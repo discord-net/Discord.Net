@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Model = Discord.API.Interaction;
 using DataModel = Discord.API.ApplicationCommandInteractionData;
 using Newtonsoft.Json;
+using Discord.Net;
 
 namespace Discord.Rest
 {
@@ -130,7 +131,11 @@ namespace Discord.Rest
 
             if(Channel == null && model.ChannelId.IsSpecified)
             {
-                Channel = (IRestMessageChannel)await discord.GetChannelAsync(model.ChannelId.Value);
+                try
+                {
+                    Channel = (IRestMessageChannel)await discord.GetChannelAsync(model.ChannelId.Value);
+                }
+                catch(HttpException x) when(x.DiscordCode == DiscordErrorCode.MissingPermissions) { } // ignore
             }
 
             UserLocale = model.UserLocale.IsSpecified

@@ -17,6 +17,10 @@ namespace Discord.WebSocket
         /// <summary>
         ///     The <see cref="ISocketMessageChannel"/> this interaction was used in.
         /// </summary>
+        /// <remarks>
+        ///     If the channel isn't cached or the bot doesn't have access to it then
+        ///     this property will be <see langword="null"/>.
+        /// </remarks>
         public ISocketMessageChannel Channel { get; private set; }
 
         /// <summary>

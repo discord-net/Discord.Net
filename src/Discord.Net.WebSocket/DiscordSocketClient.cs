@@ -2243,57 +2243,37 @@ namespace Discord.WebSocket
                                         channel = State.GetDMChannel(data.User.Value.Id);
                                     }
 
-                                    if (channel == null)
+                                    var guild = (channel as SocketGuildChannel)?.Guild;
+                                    if (guild != null && !guild.IsSynced)
                                     {
-                                        var channelModel = await Rest.ApiClient.GetChannelAsync(data.ChannelId.Value);
-
-                                        if (data.GuildId.IsSpecified)
-                                            channel = SocketTextChannel.Create(State.GetGuild(data.GuildId.Value), State, channelModel);
-                                        else
-                                            channel = (SocketChannel)SocketChannel.CreatePrivate(this, State, channelModel);
-
-                                        State.AddChannel(channel);
-                                    }
-
-                                    if (channel is ISocketMessageChannel textChannel)
-                                    {
-                                        var guild = (channel as SocketGuildChannel)?.Guild;
-                                        if (guild != null && !guild.IsSynced)
-                                        {
-                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
-                                            return;
-                                        }
-
-                                        var interaction = SocketInteraction.Create(this, data, channel as ISocketMessageChannel);
-
-                                        await TimedInvokeAsync(_interactionCreatedEvent, nameof(InteractionCreated), interaction).ConfigureAwait(false);
-
-                                        switch (interaction)
-                                        {
-                                            case SocketSlashCommand slashCommand:
-                                                await TimedInvokeAsync(_slashCommandExecuted, nameof(SlashCommandExecuted), slashCommand).ConfigureAwait(false);
-                                                break;
-                                            case SocketMessageComponent messageComponent:
-                                                if(messageComponent.Data.Type == ComponentType.SelectMenu)
-                                                    await TimedInvokeAsync(_selectMenuExecuted, nameof(SelectMenuExecuted), messageComponent).ConfigureAwait(false);
-                                                if(messageComponent.Data.Type == ComponentType.Button)
-                                                    await TimedInvokeAsync(_buttonExecuted, nameof(ButtonExecuted), messageComponent).ConfigureAwait(false);
-                                                break;
-                                            case SocketUserCommand userCommand:
-                                                await TimedInvokeAsync(_userCommandExecuted, nameof(UserCommandExecuted), userCommand).ConfigureAwait(false);
-                                                break;
-                                            case SocketMessageCommand messageCommand:
-                                                await TimedInvokeAsync(_messageCommandExecuted, nameof(MessageCommandExecuted), messageCommand).ConfigureAwait(false);
-                                                break;
-                                            case SocketAutocompleteInteraction autocomplete:
-                                                await TimedInvokeAsync(_autocompleteExecuted, nameof(AutocompleteExecuted), autocomplete).ConfigureAwait(false);
-                                                break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
+                                        await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                         return;
+                                    }
+
+                                    var interaction = SocketInteraction.Create(this, data, channel as ISocketMessageChannel);
+
+                                    await TimedInvokeAsync(_interactionCreatedEvent, nameof(InteractionCreated), interaction).ConfigureAwait(false);
+
+                                    switch (interaction)
+                                    {
+                                        case SocketSlashCommand slashCommand:
+                                            await TimedInvokeAsync(_slashCommandExecuted, nameof(SlashCommandExecuted), slashCommand).ConfigureAwait(false);
+                                            break;
+                                        case SocketMessageComponent messageComponent:
+                                            if (messageComponent.Data.Type == ComponentType.SelectMenu)
+                                                await TimedInvokeAsync(_selectMenuExecuted, nameof(SelectMenuExecuted), messageComponent).ConfigureAwait(false);
+                                            if (messageComponent.Data.Type == ComponentType.Button)
+                                                await TimedInvokeAsync(_buttonExecuted, nameof(ButtonExecuted), messageComponent).ConfigureAwait(false);
+                                            break;
+                                        case SocketUserCommand userCommand:
+                                            await TimedInvokeAsync(_userCommandExecuted, nameof(UserCommandExecuted), userCommand).ConfigureAwait(false);
+                                            break;
+                                        case SocketMessageCommand messageCommand:
+                                            await TimedInvokeAsync(_messageCommandExecuted, nameof(MessageCommandExecuted), messageCommand).ConfigureAwait(false);
+                                            break;
+                                        case SocketAutocompleteInteraction autocomplete:
+                                            await TimedInvokeAsync(_autocompleteExecuted, nameof(AutocompleteExecuted), autocomplete).ConfigureAwait(false);
+                                            break;
                                     }
                                 }
                                 break;
