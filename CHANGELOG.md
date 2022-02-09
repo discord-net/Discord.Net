@@ -1,5 +1,26 @@
 # Changelog
 
+## [3.3.0] - 2022-02-09
+
+### Added
+
+- #2087 Add modals (c8f175e)
+- #2088 Add support for slash command attachment type (33efd89)
+
+### Fixed
+
+- #2091 Fix modifying attachments on interactions and extend the module base (97e54e1)
+- #2076 Fix rest message components cannot pass through execute method (b45aebf)
+- #2077 Fix clone being created on updated entity (7d6f4f3)
+- #2092 Fix Current user null on reconnect (b424bb2)
+- #2089 Fix guild feature enum (d142710)
+- #2090 Fix attempts to fetch channels in interactions (6290f75)
+
+### Misc
+
+- #1713 Simplify code in DiscordComparers (43b20bc)
+- #2079 Add IEnumerable collection parameters instead of arrays for MessageExtensions (75e94fe)
+
 ## [3.2.1] - 2022-01-30
 
 ### Added
