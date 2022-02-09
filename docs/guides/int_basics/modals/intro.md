@@ -111,9 +111,9 @@ _client.ModalSubmitted += async modal =>
     List<SocketMessageComponentData> components =
         modal.Data.Components.ToList();
     string food = components
-        .Where(x => x.CustomId == "food_name").First().Value;
+        .First(x => x.CustomId == "food_name").Value;
     string reason = components
-        .Where(x => x.CustomId == "food_reason").First().Value;
+        .First(x => x.CustomId == "food_reason").Value;
 
     // Build the message to send.
     string message = "hey @everyone; I just learned " + 
