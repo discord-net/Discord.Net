@@ -608,41 +608,5 @@ namespace Discord.Interactions.Builders
                 propertyInfo.SetMethod?.IsStatic == false &&
                 propertyInfo.IsDefined(typeof(ModalInputAttribute));
         }
-
-        private static ConstructorInfo GetComplexParameterConstructor(TypeInfo typeInfo, ComplexParameterAttribute complexParameter)
-        {
-            var ctors = typeInfo.GetConstructors();
-
-            if (ctors.Length == 0)
-                throw new InvalidOperationException($"No constructor found for \"{typeInfo.FullName}\".");
-
-            if (complexParameter.PrioritizedCtorSignature is not null)
-            {
-                var ctor = typeInfo.GetConstructor(complexParameter.PrioritizedCtorSignature);
-
-                if (ctor is null)
-                    throw new InvalidOperationException($"No constructor was found with the signature: {string.Join(",", complexParameter.PrioritizedCtorSignature.Select(x => x.Name))}");
-
-                return ctor;
-            }
-
-            var prioritizedCtors = ctors.Where(x => x.IsDefined(typeof(ComplexParameterCtorAttribute), true));
-
-            switch (prioritizedCtors.Count())
-            {
-                case > 1:
-                    throw new InvalidOperationException($"{nameof(ComplexParameterCtorAttribute)} can only be used once in a type.");
-                case 1:
-                    return prioritizedCtors.First();
-            }
-
-            switch (ctors.Length)
-            {
-                case > 1:
-                    throw new InvalidOperationException($"Multiple constructors found for \"{typeInfo.FullName}\".");
-                default:
-                    return ctors.First();
-            }
-        }
     }
 }
