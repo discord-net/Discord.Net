@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -41,7 +42,7 @@ namespace Discord
         /// </returns>
         /// <seealso cref="IMessage.AddReactionAsync(IEmote, RequestOptions)"/>
         /// <seealso cref="IEmote"/>
-        public static async Task AddReactionsAsync(this IUserMessage msg, IEmote[] reactions, RequestOptions options = null)
+        public static async Task AddReactionsAsync(this IUserMessage msg, IEnumerable<IEmote> reactions, RequestOptions options = null)
         {
             foreach (var rxn in reactions)
                 await msg.AddReactionAsync(rxn, options).ConfigureAwait(false);
@@ -67,7 +68,7 @@ namespace Discord
         /// </returns>
         /// <seealso cref="IMessage.RemoveReactionAsync(IEmote, IUser, RequestOptions)"/>
         /// <seealso cref="IEmote"/>
-        public static async Task RemoveReactionsAsync(this IUserMessage msg, IUser user, IEmote[] reactions, RequestOptions options = null)
+        public static async Task RemoveReactionsAsync(this IUserMessage msg, IUser user, IEnumerable<IEmote> reactions, RequestOptions options = null)
         {
             foreach (var rxn in reactions)
                 await msg.RemoveReactionAsync(rxn, user, options).ConfigureAwait(false);
