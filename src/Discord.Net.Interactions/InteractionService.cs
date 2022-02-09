@@ -183,6 +183,7 @@ namespace Discord.Interactions
             {
                 [typeof(IChannel)] = typeof(DefaultChannelConverter<>),
                 [typeof(IRole)] = typeof(DefaultRoleConverter<>),
+                [typeof(IAttachment)] = typeof(DefaultAttachmentConverter<>),
                 [typeof(IUser)] = typeof(DefaultUserConverter<>),
                 [typeof(IMentionable)] = typeof(DefaultMentionableConverter<>),
                 [typeof(IConvertible)] = typeof(DefaultValueConverter<>),

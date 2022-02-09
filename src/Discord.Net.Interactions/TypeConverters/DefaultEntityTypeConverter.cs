@@ -20,6 +20,11 @@ namespace Discord.Interactions
         }
     }
 
+    internal class DefaultAttachmentConverter<T> : DefaultEntityTypeConverter<T> where T : class, IAttachment
+    {
+        public override ApplicationCommandOptionType GetDiscordType() => ApplicationCommandOptionType.Attachment;
+    }
+
     internal class DefaultRoleConverter<T> : DefaultEntityTypeConverter<T> where T : class, IRole
     {
         public override ApplicationCommandOptionType GetDiscordType ( ) => ApplicationCommandOptionType.Role;

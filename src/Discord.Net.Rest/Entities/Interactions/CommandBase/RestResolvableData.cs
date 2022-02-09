@@ -19,6 +19,9 @@ namespace Discord.Rest
         internal readonly Dictionary<ulong, RestMessage> Messages
             = new Dictionary<ulong, RestMessage>();
 
+        internal readonly Dictionary<ulong, Attachment> Attachments
+            = new Dictionary<ulong, Attachment>();
+
         internal async Task PopulateAsync(DiscordRestClient discord, RestGuild guild, IRestMessageChannel channel, T model)
         {
             var resolved = model.Resolved.Value;
@@ -89,6 +92,16 @@ namespace Discord.Rest
                     var message = RestMessage.Create(discord, channel, author, msg.Value);
 
                     Messages.Add(message.Id, message);
+                }
+            }
+            
+            if (resolved.Attachments.IsSpecified)
+            {
+                foreach (var attachment in resolved.Attachments.Value)
+                {
+                    var discordAttachment = Attachment.Create(attachment.Value);
+
+                    Attachments.Add(ulong.Parse(attachment.Key), discordAttachment);
                 }
             }
         }

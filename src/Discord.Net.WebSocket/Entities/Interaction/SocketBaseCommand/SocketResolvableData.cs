@@ -16,6 +16,9 @@ namespace Discord.WebSocket
         internal readonly Dictionary<ulong, SocketMessage> Messages
             = new Dictionary<ulong, SocketMessage>();
 
+        internal readonly Dictionary<ulong, Attachment> Attachments
+            = new Dictionary<ulong, Attachment>();
+
         internal SocketResolvableData(DiscordSocketClient discord, ulong? guildId, T model)
         {
             var guild = guildId.HasValue ? discord.GetGuild(guildId.Value) : null;
@@ -102,6 +105,16 @@ namespace Discord.WebSocket
 
                     var message = SocketMessage.Create(discord, discord.State, author, channel, msg.Value);
                     Messages.Add(message.Id, message);
+                }
+            }
+
+            if (resolved.Attachments.IsSpecified)
+            {
+                foreach (var attachment in resolved.Attachments.Value)
+                {
+                    var discordAttachment = Attachment.Create(attachment.Value);
+
+                    Attachments.Add(ulong.Parse(attachment.Key), discordAttachment);
                 }
             }
         }
