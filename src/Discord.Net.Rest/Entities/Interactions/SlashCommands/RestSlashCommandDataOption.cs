@@ -43,6 +43,7 @@ namespace Discord.Rest
                     case ApplicationCommandOptionType.Role:
                     case ApplicationCommandOptionType.Channel:
                     case ApplicationCommandOptionType.Mentionable:
+                    case ApplicationCommandOptionType.Attachment:
                         if (ulong.TryParse($"{model.Value.Value}", out var valueId))
                         {
                             switch (Type)
@@ -79,6 +80,9 @@ namespace Discord.Rest
                                             Value = data.ResolvableData.Roles.FirstOrDefault(x => x.Key == valueId).Value;
                                         }
                                     }
+                                    break;
+                                case ApplicationCommandOptionType.Attachment:
+                                    Value = data.ResolvableData.Attachments.FirstOrDefault(x => x.Key == valueId).Value;
                                     break;
                                 default:
                                     Value = model.Value.Value;
