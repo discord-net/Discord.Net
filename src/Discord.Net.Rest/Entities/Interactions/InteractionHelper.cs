@@ -424,16 +424,31 @@ namespace Discord.Rest
 
             Preconditions.AtMost(apiEmbeds?.Count ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
 
-            var apiArgs = new ModifyInteractionResponseParams
+            if (!args.Attachments.IsSpecified)
             {
-                Content = args.Content,
-                Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
-                AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
-                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
-                Flags = args.Flags
-            };
+                var apiArgs = new ModifyInteractionResponseParams
+                {
+                    Content = args.Content,
+                    Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
+                    AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
+                    Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                    Flags = args.Flags
+                };
 
-            return await client.ApiClient.ModifyInteractionResponseAsync(apiArgs, token, options).ConfigureAwait(false);
+                return await client.ApiClient.ModifyInteractionResponseAsync(apiArgs, token, options).ConfigureAwait(false);
+            }
+            else
+            {
+                var apiArgs = new UploadWebhookFileParams(args.Attachments.Value.ToArray())
+                {
+                    Content = args.Content,
+                    Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
+                    AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
+                    MessageComponents = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                };
+
+                return await client.ApiClient.ModifyInteractionResponseAsync(apiArgs, token, options).ConfigureAwait(false);
+            }
         }
 
         public static async Task DeleteInteractionResponseAsync(BaseDiscordClient client, RestInteractionMessage message, RequestOptions options = null)
