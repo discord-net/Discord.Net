@@ -100,6 +100,9 @@ namespace Discord.Rest
             if (model.Type == InteractionType.ApplicationCommandAutocomplete)
                 return await RestAutocompleteInteraction.CreateAsync(client, model).ConfigureAwait(false);
 
+            if (model.Type == InteractionType.ModalSubmit)
+                return await RestModal.CreateAsync(client, model).ConfigureAwait(false);
+
             return null;
         }
 
@@ -180,6 +183,9 @@ namespace Discord.Rest
             var model = await InteractionHelper.ModifyInteractionResponseAsync(Discord, Token, func, options);
             return RestInteractionMessage.Create(Discord, model, Token, Channel);
         }
+        /// <inheritdoc/>
+        public abstract string RespondWithModal(Modal modal, RequestOptions options = null);
+        
         /// <inheritdoc/>
         public abstract string Respond(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
 
@@ -293,6 +299,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         Task IDiscordInteraction.DeferAsync(bool ephemeral, RequestOptions options)
             => Task.FromResult(Defer(ephemeral, options));
+        /// <inheritdoc/>
+        Task IDiscordInteraction.RespondWithModalAsync(Modal modal, RequestOptions options)
+            => Task.FromResult(RespondWithModal(modal, options));
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.FollowupAsync(string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions,
             MessageComponent components, Embed embed, RequestOptions options)

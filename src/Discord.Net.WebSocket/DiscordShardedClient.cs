@@ -468,6 +468,7 @@ namespace Discord.WebSocket
             client.UserCommandExecuted += (arg) => _userCommandExecuted.InvokeAsync(arg);
             client.MessageCommandExecuted += (arg) => _messageCommandExecuted.InvokeAsync(arg);
             client.AutocompleteExecuted += (arg) => _autocompleteExecuted.InvokeAsync(arg);
+            client.ModalSubmitted += (arg) => _modalSubmitted.InvokeAsync(arg);
 
             client.ThreadUpdated += (thread1, thread2) => _threadUpdated.InvokeAsync(thread1, thread2);
             client.ThreadCreated += (thread) => _threadCreated.InvokeAsync(thread);

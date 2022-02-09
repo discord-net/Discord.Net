@@ -108,6 +108,9 @@ namespace Discord.WebSocket
             if (model.Type == InteractionType.ApplicationCommandAutocomplete)
                 return SocketAutocompleteInteraction.Create(client, model, channel);
 
+            if (model.Type == InteractionType.ModalSubmit)
+                return SocketModal.Create(client, model, channel);
+
             return null;
         }
 
@@ -387,6 +390,13 @@ namespace Discord.WebSocket
         /// </returns>
         public abstract Task DeferAsync(bool ephemeral = false, RequestOptions options = null);
 
+        /// <summary>
+        ///     Responds to this interaction with a <see cref="Modal"/>.
+        /// </summary>
+        /// <param name="modal">The <see cref="Modal"/> to respond with.</param>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
+        /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
+        public abstract Task RespondWithModalAsync(Modal modal, RequestOptions options = null);
         #endregion
 
         #region  IDiscordInteraction

@@ -103,6 +103,7 @@ namespace Discord.Interactions.Builders
             var validContextCommands = methods.Where(IsValidContextCommandDefinition);
             var validInteractions = methods.Where(IsValidComponentCommandDefinition);
             var validAutocompleteCommands = methods.Where(IsValidAutocompleteCommandDefinition);
+            var validModalCommands = methods.Where(IsValidModalCommanDefinition);
 
             Func<IServiceProvider, IInteractionModuleBase> createInstance = commandService._useCompiledLambda ?
                 ReflectionUtils<IInteractionModuleBase>.CreateLambdaBuilder(typeInfo, commandService) : ReflectionUtils<IInteractionModuleBase>.CreateBuilder(typeInfo, commandService);
@@ -118,6 +119,9 @@ namespace Discord.Interactions.Builders
 
             foreach(var method in validAutocompleteCommands)
                 builder.AddAutocompleteCommand(x => BuildAutocompleteCommand(x, createInstance, method, commandService, services));
+
+            foreach(var method in validModalCommands)
+                builder.AddModalCommand(x => BuildModalCommand(x, createInstance, method, commandService, services));
         }
 
         private static void BuildSubModules (ModuleBuilder parent, IEnumerable<TypeInfo> subModules, IList<TypeInfo> builtTypes, InteractionService commandService,
@@ -298,6 +302,47 @@ namespace Discord.Interactions.Builders
             builder.Callback = CreateCallback(createInstance, methodInfo, commandService);
         }
 
+        private static void BuildModalCommand(ModalCommandBuilder builder, Func<IServiceProvider, IInteractionModuleBase> createInstance, MethodInfo methodInfo,
+            InteractionService commandService, IServiceProvider services)
+        {
+            var parameters = methodInfo.GetParameters();
+
+            if (parameters.Count(x => typeof(IModal).IsAssignableFrom(x.ParameterType)) > 1)
+                throw new InvalidOperationException($"A modal command can only have one {nameof(IModal)} parameter.");
+
+            if (!parameters.All(x => x.ParameterType == typeof(string) || typeof(IModal).IsAssignableFrom(x.ParameterType)))
+                throw new InvalidOperationException($"All parameters of a modal command must be either a string or an implementation of {nameof(IModal)}");
+
+            var attributes = methodInfo.GetCustomAttributes();
+
+            builder.MethodName = methodInfo.Name;
+
+            foreach (var attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case ModalInteractionAttribute modal:
+                        {
+                            builder.Name = modal.CustomId;
+                            builder.RunMode = modal.RunMode;
+                            builder.IgnoreGroupNames = modal.IgnoreGroupNames;
+                        }
+                        break;
+                    case PreconditionAttribute precondition:
+                        builder.WithPreconditions(precondition);
+                        break;
+                    default:
+                        builder.WithAttributes(attribute);
+                        break;
+                }
+            }
+
+            foreach (var parameter in parameters)
+                builder.AddParameter(x => BuildParameter(x, parameter));
+
+            builder.Callback = CreateCallback(createInstance, methodInfo, commandService);
+        }
+
         private static ExecuteCallback CreateCallback (Func<IServiceProvider, IInteractionModuleBase> createInstance,
             MethodInfo methodInfo, InteractionService commandService)
         {
@@ -400,7 +445,9 @@ namespace Discord.Interactions.Builders
             builder.Name = Regex.Replace(builder.Name, "(?<=[a-z])(?=[A-Z])", "-").ToLower();
         }
 
-        private static void BuildParameter (CommandParameterBuilder builder, ParameterInfo paramInfo)
+        private static void BuildParameter<TInfo, TBuilder> (ParameterBuilder<TInfo, TBuilder> builder, ParameterInfo paramInfo)
+            where TInfo : class, IParameterInfo
+            where TBuilder : ParameterBuilder<TInfo, TBuilder>
         {
             var attributes = paramInfo.GetCustomAttributes();
             var paramType = paramInfo.ParameterType;
@@ -422,6 +469,84 @@ namespace Discord.Interactions.Builders
                         break;
                     default:
                         builder.AddAttributes(attribute);
+                        break;
+                }
+            }
+        }
+        #endregion
+
+        #region Modals
+        public static ModalInfo BuildModalInfo(Type modalType)
+        {
+            if (!typeof(IModal).IsAssignableFrom(modalType))
+                throw new InvalidOperationException($"{modalType.FullName} isn't an implementation of {typeof(IModal).FullName}");
+
+            var instance = Activator.CreateInstance(modalType, false) as IModal;
+
+            try
+            {
+                var builder = new ModalBuilder(modalType)
+                {
+                    Title = instance.Title
+                };
+
+                var inputs = modalType.GetProperties().Where(IsValidModalInputDefinition);
+
+                foreach (var prop in inputs)
+                {
+                    var componentType = prop.GetCustomAttribute<ModalInputAttribute>()?.ComponentType;
+
+                    switch (componentType)
+                    {
+                        case ComponentType.TextInput:
+                            builder.AddTextComponent(x => BuildTextInput(x, prop, prop.GetValue(instance)));
+                            break;
+                        case null:
+                            throw new InvalidOperationException($"{prop.Name} of {prop.DeclaringType.Name} isn't a valid modal input field.");
+                        default:
+                            throw new InvalidOperationException($"Component type {componentType} cannot be used in modals.");
+                    }
+                }
+
+                var memberInit = ReflectionUtils<IModal>.CreateLambdaMemberInit(modalType.GetTypeInfo(), modalType.GetConstructor(Type.EmptyTypes), x => x.IsDefined(typeof(ModalInputAttribute)));
+                builder.ModalInitializer = (args) => memberInit(Array.Empty<object>(), args);
+                return builder.Build();
+            }
+            finally
+            {
+                (instance as IDisposable)?.Dispose();
+            }
+        }
+
+        private static void BuildTextInput(TextInputComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
+        {
+            var attributes = propertyInfo.GetCustomAttributes();
+
+            builder.Label = propertyInfo.Name;
+            builder.DefaultValue = defaultValue;
+            builder.WithType(propertyInfo.PropertyType);
+
+            foreach(var attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case ModalTextInputAttribute textInput:
+                        builder.CustomId = textInput.CustomId;
+                        builder.ComponentType = textInput.ComponentType;
+                        builder.Style = textInput.Style;
+                        builder.Placeholder = textInput.Placeholder;
+                        builder.MaxLength = textInput.MaxLength;
+                        builder.MinLength = textInput.MinLength;
+                        builder.InitialValue = textInput.InitialValue;
+                        break;
+                    case RequiredInputAttribute requiredInput:
+                        builder.IsRequired = requiredInput.IsRequired;
+                        break;
+                    case InputLabelAttribute inputLabel:
+                        builder.Label = inputLabel.Label;
+                        break;
+                    default:
+                        builder.WithAttributes(attribute);
                         break;
                 }
             }
@@ -466,6 +591,22 @@ namespace Discord.Interactions.Builders
                 !methodInfo.IsStatic &&
                 !methodInfo.IsGenericMethod &&
                 methodInfo.GetParameters().Length == 0;
+        }
+
+        private static bool IsValidModalCommanDefinition(MethodInfo methodInfo)
+        {
+            return methodInfo.IsDefined(typeof(ModalInteractionAttribute)) &&
+                (methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(Task<RuntimeResult>)) &&
+                !methodInfo.IsStatic &&
+                !methodInfo.IsGenericMethod &&
+                typeof(IModal).IsAssignableFrom(methodInfo.GetParameters().Last().ParameterType);
+        }
+
+        private static bool IsValidModalInputDefinition(PropertyInfo propertyInfo)
+        {
+            return propertyInfo.SetMethod?.IsPublic == true &&
+                propertyInfo.SetMethod?.IsStatic == false &&
+                propertyInfo.IsDefined(typeof(ModalInputAttribute));
         }
     }
 }

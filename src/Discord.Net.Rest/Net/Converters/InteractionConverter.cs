@@ -56,6 +56,13 @@ namespace Discord.Net.Converters
                             interaction.Data = autocompleteData;
                         }
                         break;
+                    case InteractionType.ModalSubmit:
+                        {
+                            var modalData = new API.ModalInteractionData();
+                            serializer.Populate(result.CreateReader(), modalData);
+                            interaction.Data = modalData;
+                        }
+                        break;
                 }
             }
             else

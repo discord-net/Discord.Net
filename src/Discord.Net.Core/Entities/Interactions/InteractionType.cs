@@ -23,6 +23,11 @@ namespace Discord
         /// <summary>
         ///     An autocomplete request sent from discord.
         /// </summary>
-        ApplicationCommandAutocomplete = 4
+        ApplicationCommandAutocomplete = 4,
+
+        /// <summary>
+        ///     A modal sent from discord.
+        /// </summary>
+        ModalSubmit = 5,
     }
 }

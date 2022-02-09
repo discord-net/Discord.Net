@@ -112,7 +112,8 @@ namespace Discord.Rest
             => throw new NotSupportedException("Autocomplete interactions don't support this method!");
         public override Task<RestFollowupMessage> FollowupWithFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null)
             => throw new NotSupportedException("Autocomplete interactions don't support this method!");
-
+        public override string RespondWithModal(Modal modal, RequestOptions options = null)
+            => throw new NotSupportedException("Autocomplete interactions don't support this method!");
 
         //IAutocompleteInteraction
         /// <inheritdoc/>

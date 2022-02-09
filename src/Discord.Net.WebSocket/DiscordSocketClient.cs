@@ -2274,6 +2274,9 @@ namespace Discord.WebSocket
                                         case SocketAutocompleteInteraction autocomplete:
                                             await TimedInvokeAsync(_autocompleteExecuted, nameof(AutocompleteExecuted), autocomplete).ConfigureAwait(false);
                                             break;
+                                        case SocketModal modal:
+                                            await TimedInvokeAsync(_modalSubmitted, nameof(ModalSubmitted), modal).ConfigureAwait(false);
+                                            break;
                                     }
                                 }
                                 break;

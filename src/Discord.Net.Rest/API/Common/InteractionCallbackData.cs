@@ -24,5 +24,11 @@ namespace Discord.API
 
         [JsonProperty("choices")]
         public Optional<ApplicationCommandOptionChoice[]> Choices { get; set; }
+
+        [JsonProperty("title")]
+        public Optional<string> Title { get; set; }
+
+        [JsonProperty("custom_id")]
+        public Optional<string> CustomId { get; set; }
     }
 }

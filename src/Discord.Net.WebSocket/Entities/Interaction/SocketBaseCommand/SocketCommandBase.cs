@@ -1,4 +1,3 @@
-using Discord.Net.Rest;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -133,6 +132,42 @@ namespace Discord.WebSocket
 
             await InteractionHelper.SendInteractionResponseAsync(Discord, response, this, Channel, options).ConfigureAwait(false);
             HasResponded = true;
+        }
+
+        /// <inheritdoc/>
+        public override async Task RespondWithModalAsync(Modal modal, RequestOptions options = null)
+        {
+            if (!IsValidToken)
+                throw new InvalidOperationException("Interaction token is no longer valid");
+
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot respond to an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
+
+            var response = new API.InteractionResponse
+            {
+                Type = InteractionResponseType.Modal,
+                Data = new API.InteractionCallbackData
+                {
+                    CustomId = modal.CustomId,
+                    Title = modal.Title,
+                    Components = modal.Component.Components.Select(x => new Discord.API.ActionRowComponent(x)).ToArray()
+                }
+            };
+
+            lock (_lock)
+            {
+                if (HasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond twice to the same interaction");
+                }
+            }
+
+            await InteractionHelper.SendInteractionResponseAsync(Discord, response, this, Channel, options).ConfigureAwait(false);
+
+            lock (_lock)
+            {
+                HasResponded = true;
+            }
         }
 
         public override async Task RespondWithFilesAsync(

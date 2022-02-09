@@ -12,5 +12,8 @@ namespace Discord.API
 
         [JsonProperty("values")]
         public Optional<string[]> Values { get; set; }
+
+        [JsonProperty("value")]
+        public Optional<string> Value { get; set; }
     }
 }
