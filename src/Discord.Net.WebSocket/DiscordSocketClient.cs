@@ -46,6 +46,7 @@ namespace Discord.WebSocket
         private bool _isDisposed;
         private GatewayIntents _gatewayIntents;
         private ImmutableArray<StickerPack<SocketSticker>> _defaultStickers;
+        private SocketSelfUser _previousSessionUser;
 
         /// <summary>
         ///     Provides access to a REST-only client with a shared state from this client.
@@ -888,6 +889,7 @@ namespace Discord.WebSocket
                                         _sessionId = data.SessionId;
                                         _unavailableGuildCount = unavailableGuilds;
                                         CurrentUser = currentUser;
+                                        _previousSessionUser = CurrentUser;
                                         State = state;
                                     }
                                     catch (Exception ex)
@@ -929,6 +931,9 @@ namespace Discord.WebSocket
                                         if (guild.IsAvailable)
                                             await GuildAvailableAsync(guild).ConfigureAwait(false);
                                     }
+
+                                    // Restore the previous sessions current user
+                                    CurrentUser = _previousSessionUser;
 
                                     await _gatewayLogger.InfoAsync("Resumed previous session").ConfigureAwait(false);
                                 }
