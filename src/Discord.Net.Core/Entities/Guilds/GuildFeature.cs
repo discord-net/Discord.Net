@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     [Flags]
-    public enum GuildFeature
+    public enum GuildFeature : long
     {
         /// <summary>
         ///     The guild has no features.
