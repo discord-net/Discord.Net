@@ -2238,8 +2238,6 @@ namespace Discord.WebSocket
                                         channel = State.GetDMChannel(data.User.Value.Id);
                                     }
 
-                                    channel = null;
-
                                     var guild = (channel as SocketGuildChannel)?.Guild;
                                     if (guild != null && !guild.IsSynced)
                                     {
