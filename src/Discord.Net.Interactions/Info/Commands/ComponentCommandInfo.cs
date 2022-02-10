@@ -61,49 +61,29 @@ namespace Discord.Interactions
                 for(var i = 0; i < paramCount; i++)
                 {
                     var parameter = Parameters.ElementAt(i);
+                    bool isCapture = i < captureCount;
 
-                    if (i < captureCount)
+                    if(isCapture ^ parameter.IsRouteSegmentParameter)
                     {
-                        if(parameter.IsRouteSegmentParameter)
-                        {
-                            var readResult = await parameter.TypeReader.ReadAsync(context, wildcardCaptures.ElementAt(i), services).ConfigureAwait(false);
-
-                            if(!readResult.IsSuccess)
-                            {
-                                await InvokeModuleEvent(context, readResult).ConfigureAwait(false);
-                                return readResult;
-                            }
-
-                            args[i] = readResult.Value;
-                        }
-                        else
-                        {
-                            var result = ExecuteResult.FromError(InteractionCommandError.BadArgs, $"Expected Wild Card Capture, got component value");
-                            await InvokeModuleEvent(context, result).ConfigureAwait(false);
-                            return result;
-                        }    
+                        var result = ExecuteResult.FromError(InteractionCommandError.BadArgs, $"Argument type and parameter type didn't match (Wild Card capture/Component value)");
+                        await InvokeModuleEvent(context, result).ConfigureAwait(false);
+                        return result;
                     }
+
+                    TypeConverterResult readResult;
+
+                    if (isCapture)
+                        readResult = await parameter.TypeReader.ReadAsync(context, wildcardCaptures.ElementAt(i), services).ConfigureAwait(false);
                     else
+                        readResult = await parameter.TypeConverter.ReadAsync(context, data, services).ConfigureAwait(false);   
+
+                    if (!readResult.IsSuccess)
                     {
-                        if(!parameter.IsRouteSegmentParameter)
-                        {
-                            var readResult = await parameter.TypeConverter.ReadAsync(context, data, services).ConfigureAwait(false);
-
-                            if (!readResult.IsSuccess)
-                            {
-                                await InvokeModuleEvent(context, readResult).ConfigureAwait(false);
-                                return readResult;
-                            }
-
-                            args[i] = readResult.Value;
-                        }
-                        else
-                        {
-                            var result = ExecuteResult.FromError(InteractionCommandError.BadArgs, $"Expected component value, got Wild Card capture.");
-                            await InvokeModuleEvent(context, result).ConfigureAwait(false);
-                            return result;
-                        }
+                        await InvokeModuleEvent(context, readResult).ConfigureAwait(false);
+                        return readResult;
                     }
+
+                    args[i] = readResult.Value;
                 }
 
                 return await RunAsync(context, args, services).ConfigureAwait(false);
