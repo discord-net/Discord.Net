@@ -1,5 +1,4 @@
 using Discord.Interactions.Builders;
-using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -54,16 +53,14 @@ namespace Discord.Interactions
 
             try
             {
-                var paramCount = paramList.Count();
-                var captureCount = wildcardCaptures?.Count() ?? 0;
                 var args = new object[paramCount];
 
-                for(var i = 0; i < paramCount; i++)
+                for (var i = 0; i < paramCount; i++)
                 {
                     var parameter = Parameters.ElementAt(i);
                     bool isCapture = i < captureCount;
 
-                    if(isCapture ^ parameter.IsRouteSegmentParameter)
+                    if (isCapture ^ parameter.IsRouteSegmentParameter)
                     {
                         var result = ExecuteResult.FromError(InteractionCommandError.BadArgs, $"Argument type and parameter type didn't match (Wild Card capture/Component value)");
                         await InvokeModuleEvent(context, result).ConfigureAwait(false);
@@ -75,7 +72,7 @@ namespace Discord.Interactions
                     if (isCapture)
                         readResult = await parameter.TypeReader.ReadAsync(context, wildcardCaptures.ElementAt(i), services).ConfigureAwait(false);
                     else
-                        readResult = await parameter.TypeConverter.ReadAsync(context, data, services).ConfigureAwait(false);   
+                        readResult = await parameter.TypeConverter.ReadAsync(context, data, services).ConfigureAwait(false);
 
                     if (!readResult.IsSuccess)
                     {
@@ -90,36 +87,10 @@ namespace Discord.Interactions
             }
             catch (Exception ex)
             {
-                return ExecuteResult.FromError(ex);
+                var result = ExecuteResult.FromError(ex);
+                await InvokeModuleEvent(context, result).ConfigureAwait(false);
+                return result;
             }
-        }
-
-        private static object[] GenerateArgs(IEnumerable<CommandParameterInfo> paramList, IEnumerable<string> argList)
-        {
-            var result = new object[paramList.Count()];
-
-            for (var i = 0; i < paramList.Count(); i++)
-            {
-                var parameter = paramList.ElementAt(i);
-
-                if (argList?.ElementAt(i) is null)
-                {
-                    if (!parameter.IsRequired)
-                        result[i] = parameter.DefaultValue;
-                    else
-                        throw new InvalidOperationException($"Component Interaction handler is executed with too few args.");
-                }
-                else if (parameter.IsParameterArray)
-                {
-                    string[] paramArray = new string[argList.Count() - i];
-                    argList.ToArray().CopyTo(paramArray, i);
-                    result[i] = paramArray;
-                }
-                else
-                    result[i] = argList?.ElementAt(i);
-            }
-
-            return result;
         }
 
         protected override Task InvokeModuleEvent(IInteractionContext context, IResult result)
