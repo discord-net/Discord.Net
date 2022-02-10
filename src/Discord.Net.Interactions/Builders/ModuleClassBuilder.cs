@@ -257,8 +257,10 @@ namespace Discord.Interactions.Builders
 
             var parameters = methodInfo.GetParameters();
 
+            var wildCardCount = Regex.Matches(Regex.Escape(builder.Name), Regex.Escape(commandService._wildCardExp)).Count;
+
             foreach (var parameter in parameters)
-                builder.AddParameter(x => BuildParameter(x, parameter));
+                builder.AddParameter(x => BuildComponentParameter(x, parameter, parameter.Position >= wildCardCount));
 
             builder.Callback = CreateCallback(createInstance, methodInfo, commandService);
         }
@@ -442,10 +444,11 @@ namespace Discord.Interactions.Builders
             builder.Name = Regex.Replace(builder.Name, "(?<=[a-z])(?=[A-Z])", "-").ToLower();
         }
 
-        private static void BuildComponentParameter(ComponentCommandParameterBuilder builder, ParameterInfo paramInfo)
+        private static void BuildComponentParameter(ComponentCommandParameterBuilder builder, ParameterInfo paramInfo, bool isComponentParam)
         {
-            BuildParameter(builder, paramInfo);
+            builder.SetAsRouteSegment(!isComponentParam);
 
+            BuildParameter(builder, paramInfo);
         }
 
         private static void BuildParameter<TInfo, TBuilder> (ParameterBuilder<TInfo, TBuilder> builder, ParameterInfo paramInfo)

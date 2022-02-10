@@ -199,8 +199,7 @@ namespace Discord.Interactions
             _compTypeConverterMap = new TypeMap<ComponentTypeConverter, IComponentInteractionData>(this, new Dictionary<Type, ComponentTypeConverter>(),
                 new Dictionary<Type, Type>
                 {
-                    [typeof(Array)] = typeof(DefaultArrayComponentConverter<>),
-                    [typeof(string)] = typeof(DefaultValueConverter<>)
+                    [typeof(Array)] = typeof(DefaultArrayComponentConverter<>)
                 });
 
             _typeReaderMap = new TypeMap<TypeReader, string>(this, new Dictionary<Type, TypeReader>(),

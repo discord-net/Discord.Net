@@ -5,6 +5,8 @@ namespace Discord.Interactions.Builders
     public class ComponentCommandParameterBuilder : ParameterBuilder<ComponentCommandParameterInfo, ComponentCommandParameterBuilder>
     {
         public ComponentTypeConverter TypeConverter { get; private set; }
+        public TypeReader TypeReader { get; private set; }
+        public bool IsRouteSegmentParameter { get; private set; }
         protected override ComponentCommandParameterBuilder Instance => this;
 
         public ComponentCommandParameterBuilder(ICommandBuilder command) : base(command) { }
@@ -25,7 +27,18 @@ namespace Discord.Interactions.Builders
         public ComponentCommandParameterBuilder SetParameterType(Type type, IServiceProvider services = null)
         {
             base.SetParameterType(type);
-            TypeConverter = Command.Module.InteractionService.GetComponentTypeConverter(ParameterType,  services);
+
+            if (IsRouteSegmentParameter)
+                TypeReader = Command.Module.InteractionService.GetTypeReader(type);
+            else
+                TypeConverter = Command.Module.InteractionService.GetComponentTypeConverter(ParameterType, services);
+
+            return this;
+        }
+
+        public ComponentCommandParameterBuilder SetAsRouteSegment(bool isRouteSegment)
+        {
+            IsRouteSegmentParameter = isRouteSegment;
             return this;
         }
 

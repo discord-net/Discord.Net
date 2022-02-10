@@ -62,19 +62,47 @@ namespace Discord.Interactions
                 {
                     var parameter = Parameters.ElementAt(i);
 
-                    if (i <= captureCount)
-                        args[i] = wildcardCaptures.ElementAt(i);
+                    if (i < captureCount)
+                    {
+                        if(parameter.IsRouteSegmentParameter)
+                        {
+                            var readResult = await parameter.TypeReader.ReadAsync(context, wildcardCaptures.ElementAt(i), services).ConfigureAwait(false);
+
+                            if(!readResult.IsSuccess)
+                            {
+                                await InvokeModuleEvent(context, readResult).ConfigureAwait(false);
+                                return readResult;
+                            }
+
+                            args[i] = readResult.Value;
+                        }
+                        else
+                        {
+                            var result = ExecuteResult.FromError(InteractionCommandError.BadArgs, $"Expected Wild Card Capture, got component value");
+                            await InvokeModuleEvent(context, result).ConfigureAwait(false);
+                            return result;
+                        }    
+                    }
                     else
                     {
-                        var readResult = await parameter.TypeConverter.ReadAsync(context, data, services).ConfigureAwait(false);
-
-                        if(!readResult.IsSuccess)
+                        if(!parameter.IsRouteSegmentParameter)
                         {
-                            await InvokeModuleEvent(context, readResult).ConfigureAwait(false);
-                            return readResult;
-                        }
+                            var readResult = await parameter.TypeConverter.ReadAsync(context, data, services).ConfigureAwait(false);
 
-                        args[i] = readResult.Value;
+                            if (!readResult.IsSuccess)
+                            {
+                                await InvokeModuleEvent(context, readResult).ConfigureAwait(false);
+                                return readResult;
+                            }
+
+                            args[i] = readResult.Value;
+                        }
+                        else
+                        {
+                            var result = ExecuteResult.FromError(InteractionCommandError.BadArgs, $"Expected component value, got Wild Card capture.");
+                            await InvokeModuleEvent(context, result).ConfigureAwait(false);
+                            return result;
+                        }
                     }
                 }
 
@@ -94,7 +122,7 @@ namespace Discord.Interactions
             {
                 var parameter = paramList.ElementAt(i);
 
-                if (argList?.ElementAt(i) == null)
+                if (argList?.ElementAt(i) is null)
                 {
                     if (!parameter.IsRequired)
                         result[i] = parameter.DefaultValue;

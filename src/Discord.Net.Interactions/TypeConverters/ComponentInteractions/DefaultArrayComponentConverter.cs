@@ -36,7 +36,12 @@ namespace Discord.Interactions
                 results.Add(result);
             }
 
-            return TypeConverterResult.FromSuccess(results.Select(x => x.Value).ToArray());
+            var destination = Array.CreateInstance(_underlyingType, results.Count);
+
+            for (var i = 0; i < results.Count; i++)
+                destination.SetValue(results[i].Value, i);
+
+            return TypeConverterResult.FromSuccess(destination);
         }
     }
 }

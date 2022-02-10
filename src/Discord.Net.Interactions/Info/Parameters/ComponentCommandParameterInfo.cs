@@ -13,10 +13,14 @@ namespace Discord.Interactions
         ///     <see cref="CommandParameterInfo.ParameterType"/>.
         /// </summary>
         public ComponentTypeConverter TypeConverter { get; }
+        public TypeReader TypeReader { get; }
+        public bool IsRouteSegmentParameter { get; }
 
         internal ComponentCommandParameterInfo(ComponentCommandParameterBuilder builder, ICommandInfo command) : base(builder, command)
         {
             TypeConverter = builder.TypeConverter;
+            TypeReader = builder.TypeReader;
+            IsRouteSegmentParameter = builder.IsRouteSegmentParameter;
         }
     }
 }
