@@ -199,7 +199,8 @@ namespace Discord.Interactions
             _compTypeConverterMap = new TypeMap<ComponentTypeConverter, IComponentInteractionData>(this, new Dictionary<Type, ComponentTypeConverter>(),
                 new Dictionary<Type, Type>
                 {
-                    [typeof(Array)] = typeof(DefaultArrayComponentConverter<>)
+                    [typeof(Array)] = typeof(DefaultArrayComponentConverter<>),
+                    [typeof(IConvertible)] = typeof(DefaultValueComponentConverter<>)
                 });
 
             _typeReaderMap = new TypeMap<TypeReader, string>(this, new Dictionary<Type, TypeReader>(),
@@ -875,6 +876,24 @@ namespace Discord.Interactions
 
         public void AddGenericTypeReader(Type targetType, Type readerType) =>
             _typeReaderMap.AddGeneric(targetType, readerType);
+
+        /// <summary>
+        ///     Loads and caches an <see cref="ModalInfo"/> for the provided <see cref="IModal"/>.
+        /// </summary>
+        /// <typeparam name="T">Type of <see cref="IModal"/> to be loaded.</typeparam>
+        /// <returns>
+        ///     The built <see cref="ModalInfo"/> instance.
+        /// </returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public ModalInfo AddModalInfo<T>() where T : class, IModal
+        {
+            var type = typeof(T);
+
+            if (_modalInfos.ContainsKey(type))
+                throw new InvalidOperationException($"Modal type {type.FullName} already exists.");
+
+            return ModalUtils.GetOrAdd(type, this);
+        }
 
         internal IAutocompleteHandler GetAutocompleteHandler(Type autocompleteHandlerType, IServiceProvider services = null)
         {

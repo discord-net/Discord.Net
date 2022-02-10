@@ -12,7 +12,7 @@ namespace Discord.Interactions
             {
                 return option.Type switch
                 {
-                    ComponentType.SelectMenu => Task.FromResult(TypeConverterResult.FromSuccess(Convert.ChangeType(string.Join(',', option.Values), typeof(T)))),
+                    ComponentType.SelectMenu => Task.FromResult(TypeConverterResult.FromSuccess(Convert.ChangeType(string.Join(",", option.Values), typeof(T)))),
                     ComponentType.TextInput => Task.FromResult(TypeConverterResult.FromSuccess(Convert.ChangeType(option.Value, typeof(T)))),
                     _ => Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"{option.Type} doesn't have a convertible value."))
                 };

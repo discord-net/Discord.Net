@@ -39,7 +39,7 @@ namespace Discord.Interactions
             else if (_concretes.Any(x => x.Value.CanConvertTo(type)))
                 return _concretes.First(x => x.Value.CanConvertTo(type)).Value;
 
-            throw new ArgumentException($"No type {nameof(TConverter)} is defined for this {type.FullName}", "type");
+            throw new ArgumentException($"No type {typeof(TConverter).Name} is defined for this {type.FullName}", "type");
         }
 
         public void AddConcrete<TTarget>(TConverter converter) =>

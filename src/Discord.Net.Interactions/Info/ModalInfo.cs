@@ -20,6 +20,7 @@ namespace Discord.Interactions
     /// </summary>
     public class ModalInfo
     {
+        internal readonly InteractionService _interactionService;
         internal readonly ModalInitializer _initializer;
 
         /// <summary>
@@ -54,6 +55,7 @@ namespace Discord.Interactions
 
             TextComponents = Components.OfType<TextInputComponentInfo>().ToImmutableArray();
 
+            _interactionService = builder._interactionService;
             _initializer = builder.ModalInitializer;
         }
 
