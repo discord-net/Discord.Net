@@ -33,6 +33,8 @@ namespace Discord.Interactions.Builders
         /// <inheritdoc/>
         public Type Type { get; private set; }
 
+        public ComponentTypeConverter TypeConverter { get; private set; }
+
         /// <inheritdoc/>
         public object DefaultValue { get; set; }
 
@@ -111,6 +113,7 @@ namespace Discord.Interactions.Builders
         public TBuilder WithType(Type type)
         {
             Type = type;
+            TypeConverter = Modal._interactionService.GetComponentTypeConverter(type);
             return Instance;
         }
 

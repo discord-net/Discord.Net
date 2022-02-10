@@ -52,8 +52,15 @@ namespace Discord.Interactions
                 if (additionalArgs is not null)
                     args.AddRange(additionalArgs);
 
-                var modal = Modal.CreateModal(modalInteraction, Module.CommandService._exitOnMissingModalField);
-                args.Add(modal);
+                var modalResult = await Modal.ParseModalAsync(context, services, Module.CommandService._exitOnMissingModalField).ConfigureAwait(false);
+
+                if(!modalResult.IsSuccess || modalResult is not ParseResult parseResult)
+                {
+                    await InvokeModuleEvent(context, modalResult).ConfigureAwait(false);
+                    return modalResult;
+                }
+
+                args.Add(parseResult.Value);
 
                 return await RunAsync(context, args.ToArray(), services);
             }

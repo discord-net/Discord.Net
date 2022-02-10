@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Discord.Interactions
 {
@@ -85,6 +86,42 @@ namespace Discord.Interactions
             }
 
             return _initializer(args);
+        }
+
+        internal async Task<IResult> ParseModalAsync(IInteractionContext context, IServiceProvider services = null, bool throwOnMissingField = false)
+        {
+            if (context.Interaction is not IModalInteraction modalInteraction)
+                throw new InvalidOperationException("Provided context doesn't belong to a Modal Interaction.");
+
+            services ??= EmptyServiceProvider.Instance;
+
+            var args = new object[Components.Count];
+            var components = modalInteraction.Data.Components.ToList();
+
+            for (var i = 0; i < Components.Count; i++)
+            {
+                var input = Components.ElementAt(i);
+                var component = components.Find(x => x.CustomId == input.CustomId);
+
+                if (component is null)
+                {
+                    if (!throwOnMissingField)
+                        args[i] = input.DefaultValue;
+                    else
+                        throw new InvalidOperationException($"Modal interaction is missing the required field: {input.CustomId}");
+                }
+                else
+                {
+                    var readResult = await input.TypeConverter.ReadAsync(context, component, services).ConfigureAwait(false);
+
+                    if (!readResult.IsSuccess)
+                        return readResult;
+
+                    args[i] = readResult.Value;
+                }
+            }
+
+            return ParseResult.FromSuccess(_initializer(args));
         }
     }
 }

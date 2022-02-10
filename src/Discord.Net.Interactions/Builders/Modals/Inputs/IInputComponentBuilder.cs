@@ -38,6 +38,8 @@ namespace Discord.Interactions.Builders
         /// </summary>
         Type Type { get; }
 
+        ComponentTypeConverter TypeConverter { get; }
+
         /// <summary>
         ///     Gets the default value of this input component.
         /// </summary>

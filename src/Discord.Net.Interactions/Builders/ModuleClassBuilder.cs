@@ -482,7 +482,7 @@ namespace Discord.Interactions.Builders
         #endregion
 
         #region Modals
-        public static ModalInfo BuildModalInfo(Type modalType)
+        public static ModalInfo BuildModalInfo(Type modalType, InteractionService interactionService)
         {
             if (!typeof(IModal).IsAssignableFrom(modalType))
                 throw new InvalidOperationException($"{modalType.FullName} isn't an implementation of {typeof(IModal).FullName}");
@@ -491,7 +491,7 @@ namespace Discord.Interactions.Builders
 
             try
             {
-                var builder = new ModalBuilder(modalType)
+                var builder = new ModalBuilder(modalType, interactionService)
                 {
                     Title = instance.Title
                 };
