@@ -4,13 +4,32 @@ namespace Discord.Interactions.Builders
 {
     public class ComponentCommandParameterBuilder : ParameterBuilder<ComponentCommandParameterInfo, ComponentCommandParameterBuilder>
     {
+        /// <summary>
+        ///     Get the <see cref="ComponentTypeConverter"/> assigned to this parameter, if <see cref="IsRouteSegmentParameter"/> is <see langword="false"/>.
+        /// </summary>
         public ComponentTypeConverter TypeConverter { get; private set; }
+
+        /// <summary>
+        ///     Get the <see cref="Discord.Interactions.TypeReader"/> assigned to this parameter, if <see cref="IsRouteSegmentParameter"/> is <see langword="true"/>.
+        /// </summary>
         public TypeReader TypeReader { get; private set; }
+
+        /// <summary>
+        ///     Gets whether this parameter is a CustomId segment or a Component value parameter.
+        /// </summary>
         public bool IsRouteSegmentParameter { get; private set; }
+
+        /// <inheritdoc/>
         protected override ComponentCommandParameterBuilder Instance => this;
 
-        public ComponentCommandParameterBuilder(ICommandBuilder command) : base(command) { }
+        internal ComponentCommandParameterBuilder(ICommandBuilder command) : base(command) { }
 
+        /// <summary>
+        ///     Initializes a new <see cref="ComponentCommandParameterBuilder"/>.
+        /// </summary>
+        /// <param name="command">Parent command of this parameter.</param>
+        /// <param name="name">Name of this command.</param>
+        /// <param name="type">Type of this parameter.</param>
         public ComponentCommandParameterBuilder(ICommandBuilder command, string name, Type type) : base(command, name, type) { }
 
         /// <inheritdoc/>
@@ -36,7 +55,14 @@ namespace Discord.Interactions.Builders
             return this;
         }
 
-        public ComponentCommandParameterBuilder SetAsRouteSegment(bool isRouteSegment)
+        /// <summary>
+        ///     Sets <see cref="IsRouteSegmentParameter"/>.
+        /// </summary>
+        /// <param name="isRouteSegment">New value of the <see cref="IsRouteSegmentParameter"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ComponentCommandParameterBuilder SetIsRouteSegment(bool isRouteSegment)
         {
             IsRouteSegmentParameter = isRouteSegment;
             return this;

@@ -62,10 +62,11 @@ namespace Discord.Interactions
         /// <summary>
         ///     Creates an <see cref="IModal"/> and fills it with provided message components.
         /// </summary>
-        /// <param name="components"><see cref="IModalInteraction"/> that will be injected into the modal.</param>
+        /// <param name="modalInteraction"><see cref="IModalInteraction"/> that will be injected into the modal.</param>
         /// <returns>
         ///     A <see cref="IModal"/> filled with the provided components.
         /// </returns>
+        [Obsolete("This method is no longer supported with the introduction of Component TypeConverters, please use the CreateModalAsync method.")]
         public IModal CreateModal(IModalInteraction modalInteraction, bool throwOnMissingField = false)
         {
             var args = new object[Components.Count];
@@ -90,10 +91,19 @@ namespace Discord.Interactions
             return _initializer(args);
         }
 
-        internal async Task<IResult> ParseModalAsync(IInteractionContext context, IServiceProvider services = null, bool throwOnMissingField = false)
+        /// <summary>
+        ///     Creates an <see cref="IModal"/> and fills it with provided message components.
+        /// </summary>
+        /// <param name="context">Context of the <see cref="IModalInteraction"/> that will be injected into the modal.</param>
+        /// <param name="services">Services to be passed onto the <see cref="ComponentTypeConverter"/>s of the modal fiels.</param>
+        /// <param name="throwOnMissingField">Wheter or not this method should exit on encountering a missing modal field.</param>
+        /// <returns>
+        ///     A <see cref="TypeConverterResult"/> if a type conversion has failed, else  a <see cref="ParseResult"/>.
+        /// </returns>
+        public async Task<IResult> CreateModalAsync(IInteractionContext context, IServiceProvider services = null, bool throwOnMissingField = false)
         {
             if (context.Interaction is not IModalInteraction modalInteraction)
-                throw new InvalidOperationException("Provided context doesn't belong to a Modal Interaction.");
+                return ParseResult.FromError(InteractionCommandError.Unsuccessful, "Provided context doesn't belong to a Modal Interaction.");
 
             services ??= EmptyServiceProvider.Instance;
 
@@ -110,7 +120,7 @@ namespace Discord.Interactions
                     if (!throwOnMissingField)
                         args[i] = input.DefaultValue;
                     else
-                        throw new InvalidOperationException($"Modal interaction is missing the required field: {input.CustomId}");
+                        return ParseResult.FromError(InteractionCommandError.BadArgs, $"Modal interaction is missing the required field: {input.CustomId}");
                 }
                 else
                 {

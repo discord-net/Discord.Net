@@ -20,6 +20,8 @@ namespace Discord.Interactions
             else
                 return TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"{option} must be a valid {typeof(T).Name} snowflake to be parsed.");
         }
+
+        public override Task<string> SerializeAsync(object obj) => Task.FromResult((obj as ISnowflakeEntity)?.Id.ToString());
     }
 
     internal sealed class DefaultUserReader<T> : DefaultSnowflakeReader<T>

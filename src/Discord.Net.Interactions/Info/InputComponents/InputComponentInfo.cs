@@ -39,6 +39,9 @@ namespace Discord.Interactions
         /// </summary>
         public Type Type { get; }
 
+        /// <summary>
+        ///     Gets the <see cref="ComponentTypeConverter"/> assigned to this component.
+        /// </summary>
         public ComponentTypeConverter TypeConverter { get; }
 
         /// <summary>

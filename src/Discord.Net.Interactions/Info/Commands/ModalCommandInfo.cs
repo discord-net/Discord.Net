@@ -52,15 +52,18 @@ namespace Discord.Interactions
                 if (additionalArgs is not null)
                     args.AddRange(additionalArgs);
 
-                var modalResult = await Modal.ParseModalAsync(context, services, Module.CommandService._exitOnMissingModalField).ConfigureAwait(false);
+                var modalResult = await Modal.CreateModalAsync(context, services, Module.CommandService._exitOnMissingModalField).ConfigureAwait(false);
 
-                if(!modalResult.IsSuccess || modalResult is not ParseResult parseResult)
+                if(!modalResult.IsSuccess)
                 {
                     await InvokeModuleEvent(context, modalResult).ConfigureAwait(false);
                     return modalResult;
                 }
 
-                args.Add(parseResult.Value);
+                if(modalResult is ParseResult parseResult)
+                    args.Add(parseResult.Value);
+                else
+                    return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command parameter parsing failed for an unknown reason.");
 
                 return await RunAsync(context, args.ToArray(), services);
             }

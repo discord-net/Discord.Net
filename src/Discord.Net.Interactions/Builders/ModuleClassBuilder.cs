@@ -446,8 +446,7 @@ namespace Discord.Interactions.Builders
 
         private static void BuildComponentParameter(ComponentCommandParameterBuilder builder, ParameterInfo paramInfo, bool isComponentParam)
         {
-            builder.SetAsRouteSegment(!isComponentParam);
-
+            builder.SetIsRouteSegment(!isComponentParam);
             BuildParameter(builder, paramInfo);
         }
 

@@ -38,6 +38,9 @@ namespace Discord.Interactions.Builders
         /// </summary>
         Type Type { get; }
 
+        /// <summary>
+        ///     Get the <see cref="ComponentTypeConverter"/> assigned to this input.
+        /// </summary>
         ComponentTypeConverter TypeConverter { get; }
 
         /// <summary>

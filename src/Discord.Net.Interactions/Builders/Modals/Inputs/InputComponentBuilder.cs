@@ -33,6 +33,7 @@ namespace Discord.Interactions.Builders
         /// <inheritdoc/>
         public Type Type { get; private set; }
 
+        /// <inheritdoc/>
         public ComponentTypeConverter TypeConverter { get; private set; }
 
         /// <inheritdoc/>

@@ -181,30 +181,30 @@ namespace Discord.Interactions
             _autoServiceScopes = config.AutoServiceScopes;
             _restResponseCallback = config.RestResponseCallback;
 
-            _typeConverterMap = new TypeMap<TypeConverter, IApplicationCommandInteractionDataOption>(this, new Dictionary<Type, TypeConverter>
-            {
-                [typeof(TimeSpan)] = new TimeSpanConverter()
-            }, new Dictionary<Type, Type>
-            {
-                [typeof(IChannel)] = typeof(DefaultChannelConverter<>),
-                [typeof(IRole)] = typeof(DefaultRoleConverter<>),
-                [typeof(IAttachment)] = typeof(DefaultAttachmentConverter<>),
-                [typeof(IUser)] = typeof(DefaultUserConverter<>),
-                [typeof(IMentionable)] = typeof(DefaultMentionableConverter<>),
-                [typeof(IConvertible)] = typeof(DefaultValueConverter<>),
-                [typeof(Enum)] = typeof(EnumConverter<>),
-                [typeof(Nullable<>)] = typeof(NullableConverter<>),
-            });
+            _typeConverterMap = new TypeMap<TypeConverter, IApplicationCommandInteractionDataOption>(this, new ConcurrentDictionary<Type, TypeConverter>
+                {
+                    [typeof(TimeSpan)] = new TimeSpanConverter()
+                }, new ConcurrentDictionary<Type, Type>
+                {
+                    [typeof(IChannel)] = typeof(DefaultChannelConverter<>),
+                    [typeof(IRole)] = typeof(DefaultRoleConverter<>),
+                    [typeof(IAttachment)] = typeof(DefaultAttachmentConverter<>),
+                    [typeof(IUser)] = typeof(DefaultUserConverter<>),
+                    [typeof(IMentionable)] = typeof(DefaultMentionableConverter<>),
+                    [typeof(IConvertible)] = typeof(DefaultValueConverter<>),
+                    [typeof(Enum)] = typeof(EnumConverter<>),
+                    [typeof(Nullable<>)] = typeof(NullableConverter<>),
+                });
 
-            _compTypeConverterMap = new TypeMap<ComponentTypeConverter, IComponentInteractionData>(this, new Dictionary<Type, ComponentTypeConverter>(),
-                new Dictionary<Type, Type>
+            _compTypeConverterMap = new TypeMap<ComponentTypeConverter, IComponentInteractionData>(this, new ConcurrentDictionary<Type, ComponentTypeConverter>(),
+                new ConcurrentDictionary<Type, Type>
                 {
                     [typeof(Array)] = typeof(DefaultArrayComponentConverter<>),
                     [typeof(IConvertible)] = typeof(DefaultValueComponentConverter<>)
                 });
 
-            _typeReaderMap = new TypeMap<TypeReader, string>(this, new Dictionary<Type, TypeReader>(),
-                new Dictionary<Type, Type>
+            _typeReaderMap = new TypeMap<TypeReader, string>(this, new ConcurrentDictionary<Type, TypeReader>(),
+                new ConcurrentDictionary<Type, Type>
                 {
                     [typeof(IChannel)] = typeof(DefaultChannelReader<>),
                     [typeof(IRole)] = typeof(DefaultRoleReader<>),
@@ -827,55 +827,83 @@ namespace Discord.Interactions
             _compTypeConverterMap.Get(type, services);
 
         /// <summary>
+        ///     Add a concrete type <see cref="ComponentTypeConverter"/>.
+        /// </summary>
+        /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="ComponentTypeConverter"/>.</typeparam>
+        /// <param name="converter">The <see cref="ComponentTypeConverter"/> instance.</param>
+        public void AddComponentTypeConverter<T>(ComponentTypeConverter converter) =>
+            AddComponentTypeConverter(typeof(T), converter);
+
+        /// <summary>
+        ///     Add a concrete type <see cref="ComponentTypeConverter"/>.
+        /// </summary>
+        /// <param name="type">Primary target <see cref="Type"/> of the <see cref="ComponentTypeConverter"/>.</param>
+        /// <param name="converter">The <see cref="ComponentTypeConverter"/> instance.</param>
+        public void AddComponentTypeConverter(Type type, ComponentTypeConverter converter) =>
+            _compTypeConverterMap.AddConcrete(type, converter);
+
+        /// <summary>
+        ///     Add a generic type <see cref="ComponentTypeConverter{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="ComponentTypeConverter{T}"/>.</typeparam>
+        /// <param name="converterType">Type of the <see cref="ComponentTypeConverter{T}"/>.</param>
+        public void AddGenericComponentTypeConverter<T>(Type converterType) =>
+            AddGenericComponentTypeConverter(typeof(T), converterType);
+
+        /// <summary>
+        ///     Add a generic type <see cref="ComponentTypeConverter{T}"/>.
+        /// </summary>
+        /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="ComponentTypeConverter{T}"/>.</param>
+        /// <param name="converterType">Type of the <see cref="ComponentTypeConverter{T}"/>.</param>
+        public void AddGenericComponentTypeConverter(Type targetType, Type converterType) =>
+            _compTypeConverterMap.AddGeneric(targetType, converterType);
+
+        internal TypeReader GetTypeReader(Type type, IServiceProvider services = null) =>
+            _typeReaderMap.Get(type, services);
+
+        /// <summary>
         ///     Add a concrete type <see cref="TypeReader"/>.
         /// </summary>
         /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</typeparam>
         /// <param name="converter">The <see cref="TypeReader"/> instance.</param>
-        public void AddComponentTypeConverter<T>(ComponentTypeConverter converter) =>
-            AddComponentTypeConverter(typeof(T), converter);
+        public void AddTypeReader<T>(TypeReader reader) =>
+            AddTypeReader(typeof(T), reader);
 
         /// <summary>
         ///     Add a concrete type <see cref="TypeReader"/>.
         /// </summary>
         /// <param name="type">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</param>
         /// <param name="converter">The <see cref="TypeReader"/> instance.</param>
-        public void AddComponentTypeConverter(Type type, ComponentTypeConverter converter) =>
-            _compTypeConverterMap.AddConcrete(type, converter);
-
-        /// <summary>
-        ///     Add a generic type <see cref="CompTypeConverter{T}"/>.
-        /// </summary>
-        /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="CompTypeConverter{T}"/>.</typeparam>
-        /// <param name="converterType">Type of the <see cref="CompTypeConverter{T}"/>.</param>
-
-        public void AddGenericComponentTypeConverter<T>(Type converterType) =>
-            AddGenericComponentTypeConverter(typeof(T), converterType);
-
-        /// <summary>
-        ///     Add a generic type <see cref="CompTypeConverter{T}"/>.
-        /// </summary>
-        /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="CompTypeConverter{T}"/>.</param>
-        /// <param name="converterType">Type of the <see cref="CompTypeConverter{T}"/>.</param>
-        public void AddGenericComponentTypeConverter(Type targetType, Type converterType) =>
-            _compTypeConverterMap.AddGeneric(targetType, converterType);
-
-        public Task<string> SerializeValue<T>(T obj, IServiceProvider services = null) =>
-            _compTypeConverterMap.Get(typeof(T), services).SerializeAsync(obj);
-
-        internal TypeReader GetTypeReader(Type type, IServiceProvider services = null) =>
-            _typeReaderMap.Get(type, services);
-
-        public void AddTypeReader<T>(TypeReader reader) =>
-            AddTypeReader(typeof(T), reader);
-
         public void AddTypeReader(Type type, TypeReader reader) =>
             _typeReaderMap.AddConcrete(type, reader);
 
+        /// <summary>
+        ///     Add a generic type <see cref="TypeReader{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeReader{T}"/>.</typeparam>
+        /// <param name="readerType">Type of the <see cref="TypeReader{T}"/>.</param>
         public void AddGenericTypeReader<T>(Type readerType) =>
             AddGenericTypeReader(typeof(T), readerType);
 
+        /// <summary>
+        ///     Add a generic type <see cref="TypeReader{T}"/>.
+        /// </summary>
+        /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeReader{T}"/>.</param>
+        /// <param name="readerType">Type of the <see cref="TypeReader{T}"/>.</param>
         public void AddGenericTypeReader(Type targetType, Type readerType) =>
             _typeReaderMap.AddGeneric(targetType, readerType);
+
+        /// <summary>
+        ///     Serialize an object using a <see cref="TypeReader"/> into a <see cref="string"/> to be placed in a Component CustomId.
+        /// </summary>
+        /// <typeparam name="T">Type of the object to be serialized.</typeparam>
+        /// <param name="obj">Object to be serialized.</param>
+        /// <param name="services">Services that will be passed on to the TypeReader.</param>
+        /// <returns>
+        ///     A task representing the conversion process. The task result contains the result of the conversion.
+        /// </returns>
+        public Task<string> SerializeValue<T>(T obj, IServiceProvider services = null) =>
+            _typeReaderMap.Get(typeof(T), services).SerializeAsync(obj);
 
         /// <summary>
         ///     Loads and caches an <see cref="ModalInfo"/> for the provided <see cref="IModal"/>.
