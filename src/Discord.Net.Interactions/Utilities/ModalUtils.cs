@@ -7,7 +7,7 @@ namespace Discord.Interactions
 {
     internal static class ModalUtils
     {
-        private static ConcurrentDictionary<Type, ModalInfo> _modalInfos = new();
+        private static readonly ConcurrentDictionary<Type, ModalInfo> _modalInfos = new();
 
         public static IReadOnlyCollection<ModalInfo> Modals => _modalInfos.Values.ToReadOnlyCollection();
 

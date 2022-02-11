@@ -8,10 +8,8 @@ namespace Discord.Interactions
     {
         public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, string option, IServiceProvider services)
         {
-            if (Enum.TryParse<T>(option, out var result))
-                return Task.FromResult(TypeConverterResult.FromSuccess(result));
-            else
-                return Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"Value {option} cannot be converted to {nameof(T)}"));
+            return Task.FromResult(Enum.TryParse<T>(option, out var result) ?
+                TypeConverterResult.FromSuccess(result) : TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"Value {option} cannot be converted to {nameof(T)}"));
         }
 
         public override Task<string> SerializeAsync(object obj)

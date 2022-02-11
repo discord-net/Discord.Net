@@ -56,46 +56,65 @@ namespace Discord.Interactions
         {
             try
             {
-                if (paramList?.Count() < argList?.Count())
-                    return ExecuteResult.FromError(InteractionCommandError.BadArgs ,"Command was invoked with too many parameters");
+                var slashCommandParameterInfos = paramList.ToList();
+                var args = new object[slashCommandParameterInfos.Count];
 
-                var args = new object[paramList.Count()];
-
-                for (var i = 0; i < paramList.Count(); i++)
+                for (var i = 0; i < slashCommandParameterInfos.Count; i++)
                 {
-                    var parameter = paramList.ElementAt(i);
+                    var parameter = slashCommandParameterInfos[i];
+                    var result = await ParseArgument(parameter, context, argList, services).ConfigureAwait(false);
 
-                    var arg = argList?.Find(x => string.Equals(x.Name, parameter.Name, StringComparison.OrdinalIgnoreCase));
+                    if (!result.IsSuccess)
+                        return await InvokeEventAndReturn(context, result).ConfigureAwait(false);
 
-                    if (arg == default)
-                    {
-                        if (parameter.IsRequired)
-                            return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command was invoked with too few parameters");
-                        else
-                            args[i] = parameter.DefaultValue;
-                    }
-                    else
-                    {
-                        var typeConverter = parameter.TypeConverter;
+                    if (result is not ParseResult parseResult)
+                        return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command parameter parsing failed for an unknown reason.");
 
-                        var readResult = await typeConverter.ReadAsync(context, arg, services).ConfigureAwait(false);
-
-                        if (!readResult.IsSuccess)
-                        {
-                            await InvokeModuleEvent(context, readResult).ConfigureAwait(false);
-                            return readResult;
-                        }
-
-                        args[i] = readResult.Value;
-                    }
+                    args[i] = parseResult.Value;
                 }
-
                 return await RunAsync(context, args, services).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                return ExecuteResult.FromError(ex);
+                return await InvokeEventAndReturn(context, ExecuteResult.FromError(ex)).ConfigureAwait(false);
             }
+        }
+
+        private async Task<IResult> ParseArgument(SlashCommandParameterInfo parameterInfo, IInteractionContext context, List<IApplicationCommandInteractionDataOption> argList,
+             IServiceProvider services)
+        {
+            if (parameterInfo.IsComplexParameter)
+            {
+                var ctorArgs = new object[parameterInfo.ComplexParameterFields.Count];
+
+                for (var i = 0; i < ctorArgs.Length; i++)
+                {
+                    var result = await ParseArgument(parameterInfo.ComplexParameterFields.ElementAt(i), context, argList, services).ConfigureAwait(false);
+
+                    if (!result.IsSuccess)
+                        return result;
+
+                    if (result is not ParseResult parseResult)
+                        return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Complex command parsing failed for an unknown reason.");
+
+                    ctorArgs[i] = parseResult.Value;
+                }
+
+                return ParseResult.FromSuccess(parameterInfo._complexParameterInitializer(ctorArgs));
+            }
+
+            var arg = argList?.Find(x => string.Equals(x.Name, parameterInfo.Name, StringComparison.OrdinalIgnoreCase));
+
+            if (arg == default)
+                return parameterInfo.IsRequired ? ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command was invoked with too few parameters") :
+                    ParseResult.FromSuccess(parameterInfo.DefaultValue);
+
+            var typeConverter = parameterInfo.TypeConverter;
+            var readResult = await typeConverter.ReadAsync(context, arg, services).ConfigureAwait(false);
+            if (!readResult.IsSuccess)
+                return readResult;
+
+            return ParseResult.FromSuccess(readResult.Value);
         }
 
         protected override Task InvokeModuleEvent (IInteractionContext context, IResult result)

@@ -15,10 +15,8 @@ namespace Discord.Interactions
 
             var result = await GetEntity(snowflake, context).ConfigureAwait(false);
 
-            if (result is not null)
-                return TypeConverterResult.FromSuccess(result);
-            else
-                return TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"{option} must be a valid {typeof(T).Name} snowflake to be parsed.");
+            return result is not null ?
+                TypeConverterResult.FromSuccess(result) : TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"{option} must be a valid {typeof(T).Name} snowflake to be parsed.");
         }
 
         public override Task<string> SerializeAsync(object obj) => Task.FromResult((obj as ISnowflakeEntity)?.Id.ToString());

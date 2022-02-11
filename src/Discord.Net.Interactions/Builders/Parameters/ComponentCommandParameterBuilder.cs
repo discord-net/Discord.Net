@@ -43,7 +43,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ComponentCommandParameterBuilder SetParameterType(Type type, IServiceProvider services = null)
+        public ComponentCommandParameterBuilder SetParameterType(Type type, IServiceProvider services)
         {
             base.SetParameterType(type);
 

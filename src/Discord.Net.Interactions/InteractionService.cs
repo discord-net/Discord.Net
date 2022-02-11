@@ -193,7 +193,7 @@ namespace Discord.Interactions
                     [typeof(IMentionable)] = typeof(DefaultMentionableConverter<>),
                     [typeof(IConvertible)] = typeof(DefaultValueConverter<>),
                     [typeof(Enum)] = typeof(EnumConverter<>),
-                    [typeof(Nullable<>)] = typeof(NullableConverter<>),
+                    [typeof(Nullable<>)] = typeof(NullableConverter<>)
                 });
 
             _compTypeConverterMap = new TypeMap<ComponentTypeConverter, IComponentInteractionData>(this, new ConcurrentDictionary<Type, ComponentTypeConverter>(),
@@ -209,7 +209,7 @@ namespace Discord.Interactions
                     [typeof(IChannel)] = typeof(DefaultChannelReader<>),
                     [typeof(IRole)] = typeof(DefaultRoleReader<>),
                     [typeof(IUser)] = typeof(DefaultUserReader<>),
-                    [typeof(IMessage)] = typeof(DefaultUserReader<>),
+                    [typeof(IMessage)] = typeof(DefaultMessageReader<>),
                     [typeof(IConvertible)] = typeof(DefaultValueReader<>),
                     [typeof(Enum)] = typeof(EnumReader<>)
                 });
@@ -311,7 +311,7 @@ namespace Discord.Interactions
         public async Task<ModuleInfo> AddModuleAsync (Type type, IServiceProvider services)
         {
             if (!typeof(IInteractionModuleBase).IsAssignableFrom(type))
-                throw new ArgumentException("Type parameter must be a type of Slash Module", "T");
+                throw new ArgumentException("Type parameter must be a type of Slash Module", nameof(type));
 
             services ??= EmptyServiceProvider.Instance;
 
@@ -344,7 +344,7 @@ namespace Discord.Interactions
         }
 
         /// <summary>
-        ///     Register Application Commands from <see cref="ContextCommands"/> and <see cref="SlashCommands"/> to a guild. 
+        ///     Register Application Commands from <see cref="ContextCommands"/> and <see cref="SlashCommands"/> to a guild.
         /// </summary>
         /// <param name="guildId">Id of the target guild.</param>
         /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
@@ -440,7 +440,7 @@ namespace Discord.Interactions
         }
 
         /// <summary>
-        ///     Register Application Commands from modules provided in <paramref name="modules"/> to a guild. 
+        ///     Register Application Commands from modules provided in <paramref name="modules"/> to a guild.
         /// </summary>
         /// <param name="guild">The target guild.</param>
         /// <param name="modules">Modules to be registered to Discord.</param>
@@ -467,7 +467,7 @@ namespace Discord.Interactions
         }
 
         /// <summary>
-        ///     Register Application Commands from modules provided in <paramref name="modules"/> as global commands. 
+        ///     Register Application Commands from modules provided in <paramref name="modules"/> as global commands.
         /// </summary>
         /// <param name="modules">Modules to be registered to Discord.</param>
         /// <returns>
@@ -695,7 +695,7 @@ namespace Discord.Interactions
         public async Task<IResult> ExecuteCommandAsync (IInteractionContext context, IServiceProvider services)
         {
             var interaction = context.Interaction;
-            
+
             return interaction switch
             {
                 ISlashCommandInteraction slashCommand => await ExecuteSlashCommandAsync(context, slashCommand, services).ConfigureAwait(false),
@@ -865,7 +865,7 @@ namespace Discord.Interactions
         ///     Add a concrete type <see cref="TypeReader"/>.
         /// </summary>
         /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</typeparam>
-        /// <param name="converter">The <see cref="TypeReader"/> instance.</param>
+        /// <param name="reader">The <see cref="TypeReader"/> instance.</param>
         public void AddTypeReader<T>(TypeReader reader) =>
             AddTypeReader(typeof(T), reader);
 
@@ -873,7 +873,7 @@ namespace Discord.Interactions
         ///     Add a concrete type <see cref="TypeReader"/>.
         /// </summary>
         /// <param name="type">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</param>
-        /// <param name="converter">The <see cref="TypeReader"/> instance.</param>
+        /// <param name="reader">The <see cref="TypeReader"/> instance.</param>
         public void AddTypeReader(Type type, TypeReader reader) =>
             _typeReaderMap.AddConcrete(type, reader);
 
@@ -1066,7 +1066,7 @@ namespace Discord.Interactions
         public ModuleInfo GetModuleInfo<TModule> ( ) where TModule : class
         {
             if (!typeof(IInteractionModuleBase).IsAssignableFrom(typeof(TModule)))
-                throw new ArgumentException("Type parameter must be a type of Slash Module", "TModule");
+                throw new ArgumentException("Type parameter must be a type of Slash Module", nameof(TModule));
 
             var module = _typedModuleDefs[typeof(TModule)];
 

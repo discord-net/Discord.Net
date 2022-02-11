@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Threading.Tasks;
 namespace Discord.Interactions
@@ -57,37 +58,28 @@ namespace Discord.Interactions
                     if(i < captureCount)
                     {
                         var readResult = await parameter.TypeReader.ReadAsync(context, additionalArgs[i], services).ConfigureAwait(false);
+                        if (!readResult.IsSuccess)
+                            return await InvokeEventAndReturn(context, readResult).ConfigureAwait(false);
 
-                        if(!readResult.IsSuccess)
-                        {
-                            await InvokeModuleEvent(context, readResult).ConfigureAwait(false);
-                            return readResult;
-                        }
                         args[i] = readResult.Value;
                     }
                     else
                     {
                         var modalResult = await Modal.CreateModalAsync(context, services, Module.CommandService._exitOnMissingModalField).ConfigureAwait(false);
-
                         if (!modalResult.IsSuccess)
-                        {
-                            await InvokeModuleEvent(context, modalResult).ConfigureAwait(false);
-                            return modalResult;
-                        }
+                            return await InvokeEventAndReturn(context, modalResult).ConfigureAwait(false);
 
-                        if (modalResult is ParseResult parseResult)
-                            args[i] = parseResult.Value;
-                        else
-                            return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command parameter parsing failed for an unknown reason.");
+                        if (modalResult is not ParseResult parseResult)
+                            return await InvokeEventAndReturn(context, ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command parameter parsing failed for an unknown reason."));
+
+                        args[i] = parseResult.Value;
                     }
                 }
-                return await RunAsync(context, args.ToArray(), services);
+                return await RunAsync(context, args, services);
             }
             catch (Exception ex)
             {
-                var result = ExecuteResult.FromError(ex);
-                await InvokeModuleEvent(context, result).ConfigureAwait(false);
-                return result;
+                return await InvokeEventAndReturn(context, ExecuteResult.FromError(ex)).ConfigureAwait(false);
             }
         }
 

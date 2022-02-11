@@ -20,8 +20,8 @@ namespace Discord.Interactions
         /// <summary>
         ///     Will be used to read the incoming payload before executing the method body.
         /// </summary>
-        /// <param name="context">Command exexution context.</param>
-        /// <param name="option">Recieved option payload.</param>
+        /// <param name="context">Command execution context.</param>
+        /// <param name="option">Received option payload.</param>
         /// <param name="services">Service provider that will be used to initialize the command module.</param>
         /// <returns>The result of the read process.</returns>
         public abstract Task<TypeConverterResult> ReadAsync(IInteractionContext context, string option, IServiceProvider services);
@@ -31,7 +31,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="obj">Object to be serialized.</param>
         /// <returns>
-        ///     A task represting the conversion process. The result of the task contains the conversion result.
+        ///     A task representing the conversion process. The result of the task contains the conversion result.
         /// </returns>
         public virtual Task<string> SerializeAsync(object obj) => Task.FromResult(obj.ToString());
     }

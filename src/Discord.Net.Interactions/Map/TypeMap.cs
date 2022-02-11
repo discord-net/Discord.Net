@@ -25,8 +25,8 @@ namespace Discord.Interactions
             if (_concretes.TryGetValue(type, out var specific))
                 return specific;
 
-            else if (_generics.Any(x => x.Key.IsAssignableFrom(type)
-            || (x.Key.IsGenericTypeDefinition && type.IsGenericType && x.Key.GetGenericTypeDefinition() == type.GetGenericTypeDefinition())))
+            if (_generics.Any(x => x.Key.IsAssignableFrom(type)
+                                   || x.Key.IsGenericTypeDefinition && type.IsGenericType && x.Key.GetGenericTypeDefinition() == type.GetGenericTypeDefinition()))
             {
                 services ??= EmptyServiceProvider.Instance;
 
@@ -36,10 +36,10 @@ namespace Discord.Interactions
                 return converter;
             }
 
-            else if (_concretes.Any(x => x.Value.CanConvertTo(type)))
+            if (_concretes.Any(x => x.Value.CanConvertTo(type)))
                 return _concretes.First(x => x.Value.CanConvertTo(type)).Value;
 
-            throw new ArgumentException($"No type {typeof(TConverter).Name} is defined for this {type.FullName}", "type");
+            throw new ArgumentException($"No type {typeof(TConverter).Name} is defined for this {type.FullName}", nameof(type));
         }
 
         public void AddConcrete<TTarget>(TConverter converter) =>
@@ -63,7 +63,7 @@ namespace Discord.Interactions
 
             var genericArguments = converterType.GetGenericArguments();
 
-            if (genericArguments.Count() > 1)
+            if (genericArguments.Length > 1)
                 throw new InvalidOperationException($"Valid generic {converterType.FullName}s cannot have more than 1 generic type parameter");
 
             var constraints = genericArguments.SelectMany(x => x.GetGenericParameterConstraints());
