@@ -13,7 +13,7 @@ namespace Discord.Interactions
             if (!ulong.TryParse(option, out var snowflake))
                 return TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"{option} isn't a valid snowflake thus cannot be converted into {typeof(T).Name}");
 
-            var result = GetEntity(snowflake, context);
+            var result = await GetEntity(snowflake, context).ConfigureAwait(false);
 
             if (result is not null)
                 return TypeConverterResult.FromSuccess(result);
@@ -37,7 +37,7 @@ namespace Discord.Interactions
     }
 
     internal sealed class DefaultRoleReader<T> : DefaultSnowflakeReader<T>
-        where T : class, IUser
+        where T : class, IRole
     {
         protected override Task<T> GetEntity(ulong id, IInteractionContext ctx) => Task.FromResult(ctx.Guild?.GetRole(id) as T);
     }

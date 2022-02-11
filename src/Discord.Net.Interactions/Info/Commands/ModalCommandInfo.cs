@@ -47,24 +47,40 @@ namespace Discord.Interactions
 
             try
             {
-                var args = new List<object>();
+                var args = new object[Parameters.Count];
+                var captureCount = additionalArgs.Length;
 
-                if (additionalArgs is not null)
-                    args.AddRange(additionalArgs);
-
-                var modalResult = await Modal.CreateModalAsync(context, services, Module.CommandService._exitOnMissingModalField).ConfigureAwait(false);
-
-                if(!modalResult.IsSuccess)
+                for(var i = 0; i < Parameters.Count; i++)
                 {
-                    await InvokeModuleEvent(context, modalResult).ConfigureAwait(false);
-                    return modalResult;
+                    var parameter = Parameters.ElementAt(i);
+
+                    if(i < captureCount)
+                    {
+                        var readResult = await parameter.TypeReader.ReadAsync(context, additionalArgs[i], services).ConfigureAwait(false);
+
+                        if(!readResult.IsSuccess)
+                        {
+                            await InvokeModuleEvent(context, readResult).ConfigureAwait(false);
+                            return readResult;
+                        }
+                        args[i] = readResult.Value;
+                    }
+                    else
+                    {
+                        var modalResult = await Modal.CreateModalAsync(context, services, Module.CommandService._exitOnMissingModalField).ConfigureAwait(false);
+
+                        if (!modalResult.IsSuccess)
+                        {
+                            await InvokeModuleEvent(context, modalResult).ConfigureAwait(false);
+                            return modalResult;
+                        }
+
+                        if (modalResult is ParseResult parseResult)
+                            args[i] = parseResult.Value;
+                        else
+                            return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command parameter parsing failed for an unknown reason.");
+                    }
                 }
-
-                if(modalResult is ParseResult parseResult)
-                    args.Add(parseResult.Value);
-                else
-                    return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command parameter parsing failed for an unknown reason.");
-
                 return await RunAsync(context, args.ToArray(), services);
             }
             catch (Exception ex)
