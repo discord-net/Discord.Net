@@ -37,7 +37,7 @@ namespace Discord.WebSocket
         public bool IsDefaultPermission { get; private set; }
 
         /// <summary>
-        ///     Gets a collection of <see cref="SocketApplicationCommandOption"/>'s for this command.
+        ///     Gets a collection of <see cref="SocketApplicationCommandOption"/>s for this command.
         /// </summary>
         /// <remarks>
         ///     If the <see cref="Type"/> is not a slash command, this field will be an empty collection.
