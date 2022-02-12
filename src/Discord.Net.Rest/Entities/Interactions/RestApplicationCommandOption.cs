@@ -41,7 +41,7 @@ namespace Discord.Rest
         public IReadOnlyCollection<RestApplicationCommandChoice> Choices { get; private set; }
 
         /// <summary>
-        ///     Gets a collection of <see cref="RestApplicationCommandOption"/>'s for this command.
+        ///     Gets a collection of <see cref="RestApplicationCommandOption"/>s for this command.
         /// </summary>
         public IReadOnlyCollection<RestApplicationCommandOption> Options { get; private set; }
 
