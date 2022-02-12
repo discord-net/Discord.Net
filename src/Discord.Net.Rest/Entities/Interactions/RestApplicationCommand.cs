@@ -28,7 +28,7 @@ namespace Discord.Rest
         public bool IsDefaultPermission { get; private set; }
 
         /// <summary>
-        ///     The options of this command.
+        ///     Gets a collection of options for this command.
         /// </summary>
         public IReadOnlyCollection<RestApplicationCommandOption> Options { get; private set; }
 

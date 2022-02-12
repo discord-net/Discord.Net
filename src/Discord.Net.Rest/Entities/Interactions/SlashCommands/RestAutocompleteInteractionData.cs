@@ -13,34 +13,22 @@ namespace Discord.Rest
     /// </summary>
     public class RestAutocompleteInteractionData : IAutocompleteInteractionData
     {
-        /// <summary>
-        ///     Gets the name of the invoked command.
-        /// </summary>
+        /// <inheritdoc/>
         public string CommandName { get; }
 
-        /// <summary>
-        ///     Gets the id of the invoked command.
-        /// </summary>
+        /// <inheritdoc/>
         public ulong CommandId { get; }
 
-        /// <summary>
-        ///     Gets the type of the invoked command.
-        /// </summary>
+        /// <inheritdoc/>
         public ApplicationCommandType Type { get; }
 
-        /// <summary>
-        ///     Gets the version of the invoked command.
-        /// </summary>
+        /// <inheritdoc/>
         public ulong Version { get; }
 
-        /// <summary>
-        ///     Gets the current autocomplete option that is actively being filled out.
-        /// </summary>
+        /// <inheritdoc/>
         public AutocompleteOption Current { get; }
 
-        /// <summary>
-        ///     Gets a collection of all the other options the executing users has filled out.
-        /// </summary>
+        /// <inheritdoc/>
         public IReadOnlyCollection<AutocompleteOption> Options { get; }
 
         internal RestAutocompleteInteractionData(DataModel model)

@@ -18,7 +18,7 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         /// <remarks>
-        ///     <b>Note</b> Not implemented for <see cref="SocketUserCommandData"/>
+        ///     <b>Note</b> Not implemented for <see cref="RestUserCommandData"/>
         /// </remarks>
         public override IReadOnlyCollection<IApplicationCommandInteractionDataOption> Options
             => throw new System.NotImplementedException();

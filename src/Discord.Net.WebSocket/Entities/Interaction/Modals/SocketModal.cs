@@ -17,9 +17,8 @@ namespace Discord.WebSocket
     public class SocketModal : SocketInteraction, IDiscordInteraction, IModalInteraction
     {
         /// <summary>
-        ///     The data for this <see cref="Modal"/> interaction.
+        ///     Gets the data for this <see cref="Modal"/> interaction.
         /// </summary>
-        /// <value></value>
         public new SocketModalData Data { get; set; }
 
         internal SocketModal(DiscordSocketClient client, ModelBase model, ISocketMessageChannel channel, SocketUser user)

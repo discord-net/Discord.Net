@@ -12,19 +12,13 @@ namespace Discord.Rest
     /// </summary>
     public class RestMessageComponentData : IComponentInteractionData, IDiscordInteractionData
     {
-        /// <summary>
-        ///     Gets the components Custom Id that was clicked.
-        /// </summary>
+        /// <inheritdoc/>
         public string CustomId { get; }
 
-        /// <summary>
-        ///     Gets the type of the component clicked.
-        /// </summary>
+        /// <inheritdoc/>
         public ComponentType Type { get; }
 
-        /// <summary>
-        ///     Gets the value(s) of a <see cref="SelectMenuComponent"/> interaction response.
-        /// </summary>
+        /// <inheritdoc/>
         public IReadOnlyCollection<string> Values { get; }
 
         /// <inheritdoc/>

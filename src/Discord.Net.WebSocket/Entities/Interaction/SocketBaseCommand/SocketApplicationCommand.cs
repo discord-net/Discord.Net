@@ -16,7 +16,7 @@ namespace Discord.WebSocket
     {
         #region SocketApplicationCommand
         /// <summary>
-        ///    <see langword="true"/> if this command is a global command, otherwise <see langword="false"/>.
+        ///    Gets whether or not this command is a global application command.
         /// </summary>
         public bool IsGlobalCommand
             => Guild == null;
@@ -37,7 +37,7 @@ namespace Discord.WebSocket
         public bool IsDefaultPermission { get; private set; }
 
         /// <summary>
-        ///     A collection of <see cref="SocketApplicationCommandOption"/>'s for this command.
+        ///     Gets a collection of <see cref="SocketApplicationCommandOption"/>s for this command.
         /// </summary>
         /// <remarks>
         ///     If the <see cref="Type"/> is not a slash command, this field will be an empty collection.
@@ -49,7 +49,7 @@ namespace Discord.WebSocket
             => SnowflakeUtils.FromSnowflake(Id);
 
         /// <summary>
-        ///     Returns the guild this command resides in, if this command is a global command then it will return <see langword="null"/>
+        ///     Gets the guild this command resides in; if this command is a global command then it will return <see langword="null"/>
         /// </summary>
         public SocketGuild Guild
             => GuildId.HasValue ? Discord.GetGuild(GuildId.Value) : null;

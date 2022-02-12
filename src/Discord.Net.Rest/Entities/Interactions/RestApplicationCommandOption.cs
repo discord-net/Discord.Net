@@ -36,18 +36,16 @@ namespace Discord.Rest
         public double? MaxValue { get; private set; }
 
         /// <summary>
-        ///     A collection of <see cref="RestApplicationCommandChoice"/>'s for this command.
+        ///     Gets a collection of <see cref="RestApplicationCommandChoice"/>s for this command.
         /// </summary>
         public IReadOnlyCollection<RestApplicationCommandChoice> Choices { get; private set; }
 
         /// <summary>
-        ///     A collection of <see cref="RestApplicationCommandOption"/>'s for this command.
+        ///     Gets a collection of <see cref="RestApplicationCommandOption"/>s for this command.
         /// </summary>
         public IReadOnlyCollection<RestApplicationCommandOption> Options { get; private set; }
 
-        /// <summary>
-        ///     The allowed channel types for this option.
-        /// </summary>
+        /// <inheritdoc/>
         public IReadOnlyCollection<ChannelType> ChannelTypes { get; private set; }
 
         internal RestApplicationCommandOption() { }
