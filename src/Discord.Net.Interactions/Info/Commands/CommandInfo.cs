@@ -253,20 +253,21 @@ namespace Discord.Interactions
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder builder = new();
+            List<string> builder = new();
 
             var currentParent = Module;
 
             while (currentParent != null)
             {
                 if (currentParent.IsSlashGroup)
-                    builder.AppendFormat(" {0}", currentParent.SlashGroupName);
+                    builder.Add(currentParent.SlashGroupName);
 
                 currentParent = currentParent.Parent;
             }
-            builder.AppendFormat(" {0}", Name);
+            builder.Reverse();
+            builder.Add(Name);
 
-            return builder.ToString().Trim();
+            return string.Join(" ", builder);
         }
     }
 }
