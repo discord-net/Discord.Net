@@ -22,8 +22,8 @@ namespace Discord.WebSocket
         /// <value></value>
         public new SocketModalData Data { get; set; }
 
-        internal SocketModal(DiscordSocketClient client, ModelBase model, ISocketMessageChannel channel)
-             : base(client, model.Id, channel)
+        internal SocketModal(DiscordSocketClient client, ModelBase model, ISocketMessageChannel channel, SocketUser user)
+             : base(client, model.Id, channel, user)
         {
             var dataModel = model.Data.IsSpecified
                 ? (DataModel)model.Data.Value
@@ -32,9 +32,9 @@ namespace Discord.WebSocket
             Data = new SocketModalData(dataModel);
         }
 
-        internal new static SocketModal Create(DiscordSocketClient client, ModelBase model, ISocketMessageChannel channel)
+        internal new static SocketModal Create(DiscordSocketClient client, ModelBase model, ISocketMessageChannel channel, SocketUser user)
         {
-            var entity = new SocketModal(client, model, channel);
+            var entity = new SocketModal(client, model, channel, user);
             entity.Update(model);
             return entity;
         }

@@ -61,6 +61,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public bool HasResponded { get; protected set; }
 
+        /// <inheritdoc/>
+        public bool IsDMInteraction { get; private set; }
+
         internal RestInteraction(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
@@ -108,6 +111,8 @@ namespace Discord.Rest
 
         internal virtual async Task UpdateAsync(DiscordRestClient discord, Model model)
         {
+            IsDMInteraction = !model.GuildId.IsSpecified;
+
             Data = model.Data.IsSpecified
                 ? model.Data.Value
                 : null;

@@ -35,8 +35,8 @@ namespace Discord.WebSocket
 
         private object _lock = new object();
 
-        internal SocketCommandBase(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
-            : base(client, model.Id, channel)
+        internal SocketCommandBase(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
+            : base(client, model.Id, channel, user)
         {
             var dataModel = model.Data.IsSpecified
                 ? (DataModel)model.Data.Value
@@ -49,9 +49,9 @@ namespace Discord.WebSocket
             Data = SocketCommandBaseData.Create(client, dataModel, model.Id, guildId);
         }
 
-        internal new static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
+        internal new static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
         {
-            var entity = new SocketCommandBase(client, model, channel);
+            var entity = new SocketCommandBase(client, model, channel, user);
             entity.Update(model);
             return entity;
         }

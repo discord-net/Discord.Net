@@ -2233,24 +2233,42 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<API.Interaction>(_serializer);
 
-                                    SocketChannel channel = null;
-                                    if(data.ChannelId.IsSpecified)
-                                    {
-                                        channel = State.GetChannel(data.ChannelId.Value);
-                                    }
-                                    else if (data.User.IsSpecified)
-                                    {
-                                        channel = State.GetDMChannel(data.User.Value.Id);
-                                    }
+                                    var guild = data.GuildId.IsSpecified ? GetGuild(data.GuildId.Value) : null;
 
-                                    var guild = (channel as SocketGuildChannel)?.Guild;
                                     if (guild != null && !guild.IsSynced)
                                     {
                                         await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                         return;
                                     }
 
-                                    var interaction = SocketInteraction.Create(this, data, channel as ISocketMessageChannel);
+                                    SocketUser user = data.User.IsSpecified
+                                        ? State.GetOrAddUser(data.User.Value.Id, (_) => SocketGlobalUser.Create(this, State, data.User.Value))
+                                        : guild.AddOrUpdateUser(data.Member.Value);
+
+                                    SocketChannel channel = null;
+                                    if(data.ChannelId.IsSpecified)
+                                    {
+                                        channel = State.GetChannel(data.ChannelId.Value);
+
+                                        if (channel == null)
+                                        {
+                                            if (!data.GuildId.IsSpecified)  // assume it is a DM
+                                            {
+                                                channel = CreateDMChannel(data.ChannelId.Value, user, State);
+                                            }
+                                            else
+                                            {
+                                                await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
+                                                return;
+                                            }
+                                        }
+                                    }
+                                    else if (data.User.IsSpecified)
+                                    {
+                                        channel = State.GetDMChannel(data.User.Value.Id);
+                                    }
+
+                                    var interaction = SocketInteraction.Create(this, data, channel as ISocketMessageChannel, user);
 
                                     await TimedInvokeAsync(_interactionCreatedEvent, nameof(InteractionCreated), interaction).ConfigureAwait(false);
 

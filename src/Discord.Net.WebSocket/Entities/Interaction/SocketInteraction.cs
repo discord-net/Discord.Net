@@ -5,6 +5,7 @@ using Model = Discord.API.Interaction;
 using DataModel = Discord.API.ApplicationCommandInteractionData;
 using System.IO;
 using System.Collections.Generic;
+using Discord.Net;
 
 namespace Discord.WebSocket
 {
@@ -72,17 +73,23 @@ namespace Discord.WebSocket
         public bool IsValidToken
             => InteractionHelper.CanRespondOrFollowup(this);
 
-        internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel)
+        /// <inheritdoc/>
+        public bool IsDMInteraction { get; private set; }
+
+        private ulong? _channelId;
+
+        internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel, SocketUser user)
             : base(client, id)
         {
             Channel = channel;
+            User = user;
 
             CreatedAt = client.UseInteractionSnowflakeDate
                 ? SnowflakeUtils.FromSnowflake(Id)
                 : DateTime.UtcNow;
         }
 
-        internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
+        internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
         {
             if (model.Type == InteractionType.ApplicationCommand)
             {
@@ -95,45 +102,37 @@ namespace Discord.WebSocket
 
                 return dataModel.Type switch
                 {
-                    ApplicationCommandType.Slash => SocketSlashCommand.Create(client, model, channel),
-                    ApplicationCommandType.Message => SocketMessageCommand.Create(client, model, channel),
-                    ApplicationCommandType.User => SocketUserCommand.Create(client, model, channel),
+                    ApplicationCommandType.Slash => SocketSlashCommand.Create(client, model, channel, user),
+                    ApplicationCommandType.Message => SocketMessageCommand.Create(client, model, channel, user),
+                    ApplicationCommandType.User => SocketUserCommand.Create(client, model, channel, user),
                     _ => null
                 };
             }
 
             if (model.Type == InteractionType.MessageComponent)
-                return SocketMessageComponent.Create(client, model, channel);
+                return SocketMessageComponent.Create(client, model, channel, user);
 
             if (model.Type == InteractionType.ApplicationCommandAutocomplete)
-                return SocketAutocompleteInteraction.Create(client, model, channel);
+                return SocketAutocompleteInteraction.Create(client, model, channel, user);
 
             if (model.Type == InteractionType.ModalSubmit)
-                return SocketModal.Create(client, model, channel);
+                return SocketModal.Create(client, model, channel, user);
 
             return null;
         }
 
         internal virtual void Update(Model model)
         {
+            IsDMInteraction = !model.GuildId.IsSpecified;
+
+            _channelId = model.ChannelId.ToNullable();
+
             Data = model.Data.IsSpecified
                 ? model.Data.Value
                 : null;
             Token = model.Token;
             Version = model.Version;
             Type = model.Type;
-
-            if (User == null)
-            {
-                if (model.Member.IsSpecified && model.GuildId.IsSpecified)
-                {
-                    User = SocketGuildUser.Create(Discord.State.GetGuild(model.GuildId.Value), Discord.State, model.Member.Value);
-                }
-                else
-                {
-                    User = SocketGlobalUser.Create(Discord, Discord.State, model.User.Value);
-                }
-            }
 
             UserLocale = model.UserLocale.IsSpecified
                 ? model.UserLocale.Value
@@ -398,6 +397,28 @@ namespace Discord.WebSocket
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
         public abstract Task RespondWithModalAsync(Modal modal, RequestOptions options = null);
         #endregion
+
+        /// <summary>
+        ///     Attepts to get the channel this interaction was executed in.
+        /// </summary>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous operation of fetching the channel.
+        /// </returns>
+        public async ValueTask<IMessageChannel> GetChannelAsync(RequestOptions options  = null)
+        {
+            if (Channel != null)
+                return Channel;
+
+            if (!_channelId.HasValue)
+                return null;
+
+            try
+            {
+                return (IMessageChannel)await Discord.GetChannelAsync(_channelId.Value, options).ConfigureAwait(false);
+            }
+            catch(HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions) { return null; } // bot can't view that channel, return null instead of throwing.
+        }
 
         #region  IDiscordInteraction
         /// <inheritdoc/>

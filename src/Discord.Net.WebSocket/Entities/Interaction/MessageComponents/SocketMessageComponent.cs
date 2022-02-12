@@ -28,8 +28,8 @@ namespace Discord.WebSocket
         private object _lock = new object();
         public override bool HasResponded { get; internal set; } = false;
 
-        internal SocketMessageComponent(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
-            : base(client, model.Id, channel)
+        internal SocketMessageComponent(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
+            : base(client, model.Id, channel, user)
         {
             var dataModel = model.Data.IsSpecified
                 ? (DataModel)model.Data.Value
@@ -38,9 +38,9 @@ namespace Discord.WebSocket
             Data = new SocketMessageComponentData(dataModel);
         }
 
-        internal new static SocketMessageComponent Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
+        internal new static SocketMessageComponent Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
         {
-            var entity = new SocketMessageComponent(client, model, channel);
+            var entity = new SocketMessageComponent(client, model, channel, user);
             entity.Update(model);
             return entity;
         }
