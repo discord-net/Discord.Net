@@ -36,7 +36,7 @@ namespace Discord.Rest
         public double? MaxValue { get; private set; }
 
         /// <summary>
-        ///     Gets a collection of <see cref="RestApplicationCommandChoice"/>'s for this command.
+        ///     Gets a collection of <see cref="RestApplicationCommandChoice"/>s for this command.
         /// </summary>
         public IReadOnlyCollection<RestApplicationCommandChoice> Choices { get; private set; }
 
