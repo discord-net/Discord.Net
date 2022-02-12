@@ -75,6 +75,7 @@ namespace Discord.Net.Queue
                         switch (response.StatusCode)
                         {
                             case (HttpStatusCode)429:
+                                info.ReadRatelimitPayload(response.Stream);
                                 if (info.IsGlobal)
                                 {
 #if DEBUG_LIMITS
