@@ -49,7 +49,7 @@ namespace Discord.WebSocket
             => SnowflakeUtils.FromSnowflake(Id);
 
         /// <summary>
-        ///     Gets the guild this command resides in, if this command is a global command then it will return <see langword="null"/>
+        ///     Gets the guild this command resides in; if this command is a global command then it will return <see langword="null"/>
         /// </summary>
         public SocketGuild Guild
             => GuildId.HasValue ? Discord.GetGuild(GuildId.Value) : null;
