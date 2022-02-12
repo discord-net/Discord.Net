@@ -13,8 +13,8 @@ namespace Discord.WebSocket
         /// </summary>
         public new SocketUserCommandData Data { get; }
 
-        internal SocketUserCommand(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
-            : base(client, model, channel)
+        internal SocketUserCommand(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
+            : base(client, model, channel, user)
         {
             var dataModel = model.Data.IsSpecified
                 ? (DataModel)model.Data.Value
@@ -27,9 +27,9 @@ namespace Discord.WebSocket
             Data = SocketUserCommandData.Create(client, dataModel, model.Id, guildId);
         }
 
-        internal new static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
+        internal new static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
         {
-            var entity = new SocketUserCommand(client, model, channel);
+            var entity = new SocketUserCommand(client, model, channel, user);
             entity.Update(model);
             return entity;
         }

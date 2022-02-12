@@ -63,6 +63,11 @@ namespace Discord
         string GuildLocale { get; }
 
         /// <summary>
+        ///     Gets whether or not this interaction was executed in a dm channel.
+        /// </summary>
+        bool IsDMInteraction { get; }
+
+        /// <summary>
         ///     Responds to an Interaction with type <see cref="InteractionResponseType.ChannelMessageWithSource"/>.
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>

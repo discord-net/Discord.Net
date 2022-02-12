@@ -57,11 +57,9 @@ namespace Discord.Interactions
             bool isValid = false;
 
             if ((Contexts & ContextType.Guild) != 0)
-                isValid = context.Channel is IGuildChannel;
-            if ((Contexts & ContextType.DM) != 0)
-                isValid = isValid || context.Channel is IDMChannel;
-            if ((Contexts & ContextType.Group) != 0)
-                isValid = isValid || context.Channel is IGroupChannel;
+                isValid = !context.Interaction.IsDMInteraction;
+            if ((Contexts & ContextType.DM) != 0 && (Contexts & ContextType.Group) != 0)
+                isValid = context.Interaction.IsDMInteraction;
 
             if (isValid)
                 return Task.FromResult(PreconditionResult.FromSuccess());

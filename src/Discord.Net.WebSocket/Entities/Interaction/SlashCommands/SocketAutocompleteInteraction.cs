@@ -21,8 +21,8 @@ namespace Discord.WebSocket
         public override bool HasResponded { get; internal set; }
         private object _lock = new object();
 
-        internal SocketAutocompleteInteraction(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
-            : base(client, model.Id, channel)
+        internal SocketAutocompleteInteraction(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
+            : base(client, model.Id, channel, user)
         {
             var dataModel = model.Data.IsSpecified
                 ? (DataModel)model.Data.Value
@@ -32,9 +32,9 @@ namespace Discord.WebSocket
                 Data = new SocketAutocompleteInteractionData(dataModel);
         }
 
-        internal new static SocketAutocompleteInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
+        internal new static SocketAutocompleteInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
         {
-            var entity = new SocketAutocompleteInteraction(client, model, channel);
+            var entity = new SocketAutocompleteInteraction(client, model, channel, user);
             entity.Update(model);
             return entity;
         }
