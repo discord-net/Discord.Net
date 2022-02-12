@@ -28,7 +28,7 @@ namespace Discord.Rest
             => Data.Id;
 
         /// <summary>
-        ///     The data associated with this interaction.
+        ///     Gets the data associated with this interaction.
         /// </summary>
         internal new RestCommandBaseData Data { get; private set; }
 

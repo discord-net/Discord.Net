@@ -10,7 +10,7 @@ namespace Discord.Rest
     public class RestGuildCommand : RestApplicationCommand
     {
         /// <summary>
-        ///     The guild Id where this command originates.
+        ///     Gets the guild Id where this command originates.
         /// </summary>
         public ulong GuildId { get; private set; }
 

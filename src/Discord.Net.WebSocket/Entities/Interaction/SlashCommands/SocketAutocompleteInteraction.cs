@@ -14,11 +14,13 @@ namespace Discord.WebSocket
     public class SocketAutocompleteInteraction : SocketInteraction, IAutocompleteInteraction, IDiscordInteraction
     {
         /// <summary>
-        ///     The autocomplete data of this interaction.
+        ///     Gets the autocomplete data of this interaction.
         /// </summary>
         public new SocketAutocompleteInteractionData Data { get; }
 
+        /// <inheritdoc/>
         public override bool HasResponded { get; internal set; }
+
         private object _lock = new object();
 
         internal SocketAutocompleteInteraction(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)

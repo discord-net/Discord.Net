@@ -16,7 +16,7 @@ namespace Discord.WebSocket
     {
         #region SocketInteraction
         /// <summary>
-        ///     The <see cref="ISocketMessageChannel"/> this interaction was used in.
+        ///     Gets the <see cref="ISocketMessageChannel"/> this interaction was used in.
         /// </summary>
         /// <remarks>
         ///     If the channel isn't cached or the bot doesn't have access to it then
@@ -25,23 +25,17 @@ namespace Discord.WebSocket
         public ISocketMessageChannel Channel { get; private set; }
 
         /// <summary>
-        ///     The <see cref="SocketUser"/> who triggered this interaction.
+        ///     Gets the <see cref="SocketUser"/> who triggered this interaction.
         /// </summary>
         public SocketUser User { get; private set; }
 
-        /// <summary>
-        ///     The type of this interaction.
-        /// </summary>
+        /// <inheritdoc/>
         public InteractionType Type { get; private set; }
 
-        /// <summary>
-        ///     The token used to respond to this interaction.
-        /// </summary>
+        /// <inheritdoc/>
         public string Token { get; private set; }
 
-        /// <summary>
-        ///     The data sent with this interaction.
-        /// </summary>
+        /// <inheritdoc/>
         public IDiscordInteractionData Data { get; private set; }
 
         /// <inheritdoc/>
@@ -50,25 +44,17 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public string GuildLocale { get; private set; }
 
-        /// <summary>
-        ///     The version of this interaction.
-        /// </summary>
+        /// <inheritdoc/>
         public int Version { get; private set; }
 
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt { get; private set; }
 
-        /// <summary>
-        ///     Gets whether or not this interaction has been responded to.
-        /// </summary>
-        /// <remarks>
-        ///     This property is locally set -- if you're running multiple bots
-        ///     off the same token then this property won't be in sync with them.
-        /// </remarks>
+        /// <inheritdoc/>
         public abstract bool HasResponded { get; internal set; }
 
         /// <summary>
-        ///     <see langword="true"/> if the token is valid for replying to, otherwise <see langword="false"/>.
+        ///     Gets whether or not the token used to respond to this interaction is valid.
         /// </summary>
         public bool IsValidToken
             => InteractionHelper.CanRespondOrFollowup(this);

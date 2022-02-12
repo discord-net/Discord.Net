@@ -9,7 +9,7 @@ namespace Discord.WebSocket
     public class SocketSlashCommand : SocketCommandBase, ISlashCommandInteraction, IDiscordInteraction
     {
         /// <summary>
-        ///     The data associated with this interaction.
+        ///     Gets the data associated with this interaction.
         /// </summary>
         public new SocketSlashCommandData Data { get; }
 

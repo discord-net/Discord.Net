@@ -27,10 +27,11 @@ namespace Discord.WebSocket
             => Data.Id;
 
         /// <summary>
-        ///     The data associated with this interaction.
+        ///     Gets the data associated with this interaction.
         /// </summary>
         internal new SocketCommandBaseData Data { get; }
 
+        /// <inheritdoc/>
         public override bool HasResponded { get; internal set; }
 
         private object _lock = new object();

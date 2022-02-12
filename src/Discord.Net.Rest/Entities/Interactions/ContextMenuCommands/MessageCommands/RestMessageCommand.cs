@@ -10,7 +10,7 @@ namespace Discord.Rest
     public class RestMessageCommand : RestCommandBase, IMessageCommandInteraction, IDiscordInteraction
     {
         /// <summary>
-        ///     The data associated with this interaction.
+        ///     Gets the data associated with this interaction.
         /// </summary>
         public new RestMessageCommandData Data { get; private set; }
 

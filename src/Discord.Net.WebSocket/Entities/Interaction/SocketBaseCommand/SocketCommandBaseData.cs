@@ -12,19 +12,15 @@ namespace Discord.WebSocket
         public string Name { get; private set; }
 
         /// <summary>
-        ///     The <typeparamref name="TOption"/> received with this interaction.
+        ///     Gets the <typeparamref name="TOption"/> received with this interaction.
         /// </summary>
         public virtual IReadOnlyCollection<TOption> Options { get; internal set; }
 
         internal readonly SocketResolvableData<Model> ResolvableData;
 
-        private ApplicationCommandType Type { get; set; }
-
         internal SocketCommandBaseData(DiscordSocketClient client, Model model, ulong? guildId)
             : base(client, model.Id)
         {
-            Type = model.Type;
-
             if (model.Resolved.IsSpecified)
             {
                 ResolvableData = new SocketResolvableData<Model>(client, guildId, model);

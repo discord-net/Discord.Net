@@ -43,7 +43,7 @@ namespace Discord.Rest
         public DateTimeOffset CreatedAt { get; private set; }
 
         /// <summary>
-        ///     <see langword="true"/> if the token is valid for replying to, otherwise <see langword="false"/>.
+        ///     Gets whether or not the token used to respond to this interaction is valid.
         /// </summary>
         public bool IsValidToken
             => InteractionHelper.CanRespondOrFollowup(this);

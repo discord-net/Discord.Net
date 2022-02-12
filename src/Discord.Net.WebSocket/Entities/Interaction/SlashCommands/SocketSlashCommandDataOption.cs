@@ -21,7 +21,7 @@ namespace Discord.WebSocket
         public ApplicationCommandOptionType Type { get; private set; }
 
         /// <summary>
-        ///      The sub command options received for this sub command group.
+        ///      Gets the sub command options received for this sub command group.
         /// </summary>
         public IReadOnlyCollection<SocketSlashCommandDataOption> Options { get; private set; }
 

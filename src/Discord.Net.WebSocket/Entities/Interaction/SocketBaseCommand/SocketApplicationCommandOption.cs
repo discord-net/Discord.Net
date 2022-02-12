@@ -34,17 +34,17 @@ namespace Discord.WebSocket
         public double? MaxValue { get; private set; }
 
         /// <summary>
-        ///     Choices for string and int types for the user to pick from.
+        ///     Gets a collection of choices for the user to pick from.
         /// </summary>
         public IReadOnlyCollection<SocketApplicationCommandChoice> Choices { get; private set; }
 
         /// <summary>
-        ///     If the option is a subcommand or subcommand group type, this nested options will be the parameters.
+        ///     Gets a collection of nested options.
         /// </summary>
         public IReadOnlyCollection<SocketApplicationCommandOption> Options { get; private set; }
 
         /// <summary>
-        ///     The allowed channel types for this option.
+        ///     Gets the allowed channel types for this option.
         /// </summary>
         public IReadOnlyCollection<ChannelType> ChannelTypes { get; private set; }
 
