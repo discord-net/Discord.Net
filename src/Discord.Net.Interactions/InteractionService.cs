@@ -854,8 +854,17 @@ namespace Discord.Interactions
             if (!constraints.Any(x => x.IsAssignableFrom(targetType)))
                 throw new InvalidOperationException($"This generic class does not support type {targetType.FullName}");
 
-            _genericTypeConverters[targetType] = converterType;
-        }
+        /// <summary>
+        ///     Serialize an object using a <see cref="TypeReader"/> into a <see cref="string"/> to be placed in a Component CustomId.
+        /// </summary>
+        /// <typeparam name="T">Type of the object to be serialized.</typeparam>
+        /// <param name="obj">Object to be serialized.</param>
+        /// <param name="services">Services that will be passed on to the TypeReader.</param>
+        /// <returns>
+        ///     A task representing the conversion process. The task result contains the result of the conversion.
+        /// </returns>
+        public Task<string> SerializeValueAsync<T>(T obj, IServiceProvider services = null) =>
+            _typeReaderMap.Get(typeof(T), services).SerializeAsync(obj);
 
         /// <summary>
         ///     Loads and caches an <see cref="ModalInfo"/> for the provided <see cref="IModal"/>.
