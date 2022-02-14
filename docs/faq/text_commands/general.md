@@ -1,6 +1,6 @@
 ---
-uid: FAQ.Commands.General
-title: General Questions about chat Commands
+uid: FAQ.TextCommands.General
+title: General Questions about Text Commands
 ---
 
 # Chat Command-related Questions
@@ -10,21 +10,16 @@ answered regarding general command usage when using @Discord.Commands.
 
 ## How can I restrict some of my commands so only specific users can execute them?
 
-Based on how you want to implement the restrictions, you can use the
-built-in [RequireUserPermission] precondition, which allows you to
+You can use the built-in `RequireUserPermission` precondition, which allows you to
 restrict the command based on the user's current permissions in the
 guild or channel (*e.g., `GuildPermission.Administrator`,
 `ChannelPermission.ManageMessages`*).
 
-If, however, you wish to restrict the commands based on the user's
-role, you can either create your custom precondition or use
-Joe4evr's [Preconditions Addons] that provides a few custom
-preconditions that aren't provided in the stock library.
-Its source can also be used as an example for creating your
-custom preconditions.
+> [!NOTE]
+> There are many more preconditions to use, including being able to make some yourself.
+> Precondition documentation is covered [here](xref:Guides.TextCommands.Preconditions)
 
 [RequireUserPermission]: xref:Discord.Commands.RequireUserPermissionAttribute
-[Preconditions Addons]: https://github.com/Joe4evr/Discord.Addons/tree/master/src/Discord.Addons.Preconditions
 
 ## Why am I getting an error about `Assembly.GetEntryAssembly`?
 

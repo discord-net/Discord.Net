@@ -1,11 +1,13 @@
 ---
-uid: FAQ.Basics.InteractionBasics
-title: Basics of interactions, common practice
+uid: FAQ.Interactions.General
+title: Interactions
 ---
 
-# Interactions basics, where to get started
+# Interaction basics
 
-This section answers basic questions and common mistakes in handling application commands, and responding to them.
+This chapter mostly refers to interactions in general,
+and will include questions that are common among users of the Interaction Framework
+as well as users that register and handle commands manually.
 
 ## What's the difference between RespondAsync, DeferAsync and FollowupAsync?
 
@@ -24,33 +26,20 @@ DeferAsync will not send out a response, RespondAsync will.
 
 ## Im getting System.TimeoutException: 'Cannot respond to an interaction after 3 seconds!'
 
-This happens because your computers clock is out of sync or your trying to respond after 3 seconds. If your clock is out of sync and you cant fix it, you can set the `UseInteractionSnowflakeDate` to false in the config.
+This happens because your computers clock is out of sync or your trying to respond after 3 seconds.
+If your clock is out of sync and you can't fix it, you can set the `UseInteractionSnowflakeDate` to false in the [DiscordSocketConfig].
 
-## Bad form Exception when I try to create my commands, why do I get this?
+[!code-csharp[Interaction Sync](samples/interactionsyncing.cs)]
 
-Bad form exceptions are thrown if the slash, user or message command builder has invalid values.
-The following options could resolve your error.
+[DiscordClientConfig]: xref:Discord.WebSocket.DiscordSocketConfig
 
-#### Is your command name lowercase?
+## How do I use this * interaction specific method/property?
 
-If your command name is not lowercase, it is not seen as a valid command entry.
-`Avatar` is invalid; `avatar` is valid.
-
-#### Are your values below or above the required amount? (This also applies to message components)
-
-Discord expects all values to be below maximum allowed.
-Going over this maximum amount of characters causes an exception.
+If your interaction context holds a down-casted version of the interaction object, you need to up-cast it.
+Ideally, use pattern matching to make sure its the type of interaction you are expecting it to be.
 
 > [!NOTE]
-> All maximum and minimum value requirements can be found in the [Discord Developer Docs].
-> For components, structure documentation is found [here].
-
-[Discord Developer Docs]: https://discord.com/developers/docs/interactions/application-commands#application-commands
-[here]: https://discord.com/developers/docs/interactions/message-components#message-components
-
-#### Is your subcommand branching correct?
-
-Branching structure is covered properly here: xref:Guides.SlashCommands.SubCommand
+> Further documentation on pattern matching can be found [here](xref:Guides.Entities.Casting).
 
 ## My interaction commands are not showing up?
 
@@ -64,16 +53,6 @@ Did you register a guild command (should be instant), or waited more than an hou
 - Check if no bad form exception is thrown; If so, refer to the above question.
 
 - Do you have the application commands scope checked when adding your bot to guilds?
-
-![Scope check](images/scope.png)
-
-## There are many options for creating commands, which do I use?
-
-[!code-csharp[Register examples](samples/registerint.cs)]
-
-> [!NOTE]
-> You can use bulkoverwrite even if there are no commands in guild, nor globally.
-> The bulkoverwrite method disposes the old set of commands and replaces it with the new.
 
 ## Do I need to create commands on startup?
 
