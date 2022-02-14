@@ -152,7 +152,7 @@ namespace Discord.WebSocket
             LogGatewayIntentWarnings = config.LogGatewayIntentWarnings;
             HandlerTimeout = config.HandlerTimeout;
             State = new ClientState(0, 0);
-            if (shardedClient == null || shardedClient.Shards.First()?.ShardId == ShardId)
+            if (shardedClient == null || !shardedClient.Shards.Any())
                 Rest = new DiscordSocketRestClient(config, ApiClient);
             _heartbeatTimes = new ConcurrentQueue<long>();
             _gatewayIntents = config.GatewayIntents;
