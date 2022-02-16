@@ -30,6 +30,10 @@ namespace Discord.WebSocket
             => GuildUser.JoinedAt;
 
         /// <inheritdoc/>
+        public string DisplayName
+            => GuildUser.Nickname ?? GuildUser.Username;
+
+        /// <inheritdoc/>
         public string Nickname
             => GuildUser.Nickname;
 

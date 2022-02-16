@@ -18,6 +18,13 @@ namespace Discord
         /// </returns>
         DateTimeOffset? JoinedAt { get; }
         /// <summary>
+        ///     Gets the displayed name for this user.
+        /// </summary>
+        /// <returns>
+        ///     A string representing the display name of the user; If the nickname is null, this will be the username.
+        /// </returns>
+        string DisplayName { get; }
+        /// <summary>
         ///     Gets the nickname for this user.
         /// </summary>
         /// <returns>

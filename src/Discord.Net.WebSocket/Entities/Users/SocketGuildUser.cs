@@ -30,6 +30,8 @@ namespace Discord.WebSocket
         /// </summary>
         public SocketGuild Guild { get; }
         /// <inheritdoc />
+        public string DisplayName => Nickname ?? Username;
+        /// <inheritdoc />
         public string Nickname { get; private set; }
         /// <inheritdoc/>
         public string GuildAvatarId { get; private set; }
