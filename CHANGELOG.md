@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.3.1] - 2022-02-16
+
+### Added
+
+- #2107 Add DisplayName property to IGuildUser. (abfba3c)
+
+### Fixed
+
+- #2110 Fix incorrect ratelimit handles for 429's (b2598d3)
+- #2094 Fix ToString() on CommandInfo (01735c8)
+- #2098 Fix channel being null in DMs on Interactions (7e1b8c9)
+- #2100 Fix crosspost ratelimits (fad217e)
+- #2108 Fix being unable to modify AllowedMentions with no embeds set. (169d54f)
+- #2109 Fix unused creation of REST clients for DiscordShardedClient shards. (6039378)
+
+### Misc
+
+- #2099 Update interaction summaries (503d32a)
+
 ## [3.3.0] - 2022-02-09
 
 ### Added
