@@ -34,6 +34,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Nickname { get; private set; }
         /// <inheritdoc/>
+        public string DisplayAvatarId => GuildAvatarId ?? AvatarId;
+        /// <inheritdoc/>
         public string GuildAvatarId { get; private set; }
         /// <inheritdoc />
         public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
@@ -246,6 +248,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public ChannelPermissions GetPermissions(IGuildChannel channel)
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
+
+        /// <inheritdoc />
+        public string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GuildAvatarId is not null
+                ? GetGuildAvatarUrl(format, size)
+                : GetAvatarUrl(format, size);
+
+        /// <inheritdoc />
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, Guild.Id, GuildAvatarId, size, format);
 
