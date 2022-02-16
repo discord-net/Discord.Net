@@ -55,8 +55,12 @@ namespace Discord.Rest
         string IGuildUser.DisplayName => null;
         /// <inheritdoc />
         string IGuildUser.Nickname => null;
+        /// <inheritdoc/>
+        string IGuildUser.DisplayAvatarId => null;
         /// <inheritdoc />
         string IGuildUser.GuildAvatarId => null;
+        /// <inheritdoc />
+        string IGuildUser.GetDisplayAvatarUrl(ImageFormat format, ushort size) => null;
         /// <inheritdoc />
         string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => null;
         /// <inheritdoc />

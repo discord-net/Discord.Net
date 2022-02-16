@@ -24,6 +24,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string Nickname { get; private set; }
         /// <inheritdoc/>
+        public string DisplayAvatarId => GuildAvatarId ?? AvatarId;
+        /// <inheritdoc/>
         public string GuildAvatarId { get; private set; }
         internal IGuild Guild { get; private set; }
         /// <inheritdoc />
@@ -183,6 +185,13 @@ namespace Discord.Rest
             return new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, guildPerms.RawValue));
         }
 
+        /// <inheritdoc />
+        public string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GuildAvatarId is not null
+                ? GetGuildAvatarUrl(format, size)
+                : GetAvatarUrl(format, size);
+
+        /// <inheritdoc />
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, GuildId, GuildAvatarId, size, format);
 #endregion
