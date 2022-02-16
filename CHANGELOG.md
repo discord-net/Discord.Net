@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.3.2] - 2022-02-16
+
+### Fixed
+
+- #2116 Fix null rest client in shards
+
 ## [3.3.1] - 2022-02-16
 
 ### Added
