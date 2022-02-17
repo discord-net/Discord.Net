@@ -25,7 +25,7 @@ If you grant no permissions, no role will be created for your bot upon invitatio
 ![Permissions](images/permissions.png)
 
 When done selecting permissions, you can use the link below in your browser to invite the bot
-to servers you have `Manage Server` permission of.
+to servers where you have the `Manage Server` permission.
 
 ![Invite](images/link.png)
 
