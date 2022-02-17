@@ -11,7 +11,7 @@ introduction to the Discord API ecosystem.
 
 ## How do I add my bot to my server/guild?
 
-Inviting your bot can be done by using the O2Auth url generator provided by the [Discord Developer Portal].
+Inviting your bot can be done by using the OAuth2 url generator provided by the [Discord Developer Portal].
 
 Permissions can be granted by selecting the `bot` scope in the scopes section.
 
