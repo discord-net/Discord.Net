@@ -26,7 +26,7 @@ DeferAsync will not send out a response, RespondAsync will.
 
 ## Im getting System.TimeoutException: 'Cannot respond to an interaction after 3 seconds!'
 
-This happens because your computers clock is out of sync or your trying to respond after 3 seconds.
+This happens because your computer's clock is out of sync or you're trying to respond after 3 seconds.
 If your clock is out of sync and you can't fix it, you can set the `UseInteractionSnowflakeDate` to false in the [DiscordSocketConfig].
 
 [!code-csharp[Interaction Sync](samples/interactionsyncing.cs)]
