@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -30,17 +31,17 @@ namespace Discord
         {
             if (language != null || text.Contains("\n"))
                 return $"```{language ?? ""}\n{text}\n```";
-            else
-                return $"`{text}`";
+
+            return $"`{text}`";
         }
 
         /// <summary> Sanitizes the string, safely escaping any Markdown sequences. </summary>
-        public static string Sanitize(string text)
-        {
-            foreach (string unsafeChar in SensitiveCharacters)
-                text = text.Replace(unsafeChar, $"\\{unsafeChar}");
-            return text;
-        }
+        public static string Sanitize(string text) =>
+            SensitiveCharacters.Aggregate(text,
+                (current,
+                    unsafeChar) => current.Replace(unsafeChar,
+                    $"\\{unsafeChar}"));
+
 
         /// <summary>
         ///     Formats a string as a quote.
@@ -79,7 +80,7 @@ namespace Discord
 
             return result.ToString();
         }
-        
+
         /// <summary>
         ///     Formats a string as a block quote.
         /// </summary>
