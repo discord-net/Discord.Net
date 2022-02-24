@@ -26,28 +26,7 @@ You can install the following packages through your IDE or go to the nuget link 
 
 To use EFCore, you need a DbContext to access everything in your database. The DbContext will look like this. Here is an example entity to show you how you can add more entities yourself later on.
 
-```cs
-// ApplicationDbContext.cs
-using Microsoft.EntityFrameworkCore;
-
-public class ApplicationDbContext : DbContext
-{
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-
-    }
-
-    public DbSet<UserEntity> Users { get; set; } = null!;
-}
-
-// UserEntity.cs
-
-public class UserEntity
-{
-    public ulong Id { get; set; }
-    public string Name { get; set; }
-}
-```
+[!code-csharp[DBContext Sample](samples/DbContextSample.cs)]
 
 > [!NOTE]
 > To learn more about creating the EFCore model, visit the following [link](https://docs.microsoft.com/en-us/ef/core/get-started/overview/first-app?tabs=netcore-cli#create-the-model)
@@ -56,17 +35,7 @@ public class UserEntity
 
 To add your newly created DbContext to your Dependency Injection container, simply use the extension method provided by EFCore to add the context to your container. It should look something like this
 
-```cs
-private static ServiceProvider ConfigureServices()
-{
-    return new ServiceCollection()
-        .AddDbContext<ApplicationDbContext>(
-          options => options.UseNpgsql("Your connection string")
-        )
-        [...]
-        .BuildServiceProvider();
-}
-```
+[!code-csharp[DBContext Dependency Injection](samples/DbContextDepInjection.cs)]
 
 > [!NOTE]
 > You can find out how to get your connection string [here](https://www.connectionstrings.com/npgsql/standard/)
@@ -80,30 +49,10 @@ To learn more about migrations, visit the official Microsoft documentation [here
 
 You can now use the DbContext wherever you can inject it. Here's an example on injecting it into an interaction command module.
 
-```cs
-using Discord;
-
-public class SampleModule : InteractionModuleBase<SocketInteractionContext>
-{
-  private readonly ApplicationDbContext _db;
-
-  public SampleModule(ApplicationDbContext db)
-  {
-    _db = db;
-  }
-
-  [SlashCommand("sample", "sample")]
-  public async Task Sample()
-  {
-    // Do stuff with your injected DbContext
-    var user = _db.Users.FirstOrDefault(x => x.Id == Context.User.Id);
-
-    ...
-  }
-}
-```
+[!code-csharp[DBContext injected into interaction module](samples/InteractionModuleDISample.cs)]
 
 ## Using a different database provider
+
 Here's a couple of popular database providers for EFCore and links to tutorials on how to set them up. The only thing that usually changes is the provider inside of your `DbContextOptions`
 
 | Provider | Link |
