@@ -95,7 +95,7 @@
       topicUid: Guides.MessageComponents.TextInputs
     - name: Advanced Concepts
       topicUid: Guides.MessageComponents.Advanced
-- name: Modal Basics 
+- name: Modal Basics
   items:
     - name: Introduction
       topicUid: Guides.Modals.Intro
@@ -109,6 +109,10 @@
       topicUid: Guides.GuildEvents.GettingUsers
     - name: Modifying Events
       topicUid: Guides.GuildEvents.Modifying
+- name: Working with other libraries
+  items:
+    - name: Configuring Serilog
+      topicUid: Guides.OtherLibs.Serilog
 - name: Emoji
   topicUid: Guides.Emoji
 - name: Voice
