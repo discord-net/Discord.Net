@@ -1,13 +1,13 @@
 ---
 uid: Guides.OtherLibs.Serilog
-title: Configuring Serilog
+title: Serilog
 ---
 
 # Configuring serilog
 
 ## Prerequisites
 
-- A basic working bot with a logging method as described in [Creating your first bot]: xref:Guides.GettingStarted.FirstBot#creating-a-discord-client
+- A basic working bot with a logging method as described in [Creating your first bot](xref:Guides.GettingStarted.FirstBot)
 
 ## Installing the Serilog package
 
@@ -23,9 +23,13 @@ You can install the following packages through your IDE or go to the nuget link 
 Serilog will be configured at the top of your async Main method, it looks like this
 
 ```cs
+using Discord;
+using Serilog;
+using Serilog.Events;
+
 public class Program
 {
-  public static Task Main(string[] args) => new Program().MainAsync();
+  public static Task Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
 
   public async Task MainAsync()
   {
@@ -45,15 +49,15 @@ public class Program
 
     // Some alternative options would be to keep your token in an Environment Variable or a standalone file.
     // var token = Environment.GetEnvironmentVariable("NameOfYourEnvironmentVariable");
-    // var token = File.ReadAllText("token.txt");
+    // var token = File.ReadAllText("token.txt")[0];
     // var token = JsonConvert.DeserializeObject<AConfigurationClass>(File.ReadAllText("config.json")).Token;
 
     await _client.LoginAsync(TokenType.Bot, token);
     await _client.StartAsync();
 
     // Block this task until the program is closed.
-    await Task.Delay(-1);
-}
+    await Task.Delay(Timeout.Infinite);
+  }
 }
 ```
 
@@ -62,7 +66,7 @@ public class Program
 For serilog to log discord events correctly, we have to map the discord `LogSeverity` to the serilog `LogEventLevel`. You can modify your log method to look like this.
 
 ```cs
-private static Task LogAsync(LogMessage message)
+private static async Task LogAsync(LogMessage message)
 {
     var severity = message.Severity switch
     {
@@ -75,7 +79,7 @@ private static Task LogAsync(LogMessage message)
         _ => LogEventLevel.Information
     };
     Log.Write(severity, message.Exception, "[{Source}] {Message}", message.Source, message.Message);
-    return Task.CompletedTask;
+    await Task.CompletedTask;
 }
 ```
 
