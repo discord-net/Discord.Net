@@ -21,12 +21,14 @@ namespace Discord.Webhook
             return RestInternalWebhook.Create(client, model);
         }
         public static async Task<ulong> SendMessageAsync(DiscordWebhookClient client,
-            string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options, MessageComponent components)
+            string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl, 
+            AllowedMentions allowedMentions, RequestOptions options, MessageComponent components, MessageFlags flags)
         {
             var args = new CreateWebhookMessageParams
             {
                 Content = text,
-                IsTTS = isTTS
+                IsTTS = isTTS,
+                Flags = flags
             };
 
             if (embeds != null)
@@ -40,6 +42,9 @@ namespace Discord.Webhook
             if (components != null)
                 args.Components = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray();
 
+            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
+                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
+            
             var model = await client.ApiClient.CreateWebhookMessageAsync(client.Webhook.Id, args, options: options).ConfigureAwait(false);
             return model.Id;
         }
@@ -97,22 +102,27 @@ namespace Discord.Webhook
             await client.ApiClient.DeleteWebhookMessageAsync(client.Webhook.Id, messageId, options).ConfigureAwait(false);
         }
         public static async Task<ulong> SendFileAsync(DiscordWebhookClient client, string filePath, string text, bool isTTS,
-            IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options, bool isSpoiler, MessageComponent components)
+            IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options,
+            bool isSpoiler, MessageComponent components, MessageFlags flags = MessageFlags.None)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
-                return await SendFileAsync(client, file, filename, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, isSpoiler, components).ConfigureAwait(false);
+                return await SendFileAsync(client, file, filename, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, isSpoiler, components, flags).ConfigureAwait(false);
         }
         public static Task<ulong> SendFileAsync(DiscordWebhookClient client, Stream stream, string filename, string text, bool isTTS,
             IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options, bool isSpoiler,
-            MessageComponent components)
-            => SendFileAsync(client, new FileAttachment(stream, filename, isSpoiler: isSpoiler), text, isTTS, embeds, username, avatarUrl, allowedMentions, components, options);
+            MessageComponent components, MessageFlags flags)
+            => SendFileAsync(client, new FileAttachment(stream, filename, isSpoiler: isSpoiler), text, isTTS, embeds, username, avatarUrl, allowedMentions, components, options, flags);
 
-        public static Task<ulong> SendFileAsync(DiscordWebhookClient client, FileAttachment attachment, string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, MessageComponent components, RequestOptions options)
-            => SendFilesAsync(client, new FileAttachment[] { attachment }, text, isTTS, embeds, username, avatarUrl, allowedMentions, components, options);
+        public static Task<ulong> SendFileAsync(DiscordWebhookClient client, FileAttachment attachment, string text, bool isTTS, 
+            IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, 
+            MessageComponent components, RequestOptions options, MessageFlags flags)
+            => SendFilesAsync(client, new FileAttachment[] { attachment }, text, isTTS, embeds, username, avatarUrl, allowedMentions, components, options, flags);
 
         public static async Task<ulong> SendFilesAsync(DiscordWebhookClient client,
-            IEnumerable<FileAttachment> attachments, string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, MessageComponent components, RequestOptions options)
+            IEnumerable<FileAttachment> attachments, string text, bool isTTS, IEnumerable<Embed> embeds, string username, 
+            string avatarUrl, AllowedMentions allowedMentions, MessageComponent components, RequestOptions options,
+            MessageFlags flags)
         {
             embeds ??= Array.Empty<Embed>();
            
@@ -141,7 +151,19 @@ namespace Discord.Webhook
                 }
             }
 
-            var args = new UploadWebhookFileParams(attachments.ToArray()) {AvatarUrl = avatarUrl, Username = username, Content = text, IsTTS = isTTS, Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified, AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, MessageComponents = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified };
+            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
+                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
+
+            var args = new UploadWebhookFileParams(attachments.ToArray()) 
+            {
+                AvatarUrl = avatarUrl, 
+                Username = username, Content = text, 
+                IsTTS = isTTS, 
+                Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified, 
+                AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, 
+                MessageComponents = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
+                Flags = flags
+            };
             var msg = await client.ApiClient.UploadWebhookFileAsync(client.Webhook.Id, args, options).ConfigureAwait(false);
             return msg.Id;
         }
