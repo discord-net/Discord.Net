@@ -111,8 +111,10 @@
       topicUid: Guides.GuildEvents.Modifying
 - name: Working with other libraries
   items:
-    - name: Configuring Serilog
+    - name: Serilog
       topicUid: Guides.OtherLibs.Serilog
+    - name: EFCore
+      topicUid: Guides.OtherLibs.EFCore
 - name: Emoji
   topicUid: Guides.Emoji
 - name: Voice
