@@ -65,6 +65,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool IsStreaming => VoiceState?.IsStreaming ?? false;
         /// <inheritdoc />
+        public bool IsVideoing => VoiceState?.IsVideoing ?? false;
+        /// <inheritdoc />
         public DateTimeOffset? RequestToSpeakTimestamp => VoiceState?.RequestToSpeakTimestamp ?? null;
         /// <inheritdoc />
         public bool? IsPending { get; private set; }

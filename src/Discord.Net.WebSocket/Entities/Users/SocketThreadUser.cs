@@ -123,6 +123,10 @@ namespace Discord.WebSocket
             => GuildUser.IsStreaming;
 
         /// <inheritdoc/>
+        public bool IsVideoing
+            => GuildUser.IsVideoing;
+
+        /// <inheritdoc/>
         public DateTimeOffset? RequestToSpeakTimestamp
             => GuildUser.RequestToSpeakTimestamp;
 
