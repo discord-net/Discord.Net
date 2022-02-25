@@ -26,7 +26,7 @@ Serilog will be configured at the top of your async Main method, it looks like t
 
 ## Modifying your logging method
 
-For serilog to log Discord events correctly, we have to map the discord `LogSeverity` to the serilog `LogEventLevel`. You can modify your log method to look like this.
+For Serilog to log Discord events correctly, we have to map the Discord `LogSeverity` to the Serilog `LogEventLevel`. You can modify your log method to look like this.
 
 [!code-csharp[Modifying your log method](samples/ModifyLogMethod.cs)]
 
