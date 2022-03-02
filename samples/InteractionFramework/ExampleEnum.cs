@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _04_interactions_framework
+namespace InteractionFramework
 {
     public enum ExampleEnum
     {
