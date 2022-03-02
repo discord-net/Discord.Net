@@ -103,7 +103,7 @@ namespace Discord.WebSocket
         ///     The duration on which this thread archives after.
         ///     <para>
         ///         <b>Note: </b> Options <see cref="ThreadArchiveDuration.OneWeek"/> and <see cref="ThreadArchiveDuration.ThreeDays"/>
-        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the 
+        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the
         ///         guild has the <b>THREE_DAY_THREAD_ARCHIVE</b> and <b>SEVEN_DAY_THREAD_ARCHIVE</b>.
         ///     </para>
         /// </param>
@@ -355,11 +355,22 @@ namespace Discord.WebSocket
 
         #region IGuildChannel
         /// <inheritdoc />
-        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => Task.FromResult<IGuildUser>(GetUser(id));
+        async Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            var user = GetUser(id);
+            if (user is not null || mode == CacheMode.CacheOnly)
+                return user;
+
+            return await ChannelHelper.GetUserAsync(this, Guild, Discord, id, options).ConfigureAwait(false);
+        }
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
+        {
+            return mode == CacheMode.AllowDownload
+                ? ChannelHelper.GetUsersAsync(this, Guild, Discord, null, null, options)
+                : ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
+        }
+
         #endregion
 
         #region IMessageChannel

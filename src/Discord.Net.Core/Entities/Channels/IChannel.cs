@@ -21,7 +21,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>

@@ -372,7 +372,7 @@ namespace Discord.WebSocket
         ///     This field is based off of caching alone, since there is no events returned on the guild model.
         /// </remarks>
         /// <returns>
-        ///     A read-only collection of guild events found within this guild. 
+        ///     A read-only collection of guild events found within this guild.
         /// </returns>
         public IReadOnlyCollection<SocketGuildEvent> Events => _events.ToReadOnlyCollection();
 
@@ -1926,8 +1926,15 @@ namespace Discord.WebSocket
         async Task<IGuildUser> IGuild.AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func, RequestOptions options)
             => await AddGuildUserAsync(userId, accessToken, func, options);
         /// <inheritdoc />
-        Task<IGuildUser> IGuild.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => Task.FromResult<IGuildUser>(GetUser(id));
+        async Task<IGuildUser> IGuild.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            var user = GetUser(id);
+            if (user is not null || mode == CacheMode.CacheOnly)
+                return user;
+
+            return await GuildHelper.GetUserAsync(this, Discord, id, options).ConfigureAwait(false);
+        }
+
         /// <inheritdoc />
         Task<IGuildUser> IGuild.GetCurrentUserAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(CurrentUser);
