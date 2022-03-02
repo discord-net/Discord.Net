@@ -377,7 +377,8 @@ namespace Discord.Net.Queue
                     // use the payload reset after value
                     var payload = info.ReadRatelimitPayload(body);
 
-                    resetTick = DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(payload.RetryAfter));
+                    // fallback on stored ratelimit info when payload is null, https://github.com/discord-net/Discord.Net/issues/2123
+                    resetTick = DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(payload?.RetryAfter ?? info.ResetAfter?.TotalSeconds ?? 0));
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Reset-After: {info.ResetAfter.Value} ({info.ResetAfter?.TotalMilliseconds} ms)");
 #endif
