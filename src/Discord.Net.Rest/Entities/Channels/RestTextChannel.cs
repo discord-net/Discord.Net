@@ -261,7 +261,7 @@ namespace Discord.Rest
         ///     The duration on which this thread archives after.
         ///     <para>
         ///         <b>Note: </b> Options <see cref="ThreadArchiveDuration.OneWeek"/> and <see cref="ThreadArchiveDuration.ThreeDays"/>
-        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the 
+        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the
         ///         guild has the <b>THREE_DAY_THREAD_ARCHIVE</b> and <b>SEVEN_DAY_THREAD_ARCHIVE</b>.
         ///     </para>
         /// </param>
@@ -364,10 +364,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
         {
-            if (mode == CacheMode.AllowDownload)
-                return GetUsersAsync(options);
-            else
-                return AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
+            return mode == CacheMode.AllowDownload
+                ? GetUsersAsync(options)
+                : AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
         }
         #endregion
 
