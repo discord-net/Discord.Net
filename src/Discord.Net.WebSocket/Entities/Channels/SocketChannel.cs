@@ -17,7 +17,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets when the channel is created.
         /// </summary>
-        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+        public virtual DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <summary>
         ///     Gets a collection of users from the WebSocket cache.
         /// </summary>
