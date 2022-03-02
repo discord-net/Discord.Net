@@ -43,7 +43,7 @@ var components = new ComponentBuilder()
     .WithSelectMenu(menu);
 
 
-await arg.RespondAsync("On a scale of one to five, how gaming is this?", component: componBuild(), ephemeral: true);
+await arg.RespondAsync("On a scale of one to five, how gaming is this?", component: components.Build(), ephemeral: true);
 break;
 ```
 
