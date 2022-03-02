@@ -1,6 +1,6 @@
 ---
-uid: FAQ.Interactions.Basics
-title: Interaction Basics
+uid: FAQ.Interactions.Manual
+title: Manual handling
 ---
 
 # Manually handing interactions.
