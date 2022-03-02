@@ -27,7 +27,7 @@ private async Task Client_Ready()
             .AddChoice("Lovely", 4)
             .AddChoice("Excellent!", 5)
             .WithType(ApplicationCommandOptionType.Integer)
-        ).Build();
+        );
 
     try
     {
