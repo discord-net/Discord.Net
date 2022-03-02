@@ -557,6 +557,7 @@ namespace Discord.Commands
             if (matchResult.Pipeline is PreconditionResult preconditionResult)
             {
                 await _commandExecutedEvent.InvokeAsync(matchResult.Match.Value.Command, context, preconditionResult).ConfigureAwait(false);
+                return preconditionResult;
             }
 
             return matchResult;
