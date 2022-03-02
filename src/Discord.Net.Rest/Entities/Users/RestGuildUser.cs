@@ -223,6 +223,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;
         /// <inheritdoc />
+        bool IVoiceState.IsVideoing => false;
+        /// <inheritdoc />
         DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
         #endregion
     }

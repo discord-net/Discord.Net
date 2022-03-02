@@ -164,6 +164,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;
         /// <inheritdoc />
+        bool IVoiceState.IsVideoing => false;
+        /// <inheritdoc />
         DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
         #endregion
     }

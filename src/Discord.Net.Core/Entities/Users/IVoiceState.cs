@@ -65,6 +65,13 @@ namespace Discord
         /// </returns>
         bool IsStreaming { get; }
         /// <summary>
+        ///     Gets a value that indicates if the user is videoing in a voice channel.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if the user has their camera turned on; otherwise <c>false</c>.
+        /// </returns>
+        bool IsVideoing { get; }
+        /// <summary>
         ///     Gets the time on which the user requested to speak.
         /// </summary>
         DateTimeOffset? RequestToSpeakTimestamp { get; }
