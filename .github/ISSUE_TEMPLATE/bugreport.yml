@@ -76,3 +76,11 @@ body:
         ```
     validations:
       required: false
+  - type: textarea
+    id: packages
+    attributes: 
+      label: Packages
+      description: List Discord.Net and Discord.Net related pacakges in use, and versions.
+      placeholder: Discord.Net V3.3.2, etc.
+    validations:
+      required: true
