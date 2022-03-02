@@ -397,7 +397,6 @@ namespace Discord.Interactions.Builders
             builder.Description = paramInfo.Name;
             builder.IsRequired = !paramInfo.IsOptional;
             builder.DefaultValue = paramInfo.DefaultValue;
-            builder.SetParameterType(paramType, services);
 
             foreach (var attribute in attributes)
             {
@@ -435,11 +434,31 @@ namespace Discord.Interactions.Builders
                     case MinValueAttribute minValue:
                         builder.MinValue = minValue.Value;
                         break;
+                    case ComplexParameterAttribute complexParameter:
+                        {
+                            builder.IsComplexParameter = true;
+                            ConstructorInfo ctor = GetComplexParameterConstructor(paramInfo.ParameterType.GetTypeInfo(), complexParameter);
+
+                            foreach (var parameter in ctor.GetParameters())
+                            {
+                                if (parameter.IsDefined(typeof(ComplexParameterAttribute)))
+                                    throw new InvalidOperationException("You cannot create nested complex parameters.");
+
+                                builder.AddComplexParameterField(fieldBuilder => BuildSlashParameter(fieldBuilder, parameter, services));
+                            }
+
+                            var initializer = builder.Command.Module.InteractionService._useCompiledLambda ?
+                                ReflectionUtils<object>.CreateLambdaConstructorInvoker(paramInfo.ParameterType.GetTypeInfo()) : ctor.Invoke;
+                            builder.ComplexParameterInitializer = args => initializer(args);
+                        }
+                        break;
                     default:
                         builder.AddAttributes(attribute);
                         break;
                 }
             }
+
+            builder.SetParameterType(paramType, services);
 
             // Replace pascal casings with '-'
             builder.Name = Regex.Replace(builder.Name, "(?<=[a-z])(?=[A-Z])", "-").ToLower();
@@ -607,6 +626,42 @@ namespace Discord.Interactions.Builders
             return propertyInfo.SetMethod?.IsPublic == true &&
                 propertyInfo.SetMethod?.IsStatic == false &&
                 propertyInfo.IsDefined(typeof(ModalInputAttribute));
+        }
+        
+        private static ConstructorInfo GetComplexParameterConstructor(TypeInfo typeInfo, ComplexParameterAttribute complexParameter)
+        {
+            var ctors = typeInfo.GetConstructors();
+
+            if (ctors.Length == 0)
+                throw new InvalidOperationException($"No constructor found for \"{typeInfo.FullName}\".");
+
+            if (complexParameter.PrioritizedCtorSignature is not null)
+            {
+                var ctor = typeInfo.GetConstructor(complexParameter.PrioritizedCtorSignature);
+
+                if (ctor is null)
+                    throw new InvalidOperationException($"No constructor was found with the signature: {string.Join(",", complexParameter.PrioritizedCtorSignature.Select(x => x.Name))}");
+
+                return ctor;
+            }
+
+            var prioritizedCtors = ctors.Where(x => x.IsDefined(typeof(ComplexParameterCtorAttribute), true));
+
+            switch (prioritizedCtors.Count())
+            {
+                case > 1:
+                    throw new InvalidOperationException($"{nameof(ComplexParameterCtorAttribute)} can only be used once in a type.");
+                case 1:
+                    return prioritizedCtors.First();
+            }
+
+            switch (ctors.Length)
+            {
+                case > 1:
+                    throw new InvalidOperationException($"Multiple constructors found for \"{typeInfo.FullName}\".");
+                default:
+                    return ctors.First();
+            }
         }
     }
 }

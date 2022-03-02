@@ -13,7 +13,7 @@ namespace Discord.Interactions
             {
                 Name = parameterInfo.Name,
                 Description = parameterInfo.Description,
-                Type = parameterInfo.DiscordOptionType,
+                Type = parameterInfo.DiscordOptionType.Value,
                 IsRequired = parameterInfo.IsRequired,
                 Choices = parameterInfo.Choices?.Select(x => new ApplicationCommandOptionChoiceProperties
                 {
@@ -46,7 +46,7 @@ namespace Discord.Interactions
             if (commandInfo.Parameters.Count > SlashCommandBuilder.MaxOptionsCount)
                 throw new InvalidOperationException($"Slash Commands cannot have more than {SlashCommandBuilder.MaxOptionsCount} command parameters");
 
-            props.Options = commandInfo.Parameters.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified;
+            props.Options = commandInfo.FlattenedParameters.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified;
 
             return props;
         }
@@ -58,7 +58,7 @@ namespace Discord.Interactions
                 Description = commandInfo.Description,
                 Type = ApplicationCommandOptionType.SubCommand,
                 IsRequired = false,
-                Options = commandInfo.Parameters?.Select(x => x.ToApplicationCommandOptionProps())?.ToList()
+                Options = commandInfo.FlattenedParameters?.Select(x => x.ToApplicationCommandOptionProps())?.ToList()
             };
 
         public static ApplicationCommandProperties ToApplicationCommandProps(this ContextCommandInfo commandInfo)

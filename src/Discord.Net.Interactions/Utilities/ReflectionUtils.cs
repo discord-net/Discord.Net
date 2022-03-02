@@ -205,5 +205,26 @@ namespace Discord.Interactions
                 return instance;
             };
         }
+
+        internal static Func<object[], T> CreateLambdaConstructorInvoker(TypeInfo typeInfo)
+        {
+            var constructor = GetConstructor(typeInfo);
+            var parameters = constructor.GetParameters();
+
+            var argsExp = Expression.Parameter(typeof(object[]), "args");
+
+            var parameterExps = new Expression[parameters.Length];
+
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                var indexExp = Expression.Constant(i);
+                var accessExp = Expression.ArrayIndex(argsExp, indexExp);
+                parameterExps[i] = Expression.Convert(accessExp, parameters[i].ParameterType);
+            }
+
+            var newExp = Expression.New(constructor, parameterExps);
+
+            return Expression.Lambda<Func<object[], T>>(newExp, argsExp).Compile();
+        }
     }
 }
