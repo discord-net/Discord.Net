@@ -11,18 +11,32 @@ introduction to the Discord API ecosystem.
 
 ## How do I add my bot to my server/guild?
 
-You can do so by using the [permission calculator] provided
-by [FiniteReality].
-This tool allows you to set permissions that the bot will be assigned
-with, and invite the bot into your guild. With this method, bots will
-also be assigned a unique role that a regular user cannot use; this
-is what we call a `Managed` role. Because you cannot assign this
-role to any other users, it is much safer than creating a single
-role which, intentionally or not, can be applied to other users
-to escalate their privilege.
+Inviting your bot can be done by using the OAuth2 url generator provided by the [Discord Developer Portal].
 
-[FiniteReality]: https://github.com/FiniteReality/permissions-calculator
-[permission calculator]: https://finitereality.github.io/permissions-calculator
+Permissions can be granted by selecting the `bot` scope in the scopes section.
+
+![Scopes](images/scopes.png)
+
+A permissions tab will appear below the scope selection,
+from which you can pick any permissions your bot may require to function.
+When invited, the role this bot is granted will include these permissions.
+If you grant no permissions, no role will be created for your bot upon invitation as there is no need for one.
+
+![Permissions](images/permissions.png)
+
+When done selecting permissions, you can use the link below in your browser to invite the bot
+to servers where you have the `Manage Server` permission.
+
+![Invite](images/link.png)
+
+If you are planning to play around with slash/context commands,
+make sure to check the `application commands` scope before inviting your bot!
+
+> [!NOTE]
+> You do not have to kick and reinvite your bot to update permissions/scopes later on.
+> Simply reusing the invite link with provided scopes/perms will update it accordingly.
+
+[Discord Developer Portal]: https://discord.com/developers/applications/
 
 ## What is a token?
 

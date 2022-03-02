@@ -11,8 +11,8 @@ public class CommandHandler
     public CommandHandler(DiscordSocketClient client)
     {
         _services = new ServiceCollection()
-            .AddService<CommandService>()
-            .AddService(client)
+            .AddSingleton<CommandService>()
+            .AddSingleton(client)
             // We are missing DatabaseService!
             .BuildServiceProvider();
     }
@@ -25,5 +25,8 @@ public class CommandHandler
         // registered in this instance of _services.
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         // ...
+
+        // The same approach applies to the interaction service.
+        // Make sure to resolve these issues!
     }
 }
