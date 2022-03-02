@@ -35,6 +35,10 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a collection of users that are able to view the channel.
         /// </summary>
+        /// <remarks>
+        ///     If this channel is a voice channel, a collection of users who are currently connected to this channel
+        ///     is returned.
+        /// </remarks>
         /// <returns>
         ///     A read-only collection of users that can access the channel (i.e. the users seen in the user list).
         /// </returns>
