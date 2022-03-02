@@ -58,6 +58,6 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the banner image of the event.
         /// </summary>
-        public Optional<Image?> Image { get; set; }
+        public Optional<Image?> CoverImage { get; set; }
     }
 }

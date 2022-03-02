@@ -800,9 +800,9 @@ namespace Discord.Rest
                 StartTime = args.StartTime,
                 Status = args.Status,
                 Type = args.Type,
-                Image = args.Image.IsSpecified
-                    ? args.Image.Value.HasValue
-                        ? args.Image.Value.Value.ToModel()
+                Image = args.CoverImage.IsSpecified
+                    ? args.CoverImage.Value.HasValue
+                        ? args.CoverImage.Value.Value.ToModel()
                         : null
                     : Optional<ImageModel?>.Unspecified
             };
