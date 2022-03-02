@@ -15,7 +15,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the time for this timestamp tag.
         /// </summary>
-        public DateTime Time { get; set; }
+        public DateTimeOffset Time { get; set; }
 
         /// <summary>
         ///     Converts the current timestamp tag to the string representation supported by discord.
@@ -26,11 +26,11 @@ namespace Discord
         /// <returns>A string that is compatible in a discord message, ex: <code>&lt;t:1625944201:f&gt;</code></returns>
         public override string ToString()
         {
-            return $"<t:{((DateTimeOffset)Time).ToUnixTimeSeconds()}:{(char)Style}>";
+            return $"<t:{Time.ToUnixTimeSeconds()}:{(char)Style}>";
         }
 
         /// <summary>
-        ///     Creates a new timestamp tag with the specified datetime object.
+        ///     Creates a new timestamp tag with the specified <see cref="DateTime"/> object.
         /// </summary>
         /// <param name="time">The time of this timestamp tag.</param>
         /// <param name="style">The style for this timestamp tag.</param>
@@ -41,6 +41,21 @@ namespace Discord
             {
                 Style = style,
                 Time = time
+            };
+        }
+
+        /// <summary>
+        ///     Creates a new timestamp tag with the specified <see cref="DateTimeOffset"/> object.
+        /// </summary>
+        /// <param name="time">The time of this timestamp tag.</param>
+        /// <param name="style">The style for this timestamp tag.</param>
+        /// <returns>The newly create timestamp tag.</returns>
+        public static TimestampTag FromDateTimeOffset(DateTimeOffset time, TimestampTagStyles style = TimestampTagStyles.ShortDateTime)
+        {
+            return new TimestampTag
+            {
+                Style = style,
+                Time  = time
             };
         }
     }
