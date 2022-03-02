@@ -25,7 +25,7 @@ namespace Discord.WebSocket
             SelfMuted = 0x08,
             SelfDeafened = 0x10,
             SelfStream = 0x20,
-            SelfVideo = 0x30,
+            SelfVideo = 0x40,
         }
 
         private readonly Flags _voiceStates;
