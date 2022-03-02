@@ -70,14 +70,14 @@ public async Task Client_Ready()
     // Let's do our global command
     var globalCommand = new SlashCommandBuilder();
     globalCommand.WithName("first-global-command");
-    globalCommand.WithDescription("This is my frist global slash command");
+    globalCommand.WithDescription("This is my first global slash command");
 
     try
     {
         // Now that we have our builder, we can call the CreateApplicationCommandAsync method to make our slash command.
         await guild.CreateApplicationCommandAsync(guildCommand.Build());
 
-        // With global commands we dont need the guild.
+        // With global commands we don't need the guild.
         await client.CreateGlobalApplicationCommandAsync(globalCommand.Build());
         // Using the ready event is a simple implementation for the sake of the example. Suitable for testing and development.
         // For a production bot, it is recommended to only run the CreateGlobalApplicationCommandAsync() once for each command.
