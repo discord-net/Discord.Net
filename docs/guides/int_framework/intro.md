@@ -150,7 +150,7 @@ Constructor methods support every attribute type that can be used with the regul
 Preferred constructor of a Type can be specified either by passing a `Type[]` to the `[ComplexParameterAttribute]` or tagging a type constructor with the `[ComplexParameterCtorAttribute]`. If nothing is specified, the InteractionService defaults to the only public constructor of the type.
 TypeConverter pattern is used to parse the constructor methods objects.
 
-[!code-csharp[Complex Parameter](samples/intro/usercommand.cs)]
+[!code-csharp[Complex Parameter](samples/intro/complexparams.cs)]
 
 Interaction service complex parameter constructors are prioritized in the following order:
 
