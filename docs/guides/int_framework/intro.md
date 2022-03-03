@@ -145,7 +145,7 @@ You can specify the permitted max/min value for a number type parameter using th
 
 #### Complex Parameters
 
-This allows users to create slash command options using an object's constructor. Also allowing complex objects to be created which cannot be infered from only one input value.
+This allows users to create slash command options using an object's constructor allowing complex objects to be created which cannot be infered from only one input value.
 Constructor methods support every attribute type that can be used with the regular slash commands ([Autocomplete], [Summary] etc. ).
 Preferred constructor of a Type can be specified either by passing a `Type[]` to the `[ComplexParameterAttribute]` or tagging a type constructor with the `[ComplexParameterCtorAttribute]`. If nothing is specified, the InteractionService defaults to the only public constructor of the type.
 TypeConverter pattern is used to parse the constructor methods objects.
