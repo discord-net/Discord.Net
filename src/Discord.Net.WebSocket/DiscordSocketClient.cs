@@ -78,6 +78,7 @@ namespace Discord.WebSocket
         internal bool AlwaysDownloadDefaultStickers { get; private set; }
         internal bool AlwaysResolveStickers { get; private set; }
         internal bool LogGatewayIntentWarnings { get; private set; }
+        internal bool SuppressUnknownDispatchWarnings { get; private set; }
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -150,6 +151,7 @@ namespace Discord.WebSocket
             AlwaysDownloadDefaultStickers = config.AlwaysDownloadDefaultStickers;
             AlwaysResolveStickers = config.AlwaysResolveStickers;
             LogGatewayIntentWarnings = config.LogGatewayIntentWarnings;
+            SuppressUnknownDispatchWarnings = config.SuppressUnknownDispatchWarnings;
             HandlerTimeout = config.HandlerTimeout;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
@@ -2771,7 +2773,7 @@ namespace Discord.WebSocket
 
                             #region Others
                             default:
-                                await _gatewayLogger.WarningAsync($"Unknown Dispatch ({type})").ConfigureAwait(false);
+                                if(!SuppressUnknownDispatchWarnings) await _gatewayLogger.WarningAsync($"Unknown Dispatch ({type})").ConfigureAwait(false);
                                 break;
                                 #endregion
                         }
