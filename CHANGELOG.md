@@ -1,5 +1,28 @@
 # Changelog
 
+## [3.4.0] - 2022-3-2
+
+## Added
+- #2146 Add FromDateTimeOffset in TimestampTag (553055b)
+- #2062 Add return statement to precondition handling (3e52fab)
+- #2131 Add support for sending Message Flags (1fb62de)
+- #2137 Add self_video to VoiceState (8bcd3da)
+- #2151 Add Image property to Guild Scheduled Events (1dc473c)
+- #2152 Add missing json error codes (202554f)
+- #2153 Add IsInvitable and CreatedAt to threads (6bf5818)
+- #2155 Add Interaction Service Complex Parameters (9ba64f6)
+- #2156 Add Display name support for enum type converter (c800674)
+
+## Fixed
+- #2117 Fix stream access exception when ratelimited (a1cfa41)
+- #2128 Fix context menu comand message type (f601e9b)
+- #2135 Fix NRE when ratelimmited requests don't return a body (b95b942)
+- #2154 Fix usage of CacheMode.AllowDownload in channels (b3370c3)
+
+## Misc
+- #2149 Clarify Users property on SocketGuildChannel (5594739)
+- #2157 Enforce valid button styles (507a18d)
+
 ## [3.3.2] - 2022-02-16
 
 ### Fixed
