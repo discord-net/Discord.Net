@@ -143,6 +143,21 @@ In this case, user can only input Stage Channels and Text Channels to this param
 
 You can specify the permitted max/min value for a number type parameter using the [MaxValueAttribute] and [MinValueAttribute].
 
+#### Complex Parameters
+
+This allows users to create slash command options using an object's constructor allowing complex objects to be created which cannot be infered from only one input value.
+Constructor methods support every attribute type that can be used with the regular slash commands ([Autocomplete], [Summary] etc. ).
+Preferred constructor of a Type can be specified either by passing a `Type[]` to the `[ComplexParameterAttribute]` or tagging a type constructor with the `[ComplexParameterCtorAttribute]`. If nothing is specified, the InteractionService defaults to the only public constructor of the type.
+TypeConverter pattern is used to parse the constructor methods objects.
+
+[!code-csharp[Complex Parameter](samples/intro/usercommand.cs)]
+
+Interaction service complex parameter constructors are prioritized in the following order:
+
+1. Constructor matching the signature provided in the `[ComplexParameter(Type[])]` overload.
+2. Constuctor tagged with `[ComplexParameterCtor]`.
+3. Type's only public constuctor.
+
 ## User Commands
 
 A valid User Command must have the following structure:
