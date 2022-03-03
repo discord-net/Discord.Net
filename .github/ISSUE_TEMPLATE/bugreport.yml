@@ -80,7 +80,7 @@ body:
     id: packages
     attributes: 
       label: Packages
-      description: List Discord.Net and Discord.Net related pacakges in use, and versions.
-      placeholder: Discord.Net V3.3.2, etc.
+      description: List related packages in use, and versions.
+      placeholder: Discord.Addons.Hosting V5.1.0, Discord.InteractivityAddon V2.4.0, etc.
     validations:
       required: true
