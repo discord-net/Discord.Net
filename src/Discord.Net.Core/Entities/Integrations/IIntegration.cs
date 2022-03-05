@@ -3,15 +3,16 @@ using System;
 namespace Discord
 {
     /// <summary>
-    ///     Holds information for a guild integration feature.
+    ///     Holds information for an integration feature.
+    ///     Nullable fields not provided for Discord bot integrations, but are for Twitch etc.
     /// </summary>
-    public interface IGuildIntegration
+    public interface IIntegration
     {
         /// <summary>
         ///     Gets the integration ID.
         /// </summary>
         /// <returns>
-        ///     An <see cref="UInt64"/> representing the unique identifier value of this integration.
+        ///     A <see cref="ulong"/> representing the unique identifier value of this integration.
         /// </returns>
         ulong Id { get; }
         /// <summary>
@@ -45,30 +46,52 @@ namespace Discord
         /// <returns>
         ///      <c>true</c> if this integration is syncing; otherwise <c>false</c>.
         /// </returns>
-        bool IsSyncing { get; }
+        bool? IsSyncing { get; }
         /// <summary>
         ///     Gets the ID that this integration uses for "subscribers".
         /// </summary>
-        ulong ExpireBehavior { get; }
+        ulong? RoleId { get; }
+        /// <summary>
+        ///     Gets whether emoticons should be synced for this integration (twitch only currently).
+        /// </summary>
+        bool? HasEnabledEmoticons { get; }
+        /// <summary>
+        ///     Gets the behavior of expiring subscribers.
+        /// </summary>
+        IntegrationExpireBehavior? ExpireBehavior { get; }
         /// <summary>
         ///     Gets the grace period before expiring "subscribers".
         /// </summary>
-        ulong ExpireGracePeriod { get; }
+        int? ExpireGracePeriod { get; }
+        /// <summary>
+        ///     Gets the user for this integration.
+        /// </summary>
+        IUser User { get; }
+        /// <summary>
+        ///     Gets integration account information.
+        /// </summary>
+        IIntegrationAccount Account { get; }
         /// <summary>
         ///     Gets when this integration was last synced.
         /// </summary>
         /// <returns>
-        ///     A <see cref="DateTimeOffset"/> containing a date and time of day when the integration was last synced.
+        ///     Gets a <see cref="DateTimeOffset"/> containing a date and time of day when the integration was last synced.
         /// </returns>
-        DateTimeOffset SyncedAt { get; }
+        DateTimeOffset? SyncedAt { get; }
         /// <summary>
-        ///     Gets integration account information.
+        ///     Gets how many subscribers this integration has.
         /// </summary>
-        IntegrationAccount Account { get; }
-
+        int? SubscriberCount { get; }
+        /// <summary>
+        ///     Gets whether this integration been revoked.
+        /// </summary>
+        bool? IsRevoked { get; }
+        /// <summary>
+        ///     Gets the bot/OAuth2 application for a discord integration.
+        /// </summary>
+        IIntegrationApplication Application { get; }
+        
         IGuild Guild { get; }
         ulong GuildId { get; }
-        ulong RoleId { get; }
-        IUser User { get; }
     }
 }

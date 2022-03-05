@@ -2017,6 +2017,92 @@ namespace Discord.WebSocket
                                 break;
                             #endregion
 
+                            #region Integrations
+                            case "INTEGRATION_CREATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (INTEGRATION_CREATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<Integration>(_serializer);
+
+                                    // Integrations from Gateway should always have guild IDs specified.
+                                    if (!data.GuildId.IsSpecified)
+                                        return;
+
+                                    var guild = State.GetGuild(data.GuildId.Value);
+
+                                    if (guild != null)
+                                    {
+                                        if (!guild.IsSynced)
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+
+                                        await TimedInvokeAsync(_integrationCreated, nameof(IntegrationCreated), RestIntegration.Create(this, guild, data)).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
+                            case "INTEGRATION_UPDATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (INTEGRATION_UPDATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<Integration>(_serializer);
+
+                                    // Integrations from Gateway should always have guild IDs specified.
+                                    if (!data.GuildId.IsSpecified)
+                                        return;
+
+                                    var guild = State.GetGuild(data.GuildId.Value);
+
+                                    if (guild != null)
+                                    {
+                                        if (!guild.IsSynced)
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+
+                                        await TimedInvokeAsync(_integrationUpdated, nameof(IntegrationUpdated), RestIntegration.Create(this, guild, data)).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
+                            case "INTEGRATION_DELETE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (INTEGRATION_DELETE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<IntegrationDeletedEvent>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    if (guild != null)
+                                    {
+                                        if (!guild.IsSynced)
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+
+                                        await TimedInvokeAsync(_integrationDeleted, nameof(IntegrationDeleted), guild, data.Id, data.ApplicationID).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
+                            #endregion
+
                             #region Users
                             case "USER_UPDATE":
                                 {

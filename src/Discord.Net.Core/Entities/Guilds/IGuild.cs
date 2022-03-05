@@ -718,8 +718,21 @@ namespace Discord
         /// </returns>
         Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null);
 
-        Task<IReadOnlyCollection<IGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null);
-        Task<IGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        Task<IReadOnlyCollection<IIntegration>> GetIntegrationsAsync(RequestOptions options = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        Task<IIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null);
 
         /// <summary>
         ///     Gets a collection of all invites in this guild.

@@ -305,18 +305,18 @@ namespace Discord.Rest
         #endregion
 
         #region Integrations
-        public static async Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client,
+        public static async Task<IReadOnlyCollection<RestIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)
         {
             var models = await client.ApiClient.GetGuildIntegrationsAsync(guild.Id, options).ConfigureAwait(false);
-            return models.Select(x => RestGuildIntegration.Create(client, guild, x)).ToImmutableArray();
+            return models.Select(x => RestIntegration.Create(client, guild, x)).ToImmutableArray();
         }
-        public static async Task<RestGuildIntegration> CreateIntegrationAsync(IGuild guild, BaseDiscordClient client,
+        public static async Task<RestIntegration> CreateIntegrationAsync(IGuild guild, BaseDiscordClient client,
             ulong id, string type, RequestOptions options)
         {
             var args = new CreateGuildIntegrationParams(id, type);
             var model = await client.ApiClient.CreateGuildIntegrationAsync(guild.Id, args, options).ConfigureAwait(false);
-            return RestGuildIntegration.Create(client, guild, model);
+            return RestIntegration.Create(client, guild, model);
         }
         #endregion
 
