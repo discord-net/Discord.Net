@@ -19,12 +19,12 @@ namespace Discord
         /// <summary> Gets a <see cref="IReadOnlyCollection{T}"/> of integration parials. </summary>
         IReadOnlyCollection<IIntegration> Integrations { get; }
         /// <summary> Gets whether the connection is verified. </summary>
-        public bool Verified { get; }
+        bool Verified { get; }
         /// <summary> Gets whether friend sync is enabled for this connection. </summary>
-        public bool FriendSync { get; }
+        bool FriendSync { get; }
         /// <summary> Gets whether activities related to this connection will be shown in presence updates. </summary>
-        public bool ShowActivity { get; }
+        bool ShowActivity { get; }
         /// <summary> Visibility of this connection. </summary>
-        public ConnectionVisibility Visibility { get; }
+        ConnectionVisibility Visibility { get; }
     }
 }
