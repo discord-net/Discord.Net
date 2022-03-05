@@ -75,7 +75,7 @@ namespace Discord
         ///     Gets when this integration was last synced.
         /// </summary>
         /// <returns>
-        ///     Gets a <see cref="DateTimeOffset"/> containing a date and time of day when the integration was last synced.
+        ///     A <see cref="DateTimeOffset"/> containing a date and time of day when the integration was last synced.
         /// </returns>
         DateTimeOffset? SyncedAt { get; }
         /// <summary>
