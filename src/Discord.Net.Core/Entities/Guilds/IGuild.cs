@@ -719,19 +719,25 @@ namespace Discord
         Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null);
 
         /// <summary>
-        /// 
+        ///     Gets a collection of all the integrations this guild contains.
         /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     integrations the guild can has.
+        /// </returns>
         Task<IReadOnlyCollection<IIntegration>> GetIntegrationsAsync(RequestOptions options = null);
 
         /// <summary>
-        /// 
+        ///     Creates a new integration.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="type"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
+        /// <param name="id">The id for the integration.</param>
+        /// <param name="type">The type of integration.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     integration.
+        /// </returns>
         Task<IIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null);
 
         /// <summary>
