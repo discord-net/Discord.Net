@@ -96,9 +96,11 @@ namespace Discord
         #endregion
 
         #region General Request Errors (40XXX)
+        MaximumNumberOfEditsReached = 30046,
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
         OpeningDMTooFast = 40003,
+        SendMessagesHasBeenTemporarilyDisabled = 40004,
         RequestEntityTooLarge = 40005,
         FeatureDisabled = 40006,
         UserBanned = 40007,
@@ -108,6 +110,7 @@ namespace Discord
         #endregion
 
         #region Action Preconditions/Checks (50XXX)
+        InteractionHasAlreadyBeenAcknowledged = 40060,
         MissingPermissions = 50001,
         InvalidAccountType = 50002,
         CannotExecuteForDM = 50003,
@@ -141,12 +144,14 @@ namespace Discord
         InvalidFileUpload = 50046,
         CannotSelfRedeemGift = 50054,
         InvalidGuild = 50055,
+        InvalidMessageType = 50068,
         PaymentSourceRequiredForGift = 50070,
         CannotDeleteRequiredCommunityChannel = 50074,
         InvalidSticker = 50081,
         CannotExecuteOnArchivedThread = 50083,
         InvalidThreadNotificationSettings = 50084,
         BeforeValueEarlierThanThreadCreation = 50085,
+        CommunityServerChannelsMustBeTextChannels = 50086,
         ServerLocaleUnavailable = 50095,
         ServerRequiresMonetization = 50097,
         ServerRequiresBoosts = 50101,

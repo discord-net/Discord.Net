@@ -61,22 +61,18 @@ namespace Discord.Net
                 DateTimeOffset.TryParse(temp, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) ? DateTimeOffset.UtcNow - date : (TimeSpan?)null;
         }
 
-        internal void ReadRatelimitPayload(Stream response)
+        internal Ratelimit ReadRatelimitPayload(Stream response)
         {
-            try
+            if (response != null && response.Length != 0)
             {
-                if (response != null && response.Length != 0)
+                using (TextReader text = new StreamReader(response))
+                using (JsonReader reader = new JsonTextReader(text))
                 {
-                    using (TextReader text = new StreamReader(response))
-                    using (JsonReader reader = new JsonTextReader(text))
-                    {
-                        var ratelimit = Discord.Rest.DiscordRestClient.Serializer.Deserialize<Ratelimit>(reader);
-
-                        ResetAfter = TimeSpan.FromSeconds(ratelimit.RetryAfter);
-                    }
+                    return Discord.Rest.DiscordRestClient.Serializer.Deserialize<Ratelimit>(reader);
                 }
             }
-            catch { }
+
+            return null;
         }
     }
 }

@@ -30,7 +30,11 @@ namespace Discord.WebSocket
         /// </summary>
         public SocketGuild Guild { get; }
         /// <inheritdoc />
+        public string DisplayName => Nickname ?? Username;
+        /// <inheritdoc />
         public string Nickname { get; private set; }
+        /// <inheritdoc/>
+        public string DisplayAvatarId => GuildAvatarId ?? AvatarId;
         /// <inheritdoc/>
         public string GuildAvatarId { get; private set; }
         /// <inheritdoc />
@@ -60,6 +64,8 @@ namespace Discord.WebSocket
         public bool IsMuted => VoiceState?.IsMuted ?? false;
         /// <inheritdoc />
         public bool IsStreaming => VoiceState?.IsStreaming ?? false;
+        /// <inheritdoc />
+        public bool IsVideoing => VoiceState?.IsVideoing ?? false;
         /// <inheritdoc />
         public DateTimeOffset? RequestToSpeakTimestamp => VoiceState?.RequestToSpeakTimestamp ?? null;
         /// <inheritdoc />
@@ -244,6 +250,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public ChannelPermissions GetPermissions(IGuildChannel channel)
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
+
+        /// <inheritdoc />
+        public string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GuildAvatarId is not null
+                ? GetGuildAvatarUrl(format, size)
+                : GetAvatarUrl(format, size);
+
+        /// <inheritdoc />
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, Guild.Id, GuildAvatarId, size, format);
 

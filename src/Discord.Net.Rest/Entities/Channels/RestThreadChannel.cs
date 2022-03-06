@@ -34,17 +34,26 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public int MessageCount { get; private set; }
 
+        /// <inheritdoc/>
+        public bool? IsInvitable { get; private set; }
+
+        /// <inheritdoc cref="IThreadChannel.CreatedAt"/>
+        public override DateTimeOffset CreatedAt { get; }
+
         /// <summary>
         ///     Gets the parent text channel id.
         /// </summary>
         public ulong ParentChannelId { get; private set; }
 
-        internal RestThreadChannel(BaseDiscordClient discord, IGuild guild, ulong id)
-            : base(discord, guild, id) { }
+        internal RestThreadChannel(BaseDiscordClient discord, IGuild guild, ulong id, DateTimeOffset? createdAt)
+            : base(discord, guild, id)
+        {
+            CreatedAt = createdAt ?? new DateTimeOffset(2022, 1, 9, 0, 0, 0, TimeSpan.Zero);
+        }
 
         internal new static RestThreadChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestThreadChannel(discord, guild, model.Id);
+            var entity = new RestThreadChannel(discord, guild, model.Id, model.ThreadMetadata.GetValueOrDefault()?.CreatedAt.GetValueOrDefault());
             entity.Update(model);
             return entity;
         }
@@ -57,6 +66,7 @@ namespace Discord.Rest
 
             if (model.ThreadMetadata.IsSpecified)
             {
+                IsInvitable = model.ThreadMetadata.Value.Invitable.ToNullable();
                 IsArchived = model.ThreadMetadata.Value.Archived;
                 AutoArchiveDuration = model.ThreadMetadata.Value.AutoArchiveDuration;
                 ArchiveTimestamp = model.ThreadMetadata.Value.ArchiveTimestamp;

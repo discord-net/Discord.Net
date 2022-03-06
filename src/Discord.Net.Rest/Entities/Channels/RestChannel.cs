@@ -13,7 +13,7 @@ namespace Discord.Rest
     {
         #region RestChannel
         /// <inheritdoc />
-        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+        public virtual DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
         internal RestChannel(BaseDiscordClient discord, ulong id)
             : base(discord, id)

@@ -1,7 +1,7 @@
 discordClient.ButtonExecuted += async (interaction) => 
 {
     var ctx = new SocketInteractionContext<SocketMessageComponent>(discordClient, interaction);
-    await _interactionService.ExecuteAsync(ctx, serviceProvider);
+    await _interactionService.ExecuteCommandAsync(ctx, serviceProvider);
 };
 
 public class MessageComponentModule : InteractionModuleBase<SocketInteractionContext<SocketMessageComponent>>

@@ -9,84 +9,14 @@ namespace Discord.Rest
     /// </summary>
     public interface IRestMessageChannel : IMessageChannel
     {
-        /// <summary>
-        ///     Sends a message to this message channel.
-        /// </summary>
-        /// <remarks>
-        ///     This method follows the same behavior as described in <see cref="IMessageChannel.SendMessageAsync"/>.
-        ///     Please visit its documentation for more details on this method.
-        /// </remarks>
-        /// <param name="text">The message to be sent.</param>
-        /// <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
-        /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <param name="allowedMentions">
-        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
-        /// </param>
-        /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
-        /// <param name="stickers">A collection of stickers to send with the message.</param>
-        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
-        /// <returns>
-        ///     A task that represents an asynchronous send operation for delivering the message. The task result
-        ///     contains the sent message.
-        /// </returns>
-        new Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null);
-        /// <summary>
-        ///     Sends a file to this message channel with an optional caption.
-        /// </summary>
-        /// <remarks>
-        ///     This method follows the same behavior as described in
-        ///     <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[])"/>. Please visit
-        ///     its documentation for more details on this method.
-        /// </remarks>
-        /// <param name="filePath">The file path of the file.</param>
-        /// <param name="text">The message to be sent.</param>
-        /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
-        /// <param name="embed">The <see cref="Discord.EmbedType.Rich" /> <see cref="Embed" /> to be sent.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
-        /// <param name="allowedMentions">
-        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
-        /// </param>
-        /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
-        /// <param name="stickers">A collection of stickers to send with the message.</param>
-        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
-        /// <returns>
-        ///     A task that represents an asynchronous send operation for delivering the message. The task result
-        ///     contains the sent message.
-        /// </returns>
-        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null);
-        /// <summary>
-        ///     Sends a file to this message channel with an optional caption.
-        /// </summary>
-        /// <remarks>
-        ///     This method follows the same behavior as described in <see cref="IMessageChannel.SendFileAsync(Stream, string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[])"/>.
-        ///     Please visit its documentation for more details on this method.
-        /// </remarks>
-        /// <param name="stream">The <see cref="Stream" /> of the file to be sent.</param>
-        /// <param name="filename">The name of the attachment.</param>
-        /// <param name="text">The message to be sent.</param>
-        /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
-        /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
-        /// <param name="allowedMentions">
-        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
-        /// </param>
-        /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
-        /// <param name="stickers">A collection of stickers to send with the message.</param>
-        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
-        /// <returns>
-        ///     A task that represents an asynchronous send operation for delivering the message. The task result
-        ///     contains the sent message.
-        /// </returns>
-        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null);
+        /// <inheritdoc cref="IMessageChannel.SendMessageAsync(string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
+        new Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+        
+        /// <inheritdoc cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
+        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+        
+        /// <inheritdoc cref="IMessageChannel.SendFileAsync(Stream, string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
+        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
 
         /// <summary>
         ///     Gets a message from this message channel.

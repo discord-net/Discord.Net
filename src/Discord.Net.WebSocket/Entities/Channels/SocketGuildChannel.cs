@@ -35,6 +35,10 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a collection of users that are able to view the channel.
         /// </summary>
+        /// <remarks>
+        ///     If this channel is a voice channel, a collection of users who are currently connected to this channel
+        ///     is returned.
+        /// </remarks>
         /// <returns>
         ///     A read-only collection of users that can access the channel (i.e. the users seen in the user list).
         /// </returns>
@@ -210,10 +214,10 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
+            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable(); //Overridden in Text/Voice
         /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => Task.FromResult<IGuildUser>(GetUser(id));
+            => Task.FromResult<IGuildUser>(GetUser(id)); //Overridden in Text/Voice
         #endregion
 
         #region IChannel

@@ -13,6 +13,8 @@ namespace Discord.Interactions
     /// </summary>
     public class SlashCommandInfo : CommandInfo<SlashCommandParameterInfo>, IApplicationCommandInfo
     {
+        internal IReadOnlyDictionary<string, SlashCommandParameterInfo> _flattenedParameterDictionary { get; }
+
         /// <summary>
         ///     Gets the command description that will be displayed on Discord.
         /// </summary>
@@ -30,11 +32,23 @@ namespace Discord.Interactions
         /// <inheritdoc/>
         public override bool SupportsWildCards => false;
 
+        /// <summary>
+        ///     Gets the flattened collection of command parameters and complex parameter fields.
+        /// </summary>
+        public IReadOnlyCollection<SlashCommandParameterInfo> FlattenedParameters { get; }
+
         internal SlashCommandInfo (Builders.SlashCommandBuilder builder, ModuleInfo module, InteractionService commandService) : base(builder, module, commandService)
         {
             Description = builder.Description;
             DefaultPermission = builder.DefaultPermission;
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
+            FlattenedParameters = FlattenParameters(Parameters).ToImmutableArray();
+
+            for (var i = 0; i < FlattenedParameters.Count - 1; i++)
+                if (!FlattenedParameters.ElementAt(i).IsRequired && FlattenedParameters.ElementAt(i + 1).IsRequired)
+                    throw new InvalidOperationException("Optional parameters must appear after all required parameters, ComplexParameters with optional parameters must be located at the end.");
+
+            _flattenedParameterDictionary = FlattenedParameters?.ToDictionary(x => x.Name, x => x).ToImmutableDictionary();
         }
 
         /// <inheritdoc/>
@@ -74,7 +88,7 @@ namespace Discord.Interactions
                 }
                 return await RunAsync(context, args, services).ConfigureAwait(false);
             }
-            catch (Exception ex)
+            else
             {
                 return await InvokeEventAndReturn(context, ExecuteResult.FromError(ex)).ConfigureAwait(false);
             }
@@ -126,6 +140,16 @@ namespace Discord.Interactions
                 return $"Slash Command: \"{base.ToString()}\" for {context.User} in {context.Guild}/{context.Channel}";
             else
                 return $"Slash Command: \"{base.ToString()}\" for {context.User} in {context.Channel}";
+        }
+
+        private static IEnumerable<SlashCommandParameterInfo> FlattenParameters(IEnumerable<SlashCommandParameterInfo> parameters)
+        {
+            foreach (var parameter in parameters)
+                if (!parameter.IsComplexParameter)
+                    yield return parameter;
+                else
+                    foreach(var complexParameterField in parameter.ComplexParameterFields)
+                        yield return complexParameterField;
         }
     }
 }

@@ -18,7 +18,8 @@ body:
     attributes:
       label: Verify Issue Source
       description: If your issue is related to an exception make sure the error was thrown by Discord.Net, and not your code or another library. 
-                  If you get an `HttpException` with the error code `401`, then the error is caused by your bot's permissions, not dnet.
+                  If you get an `HttpException` with the error code `401`, then the error is caused by your bot's permissions, not dnet. 
+                  If you have a issue that does directly relate to an API bug, feel free to open a [Q&A Discussion](https://github.com/discord-net/Discord.Net/discussions)
       options:
       - label: I verified the issue was caused by Discord.Net.
         required: true
@@ -75,3 +76,11 @@ body:
         ```
     validations:
       required: false
+  - type: textarea
+    id: packages
+    attributes: 
+      label: Packages
+      description: Please list all 3rd party packages in use if applicable, including their versions.
+      placeholder: Discord.Addons.Hosting V5.1.0, Discord.InteractivityAddon V2.4.0, etc.
+    validations:
+      required: true

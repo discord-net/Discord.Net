@@ -2,6 +2,7 @@ using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Discord.Interactions
@@ -27,12 +28,14 @@ namespace Discord.Interactions
                 var choices = new List<ApplicationCommandOptionChoiceProperties>();
 
                 foreach (var member in members)
+                {
+                    var displayValue = member.GetCustomAttribute<ChoiceDisplayAttribute>()?.Name ?? member.Name;
                     choices.Add(new ApplicationCommandOptionChoiceProperties
                     {
-                        Name = member.Name,
+                        Name = displayValue,
                         Value = member.Name
                     });
-
+                }
                 properties.Choices = choices;
             }
         }

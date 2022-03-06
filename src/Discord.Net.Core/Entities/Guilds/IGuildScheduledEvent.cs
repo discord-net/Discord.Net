@@ -40,6 +40,11 @@ namespace Discord
         string Description { get; }
 
         /// <summary>
+        ///     Gets the banner asset id of the event.
+        /// </summary>
+        string CoverImageId { get; }
+
+        /// <summary>
         ///     Gets the start time of the event.
         /// </summary>
         DateTimeOffset StartTime { get; }
@@ -79,6 +84,14 @@ namespace Discord
         ///     Gets the user count of the event.
         /// </summary>
         int? UserCount { get; }
+
+        /// <summary>
+        ///     Gets this events banner image url.
+        /// </summary>
+        /// <param name="format">The format to return.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
+        /// <returns>The cover images url.</returns>
+        string GetCoverImageUrl(ImageFormat format = ImageFormat.Auto, ushort size = 1024);
 
         /// <summary>
         ///     Starts the event.
