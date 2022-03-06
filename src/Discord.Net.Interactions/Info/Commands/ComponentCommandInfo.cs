@@ -51,8 +51,6 @@ namespace Discord.Interactions
             var paramCount = paramList.Count();
             var captureCount = wildcardCaptures?.Count() ?? 0;
 
-            if (paramCount < captureCount + 1)
-                return await InvokeEventAndReturn(context, ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command was invoked with too many parameters")).ConfigureAwait(false);
             if (context.Interaction is not IComponentInteraction messageComponent)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Component Command Interaction");
 
