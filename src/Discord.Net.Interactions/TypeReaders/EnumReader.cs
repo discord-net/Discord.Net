@@ -12,7 +12,7 @@ namespace Discord.Interactions
                 TypeConverterResult.FromSuccess(result) : TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"Value {option} cannot be converted to {nameof(T)}"));
         }
 
-        public override Task<string> SerializeAsync(object obj)
+        public override Task<string> SerializeAsync(object obj, IServiceProvider services)
         {
             var name = Enum.GetName(typeof(T), obj);
 

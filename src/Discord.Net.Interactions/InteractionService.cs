@@ -914,8 +914,23 @@ namespace Discord.Interactions
         /// <returns>
         ///     A task representing the conversion process. The task result contains the result of the conversion.
         /// </returns>
-        public Task<string> SerializeValue<T>(T obj, IServiceProvider services = null) =>
-            _typeReaderMap.Get(typeof(T), services).SerializeAsync(obj);
+        public Task<string> SerializeValueAsync<T>(T obj, IServiceProvider services) =>
+            _typeReaderMap.Get(typeof(T), services).SerializeAsync(obj, services);
+
+        public async Task<string> GenerateCustomIdStringAsync(string format, IServiceProvider services, params object[] args)
+        {
+            var serializedValues = new string[args.Length];
+
+            for(var i = 0; i < args.Length; i++)
+            {
+                var arg = args[i];
+                var typeReader = _typeReaderMap.Get(arg.GetType(), null);
+                var result = await typeReader.SerializeAsync(arg, services);
+                serializedValues[i] = result;
+            }
+
+            return string.Format(format, serializedValues);
+        }
 
         /// <summary>
         ///     Loads and caches an <see cref="ModalInfo"/> for the provided <see cref="IModal"/>.
