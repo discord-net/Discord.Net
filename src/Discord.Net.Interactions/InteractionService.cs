@@ -785,6 +785,20 @@ namespace Discord.Interactions
             return await commandResult.Command.ExecuteAsync(context, services).ConfigureAwait(false);
         }
 
+        private async Task<IResult> ExecuteModalCommandAsync(IInteractionContext context, string input, IServiceProvider services)
+        {
+            var result = _modalCommandMap.GetCommand(input);
+
+            if (!result.IsSuccess)
+            {
+                await _cmdLogger.DebugAsync($"Unknown custom interaction id, skipping execution ({input.ToUpper()})");
+
+                await _componentCommandExecutedEvent.InvokeAsync(null, context, result).ConfigureAwait(false);
+                return result;
+            }
+            return await result.Command.ExecuteAsync(context, services, result.RegexCaptureGroups).ConfigureAwait(false);
+        }
+
         internal TypeConverter GetTypeConverter(Type type, IServiceProvider services = null)
             => _typeConverterMap.Get(type, services);
 

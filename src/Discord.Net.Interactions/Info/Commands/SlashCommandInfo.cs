@@ -88,7 +88,7 @@ namespace Discord.Interactions
                 }
                 return await RunAsync(context, args, services).ConfigureAwait(false);
             }
-            else
+            catch(Exception ex)
             {
                 return await InvokeEventAndReturn(context, ExecuteResult.FromError(ex)).ConfigureAwait(false);
             }
