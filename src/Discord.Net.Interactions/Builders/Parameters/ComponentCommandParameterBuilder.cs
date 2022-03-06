@@ -2,6 +2,9 @@ using System;
 
 namespace Discord.Interactions.Builders
 {
+    /// <summary>
+    ///     Represents a builder for creating <see cref="ComponentCommandParameterInfo"/>.
+    /// </summary>
     public class ComponentCommandParameterBuilder : ParameterBuilder<ComponentCommandParameterInfo, ComponentCommandParameterBuilder>
     {
         /// <summary>
