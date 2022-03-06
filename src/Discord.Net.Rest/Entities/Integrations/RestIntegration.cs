@@ -76,12 +76,7 @@ namespace Discord.Rest
         
         public async Task DeleteAsync()
         {
-            await Discord.ApiClient.DeleteGuildIntegrationAsync(GuildId, Id).ConfigureAwait(false);
-        }
-
-        public async Task SyncAsync()
-        {
-            await Discord.ApiClient.SyncGuildIntegrationAsync(GuildId, Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteIntegrationAsync(GuildId, Id).ConfigureAwait(false);
         }
 
         public override string ToString() => Name;

@@ -729,16 +729,14 @@ namespace Discord
         Task<IReadOnlyCollection<IIntegration>> GetIntegrationsAsync(RequestOptions options = null);
 
         /// <summary>
-        ///     Creates a new integration.
+        ///     Deletes an integration.
         /// </summary>
         /// <param name="id">The id for the integration.</param>
-        /// <param name="type">The type of integration.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
-        ///     integration.
+        ///     A task that represents the asynchronous removal operation.
         /// </returns>
-        Task<IIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null);
+        Task DeleteIntegrationAsync(ulong id, RequestOptions options = null);
 
         /// <summary>
         ///     Gets a collection of all invites in this guild.

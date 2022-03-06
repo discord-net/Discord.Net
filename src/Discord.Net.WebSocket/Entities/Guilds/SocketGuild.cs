@@ -849,8 +849,8 @@ namespace Discord.WebSocket
         #region Integrations
         public Task<IReadOnlyCollection<RestIntegration>> GetIntegrationsAsync(RequestOptions options = null)
             => GuildHelper.GetIntegrationsAsync(this, Discord, options);
-        public Task<RestIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null)
-            => GuildHelper.CreateIntegrationAsync(this, Discord, id, type, options);
+        public Task DeleteIntegrationAsync(ulong id, RequestOptions options = null)
+            => GuildHelper.DeleteIntegrationAsync(this, Discord, id, options);
         #endregion
 
         #region Interactions
@@ -1895,8 +1895,8 @@ namespace Discord.WebSocket
         async Task<IReadOnlyCollection<IIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)
             => await GetIntegrationsAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IIntegration> IGuild.CreateIntegrationAsync(ulong id, string type, RequestOptions options)
-            => await CreateIntegrationAsync(id, type, options).ConfigureAwait(false);
+        async Task IGuild.DeleteIntegrationAsync(ulong id, RequestOptions options)
+            => await DeleteIntegrationAsync(id, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuild.GetInvitesAsync(RequestOptions options)
