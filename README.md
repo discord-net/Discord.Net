@@ -53,7 +53,7 @@ In order to compile Discord.Net, you require the following:
 
 ### Using Visual Studio
 
-- [Visual Studio 2017](https://www.microsoft.com/net/core#windowsvs2017)
+- [Visual Studio 2022](https://www.microsoft.com/net/core#windowsvs2022)
 - [.NET Core SDK](https://www.microsoft.com/net/download/core)
 
 The .NET Core workload must be selected during Visual Studio installation.
