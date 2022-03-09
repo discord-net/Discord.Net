@@ -17,15 +17,15 @@ namespace Discord.API
         [JsonProperty("enabled")]
         public bool Enabled { get; set; }
         [JsonProperty("syncing")]
-        public Optional<bool> Syncing { get; set; }
+        public Optional<bool?> Syncing { get; set; }
         [JsonProperty("role_id")]
-        public ulong? RoleId { get; set; }
+        public Optional<ulong?> RoleId { get; set; }
         [JsonProperty("enable_emoticons")]
-        public Optional<bool> EnableEmoticons { get; set; }
+        public Optional<bool?> EnableEmoticons { get; set; }
         [JsonProperty("expire_behavior")]
         public Optional<IntegrationExpireBehavior> ExpireBehavior { get; set; }
         [JsonProperty("expire_grace_period")]
-        public Optional<int> ExpireGracePeriod { get; set; }
+        public Optional<int?> ExpireGracePeriod { get; set; }
         [JsonProperty("user")]
         public Optional<User> User { get; set; }
         [JsonProperty("account")]
@@ -33,9 +33,9 @@ namespace Discord.API
         [JsonProperty("synced_at")]
         public Optional<DateTimeOffset> SyncedAt { get; set; }
         [JsonProperty("subscriber_count")]
-        public Optional<int> SubscriberAccount { get; set; }
+        public Optional<int?> SubscriberAccount { get; set; }
         [JsonProperty("revoked")]
-        public Optional<bool> Revoked { get; set; }
+        public Optional<bool?> Revoked { get; set; }
         [JsonProperty("application")]
         public Optional<IntegrationApplication> Application { get; set; }
     }
