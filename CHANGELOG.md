@@ -1,5 +1,53 @@
 # Changelog
 
+## [3.4.0] - 2022-3-2
+
+## Added
+- #2146 Add FromDateTimeOffset in TimestampTag (553055b)
+- #2062 Add return statement to precondition handling (3e52fab)
+- #2131 Add support for sending Message Flags (1fb62de)
+- #2137 Add self_video to VoiceState (8bcd3da)
+- #2151 Add Image property to Guild Scheduled Events (1dc473c)
+- #2152 Add missing json error codes (202554f)
+- #2153 Add IsInvitable and CreatedAt to threads (6bf5818)
+- #2155 Add Interaction Service Complex Parameters (9ba64f6)
+- #2156 Add Display name support for enum type converter (c800674)
+
+## Fixed
+- #2117 Fix stream access exception when ratelimited (a1cfa41)
+- #2128 Fix context menu comand message type (f601e9b)
+- #2135 Fix NRE when ratelimmited requests don't return a body (b95b942)
+- #2154 Fix usage of CacheMode.AllowDownload in channels (b3370c3)
+
+## Misc
+- #2149 Clarify Users property on SocketGuildChannel (5594739)
+- #2157 Enforce valid button styles (507a18d)
+
+## [3.3.2] - 2022-02-16
+
+### Fixed
+
+- #2116 Fix null rest client in shards
+
+## [3.3.1] - 2022-02-16
+
+### Added
+
+- #2107 Add DisplayName property to IGuildUser. (abfba3c)
+
+### Fixed
+
+- #2110 Fix incorrect ratelimit handles for 429's (b2598d3)
+- #2094 Fix ToString() on CommandInfo (01735c8)
+- #2098 Fix channel being null in DMs on Interactions (7e1b8c9)
+- #2100 Fix crosspost ratelimits (fad217e)
+- #2108 Fix being unable to modify AllowedMentions with no embeds set. (169d54f)
+- #2109 Fix unused creation of REST clients for DiscordShardedClient shards. (6039378)
+
+### Misc
+
+- #2099 Update interaction summaries (503d32a)
+
 ## [3.3.0] - 2022-02-09
 
 ### Added

@@ -29,6 +29,9 @@ namespace Discord.Rest
         public string Description { get; private set; }
 
         /// <inheritdoc/>
+        public string CoverImageId { get; private set; }
+
+        /// <inheritdoc/>
         public DateTimeOffset StartTime { get; private set; }
 
         /// <inheritdoc/>
@@ -98,7 +101,12 @@ namespace Discord.Rest
             EntityId = model.EntityId;
             Location = model.EntityMetadata?.Location.GetValueOrDefault();
             UserCount = model.UserCount.ToNullable();
+            CoverImageId = model.Image;
         }
+
+        /// <inheritdoc/>
+        public string GetCoverImageUrl(ImageFormat format = ImageFormat.Auto, ushort size = 1024)
+            => CDN.GetEventCoverImageUrl(Guild.Id, Id, CoverImageId, format, size);
 
         /// <inheritdoc/>
         public Task StartAsync(RequestOptions options = null)

@@ -63,9 +63,15 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         DateTimeOffset? IGuildUser.JoinedAt => null;
         /// <inheritdoc />
+        string IGuildUser.DisplayName => null;
+        /// <inheritdoc />
         string IGuildUser.Nickname => null;
         /// <inheritdoc />
+        string IGuildUser.DisplayAvatarId => null;
+        /// <inheritdoc />
         string IGuildUser.GuildAvatarId => null;
+        /// <inheritdoc />
+        string IGuildUser.GetDisplayAvatarUrl(ImageFormat format, ushort size) => null;
         /// <inheritdoc />
         string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => null;
         /// <inheritdoc />
@@ -157,6 +163,8 @@ namespace Discord.WebSocket
         string IVoiceState.VoiceSessionId => null;
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;
+        /// <inheritdoc />
+        bool IVoiceState.IsVideoing => false;
         /// <inheritdoc />
         DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
         #endregion

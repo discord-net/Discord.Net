@@ -53,7 +53,6 @@ namespace Discord.Rest
                 AllowedMentions allowedMentions = args.AllowedMentions.Value;
                 Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
                 Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
-                Preconditions.AtMost(args.Embeds.Value?.Length ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
 
                 // check that user flag and user Id list are exclusive, same with role flag and role Id list
                 if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)

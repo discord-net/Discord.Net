@@ -799,7 +799,12 @@ namespace Discord.Rest
                 PrivacyLevel = args.PrivacyLevel,
                 StartTime = args.StartTime,
                 Status = args.Status,
-                Type = args.Type
+                Type = args.Type,
+                Image = args.CoverImage.IsSpecified
+                    ? args.CoverImage.Value.HasValue
+                        ? args.CoverImage.Value.Value.ToModel()
+                        : null
+                    : Optional<ImageModel?>.Unspecified
             };
 
             if(args.Location.IsSpecified)
@@ -839,6 +844,7 @@ namespace Discord.Rest
             DateTimeOffset? endTime = null,
             ulong? channelId = null,
             string location = null,
+            Image? bannerImage = null,
             RequestOptions options = null)
         {
             if(location != null)
@@ -864,6 +870,7 @@ namespace Discord.Rest
             if (endTime != null && endTime <= startTime)
                 throw new ArgumentOutOfRangeException(nameof(endTime), $"{nameof(endTime)} cannot be before the start time");
 
+            
             var apiArgs = new CreateGuildScheduledEventParams()
             {
                 ChannelId = channelId ?? Optional<ulong>.Unspecified,
@@ -872,7 +879,8 @@ namespace Discord.Rest
                 Name = name,
                 PrivacyLevel = privacyLevel,
                 StartTime = startTime,
-                Type = type
+                Type = type,
+                Image = bannerImage.HasValue ? bannerImage.Value.ToModel() : Optional<ImageModel>.Unspecified
             };
 
             if(location != null)

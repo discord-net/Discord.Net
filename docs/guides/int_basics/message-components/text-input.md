@@ -35,11 +35,11 @@ and min/max length of the input:
 var tb = new TextInputBuilder()
     .WithLabel("Labeled")
     .WithCustomId("text_input")
-	.WithStyle(TextInputStyle.Paragraph)
-	.WithMinLength(6);
-	.WithMaxLength(42)
-	.WithRequired(true)
-	.WithPlaceholder("Consider this place held.");
+    .WithStyle(TextInputStyle.Paragraph)
+    .WithMinLength(6)
+    .WithMaxLength(42)
+    .WithRequired(true)
+    .WithPlaceholder("Consider this place held.");
 ```
 
 ![more advanced text input](images/image9.png)

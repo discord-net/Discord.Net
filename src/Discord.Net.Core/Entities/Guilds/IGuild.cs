@@ -1105,6 +1105,7 @@ namespace Discord
         /// </param>
         /// <param name="speakers">A collection of speakers for the event.</param>
         /// <param name="location">The location of the event; links are supported</param>
+        /// <param name="coverImage">The optional banner image for the event.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous create operation.
@@ -1118,6 +1119,7 @@ namespace Discord
             DateTimeOffset? endTime = null,
             ulong? channelId = null,
             string location = null,
+            Image? coverImage = null,
             RequestOptions options = null);
 
         /// <summary>

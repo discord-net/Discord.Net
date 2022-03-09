@@ -18,6 +18,13 @@ namespace Discord
         /// </returns>
         DateTimeOffset? JoinedAt { get; }
         /// <summary>
+        ///     Gets the displayed name for this user.
+        /// </summary>
+        /// <returns>
+        ///     A string representing the display name of the user; If the nickname is null, this will be the username.
+        /// </returns>
+        string DisplayName { get; }
+        /// <summary>
         ///     Gets the nickname for this user.
         /// </summary>
         /// <returns>
@@ -25,7 +32,15 @@ namespace Discord
         /// </returns>
         string Nickname { get; }
         /// <summary>
-        ///     Gets the guild specific avatar for this users.
+        ///     Gets the displayed avatar for this user.
+        /// </summary>
+        /// <returns>
+        ///     The users displayed avatar hash. If the user does not have a guild avatar, this will be the regular avatar.
+        ///     If the user also does not have a regular avatar, this will be <see langword="null"/>.
+        /// </returns>
+        string DisplayAvatarId { get; }
+        /// <summary>
+        ///     Gets the guild specific avatar for this user.
         /// </summary>
         /// <returns>
         ///     The users guild avatar hash if they have one; otherwise <see langword="null"/>.
@@ -119,15 +134,28 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This property retrieves a URL for this guild user's guild specific avatar. In event that the user does not have a valid guild avatar
-        ///     (i.e. their avatar identifier is not set), this method will return <c>null</c>.
+        ///     (i.e. their avatar identifier is not set), this method will return <see langword="null"/>.
         /// </remarks>
         /// <param name="format">The format to return.</param>
         /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
         /// </param>
         /// <returns>
-        ///     A string representing the user's avatar URL; <c>null</c> if the user does not have an avatar in place.
+        ///     A string representing the user's avatar URL; <see langword="null"/> if the user does not have an avatar in place.
         /// </returns>
         string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+        /// <summary>
+        ///     Gets the display avatar URL for this user.
+        /// </summary>
+        /// <remarks>
+        ///     This property retrieves an URL for this guild user's displayed avatar.
+        ///     If the user does not have a guild avatar, this will be the user's regular avatar.
+        /// </remarks>
+        /// <param name="format">The format to return.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
+        /// <returns>
+        ///     A string representing the URL of the displayed avatar for this user. <see langword="null"/> if the user does not have an avatar in place.
+        /// </returns>
+        string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
         /// <summary>
         ///     Kicks this user from this guild.
         /// </summary>

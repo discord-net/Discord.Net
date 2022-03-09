@@ -75,7 +75,6 @@ namespace Discord.Net.Queue
                         switch (response.StatusCode)
                         {
                             case (HttpStatusCode)429:
-                                info.ReadRatelimitPayload(response.Stream);
                                 if (info.IsGlobal)
                                 {
 #if DEBUG_LIMITS
@@ -88,7 +87,7 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                                     Debug.WriteLine($"[{id}] (!) 429");
 #endif
-                                    UpdateRateLimit(id, request, info, true);
+                                    UpdateRateLimit(id, request, info, true, body:response.Stream);
                                 }
                                 await _queue.RaiseRateLimitTriggered(Id, info, $"{request.Method} {request.Endpoint}").ConfigureAwait(false);
                                 continue; //Retry
@@ -316,7 +315,7 @@ namespace Discord.Net.Queue
             }
         }
 
-        private void UpdateRateLimit(int id, IRequest request, RateLimitInfo info, bool is429, bool redirected = false)
+        private void UpdateRateLimit(int id, IRequest request, RateLimitInfo info, bool is429, bool redirected = false, Stream body = null)
         {
             if (WindowCount == 0)
                 return;
@@ -373,7 +372,18 @@ namespace Discord.Net.Queue
                     Debug.WriteLine($"[{id}] X-RateLimit-Remaining: " + info.Remaining.Value);
                     _semaphore = info.Remaining.Value;
                 }*/
-                if (info.RetryAfter.HasValue)
+                if (is429)
+                {
+                    // use the payload reset after value
+                    var payload = info.ReadRatelimitPayload(body);
+
+                    // fallback on stored ratelimit info when payload is null, https://github.com/discord-net/Discord.Net/issues/2123
+                    resetTick = DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(payload?.RetryAfter ?? info.ResetAfter?.TotalSeconds ?? 0));
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Reset-After: {info.ResetAfter.Value} ({info.ResetAfter?.TotalMilliseconds} ms)");
+#endif
+                }
+                else if (info.RetryAfter.HasValue)
                 {
                     //RetryAfter is more accurate than Reset, where available
                     resetTick = DateTimeOffset.UtcNow.AddSeconds(info.RetryAfter.Value);
