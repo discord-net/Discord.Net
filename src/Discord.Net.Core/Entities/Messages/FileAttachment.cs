@@ -7,13 +7,29 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents an outgoing file attachment used to send a file to discord.
+    /// </summary>
     public struct FileAttachment : IDisposable
     {
+        /// <summary>
+        ///     Gets or sets the filename.
+        /// </summary>
         public string FileName { get; set; }
+        /// <summary>
+        ///     Gets or sets the description of the file.
+        /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        ///     Gets or sets whether this file should be marked as a spoiler.
+        /// </summary>
         public bool IsSpoiler { get; set; }
 
 #pragma warning disable IDISP008
+        /// <summary>
+        ///     Gets the stream containing the file content.
+        /// </summary>
         public Stream Stream { get; }
 #pragma warning restore IDISP008 
 
