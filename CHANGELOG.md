@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.4.1] - 2022-03-9
+
+### Added
+- #2169 Component TypeConverters and CustomID TypeReaders (fb4250b)
+- #2180 Attachment description and content type (765c0c5)
+- #2162 Add configuration toggle to suppress Unknown dispatch warnings (1ba96d6)
+- #2178 Add 10065 Error code (cc6918d)
+
+### Fixed
+- #2179 Logging out sharded client throws (24b7bb5)
+- #2182 Thread owner always returns null (25aaa49)
+- #2165 Fix error with flag params when uploading files. (a5d3add)
+- #2181 Fix ambiguous reference for creating roles (f8ec3c7)
+
 ## [3.4.0] - 2022-3-2
 
 ## Added
