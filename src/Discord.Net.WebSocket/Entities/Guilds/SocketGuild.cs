@@ -999,10 +999,6 @@ namespace Discord.WebSocket
             return null;
         }
 
-        /// <inheritdoc />
-        public Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
-            bool isHoisted = false, RequestOptions options = null)
-            => GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, false, options);
         /// <summary>
         ///     Creates a new role with the provided name.
         /// </summary>
