@@ -6,7 +6,7 @@ namespace Discord.Interactions
     /// <summary>
     ///     Base class for creating TypeConverters. <see cref="InteractionService"/> uses TypeConverters to interface with Slash Command parameters.
     /// </summary>
-    public abstract class TypeConverter
+    public abstract class TypeConverter : ITypeConverter<IApplicationCommandInteractionDataOption>
     {
         /// <summary>
         ///     Will be used to search for alternative TypeConverters whenever the Command Service encounters an unknown parameter type.

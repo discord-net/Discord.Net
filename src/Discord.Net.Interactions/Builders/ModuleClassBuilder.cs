@@ -231,9 +231,6 @@ namespace Discord.Interactions.Builders
         private static void BuildComponentCommand (ComponentCommandBuilder builder, Func<IServiceProvider, IInteractionModuleBase> createInstance, MethodInfo methodInfo,
             InteractionService commandService, IServiceProvider services)
         {
-            if (!methodInfo.GetParameters().All(x => x.ParameterType == typeof(string) || x.ParameterType == typeof(string[])))
-                throw new InvalidOperationException($"Interaction method parameters all must be types of {typeof(string).Name} or {typeof(string[]).Name}");
-
             var attributes = methodInfo.GetCustomAttributes();
 
             builder.MethodName = methodInfo.Name;
@@ -260,8 +257,10 @@ namespace Discord.Interactions.Builders
 
             var parameters = methodInfo.GetParameters();
 
+            var wildCardCount = Regex.Matches(Regex.Escape(builder.Name), Regex.Escape(commandService._wildCardExp)).Count;
+
             foreach (var parameter in parameters)
-                builder.AddParameter(x => BuildParameter(x, parameter));
+                builder.AddParameter(x => BuildComponentParameter(x, parameter, parameter.Position >= wildCardCount));
 
             builder.Callback = CreateCallback(createInstance, methodInfo, commandService);
         }
@@ -310,8 +309,8 @@ namespace Discord.Interactions.Builders
             if (parameters.Count(x => typeof(IModal).IsAssignableFrom(x.ParameterType)) > 1)
                 throw new InvalidOperationException($"A modal command can only have one {nameof(IModal)} parameter.");
 
-            if (!parameters.All(x => x.ParameterType == typeof(string) || typeof(IModal).IsAssignableFrom(x.ParameterType)))
-                throw new InvalidOperationException($"All parameters of a modal command must be either a string or an implementation of {nameof(IModal)}");
+            if (!typeof(IModal).IsAssignableFrom(parameters.Last().ParameterType))
+                throw new InvalidOperationException($"Last parameter of a modal command must be an implementation of {nameof(IModal)}");
 
             var attributes = methodInfo.GetCustomAttributes();
 
@@ -464,6 +463,12 @@ namespace Discord.Interactions.Builders
             builder.Name = Regex.Replace(builder.Name, "(?<=[a-z])(?=[A-Z])", "-").ToLower();
         }
 
+        private static void BuildComponentParameter(ComponentCommandParameterBuilder builder, ParameterInfo paramInfo, bool isComponentParam)
+        {
+            builder.SetIsRouteSegment(!isComponentParam);
+            BuildParameter(builder, paramInfo);
+        }
+
         private static void BuildParameter<TInfo, TBuilder> (ParameterBuilder<TInfo, TBuilder> builder, ParameterInfo paramInfo)
             where TInfo : class, IParameterInfo
             where TBuilder : ParameterBuilder<TInfo, TBuilder>
@@ -495,7 +500,7 @@ namespace Discord.Interactions.Builders
         #endregion
 
         #region Modals
-        public static ModalInfo BuildModalInfo(Type modalType)
+        public static ModalInfo BuildModalInfo(Type modalType, InteractionService interactionService)
         {
             if (!typeof(IModal).IsAssignableFrom(modalType))
                 throw new InvalidOperationException($"{modalType.FullName} isn't an implementation of {typeof(IModal).FullName}");
@@ -504,7 +509,7 @@ namespace Discord.Interactions.Builders
 
             try
             {
-                var builder = new ModalBuilder(modalType)
+                var builder = new ModalBuilder(modalType, interactionService)
                 {
                     Title = instance.Title
                 };

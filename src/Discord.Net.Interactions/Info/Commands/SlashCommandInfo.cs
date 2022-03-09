@@ -70,34 +70,27 @@ namespace Discord.Interactions
         {
             try
             {
-                var args = new object[paramList.Count()];
+                var slashCommandParameterInfos = paramList.ToList();
+                var args = new object[slashCommandParameterInfos.Count];
 
-                for (var i = 0; i < paramList.Count(); i++)
+                for (var i = 0; i < slashCommandParameterInfos.Count; i++)
                 {
-                    var parameter = paramList.ElementAt(i);
-
+                    var parameter = slashCommandParameterInfos[i];
                     var result = await ParseArgument(parameter, context, argList, services).ConfigureAwait(false);
 
-                    if(!result.IsSuccess)
-                    {
-                        var execResult = ExecuteResult.FromError(result);
-                        await InvokeModuleEvent(context, execResult).ConfigureAwait(false);
-                        return execResult;
-                    }
+                    if (!result.IsSuccess)
+                        return await InvokeEventAndReturn(context, result).ConfigureAwait(false);
 
-                    if (result is ParseResult parseResult)
-                        args[i] = parseResult.Value;
-                    else
+                    if (result is not ParseResult parseResult)
                         return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command parameter parsing failed for an unknown reason.");
-                }
 
+                    args[i] = parseResult.Value;
+                }
                 return await RunAsync(context, args, services).ConfigureAwait(false);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                var result = ExecuteResult.FromError(ex);
-                await InvokeModuleEvent(context, result).ConfigureAwait(false);
-                return result;
+                return await InvokeEventAndReturn(context, ExecuteResult.FromError(ex)).ConfigureAwait(false);
             }
         }
 
@@ -115,37 +108,27 @@ namespace Discord.Interactions
                     if (!result.IsSuccess)
                         return result;
 
-                    if (result is ParseResult parseResult)
-                        ctorArgs[i] = parseResult.Value;
-                    else
+                    if (result is not ParseResult parseResult)
                         return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Complex command parsing failed for an unknown reason.");
+
+                    ctorArgs[i] = parseResult.Value;
                 }
 
                 return ParseResult.FromSuccess(parameterInfo._complexParameterInitializer(ctorArgs));
             }
-            else
-            {
-                var arg = argList?.Find(x => string.Equals(x.Name, parameterInfo.Name, StringComparison.OrdinalIgnoreCase));
 
-                if (arg == default)
-                {
-                    if (parameterInfo.IsRequired)
-                        return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command was invoked with too few parameters");
-                    else
-                        return ParseResult.FromSuccess(parameterInfo.DefaultValue);
-                }
-                else
-                {
-                    var typeConverter = parameterInfo.TypeConverter;
+            var arg = argList?.Find(x => string.Equals(x.Name, parameterInfo.Name, StringComparison.OrdinalIgnoreCase));
 
-                    var readResult = await typeConverter.ReadAsync(context, arg, services).ConfigureAwait(false);
+            if (arg == default)
+                return parameterInfo.IsRequired ? ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command was invoked with too few parameters") :
+                    ParseResult.FromSuccess(parameterInfo.DefaultValue);
 
-                    if (!readResult.IsSuccess)
-                        return readResult;
+            var typeConverter = parameterInfo.TypeConverter;
+            var readResult = await typeConverter.ReadAsync(context, arg, services).ConfigureAwait(false);
+            if (!readResult.IsSuccess)
+                return readResult;
 
-                    return ParseResult.FromSuccess(readResult.Value);
-                }
-            }
+            return ParseResult.FromSuccess(readResult.Value);
         }
 
         protected override Task InvokeModuleEvent (IInteractionContext context, IResult result)

@@ -40,6 +40,11 @@ namespace Discord.Interactions
         public Type Type { get; }
 
         /// <summary>
+        ///     Gets the <see cref="ComponentTypeConverter"/> assigned to this component.
+        /// </summary>
+        public ComponentTypeConverter TypeConverter { get; }
+
+        /// <summary>
         ///     Gets the default value of this component.
         /// </summary>
         public object DefaultValue { get; }
@@ -57,6 +62,7 @@ namespace Discord.Interactions
             IsRequired = builder.IsRequired;
             ComponentType = builder.ComponentType;
             Type = builder.Type;
+            TypeConverter = builder.TypeConverter;
             DefaultValue = builder.DefaultValue;
             Attributes = builder.Attributes.ToImmutableArray();
         }

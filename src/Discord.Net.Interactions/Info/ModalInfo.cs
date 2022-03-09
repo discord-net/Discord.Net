@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Discord.Interactions
 {
@@ -19,6 +20,7 @@ namespace Discord.Interactions
     /// </summary>
     public class ModalInfo
     {
+        internal readonly InteractionService _interactionService;
         internal readonly ModalInitializer _initializer;
 
         /// <summary>
@@ -53,16 +55,18 @@ namespace Discord.Interactions
 
             TextComponents = Components.OfType<TextInputComponentInfo>().ToImmutableArray();
 
+            _interactionService = builder._interactionService;
             _initializer = builder.ModalInitializer;
         }
 
         /// <summary>
         ///     Creates an <see cref="IModal"/> and fills it with provided message components.
         /// </summary>
-        /// <param name="components"><see cref="IModalInteraction"/> that will be injected into the modal.</param>
+        /// <param name="modalInteraction"><see cref="IModalInteraction"/> that will be injected into the modal.</param>
         /// <returns>
         ///     A <see cref="IModal"/> filled with the provided components.
         /// </returns>
+        [Obsolete("This method is no longer supported with the introduction of Component TypeConverters, please use the CreateModalAsync method.")]
         public IModal CreateModal(IModalInteraction modalInteraction, bool throwOnMissingField = false)
         {
             var args = new object[Components.Count];
@@ -85,6 +89,51 @@ namespace Discord.Interactions
             }
 
             return _initializer(args);
+        }
+
+        /// <summary>
+        ///     Creates an <see cref="IModal"/> and fills it with provided message components.
+        /// </summary>
+        /// <param name="context">Context of the <see cref="IModalInteraction"/> that will be injected into the modal.</param>
+        /// <param name="services">Services to be passed onto the <see cref="ComponentTypeConverter"/>s of the modal fiels.</param>
+        /// <param name="throwOnMissingField">Wheter or not this method should exit on encountering a missing modal field.</param>
+        /// <returns>
+        ///     A <see cref="TypeConverterResult"/> if a type conversion has failed, else  a <see cref="ParseResult"/>.
+        /// </returns>
+        public async Task<IResult> CreateModalAsync(IInteractionContext context, IServiceProvider services = null, bool throwOnMissingField = false)
+        {
+            if (context.Interaction is not IModalInteraction modalInteraction)
+                return ParseResult.FromError(InteractionCommandError.Unsuccessful, "Provided context doesn't belong to a Modal Interaction.");
+
+            services ??= EmptyServiceProvider.Instance;
+
+            var args = new object[Components.Count];
+            var components = modalInteraction.Data.Components.ToList();
+
+            for (var i = 0; i < Components.Count; i++)
+            {
+                var input = Components.ElementAt(i);
+                var component = components.Find(x => x.CustomId == input.CustomId);
+
+                if (component is null)
+                {
+                    if (!throwOnMissingField)
+                        args[i] = input.DefaultValue;
+                    else
+                        return ParseResult.FromError(InteractionCommandError.BadArgs, $"Modal interaction is missing the required field: {input.CustomId}");
+                }
+                else
+                {
+                    var readResult = await input.TypeConverter.ReadAsync(context, component, services).ConfigureAwait(false);
+
+                    if (!readResult.IsSuccess)
+                        return readResult;
+
+                    args[i] = readResult.Value;
+                }
+            }
+
+            return ParseResult.FromSuccess(_initializer(args));
         }
     }
 }

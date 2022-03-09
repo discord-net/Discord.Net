@@ -20,6 +20,11 @@ namespace Discord.Interactions.Builders
         /// </summary>
         public bool IsModalParameter => Modal is not null;
 
+        /// <summary>
+        ///     Gets the <see cref="TypeReader"/> assigned to this parameter, if <see cref="IsModalParameter"/> is <see langword="true"/>.
+        /// </summary>
+        public TypeReader TypeReader { get; private set; }
+
         internal ModalCommandParameterBuilder(ICommandBuilder command) : base(command) { }
 
         /// <summary>
@@ -34,7 +39,9 @@ namespace Discord.Interactions.Builders
         public override ModalCommandParameterBuilder SetParameterType(Type type)
         {
             if (typeof(IModal).IsAssignableFrom(type))
-                Modal = ModalUtils.GetOrAdd(type);
+                Modal = ModalUtils.GetOrAdd(type, Command.Module.InteractionService);
+            else
+                TypeReader = Command.Module.InteractionService.GetTypeReader(type);
 
             return base.SetParameterType(type);
         }
