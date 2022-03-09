@@ -178,7 +178,6 @@ namespace Discord.WebSocket
                     await _shards[i].LogoutAsync();
             }
 
-            CurrentUser = null;
             if (_automaticShards)
             {
                 _shardIds = new int[0];
