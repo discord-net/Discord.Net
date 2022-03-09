@@ -48,6 +48,7 @@ namespace Discord
         UnknownSticker = 10060,
         UnknownInteraction = 10062,
         UnknownApplicationCommand = 10063,
+        UnknownVoiceState = 10065,
         UnknownApplicationCommandPermissions = 10066,
         UnknownStageInstance = 10067,
         UnknownGuildMemberVerificationForm = 10068,
