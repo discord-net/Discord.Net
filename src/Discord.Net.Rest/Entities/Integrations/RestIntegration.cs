@@ -5,6 +5,9 @@ using Model = Discord.API.Integration;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a Rest-based implementation of <see cref="IIntegration"/>.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestIntegration : RestEntity<ulong>, IIntegration
     {

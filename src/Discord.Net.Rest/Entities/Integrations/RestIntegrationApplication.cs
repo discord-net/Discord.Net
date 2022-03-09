@@ -2,6 +2,9 @@ using Model = Discord.API.IntegrationApplication;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a Rest-based implementation of <see cref="IIntegrationApplication"/>.
+    /// </summary>
     public class RestIntegrationApplication : RestEntity<ulong>, IIntegrationApplication
     {
         public string Name { get; private set; }

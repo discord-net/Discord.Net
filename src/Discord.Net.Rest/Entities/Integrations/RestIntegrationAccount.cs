@@ -2,6 +2,9 @@ using Model = Discord.API.IntegrationAccount;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a Rest-based implementation of <see cref="IIntegrationAccount"/>.
+    /// </summary>
     public class RestIntegrationAccount : IIntegrationAccount
     {
         internal RestIntegrationAccount() { }
