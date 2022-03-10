@@ -64,7 +64,7 @@ namespace Discord.Rest
             IsEnabled = model.Enabled;
 
             IsSyncing = model.Syncing.IsSpecified ? model.Syncing.Value : null;
-            RoleId = model.RoleId.HasValue ? model.RoleId.Value : null;
+            RoleId = model.RoleId.IsSpecified ? model.RoleId.Value : null;
             HasEnabledEmoticons = model.EnableEmoticons.IsSpecified ? model.EnableEmoticons.Value : null;
             ExpireBehavior = model.ExpireBehavior.IsSpecified ? model.ExpireBehavior.Value : null;
             ExpireGracePeriod = model.ExpireGracePeriod.IsSpecified ? model.ExpireGracePeriod.Value : null;
