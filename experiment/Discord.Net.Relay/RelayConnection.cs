@@ -1,9 +1,9 @@
-using Discord.API;
+global using Discord.API;
 using Discord.API.Gateway;
-using Discord.Logging;
+global using Discord.Logging;
 using System;
 using System.Net.WebSockets;
-using System.Threading;
+global using System.Threading;
 using System.Threading.Tasks;
 using WebSocketClient = System.Net.WebSockets.WebSocket;
 
