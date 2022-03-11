@@ -1,5 +1,3 @@
-using Discord.API;
-using Discord.Logging;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
 using Discord.Rest;
@@ -8,7 +6,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using WebSocketClient = System.Net.WebSockets.WebSocket;
 
