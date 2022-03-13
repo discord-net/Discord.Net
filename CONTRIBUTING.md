@@ -7,7 +7,7 @@ following guidelines when possible:
 ## Development Cycle
 
 We prefer all changes to the library to be discussed beforehand,
-either in a GitHub issue, or in a discussion in our Discord channel
+either in a GitHub issue, or in a discussion in our [Discord server](https://discord.gg/dnet)
 with library regulars or other contributors.
 
 Issues that are tagged as "up for grabs" are free to be picked up by
