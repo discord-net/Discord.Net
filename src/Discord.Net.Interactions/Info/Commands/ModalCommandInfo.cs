@@ -49,7 +49,11 @@ namespace Discord.Interactions
             try
             {
                 var args = new object[Parameters.Count];
-                var captureCount = additionalArgs.Length;
+                
+                var captureCount = 0;
+                
+                if(additionalArgs != null)
+                    var captureCount = additionalArgs.Length;
 
                 for(var i = 0; i < Parameters.Count; i++)
                 {
