@@ -451,7 +451,7 @@ namespace Discord.WebSocket
             remove { _userUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketUser, SocketUser, Task>> _userUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketUser, Task>>();
-        /// <summary> Fired when a guild member is updated, or a member presence is updated. </summary>
+        /// <summary> Fired when a guild member is updated. </summary>
         public event Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task> GuildMemberUpdated
         {
             add { _guildMemberUpdatedEvent.Add(value); }
