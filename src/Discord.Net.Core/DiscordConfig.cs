@@ -187,5 +187,10 @@ namespace Discord
         ///     <b>This will still require a stable clock on your system.</b>
         /// </remarks>
         public bool UseInteractionSnowflakeDate { get; set; } = true;
+
+        /// <summary>
+        ///     Gets or sets if any user's <see cref="object.ToString"/> override formats the string in respect to bidirectional unicode.
+        /// </summary>
+        public bool FormatUsersInBidirectionalUnicode { get; set; } = true;
     }
 }
