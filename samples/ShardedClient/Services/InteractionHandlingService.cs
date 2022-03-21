@@ -31,9 +31,9 @@ namespace ShardedClient.Services
         {
             await _service.AddModulesAsync(typeof(InteractionHandlingService).Assembly, _provider);
 #if DEBUG
-            await _service.AddCommandsToGuildAsync(_client.Guilds.First(x => x.Id == 1));
+            await _service.RegisterCommandsToGuildAsync(1 /* implement */);
 #else
-            await _service.AddCommandsGloballyAsync();
+            await _service.RegisterCommandsGloballyAsync();
 #endif
         }
 
