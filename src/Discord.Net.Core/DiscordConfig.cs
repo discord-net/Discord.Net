@@ -189,8 +189,13 @@ namespace Discord
         public bool UseInteractionSnowflakeDate { get; set; } = true;
 
         /// <summary>
-        ///     Gets or sets if any user's <see cref="object.ToString"/> override formats the string in respect to bidirectional unicode.
+        ///     Gets or sets if the Rest/Socket user <see cref="object.ToString"/> override formats the string in respect to bidirectional unicode.
         /// </summary>
+        /// <remarks>
+        ///     By default, the returned value will be "?Discord?#1234", to work with bidirectional usernames.
+        ///     <br/>
+        ///     If set to <see langword="false"/>, this value will be "Discord#1234".
+        /// </remarks>
         public bool FormatUsersInBidirectionalUnicode { get; set; } = true;
     }
 }
