@@ -10,12 +10,12 @@ namespace Discord
         /// <summary>
         ///     Gets the collection of the captured route segments.
         /// </summary>
-        public IEnumerable<IRouteSegmentMatch> SegmentMatches { get; }
+        IEnumerable<IRouteSegmentMatch> SegmentMatches { get; }
 
         /// <summary>
         ///     Sets the <see cref="SegmentMatches"/> propert
         /// </summary>
         /// <param name="segmentMatches">The collection of captured route segments.</param>
-        public void SetSegmentMatches(IEnumerable<IRouteSegmentMatch> segmentMatches);
+        void SetSegmentMatches(IEnumerable<IRouteSegmentMatch> segmentMatches);
     }
 }
