@@ -403,6 +403,41 @@ namespace Discord.Commands
                     AddNullableTypeReader(type, reader);
             }
         }
+
+        /// <summary>
+        ///     Removes a type reader from the list of type readers.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <param name="type">The type to remove the readers from.</param>
+        /// <param name="isDefaultTypeReader"><see langword="true"/> if the default readers for <paramref name="type"/> should be removed; otherwise <see langword="false"/>.</param>
+        /// <param name="readers">The removed collection of type readers.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveTypeReader(Type type, bool isDefaultTypeReader, out IDictionary<Type, TypeReader> readers)
+        {
+            readers = new Dictionary<Type, TypeReader>();
+
+            if (isDefaultTypeReader)
+            {
+                var isSuccess = _defaultTypeReaders.TryRemove(type, out var result);
+                if (isSuccess)
+                    readers.Add(result?.GetType(), result);
+
+                return isSuccess;
+            }
+            else
+            {
+                var isSuccess = _typeReaders.TryRemove(type, out var result);
+
+                if (isSuccess)
+                    readers = result;
+
+                return isSuccess;
+            }
+        }
+
         internal bool HasDefaultTypeReader(Type type)
         {
             if (_defaultTypeReaders.ContainsKey(type))
