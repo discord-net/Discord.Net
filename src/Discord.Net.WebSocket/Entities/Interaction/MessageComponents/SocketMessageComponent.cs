@@ -202,12 +202,7 @@ namespace Discord.WebSocket
             HasResponded = true;
         }
 
-        /// <summary>
-        ///     Updates the message which this component resides in with the type <see cref="InteractionResponseType.UpdateMessage"/>
-        /// </summary>
-        /// <param name="func">A delegate containing the properties to modify the message with.</param>
-        /// <param name="options">The request options for this <see langword="async"/> request.</param>
-        /// <returns>A task that represents the asynchronous operation of updating the message.</returns>
+        /// <inheritdoc/>
         public async Task UpdateAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
             var args = new MessageProperties();
@@ -383,14 +378,7 @@ namespace Discord.WebSocket
             return await InteractionHelper.SendFollowupAsync(Discord, args, Token, Channel, options).ConfigureAwait(false);
         }
 
-        /// <summary>
-        ///     Defers an interaction and responds with type 5 (<see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>)
-        /// </summary>
-        /// <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
-        /// <param name="options">The request options for this <see langword="async"/> request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous operation of acknowledging the interaction.
-        /// </returns>
+        /// <inheritdoc/>
         public async Task DeferLoadingAsync(bool ephemeral = false, RequestOptions options = null)
         {
             if (!InteractionHelper.CanSendResponse(this))
