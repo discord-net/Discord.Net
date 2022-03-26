@@ -17,7 +17,6 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class SocketUser : SocketEntity<ulong>, IUser
     {
-        private readonly bool _useBidirectionalUnicode;
         /// <inheritdoc />
         public abstract bool IsBot { get; internal set; }
         /// <inheritdoc />
@@ -57,7 +56,6 @@ namespace Discord.WebSocket
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
-            _useBidirectionalUnicode = discord.FormatUsersInBidirectionalUnicode;
         }
         internal virtual bool Update(ClientState state, Model model)
         {
@@ -119,8 +117,8 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The full name of the user.
         /// </returns>
-        public override string ToString() => Format.UsernameAndDiscriminator(this, _useBidirectionalUnicode);
-        private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this, _useBidirectionalUnicode)} ({Id}{(IsBot ? ", Bot" : "")})";
+        public override string ToString() => Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode);
+        private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode)} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
     }
 }

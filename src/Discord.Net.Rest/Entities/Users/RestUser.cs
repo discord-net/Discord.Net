@@ -16,8 +16,6 @@ namespace Discord.Rest
     public class RestUser : RestEntity<ulong>, IUser, IUpdateable
     {
         #region RestUser
-        private readonly bool _useBidirectionalUnicode;
-
         /// <inheritdoc />
         public bool IsBot { get; private set; }
         /// <inheritdoc />
@@ -53,7 +51,6 @@ namespace Discord.Rest
         internal RestUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
-            _useBidirectionalUnicode = discord.FormatUsersInBidirectionalUnicode;
         }
         internal static RestUser Create(BaseDiscordClient discord, Model model)
             => Create(discord, null, model, null);
@@ -133,9 +130,9 @@ namespace Discord.Rest
         ///     A string that resolves to Username#Discriminator of the user.
         /// </returns>
         public override string ToString()
-            => Format.UsernameAndDiscriminator(this, _useBidirectionalUnicode);
+            => Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode);
 
-        private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this, _useBidirectionalUnicode)} ({Id}{(IsBot ? ", Bot" : "")})";
+        private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode)} ({Id}{(IsBot ? ", Bot" : "")})";
         #endregion
 
         #region IUser
