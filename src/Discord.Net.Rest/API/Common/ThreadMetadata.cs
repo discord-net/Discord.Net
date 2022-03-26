@@ -21,6 +21,6 @@ namespace Discord.API
         public Optional<bool> Invitable { get; set; }
 
         [JsonProperty("create_timestamp")]
-        public Optional<DateTimeOffset> CreatedAt { get; set; }
+        public Optional<DateTimeOffset?> CreatedAt { get; set; }
     }
 }

@@ -121,7 +121,7 @@ namespace Discord.WebSocket
         internal new static SocketThreadChannel Create(SocketGuild guild, ClientState state, Model model)
         {
             var parent = guild.GetChannel(model.CategoryId.Value);
-            var entity = new SocketThreadChannel(guild.Discord, guild, model.Id, parent, model.ThreadMetadata.GetValueOrDefault()?.CreatedAt.ToNullable());
+            var entity = new SocketThreadChannel(guild.Discord, guild, model.Id, parent, model.ThreadMetadata.GetValueOrDefault()?.CreatedAt.GetValueOrDefault(null));
             entity.Update(state, model);
             return entity;
         }
