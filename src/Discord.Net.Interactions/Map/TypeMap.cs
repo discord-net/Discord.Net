@@ -74,6 +74,18 @@ namespace Discord.Interactions
             _generics[targetType] = converterType;
         }
 
+        public bool TryRemoveConcrete<TTarget>(out TConverter converter)
+            => TryRemoveConcrete(typeof(TTarget), out converter);
+
+        public bool TryRemoveConcrete(Type type, out TConverter converter)
+            => _concretes.TryRemove(type, out converter);
+
+        public bool TryRemoveGeneric<TTarget>(out Type converterType)
+            => TryRemoveGeneric(typeof(TTarget), out converterType);
+
+        public bool TryRemoveGeneric(Type targetType, out Type converterType)
+            => _generics.TryRemove(targetType, out converterType);
+
         private Type GetMostSpecific(Type type)
         {
             if (_generics.TryGetValue(type, out var matching))
