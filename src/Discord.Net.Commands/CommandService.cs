@@ -407,6 +407,10 @@ namespace Discord.Commands
         /// <summary>
         ///     Removes a type reader from the list of type readers.
         /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
         /// <param name="type">The type to remove the readers from.</param>
         /// <param name="isDefaultTypeReader"><see langword="true"/> if the default readers for <paramref name="type"/> should be removed; otherwise <see langword="false"/>.</param>
         /// <param name="readers">The removed collection of type readers.</param>

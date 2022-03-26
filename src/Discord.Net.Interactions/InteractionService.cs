@@ -917,6 +917,10 @@ namespace Discord.Interactions
         /// <summary>
         ///     Removes a type reader for the given type.
         /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
         /// <param name="type">The type to remove the reader from.</param>
         /// <param name="reader">The reader if the resulting remove operation was successful.</param>
         /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
@@ -926,6 +930,10 @@ namespace Discord.Interactions
         /// <summary>
         ///     Removes a generic type reader from the type <typeparamref name="T"/>.
         /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
         /// <typeparam name="T">The type to remove the readers from.</typeparam>
         /// <param name="readerType">The removed readers type.</param>
         /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
@@ -935,6 +943,10 @@ namespace Discord.Interactions
         /// <summary>
         ///     Removes a generic type reader from the given type.
         /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
         /// <param name="type">The type to remove the reader from.</param>
         /// <param name="readerType">The readers type if the remove operation was successful.</param>
         /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
@@ -944,6 +956,10 @@ namespace Discord.Interactions
         /// <summary>
         ///     Serialize an object using a <see cref="TypeReader"/> into a <see cref="string"/> to be placed in a Component CustomId.
         /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
         /// <typeparam name="T">Type of the object to be serialized.</typeparam>
         /// <param name="obj">Object to be serialized.</param>
         /// <param name="services">Services that will be passed on to the <see cref="TypeReader"/>.</param>
