@@ -718,8 +718,25 @@ namespace Discord
         /// </returns>
         Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null);
 
-        Task<IReadOnlyCollection<IGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null);
-        Task<IGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a collection of all the integrations this guild contains.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     integrations the guild can has.
+        /// </returns>
+        Task<IReadOnlyCollection<IIntegration>> GetIntegrationsAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Deletes an integration.
+        /// </summary>
+        /// <param name="id">The id for the integration.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous removal operation.
+        /// </returns>
+        Task DeleteIntegrationAsync(ulong id, RequestOptions options = null);
 
         /// <summary>
         ///     Gets a collection of all invites in this guild.

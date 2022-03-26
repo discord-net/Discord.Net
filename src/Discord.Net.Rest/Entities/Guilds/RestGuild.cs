@@ -720,10 +720,10 @@ namespace Discord.Rest
         #endregion
 
         #region Integrations
-        public Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null)
+        public Task<IReadOnlyCollection<RestIntegration>> GetIntegrationsAsync(RequestOptions options = null)
             => GuildHelper.GetIntegrationsAsync(this, Discord, options);
-        public Task<RestGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null)
-            => GuildHelper.CreateIntegrationAsync(this, Discord, id, type, options);
+        public Task DeleteIntegrationAsync(ulong id, RequestOptions options = null)
+            => GuildHelper.DeleteIntegrationAsync(this, Discord, id, options);
         #endregion
 
         #region Invites
@@ -1370,11 +1370,11 @@ namespace Discord.Rest
             => await GetVoiceRegionsAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IGuildIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)
+        async Task<IReadOnlyCollection<IIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)
             => await GetIntegrationsAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IGuildIntegration> IGuild.CreateIntegrationAsync(ulong id, string type, RequestOptions options)
-            => await CreateIntegrationAsync(id, type, options).ConfigureAwait(false);
+        async Task IGuild.DeleteIntegrationAsync(ulong id, RequestOptions options)
+            => await DeleteIntegrationAsync(id, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuild.GetInvitesAsync(RequestOptions options)
