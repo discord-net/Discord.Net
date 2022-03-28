@@ -15,7 +15,7 @@ namespace Discord.Interactions
 
         private readonly string _basePath;
         private readonly string _fileName;
-        private readonly Regex _localeParserRegex = new Regex(@"\w+.(?<locale>\w{2}-\w{2}).json", RegexOptions.Compiled | RegexOptions.Singleline);
+        private readonly Regex _localeParserRegex = new Regex(@"\w+.(?<locale>\w{2}(?:-\w{2})?).json", RegexOptions.Compiled | RegexOptions.Singleline);
 
         public JsonLocalizationManager(string basePath, string fileName)
         {
