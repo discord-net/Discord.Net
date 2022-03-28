@@ -11,7 +11,7 @@
             <a href="{{topicHref}}" class="sidebar-item" name="{{tocHref}}" title="{{name}}">{{name}}</a>
           {{/topicHref}}
           {{^topicHref}}
-            <a>{{{name}}}</a>
+            <a class="sidebar-item">{{{name}}}</a>
           {{/topicHref}}
         
         {{^leaf}}

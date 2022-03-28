@@ -14,8 +14,8 @@
     --link-color: #00b0f4;
     --link-hover-color: #4bd5ff;
     --link-active-color: #fff;
-    --link-active-bg-color: #7289da;
-    --h3-color: #ffffff85;
+    --link-active-bg-color: rgb(88, 101, 242);
+    --h3-color: #ffffffeb;
     --h4-color: #ffffffeb;
     --h5-color: #ffffffd1;
     
@@ -47,8 +47,8 @@
     --alert-danger-border-color: rgba(240,71,71,.5);
     --alert-danger-bg-color: rgba(240,71,71,.1);
 
-    --alert-tip-border-color: rgba(255,255,255,.5);
-    --alert-tip-bg-color: rgba(255,255,255,.1);
+    --alert-tip-border-color: rgba(88,101,242,.5);
+    --alert-tip-bg-color: rgba(88,101,242,.1);
 
     --blockquote-border-color: rgba(255,255,255,.5);
     --blockquote-bg-color: rgba(255,255,255,.1);

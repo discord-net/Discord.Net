@@ -1,4 +1,38 @@
+/* Commit message styles: TODO */
+
+
 /* Discord Style */
+
+.content {
+    padding-bottom: 1rem;
+}
+
+input[type=text]:focus-visible{
+    outline: #f6f6f78f solid 0.5px;
+}
+
+input[type=text]::placeholder {
+    color: #f6f6f7;
+}
+
+input[type=text] {
+    width: 100%;
+    background-color: #2f3136;
+    border: 1px solid #040405;
+    border-radius: 3px;
+    color: #f6f6f7;
+    font-size: 1rem;
+    padding: 0.25rem 0.5rem;
+}
+
+li.hide {
+    display: none;
+}
+
+div[role=main] {
+    max-width: 1440px;
+    width: 100%;
+}
 
 ::-webkit-scrollbar {
     width: 10px;
@@ -142,8 +176,13 @@ a.anchorjs-link:hover {
     text-decoration: none;
 }
 
+.inner-sidebar-item {
+    margin-left: 0 !important;
+    padding-left: 16px !important;
+}
+
 a.active, a:active
-{
+{   
     color: var(--link-active-color);
 }
 
@@ -206,6 +245,7 @@ h1:first-child
 
 a.sidebar-item:hover, a.sidebar-item:focus 
 {
+    cursor: pointer;
     color: var(--link-active-color);
     text-decoration: none;
 }
@@ -246,6 +286,9 @@ span.sidebar-item
 
 .main-panel
 {
+    position: relative;
+    display: flex;
+    justify-content: center;
     background-color: var(--main-bg-color);
     flex: 1;
     overflow-y: auto;
@@ -293,7 +336,8 @@ span.sidebar-item
 .brand-title
 {
     padding: 0 .5em;
-    font-size: .9em;
+    font-size: .1.1rem;
+    font-weight: 500;
     color: var(--link-active-color);
 }
 
