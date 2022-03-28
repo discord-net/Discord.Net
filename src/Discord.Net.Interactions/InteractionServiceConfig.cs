@@ -64,6 +64,8 @@ namespace Discord.Interactions
         ///     Gets or sets whether a command execution should exit when a modal command encounters a missing modal component value.
         /// </summary>
         public bool ExitOnMissingModalField { get; set; } = false;
+
+        public ILocalizationManager LocalizationManager { get; set; }
     }
 
     /// <summary>

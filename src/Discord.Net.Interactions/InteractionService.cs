@@ -81,6 +81,7 @@ namespace Discord.Interactions
         internal readonly string _wildCardExp;
         internal readonly RunMode _runMode;
         internal readonly RestResponseCallback _restResponseCallback;
+        internal readonly ILocalizationManager _localizationManager;
 
         /// <summary>
         ///     Rest client to be used to register application commands.
@@ -180,6 +181,7 @@ namespace Discord.Interactions
             _enableAutocompleteHandlers = config.EnableAutocompleteHandlers;
             _autoServiceScopes = config.AutoServiceScopes;
             _restResponseCallback = config.RestResponseCallback;
+            _localizationManager = config.LocalizationManager;
 
             _typeConverterMap = new TypeMap<TypeConverter, IApplicationCommandInteractionDataOption>(this, new ConcurrentDictionary<Type, TypeConverter>
                 {
