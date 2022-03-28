@@ -23,10 +23,10 @@ namespace Discord.Interactions
             _fileName = fileName;
         }
 
-        public Task<IDictionary<string, string>> GetAllDescriptionsAsync(IList<string> key, LocalizationTarget destinationType, IServiceProvider serviceProvider) =>
+        public Task<IDictionary<string, string>> GetAllDescriptionsAsync(IList<string> key, LocalizationTarget destinationType) =>
             GetValuesAsync(key, DescriptionIdentifier);
 
-        public Task<IDictionary<string, string>> GetAllNamesAsync(IList<string> key, LocalizationTarget destinationType, IServiceProvider serviceProvider) =>
+        public Task<IDictionary<string, string>> GetAllNamesAsync(IList<string> key, LocalizationTarget destinationType) =>
             GetValuesAsync(key, NameIdentifier);
 
         private string[] GetAllFiles() =>
@@ -50,7 +50,8 @@ namespace Discord.Interactions
                 var obj = await JObject.LoadAsync(jr);
                 var token = string.Join(".", key) + $".{identifier}";
                 var value = (string)obj.SelectToken(token);
-                result[locale] = value;
+                if (value is not null)
+                    result[locale] = value;
             }
 
             return result;

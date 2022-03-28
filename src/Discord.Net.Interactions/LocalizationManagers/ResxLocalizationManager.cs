@@ -25,10 +25,10 @@ namespace Discord.Interactions
             _supportedLocales = supportedLocales;
         }
 
-        public Task<IDictionary<string, string>> GetAllDescriptionsAsync(IList<string> key, LocalizationTarget destinationType, IServiceProvider serviceProvider) =>
+        public Task<IDictionary<string, string>> GetAllDescriptionsAsync(IList<string> key, LocalizationTarget destinationType) =>
             Task.FromResult(GetValues(key, DescriptionIdentifier));
 
-        public Task<IDictionary<string, string>> GetAllNamesAsync(IList<string> key, LocalizationTarget destinationType, IServiceProvider serviceProvider) =>
+        public Task<IDictionary<string, string>> GetAllNamesAsync(IList<string> key, LocalizationTarget destinationType) =>
             Task.FromResult(GetValues(key, NameIdentifier));
 
         private IDictionary<string, string> GetValues(IList<string> key, string identifier)
@@ -39,7 +39,11 @@ namespace Discord.Interactions
             var resourceManager = _localizerCache.GetOrAdd(resourceName, new ResourceManager(resourceName, _assembly));
 
             foreach (var locale in _supportedLocales)
-                result[locale.Name] = resourceManager.GetString(identifier, locale);
+            {
+                var value = resourceManager.GetString(identifier, locale);
+                if (value is not null)
+                    result[locale.Name] = value;
+            }
 
             return result;
         }
