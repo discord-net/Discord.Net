@@ -106,9 +106,8 @@ namespace Discord
         private static List<Func<Override, string, Task>> _logEvents = new();
         private static ConcurrentDictionary<Override, List<LoadedOverride>> _loadedOverrides = new ConcurrentDictionary<Override, List<LoadedOverride>>();
 
-        //private const string ApiUrl = "https://overrides.discordnet.dev";
-        private const string ApiUrl = "http://localhost:8080";
-
+        private const string ApiUrl = "https://overrides.discordnet.dev";
+        
         static BuildOverrides()
         {
             _overrideDomain = new AssemblyLoadContext("Discord.Net.Overrides.Runtime");
