@@ -131,8 +131,8 @@ namespace Discord.Interactions
             return ParseResult.FromSuccess(readResult.Value);
         }
 
-        protected override Task InvokeModuleEvent (IInteractionContext context, IResult result)
-            => CommandService._slashCommandExecutedEvent.InvokeAsync(this, context, result);
+        protected override Task InvokeModuleEvent(IInteractionContext context, IResult result)
+            => CommandService.InvokeResultEventsAsync(this, context, result);
 
         protected override string GetLogString (IInteractionContext context)
         {
