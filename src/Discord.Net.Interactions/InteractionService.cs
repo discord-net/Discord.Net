@@ -812,7 +812,7 @@ namespace Discord.Interactions
 
         internal async Task InvokeResultEventsAsync(ICommandInfo info, IInteractionContext context, IResult result)
         {
-            await _interactionExecutedEvent.InvokeAsync(null, context, result).ConfigureAwait(false);
+            await _interactionExecutedEvent.InvokeAsync(info, context, result).ConfigureAwait(false);
             if (info is not null)
             {
                 switch (info)
