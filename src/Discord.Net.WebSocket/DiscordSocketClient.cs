@@ -2331,7 +2331,7 @@ namespace Discord.WebSocket
 
                                     SocketUser user = data.User.IsSpecified
                                         ? State.GetOrAddUser(data.User.Value.Id, (_) => SocketGlobalUser.Create(this, State, data.User.Value))
-                                        : guild.AddOrUpdateUser(data.Member.Value);
+                                        : guild?.AddOrUpdateUser(data.Member.Value); // null if the bot scope isn't set, so the guild cannot be retrieved.
 
                                     SocketChannel channel = null;
                                     if(data.ChannelId.IsSpecified)
@@ -2346,8 +2346,12 @@ namespace Discord.WebSocket
                                             }
                                             else
                                             {
-                                                await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
-                                                return;
+                                                if (guild != null) // The guild id is set, but the guild cannot be found as the bot scope is not set.
+                                                {
+                                                    await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
+                                                    return;
+                                                }
+                                                // The channel isnt required when responding to an interaction, so we can leave the channel null.
                                             }
                                         }
                                     }

@@ -19,13 +19,14 @@ namespace Discord.WebSocket
         ///     Gets the <see cref="ISocketMessageChannel"/> this interaction was used in.
         /// </summary>
         /// <remarks>
-        ///     If the channel isn't cached or the bot doesn't have access to it then
+        ///     If the channel isn't cached, the bot scope isn't used, or the bot doesn't have access to it then
         ///     this property will be <see langword="null"/>.
         /// </remarks>
         public ISocketMessageChannel Channel { get; private set; }
 
         /// <summary>
         ///     Gets the <see cref="SocketUser"/> who triggered this interaction.
+        ///     This property will be <see langword="null"/> if the bot scope isn't used.
         /// </summary>
         public SocketUser User { get; private set; }
 
