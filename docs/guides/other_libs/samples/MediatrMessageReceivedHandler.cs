@@ -1,5 +1,6 @@
 // MessageReceivedHandler.cs
 
+using System;
 using MediatR;
 using MediatRSample.Notifications;
 

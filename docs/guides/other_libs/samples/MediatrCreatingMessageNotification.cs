@@ -3,7 +3,7 @@
 using Discord.WebSocket;
 using MediatR;
 
-namespace Viscoin.Bot.Infrastructure.Messages;
+namespace MediatRSample.Notifications;
 
 public class MessageReceivedNotification : INotification
 {

@@ -11,7 +11,7 @@ title: MediatR
 
 ## Downloading the required packages
 
-You can install the following packages through your IDE or go to the nuget link to grab the dotnet cli command.
+You can install the following packages through your IDE or go to the NuGet link to grab the dotnet cli command.
 
 |Name|Link|
 |--|--|
@@ -32,7 +32,7 @@ The way MediatR publishes events throughout your applications is through notific
 
 ## Creating the notification publisher / event listener
 
-For MediatR to actually publish the events we need a way to listen for them. We will create a class to listen for discord events like so.
+For MediatR to actually publish the events we need a way to listen for them. We will create a class to listen for discord events like so:
 
 [!code-csharp[Creating an event listener](samples/MediatrDiscordEventListener.cs)]
 
@@ -46,7 +46,7 @@ To start the listener we have to call the `StartAsync()` method on our `DiscordE
 
 ## Creating your notification handler
 
-MediatR publishes notifications to all of your notification handlers that are listening for a specific notification. We will create a handler for our newly created `MessageReceivedNotification` like this
+MediatR publishes notifications to all of your notification handlers that are listening for a specific notification. We will create a handler for our newly created `MessageReceivedNotification` like this:
 
 [!code-csharp[Creating an event listener](samples/MediatrMessageReceivedHandler.cs)]
 
@@ -63,8 +63,8 @@ To test if we have successfully implemented MediatR, we can start up the bot and
 
 ## Adding more event types
 
-To add more event types you can follow these steps
+To add more event types you can follow these steps:
 
 1. Create a new notification class for the event. it should contain all of the parameters that the event would send. (Ex: the `MessageReceived` event takes one `SocketMessage` as an argument. The notification class should also map this argument)
-2. Register the event in your `DiscordEventListener` class
+2. Register the event in your `DiscordEventListener` class.
 3. Create a notification handler for your new notification.

@@ -4,6 +4,9 @@ using Discord.WebSocket;
 using MediatR;
 using MediatRSample.Notifications;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
+using System.Threading.Tasks;
+
 
 namespace MediatRSample;
 
@@ -30,11 +33,11 @@ public class DiscordEventListener
         }
     }
 
-    public Task StartAsync()
+    public async Task StartAsync()
     {
         _client.MessageReceived += OnMessageReceivedAsync;
 
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 
     private Task OnMessageReceivedAsync(SocketMessage arg)
