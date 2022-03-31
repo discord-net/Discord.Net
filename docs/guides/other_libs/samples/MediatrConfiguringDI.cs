@@ -1,0 +1,1 @@
+.AddMediatR(typeof(Bot))
