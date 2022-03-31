@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Threading;
 using System.Threading.Tasks;
 
-
 namespace MediatRSample;
 
 public class DiscordEventListener
