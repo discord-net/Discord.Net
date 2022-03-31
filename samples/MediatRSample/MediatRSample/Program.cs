@@ -43,16 +43,16 @@ public class Bot
 
         var client = services.GetRequiredService<DiscordSocketClient>();
         client.Log += LogAsync;
-                
+
         var listener = services.GetRequiredService<DiscordEventListener>();
         await listener.StartAsync();
 
-        await client.LoginAsync(TokenType.Bot, "OTI1ODAxMDI1OTcyMDgwNzMx.YcyZZQ.qDD8EHfF9ZMefjT-qVcwAEpDXvg");
+        await client.LoginAsync(TokenType.Bot, "YOUR_TOKEN_HERE");
         await client.StartAsync();
 
         await Task.Delay(Timeout.Infinite);
     }
-    
+
     private static Task LogAsync(LogMessage message)
     {
         var severity = message.Severity switch
