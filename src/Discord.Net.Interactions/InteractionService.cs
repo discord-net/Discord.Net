@@ -22,13 +22,7 @@ namespace Discord.Interactions
         ///     Occurs when a Slash Command related information is recieved.
         /// </summary>
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
-        internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new();
-
-        /// <summary>
-        ///     Occurs when a AutocompleteHandler is executed.
-        /// </summary>
-        public event Func<IAutocompleteHandler, IInteractionContext, IResult, Task> AutocompleteHandlerExecuted { add { _autocompleteHandlerExecutedEvent.Add(value); } remove { _autocompleteHandlerExecutedEvent.Remove(value); } }
-        internal readonly AsyncEvent<Func<IAutocompleteHandler, IInteractionContext, IResult, Task>> _autocompleteHandlerExecutedEvent = new();
+        internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new ();
 
         /// <summary>
         ///     Occurs when any type of interaction is executed.
@@ -59,6 +53,12 @@ namespace Discord.Interactions
         /// </summary>
         public event Func<AutocompleteCommandInfo, IInteractionContext, IResult, Task> AutocompleteCommandExecuted { add { _autocompleteCommandExecutedEvent.Add(value); } remove { _autocompleteCommandExecutedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<AutocompleteCommandInfo, IInteractionContext, IResult, Task>> _autocompleteCommandExecutedEvent = new();
+
+        /// <summary>
+        ///     Occurs when a AutocompleteHandler is executed.
+        /// </summary>
+        public event Func<IAutocompleteHandler, IInteractionContext, IResult, Task> AutocompleteHandlerExecuted { add { _autocompleteHandlerExecutedEvent.Add(value); } remove { _autocompleteHandlerExecutedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IAutocompleteHandler, IInteractionContext, IResult, Task>> _autocompleteHandlerExecutedEvent = new();
 
         /// <summary>
         ///     Occurs when a Modal command is executed.
