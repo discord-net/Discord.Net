@@ -424,13 +424,11 @@ namespace Discord
         ///     </note>
         /// </remarks>
         /// <param name="limit">The amount of bans to get from the guild.</param>
-        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from
-        /// cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A paged collection of bans.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
         /// <summary>
         ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUserId"/>
         /// </summary>
@@ -448,13 +446,11 @@ namespace Discord
         /// <param name="fromUserId">The ID of the user to start to get bans from.</param>
         /// <param name="dir">The direction of the bans to be gotten.</param>
         /// <param name="limit">The number of bans to get.</param>
-        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from
-        /// cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A paged collection of bans.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
         /// <summary>
         ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUser"/>
         /// </summary>
@@ -472,13 +468,11 @@ namespace Discord
         /// <param name="fromUser">The user to start to get bans from.</param>
         /// <param name="dir">The direction of the bans to be gotten.</param>
         /// <param name="limit">The number of bans to get.</param>
-        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from
-        /// cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A paged collection of bans.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
         /// <summary>
         ///     Gets a ban object for a banned user.
         /// </summary>

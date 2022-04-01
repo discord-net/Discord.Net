@@ -637,13 +637,11 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <param name="limit">The number of bans to get.</param>
-        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from
-        /// cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A paged collection of bans.
         /// </returns>
-        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, null, Direction.Before, limit, options);
 
         /// <summary>
@@ -663,13 +661,11 @@ namespace Discord.WebSocket
         /// <param name="fromUserId">The ID of the user to start to get bans from.</param>
         /// <param name="dir">The direction of the bans to be gotten.</param>
         /// <param name="limit">The number of bans to get.</param>
-        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from
-        /// cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A paged collection of bans.
         /// </returns>
-        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, fromUserId, dir, limit, options);
 
         /// <summary>
@@ -689,13 +685,11 @@ namespace Discord.WebSocket
         /// <param name="fromUser">The user to start to get bans from.</param>
         /// <param name="dir">The direction of the bans to be gotten.</param>
         /// <param name="limit">The number of bans to get.</param>
-        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from
-        /// cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A paged collection of bans.
         /// </returns>
-        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, fromUser.Id, dir, limit, options);
 
         /// <summary>
@@ -1876,36 +1870,14 @@ namespace Discord.WebSocket
         async Task<IReadOnlyCollection<IGuildScheduledEvent>> IGuild.GetEventsAsync(RequestOptions options)
             => await GetEventsAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(int limit, RequestOptions options)
+            => GetBansAsync(limit, options);
         /// <inheritdoc />
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(int limit, CacheMode mode, RequestOptions options)
-        {
-            if (mode == CacheMode.AllowDownload)
-            {
-                return GetBansAsync(limit, options);
-            }
-            else
-                return AsyncEnumerable.Empty<IReadOnlyCollection<IBan>>();
-        }
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(ulong fromUserId, Direction dir, int limit, RequestOptions options)
+            => GetBansAsync(fromUserId, dir, limit, options);
         /// <inheritdoc />
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(ulong fromUserId, Direction dir, int limit, CacheMode mode, RequestOptions options)
-        {
-            if (mode == CacheMode.AllowDownload)
-            {
-                return GetBansAsync(fromUserId, dir, limit, options);
-            }
-            else
-                return AsyncEnumerable.Empty<IReadOnlyCollection<IBan>>();
-        }
-        /// <inheritdoc />
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(IUser fromUser, Direction dir, int limit, CacheMode mode, RequestOptions options)
-        {
-            if (mode == CacheMode.AllowDownload)
-            {
-                return GetBansAsync(fromUser, dir, limit, options);
-            }
-            else
-                return AsyncEnumerable.Empty<IReadOnlyCollection<IBan>>();
-        }
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(IUser fromUser, Direction dir, int limit, RequestOptions options)
+            => GetBansAsync(fromUser, dir, limit, options);
         /// <inheritdoc/>
         async Task<IBan> IGuild.GetBanAsync(IUser user, RequestOptions options)
             => await GetBanAsync(user, options).ConfigureAwait(false);

@@ -1263,35 +1263,14 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IGuildScheduledEvent>> IGuild.GetEventsAsync(RequestOptions options)
             => await GetEventsAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(int limit, CacheMode mode, RequestOptions options)
-        {
-            if (mode == CacheMode.AllowDownload)
-            {
-                return GetBansAsync(limit, options);
-            }
-            else
-                return AsyncEnumerable.Empty<IReadOnlyCollection<IBan>>();
-        }
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(int limit, RequestOptions options)
+            => GetBansAsync(limit, options);
         /// <inheritdoc />
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(ulong fromUserId, Direction dir, int limit, CacheMode mode, RequestOptions options)
-        {
-            if (mode == CacheMode.AllowDownload)
-            {
-                return GetBansAsync(fromUserId, dir, limit, options);
-            }
-            else
-                return AsyncEnumerable.Empty<IReadOnlyCollection<IBan>>();
-        }
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(ulong fromUserId, Direction dir, int limit, RequestOptions options)
+            => GetBansAsync(fromUserId, dir, limit, options);
         /// <inheritdoc />
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(IUser fromUser, Direction dir, int limit, CacheMode mode, RequestOptions options)
-        {
-            if (mode == CacheMode.AllowDownload)
-            {
-                return GetBansAsync(fromUser, dir, limit, options);
-            }
-            else
-                return AsyncEnumerable.Empty<IReadOnlyCollection<IBan>>();
-        }
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(IUser fromUser, Direction dir, int limit, RequestOptions options)
+            => GetBansAsync(fromUser, dir, limit, options);
         /// <inheritdoc/>
         async Task<IBan> IGuild.GetBanAsync(IUser user, RequestOptions options)
             => await GetBanAsync(user, options).ConfigureAwait(false);
