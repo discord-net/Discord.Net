@@ -621,17 +621,83 @@ namespace Discord.WebSocket
         #endregion
 
         #region Bans
+
         /// <summary>
-        ///     Gets a collection of all users banned in this guild.
+        ///     Gets <paramref name="limit"/> amount of bans from the guild.
         /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
+        ///         collection.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Do not fetch too many bans at once! This may cause unwanted preemptive rate limit or even actual
+        ///         rate limit, causing your bot to freeze!
+        ///     </note>
+        /// </remarks>
+        /// <param name="limit">The number of bans to get.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from
+        /// cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
-        ///     ban objects that this guild currently possesses, with each object containing the user banned and reason
-        ///     behind the ban.
+        ///     A paged collection of bans.
         /// </returns>
-        public Task<IReadOnlyCollection<RestBan>> GetBansAsync(RequestOptions options = null)
-            => GuildHelper.GetBansAsync(this, Discord, options);
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, null, Direction.Before, limit, options);
+
+        /// <summary>
+        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUserId"/>
+        /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
+        ///         collection.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
+        ///         rate limit, causing your bot to freeze!
+        ///     </note>
+        /// </remarks>
+        /// <param name="fromUserId">The ID of the user to start to get bans from.</param>
+        /// <param name="dir">The direction of the bans to be gotten.</param>
+        /// <param name="limit">The number of bans to get.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from
+        /// cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A paged collection of bans.
+        /// </returns>
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, fromUserId, dir, limit, options);
+
+        /// <summary>
+        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUser"/>
+        /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
+        ///         collection.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
+        ///         rate limit, causing your bot to freeze!
+        ///     </note>
+        /// </remarks>
+        /// <param name="fromUser">The user to start to get bans from.</param>
+        /// <param name="dir">The direction of the bans to be gotten.</param>
+        /// <param name="limit">The number of bans to get.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from
+        /// cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A paged collection of bans.
+        /// </returns>
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, fromUser.Id, dir, limit, options);
+
         /// <summary>
         ///     Gets a ban object for a banned user.
         /// </summary>
@@ -1810,8 +1876,36 @@ namespace Discord.WebSocket
         async Task<IReadOnlyCollection<IGuildScheduledEvent>> IGuild.GetEventsAsync(RequestOptions options)
             => await GetEventsAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
-            => await GetBansAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(int limit, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+            {
+                return GetBansAsync(limit, options);
+            }
+            else
+                return AsyncEnumerable.Empty<IReadOnlyCollection<IBan>>();
+        }
+        /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(ulong fromUserId, Direction dir, int limit, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+            {
+                return GetBansAsync(fromUserId, dir, limit, options);
+            }
+            else
+                return AsyncEnumerable.Empty<IReadOnlyCollection<IBan>>();
+        }
+        /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(IUser fromUser, Direction dir, int limit, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+            {
+                return GetBansAsync(fromUser, dir, limit, options);
+            }
+            else
+                return AsyncEnumerable.Empty<IReadOnlyCollection<IBan>>();
+        }
         /// <inheritdoc/>
         async Task<IBan> IGuild.GetBanAsync(IUser user, RequestOptions options)
             => await GetBanAsync(user, options).ConfigureAwait(false);
