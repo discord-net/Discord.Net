@@ -85,6 +85,16 @@ namespace Discord.Interactions.Builders
                             builder.DefaultPermission = defPermission.IsDefaultPermission;
                         }
                         break;
+                    case EnabledInDmAttribute enabledInDm:
+                        {
+                            builder.IsEnabledInDm = enabledInDm.IsEnabled;
+                        }
+                        break;
+                    case DefaultMemberPermissionsAttribute memberPermission:
+                        {
+                            builder.DefaultMemberPermissions = memberPermission.Permissions;
+                        }
+                        break;
                     case PreconditionAttribute precondition:
                         builder.AddPreconditions(precondition);
                         break;
@@ -169,6 +179,16 @@ namespace Discord.Interactions.Builders
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
                         }
                         break;
+                    case EnabledInDmAttribute enabledInDm:
+                        {
+                            builder.IsEnabledInDm = enabledInDm.IsEnabled;
+                        }
+                        break;
+                    case DefaultMemberPermissionsAttribute memberPermission:
+                        {
+                            builder.DefaultMemberPermissions = memberPermission.Permissions;
+                        }
+                        break;
                     case PreconditionAttribute precondition:
                         builder.WithPreconditions(precondition);
                         break;
@@ -209,6 +229,16 @@ namespace Discord.Interactions.Builders
                     case DefaultPermissionAttribute defaultPermission:
                         {
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
+                        }
+                        break;
+                    case EnabledInDmAttribute enabledInDm:
+                        {
+                            builder.IsEnabledInDm = enabledInDm.IsEnabled;
+                        }
+                        break;
+                    case DefaultMemberPermissionsAttribute memberPermission:
+                        {
+                            builder.DefaultMemberPermissions = memberPermission.Permissions;
                         }
                         break;
                     case PreconditionAttribute precondition:
