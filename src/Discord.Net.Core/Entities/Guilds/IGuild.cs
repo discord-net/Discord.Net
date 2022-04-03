@@ -410,7 +410,7 @@ namespace Discord
         /// </returns>
         Task LeaveAsync(RequestOptions options = null);
         /// <summary>
-        ///     Gets <paramref name="limit"/> amount of bans from the guild.
+        ///     Gets a collection of all users banned from this guild.
         /// </summary>
         /// <remarks>
         ///     <note type="important">
