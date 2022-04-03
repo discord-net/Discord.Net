@@ -413,6 +413,7 @@ namespace Discord
         ///     Gets a collection of all users banned from this guild.
         /// </summary>
         /// <remarks>
+        ///     Bans are by default ordered by user id from least to greatest.
         ///     <note type="important">
         ///         The returned collection is an asynchronous enumerable object; one must call 
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
