@@ -453,7 +453,7 @@ namespace Discord
         /// </returns>
         IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
         /// <summary>
-        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUser"/>
+        ///     Gets a collection of bans from the guild starting at the provided <paramref name="fromUser"/>.
         /// </summary>
         /// <remarks>
         ///     <note type="important">
