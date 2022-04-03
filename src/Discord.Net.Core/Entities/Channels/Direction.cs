@@ -23,7 +23,7 @@ namespace Discord
         /// </summary>
         After,
         /// <summary>
-        ///     The message(s) should be retrieved around an entity.
+        ///     The entity(s) should be retrieved around an entity.
         /// </summary>
         Around
     }
