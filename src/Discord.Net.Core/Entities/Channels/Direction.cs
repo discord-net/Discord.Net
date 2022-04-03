@@ -15,7 +15,7 @@ namespace Discord
     public enum Direction
     {
         /// <summary>
-        ///     The message(s) should be retrieved before an entity.
+        ///     The entity(s) should be retrieved before an entity.
         /// </summary>
         Before,
         /// <summary>
