@@ -19,7 +19,7 @@ namespace Discord
         /// </summary>
         Before,
         /// <summary>
-        ///     The message(s) should be retrieved after an entity.
+        ///     The entity(s) should be retrieved after an entity.
         /// </summary>
         After,
         /// <summary>
