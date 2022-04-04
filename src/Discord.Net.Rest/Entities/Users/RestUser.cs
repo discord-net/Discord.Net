@@ -129,8 +129,10 @@ namespace Discord.Rest
         /// <returns>
         ///     A string that resolves to Username#Discriminator of the user.
         /// </returns>
-        public override string ToString() => Format.UsernameAndDiscriminator(this);
-        private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this)} ({Id}{(IsBot ? ", Bot" : "")})";
+        public override string ToString()
+            => Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode);
+
+        private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode)} ({Id}{(IsBot ? ", Bot" : "")})";
         #endregion
 
         #region IUser

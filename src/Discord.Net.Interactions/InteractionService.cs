@@ -25,6 +25,29 @@ namespace Discord.Interactions
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new ();
 
         /// <summary>
+        ///     Occurs when any type of interaction is executed.
+        /// </summary>
+        public event Func<ICommandInfo, IInteractionContext, IResult, Task> InteractionExecuted
+        {
+            add
+            {
+                SlashCommandExecuted += value;
+                ContextCommandExecuted += value;
+                ComponentCommandExecuted += value;
+                AutocompleteCommandExecuted += value;
+                ModalCommandExecuted += value;
+            }
+            remove
+            {
+                SlashCommandExecuted -= value;
+                ContextCommandExecuted -= value;
+                ComponentCommandExecuted -= value;
+                AutocompleteCommandExecuted -= value;
+                ModalCommandExecuted -= value;
+            }
+        }
+
+        /// <summary>
         ///     Occurs when a Slash Command is executed.
         /// </summary>
         public event Func<SlashCommandInfo, IInteractionContext, IResult, Task> SlashCommandExecuted { add { _slashCommandExecutedEvent.Add(value); } remove { _slashCommandExecutedEvent.Remove(value); } }
@@ -946,8 +969,60 @@ namespace Discord.Interactions
             _typeReaderMap.AddGeneric(targetType, readerType);
 
         /// <summary>
+        ///     Removes a type reader for the type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type to remove the readers from.</typeparam>
+        /// <param name="reader">The reader if the resulting remove operation was successful.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveTypeReader<T>(out TypeReader reader)
+            => TryRemoveTypeReader(typeof(T), out reader);
+
+        /// <summary>
+        ///     Removes a type reader for the given type.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <param name="type">The type to remove the reader from.</param>
+        /// <param name="reader">The reader if the resulting remove operation was successful.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveTypeReader(Type type, out TypeReader reader)
+            => _typeReaderMap.TryRemoveConcrete(type, out reader);
+
+        /// <summary>
+        ///     Removes a generic type reader from the type <typeparamref name="T"/>.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <typeparam name="T">The type to remove the readers from.</typeparam>
+        /// <param name="readerType">The removed readers type.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveGenericTypeReader<T>(out Type readerType)
+            => TryRemoveGenericTypeReader(typeof(T), out readerType);
+
+        /// <summary>
+        ///     Removes a generic type reader from the given type.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <param name="type">The type to remove the reader from.</param>
+        /// <param name="readerType">The readers type if the remove operation was successful.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveGenericTypeReader(Type type, out Type readerType)
+            => _typeReaderMap.TryRemoveGeneric(type, out readerType);
+
+        /// <summary>
         ///     Serialize an object using a <see cref="TypeReader"/> into a <see cref="string"/> to be placed in a Component CustomId.
         /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
         /// <typeparam name="T">Type of the object to be serialized.</typeparam>
         /// <param name="obj">Object to be serialized.</param>
         /// <param name="services">Services that will be passed on to the <see cref="TypeReader"/>.</param>

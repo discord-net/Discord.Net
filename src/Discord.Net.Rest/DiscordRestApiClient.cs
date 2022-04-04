@@ -1626,7 +1626,7 @@ namespace Discord.API
 
         #region Guild Integrations
         /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
-        public async Task<IReadOnlyCollection<Integration>> GetGuildIntegrationsAsync(ulong guildId, RequestOptions options = null)
+        public async Task<IReadOnlyCollection<Integration>> GetIntegrationsAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
@@ -1634,47 +1634,14 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<Integration>>("GET", () => $"guilds/{guildId}/integrations", ids, options: options).ConfigureAwait(false);
         }
-        /// <exception cref="ArgumentException"><paramref name="guildId"/> and <paramref name="args.Id"/> must not be equal to zero.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
-        public async Task<Integration> CreateGuildIntegrationAsync(ulong guildId, CreateGuildIntegrationParams args, RequestOptions options = null)
-        {
-            Preconditions.NotEqual(guildId, 0, nameof(guildId));
-            Preconditions.NotNull(args, nameof(args));
-            Preconditions.NotEqual(args.Id, 0, nameof(args.Id));
-            options = RequestOptions.CreateOrClone(options);
-
-            var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<Integration>("POST", () => $"guilds/{guildId}/integrations", ids, options: options).ConfigureAwait(false);
-        }
-        public async Task<Integration> DeleteGuildIntegrationAsync(ulong guildId, ulong integrationId, RequestOptions options = null)
+        public async Task DeleteIntegrationAsync(ulong guildId, ulong integrationId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(integrationId, 0, nameof(integrationId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<Integration>("DELETE", () => $"guilds/{guildId}/integrations/{integrationId}", ids, options: options).ConfigureAwait(false);
-        }
-        public async Task<Integration> ModifyGuildIntegrationAsync(ulong guildId, ulong integrationId, Rest.ModifyGuildIntegrationParams args, RequestOptions options = null)
-        {
-            Preconditions.NotEqual(guildId, 0, nameof(guildId));
-            Preconditions.NotEqual(integrationId, 0, nameof(integrationId));
-            Preconditions.NotNull(args, nameof(args));
-            Preconditions.AtLeast(args.ExpireBehavior, 0, nameof(args.ExpireBehavior));
-            Preconditions.AtLeast(args.ExpireGracePeriod, 0, nameof(args.ExpireGracePeriod));
-            options = RequestOptions.CreateOrClone(options);
-
-            var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<Integration>("PATCH", () => $"guilds/{guildId}/integrations/{integrationId}", args, ids, options: options).ConfigureAwait(false);
-        }
-        public async Task<Integration> SyncGuildIntegrationAsync(ulong guildId, ulong integrationId, RequestOptions options = null)
-        {
-            Preconditions.NotEqual(guildId, 0, nameof(guildId));
-            Preconditions.NotEqual(integrationId, 0, nameof(integrationId));
-            options = RequestOptions.CreateOrClone(options);
-
-            var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<Integration>("POST", () => $"guilds/{guildId}/integrations/{integrationId}/sync", ids, options: options).ConfigureAwait(false);
+            await SendAsync("DELETE", () => $"guilds/{guildId}/integrations/{integrationId}", ids, options: options).ConfigureAwait(false);
         }
         #endregion
 

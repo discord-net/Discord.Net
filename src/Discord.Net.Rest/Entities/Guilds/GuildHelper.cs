@@ -305,19 +305,15 @@ namespace Discord.Rest
         #endregion
 
         #region Integrations
-        public static async Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client,
+        public static async Task<IReadOnlyCollection<RestIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildIntegrationsAsync(guild.Id, options).ConfigureAwait(false);
-            return models.Select(x => RestGuildIntegration.Create(client, guild, x)).ToImmutableArray();
+            var models = await client.ApiClient.GetIntegrationsAsync(guild.Id, options).ConfigureAwait(false);
+            return models.Select(x => RestIntegration.Create(client, guild, x)).ToImmutableArray();
         }
-        public static async Task<RestGuildIntegration> CreateIntegrationAsync(IGuild guild, BaseDiscordClient client,
-            ulong id, string type, RequestOptions options)
-        {
-            var args = new CreateGuildIntegrationParams(id, type);
-            var model = await client.ApiClient.CreateGuildIntegrationAsync(guild.Id, args, options).ConfigureAwait(false);
-            return RestGuildIntegration.Create(client, guild, model);
-        }
+        public static async Task DeleteIntegrationAsync(IGuild guild, BaseDiscordClient client, ulong id,
+            RequestOptions options) =>
+                await client.ApiClient.DeleteIntegrationAsync(guild.Id, id, options).ConfigureAwait(false);
         #endregion
 
         #region Interactions

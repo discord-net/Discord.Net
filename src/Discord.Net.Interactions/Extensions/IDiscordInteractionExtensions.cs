@@ -10,9 +10,10 @@ namespace Discord.Interactions
         /// </summary>
         /// <typeparam name="T">Type of the <see cref="IModal"/> implementation.</typeparam>
         /// <param name="interaction">The interaction to respond to.</param>
+        /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
-        public static async Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, RequestOptions options = null)
+        public static async Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
             if (!ModalUtils.TryGet<T>(out var modalInfo))
@@ -30,6 +31,9 @@ namespace Discord.Interactions
                     default:
                         throw new InvalidOperationException($"{input.GetType().FullName} isn't a valid component info class");
                 }
+
+            if (modifyModal is not null)
+                modifyModal(builder);
 
             await interaction.RespondWithModalAsync(builder.Build(), options).ConfigureAwait(false);
         }

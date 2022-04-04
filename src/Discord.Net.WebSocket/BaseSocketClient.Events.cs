@@ -415,6 +415,32 @@ namespace Discord.WebSocket
 
         #endregion
 
+        #region Integrations
+        /// <summary> Fired when an integration is created. </summary>
+        public event Func<IIntegration, Task> IntegrationCreated
+        {
+            add { _integrationCreated.Add(value); }
+            remove { _integrationCreated.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<IIntegration, Task>> _integrationCreated = new AsyncEvent<Func<IIntegration, Task>>();
+
+        /// <summary> Fired when an integration is updated. </summary>
+        public event Func<IIntegration, Task> IntegrationUpdated
+        {
+            add { _integrationUpdated.Add(value); }
+            remove { _integrationUpdated.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<IIntegration, Task>> _integrationUpdated = new AsyncEvent<Func<IIntegration, Task>>();
+
+        /// <summary> Fired when an integration is deleted. </summary>
+        public event Func<IGuild, ulong, Optional<ulong>, Task> IntegrationDeleted
+        {
+            add { _integrationDeleted.Add(value); }
+            remove { _integrationDeleted.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<IGuild, ulong, Optional<ulong>, Task>> _integrationDeleted = new AsyncEvent<Func<IGuild, ulong, Optional<ulong>, Task>>();
+        #endregion
+
         #region Users
         /// <summary> Fired when a user joins a guild. </summary>
         public event Func<SocketGuildUser, Task> UserJoined
@@ -451,7 +477,7 @@ namespace Discord.WebSocket
             remove { _userUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketUser, SocketUser, Task>> _userUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketUser, Task>>();
-        /// <summary> Fired when a guild member is updated, or a member presence is updated. </summary>
+        /// <summary> Fired when a guild member is updated. </summary>
         public event Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task> GuildMemberUpdated
         {
             add { _guildMemberUpdatedEvent.Add(value); }

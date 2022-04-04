@@ -24,7 +24,29 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the owner of the current thread.
         /// </summary>
-        public SocketThreadUser Owner { get; private set; }
+        public SocketThreadUser Owner
+        {
+            get
+            {
+                lock (_ownerLock)
+                {
+                    var user = GetUser(_ownerId);
+
+                    if (user == null)
+                    {
+                        var guildMember = Guild.GetUser(_ownerId);
+                        if (guildMember == null)
+                            return null;
+
+                        user = SocketThreadUser.Create(Guild, this, guildMember);
+                        _members[user.Id] = user;
+                        return user;
+                    }
+                    else
+                        return user;
+                }
+            }
+        }
 
         /// <summary>
         ///     Gets the current users within this thread.
@@ -83,6 +105,9 @@ namespace Discord.WebSocket
         private bool _usersDownloaded;
 
         private readonly object _downloadLock = new object();
+        private readonly object _ownerLock = new object();
+
+        private ulong _ownerId;
 
         internal SocketThreadChannel(DiscordSocketClient discord, SocketGuild guild, ulong id, SocketGuildChannel parent,
             DateTimeOffset? createdAt)
@@ -96,7 +121,7 @@ namespace Discord.WebSocket
         internal new static SocketThreadChannel Create(SocketGuild guild, ClientState state, Model model)
         {
             var parent = guild.GetChannel(model.CategoryId.Value);
-            var entity = new SocketThreadChannel(guild.Discord, guild, model.Id, parent, model.ThreadMetadata.GetValueOrDefault()?.CreatedAt.ToNullable());
+            var entity = new SocketThreadChannel(guild.Discord, guild, model.Id, parent, model.ThreadMetadata.GetValueOrDefault()?.CreatedAt.GetValueOrDefault(null));
             entity.Update(state, model);
             return entity;
         }
@@ -120,7 +145,7 @@ namespace Discord.WebSocket
 
             if (model.OwnerId.IsSpecified)
             {
-                Owner = GetUser(model.OwnerId.Value);
+                _ownerId = model.OwnerId.Value;
             }
 
             HasJoined = model.ThreadMember.IsSpecified;

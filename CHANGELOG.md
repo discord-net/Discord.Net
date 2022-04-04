@@ -1,8 +1,22 @@
 # Changelog
 
+## [3.4.1] - 2022-03-9
+
+### Added
+- #2169 Component TypeConverters and CustomID TypeReaders (fb4250b)
+- #2180 Attachment description and content type (765c0c5)
+- #2162 Add configuration toggle to suppress Unknown dispatch warnings (1ba96d6)
+- #2178 Add 10065 Error code (cc6918d)
+
+### Fixed
+- #2179 Logging out sharded client throws (24b7bb5)
+- #2182 Thread owner always returns null (25aaa49)
+- #2165 Fix error with flag params when uploading files. (a5d3add)
+- #2181 Fix ambiguous reference for creating roles (f8ec3c7)
+
 ## [3.4.0] - 2022-3-2
 
-## Added
+### Added
 - #2146 Add FromDateTimeOffset in TimestampTag (553055b)
 - #2062 Add return statement to precondition handling (3e52fab)
 - #2131 Add support for sending Message Flags (1fb62de)
@@ -13,13 +27,13 @@
 - #2155 Add Interaction Service Complex Parameters (9ba64f6)
 - #2156 Add Display name support for enum type converter (c800674)
 
-## Fixed
+### Fixed
 - #2117 Fix stream access exception when ratelimited (a1cfa41)
 - #2128 Fix context menu comand message type (f601e9b)
 - #2135 Fix NRE when ratelimmited requests don't return a body (b95b942)
 - #2154 Fix usage of CacheMode.AllowDownload in channels (b3370c3)
 
-## Misc
+### Misc
 - #2149 Clarify Users property on SocketGuildChannel (5594739)
 - #2157 Enforce valid button styles (507a18d)
 
