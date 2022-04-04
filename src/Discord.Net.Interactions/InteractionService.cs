@@ -841,27 +841,6 @@ namespace Discord.Interactions
             matchContainer.SetSegmentMatches(matches);
         }
 
-        internal TypeConverter GetTypeConverter (Type type, IServiceProvider services = null)
-        {
-            if (_typeConverters.TryGetValue(type, out var specific))
-                return specific;
-            else if (_genericTypeConverters.Any(x => x.Key.IsAssignableFrom(type)
-            || (x.Key.IsGenericTypeDefinition && type.IsGenericType && x.Key.GetGenericTypeDefinition() == type.GetGenericTypeDefinition())))
-            {
-                services ??= EmptyServiceProvider.Instance;
-
-                var converterType = GetMostSpecificTypeConverter(type);
-                var converter = ReflectionUtils<TypeConverter>.CreateObject(converterType.MakeGenericType(type).GetTypeInfo(), this, services);
-                _typeConverters[type] = converter;
-                return converter;
-            }
-
-            else if (_typeConverters.Any(x => x.Value.CanConvertTo(type)))
-                return _typeConverters.First(x => x.Value.CanConvertTo(type)).Value;
-
-            throw new ArgumentException($"No type {nameof(TypeConverter)} is defined for this {type.FullName}", "type");
-        }
-
         internal TypeConverter GetTypeConverter(Type type, IServiceProvider services = null)
             => _typeConverterMap.Get(type, services);
 
