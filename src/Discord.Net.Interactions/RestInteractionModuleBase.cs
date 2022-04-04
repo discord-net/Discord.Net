@@ -65,5 +65,39 @@ namespace Discord.Interactions
             else
                 await InteractionService._restResponseCallback(Context, payload).ConfigureAwait(false);
         }
+
+        /// <summary>
+        ///     Responds to the interaction with a modal.
+        /// </summary>
+        /// <param name="modal">The modal to respond with.</param>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
+        /// <returns>A string that contains json to write back to the incoming http request.</returns>
+        /// <exception cref="TimeoutException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        protected override async Task RespondWithModalAsync(Modal modal, RequestOptions options = null)
+        {
+            if (Context.Interaction is not RestInteraction restInteraction)
+                throw new InvalidOperationException($"Invalid interaction type. Interaction must be a type of {nameof(RestInteraction)} in order to execute this method");
+
+            var payload = restInteraction.RespondWithModal(modal, options);
+
+            if (Context is IRestInteractionContext restContext && restContext.InteractionResponseCallback != null)
+                await restContext.InteractionResponseCallback.Invoke(payload).ConfigureAwait(false);
+            else
+                await InteractionService._restResponseCallback(Context, payload).ConfigureAwait(false);
+        }
+
+        protected override async Task RespondWithModalAsync<T>(string customId, RequestOptions options = null)
+        {
+            if (Context.Interaction is not RestInteraction restInteraction)
+                throw new InvalidOperationException($"Invalid interaction type. Interaction must be a type of {nameof(RestInteraction)} in order to execute this method");
+
+            var payload = restInteraction.RespondWithModal<T>(customId, options);
+
+            if (Context is IRestInteractionContext restContext && restContext.InteractionResponseCallback != null)
+                await restContext.InteractionResponseCallback.Invoke(payload).ConfigureAwait(false);
+            else
+                await InteractionService._restResponseCallback(Context, payload).ConfigureAwait(false);
+        }
     }
 }
