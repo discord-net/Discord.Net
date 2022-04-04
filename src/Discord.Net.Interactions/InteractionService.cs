@@ -25,6 +25,29 @@ namespace Discord.Interactions
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new ();
 
         /// <summary>
+        ///     Occurs when any type of interaction is executed.
+        /// </summary>
+        public event Func<ICommandInfo, IInteractionContext, IResult, Task> InteractionExecuted
+        {
+            add
+            {
+                SlashCommandExecuted += value;
+                ContextCommandExecuted += value;
+                ComponentCommandExecuted += value;
+                AutocompleteCommandExecuted += value;
+                ModalCommandExecuted += value;
+            }
+            remove
+            {
+                SlashCommandExecuted -= value;
+                ContextCommandExecuted -= value;
+                ComponentCommandExecuted -= value;
+                AutocompleteCommandExecuted -= value;
+                ModalCommandExecuted -= value;
+            }
+        }
+
+        /// <summary>
         ///     Occurs when a Slash Command is executed.
         /// </summary>
         public event Func<SlashCommandInfo, IInteractionContext, IResult, Task> SlashCommandExecuted { add { _slashCommandExecutedEvent.Add(value); } remove { _slashCommandExecutedEvent.Remove(value); } }
