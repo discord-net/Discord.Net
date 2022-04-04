@@ -13,7 +13,7 @@ namespace Discord.Interactions
         /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
-        public static async Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, Action<ModalBuilder> modifyModal = null, RequestOptions options = null)
+        public static async Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
             if (!ModalUtils.TryGet<T>(out var modalInfo))
