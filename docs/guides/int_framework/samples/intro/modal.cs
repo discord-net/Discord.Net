@@ -20,7 +20,7 @@ public class FoodModal : IModal
 
 // Responds to the modal.
 [ModalInteraction("food_menu")]
-public async Task ModalResponce(FoodModal modal)
+public async Task ModalResponse(FoodModal modal)
 {
     // Build the message to send.
     string message = "hey @everyone, I just learned " +
