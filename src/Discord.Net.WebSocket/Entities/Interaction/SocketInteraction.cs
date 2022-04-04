@@ -19,13 +19,25 @@ namespace Discord.WebSocket
         ///     Gets the <see cref="ISocketMessageChannel"/> this interaction was used in.
         /// </summary>
         /// <remarks>
-        ///     If the channel isn't cached or the bot doesn't have access to it then
+        ///     If the channel isn't cached, the bot scope isn't used, or the bot doesn't have access to it then
         ///     this property will be <see langword="null"/>.
         /// </remarks>
         public ISocketMessageChannel Channel { get; private set; }
 
         /// <summary>
+        ///     Gets the ID of the channel this interaction was used in.
+        /// </summary>
+        /// <remarks>
+        ///     This property is exposed in cases where the bot scope is not provided, so the channel entity cannot be retrieved.
+        ///     <br />
+        ///     To get the channel, you can call <see cref="GetChannelAsync(RequestOptions)"/>
+        ///     as this method makes a request for a <see cref="RestChannel"/> if nothing was found in cache.
+        /// </remarks>
+        public ulong? ChannelId { get; private set; }
+
+        /// <summary>
         ///     Gets the <see cref="SocketUser"/> who triggered this interaction.
+        ///     This property will be <see langword="null"/> if the bot scope isn't used.
         /// </summary>
         public SocketUser User { get; private set; }
 
@@ -61,8 +73,6 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public bool IsDMInteraction { get; private set; }
-
-        private ulong? _channelId;
 
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel, SocketUser user)
             : base(client, id)
@@ -111,7 +121,7 @@ namespace Discord.WebSocket
         {
             IsDMInteraction = !model.GuildId.IsSpecified;
 
-            _channelId = model.ChannelId.ToNullable();
+            ChannelId = model.ChannelId.ToNullable();
 
             Data = model.Data.IsSpecified
                 ? model.Data.Value
@@ -396,12 +406,12 @@ namespace Discord.WebSocket
             if (Channel != null)
                 return Channel;
 
-            if (!_channelId.HasValue)
+            if (!ChannelId.HasValue)
                 return null;
 
             try
             {
-                return (IMessageChannel)await Discord.GetChannelAsync(_channelId.Value, options).ConfigureAwait(false);
+                return (IMessageChannel)await Discord.GetChannelAsync(ChannelId.Value, options).ConfigureAwait(false);
             }
             catch(HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions) { return null; } // bot can't view that channel, return null instead of throwing.
         }
