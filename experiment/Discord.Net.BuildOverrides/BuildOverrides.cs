@@ -130,7 +130,7 @@ namespace Discord
         {
             using (var client = new HttpClient())
             {
-                var result = await client.GetAsync($"{ApiUrl}/override/{name}");
+                var result = await client.GetAsync($"{ApiUrl}/overrides/{name}");
 
                 if (result.IsSuccessStatusCode)
                 {
@@ -184,7 +184,7 @@ namespace Discord
 
             using (var client = new HttpClient())
             {
-                var result = await client.GetAsync($"{ApiUrl}/override/download/{ovrride.Id}");
+                var result = await client.GetAsync($"{ApiUrl}/overrides/download/{ovrride.Id}");
 
                 if (!result.IsSuccessStatusCode)
                     return false;
@@ -260,7 +260,7 @@ namespace Discord
         {
             using(var client = new HttpClient())
             {
-                var result = await client.PostAsync($"{ApiUrl}/override/{id}/dependency", new StringContent($"{{ \"info\": \"{name}\"}}", Encoding.UTF8, "application/json"));
+                var result = await client.PostAsync($"{ApiUrl}/overrides/{id}/dependency", new StringContent($"{{ \"info\": \"{name}\"}}", Encoding.UTF8, "application/json"));
 
                 if (!result.IsSuccessStatusCode)
                     throw new Exception("Failed to get dependency");
