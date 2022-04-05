@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace Discord.Rest
 {
-    public abstract class RestEntity<T> : IEntity<T>
+    public abstract class RestEntity<T> : MarshalByRefObject, IEntity<T>
         where T : IEquatable<T>
     {
         internal BaseDiscordClient Discord { get; }

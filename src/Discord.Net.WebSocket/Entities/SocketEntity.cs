@@ -2,7 +2,7 @@ using System;
 
 namespace Discord.WebSocket
 {
-    public abstract class SocketEntity<T> : IEntity<T>
+    public abstract class SocketEntity<T> : MarshalByRefObject, IEntity<T>
         where T : IEquatable<T>
     {
         internal DiscordSocketClient Discord { get; }
