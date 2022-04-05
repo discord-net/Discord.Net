@@ -115,6 +115,8 @@
       topicUid: Guides.OtherLibs.Serilog
     - name: EFCore
       topicUid: Guides.OtherLibs.EFCore
+    - name: MediatR
+      topicUid: Guides.OtherLibs.MediatR
 - name: Emoji
   topicUid: Guides.Emoji
 - name: Voice
