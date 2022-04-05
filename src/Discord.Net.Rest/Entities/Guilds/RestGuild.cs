@@ -333,17 +333,18 @@ namespace Discord.Rest
         #endregion
 
         #region Bans
-        /// <summary>
-        ///     Gets a collection of all users banned in this guild.
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
-        ///     ban objects that this guild currently possesses, with each object containing the user banned and reason
-        ///     behind the ban.
-        /// </returns>
-        public Task<IReadOnlyCollection<RestBan>> GetBansAsync(RequestOptions options = null)
-            => GuildHelper.GetBansAsync(this, Discord, options);
+
+        /// <inheritdoc cref="IGuild.GetBansAsync(int, RequestOptions)" />
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, null, Direction.Before, limit, options);
+
+        /// <inheritdoc cref="IGuild.GetBansAsync(ulong, Direction, int, RequestOptions)" />
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, fromUserId, dir, limit, options);
+
+        /// <inheritdoc cref="IGuild.GetBansAsync(IUser, Direction, int, RequestOptions)" />
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, fromUser.Id, dir, limit, options);
         /// <summary>
         ///     Gets a ban object for a banned user.
         /// </summary>
@@ -1193,22 +1194,24 @@ namespace Discord.Rest
         IReadOnlyCollection<IRole> IGuild.Roles => Roles;
 
         IReadOnlyCollection<ICustomSticker> IGuild.Stickers => Stickers;
-
         /// <inheritdoc />
         async Task<IGuildScheduledEvent> IGuild.CreateEventAsync(string name, DateTimeOffset startTime, GuildScheduledEventType type, GuildScheduledEventPrivacyLevel privacyLevel, string description, DateTimeOffset? endTime, ulong? channelId, string location, Image? coverImage, RequestOptions options)
             => await CreateEventAsync(name, startTime, type, privacyLevel, description, endTime, channelId, location, coverImage, options).ConfigureAwait(false);
-
         /// <inheritdoc />
         async Task<IGuildScheduledEvent> IGuild.GetEventAsync(ulong id, RequestOptions options)
             => await GetEventAsync(id, options).ConfigureAwait(false);
-
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IGuildScheduledEvent>> IGuild.GetEventsAsync(RequestOptions options)
             => await GetEventsAsync(options).ConfigureAwait(false);
-
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
-            => await GetBansAsync(options).ConfigureAwait(false);
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(int limit, RequestOptions options)
+            => GetBansAsync(limit, options);
+        /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(ulong fromUserId, Direction dir, int limit, RequestOptions options)
+            => GetBansAsync(fromUserId, dir, limit, options);
+        /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(IUser fromUser, Direction dir, int limit, RequestOptions options)
+            => GetBansAsync(fromUser, dir, limit, options);
         /// <inheritdoc/>
         async Task<IBan> IGuild.GetBanAsync(IUser user, RequestOptions options)
             => await GetBanAsync(user, options).ConfigureAwait(false);

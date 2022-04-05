@@ -409,17 +409,70 @@ namespace Discord
         ///     A task that represents the asynchronous leave operation.
         /// </returns>
         Task LeaveAsync(RequestOptions options = null);
-
         /// <summary>
-        ///     Gets a collection of all users banned in this guild.
+        ///     Gets <paramref name="limit"/> amount of bans from the guild ordered by user ID.
         /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
+        ///         collection.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Do not fetch too many bans at once! This may cause unwanted preemptive rate limit or even actual
+        ///         rate limit, causing your bot to freeze!
+        ///     </note>
+        /// </remarks>
+        /// <param name="limit">The amount of bans to get from the guild.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
-        ///     ban objects that this guild currently possesses, with each object containing the user banned and reason
-        ///     behind the ban.
+        ///     A paged collection of bans.
         /// </returns>
-        Task<IReadOnlyCollection<IBan>> GetBansAsync(RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
+        /// <summary>
+        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUserId"/> ordered by user ID.
+        /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
+        ///         collection.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Do not fetch too many bans at once! This may cause unwanted preemptive rate limit or even actual
+        ///         rate limit, causing your bot to freeze!
+        ///     </note>
+        /// </remarks>
+        /// <param name="fromUserId">The ID of the user to start to get bans from.</param>
+        /// <param name="dir">The direction of the bans to be gotten.</param>
+        /// <param name="limit">The number of bans to get.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A paged collection of bans.
+        /// </returns>
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
+        /// <summary>
+        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUser"/> ordered by user ID.
+        /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
+        ///         collection.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Do not fetch too many bans at once! This may cause unwanted preemptive rate limit or even actual
+        ///         rate limit, causing your bot to freeze!
+        ///     </note>
+        /// </remarks>
+        /// <param name="fromUser">The user to start to get bans from.</param>
+        /// <param name="dir">The direction of the bans to be gotten.</param>
+        /// <param name="limit">The number of bans to get.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A paged collection of bans.
+        /// </returns>
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
         /// <summary>
         ///     Gets a ban object for a banned user.
         /// </summary>

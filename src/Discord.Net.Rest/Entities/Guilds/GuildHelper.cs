@@ -142,12 +142,54 @@ namespace Discord.Rest
         #endregion
 
         #region Bans
-        public static async Task<IReadOnlyCollection<RestBan>> GetBansAsync(IGuild guild, BaseDiscordClient client,
-            RequestOptions options)
+        public static IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(IGuild guild, BaseDiscordClient client,
+            ulong? fromUserId, Direction dir, int limit, RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildBansAsync(guild.Id, options).ConfigureAwait(false);
-            return models.Select(x => RestBan.Create(client, x)).ToImmutableArray();
+            if (dir == Direction.Around && limit > DiscordConfig.MaxBansPerBatch)
+            {
+                int around = limit / 2;
+                if (fromUserId.HasValue)
+                    return GetBansAsync(guild, client, fromUserId.Value + 1, Direction.Before, around + 1, options)
+                        .Concat(GetBansAsync(guild, client, fromUserId.Value, Direction.After, around, options));
+                else 
+                    return GetBansAsync(guild, client, null, Direction.Before, around + 1, options);
+            }
+
+            return new PagedAsyncEnumerable<RestBan>(
+                DiscordConfig.MaxBansPerBatch,
+                async (info, ct) =>
+                {
+                    var args = new GetGuildBansParams
+                    {
+                        RelativeDirection = dir,
+                        Limit = info.PageSize
+                    };
+                    if (info.Position != null)
+                        args.RelativeUserId = info.Position.Value;
+
+                    var models = await client.ApiClient.GetGuildBansAsync(guild.Id, args, options).ConfigureAwait(false);
+                    var builder = ImmutableArray.CreateBuilder<RestBan>();
+
+                    foreach (var model in models)
+                        builder.Add(RestBan.Create(client, model));
+
+                    return builder.ToImmutable();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
+                        return false;
+                    if (dir == Direction.Before)
+                        info.Position = lastPage.Min(x => x.User.Id);
+                    else
+                        info.Position = lastPage.Max(x => x.User.Id);
+                    return true;
+                },
+                start: fromUserId,
+                count: limit
+                );
         }
+
         public static async Task<RestBan> GetBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, RequestOptions options)
         {
             var model = await client.ApiClient.GetGuildBanAsync(guild.Id, userId, options).ConfigureAwait(false);

@@ -1545,13 +1545,29 @@ namespace Discord.API
         #endregion
 
         #region Guild Bans
-        public async Task<IReadOnlyCollection<Ban>> GetGuildBansAsync(ulong guildId, RequestOptions options = null)
+        public async Task<IReadOnlyCollection<Ban>> GetGuildBansAsync(ulong guildId, GetGuildBansParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.Limit, 0, nameof(args.Limit));
+            Preconditions.AtMost(args.Limit, DiscordConfig.MaxBansPerBatch, nameof(args.Limit));
             options = RequestOptions.CreateOrClone(options);
 
+            int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxBansPerBatch);
+            ulong? relativeId = args.RelativeUserId.IsSpecified ? args.RelativeUserId.Value : (ulong?)null;
+            var relativeDir = args.RelativeDirection.GetValueOrDefault(Direction.Before) switch
+            {
+                Direction.After => "after",
+                Direction.Around => "around",
+                _ => "before",
+            };
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<Ban>>("GET", () => $"guilds/{guildId}/bans", ids, options: options).ConfigureAwait(false);
+            Expression<Func<string>> endpoint;
+            if (relativeId != null)
+                endpoint = () => $"guilds/{guildId}/bans?limit={limit}&{relativeDir}={relativeId}";
+            else
+                endpoint = () => $"guilds/{guildId}/bans?limit={limit}";
+            return await SendAsync<IReadOnlyCollection<Ban>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
         public async Task<Ban> GetGuildBanAsync(ulong guildId, ulong userId, RequestOptions options)
         {
