@@ -334,74 +334,15 @@ namespace Discord.Rest
 
         #region Bans
 
-        /// <summary>
-        ///     Gets <paramref name="limit"/> amount of bans from the guild.
-        /// </summary>
-        /// <remarks>
-        ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
-        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
-        ///         collection.
-        ///     </note>
-        ///     <note type="warning">
-        ///         Do not fetch too many bans at once! This may cause unwanted preemptive rate limit or even actual
-        ///         rate limit, causing your bot to freeze!
-        ///     </note>
-        /// </remarks>
-        /// <param name="limit">The number of bans to get.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A paged collection of bans.
-        /// </returns>/param>
-        /// <returns></returns>
+        /// <inheritdoc cref="IGuild.GetBansAsync(int, RequestOptions)" />
         public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, null, Direction.Before, limit, options);
 
-        /// <summary>
-        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUserId"/>
-        /// </summary>
-        /// <remarks>
-        ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
-        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
-        ///         collection.
-        ///     </note>
-        ///     <note type="warning">
-        ///         Do not fetch too many bans at once! This may cause unwanted preemptive rate limit or even actual
-        ///         rate limit, causing your bot to freeze!
-        ///     </note>
-        /// </remarks>
-        /// <param name="fromUserId">The ID of the user to start to get bans from.</param>
-        /// <param name="dir">The direction of the bans to be gotten.</param>
-        /// <param name="limit">The number of bans to get.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A paged collection of bans.
-        /// </returns>
+        /// <inheritdoc cref="IGuild.GetBansAsync(ulong, Direction, int, RequestOptions)" />
         public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, fromUserId, dir, limit, options);
 
-        /// <summary>
-        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUser"/>
-        /// </summary>
-        /// <remarks>
-        ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
-        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
-        ///         collection.
-        ///     </note>
-        ///     <note type="warning">
-        ///         Do not fetch too many bans at once! This may cause unwanted preemptive rate limit or even actual
-        ///         rate limit, causing your bot to freeze!
-        ///     </note>
-        /// </remarks>
-        /// <param name="fromUser">The user to start to get bans from.</param>
-        /// <param name="dir">The direction of the bans to be gotten.</param>
-        /// <param name="limit">The number of bans to get.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A paged collection of bans.
-        /// </returns>
+        /// <inheritdoc cref="IGuild.GetBansAsync(IUser, Direction, int, RequestOptions)" />
         public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, fromUser.Id, dir, limit, options);
         /// <summary>

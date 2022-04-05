@@ -410,7 +410,7 @@ namespace Discord
         /// </returns>
         Task LeaveAsync(RequestOptions options = null);
         /// <summary>
-        ///     Gets <paramref name="limit"/> amount of bans from the guild.
+        ///     Gets <paramref name="limit"/> amount of bans from the guild ordered by user ID.
         /// </summary>
         /// <remarks>
         ///     <note type="important">
@@ -430,7 +430,7 @@ namespace Discord
         /// </returns>
         IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
         /// <summary>
-        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUserId"/>
+        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUserId"/> ordered by user ID.
         /// </summary>
         /// <remarks>
         ///     <note type="important">
@@ -452,7 +452,7 @@ namespace Discord
         /// </returns>
         IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
         /// <summary>
-        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUser"/>
+        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUser"/> ordered by user ID.
         /// </summary>
         /// <remarks>
         ///     <note type="important">
