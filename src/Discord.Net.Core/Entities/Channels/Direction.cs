@@ -15,15 +15,15 @@ namespace Discord
     public enum Direction
     {
         /// <summary>
-        ///     The message(s) should be retrieved before an entity.
+        ///     The entity(s) should be retrieved before an entity.
         /// </summary>
         Before,
         /// <summary>
-        ///     The message(s) should be retrieved after an entity.
+        ///     The entity(s) should be retrieved after an entity.
         /// </summary>
         After,
         /// <summary>
-        ///     The message(s) should be retrieved around an entity.
+        ///     The entity(s) should be retrieved around an entity.
         /// </summary>
         Around
     }
