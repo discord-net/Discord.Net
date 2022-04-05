@@ -1,5 +1,31 @@
 # Changelog
 
+## [3.5.0] - 2022-04-05
+
+### Added
+- #2204 Added config option for bidirectional formatting of usernames (e38104b)
+- #2210 Add a way to remove type readers from the interaction/command service. (7339945)
+- #2213 Add global interaction post execution event. (a744948)
+- #2223 Add ban pagination support (d8757a5)
+- #2201 Add missing interface methods to IComponentInteraction (741ed80)
+- #2226 Add an action delegate parameter to `RespondWithModalAsync<T>()` for modifying the modal (d2118f0)
+- #2227 Add RespondWithModal methods to RestInteractinModuleBase (1c680db)
+
+### Fixed
+- #2168 Fix Integration model from GuildIntegration and added INTEGRATION gateway events (305d7f9)
+- #2187 Fix modal response failing (d656722)
+- #2188 Fix serialization error on thread creation timestamp. (d48a7bd)
+- #2209 Fix GuildPermissions.All not including newer permissions (91d8fab)
+- #2219 Fix ShardedClients not pushing PresenceUpdates (c4131cf)
+- #2225 Fix GuildMemberUpdated cacheable `before` entity being incorrect (bfd0d9b)
+- #2217 Fix gateway interactions not running without bot scope. (8522447)
+
+### Misc
+- #2193 Update GuildMemberUpdated comment regarding presence (82473bc)
+- #2206 Fixed typo (c286b99)
+- #2216 Fix small typo in modal example (0439437)
+- #2228 Correct minor typo (d1cf1bf)
+
 ## [3.4.1] - 2022-03-9
 
 ### Added
