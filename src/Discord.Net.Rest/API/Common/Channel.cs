@@ -66,5 +66,11 @@ namespace Discord.API
 
         [JsonProperty("member_count")]
         public Optional<int> MemberCount { get; set; }
+
+        //ForumChannel
+        [JsonProperty("available_tags")]
+        public Optional<ForumTags[]> ForumTags { get; set; }
+        [JsonProperty("default_auto_archive_duration")]
+        public Optional<ThreadArchiveDuration> DefaultAutoArchiveDuration { get; set; }
     }
 }

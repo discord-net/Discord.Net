@@ -1,30 +1,35 @@
 using Discord.Net.Converters;
 using Discord.Net.Rest;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Discord.API.Rest
 {
-    internal class UploadFileParams
+    internal class CreateMultipartPostAsync
     {
         private static JsonSerializer _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
 
         public FileAttachment[] Files { get; }
 
+        public string Title { get; set; }
+        public ThreadArchiveDuration ArchiveDuration { get; set; }
+        public Optional<int?> Slowmode { get; set; }
+
+
         public Optional<string> Content { get; set; }
-        public Optional<string> Nonce { get; set; }
         public Optional<bool> IsTTS { get; set; }
         public Optional<Embed[]> Embeds { get; set; }
         public Optional<AllowedMentions> AllowedMentions { get; set; }
-        public Optional<MessageReference> MessageReference { get; set; }
         public Optional<ActionRowComponent[]> MessageComponent { get; set; }
         public Optional<MessageFlags?> Flags { get; set; }
         public Optional<ulong[]> Stickers { get; set; }
 
-        public UploadFileParams(params Discord.FileAttachment[] attachments)
+        public CreateMultipartPostAsync(params FileAttachment[] attachments)
         {
             Files = attachments;
         }
@@ -32,22 +37,24 @@ namespace Discord.API.Rest
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
             var d = new Dictionary<string, object>();
-            
+
             var payload = new Dictionary<string, object>();
+
+            payload["title"] = Title;
+            payload["auto_archive_duration"] = ArchiveDuration;
+
+            if (Slowmode.IsSpecified)
+                payload["rate_limit_per_user"] = Slowmode.Value;
             if (Content.IsSpecified)
                 payload["content"] = Content.Value;
             if (IsTTS.IsSpecified)
                 payload["tts"] = IsTTS.Value;
-            if (Nonce.IsSpecified)
-                payload["nonce"] = Nonce.Value;
             if (Embeds.IsSpecified)
                 payload["embeds"] = Embeds.Value;
             if (AllowedMentions.IsSpecified)
                 payload["allowed_mentions"] = AllowedMentions.Value;
             if (MessageComponent.IsSpecified)
                 payload["components"] = MessageComponent.Value;
-            if (MessageReference.IsSpecified)
-                payload["message_reference"] = MessageReference.Value;
             if (Stickers.IsSpecified)
                 payload["sticker_ids"] = Stickers.Value;
             if (Flags.IsSpecified)
@@ -55,7 +62,7 @@ namespace Discord.API.Rest
 
             List<object> attachments = new();
 
-            for(int n = 0; n != Files.Length; n++)
+            for (int n = 0; n != Files.Length; n++)
             {
                 var attachment = Files[n];
 
