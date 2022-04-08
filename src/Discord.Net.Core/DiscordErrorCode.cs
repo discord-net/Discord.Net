@@ -57,6 +57,7 @@ namespace Discord
         #endregion
 
         #region General Actions (20XXX)
+        UnknownTag = 10087,
         BotsCannotUse = 20001,
         OnlyBotsCanUse = 20002,
         CannotSendExplicitContent = 20009,
@@ -96,6 +97,8 @@ namespace Discord
         #endregion
 
         #region General Request Errors (40XXX)
+        MaximumNumberOfPinnedThreadsInAForumChannelHasBeenReached = 30047,
+        MaximumNumberOfTagsInAForumChannelHasBeenReached = 30048,
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
         OpeningDMTooFast = 40003,
@@ -108,6 +111,7 @@ namespace Discord
         #endregion
 
         #region Action Preconditions/Checks (50XXX)
+        TagNamesMustBeUnique = 40061,
         MissingPermissions = 50001,
         InvalidAccountType = 50002,
         CannotExecuteForDM = 50003,
