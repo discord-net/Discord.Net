@@ -282,6 +282,8 @@ By nesting commands inside a module that is tagged with [GroupAttribute] you can
 > Although creating nested module stuctures are allowed,
 > you are not permitted to use more than 2 [GroupAttribute]'s in module hierarchy.
 
+[!code-csharp[Command Group Example](samples/intro/groupmodule.cs)]
+
 ## Executing Commands
 
 Any of the following socket events can be used to execute commands:
