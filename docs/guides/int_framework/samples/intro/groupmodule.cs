@@ -5,7 +5,7 @@ public class CommandGroupModule : InteractionModuleBase<SocketInteractionContext
     public async Task PongSubcommand()
         => await RespondAsync("Pong!");
 
-    [Group("subcommand-group", "Subcommand group description")]
+    [Group("subcommand-group-name", "Subcommand group description")]
     public class SubcommandGroupModule : InteractionModuleBase<SocketInteractionContext>
     {
         [SlashCommand("echo", "Echo an input")]
