@@ -39,7 +39,9 @@ namespace Discord.WebSocket
         public string Icon { get; private set; }
         /// <inheritdoc />
         public GuildPermissions Permissions { get; private set; }
-        /// <inheritdoc />
+        /// <summary>
+        /// Returns the position of the role in the hierarchy. The higher the number, the higher the role is in the hierarchy.
+        /// </summary>
         public int Position { get; private set; }
         /// <inheritdoc />
         public RoleTags Tags { get; private set; }
