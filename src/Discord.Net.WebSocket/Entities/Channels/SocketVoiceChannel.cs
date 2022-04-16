@@ -55,14 +55,14 @@ namespace Discord.WebSocket
             : base(discord, id, guild)
         {
         }
-        internal new static SocketVoiceChannel Create(SocketGuild guild, ClientState state, Model model)
+        internal new static SocketVoiceChannel Create(SocketGuild guild, ClientStateManager state, Model model)
         {
             var entity = new SocketVoiceChannel(guild.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }
         /// <inheritdoc />
-        internal override void Update(ClientState state, Model model)
+        internal override void Update(ClientStateManager state, Model model)
         {
             base.Update(state, model);
             CategoryId = model.CategoryId;

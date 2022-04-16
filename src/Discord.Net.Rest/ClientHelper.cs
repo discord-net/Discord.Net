@@ -151,6 +151,16 @@ namespace Discord.Rest
             return null;
         }
 
+        public static async Task<IReadOnlyCollection<RestGuildUser>> GetGuildUsersAsync(BaseDiscordClient client,
+            ulong guildId, RequestOptions options)
+        {
+            var guild = await GetGuildAsync(client, guildId, false, options).ConfigureAwait(false);
+            if (guild == null)
+                return null;
+
+            return (await GuildHelper.GetUsersAsync(guild, client, null, null, options).FlattenAsync()).ToImmutableArray();
+        }
+
         public static async Task<RestWebhook> GetWebhookAsync(BaseDiscordClient client, ulong id, RequestOptions options)
         {
             var model = await client.ApiClient.GetWebhookAsync(id).ConfigureAwait(false);

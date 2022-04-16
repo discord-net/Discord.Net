@@ -17,7 +17,7 @@ namespace Discord.API.Gateway
         [JsonProperty("v")]
         public int Version { get; set; }
         [JsonProperty("user")]
-        public User User { get; set; }
+        public CurrentUser User { get; set; }
         [JsonProperty("session_id")]
         public string SessionId { get; set; }
         [JsonProperty("read_state")]

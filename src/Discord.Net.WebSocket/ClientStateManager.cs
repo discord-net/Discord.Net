@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Discord.WebSocket
 {
-    internal class ClientState
+    internal partial class ClientStateManager
     {
         private const double AverageChannelsPerGuild = 10.22; //Source: Googie2149
         private const double AverageUsersPerGuild = 47.78; //Source: Googie2149
@@ -30,8 +30,11 @@ namespace Discord.WebSocket
                 _groupChannels.Select(x => GetChannel(x) as ISocketPrivateChannel))
             .ToReadOnlyCollection(() => _dmChannels.Count + _groupChannels.Count);
 
-        public ClientState(int guildCount, int dmChannelCount)
+        private readonly IStateProvider _state;
+
+        public ClientStateManager(IStateProvider state, int guildCount, int dmChannelCount)
         {
+            _state = state;
             double estimatedChannelCount = guildCount * AverageChannelsPerGuild + dmChannelCount;
             double estimatedUsersCount = guildCount * AverageUsersPerGuild;
             _channels = new ConcurrentDictionary<ulong, SocketChannel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedChannelCount * CollectionMultiplier));
@@ -121,22 +124,6 @@ namespace Discord.WebSocket
             return null;
         }
 
-        internal SocketGlobalUser GetUser(ulong id)
-        {
-            if (_users.TryGetValue(id, out SocketGlobalUser user))
-                return user;
-            return null;
-        }
-        internal SocketGlobalUser GetOrAddUser(ulong id, Func<ulong, SocketGlobalUser> userFactory)
-        {
-            return _users.GetOrAdd(id, userFactory);
-        }
-        internal SocketGlobalUser RemoveUser(ulong id)
-        {
-            if (_users.TryRemove(id, out SocketGlobalUser user))
-                return user;
-            return null;
-        }
         internal void PurgeUsers()
         {
             foreach (var guild in _guilds.Values)

@@ -1,7 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Model = Discord.API.User;
+using UserModel = Discord.API.User;
+using Model = Discord.API.CurrentUser;
 
 namespace Discord.Rest
 {
@@ -28,29 +29,26 @@ namespace Discord.Rest
             : base(discord, id)
         {
         }
-        internal new static RestSelfUser Create(BaseDiscordClient discord, Model model)
+        internal new static RestSelfUser Create(BaseDiscordClient discord, UserModel model)
         {
             var entity = new RestSelfUser(discord, model.Id);
             entity.Update(model);
             return entity;
         }
         /// <inheritdoc />
-        internal override void Update(Model model)
+        internal override void Update(UserModel model)
         {
             base.Update(model);
 
-            if (model.Email.IsSpecified)
-                Email = model.Email.Value;
-            if (model.Verified.IsSpecified)
-                IsVerified = model.Verified.Value;
-            if (model.MfaEnabled.IsSpecified)
-                IsMfaEnabled = model.MfaEnabled.Value;
-            if (model.Flags.IsSpecified)
-                Flags = (UserProperties)model.Flags.Value;
-            if (model.PremiumType.IsSpecified)
-                PremiumType = model.PremiumType.Value;
-            if (model.Locale.IsSpecified)
-                Locale = model.Locale.Value;
+            if (model is not Model currentUserModel)
+                throw new ArgumentException("Got unexpected model type when updating RestSelfUser");
+
+            Email = currentUserModel.Email.GetValueOrDefault();
+            IsVerified = currentUserModel.Verified.GetValueOrDefault(false);
+            IsMfaEnabled = currentUserModel.MfaEnabled.GetValueOrDefault(false);
+            Flags = currentUserModel.Flags.GetValueOrDefault();
+            PremiumType = currentUserModel.PremiumType.GetValueOrDefault();
+            Locale = currentUserModel.Locale.GetValueOrDefault();
         }
 
         /// <inheritdoc />

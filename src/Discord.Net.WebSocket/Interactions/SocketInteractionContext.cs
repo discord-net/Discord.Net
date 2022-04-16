@@ -45,7 +45,7 @@ namespace Discord.Interactions
         {
             Client = client;
             Channel = interaction.Channel;
-            Guild = (interaction.User as SocketGuildUser)?.Guild;
+            Guild = (interaction.User as SocketGuildUser)?.Guild.Value;
             User = interaction.User;
             Interaction = interaction;
         }

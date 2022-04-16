@@ -3,7 +3,7 @@ using System;
 
 namespace Discord.API
 {
-    internal class GuildMember
+    internal class GuildMember : IMemberModel
     {
         [JsonProperty("user")]
         public User User { get; set; }
@@ -25,5 +25,26 @@ namespace Discord.API
         public Optional<DateTimeOffset?> PremiumSince { get; set; }
         [JsonProperty("communication_disabled_until")]
         public Optional<DateTimeOffset?> TimedOutUntil { get; set; }
+
+        // IMemberModel
+        string IMemberModel.Nickname => Nick.GetValueOrDefault();
+
+        string IMemberModel.GuildAvatar => Avatar.GetValueOrDefault();
+
+        ulong[] IMemberModel.Roles => Roles.GetValueOrDefault(Array.Empty<ulong>());
+
+        DateTimeOffset IMemberModel.JoinedAt => JoinedAt.GetValueOrDefault();
+
+        DateTimeOffset? IMemberModel.PremiumSince =>  PremiumSince.GetValueOrDefault();
+
+        bool IMemberModel.IsDeaf => Deaf.GetValueOrDefault(false);
+
+        bool IMemberModel.IsMute => Mute.GetValueOrDefault(false);
+
+        bool? IMemberModel.IsPending => Pending.ToNullable();
+
+        DateTimeOffset? IMemberModel.CommunicationsDisabledUntil => TimedOutUntil.GetValueOrDefault();
+
+        IUserModel IMemberModel.User => User;
     }
 }

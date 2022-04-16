@@ -1,10 +1,11 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord.API
 {
-    internal class Presence
+    internal class Presence : IPresenceModel
     {
         [JsonProperty("user")]
         public User User { get; set; }
@@ -28,5 +29,17 @@ namespace Discord.API
         public List<Game> Activities { get; set; }
         [JsonProperty("premium_since")]
         public Optional<DateTimeOffset?> PremiumSince { get; set; }
+
+        ulong IPresenceModel.UserId => User.Id;
+
+        ulong? IPresenceModel.GuildId => GuildId.ToNullable();
+
+        UserStatus IPresenceModel.Status => Status;
+
+        ClientType[] IPresenceModel.ActiveClients => ClientStatus.IsSpecified
+            ? ClientStatus.Value.Select(x => (ClientType)Enum.Parse(typeof(ClientType), x.Key, true)).ToArray()
+            : Array.Empty<ClientType>();
+
+        IActivityModel[] IPresenceModel.Activities => Activities.ToArray();
     }
 }

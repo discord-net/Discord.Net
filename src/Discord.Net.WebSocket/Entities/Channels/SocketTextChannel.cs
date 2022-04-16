@@ -63,13 +63,13 @@ namespace Discord.WebSocket
             if (Discord.MessageCacheSize > 0)
                 _messages = new MessageCache(Discord);
         }
-        internal new static SocketTextChannel Create(SocketGuild guild, ClientState state, Model model)
+        internal new static SocketTextChannel Create(SocketGuild guild, ClientStateManager state, Model model)
         {
             var entity = new SocketTextChannel(guild.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }
-        internal override void Update(ClientState state, Model model)
+        internal override void Update(ClientStateManager state, Model model)
         {
             base.Update(state, model);
             CategoryId = model.CategoryId;
@@ -117,7 +117,7 @@ namespace Discord.WebSocket
         {
             var model = await ThreadHelper.CreateThreadAsync(Discord, this, name, type, autoArchiveDuration, message, invitable, slowmode, options);
 
-            var thread = (SocketThreadChannel)Guild.AddOrUpdateChannel(Discord.State, model);
+            var thread = (SocketThreadChannel)Guild.AddOrUpdateChannel(Discord.StateManager, model);
 
             if(Discord.AlwaysDownloadUsers && Discord.HasGatewayIntent(GatewayIntents.GuildMembers))
                 await thread.DownloadUsersAsync();

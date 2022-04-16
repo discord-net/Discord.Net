@@ -53,14 +53,14 @@ namespace Discord.WebSocket
             : base(discord, id, channel, author, source)
         {
         }
-        internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
+        internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientStateManager state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
             var entity = new SocketUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
             entity.Update(state, model);
             return entity;
         }
 
-        internal override void Update(ClientState state, Model model)
+        internal override void Update(ClientStateManager state, Model model)
         {
             base.Update(state, model);
 

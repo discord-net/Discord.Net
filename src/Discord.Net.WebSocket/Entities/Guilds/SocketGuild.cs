@@ -14,11 +14,11 @@ using ChannelModel = Discord.API.Channel;
 using EmojiUpdateModel = Discord.API.Gateway.GuildEmojiUpdateEvent;
 using ExtendedModel = Discord.API.Gateway.ExtendedGuild;
 using GuildSyncModel = Discord.API.Gateway.GuildSyncEvent;
-using MemberModel = Discord.API.GuildMember;
+using MemberModel = Discord.IMemberModel;
 using Model = Discord.API.Guild;
 using PresenceModel = Discord.API.Presence;
 using RoleModel = Discord.API.Role;
-using UserModel = Discord.API.User;
+using UserModel = Discord.IUserModel;
 using VoiceStateModel = Discord.API.VoiceState;
 using StickerModel = Discord.API.Sticker;
 using EventModel = Discord.API.GuildScheduledEvent;
@@ -38,7 +38,7 @@ namespace Discord.WebSocket
         private TaskCompletionSource<bool> _syncPromise, _downloaderPromise;
         private TaskCompletionSource<AudioClient> _audioConnectPromise;
         private ConcurrentDictionary<ulong, SocketGuildChannel> _channels;
-        private ConcurrentDictionary<ulong, SocketGuildUser> _members;
+        //private ConcurrentDictionary<ulong, SocketGuildUser> _members;
         private ConcurrentDictionary<ulong, SocketRole> _roles;
         private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
         private ConcurrentDictionary<ulong, SocketCustomSticker> _stickers;
@@ -305,7 +305,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the current logged-in user.
         /// </summary>
-        public SocketGuildUser CurrentUser => _members.TryGetValue(Discord.CurrentUser.Id, out SocketGuildUser member) ? member : null;
+        public SocketGuildUser CurrentUser => Discord.StateManager.GetMember(Discord.CurrentUser.Id, Id);
         /// <summary>
         ///     Gets the built-in role containing all users in this guild.
         /// </summary>
@@ -324,7 +324,7 @@ namespace Discord.WebSocket
             get
             {
                 var channels = _channels;
-                var state = Discord.State;
+                var state = Discord.StateManager;
                 return channels.Select(x => x.Value).Where(x => x != null).ToReadOnlyCollection(channels);
             }
         }
@@ -356,7 +356,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A collection of guild users found within this guild.
         /// </returns>
-        public IReadOnlyCollection<SocketGuildUser> Users => _members.ToReadOnlyCollection();
+        public IReadOnlyCollection<SocketGuildUser> Users => Discord.StateManager.GetMembers(Id).Cast<SocketGuildUser>().ToImmutableArray();
         /// <summary>
         ///     Gets a collection of all roles in this guild.
         /// </summary>
@@ -382,13 +382,13 @@ namespace Discord.WebSocket
             _audioLock = new SemaphoreSlim(1, 1);
             _emotes = ImmutableArray.Create<GuildEmote>();
         }
-        internal static SocketGuild Create(DiscordSocketClient discord, ClientState state, ExtendedModel model)
+        internal static SocketGuild Create(DiscordSocketClient discord, ClientStateManager state, ExtendedModel model)
         {
             var entity = new SocketGuild(discord, model.Id);
             entity.Update(state, model);
             return entity;
         }
-        internal void Update(ClientState state, ExtendedModel model)
+        internal void Update(ClientStateManager state, ExtendedModel model)
         {
             IsAvailable = !(model.Unavailable ?? false);
             if (!IsAvailable)
@@ -397,8 +397,6 @@ namespace Discord.WebSocket
                     _events = new ConcurrentDictionary<ulong, SocketGuildEvent>();
                 if (_channels == null)
                     _channels = new ConcurrentDictionary<ulong, SocketGuildChannel>();
-                if (_members == null)
-                    _members = new ConcurrentDictionary<ulong, SocketGuildUser>();
                 if (_roles == null)
                     _roles = new ConcurrentDictionary<ulong, SocketRole>();
                 /*if (Emojis == null)
@@ -431,25 +429,6 @@ namespace Discord.WebSocket
 
             _channels = channels;
 
-            var members = new ConcurrentDictionary<ulong, SocketGuildUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Members.Length * 1.05));
-            {
-                for (int i = 0; i < model.Members.Length; i++)
-                {
-                    var member = SocketGuildUser.Create(this, state, model.Members[i]);
-                    if (members.TryAdd(member.Id, member))
-                        member.GlobalUser.AddRef();
-                }
-                DownloadedMemberCount = members.Count;
-
-                for (int i = 0; i < model.Presences.Length; i++)
-                {
-                    if (members.TryGetValue(model.Presences[i].User.Id, out SocketGuildUser member))
-                        member.Update(state, model.Presences[i], true);
-                }
-            }
-            _members = members;
-            MemberCount = model.MemberCount;
-
             var voiceStates = new ConcurrentDictionary<ulong, SocketVoiceState>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.VoiceStates.Length * 1.05));
             {
                 for (int i = 0; i < model.VoiceStates.Length; i++)
@@ -473,6 +452,19 @@ namespace Discord.WebSocket
             }
             _events = events;
 
+            for (int i = 0; i < model.Members.Length; i++)
+            {
+                Discord.StateManager.AddOrUpdateMember(Id, SocketGuildUser.Create(Id, Discord, model.Members[i]));
+            }
+            DownloadedMemberCount = model.Members.Length;
+
+            for (int i = 0; i < model.Presences.Length; i++)
+            {
+                Discord.StateManager.AddOrUpdatePresence(SocketPresence.Create(model.Presences[i]));
+            }
+
+            MemberCount = model.MemberCount;
+
 
             _syncPromise = new TaskCompletionSource<bool>();
             _downloaderPromise = new TaskCompletionSource<bool>();
@@ -480,7 +472,7 @@ namespace Discord.WebSocket
             /*if (!model.Large)
                 _ = _downloaderPromise.TrySetResultAsync(true);*/
         }
-        internal void Update(ClientState state, Model model)
+        internal void Update(ClientStateManager state, Model model)
         {
             AFKChannelId = model.AFKChannelId;
             if (model.WidgetChannelId.IsSpecified)
@@ -561,7 +553,7 @@ namespace Discord.WebSocket
             else
                 _stickers = new ConcurrentDictionary<ulong, SocketCustomSticker>(ConcurrentHashSet.DefaultConcurrencyLevel, 7);
         }
-        /*internal void Update(ClientState state, GuildSyncModel model) //TODO remove? userbot related
+        /*internal void Update(ClientStateManager state, GuildSyncModel model) //TODO remove? userbot related
         {
             var members = new ConcurrentDictionary<ulong, SocketGuildUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Members.Length * 1.05));
             {
@@ -585,7 +577,7 @@ namespace Discord.WebSocket
             //    _ = _downloaderPromise.TrySetResultAsync(true);
         }*/
 
-        internal void Update(ClientState state, EmojiUpdateModel model)
+        internal void Update(ClientStateManager state, EmojiUpdateModel model)
         {
             var emotes = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
             for (int i = 0; i < model.Emojis.Length; i++)
@@ -682,7 +674,7 @@ namespace Discord.WebSocket
         /// </returns>
         public SocketGuildChannel GetChannel(ulong id)
         {
-            var channel = Discord.State.GetChannel(id) as SocketGuildChannel;
+            var channel = Discord.StateManager.GetChannel(id) as SocketGuildChannel;
             if (channel?.Guild.Id == Id)
                 return channel;
             return null;
@@ -799,7 +791,7 @@ namespace Discord.WebSocket
         public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options, func);
 
-        internal SocketGuildChannel AddChannel(ClientState state, ChannelModel model)
+        internal SocketGuildChannel AddChannel(ClientStateManager state, ChannelModel model)
         {
             var channel = SocketGuildChannel.Create(this, state, model);
             _channels.TryAdd(model.Id, channel);
@@ -807,26 +799,26 @@ namespace Discord.WebSocket
             return channel;
         }
 
-        internal SocketGuildChannel AddOrUpdateChannel(ClientState state, ChannelModel model)
+        internal SocketGuildChannel AddOrUpdateChannel(ClientStateManager state, ChannelModel model)
         {
             if (_channels.TryGetValue(model.Id, out SocketGuildChannel channel))
-                channel.Update(Discord.State, model);
+                channel.Update(Discord.StateManager, model);
             else
             {
-                channel = SocketGuildChannel.Create(this, Discord.State, model);
+                channel = SocketGuildChannel.Create(this, Discord.StateManager, model);
                 _channels[channel.Id] = channel;
                 state.AddChannel(channel);
             }
             return channel;
         }
 
-        internal SocketGuildChannel RemoveChannel(ClientState state, ulong id)
+        internal SocketGuildChannel RemoveChannel(ClientStateManager state, ulong id)
         {
             if (_channels.TryRemove(id, out var _))
                 return state.RemoveChannel(id) as SocketGuildChannel;
             return null;
         }
-        internal void PurgeChannelCache(ClientState state)
+        internal void PurgeChannelCache(ClientStateManager state)
         {
             foreach (var channelId in _channels)
                 state.RemoveChannel(channelId.Key);
@@ -880,7 +872,7 @@ namespace Discord.WebSocket
 
             foreach (var command in commands)
             {
-                Discord.State.AddCommand(command);
+                Discord.StateManager.AddCommand(command);
             }
 
             return commands.ToImmutableArray();
@@ -898,7 +890,7 @@ namespace Discord.WebSocket
         /// </returns>
         public async ValueTask<SocketApplicationCommand> GetApplicationCommandAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            var command = Discord.State.GetCommand(id);
+            var command = Discord.StateManager.GetCommand(id);
 
             if (command != null)
                 return command;
@@ -913,7 +905,7 @@ namespace Discord.WebSocket
 
             command = SocketApplicationCommand.Create(Discord, model, Id);
 
-            Discord.State.AddCommand(command);
+            Discord.StateManager.AddCommand(command);
 
             return command;
         }
@@ -930,7 +922,7 @@ namespace Discord.WebSocket
         {
             var model = await InteractionHelper.CreateGuildCommandAsync(Discord, Id, properties, options);
 
-            var entity = Discord.State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(Discord, model));
+            var entity = Discord.StateManager.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(Discord, model));
 
             entity.Update(model);
 
@@ -952,11 +944,11 @@ namespace Discord.WebSocket
 
             var entities = models.Select(x => SocketApplicationCommand.Create(Discord, x));
 
-            Discord.State.PurgeCommands(x => !x.IsGlobalCommand && x.Guild.Id == Id);
+            Discord.StateManager.PurgeCommands(x => !x.IsGlobalCommand && x.Guild.Id == Id);
 
             foreach(var entity in entities)
             {
-                Discord.State.AddCommand(entity);
+                Discord.StateManager.AddCommand(entity);
             }
 
             return entities.ToImmutableArray();
@@ -1020,7 +1012,7 @@ namespace Discord.WebSocket
             => GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, isMentionable, options);
         internal SocketRole AddRole(RoleModel model)
         {
-            var role = SocketRole.Create(this, Discord.State, model);
+            var role = SocketRole.Create(this, Discord.StateManager, model);
             _roles[model.Id] = role;
             return role;
         }
@@ -1034,7 +1026,7 @@ namespace Discord.WebSocket
         internal SocketRole AddOrUpdateRole(RoleModel model)
         {
             if (_roles.TryGetValue(model.Id, out SocketRole role))
-                _roles[model.Id].Update(Discord.State, model);
+                _roles[model.Id].Update(Discord.StateManager, model);
             else
                 role = AddRole(model);
 
@@ -1089,60 +1081,45 @@ namespace Discord.WebSocket
         ///     A guild user associated with the specified <paramref name="id"/>; <see langword="null"/> if none is found.
         /// </returns>
         public SocketGuildUser GetUser(ulong id)
-        {
-            if (_members.TryGetValue(id, out SocketGuildUser member))
-                return member;
-            return null;
-        }
+            => Discord.StateManager.GetMember(id, Id);
         /// <inheritdoc />
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options, includeRoleIds);
 
         internal SocketGuildUser AddOrUpdateUser(UserModel model)
         {
-            if (_members.TryGetValue(model.Id, out SocketGuildUser member))
-                member.GlobalUser?.Update(Discord.State, model);
+            SocketGuildUser member;
+            if ((member = GetUser(model.Id)) != null)
+                member.GlobalUser?.Update(Discord.StateManager, model);
             else
             {
-                member = SocketGuildUser.Create(this, Discord.State, model);
+                member = SocketGuildUser.Create(Id, Discord, model);
                 member.GlobalUser.AddRef();
-                _members[member.Id] = member;
                 DownloadedMemberCount++;
             }
             return member;
         }
         internal SocketGuildUser AddOrUpdateUser(MemberModel model)
         {
-            if (_members.TryGetValue(model.User.Id, out SocketGuildUser member))
-                member.Update(Discord.State, model);
+            SocketGuildUser member;
+            if ((member = GetUser(model.User.Id)) != null)
+                member.Update(Discord.StateManager, model);
             else
             {
-                member = SocketGuildUser.Create(this, Discord.State, model);
+                member = SocketGuildUser.Create(Id, Discord, model);
                 member.GlobalUser.AddRef();
-                _members[member.Id] = member;
-                DownloadedMemberCount++;
-            }
-            return member;
-        }
-        internal SocketGuildUser AddOrUpdateUser(PresenceModel model)
-        {
-            if (_members.TryGetValue(model.User.Id, out SocketGuildUser member))
-                member.Update(Discord.State, model, false);
-            else
-            {
-                member = SocketGuildUser.Create(this, Discord.State, model);
-                member.GlobalUser.AddRef();
-                _members[member.Id] = member;
                 DownloadedMemberCount++;
             }
             return member;
         }
         internal SocketGuildUser RemoveUser(ulong id)
         {
-            if (_members.TryRemove(id, out SocketGuildUser member))
+            SocketGuildUser member;
+            if ((member = GetUser(id)) != null)
             {
                 DownloadedMemberCount--;
                 member.GlobalUser.RemoveRef(Discord);
+                Discord.StateManager.RemoveMember(id, Id);
                 return member;
             }
             return null;
@@ -1158,18 +1135,16 @@ namespace Discord.WebSocket
         /// <param name="predicate">The predicate used to select which users to clear.</param>
         public void PurgeUserCache(Func<SocketGuildUser, bool> predicate)
         {
-            var membersToPurge = Users.Where(x => predicate.Invoke(x) && x?.Id != Discord.CurrentUser.Id);
-            var membersToKeep = Users.Where(x => !predicate.Invoke(x) || x?.Id == Discord.CurrentUser.Id);
+            var users = Users.ToArray();
+
+            var membersToPurge = users.Where(x => predicate.Invoke(x) && x?.Id != Discord.CurrentUser.Id);
+            var membersToKeep = users.Where(x => !predicate.Invoke(x) || x?.Id == Discord.CurrentUser.Id);
 
             foreach (var member in membersToPurge)
-                if(_members.TryRemove(member.Id, out _))
-                    member.GlobalUser.RemoveRef(Discord);
-
-            foreach (var member in membersToKeep)
-                _members.TryAdd(member.Id, member);
+                Discord.StateManager.RemoveMember(member.Id, Id);
 
             _downloaderPromise = new TaskCompletionSource<bool>();
-            DownloadedMemberCount = _members.Count;
+            DownloadedMemberCount = membersToKeep.Count();
         }
 
         /// <summary>
@@ -1537,7 +1512,7 @@ namespace Discord.WebSocket
         #endregion
 
         #region Voice States
-        internal async Task<SocketVoiceState> AddOrUpdateVoiceStateAsync(ClientState state, VoiceStateModel model)
+        internal async Task<SocketVoiceState> AddOrUpdateVoiceStateAsync(ClientStateManager state, VoiceStateModel model)
         {
             var voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
             var before = GetVoiceState(model.UserId) ?? SocketVoiceState.Default;

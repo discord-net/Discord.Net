@@ -24,6 +24,13 @@ namespace Discord
         /// </returns>
         public bool RequireColons { get; }
         /// <summary>
+        ///     Gets whether or not the emote is available.
+        /// </summary>
+        /// <remarks>
+        ///     An emote can be unavailable if the guild has lost its boost status.
+        /// </remarks>
+        public bool IsAvailable { get; }
+        /// <summary>
         ///     Gets the roles that are allowed to use this emoji.
         /// </summary>
         /// <returns>
@@ -39,12 +46,13 @@ namespace Discord
         /// </returns>
         public ulong? CreatorId { get; }
 
-        internal GuildEmote(ulong id, string name, bool animated, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds, ulong? userId) : base(id, name, animated)
+        internal GuildEmote(ulong id, string name, bool animated, bool isManaged, bool isAvailable, bool requireColons, IReadOnlyList<ulong> roleIds, ulong? userId) : base(id, name, animated)
         {
             IsManaged = isManaged;
             RequireColons = requireColons;
             RoleIds = roleIds;
             CreatorId = userId;
+            IsAvailable = isAvailable;
         }
 
         private string DebuggerDisplay => $"{Name} ({Id})";

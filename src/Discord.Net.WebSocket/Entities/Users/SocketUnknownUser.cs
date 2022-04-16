@@ -26,7 +26,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override bool IsWebhook => false;
         /// <inheritdoc />
-        internal override SocketPresence Presence { get { return new SocketPresence(UserStatus.Offline, null, null); } set { } }
+        internal override Lazy<SocketPresence> Presence { get { return new Lazy<SocketPresence>(() => new SocketPresence(UserStatus.Offline, null, null)); } set { } }
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">This field is not supported for an unknown user.</exception>
         internal override SocketGlobalUser GlobalUser { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -35,7 +35,7 @@ namespace Discord.WebSocket
             : base(discord, id)
         {
         }
-        internal static SocketUnknownUser Create(DiscordSocketClient discord, ClientState state, Model model)
+        internal static SocketUnknownUser Create(DiscordSocketClient discord, ClientStateManager state, Model model)
         {
             var entity = new SocketUnknownUser(discord, model.Id);
             entity.Update(state, model);

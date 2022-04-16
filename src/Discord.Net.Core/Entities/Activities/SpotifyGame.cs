@@ -107,6 +107,8 @@ namespace Discord
         /// </returns>
         public string TrackUrl { get; internal set; }
 
+        internal string AlbumArt { get; set; }
+
         internal SpotifyGame() { }
 
         /// <summary>

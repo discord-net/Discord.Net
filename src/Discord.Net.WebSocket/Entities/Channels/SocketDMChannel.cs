@@ -35,23 +35,23 @@ namespace Discord.WebSocket
         {
             Recipient = recipient;
         }
-        internal static SocketDMChannel Create(DiscordSocketClient discord, ClientState state, Model model)
+        internal static SocketDMChannel Create(DiscordSocketClient discord, ClientStateManager state, Model model)
         {
             var entity = new SocketDMChannel(discord, model.Id, discord.GetOrCreateTemporaryUser(state, model.Recipients.Value[0]));
             entity.Update(state, model);
             return entity;
         }
-        internal override void Update(ClientState state, Model model)
+        internal override void Update(ClientStateManager state, Model model)
         {
             Recipient.Update(state, model.Recipients.Value[0]);
         }
-        internal static SocketDMChannel Create(DiscordSocketClient discord, ClientState state, ulong channelId, API.User recipient)
+        internal static SocketDMChannel Create(DiscordSocketClient discord, ClientStateManager state, ulong channelId, API.User recipient)
         {
             var entity = new SocketDMChannel(discord, channelId, discord.GetOrCreateTemporaryUser(state, recipient));
             entity.Update(state, recipient);
             return entity;
         }
-        internal void Update(ClientState state, API.User recipient)
+        internal void Update(ClientStateManager state, API.User recipient)
         {
             Recipient.Update(state, recipient);
         }

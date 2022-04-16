@@ -1,18 +1,17 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using Model = Discord.API.User;
+using Model = Discord.IUserModel;
 
 namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    internal class SocketGlobalUser : SocketUser
+    internal class SocketGlobalUser : SocketUser, IDisposable
     {
         public override bool IsBot { get; internal set; }
         public override string Username { get; internal set; }
         public override ushort DiscriminatorValue { get; internal set; }
         public override string AvatarId { get; internal set; }
-        internal override SocketPresence Presence { get; set; }
 
         public override bool IsWebhook => false;
         internal override SocketGlobalUser GlobalUser { get => this; set => throw new NotImplementedException(); }
@@ -23,8 +22,9 @@ namespace Discord.WebSocket
         private SocketGlobalUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
+
         }
-        internal static SocketGlobalUser Create(DiscordSocketClient discord, ClientState state, Model model)
+        internal static SocketGlobalUser Create(DiscordSocketClient discord, ClientStateManager state, Model model)
         {
             var entity = new SocketGlobalUser(discord, model.Id);
             entity.Update(state, model);
@@ -47,6 +47,9 @@ namespace Discord.WebSocket
                     discord.RemoveUser(Id);
             }
         }
+
+        ~SocketGlobalUser() => Discord.StateManager.RemoveReferencedGlobalUser(Id);
+        public void Dispose() => Discord.StateManager.RemoveReferencedGlobalUser(Id);
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Global)";
         internal new SocketGlobalUser Clone() => MemberwiseClone() as SocketGlobalUser;

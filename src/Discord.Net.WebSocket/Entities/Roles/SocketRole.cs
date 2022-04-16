@@ -67,13 +67,13 @@ namespace Discord.WebSocket
         {
             Guild = guild;
         }
-        internal static SocketRole Create(SocketGuild guild, ClientState state, Model model)
+        internal static SocketRole Create(SocketGuild guild, ClientStateManager state, Model model)
         {
             var entity = new SocketRole(guild, model.Id);
             entity.Update(state, model);
             return entity;
         }
-        internal void Update(ClientState state, Model model)
+        internal void Update(ClientStateManager state, Model model)
         {
             Name = model.Name;
             IsHoisted = model.Hoist;

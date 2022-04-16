@@ -129,7 +129,7 @@ namespace Discord.WebSocket
             Author = author;
             Source = source;
         }
-        internal static SocketMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
+        internal static SocketMessage Create(DiscordSocketClient discord, ClientStateManager state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
             if (model.Type == MessageType.Default ||
                 model.Type == MessageType.Reply ||
@@ -140,7 +140,7 @@ namespace Discord.WebSocket
             else
                 return SocketSystemMessage.Create(discord, state, author, channel, model);
         }
-        internal virtual void Update(ClientState state, Model model)
+        internal virtual void Update(ClientStateManager state, Model model)
         {
             Type = model.Type;
 

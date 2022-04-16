@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API
 {
-    internal class User
+    internal class User : IUserModel
     {
         [JsonProperty("id")]
         public ulong Id { get; set; }
@@ -19,20 +19,16 @@ namespace Discord.API
         [JsonProperty("accent_color")]
         public Optional<uint?> AccentColor { get; set; }
 
-        //CurrentUser
-        [JsonProperty("verified")]
-        public Optional<bool> Verified { get; set; }
-        [JsonProperty("email")]
-        public Optional<string> Email { get; set; }
-        [JsonProperty("mfa_enabled")]
-        public Optional<bool> MfaEnabled { get; set; }
-        [JsonProperty("flags")]
-        public Optional<UserProperties> Flags { get; set; }
-        [JsonProperty("premium_type")]
-        public Optional<PremiumType> PremiumType { get; set; }
-        [JsonProperty("locale")]
-        public Optional<string> Locale { get; set; }
-        [JsonProperty("public_flags")]
-        public Optional<UserProperties> PublicFlags { get; set; }
+
+        // IUserModel
+        string IUserModel.Username => Username.GetValueOrDefault();
+
+        string IUserModel.Discriminator => Discriminator.GetValueOrDefault();
+
+        bool? IUserModel.IsBot => Bot.ToNullable();
+
+        string IUserModel.Avatar => Avatar.GetValueOrDefault();
+
+        ulong IEntity<ulong>.Id => Id;
     }
 }

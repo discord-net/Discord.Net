@@ -30,7 +30,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
         /// <inheritdoc />
-        internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
+        internal override Lazy<SocketPresence> Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
 
         /// <inheritdoc />
         public override bool IsWebhook => false;
@@ -41,7 +41,7 @@ namespace Discord.WebSocket
             Channel = channel;
             GlobalUser = globalUser;
         }
-        internal static SocketGroupUser Create(SocketGroupChannel channel, ClientState state, Model model)
+        internal static SocketGroupUser Create(SocketGroupChannel channel, ClientStateManager state, Model model)
         {
             var entity = new SocketGroupUser(channel, channel.Discord.GetOrCreateUser(state, model));
             entity.Update(state, model);

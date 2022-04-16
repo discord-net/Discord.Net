@@ -37,7 +37,7 @@ namespace Discord.WebSocket
             : base(discord, id, guild)
         {
         }
-        internal new static SocketCategoryChannel Create(SocketGuild guild, ClientState state, Model model)
+        internal new static SocketCategoryChannel Create(SocketGuild guild, ClientStateManager state, Model model)
         {
             var entity = new SocketCategoryChannel(guild.Discord, model.Id, guild);
             entity.Update(state, model);

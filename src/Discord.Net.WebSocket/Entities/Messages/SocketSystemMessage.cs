@@ -13,13 +13,13 @@ namespace Discord.WebSocket
             : base(discord, id, channel, author, MessageSource.System)
         {
         }
-        internal new static SocketSystemMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
+        internal new static SocketSystemMessage Create(DiscordSocketClient discord, ClientStateManager state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
             var entity = new SocketSystemMessage(discord, model.Id, channel, author);
             entity.Update(state, model);
             return entity;
         }
-        internal override void Update(ClientState state, Model model)
+        internal override void Update(ClientStateManager state, Model model)
         {
             base.Update(state, model);
         }

@@ -118,7 +118,7 @@ namespace Discord.WebSocket
             CreatedAt = createdAt ?? new DateTimeOffset(2022, 1, 9, 0, 0, 0, TimeSpan.Zero);
         }
 
-        internal new static SocketThreadChannel Create(SocketGuild guild, ClientState state, Model model)
+        internal new static SocketThreadChannel Create(SocketGuild guild, ClientStateManager state, Model model)
         {
             var parent = guild.GetChannel(model.CategoryId.Value);
             var entity = new SocketThreadChannel(guild.Discord, guild, model.Id, parent, model.ThreadMetadata.GetValueOrDefault()?.CreatedAt.GetValueOrDefault(null));
@@ -126,7 +126,7 @@ namespace Discord.WebSocket
             return entity;
         }
 
-        internal override void Update(ClientState state, Model model)
+        internal override void Update(ClientStateManager state, Model model)
         {
             base.Update(state, model);
 

@@ -70,9 +70,10 @@ namespace Discord.WebSocket
         internal int TotalShards { get; private set; }
         internal int MessageCacheSize { get; private set; }
         internal int LargeThreshold { get; private set; }
-        internal ClientState State { get; private set; }
+        internal ClientStateManager StateManager { get; private set; }
         internal UdpSocketProvider UdpSocketProvider { get; private set; }
         internal WebSocketProvider WebSocketProvider { get; private set; }
+        internal IStateProvider StateProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
         internal bool AlwaysDownloadDefaultStickers { get; private set; }
@@ -81,7 +82,7 @@ namespace Discord.WebSocket
         internal bool SuppressUnknownDispatchWarnings { get; private set; }
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
-        public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
+        public override IReadOnlyCollection<SocketGuild> Guilds => StateManager.Guilds;
         /// <inheritdoc/>
         public override IReadOnlyCollection<StickerPack<SocketSticker>> DefaultStickerPacks
         {
@@ -94,7 +95,7 @@ namespace Discord.WebSocket
             }
         }
         /// <inheritdoc />
-        public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => State.PrivateChannels;
+        public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => StateManager.PrivateChannels;
         /// <summary>
         ///     Gets a collection of direct message channels opened in this session.
         /// </summary>
@@ -109,7 +110,7 @@ namespace Discord.WebSocket
         ///     A collection of DM channels that have been opened in this session.
         /// </returns>
         public IReadOnlyCollection<SocketDMChannel> DMChannels
-            => State.PrivateChannels.OfType<SocketDMChannel>().ToImmutableArray();
+            => StateManager.PrivateChannels.OfType<SocketDMChannel>().ToImmutableArray();
         /// <summary>
         ///     Gets a collection of group channels opened in this session.
         /// </summary>
@@ -124,7 +125,7 @@ namespace Discord.WebSocket
         ///     A collection of group channels that have been opened in this session.
         /// </returns>
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels
-            => State.PrivateChannels.OfType<SocketGroupChannel>().ToImmutableArray();
+            => StateManager.PrivateChannels.OfType<SocketGroupChannel>().ToImmutableArray();
 
         /// <summary>
         ///     Initializes a new REST/WebSocket-based Discord client.
@@ -141,6 +142,7 @@ namespace Discord.WebSocket
         private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, DiscordShardedClient shardedClient, DiscordSocketClient parentClient)
             : base(config, client)
         {
+            // TODO: config concurrency and size
             ShardId = config.ShardId ?? 0;
             TotalShards = config.TotalShards ?? 1;
             MessageCacheSize = config.MessageCacheSize;
@@ -153,7 +155,6 @@ namespace Discord.WebSocket
             LogGatewayIntentWarnings = config.LogGatewayIntentWarnings;
             SuppressUnknownDispatchWarnings = config.SuppressUnknownDispatchWarnings;
             HandlerTimeout = config.HandlerTimeout;
-            State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
             _heartbeatTimes = new ConcurrentQueue<long>();
             _gatewayIntents = config.GatewayIntents;
@@ -165,6 +166,7 @@ namespace Discord.WebSocket
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => TimedInvokeAsync(_connectedEvent, nameof(Connected));
             _connection.Disconnected += (ex, recon) => TimedInvokeAsync(_disconnectedEvent, nameof(Disconnected), ex);
+            StateProvider = config.StateProvider ?? new DefaultStateProvider(_gatewayLogger, config.CacheProvider ?? new DefaultConcurrentCacheProvider(5, 50), this, config.DefaultStateBehavior);
 
             _nextAudioId = 1;
             _shardedClient = shardedClient;
@@ -200,6 +202,17 @@ namespace Discord.WebSocket
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayHost,
                 useSystemClock: config.UseSystemClock, defaultRatelimitCallback: config.DefaultRatelimitCallback);
+
+        #region State
+
+        public ValueTask<IUser> GetUserAsync(ulong id, CacheMode cacheMode = CacheMode.AllowDownload, RequestOptions options = null)
+            => StateManager.GetUserAsync(id, cacheMode, options);
+
+        public ValueTask<IGuildUser> GetGuildUserAsync(ulong userId, ulong guildId, CacheMode cacheMode = CacheMode.AllowDownload, RequestOptions options = null)
+            => StateManager.GetMemberAsync(userId, guildId, cacheMode, options);
+
+        #endregion
+
         /// <inheritdoc />
         internal override void Dispose(bool disposing)
         {
@@ -216,7 +229,6 @@ namespace Discord.WebSocket
 
             base.Dispose(disposing);
         }
-
 
         internal override async ValueTask DisposeAsync(bool disposing)
         {
@@ -348,7 +360,7 @@ namespace Discord.WebSocket
 
             //Raise virtual GUILD_UNAVAILABLEs
             await _gatewayLogger.DebugAsync("Raising virtual GuildUnavailables").ConfigureAwait(false);
-            foreach (var guild in State.Guilds)
+            foreach (var guild in StateManager.Guilds)
             {
                 if (guild.IsAvailable)
                     await GuildUnavailableAsync(guild).ConfigureAwait(false);
@@ -361,11 +373,11 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public override SocketGuild GetGuild(ulong id)
-            => State.GetGuild(id);
+            => StateManager.GetGuild(id);
 
         /// <inheritdoc />
         public override SocketChannel GetChannel(ulong id)
-            => State.GetChannel(id);
+            => StateManager.GetChannel(id);
         /// <summary>
         ///     Gets a generic channel from the cache or does a rest request if unavailable.
         /// </summary>
@@ -387,27 +399,9 @@ namespace Discord.WebSocket
         public async ValueTask<IChannel> GetChannelAsync(ulong id, RequestOptions options = null)
             => GetChannel(id) ?? (IChannel)await ClientHelper.GetChannelAsync(this, id, options).ConfigureAwait(false);
         /// <summary>
-        ///     Gets a user from the cache or does a rest request if unavailable.
-        /// </summary>
-        /// <example>
-        ///     <code language="cs" title="Example method">
-        ///     var user = await _client.GetUserAsync(168693960628371456);
-        ///     if (user != null)
-        ///         Console.WriteLine($"{user} is created at {user.CreatedAt}.";
-        ///     </code>
-        /// </example>
-        /// <param name="id">The snowflake identifier of the user (e.g. `168693960628371456`).</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains the user associated with
-        ///     the snowflake identifier; <c>null</c> if the user is not found.
-        /// </returns>
-        public async ValueTask<IUser> GetUserAsync(ulong id, RequestOptions options = null)
-            => await ClientHelper.GetUserAsync(this, id, options).ConfigureAwait(false);
-        /// <summary>
         ///     Clears all cached channels from the client.
         /// </summary>
-        public void PurgeChannelCache() => State.PurgeAllChannels();
+        public void PurgeChannelCache() => StateManager.PurgeAllChannels();
         /// <summary>
         ///     Clears cached DM channels from the client.
         /// </summary>
@@ -415,10 +409,10 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public override SocketUser GetUser(ulong id)
-            => State.GetUser(id);
+            => StateManager.GetUser(id);
         /// <inheritdoc />
         public override SocketUser GetUser(string username, string discriminator)
-            => State.Users.FirstOrDefault(x => x.Discriminator == discriminator && x.Username == username);
+            => StateManager.Users.FirstOrDefault(x => x.Discriminator == discriminator && x.Username == username);
 
         /// <summary>
         ///     Gets a global application command.
@@ -431,7 +425,7 @@ namespace Discord.WebSocket
         /// </returns>
         public async ValueTask<SocketApplicationCommand> GetGlobalApplicationCommandAsync(ulong id, RequestOptions options = null)
         {
-            var command = State.GetCommand(id);
+            var command = StateManager.GetCommand(id);
 
             if (command != null)
                 return command;
@@ -443,7 +437,7 @@ namespace Discord.WebSocket
 
             command = SocketApplicationCommand.Create(this, model);
 
-            State.AddCommand(command);
+            StateManager.AddCommand(command);
 
             return command;
         }
@@ -461,7 +455,7 @@ namespace Discord.WebSocket
 
             foreach(var command in commands)
             {
-                State.AddCommand(command);
+                StateManager.AddCommand(command);
             }
 
             return commands.ToImmutableArray();
@@ -471,7 +465,7 @@ namespace Discord.WebSocket
         {
             var model = await InteractionHelper.CreateGlobalCommandAsync(this, properties, options).ConfigureAwait(false);
 
-            var entity = State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(this, model));
+            var entity = StateManager.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(this, model));
 
             //Update it in case it was cached
             entity.Update(model);
@@ -486,11 +480,11 @@ namespace Discord.WebSocket
             var entities = models.Select(x => SocketApplicationCommand.Create(this, x));
 
             //Purge our previous commands
-            State.PurgeCommands(x => x.IsGlobalCommand);
+            StateManager.PurgeCommands(x => x.IsGlobalCommand);
 
             foreach(var entity in entities)
             {
-                State.AddCommand(entity);
+                StateManager.AddCommand(entity);
             }
 
             return entities.ToImmutableArray();
@@ -499,27 +493,26 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Clears cached users from the client.
         /// </summary>
-        public void PurgeUserCache() => State.PurgeUsers();
-        internal SocketGlobalUser GetOrCreateUser(ClientState state, Discord.API.User model)
+        public void PurgeUserCache() => StateManager.PurgeUsers();
+        internal SocketGlobalUser GetOrCreateUser(ClientStateManager state, IUserModel model)
         {
             return state.GetOrAddUser(model.Id, x => SocketGlobalUser.Create(this, state, model));
         }
-        internal SocketUser GetOrCreateTemporaryUser(ClientState state, Discord.API.User model)
+        internal SocketUser GetOrCreateTemporaryUser(ClientStateManager state, Discord.API.User model)
         {
             return state.GetUser(model.Id) ?? (SocketUser)SocketUnknownUser.Create(this, state, model);
         }
-        internal SocketGlobalUser GetOrCreateSelfUser(ClientState state, Discord.API.User model)
+        internal SocketGlobalUser GetOrCreateSelfUser(ClientStateManager state, ICurrentUserModel model)
         {
             return state.GetOrAddUser(model.Id, x =>
             {
                 var user = SocketGlobalUser.Create(this, state, model);
                 user.GlobalUser.AddRef();
-                user.Presence = new SocketPresence(UserStatus.Online, null, null);
                 return user;
             });
         }
         internal void RemoveUser(ulong id)
-            => State.RemoveUser(id);
+            => StateManager.RemoveUser(id);
 
         /// <inheritdoc/>
         public override async Task<SocketSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
@@ -548,7 +541,7 @@ namespace Discord.WebSocket
 
             if (model.GuildId.IsSpecified)
             {
-                var guild = State.GetGuild(model.GuildId.Value);
+                var guild = StateManager.GetGuild(model.GuildId.Value);
 
                 //Since the sticker can be from another guild, check if we are in the guild or its in the cache
                 if (guild != null)
@@ -696,7 +689,7 @@ namespace Discord.WebSocket
             if (CurrentUser == null)
                 return;
             var activities = _activity.IsSpecified ? ImmutableList.Create(_activity.Value) : null;
-            CurrentUser.Presence = new SocketPresence(Status, null, activities);
+            StateManager.AddOrUpdatePresence(new SocketPresence(Status, null, activities));
 
             var presence = BuildCurrentStatus() ?? (UserStatus.Online, false, null, null);
 
@@ -866,12 +859,13 @@ namespace Discord.WebSocket
                                         await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
-                                        var state = new ClientState(data.Guilds.Length, data.PrivateChannels.Length);
+                                        var state = new ClientStateManager(StateProvider, data.Guilds.Length, data.PrivateChannels.Length);
+                                        StateManager = state;
 
                                         var currentUser = SocketSelfUser.Create(this, state, data.User);
                                         Rest.CreateRestSelfUser(data.User);
                                         var activities = _activity.IsSpecified ? ImmutableList.Create(_activity.Value) : null;
-                                        currentUser.Presence = new SocketPresence(Status, null, activities);
+                                        StateManager.AddOrUpdatePresence(new SocketPresence(Status, null, activities));
                                         ApiClient.CurrentUserId = currentUser.Id;
                                         ApiClient.CurrentApplicationId = data.Application.Id;
                                         Rest.CurrentUser = RestSelfUser.Create(this, data.User);
@@ -892,7 +886,6 @@ namespace Discord.WebSocket
                                         _unavailableGuildCount = unavailableGuilds;
                                         CurrentUser = currentUser;
                                         _previousSessionUser = CurrentUser;
-                                        State = state;
                                     }
                                     catch (Exception ex)
                                     {
@@ -928,7 +921,7 @@ namespace Discord.WebSocket
                                     _ = _connection.CompleteAsync();
 
                                     //Notify the client that these guilds are available again
-                                    foreach (var guild in State.Guilds)
+                                    foreach (var guild in StateManager.Guilds)
                                     {
                                         if (guild.IsAvailable)
                                             await GuildAvailableAsync(guild).ConfigureAwait(false);
@@ -953,10 +946,10 @@ namespace Discord.WebSocket
                                         _lastGuildAvailableTime = Environment.TickCount;
                                         await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AVAILABLE)").ConfigureAwait(false);
 
-                                        var guild = State.GetGuild(data.Id);
+                                        var guild = StateManager.GetGuild(data.Id);
                                         if (guild != null)
                                         {
-                                            guild.Update(State, data);
+                                            guild.Update(StateManager, data);
 
                                             if (_unavailableGuildCount != 0)
                                                 _unavailableGuildCount--;
@@ -978,7 +971,7 @@ namespace Discord.WebSocket
                                     {
                                         await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_CREATE)").ConfigureAwait(false);
 
-                                        var guild = AddGuild(data, State);
+                                        var guild = AddGuild(data, StateManager);
                                         if (guild != null)
                                         {
                                             await TimedInvokeAsync(_joinedGuildEvent, nameof(JoinedGuild), guild).ConfigureAwait(false);
@@ -997,11 +990,11 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Guild>(_serializer);
-                                    var guild = State.GetGuild(data.Id);
+                                    var guild = StateManager.GetGuild(data.Id);
                                     if (guild != null)
                                     {
                                         var before = guild.Clone();
-                                        guild.Update(State, data);
+                                        guild.Update(StateManager, data);
                                         await TimedInvokeAsync(_guildUpdatedEvent, nameof(GuildUpdated), before, guild).ConfigureAwait(false);
                                     }
                                     else
@@ -1016,11 +1009,11 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_EMOJIS_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Gateway.GuildEmojiUpdateEvent>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
                                         var before = guild.Clone();
-                                        guild.Update(State, data);
+                                        guild.Update(StateManager, data);
                                         await TimedInvokeAsync(_guildUpdatedEvent, nameof(GuildUpdated), before, guild).ConfigureAwait(false);
                                     }
                                     else
@@ -1061,7 +1054,7 @@ namespace Discord.WebSocket
                                         type = "GUILD_UNAVAILABLE";
                                         await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_UNAVAILABLE)").ConfigureAwait(false);
 
-                                        var guild = State.GetGuild(data.Id);
+                                        var guild = StateManager.GetGuild(data.Id);
                                         if (guild != null)
                                         {
                                             await GuildUnavailableAsync(guild).ConfigureAwait(false);
@@ -1098,7 +1091,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<GuildStickerUpdateEvent>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
 
                                     if (guild == null)
                                     {
@@ -1156,10 +1149,10 @@ namespace Discord.WebSocket
                                     SocketChannel channel = null;
                                     if (data.GuildId.IsSpecified)
                                     {
-                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        var guild = StateManager.GetGuild(data.GuildId.Value);
                                         if (guild != null)
                                         {
-                                            channel = guild.AddChannel(State, data);
+                                            channel = guild.AddChannel(StateManager, data);
 
                                             if (!guild.IsSynced)
                                             {
@@ -1175,10 +1168,10 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        channel = State.GetChannel(data.Id);
+                                        channel = StateManager.GetChannel(data.Id);
                                         if (channel != null)
                                             return; //Discord may send duplicate CHANNEL_CREATEs for DMs
-                                        channel = AddPrivateChannel(data, State) as SocketChannel;
+                                        channel = AddPrivateChannel(data, StateManager) as SocketChannel;
                                     }
 
                                     if (channel != null)
@@ -1190,11 +1183,11 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-                                    var channel = State.GetChannel(data.Id);
+                                    var channel = StateManager.GetChannel(data.Id);
                                     if (channel != null)
                                     {
                                         var before = channel.Clone();
-                                        channel.Update(State, data);
+                                        channel.Update(StateManager, data);
 
                                         var guild = (channel as SocketGuildChannel)?.Guild;
                                         if (!(guild?.IsSynced ?? true))
@@ -1220,10 +1213,10 @@ namespace Discord.WebSocket
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
                                     if (data.GuildId.IsSpecified)
                                     {
-                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        var guild = StateManager.GetGuild(data.GuildId.Value);
                                         if (guild != null)
                                         {
-                                            channel = guild.RemoveChannel(State, data.Id);
+                                            channel = guild.RemoveChannel(StateManager, data.Id);
 
                                             if (!guild.IsSynced)
                                             {
@@ -1257,7 +1250,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBER_ADD)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<GuildMemberAddEvent>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
                                         var user = guild.AddOrUpdateUser(data);
@@ -1283,7 +1276,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBER_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<GuildMemberUpdateEvent>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
                                         var user = guild.GetUser(data.User.Id);
@@ -1297,13 +1290,13 @@ namespace Discord.WebSocket
                                         if (user != null)
                                         {
                                             var before = user.Clone();
-                                            if (user.GlobalUser.Update(State, data.User))
+                                            if (user.GlobalUser.Update(StateManager, data.User))
                                             {
                                                 //Global data was updated, trigger UserUpdated
                                                 await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), before.GlobalUser, user).ConfigureAwait(false);
                                             }
 
-                                            user.Update(State, data);
+                                            user.Update(StateManager, data);
 
                                             var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(before, user.Id, true, () => null);
                                             await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), cacheableBefore, user).ConfigureAwait(false);
@@ -1327,7 +1320,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBER_REMOVE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<GuildMemberRemoveEvent>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
                                         SocketUser user = guild.RemoveUser(data.User.Id);
@@ -1339,12 +1332,12 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        user ??= State.GetUser(data.User.Id);
+                                        user ??= StateManager.GetUser(data.User.Id);
 
                                         if (user != null)
-                                            user.Update(State, data.User);
+                                            user.Update(StateManager, data.User);
                                         else
-                                            user = State.GetOrAddUser(data.User.Id, (x) => SocketGlobalUser.Create(this, State, data.User));
+                                            user = StateManager.GetOrAddUser(data.User.Id, (x) => SocketGlobalUser.Create(this, StateManager, data.User));
 
                                         await TimedInvokeAsync(_userLeftEvent, nameof(UserLeft), guild, user).ConfigureAwait(false);
                                     }
@@ -1360,7 +1353,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBERS_CHUNK)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<GuildMembersChunkEvent>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
                                         foreach (var memberModel in data.Members)
@@ -1385,7 +1378,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<GuildJoinRequestDeleteEvent>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
 
                                     if (guild == null)
                                     {
@@ -1410,7 +1403,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_RECIPIENT_ADD)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<RecipientEvent>(_serializer);
-                                    if (State.GetChannel(data.ChannelId) is SocketGroupChannel channel)
+                                    if (StateManager.GetChannel(data.ChannelId) is SocketGroupChannel channel)
                                     {
                                         var user = channel.GetOrAddUser(data.User);
                                         await TimedInvokeAsync(_recipientAddedEvent, nameof(RecipientAdded), user).ConfigureAwait(false);
@@ -1427,7 +1420,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_RECIPIENT_REMOVE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<RecipientEvent>(_serializer);
-                                    if (State.GetChannel(data.ChannelId) is SocketGroupChannel channel)
+                                    if (StateManager.GetChannel(data.ChannelId) is SocketGroupChannel channel)
                                     {
                                         var user = channel.RemoveUser(data.User.Id);
                                         if (user != null)
@@ -1454,7 +1447,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_ROLE_CREATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<GuildRoleCreateEvent>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
                                         var role = guild.AddRole(data.Role);
@@ -1478,14 +1471,14 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_ROLE_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<GuildRoleUpdateEvent>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
                                         var role = guild.GetRole(data.Role.Id);
                                         if (role != null)
                                         {
                                             var before = role.Clone();
-                                            role.Update(State, data.Role);
+                                            role.Update(StateManager, data.Role);
 
                                             if (!guild.IsSynced)
                                             {
@@ -1513,7 +1506,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_ROLE_DELETE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<GuildRoleDeleteEvent>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
                                         var role = guild.RemoveRole(data.RoleId);
@@ -1548,7 +1541,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_BAN_ADD)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
                                         if (!guild.IsSynced)
@@ -1559,7 +1552,7 @@ namespace Discord.WebSocket
 
                                         SocketUser user = guild.GetUser(data.User.Id);
                                         if (user == null)
-                                            user = SocketUnknownUser.Create(this, State, data.User);
+                                            user = SocketUnknownUser.Create(this, StateManager, data.User);
                                         await TimedInvokeAsync(_userBannedEvent, nameof(UserBanned), user, guild).ConfigureAwait(false);
                                     }
                                     else
@@ -1574,7 +1567,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_BAN_REMOVE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
                                         if (!guild.IsSynced)
@@ -1583,9 +1576,9 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        SocketUser user = State.GetUser(data.User.Id);
+                                        SocketUser user = StateManager.GetUser(data.User.Id);
                                         if (user == null)
-                                            user = SocketUnknownUser.Create(this, State, data.User);
+                                            user = SocketUnknownUser.Create(this, StateManager, data.User);
                                         await TimedInvokeAsync(_userUnbannedEvent, nameof(UserUnbanned), user, guild).ConfigureAwait(false);
                                     }
                                     else
@@ -1616,7 +1609,7 @@ namespace Discord.WebSocket
                                     {
                                         if (!data.GuildId.IsSpecified)  // assume it is a DM
                                         {
-                                            channel = CreateDMChannel(data.ChannelId, data.Author.Value, State);
+                                            channel = CreateDMChannel(data.ChannelId, data.Author.Value, StateManager);
                                         }
                                         else
                                         {
@@ -1629,7 +1622,7 @@ namespace Discord.WebSocket
                                     if (guild != null)
                                     {
                                         if (data.WebhookId.IsSpecified)
-                                            author = SocketWebhookUser.Create(guild, State, data.Author.Value, data.WebhookId.Value);
+                                            author = SocketWebhookUser.Create(guild, StateManager, data.Author.Value, data.WebhookId.Value);
                                         else
                                             author = guild.GetUser(data.Author.Value.Id);
                                     }
@@ -1657,7 +1650,7 @@ namespace Discord.WebSocket
                                         }
                                     }
 
-                                    var msg = SocketMessage.Create(this, State, author, channel, data);
+                                    var msg = SocketMessage.Create(this, StateManager, author, channel, data);
                                     SocketChannelHelper.AddMessage(channel, this, msg);
                                     await TimedInvokeAsync(_messageReceivedEvent, nameof(MessageReceived), msg).ConfigureAwait(false);
                                 }
@@ -1682,7 +1675,7 @@ namespace Discord.WebSocket
                                     if (isCached)
                                     {
                                         before = cachedMsg.Clone();
-                                        cachedMsg.Update(State, data);
+                                        cachedMsg.Update(StateManager, data);
                                         after = cachedMsg;
                                     }
                                     else
@@ -1694,7 +1687,7 @@ namespace Discord.WebSocket
                                             if (guild != null)
                                             {
                                                 if (data.WebhookId.IsSpecified)
-                                                    author = SocketWebhookUser.Create(guild, State, data.Author.Value, data.WebhookId.Value);
+                                                    author = SocketWebhookUser.Create(guild, StateManager, data.Author.Value, data.WebhookId.Value);
                                                 else
                                                     author = guild.GetUser(data.Author.Value.Id);
                                             }
@@ -1727,12 +1720,12 @@ namespace Discord.WebSocket
                                             {
                                                 if (data.Author.IsSpecified)
                                                 {
-                                                    var dmChannel = CreateDMChannel(data.ChannelId, data.Author.Value, State);
+                                                    var dmChannel = CreateDMChannel(data.ChannelId, data.Author.Value, StateManager);
                                                     channel = dmChannel;
                                                     author = dmChannel.Recipient;
                                                 }
                                                 else
-                                                    channel = CreateDMChannel(data.ChannelId, author, State);
+                                                    channel = CreateDMChannel(data.ChannelId, author, StateManager);
                                             }
                                             else
                                             {
@@ -1741,7 +1734,7 @@ namespace Discord.WebSocket
                                             }
                                         }
 
-                                        after = SocketMessage.Create(this, State, author, channel, data);
+                                        after = SocketMessage.Create(this, StateManager, author, channel, data);
                                     }
                                     var cacheableBefore = new Cacheable<IMessage, ulong>(before, data.Id, isCached, async () => await channel.GetMessageAsync(data.Id).ConfigureAwait(false));
 
@@ -1941,7 +1934,7 @@ namespace Discord.WebSocket
 
                                     if (data.GuildId.IsSpecified)
                                     {
-                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        var guild = StateManager.GetGuild(data.GuildId.Value);
                                         if (guild == null)
                                         {
                                             await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
@@ -1960,12 +1953,12 @@ namespace Discord.WebSocket
                                             {
                                                 return;
                                             }
-                                            user = guild.AddOrUpdateUser(data);
+                                            user = guild.AddOrUpdateUser(data.User);
                                         }
                                         else
                                         {
                                             var globalBefore = user.GlobalUser.Clone();
-                                            if (user.GlobalUser.Update(State, data.User))
+                                            if (user.GlobalUser.Update(StateManager, data.User))
                                             {
                                                 //Global data was updated, trigger UserUpdated
                                                 await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), globalBefore, user).ConfigureAwait(false);
@@ -1974,7 +1967,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        user = State.GetUser(data.User.Id);
+                                        user = StateManager.GetUser(data.User.Id);
                                         if (user == null)
                                         {
                                             await UnknownGlobalUserAsync(type, data.User.Id).ConfigureAwait(false);
@@ -1982,10 +1975,11 @@ namespace Discord.WebSocket
                                         }
                                     }
 
-                                    var before = user.Presence?.Clone();
-                                    user.Update(State, data.User);
-                                    user.Update(data);
-                                    await TimedInvokeAsync(_presenceUpdated, nameof(PresenceUpdated), user, before, user.Presence).ConfigureAwait(false);
+                                    var before = user.Presence?.Value?.Clone();
+                                    user.Update(StateManager, data.User);
+                                    var after = SocketPresence.Create(data);
+                                    StateManager.AddOrUpdatePresence(after);
+                                    await TimedInvokeAsync(_presenceUpdated, nameof(PresenceUpdated), user, before, after).ConfigureAwait(false);
                                 }
                                 break;
                             case "TYPING_START":
@@ -2028,7 +2022,7 @@ namespace Discord.WebSocket
                                     if (!data.GuildId.IsSpecified)
                                         return;
 
-                                    var guild = State.GetGuild(data.GuildId.Value);
+                                    var guild = StateManager.GetGuild(data.GuildId.Value);
 
                                     if (guild != null)
                                     {
@@ -2057,7 +2051,7 @@ namespace Discord.WebSocket
                                     if (!data.GuildId.IsSpecified)
                                         return;
 
-                                    var guild = State.GetGuild(data.GuildId.Value);
+                                    var guild = StateManager.GetGuild(data.GuildId.Value);
 
                                     if (guild != null)
                                     {
@@ -2082,7 +2076,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<IntegrationDeletedEvent>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
 
                                     if (guild != null)
                                     {
@@ -2112,7 +2106,7 @@ namespace Discord.WebSocket
                                     if (data.Id == CurrentUser.Id)
                                     {
                                         var before = CurrentUser.Clone();
-                                        CurrentUser.Update(State, data);
+                                        CurrentUser.Update(StateManager, data);
                                         await TimedInvokeAsync(_selfUpdatedEvent, nameof(CurrentUserUpdated), before, CurrentUser).ConfigureAwait(false);
                                     }
                                     else
@@ -2134,7 +2128,7 @@ namespace Discord.WebSocket
                                     SocketVoiceState before, after;
                                     if (data.GuildId != null)
                                     {
-                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        var guild = StateManager.GetGuild(data.GuildId.Value);
                                         if (guild == null)
                                         {
                                             await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
@@ -2149,7 +2143,7 @@ namespace Discord.WebSocket
                                         if (data.ChannelId != null)
                                         {
                                             before = guild.GetVoiceState(data.UserId)?.Clone() ?? SocketVoiceState.Default;
-                                            after = await guild.AddOrUpdateVoiceStateAsync(State, data).ConfigureAwait(false);
+                                            after = await guild.AddOrUpdateVoiceStateAsync(StateManager, data).ConfigureAwait(false);
                                             /*if (data.UserId == CurrentUser.Id)
                                             {
                                                 var _ = guild.FinishJoinAudioChannel().ConfigureAwait(false);
@@ -2181,7 +2175,7 @@ namespace Discord.WebSocket
                                         if (data.ChannelId != null)
                                         {
                                             before = groupChannel.GetVoiceState(data.UserId)?.Clone() ?? SocketVoiceState.Default;
-                                            after = groupChannel.AddOrUpdateVoiceState(State, data);
+                                            after = groupChannel.AddOrUpdateVoiceState(StateManager, data);
                                         }
                                         else
                                         {
@@ -2198,7 +2192,7 @@ namespace Discord.WebSocket
 
                                     if (user is SocketGuildUser guildUser && data.ChannelId.HasValue)
                                     {
-                                        SocketStageChannel stage = guildUser.Guild.GetStageChannel(data.ChannelId.Value);
+                                        SocketStageChannel stage = guildUser.Guild.Value.GetStageChannel(data.ChannelId.Value);
 
                                         if (stage != null && before.VoiceChannel != null && after.VoiceChannel != null)
                                         {
@@ -2227,10 +2221,10 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_SERVER_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<VoiceServerUpdateEvent>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
                                     var isCached = guild != null;
                                     var cachedGuild = new Cacheable<IGuild, ulong>(guild, data.GuildId, isCached,
-                                        () => Task.FromResult(State.GetGuild(data.GuildId) as IGuild));
+                                        () => Task.FromResult(StateManager.GetGuild(data.GuildId) as IGuild));
 
                                     var voiceServer = new SocketVoiceServer(cachedGuild, data.Endpoint, data.Token);
                                     await TimedInvokeAsync(_voiceServerUpdatedEvent, nameof(UserVoiceStateUpdated), voiceServer).ConfigureAwait(false);
@@ -2261,7 +2255,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (INVITE_CREATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Gateway.InviteCreateEvent>(_serializer);
-                                    if (State.GetChannel(data.ChannelId) is SocketGuildChannel channel)
+                                    if (StateManager.GetChannel(data.ChannelId) is SocketGuildChannel channel)
                                     {
                                         var guild = channel.Guild;
                                         if (!guild.IsSynced)
@@ -2275,7 +2269,7 @@ namespace Discord.WebSocket
                                             : null;
 
                                         SocketUser target = data.TargetUser.IsSpecified
-                                            ? (guild.GetUser(data.TargetUser.Value.Id) ?? (SocketUser)SocketUnknownUser.Create(this, State, data.TargetUser.Value))
+                                            ? (guild.GetUser(data.TargetUser.Value.Id) ?? (SocketUser)SocketUnknownUser.Create(this, StateManager, data.TargetUser.Value))
                                             : null;
 
                                         var invite = SocketInvite.Create(this, guild, channel, inviter, target, data);
@@ -2294,7 +2288,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (INVITE_DELETE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Gateway.InviteDeleteEvent>(_serializer);
-                                    if (State.GetChannel(data.ChannelId) is SocketGuildChannel channel)
+                                    if (StateManager.GetChannel(data.ChannelId) is SocketGuildChannel channel)
                                     {
                                         var guild = channel.Guild;
                                         if (!guild.IsSynced)
@@ -2330,19 +2324,19 @@ namespace Discord.WebSocket
                                     }
 
                                     SocketUser user = data.User.IsSpecified
-                                        ? State.GetOrAddUser(data.User.Value.Id, (_) => SocketGlobalUser.Create(this, State, data.User.Value))
+                                        ? StateManager.GetOrAddUser(data.User.Value.Id, (_) => SocketGlobalUser.Create(this, StateManager, data.User.Value))
                                         : guild?.AddOrUpdateUser(data.Member.Value); // null if the bot scope isn't set, so the guild cannot be retrieved.
 
                                     SocketChannel channel = null;
                                     if(data.ChannelId.IsSpecified)
                                     {
-                                        channel = State.GetChannel(data.ChannelId.Value);
+                                        channel = StateManager.GetChannel(data.ChannelId.Value);
 
                                         if (channel == null)
                                         {
                                             if (!data.GuildId.IsSpecified)  // assume it is a DM
                                             {
-                                                channel = CreateDMChannel(data.ChannelId.Value, user, State);
+                                                channel = CreateDMChannel(data.ChannelId.Value, user, StateManager);
                                             }
                                             else
                                             {
@@ -2357,7 +2351,7 @@ namespace Discord.WebSocket
                                     }
                                     else if (data.User.IsSpecified)
                                     {
-                                        channel = State.GetDMChannel(data.User.Value.Id);
+                                        channel = StateManager.GetDMChannel(data.User.Value.Id);
                                     }
 
                                     var interaction = SocketInteraction.Create(this, data, channel as ISocketMessageChannel, user);
@@ -2398,7 +2392,7 @@ namespace Discord.WebSocket
 
                                     if (data.GuildId.IsSpecified)
                                     {
-                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        var guild = StateManager.GetGuild(data.GuildId.Value);
                                         if (guild == null)
                                         {
                                             await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
@@ -2408,7 +2402,7 @@ namespace Discord.WebSocket
 
                                     var applicationCommand = SocketApplicationCommand.Create(this, data);
 
-                                    State.AddCommand(applicationCommand);
+                                    StateManager.AddCommand(applicationCommand);
 
                                     await TimedInvokeAsync(_applicationCommandCreated, nameof(ApplicationCommandCreated), applicationCommand).ConfigureAwait(false);
                                 }
@@ -2421,7 +2415,7 @@ namespace Discord.WebSocket
 
                                     if (data.GuildId.IsSpecified)
                                     {
-                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        var guild = StateManager.GetGuild(data.GuildId.Value);
                                         if (guild == null)
                                         {
                                             await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
@@ -2431,7 +2425,7 @@ namespace Discord.WebSocket
 
                                     var applicationCommand = SocketApplicationCommand.Create(this, data);
 
-                                    State.AddCommand(applicationCommand);
+                                    StateManager.AddCommand(applicationCommand);
 
                                     await TimedInvokeAsync(_applicationCommandUpdated, nameof(ApplicationCommandUpdated), applicationCommand).ConfigureAwait(false);
                                 }
@@ -2444,7 +2438,7 @@ namespace Discord.WebSocket
 
                                     if (data.GuildId.IsSpecified)
                                     {
-                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        var guild = StateManager.GetGuild(data.GuildId.Value);
                                         if (guild == null)
                                         {
                                             await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
@@ -2454,7 +2448,7 @@ namespace Discord.WebSocket
 
                                     var applicationCommand = SocketApplicationCommand.Create(this, data);
 
-                                    State.RemoveCommand(applicationCommand.Id);
+                                    StateManager.RemoveCommand(applicationCommand.Id);
 
                                     await TimedInvokeAsync(_applicationCommandDeleted, nameof(ApplicationCommandDeleted), applicationCommand).ConfigureAwait(false);
                                 }
@@ -2468,7 +2462,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<Channel>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId.Value);
+                                    var guild = StateManager.GetGuild(data.GuildId.Value);
 
                                     if (guild == null)
                                     {
@@ -2480,14 +2474,14 @@ namespace Discord.WebSocket
 
                                     if ((threadChannel = guild.ThreadChannels.FirstOrDefault(x => x.Id == data.Id)) != null)
                                     {
-                                        threadChannel.Update(State, data);
+                                        threadChannel.Update(StateManager, data);
 
                                         if(data.ThreadMember.IsSpecified)
                                             threadChannel.AddOrUpdateThreadMember(data.ThreadMember.Value, guild.CurrentUser);
                                     }
                                     else
                                     {
-                                        threadChannel = (SocketThreadChannel)guild.AddChannel(State, data);
+                                        threadChannel = (SocketThreadChannel)guild.AddChannel(StateManager, data);
                                         if (data.ThreadMember.IsSpecified)
                                             threadChannel.AddOrUpdateThreadMember(data.ThreadMember.Value, guild.CurrentUser);
                                     }
@@ -2501,7 +2495,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-                                    var guild = State.GetGuild(data.GuildId.Value);
+                                    var guild = StateManager.GetGuild(data.GuildId.Value);
                                     if (guild == null)
                                     {
                                         await UnknownGuildAsync(type, data.GuildId.Value);
@@ -2515,7 +2509,7 @@ namespace Discord.WebSocket
 
                                     if (threadChannel != null)
                                     {
-                                        threadChannel.Update(State, data);
+                                        threadChannel.Update(StateManager, data);
 
                                         if (data.ThreadMember.IsSpecified)
                                             threadChannel.AddOrUpdateThreadMember(data.ThreadMember.Value, guild.CurrentUser);
@@ -2523,7 +2517,7 @@ namespace Discord.WebSocket
                                     else
                                     {
                                         //Thread is updated but was not cached, likely meaning the thread was unarchived.
-                                        threadChannel = (SocketThreadChannel)guild.AddChannel(State, data);
+                                        threadChannel = (SocketThreadChannel)guild.AddChannel(StateManager, data);
                                         if (data.ThreadMember.IsSpecified)
                                             threadChannel.AddOrUpdateThreadMember(data.ThreadMember.Value, guild.CurrentUser);
                                     }
@@ -2543,7 +2537,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId.Value);
+                                    var guild = StateManager.GetGuild(data.GuildId.Value);
 
                                     if(guild == null)
                                     {
@@ -2564,7 +2558,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<API.Gateway.ThreadListSyncEvent>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
 
                                     if(guild == null)
                                     {
@@ -2578,11 +2572,11 @@ namespace Discord.WebSocket
 
                                         if(entity == null)
                                         {
-                                            entity = (SocketThreadChannel)guild.AddChannel(State, thread);
+                                            entity = (SocketThreadChannel)guild.AddChannel(StateManager, thread);
                                         }
                                         else
                                         {
-                                            entity.Update(State, thread);
+                                            entity.Update(StateManager, thread);
                                         }
 
                                         foreach(var member in data.Members.Where(x => x.Id.Value == entity.Id))
@@ -2600,7 +2594,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<ThreadMember>(_serializer);
 
-                                    var thread = (SocketThreadChannel)State.GetChannel(data.Id.Value);
+                                    var thread = (SocketThreadChannel)StateManager.GetChannel(data.Id.Value);
 
                                     if (thread == null)
                                     {
@@ -2618,7 +2612,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<ThreadMembersUpdated>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
 
                                     if (guild == null)
                                     {
@@ -2691,7 +2685,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<StageInstance>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
 
                                     if(guild == null)
                                     {
@@ -2734,7 +2728,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<GuildScheduledEvent>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
 
                                     if (guild == null)
                                     {
@@ -2753,7 +2747,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<GuildScheduledEvent>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
 
                                     if (guild == null)
                                     {
@@ -2784,7 +2778,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<GuildScheduledEvent>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
 
                                     if (guild == null)
                                     {
@@ -2803,7 +2797,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<GuildScheduledEventUserAddRemoveEvent>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
+                                    var guild = StateManager.GetGuild(data.GuildId);
 
                                     if(guild == null)
                                     {
@@ -2819,7 +2813,7 @@ namespace Discord.WebSocket
                                         return;
                                     }
 
-                                    var user = (SocketUser)guild.GetUser(data.UserId) ?? State.GetUser(data.UserId);
+                                    var user = (SocketUser)guild.GetUser(data.UserId) ?? StateManager.GetUser(data.UserId);
 
                                     var cacheableUser = new Cacheable<SocketUser, RestUser, IUser, ulong>(user, data.UserId, user != null, () => Rest.GetUserAsync(data.UserId));
 
@@ -2954,7 +2948,7 @@ namespace Discord.WebSocket
                 await ApiClient.SendGuildSyncAsync(guildIds).ConfigureAwait(false);
         }
 
-        internal SocketGuild AddGuild(ExtendedGuild model, ClientState state)
+        internal SocketGuild AddGuild(ExtendedGuild model, ClientStateManager state)
         {
             var guild = SocketGuild.Create(this, state, model);
             state.AddGuild(guild);
@@ -2963,26 +2957,26 @@ namespace Discord.WebSocket
             return guild;
         }
         internal SocketGuild RemoveGuild(ulong id)
-            => State.RemoveGuild(id);
+            => StateManager.RemoveGuild(id);
 
         /// <exception cref="InvalidOperationException">Unexpected channel type is created.</exception>
-        internal ISocketPrivateChannel AddPrivateChannel(API.Channel model, ClientState state)
+        internal ISocketPrivateChannel AddPrivateChannel(API.Channel model, ClientStateManager state)
         {
             var channel = SocketChannel.CreatePrivate(this, state, model);
             state.AddChannel(channel as SocketChannel);
             return channel;
         }
-        internal SocketDMChannel CreateDMChannel(ulong channelId, API.User model, ClientState state)
+        internal SocketDMChannel CreateDMChannel(ulong channelId, API.User model, ClientStateManager state)
         {
             return SocketDMChannel.Create(this, state, channelId, model);
         }
-        internal SocketDMChannel CreateDMChannel(ulong channelId, SocketUser user, ClientState state)
+        internal SocketDMChannel CreateDMChannel(ulong channelId, SocketUser user, ClientStateManager state)
         {
             return new SocketDMChannel(this, channelId, user);
         }
         internal ISocketPrivateChannel RemovePrivateChannel(ulong id)
         {
-            var channel = State.RemoveChannel(id) as ISocketPrivateChannel;
+            var channel = StateManager.RemoveChannel(id) as ISocketPrivateChannel;
             if (channel != null)
             {
                 foreach (var recipient in channel.Recipients)
@@ -2992,8 +2986,8 @@ namespace Discord.WebSocket
         }
         internal void RemoveDMChannels()
         {
-            var channels = State.DMChannels;
-            State.PurgeDMChannels();
+            var channels = StateManager.DMChannels;
+            StateManager.PurgeDMChannels();
             foreach (var channel in channels)
                 channel.Recipient.GlobalUser.RemoveRef(this);
         }

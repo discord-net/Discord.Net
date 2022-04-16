@@ -227,7 +227,7 @@ namespace Discord.WebSocket
 
         internal override SocketGlobalUser GlobalUser { get => GuildUser.GlobalUser; set => GuildUser.GlobalUser = value; }
 
-        internal override SocketPresence Presence { get => GuildUser.Presence; set => GuildUser.Presence = value; }
+        internal override Lazy<SocketPresence> Presence { get => GuildUser.Presence; set => GuildUser.Presence = value; }
 
         /// <summary>
         ///     Gets the guild user of this thread user.

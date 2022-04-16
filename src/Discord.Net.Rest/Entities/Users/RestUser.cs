@@ -78,20 +78,16 @@ namespace Discord.Rest
 
         internal virtual void Update(Model model)
         {
-            if (model.Avatar.IsSpecified)
-                AvatarId = model.Avatar.Value;
-            if (model.Banner.IsSpecified)
-                BannerId = model.Banner.Value;
-            if (model.AccentColor.IsSpecified)
-                AccentColor = model.AccentColor.Value;
-            if (model.Discriminator.IsSpecified)
+            AvatarId = model.Avatar.GetValueOrDefault();
+            if(model.Discriminator.IsSpecified)
                 DiscriminatorValue = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
-            if (model.Bot.IsSpecified)
-                IsBot = model.Bot.Value;
-            if (model.Username.IsSpecified)
-                Username = model.Username.Value;
-            if (model.PublicFlags.IsSpecified)
-                PublicFlags = model.PublicFlags.Value;
+            IsBot = model.Bot.GetValueOrDefault(false);
+            Username = model.Username.GetValueOrDefault();
+
+            if(model is ICurrentUserModel currentUserModel)
+            {
+                PublicFlags = currentUserModel.PublicFlags;
+            }
         }
 
         /// <inheritdoc />
