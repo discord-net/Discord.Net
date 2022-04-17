@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord.API
@@ -38,6 +39,18 @@ namespace Discord.API
         [JsonProperty("channel_types")]
         public Optional<ChannelType[]> ChannelTypes { get; set; }
 
+        [JsonProperty("name_localizations")]
+        public Optional<Dictionary<string, string>?> NameLocalizations { get; set; }
+
+        [JsonProperty("description_localizations")]
+        public Optional<Dictionary<string, string>?> DescriptionLocalizations { get; set; }
+
+        [JsonProperty("name_localized")]
+        public Optional<string?> NameLocalized { get; set; }
+
+        [JsonProperty("description_localized")]
+        public Optional<string?> DescriptionLocalized { get; set; }
+
         public ApplicationCommandOption() { }
 
         public ApplicationCommandOption(IApplicationCommandOption cmd)
@@ -61,6 +74,11 @@ namespace Discord.API
             Name = cmd.Name;
             Type = cmd.Type;
             Description = cmd.Description;
+
+            NameLocalizations = cmd.NameLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
+            DescriptionLocalizations = cmd.DescriptionLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
+            NameLocalized = cmd.NameLocalized;
+            DescriptionLocalized = cmd.DescriptionLocalized;
         }
         public ApplicationCommandOption(ApplicationCommandOptionProperties option)
         {

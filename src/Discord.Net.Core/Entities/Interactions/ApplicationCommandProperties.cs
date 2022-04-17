@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+
 namespace Discord
 {
     /// <summary>
@@ -16,6 +19,10 @@ namespace Discord
         ///     Gets or sets whether the command is enabled by default when the app is added to a guild. Default is <see langword="true"/>
         /// </summary>
         public Optional<bool> IsDefaultPermission { get; set; }
+
+        public Optional<IDictionary<string, string>> NameLocalizations { get; set; }
+
+        public Optional<IDictionary<string, string>> DescriptionLocalizations { get; set; }
 
         internal ApplicationCommandProperties() { }
     }

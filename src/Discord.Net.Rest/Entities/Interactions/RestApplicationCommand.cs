@@ -32,6 +32,14 @@ namespace Discord.Rest
         /// </summary>
         public IReadOnlyCollection<RestApplicationCommandOption> Options { get; private set; }
 
+        public IReadOnlyDictionary<string, string>? NameLocalizations { get; private set; }
+
+        public IReadOnlyDictionary<string, string>? DescriptionLocalizations { get; private set; }
+
+        public string? NameLocalized { get; private set; }
+
+        public string? DescriptionLocalized { get; private set; }
+
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(Id);
@@ -57,6 +65,15 @@ namespace Discord.Rest
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(RestApplicationCommandOption.Create).ToImmutableArray()
                 : ImmutableArray.Create<RestApplicationCommandOption>();
+
+            NameLocalizations = model.NameLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                ImmutableDictionary<string, string>.Empty;
+
+            DescriptionLocalizations = model.DescriptionLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                ImmutableDictionary<string, string>.Empty;
+
+            NameLocalized = model.NameLocalized.GetValueOrDefault();
+            DescriptionLocalized = model.DescriptionLocalized.GetValueOrDefault();
         }
 
         /// <inheritdoc/>

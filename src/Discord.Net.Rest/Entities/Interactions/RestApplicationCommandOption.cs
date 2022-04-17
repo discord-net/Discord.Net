@@ -27,7 +27,7 @@ namespace Discord.Rest
         public bool? IsRequired { get; private set; }
 
         /// <inheritdoc/>
-        public bool? IsAutocomplete { get; private set; } 
+        public bool? IsAutocomplete { get; private set; }
 
         /// <inheritdoc/>
         public double? MinValue { get; private set; }
@@ -47,6 +47,14 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public IReadOnlyCollection<ChannelType> ChannelTypes { get; private set; }
+
+        public IReadOnlyDictionary<string, string>? NameLocalizations { get; private set; }
+
+        public IReadOnlyDictionary<string, string>? DescriptionLocalizations { get; private set; }
+
+        public string? NameLocalized { get; private set; }
+
+        public string? DescriptionLocalized { get; private set; }
 
         internal RestApplicationCommandOption() { }
 
@@ -89,6 +97,15 @@ namespace Discord.Rest
             ChannelTypes = model.ChannelTypes.IsSpecified
                 ? model.ChannelTypes.Value.ToImmutableArray()
                 : ImmutableArray.Create<ChannelType>();
+
+            NameLocalizations = model.NameLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                ImmutableDictionary<string, string>.Empty;
+
+            DescriptionLocalizations = model.DescriptionLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                       ImmutableDictionary<string, string>.Empty;
+
+            NameLocalized = model.NameLocalized.GetValueOrDefault();
+            DescriptionLocalized = model.DescriptionLocalized.GetValueOrDefault();
         }
         #endregion
 

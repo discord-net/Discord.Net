@@ -48,6 +48,14 @@ namespace Discord.WebSocket
         /// </summary>
         public IReadOnlyCollection<ChannelType> ChannelTypes { get; private set; }
 
+        public IReadOnlyDictionary<string, string>? NameLocalizations { get; private set; }
+
+        public IReadOnlyDictionary<string, string>? DescriptionLocalizations { get; private set; }
+
+        public string? NameLocalized { get; private set; }
+
+        public string? DescriptionLocalized { get; private set; }
+
         internal SocketApplicationCommandOption() { }
         internal static SocketApplicationCommandOption Create(Model model)
         {
@@ -83,6 +91,15 @@ namespace Discord.WebSocket
             ChannelTypes = model.ChannelTypes.IsSpecified
                 ? model.ChannelTypes.Value.ToImmutableArray()
                 : ImmutableArray.Create<ChannelType>();
+
+            NameLocalizations = model.NameLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                ImmutableDictionary<string, string>.Empty;
+
+            DescriptionLocalizations = model.DescriptionLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                       ImmutableDictionary<string, string>.Empty;
+
+            NameLocalized = model.NameLocalized.GetValueOrDefault();
+            DescriptionLocalized = model.DescriptionLocalized.GetValueOrDefault();
         }
 
         IReadOnlyCollection<IApplicationCommandOptionChoice> IApplicationCommandOption.Choices => Choices;

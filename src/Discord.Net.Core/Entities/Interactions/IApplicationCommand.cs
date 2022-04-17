@@ -39,6 +39,14 @@ namespace Discord
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOption> Options { get; }
 
+        IReadOnlyDictionary<string, string>? NameLocalizations { get; }
+
+        IReadOnlyDictionary<string, string>? DescriptionLocalizations { get; }
+
+        string? NameLocalized { get; }
+
+        string? DescriptionLocalized { get; }
+
         /// <summary>
         ///     Modifies the current application command.
         /// </summary>

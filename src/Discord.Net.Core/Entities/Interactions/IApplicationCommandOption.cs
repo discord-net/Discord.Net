@@ -61,5 +61,13 @@ namespace Discord
         ///     Gets the allowed channel types for this option.
         /// </summary>
         IReadOnlyCollection<ChannelType> ChannelTypes { get; }
+
+        IReadOnlyDictionary<string, string>? NameLocalizations { get; }
+
+        IReadOnlyDictionary<string, string>? DescriptionLocalizations { get; }
+
+        string? NameLocalized { get; }
+
+        string? DescriptionLocalized { get; }
     }
 }

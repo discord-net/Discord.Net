@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using Model = Discord.API.ApplicationCommandOptionChoice;
 
 namespace Discord.WebSocket
@@ -13,6 +15,10 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public object Value { get; private set; }
 
+        public IReadOnlyDictionary<string, string>? NameLocalizations { get; private set; }
+
+        public string? NameLocalized { get; private set; }
+
         internal SocketApplicationCommandChoice() { }
         internal static SocketApplicationCommandChoice Create(Model model)
         {
@@ -24,6 +30,8 @@ namespace Discord.WebSocket
         {
             Name = model.Name;
             Value = model.Value;
+            NameLocalizations = model.NameLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary();
+            NameLocalized = model.NameLocalized.GetValueOrDefault(null);
         }
     }
 }

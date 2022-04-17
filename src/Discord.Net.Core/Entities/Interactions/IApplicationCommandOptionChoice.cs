@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Discord
 {
     /// <summary>
@@ -14,5 +16,9 @@ namespace Discord
         ///     Gets the value of the choice.
         /// </summary>
         object Value { get; }
+
+        IReadOnlyDictionary<string, string>? NameLocalizations { get; }
+
+        string? NameLocalized { get; }
     }
 }

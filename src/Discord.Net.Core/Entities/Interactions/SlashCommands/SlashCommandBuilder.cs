@@ -1,6 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
 
 namespace Discord
@@ -76,6 +79,10 @@ namespace Discord
             }
         }
 
+        public IReadOnlyDictionary<string, string> NameLocalizations => _nameLocalizations;
+
+        public IReadOnlyDictionary<string, string> DescriptionLocalizations => _descriptionLocalizations;
+
         /// <summary>
         ///     Gets or sets whether the command is enabled by default when the app is added to a guild
         /// </summary>
@@ -83,6 +90,8 @@ namespace Discord
 
         private string _name;
         private string _description;
+        private Dictionary<string, string> _nameLocalizations;
+        private Dictionary<string, string> _descriptionLocalizations;
         private List<SlashCommandOptionBuilder> _options;
 
         /// <summary>
@@ -96,6 +105,8 @@ namespace Discord
                 Name = Name,
                 Description = Description,
                 IsDefaultPermission = IsDefaultPermission,
+                NameLocalizations = _nameLocalizations,
+                DescriptionLocalizations = _descriptionLocalizations,
             };
 
             if (Options != null && Options.Any())
@@ -162,7 +173,8 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type,
            string description, bool? isRequired = null, bool? isDefault = null, bool isAutocomplete = false, double? minValue = null, double? maxValue = null,
-           List<SlashCommandOptionBuilder> options = null, List<ChannelType> channelTypes = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           List<SlashCommandOptionBuilder> options = null, List<ChannelType> channelTypes = null, IDictionary<string, string> nameLocalizations = null,
+           IDictionary<string, string> descriptionLocalizations = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
@@ -195,8 +207,14 @@ namespace Discord
                 Choices = (choices ?? Array.Empty<ApplicationCommandOptionChoiceProperties>()).ToList(),
                 ChannelTypes = channelTypes,
                 MinValue = minValue,
-                MaxValue = maxValue,
+                MaxValue = maxValue
             };
+
+            if (nameLocalizations is not null)
+                option.WithNameLocalizations(nameLocalizations);
+
+            if (descriptionLocalizations is not null)
+                option.WithDescriptionLocalizations(descriptionLocalizations);
 
             return AddOption(option);
         }
@@ -239,6 +257,74 @@ namespace Discord
             Options.AddRange(options);
             return this;
         }
+
+        public SlashCommandBuilder WithNameLocalizations(IDictionary<string, string> nameLocalizations)
+        {
+            if (nameLocalizations is null)
+                throw new ArgumentNullException(nameof(nameLocalizations));
+
+            foreach (var (locale, name) in nameLocalizations)
+            {
+                if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                    throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+                Preconditions.AtLeast(name.Length, 1, nameof(name));
+                Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
+                if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
+                    throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(name));
+            }
+
+            _nameLocalizations = new Dictionary<string, string>(nameLocalizations);
+            return this;
+        }
+
+        public SlashCommandBuilder WithDescriptionLocalizations(IDictionary<string, string> descriptionLocalizations)
+        {
+            if (descriptionLocalizations is null)
+                throw new ArgumentNullException(nameof(descriptionLocalizations));
+
+            foreach (var (locale, description) in _descriptionLocalizations)
+            {
+                if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                    throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+                Preconditions.AtLeast(description.Length, 1, nameof(description));
+                Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+            }
+
+            _descriptionLocalizations = new Dictionary<string, string>(descriptionLocalizations);
+            return this;
+        }
+
+        public SlashCommandBuilder AddNameLocalization(string locale, string name)
+        {
+            if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+            Preconditions.AtLeast(name.Length, 1, nameof(name));
+            Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
+            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
+                throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(name));
+
+            _descriptionLocalizations ??= new();
+            _nameLocalizations.Add(locale, name);
+
+            return this;
+        }
+
+        public SlashCommandBuilder AddDescriptionLocalization(string locale, string description)
+        {
+            if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+            Preconditions.AtLeast(description.Length, 1, nameof(description));
+            Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+
+            _descriptionLocalizations ??= new();
+            _descriptionLocalizations.Add(locale, description);
+
+            return this;
+        }
     }
 
     /// <summary>
@@ -258,6 +344,8 @@ namespace Discord
 
         private string _name;
         private string _description;
+        private Dictionary<string, string> _nameLocalizations;
+        private Dictionary<string, string> _descriptionLocalizations;
 
         /// <summary>
         ///     Gets or sets the name of this option.
@@ -342,6 +430,10 @@ namespace Discord
         /// </summary>
         public List<ChannelType> ChannelTypes { get; set; }
 
+        public IReadOnlyDictionary<string, string> NameLocalizations => _nameLocalizations;
+
+        public IReadOnlyDictionary<string, string> DescriptionLocalizations => _descriptionLocalizations;
+
         /// <summary>
         ///     Builds the current option.
         /// </summary>
@@ -377,7 +469,9 @@ namespace Discord
                 IsAutocomplete = IsAutocomplete,
                 ChannelTypes = ChannelTypes,
                 MinValue = MinValue,
-                MaxValue = MaxValue
+                MaxValue = MaxValue,
+                NameLocalizations = _nameLocalizations,
+                DescriptionLocalizations = _descriptionLocalizations
             };
         }
 
@@ -398,7 +492,8 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddOption(string name, ApplicationCommandOptionType type,
            string description, bool? isRequired = null, bool isDefault = false, bool isAutocomplete = false, double? minValue = null, double? maxValue = null,
-           List<SlashCommandOptionBuilder> options = null, List<ChannelType> channelTypes = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           List<SlashCommandOptionBuilder> options = null, List<ChannelType> channelTypes = null, IDictionary<string, string> nameLocalizations = null,
+           IDictionary<string, string> descriptionLocalizations = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
@@ -431,8 +526,14 @@ namespace Discord
                 Options = options,
                 Type = type,
                 Choices = (choices ?? Array.Empty<ApplicationCommandOptionChoiceProperties>()).ToList(),
-                ChannelTypes = channelTypes
+                ChannelTypes = channelTypes,
             };
+
+            if(nameLocalizations is not null)
+                option.WithNameLocalizations(nameLocalizations);
+
+            if(descriptionLocalizations is not null)
+                option.WithDescriptionLocalizations(descriptionLocalizations);
 
             return AddOption(option);
         }
@@ -460,9 +561,9 @@ namespace Discord
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandOptionBuilder AddChoice(string name, int value)
+        public SlashCommandOptionBuilder AddChoice(string name, int value, IDictionary<string, string> nameLocalizations = null)
         {
-            return AddChoiceInternal(name, value);
+            return AddChoiceInternal(name, value, nameLocalizations);
         }
 
         /// <summary>
@@ -471,9 +572,9 @@ namespace Discord
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandOptionBuilder AddChoice(string name, string value)
+        public SlashCommandOptionBuilder AddChoice(string name, string value, IDictionary<string, string> nameLocalizations = null)
         {
-            return AddChoiceInternal(name, value);
+            return AddChoiceInternal(name, value, nameLocalizations);
         }
 
         /// <summary>
@@ -482,9 +583,9 @@ namespace Discord
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandOptionBuilder AddChoice(string name, double value)
+        public SlashCommandOptionBuilder AddChoice(string name, double value, IDictionary<string, string> nameLocalizations = null)
         {
-            return AddChoiceInternal(name, value);
+            return AddChoiceInternal(name, value, nameLocalizations);
         }
 
         /// <summary>
@@ -493,9 +594,9 @@ namespace Discord
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandOptionBuilder AddChoice(string name, float value)
+        public SlashCommandOptionBuilder AddChoice(string name, float value, IDictionary<string, string> nameLocalizations = null)
         {
-            return AddChoiceInternal(name, value);
+            return AddChoiceInternal(name, value, nameLocalizations);
         }
 
         /// <summary>
@@ -504,12 +605,12 @@ namespace Discord
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandOptionBuilder AddChoice(string name, long value)
+        public SlashCommandOptionBuilder AddChoice(string name, long value, IDictionary<string, string> nameLocalizations = null)
         {
-            return AddChoiceInternal(name, value);
+            return AddChoiceInternal(name, value, nameLocalizations);
         }
 
-        private SlashCommandOptionBuilder AddChoiceInternal(string name, object value)
+        private SlashCommandOptionBuilder AddChoiceInternal(string name, object value, IDictionary<string, string> nameLocalizations = null)
         {
             Choices ??= new List<ApplicationCommandOptionChoiceProperties>();
 
@@ -531,7 +632,8 @@ namespace Discord
             Choices.Add(new ApplicationCommandOptionChoiceProperties
             {
                 Name = name,
-                Value = value
+                Value = value,
+                NameLocalizations = nameLocalizations
             });
 
             return this;
@@ -617,7 +719,7 @@ namespace Discord
             MinValue = value;
             return this;
         }
-        
+
         /// <summary>
         ///     Sets the current builders max value field.
         /// </summary>
@@ -637,6 +739,74 @@ namespace Discord
         public SlashCommandOptionBuilder WithType(ApplicationCommandOptionType type)
         {
             Type = type;
+            return this;
+        }
+
+        public SlashCommandOptionBuilder WithNameLocalizations(IDictionary<string, string> nameLocalizations)
+        {
+            if (nameLocalizations is null)
+                throw new ArgumentNullException(nameof(nameLocalizations));
+
+            foreach (var (locale, name) in nameLocalizations)
+            {
+                if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                    throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+                Preconditions.AtLeast(name.Length, 1, nameof(name));
+                Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
+                if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
+                    throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(name));
+            }
+
+            _nameLocalizations = new Dictionary<string, string>(nameLocalizations);
+            return this;
+        }
+
+        public SlashCommandOptionBuilder WithDescriptionLocalizations(IDictionary<string, string> descriptionLocalizations)
+        {
+            if (descriptionLocalizations is null)
+                throw new ArgumentNullException(nameof(descriptionLocalizations));
+
+            foreach (var (locale, description) in _descriptionLocalizations)
+            {
+                if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                    throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+                Preconditions.AtLeast(description.Length, 1, nameof(description));
+                Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+            }
+
+            _descriptionLocalizations = new Dictionary<string, string>(descriptionLocalizations);
+            return this;
+        }
+
+        public SlashCommandOptionBuilder AddNameLocalization(string locale, string name)
+        {
+            if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+            Preconditions.AtLeast(name.Length, 1, nameof(name));
+            Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
+            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
+                throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(name));
+
+            _descriptionLocalizations ??= new();
+            _nameLocalizations.Add(locale, name);
+
+            return this;
+        }
+
+        public SlashCommandOptionBuilder AddDescriptionLocalization(string locale, string description)
+        {
+            if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+            Preconditions.AtLeast(description.Length, 1, nameof(description));
+            Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+
+            _descriptionLocalizations ??= new();
+            _descriptionLocalizations.Add(locale, description);
+
             return this;
         }
     }
