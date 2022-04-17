@@ -316,8 +316,8 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     slash commands created by the current user.
         /// </returns>
-        public Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(RequestOptions options = null)
-            => GuildHelper.GetSlashCommandsAsync(this, Discord, options);
+        public Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(bool withLocalizations = false, RequestOptions options = null)
+            => GuildHelper.GetSlashCommandsAsync(this, Discord, withLocalizations, options);
 
         /// <summary>
         ///     Gets a slash command in the current guild.
@@ -932,8 +932,8 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of application commands found within the guild.
         /// </returns>
-        public async Task<IReadOnlyCollection<RestGuildCommand>> GetApplicationCommandsAsync (RequestOptions options = null)
-            => await ClientHelper.GetGuildApplicationCommandsAsync(Discord, Id, options).ConfigureAwait(false);
+        public async Task<IReadOnlyCollection<RestGuildCommand>> GetApplicationCommandsAsync (bool withLocalizations = false, RequestOptions options = null)
+            => await ClientHelper.GetGuildApplicationCommandsAsync(Discord, Id, withLocalizations, options).ConfigureAwait(false);
         /// <summary>
         ///     Gets an application command within this guild with the specified id.
         /// </summary>
@@ -1465,8 +1465,8 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (RequestOptions options)
-            => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
+        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (bool withLocalizations, RequestOptions options)
+            => await GetApplicationCommandsAsync(withLocalizations, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options)
             => await CreateStickerAsync(name, description, tags, image, options);

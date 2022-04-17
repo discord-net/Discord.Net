@@ -1188,11 +1188,12 @@ namespace Discord.API
         #endregion
 
         #region Interactions
-        public async Task<ApplicationCommand[]> GetGlobalApplicationCommandsAsync(RequestOptions options = null)
+        public async Task<ApplicationCommand[]> GetGlobalApplicationCommandsAsync(bool withLocalizations = false, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands", new BucketIds(), options: options).ConfigureAwait(false);
+            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands?with_localizations={withLocalizations}",
+                new BucketIds(), options: options).ConfigureAwait(false);
         }
 
         public async Task<ApplicationCommand> GetGlobalApplicationCommandAsync(ulong id, RequestOptions options = null)
@@ -1257,13 +1258,14 @@ namespace Discord.API
             return await SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{CurrentApplicationId}/commands", commands, new BucketIds(), options: options).ConfigureAwait(false);
         }
 
-        public async Task<ApplicationCommand[]> GetGuildApplicationCommandsAsync(ulong guildId, RequestOptions options = null)
+        public async Task<ApplicationCommand[]> GetGuildApplicationCommandsAsync(ulong guildId, bool withLocalizations = false, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
             var bucket = new BucketIds(guildId: guildId);
 
-            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands", bucket, options: options).ConfigureAwait(false);
+            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands?with_localizations={withLocalizations}",
+                bucket, options: options).ConfigureAwait(false);
         }
 
         public async Task<ApplicationCommand> GetGuildApplicationCommandAsync(ulong guildId, ulong commandId, RequestOptions options = null)
@@ -1400,7 +1402,7 @@ namespace Discord.API
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
 
             options = RequestOptions.CreateOrClone(options);
-           
+
             var ids = new BucketIds();
             return await SendMultipartAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }

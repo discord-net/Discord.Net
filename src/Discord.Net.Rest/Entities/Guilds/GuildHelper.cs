@@ -317,10 +317,10 @@ namespace Discord.Rest
         #endregion
 
         #region Interactions
-        public static async Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(IGuild guild, BaseDiscordClient client,
+        public static async Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(IGuild guild, BaseDiscordClient client, bool withLocalizations,
             RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildApplicationCommandsAsync(guild.Id, options);
+            var models = await client.ApiClient.GetGuildApplicationCommandsAsync(guild.Id, withLocalizations, options);
             return models.Select(x => RestGuildCommand.Create(client, x, guild.Id)).ToImmutableArray();
         }
         public static async Task<RestGuildCommand> GetSlashCommandAsync(IGuild guild, ulong id, BaseDiscordClient client,
@@ -866,7 +866,7 @@ namespace Discord.Rest
             if (endTime != null && endTime <= startTime)
                 throw new ArgumentOutOfRangeException(nameof(endTime), $"{nameof(endTime)} cannot be before the start time");
 
-            
+
             var apiArgs = new CreateGuildScheduledEventParams()
             {
                 ChannelId = channelId ?? Optional<ulong>.Unspecified,

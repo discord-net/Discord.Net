@@ -1147,7 +1147,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of application commands found within the guild.
         /// </returns>
-        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(bool withLocalizations = false, RequestOptions options = null);
 
         /// <summary>
         ///     Gets an application command within this guild with the specified id.

@@ -34,18 +34,7 @@ namespace Discord
             get => _name;
             set
             {
-                Preconditions.NotNullOrEmpty(value, nameof(value));
-                Preconditions.AtLeast(value.Length, 1, nameof(value));
-                Preconditions.AtMost(value.Length, MaxNameLength, nameof(value));
-
-                // Discord updated the docs, this regex prevents special characters like @!$%(... etc,
-                // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
-                if (!Regex.IsMatch(value, @"^[\w-]{1,32}$"))
-                    throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(value));
-
-                if (value.Any(x => char.IsUpper(x)))
-                    throw new FormatException("Name cannot contain any uppercase characters.");
-
+                EnsureValidCommandName(value);
                 _name = value;
             }
         }
@@ -58,10 +47,7 @@ namespace Discord
             get => _description;
             set
             {
-                Preconditions.NotNullOrEmpty(value, nameof(Description));
-                Preconditions.AtLeast(value.Length, 1, nameof(Description));
-                Preconditions.AtMost(value.Length, MaxDescriptionLength, nameof(Description));
-
+                EnsureValidCommandDescription(value);
                 _description = value;
             }
         }
@@ -268,10 +254,7 @@ namespace Discord
                 if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                     throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-                Preconditions.AtLeast(name.Length, 1, nameof(name));
-                Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
-                if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                    throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(name));
+                EnsureValidCommandName(name);
             }
 
             _nameLocalizations = new Dictionary<string, string>(nameLocalizations);
@@ -288,8 +271,7 @@ namespace Discord
                 if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                     throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-                Preconditions.AtLeast(description.Length, 1, nameof(description));
-                Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+                EnsureValidCommandDescription(description);
             }
 
             _descriptionLocalizations = new Dictionary<string, string>(descriptionLocalizations);
@@ -301,12 +283,9 @@ namespace Discord
             if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                 throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-            Preconditions.AtLeast(name.Length, 1, nameof(name));
-            Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
-            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(name));
+            EnsureValidCommandName(name);
 
-            _descriptionLocalizations ??= new();
+            _nameLocalizations ??= new();
             _nameLocalizations.Add(locale, name);
 
             return this;
@@ -317,13 +296,34 @@ namespace Discord
             if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                 throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-            Preconditions.AtLeast(description.Length, 1, nameof(description));
-            Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+            EnsureValidCommandDescription(description);
 
             _descriptionLocalizations ??= new();
             _descriptionLocalizations.Add(locale, description);
 
             return this;
+        }
+
+        internal static void EnsureValidCommandName(string name)
+        {
+            Preconditions.NotNullOrEmpty(name, nameof(name));
+            Preconditions.AtLeast(name.Length, 1, nameof(name));
+            Preconditions.AtMost(name.Length, MaxNameLength, nameof(name));
+
+            // Discord updated the docs, this regex prevents special characters like @!$%(... etc,
+            // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
+            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
+                throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(name));
+
+            if (name.Any(x => char.IsUpper(x)))
+                throw new FormatException("Name cannot contain any uppercase characters.");
+        }
+
+        internal static void EnsureValidCommandDescription(string description)
+        {
+            Preconditions.NotNullOrEmpty(description, nameof(description));
+            Preconditions.AtLeast(description.Length, 1, nameof(description));
+            Preconditions.AtMost(description.Length, MaxDescriptionLength, nameof(description));
         }
     }
 
@@ -357,10 +357,7 @@ namespace Discord
             {
                 if (value != null)
                 {
-                    Preconditions.AtLeast(value.Length, 1, nameof(value));
-                    Preconditions.AtMost(value.Length, SlashCommandBuilder.MaxNameLength, nameof(value));
-                    if (!Regex.IsMatch(value, @"^[\w-]{1,32}$"))
-                        throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(value));
+                    EnsureValidCommandOptionName(value);
                 }
 
                 _name = value;
@@ -377,8 +374,7 @@ namespace Discord
             {
                 if (value != null)
                 {
-                    Preconditions.AtLeast(value.Length, 1, nameof(value));
-                    Preconditions.AtMost(value.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(value));
+                    EnsureValidCommandOptionDescription(value);
                 }
 
                 _description = value;
@@ -752,10 +748,7 @@ namespace Discord
                 if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                     throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-                Preconditions.AtLeast(name.Length, 1, nameof(name));
-                Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
-                if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                    throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(name));
+                EnsureValidCommandOptionName(name);
             }
 
             _nameLocalizations = new Dictionary<string, string>(nameLocalizations);
@@ -772,8 +765,7 @@ namespace Discord
                 if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                     throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-                Preconditions.AtLeast(description.Length, 1, nameof(description));
-                Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+                EnsureValidCommandOptionDescription(description);
             }
 
             _descriptionLocalizations = new Dictionary<string, string>(descriptionLocalizations);
@@ -785,10 +777,7 @@ namespace Discord
             if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                 throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-            Preconditions.AtLeast(name.Length, 1, nameof(name));
-            Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
-            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(name));
+            EnsureValidCommandOptionName(name);
 
             _descriptionLocalizations ??= new();
             _nameLocalizations.Add(locale, name);
@@ -801,13 +790,26 @@ namespace Discord
             if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                 throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-            Preconditions.AtLeast(description.Length, 1, nameof(description));
-            Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+            EnsureValidCommandOptionDescription(description);
 
             _descriptionLocalizations ??= new();
             _descriptionLocalizations.Add(locale, description);
 
             return this;
+        }
+
+        private static void EnsureValidCommandOptionName(string name)
+        {
+            Preconditions.AtLeast(name.Length, 1, nameof(name));
+            Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
+            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
+                throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(name));
+        }
+
+        private static void EnsureValidCommandOptionDescription(string description)
+        {
+            Preconditions.AtLeast(description.Length, 1, nameof(description));
+            Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
         }
     }
 }
