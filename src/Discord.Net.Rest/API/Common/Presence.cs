@@ -30,16 +30,24 @@ namespace Discord.API
         [JsonProperty("premium_since")]
         public Optional<DateTimeOffset?> PremiumSince { get; set; }
 
-        ulong IPresenceModel.UserId => User.Id;
+        ulong IPresenceModel.UserId {
+            get => User.Id; set => throw new NotSupportedException();
+        }
 
-        ulong? IPresenceModel.GuildId => GuildId.ToNullable();
+        ulong? IPresenceModel.GuildId {
+            get => GuildId.ToNullable(); set => throw new NotSupportedException();
+        }
 
-        UserStatus IPresenceModel.Status => Status;
+        UserStatus IPresenceModel.Status {
+            get => Status; set => throw new NotSupportedException();
+        }
 
-        ClientType[] IPresenceModel.ActiveClients => ClientStatus.IsSpecified
-            ? ClientStatus.Value.Select(x => (ClientType)Enum.Parse(typeof(ClientType), x.Key, true)).ToArray()
-            : Array.Empty<ClientType>();
+        ClientType[] IPresenceModel.ActiveClients {
+            get => ClientStatus.IsSpecified ? ClientStatus.Value.Select(x => (ClientType)Enum.Parse(typeof(ClientType), x.Key, true)).ToArray() : Array.Empty<ClientType>(); set => throw new NotSupportedException();
+        }
 
-        IActivityModel[] IPresenceModel.Activities => Activities.ToArray();
+        IActivityModel[] IPresenceModel.Activities {
+            get => Activities.ToArray(); set => throw new NotSupportedException();
+        }
     }
 }

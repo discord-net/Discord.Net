@@ -8,16 +8,16 @@ namespace Discord
 {
     public interface IMemberModel
     {
-        IUserModel User { get; }
+        IUserModel User { get; set; }
 
-        string Nickname { get; }
-        string GuildAvatar { get; }
-        ulong[] Roles { get; }
-        DateTimeOffset JoinedAt { get; }
-        DateTimeOffset? PremiumSince { get; }
-        bool IsDeaf { get; }
-        bool IsMute { get; }
-        bool? IsPending { get; }
-        DateTimeOffset? CommunicationsDisabledUntil { get; }
+        string Nickname { get; set; }
+        string GuildAvatar { get; set; }
+        ulong[] Roles { get; set; }
+        DateTimeOffset JoinedAt { get; set; }
+        DateTimeOffset? PremiumSince { get; set; }
+        bool IsDeaf { get; set; }
+        bool IsMute { get; set; }
+        bool? IsPending { get; set; }
+        DateTimeOffset? CommunicationsDisabledUntil { get; set; }
     }
 }

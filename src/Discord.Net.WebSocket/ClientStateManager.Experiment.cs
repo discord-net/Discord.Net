@@ -41,7 +41,10 @@ namespace Discord.WebSocket
 
         #region Global users
         internal void RemoveReferencedGlobalUser(ulong id)
-            => _userReferences.TryRemove(id, out _);
+        {
+            Console.WriteLine("Global user untracked");
+            _userReferences.TryRemove(id, out _);
+        }
 
         private void TrackGlobalUser(ulong id, SocketGlobalUser user)
         {

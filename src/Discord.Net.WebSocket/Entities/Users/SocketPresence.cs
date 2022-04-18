@@ -116,6 +116,45 @@ namespace Discord.WebSocket
             public ulong? GuildId { get; set; }
         }
 
+        private struct ActivityCacheModel : IActivityModel
+        {
+            public string Id { get; set; }
+            public string Url { get; set; }
+            public string Name { get; set; }
+            public ActivityType Type { get; set; }
+            public string Details { get; set; }
+            public string State { get; set; }
+            public ActivityProperties Flags { get; set; }
+            public DateTimeOffset CreatedAt { get; set; }
+            public IEmojiModel Emoji { get; set; }
+            public ulong? ApplicationId { get; set; }
+            public string SyncId { get; set; }
+            public string SessionId { get; set; }
+            public string LargeImage { get; set; }
+            public string LargeText { get; set; }
+            public string SmallImage { get; set; }
+            public string SmallText { get; set; }
+            public string PartyId { get; set; }
+            public long[] PartySize { get; set; }
+            public string JoinSecret { get; set; }
+            public string SpectateSecret { get; set; }
+            public string MatchSecret { get; set; }
+            public DateTimeOffset? TimestampStart { get; set; }
+            public DateTimeOffset? TimestampEnd { get; set; }
+        }
+
+        private struct EmojiCacheModel : IEmojiModel
+        {
+            public ulong? Id { get; set; }
+            public string Name { get; set; }
+            public ulong[] Roles { get; set; }
+            public bool RequireColons { get; set; }
+            public bool IsManaged { get; set; }
+            public bool IsAnimated { get; set; }
+            public bool IsAvailable { get; set; }
+            public ulong? CreatorId { get; set; }
+        }
+
         internal Model ToModel()
         {
             return new CacheModel
@@ -132,18 +171,18 @@ namespace Discord.WebSocket
                             switch (game)
                             {
                                 case RichGame richGame:
-                                    return richGame.ToModel<WritableActivityModel>();
+                                    return richGame.ToModel<ActivityCacheModel>();
                                 case SpotifyGame spotify:
-                                    return spotify.ToModel<WritableActivityModel>();
+                                    return spotify.ToModel<ActivityCacheModel>();
                                 case CustomStatusGame custom:
-                                    return custom.ToModel<WritableActivityModel, WritableEmojiModel>();
+                                    return custom.ToModel<ActivityCacheModel, EmojiCacheModel>();
                                 case StreamingGame stream:
-                                    return stream.ToModel<WritableActivityModel>();
+                                    return stream.ToModel<ActivityCacheModel>();
                             }
                             break;
                     }
 
-                    return new WritableActivityModel
+                    return new ActivityCacheModel
                     {
                         Name = x.Name,
                         Details = x.Details,

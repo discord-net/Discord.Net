@@ -25,18 +25,46 @@ namespace Discord.API
         public Optional<UserProperties> PublicFlags { get; set; }
 
         // ICurrentUserModel
-        bool? ICurrentUserModel.IsVerified => Verified.ToNullable();
+        bool? ICurrentUserModel.IsVerified
+        {
+            get => Verified.ToNullable();
+            set => throw new NotSupportedException();
+        }
 
-        string ICurrentUserModel.Email => Email.GetValueOrDefault();
+        string ICurrentUserModel.Email
+        {
+            get => Email.GetValueOrDefault();
+            set => throw new NotSupportedException();
+        }
 
-        bool? ICurrentUserModel.IsMfaEnabled => MfaEnabled.ToNullable();
+        bool? ICurrentUserModel.IsMfaEnabled
+        {
+            get => MfaEnabled.ToNullable();
+            set => throw new NotSupportedException();
+        }
 
-        UserProperties ICurrentUserModel.Flags => Flags.GetValueOrDefault();
+        UserProperties ICurrentUserModel.Flags
+        {
+            get => Flags.GetValueOrDefault();
+            set => throw new NotSupportedException();
+        }
 
-        PremiumType ICurrentUserModel.PremiumType => PremiumType.GetValueOrDefault();
+        PremiumType ICurrentUserModel.PremiumType
+        {
+            get => PremiumType.GetValueOrDefault();
+            set => throw new NotSupportedException();
+        }
 
-        string ICurrentUserModel.Locale => Locale.GetValueOrDefault();
+        string ICurrentUserModel.Locale
+        {
+            get => Locale.GetValueOrDefault();
+            set => throw new NotSupportedException();
+        }
 
-        UserProperties ICurrentUserModel.PublicFlags => PublicFlags.GetValueOrDefault();
+        UserProperties ICurrentUserModel.PublicFlags
+        {
+            get => PublicFlags.GetValueOrDefault();
+            set => throw new NotSupportedException();
+        }
     }
 }

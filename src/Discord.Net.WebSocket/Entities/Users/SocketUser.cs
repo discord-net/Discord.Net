@@ -15,7 +15,7 @@ namespace Discord.WebSocket
     ///     Represents a WebSocket-based user.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public abstract class SocketUser : SocketEntity<ulong>, IUser, ICached<Model>
+    public abstract class SocketUser : SocketEntity<ulong>, IUser, ICached<Model>, IDisposable
     {
         /// <inheritdoc />
         public abstract bool IsBot { get; internal set; }
@@ -41,9 +41,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public UserStatus Status => Presence.Value.Status;
         /// <inheritdoc />
-        public IReadOnlyCollection<ClientType> ActiveClients => Presence.Value.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
+        public IReadOnlyCollection<ClientType> ActiveClients => Presence.Value?.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
         /// <inheritdoc />
-        public IReadOnlyCollection<IActivity> Activities => Presence.Value.Activities ?? ImmutableList<IActivity>.Empty;
+        public IReadOnlyCollection<IActivity> Activities => Presence.Value?.Activities ?? ImmutableList<IActivity>.Empty;
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>
@@ -59,7 +59,7 @@ namespace Discord.WebSocket
         }
         internal virtual bool Update(ClientStateManager state, Model model)
         {
-            Presence ??= new Lazy<SocketPresence>(() => state.GetPresence(Id), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
+            Presence ??= new Lazy<SocketPresence>(() => state.GetPresence(Id), System.Threading.LazyThreadSafetyMode.PublicationOnly);
             bool hasChanges = false;
             if (model.Avatar != AvatarId)
             {
@@ -117,6 +117,8 @@ namespace Discord.WebSocket
         ///     The full name of the user.
         /// </returns>
         public override string ToString() => Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode);
+        ~SocketUser() => GlobalUser?.Dispose();
+        public void Dispose() => GlobalUser?.Dispose();
         private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode)} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
 

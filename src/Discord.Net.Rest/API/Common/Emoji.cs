@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System;
 
 namespace Discord.API
 {
@@ -21,20 +22,52 @@ namespace Discord.API
         [JsonProperty("user")]
         public Optional<User> User { get; set; }
 
-        ulong? IEmojiModel.Id => Id;
+        ulong? IEmojiModel.Id
+        {
+            get => Id;
+            set => throw new NotSupportedException();
+        }
 
-        string IEmojiModel.Name => Name;
+        string IEmojiModel.Name
+        {
+            get => Name;
+            set => throw new NotSupportedException();
+        }
 
-        ulong[] IEmojiModel.Roles => Roles;
+        ulong[] IEmojiModel.Roles
+        {
+            get => Roles;
+            set => throw new NotSupportedException();
+        }
 
-        bool IEmojiModel.RequireColons => RequireColons;
+        bool IEmojiModel.RequireColons
+        {
+            get => RequireColons;
+            set => throw new NotSupportedException();
+        }
 
-        bool IEmojiModel.IsManaged => Managed;
+        bool IEmojiModel.IsManaged
+        {
+            get => Managed;
+            set => throw new NotSupportedException();
+        }
 
-        bool IEmojiModel.IsAnimated => Animated.GetValueOrDefault();
+        bool IEmojiModel.IsAnimated
+        {
+            get => Animated.GetValueOrDefault();
+            set => throw new NotSupportedException();
+        }
 
-        bool IEmojiModel.IsAvailable => Available.GetValueOrDefault();
+        bool IEmojiModel.IsAvailable
+        {
+            get => Available.GetValueOrDefault();
+            set => throw new NotSupportedException();
+        }
 
-        ulong? IEmojiModel.CreatorId => User.GetValueOrDefault()?.Id;
+        ulong? IEmojiModel.CreatorId
+        {
+            get => User.GetValueOrDefault()?.Id;
+            set => throw new NotSupportedException();
+        }
     }
 }

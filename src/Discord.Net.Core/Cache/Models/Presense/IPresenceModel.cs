@@ -8,10 +8,10 @@ namespace Discord
 {
     public interface IPresenceModel
     {
-        ulong UserId { get; }
-        ulong? GuildId { get; }
-        UserStatus Status { get; }
-        ClientType[] ActiveClients { get; }
-        IActivityModel[] Activities { get; }
+        ulong UserId { get; set; }
+        ulong? GuildId { get; set; }
+        UserStatus Status { get; set; }
+        ClientType[] ActiveClients { get; set; }
+        IActivityModel[] Activities { get; set; }
     }
 }

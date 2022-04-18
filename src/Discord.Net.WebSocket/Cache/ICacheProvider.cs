@@ -29,7 +29,7 @@ namespace Discord.WebSocket
         #region Presence
 
         ValueTask<IPresenceModel> GetPresenceAsync(ulong userId, CacheRunMode runmode);
-        ValueTask AddOrUpdatePresenseAsync(ulong userId, IPresenceModel presense, CacheRunMode runmode);
+        ValueTask AddOrUpdatePresenseAsync(ulong userId, IPresenceModel model, CacheRunMode runmode);
         ValueTask RemovePresenseAsync(ulong userId, CacheRunMode runmode);
 
         #endregion

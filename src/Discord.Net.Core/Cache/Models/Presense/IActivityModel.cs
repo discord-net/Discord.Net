@@ -8,81 +8,41 @@ namespace Discord
 {
     public interface IActivityModel
     {
-        string Id { get; }
-        string Url { get; }
-        string Name { get; }
-        ActivityType Type { get; }
-        string Details { get; }
-        string State { get; }
-        ActivityProperties Flags { get; }
-        DateTimeOffset CreatedAt { get; }
-        IEmojiModel Emoji { get; }
-        ulong? ApplicationId { get; }
-        string SyncId { get; }
-        string SessionId { get; }
+        string Id { get; set; }
+        string Url { get; set; }
+        string Name { get; set; }
+        ActivityType Type { get; set; }
+        string Details { get; set; }
+        string State { get; set; }
+        ActivityProperties Flags { get; set; }
+        DateTimeOffset CreatedAt { get; set; }
+        IEmojiModel Emoji { get; set; }
+        ulong? ApplicationId { get; set; }
+        string SyncId { get; set; }
+        string SessionId { get; set; }
 
 
         #region Assets
-        string LargeImage { get; }
-        string LargeText { get; }
-        string SmallImage { get; }
-        string SmallText { get; }
+        string LargeImage { get; set; }
+        string LargeText { get; set; }
+        string SmallImage { get; set; }
+        string SmallText { get; set; }
         #endregion
 
         #region Party
-        string PartyId { get; }
-        long[] PartySize { get; }
+        string PartyId { get; set; }
+        long[] PartySize { get; set; }
         #endregion
 
         #region Secrets
-        string JoinSecret { get; }
-        string SpectateSecret { get; }
-        string MatchSecret { get; }
+        string JoinSecret { get; set; }
+        string SpectateSecret { get; set; }
+        string MatchSecret { get; set; }
         #endregion
 
         #region Timestamps
-        DateTimeOffset? TimestampStart { get; }
-        DateTimeOffset? TimestampEnd { get; }
-        #endregion
-    }
-
-    internal class WritableActivityModel : IActivityModel
-    {
-        public string Id { get; set; }
-        public string Url { get; set; }
-        public string Name { get; set; }
-        public ActivityType Type { get; set; }
-        public string Details { get; set; }
-        public string State { get; set; }
-        public ActivityProperties Flags { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public IEmojiModel Emoji { get; set; }
-        public ulong? ApplicationId { get; set; }
-        public string SyncId { get; set; }
-        public string SessionId { get; set; }
-
-
-        #region Assets
-        public string LargeImage { get; set; }
-        public string LargeText { get; set; }
-        public string SmallImage { get; set; }
-        public string SmallText { get; set; }
-        #endregion
-
-        #region Party
-        public string PartyId { get; set; }
-        public long[] PartySize { get; set; }
-        #endregion
-
-        #region Secrets
-        public string JoinSecret { get; set; }
-        public string SpectateSecret { get; set; }
-        public string MatchSecret { get; set; }
-        #endregion
-
-        #region Timestamps
-        public DateTimeOffset? TimestampStart { get; set; }
-        public DateTimeOffset? TimestampEnd { get; set; }
+        DateTimeOffset? TimestampStart { get; set; }
+        DateTimeOffset? TimestampEnd { get; set; }
         #endregion
     }
 }

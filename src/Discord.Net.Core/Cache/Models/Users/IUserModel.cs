@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IUserModel : IEntity<ulong>
+    public interface IUserModel
     {
-        string Username { get; }
-        string Discriminator { get; }
-        bool? IsBot { get; }
-        string Avatar { get; }
+        ulong Id { get; set; }
+        string Username { get; set; }
+        string Discriminator { get; set; }
+        bool? IsBot { get; set; }
+        string Avatar { get; set; }
     }
 }

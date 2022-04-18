@@ -27,24 +27,44 @@ namespace Discord.API
         public Optional<DateTimeOffset?> TimedOutUntil { get; set; }
 
         // IMemberModel
-        string IMemberModel.Nickname => Nick.GetValueOrDefault();
+        string IMemberModel.Nickname {
+            get => Nick.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        string IMemberModel.GuildAvatar => Avatar.GetValueOrDefault();
+        string IMemberModel.GuildAvatar {
+            get => Avatar.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        ulong[] IMemberModel.Roles => Roles.GetValueOrDefault(Array.Empty<ulong>());
+        ulong[] IMemberModel.Roles {
+            get => Roles.GetValueOrDefault(Array.Empty<ulong>()); set => throw new NotSupportedException();
+        }
 
-        DateTimeOffset IMemberModel.JoinedAt => JoinedAt.GetValueOrDefault();
+        DateTimeOffset IMemberModel.JoinedAt {
+            get => JoinedAt.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        DateTimeOffset? IMemberModel.PremiumSince =>  PremiumSince.GetValueOrDefault();
+        DateTimeOffset? IMemberModel.PremiumSince {
+            get => PremiumSince.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        bool IMemberModel.IsDeaf => Deaf.GetValueOrDefault(false);
+        bool IMemberModel.IsDeaf {
+            get => Deaf.GetValueOrDefault(false); set => throw new NotSupportedException();
+        }
 
-        bool IMemberModel.IsMute => Mute.GetValueOrDefault(false);
+        bool IMemberModel.IsMute {
+            get => Mute.GetValueOrDefault(false); set => throw new NotSupportedException();
+        }
 
-        bool? IMemberModel.IsPending => Pending.ToNullable();
+        bool? IMemberModel.IsPending {
+            get => Pending.ToNullable(); set => throw new NotSupportedException();
+        }
 
-        DateTimeOffset? IMemberModel.CommunicationsDisabledUntil => TimedOutUntil.GetValueOrDefault();
+        DateTimeOffset? IMemberModel.CommunicationsDisabledUntil {
+            get => TimedOutUntil.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        IUserModel IMemberModel.User => User;
+        IUserModel IMemberModel.User {
+            get => User; set => throw new NotSupportedException();
+        }
     }
 }

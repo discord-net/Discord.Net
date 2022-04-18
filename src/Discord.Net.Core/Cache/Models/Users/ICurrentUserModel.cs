@@ -8,12 +8,12 @@ namespace Discord
 {
     public interface ICurrentUserModel : IUserModel
     {
-        bool? IsVerified { get; }
-        string Email { get; }
-        bool? IsMfaEnabled { get; }
-        UserProperties Flags { get; }
-        PremiumType PremiumType { get; }
-        string Locale { get; }
-        UserProperties PublicFlags { get; }
+        bool? IsVerified { get; set; }
+        string Email { get; set; }
+        bool? IsMfaEnabled { get; set; }
+        UserProperties Flags { get; set; }
+        PremiumType PremiumType { get; set; }
+        string Locale { get; set; }
+        UserProperties PublicFlags { get; set; }
     }
 }

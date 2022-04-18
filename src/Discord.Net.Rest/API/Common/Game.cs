@@ -42,50 +42,96 @@ namespace Discord.API
         [JsonProperty("created_at")]
         public Optional<long> CreatedAt { get; set; }
 
-        string IActivityModel.Id => Id.GetValueOrDefault();
+        string IActivityModel.Id {
+            get => Id.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.Url => StreamUrl.GetValueOrDefault();
+        string IActivityModel.Url {
+            get => StreamUrl.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.State => State.GetValueOrDefault();
+        string IActivityModel.State {
+            get => State.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        IEmojiModel IActivityModel.Emoji => Emoji.GetValueOrDefault();
+        IEmojiModel IActivityModel.Emoji {
+            get => Emoji.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.Name => Name;
+        string IActivityModel.Name {
+            get => Name; set => throw new NotSupportedException();
+        }
 
-        ActivityType IActivityModel.Type => Type.GetValueOrDefault().GetValueOrDefault();
+        ActivityType IActivityModel.Type {
+            get => Type.GetValueOrDefault().GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        ActivityProperties IActivityModel.Flags => Flags.GetValueOrDefault();
+        ActivityProperties IActivityModel.Flags {
+            get => Flags.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.Details => Details.GetValueOrDefault();
-        DateTimeOffset IActivityModel.CreatedAt => DateTimeOffset.FromUnixTimeMilliseconds(CreatedAt.GetValueOrDefault());
+        string IActivityModel.Details {
+            get => Details.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
+        DateTimeOffset IActivityModel.CreatedAt {
+            get => DateTimeOffset.FromUnixTimeMilliseconds(CreatedAt.GetValueOrDefault()); set => throw new NotSupportedException();
+        }
 
-        ulong? IActivityModel.ApplicationId => ApplicationId.ToNullable();
+        ulong? IActivityModel.ApplicationId {
+            get => ApplicationId.ToNullable(); set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.SyncId => SyncId.GetValueOrDefault();
+        string IActivityModel.SyncId {
+            get => SyncId.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.SessionId => SessionId.GetValueOrDefault();
+        string IActivityModel.SessionId {
+            get => SessionId.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.LargeImage => Assets.GetValueOrDefault()?.LargeImage.GetValueOrDefault();
+        string IActivityModel.LargeImage {
+            get => Assets.GetValueOrDefault()?.LargeImage.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.LargeText => Assets.GetValueOrDefault()?.LargeText.GetValueOrDefault();
+        string IActivityModel.LargeText {
+            get => Assets.GetValueOrDefault()?.LargeText.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.SmallImage => Assets.GetValueOrDefault()?.SmallImage.GetValueOrDefault();
+        string IActivityModel.SmallImage {
+            get => Assets.GetValueOrDefault()?.SmallImage.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.SmallText => Assets.GetValueOrDefault()?.SmallText.GetValueOrDefault();
+        string IActivityModel.SmallText {
+            get => Assets.GetValueOrDefault()?.SmallText.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.PartyId => Party.GetValueOrDefault()?.Id;
+        string IActivityModel.PartyId {
+            get => Party.GetValueOrDefault()?.Id; set => throw new NotSupportedException();
+        }
 
-        long[] IActivityModel.PartySize => Party.GetValueOrDefault()?.Size;
+        long[] IActivityModel.PartySize {
+            get => Party.GetValueOrDefault()?.Size; set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.JoinSecret => Secrets.GetValueOrDefault()?.Join;
+        string IActivityModel.JoinSecret {
+            get => Secrets.GetValueOrDefault()?.Join; set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.SpectateSecret => Secrets.GetValueOrDefault()?.Spectate;
+        string IActivityModel.SpectateSecret {
+            get => Secrets.GetValueOrDefault()?.Spectate; set => throw new NotSupportedException();
+        }
 
-        string IActivityModel.MatchSecret => Secrets.GetValueOrDefault()?.Match;
+        string IActivityModel.MatchSecret {
+            get => Secrets.GetValueOrDefault()?.Match; set => throw new NotSupportedException();
+        }
 
-        DateTimeOffset? IActivityModel.TimestampStart => Timestamps.GetValueOrDefault()?.Start.ToNullable();
+        DateTimeOffset? IActivityModel.TimestampStart {
+            get => Timestamps.GetValueOrDefault()?.Start.ToNullable(); set => throw new NotSupportedException();
+        }
 
-        DateTimeOffset? IActivityModel.TimestampEnd => Timestamps.GetValueOrDefault()?.End.ToNullable();
+        DateTimeOffset? IActivityModel.TimestampEnd {
+            get => Timestamps.GetValueOrDefault()?.End.ToNullable(); set => throw new NotSupportedException();
+        }
 
 
 

@@ -8,27 +8,14 @@ namespace Discord
 {
     public interface IEmojiModel
     {
-        ulong? Id { get; }
-        string Name { get; }
-        ulong[] Roles { get; }
-        bool RequireColons { get; }
-        bool IsManaged { get; }
-        bool IsAnimated { get; }
-        bool IsAvailable { get; }
+        ulong? Id { get; set; }
+        string Name { get; set; }
+        ulong[] Roles { get; set; }
+        bool RequireColons { get; set; }
+        bool IsManaged { get; set; }
+        bool IsAnimated { get; set; }
+        bool IsAvailable { get; set; }
 
-        ulong? CreatorId { get; }
-    }
-
-    internal class WritableEmojiModel : IEmojiModel
-    {
-        public ulong? Id { get; set; }
-        public string Name { get; set; }
-        public ulong[] Roles { get; set; }
-        public bool RequireColons { get; set; }
-        public bool IsManaged { get; set; }
-        public bool IsAnimated { get; set; }
-        public bool IsAvailable { get; set; }
-
-        public ulong? CreatorId { get; set; }
+        ulong? CreatorId { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace Discord
 {
     internal static class CacheableEntityExtensions
     {
-        public static IActivityModel ToModel<TModel>(this RichGame richGame) where TModel : WritableActivityModel, new()
+        public static IActivityModel ToModel<TModel>(this RichGame richGame) where TModel : IActivityModel, new()
         {
             return new TModel()
             {
@@ -34,7 +34,7 @@ namespace Discord
             };
         }
 
-        public static IActivityModel ToModel<TModel>(this SpotifyGame spotify) where TModel : WritableActivityModel, new()
+        public static IActivityModel ToModel<TModel>(this SpotifyGame spotify) where TModel : IActivityModel, new()
         {
             return new TModel()
             {
@@ -53,11 +53,12 @@ namespace Discord
         }
 
         public static IActivityModel ToModel<TModel, TEmoteModel>(this CustomStatusGame custom)
-            where TModel : WritableActivityModel, new()
-            where TEmoteModel : WritableEmojiModel, new()
+            where TModel : IActivityModel, new()
+            where TEmoteModel : IEmojiModel, new()
         {
             return new TModel
             {
+                Id = "custom",
                 Type = ActivityType.CustomStatus,
                 Name = custom.Name,
                 State = custom.State,
@@ -66,7 +67,7 @@ namespace Discord
             };
         }
 
-        public static IActivityModel ToModel<TModel>(this StreamingGame stream) where TModel : WritableActivityModel, new()
+        public static IActivityModel ToModel<TModel>(this StreamingGame stream) where TModel : IActivityModel, new()
         {
             return new TModel
             {
@@ -77,8 +78,11 @@ namespace Discord
             };
         }
 
-        public static IEmojiModel ToModel<TModel>(this IEmote emote) where TModel : WritableEmojiModel, new()
+        public static IEmojiModel ToModel<TModel>(this IEmote emote) where TModel : IEmojiModel, new()
         {
+            if (emote == null)
+                return null;
+
             var model = new TModel()
             {
                 Name = emote.Name

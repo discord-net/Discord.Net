@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System;
 
 namespace Discord.API
 {
@@ -21,14 +22,31 @@ namespace Discord.API
 
 
         // IUserModel
-        string IUserModel.Username => Username.GetValueOrDefault();
+        string IUserModel.Username
+        {
+            get => Username.GetValueOrDefault();
+            set => throw new NotSupportedException();
+        }
 
-        string IUserModel.Discriminator => Discriminator.GetValueOrDefault();
+        string IUserModel.Discriminator {
+            get => Discriminator.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        bool? IUserModel.IsBot => Bot.ToNullable();
+        bool? IUserModel.IsBot
+        {
+            get => Bot.ToNullable();
+            set => throw new NotSupportedException();
+        }
 
-        string IUserModel.Avatar => Avatar.GetValueOrDefault();
+        string IUserModel.Avatar
+        {
+            get => Avatar.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
 
-        ulong IEntity<ulong>.Id => Id;
+        ulong IUserModel.Id
+        {
+            get => Id;
+            set => throw new NotSupportedException();
+    }
     }
 }
