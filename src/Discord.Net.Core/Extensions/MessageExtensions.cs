@@ -93,9 +93,29 @@ namespace Discord
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        public static async Task<IUserMessage> ReplyAsync(this IUserMessage msg, string text = null, bool isTTS = false, Embed embed = null, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null)
+        public static Task<IUserMessage> ReplyAsync(this IUserMessage msg, string text = null, bool isTTS = false, Embed embed = null, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null)
         {
-            return await msg.Channel.SendMessageAsync(text, isTTS, embed, options, allowedMentions, new MessageReference(messageId: msg.Id), components, stickers, embeds).ConfigureAwait(false);
+            return msg.Channel.SendMessageAsync(text, isTTS, embed, options, allowedMentions, new MessageReference(messageId: msg.Id), components, stickers, embeds);
+        }
+
+        /// <summary>
+        ///     Sends an inline reply that references a message.
+        /// </summary>
+        /// <remarks>
+        ///     Any feild set with the <see cref="MessageBuilder.WithMessageReference(IMessage)"/> will be
+        ///     overwritten by this function.
+        /// </remarks>
+        /// <param name="msg">The message that is being replied on.</param>
+        /// <param name="message">The <see cref="Message"/> created from a <see cref="MessageBuilder"/>.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents an asynchronous send operation for delivering the message. The task result
+        ///     contains the sent message.
+        /// </returns>
+        public static Task<IUserMessage> ReplyAsync(this IUserMessage msg, Message message, RequestOptions options = null)
+        {
+            message.MessageReference = new MessageReference(messageId: msg.Id);
+            return msg.Channel.SendMessageAsync(message, options);
         }
     }
 }

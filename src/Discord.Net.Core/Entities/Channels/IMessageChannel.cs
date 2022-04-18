@@ -38,6 +38,16 @@ namespace Discord
         /// </returns>
         Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
         /// <summary>
+        ///     Sends a message to this message channel.
+        /// </summary>
+        /// <param name="message">The <see cref="Message"/> created from a <see cref="MessageBuilder"/>.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents an asynchronous send operation for delivering the message. The task result
+        ///     contains the sent message.
+        /// </returns>
+        Task<IUserMessage> SendMessageAsync(Message message, RequestOptions options = null);
+        /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <example>
