@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 
 namespace Discord.Interactions
 {
-    internal class JsonLocalizationManager : ILocalizationManager
+    /// <summary>
+    ///     The default localization provider for Json resource files.
+    /// </summary>
+    public sealed class JsonLocalizationManager : ILocalizationManager
     {
         private const string NameIdentifier = "name";
         private const string DescriptionIdentifier = "description";
@@ -17,15 +20,22 @@ namespace Discord.Interactions
         private readonly string _fileName;
         private readonly Regex _localeParserRegex = new Regex(@"\w+.(?<locale>\w{2}(?:-\w{2})?).json", RegexOptions.Compiled | RegexOptions.Singleline);
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JsonLocalizationManager"/> class.
+        /// </summary>
+        /// <param name="basePath">Base path of the Json file.</param>
+        /// <param name="fileName">Name of the Json file.</param>
         public JsonLocalizationManager(string basePath, string fileName)
         {
             _basePath = basePath;
             _fileName = fileName;
         }
 
+        /// <inheritdoc />
         public IDictionary<string, string> GetAllDescriptions(IList<string> key, LocalizationTarget destinationType) =>
             GetValues(key, DescriptionIdentifier);
 
+        /// <inheritdoc />
         public IDictionary<string, string> GetAllNames(IList<string> key, LocalizationTarget destinationType) =>
             GetValues(key, NameIdentifier);
 

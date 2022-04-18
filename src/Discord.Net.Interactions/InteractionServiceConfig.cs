@@ -65,6 +65,9 @@ namespace Discord.Interactions
         /// </summary>
         public bool ExitOnMissingModalField { get; set; } = false;
 
+        /// <summary>
+        ///     Localization provider to be used when registering application commands.
+        /// </summary>
         public ILocalizationManager LocalizationManager { get; set; }
     }
 

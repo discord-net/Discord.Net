@@ -205,22 +205,22 @@ namespace Discord.Interactions
                     Description = command.Description,
                     IsDefaultPermission = command.IsDefaultPermission,
                     Options = command.Options?.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified,
-                    NameLocalizations = command.NameLocalizations?.ToImmutableDictionary(),
-                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary(),
+                    NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
+                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                 },
                 ApplicationCommandType.User => new UserCommandProperties
                 {
                     Name = command.Name,
                     IsDefaultPermission = command.IsDefaultPermission,
-                    NameLocalizations = command.NameLocalizations?.ToImmutableDictionary(),
-                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary()
+                    NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
+                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty
                 },
                 ApplicationCommandType.Message => new MessageCommandProperties
                 {
                     Name = command.Name,
                     IsDefaultPermission = command.IsDefaultPermission,
-                    NameLocalizations = command.NameLocalizations?.ToImmutableDictionary(),
-                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary()
+                    NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
+                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty
                 },
                 _ => throw new InvalidOperationException($"Cannot create command properties for command type {command.Type}"),
             };

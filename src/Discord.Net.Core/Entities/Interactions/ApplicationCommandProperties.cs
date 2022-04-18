@@ -20,9 +20,9 @@ namespace Discord
         /// </summary>
         public Optional<bool> IsDefaultPermission { get; set; }
 
-        public Optional<IDictionary<string, string>> NameLocalizations { get; set; }
+        public IDictionary<string, string>? NameLocalizations { get; set; }
 
-        public Optional<IDictionary<string, string>> DescriptionLocalizations { get; set; }
+        public IDictionary<string, string>? DescriptionLocalizations { get; set; }
 
         internal ApplicationCommandProperties() { }
     }
