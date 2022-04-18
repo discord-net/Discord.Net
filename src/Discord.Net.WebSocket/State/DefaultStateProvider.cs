@@ -45,14 +45,6 @@ namespace Discord.WebSocket
             });
         }
 
-        private TResult WaitSynchronouslyForTask<TResult>(Task<TResult> t)
-        {
-            var sw = new SpinWait();
-            while (!t.IsCompleted)
-                sw.SpinOnce();
-            return t.GetAwaiter().GetResult();
-        }
-
         private TType ValidateAsSocketEntity<TType>(ISnowflakeEntity entity) where TType : SocketEntity<ulong>
         {
             if(entity is not TType val)
@@ -62,7 +54,6 @@ namespace Discord.WebSocket
 
         private StateBehavior ResolveBehavior(StateBehavior behavior)
             => behavior == StateBehavior.Default ? _defaultBehavior : behavior;
-
 
         public ValueTask AddOrUpdateMemberAsync(ulong guildId, IGuildUser user)
         {
@@ -96,7 +87,7 @@ namespace Discord.WebSocket
                 }
                 else
                 {
-                    return new ValueTask<IGuildUser>(Task.Run(async () =>
+                    return new ValueTask<IGuildUser>(Task.Run(async () => // review: task.run here?
                     {
                         var result = await memberLookupTask;
 
@@ -143,6 +134,9 @@ namespace Discord.WebSocket
                     }));
                 }
             }
+
+            if (behavior == StateBehavior.AllowDownload || behavior == StateBehavior.DownloadOnly)
+                return new ValueTask<IEnumerable<IGuildUser>>(_client.Rest.GetGuildUsersAsync(guildId, options).ContinueWith(x => x.Result.Cast<IGuildUser>()));
 
             return default;
         }
@@ -227,16 +221,18 @@ namespace Discord.WebSocket
                     return new ValueTask<IPresence>(SocketPresence.Create(fetchTask.Result));
                 else
                 {
-                    return new ValueTask<IPresence>(fetchTask.AsTask().ContinueWith(x =>
+                    return new ValueTask<IPresence>(Task.Run(async () =>
                     {
-                        if (x.Result != null)
-                            return (IPresence)SocketPresence.Create(x.Result);
+                        var result = await fetchTask;
+
+                        if(result != null)
+                            return (IPresence)SocketPresence.Create(result);
                         return null;
                     }));
                 }
             }
 
-            // theres no rest call to download presence so return null
+            // no download path
             return new ValueTask<IPresence>((IPresence)null);
         }
 
