@@ -25,11 +25,11 @@ namespace Discord.Interactions
             _supportedLocales = supportedLocales;
         }
 
-        public Task<IDictionary<string, string>> GetAllDescriptionsAsync(IList<string> key, LocalizationTarget destinationType) =>
-            Task.FromResult(GetValues(key, DescriptionIdentifier));
+        public IDictionary<string, string> GetAllDescriptions(IList<string> key, LocalizationTarget destinationType) =>
+            GetValues(key, DescriptionIdentifier);
 
-        public Task<IDictionary<string, string>> GetAllNamesAsync(IList<string> key, LocalizationTarget destinationType) =>
-            Task.FromResult(GetValues(key, NameIdentifier));
+        public IDictionary<string, string> GetAllNames(IList<string> key, LocalizationTarget destinationType) =>
+            GetValues(key, NameIdentifier);
 
         private IDictionary<string, string> GetValues(IList<string> key, string identifier)
         {

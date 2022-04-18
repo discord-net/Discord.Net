@@ -23,16 +23,16 @@ namespace Discord.Interactions
             _fileName = fileName;
         }
 
-        public Task<IDictionary<string, string>> GetAllDescriptionsAsync(IList<string> key, LocalizationTarget destinationType) =>
-            GetValuesAsync(key, DescriptionIdentifier);
+        public IDictionary<string, string> GetAllDescriptions(IList<string> key, LocalizationTarget destinationType) =>
+            GetValues(key, DescriptionIdentifier);
 
-        public Task<IDictionary<string, string>> GetAllNamesAsync(IList<string> key, LocalizationTarget destinationType) =>
-            GetValuesAsync(key, NameIdentifier);
+        public IDictionary<string, string> GetAllNames(IList<string> key, LocalizationTarget destinationType) =>
+            GetValues(key, NameIdentifier);
 
         private string[] GetAllFiles() =>
             Directory.GetFiles(_basePath, $"{_fileName}.*.json", SearchOption.TopDirectoryOnly);
 
-        private async Task<IDictionary<string, string>> GetValuesAsync(IList<string> key, string identifier)
+        private IDictionary<string, string> GetValues(IList<string> key, string identifier)
         {
             var result = new Dictionary<string, string>();
             var files = GetAllFiles();
@@ -47,7 +47,7 @@ namespace Discord.Interactions
 
                 using var sr = new StreamReader(file);
                 using var jr = new JsonTextReader(sr);
-                var obj = await JObject.LoadAsync(jr);
+                var obj = JObject.Load(jr);
                 var token = string.Join(".", key) + $".{identifier}";
                 var value = (string)obj.SelectToken(token);
                 if (value is not null)

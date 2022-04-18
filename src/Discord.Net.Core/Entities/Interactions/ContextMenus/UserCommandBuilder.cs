@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+
 namespace Discord
 {
     /// <summary>
@@ -5,7 +10,7 @@ namespace Discord
     /// </summary>
     public class UserCommandBuilder
     {
-        /// <summary> 
+        /// <summary>
         ///     Returns the maximum length a commands name allowed by Discord.
         /// </summary>
         public const int MaxNameLength = 32;
@@ -31,7 +36,10 @@ namespace Discord
         /// </summary>
         public bool IsDefaultPermission { get; set; } = true;
 
+        public IReadOnlyDictionary<string, string> NameLocalizations => _nameLocalizations;
+
         private string _name;
+        private Dictionary<string, string> _nameLocalizations;
 
         /// <summary>
         ///     Build the current builder into a <see cref="UserCommandProperties"/> class.
@@ -70,6 +78,51 @@ namespace Discord
         {
             IsDefaultPermission = isDefaultPermission;
             return this;
+        }
+
+        public UserCommandBuilder WithNameLocalizations(IDictionary<string, string> nameLocalizations)
+        {
+            if (nameLocalizations is null)
+                throw new ArgumentNullException(nameof(nameLocalizations));
+
+            foreach (var (locale, name) in nameLocalizations)
+            {
+                if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                    throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+                EnsureValidCommandName(name);
+            }
+
+            _nameLocalizations = new Dictionary<string, string>(nameLocalizations);
+            return this;
+        }
+
+        public UserCommandBuilder AddNameLocalization(string locale, string name)
+        {
+            if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+            EnsureValidCommandName(name);
+
+            _nameLocalizations ??= new();
+            _nameLocalizations.Add(locale, name);
+
+            return this;
+        }
+
+        internal static void EnsureValidCommandName(string name)
+        {
+            Preconditions.NotNullOrEmpty(name, nameof(name));
+            Preconditions.AtLeast(name.Length, 1, nameof(name));
+            Preconditions.AtMost(name.Length, MaxNameLength, nameof(name));
+
+            // Discord updated the docs, this regex prevents special characters like @!$%(... etc,
+            // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
+            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
+                throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(name));
+
+            if (name.Any(x => char.IsUpper(x)))
+                throw new FormatException("Name cannot contain any uppercase characters.");
         }
     }
 }
