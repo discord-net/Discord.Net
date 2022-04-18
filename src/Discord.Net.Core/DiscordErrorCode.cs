@@ -97,7 +97,7 @@ namespace Discord
         #endregion
 
         #region General Request Errors (40XXX)
-        MaximumNumberOfPinnedThreadsInAForumChannelHasBeenReached = 30047,
+        MaximumNumberOfPinnedThreadsInAForumChannelReached = 30047,
         MaximumNumberOfTagsInAForumChannelReached = 30048,
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
