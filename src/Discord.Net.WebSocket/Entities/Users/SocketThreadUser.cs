@@ -147,6 +147,17 @@ namespace Discord.WebSocket
             return entity;
         }
 
+        internal static SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, SocketGuildUser owner)
+        {
+            // this is used for creating the owner of the thread.
+            var entity = new SocketThreadUser(guild, thread, owner, owner.Id);
+            entity.Update(new Model
+            {
+                JoinTimestamp = thread.CreatedAt,
+            });
+            return entity;
+        }
+
         internal void Update(Model model)
         {
             ThreadJoinedAt = model.JoinTimestamp;

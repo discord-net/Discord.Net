@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Threading.Tasks;
 namespace Discord.Interactions
@@ -47,21 +48,38 @@ namespace Discord.Interactions
 
             try
             {
-                var args = new List<object>();
+                var args = new object[Parameters.Count];
+                var captureCount = additionalArgs?.Length ?? 0;
 
-                if (additionalArgs is not null)
-                    args.AddRange(additionalArgs);
+                for(var i = 0; i < Parameters.Count; i++)
+                {
+                    var parameter = Parameters.ElementAt(i);
 
-                var modal = Modal.CreateModal(modalInteraction, Module.CommandService._exitOnMissingModalField);
-                args.Add(modal);
+                    if(i < captureCount)
+                    {
+                        var readResult = await parameter.TypeReader.ReadAsync(context, additionalArgs[i], services).ConfigureAwait(false);
+                        if (!readResult.IsSuccess)
+                            return await InvokeEventAndReturn(context, readResult).ConfigureAwait(false);
 
-                return await RunAsync(context, args.ToArray(), services);
+                        args[i] = readResult.Value;
+                    }
+                    else
+                    {
+                        var modalResult = await Modal.CreateModalAsync(context, services, Module.CommandService._exitOnMissingModalField).ConfigureAwait(false);
+                        if (!modalResult.IsSuccess)
+                            return await InvokeEventAndReturn(context, modalResult).ConfigureAwait(false);
+
+                        if (modalResult is not ParseResult parseResult)
+                            return await InvokeEventAndReturn(context, ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command parameter parsing failed for an unknown reason."));
+
+                        args[i] = parseResult.Value;
+                    }
+                }
+                return await RunAsync(context, args, services);
             }
             catch (Exception ex)
             {
-                var result = ExecuteResult.FromError(ex);
-                await InvokeModuleEvent(context, result).ConfigureAwait(false);
-                return result;
+                return await InvokeEventAndReturn(context, ExecuteResult.FromError(ex)).ConfigureAwait(false);
             }
         }
 

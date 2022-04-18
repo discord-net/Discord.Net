@@ -142,12 +142,54 @@ namespace Discord.Rest
         #endregion
 
         #region Bans
-        public static async Task<IReadOnlyCollection<RestBan>> GetBansAsync(IGuild guild, BaseDiscordClient client,
-            RequestOptions options)
+        public static IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(IGuild guild, BaseDiscordClient client,
+            ulong? fromUserId, Direction dir, int limit, RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildBansAsync(guild.Id, options).ConfigureAwait(false);
-            return models.Select(x => RestBan.Create(client, x)).ToImmutableArray();
+            if (dir == Direction.Around && limit > DiscordConfig.MaxBansPerBatch)
+            {
+                int around = limit / 2;
+                if (fromUserId.HasValue)
+                    return GetBansAsync(guild, client, fromUserId.Value + 1, Direction.Before, around + 1, options)
+                        .Concat(GetBansAsync(guild, client, fromUserId.Value, Direction.After, around, options));
+                else 
+                    return GetBansAsync(guild, client, null, Direction.Before, around + 1, options);
+            }
+
+            return new PagedAsyncEnumerable<RestBan>(
+                DiscordConfig.MaxBansPerBatch,
+                async (info, ct) =>
+                {
+                    var args = new GetGuildBansParams
+                    {
+                        RelativeDirection = dir,
+                        Limit = info.PageSize
+                    };
+                    if (info.Position != null)
+                        args.RelativeUserId = info.Position.Value;
+
+                    var models = await client.ApiClient.GetGuildBansAsync(guild.Id, args, options).ConfigureAwait(false);
+                    var builder = ImmutableArray.CreateBuilder<RestBan>();
+
+                    foreach (var model in models)
+                        builder.Add(RestBan.Create(client, model));
+
+                    return builder.ToImmutable();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
+                        return false;
+                    if (dir == Direction.Before)
+                        info.Position = lastPage.Min(x => x.User.Id);
+                    else
+                        info.Position = lastPage.Max(x => x.User.Id);
+                    return true;
+                },
+                start: fromUserId,
+                count: limit
+                );
         }
+
         public static async Task<RestBan> GetBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, RequestOptions options)
         {
             var model = await client.ApiClient.GetGuildBanAsync(guild.Id, userId, options).ConfigureAwait(false);
@@ -305,19 +347,15 @@ namespace Discord.Rest
         #endregion
 
         #region Integrations
-        public static async Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client,
+        public static async Task<IReadOnlyCollection<RestIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildIntegrationsAsync(guild.Id, options).ConfigureAwait(false);
-            return models.Select(x => RestGuildIntegration.Create(client, guild, x)).ToImmutableArray();
+            var models = await client.ApiClient.GetIntegrationsAsync(guild.Id, options).ConfigureAwait(false);
+            return models.Select(x => RestIntegration.Create(client, guild, x)).ToImmutableArray();
         }
-        public static async Task<RestGuildIntegration> CreateIntegrationAsync(IGuild guild, BaseDiscordClient client,
-            ulong id, string type, RequestOptions options)
-        {
-            var args = new CreateGuildIntegrationParams(id, type);
-            var model = await client.ApiClient.CreateGuildIntegrationAsync(guild.Id, args, options).ConfigureAwait(false);
-            return RestGuildIntegration.Create(client, guild, model);
-        }
+        public static async Task DeleteIntegrationAsync(IGuild guild, BaseDiscordClient client, ulong id,
+            RequestOptions options) =>
+                await client.ApiClient.DeleteIntegrationAsync(guild.Id, id, options).ConfigureAwait(false);
         #endregion
 
         #region Interactions
@@ -799,7 +837,12 @@ namespace Discord.Rest
                 PrivacyLevel = args.PrivacyLevel,
                 StartTime = args.StartTime,
                 Status = args.Status,
-                Type = args.Type
+                Type = args.Type,
+                Image = args.CoverImage.IsSpecified
+                    ? args.CoverImage.Value.HasValue
+                        ? args.CoverImage.Value.Value.ToModel()
+                        : null
+                    : Optional<ImageModel?>.Unspecified
             };
 
             if(args.Location.IsSpecified)
@@ -839,6 +882,7 @@ namespace Discord.Rest
             DateTimeOffset? endTime = null,
             ulong? channelId = null,
             string location = null,
+            Image? bannerImage = null,
             RequestOptions options = null)
         {
             if(location != null)
@@ -864,6 +908,7 @@ namespace Discord.Rest
             if (endTime != null && endTime <= startTime)
                 throw new ArgumentOutOfRangeException(nameof(endTime), $"{nameof(endTime)} cannot be before the start time");
 
+            
             var apiArgs = new CreateGuildScheduledEventParams()
             {
                 ChannelId = channelId ?? Optional<ulong>.Unspecified,
@@ -872,7 +917,8 @@ namespace Discord.Rest
                 Name = name,
                 PrivacyLevel = privacyLevel,
                 StartTime = startTime,
-                Type = type
+                Type = type,
+                Image = bannerImage.HasValue ? bannerImage.Value.ToModel() : Optional<ImageModel>.Unspecified
             };
 
             if(location != null)

@@ -208,6 +208,18 @@ namespace Discord
         public static string GetStickerUrl(ulong stickerId, StickerFormatType format = StickerFormatType.Png)
             => $"{DiscordConfig.CDNUrl}stickers/{stickerId}.{FormatToExtension(format)}";
 
+        /// <summary>
+        ///     Returns an events cover image url.
+        /// </summary>
+        /// <param name="guildId">The guild id that the event is in.</param>
+        /// <param name="eventId">The id of the event.</param>
+        /// <param name="assetId">The id of the cover image asset.</param>
+        /// <param name="format">The format of the image.</param>
+        /// <param name="size">The size of the image.</param>
+        /// <returns></returns>
+        public static string GetEventCoverImageUrl(ulong guildId, ulong eventId, string assetId, ImageFormat format = ImageFormat.Auto, ushort size = 1024)
+            => $"{DiscordConfig.CDNUrl}guild-events/{guildId}/{eventId}/{assetId}.{FormatToExtension(format, assetId)}?size={size}";
+
         private static string FormatToExtension(StickerFormatType format)
         {
             return format switch

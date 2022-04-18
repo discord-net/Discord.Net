@@ -25,5 +25,7 @@ namespace Discord.API.Rest
         public Optional<string> Description { get; set; }
         [JsonProperty("entity_type")]
         public GuildScheduledEventType Type { get; set; }
+        [JsonProperty("image")]
+        public Optional<Image> Image { get; set; }
     }
 }

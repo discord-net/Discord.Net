@@ -76,3 +76,11 @@ body:
         ```
     validations:
       required: false
+  - type: textarea
+    id: packages
+    attributes: 
+      label: Packages
+      description: Please list all 3rd party packages in use if applicable, including their versions.
+      placeholder: Discord.Addons.Hosting V5.1.0, Discord.InteractivityAddon V2.4.0, etc.
+    validations:
+      required: true

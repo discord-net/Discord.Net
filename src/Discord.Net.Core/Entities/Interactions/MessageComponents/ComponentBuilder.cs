@@ -613,6 +613,9 @@ namespace Discord
             if (!(string.IsNullOrEmpty(Url) ^ string.IsNullOrEmpty(CustomId)))
                 throw new InvalidOperationException("A button must contain either a URL or a CustomId, but not both!");
 
+            if (Style == 0)
+                throw new ArgumentException("A button must have a style.", nameof(Style));
+
             if (Style == ButtonStyle.Link)
             {
                 if (string.IsNullOrEmpty(Url))

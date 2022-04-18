@@ -78,6 +78,7 @@ namespace Discord.WebSocket
         internal bool AlwaysDownloadDefaultStickers { get; private set; }
         internal bool AlwaysResolveStickers { get; private set; }
         internal bool LogGatewayIntentWarnings { get; private set; }
+        internal bool SuppressUnknownDispatchWarnings { get; private set; }
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -150,6 +151,7 @@ namespace Discord.WebSocket
             AlwaysDownloadDefaultStickers = config.AlwaysDownloadDefaultStickers;
             AlwaysResolveStickers = config.AlwaysResolveStickers;
             LogGatewayIntentWarnings = config.LogGatewayIntentWarnings;
+            SuppressUnknownDispatchWarnings = config.SuppressUnknownDispatchWarnings;
             HandlerTimeout = config.HandlerTimeout;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
@@ -543,7 +545,7 @@ namespace Discord.WebSocket
             if(model == null)
                 return null;
 
-            
+
             if (model.GuildId.IsSpecified)
             {
                 var guild = State.GetGuild(model.GuildId.Value);
@@ -1309,7 +1311,7 @@ namespace Discord.WebSocket
                                         else
                                         {
                                             user = guild.AddOrUpdateUser(data);
-                                            var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(user, user.Id, true, () => null);
+                                            var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(null, user.Id, false, () => null);
                                             await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), cacheableBefore, user).ConfigureAwait(false);
                                         }
                                     }
@@ -2015,6 +2017,92 @@ namespace Discord.WebSocket
                                 break;
                             #endregion
 
+                            #region Integrations
+                            case "INTEGRATION_CREATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (INTEGRATION_CREATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<Integration>(_serializer);
+
+                                    // Integrations from Gateway should always have guild IDs specified.
+                                    if (!data.GuildId.IsSpecified)
+                                        return;
+
+                                    var guild = State.GetGuild(data.GuildId.Value);
+
+                                    if (guild != null)
+                                    {
+                                        if (!guild.IsSynced)
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+
+                                        await TimedInvokeAsync(_integrationCreated, nameof(IntegrationCreated), RestIntegration.Create(this, guild, data)).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
+                            case "INTEGRATION_UPDATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (INTEGRATION_UPDATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<Integration>(_serializer);
+
+                                    // Integrations from Gateway should always have guild IDs specified.
+                                    if (!data.GuildId.IsSpecified)
+                                        return;
+
+                                    var guild = State.GetGuild(data.GuildId.Value);
+
+                                    if (guild != null)
+                                    {
+                                        if (!guild.IsSynced)
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+
+                                        await TimedInvokeAsync(_integrationUpdated, nameof(IntegrationUpdated), RestIntegration.Create(this, guild, data)).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
+                            case "INTEGRATION_DELETE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (INTEGRATION_DELETE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<IntegrationDeletedEvent>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    if (guild != null)
+                                    {
+                                        if (!guild.IsSynced)
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+
+                                        await TimedInvokeAsync(_integrationDeleted, nameof(IntegrationDeleted), guild, data.Id, data.ApplicationID).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
+                            #endregion
+
                             #region Users
                             case "USER_UPDATE":
                                 {
@@ -2128,7 +2216,7 @@ namespace Discord.WebSocket
                                             {
                                                 await TimedInvokeAsync(_speakerRemoved, nameof(SpeakerRemoved), stage, guildUser);
                                             }
-                                        }    
+                                        }
                                     }
 
                                     await TimedInvokeAsync(_userVoiceStateUpdatedEvent, nameof(UserVoiceStateUpdated), user, before, after).ConfigureAwait(false);
@@ -2243,7 +2331,7 @@ namespace Discord.WebSocket
 
                                     SocketUser user = data.User.IsSpecified
                                         ? State.GetOrAddUser(data.User.Value.Id, (_) => SocketGlobalUser.Create(this, State, data.User.Value))
-                                        : guild.AddOrUpdateUser(data.Member.Value);
+                                        : guild?.AddOrUpdateUser(data.Member.Value); // null if the bot scope isn't set, so the guild cannot be retrieved.
 
                                     SocketChannel channel = null;
                                     if(data.ChannelId.IsSpecified)
@@ -2258,8 +2346,12 @@ namespace Discord.WebSocket
                                             }
                                             else
                                             {
-                                                await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
-                                                return;
+                                                if (guild != null) // The guild id is set, but the guild cannot be found as the bot scope is not set.
+                                                {
+                                                    await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
+                                                    return;
+                                                }
+                                                // The channel isnt required when responding to an interaction, so we can leave the channel null.
                                             }
                                         }
                                     }
@@ -2520,7 +2612,7 @@ namespace Discord.WebSocket
                                 }
 
                                 break;
-                            case "THREAD_MEMBERS_UPDATE": 
+                            case "THREAD_MEMBERS_UPDATE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_MEMBERS_UPDATE)").ConfigureAwait(false);
 
@@ -2771,7 +2863,7 @@ namespace Discord.WebSocket
 
                             #region Others
                             default:
-                                await _gatewayLogger.WarningAsync($"Unknown Dispatch ({type})").ConfigureAwait(false);
+                                if(!SuppressUnknownDispatchWarnings) await _gatewayLogger.WarningAsync($"Unknown Dispatch ({type})").ConfigureAwait(false);
                                 break;
                                 #endregion
                         }
@@ -3113,7 +3205,14 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         async Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => mode == CacheMode.AllowDownload ? await GetUserAsync(id, options).ConfigureAwait(false) : GetUser(id);
+        {
+            var user = GetUser(id);
+            if (user is not null || mode == CacheMode.CacheOnly)
+                return user;
+
+            return await Rest.GetUserAsync(id, options).ConfigureAwait(false);
+        }
+
         /// <inheritdoc />
         Task<IUser> IDiscordClient.GetUserAsync(string username, string discriminator, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(username, discriminator));

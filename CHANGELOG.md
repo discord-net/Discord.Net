@@ -1,5 +1,68 @@
 # Changelog
 
+## [3.5.0] - 2022-04-05
+
+### Added
+- #2204 Added config option for bidirectional formatting of usernames (e38104b)
+- #2210 Add a way to remove type readers from the interaction/command service. (7339945)
+- #2213 Add global interaction post execution event. (a744948)
+- #2223 Add ban pagination support (d8757a5)
+- #2201 Add missing interface methods to IComponentInteraction (741ed80)
+- #2226 Add an action delegate parameter to `RespondWithModalAsync<T>()` for modifying the modal (d2118f0)
+- #2227 Add RespondWithModal methods to RestInteractinModuleBase (1c680db)
+
+### Fixed
+- #2168 Fix Integration model from GuildIntegration and added INTEGRATION gateway events (305d7f9)
+- #2187 Fix modal response failing (d656722)
+- #2188 Fix serialization error on thread creation timestamp. (d48a7bd)
+- #2209 Fix GuildPermissions.All not including newer permissions (91d8fab)
+- #2219 Fix ShardedClients not pushing PresenceUpdates (c4131cf)
+- #2225 Fix GuildMemberUpdated cacheable `before` entity being incorrect (bfd0d9b)
+- #2217 Fix gateway interactions not running without bot scope. (8522447)
+
+### Misc
+- #2193 Update GuildMemberUpdated comment regarding presence (82473bc)
+- #2206 Fixed typo (c286b99)
+- #2216 Fix small typo in modal example (0439437)
+- #2228 Correct minor typo (d1cf1bf)
+
+## [3.4.1] - 2022-03-9
+
+### Added
+- #2169 Component TypeConverters and CustomID TypeReaders (fb4250b)
+- #2180 Attachment description and content type (765c0c5)
+- #2162 Add configuration toggle to suppress Unknown dispatch warnings (1ba96d6)
+- #2178 Add 10065 Error code (cc6918d)
+
+### Fixed
+- #2179 Logging out sharded client throws (24b7bb5)
+- #2182 Thread owner always returns null (25aaa49)
+- #2165 Fix error with flag params when uploading files. (a5d3add)
+- #2181 Fix ambiguous reference for creating roles (f8ec3c7)
+
+## [3.4.0] - 2022-3-2
+
+### Added
+- #2146 Add FromDateTimeOffset in TimestampTag (553055b)
+- #2062 Add return statement to precondition handling (3e52fab)
+- #2131 Add support for sending Message Flags (1fb62de)
+- #2137 Add self_video to VoiceState (8bcd3da)
+- #2151 Add Image property to Guild Scheduled Events (1dc473c)
+- #2152 Add missing json error codes (202554f)
+- #2153 Add IsInvitable and CreatedAt to threads (6bf5818)
+- #2155 Add Interaction Service Complex Parameters (9ba64f6)
+- #2156 Add Display name support for enum type converter (c800674)
+
+### Fixed
+- #2117 Fix stream access exception when ratelimited (a1cfa41)
+- #2128 Fix context menu comand message type (f601e9b)
+- #2135 Fix NRE when ratelimmited requests don't return a body (b95b942)
+- #2154 Fix usage of CacheMode.AllowDownload in channels (b3370c3)
+
+### Misc
+- #2149 Clarify Users property on SocketGuildChannel (5594739)
+- #2157 Enforce valid button styles (507a18d)
+
 ## [3.3.2] - 2022-02-16
 
 ### Fixed

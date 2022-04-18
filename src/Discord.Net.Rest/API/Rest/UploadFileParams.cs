@@ -51,7 +51,7 @@ namespace Discord.API.Rest
             if (Stickers.IsSpecified)
                 payload["sticker_ids"] = Stickers.Value;
             if (Flags.IsSpecified)
-                payload["flags"] = Flags;
+                payload["flags"] = Flags.Value;
 
             List<object> attachments = new();
 

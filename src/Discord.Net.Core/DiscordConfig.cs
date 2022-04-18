@@ -97,6 +97,13 @@ namespace Discord
         /// </returns>
         public const int MaxUsersPerBatch = 1000;
         /// <summary>
+        ///     Returns the max bans allowed to be in a request.
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of bans that can be gotten per-batch.
+        /// </returns>
+        public const int MaxBansPerBatch = 1000;
+        /// <summary>
         ///     Returns the max users allowed to be in a request for guild event users.
         /// </summary>
         /// <returns>
@@ -187,5 +194,15 @@ namespace Discord
         ///     <b>This will still require a stable clock on your system.</b>
         /// </remarks>
         public bool UseInteractionSnowflakeDate { get; set; } = true;
+
+        /// <summary>
+        ///     Gets or sets if the Rest/Socket user <see cref="object.ToString"/> override formats the string in respect to bidirectional unicode.
+        /// </summary>
+        /// <remarks>
+        ///     By default, the returned value will be "?Discord?#1234", to work with bidirectional usernames.
+        ///     <br/>
+        ///     If set to <see langword="false"/>, this value will be "Discord#1234".
+        /// </remarks>
+        public bool FormatUsersInBidirectionalUnicode { get; set; } = true;
     }
 }

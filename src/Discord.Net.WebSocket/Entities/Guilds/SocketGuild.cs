@@ -372,7 +372,7 @@ namespace Discord.WebSocket
         ///     This field is based off of caching alone, since there is no events returned on the guild model.
         /// </remarks>
         /// <returns>
-        ///     A read-only collection of guild events found within this guild. 
+        ///     A read-only collection of guild events found within this guild.
         /// </returns>
         public IReadOnlyCollection<SocketGuildEvent> Events => _events.ToReadOnlyCollection();
 
@@ -621,17 +621,19 @@ namespace Discord.WebSocket
         #endregion
 
         #region Bans
-        /// <summary>
-        ///     Gets a collection of all users banned in this guild.
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
-        ///     ban objects that this guild currently possesses, with each object containing the user banned and reason
-        ///     behind the ban.
-        /// </returns>
-        public Task<IReadOnlyCollection<RestBan>> GetBansAsync(RequestOptions options = null)
-            => GuildHelper.GetBansAsync(this, Discord, options);
+
+        /// <inheritdoc cref="IGuild.GetBansAsync(int, RequestOptions)" />
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, null, Direction.Before, limit, options);
+
+        /// <inheritdoc cref="IGuild.GetBansAsync(ulong, Direction, int, RequestOptions)" />
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, fromUserId, dir, limit, options);
+
+        /// <inheritdoc cref="IGuild.GetBansAsync(IUser, Direction, int, RequestOptions)" />
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, fromUser.Id, dir, limit, options);
+
         /// <summary>
         ///     Gets a ban object for a banned user.
         /// </summary>
@@ -847,10 +849,10 @@ namespace Discord.WebSocket
         #endregion
 
         #region Integrations
-        public Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null)
+        public Task<IReadOnlyCollection<RestIntegration>> GetIntegrationsAsync(RequestOptions options = null)
             => GuildHelper.GetIntegrationsAsync(this, Discord, options);
-        public Task<RestGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null)
-            => GuildHelper.CreateIntegrationAsync(this, Discord, id, type, options);
+        public Task DeleteIntegrationAsync(ulong id, RequestOptions options = null)
+            => GuildHelper.DeleteIntegrationAsync(this, Discord, id, options);
         #endregion
 
         #region Interactions
@@ -999,10 +1001,6 @@ namespace Discord.WebSocket
             return null;
         }
 
-        /// <inheritdoc />
-        public Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
-            bool isHoisted = false, RequestOptions options = null)
-            => GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, false, options);
         /// <summary>
         ///     Creates a new role with the provided name.
         /// </summary>
@@ -1295,6 +1293,7 @@ namespace Discord.WebSocket
         /// </param>
         /// <param name="speakers">A collection of speakers for the event.</param>
         /// <param name="location">The location of the event; links are supported</param>
+        /// <param name="coverImage">The optional banner image for the event.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous create operation.
@@ -1308,6 +1307,7 @@ namespace Discord.WebSocket
             DateTimeOffset? endTime = null,
             ulong? channelId = null,
             string location = null,
+            Image? coverImage = null,
             RequestOptions options = null)
         {
             // requirements taken from https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-permissions-requirements
@@ -1324,7 +1324,7 @@ namespace Discord.WebSocket
                     break;
             }
 
-            return GuildHelper.CreateGuildEventAsync(Discord, this, name, privacyLevel, startTime, type, description, endTime, channelId, location, options);
+            return GuildHelper.CreateGuildEventAsync(Discord, this, name, privacyLevel, startTime, type, description, endTime, channelId, location, coverImage, options);
         }
 
 
@@ -1781,7 +1781,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         ulong? IGuild.AFKChannelId => AFKChannelId;
         /// <inheritdoc />
-        IAudioClient IGuild.AudioClient => null;
+        IAudioClient IGuild.AudioClient => AudioClient;
         /// <inheritdoc />
         bool IGuild.Available => true;
         /// <inheritdoc />
@@ -1803,8 +1803,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IReadOnlyCollection<ICustomSticker> IGuild.Stickers => Stickers;
         /// <inheritdoc />
-        async Task<IGuildScheduledEvent> IGuild.CreateEventAsync(string name, DateTimeOffset startTime, GuildScheduledEventType type, GuildScheduledEventPrivacyLevel privacyLevel, string description, DateTimeOffset? endTime, ulong? channelId, string location, RequestOptions options)
-            => await CreateEventAsync(name, startTime, type, privacyLevel, description, endTime, channelId, location, options).ConfigureAwait(false);
+        async Task<IGuildScheduledEvent> IGuild.CreateEventAsync(string name, DateTimeOffset startTime, GuildScheduledEventType type, GuildScheduledEventPrivacyLevel privacyLevel, string description, DateTimeOffset? endTime, ulong? channelId, string location, Image? coverImage, RequestOptions options)
+            => await CreateEventAsync(name, startTime, type, privacyLevel, description, endTime, channelId, location, coverImage, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<IGuildScheduledEvent> IGuild.GetEventAsync(ulong id, RequestOptions options)
             => await GetEventAsync(id, options).ConfigureAwait(false);
@@ -1812,8 +1812,14 @@ namespace Discord.WebSocket
         async Task<IReadOnlyCollection<IGuildScheduledEvent>> IGuild.GetEventsAsync(RequestOptions options)
             => await GetEventsAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
-            => await GetBansAsync(options).ConfigureAwait(false);
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(int limit, RequestOptions options)
+            => GetBansAsync(limit, options);
+        /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(ulong fromUserId, Direction dir, int limit, RequestOptions options)
+            => GetBansAsync(fromUserId, dir, limit, options);
+        /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(IUser fromUser, Direction dir, int limit, RequestOptions options)
+            => GetBansAsync(fromUser, dir, limit, options);
         /// <inheritdoc/>
         async Task<IBan> IGuild.GetBanAsync(IUser user, RequestOptions options)
             => await GetBanAsync(user, options).ConfigureAwait(false);
@@ -1890,11 +1896,11 @@ namespace Discord.WebSocket
             => await GetVoiceRegionsAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IGuildIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)
+        async Task<IReadOnlyCollection<IIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)
             => await GetIntegrationsAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IGuildIntegration> IGuild.CreateIntegrationAsync(ulong id, string type, RequestOptions options)
-            => await CreateIntegrationAsync(id, type, options).ConfigureAwait(false);
+        async Task IGuild.DeleteIntegrationAsync(ulong id, RequestOptions options)
+            => await DeleteIntegrationAsync(id, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuild.GetInvitesAsync(RequestOptions options)
@@ -1926,8 +1932,15 @@ namespace Discord.WebSocket
         async Task<IGuildUser> IGuild.AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func, RequestOptions options)
             => await AddGuildUserAsync(userId, accessToken, func, options);
         /// <inheritdoc />
-        Task<IGuildUser> IGuild.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => Task.FromResult<IGuildUser>(GetUser(id));
+        async Task<IGuildUser> IGuild.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            var user = GetUser(id);
+            if (user is not null || mode == CacheMode.CacheOnly)
+                return user;
+
+            return await GuildHelper.GetUserAsync(this, Discord, id, options).ConfigureAwait(false);
+        }
+
         /// <inheritdoc />
         Task<IGuildUser> IGuild.GetCurrentUserAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(CurrentUser);
