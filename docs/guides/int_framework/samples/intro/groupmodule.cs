@@ -15,7 +15,7 @@ public class CommandGroupModule : InteractionModuleBase<SocketInteractionContext
         //This command will look like
         //  group-name subcommand-group-name echo
         [SlashCommand("echo", "Echo an input")]
-        public async Task PongSubcommand(string input)
+        public async Task EchoSubcommand(string input)
             => await RespondAsync(input);
     }
 }
