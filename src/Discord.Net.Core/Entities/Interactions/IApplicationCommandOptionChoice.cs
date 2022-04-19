@@ -17,8 +17,17 @@ namespace Discord
         /// </summary>
         object Value { get; }
 
+        /// <summary>
+        ///     Gets the localization dictionary for the name field of this command.
+        /// </summary>
         IReadOnlyDictionary<string, string>? NameLocalizations { get; }
 
+        /// <summary>
+        ///     Gets the localized name of this command.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to true when requesting the command.
+        /// </remarks>
         string? NameLocalized { get; }
     }
 }

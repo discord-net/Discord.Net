@@ -46,6 +46,10 @@ namespace Discord
             }
         }
 
+        /// <summary>
+        ///     Gets or sets the localization dictionary for the name field of this choice.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown when any of the dictionary keys is an invalid locale.</exception>
         public IDictionary<string, string> NameLocalizations
         {
             get => _nameLocalizations;

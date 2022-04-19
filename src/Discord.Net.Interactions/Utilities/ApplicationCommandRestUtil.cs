@@ -10,7 +10,7 @@ namespace Discord.Interactions
         #region Parameters
         public static ApplicationCommandOptionProperties ToApplicationCommandOptionProps(this SlashCommandParameterInfo parameterInfo)
         {
-            var localizationManager = parameterInfo.Command.Module.CommandService._localizationManager;
+            var localizationManager = parameterInfo.Command.Module.CommandService.LocalizationManager;
             var parameterPath = parameterInfo.GetParameterPath();
 
             var props = new ApplicationCommandOptionProperties
@@ -43,7 +43,7 @@ namespace Discord.Interactions
         public static SlashCommandProperties ToApplicationCommandProps(this SlashCommandInfo commandInfo)
         {
             var commandPath = commandInfo.GetCommandPath();
-            var localizationManager = commandInfo.Module.CommandService._localizationManager;
+            var localizationManager = commandInfo.Module.CommandService.LocalizationManager;
 
             var props = new SlashCommandBuilder()
             {
@@ -64,7 +64,7 @@ namespace Discord.Interactions
 
         public static ApplicationCommandOptionProperties ToApplicationCommandOptionProps(this SlashCommandInfo commandInfo)
         {
-            var localizationManager = commandInfo.Module.CommandService._localizationManager;
+            var localizationManager = commandInfo.Module.CommandService.LocalizationManager;
             var commandPath = commandInfo.GetCommandPath();
 
             return new ApplicationCommandOptionProperties
@@ -82,7 +82,7 @@ namespace Discord.Interactions
 
         public static ApplicationCommandProperties ToApplicationCommandProps(this ContextCommandInfo commandInfo)
         {
-            var localizationManager = commandInfo.Module.CommandService._localizationManager;
+            var localizationManager = commandInfo.Module.CommandService.LocalizationManager;
             var commandPath = commandInfo.GetCommandPath();
 
             return commandInfo.CommandType switch
@@ -136,7 +136,7 @@ namespace Discord.Interactions
 
                 options.AddRange(moduleInfo.SubModules?.SelectMany(x => x.ParseSubModule(args, ignoreDontRegister)));
 
-                var localizationManager = moduleInfo.CommandService._localizationManager;
+                var localizationManager = moduleInfo.CommandService.LocalizationManager;
                 var modulePath = moduleInfo.GetModulePath();
 
                 var props = new SlashCommandBuilder
@@ -186,9 +186,9 @@ namespace Discord.Interactions
                     Description = moduleInfo.Description,
                     Type = ApplicationCommandOptionType.SubCommandGroup,
                     Options = options,
-                    NameLocalizations = moduleInfo.CommandService._localizationManager?.GetAllNames(moduleInfo.GetModulePath(), LocalizationTarget.Group)
+                    NameLocalizations = moduleInfo.CommandService.LocalizationManager?.GetAllNames(moduleInfo.GetModulePath(), LocalizationTarget.Group)
                         ?? ImmutableDictionary<string, string>.Empty,
-                    DescriptionLocalizations = moduleInfo.CommandService._localizationManager?.GetAllDescriptions(moduleInfo.GetModulePath(), LocalizationTarget.Group)
+                    DescriptionLocalizations = moduleInfo.CommandService.LocalizationManager?.GetAllDescriptions(moduleInfo.GetModulePath(), LocalizationTarget.Group)
                         ?? ImmutableDictionary<string, string>.Empty,
                 } };
         }

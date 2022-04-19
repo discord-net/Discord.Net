@@ -87,6 +87,10 @@ namespace Discord
         /// </summary>
         public List<ChannelType> ChannelTypes { get; set; }
 
+        /// <summary>
+        ///     Gets or sets the localization dictionary for the name field of this option.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown when any of the dictionary keys is an invalid locale.</exception>
         public IDictionary<string, string> NameLocalizations
         {
             get => _nameLocalizations;
@@ -103,6 +107,10 @@ namespace Discord
             }
         }
 
+        /// <summary>
+        ///     Gets or sets the localization dictionary for the description field of this option.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown when any of the dictionary keys is an invalid locale.</exception>
         public IDictionary<string, string> DescriptionLocalizations
         {
             get => _descriptionLocalizations;
@@ -115,7 +123,7 @@ namespace Discord
 
                     EnsureValidOptionDescription(description);
                 }
-                _nameLocalizations = value;
+                _descriptionLocalizations = value;
             }
         }
 

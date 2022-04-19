@@ -65,8 +65,14 @@ namespace Discord
             }
         }
 
+        /// <summary>
+        ///     Gets the localization dictionary for the name field of this command.
+        /// </summary>
         public IReadOnlyDictionary<string, string> NameLocalizations => _nameLocalizations;
 
+        /// <summary>
+        ///     Gets the localization dictionary for the description field of this command.
+        /// </summary>
         public IReadOnlyDictionary<string, string> DescriptionLocalizations => _descriptionLocalizations;
 
         /// <summary>
@@ -153,6 +159,8 @@ namespace Discord
         /// <param name="isAutocomplete">If this option is set to autocomplete.</param>
         /// <param name="options">The options of the option to add.</param>
         /// <param name="channelTypes">The allowed channel types for this option.</param>
+        /// <param name="nameLocalizations">Localization dictionary for the name field of this command.</param>
+        /// <param name="descriptionLocalizations">Localization dictionary for the description field of this command.</param>
         /// <param name="choices">The choices of this option.</param>
         /// <param name="minValue">The smallest number value the user can input.</param>
         /// <param name="maxValue">The largest number value the user can input.</param>
@@ -244,6 +252,13 @@ namespace Discord
             return this;
         }
 
+        /// <summary>
+        ///     Sets the <see cref="NameLocalizations"/> collection.
+        /// </summary>
+        /// <param name="nameLocalizations">Localization dictionary for the name field of this command.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="nameLocalizations"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>
         public SlashCommandBuilder WithNameLocalizations(IDictionary<string, string> nameLocalizations)
         {
             if (nameLocalizations is null)
@@ -261,6 +276,13 @@ namespace Discord
             return this;
         }
 
+        /// <summary>
+        ///     Sets the <see cref="DescriptionLocalizations"/> collection.
+        /// </summary>
+        /// <param name="descriptionLocalizations">Localization dictionary for the name field of this command.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="descriptionLocalizations"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>
         public SlashCommandBuilder WithDescriptionLocalizations(IDictionary<string, string> descriptionLocalizations)
         {
             if (descriptionLocalizations is null)
@@ -278,6 +300,13 @@ namespace Discord
             return this;
         }
 
+        /// <summary>
+        ///     Adds a new entry to the <see cref="NameLocalizations"/> collection.
+        /// </summary>
+        /// <param name="locale">Locale of the entry.</param>
+        /// <param name="name">Localized string for the name field.</param>
+        /// <returns>The current builder.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="locale"/> is an invalid locale string.</exception>
         public SlashCommandBuilder AddNameLocalization(string locale, string name)
         {
             if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
@@ -291,6 +320,13 @@ namespace Discord
             return this;
         }
 
+        /// <summary>
+        ///     Adds a new entry to the <see cref="Description"/> collection.
+        /// </summary>
+        /// <param name="locale">Locale of the entry.</param>
+        /// <param name="description">Localized string for the description field.</param>
+        /// <returns>The current builder.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="locale"/> is an invalid locale string.</exception>
         public SlashCommandBuilder AddDescriptionLocalization(string locale, string description)
         {
             if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
@@ -426,8 +462,14 @@ namespace Discord
         /// </summary>
         public List<ChannelType> ChannelTypes { get; set; }
 
+        /// <summary>
+        ///     Gets the localization dictionary for the name field of this command.
+        /// </summary>
         public IReadOnlyDictionary<string, string> NameLocalizations => _nameLocalizations;
 
+        /// <summary>
+        ///     Gets the localization dictionary for the description field of this command.
+        /// </summary>
         public IReadOnlyDictionary<string, string> DescriptionLocalizations => _descriptionLocalizations;
 
         /// <summary>
@@ -482,6 +524,8 @@ namespace Discord
         /// <param name="isAutocomplete">If this option supports autocomplete.</param>
         /// <param name="options">The options of the option to add.</param>
         /// <param name="channelTypes">The allowed channel types for this option.</param>
+        /// <param name="nameLocalizations">Localization dictionary for the description field of this command.</param>
+        /// <param name="descriptionLocalizations">Localization dictionary for the description field of this command.</param>
         /// <param name="choices">The choices of this option.</param>
         /// <param name="minValue">The smallest number value the user can input.</param>
         /// <param name="maxValue">The largest number value the user can input.</param>
@@ -556,6 +600,7 @@ namespace Discord
         /// </summary>
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
+        /// <param name="nameLocalizations">Localization dictionary for the description field of this command.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddChoice(string name, int value, IDictionary<string, string> nameLocalizations = null)
         {
@@ -567,6 +612,7 @@ namespace Discord
         /// </summary>
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
+        /// <param name="nameLocalizations">Localization dictionary for the description field of this command.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddChoice(string name, string value, IDictionary<string, string> nameLocalizations = null)
         {
@@ -578,6 +624,7 @@ namespace Discord
         /// </summary>
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
+        /// <param name="nameLocalizations">Localization dictionary for the description field of this command.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddChoice(string name, double value, IDictionary<string, string> nameLocalizations = null)
         {
@@ -589,6 +636,7 @@ namespace Discord
         /// </summary>
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
+        /// <param name="nameLocalizations">Localization dictionary for the description field of this command.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddChoice(string name, float value, IDictionary<string, string> nameLocalizations = null)
         {
@@ -600,6 +648,7 @@ namespace Discord
         /// </summary>
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
+        /// <param name="nameLocalizations">Localization dictionary for the description field of this command.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddChoice(string name, long value, IDictionary<string, string> nameLocalizations = null)
         {

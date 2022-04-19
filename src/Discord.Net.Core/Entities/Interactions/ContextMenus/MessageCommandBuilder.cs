@@ -36,6 +36,9 @@ namespace Discord
         /// </summary>
         public bool IsDefaultPermission { get; set; } = true;
 
+        /// <summary>
+        ///     Gets the localization dictionary for the name field of this command.
+        /// </summary>
         public IReadOnlyDictionary<string, string> NameLocalizations => _nameLocalizations;
 
         private string _name;
@@ -82,6 +85,13 @@ namespace Discord
             return this;
         }
 
+        /// <summary>
+        ///     Sets the <see cref="NameLocalizations"/> collection.
+        /// </summary>
+        /// <param name="nameLocalizations">Localization dictionary for the name field of this command.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="nameLocalizations"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>
         public MessageCommandBuilder WithNameLocalizations(IDictionary<string, string> nameLocalizations)
         {
             if (nameLocalizations is null)
@@ -99,6 +109,13 @@ namespace Discord
             return this;
         }
 
+        /// <summary>
+        ///     Adds a new entry to the <see cref="NameLocalizations"/> collection.
+        /// </summary>
+        /// <param name="locale">Locale of the entry.</param>
+        /// <param name="name">Localized string for the name field.</param>
+        /// <returns>The current builder.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="locale"/> is an invalid locale string.</exception>
         public MessageCommandBuilder AddNameLocalization(string locale, string name)
         {
             if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
@@ -112,7 +129,7 @@ namespace Discord
             return this;
         }
 
-        internal static void EnsureValidCommandName(string name)
+        private static void EnsureValidCommandName(string name)
         {
             Preconditions.NotNullOrEmpty(name, nameof(name));
             Preconditions.AtLeast(name.Length, 1, nameof(name));
