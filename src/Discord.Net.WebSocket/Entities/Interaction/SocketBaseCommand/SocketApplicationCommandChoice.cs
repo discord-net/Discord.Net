@@ -15,8 +15,17 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public object Value { get; private set; }
 
+        /// <summary>
+        ///     Gets the localization dictionary for the name field of this command option choice.
+        /// </summary>
         public IReadOnlyDictionary<string, string>? NameLocalizations { get; private set; }
 
+        /// <summary>
+        ///     Gets the localized name of this command option choice.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to true when requesting the command.
+        /// </remarks>
         public string? NameLocalized { get; private set; }
 
         internal SocketApplicationCommandChoice() { }

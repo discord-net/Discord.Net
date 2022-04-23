@@ -155,6 +155,7 @@ namespace Discord
         /// <summary>
         ///     Gets a collection of all global commands.
         /// </summary>
+        /// <param name="withLocalizations">Whether to include full localization dictionaries in the returned objects, instead of the name localized and description localized fields.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of global

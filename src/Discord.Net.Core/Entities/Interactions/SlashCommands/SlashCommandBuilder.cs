@@ -787,6 +787,13 @@ namespace Discord
             return this;
         }
 
+        /// <summary>
+        ///     Sets the <see cref="NameLocalizations"/> collection.
+        /// </summary>
+        /// <param name="nameLocalizations">Localization dictionary for the name field of this command.</param>
+        /// <returns>The current builder.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="nameLocalizations"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>
         public SlashCommandOptionBuilder WithNameLocalizations(IDictionary<string, string> nameLocalizations)
         {
             if (nameLocalizations is null)
@@ -804,6 +811,13 @@ namespace Discord
             return this;
         }
 
+        /// <summary>
+        ///     Sets the <see cref="DescriptionLocalizations"/> collection.
+        /// </summary>
+        /// <param name="descriptionLocalizations">Localization dictionary for the description field of this command.</param>
+        /// <returns>The current builder.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="nameLocalizations"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>
         public SlashCommandOptionBuilder WithDescriptionLocalizations(IDictionary<string, string> descriptionLocalizations)
         {
             if (descriptionLocalizations is null)
@@ -821,6 +835,13 @@ namespace Discord
             return this;
         }
 
+        /// <summary>
+        ///     Adds a new entry to the <see cref="NameLocalizations"/> collection.
+        /// </summary>
+        /// <param name="locale">Locale of the entry.</param>
+        /// <param name="name">Localized string for the name field.</param>
+        /// <returns>The current builder.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="locale"/> is an invalid locale string.</exception>
         public SlashCommandOptionBuilder AddNameLocalization(string locale, string name)
         {
             if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
@@ -834,6 +855,13 @@ namespace Discord
             return this;
         }
 
+        /// <summary>
+        ///     Adds a new entry to the <see cref="DescriptionLocalizations"/> collection.
+        /// </summary>
+        /// <param name="locale">Locale of the entry.</param>
+        /// <param name="description">Localized string for the description field.</param>
+        /// <returns>The current builder.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="locale"/> is an invalid locale string.</exception>
         public SlashCommandOptionBuilder AddDescriptionLocalization(string locale, string description)
         {
             if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))

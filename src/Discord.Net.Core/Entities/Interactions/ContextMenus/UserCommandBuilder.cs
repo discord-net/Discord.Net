@@ -87,7 +87,7 @@ namespace Discord
         ///     Sets the <see cref="NameLocalizations"/> collection.
         /// </summary>
         /// <param name="nameLocalizations">Localization dictionary for the name field of this command.</param>
-        /// <returns></returns>
+        /// <returns>The current builder.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="nameLocalizations"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>
         public UserCommandBuilder WithNameLocalizations(IDictionary<string, string> nameLocalizations)
