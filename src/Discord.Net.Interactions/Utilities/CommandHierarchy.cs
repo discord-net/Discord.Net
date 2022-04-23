@@ -29,21 +29,21 @@ namespace Discord.Interactions
                 return new string[] { commandInfo.Name };
 
             var path = commandInfo.Module.GetModulePath();
-            path.Insert(0, commandInfo.Name);
+            path.Add(commandInfo.Name);
             return path;
         }
 
         public static IList<string> GetParameterPath(this IParameterInfo parameterInfo)
         {
             var path = parameterInfo.Command.GetCommandPath();
-            path.Insert(0, parameterInfo.Name);
+            path.Add(parameterInfo.Name);
             return path;
         }
 
         public static IList<string> GetChoicePath(this IParameterInfo parameterInfo, ParameterChoice choice)
         {
             var path = parameterInfo.GetParameterPath();
-            path.Insert(0, choice.Name);
+            path.Add(choice.Name);
             return path;
         }
 

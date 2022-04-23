@@ -75,8 +75,8 @@ namespace Discord.API
             Type = cmd.Type;
             Description = cmd.Description;
 
-            NameLocalizations = cmd.NameLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
-            DescriptionLocalizations = cmd.DescriptionLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
+            NameLocalizations = cmd.NameLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
+            DescriptionLocalizations = cmd.DescriptionLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
             NameLocalized = cmd.NameLocalized;
             DescriptionLocalized = cmd.DescriptionLocalized;
         }
@@ -102,6 +102,9 @@ namespace Discord.API
             Type = option.Type;
             Description = option.Description;
             Autocomplete = option.IsAutocomplete;
+
+            NameLocalizations = option.NameLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
+            DescriptionLocalizations = option.DescriptionLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
         }
     }
 }
