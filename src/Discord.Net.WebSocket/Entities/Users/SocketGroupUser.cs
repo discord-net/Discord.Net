@@ -18,38 +18,33 @@ namespace Discord.WebSocket
         ///     A <see cref="SocketGroupChannel" /> representing the channel of which the user belongs to.
         /// </returns>
         public SocketGroupChannel Channel { get; }
-        /// <inheritdoc />
-        internal override SocketGlobalUser GlobalUser { get; set; }
-
-        /// <inheritdoc />
-        public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
-        /// <inheritdoc />
-        public override string Username { get { return GlobalUser.Username; } internal set { GlobalUser.Username = value; } }
-        /// <inheritdoc />
-        public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
-        /// <inheritdoc />
-        public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
-        /// <inheritdoc />
-        internal override Lazy<SocketPresence> Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
 
         /// <inheritdoc />
         public override bool IsWebhook => false;
 
-        internal SocketGroupUser(SocketGroupChannel channel, SocketGlobalUser globalUser)
-            : base(channel.Discord, globalUser.Id)
+        internal SocketGroupUser(SocketGroupChannel channel, ulong userId)
+            : base(channel.Discord, userId)
         {
             Channel = channel;
-            GlobalUser = globalUser;
         }
-        internal static SocketGroupUser Create(SocketGroupChannel channel, ClientStateManager state, Model model)
+        internal static SocketGroupUser Create(SocketGroupChannel channel, Model model)
         {
-            var entity = new SocketGroupUser(channel, channel.Discord.GetOrCreateUser(state, model));
-            entity.Update(state, model);
+            var entity = new SocketGroupUser(channel, model.Id);
+            entity.Update(model);
             return entity;
         }
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Group)";
         internal new SocketGroupUser Clone() => MemberwiseClone() as SocketGroupUser;
+        public override void Dispose()
+        {
+            GC.SuppressFinalize(this);
+
+            if (GlobalUser.IsValueCreated)
+                GlobalUser.Value.Dispose();
+        }
+        ~SocketGroupUser() => Dispose();
+
         #endregion
 
         #region IVoiceState

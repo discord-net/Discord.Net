@@ -18,18 +18,18 @@ namespace Discord.WebSocket
     public abstract class SocketUser : SocketEntity<ulong>, IUser, ICached<Model>, IDisposable
     {
         /// <inheritdoc />
-        public abstract bool IsBot { get; internal set; }
+        public virtual bool IsBot { get; internal set; }
         /// <inheritdoc />
-        public abstract string Username { get; internal set; }
+        public virtual string Username { get; internal set; }
         /// <inheritdoc />
-        public abstract ushort DiscriminatorValue { get; internal set; }
+        public virtual ushort DiscriminatorValue { get; internal set; }
         /// <inheritdoc />
-        public abstract string AvatarId { get; internal set; }
+        public virtual string AvatarId { get; internal set; }
         /// <inheritdoc />
-        public abstract bool IsWebhook { get; }
+        public virtual bool IsWebhook { get; }
         /// <inheritdoc />
         public UserProperties? PublicFlags { get; private set; }
-        internal abstract SocketGlobalUser GlobalUser { get; set; }
+        internal virtual Lazy<SocketGlobalUser> GlobalUser { get; set; }
         internal virtual Lazy<SocketPresence> Presence { get; set; }
 
         /// <inheritdoc />
@@ -57,9 +57,10 @@ namespace Discord.WebSocket
             : base(discord, id)
         {
         }
-        internal virtual bool Update(ClientStateManager state, Model model)
+        internal virtual bool Update(Model model)
         {
-            Presence ??= new Lazy<SocketPresence>(() => state.GetPresence(Id), System.Threading.LazyThreadSafetyMode.PublicationOnly);
+            Presence ??= new Lazy<SocketPresence>(() => Discord.StateManager.GetPresence(Id), System.Threading.LazyThreadSafetyMode.PublicationOnly);
+            GlobalUser ??= new Lazy<SocketGlobalUser>(() => Discord.StateManager.GetUser(Id), System.Threading.LazyThreadSafetyMode.PublicationOnly);
             bool hasChanges = false;
             if (model.Avatar != AvatarId)
             {
@@ -98,6 +99,8 @@ namespace Discord.WebSocket
             return hasChanges;
         }
 
+        public abstract void Dispose();
+
         /// <inheritdoc />
         public async Task<IDMChannel> CreateDMChannelAsync(RequestOptions options = null)
             => await UserHelper.CreateDMChannelAsync(this, Discord, options).ConfigureAwait(false);
@@ -117,8 +120,6 @@ namespace Discord.WebSocket
         ///     The full name of the user.
         /// </returns>
         public override string ToString() => Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode);
-        ~SocketUser() => GlobalUser?.Dispose();
-        public void Dispose() => GlobalUser?.Dispose();
         private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode)} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
 
@@ -136,12 +137,9 @@ namespace Discord.WebSocket
             public ulong Id { get; set; }
         }
 
-        Model ICached<Model>.ToModel()
-            => ToModel();
-
-        internal Model ToModel()
+        internal TModel ToModel<TModel>() where TModel : Model, new()
         {
-            return new CacheModel
+            return new TModel
             {
                 Avatar = AvatarId,
                 Discriminator = Discriminator,
@@ -150,6 +148,17 @@ namespace Discord.WebSocket
                 Username = Username
             };
         }
+
+        internal Model ToModel()
+            => ToModel<CacheModel>();
+
+        Model ICached<Model>.ToModel()
+            => ToModel();
+
+        TResult ICached<Model>.ToModel<TResult>()
+            => ToModel<TResult>();
+
+        void ICached<Model>.Update(Model model) => Update(model);
 
         #endregion
     }

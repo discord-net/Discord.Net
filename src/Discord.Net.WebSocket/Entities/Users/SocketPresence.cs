@@ -114,6 +114,12 @@ namespace Discord.WebSocket
             public ulong UserId { get; set; }
 
             public ulong? GuildId { get; set; }
+
+            ulong IEntityModel<ulong>.Id
+            {
+                get => UserId;
+                set => throw new NotSupportedException();
+            }
         }
 
         private struct ActivityCacheModel : IActivityModel
@@ -156,8 +162,11 @@ namespace Discord.WebSocket
         }
 
         internal Model ToModel()
+            => ToModel<CacheModel>();
+
+        internal TModel ToModel<TModel>() where TModel : Model, new()
         {
-            return new CacheModel
+            return new TModel
             {
                 Status = Status,
                 ActiveClients = ActiveClients.ToArray(),
@@ -194,6 +203,8 @@ namespace Discord.WebSocket
         }
 
         Model ICached<Model>.ToModel() => ToModel();
+        TResult ICached<Model>.ToModel<TResult>() => ToModel<TResult>();
+        void ICached<Model>.Update(Model model) => Update(model);
 
         #endregion
     }

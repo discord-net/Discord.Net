@@ -27,20 +27,20 @@ namespace Discord.WebSocket
         public override bool IsWebhook => false;
         /// <inheritdoc />
         internal override Lazy<SocketPresence> Presence { get { return new Lazy<SocketPresence>(() => new SocketPresence(UserStatus.Offline, null, null)); } set { } }
-        /// <inheritdoc />
-        /// <exception cref="NotSupportedException">This field is not supported for an unknown user.</exception>
-        internal override SocketGlobalUser GlobalUser { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        internal override Lazy<SocketGlobalUser> GlobalUser { get => new Lazy<SocketGlobalUser>(() => null); set { } }
 
         internal SocketUnknownUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static SocketUnknownUser Create(DiscordSocketClient discord, ClientStateManager state, Model model)
+        internal static SocketUnknownUser Create(DiscordSocketClient discord, Model model)
         {
             var entity = new SocketUnknownUser(discord, model.Id);
-            entity.Update(state, model);
+            entity.Update(model);
             return entity;
         }
+
+        public override void Dispose() { }
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Unknown)";
         internal new SocketUnknownUser Clone() => MemberwiseClone() as SocketUnknownUser;

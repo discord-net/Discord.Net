@@ -9,74 +9,74 @@ namespace Discord.WebSocket
 {
     public class DefaultConcurrentCacheProvider : ICacheProvider
     {
-        private readonly ConcurrentDictionary<ulong, IUserModel> _users;
-        private readonly ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, IMemberModel>> _members;
-        private readonly ConcurrentDictionary<ulong, IPresenceModel> _presense; 
+        private readonly ConcurrentDictionary<Type, object> _storeCache = new();
+        private readonly ConcurrentDictionary<object, object> _subStoreCache = new();
 
-        private ValueTask CompletedValueTask => new ValueTask(Task.CompletedTask).Preserve();
+        private class DefaultEntityStore<TModel, TId> : IEntityStore<TModel, TId>
+            where TModel : IEntityModel<TId>
+            where TId : IEquatable<TId>
+        {
+            private ConcurrentDictionary<TId, TModel> _cache;
 
-        public DefaultConcurrentCacheProvider(int defaultConcurrency, int defaultCapacity)
-        {
-            _users = new(defaultConcurrency, defaultCapacity);
-            _members = new(defaultConcurrency, defaultCapacity);
-            _presense = new(defaultConcurrency, defaultCapacity);
+            public DefaultEntityStore(ConcurrentDictionary<TId, TModel> cache)
+            {
+                _cache = cache;
+            }
+
+            public ValueTask AddOrUpdateAsync(TModel model, CacheRunMode runmode)
+            {
+                _cache.AddOrUpdate(model.Id, model, (_, __) => model);
+                return default;
+            }
+
+            public ValueTask AddOrUpdateBatchAsync(IEnumerable<TModel> models, CacheRunMode runmode)
+            {
+                foreach (var model in models)
+                    _cache.AddOrUpdate(model.Id, model, (_, __) => model);
+                return default;
+            }
+
+            public IAsyncEnumerable<TModel> GetAllAsync(CacheRunMode runmode)
+            {
+                var coll = _cache.Select(x => x.Value).GetEnumerator();
+                return AsyncEnumerable.Create((_) => AsyncEnumerator.Create(
+                    () => new ValueTask<bool>(coll.MoveNext()),
+                    () => coll.Current,
+                    () => new ValueTask()));
+            }
+            public ValueTask<TModel> GetAsync(TId id, CacheRunMode runmode)
+            {
+                if (_cache.TryGetValue(id, out var model))
+                    return new ValueTask<TModel>(model);
+                return default;
+            }
+            public ValueTask RemoveAsync(TId id, CacheRunMode runmode)
+            {
+                _cache.TryRemove(id, out _);
+                return default;
+            }
+
+            public ValueTask PurgeAllAsync(CacheRunMode runmode)
+            {
+                _cache.Clear();
+                return default;
+            }
         }
 
-        public ValueTask AddOrUpdateUserAsync(IUserModel model, CacheRunMode mode)
+        public virtual ValueTask<IEntityStore<TModel, TId>> GetStoreAsync<TModel, TId>()
+            where TModel : IEntityModel<TId>
+            where TId : IEquatable<TId>
         {
-            _users.AddOrUpdate(model.Id, model, (_, __) => model);
-            return CompletedValueTask;
-        }
-        public ValueTask AddOrUpdateMemberAsync(IMemberModel model, ulong guildId, CacheRunMode mode)
-        {
-            var guildMemberCache = _members.GetOrAdd(guildId, (_) => new ConcurrentDictionary<ulong, IMemberModel>());
-            guildMemberCache.AddOrUpdate(model.User.Id, model, (_, __) => model);
-            return CompletedValueTask;
-        }
-        public ValueTask<IMemberModel> GetMemberAsync(ulong id, ulong guildId, CacheRunMode mode)
-            => new ValueTask<IMemberModel>(_members.FirstOrDefault(x => x.Key == guildId).Value?.FirstOrDefault(x => x.Key == id).Value);
-
-        public ValueTask<IEnumerable<IMemberModel>> GetMembersAsync(ulong guildId, CacheRunMode mode)
-        {
-            if(_members.TryGetValue(guildId, out var inner))
-                return new ValueTask<IEnumerable<IMemberModel>>(inner.ToArray().Select(x => x.Value)); // ToArray here is important before .Select due to concurrency
-            return new ValueTask<IEnumerable<IMemberModel>>(Array.Empty<IMemberModel>());
-        }
-        public ValueTask<IUserModel> GetUserAsync(ulong id, CacheRunMode mode)
-        {
-            if (_users.TryGetValue(id, out var result))
-                return new ValueTask<IUserModel>(result);
-            return new ValueTask<IUserModel>((IUserModel)null);
-        }
-        public ValueTask<IEnumerable<IUserModel>> GetUsersAsync(CacheRunMode mode)
-            => new ValueTask<IEnumerable<IUserModel>>(_users.ToArray().Select(x => x.Value));
-        public ValueTask RemoveMemberAsync(ulong id, ulong guildId, CacheRunMode mode)
-        {
-            if (_members.TryGetValue(guildId, out var inner))
-                inner.TryRemove(id, out var _);
-            return CompletedValueTask;
-        }
-        public ValueTask RemoveUserAsync(ulong id, CacheRunMode mode)
-        {
-            _members.TryRemove(id, out var _);
-            return CompletedValueTask;
+            var store = _storeCache.GetOrAdd(typeof(TModel), (_) => new DefaultEntityStore<TModel, TId>(new ConcurrentDictionary<TId, TModel>()));
+            return new ValueTask<IEntityStore<TModel, TId>>((IEntityStore<TModel, TId>)store);
         }
 
-        public ValueTask<IPresenceModel> GetPresenceAsync(ulong userId, CacheRunMode runmode)
+        public virtual ValueTask<IEntityStore<TModel, TId>> GetSubStoreAsync<TModel, TId>(TId parentId)
+            where TModel : IEntityModel<TId>
+            where TId : IEquatable<TId>
         {
-            if (_presense.TryGetValue(userId, out var presense))
-                return new ValueTask<IPresenceModel>(presense);
-            return new ValueTask<IPresenceModel>((IPresenceModel)null);
-        }
-        public ValueTask AddOrUpdatePresenseAsync(ulong userId, IPresenceModel presense, CacheRunMode runmode)
-        {
-            _presense.AddOrUpdate(userId, presense, (_, __) => presense);
-            return CompletedValueTask;
-        }
-        public ValueTask RemovePresenseAsync(ulong userId, CacheRunMode runmode)
-        {
-            _presense.TryRemove(userId, out var _);
-            return CompletedValueTask;
+            var store = _subStoreCache.GetOrAdd(parentId, (_) => new DefaultEntityStore<TModel, TId>(new ConcurrentDictionary<TId, TModel>()));
+            return new ValueTask<IEntityStore<TModel, TId>>((IEntityStore<TModel, TId>)store);
         }
     }
 }

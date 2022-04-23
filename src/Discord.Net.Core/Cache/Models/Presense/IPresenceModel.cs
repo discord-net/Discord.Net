@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IPresenceModel
+    public interface IPresenceModel : IEntityModel<ulong>
     {
         ulong UserId { get; set; }
         ulong? GuildId { get; set; }

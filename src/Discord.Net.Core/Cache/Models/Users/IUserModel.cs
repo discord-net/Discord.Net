@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IUserModel
+    public interface IUserModel : IEntityModel<ulong>
     {
-        ulong Id { get; set; }
         string Username { get; set; }
         string Discriminator { get; set; }
         bool? IsBot { get; set; }

@@ -43,10 +43,10 @@ namespace Discord.API
             get => Avatar.GetValueOrDefault(); set => throw new NotSupportedException();
         }
 
-        ulong IUserModel.Id
+        ulong IEntityModel<ulong>.Id
         {
             get => Id;
             set => throw new NotSupportedException();
-    }
+        }
     }
 }

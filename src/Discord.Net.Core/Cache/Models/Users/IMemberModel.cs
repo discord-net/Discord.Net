@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IMemberModel
+    public interface IMemberModel : IEntityModel<ulong>
     {
-        IUserModel User { get; set; }
-
+        //IUserModel User { get; set; }
         string Nickname { get; set; }
         string GuildAvatar { get; set; }
         ulong[] Roles { get; set; }

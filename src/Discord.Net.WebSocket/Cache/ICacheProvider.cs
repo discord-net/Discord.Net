@@ -8,30 +8,24 @@ namespace Discord.WebSocket
 {
     public interface ICacheProvider
     {
-        #region Users
+        ValueTask<IEntityStore<TModel, TId>> GetStoreAsync<TModel, TId>()
+            where TModel : IEntityModel<TId>
+            where TId : IEquatable<TId>;
 
-        ValueTask<IUserModel> GetUserAsync(ulong id, CacheRunMode runmode);
-        ValueTask<IEnumerable<IUserModel>> GetUsersAsync(CacheRunMode runmode);
-        ValueTask AddOrUpdateUserAsync(IUserModel model, CacheRunMode runmode);
-        ValueTask RemoveUserAsync(ulong id, CacheRunMode runmode);
+        ValueTask<IEntityStore<TModel, TId>> GetSubStoreAsync<TModel, TId>(TId parentId)
+            where TModel : IEntityModel<TId>
+            where TId : IEquatable<TId>;
+    }
 
-        #endregion
-
-        #region Members
-
-        ValueTask<IMemberModel> GetMemberAsync(ulong id, ulong guildId, CacheRunMode runmode);
-        ValueTask<IEnumerable<IMemberModel>> GetMembersAsync(ulong guildId, CacheRunMode runmode);
-        ValueTask AddOrUpdateMemberAsync(IMemberModel model, ulong guildId, CacheRunMode runmode);
-        ValueTask RemoveMemberAsync(ulong id, ulong guildId, CacheRunMode runmode);
-
-        #endregion
-
-        #region Presence
-
-        ValueTask<IPresenceModel> GetPresenceAsync(ulong userId, CacheRunMode runmode);
-        ValueTask AddOrUpdatePresenseAsync(ulong userId, IPresenceModel model, CacheRunMode runmode);
-        ValueTask RemovePresenseAsync(ulong userId, CacheRunMode runmode);
-
-        #endregion
+    public interface IEntityStore<TModel, TId>
+        where TModel : IEntityModel<TId>
+        where TId : IEquatable<TId>
+    {
+        ValueTask<TModel> GetAsync(TId id, CacheRunMode runmode);
+        IAsyncEnumerable<TModel> GetAllAsync(CacheRunMode runmode);
+        ValueTask AddOrUpdateAsync(TModel model, CacheRunMode runmode);
+        ValueTask AddOrUpdateBatchAsync(IEnumerable<TModel> models, CacheRunMode runmode);
+        ValueTask RemoveAsync(TId id, CacheRunMode runmode);
+        ValueTask PurgeAllAsync(CacheRunMode runmode);
     }
 }

@@ -25,7 +25,6 @@ namespace Discord.WebSocket
         private ImmutableArray<ulong> _roleIds;
         private ulong _guildId;
 
-        internal override SocketGlobalUser GlobalUser { get; set; }
         /// <summary>
         ///     Gets the guild the user is in.
         /// </summary>
@@ -43,13 +42,13 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public string GuildAvatarId { get; private set; }
         /// <inheritdoc />
-        public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
+        public override bool IsBot { get { return GlobalUser.Value.IsBot; } internal set { GlobalUser.Value.IsBot = value; } }
         /// <inheritdoc />
-        public override string Username { get { return GlobalUser.Username; } internal set { GlobalUser.Username = value; } }
+        public override string Username { get { return GlobalUser.Value.Username; } internal set { GlobalUser.Value.Username = value; } }
         /// <inheritdoc />
-        public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
+        public override ushort DiscriminatorValue { get { return GlobalUser.Value.DiscriminatorValue; } internal set { GlobalUser.Value.DiscriminatorValue = value; } }
         /// <inheritdoc />
-        public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
+        public override string AvatarId { get { return GlobalUser.Value.AvatarId; } internal set { GlobalUser.Value.AvatarId = value; } }
 
         /// <inheritdoc />
         public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild.Value, this));
@@ -137,32 +136,29 @@ namespace Discord.WebSocket
             }
         }
 
-        internal SocketGuildUser(ulong guildId, SocketGlobalUser globalUser, DiscordSocketClient client)
-            : base(client, globalUser.Id)
+        internal SocketGuildUser(ulong guildId, ulong userId, DiscordSocketClient client)
+            : base(client, userId)
         {
             _guildId = guildId;
             Guild = new Lazy<SocketGuild>(() => client.StateManager.GetGuild(_guildId), System.Threading.LazyThreadSafetyMode.PublicationOnly);
-            GlobalUser = globalUser;
         }
         internal static SocketGuildUser Create(ulong guildId, DiscordSocketClient client, UserModel model)
         {
-            var entity = new SocketGuildUser(guildId, client.GetOrCreateUser(client.StateManager, (Discord.API.User)model), client);
-            if (entity.Update(client.StateManager, model))
-                client.StateManager.AddOrUpdateMember(guildId, entity);
+            var entity = new SocketGuildUser(guildId, model.Id, client);
+            if (entity.Update(model))
+                client.StateManager.AddOrUpdateMember(guildId, entity.ToModel());
             entity.UpdateRoles(Array.Empty<ulong>());
             return entity;
         }
         internal static SocketGuildUser Create(ulong guildId, DiscordSocketClient client, MemberModel model)
         {
-            var entity = new SocketGuildUser(guildId, client.GetOrCreateUser(client.StateManager, model.User), client);
-            entity.Update(client.StateManager, model);
-            client.StateManager.AddOrUpdateMember(guildId, entity);
+            var entity = new SocketGuildUser(guildId, model.Id, client);
+            entity.Update(model);
+            client.StateManager.AddOrUpdateMember(guildId, model);
             return entity;
         }
-        internal void Update(ClientStateManager state, MemberModel model)
+        internal void Update(MemberModel model)
         {
-            base.Update(state, model.User);
-
             _joinedAtTicks = model.JoinedAt.UtcTicks;
             Nickname = model.Nickname;
             GuildAvatarId = model.GuildAvatar;
@@ -234,12 +230,7 @@ namespace Discord.WebSocket
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
 
-        internal new SocketGuildUser Clone()
-        {
-            var clone = MemberwiseClone() as SocketGuildUser;
-            clone.GlobalUser = GlobalUser.Clone();
-            return clone;
-        }
+        internal new SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;
 
         #endregion
 
@@ -260,8 +251,7 @@ namespace Discord.WebSocket
 
         private struct CacheModel : MemberModel
         {
-            public UserModel User { get; set; }
-
+            public ulong Id { get; set; }
             public string Nickname { get; set; }
 
             public string GuildAvatar { get; set; }
@@ -280,15 +270,14 @@ namespace Discord.WebSocket
 
             public DateTimeOffset? CommunicationsDisabledUntil { get; set; }
         }
+        internal new MemberModel ToModel()
+            => ToModel<CacheModel>();
 
-        MemberModel ICached<MemberModel>.ToModel()
-            => ToMemberModel();
-
-        internal MemberModel ToMemberModel()
+        internal new TModel ToModel<TModel>() where TModel : MemberModel, new()
         {
-            return new CacheModel
+            return new TModel
             {
-                User = ((ICached<UserModel>)this).ToModel(),
+                Id = Id,
                 CommunicationsDisabledUntil = TimedOutUntil,
                 GuildAvatar = GuildAvatarId,
                 IsDeaf = IsDeafened,
@@ -301,7 +290,19 @@ namespace Discord.WebSocket
             };
         }
 
-        public void Dispose() => Discord.StateManager.RemovedReferencedMember(Id, _guildId);
+        MemberModel ICached<MemberModel>.ToModel()
+            => ToModel();
+
+        TResult ICached<MemberModel>.ToModel<TResult>()
+            => ToModel<TResult>();
+
+        void ICached<MemberModel>.Update(MemberModel model) => Update(model);
+
+        public override void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            Discord.StateManager.RemovedReferencedMember(Id, _guildId);
+        }
         ~SocketGuildUser() => Discord.StateManager.RemovedReferencedMember(Id, _guildId);
 
         #endregion

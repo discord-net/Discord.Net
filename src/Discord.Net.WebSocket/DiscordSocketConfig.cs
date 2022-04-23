@@ -29,7 +29,12 @@ namespace Discord.WebSocket
         ///     Gets or sets the cache provider to use 
         /// </summary>
         public ICacheProvider CacheProvider { get; set; }
-        public IStateProvider StateProvider { get; set; }
+
+        /// <summary>
+        ///     Gets or sets whether or not non-async cache lookups would wait for the task to complete
+        ///     synchronously or to throw.
+        /// </summary>
+        public bool AllowSynchronousWaiting { get; set; } = false;
 
         /// <summary>
         ///    Returns the encoding gateway should use.
@@ -198,11 +203,6 @@ namespace Discord.WebSocket
         ///     Gets or sets whether or not Unknown Dispatch event messages should be logged.
         /// </summary>
         public bool SuppressUnknownDispatchWarnings { get; set; } = true;
-
-        /// <summary>
-        ///     Gets or sets the default state behavior clients will use.
-        /// </summary>
-        public StateBehavior DefaultStateBehavior { get; set; } = StateBehavior.Default;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="DiscordSocketConfig"/> class with the default configuration.

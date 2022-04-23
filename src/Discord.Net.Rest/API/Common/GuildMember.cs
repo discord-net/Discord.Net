@@ -63,8 +63,8 @@ namespace Discord.API
             get => TimedOutUntil.GetValueOrDefault(); set => throw new NotSupportedException();
         }
 
-        IUserModel IMemberModel.User {
-            get => User; set => throw new NotSupportedException();
+        ulong IEntityModel<ulong>.Id {
+            get => User.Id; set => throw new NotSupportedException();
         }
     }
 }

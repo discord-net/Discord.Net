@@ -452,16 +452,7 @@ namespace Discord.WebSocket
             }
             _events = events;
 
-            for (int i = 0; i < model.Members.Length; i++)
-            {
-                Discord.StateManager.AddOrUpdateMember(Id, SocketGuildUser.Create(Id, Discord, model.Members[i]));
-            }
             DownloadedMemberCount = model.Members.Length;
-
-            for (int i = 0; i < model.Presences.Length; i++)
-            {
-                Discord.StateManager.AddOrUpdatePresence(SocketPresence.Create(model.Presences[i]));
-            }
 
             MemberCount = model.MemberCount;
 
@@ -553,29 +544,12 @@ namespace Discord.WebSocket
             else
                 _stickers = new ConcurrentDictionary<ulong, SocketCustomSticker>(ConcurrentHashSet.DefaultConcurrencyLevel, 7);
         }
-        /*internal void Update(ClientStateManager state, GuildSyncModel model) //TODO remove? userbot related
+
+        internal async ValueTask UpdateCacheAsync(ExtendedModel model)
         {
-            var members = new ConcurrentDictionary<ulong, SocketGuildUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Members.Length * 1.05));
-            {
-                for (int i = 0; i < model.Members.Length; i++)
-                {
-                    var member = SocketGuildUser.Create(this, state, model.Members[i]);
-                    members.TryAdd(member.Id, member);
-                }
-                DownloadedMemberCount = members.Count;
-
-                for (int i = 0; i < model.Presences.Length; i++)
-                {
-                    if (members.TryGetValue(model.Presences[i].User.Id, out SocketGuildUser member))
-                        member.Update(state, model.Presences[i], true);
-                }
-            }
-            _members = members;
-
-            var _ = _syncPromise.TrySetResultAsync(true);
-            //if (!model.Large)
-            //    _ = _downloaderPromise.TrySetResultAsync(true);
-        }*/
+            await Discord.StateManager.BulkAddOrUpdatePresenceAsync(model.Presences).ConfigureAwait(false);
+            await Discord.StateManager.BulkAddOrUpdateMembersAsync(Id, model.Members).ConfigureAwait(false);
+        }
 
         internal void Update(ClientStateManager state, EmojiUpdateModel model)
         {

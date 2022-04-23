@@ -30,11 +30,17 @@ namespace Discord.WebSocket
                 _groupChannels.Select(x => GetChannel(x) as ISocketPrivateChannel))
             .ToReadOnlyCollection(() => _dmChannels.Count + _groupChannels.Count);
 
-        private readonly IStateProvider _state;
+        internal bool AllowSyncWaits
+            => _client.AllowSynchronousWaiting;
 
-        public ClientStateManager(IStateProvider state, int guildCount, int dmChannelCount)
+        private readonly ICacheProvider _cacheProvider;
+        private readonly DiscordSocketClient _client;
+
+
+        public ClientStateManager(DiscordSocketClient client, int guildCount, int dmChannelCount)
         {
-            _state = state;
+            _client = client;
+            _cacheProvider = client.CacheProvider;
             double estimatedChannelCount = guildCount * AverageChannelsPerGuild + dmChannelCount;
             double estimatedUsersCount = guildCount * AverageUsersPerGuild;
             _channels = new ConcurrentDictionary<ulong, SocketChannel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedChannelCount * CollectionMultiplier));
@@ -43,6 +49,8 @@ namespace Discord.WebSocket
             _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
             _groupChannels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(10 * CollectionMultiplier));
             _commands = new ConcurrentDictionary<ulong, SocketApplicationCommand>();
+
+            CreateStores();
         }
 
         internal SocketChannel GetChannel(ulong id)

@@ -49,5 +49,8 @@ namespace Discord.API
         IActivityModel[] IPresenceModel.Activities {
             get => Activities.ToArray(); set => throw new NotSupportedException();
         }
+        ulong IEntityModel<ulong>.Id {
+            get => User.Id; set => throw new NotSupportedException();
+        }
     }
 }

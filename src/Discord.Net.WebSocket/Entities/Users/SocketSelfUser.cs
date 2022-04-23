@@ -19,18 +19,17 @@ namespace Discord.WebSocket
         public bool IsVerified { get; private set; }
         /// <inheritdoc />
         public bool IsMfaEnabled { get; private set; }
-        internal override SocketGlobalUser GlobalUser { get; set; }
 
         /// <inheritdoc />
-        public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
+        public override bool IsBot { get { return GlobalUser.Value.IsBot; } internal set { GlobalUser.Value.IsBot = value; } }
         /// <inheritdoc />
-        public override string Username { get { return GlobalUser.Username; } internal set { GlobalUser.Username = value; } }
+        public override string Username { get { return GlobalUser.Value.Username; } internal set { GlobalUser.Value.Username = value; } }
         /// <inheritdoc />
-        public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
+        public override ushort DiscriminatorValue { get { return GlobalUser.Value.DiscriminatorValue; } internal set { GlobalUser.Value.DiscriminatorValue = value; } }
         /// <inheritdoc />
-        public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
+        public override string AvatarId { get { return GlobalUser.Value.AvatarId; } internal set { GlobalUser.Value.AvatarId = value; } }
         /// <inheritdoc />
-        internal override Lazy<SocketPresence> Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
+        internal override Lazy<SocketPresence> Presence { get { return GlobalUser.Value.Presence; } set { GlobalUser.Value.Presence = value; } }
         /// <inheritdoc />
         public UserProperties Flags { get; internal set; }
         /// <inheritdoc />
@@ -41,20 +40,20 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override bool IsWebhook => false;
 
-        internal SocketSelfUser(DiscordSocketClient discord, SocketGlobalUser globalUser)
-            : base(discord, globalUser.Id)
+        internal SocketSelfUser(DiscordSocketClient discord, ulong userId)
+            : base(discord, userId)
         {
-            GlobalUser = globalUser;
+
         }
-        internal static SocketSelfUser Create(DiscordSocketClient discord, ClientStateManager state, Model model)
+        internal static SocketSelfUser Create(DiscordSocketClient discord, Model model)
         {
-            var entity = new SocketSelfUser(discord, discord.GetOrCreateSelfUser(state, model));
-            entity.Update(state, model);
+            var entity = new SocketSelfUser(discord, model.Id);
+            entity.Update(model);
             return entity;
         }
-        internal override bool Update(ClientStateManager state, UserModel model)
+        internal override bool Update(UserModel model)
         {
-            bool hasGlobalChanges = base.Update(state, model);
+            bool hasGlobalChanges = base.Update(model);
 
             if (model is not Model currentUserModel)
                 throw new ArgumentException($"Got unexpected model type \"{model?.GetType()}\"");
@@ -98,9 +97,13 @@ namespace Discord.WebSocket
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Self)";
         internal new SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;
+        public override void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            Discord.StateManager.RemoveReferencedGlobalUser(Id);
+        }
 
         #region Cache
-
         private struct CacheModel : Model
         {
             public bool? IsVerified { get; set; }
@@ -128,9 +131,12 @@ namespace Discord.WebSocket
             public ulong Id { get; set; }
         }
 
-        Model ICached<Model>.ToModel()
+        internal new Model ToModel()
+            => ToModel<CacheModel>();
+
+        internal new TModel ToModel<TModel>() where TModel : Model, new()
         {
-            return new CacheModel
+            return new TModel
             {
                 Avatar = AvatarId,
                 Discriminator = Discriminator,
@@ -147,6 +153,9 @@ namespace Discord.WebSocket
             };
         }
 
+        Model ICached<Model>.ToModel() => ToModel();
+        TResult ICached<Model>.ToModel<TResult>() => ToModel<TResult>();
+        void ICached<Model>.Update(Model model) => Update(model);
         #endregion
     }
 }
