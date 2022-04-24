@@ -30,7 +30,7 @@ namespace Discord.WebSocket
         /// </summary>
         public Lazy<SocketGuild> Guild { get; } // TODO: convert to LazyCached once guilds are cached.
         /// <summary>
-        ///     Gets the guilds id that the user is in.
+        ///     Gets the ID of the guild that the user is in.
         /// </summary>
         public ulong GuildId => _guildId;
         /// <inheritdoc />
