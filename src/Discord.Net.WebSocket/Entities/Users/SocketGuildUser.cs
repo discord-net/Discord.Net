@@ -28,7 +28,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the guild the user is in.
         /// </summary>
-        public Lazy<SocketGuild> Guild { get; }
+        public Lazy<SocketGuild> Guild { get; } // TODO: convert to LazyCached once guilds are cached.
         /// <summary>
         ///     Gets the guilds id that the user is in.
         /// </summary>
@@ -146,7 +146,7 @@ namespace Discord.WebSocket
         {
             var entity = new SocketGuildUser(guildId, model.Id, client);
             if (entity.Update(model))
-                client.StateManager.AddOrUpdateMember(guildId, entity.ToModel());
+                client.StateManager.GetMemberStore(guildId)?.AddOrUpdate(entity.ToModel());
             entity.UpdateRoles(Array.Empty<ulong>());
             return entity;
         }
@@ -154,7 +154,7 @@ namespace Discord.WebSocket
         {
             var entity = new SocketGuildUser(guildId, model.Id, client);
             entity.Update(model);
-            client.StateManager.AddOrUpdateMember(guildId, model);
+            client.StateManager.GetMemberStore(guildId)?.AddOrUpdate(model);
             return entity;
         }
         internal void Update(MemberModel model)
@@ -301,9 +301,9 @@ namespace Discord.WebSocket
         public override void Dispose()
         {
             GC.SuppressFinalize(this);
-            Discord.StateManager.RemovedReferencedMember(Id, _guildId);
+            Discord.StateManager.GetMemberStore(_guildId)?.RemoveReference(Id);
         }
-        ~SocketGuildUser() => Discord.StateManager.RemovedReferencedMember(Id, _guildId);
+        ~SocketGuildUser() => Dispose();
 
         #endregion
     }

@@ -19,17 +19,6 @@ namespace Discord.WebSocket
         public bool IsVerified { get; private set; }
         /// <inheritdoc />
         public bool IsMfaEnabled { get; private set; }
-
-        /// <inheritdoc />
-        public override bool IsBot { get { return GlobalUser.Value.IsBot; } internal set { GlobalUser.Value.IsBot = value; } }
-        /// <inheritdoc />
-        public override string Username { get { return GlobalUser.Value.Username; } internal set { GlobalUser.Value.Username = value; } }
-        /// <inheritdoc />
-        public override ushort DiscriminatorValue { get { return GlobalUser.Value.DiscriminatorValue; } internal set { GlobalUser.Value.DiscriminatorValue = value; } }
-        /// <inheritdoc />
-        public override string AvatarId { get { return GlobalUser.Value.AvatarId; } internal set { GlobalUser.Value.AvatarId = value; } }
-        /// <inheritdoc />
-        internal override Lazy<SocketPresence> Presence { get { return GlobalUser.Value.Presence; } set { GlobalUser.Value.Presence = value; } }
         /// <inheritdoc />
         public UserProperties Flags { get; internal set; }
         /// <inheritdoc />
@@ -99,8 +88,12 @@ namespace Discord.WebSocket
         internal new SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;
         public override void Dispose()
         {
+            if (IsFreed)
+                return;
+
             GC.SuppressFinalize(this);
-            Discord.StateManager.RemoveReferencedGlobalUser(Id);
+            Discord.StateManager.UserStore.RemoveReference(Id);
+            IsFreed = true;
         }
 
         #region Cache

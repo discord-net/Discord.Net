@@ -15,7 +15,7 @@ namespace Discord.WebSocket
     ///     Represents a WebSocket-based user.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public abstract class SocketUser : SocketEntity<ulong>, IUser, ICached<Model>, IDisposable
+    public abstract class SocketUser : SocketEntity<ulong>, IUser, ICached<Model>
     {
         /// <inheritdoc />
         public virtual bool IsBot { get; internal set; }
@@ -29,9 +29,9 @@ namespace Discord.WebSocket
         public virtual bool IsWebhook { get; }
         /// <inheritdoc />
         public UserProperties? PublicFlags { get; private set; }
-        internal virtual Lazy<SocketGlobalUser> GlobalUser { get; set; }
-        internal virtual Lazy<SocketPresence> Presence { get; set; }
-
+        internal virtual LazyCached<SocketGlobalUser> GlobalUser { get; set; }
+        internal virtual LazyCached<SocketPresence> Presence { get; set; }
+        internal bool IsFreed { get; set; }
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
@@ -56,11 +56,11 @@ namespace Discord.WebSocket
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
+            Presence = new LazyCached<SocketPresence>(id, discord.StateManager.PresenceStore);
+            GlobalUser = new LazyCached<SocketGlobalUser>(id, discord.StateManager.UserStore);
         }
         internal virtual bool Update(Model model)
         {
-            Presence ??= new Lazy<SocketPresence>(() => Discord.StateManager.GetPresence(Id), System.Threading.LazyThreadSafetyMode.PublicationOnly);
-            GlobalUser ??= new Lazy<SocketGlobalUser>(() => Discord.StateManager.GetUser(Id), System.Threading.LazyThreadSafetyMode.PublicationOnly);
             bool hasChanges = false;
             if (model.Avatar != AvatarId)
             {
@@ -124,7 +124,7 @@ namespace Discord.WebSocket
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
 
         #region Cache 
-        private struct CacheModel : Model
+        private class CacheModel : Model
         {
             public string Username { get; set; }
 
@@ -159,6 +159,8 @@ namespace Discord.WebSocket
             => ToModel<TResult>();
 
         void ICached<Model>.Update(Model model) => Update(model);
+
+        bool ICached.IsFreed => IsFreed;
 
         #endregion
     }

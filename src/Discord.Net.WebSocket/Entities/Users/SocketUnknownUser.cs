@@ -26,8 +26,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override bool IsWebhook => false;
         /// <inheritdoc />
-        internal override Lazy<SocketPresence> Presence { get { return new Lazy<SocketPresence>(() => new SocketPresence(UserStatus.Offline, null, null)); } set { } }
-        internal override Lazy<SocketGlobalUser> GlobalUser { get => new Lazy<SocketGlobalUser>(() => null); set { } }
+        internal override LazyCached<SocketPresence> Presence { get { return new(SocketPresence.Default); } set { } }
+        internal override LazyCached<SocketGlobalUser> GlobalUser { get => new(null); set { } }
 
         internal SocketUnknownUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)

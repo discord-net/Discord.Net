@@ -122,14 +122,14 @@ namespace Discord.WebSocket
                     if (guild != null)
                     {
                         if (webhookId != null)
-                            refMsgAuthor = SocketWebhookUser.Create(guild, state, refMsg.Author.Value, webhookId.Value);
+                            refMsgAuthor = SocketWebhookUser.Create(guild, refMsg.Author.Value, webhookId.Value);
                         else
                             refMsgAuthor = guild.GetUser(refMsg.Author.Value.Id);
                     }
                     else
                         refMsgAuthor = (Channel as SocketChannel).GetUser(refMsg.Author.Value.Id);
                     if (refMsgAuthor == null)
-                        refMsgAuthor = SocketUnknownUser.Create(Discord, state, refMsg.Author.Value);
+                        refMsgAuthor = SocketUnknownUser.Create(Discord, refMsg.Author.Value);
                 }
                 else
                     // Message author wasn't specified in the payload, so create a completely anonymous unknown user

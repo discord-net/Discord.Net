@@ -26,11 +26,11 @@ namespace Discord.WebSocket
             return entity;
         }
 
-        ~SocketGlobalUser() => Discord.StateManager.RemoveReferencedGlobalUser(Id);
+        ~SocketGlobalUser() => Dispose();
         public override void Dispose()
         {
             GC.SuppressFinalize(this);
-            Discord.StateManager.RemoveReferencedGlobalUser(Id);
+            Discord.StateManager.UserStore.RemoveReference(Id);
         }
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Global)";

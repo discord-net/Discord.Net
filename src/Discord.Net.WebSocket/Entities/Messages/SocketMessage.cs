@@ -251,7 +251,7 @@ namespace Discord.WebSocket
                             if (user != null)
                                 newMentions.Add(user);
                             else
-                                newMentions.Add(SocketUnknownUser.Create(Discord, state, val));
+                                newMentions.Add(SocketUnknownUser.Create(Discord, val));
                         }
                     }
                     _userMentions = newMentions.ToImmutable();
@@ -263,7 +263,7 @@ namespace Discord.WebSocket
                 Interaction = new MessageInteraction<SocketUser>(model.Interaction.Value.Id,
                     model.Interaction.Value.Type,
                     model.Interaction.Value.Name,
-                    SocketGlobalUser.Create(Discord, state, model.Interaction.Value.User));
+                    SocketGlobalUser.Create(Discord, model.Interaction.Value.User));
             }
 
             if (model.Flags.IsSpecified)

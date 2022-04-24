@@ -88,7 +88,7 @@ namespace Discord.WebSocket
                     if (guild != null)
                     {
                         if (msg.Value.WebhookId.IsSpecified)
-                            author = SocketWebhookUser.Create(guild, discord.StateManager, msg.Value.Author.Value, msg.Value.WebhookId.Value);
+                            author = SocketWebhookUser.Create(guild, msg.Value.Author.Value, msg.Value.WebhookId.Value);
                         else
                             author = guild.GetUser(msg.Value.Author.Value.Id);
                     }

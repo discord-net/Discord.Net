@@ -305,7 +305,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the current logged-in user.
         /// </summary>
-        public SocketGuildUser CurrentUser => Discord.StateManager.GetMember(Discord.CurrentUser.Id, Id);
+        public SocketGuildUser CurrentUser => Discord.StateManager.TryGetMemberStore(Id, out var store) ? store.Get(Discord.CurrentUser.Id) : null;
         /// <summary>
         ///     Gets the built-in role containing all users in this guild.
         /// </summary>
@@ -356,7 +356,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A collection of guild users found within this guild.
         /// </returns>
-        public IReadOnlyCollection<SocketGuildUser> Users => Discord.StateManager.GetMembers(Id).Cast<SocketGuildUser>().ToImmutableArray();
+        public IReadOnlyCollection<SocketGuildUser> Users => Discord.StateManager.TryGetMemberStore(Id, out var store) ? store.GetAll().ToImmutableArray() : ImmutableArray<SocketGuildUser>.Empty;
         /// <summary>
         ///     Gets a collection of all roles in this guild.
         /// </summary>
@@ -547,8 +547,12 @@ namespace Discord.WebSocket
 
         internal async ValueTask UpdateCacheAsync(ExtendedModel model)
         {
-            await Discord.StateManager.BulkAddOrUpdatePresenceAsync(model.Presences).ConfigureAwait(false);
-            await Discord.StateManager.BulkAddOrUpdateMembersAsync(Id, model.Members).ConfigureAwait(false);
+            await Discord.StateManager.PresenceStore.BulkAddOrUpdateAsync(model.Presences);
+
+            await Discord.StateManager.UserStore.BulkAddOrUpdateAsync(model.Members.Select(x => x.User));
+
+            if(Discord.StateManager.TryGetMemberStore(Id, out var store))
+                store.BulkAddOrUpdate(model.Members);
         }
 
         internal void Update(ClientStateManager state, EmojiUpdateModel model)
@@ -1055,7 +1059,7 @@ namespace Discord.WebSocket
         ///     A guild user associated with the specified <paramref name="id"/>; <see langword="null"/> if none is found.
         /// </returns>
         public SocketGuildUser GetUser(ulong id)
-            => Discord.StateManager.GetMember(id, Id);
+            => Discord.StateManager.TryGetMemberStore(Id, out var store) ? store.Get(id) : null;
         /// <inheritdoc />
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options, includeRoleIds);
@@ -1064,11 +1068,10 @@ namespace Discord.WebSocket
         {
             SocketGuildUser member;
             if ((member = GetUser(model.Id)) != null)
-                member.GlobalUser?.Update(Discord.StateManager, model);
+                member.Update(model);
             else
             {
                 member = SocketGuildUser.Create(Id, Discord, model);
-                member.GlobalUser.AddRef();
                 DownloadedMemberCount++;
             }
             return member;
@@ -1076,12 +1079,11 @@ namespace Discord.WebSocket
         internal SocketGuildUser AddOrUpdateUser(MemberModel model)
         {
             SocketGuildUser member;
-            if ((member = GetUser(model.User.Id)) != null)
-                member.Update(Discord.StateManager, model);
+            if ((member = GetUser(model.Id)) != null)
+                member.Update(model);
             else
             {
                 member = SocketGuildUser.Create(Id, Discord, model);
-                member.GlobalUser.AddRef();
                 DownloadedMemberCount++;
             }
             return member;
@@ -1092,8 +1094,8 @@ namespace Discord.WebSocket
             if ((member = GetUser(id)) != null)
             {
                 DownloadedMemberCount--;
-                member.GlobalUser.RemoveRef(Discord);
-                Discord.StateManager.RemoveMember(id, Id);
+                if (Discord.StateManager.TryGetMemberStore(Id, out var store))
+                    store.Remove(id);
                 return member;
             }
             return null;
@@ -1114,8 +1116,9 @@ namespace Discord.WebSocket
             var membersToPurge = users.Where(x => predicate.Invoke(x) && x?.Id != Discord.CurrentUser.Id);
             var membersToKeep = users.Where(x => !predicate.Invoke(x) || x?.Id == Discord.CurrentUser.Id);
 
-            foreach (var member in membersToPurge)
-                Discord.StateManager.RemoveMember(member.Id, Id);
+            if(Discord.StateManager.TryGetMemberStore(Id, out var store))
+                foreach (var member in membersToPurge)
+                    store.Remove(member.Id);
 
             _downloaderPromise = new TaskCompletionSource<bool>();
             DownloadedMemberCount = membersToKeep.Count();
@@ -1240,7 +1243,6 @@ namespace Discord.WebSocket
         ///     in order to use this property.
         ///     </remarks>
         /// </param>
-        /// <param name="speakers">A collection of speakers for the event.</param>
         /// <param name="location">The location of the event; links are supported</param>
         /// <param name="coverImage">The optional banner image for the event.</param>
         /// <param name="options">The options to be used when sending the request.</param>

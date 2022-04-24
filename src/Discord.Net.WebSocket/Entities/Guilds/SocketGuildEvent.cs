@@ -89,7 +89,7 @@ namespace Discord.WebSocket
                 if(guildUser != null)
                 {
                     if(model.Creator.IsSpecified)
-                        guildUser.Update(Discord.StateManager, model.Creator.Value);
+                        guildUser.Update(model.Creator.Value);
 
                     Creator = guildUser;
                 }

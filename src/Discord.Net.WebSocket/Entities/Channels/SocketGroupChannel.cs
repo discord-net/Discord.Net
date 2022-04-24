@@ -77,7 +77,7 @@ namespace Discord.WebSocket
         {
             var users = new ConcurrentDictionary<ulong, SocketGroupUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(models.Length * 1.05));
             for (int i = 0; i < models.Length; i++)
-                users[models[i].Id] = SocketGroupUser.Create(this, state, models[i]);
+                users[models[i].Id] = SocketGroupUser.Create(this, models[i]);
             _users = users;
         }
 
@@ -265,8 +265,7 @@ namespace Discord.WebSocket
                 return user;
             else
             {
-                var privateUser = SocketGroupUser.Create(this, Discord.StateManager, model);
-                privateUser.GlobalUser.AddRef();
+                var privateUser = SocketGroupUser.Create(this, model);
                 _users[privateUser.Id] = privateUser;
                 return privateUser;
             }
@@ -275,7 +274,6 @@ namespace Discord.WebSocket
         {
             if (_users.TryRemove(id, out SocketGroupUser user))
             {
-                user.GlobalUser.RemoveRef(Discord);
                 return user;
             }
             return null;

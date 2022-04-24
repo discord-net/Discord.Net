@@ -238,7 +238,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => GuildUser.Value.GetGuildAvatarUrl(format, size);
 
-        internal override Lazy<SocketPresence> Presence { get => GuildUser.Value.Presence; set => GuildUser.Value.Presence = value; }
+        internal override LazyCached<SocketPresence> Presence { get => GuildUser.Value.Presence; set => GuildUser.Value.Presence = value; }
 
         public override void Dispose()
         {

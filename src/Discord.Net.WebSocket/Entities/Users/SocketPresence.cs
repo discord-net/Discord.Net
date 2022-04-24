@@ -15,6 +15,8 @@ namespace Discord.WebSocket
     {
         internal ulong UserId;
         internal ulong? GuildId;
+        internal bool IsFreed;
+        internal DiscordSocketClient Discord;
 
         /// <inheritdoc />
         public UserStatus Status { get; private set; }
@@ -23,17 +25,24 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public IReadOnlyCollection<IActivity> Activities { get; private set; }
 
-        internal SocketPresence() { }
-        internal SocketPresence(UserStatus status, IImmutableSet<ClientType> activeClients, IImmutableList<IActivity> activities)
+        public static SocketPresence Default
+            => new SocketPresence(null, UserStatus.Offline, null, null);
+
+        internal SocketPresence(DiscordSocketClient discord)
+        {
+            Discord = discord;
+        }
+        internal SocketPresence(DiscordSocketClient discord, UserStatus status, IImmutableSet<ClientType> activeClients, IImmutableList<IActivity> activities)
+            : this(discord)
         {
             Status = status;
             ActiveClients = activeClients ?? ImmutableHashSet<ClientType>.Empty;
             Activities = activities ?? ImmutableList<IActivity>.Empty;
         }
 
-        internal static SocketPresence Create(Model model)
+        internal static SocketPresence Create(DiscordSocketClient client, Model model)
         {
-            var entity = new SocketPresence();
+            var entity = new SocketPresence(client);
             entity.Update(model);
             return entity;
         }
@@ -101,6 +110,22 @@ namespace Discord.WebSocket
         private string DebuggerDisplay => $"{Status}{(Activities?.FirstOrDefault()?.Name ?? "")}";
 
         internal SocketPresence Clone() => MemberwiseClone() as SocketPresence;
+
+        ~SocketPresence() => Dispose();
+
+        public void Dispose()
+        {
+            if (IsFreed)
+                return;
+
+            GC.SuppressFinalize(this);
+
+            if(Discord != null)
+            {
+                Discord.StateManager.PresenceStore.RemoveReference(UserId);
+                IsFreed = true;
+            }
+        }
 
         #region Cache
         private struct CacheModel : Model
@@ -205,6 +230,7 @@ namespace Discord.WebSocket
         Model ICached<Model>.ToModel() => ToModel();
         TResult ICached<Model>.ToModel<TResult>() => ToModel<TResult>();
         void ICached<Model>.Update(Model model) => Update(model);
+        bool ICached.IsFreed => IsFreed;
 
         #endregion
     }

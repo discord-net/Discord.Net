@@ -19,8 +19,6 @@ namespace Discord.WebSocket
 
         private int _referenceCount;
 
-        private readonly object _lock = new object();
-
         public CacheReference(TType value)
         {
             Reference = new(value);
@@ -39,33 +37,49 @@ namespace Discord.WebSocket
 
         public void ReleaseReference()
         {
-            lock (_lock)
-            {
-                if (_referenceCount > 0)
-                    _referenceCount--;
-            }
+            Interlocked.Decrement(ref _referenceCount);
         }
     }
-    internal class ReferenceStore<TEntity, TModel, TId, ISharedEntity>
-        where TEntity : class, ICached<TModel>, ISharedEntity
+
+    internal interface ILookupReferenceStore<TEntity, TId>
+    {
+        TEntity Get(TId id);
+        ValueTask<TEntity> GetAsync(TId id); 
+    }
+
+    internal class ReferenceStore<TEntity, TModel, TId, TSharedEntity> : ILookupReferenceStore<TEntity, TId>
+        where TEntity : class, ICached<TModel>, TSharedEntity
         where TModel : IEntityModel<TId>
         where TId : IEquatable<TId>
-        where ISharedEntity : class
+        where TSharedEntity : class
     {
         private readonly ICacheProvider _cacheProvider;
         private readonly ConcurrentDictionary<TId, CacheReference<TEntity>> _references = new();
         private IEntityStore<TModel, TId> _store;
         private Func<TModel, TEntity> _entityBuilder;
-        private Func<TId, RequestOptions, Task<ISharedEntity>> _restLookup;
+        private Func<TId, RequestOptions, Task<TSharedEntity>> _restLookup;
         private readonly bool _allowSyncWaits;
         private readonly object _lock = new();
 
-        public ReferenceStore(ICacheProvider cacheProvider, Func<TModel, TEntity> entityBuilder, Func<TId, RequestOptions, Task<ISharedEntity>> restLookup, bool allowSyncWaits)
+        public ReferenceStore(ICacheProvider cacheProvider, Func<TModel, TEntity> entityBuilder, Func<TId, RequestOptions, Task<TSharedEntity>> restLookup, bool allowSyncWaits)
         {
             _allowSyncWaits = allowSyncWaits;
             _cacheProvider = cacheProvider;
             _entityBuilder = entityBuilder;
             _restLookup = restLookup;
+        }
+
+        internal bool RemoveReference(TId id)
+        {
+            if(_references.TryGetValue(id, out var rf))
+            {
+                rf.ReleaseReference();
+
+                if (rf.CanRelease)
+                    return _references.TryRemove(id, out _);
+            }
+
+            return false;
         }
 
         internal void ClearDeadReferences()
@@ -135,7 +149,7 @@ namespace Discord.WebSocket
             return null;
         }
 
-        public async ValueTask<ISharedEntity> GetAsync(TId id, CacheMode mode, RequestOptions options = null)
+        public async ValueTask<TSharedEntity> GetAsync(TId id, CacheMode mode, RequestOptions options = null)
         {
             if (TryGetReference(id, out var entity))
             {
@@ -216,6 +230,28 @@ namespace Discord.WebSocket
             return _store.AddOrUpdateAsync(model, CacheRunMode.Async);
         }
 
+        public void BulkAddOrUpdate(IEnumerable<TModel> models)
+        {
+            RunOrThrowValueTask(_store.AddOrUpdateBatchAsync(models, CacheRunMode.Sync));
+
+            foreach(var model in models)
+            {
+                if (_references.TryGetValue(model.Id, out var rf) && rf.Reference.TryGetTarget(out var entity))
+                    entity.Update(model);
+            }
+        }
+
+        public async ValueTask BulkAddOrUpdateAsync(IEnumerable<TModel> models)
+        {
+            await _store.AddOrUpdateBatchAsync(models, CacheRunMode.Async).ConfigureAwait(false);
+
+            foreach (var model in models)
+            {
+                if (_references.TryGetValue(model.Id, out var rf) && rf.Reference.TryGetTarget(out var entity))
+                    entity.Update(model);
+            }
+        }
+
         public void Remove(TId id)
         {
             RunOrThrowValueTask(_store.RemoveAsync(id, CacheRunMode.Sync));
@@ -239,6 +275,9 @@ namespace Discord.WebSocket
             _references.Clear();
             return _store.PurgeAllAsync(CacheRunMode.Async);
         }
+
+        TEntity ILookupReferenceStore<TEntity, TId>.Get(TId id) => Get(id);
+        async ValueTask<TEntity> ILookupReferenceStore<TEntity, TId>.GetAsync(TId id) => (TEntity)await GetAsync(id, CacheMode.CacheOnly).ConfigureAwait(false);
     }
 
     internal partial class ClientStateManager
@@ -261,7 +300,7 @@ namespace Discord.WebSocket
 
             PresenceStore = new ReferenceStore<SocketPresence, IPresenceModel, ulong, IPresence>(
                 _cacheProvider,
-                m => SocketPresence.Create(m),
+                m => SocketPresence.Create(_client, m),
                 (id, options) => Task.FromResult<IPresence>(null),
                 AllowSyncWaits);
 
@@ -283,6 +322,9 @@ namespace Discord.WebSocket
             await UserStore.InitializeAsync();
             await PresenceStore.InitializeAsync();
         }
+
+        public ReferenceStore<SocketGuildUser, IMemberModel, ulong, IGuildUser> GetMemberStore(ulong guildId)
+            => TryGetMemberStore(guildId, out var store) ? store : null;
 
         public bool TryGetMemberStore(ulong guildId, out ReferenceStore<SocketGuildUser, IMemberModel, ulong, IGuildUser> store)
             => _memberStores.TryGetValue(guildId, out store);

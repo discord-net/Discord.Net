@@ -171,7 +171,6 @@ namespace Discord.WebSocket
             else
             {
                 member = SocketThreadUser.Create(Guild, this, model, guildMember);
-                member.GlobalUser.AddRef();
                 _members[member.Id] = member;
             }
             return member;
