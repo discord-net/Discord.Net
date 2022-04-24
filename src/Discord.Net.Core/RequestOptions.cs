@@ -1,5 +1,6 @@
 using Discord.Net;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace Discord
         ///     Gets or sets the maximum time to wait for this request to complete.
         /// </summary>
         /// <remarks>
-        ///     Gets or set the max time, in milliseconds, to wait for this request to complete. If 
+        ///     Gets or set the max time, in milliseconds, to wait for this request to complete. If
         ///     <c>null</c>, a request will not time out. If a rate limit has been triggered for this request's bucket
         ///     and will not be unpaused in time, this request will fail immediately.
         /// </remarks>
@@ -53,7 +54,7 @@ namespace Discord
 		/// </summary>
 		/// <remarks>
 		///		This property can also be set in <see cref="DiscordConfig"/>.
-		///		On a per-request basis, the system clock should only be disabled 
+		///		On a per-request basis, the system clock should only be disabled
 		///		when millisecond precision is especially important, and the
 		///		hosting system is known to have a desynced clock.
 		/// </remarks>
@@ -64,6 +65,8 @@ namespace Discord
         /// </summary>
         public Func<IRateLimitInfo, Task> RatelimitCallback { get; set; }
 
+        public IEnumerable<KeyValuePair<string, IEnumerable<string>>> RequestHeaders { get; } = new Dictionary<string, IEnumerable<string>>();
+
         internal bool IgnoreState { get; set; }
         internal BucketId BucketId { get; set; }
         internal bool IsClientBucket { get; set; }
@@ -71,7 +74,7 @@ namespace Discord
         internal bool IsGatewayBucket { get; set; }
 
         internal static RequestOptions CreateOrClone(RequestOptions options)
-        {            
+        {
             if (options == null)
                 return new RequestOptions();
             else
@@ -97,7 +100,7 @@ namespace Discord
         {
             Timeout = DiscordConfig.DefaultRequestTimeout;
         }
-        
+
         public RequestOptions Clone() => MemberwiseClone() as RequestOptions;
     }
 }

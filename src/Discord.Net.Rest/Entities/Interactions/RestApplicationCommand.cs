@@ -46,7 +46,7 @@ namespace Discord.Rest
         ///     Gets the localized name of this command.
         /// </summary>
         /// <remarks>
-        ///     Only returned when the `withLocalizations` query parameter is set to true when requesting the command.
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
         /// </remarks>
         public string? NameLocalized { get; private set; }
 
@@ -54,7 +54,7 @@ namespace Discord.Rest
         ///     Gets the localized description of this command.
         /// </summary>
         /// <remarks>
-        ///     Only returned when the `withLocalizations` query parameter is set to true when requesting the command.
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
         /// </remarks>
         public string? DescriptionLocalized { get; private set; }
 

@@ -1193,7 +1193,8 @@ namespace Discord.API
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands?with_localizations={withLocalizations}",
+            //with_localizations=false doesnt return localized names and descriptions
+            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands{(withLocalizations ? "?with_localizations=true" : string.Empty)}",
                 new BucketIds(), options: options).ConfigureAwait(false);
         }
 
@@ -1265,7 +1266,8 @@ namespace Discord.API
 
             var bucket = new BucketIds(guildId: guildId);
 
-            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands?with_localizations={withLocalizations}",
+            //with_localizations=false doesnt return localized names and descriptions
+            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands{(withLocalizations ? "?with_localizations=true" : string.Empty)}",
                 bucket, options: options).ConfigureAwait(false);
         }
 
