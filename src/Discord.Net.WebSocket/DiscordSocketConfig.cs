@@ -26,7 +26,7 @@ namespace Discord.WebSocket
     public class DiscordSocketConfig : DiscordRestConfig
     {
         /// <summary>
-        ///     Gets or sets the cache provider to use 
+        ///     Gets or sets the cache provider to use.
         /// </summary>
         public ICacheProvider CacheProvider { get; set; }
 
