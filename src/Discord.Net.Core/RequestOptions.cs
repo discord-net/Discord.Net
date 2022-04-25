@@ -70,7 +70,6 @@ namespace Discord
         internal bool IsClientBucket { get; set; }
         internal bool IsReactionBucket { get; set; }
         internal bool IsGatewayBucket { get; set; }
-
         internal IDictionary<string, IEnumerable<string?>> RequestHeaders { get; }
 
         internal static RequestOptions CreateOrClone(RequestOptions options)
