@@ -297,5 +297,20 @@ namespace Discord
             }
         }
         #endregion
+
+        #region SlashCommandOptions
+
+        public static void Options(string name, string description)
+        {
+            // Make sure the name matches the requirements from discord
+            NotNullOrEmpty(name, nameof(name));
+            NotNullOrEmpty(description, nameof(description));
+            AtLeast(name.Length, 1, nameof(name));
+            AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
+            AtLeast(description.Length, 1, nameof(description));
+            AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+        }
+
+        #endregion
     }
 }
