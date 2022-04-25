@@ -11,8 +11,6 @@ namespace Discord
         void Update(TType model);
 
         TType ToModel();
-
-        TResult ToModel<TResult>() where TResult : TType, new();
     }
 
     public interface ICached

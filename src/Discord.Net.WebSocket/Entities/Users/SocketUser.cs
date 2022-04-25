@@ -137,29 +137,20 @@ namespace Discord.WebSocket
             public ulong Id { get; set; }
         }
 
-        internal TModel ToModel<TModel>() where TModel : Model, new()
-        {
-            return new TModel
-            {
-                Avatar = AvatarId,
-                Discriminator = Discriminator,
-                Id = Id,
-                IsBot = IsBot,
-                Username = Username
-            };
-        }
-
         internal Model ToModel()
-            => ToModel<CacheModel>();
+        {
+            var model = Discord.StateManager.GetModel<Model, CacheModel>();
+            model.Avatar = AvatarId;
+            model.Discriminator = Discriminator;
+            model.Id = Id;
+            model.IsBot = IsBot;
+            model.Username = Username;
+            return model;
+        }
 
         Model ICached<Model>.ToModel()
             => ToModel();
-
-        TResult ICached<Model>.ToModel<TResult>()
-            => ToModel<TResult>();
-
         void ICached<Model>.Update(Model model) => Update(model);
-
         bool ICached.IsFreed => IsFreed;
 
         #endregion

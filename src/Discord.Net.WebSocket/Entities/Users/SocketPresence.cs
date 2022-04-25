@@ -112,7 +112,6 @@ namespace Discord.WebSocket
         internal SocketPresence Clone() => MemberwiseClone() as SocketPresence;
 
         ~SocketPresence() => Dispose();
-
         public void Dispose()
         {
             if (IsFreed)
@@ -128,7 +127,7 @@ namespace Discord.WebSocket
         }
 
         #region Cache
-        private struct CacheModel : Model
+        private class CacheModel : Model
         {
             public UserStatus Status { get; set; }
 
@@ -187,48 +186,43 @@ namespace Discord.WebSocket
         }
 
         internal Model ToModel()
-            => ToModel<CacheModel>();
-
-        internal TModel ToModel<TModel>() where TModel : Model, new()
         {
-            return new TModel
+            var model = Discord.StateManager.GetModel<Model, CacheModel>();
+            model.Status = Status;
+            model.ActiveClients = ActiveClients.ToArray();
+            model.UserId = UserId;
+            model.GuildId = GuildId;
+            model.Activities = Activities.Select(x =>
             {
-                Status = Status,
-                ActiveClients = ActiveClients.ToArray(),
-                UserId = UserId,
-                GuildId = GuildId,
-                Activities = Activities.Select(x =>
+                switch (x)
                 {
-                    switch (x)
-                    {
-                        case Game game:
-                            switch (game)
-                            {
-                                case RichGame richGame:
-                                    return richGame.ToModel<ActivityCacheModel>();
-                                case SpotifyGame spotify:
-                                    return spotify.ToModel<ActivityCacheModel>();
-                                case CustomStatusGame custom:
-                                    return custom.ToModel<ActivityCacheModel, EmojiCacheModel>();
-                                case StreamingGame stream:
-                                    return stream.ToModel<ActivityCacheModel>();
-                            }
-                            break;
-                    }
+                    case Game game:
+                        switch (game)
+                        {
+                            case RichGame richGame:
+                                return richGame.ToModel<ActivityCacheModel>();
+                            case SpotifyGame spotify:
+                                return spotify.ToModel<ActivityCacheModel>();
+                            case CustomStatusGame custom:
+                                return custom.ToModel<ActivityCacheModel, EmojiCacheModel>();
+                            case StreamingGame stream:
+                                return stream.ToModel<ActivityCacheModel>();
+                        }
+                        break;
+                }
 
-                    return new ActivityCacheModel
-                    {
-                        Name = x.Name,
-                        Details = x.Details,
-                        Flags = x.Flags,
-                        Type = x.Type
-                    };
-                }).ToArray(),
-            };
+                return new ActivityCacheModel
+                {
+                    Name = x.Name,
+                    Details = x.Details,
+                    Flags = x.Flags,
+                    Type = x.Type
+                };
+            }).ToArray();
+            return model;
         }
 
         Model ICached<Model>.ToModel() => ToModel();
-        TResult ICached<Model>.ToModel<TResult>() => ToModel<TResult>();
         void ICached<Model>.Update(Model model) => Update(model);
         bool ICached.IsFreed => IsFreed;
 

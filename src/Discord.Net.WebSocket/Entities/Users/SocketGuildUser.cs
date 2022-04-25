@@ -74,7 +74,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool? IsPending { get; private set; }
 
-
         /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
         /// <summary>
@@ -159,7 +158,7 @@ namespace Discord.WebSocket
         }
         internal void Update(MemberModel model)
         {
-            _joinedAtTicks = model.JoinedAt.UtcTicks;
+            _joinedAtTicks = model.JoinedAt.HasValue ? model.JoinedAt.Value.UtcTicks : null;
             Nickname = model.Nickname;
             GuildAvatarId = model.GuildAvatar;
             UpdateRoles(model.Roles);
@@ -232,6 +231,17 @@ namespace Discord.WebSocket
 
         internal new SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;
 
+        public override void Dispose()
+        {
+            if (IsFreed)
+                return;
+
+            GC.SuppressFinalize(this);
+            Discord.StateManager.GetMemberStore(_guildId)?.RemoveReference(Id);
+            IsFreed = true;
+        }
+        ~SocketGuildUser() => Dispose();
+
         #endregion
 
         #region IGuildUser
@@ -249,7 +259,7 @@ namespace Discord.WebSocket
 
         #region Cache
 
-        private struct CacheModel : MemberModel
+        private class CacheModel : MemberModel
         {
             public ulong Id { get; set; }
             public string Nickname { get; set; }
@@ -258,7 +268,7 @@ namespace Discord.WebSocket
 
             public ulong[] Roles { get; set; }
 
-            public DateTimeOffset JoinedAt { get; set; }
+            public DateTimeOffset? JoinedAt { get; set; }
 
             public DateTimeOffset? PremiumSince { get; set; }
 
@@ -271,40 +281,25 @@ namespace Discord.WebSocket
             public DateTimeOffset? CommunicationsDisabledUntil { get; set; }
         }
         internal new MemberModel ToModel()
-            => ToModel<CacheModel>();
-
-        internal new TModel ToModel<TModel>() where TModel : MemberModel, new()
         {
-            return new TModel
-            {
-                Id = Id,
-                CommunicationsDisabledUntil = TimedOutUntil,
-                GuildAvatar = GuildAvatarId,
-                IsDeaf = IsDeafened,
-                IsMute = IsMuted,
-                IsPending = IsPending,
-                JoinedAt = JoinedAt ?? DateTimeOffset.UtcNow, // review: nullable joined at here? should our model reflect this?
-                Nickname = Nickname,
-                PremiumSince = PremiumSince,
-                Roles = _roleIds.ToArray()
-            };
+            var model = Discord.StateManager.GetModel<MemberModel, CacheModel>();
+            model.Id = Id;
+            model.Nickname = Nickname;
+            model.GuildAvatar = GuildAvatarId;
+            model.Roles = _roleIds.ToArray();
+            model.JoinedAt = JoinedAt;
+            model.PremiumSince = PremiumSince;
+            model.IsDeaf = IsDeafened;
+            model.IsMute = IsMuted;
+            model.IsPending = IsPending;
+            model.CommunicationsDisabledUntil = TimedOutUntil;
+            return model;
         }
 
         MemberModel ICached<MemberModel>.ToModel()
             => ToModel();
 
-        TResult ICached<MemberModel>.ToModel<TResult>()
-            => ToModel<TResult>();
-
         void ICached<MemberModel>.Update(MemberModel model) => Update(model);
-
-        public override void Dispose()
-        {
-            GC.SuppressFinalize(this);
-            Discord.StateManager.GetMemberStore(_guildId)?.RemoveReference(Id);
-        }
-        ~SocketGuildUser() => Dispose();
-
         #endregion
     }
 }

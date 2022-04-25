@@ -8,6 +8,8 @@ namespace Discord.WebSocket
 {
     public interface ICacheProvider
     {
+        Type GetModel<TModelInterface>();
+
         ValueTask<IEntityStore<TModel, TId>> GetStoreAsync<TModel, TId>()
             where TModel : IEntityModel<TId>
             where TId : IEquatable<TId>;
@@ -21,11 +23,17 @@ namespace Discord.WebSocket
         where TModel : IEntityModel<TId>
         where TId : IEquatable<TId>
     {
-        ValueTask<TModel> GetAsync(TId id, CacheRunMode runmode);
-        IAsyncEnumerable<TModel> GetAllAsync(CacheRunMode runmode);
-        ValueTask AddOrUpdateAsync(TModel model, CacheRunMode runmode);
-        ValueTask AddOrUpdateBatchAsync(IEnumerable<TModel> models, CacheRunMode runmode);
-        ValueTask RemoveAsync(TId id, CacheRunMode runmode);
-        ValueTask PurgeAllAsync(CacheRunMode runmode);
+        ValueTask<TModel> GetAsync(TId id);
+        TModel Get(TId id);
+        IAsyncEnumerable<TModel> GetAllAsync();
+        IEnumerable<TModel> GetAll();
+        ValueTask AddOrUpdateAsync(TModel model);
+        void AddOrUpdate(TModel model);
+        ValueTask AddOrUpdateBatchAsync(IEnumerable<TModel> models);
+        void AddOrUpdateBatch(IEnumerable<TModel> models);
+        ValueTask RemoveAsync(TId id);
+        void Remove(TId id);
+        ValueTask PurgeAllAsync();
+        void PurgeAll();
     }
 }

@@ -39,8 +39,8 @@ namespace Discord.API
             get => Roles.GetValueOrDefault(Array.Empty<ulong>()); set => throw new NotSupportedException();
         }
 
-        DateTimeOffset IMemberModel.JoinedAt {
-            get => JoinedAt.GetValueOrDefault(); set => throw new NotSupportedException();
+        DateTimeOffset? IMemberModel.JoinedAt {
+            get => JoinedAt.ToNullable(); set => throw new NotSupportedException();
         }
 
         DateTimeOffset? IMemberModel.PremiumSince {

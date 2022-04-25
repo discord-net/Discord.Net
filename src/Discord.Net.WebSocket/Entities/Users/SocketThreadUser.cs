@@ -151,14 +151,14 @@ namespace Discord.WebSocket
 
         internal static SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, Model model, SocketGuildUser member)
         {
-            var entity = new SocketThreadUser(guild.Discord, guild.Id, thread.Id, model.UserId.Value);
+            var entity = new SocketThreadUser(guild.Discord, guild.Id, thread.Id, model.Id);
             entity.Update(model);
             return entity;
         }
 
         internal static SocketThreadUser Create(DiscordSocketClient client, ulong guildId, ulong threadId, Model model)
         {
-            var entity = new SocketThreadUser(client, guildId, threadId, model.UserId.Value);
+            var entity = new SocketThreadUser(client, guildId, threadId, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -242,7 +242,12 @@ namespace Discord.WebSocket
 
         public override void Dispose()
         {
+            if (IsFreed)
+                return;
+
             GC.SuppressFinalize(this);
+            Discord.StateManager.GetThreadMemberStore(_threadId)?.RemoveReference(Id);
+            IsFreed = true;
         }
 
 
@@ -255,27 +260,21 @@ namespace Discord.WebSocket
         #region Cache
         private class CacheModel : Model
         {
+            public ulong Id { get; set; }
             public ulong? ThreadId { get; set; }
-            public ulong? UserId { get; set; }
             public DateTimeOffset JoinedAt { get; set; }
-
-            ulong IEntityModel<ulong>.Id { get => UserId.GetValueOrDefault(); set => throw new NotSupportedException(); }
         }
 
-        internal new Model ToModel() => ToModel<CacheModel>();
-
-        internal new TModel ToModel<TModel>() where TModel : Model, new()
+        internal new Model ToModel()
         {
-            return new TModel
-            {
-                JoinedAt = ThreadJoinedAt,
-                ThreadId = _threadId,
-                UserId = Id
-            };
+            var model = Discord.StateManager.GetModel<Model, CacheModel>();
+            model.Id = Id;
+            model.ThreadId = _threadId;
+            model.JoinedAt = ThreadJoinedAt;
+            return model;
         }
 
         Model ICached<Model>.ToModel() => ToModel();
-        TResult ICached<Model>.ToModel<TResult>() => ToModel<TResult>();
         void ICached<Model>.Update(Model model) => Update(model);
         #endregion
     }

@@ -97,7 +97,7 @@ namespace Discord.WebSocket
         }
 
         #region Cache
-        private struct CacheModel : Model
+        private class CacheModel : Model
         {
             public bool? IsVerified { get; set; }
 
@@ -125,29 +125,23 @@ namespace Discord.WebSocket
         }
 
         internal new Model ToModel()
-            => ToModel<CacheModel>();
-
-        internal new TModel ToModel<TModel>() where TModel : Model, new()
         {
-            return new TModel
-            {
-                Avatar = AvatarId,
-                Discriminator = Discriminator,
-                Email = Email,
-                Flags = Flags,
-                Id = Id,
-                IsBot = IsBot,
-                IsMfaEnabled = IsMfaEnabled,
-                IsVerified = IsVerified,
-                Locale = Locale,
-                PremiumType = this.PremiumType,
-                PublicFlags = PublicFlags ?? UserProperties.None,
-                Username = Username
-            };
+            var model = Discord.StateManager.GetModel<Model, CacheModel>();
+            model.Avatar = AvatarId;
+            model.Discriminator = Discriminator;
+            model.Email = Email;
+            model.Flags = Flags;
+            model.IsBot = IsBot;
+            model.IsMfaEnabled = IsMfaEnabled;
+            model.Locale = Locale;
+            model.PremiumType = PremiumType;
+            model.PublicFlags = PublicFlags ?? UserProperties.None;
+            model.Username = Username;
+            model.Id = Id;
+            return model;
         }
 
         Model ICached<Model>.ToModel() => ToModel();
-        TResult ICached<Model>.ToModel<TResult>() => ToModel<TResult>();
         void ICached<Model>.Update(Model model) => Update(model);
         #endregion
     }

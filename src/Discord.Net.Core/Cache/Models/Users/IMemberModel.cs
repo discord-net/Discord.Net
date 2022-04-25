@@ -12,7 +12,7 @@ namespace Discord
         string Nickname { get; set; }
         string GuildAvatar { get; set; }
         ulong[] Roles { get; set; }
-        DateTimeOffset JoinedAt { get; set; }
+        DateTimeOffset? JoinedAt { get; set; }
         DateTimeOffset? PremiumSince { get; set; }
         bool IsDeaf { get; set; }
         bool IsMute { get; set; }

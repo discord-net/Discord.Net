@@ -15,7 +15,6 @@ namespace Discord.API
         public DateTimeOffset JoinTimestamp { get; set; }
 
         ulong? IThreadMemberModel.ThreadId { get => ThreadId.ToNullable(); set => throw new NotSupportedException(); }
-        ulong? IThreadMemberModel.UserId { get => UserId.ToNullable(); set => throw new NotSupportedException(); }
         DateTimeOffset IThreadMemberModel.JoinedAt { get => JoinTimestamp; set => throw new NotSupportedException(); }
         ulong IEntityModel<ulong>.Id { get => UserId.GetValueOrDefault(0); set => throw new NotSupportedException(); }
     }

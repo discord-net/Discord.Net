@@ -9,7 +9,6 @@ namespace Discord
     public interface IThreadMemberModel : IEntityModel<ulong>
     {
         ulong? ThreadId { get; set; }
-        ulong? UserId { get; set; }
         DateTimeOffset JoinedAt { get; set; }
     }
 }
