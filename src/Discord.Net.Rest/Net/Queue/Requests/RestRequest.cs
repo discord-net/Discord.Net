@@ -1,5 +1,8 @@
 using Discord.Net.Rest;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -28,7 +31,7 @@ namespace Discord.Net.Queue
 
         public virtual async Task<RestResponse> SendAsync()
         {
-            return await Client.SendAsync(Method, Endpoint, Options.CancelToken, Options.HeaderOnly, Options.AuditLogReason).ConfigureAwait(false);
+            return await Client.SendAsync(Method, Endpoint, Options.CancelToken, Options.HeaderOnly, Options.AuditLogReason, Options.RequestHeaders).ConfigureAwait(false);
         }
     }
 }
