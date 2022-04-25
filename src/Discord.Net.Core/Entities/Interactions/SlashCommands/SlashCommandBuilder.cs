@@ -166,8 +166,11 @@ namespace Discord
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
+            Preconditions.NotNullOrEmpty(description, nameof(description));
             Preconditions.AtLeast(name.Length, 1, nameof(name));
             Preconditions.AtMost(name.Length, MaxNameLength, nameof(name));
+            Preconditions.AtLeast(description.Length, 1, nameof(description));
+            Preconditions.AtMost(description.Length, MaxDescriptionLength, nameof(description));
 
             // Discord updated the docs, this regex prevents special characters like @!$%( and s p a c e s.. etc,
             // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
@@ -402,8 +405,11 @@ namespace Discord
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
+            Preconditions.NotNullOrEmpty(description, nameof(description));
             Preconditions.AtLeast(name.Length, 1, nameof(name));
             Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
+            Preconditions.AtLeast(description.Length, 1, nameof(description));
+            Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
 
             // Discord updated the docs, this regex prevents special characters like @!$%( and s p a c e s.. etc,
             // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
