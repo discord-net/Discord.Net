@@ -300,6 +300,8 @@ namespace Discord
 
         #region SlashCommandOptions
 
+        /// <exception cref="ArgumentNullException"><paramref name="description"/> or <paramref name="name"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="description"/> or <paramref name="name"/> are either empty or their length exceed limits.</exception>
         public static void Options(string name, string description)
         {
             // Make sure the name matches the requirements from discord
