@@ -775,6 +775,9 @@ namespace Discord.Interactions
                 await _componentCommandExecutedEvent.InvokeAsync(null, context, result).ConfigureAwait(false);
                 return result;
             }
+
+            SetMatchesIfApplicable(context, result);
+
             return await result.Command.ExecuteAsync(context, services, result.RegexCaptureGroups).ConfigureAwait(false);
         }
 
@@ -819,7 +822,23 @@ namespace Discord.Interactions
                 await _componentCommandExecutedEvent.InvokeAsync(null, context, result).ConfigureAwait(false);
                 return result;
             }
+
+            SetMatchesIfApplicable(context, result);
+
             return await result.Command.ExecuteAsync(context, services, result.RegexCaptureGroups).ConfigureAwait(false);
+        }
+
+        private static void SetMatchesIfApplicable<T>(IInteractionContext context, SearchResult<T> searchResult)
+            where T : class, ICommandInfo
+        {
+            if (!searchResult.Command.SupportsWildCards || context is not IRouteMatchContainer matchContainer)
+                return;
+
+            var matches = new RouteSegmentMatch[searchResult.RegexCaptureGroups.Length];
+            for (var i = 0; i < searchResult.RegexCaptureGroups.Length; i++)
+                matches[i] = new RouteSegmentMatch(searchResult.RegexCaptureGroups[i]);
+
+            matchContainer.SetSegmentMatches(matches);
         }
 
         internal TypeConverter GetTypeConverter(Type type, IServiceProvider services = null)
