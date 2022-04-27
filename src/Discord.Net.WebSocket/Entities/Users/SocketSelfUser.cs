@@ -97,7 +97,7 @@ namespace Discord.WebSocket
         }
 
         #region Cache
-        private class CacheModel : Model
+        internal new class CacheModel : Model
         {
             public bool? IsVerified { get; set; }
 

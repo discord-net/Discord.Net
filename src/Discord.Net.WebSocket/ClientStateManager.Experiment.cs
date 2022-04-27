@@ -267,26 +267,15 @@ namespace Discord.WebSocket
         private SemaphoreSlim _memberStoreLock;
         private SemaphoreSlim _threadMemberLock;
 
-        private void CreateStores()
+        private readonly Dictionary<Type, Func<object>> _defaultModelFactory = new()
         {
-            UserStore = new ReferenceStore<SocketGlobalUser, IUserModel, ulong, IUser>(
-                _cacheProvider,
-                m => SocketGlobalUser.Create(_client, m),
-                async (id, options) => await _client.Rest.GetUserAsync(id, options).ConfigureAwait(false),
-                AllowSyncWaits);
+            { typeof(IUserModel), () => new SocketUser.CacheModel() },
+            { typeof(IMemberModel), () => new SocketGuildUser.CacheModel() },
+            { typeof(ICurrentUserModel), () => new SocketSelfUser.CacheModel() },
+            { typeof(IThreadMemberModel), () => new SocketThreadUser.CacheModel() },
+            { typeof(IPresenceModel), () => new SocketPresence.CacheModel() },
+        };
 
-            PresenceStore = new ReferenceStore<SocketPresence, IPresenceModel, ulong, IPresence>(
-                _cacheProvider,
-                m => SocketPresence.Create(_client, m),
-                (id, options) => Task.FromResult<IPresence>(null),
-                AllowSyncWaits);
-
-            _memberStores = new();
-            _threadMemberStores = new();
-
-            _threadMemberLock = new(1, 1);
-            _memberStoreLock = new(1,1);
-        }
 
         public void ClearDeadReferences()
         {
@@ -374,7 +363,27 @@ namespace Discord.WebSocket
                 return (TModel)Activator.CreateInstance(type);
             }
             else
-                return new TFallback();
+                return _defaultModelFactory.TryGetValue(typeof(TModel), out var m) ? (TModel)m() : new TFallback();
+        }
+        private void CreateStores()
+        {
+            UserStore = new ReferenceStore<SocketGlobalUser, IUserModel, ulong, IUser>(
+                _cacheProvider,
+                m => SocketGlobalUser.Create(_client, m),
+                async (id, options) => await _client.Rest.GetUserAsync(id, options).ConfigureAwait(false),
+                AllowSyncWaits);
+
+            PresenceStore = new ReferenceStore<SocketPresence, IPresenceModel, ulong, IPresence>(
+                _cacheProvider,
+                m => SocketPresence.Create(_client, m),
+                (id, options) => Task.FromResult<IPresence>(null),
+                AllowSyncWaits);
+
+            _memberStores = new();
+            _threadMemberStores = new();
+
+            _threadMemberLock = new(1, 1);
+            _memberStoreLock = new(1,1);
         }
     }
 }

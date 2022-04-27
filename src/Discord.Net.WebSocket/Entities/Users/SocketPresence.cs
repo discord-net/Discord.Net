@@ -127,7 +127,7 @@ namespace Discord.WebSocket
         }
 
         #region Cache
-        private class CacheModel : Model
+        internal class CacheModel : Model
         {
             public UserStatus Status { get; set; }
 

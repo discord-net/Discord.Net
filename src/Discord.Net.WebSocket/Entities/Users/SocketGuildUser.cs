@@ -259,7 +259,7 @@ namespace Discord.WebSocket
 
         #region Cache
 
-        private class CacheModel : MemberModel
+        internal new class CacheModel : MemberModel
         {
             public ulong Id { get; set; }
             public string Nickname { get; set; }

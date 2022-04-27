@@ -124,7 +124,7 @@ namespace Discord.WebSocket
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
 
         #region Cache 
-        private class CacheModel : Model
+        internal class CacheModel : Model
         {
             public string Username { get; set; }
 

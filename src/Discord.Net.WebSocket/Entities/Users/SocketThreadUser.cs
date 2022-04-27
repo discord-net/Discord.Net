@@ -258,7 +258,7 @@ namespace Discord.WebSocket
         public static explicit operator SocketGuildUser(SocketThreadUser user) => user.GuildUser.Value;
 
         #region Cache
-        private class CacheModel : Model
+        internal new class CacheModel : Model
         {
             public ulong Id { get; set; }
             public ulong? ThreadId { get; set; }
