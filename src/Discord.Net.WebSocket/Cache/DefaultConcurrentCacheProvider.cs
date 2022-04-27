@@ -12,16 +12,6 @@ namespace Discord.WebSocket
         private readonly ConcurrentDictionary<Type, object> _storeCache = new();
         private readonly ConcurrentDictionary<object, object> _subStoreCache = new();
 
-        private readonly Dictionary<Type, Type> _models = new()
-        {
-            { typeof(IUserModel), typeof(API.User) },
-            { typeof(ICurrentUserModel), typeof(API.CurrentUser) },
-            { typeof(IMemberModel), typeof(API.GuildMember) },
-            { typeof(IThreadMemberModel), typeof(API.ThreadMember)},
-            { typeof(IPresenceModel), typeof(API.Presence)},
-            { typeof(IActivityModel), typeof(API.Game)}
-        };
-
         private class DefaultEntityStore<TModel, TId> : IEntityStore<TModel, TId>
             where TModel : IEntityModel<TId>
             where TId : IEquatable<TId>
@@ -94,12 +84,7 @@ namespace Discord.WebSocket
             }
         }
 
-        public Type GetModel<TInterface>()
-        {
-            if (_models.TryGetValue(typeof(TInterface), out var t))
-                return t;
-            return null;
-        }
+        public Type GetModel<TInterface>() => null;
 
         public virtual ValueTask<IEntityStore<TModel, TId>> GetStoreAsync<TModel, TId>()
             where TModel : IEntityModel<TId>

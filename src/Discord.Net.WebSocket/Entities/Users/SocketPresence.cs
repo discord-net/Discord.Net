@@ -142,11 +142,11 @@ namespace Discord.WebSocket
             ulong IEntityModel<ulong>.Id
             {
                 get => UserId;
-                set => throw new NotSupportedException();
+                set => UserId = value;
             }
         }
 
-        private struct ActivityCacheModel : IActivityModel
+        internal class ActivityCacheModel : IActivityModel
         {
             public string Id { get; set; }
             public string Url { get; set; }
@@ -173,7 +173,7 @@ namespace Discord.WebSocket
             public DateTimeOffset? TimestampEnd { get; set; }
         }
 
-        private struct EmojiCacheModel : IEmojiModel
+        private class EmojiCacheModel : IEmojiModel
         {
             public ulong? Id { get; set; }
             public string Name { get; set; }
