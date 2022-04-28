@@ -19,7 +19,7 @@ namespace Discord.API.Rest
         [JsonProperty("default_permission")]
         public Optional<bool> DefaultPermission { get; set; }
 
-        [JsonProperty("dm_permissions")]
+        [JsonProperty("dm_permission")]
         public Optional<bool?> DmPermission { get; set; }
 
         [JsonProperty("default_member_permissions")]
