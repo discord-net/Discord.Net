@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.6.0] - 2022-04-28
+### Added
+- #2136 Passing CustomId matches into contexts (4ce1801)
+- #2222 V2 Permissions (d98b3cc)
+
+### Fixed
+- #2260 Guarding against empty descriptions in `SlashCommandBuilder`/`SlashCommandOptionBuilder` (0554ac2)
+- #2248 Fix SocketGuild not returning the AudioClient (daba58c)
+- #2254 Fix browser property (275b833)
+
 ## [3.5.0] - 2022-04-05
 
 ### Added
