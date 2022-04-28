@@ -49,7 +49,7 @@ and will be set up for all of the commands & nested modules inside this class.
 
 [!code-csharp[Permission stacking](samples/permissions/perm-nesting.cs)]
 
-The amount of nesting you can do is realistically endless, although really deep nesting is not adviced as the lookup will only take longer.
+The amount of nesting you can do is realistically endless, although really deep nesting is not advised as the lookup will only take longer.
 
 > [!NOTE]
 > If the nested class is marked with `Group`, as required for setting up subcommands, this example will not work.
