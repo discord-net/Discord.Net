@@ -198,20 +198,12 @@ namespace Discord
            string description, bool? isRequired = null, bool? isDefault = null, bool isAutocomplete = false, double? minValue = null, double? maxValue = null,
            List<SlashCommandOptionBuilder> options = null, List<ChannelType> channelTypes = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
-            // Make sure the name matches the requirements from discord
-            Preconditions.NotNullOrEmpty(name, nameof(name));
-            Preconditions.AtLeast(name.Length, 1, nameof(name));
-            Preconditions.AtMost(name.Length, MaxNameLength, nameof(name));
+            Preconditions.Options(name, description);
 
             // Discord updated the docs, this regex prevents special characters like @!$%( and s p a c e s.. etc,
             // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
             if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
                 throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(name));
-
-            // same with description
-            Preconditions.NotNullOrEmpty(description, nameof(description));
-            Preconditions.AtLeast(description.Length, 1, nameof(description));
-            Preconditions.AtMost(description.Length, MaxDescriptionLength, nameof(description));
 
             // make sure theres only one option with default set to true
             if (isDefault == true && Options?.Any(x => x.IsDefault == true) == true)
@@ -248,6 +240,7 @@ namespace Discord
                 throw new InvalidOperationException($"Cannot have more than {MaxOptionsCount} options!");
 
             Preconditions.NotNull(option, nameof(option));
+            Preconditions.Options(option.Name, option.Description); // this is a double-check when this method is called via AddOption(string name... )
 
             Options.Add(option);
             return this;
@@ -269,6 +262,9 @@ namespace Discord
 
             if (Options.Count + options.Length > MaxOptionsCount)
                 throw new ArgumentOutOfRangeException(nameof(options), $"Cannot have more than {MaxOptionsCount} options!");
+
+            foreach (var option in options)
+                Preconditions.Options(option.Name, option.Description);
 
             Options.AddRange(options);
             return this;
@@ -413,7 +409,7 @@ namespace Discord
                 MinValue = MinValue,
                 MaxValue = MaxValue
             };
-        }
+        }        
 
         /// <summary>
         ///     Adds an option to the current slash command.
@@ -434,20 +430,12 @@ namespace Discord
            string description, bool? isRequired = null, bool isDefault = false, bool isAutocomplete = false, double? minValue = null, double? maxValue = null,
            List<SlashCommandOptionBuilder> options = null, List<ChannelType> channelTypes = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
-            // Make sure the name matches the requirements from discord
-            Preconditions.NotNullOrEmpty(name, nameof(name));
-            Preconditions.AtLeast(name.Length, 1, nameof(name));
-            Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
+            Preconditions.Options(name, description);
 
             // Discord updated the docs, this regex prevents special characters like @!$%( and s p a c e s.. etc,
             // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
             if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
                 throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(name));
-
-            // same with description
-            Preconditions.NotNullOrEmpty(description, nameof(description));
-            Preconditions.AtLeast(description.Length, 1, nameof(description));
-            Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
 
             // make sure theres only one option with default set to true
             if (isDefault && Options?.Any(x => x.IsDefault == true) == true)
@@ -483,6 +471,7 @@ namespace Discord
                 throw new InvalidOperationException($"There can only be {SlashCommandBuilder.MaxOptionsCount} options per sub command group!");
 
             Preconditions.NotNull(option, nameof(option));
+            Preconditions.Options(option.Name, option.Description); // double check again
 
             Options.Add(option);
             return this;
