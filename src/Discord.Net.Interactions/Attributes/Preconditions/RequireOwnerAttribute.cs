@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord.Interactions
@@ -25,8 +26,16 @@ namespace Discord.Interactions
             {
                 case TokenType.Bot:
                     var application = await context.Client.GetApplicationInfoAsync().ConfigureAwait(false);
-                    if (context.User.Id != application.Owner.Id)
-                        return PreconditionResult.FromError(ErrorMessage ?? "Command can only be run by the owner of the bot.");
+                    if (application.Owner.PublicFlags.HasValue && (application.Owner.PublicFlags.Value & UserProperties.TeamUser) != 0)
+                    {
+                        if (application.Team.TeamMembers.All(tm => tm.User.Id != context.User.Id))
+                            return PreconditionResult.FromError(ErrorMessage ?? "Command can only be run by an owner of the bot.");
+                    }
+                    else
+                    {
+                        if (context.User.Id != application.Owner.Id)
+                            return PreconditionResult.FromError(ErrorMessage ?? "Command can only be run by the owner of the bot.");
+                    }
                     return PreconditionResult.FromSuccess();
                 default:
                     return PreconditionResult.FromError($"{nameof(RequireOwnerAttribute)} is not supported by this {nameof(TokenType)}.");
