@@ -243,7 +243,7 @@ namespace Discord.Net.ED25519
         /// <summary>
         /// // Decode a base58-encoded string into byte array
         /// </summary>
-        /// <param name="strBase58">Base58 data string</param>
+        /// <param name="input">Base58 data string</param>
         /// <returns>Byte array</returns>
         public static byte[] Base58Decode(string input)
         {
