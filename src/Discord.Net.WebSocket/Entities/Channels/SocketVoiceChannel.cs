@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
@@ -14,7 +15,7 @@ namespace Discord.WebSocket
     ///     Represents a WebSocket-based voice channel in a guild.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketVoiceChannel : SocketGuildChannel, IVoiceChannel, ISocketAudioChannel
+    public class SocketVoiceChannel : SocketTextChannel, IVoiceChannel, ISocketAudioChannel
     {
         #region SocketVoiceChannel
         /// <inheritdoc />
@@ -48,7 +49,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A read-only collection of users that are currently connected to this voice channel.
         /// </returns>
-        public override IReadOnlyCollection<SocketGuildUser> Users
+        public IReadOnlyCollection<SocketGuildUser> ConnectedUsers
             => Guild.Users.Where(x => x.VoiceChannel?.Id == Id).ToImmutableArray();
 
         internal SocketVoiceChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
@@ -65,7 +66,6 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-            CategoryId = model.CategoryId;
             Bitrate = model.Bitrate.Value;
             UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
             RTCRegion = model.RTCRegion.GetValueOrDefault(null);
@@ -99,7 +99,28 @@ namespace Discord.WebSocket
                 return user;
             return null;
         }
-#endregion
+
+        /// <inheritdoc/>
+        /// <exception cref="InvalidOperationException">Cannot create threads in voice channels.</exception>
+        public override Task<SocketThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
+            => throw new InvalidOperationException("Voice channels cannot contain threads.");
+        /// <inheritdoc/>
+        /// <exception cref="InvalidOperationException">Cannot create webhooks in voice channels.</exception>
+        public override Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
+            => throw new InvalidOperationException("Voice channels cannot contain webhooks.");
+        /// <inheritdoc/>
+        /// <exception cref="InvalidOperationException">Cannot modify text channel properties within a webhook.</exception>
+        public override Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
+            => throw new InvalidOperationException("Cannot modify text channel properties for voice channels.");
+        /// <inheritdoc/>
+        /// <exception cref="InvalidOperationException">Cannot get webhooks for a voice channel.</exception>
+        public override Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
+            => throw new InvalidOperationException("Cannot get webhooks for a voice channel.");
+        /// <inheritdoc/>
+        /// <exception cref="InvalidOperationException">Cannot get webhooks for a voice channel.</exception>
+        public override Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
+            => throw new InvalidOperationException("Cannot get webhooks for a voice channel.");
+        #endregion
 
         #region Invites
         /// <inheritdoc />

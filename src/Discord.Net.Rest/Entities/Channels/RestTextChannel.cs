@@ -232,38 +232,6 @@ namespace Discord.Rest
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
 
         /// <summary>
-        ///     Gets the parent (category) channel of this channel.
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains the category channel
-        ///     representing the parent of this channel; <c>null</c> if none is set.
-        /// </returns>
-        public virtual Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
-            => ChannelHelper.GetCategoryAsync(this, Discord, options);
-        /// <inheritdoc />
-        public Task SyncPermissionsAsync(RequestOptions options = null)
-            => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
-        #endregion
-
-        #region Invites
-        /// <inheritdoc />
-        public virtual async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
-        public virtual async Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteToApplicationAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, applicationId, options);
-        /// <inheritdoc />
-        public virtual async Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteToApplicationAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, (ulong)application, options);
-        public virtual Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => throw new NotImplementedException();
-        /// <inheritdoc />
-        public virtual async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
-            => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
-
-        private string DebuggerDisplay => $"{Name} ({Id}, Text)";
-
-        /// <summary>
         ///     Creates a thread within this <see cref="ITextChannel"/>.
         /// </summary>
         /// <remarks>
@@ -299,6 +267,38 @@ namespace Discord.Rest
             var model = await ThreadHelper.CreateThreadAsync(Discord, this, name, type, autoArchiveDuration, message, invitable, slowmode, options);
             return RestThreadChannel.Create(Discord, Guild, model);
         }
+
+        /// <summary>
+        ///     Gets the parent (category) channel of this channel.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the category channel
+        ///     representing the parent of this channel; <c>null</c> if none is set.
+        /// </returns>
+        public virtual Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
+            => ChannelHelper.GetCategoryAsync(this, Discord, options);
+        /// <inheritdoc />
+        public Task SyncPermissionsAsync(RequestOptions options = null)
+            => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
+        #endregion
+
+        #region Invites
+        /// <inheritdoc />
+        public virtual async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
+        public virtual async Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+            => await ChannelHelper.CreateInviteToApplicationAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, applicationId, options);
+        /// <inheritdoc />
+        public virtual async Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+            => await ChannelHelper.CreateInviteToApplicationAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, (ulong)application, options);
+        public virtual Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+            => throw new NotImplementedException();
+        /// <inheritdoc />
+        public virtual async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
+            => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
+
+        private string DebuggerDisplay => $"{Name} ({Id}, Text)";
         #endregion
 
         #region ITextChannel
