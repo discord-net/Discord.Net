@@ -357,7 +357,8 @@ namespace Discord.Interactions.Builders
             return this;
 
         }
-        
+
+        /// <summary>
         ///     Adds a modal command builder to <see cref="ModalCommands"/>.
         /// </summary>
         /// <param name="configure"><see cref="ModalCommands"/> factory.</param>

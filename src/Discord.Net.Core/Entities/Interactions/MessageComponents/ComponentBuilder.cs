@@ -1194,9 +1194,9 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the default value of the text input.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException"><see cref="Value.Length"/> is less than 0.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><see cref="Value"/>.Length is less than 0.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
-        ///     <see cref="Value.Length"/> is greater than <see cref="LargestMaxLength"/> or <see cref="MaxLength"/>.
+        ///     <see cref="Value"/>.Length is greater than <see cref="LargestMaxLength"/> or <see cref="MaxLength"/>.
         /// </exception>
         public string Value
         {
@@ -1306,18 +1306,18 @@ namespace Discord
         /// <summary>
         ///     Sets the minimum length of the current builder.
         /// </summary>
-        /// <param name="placeholder">The value to set.</param>
+        /// <param name="minLength">The value to set.</param>
         /// <returns>The current builder. </returns>
         public TextInputBuilder WithMinLength(int minLength)
         {
             MinLength = minLength;
             return this;
         }
-        
+
         /// <summary>
         ///     Sets the maximum length of the current builder.
         /// </summary>
-        /// <param name="placeholder">The value to set.</param>
+        /// <param name="maxLength">The value to set.</param>
         /// <returns>The current builder. </returns>
         public TextInputBuilder WithMaxLength(int maxLength)
         {
