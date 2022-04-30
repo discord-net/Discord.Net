@@ -27,20 +27,20 @@ namespace Discord.Rest
         {
         }
 
-        internal static async Task<RestCommandBaseData> CreateAsync(DiscordRestClient client, Model model, RestGuild guild, IRestMessageChannel channel)
+        internal static RestCommandBaseData Create(DiscordRestClient client, Model model, RestGuild guild, IRestMessageChannel channel)
         {
             var entity = new RestCommandBaseData(client, model);
-            await entity.UpdateAsync(client, model, guild, channel).ConfigureAwait(false);
+            entity.Update(client, model, guild, channel);
             return entity;
         }
 
-        internal virtual async Task UpdateAsync(DiscordRestClient client, Model model, RestGuild guild, IRestMessageChannel channel)
+        internal virtual void Update(DiscordRestClient client, Model model, RestGuild guild, IRestMessageChannel channel)
         {
             Name = model.Name;
             if (model.Resolved.IsSpecified && ResolvableData == null)
             {
                 ResolvableData = new RestResolvableData<Model>();
-                await ResolvableData.PopulateAsync(client, guild, channel, model).ConfigureAwait(false);
+                ResolvableData.PopulateAsync(client, guild, channel, model).ConfigureAwait(false);
             }
         }
 

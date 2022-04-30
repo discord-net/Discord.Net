@@ -23,22 +23,22 @@ namespace Discord.Rest
         {
         }
 
-        internal new static async Task<RestUserCommand> CreateAsync(DiscordRestClient client, Model model)
+        internal new static RestUserCommand Create(DiscordRestClient client, Model model)
         {
             var entity = new RestUserCommand(client, model);
-            await entity.UpdateAsync(client, model).ConfigureAwait(false);
+            entity.Update(client, model);
             return entity;
         }
 
-        internal override async Task UpdateAsync(DiscordRestClient client, Model model)
+        internal override void Update(DiscordRestClient client, Model model)
         {
-            await base.UpdateAsync(client, model).ConfigureAwait(false);
+            base.Update(client, model);
 
             var dataModel = model.Data.IsSpecified
                 ? (DataModel)model.Data.Value
                 : null;
 
-            Data = await RestUserCommandData.CreateAsync(client, dataModel, Guild, Channel).ConfigureAwait(false);
+            Data = RestUserCommandData.Create(client, dataModel, Guild, Channel);
         }
 
         //IUserCommandInteractionData

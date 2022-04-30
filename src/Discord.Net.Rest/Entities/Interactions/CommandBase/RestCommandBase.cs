@@ -39,16 +39,16 @@ namespace Discord.Rest
         {
         }
 
-        internal new static async Task<RestCommandBase> CreateAsync(DiscordRestClient client, Model model)
+        internal new static RestCommandBase Create(DiscordRestClient client, Model model)
         {
             var entity = new RestCommandBase(client, model);
-            await entity.UpdateAsync(client, model).ConfigureAwait(false);
+            entity.Update(client, model);
             return entity;
         }
 
-        internal override async Task UpdateAsync(DiscordRestClient client, Model model)
+        internal override void Update(DiscordRestClient client, Model model)
         {
-            await base.UpdateAsync(client, model).ConfigureAwait(false);
+            base.Update(client, model);
         }
 
         /// <summary>

@@ -26,10 +26,10 @@ namespace Discord.Rest
         internal RestUserCommandData(DiscordRestClient client, Model model)
             : base(client, model) { }
 
-        internal new static async Task<RestUserCommandData> CreateAsync(DiscordRestClient client, Model model, RestGuild guild, IRestMessageChannel channel)
+        internal new static RestUserCommandData Create(DiscordRestClient client, Model model, RestGuild guild, IRestMessageChannel channel)
         {
             var entity = new RestUserCommandData(client, model);
-            await entity.UpdateAsync(client, model, guild, channel).ConfigureAwait(false);
+            entity.Update(client, model, guild, channel);
             return entity;
         }
 

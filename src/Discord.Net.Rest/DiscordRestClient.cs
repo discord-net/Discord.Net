@@ -113,7 +113,7 @@ namespace Discord.Rest
         ///     A <see cref="RestInteraction"/> that represents the incoming http interaction.
         /// </returns>
         /// <exception cref="BadSignatureException">Thrown when the signature doesn't match the public key.</exception>
-        public Task<RestInteraction> ParseHttpInteractionAsync(string publicKey, string signature, string timestamp, string body)
+        public RestInteraction ParseHttpInteractionAsync(string publicKey, string signature, string timestamp, string body)
             => ParseHttpInteractionAsync(publicKey, signature, timestamp, Encoding.UTF8.GetBytes(body));
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace Discord.Rest
         ///     A <see cref="RestInteraction"/> that represents the incoming http interaction.
         /// </returns>
         /// <exception cref="BadSignatureException">Thrown when the signature doesn't match the public key.</exception>
-        public async Task<RestInteraction> ParseHttpInteractionAsync(string publicKey, string signature, string timestamp, byte[] body)
+        public RestInteraction ParseHttpInteractionAsync(string publicKey, string signature, string timestamp, byte[] body)
         {
             if (!IsValidHttpInteraction(publicKey, signature, timestamp, body))
             {
@@ -138,7 +138,7 @@ namespace Discord.Rest
             using (var jsonReader = new JsonTextReader(textReader))
             {
                 var model = Serializer.Deserialize<API.Interaction>(jsonReader);
-                return await RestInteraction.CreateAsync(this, model);
+                return RestInteraction.Create(this, model);
             }
         }
 

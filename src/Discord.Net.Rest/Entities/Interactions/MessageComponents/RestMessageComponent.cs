@@ -37,15 +37,15 @@ namespace Discord.Rest
             Data = new RestMessageComponentData(dataModel);
         }
 
-        internal new static async Task<RestMessageComponent> CreateAsync(DiscordRestClient client, Model model)
+        internal new static RestMessageComponent Create(DiscordRestClient client, Model model)
         {
             var entity = new RestMessageComponent(client, model);
-            await entity.UpdateAsync(client, model).ConfigureAwait(false);
+            entity.Update(client, model);
             return entity;
         }
-        internal override async Task UpdateAsync(DiscordRestClient discord, Model model)
+        internal override void Update(DiscordRestClient discord, Model model)
         {
-            await base.UpdateAsync(discord, model).ConfigureAwait(false);
+            base.Update(discord, model);
 
             if (model.Message.IsSpecified && model.ChannelId.IsSpecified)
             {

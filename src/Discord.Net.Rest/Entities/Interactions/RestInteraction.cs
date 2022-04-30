@@ -28,10 +28,16 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public int Version { get; private set; }
 
+        private Lazy<RestUser> _user;
+
         /// <summary>
         ///     Gets the user who invoked the interaction.
         /// </summary>
-        public RestUser User { get; private set; }
+        public RestUser User
+        {
+            get
+                => _user.Value;
+        }
 
         /// <inheritdoc/>
         public string UserLocale { get; private set; }
@@ -48,15 +54,27 @@ namespace Discord.Rest
         public bool IsValidToken
             => InteractionHelper.CanRespondOrFollowup(this);
 
+        private Lazy<IRestMessageChannel> _channel;
+
         /// <summary>
         ///     Gets the channel that this interaction was executed in.
         /// </summary>
-        public IRestMessageChannel Channel { get; private set; }
+        public IRestMessageChannel Channel
+        {
+            get
+                => _channel.Value;
+        }
+
+        private Lazy<RestGuild> _guild;
 
         /// <summary>
         ///     Gets the guild this interaction was executed in.
         /// </summary>
-        public RestGuild Guild { get; private set; }
+        public RestGuild Guild
+        {
+            get
+                => _guild.Value;
+        }
 
         /// <inheritdoc/>
         public bool HasResponded { get; protected set; }
@@ -72,11 +90,11 @@ namespace Discord.Rest
                 : DateTime.UtcNow;
         }
 
-        internal static async Task<RestInteraction> CreateAsync(DiscordRestClient client, Model model)
+        internal static RestInteraction Create(DiscordRestClient client, Model model)
         {
             if(model.Type == InteractionType.Ping)
             {
-                return await RestPingInteraction.CreateAsync(client, model);
+                return RestPingInteraction.Create(client, model);
             }
 
             if (model.Type == InteractionType.ApplicationCommand)
@@ -90,26 +108,26 @@ namespace Discord.Rest
 
                 return dataModel.Type switch
                 {
-                    ApplicationCommandType.Slash => await RestSlashCommand.CreateAsync(client, model).ConfigureAwait(false),
-                    ApplicationCommandType.Message => await RestMessageCommand.CreateAsync(client, model).ConfigureAwait(false),
-                    ApplicationCommandType.User => await RestUserCommand.CreateAsync(client, model).ConfigureAwait(false),
+                    ApplicationCommandType.Slash => RestSlashCommand.Create(client, model),
+                    ApplicationCommandType.Message => RestMessageCommand.Create(client, model),
+                    ApplicationCommandType.User => RestUserCommand.Create(client, model),
                     _ => null
                 };
             }
 
             if (model.Type == InteractionType.MessageComponent)
-                return await RestMessageComponent.CreateAsync(client, model).ConfigureAwait(false);
+                return RestMessageComponent.Create(client, model);
 
             if (model.Type == InteractionType.ApplicationCommandAutocomplete)
-                return await RestAutocompleteInteraction.CreateAsync(client, model).ConfigureAwait(false);
+                return RestAutocompleteInteraction.Create(client, model);
 
             if (model.Type == InteractionType.ModalSubmit)
-                return await RestModal.CreateAsync(client, model).ConfigureAwait(false);
+                return RestModal.Create(client, model);
 
             return null;
         }
 
-        internal virtual async Task UpdateAsync(DiscordRestClient discord, Model model)
+        internal virtual void Update(DiscordRestClient discord, Model model)
         {
             IsDMInteraction = !model.GuildId.IsSpecified;
 
@@ -122,18 +140,18 @@ namespace Discord.Rest
 
             if(Guild == null && model.GuildId.IsSpecified)
             {
-                Guild = await discord.GetGuildAsync(model.GuildId.Value);
+                _guild = new(() => discord.GetGuildAsync(model.GuildId.Value).GetAwaiter().GetResult()); // tbd
             }
 
             if (User == null)
             {
                 if (model.Member.IsSpecified && model.GuildId.IsSpecified)
                 {
-                    User = RestGuildUser.Create(Discord, Guild, model.Member.Value);
+                    _user = new(() => RestGuildUser.Create(Discord, Guild, model.Member.Value));
                 }
                 else
                 {
-                    User = RestUser.Create(Discord, model.User.Value);
+                    _user = new(() => RestUser.Create(Discord, model.User.Value));
                 }
             }
 
@@ -141,7 +159,7 @@ namespace Discord.Rest
             {
                 try
                 {
-                    Channel = (IRestMessageChannel)await discord.GetChannelAsync(model.ChannelId.Value);
+                    _channel = new(() => (IRestMessageChannel)discord.GetChannelAsync(model.ChannelId.Value).GetAwaiter().GetResult()); // tbd
                 }
                 catch(HttpException x) when(x.DiscordCode == DiscordErrorCode.MissingPermissions) { } // ignore
             }
