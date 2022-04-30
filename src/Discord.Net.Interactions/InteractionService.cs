@@ -834,11 +834,16 @@ namespace Discord.Interactions
             if (!searchResult.Command.SupportsWildCards || context is not IRouteMatchContainer matchContainer)
                 return;
 
-            var matches = new RouteSegmentMatch[searchResult.RegexCaptureGroups.Length];
-            for (var i = 0; i < searchResult.RegexCaptureGroups.Length; i++)
-                matches[i] = new RouteSegmentMatch(searchResult.RegexCaptureGroups[i]);
+            if (searchResult.RegexCaptureGroups?.Length > 0)
+            {
+                var matches = new RouteSegmentMatch[searchResult.RegexCaptureGroups.Length];
+                for (var i = 0; i < searchResult.RegexCaptureGroups.Length; i++)
+                    matches[i] = new RouteSegmentMatch(searchResult.RegexCaptureGroups[i]);
 
-            matchContainer.SetSegmentMatches(matches);
+                matchContainer.SetSegmentMatches(matches);
+            }
+            else
+                matchContainer.SetSegmentMatches(Array.Empty<RouteSegmentMatch>());
         }
 
         internal TypeConverter GetTypeConverter(Type type, IServiceProvider services = null)
