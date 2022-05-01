@@ -53,18 +53,36 @@ namespace Discord.Rest
             => InteractionHelper.CanRespondOrFollowup(this);
 
         /// <summary>
+        ///     Gets the ID of the channel this interaction was executed in.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the interaction was not executed in a guild.
+        /// </remarks>
+        public ulong? ChannelId { get; private set; } = null;
+
+        /// <summary>
         ///     Gets the channel that this interaction was executed in.
         /// </summary>
         /// <remarks>
-        ///     <see langword="null"/> if <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false.
+        ///     <see langword="null"/> if <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false
+        ///     or if the interaction was not executed in a guild.
         /// </remarks>
         public IRestMessageChannel Channel { get; private set; }
+
+        /// <summary>
+        ///     Gets the ID of the guild this interaction was executed in if applicable.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the interaction was not executed in a guild.
+        /// </remarks>
+        public ulong? GuildId { get; private set; } = null;
 
         /// <summary>
         ///     Gets the guild this interaction was executed in if applicable.
         /// </summary>
         /// <remarks>
-        ///     <see langword="null"/> if <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false.
+        ///     This property will be <see langword="null"/> if <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false
+        ///     or if the interaction was not executed in a guild.
         /// </remarks>
         public RestGuild Guild { get; private set; }
 
@@ -130,8 +148,9 @@ namespace Discord.Rest
             Version = model.Version;
             Type = model.Type;
 
-            if(Guild == null && model.GuildId.IsSpecified)
+            if (Guild == null && model.GuildId.IsSpecified)
             {
+                GuildId = model.GuildId.Value;
                 if (discord.APIOnInteractionCreation)
                     Guild = await discord.GetGuildAsync(model.GuildId.Value);
                 else
@@ -150,21 +169,23 @@ namespace Discord.Rest
                 }
             }
 
-            if(Channel == null && model.ChannelId.IsSpecified)
+            if (Channel == null && model.ChannelId.IsSpecified)
             {
                 try
                 {
+                    ChannelId = model.ChannelId.Value;
                     if (discord.APIOnInteractionCreation)
                         Channel = (IRestMessageChannel)await discord.GetChannelAsync(model.ChannelId.Value);
                     else
                         Channel = null;
                 }
-                catch(HttpException x) when(x.DiscordCode == DiscordErrorCode.MissingPermissions) { } // ignore
+                catch (HttpException x) when (x.DiscordCode == DiscordErrorCode.MissingPermissions) { } // ignore
             }
 
             UserLocale = model.UserLocale.IsSpecified
-               ? model.UserLocale.Value
-               : null;
+                ? model.UserLocale.Value
+                : null;
+
             GuildLocale = model.GuildLocale.IsSpecified
                 ? model.GuildLocale.Value
                 : null;
@@ -179,6 +200,9 @@ namespace Discord.Rest
 
             return json.ToString();
         }
+
+        public async Task<RestGuild> GetGuildAsync()
+            => await 
 
         /// <inheritdoc/>
         public abstract string Defer(bool ephemeral = false, RequestOptions options = null);
