@@ -31,6 +31,10 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the user who invoked the interaction.
         /// </summary>
+        /// <remarks>
+        ///     If this user is an <see cref="RestGuildUser"/> and <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false,
+        ///     <see cref="RestGuildUser.Guild"/> will return <see langword="null"/>
+        /// </remarks>
         public RestUser User { get; private set; }
 
         /// <inheritdoc/>
@@ -51,11 +55,17 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the channel that this interaction was executed in.
         /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false.
+        /// </remarks>
         public IRestMessageChannel Channel { get; private set; }
 
         /// <summary>
-        ///     Gets the guild this interaction was executed in.
+        ///     Gets the guild this interaction was executed in if applicable.
         /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false.
+        /// </remarks>
         public RestGuild Guild { get; private set; }
 
         /// <inheritdoc/>
@@ -122,7 +132,10 @@ namespace Discord.Rest
 
             if(Guild == null && model.GuildId.IsSpecified)
             {
-                Guild = await discord.GetGuildAsync(model.GuildId.Value);
+                if (discord.APIOnInteractionCreation)
+                    Guild = await discord.GetGuildAsync(model.GuildId.Value);
+                else
+                    Guild = null;
             }
 
             if (User == null)
@@ -141,7 +154,10 @@ namespace Discord.Rest
             {
                 try
                 {
-                    Channel = (IRestMessageChannel)await discord.GetChannelAsync(model.ChannelId.Value);
+                    if (discord.APIOnInteractionCreation)
+                        Channel = (IRestMessageChannel)await discord.GetChannelAsync(model.ChannelId.Value);
+                    else
+                        Channel = null;
                 }
                 catch(HttpException x) when(x.DiscordCode == DiscordErrorCode.MissingPermissions) { } // ignore
             }

@@ -32,9 +32,15 @@ namespace Discord.Rest
         ///     Initializes a new <see cref="DiscordRestClient"/> with the provided configuration.
         /// </summary>
         /// <param name="config">The configuration to be used with the client.</param>
-        public DiscordRestClient(DiscordRestConfig config) : base(config, CreateApiClient(config)) { }
+        public DiscordRestClient(DiscordRestConfig config) : base(config, CreateApiClient(config))
+        {
+            APIOnInteractionCreation = config.APIOnRestInteractionCreation;
+        }
         // used for socket client rest access
-        internal DiscordRestClient(DiscordRestConfig config, API.DiscordRestApiClient api) : base(config, api) { }
+        internal DiscordRestClient(DiscordRestConfig config, API.DiscordRestApiClient api) : base(config, api)
+        {
+            APIOnInteractionCreation = config.APIOnRestInteractionCreation;
+        }
 
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
             => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, serializer: Serializer, useSystemClock: config.UseSystemClock, defaultRatelimitCallback: config.DefaultRatelimitCallback);
@@ -81,6 +87,8 @@ namespace Discord.Rest
         }
 
         #region Rest interactions
+
+        internal readonly bool APIOnInteractionCreation;
 
         public bool IsValidHttpInteraction(string publicKey, string signature, string timestamp, string body)
             => IsValidHttpInteraction(publicKey, signature, timestamp, Encoding.UTF8.GetBytes(body));
