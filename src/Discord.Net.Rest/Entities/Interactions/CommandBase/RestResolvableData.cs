@@ -22,7 +22,7 @@ namespace Discord.Rest
         internal readonly Dictionary<ulong, Attachment> Attachments
             = new Dictionary<ulong, Attachment>();
 
-        internal async Task PopulateAsync(DiscordRestClient discord, RestGuild guild, IRestMessageChannel channel, T model)
+        internal async Task PopulateAsync(DiscordRestClient discord, RestGuild guild, IRestMessageChannel channel, T model, bool doApiCall)
         {
             var resolved = model.Resolved.Value;
 
@@ -38,7 +38,7 @@ namespace Discord.Rest
 
             if (resolved.Channels.IsSpecified)
             {
-                var channels = discord.APIOnInteractionCreation ? await guild.GetChannelsAsync().ConfigureAwait(false) : null;
+                var channels = doApiCall ? await guild.GetChannelsAsync().ConfigureAwait(false) : null;
 
                 foreach (var channelModel in resolved.Channels.Value)
                 {
@@ -88,7 +88,7 @@ namespace Discord.Rest
                 foreach (var msg in resolved.Messages.Value)
                 {
                     channel ??= (IRestMessageChannel)(Channels.FirstOrDefault(x => x.Key == msg.Value.ChannelId).Value
-                        ?? (discord.APIOnInteractionCreation
+                        ?? (doApiCall
                         ? await discord.GetChannelAsync(msg.Value.ChannelId).ConfigureAwait(false)
                         : null));
 

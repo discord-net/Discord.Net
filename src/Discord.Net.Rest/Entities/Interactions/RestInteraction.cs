@@ -100,11 +100,11 @@ namespace Discord.Rest
                 : DateTime.UtcNow;
         }
 
-        internal static async Task<RestInteraction> CreateAsync(DiscordRestClient client, Model model)
+        internal static async Task<RestInteraction> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
             if(model.Type == InteractionType.Ping)
             {
-                return await RestPingInteraction.CreateAsync(client, model);
+                return await RestPingInteraction.CreateAsync(client, model, doApiCall);
             }
 
             if (model.Type == InteractionType.ApplicationCommand)
@@ -118,26 +118,26 @@ namespace Discord.Rest
 
                 return dataModel.Type switch
                 {
-                    ApplicationCommandType.Slash => await RestSlashCommand.CreateAsync(client, model).ConfigureAwait(false),
-                    ApplicationCommandType.Message => await RestMessageCommand.CreateAsync(client, model).ConfigureAwait(false),
-                    ApplicationCommandType.User => await RestUserCommand.CreateAsync(client, model).ConfigureAwait(false),
+                    ApplicationCommandType.Slash => await RestSlashCommand.CreateAsync(client, model, doApiCall).ConfigureAwait(false),
+                    ApplicationCommandType.Message => await RestMessageCommand.CreateAsync(client, model, doApiCall).ConfigureAwait(false),
+                    ApplicationCommandType.User => await RestUserCommand.CreateAsync(client, model, doApiCall).ConfigureAwait(false),
                     _ => null
                 };
             }
 
             if (model.Type == InteractionType.MessageComponent)
-                return await RestMessageComponent.CreateAsync(client, model).ConfigureAwait(false);
+                return await RestMessageComponent.CreateAsync(client, model, doApiCall).ConfigureAwait(false);
 
             if (model.Type == InteractionType.ApplicationCommandAutocomplete)
-                return await RestAutocompleteInteraction.CreateAsync(client, model).ConfigureAwait(false);
+                return await RestAutocompleteInteraction.CreateAsync(client, model, doApiCall).ConfigureAwait(false);
 
             if (model.Type == InteractionType.ModalSubmit)
-                return await RestModal.CreateAsync(client, model).ConfigureAwait(false);
+                return await RestModal.CreateAsync(client, model, doApiCall).ConfigureAwait(false);
 
             return null;
         }
 
-        internal virtual async Task UpdateAsync(DiscordRestClient discord, Model model)
+        internal virtual async Task UpdateAsync(DiscordRestClient discord, Model model, bool doApiCall)
         {
             IsDMInteraction = !model.GuildId.IsSpecified;
 
@@ -151,7 +151,7 @@ namespace Discord.Rest
             if (Guild == null && model.GuildId.IsSpecified)
             {
                 GuildId = model.GuildId.Value;
-                if (discord.APIOnInteractionCreation)
+                if (doApiCall)
                     Guild = await discord.GetGuildAsync(model.GuildId.Value);
                 else
                     Guild = null;
@@ -174,7 +174,7 @@ namespace Discord.Rest
                 try
                 {
                     ChannelId = model.ChannelId.Value;
-                    if (discord.APIOnInteractionCreation)
+                    if (doApiCall)
                         Channel = (IRestMessageChannel)await discord.GetChannelAsync(model.ChannelId.Value);
                     else
                         Channel = null;
@@ -200,9 +200,6 @@ namespace Discord.Rest
 
             return json.ToString();
         }
-
-        public async Task<RestGuild> GetGuildAsync()
-            => await 
 
         /// <inheritdoc/>
         public abstract string Defer(bool ephemeral = false, RequestOptions options = null);
