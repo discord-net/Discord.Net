@@ -32,7 +32,7 @@ namespace Discord.Rest
 
         internal override async Task UpdateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
-            await base.UpdateAsync(client, model).ConfigureAwait(false);
+            await base.UpdateAsync(client, model, doApiCall).ConfigureAwait(false);
 
             var dataModel = model.Data.IsSpecified
                 ? (DataModel)model.Data.Value

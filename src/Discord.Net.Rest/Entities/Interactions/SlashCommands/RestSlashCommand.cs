@@ -26,7 +26,7 @@ namespace Discord.Rest
         internal new static async Task<RestSlashCommand> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
             var entity = new RestSlashCommand(client, model);
-            await entity.UpdateAsync(client, model).ConfigureAwait(false);
+            await entity.UpdateAsync(client, model, doApiCall).ConfigureAwait(false);
             return entity;
         }
 
