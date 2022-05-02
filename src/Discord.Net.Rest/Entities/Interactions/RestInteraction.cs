@@ -16,6 +16,10 @@ namespace Discord.Rest
     /// </summary>
     public abstract class RestInteraction : RestEntity<ulong>, IDiscordInteraction
     {
+        // Added so channel & guild methods don't need a client reference
+        private Func<RequestOptions, ulong, Task<IRestMessageChannel>> _getChannel = null;
+        private Func<RequestOptions, ulong, Task<RestGuild>> _getGuild = null;
+
         /// <inheritdoc/>
         public InteractionType Type { get; private set; }
 
@@ -64,8 +68,8 @@ namespace Discord.Rest
         ///     Gets the channel that this interaction was executed in.
         /// </summary>
         /// <remarks>
-        ///     <see langword="null"/> if <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false
-        ///     or if the interaction was not executed in a guild.
+        ///     <see langword="null"/> if <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false.
+        ///     Call <see cref="GetChannelAsync"/> to set this property and get the interaction channel.
         /// </remarks>
         public IRestMessageChannel Channel { get; private set; }
 
@@ -154,7 +158,10 @@ namespace Discord.Rest
                 if (doApiCall)
                     Guild = await discord.GetGuildAsync(model.GuildId.Value);
                 else
+                {
                     Guild = null;
+                    _getGuild = new(async (opt, ul) => await discord.GetGuildAsync(ul, opt));
+                }
             }
 
             if (User == null)
@@ -177,7 +184,17 @@ namespace Discord.Rest
                     if (doApiCall)
                         Channel = (IRestMessageChannel)await discord.GetChannelAsync(model.ChannelId.Value);
                     else
+                    {
+                        _getChannel = new(async (opt, ul) =>
+                        {
+                            if (Guild is null)
+                                return (IRestMessageChannel)await discord.GetChannelAsync(ul, opt);
+                            else // get a guild channel if the guild is set.
+                                return (IRestMessageChannel)await Guild.GetChannelAsync(ul, opt);
+                        });
+
                         Channel = null;
+                    }
                 }
                 catch (HttpException x) when (x.DiscordCode == DiscordErrorCode.MissingPermissions) { } // ignore
             }
@@ -199,6 +216,59 @@ namespace Discord.Rest
                 DiscordRestClient.Serializer.Serialize(writer, payload);
 
             return json.ToString();
+        }
+
+        /// <summary>
+        ///     Gets the channel this interaction was executed in. Will be a DM channel if the interaction was executed in DM.
+        /// </summary>
+        /// <remarks>
+        ///     Calling this method succesfully will populate the <see cref="Channel"/> property.
+        ///     After this, further calls to this method will no longer call the API, and depend on the value set in <see cref="Channel"/>.
+        /// </remarks>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
+        /// <returns>A Rest channel to send messages to.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if no channel can be received.</exception>
+        public async Task<IRestMessageChannel> GetChannelAsync(RequestOptions options = null)
+        {
+            if (IsDMInteraction && Channel is null)
+            {
+                var channel = await User.CreateDMChannelAsync(options);
+                Channel = channel;
+            }
+
+            else if (Channel is null)
+            {
+                var channel = await _getChannel(options, ChannelId.Value);
+
+                if (channel is null)
+                    throw new InvalidOperationException("The interaction channel was not able to be retrieved.");
+                Channel = channel;
+
+                _getChannel = null; // get rid of it, we don't need it anymore.
+            }
+
+            return Channel;
+        }
+
+        /// <summary>
+        ///     Gets the guild this interaction was executed in if applicable.
+        /// </summary>
+        /// <remarks>
+        ///     Calling this method succesfully will populate the <see cref="Guild"/> property.
+        ///     After this, further calls to this method will no longer call the API, and depend on the value set in <see cref="Guild"/>.
+        /// </remarks>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
+        /// <returns>The guild this interaction was executed in. <see langword="null"/> if the interaction was executed inside DM.</returns>
+        public async Task<RestGuild> GetGuildAsync(RequestOptions options)
+        {
+            if (IsDMInteraction)
+                return null;
+
+            if (Guild is null)
+                Guild = await _getGuild(options, GuildId.Value);
+
+            _getGuild = null; // get rid of it, we don't need it anymore.
+            return Guild;
         }
 
         /// <inheritdoc/>
