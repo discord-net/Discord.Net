@@ -8,7 +8,8 @@ public async Task Autocomplete()
         new AutocompleteResult("foo", "foo_value"),
         new AutocompleteResult("bar", "bar_value"),
         new AutocompleteResult("baz", "baz_value"),
-    }.Where(x => x.Name.StartsWith(userInput)); // only send suggestions that start with user's input
+    }.Where(x => x.Name.StartsWith(userInput, StringComparison.InvariantCultureIgnoreCase)); // only send suggestions that starts with user's input; use case insensitive matching
+
 
     // max - 25 suggestions at a time
     await (Context.Interaction as SocketAutocompleteInteraction).RespondAsync(results.Take(25));

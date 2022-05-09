@@ -14,7 +14,7 @@ public class ExampleAutocompleteHandler : AutocompleteHandler
             new AutocompleteResult("Name2", "value2")
         };
 
-        // max - 25 suggestions at a time
+        // max - 25 suggestions at a time (API limit)
         return AutocompletionResult.FromSuccess(results.Take(25));
     }
 }
