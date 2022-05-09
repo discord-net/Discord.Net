@@ -1,13 +1,16 @@
 [AutocompleteCommand("parameter_name", "command_name")]
 public async Task Autocomplete()
 {
-    IEnumerable<AutocompleteResult> results = new[] 
-    { 
-        new AutocompleteResult("Name1", "value1"), 
-        new AutocompleteResult("Name2", "value2") 
-    };
+    string userInput = (Context.Interaction as SocketAutocompleteInteraction).Data.Current.Value.ToString();
 
-        // max - 25 suggestions at a time
+    IEnumerable<AutocompleteResult> results = new[]
+    {
+        new AutocompleteResult("foo", "foo_value"),
+        new AutocompleteResult("bar", "bar_value"),
+        new AutocompleteResult("baz", "baz_value"),
+    }.Where(x => x.Name.StartsWith(userInput)); // only send suggestions that start with user's input
+
+    // max - 25 suggestions at a time
     await (Context.Interaction as SocketAutocompleteInteraction).RespondAsync(results.Take(25));
 }
 
