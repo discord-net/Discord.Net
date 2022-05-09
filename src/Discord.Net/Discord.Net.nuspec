@@ -8,10 +8,10 @@
     <owners>foxbot</owners>
     <description>An asynchronous API wrapper for Discord. This metapackage includes all of the optional Discord.Net components.</description>
     <tags>discord;discordapp</tags>
-    <projectUrl>https://github.com/RogueException/Discord.Net</projectUrl>
+    <projectUrl>https://github.com/discord-net/Discord.Net</projectUrl>
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <iconUrl>https://github.com/RogueException/Discord.Net/raw/dev/docs/marketing/logo/PackageLogo.png</iconUrl>
+    <iconUrl>https://github.com/discord-net/Discord.Net/raw/dev/docs/marketing/logo/PackageLogo.png</iconUrl>
     <dependencies>
         <group targetFramework="net6.0">
             <dependency id="Discord.Net.Core" version="3.6.1$suffix$" />
