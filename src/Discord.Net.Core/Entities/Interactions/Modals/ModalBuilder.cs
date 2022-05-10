@@ -64,18 +64,18 @@ namespace Discord
         /// <summary>
         ///     Sets the custom id of the current modal.
         /// </summary>
-        /// <param name="title">The value to set the custom id to.</param>
+        /// <param name="customId">The value to set the custom id to.</param>
         /// <returns>The current builder.</returns>
         public ModalBuilder WithCustomId(string customId)
         {
             CustomId = customId;
             return this;
         }
-        
+
         /// <summary>
         ///     Adds a component to the current builder.
         /// </summary>
-        /// <param name="title">The component to add.</param>
+        /// <param name="component">The component to add.</param>
         /// <returns>The current builder.</returns>
         public ModalBuilder AddTextInput(TextInputBuilder component)
         {
@@ -213,7 +213,7 @@ namespace Discord
         ///     Adds a <see cref="TextInputBuilder"/> to the <see cref="ModalComponentBuilder"/> at the specific row.
         ///     If the row cannot accept the component then it will add it to a row that can.
         /// </summary>
-        /// <param name="text">The <see cref="TextInputBuilder"> to add.</param>
+        /// <param name="text">The <see cref="TextInputBuilder"/> to add.</param>
         /// <param name="row">The row to add the text input.</param>
         /// <exception cref="InvalidOperationException">There are no more rows to add a text input to.</exception>
         /// <exception cref="ArgumentException"><paramref name="row"/> must be less than <see cref="MaxActionRowCount"/>.</exception>

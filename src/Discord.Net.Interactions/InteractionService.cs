@@ -421,7 +421,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <remarks>
         ///     Commands will be registered as standalone commands, if you want the <see cref="GroupAttribute"/> to take effect,
-        ///     use <see cref="AddModulesToGuildAsync(IGuild, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
+        ///     use <see cref="AddModulesToGuildAsync(IGuild, bool, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
         /// </remarks>
         /// <param name="guild">The target guild.</param>
         /// <param name="commands">Commands to be registered to Discord.</param>
@@ -517,7 +517,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <remarks>
         ///     Commands will be registered as standalone commands, if you want the <see cref="GroupAttribute"/> to take effect,
-        ///     use <see cref="AddModulesToGuildAsync(IGuild, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
+        ///     use <see cref="AddModulesToGuildAsync(IGuild, bool, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
         /// </remarks>
         /// <param name="commands">Commands to be registered to Discord.</param>
         /// <returns>
@@ -834,11 +834,16 @@ namespace Discord.Interactions
             if (!searchResult.Command.SupportsWildCards || context is not IRouteMatchContainer matchContainer)
                 return;
 
-            var matches = new RouteSegmentMatch[searchResult.RegexCaptureGroups.Length];
-            for (var i = 0; i < searchResult.RegexCaptureGroups.Length; i++)
-                matches[i] = new RouteSegmentMatch(searchResult.RegexCaptureGroups[i]);
+            if (searchResult.RegexCaptureGroups?.Length > 0)
+            {
+                var matches = new RouteSegmentMatch[searchResult.RegexCaptureGroups.Length];
+                for (var i = 0; i < searchResult.RegexCaptureGroups.Length; i++)
+                    matches[i] = new RouteSegmentMatch(searchResult.RegexCaptureGroups[i]);
 
-            matchContainer.SetSegmentMatches(matches);
+                matchContainer.SetSegmentMatches(matches);
+            }
+            else
+                matchContainer.SetSegmentMatches(Array.Empty<RouteSegmentMatch>());
         }
 
         internal TypeConverter GetTypeConverter(Type type, IServiceProvider services = null)
@@ -960,7 +965,7 @@ namespace Discord.Interactions
         ///     Removes a type reader for the given type.
         /// </summary>
         /// <remarks>
-        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="InteractionService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
         ///     You need to reload the modules for the changes to take effect.
         /// </remarks>
         /// <param name="type">The type to remove the reader from.</param>
@@ -973,7 +978,7 @@ namespace Discord.Interactions
         ///     Removes a generic type reader from the type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="InteractionService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
         ///     You need to reload the modules for the changes to take effect.
         /// </remarks>
         /// <typeparam name="T">The type to remove the readers from.</typeparam>
@@ -986,7 +991,7 @@ namespace Discord.Interactions
         ///     Removes a generic type reader from the given type.
         /// </summary>
         /// <remarks>
-        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="InteractionService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
         ///     You need to reload the modules for the changes to take effect.
         /// </remarks>
         /// <param name="type">The type to remove the reader from.</param>
@@ -999,7 +1004,7 @@ namespace Discord.Interactions
         ///     Serialize an object using a <see cref="TypeReader"/> into a <see cref="string"/> to be placed in a Component CustomId.
         /// </summary>
         /// <remarks>
-        ///     Removing a <see cref="TypeReader"/> from the <see cref="CommandService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="InteractionService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
         ///     You need to reload the modules for the changes to take effect.
         /// </remarks>
         /// <typeparam name="T">Type of the object to be serialized.</typeparam>

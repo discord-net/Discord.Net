@@ -56,7 +56,7 @@ namespace Discord.Interactions.Builders
         /// <summary>
         ///     Sets <see cref="DefaultPermission"/>.
         /// </summary>
-        /// <param name="defaultPermision">New value of the <see cref="DefaultPermission"/>.</param>
+        /// <param name="permission">New value of the <see cref="DefaultPermission"/>.</param>
         /// <returns>
         ///     The builder instance.
         /// </returns>

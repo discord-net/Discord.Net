@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord.Commands
 {
@@ -12,7 +12,7 @@ namespace Discord.Commands
         /// <summary>
         ///     Gets on which pipeline stage the command may have matched or failed.
         /// </summary>
-        public IResult? Pipeline { get; }
+        public IResult Pipeline { get; }
 
         /// <inheritdoc />
         public CommandError? Error { get; }
@@ -21,7 +21,7 @@ namespace Discord.Commands
         /// <inheritdoc />
         public bool IsSuccess => !Error.HasValue;
 
-        private MatchResult(CommandMatch? match, IResult? pipeline, CommandError? error, string errorReason)
+        private MatchResult(CommandMatch? match, IResult pipeline, CommandError? error, string errorReason)
         {
             Match = match;
             Error = error;
