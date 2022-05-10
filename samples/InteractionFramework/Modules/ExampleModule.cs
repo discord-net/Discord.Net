@@ -14,7 +14,7 @@ namespace InteractionFramework.Modules
 
         private InteractionHandler _handler;
 
-        // Constructor injection is also a valid way to access the dependecies
+        // Constructor injection is also a valid way to access the dependencies
         public ExampleModule(InteractionHandler handler)
         {
             _handler = handler;

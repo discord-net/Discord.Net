@@ -1,11 +1,13 @@
 using Discord.WebSocket;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Discord.Interactions
 {
     /// <summary>
     ///     Represents a Web-Socket based context of an <see cref="IDiscordInteraction"/>.
     /// </summary>
-    public class SocketInteractionContext<TInteraction> : IInteractionContext
+    public class SocketInteractionContext<TInteraction> : IInteractionContext, IRouteMatchContainer
         where TInteraction : SocketInteraction
     {
         /// <summary>
@@ -36,6 +38,9 @@ namespace Discord.Interactions
         /// </summary>
         public TInteraction Interaction { get; }
 
+        /// <inheritdoc cref="IRouteMatchContainer.SegmentMatches"/>
+        public IReadOnlyCollection<IRouteSegmentMatch> SegmentMatches { get; private set; }
+
         /// <summary>
         ///     Initializes a new <see cref="SocketInteractionContext{TInteraction}"/>. 
         /// </summary>
@@ -49,6 +54,13 @@ namespace Discord.Interactions
             User = interaction.User;
             Interaction = interaction;
         }
+
+        /// <inheritdoc/>
+        public void SetSegmentMatches(IEnumerable<IRouteSegmentMatch> segmentMatches) => SegmentMatches = segmentMatches.ToImmutableArray();
+
+        //IRouteMatchContainer
+        /// <inheritdoc/>
+        IEnumerable<IRouteSegmentMatch> IRouteMatchContainer.SegmentMatches => SegmentMatches;
 
         // IInteractionContext
         /// <inheritdoc/>

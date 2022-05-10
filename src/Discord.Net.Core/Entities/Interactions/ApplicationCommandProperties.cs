@@ -17,6 +17,16 @@ namespace Discord
         /// </summary>
         public Optional<bool> IsDefaultPermission { get; set; }
 
+        /// <summary>
+        ///     Gets or sets whether or not this command can be used in DMs.
+        /// </summary>
+        public Optional<bool> IsDMEnabled { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the default permissions required by a user to execute this application command.
+        /// </summary>
+        public Optional<GuildPermission> DefaultMemberPermissions { get; set; }
+
         internal ApplicationCommandProperties() { }
     }
 }

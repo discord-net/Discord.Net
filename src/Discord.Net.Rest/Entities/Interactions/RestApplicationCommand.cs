@@ -27,6 +27,12 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public bool IsDefaultPermission { get; private set; }
 
+        /// <inheritdoc/>
+        public bool IsEnabledInDm { get; private set; }
+
+        /// <inheritdoc/>
+        public GuildPermissions DefaultMemberPermissions { get; private set; }
+
         /// <summary>
         ///     Gets a collection of options for this command.
         /// </summary>
@@ -57,6 +63,9 @@ namespace Discord.Rest
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(RestApplicationCommandOption.Create).ToImmutableArray()
                 : ImmutableArray.Create<RestApplicationCommandOption>();
+
+            IsEnabledInDm = model.DmPermission.GetValueOrDefault(true).GetValueOrDefault(true);
+            DefaultMemberPermissions = new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(0).GetValueOrDefault(0));
         }
 
         /// <inheritdoc/>

@@ -202,7 +202,7 @@ online in Discord.
 
 To create commands for your bot, you may choose from a variety of
 command processors available. Throughout the guides, we will be using
-the one that Discord.Net ships with. @Guides.Commands.Intro will
+the one that Discord.Net ships with. @Guides.TextCommands.Intro will
 guide you through how to setup a program that is ready for
 [CommandService].
 

@@ -1,5 +1,28 @@
 # Changelog
 
+## [3.6.1] - 2022-04-30
+### Added
+- #2272 add 50080 Error code (503e720)
+
+### Fixed
+- #2267 Permissions v2 Invalid Operation Exception (a8f6075)
+- #2271 null user on interaction without bot scope (f2bb55e)
+- #2274 Implement fix for Custom Id Segments NRE (0d74c5c)
+
+### Misc
+- 3.6.0 (27226f0)
+
+
+## [3.6.0] - 2022-04-28
+### Added
+- #2136 Passing CustomId matches into contexts (4ce1801)
+- #2222 V2 Permissions (d98b3cc)
+
+### Fixed
+- #2260 Guarding against empty descriptions in `SlashCommandBuilder`/`SlashCommandOptionBuilder` (0554ac2)
+- #2248 Fix SocketGuild not returning the AudioClient (daba58c)
+- #2254 Fix browser property (275b833)
+
 ## [3.5.0] - 2022-04-05
 
 ### Added

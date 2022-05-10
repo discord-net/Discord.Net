@@ -36,6 +36,12 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public bool IsDefaultPermission { get; private set; }
 
+        /// <inheritdoc/>
+        public bool IsEnabledInDm { get; private set; }
+
+        /// <inheritdoc/>
+        public GuildPermissions DefaultMemberPermissions { get; private set; }
+
         /// <summary>
         ///     Gets a collection of <see cref="SocketApplicationCommandOption"/>s for this command.
         /// </summary>
@@ -86,6 +92,9 @@ namespace Discord.WebSocket
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(SocketApplicationCommandOption.Create).ToImmutableArray()
                 : ImmutableArray.Create<SocketApplicationCommandOption>();
+
+            IsEnabledInDm = model.DmPermission.GetValueOrDefault(true).GetValueOrDefault(true);
+            DefaultMemberPermissions = new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(0).GetValueOrDefault(0));
         }
 
         /// <inheritdoc/>

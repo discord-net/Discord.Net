@@ -57,6 +57,8 @@
       topicUid: Guides.IntFw.DI
     - name: Post-execution Handling
       topicUid: Guides.IntFw.PostExecution
+    - name: Permissions
+      topicUid: Guides.IntFw.Perms
 - name: Slash Command Basics
   items:
     - name: Introduction

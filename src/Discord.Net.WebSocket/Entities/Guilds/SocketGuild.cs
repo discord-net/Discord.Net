@@ -1732,7 +1732,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         ulong? IGuild.AFKChannelId => AFKChannelId;
         /// <inheritdoc />
-        IAudioClient IGuild.AudioClient => null;
+        IAudioClient IGuild.AudioClient => AudioClient;
         /// <inheritdoc />
         bool IGuild.Available => true;
         /// <inheritdoc />
