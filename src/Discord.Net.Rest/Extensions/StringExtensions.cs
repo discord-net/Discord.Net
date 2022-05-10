@@ -1,5 +1,7 @@
 using Discord.Net.Converters;
 using Newtonsoft.Json;
+using System.Linq;
+using System;
 
 namespace Discord.Rest
 {
@@ -8,6 +10,16 @@ namespace Discord.Rest
     /// </summary>
     public static class StringExtensions
     {
+        private static Lazy<JsonSerializerSettings> _settings = new(() =>
+        {
+            var serializer = new JsonSerializerSettings()
+            {
+                ContractResolver = new DiscordContractResolver()
+            };
+            serializer.Converters.Add(new EmbedTypeConverter());
+            return serializer;
+        });
+
         /// <summary>
         ///     Gets a Json formatted <see langword="string"/> from an <see cref="EmbedBuilder"/>.
         /// </summary>
@@ -30,6 +42,6 @@ namespace Discord.Rest
         /// <param name="formatting">The formatting in which the Json will be returned.</param>
         /// <returns>A Json <see langword="string"/> containing the data from the <paramref name="builder"/>.</returns>
         public static string ToJsonString(this Embed embed, Formatting formatting = Formatting.Indented)
-            => JsonConvert.SerializeObject(embed.ToModel(), formatting, new EmbedTypeConverter());
+            => JsonConvert.SerializeObject(embed.ToModel(), formatting, _settings.Value);
     }
 }
