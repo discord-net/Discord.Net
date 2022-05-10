@@ -23,7 +23,7 @@ namespace Discord.Utils
 
         /// <summary>
         ///     Not full URL validation right now. Just Ensures the protocol is either http, https, or discord
-        /// <see cref="Validate(string)"/> should be used everything other than url buttons.
+        /// <see cref="Validate(string, bool)"/> should be used everything other than url buttons.
         /// </summary>
         /// <param name="url">The URL to validate before sending to discord.</param>
         /// <exception cref="InvalidOperationException">A URL must include a protocol (either http, https, or discord).</exception>

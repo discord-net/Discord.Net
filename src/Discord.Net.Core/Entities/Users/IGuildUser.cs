@@ -104,7 +104,7 @@ namespace Discord
         ///     Gets the date and time that indicates if and for how long a user has been timed out.
         /// </summary>
         /// <remarks>
-        ///     <see cref="null"/> or a timestamp in the past if the user is not timed out.
+        ///     <see langword="null"/> or a timestamp in the past if the user is not timed out.
         /// </remarks>
         /// <returns>
         ///     A <see cref="DateTimeOffset"/> indicating how long the user will be timed out for.
@@ -116,7 +116,7 @@ namespace Discord
         /// </summary>
         /// <example>
         ///     <para>The following example checks if the current user has the ability to send a message with attachment in
-        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference)"/>.</para>
+        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>.</para>
         /// <code language="cs">
         ///     if (currentUser?.GetPermissions(targetChannel)?.AttachFiles)
         ///         await targetChannel.SendFileAsync("fortnite.png");
@@ -151,7 +151,7 @@ namespace Discord
         ///     If the user does not have a guild avatar, this will be the user's regular avatar.
         /// </remarks>
         /// <param name="format">The format to return.</param>
-        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
         /// <returns>
         ///     A string representing the URL of the displayed avatar for this user. <see langword="null"/> if the user does not have an avatar in place.
         /// </returns>
