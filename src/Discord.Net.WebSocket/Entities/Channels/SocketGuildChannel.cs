@@ -222,6 +222,8 @@ namespace Discord.WebSocket
 
         #region IChannel
         /// <inheritdoc />
+        string IChannel.Name => Name;
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable(); //Overridden in Text/Voice
         /// <inheritdoc />
