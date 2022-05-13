@@ -820,13 +820,6 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(webhookId: webhookId);
-
-            string threadQuery = "";
-            if (threadId.HasValue)
-            {
-                threadQuery = $"&thread_id=${threadId}";
-            }
-
             return await SendJsonAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?{WebhookQuery(true, threadId)}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
 
@@ -901,12 +894,6 @@ namespace Discord.API
                     args.Content = "";
                 if (args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                     throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
-            }
-
-            string threadQuery = "";
-            if (threadId.HasValue)
-            {
-                threadQuery = $"&";
             }
 
             var ids = new BucketIds(webhookId: webhookId);
