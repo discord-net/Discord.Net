@@ -37,8 +37,9 @@ namespace Discord
         /// <summary> Sanitizes the string, safely escaping any Markdown sequences. </summary>
         public static string Sanitize(string text)
         {
-            foreach (string unsafeChar in SensitiveCharacters)
-                text = text.Replace(unsafeChar, $"\\{unsafeChar}");
+            if (text != null)
+                foreach (string unsafeChar in SensitiveCharacters)
+                    text = text.Replace(unsafeChar, $"\\{unsafeChar}");
             return text;
         }
 
