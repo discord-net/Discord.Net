@@ -65,8 +65,7 @@ namespace Discord.Rest
                 : ImmutableArray.Create<RestApplicationCommandOption>();
 
             IsEnabledInDm = model.DmPermission.GetValueOrDefault(true).GetValueOrDefault(true);
-            DefaultMemberPermissions = model.DefaultMemberPermission.GetValueOrDefault(null).HasValue
-                ? new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(null).Value) : GuildPermissions.None;
+            DefaultMemberPermissions = new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(0).GetValueOrDefault(0));
         }
 
         /// <inheritdoc/>

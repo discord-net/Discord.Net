@@ -64,7 +64,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds text components to <see cref="TextComponents"/>.
+        ///     Adds text components to <see cref="Components"/>.
         /// </summary>
         /// <param name="configure">Text Component builder factory.</param>
         /// <returns>

@@ -2331,7 +2331,9 @@ namespace Discord.WebSocket
 
                                     SocketUser user = data.User.IsSpecified
                                         ? State.GetOrAddUser(data.User.Value.Id, (_) => SocketGlobalUser.Create(this, State, data.User.Value))
-                                        : guild?.AddOrUpdateUser(data.Member.Value); // null if the bot scope isn't set, so the guild cannot be retrieved.
+                                        : guild != null
+                                            ? guild.AddOrUpdateUser(data.Member.Value) // null if the bot scope isn't set, so the guild cannot be retrieved.
+                                            : State.GetOrAddUser(data.Member.Value.User.Id, (_) => SocketGlobalUser.Create(this, State, data.Member.Value.User));
 
                                     SocketChannel channel = null;
                                     if(data.ChannelId.IsSpecified)

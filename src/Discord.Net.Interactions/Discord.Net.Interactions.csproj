@@ -7,8 +7,10 @@
     <RootNamespace>Discord.Interactions</RootNamespace>
     <AssemblyName>Discord.Net.Interactions</AssemblyName>
     <Description>A Discord.Net extension adding support for Application Commands.</Description>
+    <WarningLevel>5</WarningLevel>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
     <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
