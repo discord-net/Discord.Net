@@ -94,8 +94,8 @@ namespace Discord.WebSocket
                 : ImmutableArray.Create<SocketApplicationCommandOption>();
 
             IsEnabledInDm = model.DmPermission.GetValueOrDefault(true).GetValueOrDefault(true);
-            DefaultMemberPermissions = model.DefaultMemberPermission.IsSpecified
-                ? new GuildPermissions((ulong)model.DefaultMemberPermission.Value) : GuildPermissions.None;
+            DefaultMemberPermissions = model.DefaultMemberPermission.GetValueOrDefault(null).HasValue
+                ? new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(null).Value) : GuildPermissions.None;
         }
 
         /// <inheritdoc/>

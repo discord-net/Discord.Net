@@ -248,7 +248,7 @@ namespace Discord.Interactions
 
             while (parent != null)
             {
-                permissions = (permissions ?? 0) | (parent.DefaultMemberPermissions ?? 0);
+                permissions = (permissions ?? 0) | (parent.DefaultMemberPermissions ?? 0).SanitizeGuildPermissions();
                 parent = parent.Parent;
             }
 
