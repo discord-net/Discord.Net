@@ -168,7 +168,7 @@ namespace Discord.Rest
             {
                 if (model.Member.IsSpecified && model.GuildId.IsSpecified)
                 {
-                    User = RestGuildUser.Create(Discord, Guild, model.Member.Value);
+                    User = RestGuildUser.Create(Discord, Guild, model.Member.Value, (Guild is null) ? model.GuildId.Value : null);
                 }
                 else
                 {
