@@ -14,18 +14,23 @@ namespace Discord.Interactions
         /// <inheritdoc/>
         public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
         {
-            if (context.Interaction is not IMessageCommandInteraction messageCommand)
+            if (context.Interaction is not IMessageCommandInteraction)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Message Command Interation");
 
+            return await ExecuteAsync(context, services).ConfigureAwait(false);
+        }
+
+        protected override async ValueTask<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
+        {
             try
             {
-                object[] args = new object[1] { messageCommand.Data.Message };
+                object[] args = new object[1] { (context.Interaction as IMessageCommandInteraction).Data.Message };
 
-                return await RunAsync(context, args, services).ConfigureAwait(false);
+                return ParseResult.FromSuccess(args);
             }
             catch (Exception ex)
             {
-                return ExecuteResult.FromError(ex);
+                return ParseResult.FromError(ex);
             }
         }
 

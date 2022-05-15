@@ -17,15 +17,20 @@ namespace Discord.Interactions
             if (context.Interaction is not IUserCommandInteraction userCommand)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Message Command Interation");
 
+            return await ExecuteAsync(context, services).ConfigureAwait(false);
+        }
+
+        protected override async ValueTask<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
+        {
             try
             {
-                object[] args = new object[1] { userCommand.Data.User };
+                object[] args = new object[1] { (context.Interaction as IUserCommandInteraction).Data.User };
 
-                return await RunAsync(context, args, services).ConfigureAwait(false);
+                return ParseResult.FromSuccess(args);
             }
             catch (Exception ex)
             {
-                return ExecuteResult.FromError(ex);
+                return ParseResult.FromError(ex);
             }
         }
 
