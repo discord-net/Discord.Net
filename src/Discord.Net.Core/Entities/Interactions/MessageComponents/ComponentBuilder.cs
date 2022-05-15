@@ -357,8 +357,6 @@ namespace Discord
         /// <param name="minValues">The min values of the placeholder.</param>
         /// <param name="maxValues">The max values of the placeholder.</param>
         /// <param name="disabled">Whether or not the menu is disabled.</param>
-        /// <exception cref="InvalidOperationException">Components count reached <see cref="MaxChildCount"/></exception>
-        /// <exception cref="InvalidOperationException">A Select Menu cannot exist in a pre-occupied ActionRow.</exception>
         /// <returns>The current builder.</returns> 
         public ActionRowBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options,
             string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false)
@@ -402,8 +400,6 @@ namespace Discord
         /// <param name="customId">The custom id of the newly added button.</param>
         /// <param name="url">A URL to be used only if the <see cref="ButtonStyle"/> is a Link.</param>
         /// <param name="disabled">Whether or not the newly created button is disabled.</param>
-        /// <exception cref="InvalidOperationException">Components count reached <see cref="MaxChildCount"/>.</exception>
-        /// <exception cref="InvalidOperationException">A button cannot be added to a row with a SelectMenu.</exception>
         /// <returns>The current builder.</returns>
         public ActionRowBuilder WithButton(
             string label = null,
