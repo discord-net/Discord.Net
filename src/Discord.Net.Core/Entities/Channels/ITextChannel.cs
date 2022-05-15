@@ -36,6 +36,17 @@ namespace Discord
         int SlowModeInterval { get; }
 
         /// <summary>
+        ///     Gets the default auto-archive duration for client-created threads in this channel.
+        /// </summary>
+        /// <remarks>
+        ///     The value of this property does not affect API thread creation, it will not respect this value.
+        /// </remarks>
+        /// <returns>
+        ///     The default auto-archive duration for thread creation in this channel.
+        /// </returns>
+        ThreadArchiveDuration DefaultArchiveDuration { get; }
+
+        /// <summary>
         ///     Bulk-deletes multiple messages.
         /// </summary>
         /// <example>

@@ -66,5 +66,8 @@ namespace Discord.API
 
         [JsonProperty("member_count")]
         public Optional<int> MemberCount { get; set; }
+
+        [JsonProperty("default_auto_archive_duration")]
+        public Optional<ThreadArchiveDuration> AutoArchiveDuration { get; set; }
     }
 }
