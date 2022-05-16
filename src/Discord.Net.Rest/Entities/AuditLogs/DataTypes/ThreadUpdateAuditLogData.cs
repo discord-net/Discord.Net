@@ -15,7 +15,7 @@ namespace Discord.Rest
             Thread = thread;
             ThreadType = type;
             Before = before;
-            After = After;
+            After = after;
         }
 
         internal static ThreadUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)

@@ -142,9 +142,8 @@ namespace Discord.Rest
         ///     Updates the message which this component resides in with the type <see cref="InteractionResponseType.UpdateMessage"/>
         /// </summary>
         /// <param name="func">A delegate containing the properties to modify the message with.</param>
-        /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A string that contains json to write back to the incoming http request.</returns>
-        public string Update(Action<MessageProperties> func, RequestOptions options = null)
+        public string Update(Action<MessageProperties> func)
         {
             var args = new MessageProperties();
             func(args);
@@ -384,11 +383,10 @@ namespace Discord.Rest
         ///     Defers an interaction and responds with type 5 (<see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>)
         /// </summary>
         /// <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
-        /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>
         ///     A string that contains json to write back to the incoming http request.
         /// </returns>
-        public string DeferLoading(bool ephemeral = false, RequestOptions options = null)
+        public string DeferLoading(bool ephemeral = false)
         {
             if (!InteractionHelper.CanSendResponse(this))
                 throw new TimeoutException($"Cannot defer an interaction after {InteractionHelper.ResponseTimeLimit} seconds of no response/acknowledgement");

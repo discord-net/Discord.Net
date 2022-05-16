@@ -33,7 +33,6 @@ namespace Discord.WebSocket
     public class SocketGuild : SocketEntity<ulong>, IGuild, IDisposable
     {
         #region SocketGuild
-#pragma warning disable IDISP002, IDISP006
         private readonly SemaphoreSlim _audioLock;
         private TaskCompletionSource<bool> _syncPromise, _downloaderPromise;
         private TaskCompletionSource<AudioClient> _audioConnectPromise;
@@ -47,7 +46,6 @@ namespace Discord.WebSocket
 
         private AudioClient _audioClient;
         private VoiceStateUpdateParams _voiceStateUpdateParams;
-#pragma warning restore IDISP002, IDISP006
 
         /// <inheritdoc />
         public string Name { get; private set; }
@@ -585,7 +583,7 @@ namespace Discord.WebSocket
             //    _ = _downloaderPromise.TrySetResultAsync(true);
         }*/
 
-        internal void Update(ClientState state, EmojiUpdateModel model)
+        internal void Update(ClientState _, EmojiUpdateModel model)
         {
             var emotes = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
             for (int i = 0; i < model.Emojis.Length; i++)
@@ -1607,11 +1605,9 @@ namespace Discord.WebSocket
 
                 if (external)
                 {
-#pragma warning disable IDISP001
                     var _ = promise.TrySetResultAsync(null);
                     await Discord.ApiClient.SendVoiceStateUpdateAsync(_voiceStateUpdateParams).ConfigureAwait(false);
                     return null;
-#pragma warning restore IDISP001
                 }
 
                 if (_audioClient == null)
@@ -1634,14 +1630,10 @@ namespace Discord.WebSocket
                     };
                     audioClient.Connected += () =>
                     {
-#pragma warning disable IDISP001
                         var _ = promise.TrySetResultAsync(_audioClient);
-#pragma warning restore IDISP001
                         return Task.Delay(0);
                     };
-#pragma warning disable IDISP003
                     _audioClient = audioClient;
-#pragma warning restore IDISP003
                 }
 
                 await Discord.ApiClient.SendVoiceStateUpdateAsync(_voiceStateUpdateParams).ConfigureAwait(false);

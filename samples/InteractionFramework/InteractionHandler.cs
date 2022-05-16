@@ -37,7 +37,10 @@ namespace InteractionFramework
         }
 
         private async Task LogAsync(LogMessage log)
-            => Console.WriteLine(log);
+        {
+            Console.WriteLine(log);
+            await Task.CompletedTask;
+        }
 
         private async Task ReadyAsync()
         {

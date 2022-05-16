@@ -43,7 +43,7 @@ namespace Discord
         {
             if (avatarId == null)
                 return null;
-            string extension = FormatToExtension(format, avatarId);
+            var extension = FormatToExtension(format, avatarId);
             return $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}.{extension}?size={size}";
         }
 
@@ -51,7 +51,7 @@ namespace Discord
         {
             if (avatarId == null)
                 return null;
-            string extension = FormatToExtension(format, avatarId);
+            var extension = FormatToExtension(format, avatarId);
             return $"{DiscordConfig.CDNUrl}guilds/{guildId}/users/{userId}/avatars/{avatarId}.{extension}?size={size}";
         }
 
@@ -69,7 +69,7 @@ namespace Discord
         {
             if (bannerId == null)
                 return null;
-            string extension = FormatToExtension(format, bannerId);
+            var extension = FormatToExtension(format, bannerId);
             return $"{DiscordConfig.CDNUrl}banners/{userId}/{bannerId}.{extension}?size={size}";
         }
         /// <summary>
@@ -148,7 +148,7 @@ namespace Discord
         {
 	        if (string.IsNullOrEmpty(bannerId))
 		        return null;
-	        string extension = FormatToExtension(format, bannerId);
+	        var extension = FormatToExtension(format, bannerId);
 	        return $"{DiscordConfig.CDNUrl}banners/{guildId}/{bannerId}.{extension}" + (size.HasValue ? $"?size={size}" : string.Empty);
         }
         /// <summary>
@@ -174,7 +174,7 @@ namespace Discord
         /// </returns>
         public static string GetRichAssetUrl(ulong appId, string assetId, ushort size, ImageFormat format)
         {
-            string extension = FormatToExtension(format, "");
+            var extension = FormatToExtension(format, "");
             return $"{DiscordConfig.CDNUrl}app-assets/{appId}/{assetId}.{extension}?size={size}";
         }
 

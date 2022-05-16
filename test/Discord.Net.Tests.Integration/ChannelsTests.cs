@@ -13,20 +13,20 @@ namespace Discord
     [CollectionDefinition("ChannelsTests", DisableParallelization = true)]
     public class ChannelsTests : IClassFixture<RestGuildFixture>
     {
-        private IGuild guild;
-        private readonly ITestOutputHelper output;
+        private readonly IGuild guild;
+        private readonly ITestOutputHelper _output;
 
         public ChannelsTests(RestGuildFixture guildFixture, ITestOutputHelper output)
         {
             guild = guildFixture.Guild;
-            output = output;
-            output.WriteLine($"RestGuildFixture using guild: {guild.Id}");
+            _output = output;
+            _output.WriteLine($"RestGuildFixture using guild: {guild.Id}");
             // capture all console output
             guildFixture.Client.Log += LogAsync;
         }
         private Task LogAsync(LogMessage message)
         {
-            output.WriteLine(message.ToString());
+            _output.WriteLine(message.ToString());
             return Task.CompletedTask;
         }
 
@@ -100,7 +100,7 @@ namespace Discord
         public async Task ModifyChannelCategories()
         {
             // util method for checking if a category is set
-            async Task CheckAsync(INestedChannel channel, ICategoryChannel cat)
+            static async Task CheckAsync(INestedChannel channel, ICategoryChannel cat)
             {
                 // check that the category is not set
                 if (cat == null)

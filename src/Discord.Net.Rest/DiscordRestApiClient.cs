@@ -24,10 +24,10 @@ namespace Discord.API
     internal class DiscordRestApiClient : IDisposable, IAsyncDisposable
     {
         #region DiscordRestApiClient
-        private static readonly ConcurrentDictionary<string, Func<BucketIds, BucketId>> _bucketIdGenerators = new ConcurrentDictionary<string, Func<BucketIds, BucketId>>();
+        private static readonly ConcurrentDictionary<string, Func<BucketIds, BucketId>> _bucketIdGenerators = new();
 
         public event Func<string, string, double, Task> SentRequest { add { _sentRequestEvent.Add(value); } remove { _sentRequestEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new AsyncEvent<Func<string, string, double, Task>>();
+        private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new();
 
         protected readonly JsonSerializer _serializer;
         protected readonly SemaphoreSlim _stateLock;
@@ -110,7 +110,7 @@ namespace Discord.API
                     _loginCancelToken?.Dispose();
                     RestClient?.Dispose();
 
-                    if (!(RequestQueue is null))
+                    if (RequestQueue is not null)
                         await RequestQueue.DisposeAsync().ConfigureAwait(false);
 
                     _stateLock?.Dispose();
@@ -123,16 +123,16 @@ namespace Discord.API
 
         public ValueTask DisposeAsync() => DisposeAsync(true);
 
-        public async Task LoginAsync(TokenType tokenType, string token, RequestOptions options = null)
+        public async Task LoginAsync(TokenType tokenType, string token)
         {
             await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await LoginInternalAsync(tokenType, token, options).ConfigureAwait(false);
+                await LoginInternalAsync(tokenType, token).ConfigureAwait(false);
             }
             finally { _stateLock.Release(); }
         }
-        private async Task LoginInternalAsync(TokenType tokenType, string token, RequestOptions options = null)
+        private async Task LoginInternalAsync(TokenType tokenType, string token)
         {
             if (LoginState != LoginState.LoggedOut)
                 await LogoutInternalAsync().ConfigureAwait(false);
@@ -196,11 +196,10 @@ namespace Discord.API
         #endregion
 
         #region Core
-        internal Task SendAsync(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
-            => SendAsync(method, GetEndpoint(endpointExpr), GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
+        internal Task SendAsync(string method, Expression<Func<string>> endpointExpr, BucketIds ids, RequestOptions options = null, [CallerMemberName] string funcName = null)
+            => SendAsync(method, GetEndpoint(endpointExpr), GetBucketId(method, ids, endpointExpr, funcName), options);
         public async Task SendAsync(string method, string endpoint,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
+            BucketId bucketId = null, RequestOptions options = null)
         {
             options ??= new RequestOptions();
             options.HeaderOnly = true;
@@ -210,26 +209,24 @@ namespace Discord.API
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
-        internal Task SendJsonAsync(string method, Expression<Func<string>> endpointExpr, object payload, BucketIds ids,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
-            => SendJsonAsync(method, GetEndpoint(endpointExpr), payload, GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
+        internal Task SendJsonAsync(string method, Expression<Func<string>> endpointExpr, object payload, BucketIds ids, RequestOptions options = null, [CallerMemberName] string funcName = null)
+            => SendJsonAsync(method, GetEndpoint(endpointExpr), payload, GetBucketId(method, ids, endpointExpr, funcName), options);
         public async Task SendJsonAsync(string method, string endpoint, object payload,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
+            BucketId bucketId = null, RequestOptions options = null)
         {
             options ??= new RequestOptions();
             options.HeaderOnly = true;
             options.BucketId = bucketId;
 
-            string json = payload != null ? SerializeJson(payload) : null;
+            var json = payload != null ? SerializeJson(payload) : null;
             var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
-        internal Task SendMultipartAsync(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
-            => SendMultipartAsync(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
+        internal Task SendMultipartAsync(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids, RequestOptions options = null, [CallerMemberName] string funcName = null)
+            => SendMultipartAsync(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(method, ids, endpointExpr, funcName), options);
         public async Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
+            BucketId bucketId = null, RequestOptions options = null)
         {
             options ??= new RequestOptions();
             options.HeaderOnly = true;
@@ -239,11 +236,10 @@ namespace Discord.API
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
-        internal Task<TResponse> SendAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
-            => SendAsync<TResponse>(method, GetEndpoint(endpointExpr), GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
+        internal Task<TResponse> SendAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, BucketIds ids, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
+            => SendAsync<TResponse>(method, GetEndpoint(endpointExpr), GetBucketId(method, ids, endpointExpr, funcName), options);
         public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
+            BucketId bucketId = null, RequestOptions options = null) where TResponse : class
         {
             options ??= new RequestOptions();
             options.BucketId = bucketId;
@@ -252,26 +248,25 @@ namespace Discord.API
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
-        internal Task<TResponse> SendJsonAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, object payload, BucketIds ids,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
-            => SendJsonAsync<TResponse>(method, GetEndpoint(endpointExpr), payload, GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
+        internal Task<TResponse> SendJsonAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, object payload, BucketIds ids, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
+            => SendJsonAsync<TResponse>(method, GetEndpoint(endpointExpr), payload, GetBucketId(method, ids, endpointExpr, funcName), options);
         public async Task<TResponse> SendJsonAsync<TResponse>(string method, string endpoint, object payload,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
+            BucketId bucketId = null, RequestOptions options = null) where TResponse : class
         {
             options ??= new RequestOptions();
             options.BucketId = bucketId;
 
-            string json = payload != null ? SerializeJson(payload) : null;
+            var json = payload != null ? SerializeJson(payload) : null;
 
             var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
         internal Task<TResponse> SendMultipartAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
-            => SendMultipartAsync<TResponse>(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
+            RequestOptions options = null, [CallerMemberName] string funcName = null)
+            => SendMultipartAsync<TResponse>(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(method, ids, endpointExpr, funcName), options);
         public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
-            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
+            BucketId bucketId = null, RequestOptions options = null)
         {
             options ??= new RequestOptions();
             options.BucketId = bucketId;
@@ -293,7 +288,7 @@ namespace Discord.API
             var responseStream = await RequestQueue.SendAsync(request).ConfigureAwait(false);
             stopwatch.Stop();
 
-            double milliseconds = ToMilliseconds(stopwatch);
+            var milliseconds = ToMilliseconds(stopwatch);
             await _sentRequestEvent.InvokeAsync(method, endpoint, milliseconds).ConfigureAwait(false);
 
             return responseStream;
@@ -585,15 +580,15 @@ namespace Discord.API
 
             var bucket = new BucketIds(channelId: channelId);
 
-            string query = "";
+            var query = "";
 
             if (limit.HasValue)
             {
-                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O")}&limit={limit.Value}";
+                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow):O}&limit={limit.Value}";
             }
             else if (before.HasValue)
             {
-                query = $"?before={before.Value.ToString("O")}";
+                query = $"?before={before.Value:O}";
             }
 
             return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/public{query}", bucket, options: options);
@@ -608,15 +603,15 @@ namespace Discord.API
 
             var bucket = new BucketIds(channelId: channelId);
 
-            string query = "";
+            var query = "";
 
             if (limit.HasValue)
             {
-                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O")}&limit={limit.Value}";
+                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow):O}&limit={limit.Value}";
             }
             else if (before.HasValue)
             {
-                query = $"?before={before.Value.ToString("O")}";
+                query = $"?before={before.Value:O}";
             }
 
             return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/private{query}", bucket, options: options);
@@ -631,7 +626,7 @@ namespace Discord.API
 
             var bucket = new BucketIds(channelId: channelId);
 
-            string query = "";
+            var query = "";
 
             if (limit.HasValue)
             {
@@ -639,7 +634,7 @@ namespace Discord.API
             }
             else if (before.HasValue)
             {
-                query = $"?before={before.Value.ToString("O")}";
+                query = $"?before={before.Value:O}";
             }
 
             return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/users/@me/threads/archived/private{query}", bucket, options: options);
@@ -769,8 +764,8 @@ namespace Discord.API
             Preconditions.AtMost(args.Limit, DiscordConfig.MaxMessagesPerBatch, nameof(args.Limit));
             options = RequestOptions.CreateOrClone(options);
 
-            int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxMessagesPerBatch);
-            ulong? relativeId = args.RelativeMessageId.IsSpecified ? args.RelativeMessageId.Value : (ulong?)null;
+            var limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxMessagesPerBatch);
+            var relativeId = args.RelativeMessageId.IsSpecified ? args.RelativeMessageId.Value : (ulong?)null;
             var relativeDir = args.RelativeDirection.GetValueOrDefault(Direction.Before) switch
             {
                 Direction.After => "after",
@@ -794,11 +789,11 @@ namespace Discord.API
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
             if (args.Content?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendJsonAsync<Message>("POST", () => $"channels/{channelId}/messages", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return await SendJsonAsync<Message>("POST", () => $"channels/{channelId}/messages", args, ids, options: options).ConfigureAwait(false);
         }
 
 
@@ -815,12 +810,12 @@ namespace Discord.API
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
             if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args));
 
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(webhookId: webhookId);
-            return await SendJsonAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?{WebhookQuery(true, threadId)}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return await SendJsonAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?{WebhookQuery(true, threadId)}", args, ids, options: options).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -837,11 +832,11 @@ namespace Discord.API
             if (args.Embeds.IsSpecified)
                 Preconditions.AtMost(args.Embeds.Value.Length, 10, nameof(args.Embeds), "A max of 10 Embeds are allowed.");
             if (args.Content.IsSpecified && args.Content.Value.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(webhookId: webhookId);
-            await SendJsonAsync<Message>("PATCH", () => $"webhooks/{webhookId}/{AuthToken}/messages/{messageId}${WebhookQuery(false, threadId)}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            await SendJsonAsync<Message>("PATCH", () => $"webhooks/{webhookId}/{AuthToken}/messages/{messageId}${WebhookQuery(false, threadId)}", args, ids, options: options).ConfigureAwait(false);
         }
 
         /// <exception cref="InvalidOperationException">This operation may only be called with a <see cref="TokenType.Webhook"/> token.</exception>
@@ -872,7 +867,7 @@ namespace Discord.API
                 throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendMultipartAsync<Message>("POST", () => $"channels/{channelId}/messages", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return await SendMultipartAsync<Message>("POST", () => $"channels/{channelId}/messages", args.ToDictionary(), ids, options: options).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -897,7 +892,7 @@ namespace Discord.API
             }
 
             var ids = new BucketIds(webhookId: webhookId);
-            return await SendMultipartAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?{WebhookQuery(true, threadId)}", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return await SendMultipartAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?{WebhookQuery(true, threadId)}", args.ToDictionary(), ids, options: options).ConfigureAwait(false);
         }
         public async Task DeleteMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
@@ -941,7 +936,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return await SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, options: options).ConfigureAwait(false);
         }
 
         public async Task<Message> ModifyMessageAsync(ulong channelId, ulong messageId, Rest.UploadFileParams args, RequestOptions options = null)
@@ -954,7 +949,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendMultipartAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return await SendMultipartAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args.ToDictionary(), ids, options: options).ConfigureAwait(false);
         }
         #endregion
 
@@ -1082,8 +1077,8 @@ namespace Discord.API
             Preconditions.GreaterThan(args.AfterUserId, 0, nameof(args.AfterUserId));
             options = RequestOptions.CreateOrClone(options);
 
-            int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUserReactionsPerBatch);
-            ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
+            var limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUserReactionsPerBatch);
+            var afterUserId = args.AfterUserId.GetValueOrDefault(0);
 
             var ids = new BucketIds(channelId: channelId);
             Expression<Func<string>> endpoint = () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}?limit={limit}&after={afterUserId}";
@@ -1345,12 +1340,12 @@ namespace Discord.API
                 Preconditions.NotNullOrEmpty(response.Content, nameof(response.Content));
 
             if (response.Content.IsSpecified && response.Content.Value.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(response.Content));
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(response));
 
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds();
-            await SendMultipartAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            await SendMultipartAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response.ToDictionary(), ids, options: options).ConfigureAwait(false);
         }
         public async Task<Message> GetInteractionResponseAsync(string interactionToken, RequestOptions options = null)
         {
@@ -1385,7 +1380,7 @@ namespace Discord.API
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
             if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args));
 
             options = RequestOptions.CreateOrClone(options);
 
@@ -1401,12 +1396,12 @@ namespace Discord.API
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
             if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args));
 
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds();
-            return await SendMultipartAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return await SendMultipartAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args.ToDictionary(), ids, options: options).ConfigureAwait(false);
         }
 
         public async Task<Message> ModifyInteractionFollowupMessageAsync(ModifyInteractionResponseParams args, ulong id, string token, RequestOptions options = null)
@@ -1415,7 +1410,7 @@ namespace Discord.API
             Preconditions.NotEqual(id, 0, nameof(id));
 
             if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args));
 
             options = RequestOptions.CreateOrClone(options);
 
@@ -1540,7 +1535,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtLeast(args.Days, 1, nameof(args.Days));
-            string endpointRoleIds = args.IncludeRoleIds?.Length > 0 ? $"&include_roles={string.Join(",", args.IncludeRoleIds)}" : "";
+            var endpointRoleIds = args.IncludeRoleIds?.Length > 0 ? $"&include_roles={string.Join(",", args.IncludeRoleIds)}" : "";
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
@@ -1557,8 +1552,8 @@ namespace Discord.API
             Preconditions.AtMost(args.Limit, DiscordConfig.MaxBansPerBatch, nameof(args.Limit));
             options = RequestOptions.CreateOrClone(options);
 
-            int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxBansPerBatch);
-            ulong? relativeId = args.RelativeUserId.IsSpecified ? args.RelativeUserId.Value : (ulong?)null;
+            var limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxBansPerBatch);
+            var relativeId = args.RelativeUserId.IsSpecified ? args.RelativeUserId.Value : (ulong?)null;
             var relativeDir = args.RelativeDirection.GetValueOrDefault(Direction.Before) switch
             {
                 Direction.After => "after",
@@ -1602,7 +1597,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            string reason = string.IsNullOrWhiteSpace(args.Reason) ? "" : $"&reason={Uri.EscapeDataString(args.Reason)}";
+            var reason = string.IsNullOrWhiteSpace(args.Reason) ? "" : $"&reason={Uri.EscapeDataString(args.Reason)}";
             await SendAsync("PUT", () => $"guilds/{guildId}/bans/{userId}?delete_message_days={args.DeleteMessageDays}{reason}", ids, options: options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentException"><paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.</exception>
@@ -1674,12 +1669,12 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             //Remove trailing slash
-            if (inviteId[inviteId.Length - 1] == '/')
-                inviteId = inviteId.Substring(0, inviteId.Length - 1);
-            //Remove leading URL
-            int index = inviteId.LastIndexOf('/');
+            if (inviteId[^1] == '/')
+                inviteId = inviteId[0..^1];
+                               //Remove leading URL
+            var index = inviteId.LastIndexOf('/');
             if (index >= 0)
-                inviteId = inviteId.Substring(index + 1);
+                inviteId = inviteId[(index + 1)..];
 
             try
             {
@@ -1794,8 +1789,8 @@ namespace Discord.API
             Preconditions.GreaterThan(args.AfterUserId, 0, nameof(args.AfterUserId));
             options = RequestOptions.CreateOrClone(options);
 
-            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
-            ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
+            var limit = args.Limit.GetValueOrDefault(int.MaxValue);
+            var afterUserId = args.AfterUserId.GetValueOrDefault(0);
 
             var ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint = () => $"guilds/{guildId}/members?limit={limit}&after={afterUserId}";
@@ -1818,7 +1813,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
-            bool isCurrentUser = userId == CurrentUserId;
+            var isCurrentUser = userId == CurrentUserId;
 
             if (args.RoleIds.IsSpecified)
                 Preconditions.NotEveryoneRole(args.RoleIds.Value, guildId, nameof(args.RoleIds));
@@ -1843,8 +1838,8 @@ namespace Discord.API
             Preconditions.NotNullOrEmpty(args.Query, nameof(args.Query));
             options = RequestOptions.CreateOrClone(options);
 
-            int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUsersPerBatch);
-            string query = args.Query;
+            var limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUsersPerBatch);
+            var query = args.Query;
 
             var ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint = () => $"guilds/{guildId}/members/search?limit={limit}&query={query}";
@@ -2034,8 +2029,8 @@ namespace Discord.API
             Preconditions.AtMost(args.Limit, DiscordConfig.MaxMessagesPerBatch, nameof(args.Limit));
             options = RequestOptions.CreateOrClone(options);
 
-            int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxGuildEventUsersPerBatch);
-            ulong? relativeId = args.RelativeUserId.IsSpecified ? args.RelativeUserId.Value : (ulong?)null;
+            var limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxGuildEventUsersPerBatch);
+            var relativeId = args.RelativeUserId.IsSpecified ? args.RelativeUserId.Value : (ulong?)null;
             var relativeDir = args.RelativeDirection.GetValueOrDefault(Direction.Before) switch
             {
                 Direction.After => "after",
@@ -2092,8 +2087,8 @@ namespace Discord.API
             Preconditions.GreaterThan(args.AfterGuildId, 0, nameof(args.AfterGuildId));
             options = RequestOptions.CreateOrClone(options);
 
-            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
-            ulong afterGuildId = args.AfterGuildId.GetValueOrDefault(0);
+            var limit = args.Limit.GetValueOrDefault(int.MaxValue);
+            var afterGuildId = args.AfterGuildId.GetValueOrDefault(0);
 
             return await SendAsync<IReadOnlyCollection<UserGuild>>("GET", () => $"users/@me/guilds?limit={limit}&after={afterGuildId}", new BucketIds(), options: options).ConfigureAwait(false);
         }
@@ -2152,7 +2147,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
-            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
+            var limit = args.Limit.GetValueOrDefault(int.MaxValue);
 
             var ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint;
@@ -2175,7 +2170,7 @@ namespace Discord.API
             }
 
             // Still use string interp for the query w/o params, as this is necessary for CreateBucketId
-            endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}{queryArgs.ToString()}";
+            endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}{queryArgs}";
             return await SendAsync<AuditLog>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
         #endregion
@@ -2263,9 +2258,9 @@ namespace Discord.API
         }
         protected T DeserializeJson<T>(Stream jsonStream)
         {
-            using (TextReader text = new StreamReader(jsonStream))
-            using (JsonReader reader = new JsonTextReader(text))
-                return _serializer.Deserialize<T>(reader);
+            using TextReader text = new StreamReader(jsonStream);
+            using JsonReader reader = new JsonTextReader(text);
+            return _serializer.Deserialize<T>(reader);
         }
 
         protected async Task<T> NullifyNotFound<T>(Task<T> sendTask) where T : class
@@ -2357,7 +2352,7 @@ namespace Discord.API
                 var builder = new StringBuilder();
                 var methodCall = endpoint.Body as MethodCallExpression;
                 var methodArgs = methodCall.Arguments.ToArray();
-                string format = (methodArgs[0] as ConstantExpression).Value as string;
+                var format = (methodArgs[0] as ConstantExpression).Value as string;
 
                 //Unpack the array, if one exists (happens with 4+ parameters)
                 if (methodArgs.Length > 1 && methodArgs[1].NodeType == ExpressionType.NewArrayInit)
@@ -2368,24 +2363,24 @@ namespace Discord.API
                     Array.Copy(elements, 0, methodArgs, 1, elements.Length);
                 }
 
-                int endIndex = format.IndexOf('?'); //Don't include params
+                var endIndex = format.IndexOf('?'); //Don't include params
                 if (endIndex == -1)
                     endIndex = format.Length;
 
-                int lastIndex = 0;
+                var lastIndex = 0;
                 while (true)
                 {
-                    int leftIndex = format.IndexOf("{", lastIndex);
+                    var leftIndex = format.IndexOf("{", lastIndex);
                     if (leftIndex == -1 || leftIndex > endIndex)
                     {
                         builder.Append(format, lastIndex, endIndex - lastIndex);
                         break;
                     }
                     builder.Append(format, lastIndex, leftIndex - lastIndex);
-                    int rightIndex = format.IndexOf("}", leftIndex);
+                    var rightIndex = format.IndexOf("}", leftIndex);
 
-                    int argId = int.Parse(format.Substring(leftIndex + 1, rightIndex - leftIndex - 1), NumberStyles.None, CultureInfo.InvariantCulture);
-                    string fieldName = GetFieldName(methodArgs[argId + 1]);
+                    var argId = int.Parse(format.AsSpan(leftIndex + 1, rightIndex - leftIndex - 1).ToString(), NumberStyles.None, CultureInfo.InvariantCulture);
+                    var fieldName = GetFieldName(methodArgs[argId + 1]);
 
                     var mappedId = BucketIds.GetIndex(fieldName);
 
@@ -2397,7 +2392,7 @@ namespace Discord.API
 
                     lastIndex = rightIndex + 1;
                 }
-                if (builder[builder.Length - 1] == '/')
+                if (builder[^1] == '/')
                     builder.Remove(builder.Length - 1, 1);
 
                 format = builder.ToString();
@@ -2423,7 +2418,7 @@ namespace Discord.API
 
         private static string WebhookQuery(bool wait = false, ulong? threadId = null)
         {
-            List<string> querys = new List<string>() { };
+            List<string> querys = new() { };
             if (wait)
                 querys.Add("wait=true");
             if (threadId.HasValue)

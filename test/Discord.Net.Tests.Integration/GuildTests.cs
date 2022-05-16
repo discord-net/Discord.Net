@@ -10,21 +10,21 @@ namespace Discord
     [CollectionDefinition("GuildTests", DisableParallelization = true)]
     public class GuildTests : IClassFixture<RestGuildFixture>
     {
-        private IDiscordClient client;
-        private IGuild guild;
-        private readonly ITestOutputHelper output;
+        private readonly IDiscordClient client;
+        private readonly IGuild guild;
+        private readonly ITestOutputHelper _output;
 
         public GuildTests(RestGuildFixture guildFixture, ITestOutputHelper output)
         {
             client = guildFixture.Client;
             guild = guildFixture.Guild;
-            output = output;
-            output.WriteLine($"RestGuildFixture using guild: {guild.Id}");
+            _output = output;
+            _output.WriteLine($"RestGuildFixture using guild: {guild.Id}");
             guildFixture.Client.Log += LogAsync;
         }
         private Task LogAsync(LogMessage message)
         {
-            output.WriteLine(message.ToString());
+            _output.WriteLine(message.ToString());
             return Task.CompletedTask;
         }
         /// <summary>

@@ -503,18 +503,10 @@ namespace Discord.Commands
         /// <param name="argPos">The position of which the command starts at.</param>
         /// <returns>The result containing the matching commands.</returns>
         public SearchResult Search(ICommandContext context, int argPos)
-            => Search(context.Message.Content.Substring(argPos));
-        /// <summary>
-        ///     Searches for the command.
-        /// </summary>
-        /// <param name="context">The context of the command.</param>
-        /// <param name="input">The command string.</param>
-        /// <returns>The result containing the matching commands.</returns>
-        public SearchResult Search(ICommandContext context, string input)
-            => Search(input);
+            => Search(context.Message.Content[argPos..]);
         public SearchResult Search(string input)
         {
-            string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
+            var searchInput = _caseSensitive ? input : input.ToLowerInvariant();
             var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Command.Priority).ToImmutableArray();
 
             if (matches.Length > 0)

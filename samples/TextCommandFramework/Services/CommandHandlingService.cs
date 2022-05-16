@@ -58,7 +58,7 @@ namespace TextCommandFramework.Services
             // we will handle the result in CommandExecutedAsync,
         }
 
-        public async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
+        public static async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
         {
             // command is unspecified when there was a search failure (command not found); we don't care about these errors
             if (!command.IsSpecified)

@@ -2242,7 +2242,7 @@ namespace Discord.WebSocket
                                         //Only strip out the port if the endpoint contains it
                                         var portBegin = endpoint.LastIndexOf(':');
                                         if (portBegin > 0)
-                                            endpoint = endpoint.Substring(0, portBegin);
+                                            endpoint = endpoint[..portBegin];
 
                                         var _ = guild.FinishConnectAudio(endpoint, data.Token).ConfigureAwait(false);
                                     }
@@ -2978,7 +2978,7 @@ namespace Discord.WebSocket
         {
             return SocketDMChannel.Create(this, state, channelId, model);
         }
-        internal SocketDMChannel CreateDMChannel(ulong channelId, SocketUser user, ClientState state)
+        internal SocketDMChannel CreateDMChannel(ulong channelId, SocketUser user, ClientState _)
         {
             return new SocketDMChannel(this, channelId, user);
         }

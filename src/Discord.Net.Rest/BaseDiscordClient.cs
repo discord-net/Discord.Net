@@ -144,9 +144,7 @@ namespace Discord.Rest
         {
             if (!_isDisposed)
             {
-#pragma warning disable IDISP007
                 ApiClient.Dispose();
-#pragma warning restore IDISP007
                 _stateLock?.Dispose();
                 _isDisposed = true;
             }
@@ -156,9 +154,7 @@ namespace Discord.Rest
         {
             if (!_isDisposed)
             {
-#pragma warning disable IDISP007
                 await ApiClient.DisposeAsync().ConfigureAwait(false);
-#pragma warning restore IDISP007
                 _stateLock?.Dispose();
                 _isDisposed = true;
             }

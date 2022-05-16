@@ -143,7 +143,7 @@ namespace Discord.WebSocket
         {
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model));
             entity.Update(state, model);
-            entity.UpdateRoles(new ulong[0]);
+            entity.UpdateRoles(Array.Empty<ulong>());
             return entity;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, MemberModel model)
@@ -151,7 +151,7 @@ namespace Discord.WebSocket
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model);
             if (!model.Roles.IsSpecified)
-                entity.UpdateRoles(new ulong[0]);
+                entity.UpdateRoles(Array.Empty<ulong>());
             return entity;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, PresenceModel model)
@@ -159,7 +159,7 @@ namespace Discord.WebSocket
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model, false);
             if (!model.Roles.IsSpecified)
-                entity.UpdateRoles(new ulong[0]);
+                entity.UpdateRoles(Array.Empty<ulong>());
             return entity;
         }
         internal void Update(ClientState state, MemberModel model)
@@ -180,7 +180,7 @@ namespace Discord.WebSocket
             if (model.Pending.IsSpecified)
                 IsPending = model.Pending.Value;
         }
-        internal void Update(ClientState state, PresenceModel model, bool updatePresence)
+        internal void Update(ClientState _, PresenceModel model, bool updatePresence)
         {
             if (updatePresence)
             {

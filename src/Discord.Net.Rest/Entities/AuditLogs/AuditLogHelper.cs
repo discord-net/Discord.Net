@@ -9,7 +9,7 @@ namespace Discord.Rest
     internal static class AuditLogHelper
     {
         private static readonly Dictionary<ActionType, Func<BaseDiscordClient, Model, EntryModel, IAuditLogData>> CreateMapping
-            = new Dictionary<ActionType, Func<BaseDiscordClient, Model, EntryModel, IAuditLogData>>()
+            = new()
         {
             [ActionType.GuildUpdated] = GuildUpdateAuditLogData.Create,
 

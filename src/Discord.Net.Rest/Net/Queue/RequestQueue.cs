@@ -24,7 +24,7 @@ namespace Discord.Net.Queue
         private CancellationToken _requestCancelToken; //Parent token + Clear token
         private DateTimeOffset _waitUntil;
 
-        private Task _cleanupTask;
+        private readonly Task _cleanupTask;
 
         public RequestQueue()
         {
@@ -42,7 +42,7 @@ namespace Discord.Net.Queue
 
         public async Task SetCancelTokenAsync(CancellationToken cancelToken)
         {
-            await _tokenLock.WaitAsync().ConfigureAwait(false);
+            await _tokenLock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
             try
             {
                 _parentToken = cancelToken;

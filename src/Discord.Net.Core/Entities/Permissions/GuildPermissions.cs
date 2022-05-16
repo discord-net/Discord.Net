@@ -153,7 +153,7 @@ namespace Discord
             bool? startEmbeddedActivities = null,
             bool? moderateMembers = null)
         {
-            ulong value = initialValue;
+            var value = initialValue;
 
             Permissions.SetValue(ref value, createInstantInvite, GuildPermission.CreateInstantInvite);
             Permissions.SetValue(ref value, banMembers, GuildPermission.BanMembers);
@@ -358,7 +358,7 @@ namespace Discord
             // each of the GuildPermissions increments by 2^i from 0 to MaxBits
             for (byte i = 0; i < Permissions.MaxBits; i++)
             {
-                ulong flag = ((ulong)1 << i);
+                var flag = ((ulong)1 << i);
                 if ((RawValue & flag) != 0)
                     perms.Add((GuildPermission)flag);
             }

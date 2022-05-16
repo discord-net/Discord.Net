@@ -28,7 +28,7 @@ namespace Discord
         /// <summary> Returns a markdown-formatted string with codeblock formatting. </summary>
         public static string Code(string text, string language = null)
         {
-            if (language != null || text.Contains("\n"))
+            if (language != null || text.Contains('\n'))
                 return $"```{language ?? ""}\n{text}\n```";
             else
                 return $"`{text}`";
@@ -38,7 +38,7 @@ namespace Discord
         public static string Sanitize(string text)
         {
             if (text != null)
-                foreach (string unsafeChar in SensitiveCharacters)
+                foreach (var unsafeChar in SensitiveCharacters)
                     text = text.Replace(unsafeChar, $"\\{unsafeChar}");
             return text;
         }
@@ -55,9 +55,9 @@ namespace Discord
             if (string.IsNullOrWhiteSpace(text))
                 return text;
 
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = new();
 
-            int startIndex = 0;
+            var startIndex = 0;
             int newLineIndex;
             do
             {
@@ -65,13 +65,13 @@ namespace Discord
                 if (newLineIndex == -1)
                 {
                     // read the rest of the string
-                    var str = text.Substring(startIndex);
+                    var str = text[startIndex..];
                     result.Append($"> {str}");
                 }
                 else
                 {
                     // read until the next newline
-                    var str = text.Substring(startIndex, newLineIndex - startIndex);
+                    var str = text[startIndex..newLineIndex];
                     result.Append($"> {str}\n");
                 }
                 startIndex = newLineIndex + 1;

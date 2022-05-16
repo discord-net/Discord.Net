@@ -60,7 +60,10 @@ namespace InteractionFramework
         }
 
         private async Task LogAsync(LogMessage message)
-            => Console.WriteLine(message.ToString());
+        {
+            Console.WriteLine(message.ToString());
+            await Task.CompletedTask;
+        }
 
         public static bool IsDebug()
         {

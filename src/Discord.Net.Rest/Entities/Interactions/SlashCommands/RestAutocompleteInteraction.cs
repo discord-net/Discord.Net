@@ -49,11 +49,10 @@ namespace Discord.Rest
         ///         there is no choices for their autocompleted input.
         ///     </remarks>
         /// </param>
-        /// <param name="options">The request options for this response.</param>
         /// <returns>
         ///     A string that contains json to write back to the incoming http request.
         /// </returns>
-        public string Respond(IEnumerable<AutocompleteResult> result, RequestOptions options = null)
+        public string Respond(IEnumerable<AutocompleteResult> result)
         {
             if (!InteractionHelper.CanSendResponse(this))
                 throw new TimeoutException($"Cannot respond to an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");

@@ -22,7 +22,7 @@ namespace TextCommandFramework
     {
         // There is no need to implement IDisposable like before as we are
         // using dependency injection, which handles calling Dispose for us.
-        static void Main(string[] args)
+        static void Main(string[] _)
             => new Program().MainAsync().GetAwaiter().GetResult();
 
         public async Task MainAsync()
@@ -31,23 +31,22 @@ namespace TextCommandFramework
             // when you are finished using it, at the end of your app's lifetime.
             // If you use another dependency injection framework, you should inspect
             // its documentation for the best way to do this.
-            using (var services = ConfigureServices())
-            {
-                var client = services.GetRequiredService<DiscordSocketClient>();
+            using var services = ConfigureServices();
 
-                client.Log += LogAsync;
-                services.GetRequiredService<CommandService>().Log += LogAsync;
+            var client = services.GetRequiredService<DiscordSocketClient>();
 
-                // Tokens should be considered secret data and never hard-coded.
-                // We can read from the environment variable to avoid hard coding.
-                await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
-                await client.StartAsync();
+            client.Log += LogAsync;
+            services.GetRequiredService<CommandService>().Log += LogAsync;
 
-                // Here we initialize the logic required to register our commands.
-                await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
+            // Tokens should be considered secret data and never hard-coded.
+            // We can read from the environment variable to avoid hard coding.
+            await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
+            await client.StartAsync();
 
-                await Task.Delay(Timeout.Infinite);
-            }
+            // Here we initialize the logic required to register our commands.
+            await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
+
+            await Task.Delay(Timeout.Infinite);
         }
 
         private Task LogAsync(LogMessage log)
@@ -57,7 +56,7 @@ namespace TextCommandFramework
             return Task.CompletedTask;
         }
 
-        private ServiceProvider ConfigureServices()
+        private static ServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
                 .AddSingleton<DiscordSocketClient>()

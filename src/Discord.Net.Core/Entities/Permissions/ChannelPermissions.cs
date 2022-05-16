@@ -141,7 +141,7 @@ namespace Discord
             bool? sendMessagesInThreads = null,
             bool? startEmbeddedActivities = null)
         {
-            ulong value = initialValue;
+            var value = initialValue;
 
             Permissions.SetValue(ref value, createInstantInvite, ChannelPermission.CreateInstantInvite);
             Permissions.SetValue(ref value, manageChannel, ChannelPermission.ManageChannels);
@@ -287,7 +287,7 @@ namespace Discord
             var perms = new List<ChannelPermission>();
             for (byte i = 0; i < Permissions.MaxBits; i++)
             {
-                ulong flag = ((ulong)1 << i);
+                var flag = ((ulong)1 << i);
                 if ((RawValue & flag) != 0)
                     perms.Add((ChannelPermission)flag);
             }

@@ -145,11 +145,11 @@ namespace Discord
         {
             get
             {
-                int titleLength = Title?.Length ?? 0;
-                int authorLength = Author?.Name?.Length ?? 0;
-                int descriptionLength = Description?.Length ?? 0;
-                int footerLength = Footer?.Text?.Length ?? 0;
-                int fieldSum = Fields.Sum(f => f.Name.Length + f.Value.ToString().Length);
+                var titleLength = Title?.Length ?? 0;
+                var authorLength = Author?.Name?.Length ?? 0;
+                var descriptionLength = Description?.Length ?? 0;
+                var footerLength = Footer?.Text?.Length ?? 0;
+                var fieldSum = Fields.Sum(f => f.Name.Length + f.Value.ToString().Length);
 
                 return titleLength + authorLength + descriptionLength + footerLength + fieldSum;
             }

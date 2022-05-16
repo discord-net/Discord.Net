@@ -17,11 +17,11 @@ namespace Discord.Rest
     public class RestGroupChannel : RestChannel, IGroupChannel, IRestPrivateChannel, IRestMessageChannel, IRestAudioChannel
     {
         #region RestGroupChannel
-        private string _iconId;
         private ImmutableDictionary<ulong, RestGroupUser> _users;
 
         /// <inheritdoc />
         public string Name { get; private set; }
+
         /// <inheritdoc/>
         public string RTCRegion { get; private set; }
 
@@ -43,8 +43,6 @@ namespace Discord.Rest
         {
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
-            if (model.Icon.IsSpecified)
-                _iconId = model.Icon.Value;
 
             if (model.Recipients.IsSpecified)
                 UpdateUsers(model.Recipients.Value);
