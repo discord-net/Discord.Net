@@ -223,7 +223,8 @@ namespace Discord.Interactions
                 new ConcurrentDictionary<Type, Type>
                 {
                     [typeof(Array)] = typeof(DefaultArrayComponentConverter<>),
-                    [typeof(IConvertible)] = typeof(DefaultValueComponentConverter<>)
+                    [typeof(IConvertible)] = typeof(DefaultValueComponentConverter<>),
+                    [typeof(Nullable<>)] = typeof(NullableComponentConverter<>)
                 });
 
             _typeReaderMap = new TypeMap<TypeReader, string>(this, new ConcurrentDictionary<Type, TypeReader>(),
@@ -234,7 +235,8 @@ namespace Discord.Interactions
                     [typeof(IUser)] = typeof(DefaultUserReader<>),
                     [typeof(IMessage)] = typeof(DefaultMessageReader<>),
                     [typeof(IConvertible)] = typeof(DefaultValueReader<>),
-                    [typeof(Enum)] = typeof(EnumReader<>)
+                    [typeof(Enum)] = typeof(EnumReader<>),
+                    [typeof(Nullable<>)] = typeof(NullableReader<>)
                 });
         }
 

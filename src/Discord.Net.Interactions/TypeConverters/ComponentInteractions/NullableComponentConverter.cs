@@ -18,6 +18,6 @@ namespace Discord.Interactions
         }
 
         public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IComponentInteractionData option, IServiceProvider services)
-            => _typeConverter.ReadAsync(context, option, services);
+            => string.IsNullOrEmpty(option.Value) ? Task.FromResult(TypeConverterResult.FromSuccess(null)) : _typeConverter.ReadAsync(context, option, services);
     }
 }
