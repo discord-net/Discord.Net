@@ -20,17 +20,17 @@ namespace Discord.Interactions
             return await ExecuteAsync(context, services).ConfigureAwait(false);
         }
 
-        protected override async ValueTask<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
+        protected override Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
         {
             try
             {
                 object[] args = new object[1] { (context.Interaction as IUserCommandInteraction).Data.User };
 
-                return ParseResult.FromSuccess(args);
+                return Task.FromResult(ParseResult.FromSuccess(args) as IResult);
             }
             catch (Exception ex)
             {
-                return ParseResult.FromError(ex);
+                return Task.FromResult(ParseResult.FromError(ex) as IResult);
             }
         }
 

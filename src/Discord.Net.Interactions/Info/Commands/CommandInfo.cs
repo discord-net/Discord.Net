@@ -104,7 +104,7 @@ namespace Discord.Interactions
             return ExecuteResult.FromSuccess();
         }
 
-        protected abstract ValueTask<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services);
+        protected abstract Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services);
 
         private async Task<IResult> ExecuteInternalAsync(IInteractionContext context, IServiceProvider services)
         {
@@ -224,7 +224,7 @@ namespace Discord.Interactions
             return !commandResult.IsSuccess ? commandResult : PreconditionResult.FromSuccess();
         }
 
-        protected async ValueTask<T> InvokeEventAndReturn<T>(IInteractionContext context, T result) where T : IResult
+        protected async Task<T> InvokeEventAndReturn<T>(IInteractionContext context, T result) where T : IResult
         {
             await InvokeModuleEvent(context, result).ConfigureAwait(false);
             return result;

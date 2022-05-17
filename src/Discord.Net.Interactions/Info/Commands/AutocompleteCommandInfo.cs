@@ -44,8 +44,8 @@ namespace Discord.Interactions
             return await base.ExecuteAsync(context, services).ConfigureAwait(false);
         }
 
-        protected override async ValueTask<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
-            => ParseResult.FromSuccess(Array.Empty<object>());
+        protected override Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
+            => Task.FromResult(ParseResult.FromSuccess(Array.Empty<object>()) as IResult);
 
         /// <inheritdoc/>
         protected override Task InvokeModuleEvent(IInteractionContext context, IResult result) =>

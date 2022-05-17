@@ -28,7 +28,7 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
+        public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
         {
             if (context.Interaction is not IModalInteraction modalInteraction)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Modal Interaction.");
@@ -36,7 +36,7 @@ namespace Discord.Interactions
             return await base.ExecuteAsync(context, services).ConfigureAwait(false);
         }
 
-        protected override async ValueTask<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
+        protected override async Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
         {
             var captures = (context as IRouteMatchContainer)?.SegmentMatches?.ToList();
             var captureCount = captures?.Count() ?? 0;

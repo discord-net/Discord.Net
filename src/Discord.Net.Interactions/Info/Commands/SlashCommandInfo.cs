@@ -68,7 +68,7 @@ namespace Discord.Interactions
             return await base.ExecuteAsync(context, services);
         }
 
-        protected override async ValueTask<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
+        protected override async Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
         {
             List<IApplicationCommandInteractionDataOption> GetOptions()
             {
