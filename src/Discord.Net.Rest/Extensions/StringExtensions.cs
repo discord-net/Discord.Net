@@ -40,7 +40,7 @@ namespace Discord.Rest
         /// </remarks>
         /// <param name="embed">The embed to format as Json <see langword="string"/>.</param>
         /// <param name="formatting">The formatting in which the Json will be returned.</param>
-        /// <returns>A Json <see langword="string"/> containing the data from the <paramref name="builder"/>.</returns>
+        /// <returns>A Json <see langword="string"/> containing the data from the <paramref name="embed"/>.</returns>
         public static string ToJsonString(this Embed embed, Formatting formatting = Formatting.Indented)
             => JsonConvert.SerializeObject(embed.ToModel(), formatting, _settings.Value);
     }
