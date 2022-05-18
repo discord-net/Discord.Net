@@ -195,7 +195,7 @@ namespace Discord
         /// </summary>
         /// <param name="button">The button to add.</param>
         /// <param name="row">The row to add the button.</param>
-        /// <exception cref="InvalidOperationException">There is no more row to add a menu.</exception>
+        /// <exception cref="InvalidOperationException">There is no more row to add a button.</exception>
         /// <exception cref="ArgumentException"><paramref name="row"/> must be less than <see cref="MaxActionRowCount"/>.</exception>
         /// <returns>The current builder.</returns>
         public ComponentBuilder WithButton(ButtonBuilder button, int row = 0)
@@ -345,6 +345,100 @@ namespace Discord
                 throw new InvalidOperationException($"Components count reached {MaxChildCount}");
 
             Components.Add(component);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a <see cref="SelectMenuBuilder"/> to the <see cref="ActionRowBuilder"/>.
+        /// </summary>
+        /// <param name="customId">The custom id of the menu.</param>
+        /// <param name="options">The options of the menu.</param>
+        /// <param name="placeholder">The placeholder of the menu.</param>
+        /// <param name="minValues">The min values of the placeholder.</param>
+        /// <param name="maxValues">The max values of the placeholder.</param>
+        /// <param name="disabled">Whether or not the menu is disabled.</param>
+        /// <returns>The current builder.</returns> 
+        public ActionRowBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options,
+            string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false)
+        {
+            return WithSelectMenu(new SelectMenuBuilder()
+                .WithCustomId(customId)
+                .WithOptions(options)
+                .WithPlaceholder(placeholder)
+                .WithMaxValues(maxValues)
+                .WithMinValues(minValues)
+                .WithDisabled(disabled));
+        }
+
+        /// <summary>
+        ///     Adds a <see cref="SelectMenuBuilder"/> to the <see cref="ActionRowBuilder"/>.
+        /// </summary>
+        /// <param name="menu">The menu to add.</param>
+        /// <exception cref="InvalidOperationException">A Select Menu cannot exist in a pre-occupied ActionRow.</exception>
+        /// <returns>The current builder.</returns>
+        public ActionRowBuilder WithSelectMenu(SelectMenuBuilder menu)
+        {
+            if (menu.Options.Distinct().Count() != menu.Options.Count)
+                throw new InvalidOperationException("Please make sure that there is no duplicates values.");
+
+            var builtMenu = menu.Build();
+
+            if (Components.Count != 0)
+                throw new InvalidOperationException($"A Select Menu cannot exist in a pre-occupied ActionRow.");
+
+            AddComponent(builtMenu);
+
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a <see cref="ButtonBuilder"/> with specified parameters to the <see cref="ActionRowBuilder"/>.
+        /// </summary>
+        /// <param name="label">The label text for the newly added button.</param>
+        /// <param name="style">The style of this newly added button.</param>
+        /// <param name="emote">A <see cref="IEmote"/> to be used with this button.</param>
+        /// <param name="customId">The custom id of the newly added button.</param>
+        /// <param name="url">A URL to be used only if the <see cref="ButtonStyle"/> is a Link.</param>
+        /// <param name="disabled">Whether or not the newly created button is disabled.</param>
+        /// <returns>The current builder.</returns>
+        public ActionRowBuilder WithButton(
+            string label = null,
+            string customId = null,
+            ButtonStyle style = ButtonStyle.Primary,
+            IEmote emote = null,
+            string url = null,
+            bool disabled = false)
+        {
+            var button = new ButtonBuilder()
+                .WithLabel(label)
+                .WithStyle(style)
+                .WithEmote(emote)
+                .WithCustomId(customId)
+                .WithUrl(url)
+                .WithDisabled(disabled);
+
+            return WithButton(button);
+        }
+
+        /// <summary>
+        ///     Adds a <see cref="ButtonBuilder"/> to the <see cref="ActionRowBuilder"/>.
+        /// </summary>
+        /// <param name="button">The button to add.</param>
+        /// <exception cref="InvalidOperationException">Components count reached <see cref="MaxChildCount"/>.</exception>
+        /// <exception cref="InvalidOperationException">A button cannot be added to a row with a SelectMenu.</exception>
+        /// <returns>The current builder.</returns>
+        public ActionRowBuilder WithButton(ButtonBuilder button)
+        {
+            var builtButton = button.Build();
+
+            if(Components.Count >= 5)
+                throw new InvalidOperationException($"Components count reached {MaxChildCount}");
+
+            if (Components.Any(x => x.Type == ComponentType.SelectMenu))
+                throw new InvalidOperationException($"A button cannot be added to a row with a SelectMenu");
+
+            AddComponent(builtButton);
+
             return this;
         }
 
@@ -1227,7 +1321,7 @@ namespace Discord
         /// <param name="minLength">The text input's minimum length.</param>
         /// <param name="maxLength">The text input's maximum length.</param>
         /// <param name="required">The text input's required value.</param>
-        public TextInputBuilder (string label, string customId, TextInputStyle style = TextInputStyle.Short, string placeholder = null,
+        public TextInputBuilder(string label, string customId, TextInputStyle style = TextInputStyle.Short, string placeholder = null,
             int? minLength = null, int? maxLength = null, bool? required = null, string value = null)
         {
             Label = label;
@@ -1291,7 +1385,7 @@ namespace Discord
             Placeholder = placeholder;
             return this;
         }
-        
+
         /// <summary>
         ///     Sets the value of the current builder.
         /// </summary>
