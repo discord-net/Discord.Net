@@ -673,9 +673,11 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
+            var bucket = new BucketIds(channelId: channelId);
+
             try
             {
-                await SendAsync("DELETE", $"stage-instances/{channelId}", options: options).ConfigureAwait(false);
+                await SendAsync("DELETE", () => $"stage-instances/{channelId}", bucket, options: options).ConfigureAwait(false);
             }
             catch (HttpException httpEx) when (httpEx.HttpCode == HttpStatusCode.NotFound) { }
         }
