@@ -420,7 +420,6 @@ namespace Discord
             return WithButton(button);
         }
 
-
         /// <summary>
         ///     Adds a <see cref="ButtonBuilder"/> to the <see cref="ActionRowBuilder"/>.
         /// </summary>
