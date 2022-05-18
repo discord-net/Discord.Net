@@ -442,7 +442,6 @@ namespace Discord
             return this;
         }
 
-
         /// <summary>
         ///     Builds the current builder to a <see cref="ActionRowComponent"/> that can be used within a <see cref="ComponentBuilder"/>
         /// </summary>
