@@ -18,6 +18,8 @@ AutocompleteHandlers raise the `AutocompleteHandlerExecuted` event on execution.
 
 A valid AutocompleteHandlers must inherit [AutocompleteHandler] base type and implement all of its abstract methods.
 
+[!code-csharp[Autocomplete Command Example](samples/autocompletion/autocomplete-example.cs)]
+
 ### GenerateSuggestionsAsync()
 
 The Interactions Service uses this method to generate a response of an Autocomplete Interaction.
