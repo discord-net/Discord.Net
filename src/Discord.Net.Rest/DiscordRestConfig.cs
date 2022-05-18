@@ -9,5 +9,7 @@ namespace Discord.Rest
     {
         /// <summary> Gets or sets the provider used to generate new REST connections. </summary>
         public RestClientProvider RestClientProvider { get; set; } = DefaultRestClientProvider.Instance;
+
+        public bool APIOnRestInteractionCreation { get; set; } = true;
     }
 }
