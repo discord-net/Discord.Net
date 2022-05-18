@@ -21,11 +21,12 @@ namespace Discord.Rest
         public virtual int SlowModeInterval { get; private set; }
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
-
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionChannel(Id);
         /// <inheritdoc />
         public bool IsNsfw { get; private set; }
+        /// <inheritdoc />
+        public ThreadArchiveDuration DefaultArchiveDuration { get; private set; }
 
         internal RestTextChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
@@ -46,6 +47,12 @@ namespace Discord.Rest
             if (model.SlowMode.IsSpecified)
                 SlowModeInterval = model.SlowMode.Value;
             IsNsfw = model.Nsfw.GetValueOrDefault();
+
+            if (model.AutoArchiveDuration.IsSpecified)
+                DefaultArchiveDuration = model.AutoArchiveDuration.Value;
+            else
+                DefaultArchiveDuration = ThreadArchiveDuration.OneDay;
+            // basic value at channel creation. Shouldn't be called since guild text channels always have this property
         }
 
         /// <inheritdoc />

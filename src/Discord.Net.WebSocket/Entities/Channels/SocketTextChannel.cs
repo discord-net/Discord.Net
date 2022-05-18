@@ -40,7 +40,8 @@ namespace Discord.WebSocket
         private bool _nsfw;
         /// <inheritdoc />
         public bool IsNsfw => _nsfw;
-
+        /// <inheritdoc />
+        public ThreadArchiveDuration DefaultArchiveDuration { get; private set; }
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionChannel(Id);
         /// <inheritdoc />
@@ -76,6 +77,11 @@ namespace Discord.WebSocket
             Topic = model.Topic.GetValueOrDefault();
             SlowModeInterval = model.SlowMode.GetValueOrDefault(); // some guilds haven't been patched to include this yet?
             _nsfw = model.Nsfw.GetValueOrDefault();
+            if (model.AutoArchiveDuration.IsSpecified)
+                DefaultArchiveDuration = model.AutoArchiveDuration.Value;
+            else
+                DefaultArchiveDuration = ThreadArchiveDuration.OneDay;
+            // basic value at channel creation. Shouldn't be called since guild text channels always have this property
         }
 
         /// <inheritdoc />
