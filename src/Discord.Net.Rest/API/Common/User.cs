@@ -1,8 +1,9 @@
 using Newtonsoft.Json;
+using System;
 
 namespace Discord.API
 {
-    internal class User
+    internal class User : IUserModel
     {
         [JsonProperty("id")]
         public ulong Id { get; set; }
@@ -19,20 +20,33 @@ namespace Discord.API
         [JsonProperty("accent_color")]
         public Optional<uint?> AccentColor { get; set; }
 
-        //CurrentUser
-        [JsonProperty("verified")]
-        public Optional<bool> Verified { get; set; }
-        [JsonProperty("email")]
-        public Optional<string> Email { get; set; }
-        [JsonProperty("mfa_enabled")]
-        public Optional<bool> MfaEnabled { get; set; }
-        [JsonProperty("flags")]
-        public Optional<UserProperties> Flags { get; set; }
-        [JsonProperty("premium_type")]
-        public Optional<PremiumType> PremiumType { get; set; }
-        [JsonProperty("locale")]
-        public Optional<string> Locale { get; set; }
-        [JsonProperty("public_flags")]
-        public Optional<UserProperties> PublicFlags { get; set; }
+
+        // IUserModel
+        string IUserModel.Username
+        {
+            get => Username.GetValueOrDefault();
+            set => throw new NotSupportedException();
+        }
+
+        string IUserModel.Discriminator {
+            get => Discriminator.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
+
+        bool? IUserModel.IsBot
+        {
+            get => Bot.ToNullable();
+            set => throw new NotSupportedException();
+        }
+
+        string IUserModel.Avatar
+        {
+            get => Avatar.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
+
+        ulong IEntityModel<ulong>.Id
+        {
+            get => Id;
+            set => throw new NotSupportedException();
+        }
     }
 }

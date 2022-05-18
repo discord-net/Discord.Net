@@ -7,86 +7,97 @@ namespace Discord.WebSocket
 {
     internal static class EntityExtensions
     {
-        public static IActivity ToEntity(this API.Game model)
+        public static IActivity ToEntity(this IActivityModel model)
         {
             #region  Custom Status Game
-            if (model.Id.IsSpecified && model.Id.Value == "custom")
+            if (model.Id != null && model.Id == "custom")
             {
                 return new CustomStatusGame()
                 {
                     Type = ActivityType.CustomStatus,
                     Name = model.Name,
-                    State = model.State.IsSpecified ? model.State.Value : null,
-                    Emote = model.Emoji.IsSpecified ? model.Emoji.Value.ToIEmote() : null,
-                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(model.CreatedAt.Value),
+                    State = model.State,
+                    Emote = model.Emoji?.ToIEmote(),
+                    CreatedAt = model.CreatedAt,
                 };
             }
             #endregion
 
             #region Spotify Game
-            if (model.SyncId.IsSpecified)
+            if (model.SyncId != null)
             {
-                var assets = model.Assets.GetValueOrDefault()?.ToEntity();
-                string albumText = assets?[1]?.Text;
-                string albumArtId = assets?[1]?.ImageId?.Replace("spotify:", "");
-                var timestamps = model.Timestamps.IsSpecified ? model.Timestamps.Value.ToEntity() : null;
+                string albumText = model.LargeText;
+                string albumArtId = model.LargeImage?.Replace("spotify:", "");
                 return new SpotifyGame
                 {
                     Name = model.Name,
-                    SessionId = model.SessionId.GetValueOrDefault(),
-                    TrackId = model.SyncId.Value,
-                    TrackUrl = CDN.GetSpotifyDirectUrl(model.SyncId.Value),
+                    SessionId = model.SessionId,
+                    TrackId = model.SyncId,
+                    TrackUrl = CDN.GetSpotifyDirectUrl(model.SyncId),
                     AlbumTitle = albumText,
-                    TrackTitle = model.Details.GetValueOrDefault(),
-                    Artists = model.State.GetValueOrDefault()?.Split(';').Select(x => x?.Trim()).ToImmutableArray(),
-                    StartedAt = timestamps?.Start,
-                    EndsAt = timestamps?.End,
-                    Duration = timestamps?.End - timestamps?.Start,
+                    TrackTitle = model.Details,
+                    Artists = model.State?.Split(';').Select(x => x?.Trim()).ToImmutableArray(),
+                    StartedAt = model.TimestampStart,
+                    EndsAt = model.TimestampEnd,
+                    Duration = model.TimestampEnd - model.TimestampStart,
                     AlbumArtUrl = albumArtId != null ? CDN.GetSpotifyAlbumArtUrl(albumArtId) : null,
                     Type = ActivityType.Listening,
-                    Flags = model.Flags.GetValueOrDefault(),
+                    Flags = model.Flags,
+                    AlbumArt = model.LargeImage,
                 };
             }
             #endregion
 
             #region Rich Game
-            if (model.ApplicationId.IsSpecified)
+            if (model.ApplicationId.HasValue)
             {
                 ulong appId = model.ApplicationId.Value;
-                var assets = model.Assets.GetValueOrDefault()?.ToEntity(appId);
                 return new RichGame
                 {
                     ApplicationId = appId,
                     Name = model.Name,
-                    Details = model.Details.GetValueOrDefault(),
-                    State = model.State.GetValueOrDefault(),
-                    SmallAsset = assets?[0],
-                    LargeAsset = assets?[1],
-                    Party = model.Party.IsSpecified ? model.Party.Value.ToEntity() : null,
-                    Secrets = model.Secrets.IsSpecified ? model.Secrets.Value.ToEntity() : null,
-                    Timestamps = model.Timestamps.IsSpecified ? model.Timestamps.Value.ToEntity() : null,
-                    Flags = model.Flags.GetValueOrDefault()
+                    Details = model.Details,
+                    State = model.State,
+                    SmallAsset = new GameAsset
+                    {
+                        Text = model.SmallText,
+                        ImageId = model.SmallImage,
+                        ApplicationId = appId,
+                    },
+                    LargeAsset = new GameAsset
+                    {
+                        Text = model.LargeText,
+                        ApplicationId = appId,
+                        ImageId = model.LargeImage
+                    },
+                    Party = model.PartyId != null ? new GameParty
+                    {
+                        Id = model.PartyId,
+                        Capacity = model.PartySize?.Length > 1 ? model.PartySize[1] : 0,
+                        Members = model.PartySize?.Length > 0 ? model.PartySize[0] : 0
+                    } : null,
+                    Secrets = model.JoinSecret != null || model.SpectateSecret != null || model.MatchSecret != null ? new GameSecrets(model.MatchSecret, model.JoinSecret, model.SpectateSecret) : null,
+                    Timestamps = model.TimestampStart.HasValue || model.TimestampEnd.HasValue ? new GameTimestamps(model.TimestampStart, model.TimestampEnd) : null,
+                    Flags = model.Flags
                 };
             }
             #endregion
 
             #region  Stream Game
-            if (model.StreamUrl.IsSpecified)
+            if (model.Url != null)
             {
                 return new StreamingGame(
                     model.Name,
-                    model.StreamUrl.Value)
+                    model.Url)
                 {
-                    Flags = model.Flags.GetValueOrDefault(),
-                    Details = model.Details.GetValueOrDefault()
+                    Flags = model.Flags,
+                    Details = model.Details
                 };
             }
             #endregion
 
             #region  Normal Game
-            return new Game(model.Name, model.Type.GetValueOrDefault() ?? ActivityType.Playing,
-                model.Flags.IsSpecified ? model.Flags.Value : ActivityProperties.None,
-                model.Details.GetValueOrDefault());
+            return new Game(model.Name, model.Type, model.Flags, model.Details);
             #endregion
         }
 

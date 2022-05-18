@@ -55,13 +55,13 @@ namespace Discord.WebSocket
             _voiceStates = new ConcurrentDictionary<ulong, SocketVoiceState>(ConcurrentHashSet.DefaultConcurrencyLevel, 5);
             _users = new ConcurrentDictionary<ulong, SocketGroupUser>(ConcurrentHashSet.DefaultConcurrencyLevel, 5);
         }
-        internal static SocketGroupChannel Create(DiscordSocketClient discord, ClientState state, Model model)
+        internal static SocketGroupChannel Create(DiscordSocketClient discord, ClientStateManager state, Model model)
         {
             var entity = new SocketGroupChannel(discord, model.Id);
             entity.Update(state, model);
             return entity;
         }
-        internal override void Update(ClientState state, Model model)
+        internal override void Update(ClientStateManager state, Model model)
         {
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
@@ -73,11 +73,11 @@ namespace Discord.WebSocket
 
             RTCRegion = model.RTCRegion.GetValueOrDefault(null);
         }
-        private void UpdateUsers(ClientState state, UserModel[] models)
+        private void UpdateUsers(ClientStateManager state, UserModel[] models)
         {
             var users = new ConcurrentDictionary<ulong, SocketGroupUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(models.Length * 1.05));
             for (int i = 0; i < models.Length; i++)
-                users[models[i].Id] = SocketGroupUser.Create(this, state, models[i]);
+                users[models[i].Id] = SocketGroupUser.Create(this, models[i]);
             _users = users;
         }
 
@@ -265,8 +265,7 @@ namespace Discord.WebSocket
                 return user;
             else
             {
-                var privateUser = SocketGroupUser.Create(this, Discord.State, model);
-                privateUser.GlobalUser.AddRef();
+                var privateUser = SocketGroupUser.Create(this, model);
                 _users[privateUser.Id] = privateUser;
                 return privateUser;
             }
@@ -275,7 +274,6 @@ namespace Discord.WebSocket
         {
             if (_users.TryRemove(id, out SocketGroupUser user))
             {
-                user.GlobalUser.RemoveRef(Discord);
                 return user;
             }
             return null;
@@ -283,7 +281,7 @@ namespace Discord.WebSocket
         #endregion
 
         #region Voice States
-        internal SocketVoiceState AddOrUpdateVoiceState(ClientState state, VoiceStateModel model)
+        internal SocketVoiceState AddOrUpdateVoiceState(ClientStateManager state, VoiceStateModel model)
         {
             var voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
             var voiceState = SocketVoiceState.Create(voiceChannel, model);

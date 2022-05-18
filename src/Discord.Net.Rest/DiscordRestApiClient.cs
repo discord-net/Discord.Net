@@ -2071,10 +2071,10 @@ namespace Discord.API
         #endregion
 
         #region Current User/DMs
-        public async Task<User> GetMyUserAsync(RequestOptions options = null)
+        public async Task<CurrentUser> GetMyUserAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<User>("GET", () => "users/@me", new BucketIds(), options: options).ConfigureAwait(false);
+            return await SendAsync<CurrentUser>("GET", () => "users/@me", new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task<IReadOnlyCollection<Connection>> GetMyConnectionsAsync(RequestOptions options = null)
         {

@@ -3,7 +3,7 @@ using System;
 
 namespace Discord.API
 {
-    internal class GuildMember
+    internal class GuildMember : IMemberModel
     {
         [JsonProperty("user")]
         public User User { get; set; }
@@ -25,5 +25,46 @@ namespace Discord.API
         public Optional<DateTimeOffset?> PremiumSince { get; set; }
         [JsonProperty("communication_disabled_until")]
         public Optional<DateTimeOffset?> TimedOutUntil { get; set; }
+
+        // IMemberModel
+        string IMemberModel.Nickname {
+            get => Nick.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
+
+        string IMemberModel.GuildAvatar {
+            get => Avatar.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
+
+        ulong[] IMemberModel.Roles {
+            get => Roles.GetValueOrDefault(Array.Empty<ulong>()); set => throw new NotSupportedException();
+        }
+
+        DateTimeOffset? IMemberModel.JoinedAt {
+            get => JoinedAt.ToNullable(); set => throw new NotSupportedException();
+        }
+
+        DateTimeOffset? IMemberModel.PremiumSince {
+            get => PremiumSince.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
+
+        bool IMemberModel.IsDeaf {
+            get => Deaf.GetValueOrDefault(false); set => throw new NotSupportedException();
+        }
+
+        bool IMemberModel.IsMute {
+            get => Mute.GetValueOrDefault(false); set => throw new NotSupportedException();
+        }
+
+        bool? IMemberModel.IsPending {
+            get => Pending.ToNullable(); set => throw new NotSupportedException();
+        }
+
+        DateTimeOffset? IMemberModel.CommunicationsDisabledUntil {
+            get => TimedOutUntil.GetValueOrDefault(); set => throw new NotSupportedException();
+        }
+
+        ulong IEntityModel<ulong>.Id {
+            get => User.Id; set => throw new NotSupportedException();
+        }
     }
 }

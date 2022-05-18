@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using Model = Discord.API.Presence;
+using Model = Discord.IPresenceModel;
 
 namespace Discord.WebSocket
 {
@@ -11,8 +11,13 @@ namespace Discord.WebSocket
     ///     Represents the WebSocket user's presence status. This may include their online status and their activity.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketPresence : IPresence
+    public class SocketPresence : IPresence, ICached<Model>
     {
+        internal ulong UserId;
+        internal ulong? GuildId;
+        internal bool IsFreed;
+        internal DiscordSocketClient Discord;
+
         /// <inheritdoc />
         public UserStatus Status { get; private set; }
         /// <inheritdoc />
@@ -20,17 +25,24 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public IReadOnlyCollection<IActivity> Activities { get; private set; }
 
-        internal SocketPresence() { }
-        internal SocketPresence(UserStatus status, IImmutableSet<ClientType> activeClients, IImmutableList<IActivity> activities)
+        public static SocketPresence Default
+            => new SocketPresence(null, UserStatus.Offline, null, null);
+
+        internal SocketPresence(DiscordSocketClient discord)
+        {
+            Discord = discord;
+        }
+        internal SocketPresence(DiscordSocketClient discord, UserStatus status, IImmutableSet<ClientType> activeClients, IImmutableList<IActivity> activities)
+            : this(discord)
         {
             Status = status;
             ActiveClients = activeClients ?? ImmutableHashSet<ClientType>.Empty;
             Activities = activities ?? ImmutableList<IActivity>.Empty;
         }
 
-        internal static SocketPresence Create(Model model)
+        internal static SocketPresence Create(DiscordSocketClient client, Model model)
         {
-            var entity = new SocketPresence();
+            var entity = new SocketPresence(client);
             entity.Update(model);
             return entity;
         }
@@ -38,8 +50,10 @@ namespace Discord.WebSocket
         internal void Update(Model model)
         {
             Status = model.Status;
-            ActiveClients = ConvertClientTypesDict(model.ClientStatus.GetValueOrDefault()) ?? ImmutableArray<ClientType>.Empty;
+            ActiveClients = model.ActiveClients.Length > 0 ? model.ActiveClients.ToImmutableArray() : ImmutableArray<ClientType>.Empty;
             Activities = ConvertActivitiesList(model.Activities) ?? ImmutableArray<IActivity>.Empty;
+            UserId = model.UserId;
+            GuildId = model.GuildId;
         }
 
         /// <summary>
@@ -76,9 +90,9 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A list of all <see cref="IActivity"/> that this user currently has available.
         /// </returns>
-        private static IImmutableList<IActivity> ConvertActivitiesList(IList<API.Game> activities)
+        private static IImmutableList<IActivity> ConvertActivitiesList(IActivityModel[] activities)
         {
-            if (activities == null || activities.Count == 0)
+            if (activities == null || activities.Length == 0)
                 return ImmutableList<IActivity>.Empty;
             var list = new List<IActivity>();
             foreach (var activity in activities)
@@ -96,5 +110,122 @@ namespace Discord.WebSocket
         private string DebuggerDisplay => $"{Status}{(Activities?.FirstOrDefault()?.Name ?? "")}";
 
         internal SocketPresence Clone() => MemberwiseClone() as SocketPresence;
+
+        ~SocketPresence() => Dispose();
+        public void Dispose()
+        {
+            if (IsFreed)
+                return;
+
+            GC.SuppressFinalize(this);
+
+            if(Discord != null)
+            {
+                Discord.StateManager.PresenceStore.RemoveReference(UserId);
+                IsFreed = true;
+            }
+        }
+
+        #region Cache
+        internal class CacheModel : Model
+        {
+            public UserStatus Status { get; set; }
+
+            public ClientType[] ActiveClients { get; set; }
+
+            public IActivityModel[] Activities { get; set; }
+
+            public ulong UserId { get; set; }
+
+            public ulong? GuildId { get; set; }
+
+            ulong IEntityModel<ulong>.Id
+            {
+                get => UserId;
+                set => UserId = value;
+            }
+        }
+
+        internal class ActivityCacheModel : IActivityModel
+        {
+            public string Id { get; set; }
+            public string Url { get; set; }
+            public string Name { get; set; }
+            public ActivityType Type { get; set; }
+            public string Details { get; set; }
+            public string State { get; set; }
+            public ActivityProperties Flags { get; set; }
+            public DateTimeOffset CreatedAt { get; set; }
+            public IEmojiModel Emoji { get; set; }
+            public ulong? ApplicationId { get; set; }
+            public string SyncId { get; set; }
+            public string SessionId { get; set; }
+            public string LargeImage { get; set; }
+            public string LargeText { get; set; }
+            public string SmallImage { get; set; }
+            public string SmallText { get; set; }
+            public string PartyId { get; set; }
+            public long[] PartySize { get; set; }
+            public string JoinSecret { get; set; }
+            public string SpectateSecret { get; set; }
+            public string MatchSecret { get; set; }
+            public DateTimeOffset? TimestampStart { get; set; }
+            public DateTimeOffset? TimestampEnd { get; set; }
+        }
+
+        private class EmojiCacheModel : IEmojiModel
+        {
+            public ulong? Id { get; set; }
+            public string Name { get; set; }
+            public ulong[] Roles { get; set; }
+            public bool RequireColons { get; set; }
+            public bool IsManaged { get; set; }
+            public bool IsAnimated { get; set; }
+            public bool IsAvailable { get; set; }
+            public ulong? CreatorId { get; set; }
+        }
+
+        internal Model ToModel()
+        {
+            var model = Discord.StateManager.GetModel<Model, CacheModel>();
+            model.Status = Status;
+            model.ActiveClients = ActiveClients.ToArray();
+            model.UserId = UserId;
+            model.GuildId = GuildId;
+            model.Activities = Activities.Select(x =>
+            {
+                switch (x)
+                {
+                    case Game game:
+                        switch (game)
+                        {
+                            case RichGame richGame:
+                                return richGame.ToModel<ActivityCacheModel>();
+                            case SpotifyGame spotify:
+                                return spotify.ToModel<ActivityCacheModel>();
+                            case CustomStatusGame custom:
+                                return custom.ToModel<ActivityCacheModel, EmojiCacheModel>();
+                            case StreamingGame stream:
+                                return stream.ToModel<ActivityCacheModel>();
+                        }
+                        break;
+                }
+
+                return new ActivityCacheModel
+                {
+                    Name = x.Name,
+                    Details = x.Details,
+                    Flags = x.Flags,
+                    Type = x.Type
+                };
+            }).ToArray();
+            return model;
+        }
+
+        Model ICached<Model>.ToModel() => ToModel();
+        void ICached<Model>.Update(Model model) => Update(model);
+        bool ICached.IsFreed => IsFreed;
+
+        #endregion
     }
 }

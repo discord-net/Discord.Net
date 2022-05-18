@@ -29,7 +29,7 @@ namespace Discord.WebSocket
             {
                 foreach (var user in resolved.Users.Value)
                 {
-                    var socketUser = discord.GetOrCreateUser(discord.State, user.Value);
+                    var socketUser = discord.GetOrCreateUser(discord.StateManager, user.Value);
 
                     Users.Add(ulong.Parse(user.Key), socketUser);
                 }
@@ -50,11 +50,11 @@ namespace Discord.WebSocket
                             : discord.Rest.ApiClient.GetChannelAsync(channel.Value.Id).ConfigureAwait(false).GetAwaiter().GetResult();
 
                         socketChannel = guild != null
-                            ? SocketGuildChannel.Create(guild, discord.State, channelModel)
-                            : (SocketChannel)SocketChannel.CreatePrivate(discord, discord.State, channelModel);
+                            ? SocketGuildChannel.Create(guild, discord.StateManager, channelModel)
+                            : (SocketChannel)SocketChannel.CreatePrivate(discord, discord.StateManager, channelModel);
                     }
 
-                    discord.State.AddChannel(socketChannel);
+                    discord.StateManager.AddChannel(socketChannel);
                     Channels.Add(ulong.Parse(channel.Key), socketChannel);
                 }
             }
@@ -88,7 +88,7 @@ namespace Discord.WebSocket
                     if (guild != null)
                     {
                         if (msg.Value.WebhookId.IsSpecified)
-                            author = SocketWebhookUser.Create(guild, discord.State, msg.Value.Author.Value, msg.Value.WebhookId.Value);
+                            author = SocketWebhookUser.Create(guild, msg.Value.Author.Value, msg.Value.WebhookId.Value);
                         else
                             author = guild.GetUser(msg.Value.Author.Value.Id);
                     }
@@ -99,11 +99,11 @@ namespace Discord.WebSocket
                     {
                         if (!msg.Value.GuildId.IsSpecified)  // assume it is a DM
                         {
-                            channel = discord.CreateDMChannel(msg.Value.ChannelId, msg.Value.Author.Value, discord.State);
+                            channel = discord.CreateDMChannel(msg.Value.ChannelId, msg.Value.Author.Value, discord.StateManager);
                         }
                     }
 
-                    var message = SocketMessage.Create(discord, discord.State, author, channel, msg.Value);
+                    var message = SocketMessage.Create(discord, discord.StateManager, author, channel, msg.Value);
                     Messages.Add(message.Id, message);
                 }
             }

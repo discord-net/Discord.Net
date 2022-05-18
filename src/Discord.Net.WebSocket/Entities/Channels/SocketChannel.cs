@@ -29,7 +29,7 @@ namespace Discord.WebSocket
         }
 
         /// <exception cref="InvalidOperationException">Unexpected channel type is created.</exception>
-        internal static ISocketPrivateChannel CreatePrivate(DiscordSocketClient discord, ClientState state, Model model)
+        internal static ISocketPrivateChannel CreatePrivate(DiscordSocketClient discord, ClientStateManager state, Model model)
         {
             return model.Type switch
             {
@@ -38,7 +38,7 @@ namespace Discord.WebSocket
                 _ => throw new InvalidOperationException($"Unexpected channel type: {model.Type}"),
             };
         }
-        internal abstract void Update(ClientState state, Model model);
+        internal abstract void Update(ClientStateManager state, Model model);
         #endregion
 
         #region User

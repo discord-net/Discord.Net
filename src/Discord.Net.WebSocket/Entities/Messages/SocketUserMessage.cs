@@ -53,14 +53,14 @@ namespace Discord.WebSocket
             : base(discord, id, channel, author, source)
         {
         }
-        internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
+        internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientStateManager state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
             var entity = new SocketUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
             entity.Update(state, model);
             return entity;
         }
 
-        internal override void Update(ClientState state, Model model)
+        internal override void Update(ClientStateManager state, Model model)
         {
             base.Update(state, model);
 
@@ -122,14 +122,14 @@ namespace Discord.WebSocket
                     if (guild != null)
                     {
                         if (webhookId != null)
-                            refMsgAuthor = SocketWebhookUser.Create(guild, state, refMsg.Author.Value, webhookId.Value);
+                            refMsgAuthor = SocketWebhookUser.Create(guild, refMsg.Author.Value, webhookId.Value);
                         else
                             refMsgAuthor = guild.GetUser(refMsg.Author.Value.Id);
                     }
                     else
                         refMsgAuthor = (Channel as SocketChannel).GetUser(refMsg.Author.Value.Id);
                     if (refMsgAuthor == null)
-                        refMsgAuthor = SocketUnknownUser.Create(Discord, state, refMsg.Author.Value);
+                        refMsgAuthor = SocketUnknownUser.Create(Discord, refMsg.Author.Value);
                 }
                 else
                     // Message author wasn't specified in the payload, so create a completely anonymous unknown user

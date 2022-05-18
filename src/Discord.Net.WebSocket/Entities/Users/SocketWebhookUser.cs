@@ -33,8 +33,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override bool IsWebhook => true;
         /// <inheritdoc />
-        internal override SocketPresence Presence { get { return new SocketPresence(UserStatus.Offline, null, null); } set { } }
-        internal override SocketGlobalUser GlobalUser { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        internal override LazyCached<SocketPresence> Presence { get { return new(SocketPresence.Default); } set { } }
+        internal override LazyCached<SocketGlobalUser> GlobalUser { get => new(null); set { } }
 
         internal SocketWebhookUser(SocketGuild guild, ulong id, ulong webhookId)
             : base(guild.Discord, id)
@@ -42,16 +42,17 @@ namespace Discord.WebSocket
             Guild = guild;
             WebhookId = webhookId;
         }
-        internal static SocketWebhookUser Create(SocketGuild guild, ClientState state, Model model, ulong webhookId)
+        internal static SocketWebhookUser Create(SocketGuild guild, Model model, ulong webhookId)
         {
             var entity = new SocketWebhookUser(guild, model.Id, webhookId);
-            entity.Update(state, model);
+            entity.Update(model);
             return entity;
         }
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)";
         internal new SocketWebhookUser Clone() => MemberwiseClone() as SocketWebhookUser;
-#endregion
+        public override void Dispose() { }
+        #endregion
 
         #region IGuildUser
         /// <inheritdoc />

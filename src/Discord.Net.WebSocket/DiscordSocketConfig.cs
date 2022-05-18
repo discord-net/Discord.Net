@@ -26,6 +26,17 @@ namespace Discord.WebSocket
     public class DiscordSocketConfig : DiscordRestConfig
     {
         /// <summary>
+        ///     Gets or sets the cache provider to use.
+        /// </summary>
+        public ICacheProvider CacheProvider { get; set; }
+
+        /// <summary>
+        ///     Gets or sets whether or not non-async cache lookups would wait for the task to complete
+        ///     synchronously or to throw.
+        /// </summary>
+        public bool AllowSynchronousWaiting { get; set; } = false;
+
+        /// <summary>
         ///    Returns the encoding gateway should use.
         /// </summary>
         public const string GatewayEncoding = "json";

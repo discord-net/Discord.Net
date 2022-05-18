@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Model = Discord.API.ThreadMember;
+using Model = Discord.IThreadMemberModel;
 using System.Collections.Immutable;
 
 namespace Discord.WebSocket
@@ -10,12 +10,12 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents a thread user received over the gateway.
     /// </summary>
-    public class SocketThreadUser : SocketUser, IThreadUser, IGuildUser
+    public class SocketThreadUser : SocketUser, IThreadUser, IGuildUser, ICached<Model>
     {
         /// <summary>
         ///     Gets the <see cref="SocketThreadChannel"/> this user is in.
         /// </summary>
-        public SocketThreadChannel Thread { get; private set; }
+        public Lazy<SocketThreadChannel> Thread { get; private set; }
 
         /// <inheritdoc/>
         public DateTimeOffset ThreadJoinedAt { get; private set; }
@@ -23,126 +23,142 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the guild this user is in.
         /// </summary>
-        public SocketGuild Guild { get; private set; }
+        public Lazy<SocketGuild> Guild { get; private set; }
 
         /// <inheritdoc/>
         public DateTimeOffset? JoinedAt
-            => GuildUser.JoinedAt;
+            => GuildUser.Value.JoinedAt;
 
         /// <inheritdoc/>
         public string DisplayName
-            => GuildUser.Nickname ?? GuildUser.Username;
+            => GuildUser.Value.Nickname ?? GuildUser.Value.Username;
 
         /// <inheritdoc/>
         public string Nickname
-            => GuildUser.Nickname;
+            => GuildUser.Value.Nickname;
 
         /// <inheritdoc/>
         public DateTimeOffset? PremiumSince
-            => GuildUser.PremiumSince;
+            => GuildUser.Value.PremiumSince;
 
         /// <inheritdoc/>
         public DateTimeOffset? TimedOutUntil
-            => GuildUser.TimedOutUntil;
+            => GuildUser.Value.TimedOutUntil;
 
         /// <inheritdoc/>
         public bool? IsPending
-            => GuildUser.IsPending;
+            => GuildUser.Value.IsPending;
+
         /// <inheritdoc />
         public int Hierarchy
-            => GuildUser.Hierarchy;
+            => GuildUser.Value.Hierarchy;
 
         /// <inheritdoc/>
         public override string AvatarId
         {
-            get => GuildUser.AvatarId;
-            internal set => GuildUser.AvatarId = value;
+            get => GuildUser.Value.AvatarId;
+            internal set => GuildUser.Value.AvatarId = value;
         }
+
         /// <inheritdoc/>
         public string DisplayAvatarId => GuildAvatarId ?? AvatarId;
 
         /// <inheritdoc/>
         public string GuildAvatarId
-            => GuildUser.GuildAvatarId;
+            => GuildUser.Value.GuildAvatarId;
 
         /// <inheritdoc/>
         public override ushort DiscriminatorValue
         {
-            get => GuildUser.DiscriminatorValue;
-            internal set => GuildUser.DiscriminatorValue = value;
+            get => GuildUser.Value.DiscriminatorValue;
+            internal set => GuildUser.Value.DiscriminatorValue = value;
         }
 
         /// <inheritdoc/>
         public override bool IsBot
         {
-            get => GuildUser.IsBot;
-            internal set => GuildUser.IsBot = value;
+            get => GuildUser.Value.IsBot;
+            internal set => GuildUser.Value.IsBot = value;
         }
 
         /// <inheritdoc/>
         public override bool IsWebhook
-            => GuildUser.IsWebhook;
+            => GuildUser.Value.IsWebhook;
 
         /// <inheritdoc/>
         public override string Username
         {
-            get => GuildUser.Username;
-            internal set => GuildUser.Username = value;
+            get => GuildUser.Value.Username;
+            internal set => GuildUser.Value.Username = value;
         }
 
         /// <inheritdoc/>
         public bool IsDeafened
-            => GuildUser.IsDeafened;
+            => GuildUser.Value.IsDeafened;
 
         /// <inheritdoc/>
         public bool IsMuted
-            => GuildUser.IsMuted;
+            => GuildUser.Value.IsMuted;
 
         /// <inheritdoc/>
         public bool IsSelfDeafened
-            => GuildUser.IsSelfDeafened;
+            => GuildUser.Value.IsSelfDeafened;
 
         /// <inheritdoc/>
         public bool IsSelfMuted
-            => GuildUser.IsSelfMuted;
+            => GuildUser.Value.IsSelfMuted;
 
         /// <inheritdoc/>
         public bool IsSuppressed
-            => GuildUser.IsSuppressed;
+            => GuildUser.Value.IsSuppressed;
 
         /// <inheritdoc/>
         public IVoiceChannel VoiceChannel
-            => GuildUser.VoiceChannel;
+            => GuildUser.Value.VoiceChannel;
 
         /// <inheritdoc/>
         public string VoiceSessionId
-            => GuildUser.VoiceSessionId;
+            => GuildUser.Value.VoiceSessionId;
 
         /// <inheritdoc/>
         public bool IsStreaming
-            => GuildUser.IsStreaming;
+            => GuildUser.Value.IsStreaming;
 
         /// <inheritdoc/>
         public bool IsVideoing
-            => GuildUser.IsVideoing;
+            => GuildUser.Value.IsVideoing;
 
         /// <inheritdoc/>
         public DateTimeOffset? RequestToSpeakTimestamp
-            => GuildUser.RequestToSpeakTimestamp;
+            => GuildUser.Value.RequestToSpeakTimestamp;
 
-        private SocketGuildUser GuildUser { get; set; }
+        private Lazy<SocketGuildUser> GuildUser { get; set; }
 
-        internal SocketThreadUser(SocketGuild guild, SocketThreadChannel thread, SocketGuildUser member, ulong userId)
-            : base(guild.Discord, userId)
+        private ulong _threadId;
+        private ulong _guildId;
+
+
+        internal SocketThreadUser(DiscordSocketClient client, ulong guildId, ulong threadId, ulong userId)
+            : base(client, userId)
         {
-            Thread = thread;
-            Guild = guild;
-            GuildUser = member;
+            _guildId = guildId;
+            _threadId = threadId;
+
+            GuildUser = new(() => client.StateManager.TryGetMemberStore(guildId, out var store) ? store.Get(userId) : null);
+            Thread = new(() => client.GetChannel(threadId) as SocketThreadChannel);
+            Guild = new(() => client.GetGuild(guildId));
         }
 
         internal static SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, Model model, SocketGuildUser member)
         {
-            var entity = new SocketThreadUser(guild, thread, member, model.UserId.Value);
+            var entity = new SocketThreadUser(guild.Discord, guild.Id, thread.Id, model.Id);
+            entity.Update(model);
+            return entity;
+        }
+
+        internal static SocketThreadUser Create(DiscordSocketClient client, ulong guildId, ulong threadId, Model model)
+        {
+            var entity = new SocketThreadUser(client, guildId, threadId, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -150,89 +166,116 @@ namespace Discord.WebSocket
         internal static SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, SocketGuildUser owner)
         {
             // this is used for creating the owner of the thread.
-            var entity = new SocketThreadUser(guild, thread, owner, owner.Id);
-            entity.Update(new Model
-            {
-                JoinTimestamp = thread.CreatedAt,
-            });
+            var entity = new SocketThreadUser(guild.Discord, guild.Id, thread.Id, owner.Id);
+            entity.ThreadJoinedAt = thread.CreatedAt;
             return entity;
         }
 
         internal void Update(Model model)
         {
-            ThreadJoinedAt = model.JoinTimestamp;
+            ThreadJoinedAt = model.JoinedAt;
         }
 
         /// <inheritdoc/>
-        public ChannelPermissions GetPermissions(IGuildChannel channel) => GuildUser.GetPermissions(channel);
+        public ChannelPermissions GetPermissions(IGuildChannel channel) => GuildUser.Value.GetPermissions(channel);
 
         /// <inheritdoc/>
-        public Task KickAsync(string reason = null, RequestOptions options = null) => GuildUser.KickAsync(reason, options);
+        public Task KickAsync(string reason = null, RequestOptions options = null) => GuildUser.Value.KickAsync(reason, options);
 
         /// <inheritdoc/>
-        public Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null) => GuildUser.ModifyAsync(func, options);
+        public Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null) => GuildUser.Value.ModifyAsync(func, options);
 
         /// <inheritdoc/>
-        public Task AddRoleAsync(ulong roleId, RequestOptions options = null) => GuildUser.AddRoleAsync(roleId, options);
+        public Task AddRoleAsync(ulong roleId, RequestOptions options = null) => GuildUser.Value.AddRoleAsync(roleId, options);
 
         /// <inheritdoc/>
-        public Task AddRoleAsync(IRole role, RequestOptions options = null) => GuildUser.AddRoleAsync(role, options);
+        public Task AddRoleAsync(IRole role, RequestOptions options = null) => GuildUser.Value.AddRoleAsync(role, options);
 
         /// <inheritdoc/>
-        public Task AddRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null) => GuildUser.AddRolesAsync(roleIds, options);
+        public Task AddRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null) => GuildUser.Value.AddRolesAsync(roleIds, options);
 
         /// <inheritdoc/>
-        public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null) => GuildUser.AddRolesAsync(roles, options);
+        public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null) => GuildUser.Value.AddRolesAsync(roles, options);
 
         /// <inheritdoc/>
-        public Task RemoveRoleAsync(ulong roleId, RequestOptions options = null) => GuildUser.RemoveRoleAsync(roleId, options);
+        public Task RemoveRoleAsync(ulong roleId, RequestOptions options = null) => GuildUser.Value.RemoveRoleAsync(roleId, options);
 
         /// <inheritdoc/>
-        public Task RemoveRoleAsync(IRole role, RequestOptions options = null) => GuildUser.RemoveRoleAsync(role, options);
+        public Task RemoveRoleAsync(IRole role, RequestOptions options = null) => GuildUser.Value.RemoveRoleAsync(role, options);
 
         /// <inheritdoc/>
-        public Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null) => GuildUser.RemoveRolesAsync(roleIds, options);
+        public Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null) => GuildUser.Value.RemoveRolesAsync(roleIds, options);
 
         /// <inheritdoc/>
-        public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null) => GuildUser.RemoveRolesAsync(roles, options);
+        public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null) => GuildUser.Value.RemoveRolesAsync(roles, options);
         /// <inheritdoc/>
-        public Task SetTimeOutAsync(TimeSpan span, RequestOptions options = null) => GuildUser.SetTimeOutAsync(span, options);
+        public Task SetTimeOutAsync(TimeSpan span, RequestOptions options = null) => GuildUser.Value.SetTimeOutAsync(span, options);
 
         /// <inheritdoc/>
-        public Task RemoveTimeOutAsync(RequestOptions options = null) => GuildUser.RemoveTimeOutAsync(options);
+        public Task RemoveTimeOutAsync(RequestOptions options = null) => GuildUser.Value.RemoveTimeOutAsync(options);
 
         /// <inheritdoc/>
-        IThreadChannel IThreadUser.Thread => Thread;
+        IThreadChannel IThreadUser.Thread => Thread.Value;
 
         /// <inheritdoc/>
-        IGuild IThreadUser.Guild => Guild;
+        IGuild IThreadUser.Guild => Guild.Value;
 
         /// <inheritdoc/>
-        IGuild IGuildUser.Guild => Guild;
+        IGuild IGuildUser.Guild => Guild.Value;
 
         /// <inheritdoc/>
-        ulong IGuildUser.GuildId => Guild.Id;
+        ulong IGuildUser.GuildId => Guild.Value.Id;
 
         /// <inheritdoc/>
-        GuildPermissions IGuildUser.GuildPermissions => GuildUser.GuildPermissions;
+        GuildPermissions IGuildUser.GuildPermissions => GuildUser.Value.GuildPermissions;
 
         /// <inheritdoc/>
-        IReadOnlyCollection<ulong> IGuildUser.RoleIds => GuildUser.Roles.Select(x => x.Id).ToImmutableArray();
+        IReadOnlyCollection<ulong> IGuildUser.RoleIds => GuildUser.Value.Roles.Select(x => x.Id).ToImmutableArray();
 
         /// <inheritdoc />
-        string IGuildUser.GetDisplayAvatarUrl(ImageFormat format, ushort size) => GuildUser.GetDisplayAvatarUrl(format, size);
+        string IGuildUser.GetDisplayAvatarUrl(ImageFormat format, ushort size) => GuildUser.Value.GetDisplayAvatarUrl(format, size);
 
         /// <inheritdoc />
-        string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => GuildUser.GetGuildAvatarUrl(format, size);
+        string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => GuildUser.Value.GetGuildAvatarUrl(format, size);
 
-        internal override SocketGlobalUser GlobalUser { get => GuildUser.GlobalUser; set => GuildUser.GlobalUser = value; }
+        internal override LazyCached<SocketPresence> Presence { get => GuildUser.Value.Presence; set => GuildUser.Value.Presence = value; }
 
-        internal override SocketPresence Presence { get => GuildUser.Presence; set => GuildUser.Presence = value; }
+        public override void Dispose()
+        {
+            if (IsFreed)
+                return;
+
+            GC.SuppressFinalize(this);
+            Discord.StateManager.GetThreadMemberStore(_threadId)?.RemoveReference(Id);
+            IsFreed = true;
+        }
+
 
         /// <summary>
         ///     Gets the guild user of this thread user.
         /// </summary>
         /// <param name="user"></param>
-        public static explicit operator SocketGuildUser(SocketThreadUser user) => user.GuildUser;
+        public static explicit operator SocketGuildUser(SocketThreadUser user) => user.GuildUser.Value;
+
+        #region Cache
+        internal new class CacheModel : Model
+        {
+            public ulong Id { get; set; }
+            public ulong? ThreadId { get; set; }
+            public DateTimeOffset JoinedAt { get; set; }
+        }
+
+        internal new Model ToModel()
+        {
+            var model = Discord.StateManager.GetModel<Model, CacheModel>();
+            model.Id = Id;
+            model.ThreadId = _threadId;
+            model.JoinedAt = ThreadJoinedAt;
+            return model;
+        }
+
+        Model ICached<Model>.ToModel() => ToModel();
+        void ICached<Model>.Update(Model model) => Update(model);
+        #endregion
     }
 }

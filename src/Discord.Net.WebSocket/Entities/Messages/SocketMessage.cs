@@ -129,7 +129,7 @@ namespace Discord.WebSocket
             Author = author;
             Source = source;
         }
-        internal static SocketMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
+        internal static SocketMessage Create(DiscordSocketClient discord, ClientStateManager state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
             if (model.Type == MessageType.Default ||
                 model.Type == MessageType.Reply ||
@@ -140,7 +140,7 @@ namespace Discord.WebSocket
             else
                 return SocketSystemMessage.Create(discord, state, author, channel, model);
         }
-        internal virtual void Update(ClientState state, Model model)
+        internal virtual void Update(ClientStateManager state, Model model)
         {
             Type = model.Type;
 
@@ -252,7 +252,7 @@ namespace Discord.WebSocket
                             if (user != null)
                                 newMentions.Add(user);
                             else
-                                newMentions.Add(SocketUnknownUser.Create(Discord, state, val));
+                                newMentions.Add(SocketUnknownUser.Create(Discord, val));
                         }
                     }
                     _userMentions = newMentions.ToImmutable();
@@ -264,7 +264,7 @@ namespace Discord.WebSocket
                 Interaction = new MessageInteraction<SocketUser>(model.Interaction.Value.Id,
                     model.Interaction.Value.Type,
                     model.Interaction.Value.Name,
-                    SocketGlobalUser.Create(Discord, state, model.Interaction.Value.User));
+                    SocketGlobalUser.Create(Discord, model.Interaction.Value.User));
             }
 
             if (model.Flags.IsSpecified)

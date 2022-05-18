@@ -49,7 +49,7 @@ namespace Discord.WebSocket
         {
             Guild = guild;
         }
-        internal static SocketGuildChannel Create(SocketGuild guild, ClientState state, Model model)
+        internal static SocketGuildChannel Create(SocketGuild guild, ClientStateManager state, Model model)
         {
             return model.Type switch
             {
@@ -63,7 +63,7 @@ namespace Discord.WebSocket
             };
         }
         /// <inheritdoc />
-        internal override void Update(ClientState state, Model model)
+        internal override void Update(ClientStateManager state, Model model)
         {
             Name = model.Name.Value;
             Position = model.Position.GetValueOrDefault(0);

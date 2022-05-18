@@ -6,8 +6,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Rest;
-using Model = Discord.API.User;
-using PresenceModel = Discord.API.Presence;
+using Model = Discord.IUserModel;
+using PresenceModel = Discord.IPresenceModel;
 
 namespace Discord.WebSocket
 {
@@ -15,23 +15,23 @@ namespace Discord.WebSocket
     ///     Represents a WebSocket-based user.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public abstract class SocketUser : SocketEntity<ulong>, IUser
+    public abstract class SocketUser : SocketEntity<ulong>, IUser, ICached<Model>
     {
         /// <inheritdoc />
-        public abstract bool IsBot { get; internal set; }
+        public virtual bool IsBot { get; internal set; }
         /// <inheritdoc />
-        public abstract string Username { get; internal set; }
+        public virtual string Username { get; internal set; }
         /// <inheritdoc />
-        public abstract ushort DiscriminatorValue { get; internal set; }
+        public virtual ushort DiscriminatorValue { get; internal set; }
         /// <inheritdoc />
-        public abstract string AvatarId { get; internal set; }
+        public virtual string AvatarId { get; internal set; }
         /// <inheritdoc />
-        public abstract bool IsWebhook { get; }
+        public virtual bool IsWebhook { get; }
         /// <inheritdoc />
         public UserProperties? PublicFlags { get; private set; }
-        internal abstract SocketGlobalUser GlobalUser { get; set; }
-        internal abstract SocketPresence Presence { get; set; }
-
+        internal virtual LazyCached<SocketGlobalUser> GlobalUser { get; set; }
+        internal virtual LazyCached<SocketPresence> Presence { get; set; }
+        internal bool IsFreed { get; set; }
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
@@ -39,11 +39,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionUser(Id);
         /// <inheritdoc />
-        public UserStatus Status => Presence.Status;
+        public UserStatus Status => Presence.Value.Status;
         /// <inheritdoc />
-        public IReadOnlyCollection<ClientType> ActiveClients => Presence.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
+        public IReadOnlyCollection<ClientType> ActiveClients => Presence.Value?.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
         /// <inheritdoc />
-        public IReadOnlyCollection<IActivity> Activities => Presence.Activities ?? ImmutableList<IActivity>.Empty;
+        public IReadOnlyCollection<IActivity> Activities => Presence.Value?.Activities ?? ImmutableList<IActivity>.Empty;
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>
@@ -56,48 +56,50 @@ namespace Discord.WebSocket
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
+            Presence = new LazyCached<SocketPresence>(id, discord.StateManager.PresenceStore);
+            GlobalUser = new LazyCached<SocketGlobalUser>(id, discord.StateManager.UserStore);
         }
-        internal virtual bool Update(ClientState state, Model model)
+        internal virtual bool Update(Model model)
         {
-            Presence ??= new SocketPresence();
             bool hasChanges = false;
-            if (model.Avatar.IsSpecified && model.Avatar.Value != AvatarId)
+            if (model.Avatar != AvatarId)
             {
-                AvatarId = model.Avatar.Value;
+                AvatarId = model.Avatar;
                 hasChanges = true;
             }
-            if (model.Discriminator.IsSpecified)
+            if (model.Discriminator != null)
             {
-                var newVal = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
+                var newVal = ushort.Parse(model.Discriminator, NumberStyles.None, CultureInfo.InvariantCulture);
                 if (newVal != DiscriminatorValue)
                 {
-                    DiscriminatorValue = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
+                    DiscriminatorValue = ushort.Parse(model.Discriminator, NumberStyles.None, CultureInfo.InvariantCulture);
                     hasChanges = true;
                 }
             }
-            if (model.Bot.IsSpecified && model.Bot.Value != IsBot)
+            if (model.IsBot.HasValue && model.IsBot.Value != IsBot)
             {
-                IsBot = model.Bot.Value;
+                IsBot = model.IsBot.Value;
                 hasChanges = true;
             }
-            if (model.Username.IsSpecified && model.Username.Value != Username)
+            if (model.Username != Username)
             {
-                Username = model.Username.Value;
+                Username = model.Username;
                 hasChanges = true;
             }
-            if (model.PublicFlags.IsSpecified && model.PublicFlags.Value != PublicFlags)
+
+            if(model is ICurrentUserModel currentUserModel)
             {
-                PublicFlags = model.PublicFlags.Value;
-                hasChanges = true;
+                if (currentUserModel.PublicFlags != PublicFlags)
+                {
+                    PublicFlags = currentUserModel.PublicFlags;
+                    hasChanges = true;
+                }
             }
+
             return hasChanges;
         }
 
-        internal virtual void Update(PresenceModel model)
-        {
-            Presence ??= new SocketPresence();
-            Presence.Update(model);
-        }
+        public abstract void Dispose();
 
         /// <inheritdoc />
         public async Task<IDMChannel> CreateDMChannelAsync(RequestOptions options = null)
@@ -120,5 +122,37 @@ namespace Discord.WebSocket
         public override string ToString() => Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode);
         private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode)} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
+
+        #region Cache 
+        internal class CacheModel : Model
+        {
+            public string Username { get; set; }
+
+            public string Discriminator { get; set; }
+
+            public bool? IsBot { get; set; }
+
+            public string Avatar { get; set; }
+
+            public ulong Id { get; set; }
+        }
+
+        internal Model ToModel()
+        {
+            var model = Discord.StateManager.GetModel<Model, CacheModel>();
+            model.Avatar = AvatarId;
+            model.Discriminator = Discriminator;
+            model.Id = Id;
+            model.IsBot = IsBot;
+            model.Username = Username;
+            return model;
+        }
+
+        Model ICached<Model>.ToModel()
+            => ToModel();
+        void ICached<Model>.Update(Model model) => Update(model);
+        bool ICached.IsFreed => IsFreed;
+
+        #endregion
     }
 }

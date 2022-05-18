@@ -193,6 +193,8 @@ namespace Discord.Rest
             => ClientHelper.GetUserAsync(this, id, options);
         public Task<RestGuildUser> GetGuildUserAsync(ulong guildId, ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildUserAsync(this, guildId, id, options);
+        public Task<IReadOnlyCollection<RestGuildUser>> GetGuildUsersAsync(ulong guildId, RequestOptions options = null)
+            => ClientHelper.GetGuildUsersAsync(this, guildId, options);
 
         public Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
             => ClientHelper.GetVoiceRegionsAsync(this, options);

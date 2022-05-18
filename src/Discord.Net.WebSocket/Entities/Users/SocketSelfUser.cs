@@ -2,7 +2,8 @@ using Discord.Rest;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Model = Discord.API.User;
+using Model = Discord.ICurrentUserModel;
+using UserModel = Discord.IUserModel;
 
 namespace Discord.WebSocket
 {
@@ -10,7 +11,7 @@ namespace Discord.WebSocket
     ///     Represents the logged-in WebSocket-based user.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketSelfUser : SocketUser, ISelfUser
+    public class SocketSelfUser : SocketUser, ISelfUser, ICached<Model>
     {
         /// <inheritdoc />
         public string Email { get; private set; }
@@ -18,18 +19,6 @@ namespace Discord.WebSocket
         public bool IsVerified { get; private set; }
         /// <inheritdoc />
         public bool IsMfaEnabled { get; private set; }
-        internal override SocketGlobalUser GlobalUser { get; set; }
-
-        /// <inheritdoc />
-        public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
-        /// <inheritdoc />
-        public override string Username { get { return GlobalUser.Username; } internal set { GlobalUser.Username = value; } }
-        /// <inheritdoc />
-        public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
-        /// <inheritdoc />
-        public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
-        /// <inheritdoc />
-        internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
         /// <inheritdoc />
         public UserProperties Flags { get; internal set; }
         /// <inheritdoc />
@@ -40,48 +29,52 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override bool IsWebhook => false;
 
-        internal SocketSelfUser(DiscordSocketClient discord, SocketGlobalUser globalUser)
-            : base(discord, globalUser.Id)
+        internal SocketSelfUser(DiscordSocketClient discord, ulong userId)
+            : base(discord, userId)
         {
-            GlobalUser = globalUser;
+
         }
-        internal static SocketSelfUser Create(DiscordSocketClient discord, ClientState state, Model model)
+        internal static SocketSelfUser Create(DiscordSocketClient discord, Model model)
         {
-            var entity = new SocketSelfUser(discord, discord.GetOrCreateSelfUser(state, model));
-            entity.Update(state, model);
+            var entity = new SocketSelfUser(discord, model.Id);
+            entity.Update(model);
             return entity;
         }
-        internal override bool Update(ClientState state, Model model)
+        internal override bool Update(UserModel model)
         {
-            bool hasGlobalChanges = base.Update(state, model);
-            if (model.Email.IsSpecified)
+            bool hasGlobalChanges = base.Update(model);
+
+            if (model is not Model currentUserModel)
+                throw new ArgumentException($"Got unexpected model type \"{model?.GetType()}\"");
+
+            if(currentUserModel.Email != Email)
             {
-                Email = model.Email.Value;
+                Email = currentUserModel.Email;
                 hasGlobalChanges = true;
             }
-            if (model.Verified.IsSpecified)
+            if (currentUserModel.IsVerified.HasValue)
             {
-                IsVerified = model.Verified.Value;
+                IsVerified = currentUserModel.IsVerified.Value;
                 hasGlobalChanges = true;
             }
-            if (model.MfaEnabled.IsSpecified)
+            if (currentUserModel.IsMfaEnabled.HasValue)
             {
-                IsMfaEnabled = model.MfaEnabled.Value;
+                IsMfaEnabled = currentUserModel.IsMfaEnabled.Value;
                 hasGlobalChanges = true;
             }
-            if (model.Flags.IsSpecified && model.Flags.Value != Flags)
+            if (currentUserModel.Flags != Flags)
             {
-                Flags = (UserProperties)model.Flags.Value;
+                Flags = currentUserModel.Flags;
                 hasGlobalChanges = true;
             }
-            if (model.PremiumType.IsSpecified && model.PremiumType.Value != PremiumType)
+            if (currentUserModel.PremiumType != PremiumType)
             {
-                PremiumType = model.PremiumType.Value;
+                PremiumType = currentUserModel.PremiumType;
                 hasGlobalChanges = true;
             }
-            if (model.Locale.IsSpecified && model.Locale.Value != Locale)
+            if (currentUserModel.Locale != Locale)
             {
-                Locale = model.Locale.Value;
+                Locale = currentUserModel.Locale;
                 hasGlobalChanges = true;
             }
             return hasGlobalChanges;
@@ -93,5 +86,63 @@ namespace Discord.WebSocket
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Self)";
         internal new SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;
+        public override void Dispose()
+        {
+            if (IsFreed)
+                return;
+
+            GC.SuppressFinalize(this);
+            Discord.StateManager.UserStore.RemoveReference(Id);
+            IsFreed = true;
+        }
+
+        #region Cache
+        internal new class CacheModel : Model
+        {
+            public bool? IsVerified { get; set; }
+
+            public string Email { get; set; }
+
+            public bool? IsMfaEnabled { get; set; }
+
+            public UserProperties Flags { get; set; }
+
+            public PremiumType PremiumType { get; set; }
+
+            public string Locale { get; set; }
+
+            public UserProperties PublicFlags { get; set; }
+
+            public string Username { get; set; }
+
+            public string Discriminator { get; set; }
+
+            public bool? IsBot { get; set; }
+
+            public string Avatar { get; set; }
+
+            public ulong Id { get; set; }
+        }
+
+        internal new Model ToModel()
+        {
+            var model = Discord.StateManager.GetModel<Model, CacheModel>();
+            model.Avatar = AvatarId;
+            model.Discriminator = Discriminator;
+            model.Email = Email;
+            model.Flags = Flags;
+            model.IsBot = IsBot;
+            model.IsMfaEnabled = IsMfaEnabled;
+            model.Locale = Locale;
+            model.PremiumType = PremiumType;
+            model.PublicFlags = PublicFlags ?? UserProperties.None;
+            model.Username = Username;
+            model.Id = Id;
+            return model;
+        }
+
+        Model ICached<Model>.ToModel() => ToModel();
+        void ICached<Model>.Update(Model model) => Update(model);
+        #endregion
     }
 }
