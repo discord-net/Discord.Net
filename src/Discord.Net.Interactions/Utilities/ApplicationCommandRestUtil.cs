@@ -41,7 +41,7 @@ namespace Discord.Interactions
                 Name = commandInfo.Name,
                 Description = commandInfo.Description,
                 IsDMEnabled = commandInfo.IsEnabledInDm,
-                DefaultMemberPermissions = (commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)
+                DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
             }.Build();
 
             if (commandInfo.Parameters.Count > SlashCommandBuilder.MaxOptionsCount)
@@ -69,14 +69,14 @@ namespace Discord.Interactions
                 {
                     Name = commandInfo.Name,
                     IsDefaultPermission = commandInfo.DefaultPermission,
-                    DefaultMemberPermissions = (commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0),
+                    DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
                     IsDMEnabled = commandInfo.IsEnabledInDm
                 }.Build(),
                 ApplicationCommandType.User => new UserCommandBuilder
                 {
                     Name = commandInfo.Name,
                     IsDefaultPermission = commandInfo.DefaultPermission,
-                    DefaultMemberPermissions = (commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0),
+                    DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
                     IsDMEnabled = commandInfo.IsEnabledInDm
                 }.Build(),
                 _ => throw new InvalidOperationException($"{commandInfo.CommandType} isn't a supported command type.")
@@ -232,5 +232,8 @@ namespace Discord.Interactions
 
             return builder.Build();
         }
+
+        public static GuildPermission? SanitizeGuildPermissions(this GuildPermission permissions) =>
+            permissions == 0 ? null : permissions;
     }
 }
