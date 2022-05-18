@@ -33,7 +33,7 @@ namespace Discord.Rest
                 newMute = muteModel?.NewValue?.ToObject<bool>(discord.ApiClient.Serializer);
 
             var targetInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-            var user = RestUser.Create(discord, targetInfo);
+            RestUser user = (targetInfo != null) ? RestUser.Create(discord, targetInfo) : null;
 
             var before = new MemberInfo(oldNick, oldDeaf, oldMute);
             var after = new MemberInfo(newNick, newDeaf, newMute);
@@ -44,6 +44,9 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the user that the changes were performed on.
         /// </summary>
+        /// <remarks>
+        ///     Will be <see langword="null"/> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
+        /// </remarks>
         /// <returns>
         ///     A user object representing the user who the changes were performed on.
         /// </returns>

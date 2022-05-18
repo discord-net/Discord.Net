@@ -23,7 +23,7 @@ namespace Discord.Rest
             if (entry.TargetId.HasValue)
             {
                 var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-                user = RestUser.Create(discord, userInfo);
+                user = (userInfo != null) ? RestUser.Create(discord, userInfo) : null;
             }
 
             return new MessagePinAuditLogData(entry.Options.MessageId.Value, entry.Options.ChannelId.Value, user);
@@ -46,6 +46,9 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the user of the message that was pinned if available.
         /// </summary>
+        /// <remarks>
+        ///     Will be <see langword="null"/> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
+        /// </remarks>
         /// <returns>
         ///     A user object representing the user that created the pinned message or <see langword="null"/>.
         /// </returns>
