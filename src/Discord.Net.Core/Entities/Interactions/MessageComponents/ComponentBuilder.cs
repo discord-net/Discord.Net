@@ -92,7 +92,7 @@ namespace Discord
         /// <param name="maxValues">The max values of the placeholder.</param>
         /// <param name="disabled">Whether or not the menu is disabled.</param>
         /// <param name="row">The row to add the menu to.</param>
-        /// <returns></returns>
+        /// <returns>The current builder.</returns>
         public ComponentBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options,
             string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false, int row = 0)
         {

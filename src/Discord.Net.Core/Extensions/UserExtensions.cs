@@ -50,6 +50,21 @@ namespace Discord
         }
 
         /// <summary>
+        ///     Sends a message via DM.
+        /// </summary>
+        /// <param name="user">The user to send the DM to.</param>
+        /// <param name="message">The <see cref="Message"/> created from a <see cref="MessageBuilder"/>.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents an asynchronous send operation for delivering the message. The task result
+        ///     contains the sent message.
+        /// </returns>
+        public static async Task<IUserMessage> SendMessageAsync(this IUser user, Message message, RequestOptions options = null)
+        {
+            return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(message, options).ConfigureAwait(false);
+        }
+
+        /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <example>

@@ -92,6 +92,10 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
+        /// <inheritdoc/>
+        public Task<RestUserMessage> SendMessageAsync(Message message, RequestOptions options = null)
+            => ChannelHelper.SendMessageAsync(this, Discord, message, options);
+
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
@@ -271,6 +275,10 @@ namespace Discord.Rest
             AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components,
             ISticker[] stickers, Embed[] embeds, MessageFlags flags)
             => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags).ConfigureAwait(false);
+
+        /// <inheritdoc />
+        async Task<IUserMessage> IMessageChannel.SendMessageAsync(Message message, RequestOptions options)
+            => await SendMessageAsync(message, options).ConfigureAwait(false);
             
         #endregion
 

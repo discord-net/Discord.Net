@@ -265,6 +265,20 @@ namespace Discord.Rest
             return builder.ToImmutable();
         }
 
+        public static Task<RestUserMessage> SendMessageAsync(IMessageChannel channel, BaseDiscordClient client, Message message, RequestOptions options = null)
+        {
+            Preconditions.NotNull(message, nameof(message));
+
+            if (message.HasFiles)
+            {
+                return SendFilesAsync(channel, client, message.Attachments, message.Content, message.IsTTS, null, message.AllowedMentions,
+                    message.MessageReference, message.Components, message.Stickers?.ToArray(), options, message.Embeds?.ToArray(), message.Flags);
+            }
+            else
+                return SendMessageAsync(channel, client, message.Content, message.IsTTS, null, message.AllowedMentions, message.MessageReference,
+                    message.Components, message.Stickers?.ToArray(), options, message.Embeds?.ToArray(), message.Flags);
+        }
+
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
         public static async Task<RestUserMessage> SendMessageAsync(IMessageChannel channel, BaseDiscordClient client,
