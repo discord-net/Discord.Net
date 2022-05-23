@@ -1,4 +1,3 @@
-using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -8,12 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
-namespace Discord.WebSocket
+namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a forum channel in a guild.
+    ///     Represents a REST-based forum channel in a guild.
     /// </summary>
-    public class SocketForumChannel : SocketGuildChannel, IForumChannel
+    public class RestForumChannel : RestGuildChannel, IForumChannel
     {
         /// <inheritdoc/>
         public bool IsNsfw { get; private set; }
@@ -30,18 +29,22 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public string Mention => MentionUtils.MentionChannel(Id);
 
-        internal SocketForumChannel(DiscordSocketClient discord, ulong id, SocketGuild guild) : base(discord, id, guild) { }
-
-        internal new static SocketForumChannel Create(SocketGuild guild, ClientState state, Model model)
+        internal RestForumChannel(BaseDiscordClient client, IGuild guild, ulong id)
+            : base(client, guild, id)
         {
-            var entity = new SocketForumChannel(guild.Discord, model.Id, guild);
-            entity.Update(state, model);
+
+        }
+
+        internal new static RestStageChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
+        {
+            var entity = new RestStageChannel(discord, guild, model.Id);
+            entity.Update(model);
             return entity;
         }
 
-        internal override void Update(ClientState state, Model model)
+        internal override void Update(Model model)
         {
-            base.Update(state, model);
+            base.Update(model);
             IsNsfw = model.Nsfw.GetValueOrDefault(false);
             Topic = model.Topic.GetValueOrDefault();
             DefaultAutoArchiveDuration = model.AutoArchiveDuration.GetValueOrDefault(ThreadArchiveDuration.OneDay);

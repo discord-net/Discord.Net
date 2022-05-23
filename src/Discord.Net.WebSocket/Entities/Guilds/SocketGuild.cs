@@ -705,7 +705,15 @@ namespace Discord.WebSocket
         /// </returns>
         public SocketThreadChannel GetThreadChannel(ulong id)
             => GetChannel(id) as SocketThreadChannel;
-
+        /// <summary>
+        ///     Gets a forum channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the forum channel.</param>
+        /// <returns>
+        ///     A forum channel associated with the specified <paramref name="id" />; <see langword="null"/> if none is found.
+        /// </returns>
+        public SocketForumChannel GetForumChannel(ulong id)
+            => GetChannel(id) as SocketForumChannel;
         /// <summary>
         ///     Gets a voice channel in this guild.
         /// </summary>

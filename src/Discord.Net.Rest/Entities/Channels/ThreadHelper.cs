@@ -103,46 +103,111 @@ namespace Discord.Rest
             return RestThreadUser.Create(client, channel.Guild, model, channel);
         }
 
-        public static async Task<RestThreadChannel> CreatePostAsync(IForumChannel channel, BaseDiscordClient client, string title, ThreadArchiveDuration archiveDuration, Message message, int? slowmode = null, RequestOptions options = null)
+        public static async Task<RestThreadChannel> CreatePostAsync(IForumChannel channel, BaseDiscordClient client, string title, ThreadArchiveDuration archiveDuration = ThreadArchiveDuration.OneDay, int? slowmode = null, string text = null, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
         {
-            Model model;
+            embeds ??= Array.Empty<Embed>();
+            if (embed != null)
+                embeds = new[] { embed }.Concat(embeds).ToArray();
 
-            if (message.Attachments?.Any() ?? false)
+            Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
+            Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
+            Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+
+            // check that user flag and user Id list are exclusive, same with role flag and role Id list
+            if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
             {
-                var args = new CreateMultipartPostAsync(message.Attachments.ToArray())
+                if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Users) &&
+                    allowedMentions.UserIds != null && allowedMentions.UserIds.Count > 0)
                 {
-                    AllowedMentions = message.AllowedMentions.ToModel(),
-                    ArchiveDuration = archiveDuration,
-                    Content = message.Content,
-                    Embeds = message.Embeds.Any() ? message.Embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
-                    Flags = message.Flags,
-                    IsTTS = message.IsTTS,
-                    MessageComponent = message.Components?.Components?.Any() ?? false ? message.Components.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
-                    Slowmode = slowmode,
-                    Stickers = message.StickerIds?.Any() ?? false ? message.StickerIds.ToArray() : Optional<ulong[]>.Unspecified,
-                    Title = title
-                };
+                    throw new ArgumentException("The Users flag is mutually exclusive with the list of User Ids.", nameof(allowedMentions));
+                }
 
-                model = await client.ApiClient.CreatePostAsync(channel.Id, args, options).ConfigureAwait(false);
+                if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Roles) &&
+                    allowedMentions.RoleIds != null && allowedMentions.RoleIds.Count > 0)
+                {
+                    throw new ArgumentException("The Roles flag is mutually exclusive with the list of Role Ids.", nameof(allowedMentions));
+                }
             }
-            else
+
+            if (stickers != null)
             {
-                var args = new CreatePostParams()
-                {
-                    AllowedMentions = message.AllowedMentions.ToModel(),
-                    ArchiveDuration = archiveDuration,
-                    Content = message.Content,
-                    Embeds = message.Embeds.Any() ? message.Embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
-                    Flags = message.Flags,
-                    IsTTS = message.IsTTS,
-                    Components = message.Components?.Components?.Any() ?? false ? message.Components.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
-                    Slowmode = slowmode,
-                    Stickers = message.StickerIds?.Any() ?? false ? message.StickerIds.ToArray() : Optional<ulong[]>.Unspecified,
-                    Title = title
-                };
-
-                model = await client.ApiClient.CreatePostAsync(channel.Id, args, options);
+                Preconditions.AtMost(stickers.Length, 3, nameof(stickers), "A max of 3 stickers are allowed.");
             }
+
+
+            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
+                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
+
+            var args = new CreatePostParams()
+            {
+                Title = title,
+                ArchiveDuration = archiveDuration,
+                Slowmode = slowmode,
+                Message = new()
+                {
+                    AllowedMentions = allowedMentions.ToModel(),
+                    Content = text,
+                    Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
+                    Flags = flags,
+                    Components = components?.Components?.Any() ?? false ? components.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                    Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified,
+                }
+            };
+
+            var model = await client.ApiClient.CreatePostAsync(channel.Id, args, options).ConfigureAwait(false);
+
+            return RestThreadChannel.Create(client, channel.Guild, model);
+        }
+
+        public static async Task<RestThreadChannel> CreatePostAsync(IForumChannel channel, BaseDiscordClient client, string title, IEnumerable<FileAttachment> attachments, ThreadArchiveDuration archiveDuration, int? slowmode, string text, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags)
+        {
+            embeds ??= Array.Empty<Embed>();
+            if (embed != null)
+                embeds = new[] { embed }.Concat(embeds).ToArray();
+
+            Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
+            Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
+            Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+
+            // check that user flag and user Id list are exclusive, same with role flag and role Id list
+            if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
+            {
+                if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Users) &&
+                    allowedMentions.UserIds != null && allowedMentions.UserIds.Count > 0)
+                {
+                    throw new ArgumentException("The Users flag is mutually exclusive with the list of User Ids.", nameof(allowedMentions));
+                }
+
+                if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Roles) &&
+                    allowedMentions.RoleIds != null && allowedMentions.RoleIds.Count > 0)
+                {
+                    throw new ArgumentException("The Roles flag is mutually exclusive with the list of Role Ids.", nameof(allowedMentions));
+                }
+            }
+
+            if (stickers != null)
+            {
+                Preconditions.AtMost(stickers.Length, 3, nameof(stickers), "A max of 3 stickers are allowed.");
+            }
+
+
+            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
+                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
+
+            var args = new CreateMultipartPostAsync(attachments.ToArray())
+            {
+                AllowedMentions = allowedMentions.ToModel(),
+                ArchiveDuration = archiveDuration,
+                Content = text,
+                Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
+                Flags = flags,
+                MessageComponent = components?.Components?.Any() ?? false ? components.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                Slowmode = slowmode,
+                Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified,
+                Title = title
+            };
+
+            var model = await client.ApiClient.CreatePostAsync(channel.Id, args, options);
 
             return RestThreadChannel.Create(client, channel.Guild, model);
         }

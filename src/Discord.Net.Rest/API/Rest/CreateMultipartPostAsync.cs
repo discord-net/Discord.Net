@@ -22,7 +22,6 @@ namespace Discord.API.Rest
 
 
         public Optional<string> Content { get; set; }
-        public Optional<bool> IsTTS { get; set; }
         public Optional<Embed[]> Embeds { get; set; }
         public Optional<AllowedMentions> AllowedMentions { get; set; }
         public Optional<ActionRowComponent[]> MessageComponent { get; set; }
@@ -39,26 +38,27 @@ namespace Discord.API.Rest
             var d = new Dictionary<string, object>();
 
             var payload = new Dictionary<string, object>();
+            var message = new Dictionary<string, object>();
 
-            payload["title"] = Title;
+            payload["name"] = Title;
             payload["auto_archive_duration"] = ArchiveDuration;
 
             if (Slowmode.IsSpecified)
                 payload["rate_limit_per_user"] = Slowmode.Value;
+
+            // message
             if (Content.IsSpecified)
-                payload["content"] = Content.Value;
-            if (IsTTS.IsSpecified)
-                payload["tts"] = IsTTS.Value;
+                message["content"] = Content.Value;
             if (Embeds.IsSpecified)
-                payload["embeds"] = Embeds.Value;
+                message["embeds"] = Embeds.Value;
             if (AllowedMentions.IsSpecified)
-                payload["allowed_mentions"] = AllowedMentions.Value;
+                message["allowed_mentions"] = AllowedMentions.Value;
             if (MessageComponent.IsSpecified)
-                payload["components"] = MessageComponent.Value;
+                message["components"] = MessageComponent.Value;
             if (Stickers.IsSpecified)
-                payload["sticker_ids"] = Stickers.Value;
+                message["sticker_ids"] = Stickers.Value;
             if (Flags.IsSpecified)
-                payload["flags"] = Flags.Value;
+                message["flags"] = Flags.Value;
 
             List<object> attachments = new();
 
@@ -79,7 +79,9 @@ namespace Discord.API.Rest
                 });
             }
 
-            payload["attachments"] = attachments;
+            message["attachments"] = attachments;
+
+            payload["message"] = message;
 
             var json = new StringBuilder();
             using (var text = new StringWriter(json))

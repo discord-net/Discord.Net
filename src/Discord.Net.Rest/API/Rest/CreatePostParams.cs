@@ -19,26 +19,7 @@ namespace Discord.API.Rest
         [JsonProperty("rate_limit_per_user")]
         public Optional<int?> Slowmode { get; set; }
 
-        // message
-        [JsonProperty("content")]
-        public string Content { get; set; }
-
-        [JsonProperty("tts")]
-        public Optional<bool> IsTTS { get; set; }
-
-        [JsonProperty("embeds")]
-        public Optional<Embed[]> Embeds { get; set; }
-
-        [JsonProperty("allowed_mentions")]
-        public Optional<AllowedMentions> AllowedMentions { get; set; }
-
-        [JsonProperty("components")]
-        public Optional<API.ActionRowComponent[]> Components { get; set; }
-
-        [JsonProperty("sticker_ids")]
-        public Optional<ulong[]> Stickers { get; set; }
-
-        [JsonProperty("flags")]
-        public Optional<MessageFlags> Flags { get; set; }
+        [JsonProperty("message")]
+        public ForumThreadMessage Message { get; set; }
     }
 }

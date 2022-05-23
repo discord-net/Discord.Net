@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,15 +40,129 @@ namespace Discord
         /// </summary>
         /// <param name="title">The title of the post.</param>
         /// <param name="archiveDuration">The archive duration of the post.</param>
-        /// <param name="message">
-        ///     The starting message of the post. The content of the message supports full markdown.
-        /// </param>
         /// <param name="slowmode">The slowmode for the posts thread.</param>
+        /// <param name="text">The message to be sent.</param>
+        /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="allowedMentions">
+        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
+        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        /// </param>
+        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
+        /// <param name="stickers">A collection of stickers to send with the message.</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
+        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> is permitted.</param>
         /// <returns>
         ///     A task that represents the asynchronous creation operation.
         /// </returns>
-        Task<IThreadChannel> CreatePostAsync(string title, ThreadArchiveDuration archiveDuration, Message message, int? slowmode = null, RequestOptions options = null);
+        Task<IThreadChannel> CreatePostAsync(string title, ThreadArchiveDuration archiveDuration = ThreadArchiveDuration.OneDay, int? slowmode = null,
+            string text = null, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
+            MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+
+        /// <summary>
+        ///     Creates a new post (thread) within the forum.
+        /// </summary>
+        /// <param name="title">The title of the post.</param>
+        /// <param name="archiveDuration">The archive duration of the post.</param>
+        /// <param name="slowmode">The slowmode for the posts thread.</param>
+        /// <param name="filePath">The file path of the file.</param>
+        /// <param name="text">The message to be sent.</param>
+        /// <param name="embed">The <see cref="Discord.EmbedType.Rich" /> <see cref="Embed" /> to be sent.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
+        /// <param name="allowedMentions">
+        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
+        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        /// </param>
+        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
+        /// <param name="stickers">A collection of stickers to send with the file.</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
+        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> is permitted.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation.
+        /// </returns>
+        Task<IThreadChannel> CreatePostWithFileAsync(string title, string filePath, ThreadArchiveDuration archiveDuration = ThreadArchiveDuration.OneDay,
+            int? slowmode = null, string text = null, Embed embed = null, RequestOptions options = null, bool isSpoiler = false,
+            AllowedMentions allowedMentions = null, MessageComponent components = null,
+            ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+
+        /// <summary>
+        ///     Creates a new post (thread) within the forum.
+        /// </summary>
+        /// <param name="title">The title of the post.</param>
+        /// <param name="stream">The <see cref="Stream" /> of the file to be sent.</param>
+        /// <param name="filename">The name of the attachment.</param>
+        /// <param name="archiveDuration">The archive duration of the post.</param>
+        /// <param name="slowmode">The slowmode for the posts thread.</param>
+        /// <param name="text">The message to be sent.</param>
+        /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
+        /// <param name="allowedMentions">
+        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
+        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        /// </param>
+        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
+        /// <param name="stickers">A collection of stickers to send with the file.</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
+        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> is permitted.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation.
+        /// </returns>
+        public Task<IThreadChannel> CreatePostWithFileAsync(string title, Stream stream, string filename, ThreadArchiveDuration archiveDuration = ThreadArchiveDuration.OneDay,
+            int? slowmode = null, string text = null, Embed embed = null, RequestOptions options = null, bool isSpoiler = false,
+            AllowedMentions allowedMentions = null, MessageComponent components = null,
+            ISticker[] stickers = null, Embed[] embeds = null,MessageFlags flags = MessageFlags.None);
+
+        /// <summary>
+        ///     Creates a new post (thread) within the forum.
+        /// </summary>
+        /// <param name="title">The title of the post.</param>
+        /// <param name="attachment">The attachment containing the file and description.</param>
+        /// <param name="archiveDuration">The archive duration of the post.</param>
+        /// <param name="slowmode">The slowmode for the posts thread.</param>
+        /// <param name="text">The message to be sent.</param>
+        /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="allowedMentions">
+        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
+        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        /// </param>
+        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
+        /// <param name="stickers">A collection of stickers to send with the file.</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
+        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> is permitted.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation.
+        /// </returns>
+        public Task<IThreadChannel> CreatePostWithFileAsync(string title, FileAttachment attachment, ThreadArchiveDuration archiveDuration = ThreadArchiveDuration.OneDay,
+            int? slowmode = null, string text = null, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
+            MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+
+        /// <summary>
+        ///     Creates a new post (thread) within the forum.
+        /// </summary>
+        /// <param name="title">The title of the post.</param>
+        /// <param name="attachments">A collection of attachments to upload.</param>
+        /// <param name="archiveDuration">The archive duration of the post.</param>
+        /// <param name="slowmode">The slowmode for the posts thread.</param>
+        /// <param name="text">The message to be sent.</param>
+        /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="allowedMentions">
+        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
+        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        /// </param>
+        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
+        /// <param name="stickers">A collection of stickers to send with the file.</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
+        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> is permitted.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation.
+        /// </returns>
+        public Task<IThreadChannel> CreatePostWithFilesAsync(string title, IEnumerable<FileAttachment> attachments, ThreadArchiveDuration archiveDuration = ThreadArchiveDuration.OneDay,
+            int? slowmode = null, string text = null, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
+            MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
 
         /// <summary>
         ///     Gets a collection of active threads within this forum channel.
