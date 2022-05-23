@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class MessageApplication
+    internal class MessageApplication : IPartialApplicationModel
     {
         /// <summary>
         ///     Gets the snowflake ID of the application.
@@ -34,5 +34,10 @@ namespace Discord.API
         /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        string IPartialApplicationModel.CoverImage { get => CoverImage; set => throw new NotSupportedException(); }
+        string IPartialApplicationModel.Icon { get => Icon; set => throw new NotSupportedException(); }
+        string IPartialApplicationModel.Name { get => Name; set => throw new NotSupportedException(); }
+        ulong IEntityModel<ulong>.Id { get => Id; set => throw new NotSupportedException(); }
     }
 }

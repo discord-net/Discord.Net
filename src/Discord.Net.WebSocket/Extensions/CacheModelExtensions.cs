@@ -8,10 +8,17 @@ namespace Discord.WebSocket
 {
     internal static class CacheModelExtensions
     {
-        public static TDest ToSpecifiedModel<TId, TDest>(this IEntityModel<TId> source, TDest dest)
-            where TId : IEquatable<TId>
-            where TDest : IEntityModel<TId>
+        public static TDest InterfaceCopy<TDest>(this object source)
+            where TDest : class, new()
+            => source.InterfaceCopy(new TDest());
+
+        public static TDest InterfaceCopy<TSource, TDest>(this TSource source, TDest dest)
+            where TSource : class
+            where TDest : class
         {
+            if (source == null || dest == null)
+                throw new ArgumentNullException(source == null ? nameof(source) : nameof(dest));
+
             if (source == null || dest == null)
                 throw new ArgumentNullException(source == null ? nameof(source) : nameof(dest));
 
@@ -20,7 +27,7 @@ namespace Discord.WebSocket
             var destType = dest.GetType();
 
             if (sourceType == destType)
-                return (TDest)source;
+                return source as TDest;
 
             List<Type> sharedInterfaceModels = new();
 
@@ -51,6 +58,13 @@ namespace Discord.WebSocket
             }
 
             return dest;
+        }
+
+        public static TDest ToSpecifiedModel<TId, TDest>(this IEntityModel<TId> source, TDest dest)
+            where TId : IEquatable<TId>
+            where TDest : class, IEntityModel<TId>
+        {
+            return source.InterfaceCopy(dest);
         }
     }
 }

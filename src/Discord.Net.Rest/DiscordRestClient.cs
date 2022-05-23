@@ -158,6 +158,9 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestGroupChannel>> GetGroupChannelsAsync(RequestOptions options = null)
             => ClientHelper.GetGroupChannelsAsync(this, options);
 
+        public Task<RestMessage> GetMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+            => ClientHelper.GetMessageAsync(this, channelId, messageId, options);
+
         public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(RequestOptions options = null)
             => ClientHelper.GetConnectionsAsync(this, options);
 

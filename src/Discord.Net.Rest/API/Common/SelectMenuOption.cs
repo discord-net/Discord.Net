@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API
 {
-    internal class SelectMenuOption
+    internal class SelectMenuOption : IMessageComponentOptionModel
     {
         [JsonProperty("label")]
         public string Label { get; set; }
@@ -49,5 +49,13 @@ namespace Discord.API
 
             Default = option.IsDefault ?? Optional<bool>.Unspecified;
         }
+
+        string IMessageComponentOptionModel.Label { get => Label; set => throw new System.NotSupportedException(); }
+        string IMessageComponentOptionModel.Value { get => Value; set => throw new System.NotSupportedException(); }
+        string IMessageComponentOptionModel.Description { get => Description.GetValueOrDefault(); set => throw new System.NotSupportedException(); }
+        ulong? IMessageComponentOptionModel.EmojiId { get => Emoji.GetValueOrDefault()?.Id; set => throw new System.NotSupportedException(); }
+        string IMessageComponentOptionModel.EmojiName { get => Emoji.GetValueOrDefault()?.Name; set => throw new System.NotSupportedException(); }
+        bool? IMessageComponentOptionModel.EmojiAnimated { get => Emoji.GetValueOrDefault()?.Animated; set => throw new System.NotSupportedException(); }
+        bool? IMessageComponentOptionModel.Default { get => Default.ToNullable(); set => throw new System.NotSupportedException(); }
     }
 }

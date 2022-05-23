@@ -46,6 +46,11 @@ namespace Discord
         /// </returns>
         bool MentionedEveryone { get; }
         /// <summary>
+        ///     If the message is a <see cref="MessageType.ApplicationCommand"/> or application-owned webhook,
+        ///     this is the id of the application.
+        /// </summary>
+        ulong? ApplicationId { get; }
+        /// <summary>
         ///     Gets the content for this message.
         /// </summary>
         /// <returns>

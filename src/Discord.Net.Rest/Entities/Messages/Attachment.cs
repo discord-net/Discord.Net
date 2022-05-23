@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using Model = Discord.API.Attachment;
+using Model = Discord.IAttachmentModel;
 
 namespace Discord
 {
@@ -44,11 +44,11 @@ namespace Discord
         }
         internal static Attachment Create(Model model)
         {
-            return new Attachment(model.Id, model.Filename, model.Url, model.ProxyUrl, model.Size,
-                model.Height.IsSpecified ? model.Height.Value : (int?)null,
-                model.Width.IsSpecified ? model.Width.Value : (int?)null,
-                model.Ephemeral.ToNullable(), model.Description.GetValueOrDefault(),
-                model.ContentType.GetValueOrDefault());
+            return new Attachment(model.Id, model.FileName, model.Url, model.ProxyUrl, model.Size,
+                model.Height,
+                model.Width,
+                model.Ephemeral, model.Description,
+                model.ContentType);
         }
 
         /// <summary>

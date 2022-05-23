@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Discord.API
 {
-    internal class EmbedField
+    internal class EmbedField : IEmbedFieldModel
     {
         [JsonProperty("name")]
         public string Name { get; set; }

@@ -14,11 +14,35 @@ namespace Discord
         ulong AuthorId { get; set; }
         bool IsWebhookMessage { get; set; }
         string Content { get; set; }
-        DateTimeOffset Timestamp { get; set; }
-        DateTimeOffset? EditedTimestamp { get; set; }
+        long Timestamp { get; set; }
+        long? EditedTimestamp { get; set; }
         bool IsTextToSpeech { get; set; }
         bool MentionEveryone { get; set; }
         ulong[] UserMentionIds { get; set; }
         ulong[] RoleMentionIds { get; set; }
+
+        IAttachmentModel[] Attachments { get; set; }
+        IEmbedModel[] Embeds { get; set; }
+        IReactionMetadataModel[] Reactions { get; set; }
+        bool Pinned { get; set; }
+        IMessageActivityModel Activity { get; set; }
+        IPartialApplicationModel Application { get; set; }
+        ulong? ApplicationId { get; set; }
+
+        // message reference
+        ulong? ReferenceMessageId { get; set; }
+        ulong? ReferenceMessageChannelId { get; set; }
+        ulong? ReferenceMessageGuildId { get; set; }
+
+        MessageFlags Flags { get; set; }
+
+        // interaction
+        ulong? InteractionId { get; set; }
+        string InteractionName { get; set; }
+        InteractionType? InteractionType { get; set; }
+        ulong? InteractionUserId { get; set; }
+
+        IMessageComponentModel[] Components { get; set; }
+        IStickerItemModel[] Stickers { get; set; }
     }
 }

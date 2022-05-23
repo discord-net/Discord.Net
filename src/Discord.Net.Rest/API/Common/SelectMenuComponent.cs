@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Discord.API
 {
-    internal class SelectMenuComponent : IMessageComponent
+    internal class SelectMenuComponent : IMessageComponent, IMessageComponentModel
     {
         [JsonProperty("type")]
         public ComponentType Type { get; set; }
@@ -28,6 +28,7 @@ namespace Discord.API
 
         [JsonProperty("values")]
         public Optional<string[]> Values { get; set; }
+
         public SelectMenuComponent() { }
 
         public SelectMenuComponent(Discord.SelectMenuComponent component)
@@ -40,5 +41,27 @@ namespace Discord.API
             MaxValues = component.MaxValues;
             Disabled = component.IsDisabled;
         }
+
+        ComponentType IMessageComponentModel.Type { get => Type; set => throw new System.NotSupportedException(); }
+        string IMessageComponentModel.CustomId { get => CustomId; set => throw new System.NotSupportedException(); }
+        bool? IMessageComponentModel.Disabled { get => Disabled; set => throw new System.NotSupportedException(); }
+        IMessageComponentOptionModel[] IMessageComponentModel.Options { get => Options; set => throw new System.NotSupportedException(); }
+        string IMessageComponentModel.Placeholder { get => Placeholder.GetValueOrDefault(); set => throw new System.NotSupportedException(); }
+        int? IMessageComponentModel.MinValues { get => MinValues; set => throw new System.NotSupportedException(); }
+        int? IMessageComponentModel.MaxValues { get => MaxValues; set => throw new System.NotSupportedException(); }
+
+        #region unused
+        ButtonStyle? IMessageComponentModel.Style { get => null; set => throw new System.NotSupportedException(); }
+        string IMessageComponentModel.Label { get => null; set => throw new System.NotSupportedException(); }
+        ulong? IMessageComponentModel.EmojiId { get => null; set => throw new System.NotSupportedException(); }
+        string IMessageComponentModel.EmojiName { get => null; set => throw new System.NotSupportedException(); }
+        bool? IMessageComponentModel.EmojiAnimated { get => null; set => throw new System.NotSupportedException(); }
+        string IMessageComponentModel.Url { get => null; set => throw new System.NotSupportedException(); }
+        IMessageComponentModel[] IMessageComponentModel.Components { get => null; set => throw new System.NotSupportedException(); }
+        int? IMessageComponentModel.MinLength { get => null; set => throw new System.NotSupportedException(); }
+        int? IMessageComponentModel.MaxLength { get => null; set => throw new System.NotSupportedException(); }
+        bool? IMessageComponentModel.Required { get => null; set => throw new System.NotSupportedException(); }
+        string IMessageComponentModel.Value { get => null; set => throw new System.NotSupportedException(); }
+        #endregion
     }
 }

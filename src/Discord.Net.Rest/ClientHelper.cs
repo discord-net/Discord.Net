@@ -46,6 +46,16 @@ namespace Discord.Rest
                 .Select(x => RestGroupChannel.Create(client, x)).ToImmutableArray();
         }
 
+        public static async Task<RestMessage> GetMessageAsync(BaseDiscordClient client, ulong channelId, ulong messageId, RequestOptions options)
+        {
+            var channel = await GetChannelAsync(client, channelId, options).ConfigureAwait(false);
+
+            if (channel is not IRestMessageChannel msgChannel)
+                return null;
+
+            return await msgChannel.GetMessageAsync(messageId, options).ConfigureAwait(false);
+        }
+
         public static async Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetMyConnectionsAsync(options).ConfigureAwait(false);

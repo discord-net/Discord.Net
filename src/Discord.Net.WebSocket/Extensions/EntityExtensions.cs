@@ -7,6 +7,17 @@ namespace Discord.WebSocket
 {
     internal static class EntityExtensions
     {
+        #region Emotes
+        public static IEmote ToEntity(this IEmojiModel model)
+        {
+            if (model.Id.HasValue)
+                return new Emote(model.Id.Value, model.Name, model.IsAnimated);
+            else
+                return new Emoji(model.Name);
+        }
+        #endregion
+
+        #region Activity
         public static IActivity ToEntity(this IActivityModel model)
         {
             #region  Custom Status Game
@@ -147,5 +158,6 @@ namespace Discord.WebSocket
         {
             return new GameTimestamps(model.Start.ToNullable(), model.End.ToNullable());
         }
+        #endregion
     }
 }

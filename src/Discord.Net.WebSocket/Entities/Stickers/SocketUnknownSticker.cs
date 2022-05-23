@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Model = Discord.API.StickerItem;
+using Model = Discord.IStickerItemModel;
 
 namespace Discord.WebSocket
 {
@@ -47,7 +47,7 @@ namespace Discord.WebSocket
         internal void Update(Model model)
         {
             Name = model.Name;
-            Format = model.FormatType;
+            Format = model.Format;
         }
 
         /// <summary>

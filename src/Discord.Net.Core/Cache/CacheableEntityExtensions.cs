@@ -78,17 +78,14 @@ namespace Discord
             };
         }
 
-        public static IEmojiModel ToModel<TModel>(this IEmote emote) where TModel : IEmojiModel, new()
+        public static IEmojiModel ToModel(this IEmote emote, IEmojiModel model)
         {
             if (emote == null)
                 return null;
 
-            var model = new TModel()
-            {
-                Name = emote.Name
-            };
+            model.Name = emote.Name;
 
-            if(emote is GuildEmote guildEmote)
+            if (emote is GuildEmote guildEmote)
             {
                 model.Id = guildEmote.Id;
                 model.IsAnimated = guildEmote.Animated;
@@ -99,13 +96,21 @@ namespace Discord
                 model.Roles = guildEmote.RoleIds.ToArray();
             }
 
-            if(emote is Emote e)
+            if (emote is Emote e)
             {
                 model.IsAnimated = e.Animated;
                 model.Id = e.Id;
             }
 
             return model;
+        }
+
+        public static IEmojiModel ToModel<TModel>(this IEmote emote) where TModel : IEmojiModel, new()
+        {
+            if (emote == null)
+                return null;
+
+            return emote.ToModel(new TModel());
         }
     }
 }

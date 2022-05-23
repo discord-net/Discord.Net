@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API
 {
-    internal class EmbedAuthor
+    internal class EmbedAuthor : IEmbedAuthorModel
     {
         [JsonProperty("name")]
         public string Name { get; set; }

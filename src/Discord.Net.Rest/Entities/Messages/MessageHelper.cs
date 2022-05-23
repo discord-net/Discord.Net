@@ -221,7 +221,7 @@ namespace Discord.Rest
             await client.ApiClient.RemovePinAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
 
-        public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, IReadOnlyCollection<IUser> userMentions)
+        public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, ulong[] userMentions)
         {
             var tags = ImmutableArray.CreateBuilder<ITag>();
             int index = 0;
@@ -278,11 +278,9 @@ namespace Discord.Rest
                     IUser mentionedUser = null;
                     foreach (var mention in userMentions)
                     {
-                        if (mention.Id == id)
+                        if (mention == id)
                         {
                             mentionedUser = channel?.GetUserAsync(id, CacheMode.CacheOnly).GetAwaiter().GetResult();
-                            if (mentionedUser == null)
-                                mentionedUser = mention;
                             break;
                         }
                     }
@@ -372,11 +370,11 @@ namespace Discord.Rest
                 .ToImmutableArray();
         }
 
-        public static MessageSource GetSource(Model msg)
+        public static MessageSource GetSource(IMessageModel msg)
         {
             if (msg.Type != MessageType.Default && msg.Type != MessageType.Reply)
                 return MessageSource.System;
-            else if (msg.WebhookId.IsSpecified)
+            else if (msg.IsWebhookMessage)
                 return MessageSource.Webhook;
             else if (msg.Author.GetValueOrDefault()?.Bot.GetValueOrDefault(false) == true)
                 return MessageSource.Bot;

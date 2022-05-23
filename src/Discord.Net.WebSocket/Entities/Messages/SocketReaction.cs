@@ -20,12 +20,19 @@ namespace Discord.WebSocket
         /// </returns>
         public ulong UserId { get; }
         /// <summary>
+        ///     Gets the ID of the message that has been reacted to.
+        /// </summary>
+        /// <returns>
+        ///     A message snowflake identifier associated with the message.
+        /// </returns>
+        public ulong MessageId { get; }
+        /// <summary>
         ///     Gets the user who added the reaction if possible.
         /// </summary>
         /// <remarks>
         ///     <para>
         ///         This property attempts to retrieve a WebSocket-cached user that is responsible for this reaction from
-        ///         the client. In other words, when the user is not in the WebSocket cache, this property may not
+        ///         the client. In other words, when the user is not in the cache, this property may not
         ///         contain a value, leaving the only identifiable information to be
         ///         <see cref="Discord.WebSocket.SocketReaction.UserId" />.
         ///     </para>
@@ -35,25 +42,16 @@ namespace Discord.WebSocket
         ///     </para>
         /// </remarks>
         /// <returns>
-        ///     A user object where possible; a value is not always returned.
+        ///     A lazily-cached user object.
         /// </returns>
-        /// <seealso cref="Optional{T}"/>
-        public Optional<IUser> User { get; }
-        /// <summary>
-        ///     Gets the ID of the message that has been reacted to.
-        /// </summary>
-        /// <returns>
-        ///     A message snowflake identifier associated with the message.
-        /// </returns>
-        public ulong MessageId { get; }
+        public LazyCached<SocketUser> User { get; }
         /// <summary>
         ///     Gets the message that has been reacted to if possible.
         /// </summary>
         /// <returns>
-        ///     A WebSocket-based message where possible; a value is not always returned.
+        ///     A lazily-cached message.
         /// </returns>
-        /// <seealso cref="Optional{T}"/>
-        public Optional<SocketUserMessage> Message { get; }
+        public LazyCached<SocketMessage> Message { get; }
         /// <summary>
         ///     Gets the channel where the reaction takes place in.
         /// </summary>
@@ -64,16 +62,26 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public IEmote Emote { get; }
 
-        internal SocketReaction(ISocketMessageChannel channel, ulong messageId, Optional<SocketUserMessage> message, ulong userId, Optional<IUser> user, IEmote emoji)
+        internal SocketReaction(ISocketMessageChannel channel, ulong messageId, Optional<SocketUserMessage> message, ulong userId, Optional<SocketUser> user, IEmote emoji)
         {
-            Channel = channel;
+            var client = ((SocketChannel)channel).Discord;
+
             MessageId = messageId;
-            Message = message;
             UserId = userId;
-            User = user;
+
+            Channel = channel;
+
+            Message = message.IsSpecified
+                ? new LazyCached<SocketMessage>(message.Value)
+                : new LazyCached<SocketMessage>(messageId, client.StateManager.GetMessageStore(channel.Id));
+
+            User = user.IsSpecified
+                ? new LazyCached<SocketUser>(user.Value)
+                : new LazyCached<SocketUser>(userId, client.StateManager.UserStore);
+
             Emote = emoji;
         }
-        internal static SocketReaction Create(Model model, ISocketMessageChannel channel, Optional<SocketUserMessage> message, Optional<IUser> user)
+        internal static SocketReaction Create(Model model, ISocketMessageChannel channel, Optional<SocketUserMessage> message, Optional<SocketUser> user)
         {
             IEmote emote;
             if (model.Emoji.Id.HasValue)
@@ -86,11 +94,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override bool Equals(object other)
         {
-            if (other == null) return false;
-            if (other == this) return true;
+            if (other == null)
+                return false;
+            if (other == this)
+                return true;
 
             var otherReaction = other as SocketReaction;
-            if (otherReaction == null) return false;
+            if (otherReaction == null)
+                return false;
 
             return UserId == otherReaction.UserId && MessageId == otherReaction.MessageId && Emote.Equals(otherReaction.Emote);
         }

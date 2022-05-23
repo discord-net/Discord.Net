@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Model = Discord.API.Message;
+using Model = Discord.IMessageModel;
 
 namespace Discord.WebSocket
 {
@@ -17,11 +17,12 @@ namespace Discord.WebSocket
     {
         private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
-        private IUserMessage _referencedMessage;
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
-        private ImmutableArray<SocketRole> _roleMentions = ImmutableArray.Create<SocketRole>();
+        private ulong[] _roleMentions;
+        private ulong? _referencedMessageId;
+        //private ImmutableArray<SocketRole> _roleMentions = ImmutableArray.Create<SocketRole>();
         private ImmutableArray<SocketSticker> _stickers = ImmutableArray.Create<SocketSticker>();
 
         /// <inheritdoc />
@@ -56,30 +57,26 @@ namespace Discord.WebSocket
         internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientStateManager state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
             var entity = new SocketUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
-            entity.Update(state, model);
+            entity.Update(model);
             return entity;
         }
 
-        internal override void Update(ClientStateManager state, Model model)
+        internal override void Update(Model model)
         {
-            base.Update(state, model);
+            base.Update(model);
 
             SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
 
-            if (model.IsTextToSpeech.IsSpecified)
-                _isTTS = model.IsTextToSpeech.Value;
-            if (model.Pinned.IsSpecified)
-                _isPinned = model.Pinned.Value;
-            if (model.EditedTimestamp.IsSpecified)
-                _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
-            if (model.MentionEveryone.IsSpecified)
-                _isMentioningEveryone = model.MentionEveryone.Value;
-            if (model.RoleMentions.IsSpecified)
-                _roleMentions = model.RoleMentions.Value.Select(x => guild.GetRole(x)).ToImmutableArray();
+            _isTTS = model.IsTextToSpeech;
+            _isPinned = model.Pinned;
+            _editedTimestampTicks = model.EditedTimestamp;
+            _isMentioningEveryone = model.MentionEveryone;
+            _roleMentions = model.RoleMentionIds;
+            _referencedMessageId = model.ReferenceMessageId;
 
-            if (model.Attachments.IsSpecified)
+            if (model.Attachments != null && model.Attachments.Length > 0)
             {
-                var value = model.Attachments.Value;
+                var value = model.Attachments;
                 if (value.Length > 0)
                 {
                     var attachments = ImmutableArray.CreateBuilder<Attachment>(value.Length);
@@ -91,9 +88,9 @@ namespace Discord.WebSocket
                     _attachments = ImmutableArray.Create<Attachment>();
             }
 
-            if (model.Embeds.IsSpecified)
+            if (model.Embeds != null && model.Embeds.Length > 0)
             {
-                var value = model.Embeds.Value;
+                var value = model.Embeds;
                 if (value.Length > 0)
                 {
                     var embeds = ImmutableArray.CreateBuilder<Embed>(value.Length);
@@ -105,41 +102,16 @@ namespace Discord.WebSocket
                     _embeds = ImmutableArray.Create<Embed>();
             }
 
-            if (model.Content.IsSpecified)
+            if (model.Content != null)
             {
-                var text = model.Content.Value;
+                var text = model.Content;
                 _tags = MessageHelper.ParseTags(text, Channel, guild, MentionedUsers);
                 model.Content = text;
             }
 
-            if (model.ReferencedMessage.IsSpecified && model.ReferencedMessage.Value != null)
+            if (model.Stickers != null && model.Stickers.Length > 0)
             {
-                var refMsg = model.ReferencedMessage.Value;
-                ulong? webhookId = refMsg.WebhookId.ToNullable();
-                SocketUser refMsgAuthor = null;
-                if (refMsg.Author.IsSpecified)
-                {
-                    if (guild != null)
-                    {
-                        if (webhookId != null)
-                            refMsgAuthor = SocketWebhookUser.Create(guild, refMsg.Author.Value, webhookId.Value);
-                        else
-                            refMsgAuthor = guild.GetUser(refMsg.Author.Value.Id);
-                    }
-                    else
-                        refMsgAuthor = (Channel as SocketChannel).GetUser(refMsg.Author.Value.Id);
-                    if (refMsgAuthor == null)
-                        refMsgAuthor = SocketUnknownUser.Create(Discord, refMsg.Author.Value);
-                }
-                else
-                    // Message author wasn't specified in the payload, so create a completely anonymous unknown user
-                    refMsgAuthor = new SocketUnknownUser(Discord, id: 0);
-                _referencedMessage = SocketUserMessage.Create(Discord, state, refMsgAuthor, Channel, refMsg);
-            }
-
-            if (model.StickerItems.IsSpecified)
-            {
-                var value = model.StickerItems.Value;
+                var value = model.Stickers;
                 if (value.Length > 0)
                 {
                     var stickers = ImmutableArray.CreateBuilder<SocketSticker>(value.Length);

@@ -4,7 +4,7 @@ using Discord.Net.Converters;
 
 namespace Discord.API
 {
-    internal class Embed
+    internal class Embed : IEmbedModel
     {
         [JsonProperty("title")]
         public string Title { get; set; }
@@ -32,5 +32,15 @@ namespace Discord.API
         public Optional<EmbedProvider> Provider { get; set; }
         [JsonProperty("fields")]
         public Optional<EmbedField[]> Fields { get; set; }
+
+        EmbedType IEmbedModel.Type { get => Type; set => throw new NotSupportedException(); }
+        DateTimeOffset? IEmbedModel.Timestamp { get => Timestamp; set => throw new NotSupportedException(); }
+        IEmbedFooterModel IEmbedModel.Footer { get => Footer.GetValueOrDefault(); set => throw new NotSupportedException(); }
+        IEmbedMediaModel IEmbedModel.Image { get => Image.GetValueOrDefault(); set => throw new NotSupportedException(); }
+        IEmbedMediaModel IEmbedModel.Thumbnail { get => Thumbnail.GetValueOrDefault(); set => throw new NotSupportedException(); }
+        IEmbedMediaModel IEmbedModel.Video { get => Video.GetValueOrDefault(); set => throw new NotSupportedException(); }
+        IEmbedProviderModel IEmbedModel.Provider { get => Provider.GetValueOrDefault(); set => throw new NotSupportedException(); }
+        IEmbedAuthorModel IEmbedModel.Author { get => Author.GetValueOrDefault(); set => throw new NotSupportedException(); }
+        IEmbedFieldModel[] IEmbedModel.Fields { get => Fields.GetValueOrDefault(); set => throw new NotSupportedException(); }
     }
 }
