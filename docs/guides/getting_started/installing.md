@@ -40,19 +40,19 @@ Release builds of Discord.Net will be published to the
 Nuget also includes pre-releases for all minor & major versions,
 from which patches will be pushed until the version is ready for a stable release.
 Pre-releases introduce the latest features, and receives common updates towards bug fixes where required.
-Old features breaking down in new pre-releases is uncommon, so using pre-releases to test new features is not ill-adviced.
+Old features breaking down in new pre-releases is uncommon, so using pre-releases to test new features is not ill-advised.
 
 ### Experimental/Development
 
 Development builds of Discord.Net will be
 published to our [MyGet feed]. The MyGet feed can be used to run the latest dev branch builds.
-It is not adviced to use MyGet packages in a production environment, as changes may be made that negatively affect certain library functions.
+It is not advised to use MyGet packages in a production environment, as changes may be made that negatively affect certain library functions.
 If you want to test out new features before they've been officially released, you should use the pre-releases instead.
 
 ### Labs
 
 This exterior branch of Discord.Net has been deprecated and is no longer supported.
-If you have used Discord.Net-Labs in the past, you are adviced to update to the latest version of Discord.Net.
+If you have used Discord.Net-Labs in the past, you are advised to update to the latest version of Discord.Net.
 All features in Labs are implemented in the main repository.
 
 [official nuget feed]: https://nuget.org

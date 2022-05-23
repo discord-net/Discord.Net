@@ -321,7 +321,7 @@ can be used to register cherry picked modules or commands to global/guild scopes
 
 > [!NOTE]
 > In debug environment, since Global commands can take up to 1 hour to register/update,
-> it is adviced to register your commands to a test guild for your changes to take effect immediately.
+> it is advised to register your commands to a test guild for your changes to take effect immediately.
 > You can use preprocessor directives to create a simple logic for registering commands as seen above
 
 ## Interaction Utility
