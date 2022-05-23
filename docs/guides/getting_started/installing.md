@@ -39,7 +39,7 @@ Release builds of Discord.Net will be published to the
 
 Nuget also includes pre-releases for all minor & major versions,
 from which patches will be pushed until the version is ready for a stable release.
-Pre-releases introduce the latest features, and receives common updates towards bug fixes where required.
+Pre-releases introduce the latest features and receive common updates towards bug fixes where required.
 Old features breaking down in new pre-releases is uncommon, so using pre-releases to test new features is not ill-advised.
 
 ### Experimental/Development
