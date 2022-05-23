@@ -43,7 +43,7 @@ namespace Discord.WebSocket
             base.Update(state, model);
             IsNsfw = model.Nsfw.GetValueOrDefault(false);
             Topic = model.Topic.GetValueOrDefault();
-            DefaultAutoArchiveDuration = model.DefaultAutoArchiveDuration.GetValueOrDefault(ThreadArchiveDuration.OneDay);
+            DefaultAutoArchiveDuration = model.AutoArchiveDuration.GetValueOrDefault(ThreadArchiveDuration.OneDay);
 
             Tags = model.ForumTags.GetValueOrDefault(new API.ForumTags[0]).Select(
                 x => new ForumTag(x.Id, x.Name, x.EmojiId.GetValueOrDefault(null), x.EmojiName.GetValueOrDefault())
