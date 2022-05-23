@@ -17,7 +17,7 @@ Discord.Net is split into a core library and two different
 implementations - `Discord.Net.Core`, `Discord.Net.Rest`, and
 `Discord.Net.WebSocket`.
 
-As a common bot developer, you will only need to use `Discord.Net.WebSocket`,
+You will typically only need to use `Discord.Net.WebSocket`,
 but you should be aware of the differences between them.
 
 > [!TIP]
