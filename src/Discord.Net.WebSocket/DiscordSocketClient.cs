@@ -403,7 +403,7 @@ namespace Discord.WebSocket
         ///     the snowflake identifier; <c>null</c> if the user is not found.
         /// </returns>
         public async ValueTask<IUser> GetUserAsync(ulong id, RequestOptions options = null)
-            => await ClientHelper.GetUserAsync(this, id, options).ConfigureAwait(false);
+            => await ((IDiscordClient)this).GetUserAsync(id, CacheMode.AllowDownload, options).ConfigureAwait(false);
         /// <summary>
         ///     Clears all cached channels from the client.
         /// </summary>
