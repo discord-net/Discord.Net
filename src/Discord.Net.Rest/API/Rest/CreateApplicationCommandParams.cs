@@ -19,6 +19,12 @@ namespace Discord.API.Rest
         [JsonProperty("default_permission")]
         public Optional<bool> DefaultPermission { get; set; }
 
+        [JsonProperty("dm_permission")]
+        public Optional<bool?> DmPermission { get; set; }
+
+        [JsonProperty("default_member_permissions")]
+        public Optional<GuildPermission?> DefaultMemberPermission { get; set; }
+
         public CreateApplicationCommandParams() { }
         public CreateApplicationCommandParams(string name, string description, ApplicationCommandType type, ApplicationCommandOption[] options = null)
         {

@@ -1,3 +1,5 @@
+using System;
+
 namespace Discord.Interactions
 {
     /// <summary>
@@ -18,6 +20,17 @@ namespace Discord.Interactions
         /// <summary>
         ///     Gets the DefaultPermission of this command.
         /// </summary>
+        [Obsolete($"To be deprecated soon, use {nameof(IsEnabledInDm)} and {nameof(DefaultMemberPermissions)} instead.")]
         bool DefaultPermission { get; }
+
+        /// <summary>
+        ///     Gets whether this command can be used in DMs.
+        /// </summary>
+        public bool IsEnabledInDm { get; }
+
+        /// <summary>
+        ///     Gets the default permissions needed for executing this command.
+        /// </summary>
+        public GuildPermission? DefaultMemberPermissions { get; }
     }
 }

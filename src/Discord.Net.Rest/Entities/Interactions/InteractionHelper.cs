@@ -100,7 +100,12 @@ namespace Discord.Rest
                 Type = arg.Type,
                 DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+
+                // TODO: better conversion to nullable optionals
+                DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                DmPermission = arg.IsDMEnabled.ToNullable() 
+                
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -134,7 +139,11 @@ namespace Discord.Rest
                     Type = arg.Type,
                     DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+
+                    // TODO: better conversion to nullable optionals
+                    DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                    DmPermission = arg.IsDMEnabled.ToNullable()
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -171,7 +180,11 @@ namespace Discord.Rest
                     Type = arg.Type,
                     DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+
+                    // TODO: better conversion to nullable optionals
+                    DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                    DmPermission = arg.IsDMEnabled.ToNullable()
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -285,7 +298,11 @@ namespace Discord.Rest
                 Type = arg.Type,
                 DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+
+                // TODO: better conversion to nullable optionals
+                DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                DmPermission = arg.IsDMEnabled.ToNullable()
             };
 
             if (arg is SlashCommandProperties slashProps)

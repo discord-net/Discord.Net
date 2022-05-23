@@ -2,6 +2,7 @@ using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
@@ -12,20 +13,20 @@ namespace Discord.Rest
     ///     Represents a REST-based voice channel in a guild.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestVoiceChannel : RestGuildChannel, IVoiceChannel, IRestAudioChannel
+    public class RestVoiceChannel : RestTextChannel, IVoiceChannel, IRestAudioChannel
     {
         #region RestVoiceChannel
+        /// <summary>
+        ///     Gets whether or not the guild has Text-In-Voice enabled and the voice channel is a TiV channel.
+        /// </summary>
+        public virtual bool IsTextInVoice
+            => Guild.Features.HasTextInVoice;
         /// <inheritdoc />
         public int Bitrate { get; private set; }
         /// <inheritdoc />
         public int? UserLimit { get; private set; }
-        /// <inheritdoc />
-        public ulong? CategoryId { get; private set; }
         /// <inheritdoc/>
         public string RTCRegion { get; private set; }
-
-        /// <inheritdoc />
-        public string Mention => MentionUtils.MentionChannel(Id);
 
         internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
@@ -41,7 +42,6 @@ namespace Discord.Rest
         internal override void Update(Model model)
         {
             base.Update(model);
-            CategoryId = model.CategoryId;
 
             if(model.Bitrate.IsSpecified)
                 Bitrate = model.Bitrate.Value;
@@ -59,40 +59,184 @@ namespace Discord.Rest
             Update(model);
         }
 
-        /// <summary>
-        ///     Gets the parent (category) channel of this channel.
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains the category channel
-        ///     representing the parent of this channel; <c>null</c> if none is set.
-        /// </returns>
-        public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
-            => ChannelHelper.GetCategoryAsync(this, Discord, options);
-        /// <inheritdoc />
-        public Task SyncPermissionsAsync(RequestOptions options = null)
-            => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
-        #endregion
+        /// <inheritdoc/>
+        /// <exception cref="InvalidOperationException">Cannot modify text channel properties of a voice channel.</exception>
+        public override Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
+            => throw new InvalidOperationException("Cannot modify text channel properties of a voice channel");
 
-        #region Invites
-        /// <inheritdoc />
-        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        public async Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteToApplicationAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, applicationId, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        public virtual async Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteToApplicationAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, (ulong)application, options);
-        /// <inheritdoc />
-        public async Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteToStreamAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, user, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
-            => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
+        /// <inheritdoc/>
+        /// <exception cref="InvalidOperationException">Cannot create a thread within a voice channel.</exception>
+        public override Task<RestThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
+            => throw new InvalidOperationException("Cannot create a thread within a voice channel");
+
+        #endregion
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
+
+        #region TextOverrides
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task<RestMessage> GetMessageAsync(ulong id, RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.GetMessageAsync(id, options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.DeleteMessageAsync(message, options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.DeleteMessageAsync(messageId, options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.DeleteMessagesAsync(messages, options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.DeleteMessagesAsync(messageIds, options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override IDisposable EnterTypingState(RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.EnterTypingState(options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = 100, RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.GetMessagesAsync(fromMessage, dir, limit, options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = 100, RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.GetMessagesAsync(limit, options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = 100, RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.GetMessagesAsync(fromMessageId, dir, limit, options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.GetPinnedMessagesAsync(options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.GetWebhookAsync(id, options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.GetWebhooksAsync(options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.CreateWebhookAsync(name, avatar, options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task<IUserMessage> ModifyMessageAsync(ulong messageId, Action<MessageProperties> func, RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.ModifyMessageAsync(messageId, func, options);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task<RestUserMessage> SendFileAsync(FileAttachment attachment, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.SendFileAsync(attachment, text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler, allowedMentions, messageReference, components, stickers, embeds, flags);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.SendFileAsync(filePath, text, isTTS, embed, options, isSpoiler, allowedMentions, messageReference, components, stickers, embeds, flags);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task<RestUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.SendFilesAsync(attachments, text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags);
+        }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
+        public override Task TriggerTypingAsync(RequestOptions options = null)
+        {
+            if (!IsTextInVoice)
+                throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
+            return base.TriggerTypingAsync(options);
+        }
+
         #endregion
+
 
         #region IAudioChannel
         /// <inheritdoc />

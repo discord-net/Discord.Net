@@ -32,9 +32,15 @@ namespace Discord.Rest
         ///     Initializes a new <see cref="DiscordRestClient"/> with the provided configuration.
         /// </summary>
         /// <param name="config">The configuration to be used with the client.</param>
-        public DiscordRestClient(DiscordRestConfig config) : base(config, CreateApiClient(config)) { }
+        public DiscordRestClient(DiscordRestConfig config) : base(config, CreateApiClient(config))
+        {
+            _apiOnCreation = config.APIOnRestInteractionCreation;
+        }
         // used for socket client rest access
-        internal DiscordRestClient(DiscordRestConfig config, API.DiscordRestApiClient api) : base(config, api) { }
+        internal DiscordRestClient(DiscordRestConfig config, API.DiscordRestApiClient api) : base(config, api)
+        {
+            _apiOnCreation = config.APIOnRestInteractionCreation;
+        }
 
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
             => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, serializer: Serializer, useSystemClock: config.UseSystemClock, defaultRatelimitCallback: config.DefaultRatelimitCallback);
@@ -82,6 +88,8 @@ namespace Discord.Rest
 
         #region Rest interactions
 
+        private readonly bool _apiOnCreation;
+
         public bool IsValidHttpInteraction(string publicKey, string signature, string timestamp, string body)
             => IsValidHttpInteraction(publicKey, signature, timestamp, Encoding.UTF8.GetBytes(body));
         public bool IsValidHttpInteraction(string publicKey, string signature, string timestamp, byte[] body)
@@ -113,8 +121,8 @@ namespace Discord.Rest
         ///     A <see cref="RestInteraction"/> that represents the incoming http interaction.
         /// </returns>
         /// <exception cref="BadSignatureException">Thrown when the signature doesn't match the public key.</exception>
-        public Task<RestInteraction> ParseHttpInteractionAsync(string publicKey, string signature, string timestamp, string body)
-            => ParseHttpInteractionAsync(publicKey, signature, timestamp, Encoding.UTF8.GetBytes(body));
+        public Task<RestInteraction> ParseHttpInteractionAsync(string publicKey, string signature, string timestamp, string body, Func<InteractionType, bool> doApiCallOnCreation = null)
+            => ParseHttpInteractionAsync(publicKey, signature, timestamp, Encoding.UTF8.GetBytes(body), doApiCallOnCreation);
 
         /// <summary>
         ///     Creates a <see cref="RestInteraction"/> from a http message.
@@ -127,7 +135,7 @@ namespace Discord.Rest
         ///     A <see cref="RestInteraction"/> that represents the incoming http interaction.
         /// </returns>
         /// <exception cref="BadSignatureException">Thrown when the signature doesn't match the public key.</exception>
-        public async Task<RestInteraction> ParseHttpInteractionAsync(string publicKey, string signature, string timestamp, byte[] body)
+        public async Task<RestInteraction> ParseHttpInteractionAsync(string publicKey, string signature, string timestamp, byte[] body, Func<InteractionType, bool> doApiCallOnCreation = null)
         {
             if (!IsValidHttpInteraction(publicKey, signature, timestamp, body))
             {
@@ -138,12 +146,12 @@ namespace Discord.Rest
             using (var jsonReader = new JsonTextReader(textReader))
             {
                 var model = Serializer.Deserialize<API.Interaction>(jsonReader);
-                return await RestInteraction.CreateAsync(this, model);
+                return await RestInteraction.CreateAsync(this, model, doApiCallOnCreation != null ? doApiCallOnCreation(model.Type) : _apiOnCreation);
             }
         }
 
         #endregion
-
+        
         public async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
         {
             return _applicationInfo ??= await ClientHelper.GetApplicationInfoAsync(this, options).ConfigureAwait(false);

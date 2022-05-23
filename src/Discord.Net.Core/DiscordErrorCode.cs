@@ -58,6 +58,7 @@ namespace Discord
         #endregion
 
         #region General Actions (20XXX)
+        UnknownTag = 10087,
         BotsCannotUse = 20001,
         OnlyBotsCanUse = 20002,
         CannotSendExplicitContent = 20009,
@@ -98,6 +99,8 @@ namespace Discord
 
         #region General Request Errors (40XXX)
         MaximumNumberOfEditsReached = 30046,
+        MaximumNumberOfPinnedThreadsInAForumChannelReached = 30047,
+        MaximumNumberOfTagsInAForumChannelReached = 30048,
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
         OpeningDMTooFast = 40003,
@@ -112,6 +115,7 @@ namespace Discord
 
         #region Action Preconditions/Checks (50XXX)
         InteractionHasAlreadyBeenAcknowledged = 40060,
+        TagNamesMustBeUnique = 40061,
         MissingPermissions = 50001,
         InvalidAccountType = 50002,
         CannotExecuteForDM = 50003,
@@ -148,6 +152,7 @@ namespace Discord
         InvalidMessageType = 50068,
         PaymentSourceRequiredForGift = 50070,
         CannotDeleteRequiredCommunityChannel = 50074,
+        CannotEditStickersWithinAMessage = 50080,
         InvalidSticker = 50081,
         CannotExecuteOnArchivedThread = 50083,
         InvalidThreadNotificationSettings = 50084,

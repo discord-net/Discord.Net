@@ -70,7 +70,8 @@ namespace Discord.API
         //ForumChannel
         [JsonProperty("available_tags")]
         public Optional<ForumTags[]> ForumTags { get; set; }
+        
         [JsonProperty("default_auto_archive_duration")]
-        public Optional<ThreadArchiveDuration> DefaultAutoArchiveDuration { get; set; }
+        public Optional<ThreadArchiveDuration> AutoArchiveDuration { get; set; }
     }
 }
