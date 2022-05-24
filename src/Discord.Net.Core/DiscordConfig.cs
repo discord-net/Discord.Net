@@ -138,7 +138,7 @@ namespace Discord
         public const int MaxStickersPerMessage = 3;
 
         /// <summary>
-        ///     Returns the max number of embeds that can be sent on a message.
+        ///     Returns the max number of embeds that can be sent with a message.
         /// </summary>
         public const int MaxEmbedsPerMessage = 10;
 
