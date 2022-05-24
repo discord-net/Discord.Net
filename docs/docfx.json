@@ -60,7 +60,7 @@
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
       "_appTitle": "Discord.Net Documentation",
-      "_appFooter": "Discord.Net (c) 2015-2022 3.6.1",
+      "_appFooter": "Discord.Net (c) 2015-2022 3.7.0",
       "_enableSearch": true,
       "_appLogoPath": "marketing/logo/SVG/Logomark Purple.svg",
       "_appFaviconPath": "favicon.ico"

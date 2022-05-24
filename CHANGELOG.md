@@ -1,5 +1,26 @@
 # Changelog
 
+## [3.7.0] - 2022-05-24
+### Added
+- #2269 Text-In-Voice (23656e8)
+- #2281 Optional API calling to RestInteraction (a24dde4)
+- #2283 Support FailIfNotExists on MessageReference (0ec8938)
+- #2284 Add Parse & TryParse to EmbedBuilder & Add ToJsonString extension (cea59b5)
+- #2289 Add UpdateAsync to SocketModal (b333de2)
+- #2291 Webhook support for threads (b0a3b65)
+- #2295 Add DefaultArchiveDuration to ITextChannel (1f01881)
+- #2296 Add `.With` methods to ActionRowBuilder (13ccc7c)
+- #2307 Add Nullable ComponentTypeConverter and TypeReader (6fbd396)
+- #2316 Forum channels (7a07fd6)
+
+### Fixed
+- #2290 Possible NRE in Sanitize (20ffa64)
+- #2293 Application commands are disabled to everyone except admins by default (b465d60)
+- #2299 Close-stage bucketId being null (725d255)
+- #2313 Upload file size limit being incorrectly calculated (54a5af7)
+- #2319 Use `IDiscordClient.GetUserAsync` impl in `DiscordSocketClient` (f47f319)
+- #2320 NRE with bot scope and user parameters (88f6168)
+
 ## [3.6.1] - 2022-04-30
 ### Added
 - #2272 add 50080 Error code (503e720)
