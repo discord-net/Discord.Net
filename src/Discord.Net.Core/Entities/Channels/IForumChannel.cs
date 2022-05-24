@@ -187,7 +187,7 @@ namespace Discord
         Task<IReadOnlyCollection<IThreadChannel>> GetPublicArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null);
 
         /// <summary>
-        ///     Gets a collection of privatly archived threads within this forum channel.
+        ///     Gets a collection of privately archived threads within this forum channel.
         /// </summary>
         /// <remarks>
         ///     The bot requires the <see cref="GuildPermission.ManageThreads"/> permission in order to execute this request.
