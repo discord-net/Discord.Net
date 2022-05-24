@@ -133,6 +133,16 @@ namespace Discord
         public const int MaxAuditLogEntriesPerBatch = 100;
 
         /// <summary>
+        ///     Returns the max number of stickers that can be sent with a message.
+        /// </summary>
+        public const int MaxStickersPerMessage = 3;
+
+        /// <summary>
+        ///     Returns the max number of embeds that can be sent with a message.
+        /// </summary>
+        public const int MaxEmbedsPerMessage = 10;
+
+        /// <summary>
         ///     Gets or sets how a request should act in the case of an error, by default.
         /// </summary>
         /// <returns>

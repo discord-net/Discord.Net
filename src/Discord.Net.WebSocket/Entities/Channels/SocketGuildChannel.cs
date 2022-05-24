@@ -59,6 +59,7 @@ namespace Discord.WebSocket
                 ChannelType.Category => SocketCategoryChannel.Create(guild, state, model),
                 ChannelType.PrivateThread or ChannelType.PublicThread or ChannelType.NewsThread => SocketThreadChannel.Create(guild, state, model),
                 ChannelType.Stage => SocketStageChannel.Create(guild, state, model),
+                ChannelType.Forum => SocketForumChannel.Create(guild, state, model),
                 _ => new SocketGuildChannel(guild.Discord, model.Id, guild),
             };
         }

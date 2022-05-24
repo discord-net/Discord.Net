@@ -466,6 +466,24 @@ namespace Discord.API
         #endregion
 
         #region Threads
+        public async Task<Channel> CreatePostAsync(ulong channelId, CreatePostParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            var bucket = new BucketIds(channelId: channelId);
+
+            return await SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/threads", args, bucket, options: options);
+        }
+
+        public async Task<Channel> CreatePostAsync(ulong channelId, CreateMultipartPostAsync args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            var bucket = new BucketIds(channelId: channelId);
+
+            return await SendMultipartAsync<Channel>("POST", () => $"channels/{channelId}/threads", args.ToDictionary(), bucket, options: options);
+        }
+
         public async Task<Channel> ModifyThreadAsync(ulong channelId, ModifyThreadParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
@@ -566,15 +584,15 @@ namespace Discord.API
             return await SendAsync<ThreadMember>("GET", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options).ConfigureAwait(false);
         }
 
-        public async Task<ChannelThreads> GetActiveThreadsAsync(ulong channelId, RequestOptions options = null)
+        public async Task<ChannelThreads> GetActiveThreadsAsync(ulong guildId, RequestOptions options = null)
         {
-            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             options = RequestOptions.CreateOrClone(options);
 
-            var bucket = new BucketIds(channelId: channelId);
+            var bucket = new BucketIds(guildId: guildId);
 
-            return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/active", bucket, options: options);
+            return await SendAsync<ChannelThreads>("GET", () => $"guilds/{guildId}/threads/active", bucket, options: options);
         }
 
         public async Task<ChannelThreads> GetPublicArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null, RequestOptions options = null)
