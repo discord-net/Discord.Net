@@ -5,8 +5,8 @@
         <Authors>Discord.Net Contributors</Authors>
         <PackageTags>discord;discordapp</PackageTags>
         <PackageProjectUrl>https://github.com/Discord-Net/Discord.Net</PackageProjectUrl>
-        <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
-        <PackageIconUrl>https://github.com/Discord-Net/Discord.Net/raw/dev/docs/marketing/logo/PackageLogo.png</PackageIconUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>PackageLogo.png</PackageIcon>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>git://github.com/Discord-Net/Discord.Net</RepositoryUrl>
     </PropertyGroup>
@@ -23,4 +23,7 @@
         <WarningsAsErrors>true</WarningsAsErrors>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
+    <ItemGroup>
+        <None Include="../../docs/marketing/logo/PackageLogo.png" Pack="true" PackagePath=""/>
+    </ItemGroup>
 </Project>
