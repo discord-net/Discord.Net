@@ -202,7 +202,7 @@ namespace Discord
         Task<IReadOnlyCollection<IThreadChannel>> GetPrivateArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null);
 
         /// <summary>
-        ///     Gets a collection of privatly archived threads that the current bot has joined within this forum channel.
+        ///     Gets a collection of privately archived threads that the current bot has joined within this forum channel.
         /// </summary>
         /// <param name="limit">The optional limit of how many to get.</param>
         /// <param name="before">The optional date to return threads created before this timestamp.</param>
