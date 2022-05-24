@@ -209,7 +209,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
-        ///     a collection of privatly archived threads.
+        ///     a collection of privately archived threads.
         /// </returns>
         Task<IReadOnlyCollection<IThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null);
     }
