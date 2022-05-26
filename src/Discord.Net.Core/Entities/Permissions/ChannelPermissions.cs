@@ -51,11 +51,16 @@ namespace Discord
         /// <exception cref="ArgumentException">Unknown channel type.</exception>
         public static ChannelPermissions All(IChannel channel)
         {
+            // Because IVoiceChannel implements ITextChannel, the switch will allow voice to pass as text.
+            //
+            // This check will prevent that and first attempt to cast as voice instead.
+            if (channel is IVoiceChannel)
+                return Voice;
+
             return channel switch
             {
                 ITextChannel _ => Text,
                 IStageChannel _ => Stage,
-                IVoiceChannel _ => Voice,
                 ICategoryChannel _ => Category,
                 IDMChannel _ => DM,
                 IGroupChannel _ => Group,
