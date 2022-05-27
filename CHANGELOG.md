@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.7.1] - 2022-5-27
+### Added
+- #2325 Add missing interaction properties (d3a693a)
+- #2330 Add better call control in ParseHttpInteraction (a890de9)
+
+### Fixed
+- #2329 Voice perms not retaining text perms. (712a4ae)
+- #2331 NRE with Cacheable.DownloadAsync() (e1f9b76)
+
 ## [3.7.0] - 2022-05-24
 ### Added
 - #2269 Text-In-Voice (23656e8)
