@@ -52,7 +52,7 @@ namespace Discord.Rest
         ///     Gets the channel ID of the interaction.
         /// </summary>
         /// <remarks>
-        ///     This will be <see langword="null"/> if this interaction was executed in DM.
+        ///     This will be <see langword="null"/> if this interaction is <see cref="InteractionType.Ping"/>.
         /// </remarks>
         public ulong? ChannelId { get; }
 
