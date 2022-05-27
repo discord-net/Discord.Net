@@ -154,7 +154,7 @@ namespace Discord
         #endregion
 
         #region 2FA (60XXX)
-        YouDoNotHavePermissionToSendThisSticker. = 50600,
+        MissingPermissionToSendThisSticker = 50600,
         Requires2FA = 60003,
         #endregion
 
