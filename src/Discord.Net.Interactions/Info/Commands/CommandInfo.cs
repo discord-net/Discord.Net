@@ -110,11 +110,10 @@ namespace Discord.Interactions
         {
             await CommandService._cmdLogger.DebugAsync($"Executing {GetLogString(context)}").ConfigureAwait(false);
 
+            using var scope = services?.CreateScope();
+            
             if (CommandService._autoServiceScopes)
-            {
-                using var scope = services?.CreateScope();
                 services = scope?.ServiceProvider ?? EmptyServiceProvider.Instance;
-            }
 
             try
             {

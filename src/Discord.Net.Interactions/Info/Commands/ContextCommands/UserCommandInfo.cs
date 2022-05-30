@@ -17,7 +17,7 @@ namespace Discord.Interactions
             if (context.Interaction is not IUserCommandInteraction userCommand)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Message Command Interation");
 
-            return await ExecuteAsync(context, services).ConfigureAwait(false);
+            return await base.ExecuteAsync(context, services).ConfigureAwait(false);
         }
 
         protected override Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
