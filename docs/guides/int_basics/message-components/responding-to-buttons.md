@@ -7,7 +7,7 @@ title: Responding to Components
 
 Responding to buttons is pretty simple, there are a couple ways of doing it and we can cover both.
 
-### Method 1: Hooking the InteractionCreated Event
+### Method 1: Hooking the ButtonExecuted Event
 
 We can hook the `ButtonExecuted` event for button type interactions:
 
