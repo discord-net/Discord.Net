@@ -426,16 +426,35 @@ namespace Discord.Interactions
         ///     use <see cref="AddModulesToGuildAsync(IGuild, bool, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
         /// </remarks>
         /// <param name="guild">The target guild.</param>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="commands">Commands to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
         /// </returns>
         public async Task<IReadOnlyCollection<RestGuildCommand>> AddCommandsToGuildAsync(IGuild guild, bool deleteMissing = false, params ICommandInfo[] commands)
         {
-            EnsureClientReady();
-
             if (guild is null)
                 throw new ArgumentNullException(nameof(guild));
+
+            return await AddCommandsToGuildAsync(guild.Id, deleteMissing, commands).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Register Application Commands from <paramref name="commands"/> to a guild.
+        /// </summary>
+        /// <remarks>
+        ///     Commands will be registered as standalone commands, if you want the <see cref="GroupAttribute"/> to take effect,
+        ///     use <see cref="AddModulesToGuildAsync(ulong, bool, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
+        /// </remarks>
+        /// <param name="guildId">The target guild ID.</param>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="commands">Commands to be registered to Discord.</param>
+        /// <returns>
+        ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestGuildCommand>> AddCommandsToGuildAsync(ulong guildId, bool deleteMissing = false, params ICommandInfo[] commands)
+        {
+            EnsureClientReady();
 
             var props = new List<ApplicationCommandProperties>();
 
@@ -456,44 +475,60 @@ namespace Discord.Interactions
 
             if (!deleteMissing)
             {
-                var existing = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
+                var existing = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
                 var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
                 props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
             }
 
-            return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guild.Id).ConfigureAwait(false);
+            return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guildId).ConfigureAwait(false);
         }
 
         /// <summary>
         ///     Register Application Commands from modules provided in <paramref name="modules"/> to a guild.
         /// </summary>
         /// <param name="guild">The target guild.</param>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="modules">Modules to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
         /// </returns>
         public async Task<IReadOnlyCollection<RestGuildCommand>> AddModulesToGuildAsync(IGuild guild, bool deleteMissing = false, params ModuleInfo[] modules)
         {
-            EnsureClientReady();
-
             if (guild is null)
                 throw new ArgumentNullException(nameof(guild));
+
+            return await AddModulesToGuildAsync(guild.Id, deleteMissing, modules).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Register Application Commands from modules provided in <paramref name="modules"/> to a guild.
+        /// </summary>
+        /// <param name="guildId">The target guild ID.</param>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="modules">Modules to be registered to Discord.</param>
+        /// <returns>
+        ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestGuildCommand>> AddModulesToGuildAsync(ulong guildId, bool deleteMissing = false, params ModuleInfo[] modules)
+        {
+            EnsureClientReady();
 
             var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).ToList();
 
             if (!deleteMissing)
             {
-                var existing = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
+                var existing = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
                 var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
                 props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
             }
 
-            return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guild.Id).ConfigureAwait(false);
+            return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guildId).ConfigureAwait(false);
         }
 
         /// <summary>
         ///     Register Application Commands from modules provided in <paramref name="modules"/> as global commands.
         /// </summary>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="modules">Modules to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
@@ -521,6 +556,7 @@ namespace Discord.Interactions
         ///     Commands will be registered as standalone commands, if you want the <see cref="GroupAttribute"/> to take effect,
         ///     use <see cref="AddModulesToGuildAsync(IGuild, bool, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
         /// </remarks>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="commands">Commands to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
@@ -1086,19 +1122,40 @@ namespace Discord.Interactions
         /// <returns>
         ///     The active command permissions after the modification.
         /// </returns>
-        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync (ModuleInfo module, IGuild guild,
+        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync(ModuleInfo module, IGuild guild,
             params ApplicationCommandPermission[] permissions)
         {
+            if (module is null)
+                throw new ArgumentNullException(nameof(module));
+
+            if (guild is null)
+                throw new ArgumentNullException(nameof(guild));
+
+            return await ModifySlashCommandPermissionsAsync(module, guild.Id, permissions).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Modify the command permissions of the matching Discord Slash Command.
+        /// </summary>
+        /// <param name="module">Module representing the top level Slash Command.</param>
+        /// <param name="guildId">Target guild ID.</param>
+        /// <param name="permissions">New permission values.</param>
+        /// <returns>
+        ///     The active command permissions after the modification.
+        /// </returns>
+        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync(ModuleInfo module, ulong guildId,
+            params ApplicationCommandPermission[] permissions)
+        {
+            if (module is null)
+                throw new ArgumentNullException(nameof(module));
+
             if (!module.IsSlashGroup)
                 throw new InvalidOperationException($"This module does not have a {nameof(GroupAttribute)} and does not represent an Application Command");
 
             if (!module.IsTopLevelGroup)
                 throw new InvalidOperationException("This module is not a top level application command. You cannot change its permissions");
 
-            if (guild is null)
-                throw new ArgumentNullException("guild");
-
-            var commands = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
+            var commands = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
             var appCommand = commands.First(x => x.Name == module.SlashGroupName);
 
             return await appCommand.ModifyCommandPermissions(permissions).ConfigureAwait(false);
@@ -1113,9 +1170,29 @@ namespace Discord.Interactions
         /// <returns>
         ///     The active command permissions after the modification.
         /// </returns>
-        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync (SlashCommandInfo command, IGuild guild,
-            params ApplicationCommandPermission[] permissions) =>
-            await ModifyApplicationCommandPermissionsAsync(command, guild, permissions).ConfigureAwait(false);
+        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync(SlashCommandInfo command, IGuild guild,
+            params ApplicationCommandPermission[] permissions)
+        {
+            if (command is null)
+                throw new ArgumentNullException(nameof(command));
+
+            if (guild is null)
+                throw new ArgumentNullException(nameof(guild));
+
+            return await ModifyApplicationCommandPermissionsAsync(command, guild.Id, permissions).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Modify the command permissions of the matching Discord Slash Command.
+        /// </summary>
+        /// <param name="command">The Slash Command.</param>
+        /// <param name="guildId">Target guild ID.</param>
+        /// <param name="permissions">New permission values.</param>
+        /// <returns>
+        ///     The active command permissions after the modification.
+        /// </returns>
+        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync(SlashCommandInfo command, ulong guildId,
+            params ApplicationCommandPermission[] permissions) => await ModifyApplicationCommandPermissionsAsync(command, guildId, permissions).ConfigureAwait(false);
 
         /// <summary>
         ///     Modify the command permissions of the matching Discord Slash Command.
@@ -1126,20 +1203,40 @@ namespace Discord.Interactions
         /// <returns>
         ///     The active command permissions after the modification.
         /// </returns>
-        public async Task<GuildApplicationCommandPermission> ModifyContextCommandPermissionsAsync (ContextCommandInfo command, IGuild guild,
-            params ApplicationCommandPermission[] permissions) =>
-            await ModifyApplicationCommandPermissionsAsync(command, guild, permissions).ConfigureAwait(false);
+        public async Task<GuildApplicationCommandPermission> ModifyContextCommandPermissionsAsync(ContextCommandInfo command, IGuild guild,
+            params ApplicationCommandPermission[] permissions)
+        {
+            if (command is null)
+                throw new ArgumentNullException(nameof(command));
 
-        private async Task<GuildApplicationCommandPermission> ModifyApplicationCommandPermissionsAsync<T> (T command, IGuild guild,
+            if (guild is null)
+                throw new ArgumentNullException(nameof(guild));
+
+            return await ModifyApplicationCommandPermissionsAsync(command, guild.Id, permissions).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Modify the command permissions of the matching Discord Slash Command.
+        /// </summary>
+        /// <param name="command">The Context Command.</param>
+        /// <param name="guildId">Target guild ID.</param>
+        /// <param name="permissions">New permission values.</param>
+        /// <returns>
+        ///     The active command permissions after the modification.
+        /// </returns>
+        public async Task<GuildApplicationCommandPermission> ModifyContextCommandPermissionsAsync(ContextCommandInfo command, ulong guildId,
+            params ApplicationCommandPermission[] permissions) => await ModifyApplicationCommandPermissionsAsync(command, guildId, permissions).ConfigureAwait(false);
+
+        private async Task<GuildApplicationCommandPermission> ModifyApplicationCommandPermissionsAsync<T> (T command, ulong guildId,
             params ApplicationCommandPermission[] permissions) where T : class, IApplicationCommandInfo, ICommandInfo
         {
+            if (command is null)
+                throw new ArgumentNullException(nameof(command));
+
             if (!command.IsTopLevelCommand)
                 throw new InvalidOperationException("This command is not a top level application command. You cannot change its permissions");
 
-            if (guild is null)
-                throw new ArgumentNullException("guild");
-
-            var commands = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
+            var commands = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
             var appCommand = commands.First(x => x.Name == ( command as IApplicationCommandInfo ).Name);
 
             return await appCommand.ModifyCommandPermissions(permissions).ConfigureAwait(false);
