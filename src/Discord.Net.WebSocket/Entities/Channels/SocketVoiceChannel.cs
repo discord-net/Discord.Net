@@ -21,8 +21,12 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets whether or not the guild has Text-In-Voice enabled and the voice channel is a TiV channel.
         /// </summary>
-        public virtual bool IsTextInVoice
-            => Guild.Features.HasTextInVoice;
+        /// <remarks>
+        ///     Discord currently doesn't have a way to disable Text-In-Voice yet so this field is always
+        ///     <see langword="true"/> on <see cref="SocketVoiceChannel"/>s and <see langword="false"/> on
+        ///     <see cref="SocketStageChannel"/>s.
+        /// </remarks>
+        public virtual bool IsTextInVoice => true;
 
         /// <inheritdoc />
         public int Bitrate { get; private set; }
