@@ -8,34 +8,39 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a generic message builder that can build <see cref="Message"/>s.
+    ///     Represents a generic message builder that can build <see cref="Message"/>'s.
     /// </summary>
     public class MessageBuilder
     {
-        private string _content;
-        private List<ISticker> _stickers = new();
-        private List<EmbedBuilder> _embeds = new();
-        private List<FileAttachment> _files = new();
+        private readonly List<FileAttachment> _files;
+
+        private List<ISticker> _stickers;
+        private List<EmbedBuilder> _embeds;
+
         /// <summary>
         ///     Gets or sets the content of this message
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">The content is bigger than the <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public string Content
-        {
-            get => _content;
-            set
-            {
-                if (_content?.Length > DiscordConfig.MaxMessageSize)
-                    throw new ArgumentOutOfRangeException(nameof(value), $"Message size must be less than or equal to {DiscordConfig.MaxMessageSize} characters");
-
-                _content = value;
-            }
-        }
+        public TextBuilder Content { get; set; }
 
         /// <summary>
         ///     Gets or sets whether or not this message is TTS.
         /// </summary>
         public bool IsTTS { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the allowed mentions of this message.
+        /// </summary>
+        public AllowedMentions AllowedMentions { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the message reference (reply to) of this message.
+        /// </summary>
+        public MessageReference MessageReference { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the components of this message.
+        /// </summary>
+        public ComponentBuilder Components { get; set; }
 
         /// <summary>
         ///     Gets or sets the embeds of this message.
@@ -51,21 +56,6 @@ namespace Discord
                 _embeds = value;
             }
         }
-
-        /// <summary>
-        ///     Gets or sets the allowed mentions of this message.
-        /// </summary>
-        public AllowedMentions AllowedMentions { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the message reference (reply to) of this message.
-        /// </summary>
-        public MessageReference MessageReference { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the components of this message.
-        /// </summary>
-        public ComponentBuilder Components { get; set; } = new();
 
         /// <summary>
         ///     Gets or sets the stickers sent with this message.
@@ -101,13 +91,31 @@ namespace Discord
         public MessageFlags Flags { get; set; }
 
         /// <summary>
+        ///     Creates a new <see cref="MessageBuilder"/> based on the value of <paramref name="content"/>.
+        /// </summary>
+        /// <param name="content">The message content to create this <see cref="MessageBuilder"/> from.</param>
+        public MessageBuilder(string content)
+        {
+            Content = new TextBuilder(content);
+        }
+
+        public MessageBuilder()
+        {
+            _embeds = new();
+            _stickers = new();
+            _files = new();
+
+            Components = new();
+        }
+
+        /// <summary>
         ///     Sets the <see cref="Content"/> of this message.
         /// </summary>
         /// <param name="content">The content of the message.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder WithContent(string content)
+        public virtual MessageBuilder WithContent(TextBuilder builder)
         {
-            Content = content;
+            Content = builder;
             return this;
         }
 
@@ -116,7 +124,7 @@ namespace Discord
         /// </summary>
         /// <param name="isTTS">whether or not this message is tts.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder WithTTS(bool isTTS)
+        public virtual MessageBuilder WithTTS(bool isTTS)
         {
             IsTTS = isTTS;
             return this;
@@ -128,7 +136,7 @@ namespace Discord
         /// <param name="embeds">The embeds to be put in this message.</param>
         /// <returns>The current builder.</returns>
         /// <exception cref="ArgumentOutOfRangeException">A message can only contain a maximum of <see cref="DiscordConfig.MaxEmbedsPerMessage"/> embeds.</exception>
-        public MessageBuilder WithEmbeds(params EmbedBuilder[] embeds)
+        public virtual MessageBuilder WithEmbeds(params EmbedBuilder[] embeds)
         {
             Embeds = new(embeds);
             return this;
@@ -140,7 +148,7 @@ namespace Discord
         /// <param name="embed">The embed builder to add</param>
         /// <returns>The current builder.</returns>
         /// <exception cref="ArgumentOutOfRangeException">A message can only contain a maximum of <see cref="DiscordConfig.MaxEmbedsPerMessage"/> embeds.</exception>
-        public MessageBuilder AddEmbed(EmbedBuilder embed)
+        public virtual MessageBuilder AddEmbed(EmbedBuilder embed)
         {
             if (_embeds?.Count >= DiscordConfig.MaxEmbedsPerMessage)
                 throw new ArgumentOutOfRangeException(nameof(embed.Length), $"A message can only contain a maximum of {DiscordConfig.MaxEmbedsPerMessage} embeds");
@@ -157,7 +165,7 @@ namespace Discord
         /// </summary>
         /// <param name="allowedMentions">The allowed mentions for this message.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder WithAllowedMentions(AllowedMentions allowedMentions)
+        public virtual MessageBuilder WithAllowedMentions(AllowedMentions allowedMentions)
         {
             AllowedMentions = allowedMentions;
             return this;
@@ -168,7 +176,7 @@ namespace Discord
         /// </summary>
         /// <param name="reference">The message reference (reply-to) for this message.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder WithMessageReference(MessageReference reference)
+        public virtual MessageBuilder WithMessageReference(MessageReference reference)
         {
             MessageReference = reference;
             return this;
@@ -179,7 +187,7 @@ namespace Discord
         /// </summary>
         /// <param name="message">The message to set as a reference.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder WithMessageReference(IMessage message)
+        public virtual MessageBuilder WithMessageReference(IMessage message)
         {
             if (message != null)
                 MessageReference = new MessageReference(message.Id, message.Channel?.Id, ((IGuildChannel)message.Channel)?.GuildId);
@@ -191,7 +199,7 @@ namespace Discord
         /// </summary>
         /// <param name="builder">The component builder to set.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder WithComponentBuilder(ComponentBuilder builder)
+        public virtual MessageBuilder WithComponentBuilder(ComponentBuilder builder)
         {
             Components = builder;
             return this;
@@ -203,7 +211,7 @@ namespace Discord
         /// <param name="button">The button builder to add.</param>
         /// <param name="row">The optional row to place the button on.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder WithButton(ButtonBuilder button, int row = 0)
+        public virtual MessageBuilder WithButton(ButtonBuilder button, int row = 0)
         {
             Components ??= new();
             Components.WithButton(button, row);
@@ -221,7 +229,7 @@ namespace Discord
         /// <param name="disabled">Whether or not the newly created button is disabled.</param>
         /// <param name="row">The row the button should be placed on.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder WithButton(
+        public virtual MessageBuilder WithButton(
             string label = null,
             string customId = null,
             ButtonStyle style = ButtonStyle.Primary,
@@ -241,7 +249,7 @@ namespace Discord
         /// <param name="menu">The select menu builder to add.</param>
         /// <param name="row">The optional row to place the select menu on.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder WithSelectMenu(SelectMenuBuilder menu, int row = 0)
+        public virtual MessageBuilder WithSelectMenu(SelectMenuBuilder menu, int row = 0)
         {
             Components ??= new();
             Components.WithSelectMenu(menu, row);
@@ -259,7 +267,7 @@ namespace Discord
         /// <param name="disabled">Whether or not the menu is disabled.</param>
         /// <param name="row">The row to add the menu to.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options,
+        public virtual MessageBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options,
             string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false, int row = 0)
         {
             Components ??= new();
@@ -272,7 +280,7 @@ namespace Discord
         /// </summary>
         /// <param name="files">The file collection to set.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder WithFiles(IEnumerable<FileAttachment> files)
+        public virtual MessageBuilder WithFiles(IEnumerable<FileAttachment> files)
         {
             Files = new List<FileAttachment>(files);
             return this;
@@ -283,7 +291,7 @@ namespace Discord
         /// </summary>
         /// <param name="file">The file to add.</param>
         /// <returns>The current builder.</returns>
-        public MessageBuilder AddFile(FileAttachment file)
+        public virtual MessageBuilder AddFile(FileAttachment file)
         {
             Files.Add(file);
             return this;
@@ -300,7 +308,7 @@ namespace Discord
                 : ImmutableArray<Embed>.Empty;
 
             return new Message(
-                _content,
+                Content.Build(),
                 IsTTS,
                 embeds,
                 AllowedMentions,
