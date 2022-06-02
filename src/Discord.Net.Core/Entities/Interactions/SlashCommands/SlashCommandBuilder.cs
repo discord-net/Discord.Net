@@ -255,9 +255,6 @@ namespace Discord
             if (options == null)
                 throw new ArgumentNullException(nameof(options), "Options cannot be null!");
 
-            if (options.Length == 0)
-                throw new ArgumentException("Options cannot be empty!", nameof(options));
-
             Options ??= new List<SlashCommandOptionBuilder>();
 
             if (Options.Count + options.Length > MaxOptionsCount)
@@ -409,7 +406,7 @@ namespace Discord
                 MinValue = MinValue,
                 MaxValue = MaxValue
             };
-        }        
+        }
 
         /// <summary>
         ///     Adds an option to the current slash command.
@@ -474,6 +471,26 @@ namespace Discord
             Preconditions.Options(option.Name, option.Description); // double check again
 
             Options.Add(option);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a collection of options to the current option.
+        /// </summary>
+        /// <param name="options">The collection of options to add.</param>
+        /// <returns>The current builder.</returns>
+        public SlashCommandOptionBuilder AddOptions(params SlashCommandOptionBuilder[] options)
+        {
+            if (options == null)
+                throw new ArgumentNullException(nameof(options), "Options cannot be null!");
+
+            if ((Options?.Count ?? 0) + options.Length > SlashCommandBuilder.MaxOptionsCount)
+                throw new ArgumentOutOfRangeException(nameof(options), $"There can only be {SlashCommandBuilder.MaxOptionsCount} options per sub command group!");
+
+            foreach (var option in options)
+                Preconditions.Options(option.Name, option.Description);
+
+            Options.AddRange(options);
             return this;
         }
 
@@ -640,7 +657,7 @@ namespace Discord
             MinValue = value;
             return this;
         }
-        
+
         /// <summary>
         ///     Sets the current builders max value field.
         /// </summary>
