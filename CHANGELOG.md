@@ -1,6 +1,14 @@
 # Changelog
+## [3.7.2] - 2022-06-02
+### Added
+- #2328 Add method overloads to InteractionService (0fad3e8)
+- #2336 Add support for attachments on interaction response type 7 (35db22e)
+- #2338 AddOptions no longer has an uneeded restriction, added AddOptions to SlashCommandOptionBuilder (3a37f89)
 
-## [3.7.1] - 2022-5-27
+### Fixed
+- #2342 Disable TIV restrictions for rollout of TIV (7adf516)
+
+## [3.7.1] - 2022-05-27
 ### Added
 - #2325 Add missing interaction properties (d3a693a)
 - #2330 Add better call control in ParseHttpInteraction (a890de9)
