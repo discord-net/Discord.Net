@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Discord
@@ -35,5 +36,21 @@ namespace Discord
         ///     A string that resolves to <see cref="Discord.EmbedProvider.Name" />.
         /// </returns>
         public override string ToString() => Name;
+
+        public static bool operator ==(EmbedProvider? left, EmbedProvider? right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedProvider? left, EmbedProvider? right)
+            => !(left == right);
+
+        public override bool Equals(object obj)
+            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedProvider?);
+
+        public bool Equals(EmbedProvider embedProvider)
+            => GetHashCode() == embedProvider.GetHashCode();
+
+        public override int GetHashCode()
+            => HashCode.Combine(Name, Url);
     }
 }
