@@ -481,6 +481,40 @@ namespace Discord
 
             return new Embed(EmbedType.Rich, Title, Description, Url, Timestamp, Color, _image, null, Author?.Build(), Footer?.Build(), null, _thumbnail, fields.ToImmutable());
         }
+
+        public static bool operator ==(EmbedBuilder left, EmbedBuilder right)
+        => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedBuilder left, EmbedBuilder right)
+            => !(left == right);
+
+        public override bool Equals(object obj)
+            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedBuilder);
+
+        public bool Equals(EmbedBuilder embedBuilder)
+            => GetHashCode() == embedBuilder.GetHashCode();
+
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+            hashCode.Add(_title);
+            hashCode.Add(_description);
+            hashCode.Add(_image);
+            hashCode.Add(_thumbnail);
+            hashCode.Add(Timestamp);
+            hashCode.Add(Color);
+            hashCode.Add(Author);
+            hashCode.Add(Footer);
+            hashCode.Add(Url);
+
+            foreach (var field in _fields)
+            {
+                hashCode.Add(field);
+            }
+
+            return hashCode.ToHashCode();
+        }
     }
 
     /// <summary>
@@ -597,6 +631,22 @@ namespace Discord
         /// </exception>
         public EmbedField Build()
             => new EmbedField(Name, Value.ToString(), IsInline);
+
+        public static bool operator ==(EmbedFieldBuilder left, EmbedFieldBuilder right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedFieldBuilder left, EmbedFieldBuilder right)
+            => !(left == right);
+
+        public override bool Equals(object obj)
+            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedFieldBuilder);
+
+        public bool Equals(EmbedFieldBuilder embedFieldBuilder)
+            => GetHashCode() == embedFieldBuilder.GetHashCode();
+
+        public override int GetHashCode()
+            => HashCode.Combine(Name, Value, IsInline);
     }
 
     /// <summary>
@@ -697,6 +747,22 @@ namespace Discord
         /// </returns>
         public EmbedAuthor Build()
             => new EmbedAuthor(Name, Url, IconUrl, null);
+
+        public static bool operator ==(EmbedAuthorBuilder left, EmbedAuthorBuilder right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedAuthorBuilder left, EmbedAuthorBuilder right)
+            => !(left == right);
+
+        public override bool Equals(object obj)
+            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedAuthorBuilder);
+
+        public bool Equals(EmbedAuthorBuilder embedAuthorBuilder)
+            => GetHashCode() == embedAuthorBuilder.GetHashCode();
+
+        public override int GetHashCode()
+            => HashCode.Combine(Name, Url, IconUrl);
     }
 
     /// <summary>
@@ -777,5 +843,21 @@ namespace Discord
         /// </returns>
         public EmbedFooter Build()
             => new EmbedFooter(Text, IconUrl, null);
+
+        public static bool operator ==(EmbedFooterBuilder left, EmbedFooterBuilder right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedFooterBuilder left, EmbedFooterBuilder right)
+            => !(left == right);
+
+        public override bool Equals(object obj)
+            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedFooterBuilder);
+
+        public bool Equals(EmbedFooterBuilder embedFooterBuilder)
+            => GetHashCode() == embedFooterBuilder.GetHashCode();
+
+        public override int GetHashCode()
+            => HashCode.Combine(Text, IconUrl);
     }
 }

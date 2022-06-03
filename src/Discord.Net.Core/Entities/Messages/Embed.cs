@@ -94,5 +94,41 @@ namespace Discord
         /// </summary>
         public override string ToString() => Title;
         private string DebuggerDisplay => $"{Title} ({Type})";
+
+        public static bool operator ==(Embed left, Embed right)
+        => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(Embed left, Embed right)
+            => !(left == right);
+
+        public override bool Equals(object obj)
+            => obj is not null && GetType() == obj.GetType() && Equals(obj as Embed);
+
+        public bool Equals(Embed embed)
+            => GetHashCode() == embed.GetHashCode();
+
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+            hashCode.Add(Type);
+            hashCode.Add(Title);
+            hashCode.Add(Description);
+            hashCode.Add(Timestamp);
+            hashCode.Add(Color);
+            hashCode.Add(Image);
+            hashCode.Add(Video);
+            hashCode.Add(Author);
+            hashCode.Add(Footer);
+            hashCode.Add(Provider);
+            hashCode.Add(Thumbnail);
+
+            foreach (var field in Fields)
+            {
+                hashCode.Add(field);
+            }
+
+            return hashCode.ToHashCode();
+        }
     }
 }

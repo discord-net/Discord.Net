@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Discord
@@ -43,5 +44,21 @@ namespace Discord
         ///     A string that resolves to <see cref="Discord.EmbedFooter.Text"/>.
         /// </returns>
         public override string ToString() => Text;
+
+        public static bool operator ==(EmbedFooter? left, EmbedFooter? right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedFooter? left, EmbedFooter? right)
+            => !(left == right);
+
+        public override bool Equals(object obj)
+            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedFooter?);
+
+        public bool Equals(EmbedFooter embedFooter)
+            => GetHashCode() == embedFooter.GetHashCode();
+
+        public override int GetHashCode()
+            => HashCode.Combine(Text, IconUrl, ProxyUrl);
     }
 }

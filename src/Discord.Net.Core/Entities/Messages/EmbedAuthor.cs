@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Discord
@@ -41,5 +42,21 @@ namespace Discord
         ///     
         /// </returns>
         public override string ToString() => Name;
+
+        public static bool operator ==(EmbedAuthor? left, EmbedAuthor? right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedAuthor? left, EmbedAuthor? right)
+            => !(left == right);
+
+        public override bool Equals(object obj)
+            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedAuthor?);
+
+        public bool Equals(EmbedAuthor embedAuthor)
+            => GetHashCode() == embedAuthor.GetHashCode();
+
+        public override int GetHashCode()
+            => HashCode.Combine(Name, Url, IconUrl);
     }
 }

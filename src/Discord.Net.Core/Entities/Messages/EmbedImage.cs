@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Discord
@@ -53,5 +54,21 @@ namespace Discord
         ///     A string that resolves to <see cref="Discord.EmbedImage.Url"/> .
         /// </returns>
         public override string ToString() => Url;
+
+        public static bool operator ==(EmbedImage? left, EmbedImage? right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedImage? left, EmbedImage? right)
+            => !(left == right);
+
+        public override bool Equals(object obj)
+            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedImage?);
+
+        public bool Equals(EmbedImage embedImage)
+            => GetHashCode() == embedImage.GetHashCode();
+
+        public override int GetHashCode()
+            => HashCode.Combine(Height, Width, Url, ProxyUrl);
     }
 }

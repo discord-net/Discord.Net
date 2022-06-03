@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Discord
@@ -53,5 +54,21 @@ namespace Discord
         ///     A string that resolves to <see cref="Discord.EmbedThumbnail.Url" />.
         /// </returns>
         public override string ToString() => Url;
+
+        public static bool operator ==(EmbedThumbnail? left, EmbedThumbnail? right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedThumbnail? left, EmbedThumbnail? right)
+            => !(left == right);
+
+        public override bool Equals(object obj)
+            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedThumbnail?);
+
+        public bool Equals(EmbedThumbnail embedThumbnail)
+            => GetHashCode() == embedThumbnail.GetHashCode();
+
+        public override int GetHashCode()
+            => HashCode.Combine(Width, Height, Url, ProxyUrl);
     }
 }
