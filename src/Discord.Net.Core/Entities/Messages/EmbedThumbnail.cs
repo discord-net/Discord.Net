@@ -69,6 +69,6 @@ namespace Discord
             => GetHashCode() == embedThumbnail.GetHashCode();
 
         public override int GetHashCode()
-            => HashCode.Combine(Width, Height, Url, ProxyUrl);
+            => new { Width, Height, Url, ProxyUrl }.GetHashCode();
     }
 }

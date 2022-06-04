@@ -109,26 +109,6 @@ namespace Discord
             => GetHashCode() == embed.GetHashCode();
 
         public override int GetHashCode()
-        {
-            var hashCode = new HashCode();
-            hashCode.Add(Type);
-            hashCode.Add(Title);
-            hashCode.Add(Description);
-            hashCode.Add(Timestamp);
-            hashCode.Add(Color);
-            hashCode.Add(Image);
-            hashCode.Add(Video);
-            hashCode.Add(Author);
-            hashCode.Add(Footer);
-            hashCode.Add(Provider);
-            hashCode.Add(Thumbnail);
-
-            foreach (var field in Fields)
-            {
-                hashCode.Add(field);
-            }
-
-            return hashCode.ToHashCode();
-        }
+        => new { Type, Title, Description, Timestamp, Color, Image, Video, Author, Footer, Provider, Thumbnail, Fields }.GetHashCode();
     }
 }

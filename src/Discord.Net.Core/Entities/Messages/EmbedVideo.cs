@@ -63,6 +63,6 @@ namespace Discord
             => GetHashCode() == embedVideo.GetHashCode();
 
         public override int GetHashCode()
-            => HashCode.Combine(Width, Height, Url);
+            => new { Width, Height, Url }.GetHashCode();
     }
 }

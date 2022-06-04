@@ -52,6 +52,6 @@ namespace Discord
             => GetHashCode() == embedField.GetHashCode();
 
         public override int GetHashCode()
-            => HashCode.Combine(Name, Value, Inline);
+            => new { Name, Value, Inline }.GetHashCode();
     }
 }
