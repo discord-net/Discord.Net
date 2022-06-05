@@ -66,8 +66,8 @@ namespace Discord
         /// </summary>
         /// <param name="embedAuthor">The <see cref="EmbedAuthor"/> to compare with the current <see cref="EmbedAuthor"/></param>
         /// <returns></returns>
-        public bool Equals(EmbedAuthor embedAuthor)
-            => GetHashCode() == embedAuthor.GetHashCode();
+        public bool Equals(EmbedAuthor? embedAuthor)
+            => GetHashCode() == embedAuthor?.GetHashCode();
 
         /// <inheritdoc />
         public override int GetHashCode()

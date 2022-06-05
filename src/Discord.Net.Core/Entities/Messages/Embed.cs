@@ -119,7 +119,7 @@ namespace Discord
         /// <param name="embed">The <see cref="Embed"/> to compare with the current <see cref="Embed"/></param>
         /// <returns></returns>
         public bool Equals(Embed embed)
-            => GetHashCode() == embed.GetHashCode();
+            => GetHashCode() == embed?.GetHashCode();
 
         /// <inheritdoc />
         public override int GetHashCode()

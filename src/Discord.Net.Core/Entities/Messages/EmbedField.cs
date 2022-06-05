@@ -61,8 +61,8 @@ namespace Discord
         /// </summary>
         /// <param name="embedField"></param>
         /// <returns></returns>
-        public bool Equals(EmbedField embedField)
-            => GetHashCode() == embedField.GetHashCode();
+        public bool Equals(EmbedField? embedField)
+            => GetHashCode() == embedField?.GetHashCode();
 
         /// <inheritdoc />
         public override int GetHashCode()

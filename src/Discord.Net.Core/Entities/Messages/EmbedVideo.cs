@@ -72,8 +72,8 @@ namespace Discord
         /// </summary>
         /// <param name="embedVideo">The <see cref="EmbedVideo"/> to compare with the current <see cref="EmbedVideo"/></param>
         /// <returns></returns>
-        public bool Equals(EmbedVideo embedVideo)
-            => GetHashCode() == embedVideo.GetHashCode();
+        public bool Equals(EmbedVideo? embedVideo)
+            => GetHashCode() == embedVideo?.GetHashCode();
 
         /// <inheritdoc />
         public override int GetHashCode()

@@ -68,8 +68,8 @@ namespace Discord
         /// </summary>
         /// <param name="embedFooter">The <see cref="EmbedFooter"/> to compare with the current <see cref="EmbedFooter"/></param>
         /// <returns></returns>
-        public bool Equals(EmbedFooter embedFooter)
-            => GetHashCode() == embedFooter.GetHashCode();
+        public bool Equals(EmbedFooter? embedFooter)
+            => GetHashCode() == embedFooter?.GetHashCode();
 
         /// <inheritdoc />
         public override int GetHashCode()

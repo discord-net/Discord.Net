@@ -507,6 +507,9 @@ namespace Discord
         /// <returns></returns>
         public bool Equals(EmbedBuilder embedBuilder)
         {
+            if (embedBuilder is null)
+                return false;
+
             if (Fields.Count != embedBuilder.Fields.Count)
                 return false;
 
