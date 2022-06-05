@@ -493,10 +493,26 @@ namespace Discord
             => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedBuilder);
 
         public bool Equals(EmbedBuilder embedBuilder)
-            => GetHashCode() == embedBuilder.GetHashCode();
+        {
+            if (Fields.Count != embedBuilder.Fields.Count)
+                return false;
 
-        public override int GetHashCode()
-            => (_title, _description, _image, _thumbnail, Timestamp, Color, Author, Footer, Url, _fields).GetHashCode();
+            for (var i = 0; i < _fields.Count; i++)
+                if (_fields[i] != embedBuilder._fields[i])
+                    return false;
+
+            return _title == embedBuilder?._title
+            && _description == embedBuilder?._description
+            && _image == embedBuilder?._image
+            && _thumbnail == embedBuilder?._thumbnail
+            && Timestamp == embedBuilder?.Timestamp
+            && Color == embedBuilder?.Color
+            && Author == embedBuilder?.Author
+            && Footer == embedBuilder?.Footer
+            && Url == embedBuilder?.Url;
+        }
+
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     /// <summary>
@@ -625,10 +641,11 @@ namespace Discord
             => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedFieldBuilder);
 
         public bool Equals(EmbedFieldBuilder embedFieldBuilder)
-            => GetHashCode() == embedFieldBuilder.GetHashCode();
+            => _name == embedFieldBuilder?._name
+            && _value == embedFieldBuilder?._value
+            && IsInline == embedFieldBuilder?.IsInline;    
 
-        public override int GetHashCode()
-            => (Name, Value, IsInline).GetHashCode();
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     /// <summary>
@@ -741,10 +758,11 @@ namespace Discord
             => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedAuthorBuilder);
 
         public bool Equals(EmbedAuthorBuilder embedAuthorBuilder)
-            => GetHashCode() == embedAuthorBuilder.GetHashCode();
+            => _name == embedAuthorBuilder?._name
+            && Url == embedAuthorBuilder?.Url
+            && IconUrl == embedAuthorBuilder?.IconUrl;
 
-        public override int GetHashCode()
-            => (Name, Url, IconUrl).GetHashCode();
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     /// <summary>
@@ -837,9 +855,9 @@ namespace Discord
             => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedFooterBuilder);
 
         public bool Equals(EmbedFooterBuilder embedFooterBuilder)
-            => GetHashCode() == embedFooterBuilder.GetHashCode();
+            => _text == embedFooterBuilder?._text
+            && IconUrl == embedFooterBuilder?.IconUrl;
 
-        public override int GetHashCode()
-            => (Text, IconUrl).GetHashCode();
+        public override int GetHashCode() => base.GetHashCode();
     }
 }
