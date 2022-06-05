@@ -57,6 +57,6 @@ namespace Discord
             => GetHashCode() == embedAuthor.GetHashCode();
 
         public override int GetHashCode()
-            => new { Name, Url, IconUrl }.GetHashCode();
+            => (Name, Url, IconUrl).GetHashCode();
     }
 }

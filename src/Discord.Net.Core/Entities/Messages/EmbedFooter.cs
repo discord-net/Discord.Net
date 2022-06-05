@@ -59,6 +59,6 @@ namespace Discord
             => GetHashCode() == embedFooter.GetHashCode();
 
         public override int GetHashCode()
-            => new { Text, IconUrl, ProxyUrl }.GetHashCode();
+            => (Text, IconUrl, ProxyUrl).GetHashCode();
     }
 }

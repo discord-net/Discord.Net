@@ -496,7 +496,7 @@ namespace Discord
             => GetHashCode() == embedBuilder.GetHashCode();
 
         public override int GetHashCode()
-            => new {_title, _description, _image, _thumbnail, Timestamp, Color, Author, Footer, Url, _fields }.GetHashCode();
+            => (_title, _description, _image, _thumbnail, Timestamp, Color, Author, Footer, Url, _fields).GetHashCode();
     }
 
     /// <summary>
@@ -628,7 +628,7 @@ namespace Discord
             => GetHashCode() == embedFieldBuilder.GetHashCode();
 
         public override int GetHashCode()
-            => new { Name, Value, IsInline }.GetHashCode();
+            => (Name, Value, IsInline).GetHashCode();
     }
 
     /// <summary>
@@ -744,7 +744,7 @@ namespace Discord
             => GetHashCode() == embedAuthorBuilder.GetHashCode();
 
         public override int GetHashCode()
-            => new { Name, Url, IconUrl }.GetHashCode();
+            => (Name, Url, IconUrl).GetHashCode();
     }
 
     /// <summary>
@@ -840,6 +840,6 @@ namespace Discord
             => GetHashCode() == embedFooterBuilder.GetHashCode();
 
         public override int GetHashCode()
-            => new { Text, IconUrl }.GetHashCode();
+            => (Text, IconUrl).GetHashCode();
     }
 }
