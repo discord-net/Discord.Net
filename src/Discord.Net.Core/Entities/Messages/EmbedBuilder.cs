@@ -490,7 +490,7 @@ namespace Discord
             => !(left == right);
 
         /// <summary>
-        /// Determines whether the specified object is equals to the current <see cref="EmbedBuilder"/>.
+        /// Determines whether the specified object is equal to the current <see cref="EmbedBuilder"/>.
         /// </summary>
         /// <remarks>
         /// If the object passes is an <see cref="EmbedBuilder"/>, <see cref="Equals(EmbedBuilder)"/> will be called to compare the 2 instances
@@ -501,7 +501,7 @@ namespace Discord
             => obj is EmbedBuilder embedBuilder && Equals(embedBuilder);
 
         /// <summary>
-        /// Determines whether the specified <see cref="EmbedBuilder"/> is equals to the current <see cref="EmbedBuilder"/>
+        /// Determines whether the specified <see cref="EmbedBuilder"/> is equal to the current <see cref="EmbedBuilder"/>
         /// </summary>
         /// <param name="embedBuilder">The <see cref="EmbedBuilder"/> to compare with the current <see cref="EmbedBuilder"/></param>
         /// <returns></returns>
@@ -652,7 +652,7 @@ namespace Discord
             => !(left == right);
 
         /// <summary>
-        /// Determines whether the specified object is equals to the current <see cref="EmbedFieldBuilder"/>.
+        /// Determines whether the specified object is equal to the current <see cref="EmbedFieldBuilder"/>.
         /// </summary>
         /// <remarks>
         /// If the object passes is an <see cref="EmbedFieldBuilder"/>, <see cref="Equals(EmbedFieldBuilder)"/> will be called to compare the 2 instances
@@ -663,7 +663,7 @@ namespace Discord
             => obj is EmbedFieldBuilder embedFieldBuilder && Equals(embedFieldBuilder);
 
         /// <summary>
-        /// Determines whether the specified <see cref="EmbedFieldBuilder"/> is equals to the current <see cref="EmbedFieldBuilder"/>
+        /// Determines whether the specified <see cref="EmbedFieldBuilder"/> is equal to the current <see cref="EmbedFieldBuilder"/>
         /// </summary>
         /// <param name="embedFieldBuilder">The <see cref="EmbedFieldBuilder"/> to compare with the current <see cref="EmbedFieldBuilder"/></param>
         /// <returns></returns>
@@ -783,7 +783,7 @@ namespace Discord
             => !(left == right);
 
         /// <summary>
-        /// Determines whether the specified object is equals to the current <see cref="EmbedAuthorBuilder"/>.
+        /// Determines whether the specified object is equal to the current <see cref="EmbedAuthorBuilder"/>.
         /// </summary>
         /// <remarks>
         /// If the object passes is an <see cref="EmbedAuthorBuilder"/>, <see cref="Equals(EmbedAuthorBuilder)"/> will be called to compare the 2 instances
@@ -894,7 +894,7 @@ namespace Discord
             => !(left == right);
 
         /// <summary>
-        /// Determines whether the specified object is equals to the current <see cref="EmbedFooterBuilder"/>.
+        /// Determines whether the specified object is equal to the current <see cref="EmbedFooterBuilder"/>.
         /// </summary>
         /// <remarks>
         /// If the object passes is an <see cref="EmbedFooterBuilder"/>, <see cref="Equals(EmbedFooterBuilder)"/> will be called to compare the 2 instances
@@ -905,7 +905,7 @@ namespace Discord
             => obj is EmbedFooterBuilder embedFooterBuilder && Equals(embedFooterBuilder);
 
         /// <summary>
-        /// Determines whether the specified <see cref="EmbedFooterBuilder"/> is equals to the current <see cref="EmbedFooterBuilder"/>
+        /// Determines whether the specified <see cref="EmbedFooterBuilder"/> is equal to the current <see cref="EmbedFooterBuilder"/>
         /// </summary>
         /// <param name="embedFooterBuilder">The <see cref="EmbedFooterBuilder"/> to compare with the current <see cref="EmbedFooterBuilder"/></param>
         /// <returns></returns>

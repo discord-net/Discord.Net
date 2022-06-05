@@ -53,7 +53,7 @@ namespace Discord
             => !(left == right);
 
         /// <summary>
-        /// Determines whether the specified object is equals to the current <see cref="EmbedFooter"/>.
+        /// Determines whether the specified object is equal to the current <see cref="EmbedFooter"/>.
         /// </summary>
         /// <remarks>
         /// If the object passes is an <see cref="EmbedFooter"/>, <see cref="Equals(EmbedFooter)"/> will be called to compare the 2 instances
@@ -64,7 +64,7 @@ namespace Discord
             => obj is EmbedFooter embedFooter && Equals(embedFooter);
 
         /// <summary>
-        /// Determines whether the specified <see cref="EmbedFooter"/> is equals to the current <see cref="EmbedFooter"/>
+        /// Determines whether the specified <see cref="EmbedFooter"/> is equal to the current <see cref="EmbedFooter"/>
         /// </summary>
         /// <param name="embedFooter">The <see cref="EmbedFooter"/> to compare with the current <see cref="EmbedFooter"/></param>
         /// <returns></returns>
