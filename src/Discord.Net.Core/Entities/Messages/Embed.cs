@@ -109,6 +109,15 @@ namespace Discord
             => GetHashCode() == embed.GetHashCode();
 
         public override int GetHashCode()
-        => (Type, Title, Description, Timestamp, Color, Image, Video, Author, Footer, Provider, Thumbnail, Fields).GetHashCode();
+        {
+            unchecked
+            {
+                var hash = 17;
+                hash = hash * 23 + (Type, Title, Description, Timestamp, Color, Image, Video, Author, Footer, Provider, Thumbnail).GetHashCode();
+                foreach(var field in Fields)
+                    hash = hash * 23 + field.GetHashCode();
+                return hash;
+            }
+        }
     }
 }
