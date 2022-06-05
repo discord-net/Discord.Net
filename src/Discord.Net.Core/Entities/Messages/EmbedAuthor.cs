@@ -54,7 +54,7 @@ namespace Discord
         /// Determines whether the specified object is equal to the current <see cref="EmbedAuthor"/>.
         /// </summary>
         /// <remarks>
-        /// If the object passes is an <see cref="EmbedAuthor"/>, <see cref="Equals(EmbedAuthor)"/> will be called to compare the 2 instances
+        /// If the object passes is an <see cref="EmbedAuthor"/>, <see cref="Equals(EmbedAuthor?)"/> will be called to compare the 2 instances
         /// </remarks>
         /// <param name="obj">The object to compare with the current <see cref="EmbedAuthor"/></param>
         /// <returns></returns>

@@ -60,7 +60,7 @@ namespace Discord
         /// Determines whether the specified object is equal to the current <see cref="EmbedVideo"/>.
         /// </summary>
         /// <remarks>
-        /// If the object passes is an <see cref="EmbedVideo"/>, <see cref="Equals(EmbedVideo)"/> will be called to compare the 2 instances
+        /// If the object passes is an <see cref="EmbedVideo"/>, <see cref="Equals(EmbedVideo?)"/> will be called to compare the 2 instances
         /// </remarks>
         /// <param name="obj">The object to compare with the current <see cref="EmbedVideo"/></param>
         /// <returns></returns>
