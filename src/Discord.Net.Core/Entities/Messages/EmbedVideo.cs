@@ -56,12 +56,26 @@ namespace Discord
         public static bool operator !=(EmbedVideo? left, EmbedVideo? right)
             => !(left == right);
 
+        /// <summary>
+        /// Determines whether the specified object is equals to the current <see cref="EmbedVideo"/>.        /// 
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedVideo"/>, <see cref="Equals(EmbedVideo)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="EmbedVideo"/></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
-            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedVideo?);
+            => obj is EmbedVideo embedVideo && Equals(embedVideo);
 
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedVideo"/> is equals to the current <see cref="EmbedVideo"/>
+        /// </summary>
+        /// <param name="embedVideo">The <see cref="EmbedVideo"/> to compare with the current <see cref="EmbedVideo"/></param>
+        /// <returns></returns>
         public bool Equals(EmbedVideo embedVideo)
             => GetHashCode() == embedVideo.GetHashCode();
 
+        /// <inheritdoc />
         public override int GetHashCode()
             => (Width, Height, Url).GetHashCode();
     }

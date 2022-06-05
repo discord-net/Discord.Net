@@ -62,12 +62,26 @@ namespace Discord
         public static bool operator !=(EmbedImage? left, EmbedImage? right)
             => !(left == right);
 
+        /// <summary>
+        /// Determines whether the specified object is equals to the current <see cref="EmbedImage"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedImage"/>, <see cref="Equals(EmbedImage)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="EmbedImage"/></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
-            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedImage?);
+            => obj is EmbedImage embedImage && Equals(embedImage);
 
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedImage"/> is equals to the current <see cref="EmbedImage"/>
+        /// </summary>
+        /// <param name="embedImage">The <see cref="EmbedImage"/> to compare with the current <see cref="EmbedImage"/></param>
+        /// <returns></returns>
         public bool Equals(EmbedImage embedImage)
             => GetHashCode() == embedImage.GetHashCode();
 
+        /// <inheritdoc />
         public override int GetHashCode()
             => (Height, Width, Url, ProxyUrl).GetHashCode();
     }

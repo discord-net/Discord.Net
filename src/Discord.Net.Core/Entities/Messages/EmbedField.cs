@@ -45,12 +45,26 @@ namespace Discord
         public static bool operator !=(EmbedField? left, EmbedField? right)
             => !(left == right);
 
+        /// <summary>
+        /// Determines whether the specified object is equals to the current <see cref="EmbedField"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedField"/>, <see cref="Equals(EmbedField)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current object</param>
+        /// <returns></returns>
         public override bool Equals(object obj)
-            => obj is not null && GetType() == obj.GetType() && Equals(obj as EmbedField?);
+            => obj is EmbedField embedField && Equals(embedField);
 
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedField"/> is equals to the current <see cref="EmbedField"/>
+        /// </summary>
+        /// <param name="embedField"></param>
+        /// <returns></returns>
         public bool Equals(EmbedField embedField)
             => GetHashCode() == embedField.GetHashCode();
 
+        /// <inheritdoc />
         public override int GetHashCode()
             => (Name, Value, Inline).GetHashCode();
     }
