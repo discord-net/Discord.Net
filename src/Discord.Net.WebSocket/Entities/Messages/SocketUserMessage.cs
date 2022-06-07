@@ -127,7 +127,7 @@ namespace Discord.WebSocket
                             refMsgAuthor = guild.GetUser(refMsg.Author.Value.Id);
                     }
                     else
-                        refMsgAuthor = (Channel as SocketChannel).GetUser(refMsg.Author.Value.Id);
+                        refMsgAuthor = (Channel as SocketChannel)?.GetUser(refMsg.Author.Value.Id);
                     if (refMsgAuthor == null)
                         refMsgAuthor = SocketUnknownUser.Create(Discord, state, refMsg.Author.Value);
                 }

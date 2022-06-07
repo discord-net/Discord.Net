@@ -50,7 +50,7 @@ namespace Discord.WebSocket
         }
         internal new static SocketVoiceChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketVoiceChannel(guild.Discord, model.Id, guild);
+            var entity = new SocketVoiceChannel(guild?.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }
@@ -58,8 +58,8 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-            Bitrate = model.Bitrate.Value;
-            UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
+            Bitrate = model.Bitrate.GetValueOrDefault(64000);
+            UserLimit = model.UserLimit.GetValueOrDefault() != 0 ? model.UserLimit.Value : (int?)null;
             RTCRegion = model.RTCRegion.GetValueOrDefault(null);
         }
 
