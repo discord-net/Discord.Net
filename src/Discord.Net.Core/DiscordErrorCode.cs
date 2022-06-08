@@ -96,6 +96,7 @@ namespace Discord
         #endregion
 
         #region General Request Errors (40XXX)
+        BitrateIsTooHighForChannelOfThisType = 30052,
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
         OpeningDMTooFast = 40003,
@@ -196,4 +197,5 @@ namespace Discord
         FailedStageCreation = 180002,
         #endregion
     }
+        WebhooksCanOnlyCreateThreadsInForumChannels = 220003,
 }
