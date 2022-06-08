@@ -2318,7 +2318,7 @@ namespace Discord.WebSocket
                             case "INTERACTION_CREATE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (INTERACTION_CREATE)").ConfigureAwait(false);
-
+                                    
                                     var data = (payload as JToken).ToObject<API.Interaction>(_serializer);
 
                                     var guild = data.GuildId.IsSpecified ? GetGuild(data.GuildId.Value) : null;
@@ -2326,7 +2326,6 @@ namespace Discord.WebSocket
                                     if (guild != null && !guild.IsSynced)
                                     {
                                         await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
-                                        return;
                                     }
 
                                     SocketUser user = data.User.IsSpecified
@@ -2346,15 +2345,8 @@ namespace Discord.WebSocket
                                             {
                                                 channel = CreateDMChannel(data.ChannelId.Value, user, State);
                                             }
-                                            else
-                                            {
-                                                if (guild != null) // The guild id is set, but the guild cannot be found as the bot scope is not set.
-                                                {
-                                                    await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
-                                                    return;
-                                                }
-                                                // The channel isnt required when responding to an interaction, so we can leave the channel null.
-                                            }
+
+                                            // The channel isnt required when responding to an interaction, so we can leave the channel null.
                                         }
                                     }
                                     else if (data.User.IsSpecified)
