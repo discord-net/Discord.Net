@@ -877,5 +877,24 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketCustomSticker, Task>> _guildStickerDeleted = new AsyncEvent<Func<SocketCustomSticker, Task>>();
         #endregion
+
+        #region AutoModeration
+
+        public event Func<SocketAutoModRule, Task> AutoModRuleCreated
+        {
+            add => _autoModRuleCreated.Add(value);
+            remove => _autoModRuleCreated.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleCreated = new AsyncEvent<Func<SocketAutoModRule, Task>>();
+
+        public event Func<SocketAutoModRule, Task> AutoModRuleDelted
+        {
+            add => _autoModRuleDeleted.Add(value);
+            remove => _autoModRuleDeleted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleDeleted = new AsyncEvent<Func<SocketAutoModRule, Task>>();
+
+        //public event Func<SocketAutoModRule>
+        #endregion
     }
 }

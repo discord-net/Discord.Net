@@ -943,5 +943,42 @@ namespace Discord.Rest
         }
 
         #endregion
+
+        #region Auto Mod
+        public static Task ModifyRuleAsync(BaseDiscordClient client, IAutoModRule rule, Action<AutoModRuleProperties> func, RequestOptions options)
+        {
+            var args = new AutoModRuleProperties();
+            func(args);
+
+            var apiArgs = new API.Rest.ModifyAutoModRuleParams
+            {
+                Actions = args.Actions.IsSpecified ? args.Actions.Value.Select(x => new API.AutoModAction()
+                {
+                    Type = x.Type,
+                    Metadata = x.ChannelId.HasValue || x.TimeoutDuration.HasValue ? new API.ActionMetadata
+                    {
+                        ChannelId = x.ChannelId ?? Optional<ulong>.Unspecified,
+                        DurationSeconds = x.TimeoutDuration.HasValue ? (int)Math.Floor(x.TimeoutDuration.Value.TotalSeconds) : Optional<int>.Unspecified
+                    } : Optional<API.ActionMetadata>.Unspecified
+                }).ToArray() : Optional<API.AutoModAction[]>.Unspecified,
+                Enabled = args.Enabled,
+                EventType = args.EventType,
+                ExemptChannels = args.ExemptChannels,
+                ExemptRoles = args.ExemptRoles,
+                Name = args.Name,
+                TriggerType = args.TriggerType,
+                TriggerMetadata = args.KeywordFilter.IsSpecified || args.Presets.IsSpecified ? new API.TriggerMetadata
+                {
+                    KeywordFilter = args.KeywordFilter.GetValueOrDefault(Array.Empty<string>()),
+                    Presets = args.Presets.GetValueOrDefault(Array.Empty<KeywordPresetTypes>())
+                } : Optional<API.TriggerMetadata>.Unspecified
+            };
+
+            return client.ApiClient.ModifyGuildAutoModRuleAsync(rule.GuildId, rule.Id, apiArgs, options);
+        }
+
+        public static Task DeleteRuleAsync(BaseDiscordClient client, IAutoModRule rule, RequestOptions options)
+            => client.ApiClient.DeleteGuildAutoModRuleAsync(rule.GuildId, rule.Id, options);
+        #endregion
     }
 }

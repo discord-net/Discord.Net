@@ -43,6 +43,7 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
         private ConcurrentDictionary<ulong, SocketCustomSticker> _stickers;
         private ConcurrentDictionary<ulong, SocketGuildEvent> _events;
+        //private ConcurrentDictionary<ulong, SocketAutoModRule> _automodRules;
         private ImmutableArray<GuildEmote> _emotes;
 
         private AudioClient _audioClient;

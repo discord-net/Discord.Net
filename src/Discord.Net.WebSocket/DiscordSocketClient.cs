@@ -2839,6 +2839,34 @@ namespace Discord.WebSocket
 
                             #endregion
 
+                            #region Auto Moderation
+
+                            case "AUTO_MODERATION_RULE_CREATE":
+                                {
+
+                                }
+                                break;
+
+                            case "AUTO_MODERATION_RULE_UPDATE":
+                                {
+
+                                }
+                                break;
+
+                            case "AUTO_MODERATION_RULE_DELETE":
+                                {
+
+                                }
+                                break;
+
+                            case "AUTO_MODERATION_RULE_EXECUTE":
+                                {
+
+                                }
+                                break;
+
+                            #endregion
+
                             #region Ignored (User only)
                             case "CHANNEL_PINS_ACK":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_ACK)").ConfigureAwait(false);
