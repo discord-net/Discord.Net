@@ -26,6 +26,8 @@ namespace Discord
         /// <summary> The channel is a stage voice channel. </summary>
         Stage = 13,
         /// <summary> The channel is a guild directory used in hub servers. (Unreleased)</summary>
-        GuildDirectory = 14
+        GuildDirectory = 14,
+        /// <summary> The channel is a forum channel containing multiple threads. </summary>
+        Forum = 15
     }
 }

@@ -26,10 +26,10 @@ namespace Discord.Rest
             Data = new RestModalData(dataModel);
         }
 
-        internal new static async Task<RestModal> CreateAsync(DiscordRestClient client, ModelBase model)
+        internal new static async Task<RestModal> CreateAsync(DiscordRestClient client, ModelBase model, bool doApiCall)
         {
             var entity = new RestModal(client, model);
-            await entity.UpdateAsync(client, model);
+            await entity.UpdateAsync(client, model, doApiCall);
             return entity;
         }
         

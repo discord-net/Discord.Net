@@ -59,7 +59,7 @@ namespace Discord.WebSocket
                 }
             }
 
-            if (resolved.Members.IsSpecified)
+            if (resolved.Members.IsSpecified && guild != null)
             {
                 foreach (var member in resolved.Members.Value)
                 {

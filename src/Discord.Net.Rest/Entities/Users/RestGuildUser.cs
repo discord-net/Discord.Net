@@ -35,7 +35,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public DateTimeOffset? PremiumSince => DateTimeUtils.FromTicks(_premiumSinceTicks);
         /// <inheritdoc />
-        public ulong GuildId => Guild.Id;
+        public ulong GuildId { get; }
         /// <inheritdoc />
         public bool? IsPending { get; private set; }
         /// <inheritdoc />
@@ -80,14 +80,16 @@ namespace Discord.Rest
         /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
 
-        internal RestGuildUser(BaseDiscordClient discord, IGuild guild, ulong id)
+        internal RestGuildUser(BaseDiscordClient discord, IGuild guild, ulong id, ulong? guildId = null)
             : base(discord, id)
         {
-            Guild = guild;
+            if (guild is not null)
+                Guild = guild;
+            GuildId = guildId ?? Guild.Id;
         }
-        internal static RestGuildUser Create(BaseDiscordClient discord, IGuild guild, Model model)
+        internal static RestGuildUser Create(BaseDiscordClient discord, IGuild guild, Model model, ulong? guildId = null)
         {
-            var entity = new RestGuildUser(discord, guild, model.User.Id);
+            var entity = new RestGuildUser(discord, guild, model.User.Id, guildId);
             entity.Update(model);
             return entity;
         }
@@ -116,7 +118,7 @@ namespace Discord.Rest
         private void UpdateRoles(ulong[] roleIds)
         {
             var roles = ImmutableArray.CreateBuilder<ulong>(roleIds.Length + 1);
-            roles.Add(Guild.Id);
+            roles.Add(GuildId);
             for (int i = 0; i < roleIds.Length; i++)
                 roles.Add(roleIds[i]);
             _roleIds = roles.ToImmutable();

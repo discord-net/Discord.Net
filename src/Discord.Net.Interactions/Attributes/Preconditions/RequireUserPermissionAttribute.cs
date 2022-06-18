@@ -29,7 +29,7 @@ namespace Discord.Interactions
         /// <remarks>
         ///     This precondition will always fail if the command is being invoked in a <see cref="IPrivateChannel"/>.
         /// </remarks>
-        /// <param name="permission">
+        /// <param name="guildPermission">
         ///     The <see cref="Discord.GuildPermission" /> that the user must have. Multiple permissions can be
         ///     specified by ORing the permissions together.
         /// </param>
@@ -41,7 +41,7 @@ namespace Discord.Interactions
         /// <summary>
         ///     Requires that the user invoking the command to have a specific <see cref="Discord.ChannelPermission"/>.
         /// </summary>
-        /// <param name="permission">
+        /// <param name="channelPermission">
         ///     The <see cref="Discord.ChannelPermission"/> that the user must have. Multiple permissions can be
         ///     specified by ORing the permissions together.
         /// </param>

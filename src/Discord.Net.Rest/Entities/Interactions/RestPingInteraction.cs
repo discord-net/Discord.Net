@@ -18,10 +18,10 @@ namespace Discord.Rest
         {
         }
 
-        internal static new async Task<RestPingInteraction> CreateAsync(DiscordRestClient client, Model model)
+        internal static new async Task<RestPingInteraction> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
             var entity = new RestPingInteraction(client, model.Id);
-            await entity.UpdateAsync(client, model);
+            await entity.UpdateAsync(client, model, doApiCall);
             return entity;
         }
 

@@ -152,6 +152,7 @@ namespace Discord
         InvalidMessageType = 50068,
         PaymentSourceRequiredForGift = 50070,
         CannotDeleteRequiredCommunityChannel = 50074,
+        CannotEditStickersWithinAMessage = 50080,
         InvalidSticker = 50081,
         CannotExecuteOnArchivedThread = 50083,
         InvalidThreadNotificationSettings = 50084,
@@ -164,6 +165,7 @@ namespace Discord
         #endregion
 
         #region 2FA (60XXX)
+        MissingPermissionToSendThisSticker = 50600,
         Requires2FA = 60003,
         #endregion
 

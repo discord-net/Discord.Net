@@ -28,6 +28,12 @@ namespace Discord
         public Optional<ulong> GuildId { get; internal set; }
 
         /// <summary>
+        ///     Gets whether to error if the referenced message doesn't exist instead of sending as a normal (non-reply) message
+        ///     Defaults to true.
+        /// </summary>
+        public Optional<bool> FailIfNotExists { get; internal set; }
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="MessageReference"/> class.
         /// </summary>
         /// <param name="messageId">
@@ -39,16 +45,21 @@ namespace Discord
         /// <param name="guildId">
         ///     The ID of the guild that will be referenced. It will be validated if sent.
         /// </param>
-        public MessageReference(ulong? messageId = null, ulong? channelId = null, ulong? guildId = null)
+        /// <param name="failIfNotExists">
+        ///     Whether to error if the referenced message doesn't exist instead of sending as a normal (non-reply) message. Defaults to true.
+        /// </param>
+        public MessageReference(ulong? messageId = null, ulong? channelId = null, ulong? guildId = null, bool? failIfNotExists = null)
         {
             MessageId = messageId ?? Optional.Create<ulong>();
             InternalChannelId = channelId ?? Optional.Create<ulong>();
             GuildId = guildId ?? Optional.Create<ulong>();
+            FailIfNotExists = failIfNotExists ?? Optional.Create<bool>();
         }
 
         private string DebuggerDisplay
             => $"Channel ID: ({ChannelId}){(GuildId.IsSpecified ? $", Guild ID: ({GuildId.Value})" : "")}" +
-            $"{(MessageId.IsSpecified ? $", Message ID: ({MessageId.Value})" : "")}";
+            $"{(MessageId.IsSpecified ? $", Message ID: ({MessageId.Value})" : "")}" +
+            $"{(FailIfNotExists.IsSpecified ? $", FailIfNotExists: ({FailIfNotExists.Value})" : "")}";
 
         public override string ToString()
             => DebuggerDisplay;
