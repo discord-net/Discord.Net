@@ -19,9 +19,23 @@ namespace Discord.Interactions
             if (!ModalUtils.TryGet<T>(out var modalInfo))
                 throw new ArgumentException($"{typeof(T).FullName} isn't referenced by any registered Modal Interaction Command and doesn't have a cached {typeof(ModalInfo)}");
 
+            await SendModalResponseAsync(interaction, customId, modalInfo, options, modifyModal);
+        }
+
+        public static async Task RespondWithModalSafelyAsync<T>(this IDiscordInteraction interaction, string customId, InteractionService interactionService,
+            RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+            where T : class, IModal
+        {
+            var modalInfo = ModalUtils.GetOrAdd<T>(interactionService);
+
+            await SendModalResponseAsync(interaction, customId, modalInfo, options, modifyModal);
+        }
+
+        private static async Task SendModalResponseAsync(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+        {
             var builder = new ModalBuilder(modalInfo.Title, customId);
 
-            foreach(var input in modalInfo.Components)
+            foreach (var input in modalInfo.Components)
                 switch (input)
                 {
                     case TextInputComponentInfo textComponent:
