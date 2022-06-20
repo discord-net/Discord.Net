@@ -59,6 +59,7 @@ namespace Discord.WebSocket
                 ChannelType.Category => SocketCategoryChannel.Create(guild, state, model),
                 ChannelType.PrivateThread or ChannelType.PublicThread or ChannelType.NewsThread => SocketThreadChannel.Create(guild, state, model),
                 ChannelType.Stage => SocketStageChannel.Create(guild, state, model),
+                ChannelType.Forum => SocketForumChannel.Create(guild, state, model),
                 _ => new SocketGuildChannel(guild.Discord, model.Id, guild),
             };
         }
@@ -221,6 +222,8 @@ namespace Discord.WebSocket
         #endregion
 
         #region IChannel
+        /// <inheritdoc />
+        string IChannel.Name => Name;
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable(); //Overridden in Text/Voice

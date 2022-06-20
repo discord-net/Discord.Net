@@ -3,7 +3,7 @@ using System;
 namespace Discord.Interactions
 {
     /// <summary>
-    ///     Represents a result type for <see cref="TypeConverter.ReadAsync(IInteractionContext, WebSocket.SocketSlashCommandDataOption, IServiceProvider)"/>.
+    ///     Represents a result type for <see cref="TypeConverter.ReadAsync(IInteractionContext, IApplicationCommandInteractionDataOption, IServiceProvider)"/>.
     /// </summary>
     public struct TypeConverterResult : IResult
     {

@@ -25,7 +25,7 @@ namespace Discord.Rest
         public string Name { get; private set; }
         /// <inheritdoc />
         public string Icon { get; private set; }
-        /// <inheritdoc>/>
+        /// <inheritdoc />
         public Emoji Emoji { get; private set; }
         /// <inheritdoc />
         public GuildPermissions Permissions { get; private set; }

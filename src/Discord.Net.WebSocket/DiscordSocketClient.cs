@@ -403,7 +403,7 @@ namespace Discord.WebSocket
         ///     the snowflake identifier; <c>null</c> if the user is not found.
         /// </returns>
         public async ValueTask<IUser> GetUserAsync(ulong id, RequestOptions options = null)
-            => await ClientHelper.GetUserAsync(this, id, options).ConfigureAwait(false);
+            => await ((IDiscordClient)this).GetUserAsync(id, CacheMode.AllowDownload, options).ConfigureAwait(false);
         /// <summary>
         ///     Clears all cached channels from the client.
         /// </summary>
@@ -1305,13 +1305,13 @@ namespace Discord.WebSocket
 
                                             user.Update(State, data);
 
-                                            var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(before, user.Id, true, () => null);
+                                            var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(before, user.Id, true, () => Task.FromResult<SocketGuildUser>(null));
                                             await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), cacheableBefore, user).ConfigureAwait(false);
                                         }
                                         else
                                         {
                                             user = guild.AddOrUpdateUser(data);
-                                            var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(null, user.Id, false, () => null);
+                                            var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(null, user.Id, false, () => Task.FromResult<SocketGuildUser>(null));
                                             await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), cacheableBefore, user).ConfigureAwait(false);
                                         }
                                     }
@@ -2331,7 +2331,9 @@ namespace Discord.WebSocket
 
                                     SocketUser user = data.User.IsSpecified
                                         ? State.GetOrAddUser(data.User.Value.Id, (_) => SocketGlobalUser.Create(this, State, data.User.Value))
-                                        : guild?.AddOrUpdateUser(data.Member.Value); // null if the bot scope isn't set, so the guild cannot be retrieved.
+                                        : guild != null
+                                            ? guild.AddOrUpdateUser(data.Member.Value) // null if the bot scope isn't set, so the guild cannot be retrieved.
+                                            : State.GetOrAddUser(data.Member.Value.User.Id, (_) => SocketGlobalUser.Create(this, State, data.Member.Value.User));
 
                                     SocketChannel channel = null;
                                     if(data.ChannelId.IsSpecified)

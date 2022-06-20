@@ -89,7 +89,7 @@ namespace Discord
         ///     Gets this events banner image url.
         /// </summary>
         /// <param name="format">The format to return.</param>
-        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
         /// <returns>The cover images url.</returns>
         string GetCoverImageUrl(ImageFormat format = ImageFormat.Auto, ushort size = 1024);
 

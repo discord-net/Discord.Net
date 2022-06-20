@@ -36,7 +36,7 @@ namespace Discord.API.Rest
             if (Content.IsSpecified)
                 payload["content"] = Content.Value;
             if (IsTTS.IsSpecified)
-                payload["tts"] = IsTTS.Value.ToString();
+                payload["tts"] = IsTTS.Value;
             if (Nonce.IsSpecified)
                 payload["nonce"] = Nonce.Value;
             if (Username.IsSpecified)

@@ -86,6 +86,7 @@ By default, your methods can feature the following parameter types:
 - Implementations of [IChannel]
 - Implementations of [IRole]
 - Implementations of [IMentionable]
+- Implementations of [IAttachment]
 - `string`
 - `float`, `double`, `decimal`
 - `bool`
