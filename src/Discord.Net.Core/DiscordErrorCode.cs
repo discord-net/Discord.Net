@@ -64,6 +64,7 @@ namespace Discord
         ActionSlowmode = 20016,
         OnlyOwnerAction = 20018,
         AnnouncementEditRatelimit = 20022,
+        UnderMinimumAge = 20024,
         ChannelWriteRatelimit = 20028,
         WriteRatelimitReached = 20029,
         WordsNotAllowed = 20031,
@@ -96,6 +97,7 @@ namespace Discord
         #endregion
 
         #region General Request Errors (40XXX)
+        BitrateIsTooHighForChannelOfThisType = 30052,
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
         OpeningDMTooFast = 40003,
@@ -124,6 +126,7 @@ namespace Discord
         InvalidAuthenticationToken = 50014,
         NoteTooLong = 50015,
         ProvidedMessageDeleteCountOutOfBounds = 50016,
+        InvalidMFALevel = 50017,
         InvalidPinChannel = 50019,
         InvalidInvite = 50020,
         CannotExecuteOnSystemMessage = 50021,
@@ -196,4 +199,5 @@ namespace Discord
         FailedStageCreation = 180002,
         #endregion
     }
+        WebhooksCanOnlyCreateThreadsInForumChannels = 220003,
 }
