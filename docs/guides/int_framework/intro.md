@@ -292,7 +292,9 @@ By nesting commands inside a module that is tagged with [GroupAttribute] you can
 > you are not permitted to use more than 2 [GroupAttribute]'s in module hierarchy.
 
 > [!NOTE]
-> [ComponentInteraction] and [ModalInteraction] handlers require `ignoreGroupNames` parameter set to `true` to work in classes with [GroupAttribute]
+> To not use the command group's name as a prefix for component or modal interaction's custom id set `ignoreGroupNames` parameter to `true` in classes with [GroupAttribute]
+>
+> However you have to be careful to prevent overlapping ids of buttons and modals
 
 [!code-csharp[Command Group Example](samples/intro/groupmodule.cs)]
 
@@ -386,8 +388,6 @@ delegate can be used to create HTTP responses from a deserialized json object st
 [ChannelTypesAttribute]: xref:Discord.Interactions.ChannelTypesAttribute
 [MaxValueAttribute]: xref:Discord.Interactions.MaxValueAttribute
 [MinValueAttribute]: xref:Discord.Interactions.MinValueAttribute
-[ComponentInteraction]: xref:Discord.Interactions.ComponentInteractionAttribute
-[ModalInteraction]: xref:Discord.Interactions.ModalInteractionAttribute
 
 [IChannel]: xref:Discord.IChannel
 [IRole]: xref:Discord.IRole
