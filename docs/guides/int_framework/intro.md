@@ -294,7 +294,7 @@ By nesting commands inside a module that is tagged with [GroupAttribute] you can
 > [!NOTE]
 > To not use the command group's name as a prefix for component or modal interaction's custom id set `ignoreGroupNames` parameter to `true` in classes with [GroupAttribute]
 >
-> However you have to be careful to prevent overlapping ids of buttons and modals
+> However, you have to be careful to prevent overlapping ids of buttons and modals
 
 [!code-csharp[Command Group Example](samples/intro/groupmodule.cs)]
 
