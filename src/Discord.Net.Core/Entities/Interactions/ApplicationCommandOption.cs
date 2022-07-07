@@ -81,12 +81,12 @@ namespace Discord
         /// </summary>
         public double? MaxValue { get; set; }
 
-        // <summary>
+        /// <summary>
         ///     Gets or sets the minimum allowed length for a string input.
         /// </summary>
         public int? MinLength { get; set; }
 
-        // <summary>
+        /// <summary>
         ///     Gets or sets the maximum allowed length for a string input.
         /// </summary>
         public int? MaxLength { get; set; }
