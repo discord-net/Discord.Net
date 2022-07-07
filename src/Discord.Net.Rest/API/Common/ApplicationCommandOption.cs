@@ -38,6 +38,12 @@ namespace Discord.API
         [JsonProperty("channel_types")]
         public Optional<ChannelType[]> ChannelTypes { get; set; }
 
+        [JsonProperty("min_length")]
+        public Optional<int> MinLength { get; set; }
+
+        [JsonProperty("max_length")]
+        public Optional<int> MaxLength { get; set; }
+
         public ApplicationCommandOption() { }
 
         public ApplicationCommandOption(IApplicationCommandOption cmd)
@@ -56,6 +62,8 @@ namespace Discord.API
             Default = cmd.IsDefault ?? Optional<bool>.Unspecified;
             MinValue = cmd.MinValue ?? Optional<double>.Unspecified;
             MaxValue = cmd.MaxValue ?? Optional<double>.Unspecified;
+            MinLength = cmd.MinLength ?? Optional<int>.Unspecified;
+            MaxLength = cmd.MaxLength ?? Optional<int>.Unspecified;
             Autocomplete = cmd.IsAutocomplete ?? Optional<bool>.Unspecified;
 
             Name = cmd.Name;
@@ -77,6 +85,8 @@ namespace Discord.API
             Default = option.IsDefault ?? Optional<bool>.Unspecified;
             MinValue = option.MinValue ?? Optional<double>.Unspecified;
             MaxValue = option.MaxValue ?? Optional<double>.Unspecified;
+            MinLength = option.MinLength ?? Optional<int>.Unspecified;
+            MaxLength = option.MaxLength ?? Optional<int>.Unspecified;
 
             ChannelTypes = option.ChannelTypes?.ToArray() ?? Optional<ChannelType[]>.Unspecified;
 
