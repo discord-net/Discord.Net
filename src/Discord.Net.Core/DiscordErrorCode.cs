@@ -48,12 +48,14 @@ namespace Discord
         UnknownSticker = 10060,
         UnknownInteraction = 10062,
         UnknownApplicationCommand = 10063,
+        UnknownVoiceState = 10065,
         UnknownApplicationCommandPermissions = 10066,
         UnknownStageInstance = 10067,
         UnknownGuildMemberVerificationForm = 10068,
         UnknownGuildWelcomeScreen = 10069,
         UnknownGuildScheduledEvent = 10070,
         UnknownGuildScheduledEventUser = 10071,
+        UnknownVoiceState = 10065,
         #endregion
 
         #region General Actions (20XXX)
@@ -89,13 +91,16 @@ namespace Discord
         GuildTemplateAlreadyExists = 30031,
         MaximumNumberOfApplicationCommandsReached = 30032,
         MaximumThreadMembersReached = 30033,
-        MaxNumberOfDailyApplicationCommandCreatesHasBeenReached(200) = 30034,
+        MaxNumberOfDailyApplicationCommandCreatesHasBeenReached = 30034,
         MaximumBansForNonGuildMembersReached = 30035,
         MaximumBanFetchesReached = 30037,
         MaximumUncompleteGuildScheduledEvents = 30038,
         MaximumStickersReached = 30039,
         MaximumPruneRequestReached = 30040,
         MaximumGuildWigitsReached = 30042,
+        MaximumNumberOfEditsReached = 30046,
+        MaximumNumberOfPinnedThreadsInAForumChannelReached = 30047,    
+        MaximumNumberOfTagsInAForumChannelReached = 30048,
         #endregion
 
         #region General Request Errors (40XXX)
@@ -103,6 +108,7 @@ namespace Discord
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
         OpeningDMTooFast = 40003,
+        SendMessagesHasBeenTemporarilyDisabled = 40004,
         RequestEntityTooLarge = 40005,
         FeatureDisabled = 40006,
         UserBanned = 40007,
@@ -110,6 +116,8 @@ namespace Discord
         TargetUserNotInVoice = 40032,
         MessageAlreadyCrossposted = 40033,
         ApplicationNameAlreadyExists = 40041,
+        InteractionHasAlreadyBeenAcknowledged = 40060,    
+        TagNamesMustBeUnique = 40061,
         #endregion
 
         #region Action Preconditions/Checks (50XXX)
@@ -148,21 +156,25 @@ namespace Discord
         InvalidFileUpload = 50046,
         CannotSelfRedeemGift = 50054,
         InvalidGuild = 50055,
+        InvalidMessageType = 50068,
         PaymentSourceRequiredForGift = 50070,
         CannotDeleteRequiredCommunityChannel = 50074,
+        CannotEditStickersWithinAMessage = 50080,
         InvalidSticker = 50081,
         CannotExecuteOnArchivedThread = 50083,
         InvalidThreadNotificationSettings = 50084,
         BeforeValueEarlierThanThreadCreation = 50085,
+        CommunityServerChannelsMustBeTextChannels = 50086,
         ServerLocaleUnavailable = 50095,
         ServerRequiresMonetization = 50097,
         ServerRequiresBoosts = 50101,
         RequestBodyContainsInvalidJSON = 50109,
+        MissingPermissionToSendThisSticker = 50600,
         #endregion
 
         #region 2FA (60XXX)
         OwnershipCannotBeTransferredToABotUser = 50132,
-        FailedToResizeAssetBelowTheMaximumSize:262144 = 50138,
+        FailedToResizeAssetBelowTheMaximumSize = 50138,
         UploadedFileNotFound. = 50146,
         Requires2FA = 60003,
         #endregion
@@ -206,14 +218,14 @@ namespace Discord
         CannotUpdateFinishedEvent = 180000,
         FailedStageCreation = 180002,
         #endregion
-		
-		#region Auto Moderation (200XXX)
-		MessageWasBlockedByAutomaticModeration = 200000,
+        
+        #region Auto Moderation (200XXX)
+        MessageWasBlockedByAutomaticModeration = 200000,
         TitleWasBlockedByAutomaticModeration = 200001,
-		#endregion
-		
-		#region Forums (220XXX)
-		WebhooksCanOnlyCreateThreadsInForumChannels = 220003,
-		#endregion
+        #endregion
+        
+        #region Forums (220XXX)
+        WebhooksCanOnlyCreateThreadsInForumChannels = 220003,
+        #endregion
     }
 }
