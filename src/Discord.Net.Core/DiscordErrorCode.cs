@@ -202,12 +202,18 @@ namespace Discord
         StickerAnimationDurationTooLong = 170007,
         #endregion
 
-        #region Guild Scheduled Events
+        #region Guild Scheduled Events (180XXX)
         CannotUpdateFinishedEvent = 180000,
         FailedStageCreation = 180002,
         #endregion
-    }
-        MessageWasBlockedByAutomaticModeration = 200000,
+		
+		#region Auto Moderation (200XXX)
+		MessageWasBlockedByAutomaticModeration = 200000,
         TitleWasBlockedByAutomaticModeration = 200001,
-        WebhooksCanOnlyCreateThreadsInForumChannels = 220003,
+		#endregion
+		
+		#region Forums (220XXX)
+		WebhooksCanOnlyCreateThreadsInForumChannels = 220003,
+		#endregion
+    }
 }
