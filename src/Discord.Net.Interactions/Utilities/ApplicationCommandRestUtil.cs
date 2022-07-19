@@ -22,7 +22,8 @@ namespace Discord.Interactions
                 Choices = parameterInfo.Choices?.Select(x => new ApplicationCommandOptionChoiceProperties
                 {
                     Name = x.Name,
-                    Value = x.Value
+                    Value = x.Value,
+                    NameLocalizations = localizationManager?.GetAllNames(parameterInfo.GetChoicePath(x), LocalizationTarget.Choice) ?? ImmutableDictionary<string, string>.Empty
                 })?.ToList(),
                 ChannelTypes = parameterInfo.ChannelTypes?.ToList(),
                 IsAutocomplete = parameterInfo.IsAutocomplete,
