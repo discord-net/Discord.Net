@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Discord.API
 {
@@ -25,6 +26,18 @@ namespace Discord.API
         [JsonProperty("default_permission")]
         public Optional<bool> DefaultPermissions { get; set; }
 
+        [JsonProperty("name_localizations")]
+        public Optional<Dictionary<string, string>> NameLocalizations { get; set; }
+
+        [JsonProperty("description_localizations")]
+        public Optional<Dictionary<string, string>> DescriptionLocalizations { get; set; }
+
+        [JsonProperty("name_localized")]
+        public Optional<string> NameLocalized { get; set; }
+
+        [JsonProperty("description_localized")]
+        public Optional<string> DescriptionLocalized { get; set; }
+        
         // V2 Permissions
         [JsonProperty("dm_permission")]
         public Optional<bool?> DmPermission { get; set; }

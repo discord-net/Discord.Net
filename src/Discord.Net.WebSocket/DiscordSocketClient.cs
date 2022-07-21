@@ -455,9 +455,9 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of global
         ///     application commands.
         /// </returns>
-        public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetGlobalApplicationCommandsAsync(RequestOptions options = null)
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetGlobalApplicationCommandsAsync(bool withLocalizations = false, RequestOptions options = null)
         {
-            var commands = (await ApiClient.GetGlobalApplicationCommandsAsync(options)).Select(x => SocketApplicationCommand.Create(this, x));
+            var commands = (await ApiClient.GetGlobalApplicationCommandsAsync(withLocalizations, options)).Select(x => SocketApplicationCommand.Create(this, x));
 
             foreach(var command in commands)
             {
@@ -3230,8 +3230,8 @@ namespace Discord.WebSocket
         async Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
             => await GetGlobalApplicationCommandAsync(id, options);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(RequestOptions options)
-            => await GetGlobalApplicationCommandsAsync(options);
+        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(bool withLocalizations, RequestOptions options)
+            => await GetGlobalApplicationCommandsAsync(withLocalizations, options);
 
         /// <inheritdoc />
         async Task IDiscordClient.StartAsync()

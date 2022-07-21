@@ -243,7 +243,7 @@ namespace Discord.Rest
             => Task.FromResult<IApplicationCommand>(null);
 
         /// <inheritdoc />
-        Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(RequestOptions options)
+        Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(bool withLocalizations, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IApplicationCommand>>(ImmutableArray.Create<IApplicationCommand>());
         Task<IApplicationCommand> IDiscordClient.CreateGlobalApplicationCommand(ApplicationCommandProperties properties, RequestOptions options)
             => Task.FromResult<IApplicationCommand>(null);
@@ -257,6 +257,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         Task IDiscordClient.StopAsync()
             => Task.Delay(0);
-        #endregion 
+        #endregion
     }
 }
