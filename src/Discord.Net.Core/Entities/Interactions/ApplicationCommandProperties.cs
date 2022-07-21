@@ -30,7 +30,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the localization dictionary for the name field of this command.
         /// </summary>
-        public IReadOnlyDictionary<string, string>? NameLocalizations
+        public IReadOnlyDictionary<string, string> NameLocalizations
         {
             get => _nameLocalizations;
             set
@@ -52,7 +52,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the localization dictionary for the description field of this command.
         /// </summary>
-        public IReadOnlyDictionary<string, string>? DescriptionLocalizations
+        public IReadOnlyDictionary<string, string> DescriptionLocalizations
         {
             get => _descriptionLocalizations;
             set

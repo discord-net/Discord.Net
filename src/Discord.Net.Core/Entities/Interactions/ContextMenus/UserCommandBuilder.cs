@@ -116,6 +116,7 @@ namespace Discord
             }
 
             _nameLocalizations = new Dictionary<string, string>(nameLocalizations);
+            return this;
         }
         
         /// <summary>

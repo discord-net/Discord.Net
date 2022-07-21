@@ -53,12 +53,12 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the localization dictionary for the name field of this command.
         /// </summary>
-        public IReadOnlyDictionary<string, string>? NameLocalizations { get; private set; }
+        public IReadOnlyDictionary<string, string> NameLocalizations { get; private set; }
 
         /// <summary>
         ///     Gets the localization dictionary for the description field of this command.
         /// </summary>
-        public IReadOnlyDictionary<string, string>? DescriptionLocalizations { get; private set; }
+        public IReadOnlyDictionary<string, string> DescriptionLocalizations { get; private set; }
 
         /// <summary>
         ///     Gets the localized name of this command.
@@ -66,7 +66,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
         /// </remarks>
-        public string? NameLocalized { get; private set; }
+        public string NameLocalized { get; private set; }
 
         /// <summary>
         ///     Gets the localized description of this command.
@@ -74,7 +74,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
         /// </remarks>
-        public string? DescriptionLocalized { get; private set; }
+        public string DescriptionLocalized { get; private set; }
 
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt

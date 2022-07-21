@@ -18,9 +18,9 @@ namespace Discord.API.Rest
         public Optional<bool> DefaultPermission { get; set; }
 
         [JsonProperty("name_localizations")]
-        public Optional<Dictionary<string, string>?> NameLocalizations { get; set; }
+        public Optional<Dictionary<string, string>> NameLocalizations { get; set; }
 
         [JsonProperty("description_localizations")]
-        public Optional<Dictionary<string, string>?> DescriptionLocalizations { get; set; }
+        public Optional<Dictionary<string, string>> DescriptionLocalizations { get; set; }
     }
 }
