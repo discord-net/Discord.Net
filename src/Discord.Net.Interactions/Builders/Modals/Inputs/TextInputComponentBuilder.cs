@@ -41,7 +41,7 @@ namespace Discord.Interactions.Builders
         /// <summary>
         ///     Sets <see cref="Style"/>.
         /// </summary>
-        /// <param name="style">New value of the <see cref="SetValue(string)"/>.</param>
+        /// <param name="style">New value of the <see cref="Style"/>.</param>
         /// <returns>
         ///     The builder instance.
         /// </returns>

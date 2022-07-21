@@ -51,6 +51,8 @@ namespace Discord.Interactions
                 Name = commandInfo.Name,
                 Description = commandInfo.Description,
                 IsDefaultPermission = commandInfo.DefaultPermission,
+                IsDMEnabled = commandInfo.IsEnabledInDm,
+                DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
             }.WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
             .WithDescriptionLocalizations(localizationManager?.GetAllDescriptions(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
             .Build();
@@ -88,12 +90,24 @@ namespace Discord.Interactions
 
             return commandInfo.CommandType switch
             {
-                ApplicationCommandType.Message => new MessageCommandBuilder { Name = commandInfo.Name, IsDefaultPermission = commandInfo.DefaultPermission}
-                    .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
-                    .Build(),
-                ApplicationCommandType.User => new UserCommandBuilder { Name = commandInfo.Name, IsDefaultPermission=commandInfo.DefaultPermission}
-                    .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
-                    .Build(),
+                ApplicationCommandType.Message => new MessageCommandBuilder
+                {
+                    Name = commandInfo.Name,
+                    IsDefaultPermission = commandInfo.DefaultPermission,
+                    DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
+                    IsDMEnabled = commandInfo.IsEnabledInDm
+                }
+                .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
+                .Build(),
+                ApplicationCommandType.User => new UserCommandBuilder
+                {
+                    Name = commandInfo.Name,
+                    IsDefaultPermission = commandInfo.DefaultPermission,
+                    DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
+                    IsDMEnabled = commandInfo.IsEnabledInDm
+                }
+                .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
+                .Build(),
                 _ => throw new InvalidOperationException($"{commandInfo.CommandType} isn't a supported command type.")
             };
         }
@@ -145,6 +159,8 @@ namespace Discord.Interactions
                     Name = moduleInfo.SlashGroupName,
                     Description = moduleInfo.Description,
                     IsDefaultPermission = moduleInfo.DefaultPermission,
+                    IsDMEnabled = moduleInfo.IsEnabledInDm,
+                    DefaultMemberPermissions = moduleInfo.DefaultMemberPermissions
                 }
                 .WithNameLocalizations(localizationManager?.GetAllNames(modulePath, LocalizationTarget.Group) ?? ImmutableDictionary<string, string>.Empty)
                 .WithDescriptionLocalizations(localizationManager?.GetAllDescriptions(modulePath, LocalizationTarget.Group) ?? ImmutableDictionary<string, string>.Empty)
@@ -243,5 +259,29 @@ namespace Discord.Interactions
                 NameLocalizations = commandOption.NameLocalizations?.ToImmutableDictionary(),
                 DescriptionLocalizations = commandOption.DescriptionLocalizations?.ToImmutableDictionary()
             };
+
+        public static Modal ToModal(this ModalInfo modalInfo, string customId, Action<ModalBuilder> modifyModal = null)
+        {
+            var builder = new ModalBuilder(modalInfo.Title, customId);
+
+            foreach (var input in modalInfo.Components)
+                switch (input)
+                {
+                    case TextInputComponentInfo textComponent:
+                        builder.AddTextInput(textComponent.Label, textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
+                            textComponent.MaxLength, textComponent.IsRequired, textComponent.InitialValue);
+                        break;
+                    default:
+                        throw new InvalidOperationException($"{input.GetType().FullName} isn't a valid component info class");
+                }
+
+            if(modifyModal is not null)
+                modifyModal(builder);
+
+            return builder.Build();
+        }
+
+        public static GuildPermission? SanitizeGuildPermissions(this GuildPermission permissions) =>
+            permissions == 0 ? null : permissions;
     }
 }

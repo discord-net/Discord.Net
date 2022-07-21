@@ -37,5 +37,12 @@ namespace Discord.API
 
         [JsonProperty("description_localized")]
         public Optional<string?> DescriptionLocalized { get; set; }
+        
+        // V2 Permissions
+        [JsonProperty("dm_permission")]
+        public Optional<bool?> DmPermission { get; set; }
+
+        [JsonProperty("default_member_permissions")]
+        public Optional<GuildPermission?> DefaultMemberPermission { get; set; }
     }
 }

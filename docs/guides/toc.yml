@@ -57,6 +57,8 @@
       topicUid: Guides.IntFw.DI
     - name: Post-execution Handling
       topicUid: Guides.IntFw.PostExecution
+    - name: Permissions
+      topicUid: Guides.IntFw.Perms
 - name: Slash Command Basics
   items:
     - name: Introduction
@@ -115,6 +117,8 @@
       topicUid: Guides.OtherLibs.Serilog
     - name: EFCore
       topicUid: Guides.OtherLibs.EFCore
+    - name: MediatR
+      topicUid: Guides.OtherLibs.MediatR
 - name: Emoji
   topicUid: Guides.Emoji
 - name: Voice

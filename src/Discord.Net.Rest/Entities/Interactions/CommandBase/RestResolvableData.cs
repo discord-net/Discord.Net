@@ -22,7 +22,7 @@ namespace Discord.Rest
         internal readonly Dictionary<ulong, Attachment> Attachments
             = new Dictionary<ulong, Attachment>();
 
-        internal async Task PopulateAsync(DiscordRestClient discord, RestGuild guild, IRestMessageChannel channel, T model)
+        internal async Task PopulateAsync(DiscordRestClient discord, RestGuild guild, IRestMessageChannel channel, T model, bool doApiCall)
         {
             var resolved = model.Resolved.Value;
 
@@ -38,15 +38,26 @@ namespace Discord.Rest
 
             if (resolved.Channels.IsSpecified)
             {
-                var channels = await guild.GetChannelsAsync().ConfigureAwait(false);
+                var channels = doApiCall ? await guild.GetChannelsAsync().ConfigureAwait(false) : null;
 
                 foreach (var channelModel in resolved.Channels.Value)
                 {
-                    var restChannel = channels.FirstOrDefault(x => x.Id == channelModel.Value.Id);
+                    if (channels != null)
+                    {
+                        var guildChannel = channels.FirstOrDefault(x => x.Id == channelModel.Value.Id);
 
-                    restChannel.Update(channelModel.Value);
+                        guildChannel.Update(channelModel.Value);
 
-                    Channels.Add(ulong.Parse(channelModel.Key), restChannel);
+                        Channels.Add(ulong.Parse(channelModel.Key), guildChannel);
+                    }
+                    else
+                    {
+                        var restChannel = RestChannel.Create(discord, channelModel.Value);
+
+                        restChannel.Update(channelModel.Value);
+
+                        Channels.Add(ulong.Parse(channelModel.Key), restChannel);
+                    }
                 }
             }
 
@@ -76,7 +87,10 @@ namespace Discord.Rest
             {
                 foreach (var msg in resolved.Messages.Value)
                 {
-                    channel ??= (IRestMessageChannel)(Channels.FirstOrDefault(x => x.Key == msg.Value.ChannelId).Value ?? await discord.GetChannelAsync(msg.Value.ChannelId).ConfigureAwait(false));
+                    channel ??= (IRestMessageChannel)(Channels.FirstOrDefault(x => x.Key == msg.Value.ChannelId).Value
+                        ?? (doApiCall
+                        ? await discord.GetChannelAsync(msg.Value.ChannelId).ConfigureAwait(false)
+                        : null));
 
                     RestUser author;
 

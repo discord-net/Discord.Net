@@ -104,6 +104,10 @@ namespace Discord.Rest
                         : Optional<bool>.Unspecified,
                 NameLocalizations = arg.NameLocalizations?.ToDictionary(),
                 DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary()
+
+                // TODO: better conversion to nullable optionals
+                DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                DmPermission = arg.IsDMEnabled.ToNullable() 
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -140,6 +144,10 @@ namespace Discord.Rest
                         : Optional<bool>.Unspecified,
                     NameLocalizations = arg.NameLocalizations?.ToDictionary(),
                     DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary()
+
+                    // TODO: better conversion to nullable optionals
+                    DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                    DmPermission = arg.IsDMEnabled.ToNullable()
                 };
 
                 Console.WriteLine("Locales:" + string.Join(",", arg.NameLocalizations.Keys));
@@ -181,6 +189,10 @@ namespace Discord.Rest
                         : Optional<bool>.Unspecified,
                     NameLocalizations = arg.NameLocalizations?.ToDictionary(),
                     DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary()
+
+                    // TODO: better conversion to nullable optionals
+                    DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                    DmPermission = arg.IsDMEnabled.ToNullable()
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -299,6 +311,10 @@ namespace Discord.Rest
                         : Optional<bool>.Unspecified,
                 NameLocalizations = arg.NameLocalizations?.ToDictionary(),
                 DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary()
+
+                // TODO: better conversion to nullable optionals
+                DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                DmPermission = arg.IsDMEnabled.ToNullable()
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -367,7 +383,7 @@ namespace Discord.Rest
         #endregion
 
         #region Responses
-        public static async Task<Message> ModifyFollowupMessageAsync(BaseDiscordClient client, RestFollowupMessage message, Action<MessageProperties> func,
+        public static async Task<Discord.API.Message> ModifyFollowupMessageAsync(BaseDiscordClient client, RestFollowupMessage message, Action<MessageProperties> func,
             RequestOptions options = null)
         {
             var args = new MessageProperties();
@@ -409,7 +425,7 @@ namespace Discord.Rest
         }
         public static async Task DeleteFollowupMessageAsync(BaseDiscordClient client, RestFollowupMessage message, RequestOptions options = null)
             => await client.ApiClient.DeleteInteractionFollowupMessageAsync(message.Id, message.Token, options);
-        public static async Task<Message> ModifyInteractionResponseAsync(BaseDiscordClient client, string token, Action<MessageProperties> func,
+        public static async Task<API.Message> ModifyInteractionResponseAsync(BaseDiscordClient client, string token, Action<MessageProperties> func,
            RequestOptions options = null)
         {
             var args = new MessageProperties();

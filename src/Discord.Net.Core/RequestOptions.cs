@@ -73,6 +73,8 @@ namespace Discord
         internal bool IsReactionBucket { get; set; }
         internal bool IsGatewayBucket { get; set; }
 
+        internal IDictionary<string, IEnumerable<string>> RequestHeaders { get; }
+
         internal static RequestOptions CreateOrClone(RequestOptions options)
         {
             if (options == null)
@@ -99,6 +101,7 @@ namespace Discord
         public RequestOptions()
         {
             Timeout = DiscordConfig.DefaultRequestTimeout;
+            RequestHeaders = new Dictionary<string, IEnumerable<string>>();
         }
 
         public RequestOptions Clone() => MemberwiseClone() as RequestOptions;

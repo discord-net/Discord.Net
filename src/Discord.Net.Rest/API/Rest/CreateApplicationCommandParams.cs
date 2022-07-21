@@ -29,6 +29,12 @@ namespace Discord.API.Rest
         [JsonProperty("description_localizations")]
         public Optional<Dictionary<string, string>?> DescriptionLocalizations { get; set; }
 
+        [JsonProperty("dm_permission")]
+        public Optional<bool?> DmPermission { get; set; }
+
+        [JsonProperty("default_member_permissions")]
+        public Optional<GuildPermission?> DefaultMemberPermission { get; set; }
+
         public CreateApplicationCommandParams() { }
         public CreateApplicationCommandParams(string name, string description, ApplicationCommandType type, ApplicationCommandOption[] options = null,
             IDictionary<string, string> nameLocalizations = null, IDictionary<string, string> descriptionLocalizations = null)

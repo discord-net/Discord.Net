@@ -621,17 +621,19 @@ namespace Discord.WebSocket
         #endregion
 
         #region Bans
-        /// <summary>
-        ///     Gets a collection of all users banned in this guild.
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
-        ///     ban objects that this guild currently possesses, with each object containing the user banned and reason
-        ///     behind the ban.
-        /// </returns>
-        public Task<IReadOnlyCollection<RestBan>> GetBansAsync(RequestOptions options = null)
-            => GuildHelper.GetBansAsync(this, Discord, options);
+
+        /// <inheritdoc cref="IGuild.GetBansAsync(int, RequestOptions)" />
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, null, Direction.Before, limit, options);
+
+        /// <inheritdoc cref="IGuild.GetBansAsync(ulong, Direction, int, RequestOptions)" />
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, fromUserId, dir, limit, options);
+
+        /// <inheritdoc cref="IGuild.GetBansAsync(IUser, Direction, int, RequestOptions)" />
+        public IAsyncEnumerable<IReadOnlyCollection<RestBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null)
+            => GuildHelper.GetBansAsync(this, Discord, fromUser.Id, dir, limit, options);
+
         /// <summary>
         ///     Gets a ban object for a banned user.
         /// </summary>
@@ -703,7 +705,15 @@ namespace Discord.WebSocket
         /// </returns>
         public SocketThreadChannel GetThreadChannel(ulong id)
             => GetChannel(id) as SocketThreadChannel;
-
+        /// <summary>
+        ///     Gets a forum channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the forum channel.</param>
+        /// <returns>
+        ///     A forum channel associated with the specified <paramref name="id" />; <see langword="null"/> if none is found.
+        /// </returns>
+        public SocketForumChannel GetForumChannel(ulong id)
+            => GetChannel(id) as SocketForumChannel;
         /// <summary>
         ///     Gets a voice channel in this guild.
         /// </summary>
@@ -1290,7 +1300,6 @@ namespace Discord.WebSocket
         ///     in order to use this property.
         ///     </remarks>
         /// </param>
-        /// <param name="speakers">A collection of speakers for the event.</param>
         /// <param name="location">The location of the event; links are supported</param>
         /// <param name="coverImage">The optional banner image for the event.</param>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -1780,7 +1789,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         ulong? IGuild.AFKChannelId => AFKChannelId;
         /// <inheritdoc />
-        IAudioClient IGuild.AudioClient => null;
+        IAudioClient IGuild.AudioClient => AudioClient;
         /// <inheritdoc />
         bool IGuild.Available => true;
         /// <inheritdoc />
@@ -1811,8 +1820,14 @@ namespace Discord.WebSocket
         async Task<IReadOnlyCollection<IGuildScheduledEvent>> IGuild.GetEventsAsync(RequestOptions options)
             => await GetEventsAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
-            => await GetBansAsync(options).ConfigureAwait(false);
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(int limit, RequestOptions options)
+            => GetBansAsync(limit, options);
+        /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(ulong fromUserId, Direction dir, int limit, RequestOptions options)
+            => GetBansAsync(fromUserId, dir, limit, options);
+        /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(IUser fromUser, Direction dir, int limit, RequestOptions options)
+            => GetBansAsync(fromUser, dir, limit, options);
         /// <inheritdoc/>
         async Task<IBan> IGuild.GetBanAsync(IUser user, RequestOptions options)
             => await GetBanAsync(user, options).ConfigureAwait(false);

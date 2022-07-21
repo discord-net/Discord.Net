@@ -38,7 +38,7 @@ body:
     id: description
     attributes: 
       label: Description
-      description: A brief explination of the bug.
+      description: A brief explanation of the bug.
       placeholder: When I start a DiscordSocketClient without stopping it, the gateway thread gets blocked.
     validations:
       required: true
@@ -62,7 +62,7 @@ body:
     id: logs
     attributes: 
       label: Logs
-      description: Add applicable logs and/or a stacktrace here.
+      description: Add applicable logs and/or a stack trace here.
     validations:
       required: true
   - type: textarea

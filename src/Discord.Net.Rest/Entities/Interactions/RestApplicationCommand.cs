@@ -27,6 +27,12 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public bool IsDefaultPermission { get; private set; }
 
+        /// <inheritdoc/>
+        public bool IsEnabledInDm { get; private set; }
+
+        /// <inheritdoc/>
+        public GuildPermissions DefaultMemberPermissions { get; private set; }
+
         /// <summary>
         ///     Gets a collection of options for this command.
         /// </summary>
@@ -92,6 +98,9 @@ namespace Discord.Rest
 
             NameLocalized = model.NameLocalized.GetValueOrDefault();
             DescriptionLocalized = model.DescriptionLocalized.GetValueOrDefault();
+            
+            IsEnabledInDm = model.DmPermission.GetValueOrDefault(true).GetValueOrDefault(true);
+            DefaultMemberPermissions = new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(0).GetValueOrDefault(0));
         }
 
         /// <inheritdoc/>

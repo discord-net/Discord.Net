@@ -52,10 +52,13 @@ namespace Discord
         /// <summary>
         ///     Gets the preferred locale of the invoking User.
         /// </summary>
+        /// <remarks>
+        ///     This property returns <see langword="null"/> if the interaction is a REST ping interaction.
+        /// </remarks>
         string UserLocale { get; }
 
         /// <summary>
-        ///     Gets the preferred locale of the guild this interaction was executed in. <see cref="null"/> if not executed in a guild.
+        ///     Gets the preferred locale of the guild this interaction was executed in. <see langword="null"/> if not executed in a guild.
         /// </summary>
         /// <remarks>
         ///     Non-community guilds (With no locale setting available) will have en-US as the default value sent by Discord.
@@ -66,6 +69,27 @@ namespace Discord
         ///     Gets whether or not this interaction was executed in a dm channel.
         /// </summary>
         bool IsDMInteraction { get; }
+
+        /// <summary>
+        ///     Gets the ID of the channel this interaction was executed in.
+        /// </summary>
+        /// <remarks>
+        ///     This property returns <see langword="null"/> if the interaction is a REST ping interaction.
+        /// </remarks>
+        ulong? ChannelId { get; }
+
+        /// <summary>
+        ///     Gets the ID of the guild this interaction was executed in.
+        /// </summary>
+        /// <remarks>
+        ///     This property returns <see langword="null"/> if the interaction was not executed in a guild.
+        /// </remarks>
+        ulong? GuildId { get; }
+
+        /// <summary>
+        ///     Gets the ID of the application this interaction is for.
+        /// </summary>
+        ulong ApplicationId { get; }
 
         /// <summary>
         ///     Responds to an Interaction with type <see cref="InteractionResponseType.ChannelMessageWithSource"/>.
