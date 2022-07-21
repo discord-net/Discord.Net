@@ -856,7 +856,7 @@ namespace Discord
         /// </summary>
         /// <param name="descriptionLocalizations">Localization dictionary for the description field of this command.</param>
         /// <returns>The current builder.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="nameLocalizations"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="descriptionLocalizations"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>
         public SlashCommandOptionBuilder WithDescriptionLocalizations(IDictionary<string, string> descriptionLocalizations)
         {
