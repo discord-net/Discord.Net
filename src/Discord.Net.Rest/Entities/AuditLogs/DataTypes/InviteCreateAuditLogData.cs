@@ -45,7 +45,7 @@ namespace Discord.Rest
             {
                 var inviterId = inviterIdModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
                 var inviterInfo = log.Users.FirstOrDefault(x => x.Id == inviterId);
-                inviter = RestUser.Create(discord, inviterInfo);
+                inviter = (inviterInfo != null) ? RestUser.Create(discord, inviterInfo) : null;
             }
 
             return new InviteCreateAuditLogData(maxAge, code, temporary, inviter, channelId, uses, maxUses);
@@ -76,6 +76,9 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the user that created this invite if available.
         /// </summary>
+        /// <remarks>
+        ///     Will be <see langword="null"/> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
+        /// </remarks>
         /// <returns>
         ///     A user that created this invite or <see langword="null"/>.
         /// </returns>

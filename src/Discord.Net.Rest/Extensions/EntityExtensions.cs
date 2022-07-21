@@ -87,6 +87,7 @@ namespace Discord.Rest
                 ChannelId = entity.InternalChannelId,
                 GuildId = entity.GuildId,
                 MessageId = entity.MessageId,
+                FailIfNotExists = entity.FailIfNotExists
             };
         }
         public static IEnumerable<string> EnumerateMentionTypes(this AllowedMentionTypes mentionTypes)

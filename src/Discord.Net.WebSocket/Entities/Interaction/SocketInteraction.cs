@@ -24,20 +24,11 @@ namespace Discord.WebSocket
         /// </remarks>
         public ISocketMessageChannel Channel { get; private set; }
 
-        /// <summary>
-        ///     Gets the ID of the channel this interaction was used in.
-        /// </summary>
-        /// <remarks>
-        ///     This property is exposed in cases where the bot scope is not provided, so the channel entity cannot be retrieved.
-        ///     <br />
-        ///     To get the channel, you can call <see cref="GetChannelAsync(RequestOptions)"/>
-        ///     as this method makes a request for a <see cref="RestChannel"/> if nothing was found in cache.
-        /// </remarks>
+        /// <inheritdoc/>
         public ulong? ChannelId { get; private set; }
 
         /// <summary>
         ///     Gets the <see cref="SocketUser"/> who triggered this interaction.
-        ///     This property will be <see langword="null"/> if the bot scope isn't used.
         /// </summary>
         public SocketUser User { get; private set; }
 
@@ -73,6 +64,12 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public bool IsDMInteraction { get; private set; }
+
+        /// <inheritdoc/>
+        public ulong? GuildId { get; private set; }
+
+        /// <inheritdoc/>
+        public ulong ApplicationId { get; private set; }
 
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel, SocketUser user)
             : base(client, id)
@@ -119,13 +116,21 @@ namespace Discord.WebSocket
 
         internal virtual void Update(Model model)
         {
-            IsDMInteraction = !model.GuildId.IsSpecified;
+            ChannelId = model.ChannelId.IsSpecified
+                ? model.ChannelId.Value
+                : null;
 
-            ChannelId = model.ChannelId.ToNullable();
+            GuildId = model.GuildId.IsSpecified
+                ? model.GuildId.Value
+                : null;
+
+            IsDMInteraction = GuildId is null;
+            ApplicationId = model.ApplicationId;
 
             Data = model.Data.IsSpecified
                 ? model.Data.Value
                 : null;
+            
             Token = model.Token;
             Version = model.Version;
             Type = model.Type;
@@ -133,6 +138,7 @@ namespace Discord.WebSocket
             UserLocale = model.UserLocale.IsSpecified
                 ? model.UserLocale.Value
                 : null;
+
             GuildLocale = model.GuildLocale.IsSpecified
                 ? model.GuildLocale.Value
                 : null;
@@ -392,7 +398,7 @@ namespace Discord.WebSocket
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
         public abstract Task RespondWithModalAsync(Modal modal, RequestOptions options = null);
-        #endregion
+#endregion
 
         /// <summary>
         ///     Attepts to get the channel this interaction was executed in.
@@ -416,7 +422,7 @@ namespace Discord.WebSocket
             catch(HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions) { return null; } // bot can't view that channel, return null instead of throwing.
         }
 
-        #region  IDiscordInteraction
+#region  IDiscordInteraction
         /// <inheritdoc/>
         IUser IDiscordInteraction.User => User;
 
@@ -446,6 +452,6 @@ namespace Discord.WebSocket
         async Task<IUserMessage> IDiscordInteraction.FollowupWithFileAsync(FileAttachment attachment, string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options)
             => await FollowupWithFileAsync(attachment, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
 #endif
-        #endregion
+#endregion
     }
 }

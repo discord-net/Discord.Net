@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Discord.Rest
@@ -6,7 +8,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a Rest based context of an <see cref="IDiscordInteraction"/>.
     /// </summary>
-    public class RestInteractionContext<TInteraction> : IRestInteractionContext
+    public class RestInteractionContext<TInteraction> : IRestInteractionContext, IRouteMatchContainer
         where TInteraction : RestInteraction
     {
         /// <summary>
@@ -45,6 +47,9 @@ namespace Discord.Rest
         /// </remarks>
         public Func<string, Task> InteractionResponseCallback { get; set; }
 
+        /// <inheritdoc cref="IRouteMatchContainer.SegmentMatches"/>
+        public IReadOnlyCollection<IRouteSegmentMatch> SegmentMatches { get; private set; }
+
         /// <summary>
         ///     Initializes a new <see cref="RestInteractionContext{TInteraction}"/>. 
         /// </summary>
@@ -70,6 +75,13 @@ namespace Discord.Rest
         {
             InteractionResponseCallback = interactionResponseCallback;
         }
+
+        /// <inheritdoc/>
+        public void SetSegmentMatches(IEnumerable<IRouteSegmentMatch> segmentMatches) => SegmentMatches = segmentMatches.ToImmutableArray();
+
+        //IRouteMatchContainer
+        /// <inheritdoc/>
+        IEnumerable<IRouteSegmentMatch> IRouteMatchContainer.SegmentMatches => SegmentMatches;
 
         // IInterationContext
         /// <inheritdoc/>

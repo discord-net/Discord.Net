@@ -9,8 +9,5 @@ namespace Discord.API.Rest
 
         [JsonProperty("members")]
         public ThreadMember[] Members { get; set; }
-
-        [JsonProperty("has_more")]
-        public bool HasMore { get; set; }
     }
 }

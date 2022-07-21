@@ -35,6 +35,19 @@ namespace Discord
         bool IsDefaultPermission { get; }
 
         /// <summary>
+        ///     Indicates whether the command is available in DMs with the app.
+        /// </summary>
+        /// <remarks>
+        ///     Only for globally-scoped commands.
+        /// </remarks>
+        bool IsEnabledInDm { get; }
+
+        /// <summary>
+        ///     Set of default <see cref="GuildPermission"/> required to invoke the command.
+        /// </summary>
+        GuildPermissions DefaultMemberPermissions { get; }
+
+        /// <summary>
         ///     Gets a collection of options for this application command.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOption> Options { get; }

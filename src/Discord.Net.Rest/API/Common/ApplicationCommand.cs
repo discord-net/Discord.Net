@@ -24,5 +24,12 @@ namespace Discord.API
 
         [JsonProperty("default_permission")]
         public Optional<bool> DefaultPermissions { get; set; }
+
+        // V2 Permissions
+        [JsonProperty("dm_permission")]
+        public Optional<bool?> DmPermission { get; set; }
+
+        [JsonProperty("default_member_permissions")]
+        public Optional<GuildPermission?> DefaultMemberPermission { get; set; }
     }
 }

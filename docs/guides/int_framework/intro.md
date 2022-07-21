@@ -86,6 +86,7 @@ By default, your methods can feature the following parameter types:
 - Implementations of [IChannel]
 - Implementations of [IRole]
 - Implementations of [IMentionable]
+- Implementations of [IAttachment]
 - `string`
 - `float`, `double`, `decimal`
 - `bool`
@@ -157,6 +158,14 @@ Interaction service complex parameter constructors are prioritized in the follow
 1. Constructor matching the signature provided in the `[ComplexParameter(Type[])]` overload.
 2. Constuctor tagged with `[ComplexParameterCtor]`.
 3. Type's only public constuctor.
+
+#### DM Permissions
+
+You can use the [EnabledInDmAttribute] to configure whether a globally-scoped top level command should be enabled in Dms or not. Only works on top level commands.
+
+#### Default Member Permissions
+
+[DefaultMemberPermissionsAttribute] can be used when creating a command to set the permissions a user must have to use the command. Permission overwrites can be configured from the Integrations page of Guild Settings. [DefaultMemberPermissionsAttribute] cumulatively propagates down the class hierarchy until it reaches a top level command. This attribute can be only used on top level commands and will not work on commands that are nested in command groups.
 
 ## User Commands
 
@@ -281,6 +290,8 @@ By nesting commands inside a module that is tagged with [GroupAttribute] you can
 > [!WARNING]
 > Although creating nested module stuctures are allowed,
 > you are not permitted to use more than 2 [GroupAttribute]'s in module hierarchy.
+
+[!code-csharp[Command Group Example](samples/intro/groupmodule.cs)]
 
 ## Executing Commands
 

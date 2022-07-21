@@ -6,6 +6,7 @@ namespace Discord.Interactions
     ///     Set the "Default Permission" property of an Application Command.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    [Obsolete($"Soon to be deprecated, use Permissions-v2 attributes like {nameof(EnabledInDmAttribute)} and {nameof(DefaultMemberPermissionsAttribute)}")]
     public class DefaultPermissionAttribute : Attribute
     {
         /// <summary>

@@ -31,6 +31,16 @@ namespace Discord
         /// </summary>
         public bool IsDefaultPermission { get; set; } = true;
 
+        /// <summary>
+        ///     Gets or sets whether or not this command can be used in DMs.
+        /// </summary>
+        public bool IsDMEnabled { get; set; } = true;
+
+        /// <summary>
+        ///     Gets or sets the default permission required to use this slash command.
+        /// </summary>
+        public GuildPermission? DefaultMemberPermissions { get; set; }
+
         private string _name;
 
         /// <summary>
@@ -42,7 +52,9 @@ namespace Discord
             var props = new UserCommandProperties
             {
                 Name = Name,
-                IsDefaultPermission = IsDefaultPermission
+                IsDefaultPermission = IsDefaultPermission,
+                IsDMEnabled = IsDMEnabled,
+                DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified
             };
 
             return props;
@@ -69,6 +81,28 @@ namespace Discord
         public UserCommandBuilder WithDefaultPermission(bool isDefaultPermission)
         {
             IsDefaultPermission = isDefaultPermission;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets whether or not this command can be used in dms
+        /// </summary>
+        /// <param name="permission"><see langword="true"/> if the command is available in dms, otherwise <see langword="false"/>.</param>
+        /// <returns>The current builder.</returns>
+        public UserCommandBuilder WithDMPermission(bool permission)
+        {
+            IsDMEnabled = permission;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the default member permissions required to use this application command.
+        /// </summary>
+        /// <param name="permissions">The permissions required to use this command.</param>
+        /// <returns>The current builder.</returns>
+        public UserCommandBuilder WithDefaultMemberPermissions(GuildPermission? permissions)
+        {
+            DefaultMemberPermissions = permissions;
             return this;
         }
     }

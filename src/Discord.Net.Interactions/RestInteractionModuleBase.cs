@@ -87,12 +87,12 @@ namespace Discord.Interactions
                 await InteractionService._restResponseCallback(Context, payload).ConfigureAwait(false);
         }
 
-        protected override async Task RespondWithModalAsync<T>(string customId, RequestOptions options = null)
+        protected override async Task RespondWithModalAsync<TModal>(string customId, RequestOptions options = null)
         {
             if (Context.Interaction is not RestInteraction restInteraction)
                 throw new InvalidOperationException($"Invalid interaction type. Interaction must be a type of {nameof(RestInteraction)} in order to execute this method");
 
-            var payload = restInteraction.RespondWithModal<T>(customId, options);
+            var payload = restInteraction.RespondWithModal<TModal>(customId, options);
 
             if (Context is IRestInteractionContext restContext && restContext.InteractionResponseCallback != null)
                 await restContext.InteractionResponseCallback.Invoke(payload).ConfigureAwait(false);

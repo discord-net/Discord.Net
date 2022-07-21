@@ -1,4 +1,3 @@
-# Discord.Net
 <p align="center">
   <a href="https://discordnet.dev/" title="Click to visit the documentation!">
     <img src="https://raw.githubusercontent.com/discord-net/Discord.Net/dev/docs/marketing/logo/SVG/Combinationmark%20White%20Border.svg" alt="Logo">
@@ -18,7 +17,7 @@
     <img src="https://discord.com/api/guilds/848176216011046962/widget.png" alt="Discord">
   </a>
 </p>
-Discord NET is an unofficial .NET API Wrapper for the Discord client (https://discord.com).
+Discord.Net is an unofficial .NET API Wrapper for the Discord client (https://discord.com).
 
 ## Documentation
 

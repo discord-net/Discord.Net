@@ -274,7 +274,7 @@ namespace Discord.API
             {
                 ["$device"] = "Discord.Net",
                 ["$os"] = Environment.OSVersion.Platform.ToString(),
-                [$"browser"] = "Discord.Net"
+                ["$browser"] = "Discord.Net"
             };
             var msg = new IdentifyParams()
             {

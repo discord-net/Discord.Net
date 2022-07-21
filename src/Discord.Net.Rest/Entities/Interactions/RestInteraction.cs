@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Interaction;
@@ -16,6 +15,10 @@ namespace Discord.Rest
     /// </summary>
     public abstract class RestInteraction : RestEntity<ulong>, IDiscordInteraction
     {
+        // Added so channel & guild methods don't need a client reference
+        private Func<RequestOptions, ulong, Task<IRestMessageChannel>> _getChannel;
+        private Func<RequestOptions, ulong, Task<RestGuild>> _getGuild;
+
         /// <inheritdoc/>
         public InteractionType Type { get; private set; }
 
@@ -31,6 +34,10 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the user who invoked the interaction.
         /// </summary>
+        /// <remarks>
+        ///     If this user is an <see cref="RestGuildUser"/> and <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false,
+        ///     <see cref="RestGuildUser.Guild"/> will return <see langword="null"/>
+        /// </remarks>
         public RestUser User { get; private set; }
 
         /// <inheritdoc/>
@@ -51,18 +58,35 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the channel that this interaction was executed in.
         /// </summary>
+        /// <remarks>
+        ///     This property will be <see langword="null"/> if <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false.
+        ///     Call <see cref="GetChannelAsync"/> to set this property and get the interaction channel.
+        /// </remarks>
         public IRestMessageChannel Channel { get; private set; }
 
+        /// <inheritdoc/>
+        public ulong? ChannelId { get; private set; }
+
         /// <summary>
-        ///     Gets the guild this interaction was executed in.
+        ///     Gets the guild this interaction was executed in if applicable.
         /// </summary>
+        /// <remarks>
+        ///     This property will be <see langword="null"/> if <see cref="DiscordRestConfig.APIOnRestInteractionCreation"/> is set to false
+        ///     or if the interaction was not executed in a guild.
+        /// </remarks>
         public RestGuild Guild { get; private set; }
+
+        /// <inheritdoc/>
+        public ulong? GuildId { get; private set; }
 
         /// <inheritdoc/>
         public bool HasResponded { get; protected set; }
 
         /// <inheritdoc/>
         public bool IsDMInteraction { get; private set; }
+
+        /// <inheritdoc/>
+        public ulong ApplicationId { get; private set; }
 
         internal RestInteraction(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -72,11 +96,11 @@ namespace Discord.Rest
                 : DateTime.UtcNow;
         }
 
-        internal static async Task<RestInteraction> CreateAsync(DiscordRestClient client, Model model)
+        internal static async Task<RestInteraction> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
             if(model.Type == InteractionType.Ping)
             {
-                return await RestPingInteraction.CreateAsync(client, model);
+                return await RestPingInteraction.CreateAsync(client, model, doApiCall);
             }
 
             if (model.Type == InteractionType.ApplicationCommand)
@@ -90,65 +114,97 @@ namespace Discord.Rest
 
                 return dataModel.Type switch
                 {
-                    ApplicationCommandType.Slash => await RestSlashCommand.CreateAsync(client, model).ConfigureAwait(false),
-                    ApplicationCommandType.Message => await RestMessageCommand.CreateAsync(client, model).ConfigureAwait(false),
-                    ApplicationCommandType.User => await RestUserCommand.CreateAsync(client, model).ConfigureAwait(false),
+                    ApplicationCommandType.Slash => await RestSlashCommand.CreateAsync(client, model, doApiCall).ConfigureAwait(false),
+                    ApplicationCommandType.Message => await RestMessageCommand.CreateAsync(client, model, doApiCall).ConfigureAwait(false),
+                    ApplicationCommandType.User => await RestUserCommand.CreateAsync(client, model, doApiCall).ConfigureAwait(false),
                     _ => null
                 };
             }
 
             if (model.Type == InteractionType.MessageComponent)
-                return await RestMessageComponent.CreateAsync(client, model).ConfigureAwait(false);
+                return await RestMessageComponent.CreateAsync(client, model, doApiCall).ConfigureAwait(false);
 
             if (model.Type == InteractionType.ApplicationCommandAutocomplete)
-                return await RestAutocompleteInteraction.CreateAsync(client, model).ConfigureAwait(false);
+                return await RestAutocompleteInteraction.CreateAsync(client, model, doApiCall).ConfigureAwait(false);
 
             if (model.Type == InteractionType.ModalSubmit)
-                return await RestModal.CreateAsync(client, model).ConfigureAwait(false);
+                return await RestModal.CreateAsync(client, model, doApiCall).ConfigureAwait(false);
 
             return null;
         }
 
-        internal virtual async Task UpdateAsync(DiscordRestClient discord, Model model)
+        internal virtual async Task UpdateAsync(DiscordRestClient discord, Model model, bool doApiCall)
         {
-            IsDMInteraction = !model.GuildId.IsSpecified;
+            ChannelId = model.ChannelId.IsSpecified
+                ? model.ChannelId.Value
+                : null;
+
+            GuildId = model.GuildId.IsSpecified
+                ? model.GuildId.Value
+                : null;
+            
+            IsDMInteraction = GuildId is null;
 
             Data = model.Data.IsSpecified
                 ? model.Data.Value
                 : null;
+            
             Token = model.Token;
             Version = model.Version;
             Type = model.Type;
+            ApplicationId = model.ApplicationId;
 
-            if(Guild == null && model.GuildId.IsSpecified)
+            if (Guild is null && GuildId is not null)
             {
-                Guild = await discord.GetGuildAsync(model.GuildId.Value);
+                if (doApiCall)
+                    Guild = await discord.GetGuildAsync(GuildId.Value);
+                else
+                {
+                    Guild = null;
+                    _getGuild = async (opt, ul) => await discord.GetGuildAsync(ul, opt);
+                }
             }
 
-            if (User == null)
+            if (User is null)
             {
-                if (model.Member.IsSpecified && model.GuildId.IsSpecified)
+                if (model.Member.IsSpecified && GuildId is not null)
                 {
-                    User = RestGuildUser.Create(Discord, Guild, model.Member.Value);
+                    User = RestGuildUser.Create(Discord, Guild, model.Member.Value, GuildId);
                 }
                 else
                 {
                     User = RestUser.Create(Discord, model.User.Value);
                 }
             }
+            
 
-            if(Channel == null && model.ChannelId.IsSpecified)
+            if (Channel is null && ChannelId is not null)
             {
                 try
                 {
-                    Channel = (IRestMessageChannel)await discord.GetChannelAsync(model.ChannelId.Value);
+                    if (doApiCall)
+                        Channel = (IRestMessageChannel)await discord.GetChannelAsync(ChannelId.Value);
+                    else
+                    {
+                        Channel = null;
+
+                        _getChannel = async (opt, ul) =>
+                        {
+                            if (Guild is null)
+                                return (IRestMessageChannel)await discord.GetChannelAsync(ul, opt);
+
+                            // get a guild channel if the guild is set.
+                            return (IRestMessageChannel)await Guild.GetChannelAsync(ul, opt);
+                        };
+                    }
                 }
-                catch(HttpException x) when(x.DiscordCode == DiscordErrorCode.MissingPermissions) { } // ignore
+                catch (HttpException x) when (x.DiscordCode == DiscordErrorCode.MissingPermissions) { } // ignore
             }
 
             UserLocale = model.UserLocale.IsSpecified
-               ? model.UserLocale.Value
-               : null;
+                ? model.UserLocale.Value
+                : null;
+
             GuildLocale = model.GuildLocale.IsSpecified
                 ? model.GuildLocale.Value
                 : null;
@@ -162,6 +218,54 @@ namespace Discord.Rest
                 DiscordRestClient.Serializer.Serialize(writer, payload);
 
             return json.ToString();
+        }
+
+        /// <summary>
+        ///     Gets the channel this interaction was executed in. Will be a DM channel if the interaction was executed in DM.
+        /// </summary>
+        /// <remarks>
+        ///     Calling this method successfully will populate the <see cref="Channel"/> property.
+        ///     After this, further calls to this method will no longer call the API, and depend on the value set in <see cref="Channel"/>.
+        /// </remarks>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
+        /// <returns>A Rest channel to send messages to.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if no channel can be received.</exception>
+        public async Task<IRestMessageChannel> GetChannelAsync(RequestOptions options = null)
+        {
+            if (Channel is not null)
+                return Channel;
+
+            if (IsDMInteraction)
+            {
+                Channel = await User.CreateDMChannelAsync(options);
+            }
+            else if (ChannelId is not null)
+            {
+                Channel = await _getChannel(options, ChannelId.Value) ?? throw new InvalidOperationException("The interaction channel was not able to be retrieved.");
+                _getChannel = null; // get rid of it, we don't need it anymore.
+            }
+
+            return Channel;
+        }
+
+        /// <summary>
+        ///     Gets the guild this interaction was executed in if applicable.
+        /// </summary>
+        /// <remarks>
+        ///     Calling this method successfully will populate the <see cref="Guild"/> property.
+        ///     After this, further calls to this method will no longer call the API, and depend on the value set in <see cref="Guild"/>.
+        /// </remarks>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
+        /// <returns>The guild this interaction was executed in. <see langword="null"/> if the interaction was executed inside DM.</returns>
+        public async Task<RestGuild> GetGuildAsync(RequestOptions options)
+        {
+            if (GuildId is null)
+                return null;
+
+            Guild ??= await _getGuild(options, GuildId.Value);
+            _getGuild = null; // get rid of it, we don't need it anymore.
+
+            return Guild;
         }
 
         /// <inheritdoc/>
@@ -333,7 +437,6 @@ namespace Discord.Rest
             => await FollowupWithFilesAsync(attachments, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
         /// <inheritdoc/>
         Task IDiscordInteraction.RespondWithFilesAsync(IEnumerable<FileAttachment> attachments, string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options) => throw new NotSupportedException("REST-Based interactions don't support files.");
-        /// <inheritdoc/>
 #if NETCOREAPP3_0_OR_GREATER != true
         /// <inheritdoc/>
         Task IDiscordInteraction.RespondWithFileAsync(Stream fileStream, string fileName, string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options) => throw new NotSupportedException("REST-Based interactions don't support files.");

@@ -7,30 +7,55 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct ChannelPermissions
     {
-        /// <summary> Gets a blank <see cref="ChannelPermissions"/> that grants no permissions.</summary>
-        /// <returns> A <see cref="ChannelPermissions"/> structure that does not contain any set permissions.</returns>
-        public static readonly ChannelPermissions None = new ChannelPermissions();
-        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for text channels.</summary>
-        public static readonly ChannelPermissions Text = new ChannelPermissions(0b0_11111_0101100_0000000_1111111110001_010001);
-        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for voice channels.</summary>
-        public static readonly ChannelPermissions Voice = new ChannelPermissions(0b1_00000_0000100_1111110_0000000011100_010001);
-        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for stage channels.</summary>
-        public static readonly ChannelPermissions Stage = new ChannelPermissions(0b0_00000_1000100_0111010_0000000010000_010001);
-        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for category channels.</summary>
-        public static readonly ChannelPermissions Category = new ChannelPermissions(0b01100_1111110_1111111110001_010001);
-        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for direct message channels.</summary>
-        public static readonly ChannelPermissions DM = new ChannelPermissions(0b00000_1000110_1011100110001_000000);
-        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for group channels.</summary>
-        public static readonly ChannelPermissions Group = new ChannelPermissions(0b00000_1000110_0001101100000_000000);
-        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for a given channel type.</summary>
+        /// <summary>
+        ///     Gets a blank <see cref="ChannelPermissions"/> that grants no permissions.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ChannelPermissions"/> structure that does not contain any set permissions.
+        /// </returns>
+        public static readonly ChannelPermissions None = new();
+
+        /// <summary>
+        ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for text channels.
+        /// </summary>
+        public static readonly ChannelPermissions Text = new(0b0_11111_0101100_0000000_1111111110001_010001);
+
+        /// <summary>
+        ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for voice channels.
+        /// </summary>
+        public static readonly ChannelPermissions Voice = new(0b1_11111_0101100_1111110_1111111111101_010001); // (0b1_00000_0000100_1111110_0000000011100_010001 (<- voice only perms) |= Text)
+
+        /// <summary>
+        ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for stage channels.
+        /// </summary>
+        public static readonly ChannelPermissions Stage = new(0b0_00000_1000100_0111010_0000000010000_010001);
+
+        /// <summary>
+        ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for category channels.
+        /// </summary>
+        public static readonly ChannelPermissions Category = new(0b01100_1111110_1111111110001_010001);
+
+        /// <summary>
+        ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for direct message channels.
+        /// </summary>
+        public static readonly ChannelPermissions DM = new(0b00000_1000110_1011100110001_000000);
+
+        /// <summary>
+        ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for group channels.
+        /// </summary>
+        public static readonly ChannelPermissions Group = new(0b00000_1000110_0001101100000_000000);
+
+        /// <summary>
+        ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for a given channel type.
+        /// </summary>
         /// <exception cref="ArgumentException">Unknown channel type.</exception>
         public static ChannelPermissions All(IChannel channel)
         {
             return channel switch
             {
-                ITextChannel _ => Text,
                 IStageChannel _ => Stage,
                 IVoiceChannel _ => Voice,
+                ITextChannel _ => Text,
                 ICategoryChannel _ => Category,
                 IDMChannel _ => DM,
                 IGroupChannel _ => Group,

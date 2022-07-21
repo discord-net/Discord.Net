@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>WebHookClient</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" />
+    <PackageReference Include="Discord.Net.Webhook" Version="3.6.1" />
   </ItemGroup>
 
 </Project>

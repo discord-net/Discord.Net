@@ -41,7 +41,18 @@ namespace Discord.Interactions
         /// <summary>
         ///     Gets the default Permission of this module.
         /// </summary>
+        [Obsolete($"To be deprecated soon, use {nameof(IsEnabledInDm)} and {nameof(DefaultMemberPermissions)} instead.")]
         public bool DefaultPermission { get; }
+
+        /// <summary>
+        ///     Gets whether this command can be used in DMs.
+        /// </summary>
+        public bool IsEnabledInDm { get; }
+
+        /// <summary>
+        ///     Gets the default permissions needed for executing this command.
+        /// </summary>
+        public GuildPermission? DefaultMemberPermissions { get; }
 
         /// <summary>
         ///     Gets the collection of Sub Modules of this module.
@@ -110,6 +121,8 @@ namespace Discord.Interactions
             Description = builder.Description;
             Parent = parent;
             DefaultPermission = builder.DefaultPermission;
+            IsEnabledInDm = builder.IsEnabledInDm;
+            DefaultMemberPermissions = BuildDefaultMemberPermissions(builder);
             SlashCommands = BuildSlashCommands(builder).ToImmutableArray();
             ContextCommands = BuildContextCommands(builder).ToImmutableArray();
             ComponentCommands = BuildComponentCommands(builder).ToImmutableArray();
@@ -225,6 +238,21 @@ namespace Discord.Interactions
                 currentParent = currentParent.Parent;
             }
             return true;
+        }
+
+        private static GuildPermission? BuildDefaultMemberPermissions(ModuleBuilder builder)
+        {
+            var permissions = builder.DefaultMemberPermissions;
+
+            var parent = builder.Parent;
+
+            while (parent != null)
+            {
+                permissions = (permissions ?? 0) | (parent.DefaultMemberPermissions ?? 0).SanitizeGuildPermissions();
+                parent = parent.Parent;
+            }
+
+            return permissions;
         }
     }
 }

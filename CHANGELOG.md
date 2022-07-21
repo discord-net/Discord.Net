@@ -1,4 +1,65 @@
 # Changelog
+## [3.7.2] - 2022-06-02
+### Added
+- #2328 Add method overloads to InteractionService (0fad3e8)
+- #2336 Add support for attachments on interaction response type 7 (35db22e)
+- #2338 AddOptions no longer has an uneeded restriction, added AddOptions to SlashCommandOptionBuilder (3a37f89)
+
+### Fixed
+- #2342 Disable TIV restrictions for rollout of TIV (7adf516)
+
+## [3.7.1] - 2022-05-27
+### Added
+- #2325 Add missing interaction properties (d3a693a)
+- #2330 Add better call control in ParseHttpInteraction (a890de9)
+
+### Fixed
+- #2329 Voice perms not retaining text perms. (712a4ae)
+- #2331 NRE with Cacheable.DownloadAsync() (e1f9b76)
+
+## [3.7.0] - 2022-05-24
+### Added
+- #2269 Text-In-Voice (23656e8)
+- #2281 Optional API calling to RestInteraction (a24dde4)
+- #2283 Support FailIfNotExists on MessageReference (0ec8938)
+- #2284 Add Parse & TryParse to EmbedBuilder & Add ToJsonString extension (cea59b5)
+- #2289 Add UpdateAsync to SocketModal (b333de2)
+- #2291 Webhook support for threads (b0a3b65)
+- #2295 Add DefaultArchiveDuration to ITextChannel (1f01881)
+- #2296 Add `.With` methods to ActionRowBuilder (13ccc7c)
+- #2307 Add Nullable ComponentTypeConverter and TypeReader (6fbd396)
+- #2316 Forum channels (7a07fd6)
+
+### Fixed
+- #2290 Possible NRE in Sanitize (20ffa64)
+- #2293 Application commands are disabled to everyone except admins by default (b465d60)
+- #2299 Close-stage bucketId being null (725d255)
+- #2313 Upload file size limit being incorrectly calculated (54a5af7)
+- #2319 Use `IDiscordClient.GetUserAsync` impl in `DiscordSocketClient` (f47f319)
+- #2320 NRE with bot scope and user parameters (88f6168)
+
+## [3.6.1] - 2022-04-30
+### Added
+- #2272 add 50080 Error code (503e720)
+
+### Fixed
+- #2267 Permissions v2 Invalid Operation Exception (a8f6075)
+- #2271 null user on interaction without bot scope (f2bb55e)
+- #2274 Implement fix for Custom Id Segments NRE (0d74c5c)
+
+### Misc
+- 3.6.0 (27226f0)
+
+
+## [3.6.0] - 2022-04-28
+### Added
+- #2136 Passing CustomId matches into contexts (4ce1801)
+- #2222 V2 Permissions (d98b3cc)
+
+### Fixed
+- #2260 Guarding against empty descriptions in `SlashCommandBuilder`/`SlashCommandOptionBuilder` (0554ac2)
+- #2248 Fix SocketGuild not returning the AudioClient (daba58c)
+- #2254 Fix browser property (275b833)
 
 ## [3.5.0] - 2022-04-05
 

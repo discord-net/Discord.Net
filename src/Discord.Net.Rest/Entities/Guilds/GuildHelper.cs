@@ -132,12 +132,15 @@ namespace Discord.Rest
         }
         public static ulong GetUploadLimit(IGuild guild)
         {
-            return guild.PremiumTier switch
+            var tierFactor = guild.PremiumTier switch
             {
-                PremiumTier.Tier2 => 50ul * 1000000,
-                PremiumTier.Tier3 => 100ul * 1000000,
-                _ => 8ul * 1000000
+                PremiumTier.Tier2 => 50,
+                PremiumTier.Tier3 => 100,
+                _ => 8
             };
+
+            var mebibyte = Math.Pow(2, 20);
+            return (ulong) (tierFactor * mebibyte);
         }
         #endregion
 
@@ -151,7 +154,7 @@ namespace Discord.Rest
                 if (fromUserId.HasValue)
                     return GetBansAsync(guild, client, fromUserId.Value + 1, Direction.Before, around + 1, options)
                         .Concat(GetBansAsync(guild, client, fromUserId.Value, Direction.After, around, options));
-                else 
+                else
                     return GetBansAsync(guild, client, null, Direction.Before, around + 1, options);
             }
 
@@ -908,7 +911,7 @@ namespace Discord.Rest
             if (endTime != null && endTime <= startTime)
                 throw new ArgumentOutOfRangeException(nameof(endTime), $"{nameof(endTime)} cannot be before the start time");
 
-            
+
             var apiArgs = new CreateGuildScheduledEventParams()
             {
                 ChannelId = channelId ?? Optional<ulong>.Unspecified,
