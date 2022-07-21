@@ -65,8 +65,6 @@ namespace Discord
         /// </summary>
         public Func<IRateLimitInfo, Task> RatelimitCallback { get; set; }
 
-        public IEnumerable<KeyValuePair<string, IEnumerable<string>>> RequestHeaders { get; } = new Dictionary<string, IEnumerable<string>>();
-
         internal bool IgnoreState { get; set; }
         internal BucketId BucketId { get; set; }
         internal bool IsClientBucket { get; set; }

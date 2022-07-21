@@ -12,9 +12,9 @@ namespace Discord.API
         public object Value { get; set; }
 
         [JsonProperty("name_localizations")]
-        public Optional<Dictionary<string, string>?> NameLocalizations { get; set; }
+        public Optional<Dictionary<string, string>> NameLocalizations { get; set; }
 
         [JsonProperty("name_localized")]
-        public Optional<string?> NameLocalized { get; set; }
+        public Optional<string> NameLocalized { get; set; }
     }
 }

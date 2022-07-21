@@ -18,7 +18,7 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the localization dictionary for the name field of this command option choice.
         /// </summary>
-        public IReadOnlyDictionary<string, string>? NameLocalizations { get; }
+        public IReadOnlyDictionary<string, string> NameLocalizations { get; }
 
         /// <summary>
         ///     Gets the localized name of this command option choice.
@@ -26,7 +26,7 @@ namespace Discord.Rest
         /// <remarks>
         ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
         /// </remarks>
-        public string? NameLocalized { get; }
+        public string NameLocalized { get; }
 
         internal RestApplicationCommandChoice(Model model)
         {

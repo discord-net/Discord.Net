@@ -24,10 +24,10 @@ namespace Discord.API.Rest
         public Optional<bool> DefaultPermission { get; set; }
 
         [JsonProperty("name_localizations")]
-        public Optional<Dictionary<string, string>?> NameLocalizations { get; set; }
+        public Optional<Dictionary<string, string>> NameLocalizations { get; set; }
 
         [JsonProperty("description_localizations")]
-        public Optional<Dictionary<string, string>?> DescriptionLocalizations { get; set; }
+        public Optional<Dictionary<string, string>> DescriptionLocalizations { get; set; }
 
         [JsonProperty("dm_permission")]
         public Optional<bool?> DmPermission { get; set; }
@@ -43,8 +43,8 @@ namespace Discord.API.Rest
             Description = description;
             Options = Optional.Create(options);
             Type = type;
-            NameLocalizations = nameLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>?>.Unspecified;
-            DescriptionLocalizations = descriptionLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>?>.Unspecified;
+            NameLocalizations = nameLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
+            DescriptionLocalizations = descriptionLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
         }
     }
 }

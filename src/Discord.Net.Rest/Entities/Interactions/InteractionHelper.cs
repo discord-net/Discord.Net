@@ -103,7 +103,7 @@ namespace Discord.Rest
                         ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
                 NameLocalizations = arg.NameLocalizations?.ToDictionary(),
-                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary()
+                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
 
                 // TODO: better conversion to nullable optionals
                 DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
@@ -143,7 +143,7 @@ namespace Discord.Rest
                         ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
                     NameLocalizations = arg.NameLocalizations?.ToDictionary(),
-                    DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary()
+                    DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
 
                     // TODO: better conversion to nullable optionals
                     DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
@@ -188,7 +188,7 @@ namespace Discord.Rest
                         ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
                     NameLocalizations = arg.NameLocalizations?.ToDictionary(),
-                    DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary()
+                    DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
 
                     // TODO: better conversion to nullable optionals
                     DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
@@ -310,7 +310,7 @@ namespace Discord.Rest
                         ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
                 NameLocalizations = arg.NameLocalizations?.ToDictionary(),
-                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary()
+                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
 
                 // TODO: better conversion to nullable optionals
                 DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),

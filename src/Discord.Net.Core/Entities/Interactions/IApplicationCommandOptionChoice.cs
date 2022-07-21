@@ -20,7 +20,7 @@ namespace Discord
         /// <summary>
         ///     Gets the localization dictionary for the name field of this command.
         /// </summary>
-        IReadOnlyDictionary<string, string>? NameLocalizations { get; }
+        IReadOnlyDictionary<string, string> NameLocalizations { get; }
 
         /// <summary>
         ///     Gets the localized name of this command.
@@ -28,6 +28,6 @@ namespace Discord
         /// <remarks>
         ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
         /// </remarks>
-        string? NameLocalized { get; }
+        string NameLocalized { get; }
     }
 }
