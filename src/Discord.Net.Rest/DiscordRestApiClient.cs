@@ -1213,9 +1213,17 @@ namespace Discord.API
         #endregion
 
         #region Interactions
-        public async Task<ApplicationCommand[]> GetGlobalApplicationCommandsAsync(bool withLocalizations = false, RequestOptions options = null)
+        public async Task<ApplicationCommand[]> GetGlobalApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
+
+            if (locale is not null)
+            {
+                if (!System.Text.RegularExpressions.Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                    throw new ArgumentException($"{locale} is not a valid locale.", nameof(locale));
+
+                options.RequestHeaders["X-Discord-Locale"] = new[] { locale };
+            }
 
             //with_localizations=false doesnt return localized names and descriptions
             return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands{(withLocalizations ? "?with_localizations=true" : string.Empty)}",
@@ -1284,11 +1292,19 @@ namespace Discord.API
             return await SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{CurrentApplicationId}/commands", commands, new BucketIds(), options: options).ConfigureAwait(false);
         }
 
-        public async Task<ApplicationCommand[]> GetGuildApplicationCommandsAsync(ulong guildId, bool withLocalizations = false, RequestOptions options = null)
+        public async Task<ApplicationCommand[]> GetGuildApplicationCommandsAsync(ulong guildId, bool withLocalizations = false, string locale = null, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
             var bucket = new BucketIds(guildId: guildId);
+
+            if (locale is not null)
+            {
+                if (!System.Text.RegularExpressions.Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                    throw new ArgumentException($"{locale} is not a valid locale.", nameof(locale));
+
+                options.RequestHeaders["X-Discord-Locale"] = new[] { locale };
+            }
 
             //with_localizations=false doesnt return localized names and descriptions
             return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands{(withLocalizations ? "?with_localizations=true" : string.Empty)}",

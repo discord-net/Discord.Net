@@ -195,9 +195,9 @@ namespace Discord.Rest
         }
 
         public static async Task<IReadOnlyCollection<RestGlobalCommand>> GetGlobalApplicationCommandsAsync(BaseDiscordClient client, bool withLocalizations = false,
-            RequestOptions options = null)
+            string locale = null, RequestOptions options = null)
         {
-            var response = await client.ApiClient.GetGlobalApplicationCommandsAsync(withLocalizations, options).ConfigureAwait(false);
+            var response = await client.ApiClient.GetGlobalApplicationCommandsAsync(withLocalizations, locale, options).ConfigureAwait(false);
 
             if (!response.Any())
                 return Array.Empty<RestGlobalCommand>();
@@ -213,9 +213,9 @@ namespace Discord.Rest
         }
 
         public static async Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommandsAsync(BaseDiscordClient client, ulong guildId, bool withLocalizations = false,
-            RequestOptions options = null)
+            string locale = null, RequestOptions options = null)
         {
-            var response = await client.ApiClient.GetGuildApplicationCommandsAsync(guildId, withLocalizations, options).ConfigureAwait(false);
+            var response = await client.ApiClient.GetGuildApplicationCommandsAsync(guildId, withLocalizations, locale, options).ConfigureAwait(false);
 
             if (!response.Any())
                 return ImmutableArray.Create<RestGuildCommand>();

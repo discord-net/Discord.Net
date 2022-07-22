@@ -205,10 +205,10 @@ namespace Discord.Rest
             => ClientHelper.CreateGlobalApplicationCommandAsync(this, properties, options);
         public Task<RestGuildCommand> CreateGuildCommand(ApplicationCommandProperties properties, ulong guildId, RequestOptions options = null)
             => ClientHelper.CreateGuildApplicationCommandAsync(this, guildId, properties, options);
-        public Task<IReadOnlyCollection<RestGlobalCommand>> GetGlobalApplicationCommands(bool withLocalizations = false, RequestOptions options = null)
-            => ClientHelper.GetGlobalApplicationCommandsAsync(this, withLocalizations, options);
-        public Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommands(ulong guildId, bool withLocalizations = false, RequestOptions options = null)
-            => ClientHelper.GetGuildApplicationCommandsAsync(this, guildId, withLocalizations, options);
+        public Task<IReadOnlyCollection<RestGlobalCommand>> GetGlobalApplicationCommands(bool withLocalizations = false, string locale = null, RequestOptions options = null)
+            => ClientHelper.GetGlobalApplicationCommandsAsync(this, withLocalizations, locale, options);
+        public Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommands(ulong guildId, bool withLocalizations = false, string locale = null, RequestOptions options = null)
+            => ClientHelper.GetGuildApplicationCommandsAsync(this, guildId, withLocalizations, locale, options);
         public Task<IReadOnlyCollection<RestGlobalCommand>> BulkOverwriteGlobalCommands(ApplicationCommandProperties[] commandProperties, RequestOptions options = null)
             => ClientHelper.BulkOverwriteGlobalApplicationCommandAsync(this, commandProperties, options);
         public Task<IReadOnlyCollection<RestGuildCommand>> BulkOverwriteGuildCommands(ApplicationCommandProperties[] commandProperties, ulong guildId, RequestOptions options = null)
@@ -319,8 +319,8 @@ namespace Discord.Rest
             => await GetWebhookAsync(id, options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(bool withLocalizations, RequestOptions options)
-            => await GetGlobalApplicationCommands(withLocalizations, options).ConfigureAwait(false);
+        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(bool withLocalizations, string locale, RequestOptions options)
+            => await GetGlobalApplicationCommands(withLocalizations, locale, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
             => await ClientHelper.GetGlobalApplicationCommandAsync(this, id, options).ConfigureAwait(false);
