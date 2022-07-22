@@ -221,6 +221,8 @@ namespace Discord.Interactions
                     Name = command.Name,
                     Description = command.Description,
                     IsDefaultPermission = command.IsDefaultPermission,
+                    DefaultMemberPermissions = (GuildPermission)command.DefaultMemberPermissions.RawValue,
+                    IsDMEnabled = command.IsEnabledInDm,
                     Options = command.Options?.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified,
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
@@ -229,6 +231,8 @@ namespace Discord.Interactions
                 {
                     Name = command.Name,
                     IsDefaultPermission = command.IsDefaultPermission,
+                    DefaultMemberPermissions = (GuildPermission)command.DefaultMemberPermissions.RawValue,
+                    IsDMEnabled = command.IsEnabledInDm,
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty
                 },
@@ -236,6 +240,8 @@ namespace Discord.Interactions
                 {
                     Name = command.Name,
                     IsDefaultPermission = command.IsDefaultPermission,
+                    DefaultMemberPermissions = (GuildPermission)command.DefaultMemberPermissions.RawValue,
+                    IsDMEnabled = command.IsEnabledInDm,
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty
                 },
@@ -250,6 +256,10 @@ namespace Discord.Interactions
                 Description = commandOption.Description,
                 Type = commandOption.Type,
                 IsRequired = commandOption.IsRequired,
+                ChannelTypes = commandOption.ChannelTypes?.ToList(),
+                IsAutocomplete = commandOption.IsAutocomplete.GetValueOrDefault(),
+                MinValue = commandOption.MinValue,
+                MaxValue = commandOption.MaxValue,
                 Choices = commandOption.Choices?.Select(x => new ApplicationCommandOptionChoiceProperties
                 {
                     Name = x.Name,
