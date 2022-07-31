@@ -20,6 +20,18 @@ var _interactionService = new InteractionService(_client.Rest);
 ...
 ```
 
+Interactions are not directly executed by the `InteractionService`. You need to setup a handler that handles the InteractionCreated event and passes it to the `InteractionService`. This is also the part where the `SocketInteractionContext` will be created here.
+```csharp
+...
+await _interactionService.AddModulesAsync(assembly: Assembly.GetEntryAssembly(), services: null);
+_client.InteractionCreated += async (interaction) =>
+{
+   var ctx = new SocketInteractionContext(Client, interaction);
+   await _interactionService.ExecuteCommandAsync(ctx, services: null);
+};
+...
+```
+
 ## Modules
 
 Attribute based Interaction handlers must be defined within a command module class.
