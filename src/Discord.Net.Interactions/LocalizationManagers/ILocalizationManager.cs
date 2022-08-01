@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Discord.Interactions
 {
     /// <summary>
-    ///     Respresents localization provider for Discord Application Commands.
+    ///     Respresents a localization provider for Discord Application Commands.
     /// </summary>
     public interface ILocalizationManager
     {
