@@ -47,6 +47,12 @@ enough. Here is a list of recommended VPS provider.
   * Location(s):
     * Europe: Lithuania
   * Based in: Europe
+* [ServerStarter.Host](https://serverstarter.host/clients/store/discord-bots)
+  * Description: Bot hosting with a panel for quick deployment and
+  no Linux knowledge required.
+  * Location(s):
+    * America: United States
+  * Based in: United States
 
 ## .NET Core Deployment
 
