@@ -291,6 +291,11 @@ By nesting commands inside a module that is tagged with [GroupAttribute] you can
 > Although creating nested module stuctures are allowed,
 > you are not permitted to use more than 2 [GroupAttribute]'s in module hierarchy.
 
+> [!NOTE]
+> To not use the command group's name as a prefix for component or modal interaction's custom id set `ignoreGroupNames` parameter to `true` in classes with [GroupAttribute]
+>
+> However, you have to be careful to prevent overlapping ids of buttons and modals
+
 [!code-csharp[Command Group Example](samples/intro/groupmodule.cs)]
 
 ## Executing Commands
