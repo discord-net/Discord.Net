@@ -279,8 +279,8 @@ Meaning, the constructor parameters and public settable properties of a module w
 For more information on dependency injection, read the [DependencyInjection] guides.
 
 > [!NOTE]
-> On every command execution, module dependencies are resolved using a new service scope which allows you to utilize scoped service instances, just like in Asp.Net.
-> Including the precondition checks, every module method is executed using the same service scope and service scopes are disposed right after the `AfterExecute` method returns.
+> On every command execution, if the 'AutoServiceScopes' option is enabled in the config , module dependencies are resolved using a new service scope which allows you to utilize scoped service instances, just like in Asp.Net.
+> Including the precondition checks, every module method is executed using the same service scope and service scopes are disposed right after the `AfterExecute` method returns. This doesn't apply to methods other than `ExecuteAsync()`.
 
 ## Module Groups
 
