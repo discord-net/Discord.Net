@@ -41,7 +41,7 @@ public async Task Spawn()
     var builder = new ComponentBuilder()
         .WithSelectMenu(menuBuilder);
 
-    await ReplyAsync("Whos really lying?", components: builder.Build());
+    await ReplyAsync("Who's really lying?", component: builder.Build());
 }
 ```
 
