@@ -308,8 +308,19 @@ Any of the following socket events can be used to execute commands:
 - [AutocompleteExecuted]
 - [UserCommandExecuted]
 - [MessageCommandExecuted]
+- [ModalExecuted]
 
-Commands can be either executed on the gateway thread or on a seperate thread from the thread pool. This behaviour can be configured by changing the *RunMode* property of `InteractionServiceConfig` or by setting the *runMode* parameter of a command attribute.
+These events will trigger for the specific type of interaction they inherit their name from. The [InteractionCreated] event will trigger for all.
+An example of executing a command from an event can be seen here:
+
+[!code-csharp[Command Event Example](samples/intro/event.cs)]
+
+Commands can be either executed on the gateway thread or on a seperate thread from the thread pool.
+This behaviour can be configured by changing the `RunMode` property of `InteractionServiceConfig` or by setting the *runMode* parameter of a command attribute.
+
+> [!WARNING]
+> In the example above, no form of post-execution is presented.
+> Please carefully read the [Post Execution Documentation] for the best approach in resolving the result based on your `RunMode`.
 
 You can also configure the way [InteractionService] executes the commands.
 By default, commands are executed using `ConstructorInfo.Invoke()` to create module instances and
@@ -364,6 +375,7 @@ delegate can be used to create HTTP responses from a deserialized json object st
 
 [AutocompleteHandlers]: xref:Guides.IntFw.AutoCompletion
 [DependencyInjection]: xref:Guides.TextCommands.DI
+[Post Execution Docuemntation]: xref:Guides.IntFw.PostExecution
 
 [GroupAttribute]: xref:Discord.Interactions.GroupAttribute
 [InteractionService]: xref:Discord.Interactions.InteractionService
@@ -376,6 +388,7 @@ delegate can be used to create HTTP responses from a deserialized json object st
 [AutocompleteExecuted]: xref:Discord.WebSocket.BaseSocketClient
 [UserCommandExecuted]: xref:Discord.WebSocket.BaseSocketClient
 [MessageCommandExecuted]: xref:Discord.WebSocket.BaseSocketClient
+[ModalExecuted]: xref:Discord.WebSocket.BaseSocketClient
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 [DiscordRestClient]: xref:Discord.Rest.DiscordRestClient
 [SocketInteractionContext]: xref:Discord.Interactions.SocketInteractionContext
