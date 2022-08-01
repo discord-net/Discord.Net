@@ -2848,7 +2848,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (WEBHOOKS_UPDATE)").ConfigureAwait(false);
 
                                     var guild = State.GetGuild(data.GuildId);
-                                    var channel = State.GetChannel(data.ChanelId);
+                                    var channel = State.GetChannel(data.ChannelId);
 
                                     await TimedInvokeAsync(_webhooksUpdated, nameof(WebhooksUpdated), guild, channel);
                                 }
