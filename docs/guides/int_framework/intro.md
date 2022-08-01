@@ -358,7 +358,7 @@ delegate can be used to create HTTP responses from a deserialized json object st
 - Use the interaction endpoints of the module base instead of the interaction object (ie. `RespondAsync()`, `FollowupAsync()`...).
 
 [AutocompleteHandlers]: xref:Guides.IntFw.AutoCompletion
-[DependencyInjection]: xref:Guides.TextCommands.DI
+[DependencyInjection]: xref:Guides.DI.Intro
 
 [GroupAttribute]: xref:Discord.Interactions.GroupAttribute
 [InteractionService]: xref:Discord.Interactions.InteractionService
