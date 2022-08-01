@@ -426,7 +426,7 @@ namespace Discord.Rest
             AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options)
             => await FollowupWithFileAsync(fileStream, fileName, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
         /// <inheritdoc/>
-        async Task<IUserMessage> IDiscordInteraction.FollowupWithFileAsync(string filePath, string text, string fileName, Embed[] embeds, bool isTTS, bool ephemeral,
+        async Task<IUserMessage> IDiscordInteraction.FollowupWithFileAsync(string filePath, string fileName, string text, Embed[] embeds, bool isTTS, bool ephemeral,
             AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options)
             => await FollowupWithFileAsync(filePath, text, fileName, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
         /// <inheritdoc/>

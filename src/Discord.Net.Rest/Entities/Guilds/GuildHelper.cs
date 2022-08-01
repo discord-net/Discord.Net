@@ -428,7 +428,7 @@ namespace Discord.Rest
                 var ids = args.Roles.Value.Select(r => r.Id);
 
                 if (args.RoleIds.IsSpecified)
-                    args.RoleIds.Value.Concat(ids);
+                    args.RoleIds = Optional.Create(args.RoleIds.Value.Concat(ids));
                 else
                     args.RoleIds = Optional.Create(ids);
             }
