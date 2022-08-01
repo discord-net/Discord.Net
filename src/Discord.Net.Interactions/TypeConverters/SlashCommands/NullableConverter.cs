@@ -9,10 +9,11 @@ namespace Discord.Interactions
 
         public NullableConverter(InteractionService interactionService, IServiceProvider services)
         {
-            var type = Nullable.GetUnderlyingType(typeof(T));
+            var nullableType = typeof(T);
+            var type = Nullable.GetUnderlyingType(nullableType);
 
             if (type is null)
-                throw new ArgumentException($"No type {nameof(TypeConverter)} is defined for this {type.FullName}", "type");
+                throw new ArgumentException($"No type {nameof(TypeConverter)} is defined for this {nullableType.FullName}", nameof(type));
 
             _typeConverter = interactionService.GetTypeConverter(type, services);
         }

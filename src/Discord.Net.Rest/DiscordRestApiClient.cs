@@ -1756,7 +1756,7 @@ namespace Discord.API
                 if (args.TargetType.Value == TargetUserType.Stream)
                     Preconditions.GreaterThan(args.TargetUserId, 0, nameof(args.TargetUserId));
                 if (args.TargetType.Value == TargetUserType.EmbeddedApplication)
-                    Preconditions.GreaterThan(args.TargetApplicationId, 0, nameof(args.TargetUserId));
+                    Preconditions.GreaterThan(args.TargetApplicationId, 0, nameof(args.TargetApplicationId));
             }
             options = RequestOptions.CreateOrClone(options);
 
