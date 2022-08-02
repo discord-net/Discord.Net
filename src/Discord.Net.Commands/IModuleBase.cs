@@ -1,4 +1,5 @@
 using Discord.Commands.Builders;
+using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
@@ -14,10 +15,22 @@ namespace Discord.Commands
         void SetContext(ICommandContext context);
 
         /// <summary>
+        ///     Executed asynchronously before a command is run in this module base.
+        /// </summary>
+        /// <param name="command">The command thats about to run.</param>
+        Task BeforeExecuteAsync(CommandInfo command);
+
+        /// <summary>
         ///     Executed before a command is run in this module base.
         /// </summary>
         /// <param name="command">The command thats about to run.</param>
         void BeforeExecute(CommandInfo command);
+
+        /// <summary>
+        ///     Executed asynchronously after a command is run in this module base.
+        /// </summary>
+        /// <param name="command">The command thats about to run.</param>
+        Task AfterExecuteAsync(CommandInfo command);
 
         /// <summary>
         ///     Executed after a command is ran in this module base.
