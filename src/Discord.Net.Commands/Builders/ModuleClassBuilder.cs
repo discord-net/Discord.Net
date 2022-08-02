@@ -206,6 +206,7 @@ namespace Discord.Commands
 
                 try
                 {
+                    await instance.BeforeExecuteAsync(cmd).ConfigureAwait(false);
                     instance.BeforeExecute(cmd);
 
                     var task = method.Invoke(instance, args) as Task ?? Task.Delay(0);
@@ -221,6 +222,7 @@ namespace Discord.Commands
                 }
                 finally
                 {
+                    await instance.AfterExecuteAsync(cmd).ConfigureAwait(false);
                     instance.AfterExecute(cmd);
                     (instance as IDisposable)?.Dispose();
                 }

@@ -2839,6 +2839,23 @@ namespace Discord.WebSocket
 
                             #endregion
 
+                            #region Webhooks
+
+                            case "WEBHOOKS_UPDATE":
+                                {
+                                    var data = (payload as JToken).ToObject<WebhooksUpdatedEvent>(_serializer);
+                                    type = "WEBHOOKS_UPDATE";
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (WEBHOOKS_UPDATE)").ConfigureAwait(false);
+
+                                    var guild = State.GetGuild(data.GuildId);
+                                    var channel = State.GetChannel(data.ChannelId);
+
+                                    await TimedInvokeAsync(_webhooksUpdated, nameof(WebhooksUpdated), guild, channel);
+                                }
+                                break;
+
+                            #endregion
+
                             #region Ignored (User only)
                             case "CHANNEL_PINS_ACK":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_ACK)").ConfigureAwait(false);
@@ -2857,9 +2874,6 @@ namespace Discord.WebSocket
                                 break;
                             case "USER_SETTINGS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (USER_SETTINGS_UPDATE)").ConfigureAwait(false);
-                                break;
-                            case "WEBHOOKS_UPDATE":
-                                await _gatewayLogger.DebugAsync("Ignored Dispatch (WEBHOOKS_UPDATE)").ConfigureAwait(false);
                                 break;
                             #endregion
 

@@ -39,7 +39,7 @@ namespace Discord.WebSocket
             {
                 foreach (var channel in resolved.Channels.Value)
                 {
-                    SocketChannel socketChannel = guild != null
+                    var socketChannel = guild != null
                         ? guild.GetChannel(channel.Value.Id)
                         : discord.GetChannel(channel.Value.Id);
 
@@ -69,7 +69,7 @@ namespace Discord.WebSocket
                 }
             }
 
-            if (resolved.Roles.IsSpecified)
+            if (resolved.Roles.IsSpecified && guild != null)
             {
                 foreach (var role in resolved.Roles.Value)
                 {

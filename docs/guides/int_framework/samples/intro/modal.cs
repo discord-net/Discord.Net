@@ -12,7 +12,9 @@ public class FoodModal : IModal
     [ModalTextInput("food_name", placeholder: "Pizza", maxLength: 20)]
     public string Food { get; set; }
 
-    // Additional paremeters can be specified to further customize the input.
+    // Additional paremeters can be specified to further customize the input.    
+    // Parameters can be optional
+    [RequiredInput(false)]
     [InputLabel("Why??")]
     [ModalTextInput("food_reason", TextInputStyle.Paragraph, "Kuz it's tasty", maxLength: 500)]
     public string Reason { get; set; }
@@ -22,10 +24,15 @@ public class FoodModal : IModal
 [ModalInteraction("food_menu")]
 public async Task ModalResponse(FoodModal modal)
 {
+    // Check if "Why??" field is populated
+    string reason = string.IsNullOrWhiteSpace(modal.Reason)
+        ? "."
+        : $" because {modal.Reason}";
+
     // Build the message to send.
     string message = "hey @everyone, I just learned " +
         $"{Context.User.Mention}'s favorite food is " +
-        $"{modal.Food} because {modal.Reason}.";
+        $"{modal.Food}{reason}";
 
     // Specify the AllowedMentions so we don't actually ping everyone.
     AllowedMentions mentions = new();

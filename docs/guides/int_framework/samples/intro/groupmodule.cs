@@ -16,6 +16,11 @@ public class CommandGroupModule : InteractionModuleBase<SocketInteractionContext
         // group-name subcommand-group-name echo
         [SlashCommand("echo", "Echo an input")]
         public async Task EchoSubcommand(string input)
-            => await RespondAsync(input);
+            => await RespondAsync(input, components: new ComponentBuilder().WithButton("Echo", $"echoButton_{input}").Build());
+
+        // Component interaction with ignoreGroupNames set to true
+        [ComponentInteraction("echoButton_*", true)]
+        public async Task EchoButton(string input)
+            => await RespondAsync(input);  
     }
 }
