@@ -23,7 +23,9 @@ namespace Discord.Interactions
                 ChannelTypes = parameterInfo.ChannelTypes?.ToList(),
                 IsAutocomplete = parameterInfo.IsAutocomplete,
                 MaxValue = parameterInfo.MaxValue,
-                MinValue = parameterInfo.MinValue
+                MinValue = parameterInfo.MinValue,
+                MinLength = parameterInfo.MinLength,
+                MaxLength = parameterInfo.MaxLength,
             };
 
             parameterInfo.TypeConverter.Write(props, parameterInfo);
@@ -209,7 +211,13 @@ namespace Discord.Interactions
                     Name = x.Name,
                     Value = x.Value
                 }).ToList(),
-                Options = commandOption.Options?.Select(x => x.ToApplicationCommandOptionProps()).ToList()
+                Options = commandOption.Options?.Select(x => x.ToApplicationCommandOptionProps()).ToList(),
+                MaxLength = commandOption.MaxLength,
+                MinLength = commandOption.MinLength,
+                MaxValue = commandOption.MaxValue,
+                MinValue = commandOption.MinValue,
+                IsAutocomplete = commandOption.IsAutocomplete.GetValueOrDefault(),
+                ChannelTypes = commandOption.ChannelTypes.ToList(),
             };
 
         public static Modal ToModal(this ModalInfo modalInfo, string customId, Action<ModalBuilder> modifyModal = null)

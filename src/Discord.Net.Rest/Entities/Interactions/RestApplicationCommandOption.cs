@@ -35,6 +35,12 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public double? MaxValue { get; private set; }
 
+        /// <inheritdoc/>
+        public int? MinLength { get; private set; }
+
+        /// <inheritdoc/>
+        public int? MaxLength { get; private set; }
+
         /// <summary>
         ///     Gets a collection of <see cref="RestApplicationCommandChoice"/>s for this command.
         /// </summary>
@@ -77,6 +83,9 @@ namespace Discord.Rest
 
             if (model.Autocomplete.IsSpecified)
                 IsAutocomplete = model.Autocomplete.Value;
+
+            MinLength = model.MinLength.ToNullable();
+            MaxLength = model.MaxLength.ToNullable();
 
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(Create).ToImmutableArray()

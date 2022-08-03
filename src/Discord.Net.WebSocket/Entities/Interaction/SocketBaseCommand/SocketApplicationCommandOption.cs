@@ -33,6 +33,12 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public double? MaxValue { get; private set; }
 
+        /// <inheritdoc/>
+        public int? MinLength { get; private set; }
+
+        /// <inheritdoc/>
+        public int? MaxLength { get; private set; }
+
         /// <summary>
         ///     Gets a collection of choices for the user to pick from.
         /// </summary>
@@ -71,6 +77,9 @@ namespace Discord.WebSocket
             MaxValue = model.MaxValue.ToNullable();
 
             IsAutocomplete = model.Autocomplete.ToNullable();
+
+            MinLength = model.MinLength.ToNullable();
+            MaxLength = model.MaxLength.ToNullable();
 
             Choices = model.Choices.IsSpecified
                 ? model.Choices.Value.Select(SocketApplicationCommandChoice.Create).ToImmutableArray()

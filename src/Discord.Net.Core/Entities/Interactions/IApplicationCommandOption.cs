@@ -48,6 +48,16 @@ namespace Discord
         double? MaxValue { get; }
 
         /// <summary>
+        ///     Gets the minimum allowed length for a string input.
+        /// </summary>
+        int? MinLength { get; }
+
+        /// <summary>
+        ///     Gets the maximum allowed length for a string input.
+        /// </summary>
+        int? MaxLength { get; }
+
+        /// <summary>
         ///     Gets the choices for string and int types for the user to pick from.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOptionChoice> Choices { get; }
