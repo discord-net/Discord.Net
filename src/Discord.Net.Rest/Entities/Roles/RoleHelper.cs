@@ -23,7 +23,7 @@ namespace Discord.Rest
             {
                 role.Guild.Features.EnsureFeature(GuildFeature.RoleIcons);
 
-                if (args.Icon.IsSpecified && args.Emoji.IsSpecified)
+                if ((args.Icon.IsSpecified && args.Icon.Value != null) && (args.Emoji.IsSpecified && args.Emoji.Value != null))
                 {
                     throw new ArgumentException("Emoji and Icon properties cannot be present on a role at the same time.");
                 }
@@ -36,18 +36,18 @@ namespace Discord.Rest
                 Mentionable = args.Mentionable,
                 Name = args.Name,
                 Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue.ToString() : Optional.Create<string>(),
-                Icon = args.Icon.IsSpecified ? args.Icon.Value.Value.ToModel() : Optional<API.Image?>.Unspecified,
-                Emoji = args.Emoji.GetValueOrDefault()?.Name ?? Optional<string>.Unspecified
+                Icon = args.Icon.IsSpecified ? args.Icon.Value?.ToModel() ?? null : Optional<API.Image?>.Unspecified,
+                Emoji = args.Emoji.IsSpecified ? args.Emoji.Value?.Name ?? "" : Optional.Create<string>(),
             };
 
-            if (args.Icon.IsSpecified && role.Emoji != null)
+            if ((args.Icon.IsSpecified && args.Icon.Value != null) && role.Emoji != null)
             {
-                apiArgs.Emoji = null;
+                apiArgs.Emoji = "";
             }
 
-            if (args.Emoji.IsSpecified && !string.IsNullOrEmpty(role.Icon))
+            if ((args.Emoji.IsSpecified && args.Emoji.Value != null) && !string.IsNullOrEmpty(role.Icon))
             {
-                apiArgs.Icon = null;
+                apiArgs.Icon = Optional<API.Image?>.Unspecified;
             }
 
             var model = await client.ApiClient.ModifyGuildRoleAsync(role.Guild.Id, role.Id, apiArgs, options).ConfigureAwait(false);
