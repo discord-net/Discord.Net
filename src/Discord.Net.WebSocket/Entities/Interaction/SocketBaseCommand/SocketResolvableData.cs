@@ -1,3 +1,4 @@
+using Discord.Net;
 using System.Collections.Generic;
 
 namespace Discord.WebSocket
@@ -45,13 +46,24 @@ namespace Discord.WebSocket
 
                     if (socketChannel == null)
                     {
-                        var channelModel = guild != null
-                            ? discord.Rest.ApiClient.GetChannelAsync(guild.Id, channel.Value.Id).ConfigureAwait(false).GetAwaiter().GetResult()
-                            : discord.Rest.ApiClient.GetChannelAsync(channel.Value.Id).ConfigureAwait(false).GetAwaiter().GetResult();
+                        try
+                        {
+                            var channelModel = guild != null
+                                ? discord.Rest.ApiClient.GetChannelAsync(guild.Id, channel.Value.Id)
+                                    .ConfigureAwait(false).GetAwaiter().GetResult()
+                                : discord.Rest.ApiClient.GetChannelAsync(channel.Value.Id).ConfigureAwait(false)
+                                    .GetAwaiter().GetResult();
 
-                        socketChannel = guild != null
-                            ? SocketGuildChannel.Create(guild, discord.State, channelModel)
-                            : (SocketChannel)SocketChannel.CreatePrivate(discord, discord.State, channelModel);
+                            socketChannel = guild != null
+                                ? SocketGuildChannel.Create(guild, discord.State, channelModel)
+                                : (SocketChannel)SocketChannel.CreatePrivate(discord, discord.State, channelModel);
+                        }
+                        catch (HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions)
+                        {
+                            socketChannel = guildId != null
+                                ? SocketGuildChannel.Create(guild, discord.State, channel.Value)
+                                : (SocketChannel)SocketChannel.CreatePrivate(discord, discord.State, channel.Value);
+                        }
                     }
 
                     discord.State.AddChannel(socketChannel);
@@ -73,7 +85,10 @@ namespace Discord.WebSocket
             {
                 foreach (var role in resolved.Roles.Value)
                 {
-                    var socketRole = guild.AddOrUpdateRole(role.Value);
+                    var socketRole = guild is null
+                        ? SocketRole.Create(null, discord.State, role.Value)
+                        : guild.AddOrUpdateRole(role.Value);
+
                     Roles.Add(ulong.Parse(role.Key), socketRole);
                 }
             }
@@ -93,15 +108,18 @@ namespace Discord.WebSocket
                             author = guild.GetUser(msg.Value.Author.Value.Id);
                     }
                     else
-                        author = (channel as SocketChannel).GetUser(msg.Value.Author.Value.Id);
+                        author = (channel as SocketChannel)?.GetUser(msg.Value.Author.Value.Id);
 
                     if (channel == null)
                     {
-                        if (!msg.Value.GuildId.IsSpecified)  // assume it is a DM
+                        if (guildId is null)  // assume it is a DM
                         {
                             channel = discord.CreateDMChannel(msg.Value.ChannelId, msg.Value.Author.Value, discord.State);
+                            author = ((SocketDMChannel)channel).Recipient;
                         }
                     }
+
+                    author ??= discord.State.GetOrAddUser(msg.Value.Author.Value.Id, _ => SocketGlobalUser.Create(discord, discord.State, msg.Value.Author.Value));
 
                     var message = SocketMessage.Create(discord, discord.State, author, channel, msg.Value);
                     Messages.Add(message.Id, message);

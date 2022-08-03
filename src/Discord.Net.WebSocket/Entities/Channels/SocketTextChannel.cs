@@ -61,12 +61,12 @@ namespace Discord.WebSocket
         internal SocketTextChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
             : base(discord, id, guild)
         {
-            if (Discord.MessageCacheSize > 0)
+            if (Discord?.MessageCacheSize > 0)
                 _messages = new MessageCache(Discord);
         }
         internal new static SocketTextChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketTextChannel(guild.Discord, model.Id, guild);
+            var entity = new SocketTextChannel(guild?.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }

@@ -19,7 +19,7 @@ namespace Discord.WebSocket
         ///    Gets whether or not this command is a global application command.
         /// </summary>
         public bool IsGlobalCommand
-            => Guild == null;
+            => GuildId is null;
 
         /// <inheritdoc/>
         public ulong ApplicationId { get; private set; }

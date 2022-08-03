@@ -61,7 +61,9 @@ namespace Discord.WebSocket
                             author = channel.Guild.GetUser(model.Message.Value.Author.Value.Id);
                     }
                     else if (model.Message.Value.Author.IsSpecified)
-                        author = (Channel as SocketChannel).GetUser(model.Message.Value.Author.Value.Id);
+                        author = (Channel as SocketChannel)?.GetUser(model.Message.Value.Author.Value.Id);
+
+                    author ??= Discord.State.GetOrAddUser(model.Message.Value.Author.Value.Id, _ => SocketGlobalUser.Create(Discord, Discord.State, model.Message.Value.Author.Value));
 
                     Message = SocketUserMessage.Create(Discord, Discord.State, author, Channel, model.Message.Value);
                 }

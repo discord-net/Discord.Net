@@ -34,7 +34,7 @@ namespace Discord.WebSocket
 
         internal new static SocketForumChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketForumChannel(guild.Discord, model.Id, guild);
+            var entity = new SocketForumChannel(guild?.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }
