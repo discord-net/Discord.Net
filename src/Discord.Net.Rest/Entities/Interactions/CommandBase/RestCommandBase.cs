@@ -49,6 +49,9 @@ namespace Discord.Rest
         internal override async Task UpdateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
             await base.UpdateAsync(client, model, doApiCall).ConfigureAwait(false);
+
+            if (model.Data.IsSpecified && model.Data.Value is RestCommandBaseData data)
+                Data = data;
         }
 
         /// <summary>
