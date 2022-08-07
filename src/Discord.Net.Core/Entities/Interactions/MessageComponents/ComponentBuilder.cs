@@ -1198,6 +1198,9 @@ namespace Discord
 
     public class TextInputBuilder
     {
+        /// <summary>
+        ///     The max length of a <see cref="TextInputComponent.Placeholder"/>.
+        /// </summary>
         public const int MaxPlaceholderLength = 100;
         public const int LargestMaxLength = 4000;
 
