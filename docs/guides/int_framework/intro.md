@@ -347,6 +347,9 @@ Methods like `AddModulesToGuildAsync()`, `AddCommandsToGuildAsync()`, `AddModule
 can be used to register cherry picked modules or commands to global/guild scopes.
 
 > [!NOTE]
+> [DontAutoRegisterAttribute] can be used on module classes to to prevent `RegisterCommandsGloballyAsync()` and `RegisterCommandsToGuildAsync()` from registering them to the Discord
+
+> [!NOTE]
 > In debug environment, since Global commands can take up to 1 hour to register/update,
 > it is adviced to register your commands to a test guild for your changes to take effect immediately.
 > You can use preprocessor directives to create a simple logic for registering commands as seen above
@@ -377,6 +380,7 @@ delegate can be used to create HTTP responses from a deserialized json object st
 [DependencyInjection]: xref:Guides.DI.Intro
 
 [GroupAttribute]: xref:Discord.Interactions.GroupAttribute
+[DontAutoRegisterAttribute]: xref:Discord.Interactions.DontAutoRegisterAttribute
 [InteractionService]: xref:Discord.Interactions.InteractionService
 [InteractionServiceConfig]: xref:Discord.Interactions.InteractionServiceConfig
 [InteractionModuleBase]: xref:Discord.Interactions.InteractionModuleBase
