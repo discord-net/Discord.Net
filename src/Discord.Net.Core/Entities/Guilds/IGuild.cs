@@ -1198,7 +1198,7 @@ namespace Discord
         ///     Whether to include full localization dictionaries in the returned objects,
         ///     instead of the localized name and description fields.
         /// </param>
-        /// <param name="locale">The target locale of the localized name and description fields. Sets <c>X-Discord-Locale</c> header, which takes precedence over <c>Accept-Language</c>.</param>
+        /// <param name="locale">The target locale of the localized name and description fields. Sets the <c>X-Discord-Locale</c> header, which takes precedence over <c>Accept-Language</c>.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection

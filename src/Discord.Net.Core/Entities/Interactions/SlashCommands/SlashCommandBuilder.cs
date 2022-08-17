@@ -282,7 +282,7 @@ namespace Discord
         /// <summary>
         ///     Sets the <see cref="NameLocalizations"/> collection.
         /// </summary>
-        /// <param name="nameLocalizations">Localization dictionary for the name field of this command.</param>
+        /// <param name="nameLocalizations">The localization dictionary to use for the name field of this command.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="nameLocalizations"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>
@@ -306,7 +306,7 @@ namespace Discord
         /// <summary>
         ///     Sets the <see cref="DescriptionLocalizations"/> collection.
         /// </summary>
-        /// <param name="descriptionLocalizations">Localization dictionary for the name field of this command.</param>
+        /// <param name="descriptionLocalizations">The localization dictionary to use for the description field of this command.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="descriptionLocalizations"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>
@@ -640,7 +640,7 @@ namespace Discord
         /// </summary>
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
-        /// <param name="nameLocalizations">Localization dictionary for the description field of this command.</param>
+        /// <param name="nameLocalizations">The localization dictionary for to use the name field of this command option choice.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddChoice(string name, int value, IDictionary<string, string> nameLocalizations = null)
         {
@@ -652,7 +652,7 @@ namespace Discord
         /// </summary>
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
-        /// <param name="nameLocalizations">Localization dictionary for the description field of this command.</param>
+        /// <param name="nameLocalizations">The localization dictionary for to use the name field of this command option choice.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddChoice(string name, string value, IDictionary<string, string> nameLocalizations = null)
         {
@@ -676,7 +676,7 @@ namespace Discord
         /// </summary>
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
-        /// <param name="nameLocalizations">Localization dictionary for the description field of this command.</param>
+        /// <param name="nameLocalizations">The localization dictionary to use for the name field of this command option choice.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddChoice(string name, float value, IDictionary<string, string> nameLocalizations = null)
         {
@@ -688,7 +688,7 @@ namespace Discord
         /// </summary>
         /// <param name="name">The name of the choice.</param>
         /// <param name="value">The value of the choice.</param>
-        /// <param name="nameLocalizations">Localization dictionary for the description field of this command.</param>
+        /// <param name="nameLocalizations">The localization dictionary to use for the name field of this command option choice.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddChoice(string name, long value, IDictionary<string, string> nameLocalizations = null)
         {
@@ -830,7 +830,7 @@ namespace Discord
         /// <summary>
         ///     Sets the <see cref="NameLocalizations"/> collection.
         /// </summary>
-        /// <param name="nameLocalizations">Localization dictionary for the name field of this command.</param>
+        /// <param name="nameLocalizations">The localization dictionary to use for the name field of this command option.</param>
         /// <returns>The current builder.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="nameLocalizations"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>
@@ -854,7 +854,7 @@ namespace Discord
         /// <summary>
         ///     Sets the <see cref="DescriptionLocalizations"/> collection.
         /// </summary>
-        /// <param name="descriptionLocalizations">Localization dictionary for the description field of this command.</param>
+        /// <param name="descriptionLocalizations">The localization dictionary to use for the description field of this command option.</param>
         /// <returns>The current builder.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="descriptionLocalizations"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>

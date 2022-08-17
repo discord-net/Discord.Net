@@ -100,7 +100,7 @@ namespace Discord
         /// <summary>
         ///     Sets the <see cref="NameLocalizations"/> collection.
         /// </summary>
-        /// <param name="nameLocalizations">Localization dictionary for the name field of this command.</param>
+        /// <param name="nameLocalizations">The localization dictionary to use for the name field of this command.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="nameLocalizations"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if any dictionary key is an invalid locale string.</exception>
