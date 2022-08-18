@@ -49,7 +49,7 @@ namespace Discord.WebSocket
 
         internal new static SocketStageChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketStageChannel(guild.Discord, model.Id, guild);
+            var entity = new SocketStageChannel(guild?.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }

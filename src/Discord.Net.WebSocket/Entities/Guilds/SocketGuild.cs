@@ -532,13 +532,10 @@ namespace Discord.WebSocket
             Features = model.Features;
 
             var roles = new ConcurrentDictionary<ulong, SocketRole>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Roles.Length * 1.05));
-            if (model.Roles != null)
+            for (int i = 0; i < model.Roles.Length; i++)
             {
-                for (int i = 0; i < model.Roles.Length; i++)
-                {
-                    var role = SocketRole.Create(this, state, model.Roles[i]);
-                    roles.TryAdd(role.Id, role);
-                }
+                var role = SocketRole.Create(this, state, model.Roles[i]);
+                roles.TryAdd(role.Id, role);
             }
             _roles = roles;
 
@@ -1413,7 +1410,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="user">The user to disconnect.</param>
         /// <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
-        async Task IGuild.DisconnectAsync(IGuildUser user) => await user.ModifyAsync(x => x.Channel = new Optional<IVoiceChannel>());
+        async Task IGuild.DisconnectAsync(IGuildUser user) => await user.ModifyAsync(x => x.Channel = null);
         #endregion
 
         #region Stickers

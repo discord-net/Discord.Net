@@ -251,7 +251,7 @@ namespace Discord
         private static Assembly _overrideDomain_Resolving(AssemblyLoadContext arg1, AssemblyName arg2)
         {
             // resolve the override id
-            var v = _loadedOverrides.FirstOrDefault(x => x.Value.Any(x => x.Assembly.FullName == arg1.Assemblies.FirstOrDefault().FullName));
+            var v = _loadedOverrides.FirstOrDefault(x => x.Value.Any(x => x.Assembly.FullName == arg1.Assemblies.First().FullName));
 
             return GetDependencyAsync(v.Key.Id, $"{arg2}").GetAwaiter().GetResult();
         }

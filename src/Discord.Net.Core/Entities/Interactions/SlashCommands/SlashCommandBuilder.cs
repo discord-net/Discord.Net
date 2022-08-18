@@ -202,7 +202,8 @@ namespace Discord
         public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type,
            string description, bool? isRequired = null, bool? isDefault = null, bool isAutocomplete = false, double? minValue = null, double? maxValue = null,
            List<SlashCommandOptionBuilder> options = null, List<ChannelType> channelTypes = null, IDictionary<string, string> nameLocalizations = null,
-           IDictionary<string, string> descriptionLocalizations = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           IDictionary<string, string> descriptionLocalizations = null,
+           int? minLength = null, int? maxLength = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             Preconditions.Options(name, description);
 
@@ -227,7 +228,9 @@ namespace Discord
                 Choices = (choices ?? Array.Empty<ApplicationCommandOptionChoiceProperties>()).ToList(),
                 ChannelTypes = channelTypes,
                 MinValue = minValue,
-                MaxValue = maxValue
+                MaxValue = maxValue,
+                MinLength = minLength,
+                MaxLength = maxLength,
             };
 
             if (nameLocalizations is not null)
@@ -475,6 +478,16 @@ namespace Discord
         public double? MaxValue { get; set; }
 
         /// <summary>
+        ///     Gets or sets the minimum allowed length for a string input.
+        /// </summary>
+        public int? MinLength { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the maximum allowed length for a string input.
+        /// </summary>
+        public int? MaxLength { get; set; }
+
+        /// <summary>
         ///     Gets or sets the choices for string and int types for the user to pick from.
         /// </summary>
         public List<ApplicationCommandOptionChoiceProperties> Choices { get; set; }
@@ -507,6 +520,7 @@ namespace Discord
         {
             bool isSubType = Type == ApplicationCommandOptionType.SubCommandGroup;
             bool isIntType = Type == ApplicationCommandOptionType.Integer;
+            bool isStrType = Type == ApplicationCommandOptionType.String;
 
             if (isSubType && (Options == null || !Options.Any()))
                 throw new InvalidOperationException("SubCommands/SubCommandGroups must have at least one option");
@@ -519,6 +533,12 @@ namespace Discord
 
             if (isIntType && MaxValue != null && MaxValue % 1 != 0)
                 throw new InvalidOperationException("MaxValue cannot have decimals on Integer command options.");
+
+            if(isStrType && MinLength is not null && MinLength < 0)
+                throw new InvalidOperationException("MinLength cannot be smaller than 0.");
+
+            if (isStrType && MaxLength is not null && MaxLength < 1)
+                throw new InvalidOperationException("MaxLength cannot be smaller than 1.");
 
             return new ApplicationCommandOptionProperties
             {
@@ -537,6 +557,8 @@ namespace Discord
                 MaxValue = MaxValue,
                 NameLocalizations = _nameLocalizations,
                 DescriptionLocalizations = _descriptionLocalizations
+                MinLength = MinLength,
+                MaxLength = MaxLength,
             };
         }
 
@@ -560,7 +582,8 @@ namespace Discord
         public SlashCommandOptionBuilder AddOption(string name, ApplicationCommandOptionType type,
            string description, bool? isRequired = null, bool isDefault = false, bool isAutocomplete = false, double? minValue = null, double? maxValue = null,
            List<SlashCommandOptionBuilder> options = null, List<ChannelType> channelTypes = null, IDictionary<string, string> nameLocalizations = null,
-           IDictionary<string, string> descriptionLocalizations = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           IDictionary<string, string> descriptionLocalizations = null,
+           int? minLength = null, int? maxLength = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             Preconditions.Options(name, description);
 
@@ -582,6 +605,8 @@ namespace Discord
                 IsAutocomplete = isAutocomplete,
                 MinValue = minValue,
                 MaxValue = maxValue,
+                MinLength = minLength,
+                MaxLength = maxLength,
                 Options = options,
                 Type = type,
                 Choices = (choices ?? Array.Empty<ApplicationCommandOptionChoiceProperties>()).ToList(),
@@ -813,6 +838,28 @@ namespace Discord
         public SlashCommandOptionBuilder WithMaxValue(double value)
         {
             MaxValue = value;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the current builders min length field.
+        /// </summary>
+        /// <param name="length">The value to set.</param>
+        /// <returns>The current builder.</returns>
+        public SlashCommandOptionBuilder WithMinLength(int length)
+        {
+            MinLength = length;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the current builders max length field.
+        /// </summary>
+        /// <param name="lenght">The value to set.</param>
+        /// <returns>The current builder.</returns>
+        public SlashCommandOptionBuilder WithMaxLength(int lenght)
+        {
+            MaxLength = lenght;
             return this;
         }
 

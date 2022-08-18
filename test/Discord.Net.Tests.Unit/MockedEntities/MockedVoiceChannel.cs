@@ -12,6 +12,9 @@ namespace Discord
         public int Bitrate => throw new NotImplementedException();
 
         public int? UserLimit => throw new NotImplementedException();
+        public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null) => throw new NotImplementedException();
+
+        public Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null) => throw new NotImplementedException();
 
         public ulong? CategoryId => throw new NotImplementedException();
 

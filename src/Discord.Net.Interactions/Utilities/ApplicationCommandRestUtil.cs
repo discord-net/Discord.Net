@@ -31,6 +31,8 @@ namespace Discord.Interactions
                 MinValue = parameterInfo.MinValue,
                 NameLocalizations = localizationManager?.GetAllNames(parameterPath, LocalizationTarget.Parameter) ?? ImmutableDictionary<string, string>.Empty,
                 DescriptionLocalizations = localizationManager?.GetAllDescriptions(parameterPath, LocalizationTarget.Parameter) ?? ImmutableDictionary<string, string>.Empty
+                MinLength = parameterInfo.MinLength,
+                MaxLength = parameterInfo.MaxLength,
             };
 
             parameterInfo.TypeConverter.Write(props, parameterInfo);
@@ -268,6 +270,12 @@ namespace Discord.Interactions
                 Options = commandOption.Options?.Select(x => x.ToApplicationCommandOptionProps()).ToList(),
                 NameLocalizations = commandOption.NameLocalizations?.ToImmutableDictionary(),
                 DescriptionLocalizations = commandOption.DescriptionLocalizations?.ToImmutableDictionary()
+                MaxLength = commandOption.MaxLength,
+                MinLength = commandOption.MinLength,
+                MaxValue = commandOption.MaxValue,
+                MinValue = commandOption.MinValue,
+                IsAutocomplete = commandOption.IsAutocomplete.GetValueOrDefault(),
+                ChannelTypes = commandOption.ChannelTypes.ToList(),
             };
 
         public static Modal ToModal(this ModalInfo modalInfo, string customId, Action<ModalBuilder> modifyModal = null)

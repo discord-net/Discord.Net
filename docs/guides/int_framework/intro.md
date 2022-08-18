@@ -279,8 +279,8 @@ Meaning, the constructor parameters and public settable properties of a module w
 For more information on dependency injection, read the [DependencyInjection] guides.
 
 > [!NOTE]
-> On every command execution, module dependencies are resolved using a new service scope which allows you to utilize scoped service instances, just like in Asp.Net.
-> Including the precondition checks, every module method is executed using the same service scope and service scopes are disposed right after the `AfterExecute` method returns.
+> On every command execution, if the 'AutoServiceScopes' option is enabled in the config , module dependencies are resolved using a new service scope which allows you to utilize scoped service instances, just like in Asp.Net.
+> Including the precondition checks, every module method is executed using the same service scope and service scopes are disposed right after the `AfterExecute` method returns. This doesn't apply to methods other than `ExecuteAsync()`.
 
 ## Module Groups
 
@@ -290,6 +290,11 @@ By nesting commands inside a module that is tagged with [GroupAttribute] you can
 > [!WARNING]
 > Although creating nested module stuctures are allowed,
 > you are not permitted to use more than 2 [GroupAttribute]'s in module hierarchy.
+
+> [!NOTE]
+> To not use the command group's name as a prefix for component or modal interaction's custom id set `ignoreGroupNames` parameter to `true` in classes with [GroupAttribute]
+>
+> However, you have to be careful to prevent overlapping ids of buttons and modals
 
 [!code-csharp[Command Group Example](samples/intro/groupmodule.cs)]
 
@@ -303,8 +308,19 @@ Any of the following socket events can be used to execute commands:
 - [AutocompleteExecuted]
 - [UserCommandExecuted]
 - [MessageCommandExecuted]
+- [ModalExecuted]
 
-Commands can be either executed on the gateway thread or on a seperate thread from the thread pool. This behaviour can be configured by changing the *RunMode* property of `InteractionServiceConfig` or by setting the *runMode* parameter of a command attribute.
+These events will trigger for the specific type of interaction they inherit their name from. The [InteractionCreated] event will trigger for all.
+An example of executing a command from an event can be seen here:
+
+[!code-csharp[Command Event Example](samples/intro/event.cs)]
+
+Commands can be either executed on the gateway thread or on a seperate thread from the thread pool.
+This behaviour can be configured by changing the `RunMode` property of `InteractionServiceConfig` or by setting the *runMode* parameter of a command attribute.
+
+> [!WARNING]
+> In the example above, no form of post-execution is presented.
+> Please carefully read the [Post Execution Documentation] for the best approach in resolving the result based on your `RunMode`.
 
 You can also configure the way [InteractionService] executes the commands.
 By default, commands are executed using `ConstructorInfo.Invoke()` to create module instances and
@@ -358,7 +374,7 @@ delegate can be used to create HTTP responses from a deserialized json object st
 - Use the interaction endpoints of the module base instead of the interaction object (ie. `RespondAsync()`, `FollowupAsync()`...).
 
 [AutocompleteHandlers]: xref:Guides.IntFw.AutoCompletion
-[DependencyInjection]: xref:Guides.TextCommands.DI
+[DependencyInjection]: xref:Guides.DI.Intro
 
 [GroupAttribute]: xref:Discord.Interactions.GroupAttribute
 [InteractionService]: xref:Discord.Interactions.InteractionService
@@ -371,6 +387,7 @@ delegate can be used to create HTTP responses from a deserialized json object st
 [AutocompleteExecuted]: xref:Discord.WebSocket.BaseSocketClient
 [UserCommandExecuted]: xref:Discord.WebSocket.BaseSocketClient
 [MessageCommandExecuted]: xref:Discord.WebSocket.BaseSocketClient
+[ModalExecuted]: xref:Discord.WebSocket.BaseSocketClient
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 [DiscordRestClient]: xref:Discord.Rest.DiscordRestClient
 [SocketInteractionContext]: xref:Discord.Interactions.SocketInteractionContext
