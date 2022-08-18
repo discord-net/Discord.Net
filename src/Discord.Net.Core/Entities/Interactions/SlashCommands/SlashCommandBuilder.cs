@@ -556,7 +556,7 @@ namespace Discord
                 MinValue = MinValue,
                 MaxValue = MaxValue,
                 NameLocalizations = _nameLocalizations,
-                DescriptionLocalizations = _descriptionLocalizations
+                DescriptionLocalizations = _descriptionLocalizations,
                 MinLength = MinLength,
                 MaxLength = MaxLength,
             };
