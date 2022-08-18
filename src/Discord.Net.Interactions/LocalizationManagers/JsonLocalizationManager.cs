@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace Discord.Interactions
     {
         private const string NameIdentifier = "name";
         private const string DescriptionIdentifier = "description";
+        private const string SpaceToken = "~";
 
         private readonly string _basePath;
         private readonly string _fileName;
@@ -58,7 +60,8 @@ namespace Discord.Interactions
                 using var sr = new StreamReader(file);
                 using var jr = new JsonTextReader(sr);
                 var obj = JObject.Load(jr);
-                var token = string.Join(".", key) + $".{identifier}";
+                var token = string.Join(".", key.Select(x => $"['{x}']")) + $".{identifier}";
+                Console.WriteLine(token);
                 var value = (string)obj.SelectToken(token);
                 if (value is not null)
                     result[locale] = value;
