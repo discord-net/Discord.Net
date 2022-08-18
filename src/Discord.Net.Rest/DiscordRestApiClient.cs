@@ -1227,7 +1227,7 @@ namespace Discord.API
 
             //with_localizations=false doesnt return localized names and descriptions
             var query = withLocalizations ? "?with_localizations=true" : string.Empty;
-            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands{}",
+            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands{query}",
                 new BucketIds(), options: options).ConfigureAwait(false);
         }
 
@@ -1309,7 +1309,7 @@ namespace Discord.API
 
             //with_localizations=false doesnt return localized names and descriptions
             var query = withLocalizations ? "?with_localizations=true" : string.Empty;
-            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands{query}",
+            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands{query}",
                 bucket, options: options).ConfigureAwait(false);
         }
 
