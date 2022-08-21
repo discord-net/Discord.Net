@@ -14,8 +14,6 @@ namespace Discord.Interactions
         private const string DescriptionIdentifier = "description";
         private const string SpaceToken = "~";
 
-        private readonly string _baseResource;
-        private readonly Assembly _assembly;
         private readonly ResourceManager _resourceManager;
         private readonly IEnumerable<CultureInfo> _supportedLocales;
 
@@ -27,10 +25,8 @@ namespace Discord.Interactions
         /// <param name="supportedLocales">Cultures the <see cref="ResxLocalizationManager"/> should search for.</param>
         public ResxLocalizationManager(string baseResource, Assembly assembly, params CultureInfo[] supportedLocales)
         {
-            _baseResource = baseResource;
-            _assembly = assembly;
             _supportedLocales = supportedLocales;
-            _resourceManager = new ResourceManager(_baseResource, assembly);
+            _resourceManager = new ResourceManager(baseResource, assembly);
         }
 
         /// <inheritdoc />
@@ -43,7 +39,7 @@ namespace Discord.Interactions
 
         private IDictionary<string, string> GetValues(IList<string> key, string identifier)
         {
-            var entryKey = (string.Join('.', key) + '.' + identifier).Replace(" ", SpaceToken);
+            var entryKey = (string.Join(".", key) + "." + identifier).Replace(" ", SpaceToken);
 
             var result = new Dictionary<string, string>();
 
