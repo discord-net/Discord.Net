@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Resources;
-using System.Threading.Tasks;
 
 namespace Discord.Interactions
 {
@@ -22,9 +16,8 @@ namespace Discord.Interactions
 
         private readonly string _baseResource;
         private readonly Assembly _assembly;
-        private static readonly ConcurrentDictionary<string, ResourceManager> _localizerCache = new();
+        private readonly ResourceManager _resourceManager;
         private readonly IEnumerable<CultureInfo> _supportedLocales;
-        private readonly IEnumerable<string> _resourceNames;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ResxLocalizationManager"/> class.
@@ -37,7 +30,7 @@ namespace Discord.Interactions
             _baseResource = baseResource;
             _assembly = assembly;
             _supportedLocales = supportedLocales;
-            _resourceNames = assembly.GetManifestResourceNames();
+            _resourceManager = new ResourceManager(_baseResource, assembly);
         }
 
         /// <inheritdoc />
@@ -50,17 +43,13 @@ namespace Discord.Interactions
 
         private IDictionary<string, string> GetValues(IList<string> key, string identifier)
         {
-            var resourceName = (_baseResource + "." + string.Join(".", key)).Replace(" ", SpaceToken);
-
-            if (!_resourceNames.Any(x => string.Equals(resourceName + ".resources", x, StringComparison.OrdinalIgnoreCase)))
-                return ImmutableDictionary<string, string>.Empty;
+            var entryKey = (string.Join('.', key) + '.' + identifier).Replace(" ", SpaceToken);
 
             var result = new Dictionary<string, string>();
-            var resourceManager = _localizerCache.GetOrAdd(resourceName, new ResourceManager(resourceName, _assembly));
 
             foreach (var locale in _supportedLocales)
             {
-                var value = resourceManager.GetString(identifier, locale);
+                var value = _resourceManager.GetString(entryKey, locale);
                 if (value is not null)
                     result[locale.Name] = value;
             }
