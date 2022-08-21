@@ -94,5 +94,44 @@ namespace Discord
         /// </summary>
         public override string ToString() => Title;
         private string DebuggerDisplay => $"{Title} ({Type})";
+
+        public static bool operator ==(Embed left, Embed right)
+        => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(Embed left, Embed right)
+            => !(left == right);
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="Embed"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="Embed"/>, <see cref="Equals(Embed)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="Embed"/></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+            => obj is Embed embed && Equals(embed);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="Embed"/> is equal to the current <see cref="Embed"/>
+        /// </summary>
+        /// <param name="embed">The <see cref="Embed"/> to compare with the current <see cref="Embed"/></param>
+        /// <returns></returns>
+        public bool Equals(Embed embed)
+            => GetHashCode() == embed?.GetHashCode();
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hash = 17;
+                hash = hash * 23 + (Type, Title, Description, Timestamp, Color, Image, Video, Author, Footer, Provider, Thumbnail).GetHashCode();
+                foreach(var field in Fields)
+                    hash = hash * 23 + field.GetHashCode();
+                return hash;
+            }
+        }
     }
 }
