@@ -180,7 +180,7 @@ namespace Discord.Rest
                 },
                 nextPage: (info, lastPage) =>
                 {
-                    if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
+                    if (lastPage.Count != DiscordConfig.MaxBansPerBatch)
                         return false;
                     if (dir == Direction.Before)
                         info.Position = lastPage.Min(x => x.User.Id);
