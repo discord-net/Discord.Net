@@ -180,6 +180,20 @@ namespace Discord
         ///     A sticker was deleted.
         /// </summary>
         StickerDeleted = 92,
+
+        /// <summary>
+        ///     A thread was created.
+        /// </summary>
+        EventCreate = 100,
+        /// <summary>
+        ///     A thread was created.
+        /// </summary>
+        EventUpdate = 101,
+        /// <summary>
+        ///     A thread was created.
+        /// </summary>
+        EventDelete = 102,
+
         /// <summary>
         ///     A thread was created.
         /// </summary>

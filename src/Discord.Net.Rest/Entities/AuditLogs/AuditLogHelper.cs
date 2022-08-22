@@ -52,6 +52,10 @@ namespace Discord.Rest
             [ActionType.MessagePinned] = MessagePinAuditLogData.Create,
             [ActionType.MessageUnpinned] = MessageUnpinAuditLogData.Create,
 
+            [ActionType.EventCreate] = ScheduledEventCreateAuditLogData.Create,
+            [ActionType.EventUpdate] = ScheduledEventUpdateAuditLogData.Create,
+            [ActionType.EventDelete] = ScheduledEventDeleteAuditLogData.Create,
+
             [ActionType.ThreadCreate] = ThreadCreateAuditLogData.Create,
             [ActionType.ThreadUpdate] = ThreadUpdateAuditLogData.Create,
             [ActionType.ThreadDelete] = ThreadDeleteAuditLogData.Create,
