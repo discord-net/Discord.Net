@@ -105,7 +105,7 @@ namespace Discord.WebSocket
 
         #region IForumChannel
         async Task<IReadOnlyCollection<IThreadChannel>> IForumChannel.GetActiveThreadsAsync(RequestOptions options)
-            => await GetActiveThreadsInChannelAsync(options).ConfigureAwait(false);
+            => await GetActiveThreadsAsync(options).ConfigureAwait(false);
         async Task<IReadOnlyCollection<IThreadChannel>> IForumChannel.GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
             => await GetPublicArchivedThreadsAsync(limit, before, options).ConfigureAwait(false);
         async Task<IReadOnlyCollection<IThreadChannel>> IForumChannel.GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
