@@ -89,7 +89,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc cref="IForumChannel.GetActiveThreadsAsync(RequestOptions)"/>
         public Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
-            => ThreadHelper.GetActiveThreadsAsync(Guild, Discord, options);
+            => ThreadHelper.GetActiveThreadsInChannelAsync(Guild, this, Discord, options);
 
         /// <inheritdoc cref="IForumChannel.GetJoinedPrivateArchivedThreadsAsync(int?, DateTimeOffset?, RequestOptions)"/>
         public Task<IReadOnlyCollection<RestThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null)
@@ -105,7 +105,7 @@ namespace Discord.WebSocket
 
         #region IForumChannel
         async Task<IReadOnlyCollection<IThreadChannel>> IForumChannel.GetActiveThreadsAsync(RequestOptions options)
-            => await GetActiveThreadsAsync(options).ConfigureAwait(false);
+            => await GetActiveThreadsInChannelAsync(options).ConfigureAwait(false);
         async Task<IReadOnlyCollection<IThreadChannel>> IForumChannel.GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
             => await GetPublicArchivedThreadsAsync(limit, before, options).ConfigureAwait(false);
         async Task<IReadOnlyCollection<IThreadChannel>> IForumChannel.GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
