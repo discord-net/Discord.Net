@@ -12,7 +12,6 @@ namespace Discord.Interactions
     {
         private const string NameIdentifier = "name";
         private const string DescriptionIdentifier = "description";
-        private const string SpaceToken = "~";
 
         private readonly ResourceManager _resourceManager;
         private readonly IEnumerable<CultureInfo> _supportedLocales;
@@ -39,7 +38,7 @@ namespace Discord.Interactions
 
         private IDictionary<string, string> GetValues(IList<string> key, string identifier)
         {
-            var entryKey = (string.Join(".", key) + "." + identifier).Replace(" ", SpaceToken);
+            var entryKey = (string.Join(".", key) + "." + identifier);
 
             var result = new Dictionary<string, string>();
 
