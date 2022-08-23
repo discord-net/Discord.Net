@@ -8,7 +8,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Contains a piece of audit log data related to a scheduled event creation.
+    ///     Contains a piece of audit log data related to a scheduled event deleteion.
     /// </summary>
     public class ScheduledEventDeleteAuditLogData : IAuditLogData
     {
@@ -30,8 +30,5 @@ namespace Discord.Rest
         ///     Gets the snowflake id of the event.
         /// </summary>
         public ulong Id { get; }
-        /// <summary>
-        ///     Gets the snowflake id of the guild the event is associated with.
-        /// </summary>
     }
 }
