@@ -74,5 +74,9 @@ namespace Discord
         public Task TriggerTypingAsync(RequestOptions options = null) => throw new NotImplementedException();
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options) => throw new NotImplementedException();
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options) => throw new NotImplementedException();
+        public Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null) => throw new NotImplementedException();
+        public Task<IReadOnlyCollection<IThreadChannel>> GetPublicArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null) => throw new NotImplementedException();
+        public Task<IReadOnlyCollection<IThreadChannel>> GetPrivateArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null) => throw new NotImplementedException();
+        public Task<IReadOnlyCollection<IThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null) => throw new NotImplementedException();
     }
 }

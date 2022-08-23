@@ -36,6 +36,9 @@ namespace Discord
             throw new NotImplementedException();
         }
 
+        public Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null) => throw new NotImplementedException();
+        public Task<IReadOnlyCollection<IThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null) => throw new NotImplementedException();
+
         public OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
             throw new NotImplementedException();
@@ -45,6 +48,9 @@ namespace Discord
         {
             throw new NotImplementedException();
         }
+
+        public Task<IReadOnlyCollection<IThreadChannel>> GetPrivateArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null) => throw new NotImplementedException();
+        public Task<IReadOnlyCollection<IThreadChannel>> GetPublicArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null) => throw new NotImplementedException();
 
         public Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
