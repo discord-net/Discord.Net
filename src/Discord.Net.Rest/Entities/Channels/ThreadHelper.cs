@@ -67,10 +67,10 @@ namespace Discord.Rest
             var result = await client.ApiClient.GetActiveThreadsAsync(guild.Id, options).ConfigureAwait(false);
             return result.Threads.Select(x => RestThreadChannel.Create(client, guild, x)).ToImmutableArray();
         }
-        public static async Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsInChannelAsync(IGuild guild, IGuildChannel parentChannel, BaseDiscordClient client, RequestOptions options)
+        public static async Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsInChannelAsync(IGuildChannel channel, BaseDiscordClient client, RequestOptions options)
         {
-            var result = await client.ApiClient.GetActiveThreadsInChannelAsync(guild.Id, parentChannel.Id, options).ConfigureAwait(false);
-            return result.Threads.Select(x => RestThreadChannel.Create(client, guild, x)).ToImmutableArray();
+            var result = await client.ApiClient.GetActiveThreadsInChannelAsync(channel.Id, options).ConfigureAwait(false);
+            return result.Threads.Select(x => RestThreadChannel.Create(client, channel.Guild, x)).ToImmutableArray();
         }
 
         public static async Task<IReadOnlyCollection<RestThreadChannel>> GetPublicArchivedThreadsAsync(IGuildChannel channel, BaseDiscordClient client, int? limit = null,
