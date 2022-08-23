@@ -8,7 +8,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Contains a piece of audit log data related to a scheduled event creation.
+    ///     Contains a piece of audit log data related to a scheduled event updates.
     /// </summary>
     public class ScheduledEventUpdateAuditLogData : IAuditLogData
     {
