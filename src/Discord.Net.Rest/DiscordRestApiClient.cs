@@ -584,7 +584,7 @@ namespace Discord.API
             return await SendAsync<ThreadMember>("GET", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options).ConfigureAwait(false);
         }
 
-        public async Task<ChannelThreads> GetActiveThreadsAsync(ulong guildId, RequestOptions options = null)
+        public async Task<ChannelThreads> GetActiveThreadsInGuildAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
@@ -595,34 +595,18 @@ namespace Discord.API
             return await SendAsync<ChannelThreads>("GET", () => $"guilds/{guildId}/threads/active", bucket, options: options);
         }
 
-        public async Task<ChannelThreads> GetActiveThreadsInChannelAsync(ulong guildId, ulong parentChannel, RequestOptions options = null)
+        public async Task<ChannelThreads> GetActiveThreadsInChannelAsync(ulong channelId, RequestOptions options = null)
         {
-            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
             options = RequestOptions.CreateOrClone(options);
 
-            var bucket = new BucketIds(guildId: guildId);
+            var bucket = new BucketIds(channelId: channelId);
 
-            ChannelThreads allChannelThreads = await SendAsync<ChannelThreads>("GET", () => $"guilds/{guildId}/threads/active", bucket, options: options);
-            ChannelThreads filteredThreads = new ChannelThreads();
-
-            filteredThreads.Threads = allChannelThreads.Threads.Where(x => x.CategoryId == parentChannel).ToArray();
-
-            List<ThreadMember> members = new List<ThreadMember>();
-
-            foreach (ThreadMember m in allChannelThreads.Members)
-            {
-                if (filteredThreads.Threads.Where(x => x.Id == (ulong)m.Id).Count() == 0)
-                    continue;
-                members.Add(m);
-            }
-
-            filteredThreads.Members = members.ToArray();
-
-            return filteredThreads;
+            return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/active", bucket, options: options);
         }
 
-        public async Task<ChannelThreads> GetPublicArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null, RequestOptions options = null)
+        public async Task<ChannelThreads> GetPublicArchivedThreadsInChannelAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
@@ -644,7 +628,7 @@ namespace Discord.API
             return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/public{query}", bucket, options: options);
         }
 
-        public async Task<ChannelThreads> GetPrivateArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null,
+        public async Task<ChannelThreads> GetPrivateArchivedThreadsInChannelAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null,
             RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
@@ -667,7 +651,7 @@ namespace Discord.API
             return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/private{query}", bucket, options: options);
         }
 
-        public async Task<ChannelThreads> GetJoinedPrivateArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null,
+        public async Task<ChannelThreads> GetJoinedPrivateArchivedThreadsInChannelAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null,
             RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
