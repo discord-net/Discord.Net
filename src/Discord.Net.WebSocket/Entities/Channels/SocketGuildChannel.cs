@@ -179,7 +179,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc cref="IGuildChannel.GetActiveThreadsAsync(RequestOptions)"/>
         public Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
-            => ThreadHelper.GetActiveThreadsAsync(this, Discord, options);
+            => ThreadHelper.GetActiveThreadsInChannelAsync(Guild, this, Discord, options);
 
         /// <inheritdoc cref="IGuildChannel.GetPublicArchivedThreadsAsync(int?, DateTimeOffset?, RequestOptions)"/>
         public Task<IReadOnlyCollection<RestThreadChannel>> GetPublicArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null)

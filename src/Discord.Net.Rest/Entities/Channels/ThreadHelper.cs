@@ -64,33 +64,33 @@ namespace Discord.Rest
 
         public static async Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
         {
-            var result = await client.ApiClient.GetActiveThreadsInGuildAsync(guild.Id, options).ConfigureAwait(false);
+            var result = await client.ApiClient.GetActiveThreadsAsync(guild.Id, options).ConfigureAwait(false);
             return result.Threads.Select(x => RestThreadChannel.Create(client, guild, x)).ToImmutableArray();
         }
-        public static async Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(IGuildChannel channel, BaseDiscordClient client, RequestOptions options)
+        public static async Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsInChannelAsync(IGuild guild, IGuildChannel parentChannel, BaseDiscordClient client, RequestOptions options)
         {
-            var result = await client.ApiClient.GetActiveThreadsInChannelAsync(channel.Id, options).ConfigureAwait(false);
-            return result.Threads.Select(x => RestThreadChannel.Create(client, channel.Guild, x)).ToImmutableArray();
+            var result = await client.ApiClient.GetActiveThreadsInChannelAsync(guild.Id, parentChannel.Id, options).ConfigureAwait(false);
+            return result.Threads.Select(x => RestThreadChannel.Create(client, guild, x)).ToImmutableArray();
         }
 
         public static async Task<IReadOnlyCollection<RestThreadChannel>> GetPublicArchivedThreadsAsync(IGuildChannel channel, BaseDiscordClient client, int? limit = null,
             DateTimeOffset? before = null, RequestOptions options = null)
         {
-            var result = await client.ApiClient.GetPublicArchivedThreadsInChannelAsync(channel.Id, before, limit, options);
+            var result = await client.ApiClient.GetPublicArchivedThreadsAsync(channel.Id, before, limit, options);
             return result.Threads.Select(x => RestThreadChannel.Create(client, channel.Guild, x)).ToImmutableArray();
         }
 
         public static async Task<IReadOnlyCollection<RestThreadChannel>> GetPrivateArchivedThreadsAsync(IGuildChannel channel, BaseDiscordClient client, int? limit = null,
             DateTimeOffset? before = null, RequestOptions options = null)
         {
-            var result = await client.ApiClient.GetPrivateArchivedThreadsInChannelAsync(channel.Id, before, limit, options);
+            var result = await client.ApiClient.GetPrivateArchivedThreadsAsync(channel.Id, before, limit, options);
             return result.Threads.Select(x => RestThreadChannel.Create(client, channel.Guild, x)).ToImmutableArray();
         }
 
         public static async Task<IReadOnlyCollection<RestThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(IGuildChannel channel, BaseDiscordClient client, int? limit = null,
             DateTimeOffset? before = null, RequestOptions options = null)
         {
-            var result = await client.ApiClient.GetJoinedPrivateArchivedThreadsInChannelAsync(channel.Id, before, limit, options);
+            var result = await client.ApiClient.GetJoinedPrivateArchivedThreadsAsync(channel.Id, before, limit, options);
             return result.Threads.Select(x => RestThreadChannel.Create(client, channel.Guild, x)).ToImmutableArray();
         }
 
