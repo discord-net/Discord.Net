@@ -40,41 +40,41 @@ namespace Discord.Rest
             var image = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "image");
 
             var before = new ScheduledEventInfo(
-                guildId.OldValue.ToObject<ulong>(discord.ApiClient.Serializer),
-                channelId.OldValue.ToObject<ulong?>(discord.ApiClient.Serializer),
-                name.OldValue.ToObject<string>(discord.ApiClient.Serializer),
-                description.OldValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
+                guildId?.OldValue.ToObject<ulong>(discord.ApiClient.Serializer),
+                channelId?.OldValue.ToObject<ulong?>(discord.ApiClient.Serializer),
+                name?.OldValue.ToObject<string>(discord.ApiClient.Serializer),
+                description?.OldValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault(),
-                scheduledStartTime.OldValue.ToObject<DateTimeOffset>(discord.ApiClient.Serializer),
-                scheduledEndTime.OldValue.ToObject<DateTimeOffset?>(discord.ApiClient.Serializer),
-                privacyLevel.OldValue.ToObject<GuildScheduledEventPrivacyLevel>(discord.ApiClient.Serializer),
-                status.OldValue.ToObject<GuildScheduledEventStatus>(discord.ApiClient.Serializer),
-                entityType.OldValue.ToObject<GuildScheduledEventType>(discord.ApiClient.Serializer),
-                entityId.OldValue.ToObject<ulong?>(discord.ApiClient.Serializer),
-                entityMetadata.OldValue.ToObject<GuildScheduledEventEntityMetadata>(discord.ApiClient.Serializer)
+                scheduledStartTime?.OldValue.ToObject<DateTimeOffset>(discord.ApiClient.Serializer),
+                scheduledEndTime?.OldValue.ToObject<DateTimeOffset?>(discord.ApiClient.Serializer),
+                privacyLevel?.OldValue.ToObject<GuildScheduledEventPrivacyLevel>(discord.ApiClient.Serializer),
+                status?.OldValue.ToObject<GuildScheduledEventStatus>(discord.ApiClient.Serializer),
+                entityType?.OldValue.ToObject<GuildScheduledEventType>(discord.ApiClient.Serializer),
+                entityId?.OldValue.ToObject<ulong?>(discord.ApiClient.Serializer),
+                entityMetadata?.OldValue.ToObject<GuildScheduledEventEntityMetadata>(discord.ApiClient.Serializer)
                     ?.Location.GetValueOrDefault(),
-                userCount.OldValue.ToObject<Optional<int>>(discord.ApiClient.Serializer)
+                userCount?.OldValue.ToObject<Optional<int>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault(),
-                image.OldValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
+                image?.OldValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault()
             );
             var after = new ScheduledEventInfo(
-                guildId.NewValue.ToObject<ulong>(discord.ApiClient.Serializer),
-                channelId.NewValue.ToObject<ulong?>(discord.ApiClient.Serializer),
-                name.NewValue.ToObject<string>(discord.ApiClient.Serializer),
-                description.NewValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
+                guildId?.NewValue.ToObject<ulong>(discord.ApiClient.Serializer),
+                channelId?.NewValue.ToObject<ulong?>(discord.ApiClient.Serializer),
+                name?.NewValue.ToObject<string>(discord.ApiClient.Serializer),
+                description?.NewValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault(),
-                scheduledStartTime.NewValue.ToObject<DateTimeOffset>(discord.ApiClient.Serializer),
-                scheduledEndTime.NewValue.ToObject<DateTimeOffset?>(discord.ApiClient.Serializer),
-                privacyLevel.NewValue.ToObject<GuildScheduledEventPrivacyLevel>(discord.ApiClient.Serializer),
-                status.NewValue.ToObject<GuildScheduledEventStatus>(discord.ApiClient.Serializer),
-                entityType.NewValue.ToObject<GuildScheduledEventType>(discord.ApiClient.Serializer),
-                entityId.NewValue.ToObject<ulong?>(discord.ApiClient.Serializer),
-                entityMetadata.NewValue.ToObject<GuildScheduledEventEntityMetadata>(discord.ApiClient.Serializer)
+                scheduledStartTime?.NewValue.ToObject<DateTimeOffset>(discord.ApiClient.Serializer),
+                scheduledEndTime?.NewValue.ToObject<DateTimeOffset?>(discord.ApiClient.Serializer),
+                privacyLevel?.NewValue.ToObject<GuildScheduledEventPrivacyLevel>(discord.ApiClient.Serializer),
+                status?.NewValue.ToObject<GuildScheduledEventStatus>(discord.ApiClient.Serializer),
+                entityType?.NewValue.ToObject<GuildScheduledEventType>(discord.ApiClient.Serializer),
+                entityId?.NewValue.ToObject<ulong?>(discord.ApiClient.Serializer),
+                entityMetadata?.NewValue.ToObject<GuildScheduledEventEntityMetadata>(discord.ApiClient.Serializer)
                     ?.Location.GetValueOrDefault(),
-                userCount.NewValue.ToObject<Optional<int>>(discord.ApiClient.Serializer)
+                userCount?.NewValue.ToObject<Optional<int>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault(),
-                image.NewValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
+                image?.NewValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault()
             );
 

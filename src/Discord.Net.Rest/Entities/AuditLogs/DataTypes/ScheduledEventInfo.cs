@@ -10,7 +10,7 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the snowflake id of the guild the event is associated with.
         /// </summary>
-        public ulong GuildId { get; }
+        public ulong? GuildId { get; }
         /// <summary>
         ///     Gets the snowflake id of the channel the event is associated with.
         /// </summary>
@@ -26,7 +26,7 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the time the event was scheduled for.
         /// </summary>
-        public DateTimeOffset ScheduledStartTime { get; }
+        public DateTimeOffset? ScheduledStartTime { get; }
         /// <summary>
         ///     Gets the time the event was scheduled to end.
         /// </summary>
@@ -34,15 +34,15 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the privacy level of the event.
         /// </summary>
-        public GuildScheduledEventPrivacyLevel PrivacyLevel { get; }
+        public GuildScheduledEventPrivacyLevel? PrivacyLevel { get; }
         /// <summary>
         ///     Gets the status of the event.
         /// </summary>
-        public GuildScheduledEventStatus Status { get; }
+        public GuildScheduledEventStatus? Status { get; }
         /// <summary>
         ///     Gets the type of the entity associated with the event (stage / void / external).
         /// </summary>
-        public GuildScheduledEventType EntityType { get; }
+        public GuildScheduledEventType? EntityType { get; }
         /// <summary>
         ///     Gets the snowflake id of the entity associated with the event (stage / void / external).
         /// </summary>
@@ -54,13 +54,13 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the count of users interested in this event. 
         /// </summary>
-        public int UserCount { get; }
+        public int? UserCount { get; }
         /// <summary>
         ///     Gets the image hash of the image that was attached to the event. Null if not set.
         /// </summary>
         public string Image { get; }
 
-        internal ScheduledEventInfo(ulong guildId, ulong? channelId, string name, string description, DateTimeOffset scheduledStartTime, DateTimeOffset? scheduledEndTime, GuildScheduledEventPrivacyLevel privacyLevel, GuildScheduledEventStatus status, GuildScheduledEventType entityType, ulong? entityId, string location, int userCount, string image)
+        internal ScheduledEventInfo(ulong? guildId, ulong? channelId, string name, string description, DateTimeOffset? scheduledStartTime, DateTimeOffset? scheduledEndTime, GuildScheduledEventPrivacyLevel? privacyLevel, GuildScheduledEventStatus? status, GuildScheduledEventType? entityType, ulong? entityId, string location, int? userCount, string image)
         {
             GuildId            = guildId           ;
             ChannelId          = channelId         ;
