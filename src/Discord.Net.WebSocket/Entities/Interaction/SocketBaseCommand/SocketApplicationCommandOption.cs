@@ -54,6 +54,32 @@ namespace Discord.WebSocket
         /// </summary>
         public IReadOnlyCollection<ChannelType> ChannelTypes { get; private set; }
 
+        /// <summary>
+        ///     Gets the localization dictionary for the name field of this command option.
+        /// </summary>
+        public IReadOnlyDictionary<string, string> NameLocalizations { get; private set; }
+
+        /// <summary>
+        ///     Gets the localization dictionary for the description field of this command option.
+        /// </summary>
+        public IReadOnlyDictionary<string, string> DescriptionLocalizations { get; private set; }
+
+        /// <summary>
+        ///     Gets the localized name of this command option.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        /// </remarks>
+        public string NameLocalized { get; private set; }
+
+        /// <summary>
+        ///     Gets the localized description of this command option.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        /// </remarks>
+        public string DescriptionLocalized { get; private set; }
+
         internal SocketApplicationCommandOption() { }
         internal static SocketApplicationCommandOption Create(Model model)
         {
@@ -92,6 +118,15 @@ namespace Discord.WebSocket
             ChannelTypes = model.ChannelTypes.IsSpecified
                 ? model.ChannelTypes.Value.ToImmutableArray()
                 : ImmutableArray.Create<ChannelType>();
+
+            NameLocalizations = model.NameLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                ImmutableDictionary<string, string>.Empty;
+
+            DescriptionLocalizations = model.DescriptionLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                       ImmutableDictionary<string, string>.Empty;
+
+            NameLocalized = model.NameLocalized.GetValueOrDefault();
+            DescriptionLocalized = model.DescriptionLocalized.GetValueOrDefault();
         }
 
         IReadOnlyCollection<IApplicationCommandOptionChoice> IApplicationCommandOption.Choices => Choices;
