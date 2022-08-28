@@ -67,26 +67,26 @@ namespace Discord.Interactions.Builders
         /// <summary>
         ///     Sets <see cref="MinLength"/>.
         /// </summary>
-        /// <param name="minLenght">New value of the <see cref="MinLength"/>.</param>
+        /// <param name="minLength">New value of the <see cref="MinLength"/>.</param>
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public TextInputComponentBuilder WithMinLenght(int minLenght)
+        public TextInputComponentBuilder WithMinLength(int minLength)
         {
-            MinLength = minLenght;
+            MinLength = minLength;
             return this;
         }
 
         /// <summary>
         ///     Sets <see cref="MaxLength"/>.
         /// </summary>
-        /// <param name="maxLenght">New value of the <see cref="MaxLength"/>.</param>
+        /// <param name="maxLength">New value of the <see cref="MaxLength"/>.</param>
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public TextInputComponentBuilder WithMaxLenght(int maxLenght)
+        public TextInputComponentBuilder WithMaxLength(int maxLength)
         {
-            MaxLength = maxLenght;
+            MaxLength = maxLength;
             return this;
         }
 
