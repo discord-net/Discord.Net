@@ -855,11 +855,11 @@ namespace Discord
         /// <summary>
         ///     Sets the current builders max length field.
         /// </summary>
-        /// <param name="lenght">The value to set.</param>
+        /// <param name="length">The value to set.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandOptionBuilder WithMaxLength(int lenght)
+        public SlashCommandOptionBuilder WithMaxLength(int length)
         {
-            MaxLength = lenght;
+            MaxLength = length;
             return this;
         }
 
