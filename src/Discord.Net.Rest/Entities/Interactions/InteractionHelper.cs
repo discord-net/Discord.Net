@@ -150,8 +150,6 @@ namespace Discord.Rest
                     DmPermission = arg.IsDMEnabled.ToNullable()
                 };
 
-                Console.WriteLine("Locales:" + string.Join(",", arg.NameLocalizations.Keys));
-
                 if (arg is SlashCommandProperties slashProps)
                 {
                     Preconditions.NotNullOrEmpty(slashProps.Description, nameof(slashProps.Description));
