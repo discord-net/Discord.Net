@@ -43,6 +43,15 @@ namespace InteractionFramework
 
         public async Task RunAsync()
         {
+            // Output of bot activity.
+            while(true)
+            {
+                    await _client.SetGameAsync("I love Discord");
+                        Thread.sleep(5000);
+                    await _client.SetGameAsync("I love Discord.NET");
+                        Thread.sleep(5000);
+            }
+            
             var client = _services.GetRequiredService<DiscordSocketClient>();
 
             client.Log += LogAsync;
