@@ -64,6 +64,7 @@ namespace Discord
         ActionSlowmode = 20016,
         OnlyOwnerAction = 20018,
         AnnouncementEditRatelimit = 20022,
+        UnderMinimumAge = 20024,
         ChannelWriteRatelimit = 20028,
         WriteRatelimitReached = 20029,
         WordsNotAllowed = 20031,
@@ -86,7 +87,9 @@ namespace Discord
         MaximumServerMembersReached = 30019,
         MaximumServerCategoriesReached = 30030,
         GuildTemplateAlreadyExists = 30031,
+        MaximumNumberOfApplicationCommandsReached = 30032,
         MaximumThreadMembersReached = 30033,
+        MaxNumberOfDailyApplicationCommandCreatesHasBeenReached(200) = 30034,
         MaximumBansForNonGuildMembersReached = 30035,
         MaximumBanFetchesReached = 30037,
         MaximumUncompleteGuildScheduledEvents = 30038,
@@ -96,18 +99,24 @@ namespace Discord
         #endregion
 
         #region General Request Errors (40XXX)
+        BitrateIsTooHighForChannelOfThisType = 30052,
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
         OpeningDMTooFast = 40003,
         RequestEntityTooLarge = 40005,
         FeatureDisabled = 40006,
         UserBanned = 40007,
+        ConnectionHasBeenRevoked = 40012,
         TargetUserNotInVoice = 40032,
         MessageAlreadyCrossposted = 40033,
         ApplicationNameAlreadyExists = 40041,
         #endregion
 
         #region Action Preconditions/Checks (50XXX)
+        ApplicationInteractionFailedToSend = 40043,
+        CannotSendAMessageInAForumChannel = 40058,
+        ThereAreNoTagsAvailableThatCanBeSetByNon-Moderators = 40066,
+        ATagIsRequiredToCreateAForumPostInThisChannel = 40067,
         MissingPermissions = 50001,
         InvalidAccountType = 50002,
         CannotExecuteForDM = 50003,
@@ -124,6 +133,7 @@ namespace Discord
         InvalidAuthenticationToken = 50014,
         NoteTooLong = 50015,
         ProvidedMessageDeleteCountOutOfBounds = 50016,
+        InvalidMFALevel = 50017,
         InvalidPinChannel = 50019,
         InvalidInvite = 50020,
         CannotExecuteOnSystemMessage = 50021,
@@ -154,6 +164,9 @@ namespace Discord
         #endregion
 
         #region 2FA (60XXX)
+        OwnershipCannotBeTransferredToABotUser = 50132,
+        FailedToResizeAssetBelowTheMaximumSize:262144 = 50138,
+        UploadedFileNotFound. = 50146,
         Requires2FA = 60003,
         #endregion
 
@@ -166,6 +179,7 @@ namespace Discord
         #endregion
 
         #region API Status (130XXX)
+        ApplicationNotYetAvailable.TryAgainLater = 110001,
         APIOverloaded = 130000,
         #endregion
 
@@ -196,4 +210,11 @@ namespace Discord
         FailedStageCreation = 180002,
         #endregion
     }
+        MessageWasBlockedByAutomaticModeration = 200000,
+        TitleWasBlockedByAutomaticModeration = 200001,
+        WebhooksPostedToForumChannelsMustHaveAThread_NameOrThread_Id = 220001,
+        WebhooksPostedToForumChannelsCannotHaveBothAThread_NameAndThread_Id = 220002,
+        WebhooksCanOnlyCreateThreadsInForumChannels = 220003,
+        WebhookServicesCannotBeUsedInForumChannels = 220004,
+        MessageBlockedByHarmfulLinksFilter = 240000,
 }
