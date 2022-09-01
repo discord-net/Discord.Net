@@ -49,7 +49,7 @@ namespace Discord
         ///     Gets the content for this message.
         /// </summary>
         /// <remarks>
-        ///     This will be <see langword="null"/> if the privileged message intent is disabled.
+        ///     This will be empty if the privileged <see cref="GatewayIntents.MessageContent"/> is disabled.
         /// </remarks>
         /// <returns>
         ///     A string that contains the body of the message; note that this field may be empty if there is an embed.
@@ -59,7 +59,7 @@ namespace Discord
         ///     Gets the clean content for this message.
         /// </summary>
         /// <remarks>
-        ///     This will be <see langword="null"/> if the privileged message intent is disabled.
+        ///     This will be empty if the privileged <see cref="GatewayIntents.MessageContent"/> is disabled.
         /// </remarks>
         /// <returns>
         ///     A string that contains the body of the message stripped of mentions, markdown, emojis and pings; note that this field may be empty if there is an embed.
