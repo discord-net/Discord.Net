@@ -115,7 +115,7 @@ namespace Discord
         #region Action Preconditions/Checks (50XXX)
         ApplicationInteractionFailedToSend = 40043,
         CannotSendAMessageInAForumChannel = 40058,
-        ThereAreNoTagsAvailableThatCanBeSetByNon-Moderators = 40066,
+        ThereAreNoTagsAvailableThatCanBeSetByNonModerators = 40066,
         ATagIsRequiredToCreateAForumPostInThisChannel = 40067,
         MissingPermissions = 50001,
         InvalidAccountType = 50002,
@@ -165,8 +165,8 @@ namespace Discord
 
         #region 2FA (60XXX)
         OwnershipCannotBeTransferredToABotUser = 50132,
-        FailedToResizeAssetBelowTheMaximumSize:262144 = 50138,
-        UploadedFileNotFound. = 50146,
+        AssetResizeBelowTheMaximumSize= 50138,
+        UploadedFileNotFound = 50146,
         Requires2FA = 60003,
         #endregion
 
@@ -179,7 +179,7 @@ namespace Discord
         #endregion
 
         #region API Status (130XXX)
-        ApplicationNotYetAvailable.TryAgainLater = 110001,
+        ApplicationNotYetAvailable = 110001,
         APIOverloaded = 130000,
         #endregion
 
@@ -209,12 +209,15 @@ namespace Discord
         CannotUpdateFinishedEvent = 180000,
         FailedStageCreation = 180002,
         #endregion
-    }
+     
+        #region Forum & Automod
         MessageWasBlockedByAutomaticModeration = 200000,
         TitleWasBlockedByAutomaticModeration = 200001,
-        WebhooksPostedToForumChannelsMustHaveAThread_NameOrThread_Id = 220001,
-        WebhooksPostedToForumChannelsCannotHaveBothAThread_NameAndThread_Id = 220002,
+        WebhooksPostedToForumChannelsMustHaveAThreadNameOrThreadId = 220001,
+        WebhooksPostedToForumChannelsCannotHaveBothAThreadNameAndThreadId = 220002,
         WebhooksCanOnlyCreateThreadsInForumChannels = 220003,
         WebhookServicesCannotBeUsedInForumChannels = 220004,
         MessageBlockedByHarmfulLinksFilter = 240000,
+        #endregion
+    }
 }
