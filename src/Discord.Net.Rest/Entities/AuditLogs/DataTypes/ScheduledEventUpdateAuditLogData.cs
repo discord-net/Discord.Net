@@ -87,7 +87,13 @@ namespace Discord.Rest
         ///     Gets the snowflake id of the event.
         /// </summary>
         public ulong Id { get; }
+        /// <summary>
+        ///     Gets the state before the change.
+        /// </summary>
         public ScheduledEventInfo Before { get; }
+        /// <summary>
+        ///     Gets the state after the change.
+        /// </summary>
         public ScheduledEventInfo After { get; }
     }
 }
