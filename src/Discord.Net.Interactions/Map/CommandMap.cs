@@ -42,7 +42,7 @@ namespace Discord.Interactions
 
         public void RemoveCommand(T command)
         {
-            var key = ParseCommandName(command);
+            var key = CommandHierarchy.GetCommandPath(command);
 
             _root.RemoveCommand(key, 0);
         }
@@ -60,28 +60,9 @@ namespace Discord.Interactions
 
         private void AddCommand(T command)
         {
-            var key = ParseCommandName(command);
+            var key = CommandHierarchy.GetCommandPath(command);
 
             _root.AddCommand(key, 0, command);
-        }
-
-        private IList<string> ParseCommandName(T command)
-        {
-            var keywords = new List<string>() { command.Name };
-
-            var currentParent = command.Module;
-
-            while (currentParent != null)
-            {
-                if (!string.IsNullOrEmpty(currentParent.SlashGroupName))
-                    keywords.Add(currentParent.SlashGroupName);
-
-                currentParent = currentParent.Parent;
-            }
-
-            keywords.Reverse();
-
-            return keywords;
         }
     }
 }

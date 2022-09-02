@@ -39,7 +39,14 @@ namespace Discord
         DirectMessageReactions = 1 << 13,
         /// <summary> This intent includes TYPING_START </summary>
         DirectMessageTyping = 1 << 14,
-        /// <summary> This intent includes GUILD_SCHEDULED_EVENT_CREATE, GUILD_SCHEDULED_EVENT_UPDATE, GUILD_SCHEDULED_EVENT_DELETE, GUILD_SCHEDULED_EVENT_USER_ADD, GUILD_SCHEDULED_EVENT_USER_REMOVE </summary>
+        /// <summary>
+        ///     This intent defines if the content within messages received by MESSAGE_CREATE is available or not.
+        ///     This is a privileged intent and needs to be enabled in the developer portal. 
+        /// </summary>
+        MessageContent = 1 << 15,
+        /// <summary>
+        ///     This intent includes GUILD_SCHEDULED_EVENT_CREATE, GUILD_SCHEDULED_EVENT_UPDATE, GUILD_SCHEDULED_EVENT_DELETE, GUILD_SCHEDULED_EVENT_USER_ADD, GUILD_SCHEDULED_EVENT_USER_REMOVE
+        /// </summary>
         GuildScheduledEvents = 1 << 16,
         /// <summary>
         ///     This intent includes all but <see cref="GuildMembers"/> and <see cref="GuildPresences"/>
@@ -51,6 +58,6 @@ namespace Discord
         /// <summary>
         ///     This intent includes all of them, including privileged ones.
         /// </summary>
-        All = AllUnprivileged | GuildMembers | GuildPresences
+        All = AllUnprivileged | GuildMembers | GuildPresences | MessageContent
     }
 }

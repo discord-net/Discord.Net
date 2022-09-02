@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,6 +13,8 @@ namespace Discord
     {
         private string _name;
         private string _description;
+        private IDictionary<string, string> _nameLocalizations = new Dictionary<string, string>();
+        private IDictionary<string, string> _descriptionLocalizations = new Dictionary<string, string>();
 
         /// <summary>
         ///     Gets or sets the name of this option.
@@ -21,18 +24,7 @@ namespace Discord
             get => _name;
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value), $"{nameof(Name)} cannot be null.");
-
-                if (value.Length > 32)
-                    throw new ArgumentOutOfRangeException(nameof(value), "Name length must be less than or equal to 32.");
-
-                if (!Regex.IsMatch(value, @"^[\w-]{1,32}$"))
-                    throw new FormatException($"{nameof(value)} must match the regex ^[\\w-]{{1,32}}$");
-
-                if (value.Any(x => char.IsUpper(x)))
-                    throw new FormatException("Name cannot contain any uppercase characters.");
-
+                EnsureValidOptionName(value);
                 _name = value;
             }
         }
@@ -43,12 +35,11 @@ namespace Discord
         public string Description
         {
             get => _description;
-            set => _description = value?.Length switch
+            set
             {
-                > 100 => throw new ArgumentOutOfRangeException(nameof(value), "Description length must be less than or equal to 100."),
-                0 => throw new ArgumentOutOfRangeException(nameof(value), "Description length must be at least 1."),
-                _ => value
-            };
+                EnsureValidOptionDescription(value);
+                _description = value;
+            }
         }
 
         /// <summary>
@@ -105,5 +96,72 @@ namespace Discord
         ///     Gets or sets the allowed channel types for this option.
         /// </summary>
         public List<ChannelType> ChannelTypes { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the localization dictionary for the name field of this option.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown when any of the dictionary keys is an invalid locale.</exception>
+        public IDictionary<string, string> NameLocalizations
+        {
+            get => _nameLocalizations;
+            set
+            {
+                foreach (var (locale, name) in value)
+                {
+                    if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                        throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+                    EnsureValidOptionName(name);
+                }
+                _nameLocalizations = value;
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets the localization dictionary for the description field of this option.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown when any of the dictionary keys is an invalid locale.</exception>
+        public IDictionary<string, string> DescriptionLocalizations
+        {
+            get => _descriptionLocalizations;
+            set
+            {
+                foreach (var (locale, description) in value)
+                {
+                    if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                        throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+
+                    EnsureValidOptionDescription(description);
+                }
+                _descriptionLocalizations = value;
+            }
+        }
+
+        private static void EnsureValidOptionName(string name)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name), $"{nameof(Name)} cannot be null.");
+
+            if (name.Length > 32)
+                throw new ArgumentOutOfRangeException(nameof(name), "Name length must be less than or equal to 32.");
+
+            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
+                throw new FormatException($"{nameof(name)} must match the regex ^[\\w-]{{1,32}}$");
+
+            if (name.Any(x => char.IsUpper(x)))
+                throw new FormatException("Name cannot contain any uppercase characters.");
+        }
+
+        private static void EnsureValidOptionDescription(string description)
+        {
+            switch (description.Length)
+            {
+                case > 100:
+                    throw new ArgumentOutOfRangeException(nameof(description),
+                        "Description length must be less than or equal to 100.");
+                case 0:
+                    throw new ArgumentOutOfRangeException(nameof(description), "Description length must at least 1.");
+            }
+        }
     }
 }

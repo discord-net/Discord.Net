@@ -16,10 +16,10 @@ namespace Discord.Interactions
         /// <summary>
         ///     Sets the minimum length allowed for a string type parameter.
         /// </summary>
-        /// <param name="lenght">Minimum string length allowed.</param>
-        public MinLengthAttribute(int lenght)
+        /// <param name="length">Minimum string length allowed.</param>
+        public MinLengthAttribute(int length)
         {
-            Length = lenght;
+            Length = length;
         }
     }
 }
