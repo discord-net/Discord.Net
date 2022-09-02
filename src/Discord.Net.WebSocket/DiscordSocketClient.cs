@@ -450,14 +450,16 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a collection of all global commands.
         /// </summary>
+        /// <param name="withLocalizations">Whether to include full localization dictionaries in the returned objects, instead of the name localized and description localized fields.</param>
+        /// <param name="locale">The target locale of the localized name and description fields. Sets <c>X-Discord-Locale</c> header, which takes precedence over <c>Accept-Language</c>.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of global
         ///     application commands.
         /// </returns>
-        public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetGlobalApplicationCommandsAsync(RequestOptions options = null)
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetGlobalApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null)
         {
-            var commands = (await ApiClient.GetGlobalApplicationCommandsAsync(options)).Select(x => SocketApplicationCommand.Create(this, x));
+            var commands = (await ApiClient.GetGlobalApplicationCommandsAsync(withLocalizations, locale, options)).Select(x => SocketApplicationCommand.Create(this, x));
 
             foreach(var command in commands)
             {
@@ -2318,7 +2320,7 @@ namespace Discord.WebSocket
                             case "INTERACTION_CREATE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (INTERACTION_CREATE)").ConfigureAwait(false);
-
+                                    
                                     var data = (payload as JToken).ToObject<API.Interaction>(_serializer);
 
                                     var guild = data.GuildId.IsSpecified ? GetGuild(data.GuildId.Value) : null;
@@ -2326,7 +2328,6 @@ namespace Discord.WebSocket
                                     if (guild != null && !guild.IsSynced)
                                     {
                                         await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
-                                        return;
                                     }
 
                                     SocketUser user = data.User.IsSpecified
@@ -2346,15 +2347,8 @@ namespace Discord.WebSocket
                                             {
                                                 channel = CreateDMChannel(data.ChannelId.Value, user, State);
                                             }
-                                            else
-                                            {
-                                                if (guild != null) // The guild id is set, but the guild cannot be found as the bot scope is not set.
-                                                {
-                                                    await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
-                                                    return;
-                                                }
-                                                // The channel isnt required when responding to an interaction, so we can leave the channel null.
-                                            }
+
+                                            // The channel isnt required when responding to an interaction, so we can leave the channel null.
                                         }
                                     }
                                     else if (data.User.IsSpecified)
@@ -2839,6 +2833,23 @@ namespace Discord.WebSocket
 
                             #endregion
 
+                            #region Webhooks
+
+                            case "WEBHOOKS_UPDATE":
+                                {
+                                    var data = (payload as JToken).ToObject<WebhooksUpdatedEvent>(_serializer);
+                                    type = "WEBHOOKS_UPDATE";
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (WEBHOOKS_UPDATE)").ConfigureAwait(false);
+
+                                    var guild = State.GetGuild(data.GuildId);
+                                    var channel = State.GetChannel(data.ChannelId);
+
+                                    await TimedInvokeAsync(_webhooksUpdated, nameof(WebhooksUpdated), guild, channel);
+                                }
+                                break;
+
+                            #endregion
+
                             #region Ignored (User only)
                             case "CHANNEL_PINS_ACK":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_ACK)").ConfigureAwait(false);
@@ -2857,9 +2868,6 @@ namespace Discord.WebSocket
                                 break;
                             case "USER_SETTINGS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (USER_SETTINGS_UPDATE)").ConfigureAwait(false);
-                                break;
-                            case "WEBHOOKS_UPDATE":
-                                await _gatewayLogger.DebugAsync("Ignored Dispatch (WEBHOOKS_UPDATE)").ConfigureAwait(false);
                                 break;
                             #endregion
 
@@ -3230,8 +3238,8 @@ namespace Discord.WebSocket
         async Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
             => await GetGlobalApplicationCommandAsync(id, options);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(RequestOptions options)
-            => await GetGlobalApplicationCommandsAsync(options);
+        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(bool withLocalizations, string locale, RequestOptions options)
+            => await GetGlobalApplicationCommandsAsync(withLocalizations, locale, options);
 
         /// <inheritdoc />
         async Task IDiscordClient.StartAsync()

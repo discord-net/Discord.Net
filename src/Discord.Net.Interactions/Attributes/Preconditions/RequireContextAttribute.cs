@@ -58,7 +58,7 @@ namespace Discord.Interactions
 
             if ((Contexts & ContextType.Guild) != 0)
                 isValid = !context.Interaction.IsDMInteraction;
-            if ((Contexts & ContextType.DM) != 0 && (Contexts & ContextType.Group) != 0)
+            if ((Contexts & ContextType.DM) != 0)
                 isValid = context.Interaction.IsDMInteraction;
 
             if (isValid)

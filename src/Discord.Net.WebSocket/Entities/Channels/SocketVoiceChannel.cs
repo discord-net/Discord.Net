@@ -21,8 +21,12 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets whether or not the guild has Text-In-Voice enabled and the voice channel is a TiV channel.
         /// </summary>
-        public virtual bool IsTextInVoice
-            => Guild.Features.HasTextInVoice;
+        /// <remarks>
+        ///     Discord currently doesn't have a way to disable Text-In-Voice yet so this field is always
+        ///     <see langword="true"/> on <see cref="SocketVoiceChannel"/>s and <see langword="false"/> on
+        ///     <see cref="SocketStageChannel"/>s.
+        /// </remarks>
+        public virtual bool IsTextInVoice => true;
 
         /// <inheritdoc />
         public int Bitrate { get; private set; }
@@ -46,7 +50,7 @@ namespace Discord.WebSocket
         }
         internal new static SocketVoiceChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketVoiceChannel(guild.Discord, model.Id, guild);
+            var entity = new SocketVoiceChannel(guild?.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }
@@ -54,8 +58,8 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-            Bitrate = model.Bitrate.Value;
-            UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
+            Bitrate = model.Bitrate.GetValueOrDefault(64000);
+            UserLimit = model.UserLimit.GetValueOrDefault() != 0 ? model.UserLimit.Value : (int?)null;
             RTCRegion = model.RTCRegion.GetValueOrDefault(null);
         }
 
