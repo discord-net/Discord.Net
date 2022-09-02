@@ -532,13 +532,10 @@ namespace Discord.WebSocket
             Features = model.Features;
 
             var roles = new ConcurrentDictionary<ulong, SocketRole>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Roles.Length * 1.05));
-            if (model.Roles != null)
+            for (int i = 0; i < model.Roles.Length; i++)
             {
-                for (int i = 0; i < model.Roles.Length; i++)
-                {
-                    var role = SocketRole.Create(this, state, model.Roles[i]);
-                    roles.TryAdd(role.Id, role);
-                }
+                var role = SocketRole.Create(this, state, model.Roles[i]);
+                roles.TryAdd(role.Id, role);
             }
             _roles = roles;
 
@@ -705,7 +702,15 @@ namespace Discord.WebSocket
         /// </returns>
         public SocketThreadChannel GetThreadChannel(ulong id)
             => GetChannel(id) as SocketThreadChannel;
-
+        /// <summary>
+        ///     Gets a forum channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the forum channel.</param>
+        /// <returns>
+        ///     A forum channel associated with the specified <paramref name="id" />; <see langword="null"/> if none is found.
+        /// </returns>
+        public SocketForumChannel GetForumChannel(ulong id)
+            => GetChannel(id) as SocketForumChannel;
         /// <summary>
         ///     Gets a voice channel in this guild.
         /// </summary>
@@ -869,14 +874,17 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a collection of slash commands created by the current user in this guild.
         /// </summary>
+        /// <param name="withLocalizations">Whether to include full localization dictionaries in the returned objects, instead of the name localized and description localized fields.</param>
+        /// <param name="locale">The target locale of the localized name and description fields. Sets <c>X-Discord-Locale</c> header, which takes precedence over <c>Accept-Language</c>.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     slash commands created by the current user.
         /// </returns>
-        public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null)
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null)
         {
-            var commands = (await Discord.ApiClient.GetGuildApplicationCommandsAsync(Id, options)).Select(x => SocketApplicationCommand.Create(Discord, x, Id));
+            var commands = (await Discord.ApiClient.GetGuildApplicationCommandsAsync(Id, withLocalizations, locale, options))
+                .Select(x => SocketApplicationCommand.Create(Discord, x, Id));
 
             foreach (var command in commands)
             {
@@ -1291,7 +1299,6 @@ namespace Discord.WebSocket
         ///     in order to use this property.
         ///     </remarks>
         /// </param>
-        /// <param name="speakers">A collection of speakers for the event.</param>
         /// <param name="location">The location of the event; links are supported</param>
         /// <param name="coverImage">The optional banner image for the event.</param>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -1403,7 +1410,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="user">The user to disconnect.</param>
         /// <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
-        async Task IGuild.DisconnectAsync(IGuildUser user) => await user.ModifyAsync(x => x.Channel = new Optional<IVoiceChannel>());
+        async Task IGuild.DisconnectAsync(IGuildUser user) => await user.ModifyAsync(x => x.Channel = null);
         #endregion
 
         #region Stickers
@@ -1973,8 +1980,8 @@ namespace Discord.WebSocket
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (RequestOptions options)
-            => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
+        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (bool withLocalizations, string locale, RequestOptions options)
+            => await GetApplicationCommandsAsync(withLocalizations, locale, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options)
             => await CreateStickerAsync(name, description, tags, image, options);

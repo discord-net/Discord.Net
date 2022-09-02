@@ -36,7 +36,7 @@ namespace Discord.Interactions
         /// <summary>
         ///     Create a new <see cref="ModalTextInputAttribute"/>.
         /// </summary>
-        /// <param name="customId"The custom id of the text input.></param>
+        /// <param name="customId">The custom id of the text input.></param>
         /// <param name="style">The style of the text input.</param>
         /// <param name="placeholder">The placeholder of the text input.</param>
         /// <param name="minLength">The minimum length of the text input's content.</param>

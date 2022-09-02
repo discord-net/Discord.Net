@@ -1173,7 +1173,6 @@ namespace Discord
         ///     in order to use this property.
         ///     </remarks>
         /// </param>
-        /// <param name="speakers">A collection of speakers for the event.</param>
         /// <param name="location">The location of the event; links are supported</param>
         /// <param name="coverImage">The optional banner image for the event.</param>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -1195,12 +1194,17 @@ namespace Discord
         /// <summary>
         ///     Gets this guilds application commands.
         /// </summary>
+        /// <param name="withLocalizations">
+        ///     Whether to include full localization dictionaries in the returned objects,
+        ///     instead of the localized name and description fields.
+        /// </param>
+        /// <param name="locale">The target locale of the localized name and description fields. Sets the <c>X-Discord-Locale</c> header, which takes precedence over <c>Accept-Language</c>.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of application commands found within the guild.
         /// </returns>
-        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null);
 
         /// <summary>
         ///     Gets an application command within this guild with the specified id.

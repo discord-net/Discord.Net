@@ -36,7 +36,7 @@ _client = new DiscordSocketClient(config);
 This includes intents that receive messages such as: `GatewayIntents.GuildMessages, GatewayIntents.DirectMessages`
 - GuildMembers: An intent disabled by default, as you need to enable it in the [developer portal].
 - GuildPresences: Also disabled by default, this intent together with `GuildMembers` are the only intents not included in `AllUnprivileged`.
-- All: All intents, it is ill adviced to use this without care, as it *can* cause a memory leak from presence.
+- All: All intents, it is ill advised to use this without care, as it _can_ cause a memory leak from presence.
 The library will give responsive warnings if you specify unnecessary intents.
 
 

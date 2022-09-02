@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Discord.Net.Commands")]
 [assembly: InternalsVisibleTo("Discord.Net.Tests")]
 [assembly: InternalsVisibleTo("Discord.Net.Tests.Unit")]
+[assembly: InternalsVisibleTo("Discord.Net.Tests.Integration")]
 [assembly: InternalsVisibleTo("Discord.Net.Interactions")]
 
 [assembly: TypeForwardedTo(typeof(Discord.Embed))]

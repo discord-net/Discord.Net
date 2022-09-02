@@ -3,6 +3,7 @@ using Discord.API.Rest;
 using Discord.Net;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -101,11 +102,12 @@ namespace Discord.Rest
                 DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
+                NameLocalizations = arg.NameLocalizations?.ToDictionary(),
+                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
 
                 // TODO: better conversion to nullable optionals
                 DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
                 DmPermission = arg.IsDMEnabled.ToNullable() 
-                
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -140,6 +142,8 @@ namespace Discord.Rest
                     DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
+                    NameLocalizations = arg.NameLocalizations?.ToDictionary(),
+                    DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
 
                     // TODO: better conversion to nullable optionals
                     DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
@@ -181,6 +185,8 @@ namespace Discord.Rest
                     DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
+                    NameLocalizations = arg.NameLocalizations?.ToDictionary(),
+                    DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
 
                     // TODO: better conversion to nullable optionals
                     DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
@@ -244,7 +250,9 @@ namespace Discord.Rest
                 Name = args.Name,
                 DefaultPermission = args.IsDefaultPermission.IsSpecified
                         ? args.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+                NameLocalizations = args.NameLocalizations?.ToDictionary(),
+                DescriptionLocalizations = args.DescriptionLocalizations?.ToDictionary()
             };
 
             if (args is SlashCommandProperties slashProps)
@@ -299,6 +307,8 @@ namespace Discord.Rest
                 DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
+                NameLocalizations = arg.NameLocalizations?.ToDictionary(),
+                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
 
                 // TODO: better conversion to nullable optionals
                 DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
@@ -335,7 +345,9 @@ namespace Discord.Rest
                 Name = arg.Name,
                 DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+                NameLocalizations = arg.NameLocalizations?.ToDictionary(),
+                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary()
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -369,7 +381,7 @@ namespace Discord.Rest
         #endregion
 
         #region Responses
-        public static async Task<Message> ModifyFollowupMessageAsync(BaseDiscordClient client, RestFollowupMessage message, Action<MessageProperties> func,
+        public static async Task<Discord.API.Message> ModifyFollowupMessageAsync(BaseDiscordClient client, RestFollowupMessage message, Action<MessageProperties> func,
             RequestOptions options = null)
         {
             var args = new MessageProperties();
@@ -411,7 +423,7 @@ namespace Discord.Rest
         }
         public static async Task DeleteFollowupMessageAsync(BaseDiscordClient client, RestFollowupMessage message, RequestOptions options = null)
             => await client.ApiClient.DeleteInteractionFollowupMessageAsync(message.Id, message.Token, options);
-        public static async Task<Message> ModifyInteractionResponseAsync(BaseDiscordClient client, string token, Action<MessageProperties> func,
+        public static async Task<API.Message> ModifyInteractionResponseAsync(BaseDiscordClient client, string token, Action<MessageProperties> func,
            RequestOptions options = null)
         {
             var args = new MessageProperties();

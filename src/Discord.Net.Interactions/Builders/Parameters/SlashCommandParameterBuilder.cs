@@ -29,6 +29,16 @@ namespace Discord.Interactions.Builders
         public double? MinValue { get; set; }
 
         /// <summary>
+        ///     Gets or sets the minimum length allowed for a string type parameter.
+        /// </summary>
+        public int? MinLength { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the maximum length allowed for a string type parameter.
+        /// </summary>
+        public int? MaxLength { get; set; }
+
+        /// <summary>
         ///     Gets a collection of the choices of this command.
         /// </summary>
         public IReadOnlyCollection<ParameterChoice> Choices => _choices;
@@ -122,6 +132,32 @@ namespace Discord.Interactions.Builders
         public SlashCommandParameterBuilder WithMaxValue(double value)
         {
             MaxValue = value;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets <see cref="MinLength"/>.
+        /// </summary>
+        /// <param name="length">New value of the <see cref="MinLength"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public SlashCommandParameterBuilder WithMinLength(int length)
+        {
+            MinLength = length;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets <see cref="MaxLength"/>.
+        /// </summary>
+        /// <param name="length">New value of the <see cref="MaxLength"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public SlashCommandParameterBuilder WithMaxLength(int length)
+        {
+            MaxLength = length;
             return this;
         }
 

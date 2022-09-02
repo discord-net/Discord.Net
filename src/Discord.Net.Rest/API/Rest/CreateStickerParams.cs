@@ -1,4 +1,5 @@
 using Discord.Net.Rest;
+
 using System.Collections.Generic;
 using System.IO;
 namespace Discord.API.Rest
@@ -20,14 +21,21 @@ namespace Discord.API.Rest
                 ["tags"] = Tags
             };
 
-            string contentType = "image/png";
-
+            string contentType;
             if (File is FileStream fileStream)
-                contentType = $"image/{Path.GetExtension(fileStream.Name)}";
+            {
+                var extension = Path.GetExtension(fileStream.Name).TrimStart('.');
+                contentType = extension == "json" ? "application/json" : $"image/{extension}";
+            }
             else if (FileName != null)
-                contentType = $"image/{Path.GetExtension(FileName)}";
+            {
+                var extension = Path.GetExtension(FileName).TrimStart('.');
+                contentType = extension == "json" ? "application/json" : $"image/{extension}";
+            }
+            else
+                contentType = "image/png";
 
-            d["file"] = new MultipartFile(File, FileName ?? "image", contentType.Replace(".", ""));
+            d["file"] = new MultipartFile(File, FileName ?? "image", contentType);
 
             return d;
         }

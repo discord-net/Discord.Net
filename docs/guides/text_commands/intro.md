@@ -187,7 +187,7 @@ service provider.
 
 ### Module Constructors
 
-Modules are constructed using [Dependency Injection](xref:Guides.TextCommands.DI). Any parameters
+Modules are constructed using [Dependency Injection](xref:Guides.DI.Intro). Any parameters
 that are placed in the Module's constructor must be injected into an
 @System.IServiceProvider first.
 

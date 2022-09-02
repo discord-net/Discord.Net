@@ -18,7 +18,7 @@ namespace Discord
         ///     <see href="https://discord.com/developers/docs/reference#api-versioning">Discord API documentation</see>
         ///     .</para>
         /// </returns>
-        public const int APIVersion = 9;
+        public const int APIVersion = 10;
         /// <summary>
         /// Returns the Voice API version Discord.Net uses.
         /// </summary>
@@ -131,6 +131,16 @@ namespace Discord
         ///     The maximum number of audit log entries that can be gotten per-batch.
         /// </returns>
         public const int MaxAuditLogEntriesPerBatch = 100;
+
+        /// <summary>
+        ///     Returns the max number of stickers that can be sent with a message.
+        /// </summary>
+        public const int MaxStickersPerMessage = 3;
+
+        /// <summary>
+        ///     Returns the max number of embeds that can be sent with a message.
+        /// </summary>
+        public const int MaxEmbedsPerMessage = 10;
 
         /// <summary>
         ///     Gets or sets how a request should act in the case of an error, by default.

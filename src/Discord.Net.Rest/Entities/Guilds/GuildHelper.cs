@@ -132,12 +132,15 @@ namespace Discord.Rest
         }
         public static ulong GetUploadLimit(IGuild guild)
         {
-            return guild.PremiumTier switch
+            var tierFactor = guild.PremiumTier switch
             {
-                PremiumTier.Tier2 => 50ul * 1000000,
-                PremiumTier.Tier3 => 100ul * 1000000,
-                _ => 8ul * 1000000
+                PremiumTier.Tier2 => 50,
+                PremiumTier.Tier3 => 100,
+                _ => 8
             };
+
+            var mebibyte = Math.Pow(2, 20);
+            return (ulong) (tierFactor * mebibyte);
         }
         #endregion
 
@@ -151,7 +154,7 @@ namespace Discord.Rest
                 if (fromUserId.HasValue)
                     return GetBansAsync(guild, client, fromUserId.Value + 1, Direction.Before, around + 1, options)
                         .Concat(GetBansAsync(guild, client, fromUserId.Value, Direction.After, around, options));
-                else 
+                else
                     return GetBansAsync(guild, client, null, Direction.Before, around + 1, options);
             }
 
@@ -177,7 +180,7 @@ namespace Discord.Rest
                 },
                 nextPage: (info, lastPage) =>
                 {
-                    if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
+                    if (lastPage.Count != DiscordConfig.MaxBansPerBatch)
                         return false;
                     if (dir == Direction.Before)
                         info.Position = lastPage.Min(x => x.User.Id);
@@ -359,10 +362,10 @@ namespace Discord.Rest
         #endregion
 
         #region Interactions
-        public static async Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(IGuild guild, BaseDiscordClient client,
-            RequestOptions options)
+        public static async Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(IGuild guild, BaseDiscordClient client, bool withLocalizations,
+            string locale, RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildApplicationCommandsAsync(guild.Id, options);
+            var models = await client.ApiClient.GetGuildApplicationCommandsAsync(guild.Id, withLocalizations, locale, options);
             return models.Select(x => RestGuildCommand.Create(client, x, guild.Id)).ToImmutableArray();
         }
         public static async Task<RestGuildCommand> GetSlashCommandAsync(IGuild guild, ulong id, BaseDiscordClient client,
@@ -425,7 +428,7 @@ namespace Discord.Rest
                 var ids = args.Roles.Value.Select(r => r.Id);
 
                 if (args.RoleIds.IsSpecified)
-                    args.RoleIds.Value.Concat(ids);
+                    args.RoleIds = Optional.Create(args.RoleIds.Value.Concat(ids));
                 else
                     args.RoleIds = Optional.Create(ids);
             }
@@ -908,7 +911,7 @@ namespace Discord.Rest
             if (endTime != null && endTime <= startTime)
                 throw new ArgumentOutOfRangeException(nameof(endTime), $"{nameof(endTime)} cannot be before the start time");
 
-            
+
             var apiArgs = new CreateGuildScheduledEventParams()
             {
                 ChannelId = channelId ?? Optional<ulong>.Unspecified,
