@@ -55,7 +55,7 @@ namespace Discord.WebSocket
         /// <summary> Fired when a channel is updated. </summary>
         /// <remarks>
         ///     <para>
-        ///         This event is fired when a generic channel has been destroyed. The event handler must return a
+        ///         This event is fired when a generic channel has been updated. The event handler must return a
         ///         <see cref="Task"/> and accept 2 <see cref="SocketChannel"/> as its parameters.
         ///     </para>
         ///     <para>
@@ -106,7 +106,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <para>
         ///         This event is fired when a message is deleted. The event handler must return a
-        ///         <see cref="Task"/> and accept a <see cref="Cacheable{TEntity,TId}"/> and 
+        ///         <see cref="Task"/> and accept a <see cref="Cacheable{TEntity,TId}"/> and
         ///         <see cref="ISocketMessageChannel"/> as its parameters.
         ///     </para>
         ///     <para>
@@ -117,11 +117,11 @@ namespace Discord.WebSocket
         ///         </note>
         ///         If caching is enabled via <see cref="DiscordSocketConfig"/>, the
         ///         <see cref="Cacheable{TEntity,TId}"/> entity will contain the deleted message; otherwise, in event
-        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the
         ///         <see cref="ulong"/>.
         ///     </para>
         ///     <para>
-        ///         The source channel of the removed message will be passed into the 
+        ///         The source channel of the removed message will be passed into the
         ///         <see cref="ISocketMessageChannel"/> parameter.
         ///     </para>
         /// </remarks>
@@ -143,7 +143,7 @@ namespace Discord.WebSocket
         ///     </note>
         ///     <para>
         ///         This event is fired when multiple messages are bulk deleted. The event handler must return a
-        ///         <see cref="Task"/> and accept an <see cref="IReadOnlyCollection{Cacheable}"/> and 
+        ///         <see cref="Task"/> and accept an <see cref="IReadOnlyCollection{Cacheable}"/> and
         ///         <see cref="ISocketMessageChannel"/> as its parameters.
         ///     </para>
         ///     <para>
@@ -154,11 +154,11 @@ namespace Discord.WebSocket
         ///         </note>
         ///         If caching is enabled via <see cref="DiscordSocketConfig"/>, the
         ///         <see cref="Cacheable{TEntity,TId}"/> entity will contain the deleted message; otherwise, in event
-        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the
         ///         <see cref="ulong"/>.
         ///     </para>
         ///     <para>
-        ///         The source channel of the removed message will be passed into the 
+        ///         The source channel of the removed message will be passed into the
         ///         <see cref="ISocketMessageChannel"/> parameter.
         ///     </para>
         /// </remarks>
@@ -178,14 +178,14 @@ namespace Discord.WebSocket
         ///     <para>
         ///         If caching is enabled via <see cref="DiscordSocketConfig"/>, the
         ///         <see cref="Cacheable{TEntity,TId}"/> entity will contain the original message; otherwise, in event
-        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the
         ///         <see cref="ulong"/>.
         ///     </para>
         ///     <para>
         ///         The updated message will be passed into the <see cref="SocketMessage"/> parameter.
         ///     </para>
         ///     <para>
-        ///         The source channel of the updated message will be passed into the 
+        ///         The source channel of the updated message will be passed into the
         ///         <see cref="ISocketMessageChannel"/> parameter.
         ///     </para>
         /// </remarks>
@@ -199,24 +199,24 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <para>
         ///         This event is fired when a reaction is added to a user message. The event handler must return a
-        ///         <see cref="Task"/> and accept a <see cref="Cacheable{TEntity,TId}"/>, an 
+        ///         <see cref="Task"/> and accept a <see cref="Cacheable{TEntity,TId}"/>, an
         ///         <see cref="ISocketMessageChannel"/>, and a <see cref="SocketReaction"/> as its parameter.
         ///     </para>
         ///     <para>
         ///         If caching is enabled via <see cref="DiscordSocketConfig"/>, the
         ///         <see cref="Cacheable{TEntity,TId}"/> entity will contain the original message; otherwise, in event
-        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the
         ///         <see cref="ulong"/>.
         ///     </para>
         ///     <para>
-        ///         The source channel of the reaction addition will be passed into the 
+        ///         The source channel of the reaction addition will be passed into the
         ///         <see cref="ISocketMessageChannel"/> parameter.
         ///     </para>
         ///     <para>
         ///         The reaction that was added will be passed into the <see cref="SocketReaction"/> parameter.
         ///     </para>
         ///     <note>
-        ///         When fetching the reaction from this event, a user may not be provided under 
+        ///         When fetching the reaction from this event, a user may not be provided under
         ///         <see cref="SocketReaction.User"/>. Please see the documentation of the property for more
         ///         information.
         ///     </note>
@@ -367,7 +367,7 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<Cacheable<SocketGuildEvent, ulong>, SocketGuildEvent, Task>> _guildScheduledEventUpdated = new AsyncEvent<Func<Cacheable<SocketGuildEvent, ulong>, SocketGuildEvent, Task>>();
 
-        
+
         /// <summary>
         ///     Fired when a guild event is cancelled.
         /// </summary>
@@ -876,6 +876,21 @@ namespace Discord.WebSocket
             remove { _guildStickerDeleted.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketCustomSticker, Task>> _guildStickerDeleted = new AsyncEvent<Func<SocketCustomSticker, Task>>();
+        #endregion
+
+        #region Webhooks
+
+        /// <summary>
+        ///     Fired when a webhook is modified, moved, or deleted. If the webhook was
+        ///     moved the channel represents the destination channel, not the source.
+        /// </summary>
+        public event Func<SocketGuild, SocketChannel, Task> WebhooksUpdated
+        {
+            add { _webhooksUpdated.Add(value); }
+            remove { _webhooksUpdated.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketGuild, SocketChannel, Task>> _webhooksUpdated = new AsyncEvent<Func<SocketGuild, SocketChannel, Task>>();
+
         #endregion
     }
 }

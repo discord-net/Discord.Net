@@ -481,6 +481,55 @@ namespace Discord
 
             return new Embed(EmbedType.Rich, Title, Description, Url, Timestamp, Color, _image, null, Author?.Build(), Footer?.Build(), null, _thumbnail, fields.ToImmutable());
         }
+
+        public static bool operator ==(EmbedBuilder left, EmbedBuilder right)
+        => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedBuilder left, EmbedBuilder right)
+            => !(left == right);
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="EmbedBuilder"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedBuilder"/>, <see cref="Equals(EmbedBuilder)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="EmbedBuilder"/></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+            => obj is EmbedBuilder embedBuilder && Equals(embedBuilder);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedBuilder"/> is equal to the current <see cref="EmbedBuilder"/>
+        /// </summary>
+        /// <param name="embedBuilder">The <see cref="EmbedBuilder"/> to compare with the current <see cref="EmbedBuilder"/></param>
+        /// <returns></returns>
+        public bool Equals(EmbedBuilder embedBuilder)
+        {
+            if (embedBuilder is null)
+                return false;
+
+            if (Fields.Count != embedBuilder.Fields.Count)
+                return false;
+
+            for (var i = 0; i < _fields.Count; i++)
+                if (_fields[i] != embedBuilder._fields[i])
+                    return false;
+
+            return _title == embedBuilder?._title
+            && _description == embedBuilder?._description
+            && _image == embedBuilder?._image
+            && _thumbnail == embedBuilder?._thumbnail
+            && Timestamp == embedBuilder?.Timestamp
+            && Color == embedBuilder?.Color
+            && Author == embedBuilder?.Author
+            && Footer == embedBuilder?.Footer
+            && Url == embedBuilder?.Url;
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     /// <summary>
@@ -597,6 +646,37 @@ namespace Discord
         /// </exception>
         public EmbedField Build()
             => new EmbedField(Name, Value.ToString(), IsInline);
+
+        public static bool operator ==(EmbedFieldBuilder left, EmbedFieldBuilder right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedFieldBuilder left, EmbedFieldBuilder right)
+            => !(left == right);
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="EmbedFieldBuilder"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedFieldBuilder"/>, <see cref="Equals(EmbedFieldBuilder)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="EmbedFieldBuilder"/></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+            => obj is EmbedFieldBuilder embedFieldBuilder && Equals(embedFieldBuilder);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedFieldBuilder"/> is equal to the current <see cref="EmbedFieldBuilder"/>
+        /// </summary>
+        /// <param name="embedFieldBuilder">The <see cref="EmbedFieldBuilder"/> to compare with the current <see cref="EmbedFieldBuilder"/></param>
+        /// <returns></returns>
+        public bool Equals(EmbedFieldBuilder embedFieldBuilder)
+            => _name == embedFieldBuilder?._name
+            && _value == embedFieldBuilder?._value
+            && IsInline == embedFieldBuilder?.IsInline;
+
+        /// <inheritdoc />
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     /// <summary>
@@ -697,6 +777,37 @@ namespace Discord
         /// </returns>
         public EmbedAuthor Build()
             => new EmbedAuthor(Name, Url, IconUrl, null);
+
+        public static bool operator ==(EmbedAuthorBuilder left, EmbedAuthorBuilder right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedAuthorBuilder left, EmbedAuthorBuilder right)
+            => !(left == right);
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="EmbedAuthorBuilder"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedAuthorBuilder"/>, <see cref="Equals(EmbedAuthorBuilder)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="EmbedAuthorBuilder"/></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+            => obj is EmbedAuthorBuilder embedAuthorBuilder && Equals(embedAuthorBuilder);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedAuthorBuilder"/> is equals to the current <see cref="EmbedAuthorBuilder"/>
+        /// </summary>
+        /// <param name="embedAuthorBuilder">The <see cref="EmbedAuthorBuilder"/> to compare with the current <see cref="EmbedAuthorBuilder"/></param>
+        /// <returns></returns>
+        public bool Equals(EmbedAuthorBuilder embedAuthorBuilder)
+            => _name == embedAuthorBuilder?._name
+            && Url == embedAuthorBuilder?.Url
+            && IconUrl == embedAuthorBuilder?.IconUrl;
+
+        /// <inheritdoc />
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     /// <summary>
@@ -777,5 +888,35 @@ namespace Discord
         /// </returns>
         public EmbedFooter Build()
             => new EmbedFooter(Text, IconUrl, null);
+
+        public static bool operator ==(EmbedFooterBuilder left, EmbedFooterBuilder right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedFooterBuilder left, EmbedFooterBuilder right)
+            => !(left == right);
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="EmbedFooterBuilder"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedFooterBuilder"/>, <see cref="Equals(EmbedFooterBuilder)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="EmbedFooterBuilder"/></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+            => obj is EmbedFooterBuilder embedFooterBuilder && Equals(embedFooterBuilder);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedFooterBuilder"/> is equal to the current <see cref="EmbedFooterBuilder"/>
+        /// </summary>
+        /// <param name="embedFooterBuilder">The <see cref="EmbedFooterBuilder"/> to compare with the current <see cref="EmbedFooterBuilder"/></param>
+        /// <returns></returns>
+        public bool Equals(EmbedFooterBuilder embedFooterBuilder)
+            => _text == embedFooterBuilder?._text
+            && IconUrl == embedFooterBuilder?.IconUrl;
+
+        /// <inheritdoc />
+        public override int GetHashCode() => base.GetHashCode();
     }
 }

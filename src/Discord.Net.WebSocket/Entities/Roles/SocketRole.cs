@@ -63,7 +63,7 @@ namespace Discord.WebSocket
             => Guild.Users.Where(x => x.Roles.Any(r => r.Id == Id));
 
         internal SocketRole(SocketGuild guild, ulong id)
-            : base(guild.Discord, id)
+            : base(guild?.Discord, id)
         {
             Guild = guild;
         }

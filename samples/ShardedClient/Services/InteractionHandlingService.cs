@@ -22,6 +22,7 @@ namespace ShardedClient.Services
 
             _service.Log += LogAsync;
             _client.InteractionCreated += OnInteractionAsync;
+            _client.ShardReady += ReadyAsync;
             // For examples on how to handle post execution,
             // see the InteractionFramework samples.
         }
@@ -30,11 +31,6 @@ namespace ShardedClient.Services
         public async Task InitializeAsync()
         {
             await _service.AddModulesAsync(typeof(InteractionHandlingService).Assembly, _provider);
-#if DEBUG
-            await _service.RegisterCommandsToGuildAsync(1 /* implement */);
-#else
-            await _service.RegisterCommandsGloballyAsync();
-#endif
         }
 
         private async Task OnInteractionAsync(SocketInteraction interaction)
@@ -52,6 +48,15 @@ namespace ShardedClient.Services
             Console.WriteLine(log.ToString());
 
             return Task.CompletedTask;
+        }
+
+        private async Task ReadyAsync(DiscordSocketClient _)
+        {
+#if DEBUG
+            await _service.RegisterCommandsToGuildAsync(1 /* implement */);
+#else
+            await _service.RegisterCommandsGloballyAsync();
+#endif
         }
     }
 }

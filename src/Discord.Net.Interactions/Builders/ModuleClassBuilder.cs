@@ -463,6 +463,12 @@ namespace Discord.Interactions.Builders
                     case MinValueAttribute minValue:
                         builder.MinValue = minValue.Value;
                         break;
+                    case MinLengthAttribute minLength:
+                        builder.MinLength = minLength.Length;
+                        break;
+                    case MaxLengthAttribute maxLength:
+                        builder.MaxLength = maxLength.Length;
+                        break;
                     case ComplexParameterAttribute complexParameter:
                         {
                             builder.IsComplexParameter = true;

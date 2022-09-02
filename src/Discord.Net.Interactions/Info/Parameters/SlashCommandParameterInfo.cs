@@ -39,6 +39,16 @@ namespace Discord.Interactions
         public double? MaxValue { get; }
 
         /// <summary>
+        ///     Gets the minimum length allowed for a string type parameter.
+        /// </summary>
+        public int? MinLength { get; }
+
+        /// <summary>
+        ///     Gets the maximum length allowed for a string type parameter.
+        /// </summary>
+        public int? MaxLength { get; }
+
+        /// <summary>
         ///     Gets the <see cref="TypeConverter{T}"/> that will be used to convert the incoming <see cref="Discord.WebSocket.SocketSlashCommandDataOption"/> into
         ///     <see cref="CommandParameterInfo.ParameterType"/>.
         /// </summary>
@@ -86,6 +96,8 @@ namespace Discord.Interactions
             Description = builder.Description;
             MaxValue = builder.MaxValue;
             MinValue = builder.MinValue;
+            MinLength = builder.MinLength;
+            MaxLength = builder.MaxLength;
             IsComplexParameter = builder.IsComplexParameter;
             IsAutocomplete = builder.Autocomplete;
             Choices = builder.Choices.ToImmutableArray();
