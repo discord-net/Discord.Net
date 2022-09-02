@@ -16,10 +16,10 @@ namespace Discord.Interactions
         /// <summary>
         ///     Sets the maximum length allowed for a string type parameter.
         /// </summary>
-        /// <param name="lenght">Maximum string length allowed.</param>
-        public MaxLengthAttribute(int lenght)
+        /// <param name="length">Maximum string length allowed.</param>
+        public MaxLengthAttribute(int length)
         {
-            Length = lenght;
+            Length = length;
         }
     }
 }

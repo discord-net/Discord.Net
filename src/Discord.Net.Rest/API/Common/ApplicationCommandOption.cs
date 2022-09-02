@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord.API
@@ -38,6 +39,18 @@ namespace Discord.API
         [JsonProperty("channel_types")]
         public Optional<ChannelType[]> ChannelTypes { get; set; }
 
+        [JsonProperty("name_localizations")]
+        public Optional<Dictionary<string, string>> NameLocalizations { get; set; }
+
+        [JsonProperty("description_localizations")]
+        public Optional<Dictionary<string, string>> DescriptionLocalizations { get; set; }
+
+        [JsonProperty("name_localized")]
+        public Optional<string> NameLocalized { get; set; }
+
+        [JsonProperty("description_localized")]
+        public Optional<string> DescriptionLocalized { get; set; }
+
         [JsonProperty("min_length")]
         public Optional<int> MinLength { get; set; }
 
@@ -69,6 +82,11 @@ namespace Discord.API
             Name = cmd.Name;
             Type = cmd.Type;
             Description = cmd.Description;
+
+            NameLocalizations = cmd.NameLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
+            DescriptionLocalizations = cmd.DescriptionLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
+            NameLocalized = cmd.NameLocalized;
+            DescriptionLocalized = cmd.DescriptionLocalized;
         }
         public ApplicationCommandOption(ApplicationCommandOptionProperties option)
         {
@@ -94,6 +112,9 @@ namespace Discord.API
             Type = option.Type;
             Description = option.Description;
             Autocomplete = option.IsAutocomplete;
+
+            NameLocalizations = option.NameLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
+            DescriptionLocalizations = option.DescriptionLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
         }
     }
 }

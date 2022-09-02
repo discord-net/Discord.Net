@@ -18,7 +18,7 @@ namespace Discord
         ///     <see href="https://discord.com/developers/docs/reference#api-versioning">Discord API documentation</see>
         ///     .</para>
         /// </returns>
-        public const int APIVersion = 9;
+        public const int APIVersion = 10;
         /// <summary>
         /// Returns the Voice API version Discord.Net uses.
         /// </summary>

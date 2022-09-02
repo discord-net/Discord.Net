@@ -71,5 +71,31 @@ namespace Discord
         ///     Gets the allowed channel types for this option.
         /// </summary>
         IReadOnlyCollection<ChannelType> ChannelTypes { get; }
+
+        /// <summary>
+        ///     Gets the localization dictionary for the name field of this command option.
+        /// </summary>
+        IReadOnlyDictionary<string, string> NameLocalizations { get; }
+
+        /// <summary>
+        ///     Gets the localization dictionary for the description field of this command option.
+        /// </summary>
+        IReadOnlyDictionary<string, string> DescriptionLocalizations { get; }
+
+        /// <summary>
+        ///     Gets the localized name of this command option.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        /// </remarks>
+        string NameLocalized { get; }
+
+        /// <summary>
+        ///     Gets the localized description of this command option.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to true when requesting the command.
+        /// </remarks>
+        string DescriptionLocalized { get; }
     }
 }

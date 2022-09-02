@@ -362,10 +362,10 @@ namespace Discord.Rest
         #endregion
 
         #region Interactions
-        public static async Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(IGuild guild, BaseDiscordClient client,
-            RequestOptions options)
+        public static async Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(IGuild guild, BaseDiscordClient client, bool withLocalizations,
+            string locale, RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildApplicationCommandsAsync(guild.Id, options);
+            var models = await client.ApiClient.GetGuildApplicationCommandsAsync(guild.Id, withLocalizations, locale, options);
             return models.Select(x => RestGuildCommand.Create(client, x, guild.Id)).ToImmutableArray();
         }
         public static async Task<RestGuildCommand> GetSlashCommandAsync(IGuild guild, ulong id, BaseDiscordClient client,
