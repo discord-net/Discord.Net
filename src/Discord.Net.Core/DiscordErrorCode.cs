@@ -89,7 +89,7 @@ namespace Discord
         GuildTemplateAlreadyExists = 30031,
         MaximumNumberOfApplicationCommandsReached = 30032,
         MaximumThreadMembersReached = 30033,
-        MaxNumberOfDailyApplicationCommandCreatesHasBeenReached(200) = 30034,
+        MaxNumberOfDailyApplicationCommandCreatesHasBeenReached = 30034,
         MaximumBansForNonGuildMembersReached = 30035,
         MaximumBanFetchesReached = 30037,
         MaximumUncompleteGuildScheduledEvents = 30038,
