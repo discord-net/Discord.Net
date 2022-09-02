@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace Discord.Interactions
@@ -9,21 +10,29 @@ namespace Discord.Interactions
         #region Parameters
         public static ApplicationCommandOptionProperties ToApplicationCommandOptionProps(this SlashCommandParameterInfo parameterInfo)
         {
+            var localizationManager = parameterInfo.Command.Module.CommandService.LocalizationManager;
+            var parameterPath = parameterInfo.GetParameterPath();
+
             var props = new ApplicationCommandOptionProperties
             {
                 Name = parameterInfo.Name,
                 Description = parameterInfo.Description,
-                Type = parameterInfo.DiscordOptionType,
+                Type = parameterInfo.DiscordOptionType.Value,
                 IsRequired = parameterInfo.IsRequired,
                 Choices = parameterInfo.Choices?.Select(x => new ApplicationCommandOptionChoiceProperties
                 {
                     Name = x.Name,
-                    Value = x.Value
+                    Value = x.Value,
+                    NameLocalizations = localizationManager?.GetAllNames(parameterInfo.GetChoicePath(x), LocalizationTarget.Choice) ?? ImmutableDictionary<string, string>.Empty
                 })?.ToList(),
                 ChannelTypes = parameterInfo.ChannelTypes?.ToList(),
                 IsAutocomplete = parameterInfo.IsAutocomplete,
                 MaxValue = parameterInfo.MaxValue,
-                MinValue = parameterInfo.MinValue
+                MinValue = parameterInfo.MinValue,
+                NameLocalizations = localizationManager?.GetAllNames(parameterPath, LocalizationTarget.Parameter) ?? ImmutableDictionary<string, string>.Empty,
+                DescriptionLocalizations = localizationManager?.GetAllDescriptions(parameterPath, LocalizationTarget.Parameter) ?? ImmutableDictionary<string, string>.Empty,
+                MinLength = parameterInfo.MinLength,
+                MaxLength = parameterInfo.MaxLength,
             };
 
             parameterInfo.TypeConverter.Write(props, parameterInfo);
@@ -36,38 +45,74 @@ namespace Discord.Interactions
 
         public static SlashCommandProperties ToApplicationCommandProps(this SlashCommandInfo commandInfo)
         {
+            var commandPath = commandInfo.GetCommandPath();
+            var localizationManager = commandInfo.Module.CommandService.LocalizationManager;
+
             var props = new SlashCommandBuilder()
             {
                 Name = commandInfo.Name,
                 Description = commandInfo.Description,
                 IsDefaultPermission = commandInfo.DefaultPermission,
-            }.Build();
+                IsDMEnabled = commandInfo.IsEnabledInDm,
+                DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
+            }.WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
+            .WithDescriptionLocalizations(localizationManager?.GetAllDescriptions(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
+            .Build();
 
             if (commandInfo.Parameters.Count > SlashCommandBuilder.MaxOptionsCount)
                 throw new InvalidOperationException($"Slash Commands cannot have more than {SlashCommandBuilder.MaxOptionsCount} command parameters");
 
-            props.Options = commandInfo.Parameters.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified;
+            props.Options = commandInfo.FlattenedParameters.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified;
 
             return props;
         }
 
-        public static ApplicationCommandOptionProperties ToApplicationCommandOptionProps(this SlashCommandInfo commandInfo) =>
-            new ApplicationCommandOptionProperties
+        public static ApplicationCommandOptionProperties ToApplicationCommandOptionProps(this SlashCommandInfo commandInfo)
+        {
+            var localizationManager = commandInfo.Module.CommandService.LocalizationManager;
+            var commandPath = commandInfo.GetCommandPath();
+
+            return new ApplicationCommandOptionProperties
             {
                 Name = commandInfo.Name,
                 Description = commandInfo.Description,
                 Type = ApplicationCommandOptionType.SubCommand,
                 IsRequired = false,
-                Options = commandInfo.Parameters?.Select(x => x.ToApplicationCommandOptionProps())?.ToList()
+                Options = commandInfo.FlattenedParameters?.Select(x => x.ToApplicationCommandOptionProps())
+                    ?.ToList(),
+                NameLocalizations = localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty,
+                DescriptionLocalizations = localizationManager?.GetAllDescriptions(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty
             };
+        }
 
         public static ApplicationCommandProperties ToApplicationCommandProps(this ContextCommandInfo commandInfo)
-            => commandInfo.CommandType switch
+        {
+            var localizationManager = commandInfo.Module.CommandService.LocalizationManager;
+            var commandPath = commandInfo.GetCommandPath();
+
+            return commandInfo.CommandType switch
             {
-                ApplicationCommandType.Message => new MessageCommandBuilder { Name = commandInfo.Name, IsDefaultPermission = commandInfo.DefaultPermission}.Build(),
-                ApplicationCommandType.User => new UserCommandBuilder { Name = commandInfo.Name, IsDefaultPermission=commandInfo.DefaultPermission}.Build(),
+                ApplicationCommandType.Message => new MessageCommandBuilder
+                {
+                    Name = commandInfo.Name,
+                    IsDefaultPermission = commandInfo.DefaultPermission,
+                    DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
+                    IsDMEnabled = commandInfo.IsEnabledInDm
+                }
+                .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
+                .Build(),
+                ApplicationCommandType.User => new UserCommandBuilder
+                {
+                    Name = commandInfo.Name,
+                    IsDefaultPermission = commandInfo.DefaultPermission,
+                    DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
+                    IsDMEnabled = commandInfo.IsEnabledInDm
+                }
+                .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
+                .Build(),
                 _ => throw new InvalidOperationException($"{commandInfo.CommandType} isn't a supported command type.")
             };
+        }
         #endregion
 
         #region Modules
@@ -108,12 +153,20 @@ namespace Discord.Interactions
 
                 options.AddRange(moduleInfo.SubModules?.SelectMany(x => x.ParseSubModule(args, ignoreDontRegister)));
 
+                var localizationManager = moduleInfo.CommandService.LocalizationManager;
+                var modulePath = moduleInfo.GetModulePath();
+
                 var props = new SlashCommandBuilder
                 {
                     Name = moduleInfo.SlashGroupName,
                     Description = moduleInfo.Description,
                     IsDefaultPermission = moduleInfo.DefaultPermission,
-                }.Build();
+                    IsDMEnabled = moduleInfo.IsEnabledInDm,
+                    DefaultMemberPermissions = moduleInfo.DefaultMemberPermissions
+                }
+                .WithNameLocalizations(localizationManager?.GetAllNames(modulePath, LocalizationTarget.Group) ?? ImmutableDictionary<string, string>.Empty)
+                .WithDescriptionLocalizations(localizationManager?.GetAllDescriptions(modulePath, LocalizationTarget.Group) ?? ImmutableDictionary<string, string>.Empty)
+                .Build();
 
                 if (options.Count > SlashCommandBuilder.MaxOptionsCount)
                     throw new InvalidOperationException($"Slash Commands cannot have more than {SlashCommandBuilder.MaxOptionsCount} command parameters");
@@ -151,7 +204,11 @@ namespace Discord.Interactions
                     Name = moduleInfo.SlashGroupName,
                     Description = moduleInfo.Description,
                     Type = ApplicationCommandOptionType.SubCommandGroup,
-                    Options = options
+                    Options = options,
+                    NameLocalizations = moduleInfo.CommandService.LocalizationManager?.GetAllNames(moduleInfo.GetModulePath(), LocalizationTarget.Group)
+                        ?? ImmutableDictionary<string, string>.Empty,
+                    DescriptionLocalizations = moduleInfo.CommandService.LocalizationManager?.GetAllDescriptions(moduleInfo.GetModulePath(), LocalizationTarget.Group)
+                        ?? ImmutableDictionary<string, string>.Empty,
                 } };
         }
 
@@ -166,17 +223,29 @@ namespace Discord.Interactions
                     Name = command.Name,
                     Description = command.Description,
                     IsDefaultPermission = command.IsDefaultPermission,
-                    Options = command.Options?.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified
+                    DefaultMemberPermissions = (GuildPermission)command.DefaultMemberPermissions.RawValue,
+                    IsDMEnabled = command.IsEnabledInDm,
+                    Options = command.Options?.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified,
+                    NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
+                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                 },
                 ApplicationCommandType.User => new UserCommandProperties
                 {
                     Name = command.Name,
-                    IsDefaultPermission = command.IsDefaultPermission
+                    IsDefaultPermission = command.IsDefaultPermission,
+                    DefaultMemberPermissions = (GuildPermission)command.DefaultMemberPermissions.RawValue,
+                    IsDMEnabled = command.IsEnabledInDm,
+                    NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
+                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty
                 },
                 ApplicationCommandType.Message => new MessageCommandProperties
                 {
                     Name = command.Name,
-                    IsDefaultPermission = command.IsDefaultPermission
+                    IsDefaultPermission = command.IsDefaultPermission,
+                    DefaultMemberPermissions = (GuildPermission)command.DefaultMemberPermissions.RawValue,
+                    IsDMEnabled = command.IsEnabledInDm,
+                    NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
+                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty
                 },
                 _ => throw new InvalidOperationException($"Cannot create command properties for command type {command.Type}"),
             };
@@ -189,12 +258,44 @@ namespace Discord.Interactions
                 Description = commandOption.Description,
                 Type = commandOption.Type,
                 IsRequired = commandOption.IsRequired,
+                ChannelTypes = commandOption.ChannelTypes?.ToList(),
+                IsAutocomplete = commandOption.IsAutocomplete.GetValueOrDefault(),
+                MinValue = commandOption.MinValue,
+                MaxValue = commandOption.MaxValue,
                 Choices = commandOption.Choices?.Select(x => new ApplicationCommandOptionChoiceProperties
                 {
                     Name = x.Name,
                     Value = x.Value
                 }).ToList(),
-                Options = commandOption.Options?.Select(x => x.ToApplicationCommandOptionProps()).ToList()
+                Options = commandOption.Options?.Select(x => x.ToApplicationCommandOptionProps()).ToList(),
+                NameLocalizations = commandOption.NameLocalizations?.ToImmutableDictionary(),
+                DescriptionLocalizations = commandOption.DescriptionLocalizations?.ToImmutableDictionary(),
+                MaxLength = commandOption.MaxLength,
+                MinLength = commandOption.MinLength,
             };
+
+        public static Modal ToModal(this ModalInfo modalInfo, string customId, Action<ModalBuilder> modifyModal = null)
+        {
+            var builder = new ModalBuilder(modalInfo.Title, customId);
+
+            foreach (var input in modalInfo.Components)
+                switch (input)
+                {
+                    case TextInputComponentInfo textComponent:
+                        builder.AddTextInput(textComponent.Label, textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
+                            textComponent.MaxLength, textComponent.IsRequired, textComponent.InitialValue);
+                        break;
+                    default:
+                        throw new InvalidOperationException($"{input.GetType().FullName} isn't a valid component info class");
+                }
+
+            if(modifyModal is not null)
+                modifyModal(builder);
+
+            return builder.Build();
+        }
+
+        public static GuildPermission? SanitizeGuildPermissions(this GuildPermission permissions) =>
+            permissions == 0 ? null : permissions;
     }
 }

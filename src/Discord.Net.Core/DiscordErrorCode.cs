@@ -48,6 +48,7 @@ namespace Discord
         UnknownSticker = 10060,
         UnknownInteraction = 10062,
         UnknownApplicationCommand = 10063,
+        UnknownVoiceState = 10065,
         UnknownApplicationCommandPermissions = 10066,
         UnknownStageInstance = 10067,
         UnknownGuildMemberVerificationForm = 10068,
@@ -57,6 +58,7 @@ namespace Discord
         #endregion
 
         #region General Actions (20XXX)
+        UnknownTag = 10087,
         BotsCannotUse = 20001,
         OnlyBotsCanUse = 20002,
         CannotSendExplicitContent = 20009,
@@ -100,9 +102,13 @@ namespace Discord
 
         #region General Request Errors (40XXX)
         BitrateIsTooHighForChannelOfThisType = 30052,
+        MaximumNumberOfEditsReached = 30046,
+        MaximumNumberOfPinnedThreadsInAForumChannelReached = 30047,
+        MaximumNumberOfTagsInAForumChannelReached = 30048,
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
         OpeningDMTooFast = 40003,
+        SendMessagesHasBeenTemporarilyDisabled = 40004,
         RequestEntityTooLarge = 40005,
         FeatureDisabled = 40006,
         UserBanned = 40007,
@@ -117,6 +123,8 @@ namespace Discord
         CannotSendAMessageInAForumChannel = 40058,
         ThereAreNoTagsAvailableThatCanBeSetByNonModerators = 40066,
         ATagIsRequiredToCreateAForumPostInThisChannel = 40067,
+        InteractionHasAlreadyBeenAcknowledged = 40060,
+        TagNamesMustBeUnique = 40061,
         MissingPermissions = 50001,
         InvalidAccountType = 50002,
         CannotExecuteForDM = 50003,
@@ -151,12 +159,15 @@ namespace Discord
         InvalidFileUpload = 50046,
         CannotSelfRedeemGift = 50054,
         InvalidGuild = 50055,
+        InvalidMessageType = 50068,
         PaymentSourceRequiredForGift = 50070,
         CannotDeleteRequiredCommunityChannel = 50074,
+        CannotEditStickersWithinAMessage = 50080,
         InvalidSticker = 50081,
         CannotExecuteOnArchivedThread = 50083,
         InvalidThreadNotificationSettings = 50084,
         BeforeValueEarlierThanThreadCreation = 50085,
+        CommunityServerChannelsMustBeTextChannels = 50086,
         ServerLocaleUnavailable = 50095,
         ServerRequiresMonetization = 50097,
         ServerRequiresBoosts = 50101,
@@ -167,6 +178,7 @@ namespace Discord
         OwnershipCannotBeTransferredToABotUser = 50132,
         AssetResizeBelowTheMaximumSize= 50138,
         UploadedFileNotFound = 50146,
+        MissingPermissionToSendThisSticker = 50600,
         Requires2FA = 60003,
         #endregion
 

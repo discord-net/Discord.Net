@@ -43,9 +43,7 @@ namespace Discord.WebSocket
                 ? (DataModel)model.Data.Value
                 : null;
 
-            ulong? guildId = null;
-            if (Channel is SocketGuildChannel guildChannel)
-                guildId = guildChannel.Guild.Id;
+            ulong? guildId = model.GuildId.ToNullable();
 
             Data = SocketCommandBaseData.Create(client, dataModel, model.Id, guildId);
         }

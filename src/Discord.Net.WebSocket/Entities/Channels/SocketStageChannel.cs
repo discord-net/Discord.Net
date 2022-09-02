@@ -15,7 +15,11 @@ namespace Discord.WebSocket
     public class SocketStageChannel : SocketVoiceChannel, IStageChannel
     {
         /// <inheritdoc/>
-        public string Topic { get; private set; }
+        /// <remarks>
+        ///     This field is always false for stage channels.
+        /// </remarks>
+        public override bool IsTextInVoice
+            => false;
 
         /// <inheritdoc/>
         public StagePrivacyLevel? PrivacyLevel { get; private set; }
@@ -45,23 +49,20 @@ namespace Discord.WebSocket
 
         internal new static SocketStageChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketStageChannel(guild.Discord, model.Id, guild);
+            var entity = new SocketStageChannel(guild?.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }
-
         internal void Update(StageInstance model, bool isLive = false)
         {
             IsLive = isLive;
             if (isLive)
             {
-                Topic = model.Topic;
                 PrivacyLevel = model.PrivacyLevel;
                 IsDiscoverableDisabled = model.DiscoverableDisabled;
             }
             else
             {
-                Topic = null;
                 PrivacyLevel = null;
                 IsDiscoverableDisabled = null;
             }

@@ -8,6 +8,7 @@ steps:
     dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "$(Build.ArtifactStagingDirectory)" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
     dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "$(Build.ArtifactStagingDirectory)" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
     dotnet pack "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "$(Build.ArtifactStagingDirectory)" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
+    dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "$(Build.ArtifactStagingDirectory)" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
   displayName: Pack projects
 
 - task: NuGetCommand@2

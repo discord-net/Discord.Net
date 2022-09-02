@@ -122,7 +122,7 @@ namespace Discord.Interactions.Builders
         /// <summary>
         ///     Adds preconditions to <see cref="Preconditions"/>
         /// </summary>
-        /// <param name="preconditions">New attributes to be added to <see cref="Preconditions"/>.</param>
+        /// <param name="attributes">New attributes to be added to <see cref="Preconditions"/>.</param>
         /// <returns>
         ///     The builder instance.
         /// </returns>

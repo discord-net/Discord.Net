@@ -15,9 +15,10 @@ Slash commands can have a bunch of parameters, each their own type. Let's first 
 | Integer         | A number.                                          |
 | Boolean         | True or False.                                     |
 | User            | A user                                             |
-| Channel         | A channel, this includes voice text and categories |
 | Role            | A role.                                            |
+| Channel         | A channel, this includes voice text and categories |
 | Mentionable     | A role or a user.                                  |
+| File            | A file                                             |
 
 Each one of the parameter types has its own DNET type in the `SocketSlashCommandDataOption`'s Value field:
 | Name | C# Type |
@@ -31,6 +32,7 @@ Each one of the parameter types has its own DNET type in the `SocketSlashCommand
 | Role | `SocketRole` |
 | Channel | `SocketChannel` |
 | Mentionable | `SocketUser`, `SocketGuildUser`, or `SocketRole` |
+| File | `IAttachment` |
 
 Let's start by making a command that takes in a user and lists their roles.
 

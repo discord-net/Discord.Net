@@ -189,6 +189,11 @@ namespace Discord.WebSocket
         public bool LogGatewayIntentWarnings { get; set; } = true;
 
         /// <summary>
+        ///     Gets or sets whether or not Unknown Dispatch event messages should be logged.
+        /// </summary>
+        public bool SuppressUnknownDispatchWarnings { get; set; } = true;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="DiscordSocketConfig"/> class with the default configuration.
         /// </summary>
         public DiscordSocketConfig()

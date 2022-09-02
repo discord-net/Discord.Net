@@ -32,10 +32,10 @@ namespace Discord.Rest
                 Data = new RestAutocompleteInteractionData(dataModel);
         }
 
-        internal new static async Task<RestAutocompleteInteraction> CreateAsync(DiscordRestClient client, Model model)
+        internal new static async Task<RestAutocompleteInteraction> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
             var entity = new RestAutocompleteInteraction(client, model);
-            await entity.UpdateAsync(client, model).ConfigureAwait(false);
+            await entity.UpdateAsync(client, model, doApiCall).ConfigureAwait(false);
             return entity;
         }
 

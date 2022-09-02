@@ -3,6 +3,7 @@ using Discord.Logging;
 using Discord.Rest;
 using Discord.WebSocket;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,29 @@ namespace Discord.Interactions
         /// </summary>
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new ();
+
+        /// <summary>
+        ///     Occurs when any type of interaction is executed.
+        /// </summary>
+        public event Func<ICommandInfo, IInteractionContext, IResult, Task> InteractionExecuted
+        {
+            add
+            {
+                SlashCommandExecuted += value;
+                ContextCommandExecuted += value;
+                ComponentCommandExecuted += value;
+                AutocompleteCommandExecuted += value;
+                ModalCommandExecuted += value;
+            }
+            remove
+            {
+                SlashCommandExecuted -= value;
+                ContextCommandExecuted -= value;
+                ComponentCommandExecuted -= value;
+                AutocompleteCommandExecuted -= value;
+                ModalCommandExecuted -= value;
+            }
+        }
 
         /// <summary>
         ///     Occurs when a Slash Command is executed.
@@ -59,6 +83,11 @@ namespace Discord.Interactions
         public event Func<ModalCommandInfo, IInteractionContext, IResult, Task> ModalCommandExecuted { add { _modalCommandExecutedEvent.Add(value); } remove { _modalCommandExecutedEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<ModalCommandInfo, IInteractionContext, IResult, Task>> _modalCommandExecutedEvent = new();
 
+        /// <summary>
+        ///     Get the <see cref="ILocalizationManager"/> used by this Interaction Service instance to localize strings.
+        /// </summary>
+        public ILocalizationManager LocalizationManager { get; set; }
+
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
         private readonly CommandMap<SlashCommandInfo> _slashCommandMap;
         private readonly ConcurrentDictionary<ApplicationCommandType, CommandMap<ContextCommandInfo>> _contextCommandMaps;
@@ -66,8 +95,9 @@ namespace Discord.Interactions
         private readonly CommandMap<AutocompleteCommandInfo> _autocompleteCommandMap;
         private readonly CommandMap<ModalCommandInfo> _modalCommandMap;
         private readonly HashSet<ModuleInfo> _moduleDefs;
-        private readonly ConcurrentDictionary<Type, TypeConverter> _typeConverters;
-        private readonly ConcurrentDictionary<Type, Type> _genericTypeConverters;
+        private readonly TypeMap<TypeConverter, IApplicationCommandInteractionDataOption> _typeConverterMap;
+        private readonly TypeMap<ComponentTypeConverter, IComponentInteractionData> _compTypeConverterMap;
+        private readonly TypeMap<TypeReader, string> _typeReaderMap;
         private readonly ConcurrentDictionary<Type, IAutocompleteHandler> _autocompleteHandlers = new();
         private readonly ConcurrentDictionary<Type, ModalInfo> _modalInfos = new();
         private readonly SemaphoreSlim _lock;
@@ -178,23 +208,42 @@ namespace Discord.Interactions
             _enableAutocompleteHandlers = config.EnableAutocompleteHandlers;
             _autoServiceScopes = config.AutoServiceScopes;
             _restResponseCallback = config.RestResponseCallback;
+            LocalizationManager = config.LocalizationManager;
 
-            _genericTypeConverters = new ConcurrentDictionary<Type, Type>
-            {
-                [typeof(IChannel)] = typeof(DefaultChannelConverter<>),
-                [typeof(IRole)] = typeof(DefaultRoleConverter<>),
-                [typeof(IAttachment)] = typeof(DefaultAttachmentConverter<>),
-                [typeof(IUser)] = typeof(DefaultUserConverter<>),
-                [typeof(IMentionable)] = typeof(DefaultMentionableConverter<>),
-                [typeof(IConvertible)] = typeof(DefaultValueConverter<>),
-                [typeof(Enum)] = typeof(EnumConverter<>),
-                [typeof(Nullable<>)] = typeof(NullableConverter<>),
-            };
+            _typeConverterMap = new TypeMap<TypeConverter, IApplicationCommandInteractionDataOption>(this, new ConcurrentDictionary<Type, TypeConverter>
+                {
+                    [typeof(TimeSpan)] = new TimeSpanConverter()
+                }, new ConcurrentDictionary<Type, Type>
+                {
+                    [typeof(IChannel)] = typeof(DefaultChannelConverter<>),
+                    [typeof(IRole)] = typeof(DefaultRoleConverter<>),
+                    [typeof(IAttachment)] = typeof(DefaultAttachmentConverter<>),
+                    [typeof(IUser)] = typeof(DefaultUserConverter<>),
+                    [typeof(IMentionable)] = typeof(DefaultMentionableConverter<>),
+                    [typeof(IConvertible)] = typeof(DefaultValueConverter<>),
+                    [typeof(Enum)] = typeof(EnumConverter<>),
+                    [typeof(Nullable<>)] = typeof(NullableConverter<>)
+                });
 
-            _typeConverters = new ConcurrentDictionary<Type, TypeConverter>
-            {
-                [typeof(TimeSpan)] = new TimeSpanConverter()
-            };
+            _compTypeConverterMap = new TypeMap<ComponentTypeConverter, IComponentInteractionData>(this, new ConcurrentDictionary<Type, ComponentTypeConverter>(),
+                new ConcurrentDictionary<Type, Type>
+                {
+                    [typeof(Array)] = typeof(DefaultArrayComponentConverter<>),
+                    [typeof(IConvertible)] = typeof(DefaultValueComponentConverter<>),
+                    [typeof(Nullable<>)] = typeof(NullableComponentConverter<>)
+                });
+
+            _typeReaderMap = new TypeMap<TypeReader, string>(this, new ConcurrentDictionary<Type, TypeReader>(),
+                new ConcurrentDictionary<Type, Type>
+                {
+                    [typeof(IChannel)] = typeof(DefaultChannelReader<>),
+                    [typeof(IRole)] = typeof(DefaultRoleReader<>),
+                    [typeof(IUser)] = typeof(DefaultUserReader<>),
+                    [typeof(IMessage)] = typeof(DefaultMessageReader<>),
+                    [typeof(IConvertible)] = typeof(DefaultValueReader<>),
+                    [typeof(Enum)] = typeof(EnumReader<>),
+                    [typeof(Nullable<>)] = typeof(NullableReader<>)
+                });
         }
 
         /// <summary>
@@ -293,7 +342,7 @@ namespace Discord.Interactions
         public async Task<ModuleInfo> AddModuleAsync (Type type, IServiceProvider services)
         {
             if (!typeof(IInteractionModuleBase).IsAssignableFrom(type))
-                throw new ArgumentException("Type parameter must be a type of Slash Module", "T");
+                throw new ArgumentException("Type parameter must be a type of Slash Module", nameof(type));
 
             services ??= EmptyServiceProvider.Instance;
 
@@ -326,7 +375,7 @@ namespace Discord.Interactions
         }
 
         /// <summary>
-        ///     Register Application Commands from <see cref="ContextCommands"/> and <see cref="SlashCommands"/> to a guild. 
+        ///     Register Application Commands from <see cref="ContextCommands"/> and <see cref="SlashCommands"/> to a guild.
         /// </summary>
         /// <param name="guildId">Id of the target guild.</param>
         /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
@@ -380,19 +429,38 @@ namespace Discord.Interactions
         /// </summary>
         /// <remarks>
         ///     Commands will be registered as standalone commands, if you want the <see cref="GroupAttribute"/> to take effect,
-        ///     use <see cref="AddModulesToGuildAsync(IGuild, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
+        ///     use <see cref="AddModulesToGuildAsync(IGuild, bool, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
         /// </remarks>
         /// <param name="guild">The target guild.</param>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="commands">Commands to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
         /// </returns>
         public async Task<IReadOnlyCollection<RestGuildCommand>> AddCommandsToGuildAsync(IGuild guild, bool deleteMissing = false, params ICommandInfo[] commands)
         {
-            EnsureClientReady();
-
             if (guild is null)
                 throw new ArgumentNullException(nameof(guild));
+
+            return await AddCommandsToGuildAsync(guild.Id, deleteMissing, commands).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Register Application Commands from <paramref name="commands"/> to a guild.
+        /// </summary>
+        /// <remarks>
+        ///     Commands will be registered as standalone commands, if you want the <see cref="GroupAttribute"/> to take effect,
+        ///     use <see cref="AddModulesToGuildAsync(ulong, bool, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
+        /// </remarks>
+        /// <param name="guildId">The target guild ID.</param>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="commands">Commands to be registered to Discord.</param>
+        /// <returns>
+        ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestGuildCommand>> AddCommandsToGuildAsync(ulong guildId, bool deleteMissing = false, params ICommandInfo[] commands)
+        {
+            EnsureClientReady();
 
             var props = new List<ApplicationCommandProperties>();
 
@@ -413,44 +481,60 @@ namespace Discord.Interactions
 
             if (!deleteMissing)
             {
-                var existing = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
+                var existing = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
                 var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
                 props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
             }
 
-            return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guild.Id).ConfigureAwait(false);
+            return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guildId).ConfigureAwait(false);
         }
 
         /// <summary>
-        ///     Register Application Commands from modules provided in <paramref name="modules"/> to a guild. 
+        ///     Register Application Commands from modules provided in <paramref name="modules"/> to a guild.
         /// </summary>
         /// <param name="guild">The target guild.</param>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="modules">Modules to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
         /// </returns>
         public async Task<IReadOnlyCollection<RestGuildCommand>> AddModulesToGuildAsync(IGuild guild, bool deleteMissing = false, params ModuleInfo[] modules)
         {
-            EnsureClientReady();
-
             if (guild is null)
                 throw new ArgumentNullException(nameof(guild));
+
+            return await AddModulesToGuildAsync(guild.Id, deleteMissing, modules).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Register Application Commands from modules provided in <paramref name="modules"/> to a guild.
+        /// </summary>
+        /// <param name="guildId">The target guild ID.</param>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="modules">Modules to be registered to Discord.</param>
+        /// <returns>
+        ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestGuildCommand>> AddModulesToGuildAsync(ulong guildId, bool deleteMissing = false, params ModuleInfo[] modules)
+        {
+            EnsureClientReady();
 
             var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).ToList();
 
             if (!deleteMissing)
             {
-                var existing = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
+                var existing = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
                 var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
                 props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
             }
 
-            return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guild.Id).ConfigureAwait(false);
+            return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guildId).ConfigureAwait(false);
         }
 
         /// <summary>
-        ///     Register Application Commands from modules provided in <paramref name="modules"/> as global commands. 
+        ///     Register Application Commands from modules provided in <paramref name="modules"/> as global commands.
         /// </summary>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="modules">Modules to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
@@ -476,8 +560,9 @@ namespace Discord.Interactions
         /// </summary>
         /// <remarks>
         ///     Commands will be registered as standalone commands, if you want the <see cref="GroupAttribute"/> to take effect,
-        ///     use <see cref="AddModulesToGuildAsync(IGuild, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
+        ///     use <see cref="AddModulesToGuildAsync(IGuild, bool, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
         /// </remarks>
+        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="commands">Commands to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
@@ -677,7 +762,7 @@ namespace Discord.Interactions
         public async Task<IResult> ExecuteCommandAsync (IInteractionContext context, IServiceProvider services)
         {
             var interaction = context.Interaction;
-            
+
             return interaction switch
             {
                 ISlashCommandInteraction slashCommand => await ExecuteSlashCommandAsync(context, slashCommand, services).ConfigureAwait(false),
@@ -734,6 +819,9 @@ namespace Discord.Interactions
                 await _componentCommandExecutedEvent.InvokeAsync(null, context, result).ConfigureAwait(false);
                 return result;
             }
+
+            SetMatchesIfApplicable(context, result);
+
             return await result.Command.ExecuteAsync(context, services, result.RegexCaptureGroups).ConfigureAwait(false);
         }
 
@@ -747,9 +835,7 @@ namespace Discord.Interactions
 
                 if(autocompleteHandlerResult.IsSuccess)
                 {
-                    var parameter = autocompleteHandlerResult.Command.Parameters.FirstOrDefault(x => string.Equals(x.Name, interaction.Data.Current.Name, StringComparison.Ordinal));
-
-                    if(parameter?.AutocompleteHandler is not null)
+                    if (autocompleteHandlerResult.Command._flattenedParameterDictionary.TryGetValue(interaction.Data.Current.Name, out var parameter) && parameter?.AutocompleteHandler is not null)
                         return await parameter.AutocompleteHandler.ExecuteAsync(context, interaction, parameter, services).ConfigureAwait(false);
                 }
             }
@@ -780,50 +866,48 @@ namespace Discord.Interactions
                 await _componentCommandExecutedEvent.InvokeAsync(null, context, result).ConfigureAwait(false);
                 return result;
             }
+
+            SetMatchesIfApplicable(context, result);
+
             return await result.Command.ExecuteAsync(context, services, result.RegexCaptureGroups).ConfigureAwait(false);
         }
 
-        internal TypeConverter GetTypeConverter (Type type, IServiceProvider services = null)
+        private static void SetMatchesIfApplicable<T>(IInteractionContext context, SearchResult<T> searchResult)
+            where T : class, ICommandInfo
         {
-            if (_typeConverters.TryGetValue(type, out var specific))
-                return specific;
-            else if (_genericTypeConverters.Any(x => x.Key.IsAssignableFrom(type)
-            || (x.Key.IsGenericTypeDefinition && type.IsGenericType && x.Key.GetGenericTypeDefinition() == type.GetGenericTypeDefinition())))
+            if (!searchResult.Command.SupportsWildCards || context is not IRouteMatchContainer matchContainer)
+                return;
+
+            if (searchResult.RegexCaptureGroups?.Length > 0)
             {
-                services ??= EmptyServiceProvider.Instance;
+                var matches = new RouteSegmentMatch[searchResult.RegexCaptureGroups.Length];
+                for (var i = 0; i < searchResult.RegexCaptureGroups.Length; i++)
+                    matches[i] = new RouteSegmentMatch(searchResult.RegexCaptureGroups[i]);
 
-                var converterType = GetMostSpecificTypeConverter(type);
-                var converter = ReflectionUtils<TypeConverter>.CreateObject(converterType.MakeGenericType(type).GetTypeInfo(), this, services);
-                _typeConverters[type] = converter;
-                return converter;
+                matchContainer.SetSegmentMatches(matches);
             }
-
-            else if (_typeConverters.Any(x => x.Value.CanConvertTo(type)))
-                return _typeConverters.First(x => x.Value.CanConvertTo(type)).Value;
-
-            throw new ArgumentException($"No type {nameof(TypeConverter)} is defined for this {type.FullName}", "type");
+            else
+                matchContainer.SetSegmentMatches(Array.Empty<RouteSegmentMatch>());
         }
+
+        internal TypeConverter GetTypeConverter(Type type, IServiceProvider services = null)
+            => _typeConverterMap.Get(type, services);
 
         /// <summary>
         ///     Add a concrete type <see cref="TypeConverter"/>.
         /// </summary>
         /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="TypeConverter"/>.</typeparam>
         /// <param name="converter">The <see cref="TypeConverter"/> instance.</param>
-        public void AddTypeConverter<T> (TypeConverter converter) =>
-            AddTypeConverter(typeof(T), converter);
+        public void AddTypeConverter<T>(TypeConverter converter) =>
+            _typeConverterMap.AddConcrete<T>(converter);
 
         /// <summary>
         ///     Add a concrete type <see cref="TypeConverter"/>.
         /// </summary>
         /// <param name="type">Primary target <see cref="Type"/> of the <see cref="TypeConverter"/>.</param>
         /// <param name="converter">The <see cref="TypeConverter"/> instance.</param>
-        public void AddTypeConverter (Type type, TypeConverter converter)
-        {
-            if (!converter.CanConvertTo(type))
-                throw new ArgumentException($"This {converter.GetType().FullName} cannot read {type.FullName} and cannot be registered as its {nameof(TypeConverter)}");
-
-            _typeConverters[type] = converter;
-        }
+        public void AddTypeConverter(Type type, TypeConverter converter) =>
+            _typeConverterMap.AddConcrete(type, converter);
 
         /// <summary>
         ///     Add a generic type <see cref="TypeConverter{T}"/>.
@@ -831,30 +915,173 @@ namespace Discord.Interactions
         /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeConverter{T}"/>.</typeparam>
         /// <param name="converterType">Type of the <see cref="TypeConverter{T}"/>.</param>
 
-        public void AddGenericTypeConverter<T> (Type converterType) =>
-            AddGenericTypeConverter(typeof(T), converterType);
+        public void AddGenericTypeConverter<T>(Type converterType) =>
+            _typeConverterMap.AddGeneric<T>(converterType);
 
         /// <summary>
         ///     Add a generic type <see cref="TypeConverter{T}"/>.
         /// </summary>
         /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeConverter{T}"/>.</param>
         /// <param name="converterType">Type of the <see cref="TypeConverter{T}"/>.</param>
-        public void AddGenericTypeConverter (Type targetType, Type converterType)
+        public void AddGenericTypeConverter(Type targetType, Type converterType) =>
+            _typeConverterMap.AddGeneric(targetType, converterType);
+
+        internal ComponentTypeConverter GetComponentTypeConverter(Type type, IServiceProvider services = null) =>
+            _compTypeConverterMap.Get(type, services);
+
+        /// <summary>
+        ///     Add a concrete type <see cref="ComponentTypeConverter"/>.
+        /// </summary>
+        /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="ComponentTypeConverter"/>.</typeparam>
+        /// <param name="converter">The <see cref="ComponentTypeConverter"/> instance.</param>
+        public void AddComponentTypeConverter<T>(ComponentTypeConverter converter) =>
+            AddComponentTypeConverter(typeof(T), converter);
+
+        /// <summary>
+        ///     Add a concrete type <see cref="ComponentTypeConverter"/>.
+        /// </summary>
+        /// <param name="type">Primary target <see cref="Type"/> of the <see cref="ComponentTypeConverter"/>.</param>
+        /// <param name="converter">The <see cref="ComponentTypeConverter"/> instance.</param>
+        public void AddComponentTypeConverter(Type type, ComponentTypeConverter converter) =>
+            _compTypeConverterMap.AddConcrete(type, converter);
+
+        /// <summary>
+        ///     Add a generic type <see cref="ComponentTypeConverter{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="ComponentTypeConverter{T}"/>.</typeparam>
+        /// <param name="converterType">Type of the <see cref="ComponentTypeConverter{T}"/>.</param>
+        public void AddGenericComponentTypeConverter<T>(Type converterType) =>
+            AddGenericComponentTypeConverter(typeof(T), converterType);
+
+        /// <summary>
+        ///     Add a generic type <see cref="ComponentTypeConverter{T}"/>.
+        /// </summary>
+        /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="ComponentTypeConverter{T}"/>.</param>
+        /// <param name="converterType">Type of the <see cref="ComponentTypeConverter{T}"/>.</param>
+        public void AddGenericComponentTypeConverter(Type targetType, Type converterType) =>
+            _compTypeConverterMap.AddGeneric(targetType, converterType);
+
+        internal TypeReader GetTypeReader(Type type, IServiceProvider services = null) =>
+            _typeReaderMap.Get(type, services);
+
+        /// <summary>
+        ///     Add a concrete type <see cref="TypeReader"/>.
+        /// </summary>
+        /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</typeparam>
+        /// <param name="reader">The <see cref="TypeReader"/> instance.</param>
+        public void AddTypeReader<T>(TypeReader reader) =>
+            AddTypeReader(typeof(T), reader);
+
+        /// <summary>
+        ///     Add a concrete type <see cref="TypeReader"/>.
+        /// </summary>
+        /// <param name="type">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</param>
+        /// <param name="reader">The <see cref="TypeReader"/> instance.</param>
+        public void AddTypeReader(Type type, TypeReader reader) =>
+            _typeReaderMap.AddConcrete(type, reader);
+
+        /// <summary>
+        ///     Add a generic type <see cref="TypeReader{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeReader{T}"/>.</typeparam>
+        /// <param name="readerType">Type of the <see cref="TypeReader{T}"/>.</param>
+        public void AddGenericTypeReader<T>(Type readerType) =>
+            AddGenericTypeReader(typeof(T), readerType);
+
+        /// <summary>
+        ///     Add a generic type <see cref="TypeReader{T}"/>.
+        /// </summary>
+        /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeReader{T}"/>.</param>
+        /// <param name="readerType">Type of the <see cref="TypeReader{T}"/>.</param>
+        public void AddGenericTypeReader(Type targetType, Type readerType) =>
+            _typeReaderMap.AddGeneric(targetType, readerType);
+
+        /// <summary>
+        ///     Removes a type reader for the type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type to remove the readers from.</typeparam>
+        /// <param name="reader">The reader if the resulting remove operation was successful.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveTypeReader<T>(out TypeReader reader)
+            => TryRemoveTypeReader(typeof(T), out reader);
+
+        /// <summary>
+        ///     Removes a type reader for the given type.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="InteractionService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <param name="type">The type to remove the reader from.</param>
+        /// <param name="reader">The reader if the resulting remove operation was successful.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveTypeReader(Type type, out TypeReader reader)
+            => _typeReaderMap.TryRemoveConcrete(type, out reader);
+
+        /// <summary>
+        ///     Removes a generic type reader from the type <typeparamref name="T"/>.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="InteractionService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <typeparam name="T">The type to remove the readers from.</typeparam>
+        /// <param name="readerType">The removed readers type.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveGenericTypeReader<T>(out Type readerType)
+            => TryRemoveGenericTypeReader(typeof(T), out readerType);
+
+        /// <summary>
+        ///     Removes a generic type reader from the given type.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="InteractionService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <param name="type">The type to remove the reader from.</param>
+        /// <param name="readerType">The readers type if the remove operation was successful.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveGenericTypeReader(Type type, out Type readerType)
+            => _typeReaderMap.TryRemoveGeneric(type, out readerType);
+
+        /// <summary>
+        ///     Serialize an object using a <see cref="TypeReader"/> into a <see cref="string"/> to be placed in a Component CustomId.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="TypeReader"/> from the <see cref="InteractionService"/> will not dereference the <see cref="TypeReader"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <typeparam name="T">Type of the object to be serialized.</typeparam>
+        /// <param name="obj">Object to be serialized.</param>
+        /// <param name="services">Services that will be passed on to the <see cref="TypeReader"/>.</param>
+        /// <returns>
+        ///     A task representing the conversion process. The task result contains the result of the conversion.
+        /// </returns>
+        public Task<string> SerializeValueAsync<T>(T obj, IServiceProvider services) =>
+            _typeReaderMap.Get(typeof(T), services).SerializeAsync(obj, services);
+
+        /// <summary>
+        ///     Serialize and format multiple objects into a Custom Id string.
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="services">>Services that will be passed on to the <see cref="TypeReader"/>s.</param>
+        /// <param name="args">Objects to be serialized.</param>
+        /// <returns>
+        ///     A task representing the conversion process. The task result contains the result of the conversion.
+        /// </returns>
+        public async Task<string> GenerateCustomIdStringAsync(string format, IServiceProvider services, params object[] args)
         {
-            if (!converterType.IsGenericTypeDefinition)
-                throw new ArgumentException($"{converterType.FullName} is not generic.");
+            var serializedValues = new string[args.Length];
 
-            var genericArguments = converterType.GetGenericArguments();
+            for(var i = 0; i < args.Length; i++)
+            {
+                var arg = args[i];
+                var typeReader = _typeReaderMap.Get(arg.GetType(), null);
+                var result = await typeReader.SerializeAsync(arg, services).ConfigureAwait(false);
+                serializedValues[i] = result;
+            }
 
-            if (genericArguments.Count() > 1)
-                throw new InvalidOperationException($"Valid generic {converterType.FullName}s cannot have more than 1 generic type parameter");
-
-            var constraints = genericArguments.SelectMany(x => x.GetGenericParameterConstraints());
-
-            if (!constraints.Any(x => x.IsAssignableFrom(targetType)))
-                throw new InvalidOperationException($"This generic class does not support type {targetType.FullName}");
-
-            _genericTypeConverters[targetType] = converterType;
+            return string.Format(format, serializedValues);
         }
 
         /// <summary>
@@ -872,7 +1099,7 @@ namespace Discord.Interactions
             if (_modalInfos.ContainsKey(type))
                 throw new InvalidOperationException($"Modal type {type.FullName} already exists.");
 
-            return ModalUtils.GetOrAdd(type);
+            return ModalUtils.GetOrAdd(type, this);
         }
 
         internal IAutocompleteHandler GetAutocompleteHandler(Type autocompleteHandlerType, IServiceProvider services = null)
@@ -901,19 +1128,40 @@ namespace Discord.Interactions
         /// <returns>
         ///     The active command permissions after the modification.
         /// </returns>
-        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync (ModuleInfo module, IGuild guild,
+        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync(ModuleInfo module, IGuild guild,
             params ApplicationCommandPermission[] permissions)
         {
+            if (module is null)
+                throw new ArgumentNullException(nameof(module));
+
+            if (guild is null)
+                throw new ArgumentNullException(nameof(guild));
+
+            return await ModifySlashCommandPermissionsAsync(module, guild.Id, permissions).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Modify the command permissions of the matching Discord Slash Command.
+        /// </summary>
+        /// <param name="module">Module representing the top level Slash Command.</param>
+        /// <param name="guildId">Target guild ID.</param>
+        /// <param name="permissions">New permission values.</param>
+        /// <returns>
+        ///     The active command permissions after the modification.
+        /// </returns>
+        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync(ModuleInfo module, ulong guildId,
+            params ApplicationCommandPermission[] permissions)
+        {
+            if (module is null)
+                throw new ArgumentNullException(nameof(module));
+
             if (!module.IsSlashGroup)
                 throw new InvalidOperationException($"This module does not have a {nameof(GroupAttribute)} and does not represent an Application Command");
 
             if (!module.IsTopLevelGroup)
                 throw new InvalidOperationException("This module is not a top level application command. You cannot change its permissions");
 
-            if (guild is null)
-                throw new ArgumentNullException("guild");
-
-            var commands = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
+            var commands = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
             var appCommand = commands.First(x => x.Name == module.SlashGroupName);
 
             return await appCommand.ModifyCommandPermissions(permissions).ConfigureAwait(false);
@@ -928,9 +1176,29 @@ namespace Discord.Interactions
         /// <returns>
         ///     The active command permissions after the modification.
         /// </returns>
-        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync (SlashCommandInfo command, IGuild guild,
-            params ApplicationCommandPermission[] permissions) =>
-            await ModifyApplicationCommandPermissionsAsync(command, guild, permissions).ConfigureAwait(false);
+        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync(SlashCommandInfo command, IGuild guild,
+            params ApplicationCommandPermission[] permissions)
+        {
+            if (command is null)
+                throw new ArgumentNullException(nameof(command));
+
+            if (guild is null)
+                throw new ArgumentNullException(nameof(guild));
+
+            return await ModifyApplicationCommandPermissionsAsync(command, guild.Id, permissions).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Modify the command permissions of the matching Discord Slash Command.
+        /// </summary>
+        /// <param name="command">The Slash Command.</param>
+        /// <param name="guildId">Target guild ID.</param>
+        /// <param name="permissions">New permission values.</param>
+        /// <returns>
+        ///     The active command permissions after the modification.
+        /// </returns>
+        public async Task<GuildApplicationCommandPermission> ModifySlashCommandPermissionsAsync(SlashCommandInfo command, ulong guildId,
+            params ApplicationCommandPermission[] permissions) => await ModifyApplicationCommandPermissionsAsync(command, guildId, permissions).ConfigureAwait(false);
 
         /// <summary>
         ///     Modify the command permissions of the matching Discord Slash Command.
@@ -941,20 +1209,40 @@ namespace Discord.Interactions
         /// <returns>
         ///     The active command permissions after the modification.
         /// </returns>
-        public async Task<GuildApplicationCommandPermission> ModifyContextCommandPermissionsAsync (ContextCommandInfo command, IGuild guild,
-            params ApplicationCommandPermission[] permissions) =>
-            await ModifyApplicationCommandPermissionsAsync(command, guild, permissions).ConfigureAwait(false);
+        public async Task<GuildApplicationCommandPermission> ModifyContextCommandPermissionsAsync(ContextCommandInfo command, IGuild guild,
+            params ApplicationCommandPermission[] permissions)
+        {
+            if (command is null)
+                throw new ArgumentNullException(nameof(command));
 
-        private async Task<GuildApplicationCommandPermission> ModifyApplicationCommandPermissionsAsync<T> (T command, IGuild guild,
+            if (guild is null)
+                throw new ArgumentNullException(nameof(guild));
+
+            return await ModifyApplicationCommandPermissionsAsync(command, guild.Id, permissions).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Modify the command permissions of the matching Discord Slash Command.
+        /// </summary>
+        /// <param name="command">The Context Command.</param>
+        /// <param name="guildId">Target guild ID.</param>
+        /// <param name="permissions">New permission values.</param>
+        /// <returns>
+        ///     The active command permissions after the modification.
+        /// </returns>
+        public async Task<GuildApplicationCommandPermission> ModifyContextCommandPermissionsAsync(ContextCommandInfo command, ulong guildId,
+            params ApplicationCommandPermission[] permissions) => await ModifyApplicationCommandPermissionsAsync(command, guildId, permissions).ConfigureAwait(false);
+
+        private async Task<GuildApplicationCommandPermission> ModifyApplicationCommandPermissionsAsync<T> (T command, ulong guildId,
             params ApplicationCommandPermission[] permissions) where T : class, IApplicationCommandInfo, ICommandInfo
         {
+            if (command is null)
+                throw new ArgumentNullException(nameof(command));
+
             if (!command.IsTopLevelCommand)
                 throw new InvalidOperationException("This command is not a top level application command. You cannot change its permissions");
 
-            if (guild is null)
-                throw new ArgumentNullException("guild");
-
-            var commands = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
+            var commands = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
             var appCommand = commands.First(x => x.Name == ( command as IApplicationCommandInfo ).Name);
 
             return await appCommand.ModifyCommandPermissions(permissions).ConfigureAwait(false);
@@ -1018,7 +1306,7 @@ namespace Discord.Interactions
         public ModuleInfo GetModuleInfo<TModule> ( ) where TModule : class
         {
             if (!typeof(IInteractionModuleBase).IsAssignableFrom(typeof(TModule)))
-                throw new ArgumentException("Type parameter must be a type of Slash Module", "TModule");
+                throw new ArgumentException("Type parameter must be a type of Slash Module", nameof(TModule));
 
             var module = _typedModuleDefs[typeof(TModule)];
 
@@ -1032,21 +1320,6 @@ namespace Discord.Interactions
         public void Dispose ( )
         {
             _lock.Dispose();
-        }
-
-        private Type GetMostSpecificTypeConverter (Type type)
-        {
-            if (_genericTypeConverters.TryGetValue(type, out var matching))
-                return matching;
-
-            if (type.IsGenericType && _genericTypeConverters.TryGetValue(type.GetGenericTypeDefinition(), out var genericDefinition))
-                return genericDefinition;
-
-            var typeInterfaces = type.GetInterfaces();
-            var candidates = _genericTypeConverters.Where(x => x.Key.IsAssignableFrom(type))
-                .OrderByDescending(x => typeInterfaces.Count(y => y.IsAssignableFrom(x.Key)));
-
-            return candidates.First().Value;
         }
 
         private void EnsureClientReady()

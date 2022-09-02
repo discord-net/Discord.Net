@@ -36,8 +36,8 @@ namespace Discord.WebSocket
         ///     Gets a collection of users that are able to view the channel.
         /// </summary>
         /// <remarks>
-        ///     If this channel is a voice channel, a collection of users who are currently connected to this channel
-        ///     is returned.
+        ///     If this channel is a voice channel, use <see cref="SocketVoiceChannel.ConnectedUsers"/> to retrieve a
+        ///     collection of users who are currently connected to this channel.
         /// </remarks>
         /// <returns>
         ///     A read-only collection of users that can access the channel (i.e. the users seen in the user list).
@@ -59,6 +59,7 @@ namespace Discord.WebSocket
                 ChannelType.Category => SocketCategoryChannel.Create(guild, state, model),
                 ChannelType.PrivateThread or ChannelType.PublicThread or ChannelType.NewsThread => SocketThreadChannel.Create(guild, state, model),
                 ChannelType.Stage => SocketStageChannel.Create(guild, state, model),
+                ChannelType.Forum => SocketForumChannel.Create(guild, state, model),
                 _ => new SocketGuildChannel(guild.Discord, model.Id, guild),
             };
         }
@@ -214,13 +215,15 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
+            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable(); //Overridden in Text/Voice
         /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => Task.FromResult<IGuildUser>(GetUser(id));
+            => Task.FromResult<IGuildUser>(GetUser(id)); //Overridden in Text/Voice
         #endregion
 
         #region IChannel
+        /// <inheritdoc />
+        string IChannel.Name => Name;
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable(); //Overridden in Text/Voice

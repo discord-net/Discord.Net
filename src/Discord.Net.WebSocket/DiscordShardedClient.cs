@@ -178,7 +178,6 @@ namespace Discord.WebSocket
                     await _shards[i].LogoutAsync();
             }
 
-            CurrentUser = null;
             if (_automaticShards)
             {
                 _shardIds = new int[0];
@@ -450,6 +449,7 @@ namespace Discord.WebSocket
             client.UserBanned += (user, guild) => _userBannedEvent.InvokeAsync(user, guild);
             client.UserUnbanned += (user, guild) => _userUnbannedEvent.InvokeAsync(user, guild);
             client.UserUpdated += (oldUser, newUser) => _userUpdatedEvent.InvokeAsync(oldUser, newUser);
+            client.PresenceUpdated += (user, oldPresence, newPresence) => _presenceUpdated.InvokeAsync(user, oldPresence, newPresence);
             client.GuildMemberUpdated += (oldUser, newUser) => _guildMemberUpdatedEvent.InvokeAsync(oldUser, newUser);
             client.UserVoiceStateUpdated += (user, oldVoiceState, newVoiceState) => _userVoiceStateUpdatedEvent.InvokeAsync(user, oldVoiceState, newVoiceState);
             client.VoiceServerUpdated += (server) => _voiceServerUpdatedEvent.InvokeAsync(server);
@@ -496,6 +496,8 @@ namespace Discord.WebSocket
             client.GuildScheduledEventStarted += (arg) => _guildScheduledEventStarted.InvokeAsync(arg);
             client.GuildScheduledEventUserAdd += (arg1, arg2) => _guildScheduledEventUserAdd.InvokeAsync(arg1, arg2);
             client.GuildScheduledEventUserRemove += (arg1, arg2) => _guildScheduledEventUserRemove.InvokeAsync(arg1, arg2);
+
+            client.WebhooksUpdated += (arg1, arg2) => _webhooksUpdated.InvokeAsync(arg1, arg2);
         }
         #endregion
 
@@ -533,8 +535,15 @@ namespace Discord.WebSocket
             => await CreateGuildAsync(name, region, jpegIcon).ConfigureAwait(false);
 
         /// <inheritdoc />
-        Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => Task.FromResult<IUser>(GetUser(id));
+        async Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            var user = GetUser(id);
+            if (user is not null || mode == CacheMode.CacheOnly)
+                return user;
+
+            return await Rest.GetUserAsync(id, options).ConfigureAwait(false);
+        }
+
         /// <inheritdoc />
         Task<IUser> IDiscordClient.GetUserAsync(string username, string discriminator, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(username, discriminator));

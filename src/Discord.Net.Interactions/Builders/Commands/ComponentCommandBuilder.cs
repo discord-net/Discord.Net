@@ -5,7 +5,7 @@ namespace Discord.Interactions.Builders
     /// <summary>
     ///     Represents a builder for creating <see cref="ComponentCommandInfo"/>.
     /// </summary>
-    public sealed class ComponentCommandBuilder : CommandBuilder<ComponentCommandInfo, ComponentCommandBuilder, CommandParameterBuilder>
+    public sealed class ComponentCommandBuilder : CommandBuilder<ComponentCommandInfo, ComponentCommandBuilder, ComponentCommandParameterBuilder>
     {
         protected override ComponentCommandBuilder Instance => this;
 
@@ -26,9 +26,9 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public override ComponentCommandBuilder AddParameter (Action<CommandParameterBuilder> configure)
+        public override ComponentCommandBuilder AddParameter (Action<ComponentCommandParameterBuilder> configure)
         {
-            var parameter = new CommandParameterBuilder(this);
+            var parameter = new ComponentCommandParameterBuilder(this);
             configure(parameter);
             AddParameters(parameter);
             return this;

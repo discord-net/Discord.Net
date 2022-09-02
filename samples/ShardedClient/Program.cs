@@ -45,8 +45,11 @@ namespace ShardedClient
                 client.ShardReady += ReadyAsync;
                 client.Log += LogAsync;
 
-                await services.GetRequiredService<InteractionHandlingService>().InitializeAsync();
-                await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
+                await services.GetRequiredService<InteractionHandlingService>()
+                    .InitializeAsync();
+
+                await services.GetRequiredService<CommandHandlingService>()
+                    .InitializeAsync();
 
                 // Tokens should be considered secret data, and never hard-coded.
                 await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));

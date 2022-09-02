@@ -31,7 +31,7 @@ namespace Discord.Interactions
         /// <summary>
         ///     Gets or sets the string expression that will be treated as a wild card.
         /// </summary>
-        public string WildCardExpression { get; set; }
+        public string WildCardExpression { get; set; } = "*";
 
         /// <summary>
         ///     Gets or sets the option to use compiled lambda expressions to create module instances and execute commands. This method improves performance at the cost of memory.
@@ -64,6 +64,11 @@ namespace Discord.Interactions
         ///     Gets or sets whether a command execution should exit when a modal command encounters a missing modal component value.
         /// </summary>
         public bool ExitOnMissingModalField { get; set; } = false;
+
+        /// <summary>
+        ///     Localization provider to be used when registering application commands.
+        /// </summary>
+        public ILocalizationManager LocalizationManager { get; set; }
     }
 
     /// <summary>

@@ -55,7 +55,7 @@ namespace Discord
                 if (obj.Value == null) throw CreateNotNullException(name, msg);
                 if (obj.Value.Trim().Length == 0) throw CreateNotEmptyException(name, msg);
             }
-        }        
+        }
 
         private static ArgumentException CreateNotEmptyException(string name, string msg)
             => new ArgumentException(message: msg ?? "Argument cannot be blank.", paramName: name);
@@ -129,7 +129,7 @@ namespace Discord
 
         private static ArgumentException CreateNotEqualException<T>(string name, string msg, T value)
             => new ArgumentException(message: msg ?? $"Value may not be equal to {value}.", paramName: name);
-        
+
         /// <exception cref="ArgumentException">Value must be at least <paramref name="value"/>.</exception>
         public static void AtLeast(sbyte obj, sbyte value, string name, string msg = null) { if (obj < value) throw CreateAtLeastException(name, msg, value); }
         /// <exception cref="ArgumentException">Value must be at least <paramref name="value"/>.</exception>
@@ -165,7 +165,7 @@ namespace Discord
 
         private static ArgumentException CreateAtLeastException<T>(string name, string msg, T value)
             => new ArgumentException(message: msg ?? $"Value must be at least {value}.", paramName: name);
-        
+
         /// <exception cref="ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
         public static void GreaterThan(sbyte obj, sbyte value, string name, string msg = null) { if (obj <= value) throw CreateGreaterThanException(name, msg, value); }
         /// <exception cref="ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
@@ -201,7 +201,7 @@ namespace Discord
 
         private static ArgumentException CreateGreaterThanException<T>(string name, string msg, T value)
             => new ArgumentException(message: msg ?? $"Value must be greater than {value}.", paramName: name);
-        
+
         /// <exception cref="ArgumentException">Value must be at most <paramref name="value"/>.</exception>
         public static void AtMost(sbyte obj, sbyte value, string name, string msg = null) { if (obj > value) throw CreateAtMostException(name, msg, value); }
         /// <exception cref="ArgumentException">Value must be at most <paramref name="value"/>.</exception>
@@ -237,7 +237,7 @@ namespace Discord
 
         private static ArgumentException CreateAtMostException<T>(string name, string msg, T value)
             => new ArgumentException(message: msg ?? $"Value must be at most {value}.", paramName: name);
-        
+
         /// <exception cref="ArgumentException">Value must be less than <paramref name="value"/>.</exception>
         public static void LessThan(sbyte obj, sbyte value, string name, string msg = null) { if (obj >= value) throw CreateLessThanException(name, msg, value); }
         /// <exception cref="ArgumentException">Value must be less than <paramref name="value"/>.</exception>
@@ -296,6 +296,23 @@ namespace Discord
                     throw new ArgumentException(message: "The everyone role cannot be assigned to a user.", paramName: name);
             }
         }
+        #endregion
+
+        #region SlashCommandOptions
+
+        /// <exception cref="ArgumentNullException"><paramref name="description"/> or <paramref name="name"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="description"/> or <paramref name="name"/> are either empty or their length exceed limits.</exception>
+        public static void Options(string name, string description)
+        {
+            // Make sure the name matches the requirements from discord
+            NotNullOrEmpty(name, nameof(name));
+            NotNullOrEmpty(description, nameof(description));
+            AtLeast(name.Length, 1, nameof(name));
+            AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
+            AtLeast(description.Length, 1, nameof(description));
+            AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+        }
+
         #endregion
     }
 }

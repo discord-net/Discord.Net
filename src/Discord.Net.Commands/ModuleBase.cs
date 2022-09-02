@@ -46,12 +46,22 @@ namespace Discord.Commands
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds).ConfigureAwait(false);
         }
         /// <summary>
+        ///     The method to execute asynchronously before executing the command.
+        /// </summary>
+        /// <param name="command">The <see cref="CommandInfo"/> of the command to be executed.</param>
+        protected virtual Task BeforeExecuteAsync(CommandInfo command) => Task.CompletedTask;
+        /// <summary>
         ///     The method to execute before executing the command.
         /// </summary>
         /// <param name="command">The <see cref="CommandInfo"/> of the command to be executed.</param>
         protected virtual void BeforeExecute(CommandInfo command)
         {
         }
+        /// <summary>
+        ///     The method to execute asynchronously after executing the command.
+        /// </summary>
+        /// <param name="command">The <see cref="CommandInfo"/> of the command to be executed.</param>
+        protected virtual Task AfterExecuteAsync(CommandInfo command) => Task.CompletedTask;
         /// <summary>
         ///     The method to execute after executing the command.
         /// </summary>
@@ -76,7 +86,9 @@ namespace Discord.Commands
             var newValue = context as T;
             Context = newValue ?? throw new InvalidOperationException($"Invalid context type. Expected {typeof(T).Name}, got {context.GetType().Name}.");
         }
+        Task IModuleBase.BeforeExecuteAsync(CommandInfo command) => BeforeExecuteAsync(command);
         void IModuleBase.BeforeExecute(CommandInfo command) => BeforeExecute(command);
+        Task IModuleBase.AfterExecuteAsync(CommandInfo command) => AfterExecuteAsync(command);
         void IModuleBase.AfterExecute(CommandInfo command) => AfterExecute(command);
         void IModuleBase.OnModuleBuilding(CommandService commandService, ModuleBuilder builder) => OnModuleBuilding(commandService, builder);
         #endregion
