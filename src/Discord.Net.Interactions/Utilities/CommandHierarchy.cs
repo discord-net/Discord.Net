@@ -26,7 +26,7 @@ namespace Discord.Interactions
         public static IList<string> GetCommandPath(this ICommandInfo commandInfo)
         {
             if (commandInfo.IgnoreGroupNames)
-                return new string[] { commandInfo.Name };
+                return new List<string> { commandInfo.Name };
 
             var path = commandInfo.Module.GetModulePath();
             path.Add(commandInfo.Name);
@@ -48,6 +48,6 @@ namespace Discord.Interactions
         }
 
         public static IList<string> GetTypePath(Type type) =>
-            new string[] { EscapeChar + type.FullName };
+            new List<string> { EscapeChar + type.FullName };
     }
 }
