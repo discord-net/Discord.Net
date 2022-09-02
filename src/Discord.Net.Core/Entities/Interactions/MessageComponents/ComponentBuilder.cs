@@ -1198,6 +1198,10 @@ namespace Discord
 
     public class TextInputBuilder
     {
+        /// <summary>
+        ///     The max length of a <see cref="TextInputComponent.Placeholder"/>.
+        /// </summary>
+        public const int MaxPlaceholderLength = 100;
         public const int LargestMaxLength = 4000;
 
         /// <summary>
@@ -1229,13 +1233,13 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the placeholder of the current text input.
         /// </summary>
-        /// <exception cref="ArgumentException"><see cref="Placeholder"/> is longer than 100 characters</exception>
+        /// <exception cref="ArgumentException"><see cref="Placeholder"/> is longer than <see cref="MaxPlaceholderLength"/> characters</exception>
         public string Placeholder
         {
             get => _placeholder;
-            set => _placeholder = (value?.Length ?? 0) <= 100
+            set => _placeholder = (value?.Length ?? 0) <= MaxPlaceholderLength
                 ? value
-                : throw new ArgumentException("Placeholder cannot have more than 100 characters.");
+                : throw new ArgumentException($"Placeholder cannot have more than {MaxPlaceholderLength} characters.");
         }
 
         /// <summary>

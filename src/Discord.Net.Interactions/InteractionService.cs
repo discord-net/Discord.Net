@@ -83,6 +83,11 @@ namespace Discord.Interactions
         public event Func<ModalCommandInfo, IInteractionContext, IResult, Task> ModalCommandExecuted { add { _modalCommandExecutedEvent.Add(value); } remove { _modalCommandExecutedEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<ModalCommandInfo, IInteractionContext, IResult, Task>> _modalCommandExecutedEvent = new();
 
+        /// <summary>
+        ///     Get the <see cref="ILocalizationManager"/> used by this Interaction Service instance to localize strings.
+        /// </summary>
+        public ILocalizationManager LocalizationManager { get; set; }
+
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
         private readonly CommandMap<SlashCommandInfo> _slashCommandMap;
         private readonly ConcurrentDictionary<ApplicationCommandType, CommandMap<ContextCommandInfo>> _contextCommandMaps;
@@ -203,6 +208,7 @@ namespace Discord.Interactions
             _enableAutocompleteHandlers = config.EnableAutocompleteHandlers;
             _autoServiceScopes = config.AutoServiceScopes;
             _restResponseCallback = config.RestResponseCallback;
+            LocalizationManager = config.LocalizationManager;
 
             _typeConverterMap = new TypeMap<TypeConverter, IApplicationCommandInteractionDataOption>(this, new ConcurrentDictionary<Type, TypeConverter>
                 {
