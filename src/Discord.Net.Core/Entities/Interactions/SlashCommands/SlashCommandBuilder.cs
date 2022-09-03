@@ -207,10 +207,9 @@ namespace Discord
         {
             Preconditions.Options(name, description);
 
-            // Discord updated the docs, this regex prevents special characters like @!$%( and s p a c e s.. etc,
-            // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
-            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(name));
+            // https://discord.com/developers/docs/interactions/application-commands
+            if (!Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
+                throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
 
             // make sure theres only one option with default set to true
             if (isDefault == true && Options?.Any(x => x.IsDefault == true) == true)
@@ -376,12 +375,11 @@ namespace Discord
             Preconditions.AtLeast(name.Length, 1, nameof(name));
             Preconditions.AtMost(name.Length, MaxNameLength, nameof(name));
 
-            // Discord updated the docs, this regex prevents special characters like @!$%(... etc,
-            // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
-            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(name));
+            // https://discord.com/developers/docs/interactions/application-commands
+            if (!Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
+                throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
 
-            if (name.Any(x => char.IsUpper(x)))
+            if (name.Any(char.IsUpper))
                 throw new FormatException("Name cannot contain any uppercase characters.");
         }
 
@@ -587,10 +585,9 @@ namespace Discord
         {
             Preconditions.Options(name, description);
 
-            // Discord updated the docs, this regex prevents special characters like @!$%( and s p a c e s.. etc,
-            // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
-            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(name));
+            // https://discord.com/developers/docs/interactions/application-commands
+            if (!Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
+                throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
 
             // make sure theres only one option with default set to true
             if (isDefault && Options?.Any(x => x.IsDefault == true) == true)
@@ -966,8 +963,10 @@ namespace Discord
         {
             Preconditions.AtLeast(name.Length, 1, nameof(name));
             Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
-            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(name));
+
+            // https://discord.com/developers/docs/interactions/application-commands
+            if (!Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
+                throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
         }
 
         private static void EnsureValidCommandOptionDescription(string description)
