@@ -216,8 +216,8 @@ namespace Discord.API
                 {
                     if (!_isExplicitUrl)
                     {
-                        // TODO: 'GetGatewayAsync' -> 'GetBotGatewayAsync', but it could just be hardcoded to 'wss://gateway.discord.gg/'
-                        var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
+                        // TODO: pass this down from DiscordShardedClient, so that it's not requested separately for every single shard
+                        var gatewayResponse = await GetBotGatewayAsync().ConfigureAwait(false);
                         gatewayUrl = _gatewayUrl = FormatGatewayUrl(gatewayResponse.Url);
                     }
                     else
@@ -240,12 +240,6 @@ namespace Discord.API
             }
             catch
             {
-                if (!_isExplicitUrl)
-                {
-                    // TODO: '_gatewayUrl = null' doesn't do anything, it's never null checked
-                    _gatewayUrl = null; //Uncache in case the gateway url changed
-                }
-
                 await DisconnectInternalAsync().ConfigureAwait(false);
                 throw;
             }
