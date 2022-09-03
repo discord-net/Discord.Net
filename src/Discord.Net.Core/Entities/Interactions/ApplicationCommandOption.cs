@@ -106,13 +106,17 @@ namespace Discord
             get => _nameLocalizations;
             set
             {
-                foreach (var (locale, name) in value)
+                if (value != null)
                 {
-                    if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
-                        throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+                    foreach (var (locale, name) in value)
+                    {
+                        if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                            throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-                    EnsureValidOptionName(name);
+                        EnsureValidOptionName(name);
+                    }
                 }
+
                 _nameLocalizations = value;
             }
         }
@@ -126,13 +130,17 @@ namespace Discord
             get => _descriptionLocalizations;
             set
             {
-                foreach (var (locale, description) in value)
+                if (value != null)
                 {
-                    if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
-                        throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+                    foreach (var (locale, description) in value)
+                    {
+                        if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                            throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-                    EnsureValidOptionDescription(description);
+                        EnsureValidOptionDescription(description);
+                    }
                 }
+
                 _descriptionLocalizations = value;
             }
         }

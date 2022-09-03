@@ -55,18 +55,21 @@ namespace Discord
             get => _nameLocalizations;
             set
             {
-                foreach (var (locale, name) in value)
+                if (value != null)
                 {
-                    if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
-                        throw new ArgumentException("Key values of the dictionary must be valid language codes.");
-
-                    switch (name.Length)
+                    foreach (var (locale, name) in value)
                     {
-                        case > 100:
-                            throw new ArgumentOutOfRangeException(nameof(value),
-                                "Name length must be less than or equal to 100.");
-                        case 0:
-                            throw new ArgumentOutOfRangeException(nameof(value), "Name length must at least 1.");
+                        if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                            throw new ArgumentException("Key values of the dictionary must be valid language codes.");
+
+                        switch (name.Length)
+                        {
+                            case > 100:
+                                throw new ArgumentOutOfRangeException(nameof(value),
+                                    "Name length must be less than or equal to 100.");
+                            case 0:
+                                throw new ArgumentOutOfRangeException(nameof(value), "Name length must at least 1.");
+                        }
                     }
                 }
 
