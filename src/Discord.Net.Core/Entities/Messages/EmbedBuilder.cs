@@ -150,7 +150,7 @@ namespace Discord
                 int authorLength = Author?.Name?.Length ?? 0;
                 int descriptionLength = Description?.Length ?? 0;
                 int footerLength = Footer?.Text?.Length ?? 0;
-                int fieldSum = Fields.Sum(f => f.Name.Length + f.Value.ToString().Length);
+                int fieldSum = Fields.Sum(f => f.Name.Length + (f.Value?.ToString()?.Length ?? 0));
 
                 return titleLength + authorLength + descriptionLength + footerLength + fieldSum;
             }
