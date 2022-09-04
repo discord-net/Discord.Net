@@ -42,8 +42,9 @@ namespace Discord
 
                     Preconditions.AtLeast(name.Length, 1, nameof(name));
                     Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
-                    if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                        throw new ArgumentException("Option name cannot contain any special characters or whitespaces!", nameof(name));
+
+                    if (Type == ApplicationCommandType.Slash && !Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
+                        throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
                 }
                 _nameLocalizations = value;
             }
