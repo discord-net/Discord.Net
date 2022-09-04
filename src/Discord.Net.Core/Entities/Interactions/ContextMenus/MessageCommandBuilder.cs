@@ -67,7 +67,8 @@ namespace Discord
                 Name = Name,
                 IsDefaultPermission = IsDefaultPermission,
                 IsDMEnabled = IsDMEnabled,
-                DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified
+                DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified,
+                NameLocalizations = NameLocalizations
             };
 
             return props;
@@ -157,14 +158,6 @@ namespace Discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
             Preconditions.AtLeast(name.Length, 1, nameof(name));
             Preconditions.AtMost(name.Length, MaxNameLength, nameof(name));
-
-            // Discord updated the docs, this regex prevents special characters like @!$%(... etc,
-            // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
-            if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(name));
-
-            if (name.Any(x => char.IsUpper(x)))
-                throw new FormatException("Name cannot contain any uppercase characters.");
         }
 
         /// <summary>
