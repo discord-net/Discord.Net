@@ -154,6 +154,7 @@ namespace Discord
         #endregion
 
         #region 2FA (60XXX)
+        FailedToResizeAssetBelowTheMaximumSize:262144 = 50138,
         Requires2FA = 60003,
         #endregion
 
