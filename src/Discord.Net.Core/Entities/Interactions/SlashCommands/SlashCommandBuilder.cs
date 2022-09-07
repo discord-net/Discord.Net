@@ -563,7 +563,7 @@ namespace Discord
             if (_descriptionLocalizations is not null)
                 props.DescriptionLocalizations = _descriptionLocalizations;
             
-            return props
+            return props;
         }
 
         /// <summary>
