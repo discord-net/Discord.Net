@@ -107,11 +107,13 @@ namespace Discord
                 Name = Name,
                 Description = Description,
                 IsDefaultPermission = IsDefaultPermission,
-                NameLocalizations = _nameLocalizations,
-                DescriptionLocalizations = _descriptionLocalizations,
                 IsDMEnabled = IsDMEnabled,
                 DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified
             };
+            if (_nameLocalizations is not null)
+                props.NameLocalizations = _nameLocalizations;
+            if (_descriptionLocalizations is not null)
+                props.DescriptionLocalizations = _descriptionLocalizations;
 
             if (Options != null && Options.Any())
             {
@@ -538,7 +540,7 @@ namespace Discord
             if (isStrType && MaxLength is not null && MaxLength < 1)
                 throw new InvalidOperationException("MaxLength cannot be smaller than 1.");
 
-            return new ApplicationCommandOptionProperties
+            var props = new ApplicationCommandOptionProperties
             {
                 Name = Name,
                 Description = Description,
@@ -553,11 +555,15 @@ namespace Discord
                 ChannelTypes = ChannelTypes,
                 MinValue = MinValue,
                 MaxValue = MaxValue,
-                NameLocalizations = _nameLocalizations,
-                DescriptionLocalizations = _descriptionLocalizations,
                 MinLength = MinLength,
                 MaxLength = MaxLength,
             };
+            if (_nameLocalizations is not null)
+                props.NameLocalizations = _nameLocalizations;
+            if (_descriptionLocalizations is not null)
+                props.DescriptionLocalizations = _descriptionLocalizations,
+            
+            return props
         }
 
         /// <summary>
@@ -907,7 +913,7 @@ namespace Discord
             if (descriptionLocalizations is null)
                 throw new ArgumentNullException(nameof(descriptionLocalizations));
 
-            foreach (var (locale, description) in _descriptionLocalizations)
+            foreach (var (locale, description) in descriptionLocalizations)
             {
                 if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                     throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
@@ -933,7 +939,7 @@ namespace Discord
 
             EnsureValidCommandOptionName(name);
 
-            _descriptionLocalizations ??= new();
+            _nameLocalizations ??= new();
             _nameLocalizations.Add(locale, name);
 
             return this;
