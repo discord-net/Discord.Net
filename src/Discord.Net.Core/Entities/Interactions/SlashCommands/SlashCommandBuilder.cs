@@ -741,13 +741,16 @@ namespace Discord
                 Preconditions.AtLeast(str.Length, 1, nameof(value));
                 Preconditions.AtMost(str.Length, 100, nameof(value));
             }
-
-            Choices.Add(new ApplicationCommandOptionChoiceProperties
+            
+            var props = new ApplicationCommandOptionChoiceProperties
             {
                 Name = name,
-                Value = value,
-                NameLocalizations = nameLocalizations
-            });
+                Value = value
+            };
+            if (nameLocalizations is not null)
+                props.NameLocalizations = nameLocalizations
+            
+            Choices.Add(props);
 
             return this;
         }
