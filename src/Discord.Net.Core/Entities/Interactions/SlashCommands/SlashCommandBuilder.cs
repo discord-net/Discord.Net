@@ -748,7 +748,7 @@ namespace Discord
                 Value = value
             };
             if (nameLocalizations is not null)
-                props.NameLocalizations = nameLocalizations
+                props.NameLocalizations = nameLocalizations;
             
             Choices.Add(props);
 
