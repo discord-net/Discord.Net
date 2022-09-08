@@ -8,7 +8,7 @@ title: Introduction to the Chat Command Service
 [Discord.Commands](xref:Discord.Commands) provides an attribute-based
 command parser.
 
-> [!WARNING]
+> [!IMPORTANT]
 > The 'Message Content' intent, required for text commands, is now a 
 > privilleged intent. Please use [Slash commands](xref:Guides.SlashCommands.Intro) 
 > instead for making commands. For more information about this change
