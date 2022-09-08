@@ -9,8 +9,10 @@ title: Introduction to the Chat Command Service
 command parser.
 
 > [!WARNING]
-> The 'Message Content' intent, required for text commands, is now a privilleged intent. Please use [Slash commands](xref:Guides.SlashCommands.Intro) instead for making commands.
-> For more information about this change please check [this announcement made by discord](https://support-dev.discord.com/hc/en-us/articles/4404772028055-Message-Content-Privileged-Intent-FAQ)
+> The 'Message Content' intent, required for text commands, is now a 
+> privilleged intent. Please use [Slash commands](xref:Guides.SlashCommands.Intro) 
+> instead for making commands. For more information about this change
+> please check [this announcement made by discord](https://support-dev.discord.com/hc/en-us/articles/4404772028055-Message-Content-Privileged-Intent-FAQ)
 
 
 ## Get Started
