@@ -39,6 +39,24 @@ namespace Discord.API
         public ConnectionState ConnectionState { get; private set; }
 
         /// <summary>
+        ///     Sets the gateway URL used for identifies.
+        /// </summary>
+        /// <remarks>
+        ///     If a custom URL is set, setting this property does nothing.
+        /// </remarks>
+        public string GatewayUrl
+        {
+            set
+            {
+                // Makes the sharded client not override the custom value.
+                if (_isExplicitUrl)
+                    return;
+
+                _gatewayUrl = FormatGatewayUrl(value);
+            }
+        }
+
+        /// <summary>
         ///     Sets the gateway URL used for resumes.
         /// </summary>
         public string ResumeGatewayUrl
@@ -214,16 +232,13 @@ namespace Discord.API
                 string gatewayUrl;
                 if (_resumeGatewayUrl == null)
                 {
-                    if (!_isExplicitUrl)
+                    if (!_isExplicitUrl && _gatewayUrl == null)
                     {
-                        // TODO: pass this down from DiscordShardedClient, so that it's not requested separately for every single shard
                         var gatewayResponse = await GetBotGatewayAsync().ConfigureAwait(false);
-                        gatewayUrl = _gatewayUrl = FormatGatewayUrl(gatewayResponse.Url);
+                        _gatewayUrl = FormatGatewayUrl(gatewayResponse.Url);
                     }
-                    else
-                    {
-                        gatewayUrl = _gatewayUrl;
-                    }
+
+                    gatewayUrl = _gatewayUrl;
                 }
                 else
                 {
