@@ -35,17 +35,21 @@ namespace Discord
             get => _nameLocalizations;
             set
             {
-                foreach (var (locale, name) in value)
+                if (value != null)
                 {
-                    if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
-                        throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+                    foreach (var (locale, name) in value)
+                    {
+                        if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                            throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-                    Preconditions.AtLeast(name.Length, 1, nameof(name));
-                    Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
+                        Preconditions.AtLeast(name.Length, 1, nameof(name));
+                        Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
 
-                    if (Type == ApplicationCommandType.Slash && !Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
-                        throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
+                        if (Type == ApplicationCommandType.Slash && !Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
+                            throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
+                    }
                 }
+
                 _nameLocalizations = value;
             }
         }
@@ -58,14 +62,18 @@ namespace Discord
             get => _descriptionLocalizations;
             set
             {
-                foreach (var (locale, description) in value)
+                if (value != null)
                 {
-                    if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
-                        throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
+                    foreach (var (locale, description) in value)
+                    {
+                        if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                            throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
-                    Preconditions.AtLeast(description.Length, 1, nameof(description));
-                    Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+                        Preconditions.AtLeast(description.Length, 1, nameof(description));
+                        Preconditions.AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
+                    }
                 }
+
                 _descriptionLocalizations = value;
             }
         }

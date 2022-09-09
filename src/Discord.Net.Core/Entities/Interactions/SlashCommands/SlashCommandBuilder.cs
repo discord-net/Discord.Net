@@ -907,7 +907,7 @@ namespace Discord
             if (descriptionLocalizations is null)
                 throw new ArgumentNullException(nameof(descriptionLocalizations));
 
-            foreach (var (locale, description) in _descriptionLocalizations)
+            foreach (var (locale, description) in descriptionLocalizations)
             {
                 if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                     throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
