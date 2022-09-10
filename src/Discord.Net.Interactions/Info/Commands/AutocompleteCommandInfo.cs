@@ -41,14 +41,7 @@ namespace Discord.Interactions
             if (context.Interaction is not IAutocompleteInteraction)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Autocomplete Interaction");
 
-            try
-            {
-                return await RunAsync(context, Array.Empty<object>(), services).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return ExecuteResult.FromError(ex);
-            }
+            return await RunAsync(context, Array.Empty<object>(), services).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

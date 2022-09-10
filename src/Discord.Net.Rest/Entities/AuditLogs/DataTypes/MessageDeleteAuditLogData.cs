@@ -2,6 +2,7 @@ using System.Linq;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
+using System;
 
 namespace Discord.Rest
 {
@@ -20,7 +21,7 @@ namespace Discord.Rest
         internal static MessageDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
             var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-            return new MessageDeleteAuditLogData(entry.Options.ChannelId.Value, entry.Options.Count.Value, RestUser.Create(discord, userInfo));
+            return new MessageDeleteAuditLogData(entry.Options.ChannelId.Value, entry.Options.Count.Value, userInfo != null ? RestUser.Create(discord, userInfo) : null);
         }
 
         /// <summary>
@@ -41,6 +42,9 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the user of the messages that were deleted.
         /// </summary>
+        /// <remarks>
+        ///     Will be <see langword="null"/> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
+        /// </remarks>
         /// <returns>
         ///     A user object representing the user that created the deleted messages.
         /// </returns>

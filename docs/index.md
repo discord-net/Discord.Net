@@ -67,7 +67,7 @@ Being interactions, they are handled as SocketInteractions. Creating and receivi
 - Find out more about slash commands in the
   [Slash Command Guides](xref:Guides.SlashCommands.Intro)
 
-#### Context Message & User Ccommands
+#### Context Message & User Commands
 
 These commands can be pointed at messages and users, in custom application tabs.
 Being interactions as well, they are able to be handled just like slash commands. They do not have options however.

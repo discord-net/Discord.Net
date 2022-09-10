@@ -30,17 +30,25 @@ other limitations, you may also consider targeting [.NET Framework]
 [.net framework]: https://docs.microsoft.com/en-us/dotnet/framework/get-started/
 [additional steps]: #installing-on-net-standard-11
 
-## Installing with NuGet
+## Installing
 
 Release builds of Discord.Net will be published to the
 [official NuGet feed].
 
-Development builds of Discord.Net, as well as add-ons, will be
-published to our [MyGet feed]. See
-@Guides.GettingStarted.Installation.Nightlies to learn more.
+### Experimental/Development
 
-[official nuget feed]: https://nuget.org
-[myget feed]: https://www.myget.org/feed/Packages/discord-net
+Development builds of Discord.Net will be
+published to our [MyGet feed]. The MyGet feed can be used to run the latest dev branch builds.
+It is not advised to use MyGet packages in a production environment, as changes may be made that negatively affect certain library functions.
+
+### Labs
+
+This exterior branch of Discord.Net has been deprecated and is no longer supported.
+If you have used Discord.Net-Labs in the past, you are advised to update to the latest version of Discord.Net.
+All features in Labs are implemented in the main repository.
+
+[official NuGet feed]: https://nuget.org
+[MyGet feed]: https://www.myget.org/feed/Packages/discord-net
 
 ### [Using Visual Studio](#tab/vs-install)
 

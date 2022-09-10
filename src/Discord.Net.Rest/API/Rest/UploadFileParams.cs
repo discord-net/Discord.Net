@@ -37,7 +37,7 @@ namespace Discord.API.Rest
             if (Content.IsSpecified)
                 payload["content"] = Content.Value;
             if (IsTTS.IsSpecified)
-                payload["tts"] = IsTTS.Value.ToString();
+                payload["tts"] = IsTTS.Value;
             if (Nonce.IsSpecified)
                 payload["nonce"] = Nonce.Value;
             if (Embeds.IsSpecified)
@@ -51,7 +51,7 @@ namespace Discord.API.Rest
             if (Stickers.IsSpecified)
                 payload["sticker_ids"] = Stickers.Value;
             if (Flags.IsSpecified)
-                payload["flags"] = Flags;
+                payload["flags"] = Flags.Value;
 
             List<object> attachments = new();
 

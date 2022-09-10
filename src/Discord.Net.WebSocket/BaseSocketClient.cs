@@ -209,7 +209,7 @@ namespace Discord.WebSocket
         ///     Sets the <paramref name="activity"/> of the logged-in user.
         /// </summary>
         /// <remarks>
-        ///     This method sets the <paramref name="activity"/> of the user. 
+        ///     This method sets the <paramref name="activity"/> of the user.
         ///     <note type="note">
         ///         Discord will only accept setting of name and the type of activity.
         ///     </note>
@@ -219,7 +219,7 @@ namespace Discord.WebSocket
         ///     </note>
         ///     <note type="warning">
         ///         Rich Presence cannot be set via this method or client. Rich Presence is strictly limited to RPC
-        ///         clients only. 
+        ///         clients only.
         ///     </note>
         /// </remarks>
         /// <param name="activity">The activity to be set.</param>
@@ -240,7 +240,7 @@ namespace Discord.WebSocket
         ///     Creates a guild for the logged-in user who is in less than 10 active guilds.
         /// </summary>
         /// <remarks>
-        ///     This method creates a new guild on behalf of the logged-in user. 
+        ///     This method creates a new guild on behalf of the logged-in user.
         ///     <note type="warning">
         ///         Due to Discord's limitation, this method will only work for users that are in less than 10 guilds.
         ///     </note>
@@ -317,8 +317,15 @@ namespace Discord.WebSocket
             => await CreateGuildAsync(name, region, jpegIcon, options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => Task.FromResult<IUser>(GetUser(id));
+        async Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            var user = GetUser(id);
+            if (user is not null || mode == CacheMode.CacheOnly)
+                return user;
+
+            return await Rest.GetUserAsync(id, options).ConfigureAwait(false);
+        }
+
         /// <inheritdoc />
         Task<IUser> IDiscordClient.GetUserAsync(string username, string discriminator, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(username, discriminator));

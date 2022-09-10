@@ -27,7 +27,7 @@ namespace Discord.Rest
                 .ToList();
 
             var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-            var user = RestUser.Create(discord, userInfo);
+            RestUser user = (userInfo != null) ? RestUser.Create(discord, userInfo) : null;
 
             return new MemberRoleAuditLogData(roleInfos.ToReadOnlyCollection(), user);
         }

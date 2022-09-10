@@ -10,6 +10,7 @@ namespace Discord
     /// </summary>
     public class ColorTests
     {
+        [Fact]
         public void Color_New()
         {
             Assert.Equal(0u, new Color().RawValue);

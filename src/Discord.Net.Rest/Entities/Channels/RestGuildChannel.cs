@@ -39,6 +39,7 @@ namespace Discord.Rest
                 ChannelType.Text => RestTextChannel.Create(discord, guild, model),
                 ChannelType.Voice => RestVoiceChannel.Create(discord, guild, model),
                 ChannelType.Stage => RestStageChannel.Create(discord, guild, model),
+                ChannelType.Forum => RestForumChannel.Create(discord, guild, model),
                 ChannelType.Category => RestCategoryChannel.Create(discord, guild, model),
                 ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.NewsThread => RestThreadChannel.Create(discord, guild, model),
                 _ => new RestGuildChannel(discord, guild, model.Id),
@@ -227,7 +228,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>(); //Overridden //Overridden in Text/Voice
+            => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>(); //Overridden in Text/Voice
         /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(null); //Overridden in Text/Voice

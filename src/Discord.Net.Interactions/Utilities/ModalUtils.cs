@@ -7,20 +7,20 @@ namespace Discord.Interactions
 {
     internal static class ModalUtils
     {
-        private static ConcurrentDictionary<Type, ModalInfo> _modalInfos = new();
+        private static readonly ConcurrentDictionary<Type, ModalInfo> _modalInfos = new();
 
         public static IReadOnlyCollection<ModalInfo> Modals => _modalInfos.Values.ToReadOnlyCollection();
 
-        public static ModalInfo GetOrAdd(Type type)
+        public static ModalInfo GetOrAdd(Type type, InteractionService interactionService)
         {
             if (!typeof(IModal).IsAssignableFrom(type))
                 throw new ArgumentException($"Must be an implementation of {nameof(IModal)}", nameof(type));
 
-            return _modalInfos.GetOrAdd(type, ModuleClassBuilder.BuildModalInfo(type));
+            return _modalInfos.GetOrAdd(type, ModuleClassBuilder.BuildModalInfo(type, interactionService));
         }
 
-        public static ModalInfo GetOrAdd<T>() where T : class, IModal
-            => GetOrAdd(typeof(T));
+        public static ModalInfo GetOrAdd<T>(InteractionService interactionService) where T : class, IModal
+            => GetOrAdd(typeof(T), interactionService);
 
         public static bool TryGet(Type type, out ModalInfo modalInfo)
         {

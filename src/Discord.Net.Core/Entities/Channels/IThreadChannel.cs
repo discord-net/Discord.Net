@@ -49,6 +49,23 @@ namespace Discord
         int MessageCount { get; }
 
         /// <summary>
+        ///     Gets whether non-moderators can add other non-moderators to a thread.
+        /// </summary>
+        /// <remarks>
+        ///     This property is only available on private threads.
+        /// </remarks>
+        bool? IsInvitable { get; }
+
+        /// <summary>
+        ///     Gets when the thread was created.
+        /// </summary>
+        /// <remarks>
+        ///     This property is only populated for threads created after 2022-01-09, hence the default date of this
+        ///     property will be that date.
+        /// </remarks>
+        new DateTimeOffset CreatedAt { get; }
+
+        /// <summary>
         ///     Joins the current thread.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>

@@ -86,6 +86,7 @@ By default, your methods can feature the following parameter types:
 - Implementations of [IChannel]
 - Implementations of [IRole]
 - Implementations of [IMentionable]
+- Implementations of [IAttachment]
 - `string`
 - `float`, `double`, `decimal`
 - `bool`
@@ -142,6 +143,29 @@ In this case, user can only input Stage Channels and Text Channels to this param
 #### Min/Max Value
 
 You can specify the permitted max/min value for a number type parameter using the [MaxValueAttribute] and [MinValueAttribute].
+
+#### Complex Parameters
+
+This allows users to create slash command options using an object's constructor allowing complex objects to be created which cannot be infered from only one input value.
+Constructor methods support every attribute type that can be used with the regular slash commands ([Autocomplete], [Summary] etc. ).
+Preferred constructor of a Type can be specified either by passing a `Type[]` to the `[ComplexParameterAttribute]` or tagging a type constructor with the `[ComplexParameterCtorAttribute]`. If nothing is specified, the InteractionService defaults to the only public constructor of the type.
+TypeConverter pattern is used to parse the constructor methods objects.
+
+[!code-csharp[Complex Parameter](samples/intro/complexparams.cs)]
+
+Interaction service complex parameter constructors are prioritized in the following order:
+
+1. Constructor matching the signature provided in the `[ComplexParameter(Type[])]` overload.
+2. Constuctor tagged with `[ComplexParameterCtor]`.
+3. Type's only public constuctor.
+
+#### DM Permissions
+
+You can use the [EnabledInDmAttribute] to configure whether a globally-scoped top level command should be enabled in Dms or not. Only works on top level commands.
+
+#### Default Member Permissions
+
+[DefaultMemberPermissionsAttribute] can be used when creating a command to set the permissions a user must have to use the command. Permission overwrites can be configured from the Integrations page of Guild Settings. [DefaultMemberPermissionsAttribute] cumulatively propagates down the class hierarchy until it reaches a top level command. This attribute can be only used on top level commands and will not work on commands that are nested in command groups.
 
 ## User Commands
 
@@ -255,8 +279,8 @@ Meaning, the constructor parameters and public settable properties of a module w
 For more information on dependency injection, read the [DependencyInjection] guides.
 
 > [!NOTE]
-> On every command execution, module dependencies are resolved using a new service scope which allows you to utilize scoped service instances, just like in Asp.Net.
-> Including the precondition checks, every module method is executed using the same service scope and service scopes are disposed right after the `AfterExecute` method returns.
+> On every command execution, if the 'AutoServiceScopes' option is enabled in the config , module dependencies are resolved using a new service scope which allows you to utilize scoped service instances, just like in Asp.Net.
+> Including the precondition checks, every module method is executed using the same service scope and service scopes are disposed right after the `AfterExecute` method returns. This doesn't apply to methods other than `ExecuteAsync()`.
 
 ## Module Groups
 
@@ -266,6 +290,13 @@ By nesting commands inside a module that is tagged with [GroupAttribute] you can
 > [!WARNING]
 > Although creating nested module stuctures are allowed,
 > you are not permitted to use more than 2 [GroupAttribute]'s in module hierarchy.
+
+> [!NOTE]
+> To not use the command group's name as a prefix for component or modal interaction's custom id set `ignoreGroupNames` parameter to `true` in classes with [GroupAttribute]
+>
+> However, you have to be careful to prevent overlapping ids of buttons and modals.
+
+[!code-csharp[Command Group Example](samples/intro/groupmodule.cs)]
 
 ## Executing Commands
 
@@ -277,8 +308,19 @@ Any of the following socket events can be used to execute commands:
 - [AutocompleteExecuted]
 - [UserCommandExecuted]
 - [MessageCommandExecuted]
+- [ModalExecuted]
 
-Commands can be either executed on the gateway thread or on a seperate thread from the thread pool. This behaviour can be configured by changing the *RunMode* property of `InteractionServiceConfig` or by setting the *runMode* parameter of a command attribute.
+These events will trigger for the specific type of interaction they inherit their name from. The [InteractionCreated] event will trigger for all.
+An example of executing a command from an event can be seen here:
+
+[!code-csharp[Command Event Example](samples/intro/event.cs)]
+
+Commands can be either executed on the gateway thread or on a seperate thread from the thread pool.
+This behaviour can be configured by changing the `RunMode` property of `InteractionServiceConfig` or by setting the *runMode* parameter of a command attribute.
+
+> [!WARNING]
+> In the example above, no form of post-execution is presented.
+> Please carefully read the [Post Execution Documentation] for the best approach in resolving the result based on your `RunMode`.
 
 You can also configure the way [InteractionService] executes the commands.
 By default, commands are executed using `ConstructorInfo.Invoke()` to create module instances and
@@ -305,9 +347,12 @@ Methods like `AddModulesToGuildAsync()`, `AddCommandsToGuildAsync()`, `AddModule
 can be used to register cherry picked modules or commands to global/guild scopes.
 
 > [!NOTE]
+> [DontAutoRegisterAttribute] can be used on module classes to prevent `RegisterCommandsGloballyAsync()` and `RegisterCommandsToGuildAsync()` from registering them to the Discord.
+
+> [!NOTE]
 > In debug environment, since Global commands can take up to 1 hour to register/update,
 > it is adviced to register your commands to a test guild for your changes to take effect immediately.
-> You can use preprocessor directives to create a simple logic for registering commands as seen above
+> You can use preprocessor directives to create a simple logic for registering commands as seen above.
 
 ## Interaction Utility
 
@@ -331,10 +376,52 @@ respond to the Interactions within your command modules you need to perform the 
 delegate can be used to create HTTP responses from a deserialized json object string.
 - Use the interaction endpoints of the module base instead of the interaction object (ie. `RespondAsync()`, `FollowupAsync()`...).
 
+## Localization
+
+Discord Slash Commands support name/description localization. Localization is available for names and descriptions of Slash Command Groups ([GroupAttribute]), Slash Commands ([SlashCommandAttribute]), Slash Command parameters and Slash Command Parameter Choices. Interaction Service can be initialized with an `ILocalizationManager` instance in its config which is used to create the necessary localization dictionaries on command registration. Interaction Service has two built-in `ILocalizationManager` implementations: `ResxLocalizationManager` and `JsonLocalizationManager`.
+
+### ResXLocalizationManager
+
+`ResxLocalizationManager` uses `.` delimited key names to traverse the resource files and get the localized strings (`group1.group2.command.parameter.name`). A `ResxLocalizationManager` instance must be initialized with a base resource name, a target assembly and a collection of `CultureInfo`s. Every key path must end with either `.name` or `.description`, including parameter choice strings. [Discord.Tools.LocalizationTemplate.Resx](https://www.nuget.org/packages/Discord.Tools.LocalizationTemplate.Resx) dotnet tool can be used to create localization file templates.
+
+### JsonLocalizationManager
+
+`JsonLocaliationManager` uses a nested data structure similar to Discord's Application Commands schema. You can get the Json schema [here](https://gist.github.com/Cenngo/d46a881de24823302f66c3c7e2f7b254). `JsonLocalizationManager` accepts a base path and a base file name and automatically discovers every resource file ( \basePath\fileName.locale.json ). A Json resource file should have a structure similar to:
+
+```json
+{
+    "command_1":{
+        "name": "localized_name",
+        "description": "localized_description",
+        "parameter_1":{
+            "name": "localized_name",
+            "description": "localized_description"
+        }
+    },
+    "group_1":{
+        "name": "localized_name",
+        "description": "localized_description",
+        "command_1":{
+            "name": "localized_name",
+             "description": "localized_description",
+             "parameter_1":{
+                 "name": "localized_name",
+                  "description": "localized_description"
+            },
+            "parameter_2":{
+                 "name": "localized_name",
+                  "description": "localized_description"
+            }
+        }
+    }
+}
+```
+
 [AutocompleteHandlers]: xref:Guides.IntFw.AutoCompletion
-[DependencyInjection]: xref:Guides.TextCommands.DI
+[DependencyInjection]: xref:Guides.DI.Intro
 
 [GroupAttribute]: xref:Discord.Interactions.GroupAttribute
+[DontAutoRegisterAttribute]: xref:Discord.Interactions.DontAutoRegisterAttribute
 [InteractionService]: xref:Discord.Interactions.InteractionService
 [InteractionServiceConfig]: xref:Discord.Interactions.InteractionServiceConfig
 [InteractionModuleBase]: xref:Discord.Interactions.InteractionModuleBase
@@ -345,6 +432,7 @@ delegate can be used to create HTTP responses from a deserialized json object st
 [AutocompleteExecuted]: xref:Discord.WebSocket.BaseSocketClient
 [UserCommandExecuted]: xref:Discord.WebSocket.BaseSocketClient
 [MessageCommandExecuted]: xref:Discord.WebSocket.BaseSocketClient
+[ModalExecuted]: xref:Discord.WebSocket.BaseSocketClient
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 [DiscordRestClient]: xref:Discord.Rest.DiscordRestClient
 [SocketInteractionContext]: xref:Discord.Interactions.SocketInteractionContext

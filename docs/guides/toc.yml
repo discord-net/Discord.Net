@@ -6,9 +6,6 @@
   items:
     - name: Installation
       topicUid: Guides.GettingStarted.Installation
-      items:
-        - name: Nightly builds
-          topicUid: Guides.GettingStarted.Installation.Labs
     - name: Your First Bot
       topicUid: Guides.GettingStarted.FirstBot
     - name: Terminology
@@ -29,6 +26,18 @@
       topicUid: Guides.Entities.Casting
     - name: Glossary & Flowcharts
       topicUid: Guides.Entities.Glossary
+- name: Dependency Injection
+  items:
+    - name: Introduction
+      topicUid: Guides.DI.Intro
+    - name: Injection
+      topicUid: Guides.DI.Injection
+    - name: Command- & Interaction Services
+      topicUid: Guides.DI.Services
+    - name: Service Types
+      topicUid: Guides.DI.Dependencies
+    - name: Scaling your Application
+      topicUid: Guides.DI.Scaling
 - name: Working with Text-based Commands
   items:
     - name: Introduction
@@ -39,8 +48,6 @@
       topicUid: Guides.TextCommands.NamedArguments
     - name: Preconditions
       topicUid: Guides.TextCommands.Preconditions
-    - name: Dependency Injection
-      topicUid: Guides.TextCommands.DI
     - name: Post-execution Handling
       topicUid: Guides.TextCommands.PostExecution
 - name: Working with the Interaction Framework
@@ -53,10 +60,10 @@
       topicUid: Guides.IntFw.TypeConverters
     - name: Preconditions
       topicUid: Guides.IntFw.Preconditions
-    - name: Dependency Injection
-      topicUid: Guides.IntFw.DI
     - name: Post-execution Handling
       topicUid: Guides.IntFw.PostExecution
+    - name: Permissions
+      topicUid: Guides.IntFw.Perms
 - name: Slash Command Basics
   items:
     - name: Introduction
@@ -115,6 +122,8 @@
       topicUid: Guides.OtherLibs.Serilog
     - name: EFCore
       topicUid: Guides.OtherLibs.EFCore
+    - name: MediatR
+      topicUid: Guides.OtherLibs.MediatR
 - name: Emoji
   topicUid: Guides.Emoji
 - name: Voice

@@ -17,11 +17,9 @@ bot. (When developing on .NET Framework, this would be `bin/debug`,
 when developing on .NET Core, this is where you execute `dotnet run`
 from; typically the same directory as your csproj).
 
-For Windows Users, precompiled binaries are available for your
-convienence [here](https://github.com/discord-net/Discord.Net/tree/dev/voice-natives).
+**For Windows users, precompiled binaries are available for your convienence [here](https://github.com/discord-net/Discord.Net/tree/dev/voice-natives).**
 
-For Linux Users, you will need to compile [Sodium] and [Opus] from
-source, or install them from your package manager.
+**For Linux users, you will need to compile [Sodium] and [Opus] from source, or install them from your package manager.**
 
 [Sodium]: https://download.libsodium.org/libsodium/releases/
 [Opus]: http://downloads.xiph.org/releases/opus/

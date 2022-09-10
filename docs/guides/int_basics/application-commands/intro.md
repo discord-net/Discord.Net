@@ -18,9 +18,6 @@ The name and description help users find your command among many others, and the
 Message and User commands are only a name, to the user. So try to make the name descriptive.
 They're accessed by right clicking (or long press, on mobile) a user or a message, respectively.
 
-> [!IMPORTANT]
-> Context menu commands are currently not supported on mobile.
-
 All three varieties of application commands have both Global and Guild variants.
 Your global commands are available in every guild that adds your application.
 You can also make commands for a specific guild; they're only available in that guild.

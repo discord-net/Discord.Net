@@ -50,7 +50,7 @@ namespace Discord.API.Rest
             if (Content.IsSpecified)
                 data["content"] = Content.Value;
             if (IsTTS.IsSpecified)
-                data["tts"] = IsTTS.Value.ToString();
+                data["tts"] = IsTTS.Value;
             if (MessageComponents.IsSpecified)
                 data["components"] = MessageComponents.Value;
             if (Embeds.IsSpecified)

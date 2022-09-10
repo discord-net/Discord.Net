@@ -85,6 +85,16 @@ namespace Discord.Interactions.Builders
                             builder.DefaultPermission = defPermission.IsDefaultPermission;
                         }
                         break;
+                    case EnabledInDmAttribute enabledInDm:
+                        {
+                            builder.IsEnabledInDm = enabledInDm.IsEnabled;
+                        }
+                        break;
+                    case DefaultMemberPermissionsAttribute memberPermission:
+                        {
+                            builder.DefaultMemberPermissions = memberPermission.Permissions;
+                        }
+                        break;
                     case PreconditionAttribute precondition:
                         builder.AddPreconditions(precondition);
                         break;
@@ -169,6 +179,16 @@ namespace Discord.Interactions.Builders
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
                         }
                         break;
+                    case EnabledInDmAttribute enabledInDm:
+                        {
+                            builder.IsEnabledInDm = enabledInDm.IsEnabled;
+                        }
+                        break;
+                    case DefaultMemberPermissionsAttribute memberPermission:
+                        {
+                            builder.DefaultMemberPermissions = memberPermission.Permissions;
+                        }
+                        break;
                     case PreconditionAttribute precondition:
                         builder.WithPreconditions(precondition);
                         break;
@@ -211,6 +231,16 @@ namespace Discord.Interactions.Builders
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
                         }
                         break;
+                    case EnabledInDmAttribute enabledInDm:
+                        {
+                            builder.IsEnabledInDm = enabledInDm.IsEnabled;
+                        }
+                        break;
+                    case DefaultMemberPermissionsAttribute memberPermission:
+                        {
+                            builder.DefaultMemberPermissions = memberPermission.Permissions;
+                        }
+                        break;
                     case PreconditionAttribute precondition:
                         builder.WithPreconditions(precondition);
                         break;
@@ -231,9 +261,6 @@ namespace Discord.Interactions.Builders
         private static void BuildComponentCommand (ComponentCommandBuilder builder, Func<IServiceProvider, IInteractionModuleBase> createInstance, MethodInfo methodInfo,
             InteractionService commandService, IServiceProvider services)
         {
-            if (!methodInfo.GetParameters().All(x => x.ParameterType == typeof(string) || x.ParameterType == typeof(string[])))
-                throw new InvalidOperationException($"Interaction method parameters all must be types of {typeof(string).Name} or {typeof(string[]).Name}");
-
             var attributes = methodInfo.GetCustomAttributes();
 
             builder.MethodName = methodInfo.Name;
@@ -260,8 +287,10 @@ namespace Discord.Interactions.Builders
 
             var parameters = methodInfo.GetParameters();
 
+            var wildCardCount = Regex.Matches(Regex.Escape(builder.Name), Regex.Escape(commandService._wildCardExp)).Count;
+
             foreach (var parameter in parameters)
-                builder.AddParameter(x => BuildParameter(x, parameter));
+                builder.AddParameter(x => BuildComponentParameter(x, parameter, parameter.Position >= wildCardCount));
 
             builder.Callback = CreateCallback(createInstance, methodInfo, commandService);
         }
@@ -310,8 +339,8 @@ namespace Discord.Interactions.Builders
             if (parameters.Count(x => typeof(IModal).IsAssignableFrom(x.ParameterType)) > 1)
                 throw new InvalidOperationException($"A modal command can only have one {nameof(IModal)} parameter.");
 
-            if (!parameters.All(x => x.ParameterType == typeof(string) || typeof(IModal).IsAssignableFrom(x.ParameterType)))
-                throw new InvalidOperationException($"All parameters of a modal command must be either a string or an implementation of {nameof(IModal)}");
+            if (!typeof(IModal).IsAssignableFrom(parameters.Last().ParameterType))
+                throw new InvalidOperationException($"Last parameter of a modal command must be an implementation of {nameof(IModal)}");
 
             var attributes = methodInfo.GetCustomAttributes();
 
@@ -397,7 +426,6 @@ namespace Discord.Interactions.Builders
             builder.Description = paramInfo.Name;
             builder.IsRequired = !paramInfo.IsOptional;
             builder.DefaultValue = paramInfo.DefaultValue;
-            builder.SetParameterType(paramType, services);
 
             foreach (var attribute in attributes)
             {
@@ -435,14 +463,46 @@ namespace Discord.Interactions.Builders
                     case MinValueAttribute minValue:
                         builder.MinValue = minValue.Value;
                         break;
+                    case MinLengthAttribute minLength:
+                        builder.MinLength = minLength.Length;
+                        break;
+                    case MaxLengthAttribute maxLength:
+                        builder.MaxLength = maxLength.Length;
+                        break;
+                    case ComplexParameterAttribute complexParameter:
+                        {
+                            builder.IsComplexParameter = true;
+                            ConstructorInfo ctor = GetComplexParameterConstructor(paramInfo.ParameterType.GetTypeInfo(), complexParameter);
+
+                            foreach (var parameter in ctor.GetParameters())
+                            {
+                                if (parameter.IsDefined(typeof(ComplexParameterAttribute)))
+                                    throw new InvalidOperationException("You cannot create nested complex parameters.");
+
+                                builder.AddComplexParameterField(fieldBuilder => BuildSlashParameter(fieldBuilder, parameter, services));
+                            }
+
+                            var initializer = builder.Command.Module.InteractionService._useCompiledLambda ?
+                                ReflectionUtils<object>.CreateLambdaConstructorInvoker(paramInfo.ParameterType.GetTypeInfo()) : ctor.Invoke;
+                            builder.ComplexParameterInitializer = args => initializer(args);
+                        }
+                        break;
                     default:
                         builder.AddAttributes(attribute);
                         break;
                 }
             }
 
+            builder.SetParameterType(paramType, services);
+
             // Replace pascal casings with '-'
             builder.Name = Regex.Replace(builder.Name, "(?<=[a-z])(?=[A-Z])", "-").ToLower();
+        }
+
+        private static void BuildComponentParameter(ComponentCommandParameterBuilder builder, ParameterInfo paramInfo, bool isComponentParam)
+        {
+            builder.SetIsRouteSegment(!isComponentParam);
+            BuildParameter(builder, paramInfo);
         }
 
         private static void BuildParameter<TInfo, TBuilder> (ParameterBuilder<TInfo, TBuilder> builder, ParameterInfo paramInfo)
@@ -476,7 +536,7 @@ namespace Discord.Interactions.Builders
         #endregion
 
         #region Modals
-        public static ModalInfo BuildModalInfo(Type modalType)
+        public static ModalInfo BuildModalInfo(Type modalType, InteractionService interactionService)
         {
             if (!typeof(IModal).IsAssignableFrom(modalType))
                 throw new InvalidOperationException($"{modalType.FullName} isn't an implementation of {typeof(IModal).FullName}");
@@ -485,7 +545,7 @@ namespace Discord.Interactions.Builders
 
             try
             {
-                var builder = new ModalBuilder(modalType)
+                var builder = new ModalBuilder(modalType, interactionService)
                 {
                     Title = instance.Title
                 };
@@ -607,6 +667,42 @@ namespace Discord.Interactions.Builders
             return propertyInfo.SetMethod?.IsPublic == true &&
                 propertyInfo.SetMethod?.IsStatic == false &&
                 propertyInfo.IsDefined(typeof(ModalInputAttribute));
+        }
+        
+        private static ConstructorInfo GetComplexParameterConstructor(TypeInfo typeInfo, ComplexParameterAttribute complexParameter)
+        {
+            var ctors = typeInfo.GetConstructors();
+
+            if (ctors.Length == 0)
+                throw new InvalidOperationException($"No constructor found for \"{typeInfo.FullName}\".");
+
+            if (complexParameter.PrioritizedCtorSignature is not null)
+            {
+                var ctor = typeInfo.GetConstructor(complexParameter.PrioritizedCtorSignature);
+
+                if (ctor is null)
+                    throw new InvalidOperationException($"No constructor was found with the signature: {string.Join(",", complexParameter.PrioritizedCtorSignature.Select(x => x.Name))}");
+
+                return ctor;
+            }
+
+            var prioritizedCtors = ctors.Where(x => x.IsDefined(typeof(ComplexParameterCtorAttribute), true));
+
+            switch (prioritizedCtors.Count())
+            {
+                case > 1:
+                    throw new InvalidOperationException($"{nameof(ComplexParameterCtorAttribute)} can only be used once in a type.");
+                case 1:
+                    return prioritizedCtors.First();
+            }
+
+            switch (ctors.Length)
+            {
+                case > 1:
+                    throw new InvalidOperationException($"Multiple constructors found for \"{typeInfo.FullName}\".");
+                default:
+                    return ctors.First();
+            }
         }
     }
 }
