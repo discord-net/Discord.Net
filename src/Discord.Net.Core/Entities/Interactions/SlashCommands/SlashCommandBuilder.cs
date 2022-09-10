@@ -933,7 +933,7 @@ namespace Discord
 
             EnsureValidCommandOptionName(name);
 
-            _descriptionLocalizations ??= new();
+            _nameLocalizations ??= new();
             _nameLocalizations.Add(locale, name);
 
             return this;
