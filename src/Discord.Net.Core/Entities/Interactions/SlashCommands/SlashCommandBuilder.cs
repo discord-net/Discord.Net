@@ -107,13 +107,11 @@ namespace Discord
                 Name = Name,
                 Description = Description,
                 IsDefaultPermission = IsDefaultPermission,
+                NameLocalizations = _nameLocalizations,
+                DescriptionLocalizations = _descriptionLocalizations,
                 IsDMEnabled = IsDMEnabled,
                 DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified
             };
-            if (_nameLocalizations is not null)
-                props.NameLocalizations = _nameLocalizations;
-            if (_descriptionLocalizations is not null)
-                props.DescriptionLocalizations = _descriptionLocalizations;
 
             if (Options != null && Options.Any())
             {
@@ -540,7 +538,7 @@ namespace Discord
             if (isStrType && MaxLength is not null && MaxLength < 1)
                 throw new InvalidOperationException("MaxLength cannot be smaller than 1.");
 
-            var props = new ApplicationCommandOptionProperties
+            return new ApplicationCommandOptionProperties
             {
                 Name = Name,
                 Description = Description,
@@ -555,15 +553,11 @@ namespace Discord
                 ChannelTypes = ChannelTypes,
                 MinValue = MinValue,
                 MaxValue = MaxValue,
+                NameLocalizations = _nameLocalizations,
+                DescriptionLocalizations = _descriptionLocalizations,
                 MinLength = MinLength,
                 MaxLength = MaxLength,
             };
-            if (_nameLocalizations is not null)
-                props.NameLocalizations = _nameLocalizations;
-            if (_descriptionLocalizations is not null)
-                props.DescriptionLocalizations = _descriptionLocalizations;
-            
-            return props;
         }
 
         /// <summary>
@@ -741,16 +735,13 @@ namespace Discord
                 Preconditions.AtLeast(str.Length, 1, nameof(value));
                 Preconditions.AtMost(str.Length, 100, nameof(value));
             }
-            
-            var props = new ApplicationCommandOptionChoiceProperties
+
+            Choices.Add(new ApplicationCommandOptionChoiceProperties
             {
                 Name = name,
-                Value = value
-            };
-            if (nameLocalizations is not null)
-                props.NameLocalizations = nameLocalizations;
-            
-            Choices.Add(props);
+                Value = value,
+                NameLocalizations = nameLocalizations
+            });
 
             return this;
         }
