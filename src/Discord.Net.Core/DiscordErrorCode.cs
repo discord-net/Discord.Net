@@ -172,13 +172,14 @@ namespace Discord
         ServerRequiresMonetization = 50097,
         ServerRequiresBoosts = 50101,
         RequestBodyContainsInvalidJSON = 50109,
-        #endregion
-
-        #region 2FA (60XXX)
+        FailedToResizeAssetBelowTheMaximumSize = 50138,
         OwnershipCannotBeTransferredToABotUser = 50132,
         AssetResizeBelowTheMaximumSize= 50138,
         UploadedFileNotFound = 50146,
         MissingPermissionToSendThisSticker = 50600,
+        #endregion
+
+        #region 2FA (60XXX)
         Requires2FA = 60003,
         #endregion
 
