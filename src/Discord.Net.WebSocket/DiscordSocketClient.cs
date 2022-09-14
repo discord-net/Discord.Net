@@ -322,7 +322,6 @@ namespace Discord.WebSocket
         }
         private async Task OnDisconnectingAsync(Exception ex)
         {
-
             await _gatewayLogger.DebugAsync("Disconnecting ApiClient").ConfigureAwait(false);
             await ApiClient.DisconnectAsync(ex).ConfigureAwait(false);
 
@@ -353,6 +352,10 @@ namespace Discord.WebSocket
                 if (guild.IsAvailable)
                     await GuildUnavailableAsync(guild).ConfigureAwait(false);
             }
+
+            _sessionId = null;
+            _lastSeq = 0;
+            ApiClient.ResumeGatewayUrl = null;
         }
 
         /// <inheritdoc />
@@ -834,6 +837,7 @@ namespace Discord.WebSocket
 
                             _sessionId = null;
                             _lastSeq = 0;
+                            ApiClient.ResumeGatewayUrl = null;
 
                             if (_shardedClient != null)
                             {
@@ -891,6 +895,7 @@ namespace Discord.WebSocket
                                             AddPrivateChannel(data.PrivateChannels[i], state);
 
                                         _sessionId = data.SessionId;
+                                        ApiClient.ResumeGatewayUrl = data.ResumeGatewayUrl;
                                         _unavailableGuildCount = unavailableGuilds;
                                         CurrentUser = currentUser;
                                         _previousSessionUser = CurrentUser;

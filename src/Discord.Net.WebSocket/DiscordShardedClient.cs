@@ -139,9 +139,9 @@ namespace Discord.WebSocket
 
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
+            var botGateway = await GetBotGatewayAsync().ConfigureAwait(false);
             if (_automaticShards)
             {
-                var botGateway = await GetBotGatewayAsync().ConfigureAwait(false);
                 _shardIds = Enumerable.Range(0, botGateway.Shards).ToArray();
                 _totalShards = _shardIds.Length;
                 _shards = new DiscordSocketClient[_shardIds.Length];
@@ -163,7 +163,12 @@ namespace Discord.WebSocket
 
             //Assume thread safe: already in a connection lock
             for (int i = 0; i < _shards.Length; i++)
+            {
+                // Set the gateway URL to the one returned by Discord, if a custom one isn't set.
+                _shards[i].ApiClient.GatewayUrl = botGateway.Url;
+
                 await _shards[i].LoginAsync(tokenType, token);
+            }
 
             if(_defaultStickers.Length == 0 && _baseConfig.AlwaysDownloadDefaultStickers)
                 await DownloadDefaultStickersAsync().ConfigureAwait(false);
@@ -175,7 +180,12 @@ namespace Discord.WebSocket
             if (_shards != null)
             {
                 for (int i = 0; i < _shards.Length; i++)
+                {
+                    // Reset the gateway URL set for the shard.
+                    _shards[i].ApiClient.GatewayUrl = null;
+
                     await _shards[i].LogoutAsync();
+                }
             }
 
             if (_automaticShards)

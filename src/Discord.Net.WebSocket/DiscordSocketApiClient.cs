@@ -28,6 +28,7 @@ namespace Discord.API
         private readonly bool _isExplicitUrl;
         private CancellationTokenSource _connectCancelToken;
         private string _gatewayUrl;
+        private string _resumeGatewayUrl;
 
         //Store our decompression streams for zlib shared state
         private MemoryStream _compressed;
@@ -36,6 +37,32 @@ namespace Discord.API
         internal IWebSocketClient WebSocketClient { get; }
 
         public ConnectionState ConnectionState { get; private set; }
+
+        /// <summary>
+        ///     Sets the gateway URL used for identifies.
+        /// </summary>
+        /// <remarks>
+        ///     If a custom URL is set, setting this property does nothing.
+        /// </remarks>
+        public string GatewayUrl
+        {
+            set
+            {
+                // Makes the sharded client not override the custom value.
+                if (_isExplicitUrl)
+                    return;
+
+                _gatewayUrl = FormatGatewayUrl(value);
+            }
+        }
+
+        /// <summary>
+        ///     Sets the gateway URL used for resumes.
+        /// </summary>
+        public string ResumeGatewayUrl
+        {
+            set => _resumeGatewayUrl = FormatGatewayUrl(value);
+        }
 
         public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
             string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
@@ -157,6 +184,17 @@ namespace Discord.API
 #endif
         }
 
+        /// <summary>
+        ///     Appends necessary query parameters to the specified gateway URL.
+        /// </summary>
+        private static string FormatGatewayUrl(string gatewayUrl)
+        {
+            if (gatewayUrl == null)
+                return null;
+
+            return $"{gatewayUrl}?v={DiscordConfig.APIVersion}&encoding={DiscordSocketConfig.GatewayEncoding}&compress=zlib-stream";
+        }
+
         public async Task ConnectAsync()
         {
             await _stateLock.WaitAsync().ConfigureAwait(false);
@@ -191,24 +229,32 @@ namespace Discord.API
                 if (WebSocketClient != null)
                     WebSocketClient.SetCancelToken(_connectCancelToken.Token);
 
-                if (!_isExplicitUrl)
+                string gatewayUrl;
+                if (_resumeGatewayUrl == null)
                 {
-                    var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
-                    _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordSocketConfig.GatewayEncoding}&compress=zlib-stream";
+                    if (!_isExplicitUrl && _gatewayUrl == null)
+                    {
+                        var gatewayResponse = await GetBotGatewayAsync().ConfigureAwait(false);
+                        _gatewayUrl = FormatGatewayUrl(gatewayResponse.Url);
+                    }
+
+                    gatewayUrl = _gatewayUrl;
+                }
+                else
+                {
+                    gatewayUrl = _resumeGatewayUrl;
                 }
 
 #if DEBUG_PACKETS
-                Console.WriteLine("Connecting to gateway: " + _gatewayUrl);
+                Console.WriteLine("Connecting to gateway: " + gatewayUrl);
 #endif
 
-                await WebSocketClient.ConnectAsync(_gatewayUrl).ConfigureAwait(false);
+                await WebSocketClient.ConnectAsync(gatewayUrl).ConfigureAwait(false);
 
                 ConnectionState = ConnectionState.Connected;
             }
             catch
             {
-                if (!_isExplicitUrl)
-                    _gatewayUrl = null; //Uncache in case the gateway url changed
                 await DisconnectInternalAsync().ConfigureAwait(false);
                 throw;
             }
