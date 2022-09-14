@@ -1,5 +1,29 @@
 # Changelog
 
+## [3.8.1] - 2022-09-12
+### Added
+
+- #2437 Added scheduled event types to AuditLog ActionTypes (fca9c6b)
+- #2423 Added support for resume gateway url (d4c533a)
+
+### Fixed
+
+- #2443 Fixed typos of word length (adf012d)
+- #2438 Fixed http query symbol in ModifyWebhookMessageAsync (0aa381d)
+- #2444 Fixed BulkOverwriteCommands NRE (9feb703)
+- #2417 Fixed CommandService RemoveModuleMethod not removing modules (fca9c6b)
+- #2345 Fixed EmbedBuilder.Length NRE (11ece4b)
+- #2453 Fixed NRE on SlashCommandBuilder.Build method (5073afa)
+- #2457 Fixed typo in SlashCommandBuilder.AddNameLocalizationMethod (1b01fed)
+
+### Misc
+
+- #2462 Add additional checks for gateway event warnings (b45b152)
+- #2448 Bump to Discord API V10 (fbc5ad4)
+- #2451 Return a list instead of an array in GetModulePath and GetChoicePath methods (370bdfa)
+- #2453 Update app commands regex and fix localization on app context commands (3dec99f)
+- #2333 Update package logo (2b86a79)
+
 ## [3.8.0] - 2022-08-27
 ### Added
 - #2384 Added support for the WEBHOOKS_UPDATED event (010e8e8)
