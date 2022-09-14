@@ -153,7 +153,7 @@ namespace Discord.WebSocket
 
             HasJoined = model.ThreadMember.IsSpecified;
 
-            AppliedTags = model.AppliedTags.GetValueOrDefault(Array.Empty<ulong>());
+            AppliedTags = model.AppliedTags.GetValueOrDefault(Array.Empty<ulong>()).ToImmutableArray();
         }
 
         internal IReadOnlyCollection<SocketThreadUser> RemoveUsers(ulong[] users)

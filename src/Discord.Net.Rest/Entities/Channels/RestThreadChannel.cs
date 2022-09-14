@@ -81,7 +81,7 @@ namespace Discord.Rest
             Type = (ThreadType)model.Type;
             ParentChannelId = model.CategoryId.Value;
 
-            AppliedTags = model.AppliedTags.GetValueOrDefault(Array.Empty<ulong>());
+            AppliedTags = model.AppliedTags.GetValueOrDefault(Array.Empty<ulong>()).ToImmutableArray();
         }
 
         /// <summary>
