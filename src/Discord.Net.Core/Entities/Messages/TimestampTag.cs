@@ -20,8 +20,8 @@ namespace Discord
         /// <summary>
         ///     Creates a new <see cref="TimestampTag"/> from the provided time.
         /// </summary>
-        /// <param name="time">The time for this tag.</param>
-        /// <param name="style">The style for this tag.</param>
+        /// <param name="time">The time for this timestamp tag.</param>
+        /// <param name="style">The style for this timestamp tag.</param>
         public TimestampTag(DateTimeOffset time, TimestampTagStyles? style = null)
         {
             Time = time;
@@ -69,5 +69,23 @@ namespace Discord
         /// <returns>The newly create timestamp tag.</returns>
         public static TimestampTag FromDateTimeOffset(DateTimeOffset time, TimestampTagStyles? style = null)
             => new(time, style);
+
+        /// <summary>
+        ///     Immediately formats the provided time and style into a timestamp string.
+        /// </summary>
+        /// <param name="time">The time of this timestamp tag.</param>
+        /// <param name="style">The style for this timestamp tag.</param>
+        /// <returns>The newly create timestamp string.</returns>
+        public static string FormatFromDateTime(DateTime time, TimestampTagStyles style)
+            => FormatFromDateTimeOffset(time, style);
+
+        /// <summary>
+        ///     Immediately formats the provided time and style into a timestamp string.
+        /// </summary>
+        /// <param name="time">The time of this timestamp tag.</param>
+        /// <param name="style">The style for this timestamp tag.</param>
+        /// <returns>The newly create timestamp string.</returns>
+        public static string FormatFromDateTimeOffset(DateTimeOffset time, TimestampTagStyles style)
+            => $"<t:{(time.ToUnixTimeSeconds()}:{(char)style}>";
     }
 }
