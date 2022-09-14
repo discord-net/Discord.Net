@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Discord
 {
@@ -53,6 +54,11 @@ namespace Discord
         ///     Gets or sets the auto archive duration.
         /// </summary>
         public Optional<ThreadArchiveDuration> AutoArchiveDuration { get; set; }
-        
+
+        /// <summary>
+        /// Gets or sets the tags applied to a forum thread
+        /// </summary>
+        public Optional<IEnumerable<ulong>> AppliedTags { get; set; }
+
     }
 }

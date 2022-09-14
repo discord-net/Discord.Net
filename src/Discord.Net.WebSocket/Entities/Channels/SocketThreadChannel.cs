@@ -89,6 +89,9 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public bool? IsInvitable { get; private set; }
 
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ulong> AppliedTags { get; private set; }
+
         /// <inheritdoc cref="IThreadChannel.CreatedAt"/>
         public override DateTimeOffset CreatedAt { get; }
 
@@ -149,6 +152,8 @@ namespace Discord.WebSocket
             }
 
             HasJoined = model.ThreadMember.IsSpecified;
+
+            AppliedTags = model.AppliedTags.GetValueOrDefault(Array.Empty<ulong>());
         }
 
         internal IReadOnlyCollection<SocketThreadUser> RemoveUsers(ulong[] users)

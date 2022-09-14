@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -55,6 +56,14 @@ namespace Discord
         ///     This property is only available on private threads.
         /// </remarks>
         bool? IsInvitable { get; }
+
+        /// <summary>
+        ///     Gets ids of tags applied to a forum thread
+        /// </summary>
+        /// <remarks>
+        ///     This property is only available on forum threads.
+        /// </remarks>
+        IReadOnlyCollection<ulong> AppliedTags { get; }
 
         /// <summary>
         ///     Gets when the thread was created.

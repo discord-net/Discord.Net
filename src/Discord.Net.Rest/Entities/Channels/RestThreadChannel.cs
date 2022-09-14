@@ -37,6 +37,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public bool? IsInvitable { get; private set; }
 
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ulong> AppliedTags { get; private set; }
+
         /// <inheritdoc cref="IThreadChannel.CreatedAt"/>
         public override DateTimeOffset CreatedAt { get; }
 
@@ -77,6 +80,8 @@ namespace Discord.Rest
             MessageCount = model.MessageCount.GetValueOrDefault(0);
             Type = (ThreadType)model.Type;
             ParentChannelId = model.CategoryId.Value;
+
+            AppliedTags = model.AppliedTags.GetValueOrDefault(Array.Empty<ulong>());
         }
 
         /// <summary>
