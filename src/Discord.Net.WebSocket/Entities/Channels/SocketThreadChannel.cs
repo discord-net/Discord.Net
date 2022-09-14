@@ -339,9 +339,6 @@ namespace Discord.WebSocket
             => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
-        /// <remarks>
-        ///     <b>This method is not supported in threads.</b>
-        /// </remarks>
         public override Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
             => ThreadHelper.ModifyAsync(this, Discord, func, options);
 
