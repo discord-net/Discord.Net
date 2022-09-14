@@ -86,6 +86,6 @@ namespace Discord
         /// <param name="style">The style for this timestamp tag.</param>
         /// <returns>The newly create timestamp string.</returns>
         public static string FormatFromDateTimeOffset(DateTimeOffset time, TimestampTagStyles style)
-            => $"<t:{(time.ToUnixTimeSeconds()}:{(char)style}>";
+            => $"<t:{time.ToUnixTimeSeconds()}:{(char)style}>";
     }
 }
