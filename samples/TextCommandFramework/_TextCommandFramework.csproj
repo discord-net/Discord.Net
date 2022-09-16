@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
-    <PackageReference Include="Discord.Net.Commands" Version="3.6.1" />
-    <PackageReference Include="Discord.Net.Websocket" Version="3.6.1" />
+    <PackageReference Include="Discord.Net.Commands" Version="3.8.1" />
+    <PackageReference Include="Discord.Net.Websocket" Version="3.8.1" />
   </ItemGroup>
 
 </Project>
