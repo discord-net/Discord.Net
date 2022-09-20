@@ -9,7 +9,7 @@ namespace Discord
     /// <summary>
     ///     A struct representing a forum channel tag.
     /// </summary>
-    public struct ForumTag
+    public struct ForumTag : ISnowflakeEntity
     {
         /// <summary>
         ///     Gets the Id of the tag.
@@ -31,6 +31,11 @@ namespace Discord
         /// with the <see cref="GuildPermissions.ManageThreads"/> permission
         /// </summary>
         public bool Moderated { get; }
+
+        /// <summary>
+        /// Gets when the tag was created.
+        /// </summary>
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
         internal ForumTag(ulong id, string name, ulong? emojiId, string emojiName, bool moderated)
         {
