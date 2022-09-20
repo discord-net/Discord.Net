@@ -76,5 +76,8 @@ namespace Discord.API
 
         [JsonProperty("default_auto_archive_duration")]
         public Optional<ThreadArchiveDuration> AutoArchiveDuration { get; set; }
+
+        [JsonProperty("default_thread_rate_limit_per_user")]
+        public Optional<int> ThreadRateLimitPerUser { get; set; }
     }
 }

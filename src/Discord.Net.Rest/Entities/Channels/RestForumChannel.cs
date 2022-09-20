@@ -27,6 +27,12 @@ namespace Discord.Rest
         public IReadOnlyCollection<ForumTag> Tags { get; private set; }
 
         /// <inheritdoc/>
+        public int ThreadCreationInterval { get; private set; }
+
+        /// <inheritdoc/>
+        public int DefaultSlowModeInterval { get; private set; }
+
+        /// <inheritdoc/>
         public string Mention => MentionUtils.MentionChannel(Id);
 
         internal RestForumChannel(BaseDiscordClient client, IGuild guild, ulong id)
@@ -48,6 +54,12 @@ namespace Discord.Rest
             IsNsfw = model.Nsfw.GetValueOrDefault(false);
             Topic = model.Topic.GetValueOrDefault();
             DefaultAutoArchiveDuration = model.AutoArchiveDuration.GetValueOrDefault(ThreadArchiveDuration.OneDay);
+
+            if (model.ThreadRateLimitPerUser.IsSpecified)
+                DefaultSlowModeInterval = model.ThreadRateLimitPerUser.Value;
+
+            if(model.SlowMode.IsSpecified)
+                ThreadCreationInterval = model.SlowMode.Value;
 
             Tags = model.ForumTags.GetValueOrDefault(Array.Empty<API.ForumTags>()).Select(
                 x => new ForumTag(x.Id, x.Name, x.EmojiId.GetValueOrDefault(null), x.EmojiName.GetValueOrDefault())

@@ -36,6 +36,24 @@ namespace Discord
         IReadOnlyCollection<ForumTag> Tags { get; }
 
         /// <summary>
+        /// Gets the current rate limit on creating posts in this forum channel.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="int"/> representing the time in seconds required before the user can send another
+        ///     message; <c>0</c> if disabled.
+        /// </returns>
+        int ThreadCreationInterval { get; }
+
+        /// <summary>
+        /// Gets the current default slow-mode delay for threads in this forum channel.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="int"/> representing the time in seconds required before the user can send another
+        ///     message; <c>0</c> if disabled.
+        /// </returns>
+        int DefaultSlowModeInterval { get; }
+
+        /// <summary>
         ///     Creates a new post (thread) within the forum.
         /// </summary>
         /// <param name="title">The title of the post.</param>
