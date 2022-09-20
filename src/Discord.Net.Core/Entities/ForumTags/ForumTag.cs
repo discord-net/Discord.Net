@@ -43,12 +43,12 @@ namespace Discord
         /// </summary>
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
-        internal ForumTag(ulong id, string name, ulong? emojiId, string? emojiName, bool moderated)
+        internal ForumTag(ulong id, string name, ulong? emojiId = null, string? emojiName = null, bool moderated = false)
         {
             if (emojiId.HasValue && emojiId.Value != 0)
                 Emoji = new Emote(emojiId.Value, null, false);
             else if (emojiName != null)
-                Emoji = new Emoji(name);
+                Emoji = new Emoji(emojiName);
             else
                 Emoji = null;
 

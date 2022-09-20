@@ -82,7 +82,7 @@ public class ForumTagBuilder
     {
         Name = name;
         if(emoteId is not null)
-            Emoji = new Emote(emoteId.Value, string.Empty,  false);
+            Emoji = new Emote(emoteId.Value, null,  false);
         IsModerated = moderated;
     }
 
