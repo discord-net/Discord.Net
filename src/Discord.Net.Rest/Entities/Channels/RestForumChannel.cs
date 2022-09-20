@@ -41,9 +41,9 @@ namespace Discord.Rest
 
         }
 
-        internal new static RestStageChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
+        internal new static RestForumChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestStageChannel(discord, guild, model.Id);
+            var entity = new RestForumChannel(discord, guild, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -64,6 +64,13 @@ namespace Discord.Rest
             Tags = model.ForumTags.GetValueOrDefault(Array.Empty<API.ForumTags>()).Select(
                 x => new ForumTag(x.Id, x.Name, x.EmojiId.GetValueOrDefault(null), x.EmojiName.GetValueOrDefault(), x.Moderated)
             ).ToImmutableArray();
+        }
+
+        /// <inheritdoc/>
+        public async Task ModifyAsync(Action<ForumChannelProperties> func, RequestOptions options = null)
+        {
+            var model = await ForumHelper.ModifyAsync(this, Discord, func, options);
+            Update(model);
         }
 
         /// <inheritdoc cref="IForumChannel.CreatePostAsync(string, ThreadArchiveDuration, int?, string, Embed, RequestOptions, AllowedMentions, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
