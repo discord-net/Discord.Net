@@ -115,6 +115,13 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc/>
+        public async Task ModifyAsync(Action<ThreadChannelProperties> func, RequestOptions options = null)
+        {
+            var model = await ThreadHelper.ModifyAsync(this, Discord, func, options);
+            Update(model);
+        }
+
+        /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>

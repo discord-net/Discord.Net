@@ -46,10 +46,10 @@ namespace Discord.Rest
         }
 
         public static async Task<Model> ModifyAsync(IThreadChannel channel, BaseDiscordClient client,
-            Action<TextChannelProperties> func,
+            Action<ThreadChannelProperties> func,
             RequestOptions options)
         {
-            var args = new TextChannelProperties();
+            var args = new ThreadChannelProperties();
             func(args);
             var apiArgs = new ModifyThreadParams
             {
