@@ -58,7 +58,8 @@ namespace Discord.Rest
                 AutoArchiveDuration = args.AutoArchiveDuration,
                 Locked = args.Locked,
                 Slowmode = args.SlowModeInterval,
-                AppliedTags = args.AppliedTags
+                AppliedTags = args.AppliedTags,
+                Flags = args.Flags,
             };
             return await client.ApiClient.ModifyThreadAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }

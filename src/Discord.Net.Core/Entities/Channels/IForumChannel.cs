@@ -54,6 +54,20 @@ namespace Discord
         int DefaultSlowModeInterval { get; }
 
         /// <summary>
+        ///     Modifies this forum channel.
+        /// </summary>
+        /// <remarks>
+        ///     This method modifies the current forum channel with the specified properties. To see an example of this
+        ///     method and what properties are available, please refer to <see cref="ForumChannelProperties"/>.
+        /// </remarks>
+        /// <param name="func">The delegate containing the properties to modify the channel with.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        Task ModifyAsync(Action<ForumChannelProperties> func, RequestOptions options = null);
+
+        /// <summary>
         ///     Creates a new post (thread) within the forum.
         /// </summary>
         /// <param name="title">The title of the post.</param>

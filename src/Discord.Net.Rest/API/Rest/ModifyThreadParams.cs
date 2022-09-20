@@ -22,5 +22,8 @@ namespace Discord.API.Rest
 
         [JsonProperty("applied_tags")]
         public Optional<IEnumerable<ulong>> AppliedTags { get; set; }
+
+        [JsonProperty("flags")]
+        public Optional<ChannelFlags> Flags { get; set; }
     }
 }

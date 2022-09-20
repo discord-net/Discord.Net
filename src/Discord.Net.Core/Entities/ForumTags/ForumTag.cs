@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace Discord
 {
     /// <summary>
@@ -24,23 +26,27 @@ namespace Discord
         /// <summary>
         ///     Gets the emoji of the tag or <see langword="null"/> if none is set.
         /// </summary>
-        public IEmote Emoji { get; }
+        /// <remarks>
+        ///     If the emoji is <see cref="Emote"/> only the <see cref="Emote.Id"/> will be populated.
+        ///     Use <see cref="IGuild.GetEmoteAsync"/> to get the emoji.
+        /// </remarks>
+        public IEmote? Emoji { get; }
 
         /// <summary>
         /// Gets whether this tag can only be added to or removed from threads by a member
         /// with the <see cref="GuildPermissions.ManageThreads"/> permission
         /// </summary>
-        public bool Moderated { get; }
+        public bool IsModerated { get; }
 
         /// <summary>
         /// Gets when the tag was created.
         /// </summary>
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
-        internal ForumTag(ulong id, string name, ulong? emojiId, string emojiName, bool moderated)
+        internal ForumTag(ulong id, string name, ulong? emojiId, string? emojiName, bool moderated)
         {
             if (emojiId.HasValue && emojiId.Value != 0)
-                Emoji = new Emote(emojiId.Value, emojiName, false);
+                Emoji = new Emote(emojiId.Value, null, false);
             else if (emojiName != null)
                 Emoji = new Emoji(name);
             else
@@ -48,7 +54,7 @@ namespace Discord
 
             Id = id;
             Name = name;
-            Moderated = moderated;
+            IsModerated = moderated;
         }
     }
 }
