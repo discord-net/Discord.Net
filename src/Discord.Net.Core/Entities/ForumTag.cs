@@ -26,7 +26,13 @@ namespace Discord
         /// </summary>
         public IEmote Emoji { get; }
 
-        internal ForumTag(ulong id, string name, ulong? emojiId, string emojiName)
+        /// <summary>
+        /// Gets whether this tag can only be added to or removed from threads by a member
+        /// with the <see cref="GuildPermissions.ManageThreads"/> permission
+        /// </summary>
+        public bool Moderated { get; }
+
+        internal ForumTag(ulong id, string name, ulong? emojiId, string emojiName, bool moderated)
         {
             if (emojiId.HasValue && emojiId.Value != 0)
                 Emoji = new Emote(emojiId.Value, emojiName, false);
@@ -37,6 +43,7 @@ namespace Discord
 
             Id = id;
             Name = name;
+            Moderated = moderated;
         }
     }
 }

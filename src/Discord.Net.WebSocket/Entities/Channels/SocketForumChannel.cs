@@ -59,7 +59,7 @@ namespace Discord.WebSocket
                 ThreadCreationInterval = model.SlowMode.Value;
 
             Tags = model.ForumTags.GetValueOrDefault(Array.Empty<API.ForumTags>()).Select(
-                x => new ForumTag(x.Id, x.Name, x.EmojiId.GetValueOrDefault(null), x.EmojiName.GetValueOrDefault())
+                x => new ForumTag(x.Id, x.Name, x.EmojiId.GetValueOrDefault(null), x.EmojiName.GetValueOrDefault(), x.Moderated)
             ).ToImmutableArray();
         }
 
