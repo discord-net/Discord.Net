@@ -762,6 +762,18 @@ namespace Discord
         Task<ICategoryChannel> CreateCategoryAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null);
 
         /// <summary>
+        ///     Creates a new channel forum in this guild.
+        /// </summary>
+        /// <param name="name">The new name for the forum.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     forum channel.
+        /// </returns>
+        Task<IForumChannel> CreateForumChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null);
+
+        /// <summary>
         ///     Gets a collection of all the voice regions this guild can access.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
