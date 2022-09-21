@@ -54,6 +54,15 @@ namespace Discord
         int DefaultSlowModeInterval { get; }
 
         /// <summary>
+        /// 	Gets the emoji to show in the add reaction button on a thread in a forum channel
+        /// </summary>
+        /// <remarks>
+        ///     If the emoji is <see cref="Emote"/> only the <see cref="Emote.Id"/> will be populated.
+        ///     Use <see cref="IGuild.GetEmoteAsync"/> to get the emoji.
+        /// </remarks>
+        IEmote DefaultReactionEmoji { get; }
+
+        /// <summary>
         ///     Modifies this forum channel.
         /// </summary>
         /// <remarks>

@@ -82,5 +82,8 @@ namespace Discord.API
 
         [JsonProperty("flags")]
         public Optional<ChannelFlags> Flags { get; set; }
+
+        [JsonProperty("default_reaction_emoji")]
+        public Optional<ForumReactionEmoji> DefaultReactionEmoji { get; set; }
     }
 }

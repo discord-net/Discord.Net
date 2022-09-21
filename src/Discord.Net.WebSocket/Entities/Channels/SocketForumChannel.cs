@@ -39,6 +39,9 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public ulong? CategoryId { get; private set; }
 
+        /// <inheritdoc/>
+        public IEmote DefaultReactionEmoji { get; private set; }
+
         /// <summary>
         ///     Gets the parent (category) of this channel in the guild's channel list.
         /// </summary>
@@ -73,6 +76,16 @@ namespace Discord.WebSocket
             Tags = model.ForumTags.GetValueOrDefault(Array.Empty<API.ForumTags>()).Select(
                 x => new ForumTag(x.Id, x.Name, x.EmojiId.GetValueOrDefault(null), x.EmojiName.GetValueOrDefault(), x.Moderated)
             ).ToImmutableArray();
+
+            if (model.DefaultReactionEmoji.IsSpecified)
+            {
+                if (model.DefaultReactionEmoji.Value.EmojiId.IsSpecified && model.DefaultReactionEmoji.Value.EmojiId.Value != 0)
+                    DefaultReactionEmoji = new Emote(model.DefaultReactionEmoji.Value.EmojiId.Value, null, false);
+                else if (model.DefaultReactionEmoji.Value.EmojiName.IsSpecified)
+                    DefaultReactionEmoji = new Emoji(model.DefaultReactionEmoji.Value.EmojiName.Value);
+                else
+                    DefaultReactionEmoji = null;
+            }
         }
 
         /// <inheritdoc />
