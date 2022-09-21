@@ -79,5 +79,8 @@ namespace Discord.API
 
         [JsonProperty("default_thread_rate_limit_per_user")]
         public Optional<int> ThreadRateLimitPerUser { get; set; }
+
+        [JsonProperty("flags")]
+        public Optional<ChannelFlags> Flags { get; set; }
     }
 }

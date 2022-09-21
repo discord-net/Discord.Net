@@ -34,6 +34,8 @@ namespace Discord
 
         public ulong Id => throw new NotImplementedException();
 
+        public ChannelFlags Flags => throw new NotImplementedException();
+
         public Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null)
         {
             throw new NotImplementedException();
