@@ -302,6 +302,16 @@ namespace Discord.WebSocket
         /// </returns>
         public IReadOnlyCollection<SocketThreadChannel> ThreadChannels
             => Channels.OfType<SocketThreadChannel>().ToImmutableArray();
+
+        /// <summary>
+        ///     Gets a collection of all forum channels in this guild.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of forum channels found within this guild.
+        /// </returns>
+        public IReadOnlyCollection<SocketForumChannel> ForumChannels
+            => Channels.OfType<SocketForumChannel>().ToImmutableArray();
+
         /// <summary>
         ///     Gets the current logged-in user.
         /// </summary>
