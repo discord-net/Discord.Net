@@ -2,22 +2,20 @@ namespace Discord;
 
 #nullable enable
 
-public class ForumTagProperties
+public class ForumTagProperties : IForumTag
 {
     /// <summary>
-    ///     Gets the name of the tag.
+    ///     Gets the Id of the tag.
     /// </summary>
+    public ulong Id { get; }
+
+    /// <inheritdoc/>
     public string Name { get; }
 
-    /// <summary>
-    ///     Gets the emoji of the tag or <see langword="null"/> if none is set.
-    /// </summary>
+    /// <inheritdoc/>
     public IEmote? Emoji { get; }
 
-    /// <summary>
-    /// Gets whether this tag can only be added to or removed from threads by a member
-    /// with the <see cref="GuildPermissions.ManageThreads"/> permission
-    /// </summary>
+    /// <inheritdoc/>
     public bool IsModerated { get; }
 
     internal ForumTagProperties(string name, IEmote? emoji = null, bool isMmoderated = false)
@@ -26,4 +24,25 @@ public class ForumTagProperties
         Emoji = emoji;
         IsModerated = isMmoderated;
     }
+
+    public override int GetHashCode() => (Id, Name, Emoji, IsModerated).GetHashCode();
+
+    public override bool Equals(object? obj)
+        => obj is ForumTagProperties tag && Equals(tag);
+
+    /// <summary>
+    /// Gets whether supplied tag is equals to the current one.
+    /// </summary>
+    public bool Equals(ForumTagProperties? tag)
+        => tag is not null &&
+           Id == tag.Id &&
+           Name == tag.Name &&
+           (Emoji is Emoji emoji && tag.Emoji is Emoji otherEmoji && emoji.Equals(otherEmoji) ||
+            Emoji is Emote emote && tag.Emoji is Emote otherEmote && emote.Equals(otherEmote)) &&
+           IsModerated == tag.IsModerated;
+
+    public static bool operator ==(ForumTagProperties? left, ForumTagProperties? right)
+        => left?.Equals(right) ?? right is null;
+
+    public static bool operator !=(ForumTagProperties? left, ForumTagProperties? right) => !(left == right);
 }

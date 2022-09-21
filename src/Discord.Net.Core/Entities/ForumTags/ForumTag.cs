@@ -11,36 +11,23 @@ namespace Discord
     /// <summary>
     ///     A struct representing a forum channel tag.
     /// </summary>
-    public struct ForumTag : ISnowflakeEntity
+    public struct ForumTag : ISnowflakeEntity, IForumTag
     {
         /// <summary>
         ///     Gets the Id of the tag.
         /// </summary>
         public ulong Id { get; }
 
-        /// <summary>
-        ///     Gets the name of the tag.
-        /// </summary>
+        /// <inheritdoc/>
         public string Name { get; }
 
-        /// <summary>
-        ///     Gets the emoji of the tag or <see langword="null"/> if none is set.
-        /// </summary>
-        /// <remarks>
-        ///     If the emoji is <see cref="Emote"/> only the <see cref="Emote.Id"/> will be populated.
-        ///     Use <see cref="IGuild.GetEmoteAsync"/> to get the emoji.
-        /// </remarks>
+        /// <inheritdoc/>
         public IEmote? Emoji { get; }
 
-        /// <summary>
-        /// Gets whether this tag can only be added to or removed from threads by a member
-        /// with the <see cref="GuildPermissions.ManageThreads"/> permission
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsModerated { get; }
 
-        /// <summary>
-        /// Gets when the tag was created.
-        /// </summary>
+        /// <inheritdoc/>
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
         internal ForumTag(ulong id, string name, ulong? emojiId = null, string? emojiName = null, bool moderated = false)
@@ -56,5 +43,25 @@ namespace Discord
             Name = name;
             IsModerated = moderated;
         }
+
+        public override int GetHashCode() => (Id, Name, Emoji, IsModerated).GetHashCode();
+        
+        public override bool Equals(object? obj)
+            => obj is ForumTag tag && Equals(tag);
+
+        /// <summary>
+        /// Gets whether supplied tag is equals to the current one.
+        /// </summary>
+        public bool Equals(ForumTag tag)
+            => Id == tag.Id &&
+               Name == tag.Name &&
+               (Emoji is Emoji emoji && tag.Emoji is Emoji otherEmoji && emoji.Equals(otherEmoji) ||
+                Emoji is Emote emote && tag.Emoji is Emote otherEmote && emote.Equals(otherEmote)) &&
+               IsModerated == tag.IsModerated;
+
+        public static bool operator ==(ForumTag? left, ForumTag? right)
+            => left?.Equals(right) ?? right is null;
+
+        public static bool operator !=(ForumTag? left, ForumTag? right) => !(left == right);
     }
 }

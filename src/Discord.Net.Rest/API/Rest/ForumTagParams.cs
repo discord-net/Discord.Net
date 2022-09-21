@@ -5,6 +5,8 @@ namespace Discord.API
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ForumTagParams
     {
+        [JsonProperty("id")]
+        public Optional<ulong> Id { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
