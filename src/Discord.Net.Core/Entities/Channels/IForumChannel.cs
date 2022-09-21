@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IForumChannel : IGuildChannel, IMentionable
+    public interface IForumChannel : IGuildChannel, IMentionable, INestedChannel
     {
         /// <summary>
         ///     Gets a value that indicates whether the channel is NSFW.
