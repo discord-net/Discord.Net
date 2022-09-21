@@ -1,3 +1,4 @@
+using Discord.API;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ internal static class ForumHelper
             DefaultSlowModeInterval = args.DefaultSlowModeInterval,
             ThreadCreationInterval = args.ThreadCreationInterval,
             Tags = args.Tags.IsSpecified
-                ? args.Tags.Value.Select(tag => new API.ForumTagParams
+                ? args.Tags.Value.Select(tag => new API.ModifyForumTagParams
                 {
                     Name = tag.Name,
                     EmojiId = tag.Emoji is Emote emote
@@ -40,9 +41,18 @@ internal static class ForumHelper
                         ? emoji.Name
                         : Optional<string>.Unspecified
                 }).ToArray()
-                : Optional.Create<API.ForumTagParams[]>(),
+                : Optional.Create<API.ModifyForumTagParams[]>(),
             Flags = args.Flags.GetValueOrDefault(),
             Topic = args.Topic,
+            DefaultReactionEmoji = args.DefaultReactionEmoji.IsSpecified
+                ? new API.ModifyForumReactionEmojiParams
+                {
+                    EmojiId = args.DefaultReactionEmoji.Value is Emote emote ?
+                        emote.Id : Optional<ulong?>.Unspecified,
+                    EmojiName = args.DefaultReactionEmoji.Value is Emoji emoji ?
+                        emoji.Name : Optional<string>.Unspecified
+                }
+                : Optional<ModifyForumReactionEmojiParams>.Unspecified
         };
         return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
     }

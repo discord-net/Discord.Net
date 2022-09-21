@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 namespace Discord.API
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    internal class ForumTagParams
+    internal class ModifyForumTagParams
     {
         [JsonProperty("id")]
         public Optional<ulong> Id { get; set; }

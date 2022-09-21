@@ -2,7 +2,8 @@ using Newtonsoft.Json;
 
 namespace Discord.API;
 
-public class ForumReactionEmoji
+[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+public class ModifyForumReactionEmojiParams
 {
     [JsonProperty("emoji_id")]
     public Optional<ulong?> EmojiId { get; set; }
@@ -10,3 +11,5 @@ public class ForumReactionEmoji
     [JsonProperty("emoji_name")]
     public Optional<string> EmojiName { get; set; }
 }
+
+

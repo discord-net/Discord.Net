@@ -47,4 +47,9 @@ public class ForumChannelProperties : TextChannelProperties
     /// Gets or sets a collection of tags inside of this forum channel.
     /// </summary>
     public Optional<IEnumerable<ForumTagProperties>> Tags { get; set; }
+
+    /// <summary>
+    /// Gets or sets a new default reaction emoji in this forum channel.
+    /// </summary>
+    public Optional<IEmote> DefaultReactionEmoji { get; set; }
 }
