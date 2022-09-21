@@ -802,8 +802,7 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     category channel.
         /// </returns>
-        public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name,
-            Action<GuildChannelProperties> func = null, RequestOptions options = null)
+        public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options, func);
 
         /// <summary>
