@@ -39,6 +39,8 @@ namespace Discord.API.Rest
         public Optional<int> ThreadRateLimitPerUser { get; set; }
         [JsonProperty("available_tags")]
         public Optional<ModifyForumTagParams[]> AvailableTags { get; set; }
+        [JsonProperty("default_sort_order")]
+        public Optional<ForumSortOrder?> DefaultSortOrder { get; set; }
 
         public CreateGuildChannelParams(string name, ChannelType type)
         {

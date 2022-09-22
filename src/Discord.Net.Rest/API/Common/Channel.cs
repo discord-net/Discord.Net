@@ -83,7 +83,11 @@ namespace Discord.API
         [JsonProperty("flags")]
         public Optional<ChannelFlags> Flags { get; set; }
 
+        [JsonProperty("default_sort_order")]
+        public Optional<ForumSortOrder?> DefaultSortOrder { get; set; }
+
         [JsonProperty("default_reaction_emoji")]
         public Optional<ForumReactionEmoji> DefaultReactionEmoji { get; set; }
+
     }
 }

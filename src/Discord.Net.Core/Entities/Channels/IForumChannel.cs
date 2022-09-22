@@ -63,6 +63,14 @@ namespace Discord
         IEmote DefaultReactionEmoji { get; }
 
         /// <summary>
+        /// Gets or sets the rule used to order posts in forum channels.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to null, which indicates a preferred sort order hasn't been set
+        /// </remarks>
+        ForumSortOrder? DefaultSortOrder { get; }
+
+        /// <summary>
         ///     Modifies this forum channel.
         /// </summary>
         /// <remarks>

@@ -17,4 +17,7 @@ internal class ModifyForumChannelParams : ModifyTextChannelParams
 
     [JsonProperty("default_reaction_emoji")]
     public Optional<ModifyForumReactionEmojiParams> DefaultReactionEmoji { get; set; }
+
+    [JsonProperty("default_sort_order")]
+    public Optional<ForumSortOrder> DefaultSortOrder { get; set; }
 }

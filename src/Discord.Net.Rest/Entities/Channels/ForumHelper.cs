@@ -52,7 +52,8 @@ internal static class ForumHelper
                     EmojiName = args.DefaultReactionEmoji.Value is Emoji emoji ?
                         emoji.Name : Optional<string>.Unspecified
                 }
-                : Optional<ModifyForumReactionEmojiParams>.Unspecified
+                : Optional<ModifyForumReactionEmojiParams>.Unspecified,
+            DefaultSortOrder = args.DefaultSortOrder
         };
         return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
     }

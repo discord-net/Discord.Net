@@ -364,7 +364,7 @@ namespace Discord.Rest
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
                 SlowModeInterval = props.ThreadCreationInterval,
-                AvailableTags = props.Tags.GetValueOrDefault().Select(
+                AvailableTags = props.Tags.GetValueOrDefault(Array.Empty<ForumTagProperties>()).Select(
                     x => new ModifyForumTagParams
                     {
                         Id = x.Id,
@@ -390,7 +390,8 @@ namespace Discord.Rest
                 CategoryId = props.CategoryId,
                 IsNsfw = props.IsNsfw,
                 Topic = props.Topic,
-                DefaultAutoArchiveDuration = props.AutoArchiveDuration
+                DefaultAutoArchiveDuration = props.AutoArchiveDuration,
+                DefaultSortOrder = props.DefaultSortOrder.GetValueOrDefault(ForumSortOrder.LatestActivity)
             };
 
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);

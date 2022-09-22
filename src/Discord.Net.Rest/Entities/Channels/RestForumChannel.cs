@@ -39,6 +39,9 @@ namespace Discord.Rest
         public IEmote DefaultReactionEmoji { get; private set; }
 
         /// <inheritdoc/>
+        public ForumSortOrder? DefaultSortOrder { get; private set; }
+
+        /// <inheritdoc/>
         public string Mention => MentionUtils.MentionChannel(Id);
 
         internal RestForumChannel(BaseDiscordClient client, IGuild guild, ulong id)
@@ -67,14 +70,16 @@ namespace Discord.Rest
             if(model.SlowMode.IsSpecified)
                 ThreadCreationInterval = model.SlowMode.Value;
 
+            DefaultSortOrder = model.DefaultSortOrder.GetValueOrDefault();
+
             Tags = model.ForumTags.GetValueOrDefault(Array.Empty<API.ForumTags>()).Select(
                 x => new ForumTag(x.Id, x.Name, x.EmojiId.GetValueOrDefault(null), x.EmojiName.GetValueOrDefault(), x.Moderated)
             ).ToImmutableArray();
 
-            if (model.DefaultReactionEmoji.IsSpecified)
+            if (model.DefaultReactionEmoji.IsSpecified && model.DefaultReactionEmoji.Value is not null)
             {
-                if (model.DefaultReactionEmoji.Value.EmojiId.IsSpecified && model.DefaultReactionEmoji.Value.EmojiId.Value != 0)
-                    DefaultReactionEmoji = new Emote(model.DefaultReactionEmoji.Value.EmojiId.Value.GetValueOrDefault(), null, false);
+                if (model.DefaultReactionEmoji.Value.EmojiId.HasValue && model.DefaultReactionEmoji.Value.EmojiId.Value != 0)
+                    DefaultReactionEmoji = new Emote(model.DefaultReactionEmoji.Value.EmojiId.GetValueOrDefault(), null, false);
                 else if (model.DefaultReactionEmoji.Value.EmojiName.IsSpecified)
                     DefaultReactionEmoji = new Emoji(model.DefaultReactionEmoji.Value.EmojiName.Value);
                 else

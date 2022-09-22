@@ -52,4 +52,9 @@ public class ForumChannelProperties : TextChannelProperties
     /// Gets or sets a new default reaction emoji in this forum channel.
     /// </summary>
     public Optional<IEmote> DefaultReactionEmoji { get; set; }
+
+    /// <summary>
+    /// Gets or sets the rule used to order posts in forum channels.
+    /// </summary>
+    public Optional<ForumSortOrder> DefaultSortOrder { get; set; }
 }
