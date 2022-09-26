@@ -12,7 +12,7 @@ namespace Discord.Rest
         /// </summary>
         public ulong? GuildId { get; }
         /// <summary>
-        ///     Gets the snowflake id of the channel the event is associated with.
+        ///     Gets the snowflake id of the channel the event is associated with. 0 for events with external location.
         /// </summary>
         public ulong? ChannelId { get; }
         /// <summary>
@@ -50,7 +50,7 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the metadata for the entity associated with the event.
         /// </summary>
-        public string Location { get; }
+        public Optional<string>? Location { get; }
         /// <summary>
         ///     Gets the count of users interested in this event. 
         /// </summary>
@@ -60,7 +60,7 @@ namespace Discord.Rest
         /// </summary>
         public string Image { get; }
 
-        internal ScheduledEventInfo(ulong? guildId, ulong? channelId, string name, string description, DateTimeOffset? scheduledStartTime, DateTimeOffset? scheduledEndTime, GuildScheduledEventPrivacyLevel? privacyLevel, GuildScheduledEventStatus? status, GuildScheduledEventType? entityType, ulong? entityId, string location, int? userCount, string image)
+        internal ScheduledEventInfo(ulong? guildId, ulong? channelId, string name, string description, DateTimeOffset? scheduledStartTime, DateTimeOffset? scheduledEndTime, GuildScheduledEventPrivacyLevel? privacyLevel, GuildScheduledEventStatus? status, GuildScheduledEventType? entityType, ulong? entityId, Optional<string>? location, int? userCount, string image)
         {
             GuildId            = guildId           ;
             ChannelId          = channelId         ;
