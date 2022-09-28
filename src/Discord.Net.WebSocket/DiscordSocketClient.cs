@@ -352,10 +352,6 @@ namespace Discord.WebSocket
                 if (guild.IsAvailable)
                     await GuildUnavailableAsync(guild).ConfigureAwait(false);
             }
-
-            _sessionId = null;
-            _lastSeq = 0;
-            ApiClient.ResumeGatewayUrl = null;
         }
 
         /// <inheritdoc />
