@@ -16,35 +16,44 @@ namespace Discord.Commands
         /// <returns>
         ///     <c>true</c> if the message begins with the char <paramref name="c"/>; otherwise <c>false</c>.
         /// </returns>
-        public static bool HasCharPrefix(this IUserMessage msg, char c, ref int argPos)
+        public static bool HasCharPrefix(this IUserMessage msg, char c, out int argPos)
         {
-            var text = msg.Content;
+            string text = msg.Content;
+
             if (!string.IsNullOrEmpty(text) && text[0] == c)
             {
                 argPos = 1;
                 return true;
             }
+
+            argPos = -1;
             return false;
         }
+
         /// <summary>
         ///     Gets whether the message starts with the provided string.
         /// </summary>
-        public static bool HasStringPrefix(this IUserMessage msg, string str, ref int argPos, StringComparison comparisonType = StringComparison.Ordinal)
+        public static bool HasStringPrefix(this IUserMessage msg, string str, out int argPos, StringComparison comparisonType = StringComparison.Ordinal)
         {
-            var text = msg.Content;
+            string text = msg.Content;
+
             if (!string.IsNullOrEmpty(text) && text.StartsWith(str, comparisonType))
             {
                 argPos = str.Length;
                 return true;
             }
+
+            argPos = -1;
             return false;
         }
+
         /// <summary>
         ///     Gets whether the message starts with the user's mention string.
         /// </summary>
-        public static bool HasMentionPrefix(this IUserMessage msg, IUser user, ref int argPos)
+        public static bool HasMentionPrefix(this IUserMessage msg, IUser user, out int argPos)
         {
-            var text = msg.Content;
+            string text = msg.Content;
+            argPos = -1;
             if (string.IsNullOrEmpty(text) || text.Length <= 3 || text[0] != '<' || text[1] != '@') return false;
 
             int endPos = text.IndexOf('>');
