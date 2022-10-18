@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Newtonsoft.Json.Serialization;
 using System.Runtime.Serialization;
 
@@ -6,41 +6,41 @@ namespace Discord.API
 {
     internal class Game
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public Optional<string> StreamUrl { get; set; }
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public Optional<ActivityType?> Type { get; set; }
-        [JsonProperty("details")]
+        [JsonPropertyName("details")]
         public Optional<string> Details { get; set; }
-        [JsonProperty("state")]
+        [JsonPropertyName("state")]
         public Optional<string> State { get; set; }
-        [JsonProperty("application_id")]
+        [JsonPropertyName("application_id")]
         public Optional<ulong> ApplicationId { get; set; }
-        [JsonProperty("assets")]
+        [JsonPropertyName("assets")]
         public Optional<API.GameAssets> Assets { get; set; }
-        [JsonProperty("party")]
+        [JsonPropertyName("party")]
         public Optional<API.GameParty> Party { get; set; }
-        [JsonProperty("secrets")]
+        [JsonPropertyName("secrets")]
         public Optional<API.GameSecrets> Secrets { get; set; }
-        [JsonProperty("timestamps")]
+        [JsonPropertyName("timestamps")]
         public Optional<API.GameTimestamps> Timestamps { get; set; }
-        [JsonProperty("instance")]
+        [JsonPropertyName("instance")]
         public Optional<bool> Instance { get; set; }
-        [JsonProperty("sync_id")]
+        [JsonPropertyName("sync_id")]
         public Optional<string> SyncId { get; set; }
-        [JsonProperty("session_id")]
+        [JsonPropertyName("session_id")]
         public Optional<string> SessionId { get; set; }
-        [JsonProperty("Flags")]
+        [JsonPropertyName("Flags")]
         public Optional<ActivityProperties> Flags { get; set; }
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public Optional<string> Id { get; set; }
-        [JsonProperty("emoji")]
+        [JsonPropertyName("emoji")]
         public Optional<Emoji> Emoji { get; set; }
-        [JsonProperty("created_at")]
+        [JsonPropertyName("created_at")]
         public Optional<long> CreatedAt { get; set; }
-        //[JsonProperty("buttons")]
+        //[JsonPropertyName("buttons")]
         //public Optional<RichPresenceButton[]> Buttons { get; set; }
 
         [OnError]

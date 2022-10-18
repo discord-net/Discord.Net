@@ -1,12 +1,12 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Gateway
 {
     internal class RecipientEvent
     {
-        [JsonProperty("user")]
+        [JsonPropertyName("user")]
         public User User { get; set; }
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public ulong ChannelId { get; set; }
     }
 }

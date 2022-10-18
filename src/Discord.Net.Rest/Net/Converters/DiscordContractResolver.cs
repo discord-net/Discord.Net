@@ -14,7 +14,7 @@ namespace Discord.Net.Converters
         private static readonly TypeInfo _ienumerable = typeof(IEnumerable<ulong[]>).GetTypeInfo();
         private static readonly MethodInfo _shouldSerialize = typeof(DiscordContractResolver).GetTypeInfo().GetDeclaredMethod("ShouldSerialize");
 
-        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        protected override JsonPropertyName CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
             if (property.Ignored)
@@ -33,7 +33,7 @@ namespace Discord.Net.Converters
             return property;
         }
 
-        private static JsonConverter GetConverter(JsonProperty property, PropertyInfo propInfo, Type type, int depth)
+        private static JsonConverter GetConverter(JsonPropertyName property, PropertyInfo propInfo, Type type, int depth)
         {
             if (type.IsArray)
                 return MakeGenericConverter(property, propInfo, typeof(ArrayConverter<>), type.GetElementType(), depth);
@@ -107,7 +107,7 @@ namespace Discord.Net.Converters
             return (getter as Func<TOwner, Optional<TValue>>)((TOwner)owner).IsSpecified;
         }
 
-        private static JsonConverter MakeGenericConverter(JsonProperty property, PropertyInfo propInfo, Type converterType, Type innerType, int depth)
+        private static JsonConverter MakeGenericConverter(JsonPropertyName property, PropertyInfo propInfo, Type converterType, Type innerType, int depth)
         {
             var genericType = converterType.MakeGenericType(innerType).GetTypeInfo();
             var innerConverter = GetConverter(property, propInfo, innerType, depth + 1);

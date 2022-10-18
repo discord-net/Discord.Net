@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +10,16 @@ namespace Discord.API.Rest
     internal class CreatePostParams
     {
         // thread
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Title { get; set; }
 
-        [JsonProperty("auto_archive_duration")]
+        [JsonPropertyName("auto_archive_duration")]
         public ThreadArchiveDuration ArchiveDuration { get; set; }
 
-        [JsonProperty("rate_limit_per_user")]
+        [JsonPropertyName("rate_limit_per_user")]
         public Optional<int?> Slowmode { get; set; }
 
-        [JsonProperty("message")]
+        [JsonPropertyName("message")]
         public ForumThreadMessage Message { get; set; }
     }
 }

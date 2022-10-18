@@ -1,16 +1,16 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class Overwrite
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong TargetId { get; set; }
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public PermissionTarget TargetType { get; set; }
-        [JsonProperty("deny"), Int53]
+        [JsonPropertyName("deny"), Int53]
         public string Deny { get; set; }
-        [JsonProperty("allow"), Int53]
+        [JsonPropertyName("allow"), Int53]
         public string Allow { get; set; }
     }
 }

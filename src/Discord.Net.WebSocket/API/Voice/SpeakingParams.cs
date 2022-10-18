@@ -1,12 +1,12 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Voice
 {
     internal class SpeakingParams
     {
-        [JsonProperty("speaking")]
+        [JsonPropertyName("speaking")]
         public bool IsSpeaking { get; set; }
-        [JsonProperty("delay")]
+        [JsonPropertyName("delay")]
         public int Delay { get; set; }
     }
 }

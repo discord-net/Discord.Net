@@ -1,14 +1,14 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class EmbedVideo
     {
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public string Url { get; set; }
-        [JsonProperty("height")]
+        [JsonPropertyName("height")]
         public Optional<int> Height { get; set; }
-        [JsonProperty("width")]
+        [JsonPropertyName("width")]
         public Optional<int> Width { get; set; }
     }
 }

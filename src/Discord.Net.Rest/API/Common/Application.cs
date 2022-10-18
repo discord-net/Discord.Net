@@ -1,36 +1,36 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class Application
     {
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
-        [JsonProperty("rpc_origins")]
+        [JsonPropertyName("rpc_origins")]
         public Optional<string[]> RPCOrigins { get; set; }
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("icon")]
+        [JsonPropertyName("icon")]
         public string Icon { get; set; }
-        [JsonProperty("bot_public")]
+        [JsonPropertyName("bot_public")]
         public bool IsBotPublic { get; set; }
-        [JsonProperty("bot_require_code_grant")]
+        [JsonPropertyName("bot_require_code_grant")]
         public bool BotRequiresCodeGrant { get; set; }
-        [JsonProperty("install_params")]
+        [JsonPropertyName("install_params")]
         public Optional<InstallParams> InstallParams { get; set; }
-        [JsonProperty("team")]
+        [JsonPropertyName("team")]
         public Team Team { get; set; }
-        [JsonProperty("flags"), Int53]
+        [JsonPropertyName("flags"), Int53]
         public Optional<ApplicationFlags> Flags { get; set; }
-        [JsonProperty("owner")]
+        [JsonPropertyName("owner")]
         public Optional<User> Owner { get; set; }
-        [JsonProperty("tags")]
+        [JsonPropertyName("tags")]
         public Optional<string[]> Tags { get; set; }
-        [JsonProperty("terms_of_service_url")]
+        [JsonPropertyName("terms_of_service_url")]
         public string TermsOfService { get; set; }
-        [JsonProperty("privacy_policy_url")]
+        [JsonPropertyName("privacy_policy_url")]
         public string PrivacyPolicy { get; set; }
     }
 }

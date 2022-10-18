@@ -1,26 +1,26 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class Webhook
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public ulong ChannelId { get; set; }
-        [JsonProperty("token")]
+        [JsonPropertyName("token")]
         public string Token { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public Optional<string> Name { get; set; }
-        [JsonProperty("avatar")]
+        [JsonPropertyName("avatar")]
         public Optional<string> Avatar { get; set; }
-        [JsonProperty("guild_id")]
+        [JsonPropertyName("guild_id")]
         public Optional<ulong> GuildId { get; set; }
 
-        [JsonProperty("user")]
+        [JsonPropertyName("user")]
         public Optional<User> Creator { get; set; }
-        [JsonProperty("application_id")]
+        [JsonPropertyName("application_id")]
         public ulong? ApplicationId { get; set; }
     }
 }

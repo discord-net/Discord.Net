@@ -1,6 +1,6 @@
 using Discord.Net.Converters;
 using Discord.Net.Rest;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -41,7 +41,7 @@ namespace Discord.API.Rest
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
             var d = new Dictionary<string, object>();
-           
+
 
             var payload = new Dictionary<string, object>();
             payload["type"] = Type;

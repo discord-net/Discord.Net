@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
@@ -10,13 +10,13 @@ namespace Discord.API
         /// <summary>
         /// The unique code for the invite link.
         /// </summary>
-        [JsonProperty("code")]
+        [JsonPropertyName("code")]
         public string Code { get; set; }
 
         /// <summary>
         /// The total amount of vanity invite uses.
         /// </summary>
-        [JsonProperty("uses")]
+        [JsonPropertyName("uses")]
         public int Uses { get; set; }
     }
 }

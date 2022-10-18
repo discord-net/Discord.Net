@@ -1,34 +1,34 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class InteractionCallbackData
     {
-        [JsonProperty("tts")]
+        [JsonPropertyName("tts")]
         public Optional<bool> TTS { get; set; }
 
-        [JsonProperty("content")]
+        [JsonPropertyName("content")]
         public Optional<string> Content { get; set; }
 
-        [JsonProperty("embeds")]
+        [JsonPropertyName("embeds")]
         public Optional<Embed[]> Embeds { get; set; }
 
-        [JsonProperty("allowed_mentions")]
+        [JsonPropertyName("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
 
-        [JsonProperty("flags")]
+        [JsonPropertyName("flags")]
         public Optional<MessageFlags> Flags { get; set; }
 
-        [JsonProperty("components")]
+        [JsonPropertyName("components")]
         public Optional<ActionRowComponent[]> Components { get; set; }
 
-        [JsonProperty("choices")]
+        [JsonPropertyName("choices")]
         public Optional<ApplicationCommandOptionChoice[]> Choices { get; set; }
 
-        [JsonProperty("title")]
+        [JsonPropertyName("title")]
         public Optional<string> Title { get; set; }
 
-        [JsonProperty("custom_id")]
+        [JsonPropertyName("custom_id")]
         public Optional<string> CustomId { get; set; }
     }
 }

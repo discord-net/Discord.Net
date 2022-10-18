@@ -1,18 +1,18 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class UserGuild
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonProperty("icon")]
+        [JsonPropertyName("icon")]
         public string Icon { get; set; }
-        [JsonProperty("owner")]
+        [JsonPropertyName("owner")]
         public bool Owner { get; set; }
-        [JsonProperty("permissions"), Int53]
+        [JsonPropertyName("permissions"), Int53]
         public string Permissions { get; set; }
     }
 }

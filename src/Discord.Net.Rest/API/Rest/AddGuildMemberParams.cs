@@ -1,19 +1,19 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class AddGuildMemberParams
     {
-        [JsonProperty("access_token")]
+        [JsonPropertyName("access_token")]
         public string AccessToken { get; set; }
-        [JsonProperty("nick")]
+        [JsonPropertyName("nick")]
         public Optional<string> Nickname { get; set; }
-        [JsonProperty("roles")]
+        [JsonPropertyName("roles")]
         public Optional<ulong[]> RoleIds { get; set; }
-        [JsonProperty("mute")]
+        [JsonPropertyName("mute")]
         public Optional<bool> IsMuted { get; set; }
-        [JsonProperty("deaf")]
+        [JsonPropertyName("deaf")]
         public Optional<bool> IsDeafened { get; set; }
     }
 }

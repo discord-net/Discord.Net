@@ -1,26 +1,26 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class AuditLogEntry
     {
-        [JsonProperty("target_id")]
+        [JsonPropertyName("target_id")]
         public ulong? TargetId { get; set; }
-        [JsonProperty("user_id")]
+        [JsonPropertyName("user_id")]
         public ulong? UserId { get; set; }
 
-        [JsonProperty("changes")]
+        [JsonPropertyName("changes")]
         public AuditLogChange[] Changes { get; set; }
-        [JsonProperty("options")]
+        [JsonPropertyName("options")]
         public AuditLogOptions Options { get; set; }
 
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
 
-        [JsonProperty("action_type")]
+        [JsonPropertyName("action_type")]
         public ActionType Action { get; set; }
 
-        [JsonProperty("reason")]
+        [JsonPropertyName("reason")]
         public string Reason { get; set; }
     }
 }

@@ -1,26 +1,26 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace Discord.API.Rest
 {
     internal class ModifyApplicationCommandParams
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public Optional<string> Name { get; set; }
 
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public Optional<string> Description { get; set; }
 
-        [JsonProperty("options")]
+        [JsonPropertyName("options")]
         public Optional<ApplicationCommandOption[]> Options { get; set; }
 
-        [JsonProperty("default_permission")]
+        [JsonPropertyName("default_permission")]
         public Optional<bool> DefaultPermission { get; set; }
 
-        [JsonProperty("name_localizations")]
+        [JsonPropertyName("name_localizations")]
         public Optional<Dictionary<string, string>> NameLocalizations { get; set; }
 
-        [JsonProperty("description_localizations")]
+        [JsonPropertyName("description_localizations")]
         public Optional<Dictionary<string, string>> DescriptionLocalizations { get; set; }
     }
 }

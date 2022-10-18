@@ -1,28 +1,28 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class AuditLogOptions
     {
-        [JsonProperty("count")]
+        [JsonPropertyName("count")]
         public int? Count { get; set; }
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public ulong? ChannelId { get; set; }
-        [JsonProperty("message_id")]
+        [JsonPropertyName("message_id")]
         public ulong? MessageId { get; set; }
 
         //Prune
-        [JsonProperty("delete_member_days")]
+        [JsonPropertyName("delete_member_days")]
         public int? PruneDeleteMemberDays { get; set; }
-        [JsonProperty("members_removed")]
+        [JsonPropertyName("members_removed")]
         public int? PruneMembersRemoved { get; set; }
 
         //Overwrite Update
-        [JsonProperty("role_name")]
+        [JsonPropertyName("role_name")]
         public string OverwriteRoleName { get; set; }
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public PermissionTarget OverwriteType { get; set; }
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong? OverwriteTargetId { get; set; }
     }
 }

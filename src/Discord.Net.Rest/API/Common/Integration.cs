@@ -1,42 +1,42 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 
 namespace Discord.API
 {
     internal class Integration
     {
-        [JsonProperty("guild_id")]
+        [JsonPropertyName("guild_id")]
         public Optional<ulong> GuildId { get; set; }
 
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public string Type { get; set; }
-        [JsonProperty("enabled")]
+        [JsonPropertyName("enabled")]
         public bool Enabled { get; set; }
-        [JsonProperty("syncing")]
+        [JsonPropertyName("syncing")]
         public Optional<bool?> Syncing { get; set; }
-        [JsonProperty("role_id")]
+        [JsonPropertyName("role_id")]
         public Optional<ulong?> RoleId { get; set; }
-        [JsonProperty("enable_emoticons")]
+        [JsonPropertyName("enable_emoticons")]
         public Optional<bool?> EnableEmoticons { get; set; }
-        [JsonProperty("expire_behavior")]
+        [JsonPropertyName("expire_behavior")]
         public Optional<IntegrationExpireBehavior> ExpireBehavior { get; set; }
-        [JsonProperty("expire_grace_period")]
+        [JsonPropertyName("expire_grace_period")]
         public Optional<int?> ExpireGracePeriod { get; set; }
-        [JsonProperty("user")]
+        [JsonPropertyName("user")]
         public Optional<User> User { get; set; }
-        [JsonProperty("account")]
+        [JsonPropertyName("account")]
         public Optional<IntegrationAccount> Account { get; set; }
-        [JsonProperty("synced_at")]
+        [JsonPropertyName("synced_at")]
         public Optional<DateTimeOffset> SyncedAt { get; set; }
-        [JsonProperty("subscriber_count")]
+        [JsonPropertyName("subscriber_count")]
         public Optional<int?> SubscriberAccount { get; set; }
-        [JsonProperty("revoked")]
+        [JsonPropertyName("revoked")]
         public Optional<bool?> Revoked { get; set; }
-        [JsonProperty("application")]
+        [JsonPropertyName("application")]
         public Optional<IntegrationApplication> Application { get; set; }
     }
 }

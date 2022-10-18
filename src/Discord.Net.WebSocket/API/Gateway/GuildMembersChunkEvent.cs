@@ -1,12 +1,12 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Gateway
 {
     internal class GuildMembersChunkEvent
     {
-        [JsonProperty("guild_id")]
+        [JsonPropertyName("guild_id")]
         public ulong GuildId { get; set; }
-        [JsonProperty("members")]
+        [JsonPropertyName("members")]
         public GuildMember[] Members { get; set; }
     }
 }

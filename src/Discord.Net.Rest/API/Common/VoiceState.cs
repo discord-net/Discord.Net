@@ -1,36 +1,36 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 
 namespace Discord.API
 {
     internal class VoiceState
     {
-        [JsonProperty("guild_id")]
+        [JsonPropertyName("guild_id")]
         public ulong? GuildId { get; set; }
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public ulong? ChannelId { get; set; }
-        [JsonProperty("user_id")]
+        [JsonPropertyName("user_id")]
         public ulong UserId { get; set; }
         // ALWAYS sent over WebSocket, never on REST
-        [JsonProperty("member")]
+        [JsonPropertyName("member")]
         public Optional<GuildMember> Member { get; set; }
-        [JsonProperty("session_id")]
+        [JsonPropertyName("session_id")]
         public string SessionId { get; set; }
-        [JsonProperty("deaf")]
+        [JsonPropertyName("deaf")]
         public bool Deaf { get; set; }
-        [JsonProperty("mute")]
+        [JsonPropertyName("mute")]
         public bool Mute { get; set; }
-        [JsonProperty("self_deaf")]
+        [JsonPropertyName("self_deaf")]
         public bool SelfDeaf { get; set; }
-        [JsonProperty("self_mute")]
+        [JsonPropertyName("self_mute")]
         public bool SelfMute { get; set; }
-        [JsonProperty("suppress")]
+        [JsonPropertyName("suppress")]
         public bool Suppress { get; set; }
-        [JsonProperty("self_stream")]
+        [JsonPropertyName("self_stream")]
         public bool SelfStream { get; set; }
-        [JsonProperty("self_video")]
+        [JsonPropertyName("self_video")]
         public bool SelfVideo { get; set; }
-        [JsonProperty("request_to_speak_timestamp")]
+        [JsonPropertyName("request_to_speak_timestamp")]
         public Optional<DateTimeOffset?> RequestToSpeakTimestamp { get; set; }
     }
 }

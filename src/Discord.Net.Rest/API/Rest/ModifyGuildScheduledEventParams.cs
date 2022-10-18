@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,25 +9,25 @@ namespace Discord.API.Rest
 {
     internal class ModifyGuildScheduledEventParams
     {
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public Optional<ulong?> ChannelId { get; set; }
-        [JsonProperty("entity_metadata")]
+        [JsonPropertyName("entity_metadata")]
         public Optional<GuildScheduledEventEntityMetadata> EntityMetadata { get; set; }
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public Optional<string> Name { get; set; }
-        [JsonProperty("privacy_level")]
+        [JsonPropertyName("privacy_level")]
         public Optional<GuildScheduledEventPrivacyLevel> PrivacyLevel { get; set; }
-        [JsonProperty("scheduled_start_time")]
+        [JsonPropertyName("scheduled_start_time")]
         public Optional<DateTimeOffset> StartTime { get; set; }
-        [JsonProperty("scheduled_end_time")]
+        [JsonPropertyName("scheduled_end_time")]
         public Optional<DateTimeOffset> EndTime { get; set; }
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public Optional<string> Description { get; set; }
-        [JsonProperty("entity_type")]
+        [JsonPropertyName("entity_type")]
         public Optional<GuildScheduledEventType> Type { get; set; }
-        [JsonProperty("status")]
+        [JsonPropertyName("status")]
         public Optional<GuildScheduledEventStatus> Status { get; set; }
-        [JsonProperty("image")]
+        [JsonPropertyName("image")]
         public Optional<Image?> Image { get; set; }
     }
 }

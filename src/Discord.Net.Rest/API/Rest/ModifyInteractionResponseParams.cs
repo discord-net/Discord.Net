@@ -1,22 +1,22 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     internal class ModifyInteractionResponseParams
     {
-        [JsonProperty("content")]
+        [JsonPropertyName("content")]
         public Optional<string> Content { get; set; }
 
-        [JsonProperty("embeds")]
+        [JsonPropertyName("embeds")]
         public Optional<Embed[]> Embeds { get; set; }
 
-        [JsonProperty("allowed_mentions")]
+        [JsonPropertyName("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
 
-        [JsonProperty("components")]
+        [JsonPropertyName("components")]
         public Optional<ActionRowComponent[]> Components { get; set; }
 
-        [JsonProperty("flags")]
+        [JsonPropertyName("flags")]
         public Optional<MessageFlags?> Flags { get; set; }
     }
 }

@@ -1,41 +1,41 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyGuildParams
     {
-        [JsonProperty("username")]
+        [JsonPropertyName("username")]
         public Optional<string> Username { get; set; }
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public Optional<string> Name { get; set; }
-        [JsonProperty("region")]
+        [JsonPropertyName("region")]
         public Optional<string> RegionId { get; set; }
-        [JsonProperty("verification_level")]
+        [JsonPropertyName("verification_level")]
         public Optional<VerificationLevel> VerificationLevel { get; set; }
-        [JsonProperty("default_message_notifications")]
+        [JsonPropertyName("default_message_notifications")]
         public Optional<DefaultMessageNotifications> DefaultMessageNotifications { get; set; }
-        [JsonProperty("afk_timeout")]
+        [JsonPropertyName("afk_timeout")]
         public Optional<int> AfkTimeout { get; set; }
-        [JsonProperty("system_channel_id")]
+        [JsonPropertyName("system_channel_id")]
         public Optional<ulong?> SystemChannelId { get; set; }
-        [JsonProperty("icon")]
+        [JsonPropertyName("icon")]
         public Optional<Image?> Icon { get; set; }
-        [JsonProperty("banner")]
+        [JsonPropertyName("banner")]
         public Optional<Image?> Banner { get; set; }
-        [JsonProperty("splash")]
+        [JsonPropertyName("splash")]
         public Optional<Image?> Splash { get; set; }
-        [JsonProperty("afk_channel_id")]
+        [JsonPropertyName("afk_channel_id")]
         public Optional<ulong?> AfkChannelId { get; set; }
-        [JsonProperty("owner_id")]
+        [JsonPropertyName("owner_id")]
         public Optional<ulong> OwnerId { get; set; }
-        [JsonProperty("explicit_content_filter")]
+        [JsonPropertyName("explicit_content_filter")]
         public Optional<ExplicitContentFilterLevel> ExplicitContentFilter { get; set; }
-        [JsonProperty("system_channel_flags")]
+        [JsonPropertyName("system_channel_flags")]
         public Optional<SystemChannelMessageDeny> SystemChannelFlags { get; set; }
-        [JsonProperty("preferred_locale")]
+        [JsonPropertyName("preferred_locale")]
         public string PreferredLocale { get; set; }
-        [JsonProperty("premium_progress_bar_enabled")]
+        [JsonPropertyName("premium_progress_bar_enabled")]
         public Optional<bool> IsBoostProgressBarEnabled { get; set; }
     }
 }

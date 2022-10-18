@@ -1,87 +1,87 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class Guild
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonProperty("icon")]
+        [JsonPropertyName("icon")]
         public string Icon { get; set; }
-        [JsonProperty("splash")]
+        [JsonPropertyName("splash")]
         public string Splash { get; set; }
-        [JsonProperty("discovery_splash")]
+        [JsonPropertyName("discovery_splash")]
         public string DiscoverySplash { get; set; }
-        [JsonProperty("owner_id")]
+        [JsonPropertyName("owner_id")]
         public ulong OwnerId { get; set; }
-        [JsonProperty("region")]
+        [JsonPropertyName("region")]
         public string Region { get; set; }
-        [JsonProperty("afk_channel_id")]
+        [JsonPropertyName("afk_channel_id")]
         public ulong? AFKChannelId { get; set; }
-        [JsonProperty("afk_timeout")]
+        [JsonPropertyName("afk_timeout")]
         public int AFKTimeout { get; set; }
-        [JsonProperty("verification_level")]
+        [JsonPropertyName("verification_level")]
         public VerificationLevel VerificationLevel { get; set; }
-        [JsonProperty("default_message_notifications")]
+        [JsonPropertyName("default_message_notifications")]
         public DefaultMessageNotifications DefaultMessageNotifications { get; set; }
-        [JsonProperty("explicit_content_filter")]
+        [JsonPropertyName("explicit_content_filter")]
         public ExplicitContentFilterLevel ExplicitContentFilter { get; set; }
-        [JsonProperty("voice_states")]
+        [JsonPropertyName("voice_states")]
         public VoiceState[] VoiceStates { get; set; }
-        [JsonProperty("roles")]
+        [JsonPropertyName("roles")]
         public Role[] Roles { get; set; }
-        [JsonProperty("emojis")]
+        [JsonPropertyName("emojis")]
         public Emoji[] Emojis { get; set; }
-        [JsonProperty("features")]
+        [JsonPropertyName("features")]
         public GuildFeatures Features { get; set; }
-        [JsonProperty("mfa_level")]
+        [JsonPropertyName("mfa_level")]
         public MfaLevel MfaLevel { get; set; }
-        [JsonProperty("application_id")]
+        [JsonPropertyName("application_id")]
         public ulong? ApplicationId { get; set; }
-        [JsonProperty("widget_enabled")]
+        [JsonPropertyName("widget_enabled")]
         public Optional<bool> WidgetEnabled { get; set; }
-        [JsonProperty("widget_channel_id")]
+        [JsonPropertyName("widget_channel_id")]
         public Optional<ulong?> WidgetChannelId { get; set; }
-        [JsonProperty("system_channel_id")]
+        [JsonPropertyName("system_channel_id")]
         public ulong? SystemChannelId { get; set; }
-        [JsonProperty("premium_tier")]
+        [JsonPropertyName("premium_tier")]
         public PremiumTier PremiumTier { get; set; }
-        [JsonProperty("vanity_url_code")]
+        [JsonPropertyName("vanity_url_code")]
         public string VanityURLCode { get; set; }
-        [JsonProperty("banner")]
+        [JsonPropertyName("banner")]
         public string Banner { get; set; }
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
         // this value is inverted, flags set will turn OFF features
-        [JsonProperty("system_channel_flags")]
+        [JsonPropertyName("system_channel_flags")]
         public SystemChannelMessageDeny SystemChannelFlags { get; set; }
-        [JsonProperty("rules_channel_id")]
+        [JsonPropertyName("rules_channel_id")]
         public ulong? RulesChannelId { get; set; }
-        [JsonProperty("max_presences")]
+        [JsonPropertyName("max_presences")]
         public Optional<int?> MaxPresences { get; set; }
-        [JsonProperty("max_members")]
+        [JsonPropertyName("max_members")]
         public Optional<int> MaxMembers { get; set; }
-        [JsonProperty("premium_subscription_count")]
+        [JsonPropertyName("premium_subscription_count")]
         public int? PremiumSubscriptionCount { get; set; }
-        [JsonProperty("preferred_locale")]
+        [JsonPropertyName("preferred_locale")]
         public string PreferredLocale { get; set; }
-        [JsonProperty("public_updates_channel_id")]
+        [JsonPropertyName("public_updates_channel_id")]
         public ulong? PublicUpdatesChannelId { get; set; }
-        [JsonProperty("max_video_channel_users")]
+        [JsonPropertyName("max_video_channel_users")]
         public Optional<int> MaxVideoChannelUsers { get; set; }
-        [JsonProperty("approximate_member_count")]
+        [JsonPropertyName("approximate_member_count")]
         public Optional<int> ApproximateMemberCount { get; set; }
-        [JsonProperty("approximate_presence_count")]
+        [JsonPropertyName("approximate_presence_count")]
         public Optional<int> ApproximatePresenceCount { get; set; }
-        [JsonProperty("threads")]
+        [JsonPropertyName("threads")]
         public Optional<Channel[]> Threads { get; set; }
-        [JsonProperty("nsfw_level")]
+        [JsonPropertyName("nsfw_level")]
         public NsfwLevel NsfwLevel { get; set; }
-        [JsonProperty("stickers")]
+        [JsonPropertyName("stickers")]
         public Sticker[] Stickers { get; set; }
-        [JsonProperty("premium_progress_bar_enabled")]
+        [JsonPropertyName("premium_progress_bar_enabled")]
         public Optional<bool> IsBoostProgressBarEnabled { get; set; }
     }
 }

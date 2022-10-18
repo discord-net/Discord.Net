@@ -1,15 +1,15 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyVoiceChannelParams : ModifyGuildChannelParams
     {
-        [JsonProperty("bitrate")]
+        [JsonPropertyName("bitrate")]
         public Optional<int> Bitrate { get; set; }
-        [JsonProperty("user_limit")]
+        [JsonPropertyName("user_limit")]
         public Optional<int> UserLimit { get; set; }
-        [JsonProperty("rtc_region")]
+        [JsonPropertyName("rtc_region")]
         public Optional<string> RTCRegion { get; set; }
     }
 }

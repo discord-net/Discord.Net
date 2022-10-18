@@ -1,11 +1,11 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class CreateDMChannelParams
     {
-        [JsonProperty("recipient_id")]
+        [JsonPropertyName("recipient_id")]
         public ulong RecipientId { get; }
 
         public CreateDMChannelParams(ulong recipientId)

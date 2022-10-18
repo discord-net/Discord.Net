@@ -1,20 +1,20 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class VoiceRegion
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonProperty("vip")]
+        [JsonPropertyName("vip")]
         public bool IsVip { get; set; }
-        [JsonProperty("optimal")]
+        [JsonPropertyName("optimal")]
         public bool IsOptimal { get; set; }
-        [JsonProperty("deprecated")]
+        [JsonPropertyName("deprecated")]
         public bool IsDeprecated { get; set; }
-        [JsonProperty("custom")]
+        [JsonPropertyName("custom")]
         public bool IsCustom { get; set; }
     }
 }

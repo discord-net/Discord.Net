@@ -1,11 +1,11 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class DeleteMessagesParams
     {
-        [JsonProperty("messages")]
+        [JsonPropertyName("messages")]
         public ulong[] MessageIds { get; }
 
         public DeleteMessagesParams(ulong[] messageIds)

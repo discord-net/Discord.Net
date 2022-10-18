@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace Discord.API
 {
     internal class AuditLogChange
     {
-        [JsonProperty("key")]
+        [JsonPropertyName("key")]
         public string ChangedProperty { get; set; }
 
-        [JsonProperty("new_value")]
+        [JsonPropertyName("new_value")]
         public JToken NewValue { get; set; }
 
-        [JsonProperty("old_value")]
+        [JsonPropertyName("old_value")]
         public JToken OldValue { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 using Discord.Rest;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -118,7 +117,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     Collection of WebSocket-based users.
         /// </returns>
-        public IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions; 
+        public IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions;
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 

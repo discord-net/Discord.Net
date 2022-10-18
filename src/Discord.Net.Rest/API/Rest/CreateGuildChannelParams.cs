@@ -1,33 +1,33 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class CreateGuildChannelParams
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; }
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public ChannelType Type { get; }
-        [JsonProperty("parent_id")]
+        [JsonPropertyName("parent_id")]
         public Optional<ulong?> CategoryId { get; set; }
-        [JsonProperty("position")]
+        [JsonPropertyName("position")]
         public Optional<int> Position { get; set; }
-        [JsonProperty("permission_overwrites")]
+        [JsonPropertyName("permission_overwrites")]
         public Optional<Overwrite[]> Overwrites { get; set; }
 
         //Text channels
-        [JsonProperty("topic")]
+        [JsonPropertyName("topic")]
         public Optional<string> Topic { get; set; }
-        [JsonProperty("nsfw")]
+        [JsonPropertyName("nsfw")]
         public Optional<bool> IsNsfw { get; set; }
-        [JsonProperty("rate_limit_per_user")]
+        [JsonPropertyName("rate_limit_per_user")]
         public Optional<int> SlowModeInterval { get; set; }
 
         //Voice channels
-        [JsonProperty("bitrate")]
+        [JsonPropertyName("bitrate")]
         public Optional<int> Bitrate { get; set; }
-        [JsonProperty("user_limit")]
+        [JsonPropertyName("user_limit")]
         public Optional<int?> UserLimit { get; set; }
 
         public CreateGuildChannelParams(string name, ChannelType type)

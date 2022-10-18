@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace Discord.API.Gateway
@@ -6,12 +6,12 @@ namespace Discord.API.Gateway
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class RequestMembersParams
     {
-        [JsonProperty("query")]
+        [JsonPropertyName("query")]
         public string Query { get; set; }
-        [JsonProperty("limit")]
+        [JsonPropertyName("limit")]
         public int Limit { get; set; }
 
-        [JsonProperty("guild_id")]
+        [JsonPropertyName("guild_id")]
         public IEnumerable<ulong> GuildIds { get; set; }
     }
 }

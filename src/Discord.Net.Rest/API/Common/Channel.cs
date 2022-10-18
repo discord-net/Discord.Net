@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 
 namespace Discord.API
@@ -6,72 +6,72 @@ namespace Discord.API
     internal class Channel
     {
         //Shared
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public ChannelType Type { get; set; }
-        [JsonProperty("last_message_id")]
+        [JsonPropertyName("last_message_id")]
         public ulong? LastMessageId { get; set; }
 
         //GuildChannel
-        [JsonProperty("guild_id")]
+        [JsonPropertyName("guild_id")]
         public Optional<ulong> GuildId { get; set; }
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public Optional<string> Name { get; set; }
-        [JsonProperty("position")]
+        [JsonPropertyName("position")]
         public Optional<int> Position { get; set; }
-        [JsonProperty("permission_overwrites")]
+        [JsonPropertyName("permission_overwrites")]
         public Optional<Overwrite[]> PermissionOverwrites { get; set; }
-        [JsonProperty("parent_id")]
+        [JsonPropertyName("parent_id")]
         public ulong? CategoryId { get; set; }
 
         //TextChannel
-        [JsonProperty("topic")]
+        [JsonPropertyName("topic")]
         public Optional<string> Topic { get; set; }
-        [JsonProperty("last_pin_timestamp")]
+        [JsonPropertyName("last_pin_timestamp")]
         public Optional<DateTimeOffset?> LastPinTimestamp { get; set; }
-        [JsonProperty("nsfw")]
+        [JsonPropertyName("nsfw")]
         public Optional<bool> Nsfw { get; set; }
-        [JsonProperty("rate_limit_per_user")]
+        [JsonPropertyName("rate_limit_per_user")]
         public Optional<int> SlowMode { get; set; }
 
         //VoiceChannel
-        [JsonProperty("bitrate")]
+        [JsonPropertyName("bitrate")]
         public Optional<int> Bitrate { get; set; }
-        [JsonProperty("user_limit")]
+        [JsonPropertyName("user_limit")]
         public Optional<int> UserLimit { get; set; }
-        [JsonProperty("rtc_region")]
+        [JsonPropertyName("rtc_region")]
         public Optional<string> RTCRegion { get; set; }
 
         //PrivateChannel
-        [JsonProperty("recipients")]
+        [JsonPropertyName("recipients")]
         public Optional<User[]> Recipients { get; set; }
 
         //GroupChannel
-        [JsonProperty("icon")]
+        [JsonPropertyName("icon")]
         public Optional<string> Icon { get; set; }
 
         //ThreadChannel
-        [JsonProperty("member")]
+        [JsonPropertyName("member")]
         public Optional<ThreadMember> ThreadMember { get; set; }
 
-        [JsonProperty("thread_metadata")]
+        [JsonPropertyName("thread_metadata")]
         public Optional<ThreadMetadata> ThreadMetadata { get; set; }
 
-        [JsonProperty("owner_id")]
+        [JsonPropertyName("owner_id")]
         public Optional<ulong> OwnerId { get; set; }
 
-        [JsonProperty("message_count")]
+        [JsonPropertyName("message_count")]
         public Optional<int> MessageCount { get; set; }
 
-        [JsonProperty("member_count")]
+        [JsonPropertyName("member_count")]
         public Optional<int> MemberCount { get; set; }
 
         //ForumChannel
-        [JsonProperty("available_tags")]
+        [JsonPropertyName("available_tags")]
         public Optional<ForumTags[]> ForumTags { get; set; }
-        
-        [JsonProperty("default_auto_archive_duration")]
+
+        [JsonPropertyName("default_auto_archive_duration")]
         public Optional<ThreadArchiveDuration> AutoArchiveDuration { get; set; }
     }
 }

@@ -1,13 +1,13 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyGuildChannelsParams
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; }
-        [JsonProperty("position")]
+        [JsonPropertyName("position")]
         public int Position { get; }
 
         public ModifyGuildChannelsParams(ulong id, int position)

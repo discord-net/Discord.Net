@@ -1,35 +1,35 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class CreateMessageParams
     {
-        [JsonProperty("content")]
+        [JsonPropertyName("content")]
         public string Content { get; }
 
-        [JsonProperty("nonce")]
+        [JsonPropertyName("nonce")]
         public Optional<string> Nonce { get; set; }
 
-        [JsonProperty("tts")]
+        [JsonPropertyName("tts")]
         public Optional<bool> IsTTS { get; set; }
 
-        [JsonProperty("embeds")]
+        [JsonPropertyName("embeds")]
         public Optional<Embed[]> Embeds { get; set; }
 
-        [JsonProperty("allowed_mentions")]
+        [JsonPropertyName("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
 
-        [JsonProperty("message_reference")]
+        [JsonPropertyName("message_reference")]
         public Optional<MessageReference> MessageReference { get; set; }
 
-        [JsonProperty("components")]
+        [JsonPropertyName("components")]
         public Optional<API.ActionRowComponent[]> Components { get; set; }
 
-        [JsonProperty("sticker_ids")]
+        [JsonPropertyName("sticker_ids")]
         public Optional<ulong[]> Stickers { get; set; }
-        
-        [JsonProperty("flags")]
+
+        [JsonPropertyName("flags")]
         public Optional<MessageFlags> Flags { get; set; }
 
         public CreateMessageParams(string content)

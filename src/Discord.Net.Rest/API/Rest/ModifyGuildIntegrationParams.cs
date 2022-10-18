@@ -1,15 +1,15 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyGuildIntegrationParams
     {
-        [JsonProperty("expire_behavior")]
+        [JsonPropertyName("expire_behavior")]
         public Optional<int> ExpireBehavior { get; set; }
-        [JsonProperty("expire_grace_period")]
+        [JsonPropertyName("expire_grace_period")]
         public Optional<int> ExpireGracePeriod { get; set; }
-        [JsonProperty("enable_emoticons")]
+        [JsonPropertyName("enable_emoticons")]
         public Optional<bool> EnableEmoticons { get; set; }
     }
 }

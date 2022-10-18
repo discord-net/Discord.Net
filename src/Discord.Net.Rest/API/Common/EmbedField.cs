@@ -1,14 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class EmbedField
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonProperty("value")]
+        [JsonPropertyName("value")]
         public string Value { get; set; }
-        [JsonProperty("inline")]
+        [JsonPropertyName("inline")]
         public bool Inline { get; set; }
     }
 }

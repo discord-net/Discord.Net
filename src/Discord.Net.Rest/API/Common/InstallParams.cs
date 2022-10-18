@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +9,9 @@ namespace Discord.API
 {
     internal class InstallParams
     {
-        [JsonProperty("scopes")]
+        [JsonPropertyName("scopes")]
         public string[] Scopes { get; set; }
-        [JsonProperty("permissions")]
+        [JsonPropertyName("permissions")]
         public ulong Permission { get; set; }
     }
 }

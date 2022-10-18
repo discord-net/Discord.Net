@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Discord.API.Gateway
 {
     internal class RemoveAllReactionsEvent
     {
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public ulong ChannelId { get; set; }
-        [JsonProperty("message_id")]
+        [JsonPropertyName("message_id")]
         public ulong MessageId { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,25 +9,25 @@ namespace Discord.API
 {
     internal class ForumThreadMessage
     {
-        [JsonProperty("content")]
+        [JsonPropertyName("content")]
         public Optional<string> Content { get; set; }
 
-        [JsonProperty("nonce")]
+        [JsonPropertyName("nonce")]
         public Optional<string> Nonce { get; set; }
 
-        [JsonProperty("embeds")]
+        [JsonPropertyName("embeds")]
         public Optional<Embed[]> Embeds { get; set; }
 
-        [JsonProperty("allowed_mentions")]
+        [JsonPropertyName("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
 
-        [JsonProperty("components")]
+        [JsonPropertyName("components")]
         public Optional<API.ActionRowComponent[]> Components { get; set; }
 
-        [JsonProperty("sticker_ids")]
+        [JsonPropertyName("sticker_ids")]
         public Optional<ulong[]> Stickers { get; set; }
 
-        [JsonProperty("flags")]
+        [JsonPropertyName("flags")]
         public Optional<MessageFlags> Flags { get; set; }
     }
 }

@@ -1,34 +1,34 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class TextInputComponent : IMessageComponent
     {
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public ComponentType Type { get; set; }
 
-        [JsonProperty("style")]
+        [JsonPropertyName("style")]
         public TextInputStyle Style { get; set; }
 
-        [JsonProperty("custom_id")]
+        [JsonPropertyName("custom_id")]
         public string CustomId { get; set; }
 
-        [JsonProperty("label")]
+        [JsonPropertyName("label")]
         public string Label { get; set; }
 
-        [JsonProperty("placeholder")]
+        [JsonPropertyName("placeholder")]
         public Optional<string> Placeholder { get; set; }
 
-        [JsonProperty("min_length")]
+        [JsonPropertyName("min_length")]
         public Optional<int> MinLength { get; set; }
 
-        [JsonProperty("max_length")]
+        [JsonPropertyName("max_length")]
         public Optional<int> MaxLength { get; set; }
 
-        [JsonProperty("value")]
+        [JsonPropertyName("value")]
         public Optional<string> Value { get; set; }
 
-        [JsonProperty("required")]
+        [JsonPropertyName("required")]
         public Optional<bool> Required { get; set; }
 
         public TextInputComponent() { }

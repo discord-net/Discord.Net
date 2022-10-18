@@ -1,11 +1,11 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyCurrentUserNickParams
     {
-        [JsonProperty("nick")]
+        [JsonPropertyName("nick")]
         public string Nickname { get; }
 
         public ModifyCurrentUserNickParams(string nickname)

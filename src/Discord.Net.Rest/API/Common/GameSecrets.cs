@@ -1,14 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class GameSecrets
     {
-        [JsonProperty("match")]
+        [JsonPropertyName("match")]
         public string Match { get; set; }
-        [JsonProperty("join")]
+        [JsonPropertyName("join")]
         public string Join { get; set; }
-        [JsonProperty("spectate")]
+        [JsonPropertyName("spectate")]
         public string Spectate { get; set; }
     }
 }

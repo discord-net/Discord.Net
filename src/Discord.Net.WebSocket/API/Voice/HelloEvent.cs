@@ -1,10 +1,10 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Voice
 {
     internal class HelloEvent
     {
-        [JsonProperty("heartbeat_interval")]
+        [JsonPropertyName("heartbeat_interval")]
         public int HeartbeatInterval { get; set; }
     }
 }

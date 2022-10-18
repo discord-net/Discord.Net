@@ -1,32 +1,32 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System.Linq;
 
 namespace Discord.API
 {
     internal class SelectMenuComponent : IMessageComponent
     {
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public ComponentType Type { get; set; }
 
-        [JsonProperty("custom_id")]
+        [JsonPropertyName("custom_id")]
         public string CustomId { get; set; }
 
-        [JsonProperty("options")]
+        [JsonPropertyName("options")]
         public SelectMenuOption[] Options { get; set; }
 
-        [JsonProperty("placeholder")]
+        [JsonPropertyName("placeholder")]
         public Optional<string> Placeholder { get; set; }
 
-        [JsonProperty("min_values")]
+        [JsonPropertyName("min_values")]
         public int MinValues { get; set; }
 
-        [JsonProperty("max_values")]
+        [JsonPropertyName("max_values")]
         public int MaxValues { get; set; }
 
-        [JsonProperty("disabled")]
+        [JsonPropertyName("disabled")]
         public bool Disabled { get; set; }
 
-        [JsonProperty("values")]
+        [JsonPropertyName("values")]
         public Optional<string[]> Values { get; set; }
         public SelectMenuComponent() { }
 

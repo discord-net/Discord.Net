@@ -1,28 +1,28 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class Attachment
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("filename")]
+        [JsonPropertyName("filename")]
         public string Filename { get; set; }
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public Optional<string> Description { get; set; }
-        [JsonProperty("content_type")]
+        [JsonPropertyName("content_type")]
         public Optional<string> ContentType { get; set; }
-        [JsonProperty("size")]
+        [JsonPropertyName("size")]
         public int Size { get; set; }
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public string Url { get; set; }
-        [JsonProperty("proxy_url")]
+        [JsonPropertyName("proxy_url")]
         public string ProxyUrl { get; set; }
-        [JsonProperty("height")]
+        [JsonPropertyName("height")]
         public Optional<int> Height { get; set; }
-        [JsonProperty("width")]
+        [JsonPropertyName("width")]
         public Optional<int> Width { get; set; }
-        [JsonProperty("ephemeral")]
+        [JsonPropertyName("ephemeral")]
         public Optional<bool> Ephemeral { get; set; }
     }
 }

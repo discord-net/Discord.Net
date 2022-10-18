@@ -1,13 +1,13 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyGuildWidgetParams
-    {        
-        [JsonProperty("enabled")]
+    {
+        [JsonPropertyName("enabled")]
         public Optional<bool> Enabled { get; set; }
-        [JsonProperty("channel")]
+        [JsonPropertyName("channel")]
         public Optional<ulong?> ChannelId { get; set; }
     }
 }

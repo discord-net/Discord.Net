@@ -1,22 +1,22 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class AuditLog
     {
-        [JsonProperty("webhooks")]
+        [JsonPropertyName("webhooks")]
         public Webhook[] Webhooks { get; set; }
 
-        [JsonProperty("threads")]
+        [JsonPropertyName("threads")]
         public Channel[] Threads { get; set; }
 
-        [JsonProperty("integrations")]
+        [JsonPropertyName("integrations")]
         public Integration[] Integrations { get; set; }
 
-        [JsonProperty("users")]
+        [JsonPropertyName("users")]
         public User[] Users { get; set; }
 
-        [JsonProperty("audit_log_entries")]
+        [JsonPropertyName("audit_log_entries")]
         public AuditLogEntry[] Entries { get; set; }
     }
 }

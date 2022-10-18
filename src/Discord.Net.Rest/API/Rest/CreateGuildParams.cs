@@ -1,16 +1,16 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class CreateGuildParams
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; }
-        [JsonProperty("region")]
+        [JsonPropertyName("region")]
         public string RegionId { get; }
 
-        [JsonProperty("icon")]
+        [JsonPropertyName("icon")]
         public Optional<Image?> Icon { get; set; }
 
         public CreateGuildParams(string name, string regionId)

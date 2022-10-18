@@ -1,19 +1,19 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 
 namespace Discord.API
 {
     internal class InviteMetadata : Invite
     {
-        [JsonProperty("uses")]
+        [JsonPropertyName("uses")]
         public int Uses { get; set; }
-        [JsonProperty("max_uses")]
+        [JsonPropertyName("max_uses")]
         public int MaxUses { get; set; }
-        [JsonProperty("max_age")]
+        [JsonPropertyName("max_age")]
         public int MaxAge { get; set; }
-        [JsonProperty("temporary")]
+        [JsonPropertyName("temporary")]
         public bool Temporary { get; set; }
-        [JsonProperty("created_at")]
+        [JsonPropertyName("created_at")]
         public DateTimeOffset CreatedAt { get; set; }
     }
 }

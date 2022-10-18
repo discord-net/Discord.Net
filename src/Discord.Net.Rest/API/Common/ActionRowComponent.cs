@@ -1,14 +1,14 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System.Linq;
 
 namespace Discord.API
 {
     internal class ActionRowComponent : IMessageComponent
     {
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public ComponentType Type { get; set; }
 
-        [JsonProperty("components")]
+        [JsonPropertyName("components")]
         public IMessageComponent[] Components { get; set; }
 
         internal ActionRowComponent() { }

@@ -1,30 +1,30 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class Sticker
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("pack_id")]
+        [JsonPropertyName("pack_id")]
         public ulong PackId { get; set; }
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
-        [JsonProperty("tags")]
+        [JsonPropertyName("tags")]
         public Optional<string> Tags { get; set; }
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public StickerType Type { get; set; }
-        [JsonProperty("format_type")]
+        [JsonPropertyName("format_type")]
         public StickerFormatType FormatType { get; set; }
-        [JsonProperty("available")]
+        [JsonPropertyName("available")]
         public bool? Available { get; set; }
-        [JsonProperty("guild_id")]
+        [JsonPropertyName("guild_id")]
         public Optional<ulong> GuildId { get; set; }
-        [JsonProperty("user")]
+        [JsonPropertyName("user")]
         public Optional<User> User { get; set; }
-        [JsonProperty("sort_value")]
+        [JsonPropertyName("sort_value")]
         public int? SortValue { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +9,11 @@ namespace Discord.API
 {
     internal class GuildScheduledEventUser
     {
-        [JsonProperty("user")]
+        [JsonPropertyName("user")]
         public User User { get; set; }
-        [JsonProperty("member")]
+        [JsonPropertyName("member")]
         public Optional<GuildMember> Member { get; set; }
-        [JsonProperty("guild_scheduled_event_id")]
+        [JsonPropertyName("guild_scheduled_event_id")]
         public ulong GuildScheduledEventId { get; set; }
     }
 }

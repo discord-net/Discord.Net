@@ -1,25 +1,25 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class StageInstance
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
 
-        [JsonProperty("guild_id")]
+        [JsonPropertyName("guild_id")]
         public ulong GuildId { get; set; }
 
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public ulong ChannelId { get; set; }
 
-        [JsonProperty("topic")]
+        [JsonPropertyName("topic")]
         public string Topic { get; set; }
 
-        [JsonProperty("privacy_level")]
+        [JsonPropertyName("privacy_level")]
         public StagePrivacyLevel PrivacyLevel { get; set; }
 
-        [JsonProperty("discoverable_disabled")]
+        [JsonPropertyName("discoverable_disabled")]
         public bool DiscoverableDisabled { get; set; }
     }
 }

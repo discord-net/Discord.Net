@@ -1,15 +1,15 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyChannelPermissionsParams
     {
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public int Type { get; }
-        [JsonProperty("allow")]
+        [JsonPropertyName("allow")]
         public string Allow { get; }
-        [JsonProperty("deny")]
+        [JsonPropertyName("deny")]
         public string Deny { get; }
 
         public ModifyChannelPermissionsParams(int type, string allow, string deny)

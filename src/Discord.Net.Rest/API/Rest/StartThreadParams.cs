@@ -1,22 +1,22 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     internal class StartThreadParams
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("auto_archive_duration")]
+        [JsonPropertyName("auto_archive_duration")]
         public ThreadArchiveDuration Duration { get; set; }
 
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public ThreadType Type { get; set; }
 
-        [JsonProperty("invitable")]
+        [JsonPropertyName("invitable")]
         public Optional<bool> Invitable { get; set; }
 
-        [JsonProperty("rate_limit_per_user")]
+        [JsonPropertyName("rate_limit_per_user")]
         public Optional<int?> Ratelimit { get; set; }
     }
 }

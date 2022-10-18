@@ -1,14 +1,14 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class GameTimestamps
     {
-        [JsonProperty("start")]
+        [JsonPropertyName("start")]
         [UnixTimestamp]
         public Optional<DateTimeOffset> Start { get; set; }
-        [JsonProperty("end")]
+        [JsonPropertyName("end")]
         [UnixTimestamp]
         public Optional<DateTimeOffset> End { get; set; }
     }

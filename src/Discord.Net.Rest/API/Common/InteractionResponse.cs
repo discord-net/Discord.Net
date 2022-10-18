@@ -1,13 +1,13 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class InteractionResponse
     {
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public InteractionResponseType Type { get; set; }
 
-        [JsonProperty("data")]
+        [JsonPropertyName("data")]
         public Optional<InteractionCallbackData> Data { get; set; }
     }
 }

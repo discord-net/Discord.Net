@@ -1,66 +1,66 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 
 namespace Discord.API
 {
     internal class Message
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public MessageType Type { get; set; }
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public ulong ChannelId { get; set; }
         // ALWAYS sent on WebSocket messages
-        [JsonProperty("guild_id")]
+        [JsonPropertyName("guild_id")]
         public Optional<ulong> GuildId { get; set; }
-        [JsonProperty("webhook_id")]
+        [JsonPropertyName("webhook_id")]
         public Optional<ulong> WebhookId { get; set; }
-        [JsonProperty("author")]
+        [JsonPropertyName("author")]
         public Optional<User> Author { get; set; }
         // ALWAYS sent on WebSocket messages
-        [JsonProperty("member")]
+        [JsonPropertyName("member")]
         public Optional<GuildMember> Member { get; set; }
-        [JsonProperty("content")]
+        [JsonPropertyName("content")]
         public Optional<string> Content { get; set; }
-        [JsonProperty("timestamp")]
+        [JsonPropertyName("timestamp")]
         public Optional<DateTimeOffset> Timestamp { get; set; }
-        [JsonProperty("edited_timestamp")]
+        [JsonPropertyName("edited_timestamp")]
         public Optional<DateTimeOffset?> EditedTimestamp { get; set; }
-        [JsonProperty("tts")]
+        [JsonPropertyName("tts")]
         public Optional<bool> IsTextToSpeech { get; set; }
-        [JsonProperty("mention_everyone")]
+        [JsonPropertyName("mention_everyone")]
         public Optional<bool> MentionEveryone { get; set; }
-        [JsonProperty("mentions")]
+        [JsonPropertyName("mentions")]
         public Optional<User[]> UserMentions { get; set; }
-        [JsonProperty("mention_roles")]
+        [JsonPropertyName("mention_roles")]
         public Optional<ulong[]> RoleMentions { get; set; }
-        [JsonProperty("attachments")]
+        [JsonPropertyName("attachments")]
         public Optional<Attachment[]> Attachments { get; set; }
-        [JsonProperty("embeds")]
+        [JsonPropertyName("embeds")]
         public Optional<Embed[]> Embeds { get; set; }
-        [JsonProperty("pinned")]
+        [JsonPropertyName("pinned")]
         public Optional<bool> Pinned { get; set; }
-        [JsonProperty("reactions")]
+        [JsonPropertyName("reactions")]
         public Optional<Reaction[]> Reactions { get; set; }
         // sent with Rich Presence-related chat embeds
-        [JsonProperty("activity")]
+        [JsonPropertyName("activity")]
         public Optional<MessageActivity> Activity { get; set; }
         // sent with Rich Presence-related chat embeds
-        [JsonProperty("application")]
+        [JsonPropertyName("application")]
         public Optional<MessageApplication> Application { get; set; }
-        [JsonProperty("message_reference")]
+        [JsonPropertyName("message_reference")]
         public Optional<MessageReference> Reference { get; set; }
-        [JsonProperty("flags")]
+        [JsonPropertyName("flags")]
         public Optional<MessageFlags> Flags { get; set; }
-        [JsonProperty("allowed_mentions")]
+        [JsonPropertyName("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
-        [JsonProperty("referenced_message")]
+        [JsonPropertyName("referenced_message")]
         public Optional<Message> ReferencedMessage { get; set; }
-        [JsonProperty("components")]
+        [JsonPropertyName("components")]
         public Optional<API.ActionRowComponent[]> Components { get; set; }
         public Optional<MessageInteraction> Interaction { get; set; }
-        [JsonProperty("sticker_items")]
+        [JsonPropertyName("sticker_items")]
         public Optional<StickerItem[]> StickerItems { get; set; }
     }
 }

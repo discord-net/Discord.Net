@@ -1,38 +1,38 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class User
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("username")]
+        [JsonPropertyName("username")]
         public Optional<string> Username { get; set; }
-        [JsonProperty("discriminator")]
+        [JsonPropertyName("discriminator")]
         public Optional<string> Discriminator { get; set; }
-        [JsonProperty("bot")]
+        [JsonPropertyName("bot")]
         public Optional<bool> Bot { get; set; }
-        [JsonProperty("avatar")]
+        [JsonPropertyName("avatar")]
         public Optional<string> Avatar { get; set; }
-        [JsonProperty("banner")]
+        [JsonPropertyName("banner")]
         public Optional<string> Banner { get; set; }
-        [JsonProperty("accent_color")]
+        [JsonPropertyName("accent_color")]
         public Optional<uint?> AccentColor { get; set; }
 
         //CurrentUser
-        [JsonProperty("verified")]
+        [JsonPropertyName("verified")]
         public Optional<bool> Verified { get; set; }
-        [JsonProperty("email")]
+        [JsonPropertyName("email")]
         public Optional<string> Email { get; set; }
-        [JsonProperty("mfa_enabled")]
+        [JsonPropertyName("mfa_enabled")]
         public Optional<bool> MfaEnabled { get; set; }
-        [JsonProperty("flags")]
+        [JsonPropertyName("flags")]
         public Optional<UserProperties> Flags { get; set; }
-        [JsonProperty("premium_type")]
+        [JsonPropertyName("premium_type")]
         public Optional<PremiumType> PremiumType { get; set; }
-        [JsonProperty("locale")]
+        [JsonPropertyName("locale")]
         public Optional<string> Locale { get; set; }
-        [JsonProperty("public_flags")]
+        [JsonPropertyName("public_flags")]
         public Optional<UserProperties> PublicFlags { get; set; }
     }
 }

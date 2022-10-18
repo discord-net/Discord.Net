@@ -1,16 +1,16 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class TeamMember
     {
-        [JsonProperty("membership_state")]
+        [JsonPropertyName("membership_state")]
         public MembershipState MembershipState { get; set; }
-        [JsonProperty("permissions")]
+        [JsonPropertyName("permissions")]
         public string[] Permissions { get; set; }
-        [JsonProperty("team_id")]
+        [JsonPropertyName("team_id")]
         public ulong TeamId { get; set; }
-        [JsonProperty("user")]
+        [JsonPropertyName("user")]
         public User User { get; set; }
     }
 }

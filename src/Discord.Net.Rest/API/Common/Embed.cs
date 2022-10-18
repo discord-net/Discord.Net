@@ -1,36 +1,36 @@
 using System;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Discord.Net.Converters;
 
 namespace Discord.API
 {
     internal class Embed
     {
-        [JsonProperty("title")]
+        [JsonPropertyName("title")]
         public string Title { get; set; }
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public string Url { get; set; }
-        [JsonProperty("color")]
+        [JsonPropertyName("color")]
         public uint? Color { get; set; }
-        [JsonProperty("type"), JsonConverter(typeof(EmbedTypeConverter))]
+        [JsonPropertyName("type"), JsonConverter(typeof(EmbedTypeConverter))]
         public EmbedType Type { get; set; }
-        [JsonProperty("timestamp")]
+        [JsonPropertyName("timestamp")]
         public DateTimeOffset? Timestamp { get; set; }
-        [JsonProperty("author")]
+        [JsonPropertyName("author")]
         public Optional<EmbedAuthor> Author { get; set; }
-        [JsonProperty("footer")]
+        [JsonPropertyName("footer")]
         public Optional<EmbedFooter> Footer { get; set; }
-        [JsonProperty("video")]
+        [JsonPropertyName("video")]
         public Optional<EmbedVideo> Video { get; set; }
-        [JsonProperty("thumbnail")]
+        [JsonPropertyName("thumbnail")]
         public Optional<EmbedThumbnail> Thumbnail { get; set; }
-        [JsonProperty("image")]
+        [JsonPropertyName("image")]
         public Optional<EmbedImage> Image { get; set; }
-        [JsonProperty("provider")]
+        [JsonPropertyName("provider")]
         public Optional<EmbedProvider> Provider { get; set; }
-        [JsonProperty("fields")]
+        [JsonPropertyName("fields")]
         public Optional<EmbedField[]> Fields { get; set; }
     }
 }

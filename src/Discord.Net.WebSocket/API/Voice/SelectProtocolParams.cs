@@ -1,12 +1,12 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Voice
 {
     internal class SelectProtocolParams
     {
-        [JsonProperty("protocol")]
+        [JsonPropertyName("protocol")]
         public string Protocol { get; set; }
-        [JsonProperty("data")]
+        [JsonPropertyName("data")]
         public UdpProtocolInfo Data { get; set; }
     }
 }

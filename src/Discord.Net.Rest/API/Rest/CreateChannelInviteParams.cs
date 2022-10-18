@@ -1,23 +1,23 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class CreateChannelInviteParams
     {
-        [JsonProperty("max_age")]
+        [JsonPropertyName("max_age")]
         public Optional<int> MaxAge { get; set; }
-        [JsonProperty("max_uses")]
+        [JsonPropertyName("max_uses")]
         public Optional<int> MaxUses { get; set; }
-        [JsonProperty("temporary")]
+        [JsonPropertyName("temporary")]
         public Optional<bool> IsTemporary { get; set; }
-        [JsonProperty("unique")]
+        [JsonPropertyName("unique")]
         public Optional<bool> IsUnique { get; set; }
-        [JsonProperty("target_type")]
+        [JsonPropertyName("target_type")]
         public Optional<TargetUserType> TargetType { get; set; }
-        [JsonProperty("target_user_id")]
+        [JsonPropertyName("target_user_id")]
         public Optional<ulong> TargetUserId { get; set; }
-        [JsonProperty("target_application_id")]
+        [JsonPropertyName("target_application_id")]
         public Optional<ulong> TargetApplicationId { get; set; }
     }
 }

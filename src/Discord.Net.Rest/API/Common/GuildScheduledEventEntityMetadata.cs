@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace Discord.API
 {
     internal class GuildScheduledEventEntityMetadata
     {
-        [JsonProperty("location")]
+        [JsonPropertyName("location")]
         public Optional<string> Location { get; set; }
     }
 }

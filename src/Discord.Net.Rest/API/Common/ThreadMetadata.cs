@@ -1,26 +1,26 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 
 namespace Discord.API
 {
     internal class ThreadMetadata
     {
-        [JsonProperty("archived")]
+        [JsonPropertyName("archived")]
         public bool Archived { get; set; }
 
-        [JsonProperty("auto_archive_duration")]
+        [JsonPropertyName("auto_archive_duration")]
         public ThreadArchiveDuration AutoArchiveDuration { get; set; }
 
-        [JsonProperty("archive_timestamp")]
+        [JsonPropertyName("archive_timestamp")]
         public DateTimeOffset ArchiveTimestamp { get; set; }
 
-        [JsonProperty("locked")]
+        [JsonPropertyName("locked")]
         public Optional<bool> Locked { get; set; }
 
-        [JsonProperty("invitable")]
+        [JsonPropertyName("invitable")]
         public Optional<bool> Invitable { get; set; }
 
-        [JsonProperty("create_timestamp")]
+        [JsonPropertyName("create_timestamp")]
         public Optional<DateTimeOffset?> CreatedAt { get; set; }
     }
 }

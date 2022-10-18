@@ -1,14 +1,14 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class ReadState
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("mention_count")]
+        [JsonPropertyName("mention_count")]
         public int MentionCount { get; set; }
-        [JsonProperty("last_message_id")]
+        [JsonPropertyName("last_message_id")]
         public Optional<ulong> LastMessageId { get; set; }
     }
 }

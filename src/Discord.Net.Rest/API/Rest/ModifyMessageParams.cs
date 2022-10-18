@@ -1,19 +1,19 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyMessageParams
     {
-        [JsonProperty("content")]
+        [JsonPropertyName("content")]
         public Optional<string> Content { get; set; }
-        [JsonProperty("embeds")]
+        [JsonPropertyName("embeds")]
         public Optional<API.Embed[]> Embeds { get; set; }
-        [JsonProperty("components")]
+        [JsonPropertyName("components")]
         public Optional<API.ActionRowComponent[]> Components { get; set; }
-        [JsonProperty("flags")]
+        [JsonPropertyName("flags")]
         public Optional<MessageFlags?> Flags { get; set; }
-        [JsonProperty("allowed_mentions")]
+        [JsonPropertyName("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
     }
 }

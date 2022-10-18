@@ -1,18 +1,18 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Gateway
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class VoiceStateUpdateParams
     {
-        [JsonProperty("self_mute")]
+        [JsonPropertyName("self_mute")]
         public bool SelfMute { get; set; }
-        [JsonProperty("self_deaf")]
+        [JsonPropertyName("self_deaf")]
         public bool SelfDeaf { get; set; }
 
-        [JsonProperty("guild_id")]
+        [JsonPropertyName("guild_id")]
         public ulong? GuildId { get; set; }
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public ulong? ChannelId { get; set; }
     }
 }

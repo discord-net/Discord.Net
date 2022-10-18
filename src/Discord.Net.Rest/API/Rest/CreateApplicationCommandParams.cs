@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -8,31 +8,31 @@ namespace Discord.API.Rest
 {
     internal class CreateApplicationCommandParams
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public ApplicationCommandType Type { get; set; }
 
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
 
-        [JsonProperty("options")]
+        [JsonPropertyName("options")]
         public Optional<ApplicationCommandOption[]> Options { get; set; }
 
-        [JsonProperty("default_permission")]
+        [JsonPropertyName("default_permission")]
         public Optional<bool> DefaultPermission { get; set; }
 
-        [JsonProperty("name_localizations")]
+        [JsonPropertyName("name_localizations")]
         public Optional<Dictionary<string, string>> NameLocalizations { get; set; }
 
-        [JsonProperty("description_localizations")]
+        [JsonPropertyName("description_localizations")]
         public Optional<Dictionary<string, string>> DescriptionLocalizations { get; set; }
 
-        [JsonProperty("dm_permission")]
+        [JsonPropertyName("dm_permission")]
         public Optional<bool?> DmPermission { get; set; }
 
-        [JsonProperty("default_member_permissions")]
+        [JsonPropertyName("default_member_permissions")]
         public Optional<GuildPermission?> DefaultMemberPermission { get; set; }
 
         public CreateApplicationCommandParams() { }

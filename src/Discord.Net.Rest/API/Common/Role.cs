@@ -1,30 +1,30 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class Role
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonProperty("icon")]
+        [JsonPropertyName("icon")]
         public Optional<string> Icon { get; set; }
-        [JsonProperty("unicode_emoji")]
+        [JsonPropertyName("unicode_emoji")]
         public Optional<string> Emoji { get; set; }
-        [JsonProperty("color")]
+        [JsonPropertyName("color")]
         public uint Color { get; set; }
-        [JsonProperty("hoist")]
+        [JsonPropertyName("hoist")]
         public bool Hoist { get; set; }
-        [JsonProperty("mentionable")]
+        [JsonPropertyName("mentionable")]
         public bool Mentionable { get; set; }
-        [JsonProperty("position")]
+        [JsonPropertyName("position")]
         public int Position { get; set; }
-        [JsonProperty("permissions"), Int53]
+        [JsonPropertyName("permissions"), Int53]
         public string Permissions { get; set; }
-        [JsonProperty("managed")]
+        [JsonPropertyName("managed")]
         public bool Managed { get; set; }
-        [JsonProperty("tags")]
+        [JsonPropertyName("tags")]
         public Optional<RoleTags> Tags { get; set; }
     }
 }

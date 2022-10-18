@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Gateway
 {
@@ -6,13 +6,13 @@ namespace Discord.API.Gateway
     internal class PresenceUpdateParams
 
     {
-        [JsonProperty("status")]
+        [JsonPropertyName("status")]
         public UserStatus Status { get; set; }
-        [JsonProperty("since", NullValueHandling = NullValueHandling.Include), Int53]
+        [JsonPropertyName("since", NullValueHandling = NullValueHandling.Include), Int53]
         public long? IdleSince { get; set; }
-        [JsonProperty("afk")]
+        [JsonPropertyName("afk")]
         public bool IsAFK { get; set; }
-        [JsonProperty("activities")]
+        [JsonPropertyName("activities")]
         public object[] Activities { get; set; } // TODO, change to interface later
     }
 }

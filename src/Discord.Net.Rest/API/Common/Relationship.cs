@@ -1,14 +1,14 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class Relationship
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
-        [JsonProperty("user")]
+        [JsonPropertyName("user")]
         public User User { get; set; }
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public RelationshipType Type { get; set; }
     }
 }

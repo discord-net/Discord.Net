@@ -1,14 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class Reaction
     {
-        [JsonProperty("count")]
+        [JsonPropertyName("count")]
         public int Count { get; set; }
-        [JsonProperty("me")]
+        [JsonPropertyName("me")]
         public bool Me { get; set; }
-        [JsonProperty("emoji")]
+        [JsonPropertyName("emoji")]
         public Emoji Emoji { get; set; }
     }
 }

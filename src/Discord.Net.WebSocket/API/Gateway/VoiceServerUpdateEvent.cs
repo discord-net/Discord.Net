@@ -1,14 +1,14 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Gateway
 {
     internal class VoiceServerUpdateEvent
 	{
-		[JsonProperty("guild_id")]
+		[JsonPropertyName("guild_id")]
 		public ulong GuildId { get; set; }
-        [JsonProperty("endpoint")]
+        [JsonPropertyName("endpoint")]
 		public string Endpoint { get; set; }
-        [JsonProperty("token")]
+        [JsonPropertyName("token")]
 		public string Token { get; set; }
     }
 }

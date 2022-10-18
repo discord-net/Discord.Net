@@ -1,27 +1,27 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace Discord.API
 {
     internal class Connection
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public string Type { get; set; }
-        [JsonProperty("revoked")]
+        [JsonPropertyName("revoked")]
         public Optional<bool> Revoked { get; set; }
-        [JsonProperty("integrations")]
+        [JsonPropertyName("integrations")]
         public Optional<IReadOnlyCollection<Integration>> Integrations { get; set; }
-        [JsonProperty("verified")]
+        [JsonPropertyName("verified")]
         public bool Verified { get; set; }
-        [JsonProperty("friend_sync")]
+        [JsonPropertyName("friend_sync")]
         public bool FriendSync { get; set; }
-        [JsonProperty("show_activity")]
+        [JsonPropertyName("show_activity")]
         public bool ShowActivity { get; set; }
-        [JsonProperty("visibility")]
+        [JsonPropertyName("visibility")]
         public ConnectionVisibility Visibility { get; set; }
 
     }

@@ -1,12 +1,12 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Voice
 {
     internal class SessionDescriptionEvent
     {
-        [JsonProperty("secret_key")]
+        [JsonPropertyName("secret_key")]
         public byte[] SecretKey { get; set; }
-        [JsonProperty("mode")]
+        [JsonPropertyName("mode")]
         public string Mode { get; set; }
     }
 }

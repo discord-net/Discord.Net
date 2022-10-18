@@ -1,23 +1,23 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyGuildRoleParams
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public Optional<string> Name { get; set; }
-        [JsonProperty("permissions")]
+        [JsonPropertyName("permissions")]
         public Optional<string> Permissions { get; set; }
-        [JsonProperty("color")]
+        [JsonPropertyName("color")]
         public Optional<uint> Color { get; set; }
-        [JsonProperty("hoist")]
+        [JsonPropertyName("hoist")]
         public Optional<bool> Hoist { get; set; }
-        [JsonProperty("icon")]
+        [JsonPropertyName("icon")]
         public Optional<Image?> Icon { get; set; }
-        [JsonProperty("unicode_emoji")]
+        [JsonPropertyName("unicode_emoji")]
         public Optional<string> Emoji { get; set; }
-        [JsonProperty("mentionable")]
+        [JsonPropertyName("mentionable")]
         public Optional<bool> Mentionable { get; set; }
     }
 }

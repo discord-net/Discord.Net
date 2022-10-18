@@ -1,13 +1,13 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyCurrentUserParams
     {
-        [JsonProperty("username")]
+        [JsonPropertyName("username")]
         public Optional<string> Username { get; set; }
-        [JsonProperty("avatar")]
+        [JsonPropertyName("avatar")]
         public Optional<Image?> Avatar { get; set; }
     }
 }

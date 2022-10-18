@@ -1,13 +1,13 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class ModalInteractionData : IDiscordInteractionData
     {
-        [JsonProperty("custom_id")]
+        [JsonPropertyName("custom_id")]
         public string CustomId { get; set; }
 
-        [JsonProperty("components")]
+        [JsonPropertyName("components")]
         public API.ActionRowComponent[] Components { get; set; }
     }
 }

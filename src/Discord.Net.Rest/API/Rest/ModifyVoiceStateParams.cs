@@ -1,17 +1,17 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 
 namespace Discord.API.Rest
 {
     internal class ModifyVoiceStateParams
     {
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public ulong ChannelId { get; set; }
 
-        [JsonProperty("suppress")]
+        [JsonPropertyName("suppress")]
         public Optional<bool> Suppressed { get; set; }
 
-        [JsonProperty("request_to_speak_timestamp")]
+        [JsonPropertyName("request_to_speak_timestamp")]
         public Optional<DateTimeOffset> RequestToSpeakTimestamp { get; set; }
     }
 }

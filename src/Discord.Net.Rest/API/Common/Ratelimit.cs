@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +9,13 @@ namespace Discord.API
 {
     internal class Ratelimit
     {
-        [JsonProperty("global")]
+        [JsonPropertyName("global")]
         public bool Global { get; set; }
 
-        [JsonProperty("message")]
+        [JsonPropertyName("message")]
         public string Message { get; set; }
 
-        [JsonProperty("retry_after")]
+        [JsonPropertyName("retry_after")]
         public double RetryAfter { get; set; }
     }
 }

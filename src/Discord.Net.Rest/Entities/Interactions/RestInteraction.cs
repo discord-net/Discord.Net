@@ -142,13 +142,13 @@ namespace Discord.Rest
             GuildId = model.GuildId.IsSpecified
                 ? model.GuildId.Value
                 : null;
-            
+
             IsDMInteraction = GuildId is null;
 
             Data = model.Data.IsSpecified
                 ? model.Data.Value
                 : null;
-            
+
             Token = model.Token;
             Version = model.Version;
             Type = model.Type;
@@ -176,7 +176,7 @@ namespace Discord.Rest
                     User = RestUser.Create(Discord, model.User.Value);
                 }
             }
-            
+
 
             if (Channel is null && ChannelId is not null)
             {
@@ -294,7 +294,7 @@ namespace Discord.Rest
         }
         /// <inheritdoc/>
         public abstract string RespondWithModal(Modal modal, RequestOptions options = null);
-        
+
         /// <inheritdoc/>
         public abstract string Respond(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
 

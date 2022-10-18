@@ -1,47 +1,47 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     [JsonConverter(typeof(Net.Converters.InteractionConverter))]
     internal class Interaction
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public ulong Id { get; set; }
 
-        [JsonProperty("application_id")]
+        [JsonPropertyName("application_id")]
         public ulong ApplicationId { get; set; }
 
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public InteractionType Type { get; set; }
 
-        [JsonProperty("data")]
+        [JsonPropertyName("data")]
         public Optional<IDiscordInteractionData> Data { get; set; }
 
-        [JsonProperty("guild_id")]
+        [JsonPropertyName("guild_id")]
         public Optional<ulong> GuildId { get; set; }
 
-        [JsonProperty("channel_id")]
+        [JsonPropertyName("channel_id")]
         public Optional<ulong> ChannelId { get; set; }
 
-        [JsonProperty("member")]
+        [JsonPropertyName("member")]
         public Optional<GuildMember> Member { get; set; }
 
-        [JsonProperty("user")]
+        [JsonPropertyName("user")]
         public Optional<User> User { get; set; }
 
-        [JsonProperty("token")]
+        [JsonPropertyName("token")]
         public string Token { get; set; }
 
-        [JsonProperty("version")]
+        [JsonPropertyName("version")]
         public int Version { get; set; }
 
-        [JsonProperty("message")]
+        [JsonPropertyName("message")]
         public Optional<Message> Message { get; set; }
 
-        [JsonProperty("locale")]
+        [JsonPropertyName("locale")]
         public Optional<string> UserLocale { get; set; }
 
-        [JsonProperty("guild_locale")]
+        [JsonPropertyName("guild_locale")]
         public Optional<string> GuildLocale { get; set; }
     }
 }

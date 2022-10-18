@@ -1,29 +1,29 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 
 namespace Discord.API
 {
     internal class GuildMember
     {
-        [JsonProperty("user")]
+        [JsonPropertyName("user")]
         public User User { get; set; }
-        [JsonProperty("nick")]
+        [JsonPropertyName("nick")]
         public Optional<string> Nick { get; set; }
-        [JsonProperty("avatar")]
+        [JsonPropertyName("avatar")]
         public Optional<string> Avatar { get; set; }
-        [JsonProperty("roles")]
+        [JsonPropertyName("roles")]
         public Optional<ulong[]> Roles { get; set; }
-        [JsonProperty("joined_at")]
+        [JsonPropertyName("joined_at")]
         public Optional<DateTimeOffset> JoinedAt { get; set; }
-        [JsonProperty("deaf")]
+        [JsonPropertyName("deaf")]
         public Optional<bool> Deaf { get; set; }
-        [JsonProperty("mute")]
+        [JsonPropertyName("mute")]
         public Optional<bool> Mute { get; set; }
-        [JsonProperty("pending")]
+        [JsonPropertyName("pending")]
         public Optional<bool> Pending { get; set; }
-        [JsonProperty("premium_since")]
+        [JsonPropertyName("premium_since")]
         public Optional<DateTimeOffset?> PremiumSince { get; set; }
-        [JsonProperty("communication_disabled_until")]
+        [JsonPropertyName("communication_disabled_until")]
         public Optional<DateTimeOffset?> TimedOutUntil { get; set; }
     }
 }

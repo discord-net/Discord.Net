@@ -1,14 +1,14 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API
 {
     internal class RoleTags
     {
-        [JsonProperty("bot_id")]
+        [JsonPropertyName("bot_id")]
         public Optional<ulong> BotId { get; set; }
-        [JsonProperty("integration_id")]
+        [JsonPropertyName("integration_id")]
         public Optional<ulong> IntegrationId { get; set; }
-        [JsonProperty("premium_subscriber")]
+        [JsonPropertyName("premium_subscriber")]
         public Optional<bool?> IsPremiumSubscriber { get; set; }
     }
 }

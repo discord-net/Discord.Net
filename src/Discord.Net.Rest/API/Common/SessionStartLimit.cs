@@ -1,16 +1,16 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     internal class SessionStartLimit
     {
-        [JsonProperty("total")]
+        [JsonPropertyName("total")]
         public int Total { get; set; }
-        [JsonProperty("remaining")]
+        [JsonPropertyName("remaining")]
         public int Remaining { get; set; }
-        [JsonProperty("reset_after")]
+        [JsonPropertyName("reset_after")]
         public int ResetAfter { get; set; }
-        [JsonProperty("max_concurrency")]
+        [JsonPropertyName("max_concurrency")]
         public int MaxConcurrency { get; set; }
     }
 }

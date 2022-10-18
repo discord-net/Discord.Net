@@ -1,13 +1,13 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest
 {
     internal class ModifyStageInstanceParams
     {
-        [JsonProperty("topic")]
+        [JsonPropertyName("topic")]
         public Optional<string> Topic { get; set; }
 
-        [JsonProperty("privacy_level")]
+        [JsonPropertyName("privacy_level")]
         public Optional<StagePrivacyLevel> PrivacyLevel { get; set; }
     }
 }
