@@ -11,7 +11,8 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <!-- For .Net 3.0 and earlier the System.Text.Json package has to be installed -->
+    <PackageReference Condition=" '$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1' " Include="System.Text.Json" Version="7.0.0-rc.2.22472.3" />
     <PackageReference Include="System.Interactive.Async" Version="5.0.0" />
     <PackageReference Include="IDisposableAnalyzers" Version="3.4.15">
       <PrivateAssets>all</PrivateAssets>
