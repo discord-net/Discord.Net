@@ -18,12 +18,27 @@ namespace Discord
         ComponentType Type { get; }
 
         /// <summary>
-        ///     Gets the value(s) of a <see cref="SelectMenuComponent"/> interaction response.
+        ///     Gets the value(s) of a <see cref="ComponentType.SelectMenu"/> interaction response.
         /// </summary>
         IReadOnlyCollection<string> Values { get; }
 
         /// <summary>
-        ///     Gets the value of a <see cref="TextInputComponent"/> interaction response.
+        ///     Gets the channels(s) of a <see cref="ComponentType.ChannelSelect"/> interaction response.
+        /// </summary>
+        IReadOnlyCollection<IChannel> Channels { get; }
+
+        /// <summary>
+        ///     Gets the user(s) of a <see cref="ComponentType.UserSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response.
+        /// </summary>
+        IReadOnlyCollection<IUser> Users { get; }
+
+        /// <summary>
+        ///     Gets the roles(s) of a <see cref="ComponentType.RoleSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response.
+        /// </summary>
+        IReadOnlyCollection<IRole> Roles { get; }
+
+        /// <summary>
+        ///     Gets the value of a <see cref="ComponentType.TextInput"/> interaction response.
         /// </summary>
         public string Value { get; }
     }

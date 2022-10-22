@@ -30,6 +30,10 @@ namespace Discord.Net.Converters
                     messageComponent = new API.ButtonComponent();
                     break;
                 case ComponentType.SelectMenu:
+                case ComponentType.ChannelSelect:
+                case ComponentType.MentionableSelect:
+                case ComponentType.RoleSelect:
+                case ComponentType.UserSelect:
                     messageComponent = new API.SelectMenuComponent();
                     break;
                 case ComponentType.TextInput:

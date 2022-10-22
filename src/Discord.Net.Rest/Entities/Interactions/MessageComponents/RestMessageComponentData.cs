@@ -21,6 +21,26 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public IReadOnlyCollection<string> Values { get; }
 
+        /// <inheritdoc cref="IComponentInteractionData.Channels"/>/>
+        public IReadOnlyCollection<RestChannel> Channels { get; }
+        /// <inheritdoc cref="IComponentInteractionData.Users"/>/>
+        public IReadOnlyCollection<RestUser> Users { get; }
+        /// <inheritdoc cref="IComponentInteractionData.Roles"/>/>
+        public IReadOnlyCollection<RestRole> Roles { get; }
+
+        #region IComponentInteractionData
+
+        /// <inheritdoc/>
+        IReadOnlyCollection<IChannel> IComponentInteractionData.Channels => Channels;
+
+        /// <inheritdoc/>
+        IReadOnlyCollection<IUser> IComponentInteractionData.Users => Users;
+
+        /// <inheritdoc/>
+        IReadOnlyCollection<IRole> IComponentInteractionData.Roles => Roles;
+
+        #endregion
+
         /// <inheritdoc/>
         public string Value { get; }
 

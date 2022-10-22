@@ -26,8 +26,23 @@ namespace Discord
         TextInput = 4,
 
         /// <summary>
-        ///     An interaction sent when a model is submitted.
+        ///     A select menu for picking from users.
         /// </summary>
-        ModalSubmit = 5,
+        UserSelect = 5,
+
+        /// <summary>
+        ///     A select menu for picking from roles.
+        /// </summary>
+        RoleSelect = 6,
+
+        /// <summary>
+        ///     A select menu for picking from roles and users.
+        /// </summary>
+        MentionableSelect = 7,
+
+        /// <summary>
+        ///     A select menu for picking from channels.
+        /// </summary>
+        ChannelSelect = 8,
     }
 }
