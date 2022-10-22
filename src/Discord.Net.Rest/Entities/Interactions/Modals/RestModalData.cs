@@ -21,12 +21,24 @@ namespace Discord.Rest
         public IReadOnlyCollection<RestMessageComponentData> Components { get; }
 
         /// <inheritdoc/>
-        public ComponentType Type => ComponentType.ModalSubmit;
+        public ComponentType Type => throw new NotSupportedException("Modals do not have a component type.");
 
         /// <inheritdoc/>
         public IReadOnlyCollection<string> Values
             => throw new NotSupportedException("Modal interactions do not have values!");
-        
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<IChannel> Channels
+            => throw new NotSupportedException("Modal interactions do not have channels!");
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<IUser> Users
+            => throw new NotSupportedException("Modal interactions do not have users!");
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<IRole> Roles
+            => throw new NotSupportedException("Modal interactions do not have roles!");
+
         /// <inheritdoc/>
         public string Value
             => throw new NotSupportedException("Modal interactions do not have value!");

@@ -5,6 +5,7 @@ using Discord.Net.Converters;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
+using Discord.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -2394,7 +2395,7 @@ namespace Discord.WebSocket
                                             await TimedInvokeAsync(_slashCommandExecuted, nameof(SlashCommandExecuted), slashCommand).ConfigureAwait(false);
                                             break;
                                         case SocketMessageComponent messageComponent:
-                                            if (messageComponent.Data.Type == ComponentType.SelectMenu)
+                                            if (messageComponent.Data.Type.IsSelectType())
                                                 await TimedInvokeAsync(_selectMenuExecuted, nameof(SelectMenuExecuted), messageComponent).ConfigureAwait(false);
                                             if (messageComponent.Data.Type == ComponentType.Button)
                                                 await TimedInvokeAsync(_buttonExecuted, nameof(ButtonExecuted), messageComponent).ConfigureAwait(false);

@@ -118,7 +118,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     Collection of WebSocket-based users.
         /// </returns>
-        public IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions; 
+        public IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions;
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
@@ -226,7 +226,9 @@ namespace Discord.WebSocket
                                     parsed.Placeholder.GetValueOrDefault(),
                                     parsed.MinValues,
                                     parsed.MaxValues,
-                                    parsed.Disabled
+                                    parsed.Disabled,
+                                    parsed.Type,
+                                    parsed.ChannelTypes.GetValueOrDefault()
                                     );
                             }
                         default:

@@ -1,3 +1,5 @@
+using Discord.Utils;
+using System.Linq;
 using System.Collections.Generic;
 using Model = Discord.API.MessageComponentInteractionData;
 
@@ -8,24 +10,25 @@ namespace Discord.WebSocket
     /// </summary>
     public class SocketMessageComponentData : IComponentInteractionData
     {
-        /// <summary>
-        ///     Gets the components Custom Id that was clicked.
-        /// </summary>
+        /// <inheritdoc />
         public string CustomId { get; }
 
-        /// <summary>
-        ///     Gets the type of the component clicked.
-        /// </summary>
+        /// <inheritdoc />
         public ComponentType Type { get; }
 
-        /// <summary>
-        ///     Gets the value(s) of a <see cref="SelectMenuComponent"/> interaction response.
-        /// </summary>
+        /// <inheritdoc />
         public IReadOnlyCollection<string> Values { get; }
 
-        /// <summary>
-        ///     Gets the value of a <see cref="TextInputComponent"/> interaction response.
-        /// </summary>
+        /// <inheritdoc />
+        public IReadOnlyCollection<IChannel> Channels { get; }
+
+        /// <inheritdoc />
+        public IReadOnlyCollection<IUser> Users { get; }
+
+        /// <inheritdoc />
+        public IReadOnlyCollection<IRole> Roles { get; }
+
+        /// <inheritdoc />
         public string Value { get; }
 
         internal SocketMessageComponentData(Model model)
@@ -45,7 +48,7 @@ namespace Discord.WebSocket
                 ? (component as API.TextInputComponent).Value.Value
                 : null;
 
-            Values = component.Type == ComponentType.SelectMenu
+            Values = component.Type.IsSelectType()
                 ? (component as API.SelectMenuComponent).Values.Value
                 : null;
         }
