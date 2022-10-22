@@ -16,7 +16,7 @@ This can be done through property or constructor.
 Services can be injected from the constructor of the class.
 This is the preferred approach, because it automatically locks the readonly field in place with the provided service and isn't accessible outside of the class.
 
-[!code-csharp[Property Injection(samples/property-injecting.cs)]]
+[!code-csharp[Constructor Injection](samples/ctor-injecting.cs)]
 
 ## Injecting through properties
 

@@ -270,6 +270,11 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
+                var typeModulePair = _typedModuleDefs.FirstOrDefault(x => x.Value.Equals(module));
+
+                if (!typeModulePair.Equals(default(KeyValuePair<Type, ModuleInfo>)))
+                    _typedModuleDefs.TryRemove(typeModulePair.Key, out var _);
+
                 return RemoveModuleInternal(module);
             }
             finally

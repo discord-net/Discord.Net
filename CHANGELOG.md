@@ -1,4 +1,66 @@
 # Changelog
+
+## [3.8.1] - 2022-09-12
+### Added
+
+- #2437 Added scheduled event types to AuditLog ActionTypes (fca9c6b)
+- #2423 Added support for resume gateway url (d4c533a)
+
+### Fixed
+
+- #2443 Fixed typos of word length (adf012d)
+- #2438 Fixed http query symbol in ModifyWebhookMessageAsync (0aa381d)
+- #2444 Fixed BulkOverwriteCommands NRE (9feb703)
+- #2417 Fixed CommandService RemoveModuleMethod not removing modules (fca9c6b)
+- #2345 Fixed EmbedBuilder.Length NRE (11ece4b)
+- #2453 Fixed NRE on SlashCommandBuilder.Build method (5073afa)
+- #2457 Fixed typo in SlashCommandBuilder.AddNameLocalizationMethod (1b01fed)
+
+### Misc
+
+- #2462 Add additional checks for gateway event warnings (b45b152)
+- #2448 Bump to Discord API V10 (fbc5ad4)
+- #2451 Return a list instead of an array in GetModulePath and GetChoicePath methods (370bdfa)
+- #2453 Update app commands regex and fix localization on app context commands (3dec99f)
+- #2333 Update package logo (2b86a79)
+
+## [3.8.0] - 2022-08-27
+### Added
+- #2384 Added support for the WEBHOOKS_UPDATED event (010e8e8)
+- #2370 Add async callbacks for IModuleBase (503fa75)
+- #2367 Added DeleteMessagesAsync for TIV and added remaining rate limit in client log (f178660)
+- #2379 Added Max/Min length fields for ApplicationCommandOption (e551431)
+- #2369 Added support for using `RespondWithModalAsync<IModal>()` without prior IModal declaration (500e7b4)
+- #2347 Added Embed field comparison operators (89a8ea1)
+- #2359 Added support for creating lottie stickers (32b03c8)
+- #2395 Added App Command localization support and `ILocalizationManager` to IF (39bbd29)
+
+### Fixed
+- #2425 Fix missing Fact attribute in ColorTests (92215b1)
+- #2424 Fix IGuild.GetBansAsync() (b7b7964)
+- #2416 Fix role icon & emoji assignment (b6b5e95)
+- #2414 Fix NRE on RestCommandBase Data (02bc3b7)
+- #2421 Fix placeholder length being hardcoded (8dfe19f)
+- #2352 Fix issues related to the absence of bot scope (1eb42c6)
+- #2346 Fix IGuild.DisconnectAsync(IUser) not disconnecting users (ba02416)
+- #2404 Fix range of issues presented by 3rd party analyzer (902326d)
+- #2409 Removes GroupContext from requirecontext (b0b8167)
+
+### Misc
+- #2366 Fixed typo in ChannelUpdatedEvent's documentation (cfd2662)
+- #2408 Fix sharding sample throwing at appcommand registration (519deda)
+- #2420 Fix broken code snippet in dependency injection docs (ddcf68a)
+- #2430 Add a note about DontAutoRegisterAttribute (917118d)
+- #2418 Update xmldocs to reflect the ConnectedUsers split (65b98f8)
+- #2415 Adds missing DI entries in TOC (c49d483)
+- #2407 Introduces high quality dependency injection documentation (6fdcf98)
+- #2348 Added  `RequiredInput`  attribute to example in int.framework intro (ee6e0ad)
+- #2385 Add ServerStarter.Host to deployment.md (06ed995)
+- #2405 Add a note about  `IgnoreGroupNames`  to IF docs (cf25acd)
+- #2356 Makes voice section about precompiled binaries more visible (e0d68d4 )
+- #2405 IF intro docs improvements (246282d)
+- #2406 Labs deprecation & readme/docs edits (bf493ea)
+
 ## [3.7.2] - 2022-06-02
 ### Added
 - #2328 Add method overloads to InteractionService (0fad3e8)

@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Discord
@@ -53,5 +54,35 @@ namespace Discord
         ///     A string that resolves to <see cref="Discord.EmbedThumbnail.Url" />.
         /// </returns>
         public override string ToString() => Url;
+
+        public static bool operator ==(EmbedThumbnail? left, EmbedThumbnail? right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedThumbnail? left, EmbedThumbnail? right)
+            => !(left == right);
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="EmbedThumbnail"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedThumbnail"/>, <see cref="Equals(EmbedThumbnail?)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="EmbedThumbnail"/></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+            => obj is EmbedThumbnail embedThumbnail && Equals(embedThumbnail);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedThumbnail"/> is equal to the current <see cref="EmbedThumbnail"/>
+        /// </summary>
+        /// <param name="embedThumbnail">The <see cref="EmbedThumbnail"/> to compare with the current <see cref="EmbedThumbnail"/></param>
+        /// <returns></returns>
+        public bool Equals(EmbedThumbnail? embedThumbnail)
+            => GetHashCode() == embedThumbnail?.GetHashCode();
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+            => (Width, Height, Url, ProxyUrl).GetHashCode();
     }
 }

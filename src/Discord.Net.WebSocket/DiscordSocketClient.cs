@@ -323,7 +323,6 @@ namespace Discord.WebSocket
         }
         private async Task OnDisconnectingAsync(Exception ex)
         {
-
             await _gatewayLogger.DebugAsync("Disconnecting ApiClient").ConfigureAwait(false);
             await ApiClient.DisconnectAsync(ex).ConfigureAwait(false);
 
@@ -451,14 +450,16 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a collection of all global commands.
         /// </summary>
+        /// <param name="withLocalizations">Whether to include full localization dictionaries in the returned objects, instead of the name localized and description localized fields.</param>
+        /// <param name="locale">The target locale of the localized name and description fields. Sets <c>X-Discord-Locale</c> header, which takes precedence over <c>Accept-Language</c>.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of global
         ///     application commands.
         /// </returns>
-        public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetGlobalApplicationCommandsAsync(RequestOptions options = null)
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetGlobalApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null)
         {
-            var commands = (await ApiClient.GetGlobalApplicationCommandsAsync(options)).Select(x => SocketApplicationCommand.Create(this, x));
+            var commands = (await ApiClient.GetGlobalApplicationCommandsAsync(withLocalizations, locale, options)).Select(x => SocketApplicationCommand.Create(this, x));
 
             foreach(var command in commands)
             {
@@ -742,31 +743,49 @@ namespace Discord.WebSocket
 
         private async Task LogGatewayIntentsWarning()
         {
-            if(_gatewayIntents.HasFlag(GatewayIntents.GuildPresences) && !_presenceUpdated.HasSubscribers)
+            if (_gatewayIntents.HasFlag(GatewayIntents.GuildPresences) &&
+                (_shardedClient is null && !_presenceUpdated.HasSubscribers ||
+               (_shardedClient is not null && !_shardedClient._presenceUpdated.HasSubscribers)))
             {
                 await _gatewayLogger.WarningAsync("You're using the GuildPresences intent without listening to the PresenceUpdate event, consider removing the intent from your config.").ConfigureAwait(false);
             }
 
-            if(!_gatewayIntents.HasFlag(GatewayIntents.GuildPresences) && _presenceUpdated.HasSubscribers)
+            if(!_gatewayIntents.HasFlag(GatewayIntents.GuildPresences) &&
+               ((_shardedClient is null && _presenceUpdated.HasSubscribers) ||
+                (_shardedClient is not null && _shardedClient._presenceUpdated.HasSubscribers)))
             {
                 await _gatewayLogger.WarningAsync("You're using the PresenceUpdate event without specifying the GuildPresences intent. Discord wont send this event to your client without the intent set in your config.").ConfigureAwait(false);
             }
 
             bool hasGuildScheduledEventsSubscribers =
                 _guildScheduledEventCancelled.HasSubscribers ||
-                _guildScheduledEventUserRemove.HasSubscribers ||
-                _guildScheduledEventCompleted.HasSubscribers ||
-                _guildScheduledEventCreated.HasSubscribers ||
-                _guildScheduledEventStarted.HasSubscribers ||
-                _guildScheduledEventUpdated.HasSubscribers ||
-                _guildScheduledEventUserAdd.HasSubscribers;
+                 _guildScheduledEventUserRemove.HasSubscribers ||
+                 _guildScheduledEventCompleted.HasSubscribers ||
+                 _guildScheduledEventCreated.HasSubscribers ||
+                 _guildScheduledEventStarted.HasSubscribers ||
+                 _guildScheduledEventUpdated.HasSubscribers ||
+                 _guildScheduledEventUserAdd.HasSubscribers;
 
-            if(_gatewayIntents.HasFlag(GatewayIntents.GuildScheduledEvents) && !hasGuildScheduledEventsSubscribers)
+            bool shardedClientHasGuildScheduledEventsSubscribers =
+                 _shardedClient is not null && 
+                 (_shardedClient._guildScheduledEventCancelled.HasSubscribers ||
+                 _shardedClient._guildScheduledEventUserRemove.HasSubscribers ||
+                 _shardedClient._guildScheduledEventCompleted.HasSubscribers ||
+                 _shardedClient._guildScheduledEventCreated.HasSubscribers ||
+                 _shardedClient._guildScheduledEventStarted.HasSubscribers ||
+                 _shardedClient._guildScheduledEventUpdated.HasSubscribers ||
+                 _shardedClient._guildScheduledEventUserAdd.HasSubscribers);
+
+            if (_gatewayIntents.HasFlag(GatewayIntents.GuildScheduledEvents) &&
+                ((_shardedClient is null && !hasGuildScheduledEventsSubscribers) ||
+                 (_shardedClient is not null && !shardedClientHasGuildScheduledEventsSubscribers)))
             {
                 await _gatewayLogger.WarningAsync("You're using the GuildScheduledEvents gateway intent without listening to any events related to that intent, consider removing the intent from your config.").ConfigureAwait(false);
             }
 
-            if(!_gatewayIntents.HasFlag(GatewayIntents.GuildScheduledEvents) && hasGuildScheduledEventsSubscribers)
+            if(!_gatewayIntents.HasFlag(GatewayIntents.GuildScheduledEvents) &&
+               ((_shardedClient is null && hasGuildScheduledEventsSubscribers) ||
+                (_shardedClient is not null && shardedClientHasGuildScheduledEventsSubscribers)))
             {
                 await _gatewayLogger.WarningAsync("You're using events related to the GuildScheduledEvents gateway intent without specifying the intent. Discord wont send this event to your client without the intent set in your config.").ConfigureAwait(false);
             }
@@ -775,12 +794,21 @@ namespace Discord.WebSocket
                 _inviteCreatedEvent.HasSubscribers ||
                 _inviteDeletedEvent.HasSubscribers;
 
-            if (_gatewayIntents.HasFlag(GatewayIntents.GuildInvites) && !hasInviteEventSubscribers)
+            bool shardedClientHasInviteEventSubscribers =
+                _shardedClient is not null &&
+                (_shardedClient._inviteCreatedEvent.HasSubscribers ||
+                 _shardedClient._inviteDeletedEvent.HasSubscribers);
+
+            if (_gatewayIntents.HasFlag(GatewayIntents.GuildInvites) &&
+                ((_shardedClient is null && !hasInviteEventSubscribers) ||
+                 (_shardedClient is not null && !shardedClientHasInviteEventSubscribers)))
             {
                 await _gatewayLogger.WarningAsync("You're using the GuildInvites gateway intent without listening to any events related to that intent, consider removing the intent from your config.").ConfigureAwait(false);
             }
 
-            if (!_gatewayIntents.HasFlag(GatewayIntents.GuildInvites) && hasInviteEventSubscribers)
+            if (!_gatewayIntents.HasFlag(GatewayIntents.GuildInvites) &&
+                ((_shardedClient is null && hasInviteEventSubscribers) ||
+                (_shardedClient is not null && shardedClientHasInviteEventSubscribers)))
             {
                 await _gatewayLogger.WarningAsync("You're using events related to the GuildInvites gateway intent without specifying the intent. Discord wont send this event to your client without the intent set in your config.").ConfigureAwait(false);
             }
@@ -833,6 +861,7 @@ namespace Discord.WebSocket
 
                             _sessionId = null;
                             _lastSeq = 0;
+                            ApiClient.ResumeGatewayUrl = null;
 
                             if (_shardedClient != null)
                             {
@@ -890,6 +919,7 @@ namespace Discord.WebSocket
                                             AddPrivateChannel(data.PrivateChannels[i], state);
 
                                         _sessionId = data.SessionId;
+                                        ApiClient.ResumeGatewayUrl = data.ResumeGatewayUrl;
                                         _unavailableGuildCount = unavailableGuilds;
                                         CurrentUser = currentUser;
                                         _previousSessionUser = CurrentUser;
@@ -3237,8 +3267,8 @@ namespace Discord.WebSocket
         async Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
             => await GetGlobalApplicationCommandAsync(id, options);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(RequestOptions options)
-            => await GetGlobalApplicationCommandsAsync(options);
+        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(bool withLocalizations, string locale, RequestOptions options)
+            => await GetGlobalApplicationCommandsAsync(withLocalizations, locale, options);
 
         /// <inheritdoc />
         async Task IDiscordClient.StartAsync()

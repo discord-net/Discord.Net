@@ -28,7 +28,8 @@ namespace ShardedClient
             // have 1 shard per 1500-2000 guilds your bot is in.
             var config = new DiscordSocketConfig
             {
-                TotalShards = 2
+                TotalShards = 2,
+                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
             };
 
             // You should dispose a service provider created using ASP.NET

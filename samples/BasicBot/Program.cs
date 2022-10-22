@@ -34,9 +34,16 @@ namespace BasicBot
 
         public Program()
         {
+            // Config used by DiscordSocketClient
+            // Define intents for the client
+            var config = new DiscordSocketConfig
+            {
+                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
+            };
+
             // It is recommended to Dispose of a client when you are finished
             // using it, at the end of your app's lifetime.
-            _client = new DiscordSocketClient();
+            _client = new DiscordSocketClient(config);
 
             // Subscribing to client events, so that we may receive them whenever they're invoked.
             _client.Log += LogAsync;
