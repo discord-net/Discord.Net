@@ -116,15 +116,15 @@ namespace Discord
         TargetUserNotInVoice = 40032,
         MessageAlreadyCrossposted = 40033,
         ApplicationNameAlreadyExists = 40041,
-        #endregion
-
-        #region Action Preconditions/Checks (50XXX)
         ApplicationInteractionFailedToSend = 40043,
         CannotSendAMessageInAForumChannel = 40058,
         ThereAreNoTagsAvailableThatCanBeSetByNonModerators = 40066,
         ATagIsRequiredToCreateAForumPostInThisChannel = 40067,
         InteractionHasAlreadyBeenAcknowledged = 40060,
         TagNamesMustBeUnique = 40061,
+        #endregion
+
+        #region Action Preconditions/Checks (50XXX)
         MissingPermissions = 50001,
         InvalidAccountType = 50002,
         CannotExecuteForDM = 50003,
@@ -154,6 +154,7 @@ namespace Discord
         BulkDeleteMessageTooOld = 50034,
         InvalidFormBody = 50035,
         InviteAcceptedForGuildThatBotIsntIn = 50036,
+        InvalidActivityAction = 50039,
         InvalidAPIVersion = 50041,
         FileUploadTooBig = 50045,
         InvalidFileUpload = 50046,
@@ -161,6 +162,7 @@ namespace Discord
         InvalidGuild = 50055,
         InvalidMessageType = 50068,
         PaymentSourceRequiredForGift = 50070,
+        CannotModifySystemWebhook = 50073,
         CannotDeleteRequiredCommunityChannel = 50074,
         CannotEditStickersWithinAMessage = 50080,
         InvalidSticker = 50081,

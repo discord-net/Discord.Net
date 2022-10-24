@@ -181,5 +181,9 @@ namespace Discord
         ///     The guild has enabled the welcome screen.
         /// </summary>
         WelcomeScreenEnabled = 1L << 41,
+        /// <summary>
+        ///     The guild has been set as a support server on the App Directory.
+        /// </summary>
+        DeveloperSupportServer = 1L << 42,
     }
 }
