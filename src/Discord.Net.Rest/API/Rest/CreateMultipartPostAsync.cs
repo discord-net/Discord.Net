@@ -27,6 +27,7 @@ namespace Discord.API.Rest
         public Optional<ActionRowComponent[]> MessageComponent { get; set; }
         public Optional<MessageFlags?> Flags { get; set; }
         public Optional<ulong[]> Stickers { get; set; }
+        public Optional<ulong[]> TagIds { get; set; }
 
         public CreateMultipartPostAsync(params FileAttachment[] attachments)
         {
@@ -59,6 +60,8 @@ namespace Discord.API.Rest
                 message["sticker_ids"] = Stickers.Value;
             if (Flags.IsSpecified)
                 message["flags"] = Flags.Value;
+            if (TagIds.IsSpecified)
+                message["applied_tags"] = TagIds.Value;
 
             List<object> attachments = new();
 
