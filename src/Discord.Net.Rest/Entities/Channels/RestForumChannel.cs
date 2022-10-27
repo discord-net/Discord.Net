@@ -85,6 +85,8 @@ namespace Discord.Rest
                 else
                     DefaultReactionEmoji = null;
             }
+
+            CategoryId = model.CategoryId.GetValueOrDefault();
         }
 
         /// <inheritdoc/>

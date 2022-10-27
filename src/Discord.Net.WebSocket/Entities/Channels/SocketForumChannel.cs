@@ -91,6 +91,8 @@ namespace Discord.WebSocket
                 else
                     DefaultReactionEmoji = null;
             }
+
+            CategoryId = model.CategoryId.GetValueOrDefault();
         }
 
         /// <inheritdoc />
