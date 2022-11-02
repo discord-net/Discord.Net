@@ -92,9 +92,11 @@ namespace Discord
         /// <param name="maxValues">The max values of the placeholder.</param>
         /// <param name="disabled">Whether or not the menu is disabled.</param>
         /// <param name="row">The row to add the menu to.</param>
+        /// <param name="type">The type of the select menu.</param>
+        /// <param name="channelTypes">Menus valid channel types (only for <see cref="ComponentType.ChannelSelect"/>)</param>
         /// <returns></returns>
-        public ComponentBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options,
-            string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false, int row = 0)
+        public ComponentBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options = null,
+            string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false, int row = 0, ComponentType type = ComponentType.SelectMenu, ChannelType[] channelTypes = null)
         {
             return WithSelectMenu(new SelectMenuBuilder()
                 .WithCustomId(customId)
@@ -102,7 +104,9 @@ namespace Discord
                 .WithPlaceholder(placeholder)
                 .WithMaxValues(maxValues)
                 .WithMinValues(minValues)
-                .WithDisabled(disabled),
+                .WithDisabled(disabled)
+                .WithType(type)
+                .WithChannelTypes(channelTypes),
                 row);
         }
 
@@ -354,10 +358,13 @@ namespace Discord
         /// <param name="placeholder">The placeholder of the menu.</param>
         /// <param name="minValues">The min values of the placeholder.</param>
         /// <param name="maxValues">The max values of the placeholder.</param>
-        /// <param name="disabled">Whether or not the menu is disabled.</param>
+        /// <param name="disabled">Whether or not the menu is disabled.</param> 
+        /// <param name="type">The type of the select menu.</param>
+        /// <param name="channelTypes">Menus valid channel types (only for <see cref="ComponentType.ChannelSelect"/>)</param>
         /// <returns>The current builder.</returns>
         public ActionRowBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options,
-            string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false)
+            string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false,
+            ComponentType type = ComponentType.SelectMenu, ChannelType[] channelTypes = null)
         {
             return WithSelectMenu(new SelectMenuBuilder()
                 .WithCustomId(customId)
@@ -365,7 +372,9 @@ namespace Discord
                 .WithPlaceholder(placeholder)
                 .WithMaxValues(maxValues)
                 .WithMinValues(minValues)
-                .WithDisabled(disabled));
+                .WithDisabled(disabled)
+                .WithType(type)
+                .WithChannelTypes(channelTypes));
         }
 
         /// <summary>
