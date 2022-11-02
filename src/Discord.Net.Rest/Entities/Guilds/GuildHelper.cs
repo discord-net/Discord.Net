@@ -351,6 +351,8 @@ namespace Discord.Rest
             var props = new ForumChannelProperties();
             func?.Invoke(props);
 
+            Preconditions.AtMost(props.Tags.IsSpecified ? props.Tags.Value.Count() : 0, 5, nameof(props.Tags), "Forum channel can have max 20 tags.");
+
             var args = new CreateGuildChannelParams(name, ChannelType.Forum)
             {
                 Position = props.Position,

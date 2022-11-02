@@ -1,3 +1,4 @@
+using Discord.API;
 using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,9 @@ namespace Discord.Rest
         {
             var args = new ThreadChannelProperties();
             func(args);
+
+            Preconditions.AtMost(args.AppliedTags.IsSpecified ? args.AppliedTags.Value.Count() : 0, 5, nameof(args.AppliedTags), "Forum post can have max 5 applied tags.");
+
             var apiArgs = new ModifyThreadParams
             {
                 Name = args.Name,
@@ -117,6 +121,7 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+            Preconditions.AtMost(tagIds?.Length ?? 0, 5, nameof(tagIds), "Forum post can have max 5 applied tags.");
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
@@ -178,6 +183,8 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+            Preconditions.AtMost(tagIds?.Length ?? 0, 5, nameof(tagIds), "Forum post can have max 5 applied tags.");
+
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)

@@ -14,6 +14,9 @@ internal static class ForumHelper
     {
         var args = new ForumChannelProperties();
         func(args);
+
+        Preconditions.AtMost(args.Tags.IsSpecified ? args.Tags.Value.Count() : 0, 5, nameof(args.Tags), "Forum channel can have max 20 tags.");
+        
         var apiArgs = new API.Rest.ModifyForumChannelParams()
         {
             Name = args.Name,
