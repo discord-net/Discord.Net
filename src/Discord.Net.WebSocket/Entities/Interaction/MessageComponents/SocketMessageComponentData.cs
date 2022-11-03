@@ -26,7 +26,7 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<SocketChannel> Channels { get; }
 
         /// <inheritdoc cref="IComponentInteractionData.Users"/>
-        /// <remarks>Returns <see cref="SocketUser"/> is user is cached <see cref="RestUser"/> otherwise.</remarks>
+        /// <remarks>Returns <see cref="SocketUser"/> if user is cached, <see cref="RestUser"/> otherwise.</remarks>
         public IReadOnlyCollection<IUser> Users { get; }
 
         /// <inheritdoc cref="IComponentInteractionData.Roles"/>
