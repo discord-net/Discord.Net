@@ -10,7 +10,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents data sent from a <see cref="InteractionType.ModalSubmit"/>.
     /// </summary>
-    public class SocketModalData : IDiscordInteractionData, IModalInteractionData
+    public class SocketModalData : IModalInteractionData
     {
         /// <summary>
         ///     Gets the <see cref="Modal"/>'s Custom Id.
