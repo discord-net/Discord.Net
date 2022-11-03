@@ -48,9 +48,10 @@ namespace Discord.WebSocket
                 ? (component as API.TextInputComponent).Value.Value
                 : null;
 
-            Values = component.Type.IsSelectType()
-                ? (component as API.SelectMenuComponent).Values.Value
-                : null;
+            if (component is API.SelectMenuComponent select)
+            {
+                Values = select.Values.GetValueOrDefault(null);
+            }
         }
     }
 }

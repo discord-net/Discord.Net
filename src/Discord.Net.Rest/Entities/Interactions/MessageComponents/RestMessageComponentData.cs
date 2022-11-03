@@ -1,8 +1,12 @@
+using Discord.API;
+
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Model = Discord.API.MessageComponentInteractionData;
 
 namespace Discord.Rest
@@ -10,7 +14,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents data for a <see cref="RestMessageComponent"/>.
     /// </summary>
-    public class RestMessageComponentData : IComponentInteractionData, IDiscordInteractionData
+    public class RestMessageComponentData : IComponentInteractionData
     {
         /// <inheritdoc/>
         public string CustomId { get; }
@@ -23,8 +27,10 @@ namespace Discord.Rest
 
         /// <inheritdoc cref="IComponentInteractionData.Channels"/>/>
         public IReadOnlyCollection<RestChannel> Channels { get; }
+
         /// <inheritdoc cref="IComponentInteractionData.Users"/>/>
         public IReadOnlyCollection<RestUser> Users { get; }
+
         /// <inheritdoc cref="IComponentInteractionData.Roles"/>/>
         public IReadOnlyCollection<RestRole> Roles { get; }
 
@@ -44,14 +50,24 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public string Value { get; }
 
-        internal RestMessageComponentData(Model model)
+        internal RestMessageComponentData(Model model, BaseDiscordClient discord)
         {
             CustomId = model.CustomId;
             Type = model.ComponentType;
             Values = model.Values.GetValueOrDefault();
+            Value = model.Value.GetValueOrDefault();
+
+            if (model.Resolved.IsSpecified)
+            {
+                Users = model.Resolved.Value.Users.IsSpecified
+                    ? model.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value)).ToImmutableArray()
+                    : null;
+            }
+
+
         }
 
-        internal RestMessageComponentData(IMessageComponent component)
+        internal RestMessageComponentData(IMessageComponent component, BaseDiscordClient discord)
         {
             CustomId = component.CustomId;
             Type = component.Type;
@@ -60,7 +76,15 @@ namespace Discord.Rest
                 Value = textInput.Value.Value;
 
             if (component is API.SelectMenuComponent select)
-                Values = select.Values.Value;
+            {
+                Values = select.Values.GetValueOrDefault(null);
+                if (select.Resolved.IsSpecified)
+                {
+                    Users = select.Resolved.Value.Users.IsSpecified
+                        ? select.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value)).ToImmutableArray()
+                        : null;
+                }
+            }
         }
     }
 }
