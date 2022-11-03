@@ -22,16 +22,17 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public IReadOnlyCollection<string> Values { get; }
 
-        /// <inheritdoc cref="IComponentInteractionData.Channels"/>/>
+        /// <inheritdoc cref="IComponentInteractionData.Channels"/>
         public IReadOnlyCollection<SocketChannel> Channels { get; }
 
-        /// <inheritdoc cref="IComponentInteractionData.Users"/>/>
-        public IReadOnlyCollection<RestUser> Users { get; }
+        /// <inheritdoc cref="IComponentInteractionData.Users"/>
+        /// <remarks>Returns <see cref="SocketUser"/> is user is cached <see cref="RestUser"/> otherwise.</remarks>
+        public IReadOnlyCollection<IUser> Users { get; }
 
-        /// <inheritdoc cref="IComponentInteractionData.Roles"/>/>
+        /// <inheritdoc cref="IComponentInteractionData.Roles"/>
         public IReadOnlyCollection<SocketRole> Roles { get; }
 
-        /// <inheritdoc cref="IComponentInteractionData.Members"/>/>
+        /// <inheritdoc cref="IComponentInteractionData.Members"/>
         public IReadOnlyCollection<SocketGuildUser> Members { get; }
 
         #region IComponentInteractionData
@@ -62,7 +63,7 @@ namespace Discord.WebSocket
             if (model.Resolved.IsSpecified)
             {
                 Users = model.Resolved.Value.Users.IsSpecified
-                    ? model.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value)).ToImmutableArray()
+                    ? model.Resolved.Value.Users.Value.Select(user => (IUser)state.GetUser(user.Value.Id) ?? RestUser.Create(discord, user.Value)).ToImmutableArray()
                     : null;
 
                 Members = model.Resolved.Value.Members.IsSpecified
@@ -105,7 +106,7 @@ namespace Discord.WebSocket
                 if (select.Resolved.IsSpecified)
                 {
                     Users = select.Resolved.Value.Users.IsSpecified
-                        ? select.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value)).ToImmutableArray()
+                        ? select.Resolved.Value.Users.Value.Select(user => (IUser)state.GetUser(user.Value.Id) ?? RestUser.Create(discord, user.Value)).ToImmutableArray()
                         : null;
 
                     Members = select.Resolved.Value.Members.IsSpecified

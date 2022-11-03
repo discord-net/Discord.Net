@@ -25,16 +25,16 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public IReadOnlyCollection<string> Values { get; }
 
-        /// <inheritdoc cref="IComponentInteractionData.Channels"/>/>
+        /// <inheritdoc cref="IComponentInteractionData.Channels"/>
         public IReadOnlyCollection<RestChannel> Channels { get; }
 
-        /// <inheritdoc cref="IComponentInteractionData.Users"/>/>
+        /// <inheritdoc cref="IComponentInteractionData.Users"/>
         public IReadOnlyCollection<RestUser> Users { get; }
 
-        /// <inheritdoc cref="IComponentInteractionData.Roles"/>/>
+        /// <inheritdoc cref="IComponentInteractionData.Roles"/>
         public IReadOnlyCollection<RestRole> Roles { get; }
 
-        /// <inheritdoc cref="IComponentInteractionData.Members"/>/>
+        /// <inheritdoc cref="IComponentInteractionData.Members"/>
         public IReadOnlyCollection<RestGuildUser> Members { get; }
 
         #region IComponentInteractionData
