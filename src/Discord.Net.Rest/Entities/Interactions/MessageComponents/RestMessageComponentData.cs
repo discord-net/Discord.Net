@@ -50,7 +50,7 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public string Value { get; }
 
-        internal RestMessageComponentData(Model model, BaseDiscordClient discord)
+        internal RestMessageComponentData(Model model, BaseDiscordClient discord, IGuild guild)
         {
             CustomId = model.CustomId;
             Type = model.ComponentType;
@@ -60,14 +60,23 @@ namespace Discord.Rest
             if (model.Resolved.IsSpecified)
             {
                 Users = model.Resolved.Value.Users.IsSpecified
-                    ? model.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value)).ToImmutableArray()
+                    ? model.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value))
+                        .Concat(model.Resolved.Value.Members.IsSpecified
+                            ? model.Resolved.Value.Members.Value.Select(member => RestGuildUser.Create(discord, guild, member.Value))
+                            : Array.Empty<RestGuildUser>()).ToImmutableArray()
+                    : null;
+
+                Channels = model.Resolved.Value.Channels.IsSpecified
+                    ? model.Resolved.Value.Channels.Value.Select(channel => RestChannel.Create(discord, channel.Value)).ToImmutableArray()
+                    : null;
+
+                Roles = model.Resolved.Value.Roles.IsSpecified
+                    ? model.Resolved.Value.Roles.Value.Select(role => RestRole.Create(discord, guild, role.Value)).ToImmutableArray()
                     : null;
             }
-
-
         }
 
-        internal RestMessageComponentData(IMessageComponent component, BaseDiscordClient discord)
+        internal RestMessageComponentData(IMessageComponent component, BaseDiscordClient discord, IGuild guild)
         {
             CustomId = component.CustomId;
             Type = component.Type;
@@ -78,10 +87,22 @@ namespace Discord.Rest
             if (component is API.SelectMenuComponent select)
             {
                 Values = select.Values.GetValueOrDefault(null);
+
                 if (select.Resolved.IsSpecified)
                 {
                     Users = select.Resolved.Value.Users.IsSpecified
-                        ? select.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value)).ToImmutableArray()
+                        ? select.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value))
+                            .Concat(select.Resolved.Value.Members.IsSpecified
+                                ? select.Resolved.Value.Members.Value.Select(member => RestGuildUser.Create(discord, guild, member.Value))
+                                : Array.Empty<RestGuildUser>()).ToImmutableArray()
+                        : null;
+
+                    Channels = select.Resolved.Value.Channels.IsSpecified
+                        ? select.Resolved.Value.Channels.Value.Select(channel => RestChannel.Create(discord, channel.Value)).ToImmutableArray()
+                        : null;
+
+                    Roles = select.Resolved.Value.Roles.IsSpecified
+                        ? select.Resolved.Value.Roles.Value.Select(role => RestRole.Create(discord, guild, role.Value)).ToImmutableArray()
                         : null;
                 }
             }
