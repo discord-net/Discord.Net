@@ -34,6 +34,9 @@ namespace Discord.Rest
         /// <inheritdoc cref="IComponentInteractionData.Roles"/>/>
         public IReadOnlyCollection<RestRole> Roles { get; }
 
+        /// <inheritdoc cref="IComponentInteractionData.Members"/>/>
+        public IReadOnlyCollection<RestGuildUser> Members { get; }
+
         #region IComponentInteractionData
 
         /// <inheritdoc/>
@@ -44,6 +47,9 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         IReadOnlyCollection<IRole> IComponentInteractionData.Roles => Roles;
+
+        /// <inheritdoc/>
+        IReadOnlyCollection<IGuildUser> IComponentInteractionData.Members => Members;
 
         #endregion
 
@@ -60,19 +66,25 @@ namespace Discord.Rest
             if (model.Resolved.IsSpecified)
             {
                 Users = model.Resolved.Value.Users.IsSpecified
-                    ? model.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value))
-                        .Concat(model.Resolved.Value.Members.IsSpecified
-                            ? model.Resolved.Value.Members.Value.Select(member => RestGuildUser.Create(discord, guild, member.Value))
-                            : Array.Empty<RestGuildUser>()).ToImmutableArray()
+                    ? model.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value)).ToImmutableArray()
+                    : Array.Empty<RestUser>();
+
+                Members = model.Resolved.Value.Members.IsSpecified
+                    ? model.Resolved.Value.Members.Value.Select(member =>
+                    {
+                        member.Value.User = model.Resolved.Value.Users.Value.First(u => u.Key == member.Key).Value;
+
+                        return RestGuildUser.Create(discord, guild, member.Value);
+                    }).ToImmutableArray()
                     : null;
 
                 Channels = model.Resolved.Value.Channels.IsSpecified
                     ? model.Resolved.Value.Channels.Value.Select(channel => RestChannel.Create(discord, channel.Value)).ToImmutableArray()
-                    : null;
+                    : Array.Empty<RestChannel>();
 
                 Roles = model.Resolved.Value.Roles.IsSpecified
                     ? model.Resolved.Value.Roles.Value.Select(role => RestRole.Create(discord, guild, role.Value)).ToImmutableArray()
-                    : null;
+                    : Array.Empty<RestRole>();
             }
         }
 
@@ -91,10 +103,16 @@ namespace Discord.Rest
                 if (select.Resolved.IsSpecified)
                 {
                     Users = select.Resolved.Value.Users.IsSpecified
-                        ? select.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value))
-                            .Concat(select.Resolved.Value.Members.IsSpecified
-                                ? select.Resolved.Value.Members.Value.Select(member => RestGuildUser.Create(discord, guild, member.Value))
-                                : Array.Empty<RestGuildUser>()).ToImmutableArray()
+                        ? select.Resolved.Value.Users.Value.Select(user => RestUser.Create(discord, user.Value)).ToImmutableArray()
+                        : null;
+
+                    Members = select.Resolved.Value.Members.IsSpecified
+                        ? select.Resolved.Value.Members.Value.Select(member =>
+                        {
+                            member.Value.User = select.Resolved.Value.Users.Value.First(u => u.Key == member.Key).Value;
+
+                            return RestGuildUser.Create(discord, guild, member.Value);
+                        }).ToImmutableArray()
                         : null;
 
                     Channels = select.Resolved.Value.Channels.IsSpecified

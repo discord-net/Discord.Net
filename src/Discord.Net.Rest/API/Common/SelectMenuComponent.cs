@@ -40,7 +40,7 @@ namespace Discord.API
         {
             Type = component.Type;
             CustomId = component.CustomId;
-            Options = component.Options.Select(x => new SelectMenuOption(x)).ToArray();
+            Options = component.Options?.Select(x => new SelectMenuOption(x)).ToArray();
             Placeholder = component.Placeholder;
             MinValues = component.MinValues;
             MaxValues = component.MaxValues;

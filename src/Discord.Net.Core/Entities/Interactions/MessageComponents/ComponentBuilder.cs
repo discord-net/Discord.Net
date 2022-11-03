@@ -122,7 +122,7 @@ namespace Discord
         public ComponentBuilder WithSelectMenu(SelectMenuBuilder menu, int row = 0)
         {
             Preconditions.LessThan(row, MaxActionRowCount, nameof(row));
-            if (menu.Options.Distinct().Count() != menu.Options.Count)
+            if (menu.Options is not null && menu.Options.Distinct().Count() != menu.Options.Count)
                 throw new InvalidOperationException("Please make sure that there is no duplicates values.");
 
             var builtMenu = menu.Build();
@@ -838,8 +838,6 @@ namespace Discord
             {
                 if (value != null)
                     Preconditions.AtMost(value.Count, MaxOptionCount, nameof(Options));
-                else
-                    throw new ArgumentNullException(nameof(value), $"{nameof(Options)} cannot be null.");
 
                 _options = value;
             }
@@ -1058,7 +1056,9 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder WithChannelTypes(params ChannelType[] channelTypes)
         {
-            ChannelTypes = channelTypes.ToList();
+            ChannelTypes = channelTypes is null
+                ? ChannelTypeUtils.AllChannelTypes()
+                : channelTypes.ToList();
             return this;
         }
 

@@ -38,6 +38,11 @@ namespace Discord
         IReadOnlyCollection<IRole> Roles { get; }
 
         /// <summary>
+        ///     Gets the guild member(s) of a <see cref="ComponentType.UserSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response.
+        /// </summary>
+        IReadOnlyCollection<IGuildUser> Members { get; }
+
+        /// <summary>
         ///     Gets the value of a <see cref="ComponentType.TextInput"/> interaction response.
         /// </summary>
         public string Value { get; }
