@@ -362,7 +362,7 @@ namespace Discord
         /// <param name="type">The type of the select menu.</param>
         /// <param name="channelTypes">Menus valid channel types (only for <see cref="ComponentType.ChannelSelect"/>)</param>
         /// <returns>The current builder.</returns>
-        public ActionRowBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options,
+        public ActionRowBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options = null,
             string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false,
             ComponentType type = ComponentType.SelectMenu, ChannelType[] channelTypes = null)
         {
@@ -385,7 +385,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ActionRowBuilder WithSelectMenu(SelectMenuBuilder menu)
         {
-            if (menu.Options.Distinct().Count() != menu.Options.Count)
+            if (menu.Options is not null && menu.Options.Distinct().Count() != menu.Options.Count)
                 throw new InvalidOperationException("Please make sure that there is no duplicates values.");
 
             var builtMenu = menu.Build();
