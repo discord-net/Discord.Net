@@ -208,6 +208,9 @@ You may use as many wild card characters as you want.
 Unlike button interactions, select menu interactions also contain the values of the selected menu items.
 In this case, you should structure your method to accept a string array.
 
+> [!NOTE]
+> Use arrays of `IUser`, `IChannel`, `IRole`, `IMentionable` or their implementations to get data from a select menu with respective type.
+
 [!code-csharp[Dropdown](samples/intro/dropdown.cs)]
 
 > [!NOTE]
