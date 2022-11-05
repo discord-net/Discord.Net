@@ -28,7 +28,7 @@ namespace Discord.WebSocket
                 ? (DataModel)model.Data.Value
                 : null;
             
-            Data = new SocketModalData(dataModel, client, client.State, client.Guilds.FirstOrDefault(x => x.Id == model.GuildId.GetValueOrDefault()));
+            Data = new SocketModalData(dataModel, client, client.State, client.State.GetGuild(model.GuildId.GetValueOrDefault()), model.User.GetValueOrDefault());
         }
 
         internal new static SocketModal Create(DiscordSocketClient client, ModelBase model, ISocketMessageChannel channel, SocketUser user)

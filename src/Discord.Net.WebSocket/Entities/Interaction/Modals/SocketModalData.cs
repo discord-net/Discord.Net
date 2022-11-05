@@ -22,12 +22,12 @@ namespace Discord.WebSocket
         /// </summary>
         public IReadOnlyCollection<SocketMessageComponentData> Components { get; }
 
-        internal SocketModalData(Model model, DiscordSocketClient discord, ClientState state, SocketGuild guild)
+        internal SocketModalData(Model model, DiscordSocketClient discord, ClientState state, SocketGuild guild, API.User dmUser)
         {
             CustomId = model.CustomId;
             Components = model.Components
                 .SelectMany(x => x.Components)
-                .Select(x => new SocketMessageComponentData(x, discord, state, guild))
+                .Select(x => new SocketMessageComponentData(x, discord, state, guild, dmUser))
                 .ToArray();
         }
 

@@ -53,7 +53,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Value { get; }
 
-        internal SocketMessageComponentData(Model model, DiscordSocketClient discord, ClientState state, SocketGuild guild)
+        internal SocketMessageComponentData(Model model, DiscordSocketClient discord, ClientState state, SocketGuild guild, API.User dmUser)
         {
             CustomId = model.CustomId;
             Type = model.ComponentType;
@@ -79,7 +79,7 @@ namespace Discord.WebSocket
                         channel =>
                         {
                             if (channel.Value.Type is ChannelType.DM)
-                                return SocketDMChannel.Create(discord, state, channel.Value);
+                                return SocketDMChannel.Create(discord, state, channel.Value.Id, dmUser);
                             return (SocketChannel)SocketGuildChannel.Create(guild, state, channel.Value);
                         }).ToImmutableArray()
                     : null;
@@ -90,7 +90,7 @@ namespace Discord.WebSocket
             }
         }
 
-        internal SocketMessageComponentData(IMessageComponent component, DiscordSocketClient discord, ClientState state, SocketGuild guild)
+        internal SocketMessageComponentData(IMessageComponent component, DiscordSocketClient discord, ClientState state, SocketGuild guild, API.User dmUser)
         {
             CustomId = component.CustomId;
             Type = component.Type;
@@ -122,7 +122,7 @@ namespace Discord.WebSocket
                             channel =>
                             {
                                 if (channel.Value.Type is ChannelType.DM)
-                                    return SocketDMChannel.Create(discord, state, channel.Value);
+                                    return SocketDMChannel.Create(discord, state, channel.Value.Id, dmUser);
                                 return (SocketChannel)SocketGuildChannel.Create(guild, state, channel.Value);
                             }).ToImmutableArray()
                         : null;

@@ -79,7 +79,12 @@ namespace Discord.Rest
                     : null;
 
                 Channels = model.Resolved.Value.Channels.IsSpecified
-                    ? model.Resolved.Value.Channels.Value.Select(channel => RestChannel.Create(discord, channel.Value)).ToImmutableArray()
+                    ? model.Resolved.Value.Channels.Value.Select(channel =>
+                    {
+                        if (channel.Value.Type is ChannelType.DM)
+                            return RestDMChannel.Create(discord, channel.Value);
+                        return RestChannel.Create(discord, channel.Value);
+                    }).ToImmutableArray()
                     : Array.Empty<RestChannel>();
 
                 Roles = model.Resolved.Value.Roles.IsSpecified
