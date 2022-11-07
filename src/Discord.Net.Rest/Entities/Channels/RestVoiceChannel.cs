@@ -19,8 +19,7 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets whether or not the guild has Text-In-Voice enabled and the voice channel is a TiV channel.
         /// </summary>
-        public virtual bool IsTextInVoice
-            => Guild.Features.HasTextInVoice;
+        public virtual bool IsTextInVoice => true;
         /// <inheritdoc />
         public int Bitrate { get; private set; }
         /// <inheritdoc />
