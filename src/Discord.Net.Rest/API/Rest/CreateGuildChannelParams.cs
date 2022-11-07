@@ -23,12 +23,24 @@ namespace Discord.API.Rest
         public Optional<bool> IsNsfw { get; set; }
         [JsonProperty("rate_limit_per_user")]
         public Optional<int> SlowModeInterval { get; set; }
+        [JsonProperty("default_auto_archive_duration")]
+        public Optional<ThreadArchiveDuration> DefaultAutoArchiveDuration { get; set; }
 
         //Voice channels
         [JsonProperty("bitrate")]
         public Optional<int> Bitrate { get; set; }
         [JsonProperty("user_limit")]
         public Optional<int?> UserLimit { get; set; }
+
+        //Forum channels
+        [JsonProperty("default_reaction_emoji")]
+        public Optional<ModifyForumReactionEmojiParams> DefaultReactionEmoji { get; set; }
+        [JsonProperty("default_thread_rate_limit_per_user")]
+        public Optional<int> ThreadRateLimitPerUser { get; set; }
+        [JsonProperty("available_tags")]
+        public Optional<ModifyForumTagParams[]> AvailableTags { get; set; }
+        [JsonProperty("default_sort_order")]
+        public Optional<ForumSortOrder?> DefaultSortOrder { get; set; }
 
         public CreateGuildChannelParams(string name, ChannelType type)
         {

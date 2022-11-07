@@ -37,6 +37,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public bool? IsInvitable { get; private set; }
 
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ulong> AppliedTags { get; private set; }
+
         /// <inheritdoc cref="IThreadChannel.CreatedAt"/>
         public override DateTimeOffset CreatedAt { get; }
 
@@ -77,6 +80,8 @@ namespace Discord.Rest
             MessageCount = model.MessageCount.GetValueOrDefault(0);
             Type = (ThreadType)model.Type;
             ParentChannelId = model.CategoryId.Value;
+
+            AppliedTags = model.AppliedTags.GetValueOrDefault(Array.Empty<ulong>()).ToImmutableArray();
         }
 
         /// <summary>
@@ -104,6 +109,13 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public override async Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
+        {
+            var model = await ThreadHelper.ModifyAsync(this, Discord, func, options);
+            Update(model);
+        }
+
+        /// <inheritdoc/>
+        public async Task ModifyAsync(Action<ThreadChannelProperties> func, RequestOptions options = null)
         {
             var model = await ThreadHelper.ModifyAsync(this, Discord, func, options);
             Update(model);

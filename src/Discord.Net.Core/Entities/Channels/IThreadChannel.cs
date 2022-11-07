@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -57,6 +58,14 @@ namespace Discord
         bool? IsInvitable { get; }
 
         /// <summary>
+        ///     Gets ids of tags applied to a forum thread
+        /// </summary>
+        /// <remarks>
+        ///     This property is only available on forum threads.
+        /// </remarks>
+        IReadOnlyCollection<ulong> AppliedTags { get; }
+
+        /// <summary>
         ///     Gets when the thread was created.
         /// </summary>
         /// <remarks>
@@ -102,5 +111,16 @@ namespace Discord
         ///     A task that represents the asynchronous operation of removing a user from this thread.
         /// </returns>
         Task RemoveUserAsync(IGuildUser user, RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies this thread channel.
+        /// </summary>
+        /// <param name="func">The delegate containing the properties to modify the channel with.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        /// <seealso cref="ThreadChannelProperties"/>
+        Task ModifyAsync(Action<ThreadChannelProperties> func, RequestOptions options = null);
     }
 }
