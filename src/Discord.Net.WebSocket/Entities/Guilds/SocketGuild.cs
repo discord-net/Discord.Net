@@ -2011,6 +2011,10 @@ namespace Discord.WebSocket
             RequestOptions options)
             => await BulkOverwriteApplicationCommandAsync(properties, options);
 
+        /// <inheritdoc/>
+        public Task<WelcomeScreen> GetWelcomeScreenAsync(RequestOptions options = null)
+            => GuildHelper.GetWelcomeScreenAsync(this, Discord, options);
+
         void IDisposable.Dispose()
         {
             DisconnectAudioAsync().GetAwaiter().GetResult();

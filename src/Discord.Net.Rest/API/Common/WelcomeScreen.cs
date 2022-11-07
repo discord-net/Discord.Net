@@ -8,5 +8,5 @@ internal class WelcomeScreen
     public Optional<string> Description { get; set; }
 
     [JsonProperty("welcome_channels")]
-    public Optional<WelcomeScreenChannel[]> WelcomeChannels { get; set; }
+    public WelcomeScreenChannel[] WelcomeChannels { get; set; }
 }

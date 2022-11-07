@@ -392,6 +392,17 @@ namespace Discord.Rest
             inviteModel.Uses = vanityModel.Uses;
             return RestInviteMetadata.Create(client, guild, null, inviteModel);
         }
+
+        public static async Task<WelcomeScreen> GetWelcomeScreenAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetGuildWelcomeScreenAsync(guild.Id, options);
+
+            return new WelcomeScreen(model.Description.GetValueOrDefault(null), model.WelcomeChannels.Select(
+                x => new WelcomeScreenChannel(
+                    x.ChannelId, x.Description,
+                    x.EmojiName.GetValueOrDefault(null),
+                    x.EmojiId.GetValueOrDefault(0))).ToList());
+        }
         #endregion
 
         #region Roles

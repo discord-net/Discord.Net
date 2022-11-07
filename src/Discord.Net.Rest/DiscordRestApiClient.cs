@@ -1589,6 +1589,18 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<GetGuildPruneCountResponse>("GET", () => $"guilds/{guildId}/prune?days={args.Days}{endpointRoleIds}", ids, options: options).ConfigureAwait(false);
         }
+        public async Task<WelcomeScreen> GetGuildWelcomeScreenAsync(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+
+            try
+            {
+                var ids = new BucketIds(guildId: guildId);
+                return await SendAsync<WelcomeScreen>("GET", () => $"guilds/{guildId}/welcome-screen", ids, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
+        }
         #endregion
 
         #region Guild Bans

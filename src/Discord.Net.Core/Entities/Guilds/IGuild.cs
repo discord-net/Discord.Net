@@ -1239,5 +1239,13 @@ namespace Discord
         /// </returns>
         Task<IReadOnlyCollection<IApplicationCommand>> BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties,
             RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets the welcome screen of the guild.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="WelcomeScreen"/>.
+        /// </returns>
+        Task<WelcomeScreen> GetWelcomeScreenAsync(RequestOptions options = null);
     }
 }

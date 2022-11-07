@@ -1518,6 +1518,11 @@ namespace Discord.Rest
             else
                 return null;
         }
+
+        /// <inheritdoc/>
+        public Task<WelcomeScreen> GetWelcomeScreenAsync(RequestOptions options = null)
+            => GuildHelper.GetWelcomeScreenAsync(this, Discord, options);
+
         #endregion
     }
 }
