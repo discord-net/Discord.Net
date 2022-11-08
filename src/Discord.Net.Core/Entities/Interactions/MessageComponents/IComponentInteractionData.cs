@@ -18,27 +18,27 @@ namespace Discord
         ComponentType Type { get; }
 
         /// <summary>
-        ///     Gets the value(s) of a <see cref="ComponentType.SelectMenu"/> interaction response. Null if select type is different.
+        ///     Gets the value(s) of a <see cref="ComponentType.SelectMenu"/> interaction response. <see langword="null"/> if select type is different.
         /// </summary>
         IReadOnlyCollection<string> Values { get; }
 
         /// <summary>
-        ///     Gets the channels(s) of a <see cref="ComponentType.ChannelSelect"/> interaction response. Null if select type is different.
+        ///     Gets the channels(s) of a <see cref="ComponentType.ChannelSelect"/> interaction response. <see langword="null"/> if select type is different.
         /// </summary> 
         IReadOnlyCollection<IChannel> Channels { get; }
 
         /// <summary>
-        ///     Gets the user(s) of a <see cref="ComponentType.UserSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response. Null if select type is different.
+        ///     Gets the user(s) of a <see cref="ComponentType.UserSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response. <see langword="null"/> if select type is different.
         /// </summary>
         IReadOnlyCollection<IUser> Users { get; }
 
         /// <summary>
-        ///     Gets the roles(s) of a <see cref="ComponentType.RoleSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response. Null if select type is different.
+        ///     Gets the roles(s) of a <see cref="ComponentType.RoleSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response. <see langword="null"/> if select type is different.
         /// </summary>
         IReadOnlyCollection<IRole> Roles { get; }
 
         /// <summary>
-        ///     Gets the guild member(s) of a <see cref="ComponentType.UserSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response. Null if type select is different.
+        ///     Gets the guild member(s) of a <see cref="ComponentType.UserSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response. <see langword="null"/> if type select is different.
         /// </summary>
         IReadOnlyCollection<IGuildUser> Members { get; }
 
