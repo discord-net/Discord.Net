@@ -393,16 +393,6 @@ namespace Discord.Rest
             return RestInviteMetadata.Create(client, guild, null, inviteModel);
         }
 
-        public static async Task<WelcomeScreen> GetWelcomeScreenAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
-        {
-            var model = await client.ApiClient.GetGuildWelcomeScreenAsync(guild.Id, options);
-
-            return new WelcomeScreen(model.Description.GetValueOrDefault(null), model.WelcomeChannels.Select(
-                x => new WelcomeScreenChannel(
-                    x.ChannelId, x.Description,
-                    x.EmojiName.GetValueOrDefault(null),
-                    x.EmojiId.GetValueOrDefault(0))).ToList());
-        }
         #endregion
 
         #region Roles
@@ -951,6 +941,32 @@ namespace Discord.Rest
         public static async Task DeleteEventAsync(BaseDiscordClient client, IGuildScheduledEvent guildEvent, RequestOptions options = null)
         {
             await client.ApiClient.DeleteGuildScheduledEventAsync(guildEvent.Id, guildEvent.Guild.Id, options).ConfigureAwait(false);
+        }
+
+        #endregion
+
+        #region Welcome Screen
+
+        public static async Task<WelcomeScreen> GetWelcomeScreenAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetGuildWelcomeScreenAsync(guild.Id, options);
+
+            return new WelcomeScreen(model.Description.GetValueOrDefault(null), model.WelcomeChannels.Select(
+                x => new WelcomeScreenChannel(
+                    x.ChannelId, x.Description,
+                    x.EmojiName.GetValueOrDefault(null),
+                    x.EmojiId.GetValueOrDefault(0))).ToList());
+        }
+
+        public static async Task<WelcomeScreen> ModifyWelcomeScreenAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        {
+            var model = await client.ApiClient.ModifyGuildWelcomeScreenAsync(null, guild.Id, options);
+
+            return new WelcomeScreen(model.Description.GetValueOrDefault(null), model.WelcomeChannels.Select(
+                x => new WelcomeScreenChannel(
+                    x.ChannelId, x.Description,
+                    x.EmojiName.GetValueOrDefault(null),
+                    x.EmojiId.GetValueOrDefault(0))).ToList());
         }
 
         #endregion
