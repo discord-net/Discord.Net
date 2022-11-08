@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Discord
@@ -161,6 +162,96 @@ namespace Discord
             Embed[] embeds = null)
         {
             return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, embed, options, components: components, embeds: embeds).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Sends a file via DM with an optional caption.
+        /// </summary>
+        /// <remarks>
+        ///     This method attempts to send an attachment as a direct-message to the user.
+        ///     <note type="warning">
+        ///         <para>
+        ///         Please note that this method <strong>will</strong> throw an <see cref="Discord.Net.HttpException"/>
+        ///         if the user cannot receive DMs due to privacy reasons or if the user has the sender blocked.
+        ///         </para>
+        ///         <para>
+        ///         You may want to consider catching for <see cref="Discord.Net.HttpException.DiscordCode"/>
+        ///         <c>50007</c> when using this method.
+        ///         </para>
+        ///     </note>
+        ///     <note>
+        ///         If you wish to upload an image and have it embedded in a <see cref="Discord.EmbedType.Rich"/> embed,
+        ///         you may upload the file and refer to the file with "attachment://filename.ext" in the
+        ///         <see cref="Discord.EmbedBuilder.ImageUrl"/>. See the example section for its usage.
+        ///     </note>
+        /// </remarks>
+        /// <param name="user">The user to send the DM to.</param>
+        /// <param name="attachment">The attachment containing the file and description.</param>
+        /// <param name="text">The message to be sent.</param>
+        /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
+        /// <param name="embed">The <see cref="EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="components">The message component to be included with this message. Used for interactions.</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
+        /// <returns>
+        ///     A task that represents an asynchronous send operation for delivering the message. The task result
+        ///     contains the sent message.
+        /// </returns>
+        public static async Task<IUserMessage> SendFileAsync(this IUser user,
+            FileAttachment attachment,
+            string text = null,
+            bool isTTS = false,
+            Embed embed = null,
+            RequestOptions options = null,
+            MessageComponent components = null,
+            Embed[] embeds = null)
+        {
+            return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(attachment, text, isTTS, embed, options, components: components, embeds: embeds).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Sends a collection of files via DM.
+        /// </summary>
+        /// <remarks>
+        ///     This method attempts to send an attachments as a direct-message to the user.
+        ///     <note type="warning">
+        ///         <para>
+        ///         Please note that this method <strong>will</strong> throw an <see cref="Discord.Net.HttpException"/>
+        ///         if the user cannot receive DMs due to privacy reasons or if the user has the sender blocked.
+        ///         </para>
+        ///         <para>
+        ///         You may want to consider catching for <see cref="Discord.Net.HttpException.DiscordCode"/>
+        ///         <c>50007</c> when using this method.
+        ///         </para>
+        ///     </note>
+        ///     <note>
+        ///         If you wish to upload an image and have it embedded in a <see cref="Discord.EmbedType.Rich"/> embed,
+        ///         you may upload the file and refer to the file with "attachment://filename.ext" in the
+        ///         <see cref="Discord.EmbedBuilder.ImageUrl"/>. See the example section for its usage.
+        ///     </note>
+        /// </remarks>
+        /// <param name="user">The user to send the DM to.</param>
+        /// <param name="attachments">A collection of attachments to upload.</param>
+        /// <param name="text">The message to be sent.</param>
+        /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
+        /// <param name="embed">The <see cref="EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="components">The message component to be included with this message. Used for interactions.</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
+        /// <returns>
+        ///     A task that represents an asynchronous send operation for delivering the message. The task result
+        ///     contains the sent message.
+        /// </returns>
+        public static async Task<IUserMessage> SendFilesAsync(this IUser user,
+            IEnumerable<FileAttachment> attachments,
+            string text = null,
+            bool isTTS = false,
+            Embed embed = null,
+            RequestOptions options = null,
+            MessageComponent components = null,
+            Embed[] embeds = null)
+        {
+            return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendFilesAsync(attachments, text, isTTS, embed, options, components: components, embeds: embeds).ConfigureAwait(false);
         }
 
         /// <summary>
