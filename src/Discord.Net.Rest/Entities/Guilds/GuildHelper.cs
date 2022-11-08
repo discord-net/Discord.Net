@@ -2,6 +2,7 @@ using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using WidgetModel = Discord.API.GuildWidget;
@@ -19,7 +20,8 @@ namespace Discord.Rest
         public static async Task<Model> ModifyAsync(IGuild guild, BaseDiscordClient client,
             Action<GuildProperties> func, RequestOptions options)
         {
-            if (func == null) throw new ArgumentNullException(nameof(func));
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
 
             var args = new GuildProperties();
             func(args);
@@ -140,7 +142,7 @@ namespace Discord.Rest
             };
 
             var mebibyte = Math.Pow(2, 20);
-            return (ulong) (tierFactor * mebibyte);
+            return (ulong)(tierFactor * mebibyte);
         }
         #endregion
 
@@ -231,7 +233,8 @@ namespace Discord.Rest
         public static async Task<RestTextChannel> CreateTextChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<TextChannelProperties> func = null)
         {
-            if (name == null) throw new ArgumentNullException(paramName: nameof(name));
+            if (name == null)
+                throw new ArgumentNullException(paramName: nameof(name));
 
             var props = new TextChannelProperties();
             func?.Invoke(props);
@@ -260,7 +263,8 @@ namespace Discord.Rest
         public static async Task<RestVoiceChannel> CreateVoiceChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<VoiceChannelProperties> func = null)
         {
-            if (name == null) throw new ArgumentNullException(paramName: nameof(name));
+            if (name == null)
+                throw new ArgumentNullException(paramName: nameof(name));
 
             var props = new VoiceChannelProperties();
             func?.Invoke(props);
@@ -316,7 +320,8 @@ namespace Discord.Rest
         public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<GuildChannelProperties> func = null)
         {
-            if (name == null) throw new ArgumentNullException(paramName: nameof(name));
+            if (name == null)
+                throw new ArgumentNullException(paramName: nameof(name));
 
             var props = new GuildChannelProperties();
             func?.Invoke(props);
@@ -387,7 +392,8 @@ namespace Discord.Rest
             RequestOptions options)
         {
             var vanityModel = await client.ApiClient.GetVanityInviteAsync(guild.Id, options).ConfigureAwait(false);
-            if (vanityModel == null) throw new InvalidOperationException("This guild does not have a vanity URL.");
+            if (vanityModel == null)
+                throw new InvalidOperationException("This guild does not have a vanity URL.");
             var inviteModel = await client.ApiClient.GetInviteAsync(vanityModel.Code, options).ConfigureAwait(false);
             inviteModel.Uses = vanityModel.Uses;
             return RestInviteMetadata.Create(client, guild, null, inviteModel);
@@ -400,7 +406,8 @@ namespace Discord.Rest
         public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
             string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options)
         {
-            if (name == null) throw new ArgumentNullException(paramName: nameof(name));
+            if (name == null)
+                throw new ArgumentNullException(paramName: nameof(name));
 
             var createGuildRoleParams = new API.Rest.ModifyGuildRoleParams
             {
@@ -616,7 +623,8 @@ namespace Discord.Rest
         public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func,
             RequestOptions options)
         {
-            if (func == null) throw new ArgumentNullException(paramName: nameof(func));
+            if (func == null)
+                throw new ArgumentNullException(paramName: nameof(func));
 
             var props = new EmoteProperties();
             func(props);
@@ -807,7 +815,7 @@ namespace Discord.Rest
             {
                 switch (args.Status.Value)
                 {
-                    case GuildScheduledEventStatus.Active    when guildEvent.Status != GuildScheduledEventStatus.Scheduled:
+                    case GuildScheduledEventStatus.Active when guildEvent.Status != GuildScheduledEventStatus.Scheduled:
                     case GuildScheduledEventStatus.Completed when guildEvent.Status != GuildScheduledEventStatus.Active:
                     case GuildScheduledEventStatus.Cancelled when guildEvent.Status != GuildScheduledEventStatus.Scheduled:
                         throw new ArgumentException($"Cannot set event to {args.Status.Value} when events status is {guildEvent.Status}");
@@ -849,7 +857,7 @@ namespace Discord.Rest
                     : Optional<ImageModel?>.Unspecified
             };
 
-            if(args.Location.IsSpecified)
+            if (args.Location.IsSpecified)
             {
                 apiArgs.EntityMetadata = new API.GuildScheduledEventEntityMetadata()
                 {
@@ -889,7 +897,7 @@ namespace Discord.Rest
             Image? bannerImage = null,
             RequestOptions options = null)
         {
-            if(location != null)
+            if (location != null)
             {
                 Preconditions.AtMost(location.Length, 100, nameof(location));
             }
@@ -925,7 +933,7 @@ namespace Discord.Rest
                 Image = bannerImage.HasValue ? bannerImage.Value.ToModel() : Optional<ImageModel>.Unspecified
             };
 
-            if(location != null)
+            if (location != null)
             {
                 apiArgs.EntityMetadata = new API.GuildScheduledEventEntityMetadata()
                 {
@@ -951,6 +959,9 @@ namespace Discord.Rest
         {
             var model = await client.ApiClient.GetGuildWelcomeScreenAsync(guild.Id, options);
 
+            if (model.WelcomeChannels.Length == 0)
+                return null;
+
             return new WelcomeScreen(model.Description.GetValueOrDefault(null), model.WelcomeChannels.Select(
                 x => new WelcomeScreenChannel(
                     x.ChannelId, x.Description,
@@ -958,9 +969,28 @@ namespace Discord.Rest
                     x.EmojiId.GetValueOrDefault(0))).ToList());
         }
 
-        public static async Task<WelcomeScreen> ModifyWelcomeScreenAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        public static async Task<WelcomeScreen> ModifyWelcomeScreenAsync(bool enabled, string description, WelcomeScreenChannelProperties[] channels, IGuild guild, BaseDiscordClient client, RequestOptions options)
         {
-            var model = await client.ApiClient.ModifyGuildWelcomeScreenAsync(null, guild.Id, options);
+            if (!guild.Features.HasFeature(GuildFeature.Community))
+                throw new InvalidOperationException("Cannot update welcome screed in a non-community guild.");
+
+            var args = new ModifyGuildWelcomeScreenParams
+            {
+                Enabled = enabled,
+                Description = description,
+                WelcomeChannels = channels?.Select(ch => new API.WelcomeScreenChannel 
+                {
+                    ChannelId = ch.Id,
+                    Description = ch.Description,
+                    EmojiName = ch.Emoji is Emoji emoj ? emoj.Name : Optional<string>.Unspecified,
+                    EmojiId = ch.Emoji is Emote emote ? emote.Id : Optional<ulong?>.Unspecified
+                }).ToArray()
+            };
+
+            var model = await client.ApiClient.ModifyGuildWelcomeScreenAsync(args, guild.Id, options);
+
+            if(model.WelcomeChannels.Length == 0)
+                return null;
 
             return new WelcomeScreen(model.Description.GetValueOrDefault(null), model.WelcomeChannels.Select(
                 x => new WelcomeScreenChannel(

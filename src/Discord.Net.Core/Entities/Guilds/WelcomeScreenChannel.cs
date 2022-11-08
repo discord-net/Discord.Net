@@ -40,17 +40,4 @@ public class WelcomeScreenChannel : ISnowflakeEntity
             Emoji = null;
 
     }
-
-    /// <summary>
-    ///     Initializes a new instance of <see cref="WelcomeScreenChannel"/> to be used to modify one.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="description"></param>
-    /// <param name="emoji"></param>
-    public WelcomeScreenChannel(ulong id, string description, IEmote emoji)
-    {
-        Id = id;
-        Description = description;
-        Emoji = emoji;
-    }
 }
