@@ -5,7 +5,7 @@ namespace Discord;
 public class WelcomeScreen
 {
     /// <summary>
-    ///     Gets the server description shown in the welcome screen. Null if not set.
+    ///     Gets the server description shown in the welcome screen. <see langword="null"/> if not set.
     /// </summary>
     public string Description { get; }
 
