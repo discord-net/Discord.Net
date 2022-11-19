@@ -5,8 +5,8 @@
     <AssemblyName>Discord.Net.Commands</AssemblyName>
     <RootNamespace>Discord.Commands</RootNamespace>
     <Description>A Discord.Net extension adding support for bot commands.</Description>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net6.0;net5.0;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net6.0;net5.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net7.0;net6.0;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net7.0;net6.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <WarningLevel>5</WarningLevel>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>

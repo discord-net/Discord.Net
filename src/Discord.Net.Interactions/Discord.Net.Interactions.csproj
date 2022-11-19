@@ -2,8 +2,8 @@
   <Import Project="../../Discord.Net.targets" />
   <Import Project="../../StyleAnalyzer.targets" />
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net6.0;net5.0;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net6.0;net5.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net7.0;net6.0;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net7.0;net6.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <RootNamespace>Discord.Interactions</RootNamespace>
     <AssemblyName>Discord.Net.Interactions</AssemblyName>
     <Description>A Discord.Net extension adding support for Application Commands.</Description>
