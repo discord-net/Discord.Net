@@ -1241,7 +1241,7 @@ namespace Discord
             RequestOptions options = null);
 
         /// <summary>
-        ///     Gets the welcome screen of the guild. Returns <see langword="null"/> is the welcome channel is not set.
+        ///     Gets the welcome screen of the guild. Returns <see langword="null"/> if the welcome channel is not set.
         /// </summary>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="WelcomeScreen"/>.

@@ -972,7 +972,7 @@ namespace Discord.Rest
         public static async Task<WelcomeScreen> ModifyWelcomeScreenAsync(bool enabled, string description, WelcomeScreenChannelProperties[] channels, IGuild guild, BaseDiscordClient client, RequestOptions options)
         {
             if (!guild.Features.HasFeature(GuildFeature.Community))
-                throw new InvalidOperationException("Cannot update welcome screed in a non-community guild.");
+                throw new InvalidOperationException("Cannot update welcome screen in a non-community guild.");
 
             var args = new ModifyGuildWelcomeScreenParams
             {
