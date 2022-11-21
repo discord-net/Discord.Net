@@ -234,8 +234,16 @@ namespace Discord.API
                 {
                     if (!_isExplicitUrl && _gatewayUrl == null)
                     {
-                        var gatewayResponse = await GetBotGatewayAsync().ConfigureAwait(false);
-                        _gatewayUrl = FormatGatewayUrl(gatewayResponse.Url);
+                        if (AuthTokenType == TokenType.Bot)
+                        {
+                            var gatewayResponse = await GetBotGatewayAsync().ConfigureAwait(false);
+                            _gatewayUrl = FormatGatewayUrl(gatewayResponse.Url);
+                        }
+                        else
+                        {
+                            var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
+                            _gatewayUrl = FormatGatewayUrl(gatewayResponse.Url);
+                        }
                     }
 
                     gatewayUrl = _gatewayUrl;

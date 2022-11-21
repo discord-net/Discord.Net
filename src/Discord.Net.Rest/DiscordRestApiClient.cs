@@ -75,7 +75,8 @@ namespace Discord.API
             RestClient = _restClientProvider(baseUrl);
             RestClient.SetHeader("accept", "*/*");
             RestClient.SetHeader("user-agent", UserAgent);
-            RestClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, AuthToken));
+            if (!string.IsNullOrEmpty(AuthToken))
+                RestClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, AuthToken));
         }
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
         internal static string GetPrefixedToken(TokenType tokenType, string token)
@@ -83,7 +84,7 @@ namespace Discord.API
             return tokenType switch
             {
                 TokenType.Bot => $"Bot {token}",
-                TokenType.Bearer => $"Bearer {token}",
+                TokenType.Bearer => $"{token}",  // Bearer tokens are not prefixed
                 _ => throw new ArgumentException(message: "Unknown OAuth token type.", paramName: nameof(tokenType)),
             };
         }
