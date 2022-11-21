@@ -3006,6 +3006,10 @@ namespace Discord.WebSocket
         /// <exception cref="InvalidOperationException">Unexpected channel type is created.</exception>
         internal ISocketPrivateChannel AddPrivateChannel(API.Channel model, ClientState state)
         {
+            // don't add dead DMs
+            if (! (model.Recipients.GetValueOrDefault()?.Any() ?? false))
+                return null;
+
             var channel = SocketChannel.CreatePrivate(this, state, model);
             state.AddChannel(channel as SocketChannel);
             return channel;
