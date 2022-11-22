@@ -302,6 +302,16 @@ namespace Discord.WebSocket
         /// </returns>
         public IReadOnlyCollection<SocketThreadChannel> ThreadChannels
             => Channels.OfType<SocketThreadChannel>().ToImmutableArray();
+
+        /// <summary>
+        ///     Gets a collection of all forum channels in this guild.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of forum channels found within this guild.
+        /// </returns>
+        public IReadOnlyCollection<SocketForumChannel> ForumChannels
+            => Channels.OfType<SocketForumChannel>().ToImmutableArray();
+
         /// <summary>
         ///     Gets the current logged-in user.
         /// </summary>
@@ -790,6 +800,7 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<RestStageChannel> CreateStageChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateStageChannelAsync(this, Discord, name, options, func);
+
         /// <summary>
         ///     Creates a new channel category in this guild.
         /// </summary>
@@ -803,6 +814,20 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options, func);
+
+        /// <summary>
+        ///     Creates a new channel forum in this guild.
+        /// </summary>
+        /// <param name="name">The new name for the forum.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null"/>.</exception>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     forum channel.
+        /// </returns>
+        public Task<RestForumChannel> CreateForumChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null)
+            => GuildHelper.CreateForumChannelAsync(this, Discord, name, options, func);
 
         internal SocketGuildChannel AddChannel(ClientState state, ChannelModel model)
         {
@@ -1897,6 +1922,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<ICategoryChannel> IGuild.CreateCategoryAsync(string name, Action<GuildChannelProperties> func, RequestOptions options)
             => await CreateCategoryChannelAsync(name, func, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IForumChannel> IGuild.CreateForumChannelAsync(string name, Action<ForumChannelProperties> func, RequestOptions options)
+            => await CreateForumChannelAsync(name, func, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IVoiceRegion>> IGuild.GetVoiceRegionsAsync(RequestOptions options)

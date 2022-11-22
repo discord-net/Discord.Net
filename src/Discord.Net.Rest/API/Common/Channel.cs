@@ -70,8 +70,24 @@ namespace Discord.API
         //ForumChannel
         [JsonProperty("available_tags")]
         public Optional<ForumTags[]> ForumTags { get; set; }
-        
+
+        [JsonProperty("applied_tags")]
+        public Optional<ulong[]> AppliedTags { get; set; }
+
         [JsonProperty("default_auto_archive_duration")]
         public Optional<ThreadArchiveDuration> AutoArchiveDuration { get; set; }
+
+        [JsonProperty("default_thread_rate_limit_per_user")]
+        public Optional<int> ThreadRateLimitPerUser { get; set; }
+
+        [JsonProperty("flags")]
+        public Optional<ChannelFlags> Flags { get; set; }
+
+        [JsonProperty("default_sort_order")]
+        public Optional<ForumSortOrder?> DefaultSortOrder { get; set; }
+
+        [JsonProperty("default_reaction_emoji")]
+        public Optional<ForumReactionEmoji> DefaultReactionEmoji { get; set; }
+
     }
 }

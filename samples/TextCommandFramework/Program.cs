@@ -60,6 +60,10 @@ namespace TextCommandFramework
         private ServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
+                .AddSingleton(new DiscordSocketConfig
+                {
+                    GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
+                })
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()

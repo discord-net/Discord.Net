@@ -30,13 +30,15 @@ namespace Discord.Rest
                 ChannelType.Stage or
                 ChannelType.NewsThread or
                 ChannelType.PrivateThread or
-                ChannelType.PublicThread
+                ChannelType.PublicThread or
+                ChannelType.Forum
                     => RestGuildChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model),
                 ChannelType.DM or ChannelType.Group => CreatePrivate(discord, model) as RestChannel,
                 ChannelType.Category => RestCategoryChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model),
                 _ => new RestChannel(discord, model.Id),
             };
         }
+
         internal static RestChannel Create(BaseDiscordClient discord, Model model, IGuild guild)
         {
             return model.Type switch
@@ -47,7 +49,8 @@ namespace Discord.Rest
                 ChannelType.Stage or
                 ChannelType.NewsThread or
                 ChannelType.PrivateThread or
-                ChannelType.PublicThread
+                ChannelType.PublicThread or
+                ChannelType.Forum
                     => RestGuildChannel.Create(discord, guild, model),
                 ChannelType.DM or ChannelType.Group => CreatePrivate(discord, model) as RestChannel,
                 ChannelType.Category => RestCategoryChannel.Create(discord, guild, model),

@@ -24,7 +24,7 @@ namespace Discord.Interactions
         public GuildPermission? DefaultMemberPermissions { get; }
 
         /// <inheritdoc/>
-        public override IReadOnlyCollection<CommandParameterInfo> Parameters { get; }
+        public override IReadOnlyList<CommandParameterInfo> Parameters { get; }
 
         /// <inheritdoc/>
         public override bool SupportsWildCards => false;
