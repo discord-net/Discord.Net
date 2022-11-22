@@ -17,6 +17,8 @@
 
 - #2471 Update samples to use `MessageContent` intent & update `v2 => v3 guide` (a4d34f6)
 - #2505 Update events.cs (ea039b8)
+- #2467 Update license and icon nuspec props (11ed0ff)
+- #2306 Command execution code rework & TypeConverters auto-scope fix (6869817)
 
 ## [3.8.1] - 2022-09-12
 ### Added
