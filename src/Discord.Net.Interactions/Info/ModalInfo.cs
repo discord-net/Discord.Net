@@ -103,7 +103,7 @@ namespace Discord.Interactions
         public async Task<IResult> CreateModalAsync(IInteractionContext context, IServiceProvider services = null, bool throwOnMissingField = false)
         {
             if (context.Interaction is not IModalInteraction modalInteraction)
-                return ParseResult.FromError(InteractionCommandError.Unsuccessful, "Provided context doesn't belong to a Modal Interaction.");
+                return TypeConverterResult.FromError(InteractionCommandError.Unsuccessful, "Provided context doesn't belong to a Modal Interaction.");
 
             services ??= EmptyServiceProvider.Instance;
 
@@ -120,7 +120,7 @@ namespace Discord.Interactions
                     if (!throwOnMissingField)
                         args[i] = input.DefaultValue;
                     else
-                        return ParseResult.FromError(InteractionCommandError.BadArgs, $"Modal interaction is missing the required field: {input.CustomId}");
+                        return TypeConverterResult.FromError(InteractionCommandError.BadArgs, $"Modal interaction is missing the required field: {input.CustomId}");
                 }
                 else
                 {
@@ -133,7 +133,7 @@ namespace Discord.Interactions
                 }
             }
 
-            return ParseResult.FromSuccess(_initializer(args));
+            return TypeConverterResult.FromSuccess(_initializer(args));
         }
     }
 }

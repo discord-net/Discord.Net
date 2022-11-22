@@ -822,7 +822,7 @@ namespace Discord.Interactions
 
             SetMatchesIfApplicable(context, result);
 
-            return await result.Command.ExecuteAsync(context, services, result.RegexCaptureGroups).ConfigureAwait(false);
+            return await result.Command.ExecuteAsync(context, services).ConfigureAwait(false);
         }
 
         private async Task<IResult> ExecuteAutocompleteAsync (IInteractionContext context, IAutocompleteInteraction interaction, IServiceProvider services )
@@ -869,7 +869,7 @@ namespace Discord.Interactions
 
             SetMatchesIfApplicable(context, result);
 
-            return await result.Command.ExecuteAsync(context, services, result.RegexCaptureGroups).ConfigureAwait(false);
+            return await result.Command.ExecuteAsync(context, services).ConfigureAwait(false);
         }
 
         private static void SetMatchesIfApplicable<T>(IInteractionContext context, SearchResult<T> searchResult)
