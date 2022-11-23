@@ -200,6 +200,7 @@ namespace Discord.Interactions
                 while (ex is TargetInvocationException)
                     ex = ex.InnerException;
 
+                var interactionException = new InteractionException(this, context, ex);
                 await Module.CommandService._cmdLogger.ErrorAsync(ex).ConfigureAwait(false);
 
                 var result = ExecuteResult.FromError(ex);
