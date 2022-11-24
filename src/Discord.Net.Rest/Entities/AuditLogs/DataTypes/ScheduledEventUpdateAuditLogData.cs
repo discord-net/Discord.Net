@@ -1,10 +1,8 @@
 using System;
 using System.Linq;
-using Discord.API;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
-using Newtonsoft.Json.Linq;
 
 namespace Discord.Rest
 {
@@ -52,7 +50,7 @@ namespace Discord.Rest
                 status?.OldValue.ToObject<GuildScheduledEventStatus>(discord.ApiClient.Serializer),
                 entityType?.OldValue.ToObject<GuildScheduledEventType>(discord.ApiClient.Serializer),
                 entityId?.OldValue.ToObject<ulong?>(discord.ApiClient.Serializer),
-                location == null ? null : location.OldValue?.ToObject<string>(discord.ApiClient.Serializer) ?? Optional<string>.Unspecified,
+                location == null ? Optional<string>.Unspecified : new Optional<string>(location.OldValue?.ToObject<string>(discord.ApiClient.Serializer)),
                 userCount?.OldValue.ToObject<Optional<int>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault(),
                 image?.OldValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
@@ -70,7 +68,7 @@ namespace Discord.Rest
                 status?.NewValue.ToObject<GuildScheduledEventStatus>(discord.ApiClient.Serializer),
                 entityType?.NewValue.ToObject<GuildScheduledEventType>(discord.ApiClient.Serializer),
                 entityId?.NewValue.ToObject<ulong?>(discord.ApiClient.Serializer),
-                location == null ? null : location.NewValue?.ToObject<string>(discord.ApiClient.Serializer) ?? Optional<string>.Unspecified,
+                location == null ? Optional<string>.Unspecified : new Optional<string>(location.NewValue?.ToObject<string>(discord.ApiClient.Serializer)),
                 userCount?.NewValue.ToObject<Optional<int>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault(),
                 image?.NewValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
