@@ -95,6 +95,9 @@ namespace Discord.WebSocket
         /// <inheritdoc cref="IThreadChannel.CreatedAt"/>
         public override DateTimeOffset CreatedAt { get; }
 
+        /// <inheritdoc cref="IThreadChannel.OwnerId"/>
+        ulong IThreadChannel.OwnerId => _ownerId;
+
         /// <summary>
         ///     Gets a collection of cached users within this thread.
         /// </summary>
