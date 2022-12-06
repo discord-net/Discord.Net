@@ -1,6 +1,6 @@
 // you need to add `Autocomplete` attribute before parameter to add autocompletion to it
 [SlashCommand("command_name", "command_description")]
-public async Task ExampleCommand([Summary("parameter_name"), Autocomplete(typeof(ExampleAutocompleteHandler))] string parameterWithAutocompletion)
+public async Task ExampleCommand([Summary("parameter_name"), [Autocomplete(typeof(ExampleAutocompleteHandler))] string parameterWithAutocompletion)
     => await RespondAsync($"Your choice: {parameterWithAutocompletion}");
 
 public class ExampleAutocompleteHandler : AutocompleteHandler
