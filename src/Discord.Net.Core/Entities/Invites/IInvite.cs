@@ -56,6 +56,9 @@ namespace Discord
         /// <summary>
         ///     Gets the guild this invite is linked to.
         /// </summary>
+        /// <remarks>
+        ///     Guild might have empty properties due to API not returning full guild object.
+        /// </remarks>
         /// <returns>
         ///     A guild object representing the guild that the invite points to.
         /// </returns>

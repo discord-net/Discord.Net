@@ -515,7 +515,7 @@ namespace Discord.WebSocket
                 MaxMembers = model.MaxMembers.Value;
             if (model.MaxVideoChannelUsers.IsSpecified)
                 MaxVideoChannelUsers = model.MaxVideoChannelUsers.Value;
-            PreferredLocale = model.PreferredLocale;
+            PreferredLocale = model.PreferredLocale.IsSpecified ? model.PreferredLocale.Value : null;
             PreferredCulture = PreferredLocale == null ? null : new CultureInfo(PreferredLocale);
             if (model.IsBoostProgressBarEnabled.IsSpecified)
                 IsBoostProgressBarEnabled = model.IsBoostProgressBarEnabled.Value;

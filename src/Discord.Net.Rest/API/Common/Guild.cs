@@ -66,7 +66,7 @@ namespace Discord.API
         [JsonProperty("premium_subscription_count")]
         public int? PremiumSubscriptionCount { get; set; }
         [JsonProperty("preferred_locale")]
-        public string PreferredLocale { get; set; }
+        public Optional<string> PreferredLocale { get; set; }
         [JsonProperty("public_updates_channel_id")]
         public ulong? PublicUpdatesChannelId { get; set; }
         [JsonProperty("max_video_channel_users")]
