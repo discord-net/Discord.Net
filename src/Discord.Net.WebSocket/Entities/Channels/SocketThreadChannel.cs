@@ -374,6 +374,10 @@ namespace Discord.WebSocket
         public override Task SyncPermissionsAsync(RequestOptions options = null)
             => throw new NotSupportedException("This method is not supported in threads.");
 
+        /// <inheritdoc/> <exception cref="NotSupportedException">This method is not supported in threads.</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
+            => throw new NotSupportedException("This method is not supported in threads.");
+
         string IChannel.Name => Name;
     }
 }

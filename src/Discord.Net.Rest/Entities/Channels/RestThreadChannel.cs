@@ -241,5 +241,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public Task RemoveUserAsync(IGuildUser user, RequestOptions options = null)
             => Discord.ApiClient.RemoveThreadMemberAsync(Id, user.Id, options);
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This method is not supported in threads.</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
+            => throw new NotSupportedException("This method is not supported in threads.");
     }
 }
