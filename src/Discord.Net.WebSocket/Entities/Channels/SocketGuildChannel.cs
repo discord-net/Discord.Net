@@ -31,6 +31,9 @@ namespace Discord.WebSocket
         public int Position { get; private set; }
 
         /// <inheritdoc />
+        public ChannelFlags Flags { get; private set; }
+
+        /// <inheritdoc />
         public virtual IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
         /// <summary>
         ///     Gets a collection of users that are able to view the channel.
@@ -74,6 +77,8 @@ namespace Discord.WebSocket
             for (int i = 0; i < overwrites.Length; i++)
                 newOverwrites.Add(overwrites[i].ToEntity());
             _overwrites = newOverwrites.ToImmutable();
+
+            Flags = model.Flags.GetValueOrDefault(ChannelFlags.None);
         }
 
         /// <inheritdoc />

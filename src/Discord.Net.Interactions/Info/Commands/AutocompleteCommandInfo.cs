@@ -23,7 +23,7 @@ namespace Discord.Interactions
         public string CommandName { get; }
 
         /// <inheritdoc/>
-        public override IReadOnlyCollection<CommandParameterInfo> Parameters { get; }
+        public override IReadOnlyList<CommandParameterInfo> Parameters { get; }
 
         /// <inheritdoc/>
         public override bool SupportsWildCards => false;
@@ -41,8 +41,11 @@ namespace Discord.Interactions
             if (context.Interaction is not IAutocompleteInteraction)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Autocomplete Interaction");
 
-            return await RunAsync(context, Array.Empty<object>(), services).ConfigureAwait(false);
+            return await base.ExecuteAsync(context, services).ConfigureAwait(false);
         }
+
+        protected override Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
+            => Task.FromResult(ParseResult.FromSuccess(Array.Empty<object>()) as IResult);
 
         /// <inheritdoc/>
         protected override Task InvokeModuleEvent(IInteractionContext context, IResult result) =>

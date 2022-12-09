@@ -13,7 +13,7 @@ namespace Discord.Interactions
     public class ComponentCommandInfo : CommandInfo<ComponentCommandParameterInfo>
     {
         /// <inheritdoc/>
-        public override IReadOnlyCollection<ComponentCommandParameterInfo> Parameters { get; }
+        public override IReadOnlyList<ComponentCommandParameterInfo> Parameters { get; }
 
         /// <inheritdoc/>
         public override bool SupportsWildCards => true;
@@ -25,48 +25,32 @@ namespace Discord.Interactions
 
         /// <inheritdoc/>
         public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
-            => await ExecuteAsync(context, services, null).ConfigureAwait(false);
-
-        /// <summary>
-        ///     Execute this command using dependency injection.
-        /// </summary>
-        /// <param name="context">Context that will be injected to the <see cref="InteractionModuleBase{T}"/>.</param>
-        /// <param name="services">Services that will be used while initializing the <see cref="InteractionModuleBase{T}"/>.</param>
-        /// <param name="additionalArgs">Provide additional string parameters to the method along with the auto generated parameters.</param>
-        /// <returns>
-        ///     A task representing the asynchronous command execution process.
-        /// </returns>
-        public async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services, params string[] additionalArgs)
         {
-            if (context.Interaction is not IComponentInteraction componentInteraction)
+            if (context.Interaction is not IComponentInteraction)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Message Component Interaction");
 
-            return await ExecuteAsync(context, Parameters, additionalArgs, componentInteraction.Data, services);
+            return await base.ExecuteAsync(context, services).ConfigureAwait(false);
         }
 
-        /// <inheritdoc/>
-        public async Task<IResult> ExecuteAsync(IInteractionContext context, IEnumerable<CommandParameterInfo> paramList, IEnumerable<string> wildcardCaptures, IComponentInteractionData data,
-            IServiceProvider services)
+        protected override async Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
         {
-            var paramCount = paramList.Count();
-            var captureCount = wildcardCaptures?.Count() ?? 0;
-
-            if (context.Interaction is not IComponentInteraction messageComponent)
-                return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Component Command Interaction");
+            var captures = (context as IRouteMatchContainer)?.SegmentMatches?.ToList();
+            var captureCount = captures?.Count() ?? 0;
 
             try
             {
-                var args = new object[paramCount];
+                var data = (context.Interaction as IComponentInteraction).Data;
+                var args = new object[Parameters.Count];
 
-                for (var i = 0; i < paramCount; i++)
+                for(var i = 0; i < Parameters.Count; i++)
                 {
-                    var parameter = Parameters.ElementAt(i);
+                    var parameter = Parameters[i];
                     var isCapture = i < captureCount;
 
                     if (isCapture ^ parameter.IsRouteSegmentParameter)
                         return await InvokeEventAndReturn(context, ExecuteResult.FromError(InteractionCommandError.BadArgs, "Argument type and parameter type didn't match (Wild Card capture/Component value)")).ConfigureAwait(false);
 
-                    var readResult = isCapture ? await parameter.TypeReader.ReadAsync(context, wildcardCaptures.ElementAt(i), services).ConfigureAwait(false) :
+                    var readResult = isCapture ? await parameter.TypeReader.ReadAsync(context, captures[i].Value, services).ConfigureAwait(false) :
                         await parameter.TypeConverter.ReadAsync(context, data, services).ConfigureAwait(false);
 
                     if (!readResult.IsSuccess)
@@ -75,7 +59,7 @@ namespace Discord.Interactions
                     args[i] = readResult.Value;
                 }
 
-                return await RunAsync(context, args, services).ConfigureAwait(false);
+                return ParseResult.FromSuccess(args);
             }
             catch (Exception ex)
             {

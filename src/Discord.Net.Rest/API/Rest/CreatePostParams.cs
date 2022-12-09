@@ -21,5 +21,8 @@ namespace Discord.API.Rest
 
         [JsonProperty("message")]
         public ForumThreadMessage Message { get; set; }
+
+        [JsonProperty("applied_tags")]
+        public Optional<ulong[]> Tags { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Discord
 {
@@ -40,19 +41,9 @@ namespace Discord
         public Optional<int> SlowModeInterval { get; set; }
 
         /// <summary>
-        ///     Gets or sets whether or not the thread is archived.
-        /// </summary>
-        public Optional<bool> Archived { get; set; }
-
-        /// <summary>
-        ///     Gets or sets whether or not the thread is locked.
-        /// </summary>
-        public Optional<bool> Locked { get; set; }
-
-        /// <summary>
         ///     Gets or sets the auto archive duration.
         /// </summary>
         public Optional<ThreadArchiveDuration> AutoArchiveDuration { get; set; }
-        
+
     }
 }

@@ -352,10 +352,6 @@ namespace Discord.WebSocket
                 if (guild.IsAvailable)
                     await GuildUnavailableAsync(guild).ConfigureAwait(false);
             }
-
-            _sessionId = null;
-            _lastSeq = 0;
-            ApiClient.ResumeGatewayUrl = null;
         }
 
         /// <inheritdoc />
@@ -906,7 +902,7 @@ namespace Discord.WebSocket
                                         var activities = _activity.IsSpecified ? ImmutableList.Create(_activity.Value) : null;
                                         currentUser.Presence = new SocketPresence(Status, null, activities);
                                         ApiClient.CurrentUserId = currentUser.Id;
-                                        ApiClient.CurrentApplicationId = data.Application.Id;
+                                        ApiClient.CurrentApplicationId = data.Application?.Id;
                                         Rest.CurrentUser = RestSelfUser.Create(this, data.User);
                                         int unavailableGuilds = 0;
                                         for (int i = 0; i < data.Guilds.Length; i++)
