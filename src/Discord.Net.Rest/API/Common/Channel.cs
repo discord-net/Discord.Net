@@ -89,5 +89,8 @@ namespace Discord.API
         [JsonProperty("default_reaction_emoji")]
         public Optional<ForumReactionEmoji> DefaultReactionEmoji { get; set; }
 
+        [JsonProperty("default_forum_layout")]
+        public Optional<ForumLayout> DefaultForumLayout { get; set; }
+
     }
 }

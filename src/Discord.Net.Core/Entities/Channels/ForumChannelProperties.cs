@@ -57,4 +57,9 @@ public class ForumChannelProperties : TextChannelProperties
     /// Gets or sets the rule used to order posts in forum channels.
     /// </summary>
     public Optional<ForumSortOrder> DefaultSortOrder { get; set; }
+
+    /// <summary>
+    /// Gets or sets the rule used to display posts in a forum channel.
+    /// </summary>
+    public Optional<ForumLayout> DefaultLayout { get; set; }
 }
