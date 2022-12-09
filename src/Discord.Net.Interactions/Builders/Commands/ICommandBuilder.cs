@@ -35,6 +35,11 @@ namespace Discord.Interactions.Builders
         bool IgnoreGroupNames { get; set; }
 
         /// <summary>
+        ///     Gets or sets whether the <see cref="Name"/> should be directly used as a Regex pattern.
+        /// </summary>
+        bool TreatNameAsRegex { get; set; }
+
+        /// <summary>
         ///     Gets or sets the run mode this command gets executed with.
         /// </summary>
         RunMode RunMode { get; set; }
@@ -89,6 +94,15 @@ namespace Discord.Interactions.Builders
         ///     The builder instance.
         /// </returns>
         ICommandBuilder SetRunMode (RunMode runMode);
+
+        /// <summary>
+        ///     Sets <see cref="TreatNameAsRegex"/>.
+        /// </summary>
+        /// <param name="value">New value of the <see cref="TreatNameAsRegex"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        ICommandBuilder WithNameAsRegex(bool value);
 
         /// <summary>
         ///     Adds parameter builders to <see cref="Parameters"/>.

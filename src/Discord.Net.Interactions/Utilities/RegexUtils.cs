@@ -1,3 +1,4 @@
+using Discord.Interactions;
 using System;
 using System.Linq;
 
@@ -80,6 +81,38 @@ namespace System.Text.RegularExpressions
         internal static bool IsMetachar(char ch)
         {
             return (ch <= '|' && _category[ch] >= E);
+        }
+
+        internal static int GetWildCardCount(string input, string wildCardExpression)
+        {
+            var escapedWildCard = Regex.Escape(wildCardExpression);
+            var match = Regex.Matches(input, $@"(?<!\\){escapedWildCard}|(?<!\\){{[0-9]+(?:,[0-9]*)?(?<!\\)}}");
+            return match.Count;
+        }
+
+        internal static bool TryBuildRegexPattern<T>(T commandInfo, string wildCardStr, out string pattern) where T: class, ICommandInfo
+        {
+            if (commandInfo.TreatNameAsRegex)
+            {
+                pattern = commandInfo.Name;
+                return true;
+            }
+
+            if (GetWildCardCount(commandInfo.Name, wildCardStr) == 0)
+            {
+                pattern = null;
+                return false;
+            }
+
+            var escapedWildCard = Regex.Escape(wildCardStr);
+            var unquantified = Regex.Replace(commandInfo.Name, $@"(?<!\\){escapedWildCard}(?<delimiter>[^{escapedWildCard}]?)",
+                @"([^\n\t${delimiter}]+)${delimiter}");
+
+            var quantified = Regex.Replace(unquantified, $@"(?<!\\){{(?<start>[0-9]+)(?<end>,[0-9]*)?(?<!\\)}}(?<delimiter>[^{escapedWildCard}]?)",
+                @"([^\n\t${delimiter}]{${start}${end}})${delimiter}");
+
+            pattern = "\\A" + quantified + "\\Z";
+            return true;
         }
     }
 }

@@ -36,6 +36,9 @@ namespace Discord.Interactions.Builders
         public bool IgnoreGroupNames { get; set; }
 
         /// <inheritdoc/>
+        public bool TreatNameAsRegex { get; set; }
+
+        /// <inheritdoc/>
         public RunMode RunMode { get; set; }
 
         /// <inheritdoc/>
@@ -118,6 +121,19 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
+        ///     Sets <see cref="TreatNameAsRegex"/>.
+        /// </summary>
+        /// <param name="value">New value of the <see cref="TreatNameAsRegex"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public TBuilder WithNameAsRegex (bool value)
+        {
+            TreatNameAsRegex = value;
+            return Instance;
+        }
+
+        /// <summary>
         ///     Adds parameter builders to <see cref="Parameters"/>.
         /// </summary>
         /// <param name="parameters">New parameter builders to be added to <see cref="Parameters"/>.</param>
@@ -162,6 +178,10 @@ namespace Discord.Interactions.Builders
         /// <inheritdoc/>
         ICommandBuilder ICommandBuilder.SetRunMode (RunMode runMode) =>
             SetRunMode(runMode);
+
+        /// <inheritdoc/>
+        ICommandBuilder ICommandBuilder.WithNameAsRegex(bool value) =>
+            WithNameAsRegex(value);
 
         /// <inheritdoc/>
         ICommandBuilder ICommandBuilder.AddParameters (params IParameterBuilder[] parameters) =>
