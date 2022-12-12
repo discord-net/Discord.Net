@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -2473,6 +2474,20 @@ namespace Discord.API
                 querys.Add($"thread_id={threadId}");
 
             return $"{string.Join("&", querys)}";
+        }
+
+        #endregion
+
+        #region Application Role Connections Metadata
+
+        public async Task<IEnumerable<RoleConnectionMetadata>> GetApplicationRoleConnectionMetadataRecordsAsync(RequestOptions options = null)
+        {
+            return await SendAsync<IEnumerable<RoleConnectionMetadata>>("GET", $"/applications/{CurrentApplicationId}/role-connections/metadata", options: options).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<RoleConnectionMetadata>> UpdateApplicationRoleConnectionMetadataRecordsAsync(IEnumerable<RoleConnectionMetadata> roleConnections, RequestOptions options = null)
+        {
+            return await SendJsonAsync<IEnumerable<RoleConnectionMetadata>>("PUT", $"/applications/{CurrentApplicationId}/role-connections/metadata", roleConnections, options: options).ConfigureAwait(false);
         }
 
         #endregion
