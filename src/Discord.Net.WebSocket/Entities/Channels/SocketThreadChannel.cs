@@ -315,14 +315,14 @@ namespace Discord.WebSocket
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override OverwritePermissions? GetPermissionOverwrite(IRole role)
-            => ParentChannel.GetPermissionOverwrite(role);
+            => ParentChannel?.GetPermissionOverwrite(role);
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override OverwritePermissions? GetPermissionOverwrite(IUser user)
-            => ParentChannel.GetPermissionOverwrite(user);
+            => ParentChannel?.GetPermissionOverwrite(user);
 
         /// <inheritdoc/>
         /// <remarks>
