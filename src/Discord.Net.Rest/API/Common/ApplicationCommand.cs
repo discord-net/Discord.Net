@@ -44,5 +44,8 @@ namespace Discord.API
 
         [JsonProperty("default_member_permissions")]
         public Optional<GuildPermission?> DefaultMemberPermission { get; set; }
+
+        [JsonProperty("nsfw")]
+        public Optional<bool?> Nsfw { get; set; }
     }
 }
