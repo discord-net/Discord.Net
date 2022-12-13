@@ -177,6 +177,7 @@ namespace Discord
         OwnershipCannotBeTransferredToABotUser = 50132,
         FailedToResizeAssetBelowTheMaximumSize = 50138,
         UploadedFileNotFound = 50146,
+        FeatureInProcessOfRollingOut = 50155,
         MissingPermissionToSendThisSticker = 50600,
         #endregion
 
