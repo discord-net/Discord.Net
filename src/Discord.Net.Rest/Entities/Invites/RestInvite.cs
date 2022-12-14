@@ -28,6 +28,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public TargetUserType TargetUserType { get; private set; }
         internal IChannel Channel { get; }
+
+        /// <inheritdoc cref="IInvite.Guild"/>
         public IGuild Guild { get; }
 
         /// <inheritdoc />
