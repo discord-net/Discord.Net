@@ -102,7 +102,7 @@ namespace Discord.Interactions.Builders
                         builder.DontAutoRegister = true;
                         break;
                     case NsfwCommandAttribute nsfwCommand:
-                        builder.IsNsfw = nsfwCommand.IsNsfw;
+                        builder.SetNsfw(nsfwCommand.IsNsfw);
                         break;
                     default:
                         builder.AddAttributes(attribute);

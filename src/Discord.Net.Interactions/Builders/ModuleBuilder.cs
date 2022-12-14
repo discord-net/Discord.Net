@@ -196,6 +196,19 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
+        ///     Sets <see cref="IsNsfw"/>.
+        /// </summary>
+        /// <param name="isNsfw">New value of the <see cref="IsNsfw"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModuleBuilder SetNsfw(bool isNsfw)
+        {
+            IsNsfw = isNsfw;
+            return this;
+        }
+
+        /// <summary>
         ///     Sets <see cref="DefaultMemberPermissions"/>.
         /// </summary>
         /// <param name="permissions">New value of the <see cref="DefaultMemberPermissions"/>.</param>

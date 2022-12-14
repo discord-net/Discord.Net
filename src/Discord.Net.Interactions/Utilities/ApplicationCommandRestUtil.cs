@@ -165,6 +165,7 @@ namespace Discord.Interactions
                     Description = moduleInfo.Description,
                     IsDefaultPermission = moduleInfo.DefaultPermission,
                     IsDMEnabled = moduleInfo.IsEnabledInDm,
+                    IsNsfw = moduleInfo.IsNsfw,
                     DefaultMemberPermissions = moduleInfo.DefaultMemberPermissions
                 }
                 .WithNameLocalizations(localizationManager?.GetAllNames(modulePath, LocalizationTarget.Group) ?? ImmutableDictionary<string, string>.Empty)
