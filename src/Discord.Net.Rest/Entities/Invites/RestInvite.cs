@@ -28,7 +28,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public TargetUserType TargetUserType { get; private set; }
         internal IChannel Channel { get; }
-        internal IGuild Guild { get; }
+        public IGuild Guild { get; }
 
         /// <inheritdoc />
         public string Code => Id;
