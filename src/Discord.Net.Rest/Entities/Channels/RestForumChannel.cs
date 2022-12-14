@@ -134,9 +134,9 @@ namespace Discord.Rest
             MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None, ForumTag[] tags = null)
             => ThreadHelper.CreatePostAsync(this, Discord, title, attachments, archiveDuration, slowmode, text, embed, options, allowedMentions, components, stickers, embeds, flags, tags?.Select(tag => tag.Id).ToArray());
 
-        /// <inheritdoc cref="IForumChannel.GetActiveThreadsAsync(RequestOptions)"/>
+        /// <inheritdoc cref="ITextChannel.GetActiveThreadsAsync(RequestOptions)"/>
         public Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
-            => ThreadHelper.GetActiveThreadsAsync(Guild, Discord, options);
+            => ThreadHelper.GetActiveThreadsAsync(Guild, Id, Discord, options);
 
         /// <inheritdoc cref="IForumChannel.GetJoinedPrivateArchivedThreadsAsync(int?, DateTimeOffset?, RequestOptions)"/>
         public Task<IReadOnlyCollection<RestThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null)

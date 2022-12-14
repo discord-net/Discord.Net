@@ -296,6 +296,10 @@ namespace Discord.WebSocket
             return base.TriggerTypingAsync(options);
         }
 
+        /// <inheritdoc/> <exception cref="NotSupportedException">Threads are not supported in voice channels</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
+            => throw new NotSupportedException("Threads are not supported in voice channels");
+
         #endregion
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";

@@ -160,5 +160,15 @@ namespace Discord
         /// </returns>
         Task<IThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay,
             IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of active threads within this channel.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
+        ///     a collection of active threads.
+        /// </returns>
+        Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null);
     }
 }
