@@ -30,6 +30,9 @@ namespace Discord.Interactions
         public bool IsEnabledInDm { get; }
 
         /// <inheritdoc/>
+        public bool IsNsfw { get; }
+
+        /// <inheritdoc/>
         public GuildPermission? DefaultMemberPermissions { get; }
 
         /// <inheritdoc/>
@@ -48,6 +51,7 @@ namespace Discord.Interactions
             Description = builder.Description;
             DefaultPermission = builder.DefaultPermission;
             IsEnabledInDm = builder.IsEnabledInDm;
+            IsNsfw = builder.IsNsfw;
             DefaultMemberPermissions = builder.DefaultMemberPermissions;
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
             FlattenedParameters = FlattenParameters(Parameters).ToImmutableArray();

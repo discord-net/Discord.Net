@@ -60,6 +60,11 @@ namespace Discord.Interactions.Builders
         public bool IsEnabledInDm { get; set; } = true;
 
         /// <summary>
+        ///     Gets whether this command is age restricted.
+        /// </summary>
+        public bool IsNsfw { get; set; } = false;
+
+        /// <summary>
         ///     Gets the default permissions needed for executing this command.
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; set; } = null;

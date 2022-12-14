@@ -26,6 +26,11 @@ namespace Discord.Interactions.Builders
         public bool IsEnabledInDm { get; set; } = true;
 
         /// <summary>
+        ///     Gets whether this command is age restricted.
+        /// </summary>
+        public bool IsNsfw { get; set; } = false;
+
+        /// <summary>
         ///     Gets the default permissions needed for executing this command.
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; set; } = null;
@@ -92,6 +97,19 @@ namespace Discord.Interactions.Builders
         public ContextCommandBuilder SetEnabledInDm(bool isEnabled)
         {
             IsEnabledInDm = isEnabled;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets <see cref="IsNsfw"/>.
+        /// </summary>
+        /// <param name="isNsfw">New value of the <see cref="IsNsfw"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ContextCommandBuilder SetNsfw(bool isNsfw)
+        {
+            IsNsfw = isNsfw;
             return this;
         }
 

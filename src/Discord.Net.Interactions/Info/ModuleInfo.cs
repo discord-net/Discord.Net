@@ -50,6 +50,11 @@ namespace Discord.Interactions
         public bool IsEnabledInDm { get; }
 
         /// <summary>
+        ///     Gets whether this command is age restricted.
+        /// </summary>
+        public bool IsNsfw { get; }
+
+        /// <summary>
         ///     Gets the default permissions needed for executing this command.
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; }
@@ -121,6 +126,7 @@ namespace Discord.Interactions
             Description = builder.Description;
             Parent = parent;
             DefaultPermission = builder.DefaultPermission;
+            IsNsfw = builder.IsNsfw;
             IsEnabledInDm = builder.IsEnabledInDm;
             DefaultMemberPermissions = BuildDefaultMemberPermissions(builder);
             SlashCommands = BuildSlashCommands(builder).ToImmutableArray();
