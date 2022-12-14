@@ -66,6 +66,8 @@ namespace Discord.Interactions
         /// <inheritdoc cref="ICommandInfo.Parameters"/>
         public abstract IReadOnlyList<TParameter> Parameters { get; }
 
+        public bool TreatNameAsRegex { get; }
+
         internal CommandInfo(Builders.ICommandBuilder builder, ModuleInfo module, InteractionService commandService)
         {
             CommandService = commandService;
@@ -78,6 +80,7 @@ namespace Discord.Interactions
             RunMode = builder.RunMode != RunMode.Default ? builder.RunMode : commandService._runMode;
             Attributes = builder.Attributes.ToImmutableArray();
             Preconditions = builder.Preconditions.ToImmutableArray();
+            TreatNameAsRegex = builder.TreatNameAsRegex && SupportsWildCards;
 
             _action = builder.Callback;
             _groupedPreconditions = builder.Preconditions.ToLookup(x => x.Group, x => x, StringComparer.Ordinal);
