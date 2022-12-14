@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Discord;
 
@@ -18,7 +19,7 @@ public class WelcomeScreen
     {
         Description = description;
 
-        Channels = channels;
+        Channels = channels.ToImmutableArray();
     }
 
 }

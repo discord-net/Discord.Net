@@ -181,8 +181,8 @@ namespace Discord.Rest
                 MaxMembers = model.MaxMembers.Value;
             if (model.MaxVideoChannelUsers.IsSpecified)
                 MaxVideoChannelUsers = model.MaxVideoChannelUsers.Value;
-            PreferredLocale = model.PreferredLocale.IsSpecified ? model.PreferredLocale.Value : null;
-            PreferredCulture = model.PreferredLocale.IsSpecified ? new CultureInfo(PreferredLocale) : null;
+            PreferredLocale = model.PreferredLocale;
+            PreferredCulture = model.PreferredLocale is null ? null : new CultureInfo(PreferredLocale);
             if (model.ApproximateMemberCount.IsSpecified)
                 ApproximateMemberCount = model.ApproximateMemberCount.Value;
             if (model.ApproximatePresenceCount.IsSpecified)

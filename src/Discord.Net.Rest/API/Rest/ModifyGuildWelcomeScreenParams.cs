@@ -2,7 +2,6 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rest;
 
-
 [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 internal class ModifyGuildWelcomeScreenParams
 {
