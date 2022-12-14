@@ -35,6 +35,19 @@ namespace Discord.WebSocket
             MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, 
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
 
+        /// <inheritdoc cref="IMessageChannel.SendFileAsync(FileAttachment, string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
+        new Task<RestUserMessage> SendFileAsync(FileAttachment attachment, string text = null, bool isTTS = false,
+            Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
+            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
+            Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+
+        /// <inheritdoc cref="IMessageChannel.SendFilesAsync(IEnumerable{FileAttachment}, string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
+        new Task<RestUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text = null,
+            bool isTTS = false, Embed embed = null, RequestOptions options = null,
+            AllowedMentions allowedMentions = null, MessageReference messageReference = null,
+            MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null,
+            MessageFlags flags = MessageFlags.None);
+
         /// <summary>
         ///     Gets a cached message from this channel.
         /// </summary>
