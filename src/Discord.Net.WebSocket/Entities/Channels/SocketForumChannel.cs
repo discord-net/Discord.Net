@@ -45,6 +45,9 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public ForumSortOrder? DefaultSortOrder { get; private set; }
 
+        /// <inheritdoc />
+        public ForumLayout DefaultLayout { get; private set; }
+
         /// <summary>
         ///     Gets the parent (category) of this channel in the guild's channel list.
         /// </summary>
@@ -93,6 +96,8 @@ namespace Discord.WebSocket
             }
 
             CategoryId = model.CategoryId.GetValueOrDefault();
+
+            DefaultLayout = model.DefaultForumLayout.GetValueOrDefault();
         }
 
         /// <inheritdoc />

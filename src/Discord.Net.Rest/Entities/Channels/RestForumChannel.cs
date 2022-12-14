@@ -41,6 +41,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public ForumSortOrder? DefaultSortOrder { get; private set; }
 
+        /// <inheritdoc />
+        public ForumLayout DefaultLayout { get; private set; }
+
         /// <inheritdoc/>
         public string Mention => MentionUtils.MentionChannel(Id);
 
@@ -87,6 +90,7 @@ namespace Discord.Rest
             }
 
             CategoryId = model.CategoryId.GetValueOrDefault();
+            DefaultLayout= model.DefaultForumLayout.GetValueOrDefault();
         }
 
         /// <inheritdoc/>

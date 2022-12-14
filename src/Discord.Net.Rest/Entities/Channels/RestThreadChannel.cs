@@ -40,6 +40,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public IReadOnlyCollection<ulong> AppliedTags { get; private set; }
 
+        /// <inheritdoc/>
+        public ulong OwnerId { get; private set; }
+
         /// <inheritdoc cref="IThreadChannel.CreatedAt"/>
         public override DateTimeOffset CreatedAt { get; }
 
@@ -75,6 +78,8 @@ namespace Discord.Rest
                 ArchiveTimestamp = model.ThreadMetadata.Value.ArchiveTimestamp;
                 IsLocked = model.ThreadMetadata.Value.Locked.GetValueOrDefault(false);
             }
+
+            OwnerId = model.OwnerId.GetValueOrDefault(0);
 
             MemberCount = model.MemberCount.GetValueOrDefault(0);
             MessageCount = model.MessageCount.GetValueOrDefault(0);
