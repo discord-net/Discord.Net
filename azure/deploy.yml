@@ -11,6 +11,11 @@ steps:
     dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "$(Build.ArtifactStagingDirectory)" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
   displayName: Pack projects
 
+- task: NuGetToolInstaller@1
+  displayName: Download and Cache Nuget.exe
+  inputs:
+    versionSpec: 6.4.0
+
 - task: NuGetCommand@2
   displayName: Pack metapackage (release mode)
   condition: eq(variables['buildTag'], True)
