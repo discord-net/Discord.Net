@@ -54,6 +54,7 @@ namespace Discord.Interactions
                 Description = commandInfo.Description,
                 IsDefaultPermission = commandInfo.DefaultPermission,
                 IsDMEnabled = commandInfo.IsEnabledInDm,
+                IsNsfw = commandInfo.IsNsfw,
                 DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
             }.WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
             .WithDescriptionLocalizations(localizationManager?.GetAllDescriptions(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
@@ -97,7 +98,8 @@ namespace Discord.Interactions
                     Name = commandInfo.Name,
                     IsDefaultPermission = commandInfo.DefaultPermission,
                     DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
-                    IsDMEnabled = commandInfo.IsEnabledInDm
+                    IsDMEnabled = commandInfo.IsEnabledInDm,
+                    IsNsfw = commandInfo.IsNsfw,
                 }
                 .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
                 .Build(),
@@ -106,6 +108,7 @@ namespace Discord.Interactions
                     Name = commandInfo.Name,
                     IsDefaultPermission = commandInfo.DefaultPermission,
                     DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
+                    IsNsfw = commandInfo.IsNsfw,
                     IsDMEnabled = commandInfo.IsEnabledInDm
                 }
                 .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
@@ -162,6 +165,7 @@ namespace Discord.Interactions
                     Description = moduleInfo.Description,
                     IsDefaultPermission = moduleInfo.DefaultPermission,
                     IsDMEnabled = moduleInfo.IsEnabledInDm,
+                    IsNsfw = moduleInfo.IsNsfw,
                     DefaultMemberPermissions = moduleInfo.DefaultMemberPermissions
                 }
                 .WithNameLocalizations(localizationManager?.GetAllNames(modulePath, LocalizationTarget.Group) ?? ImmutableDictionary<string, string>.Empty)
@@ -225,6 +229,7 @@ namespace Discord.Interactions
                     IsDefaultPermission = command.IsDefaultPermission,
                     DefaultMemberPermissions = (GuildPermission)command.DefaultMemberPermissions.RawValue,
                     IsDMEnabled = command.IsEnabledInDm,
+                    IsNsfw = command.IsNsfw,
                     Options = command.Options?.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified,
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
@@ -234,6 +239,7 @@ namespace Discord.Interactions
                     Name = command.Name,
                     IsDefaultPermission = command.IsDefaultPermission,
                     DefaultMemberPermissions = (GuildPermission)command.DefaultMemberPermissions.RawValue,
+                    IsNsfw = command.IsNsfw,
                     IsDMEnabled = command.IsEnabledInDm,
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty
@@ -243,6 +249,7 @@ namespace Discord.Interactions
                     Name = command.Name,
                     IsDefaultPermission = command.IsDefaultPermission,
                     DefaultMemberPermissions = (GuildPermission)command.DefaultMemberPermissions.RawValue,
+                    IsNsfw = command.IsNsfw,
                     IsDMEnabled = command.IsEnabledInDm,
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty

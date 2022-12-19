@@ -55,5 +55,10 @@ The amount of nesting you can do is realistically endless.
 > If the nested class is marked with `Group`, as required for setting up subcommands, this example will not work.
 > As mentioned before, subcommands cannot have seperate permissions from the top level command.
 
+### NSFW Commands
+Commands can be limited to only age restricted channels and DMs:
+
+[!code-csharp[Nsfw-Permissions](samples/permissions/nsfw-permissions.cs)]
+
 [permissions]: xref:Discord.GuildPermission
 

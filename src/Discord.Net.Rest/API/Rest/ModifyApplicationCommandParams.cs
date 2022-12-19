@@ -17,6 +17,12 @@ namespace Discord.API.Rest
         [JsonProperty("default_permission")]
         public Optional<bool> DefaultPermission { get; set; }
 
+        [JsonProperty("nsfw")]
+        public Optional<bool> Nsfw { get; set; }
+
+        [JsonProperty("default_member_permissions")]
+        public Optional<GuildPermission?> DefaultMemberPermission { get; set; }
+
         [JsonProperty("name_localizations")]
         public Optional<Dictionary<string, string>> NameLocalizations { get; set; }
 
