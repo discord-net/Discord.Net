@@ -684,6 +684,26 @@ namespace Discord.Interactions
             }
         }
 
+        public async Task<IReadOnlyCollection<RestGuildCommand>> RemoveModulesFromGuildAsync(IGuild guild, params ModuleInfo[] modules)
+        {
+            if (guild is null)
+                throw new ArgumentNullException(nameof(guild));
+
+            return await RemoveModulesFromGuildAsync(guild.Id, modules).ConfigureAwait(false);
+        }
+
+        public async Task<IReadOnlyCollection<RestGuildCommand>> RemoveModulesFromGuildAsync(ulong guildId, params ModuleInfo[] modules)
+        {
+            EnsureClientReady();
+
+            var exclude = modules.SelectMany(x => x.ToApplicationCommandProps(true)).ToList();
+            var existing = (await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false)).Select(x => x.ToApplicationCommandProps());
+
+            var props = existing.Except(exclude);
+
+            return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guildId).ConfigureAwait(false);
+        }
+
         private bool RemoveModuleInternal (ModuleInfo moduleInfo)
         {
             if (!_moduleDefs.Remove(moduleInfo))
