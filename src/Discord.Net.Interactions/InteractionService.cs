@@ -703,7 +703,7 @@ namespace Discord.Interactions
         /// <summary>
         ///     Unregister Application Commands from modules provided in <paramref name="modules"/> from a guild.
         /// </summary>
-        /// <param name="guildID">The target guild ID.</param>
+        /// <param name="guildId">The target guild ID.</param>
         /// <param name="modules">Modules to be deregistered from Discord.</param>
         /// <returns>
         ///     A task representing the command de-registration process. The task result contains the active application commands of the target guild.
