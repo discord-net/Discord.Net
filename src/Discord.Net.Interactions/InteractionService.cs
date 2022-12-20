@@ -697,9 +697,9 @@ namespace Discord.Interactions
             EnsureClientReady();
 
             var exclude = modules.SelectMany(x => x.ToApplicationCommandProps(true)).ToList();
-            var existing = (await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false)).Select(x => x.ToApplicationCommandProps());
+            var existing = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
 
-            var props = existing.Except(exclude);
+            var props = existing.Where(x => !exclude.Any(y => y.Name.IsSpecified && x.Name == y.Name.Value)).Select(x => x.ToApplicationCommandProps());
 
             return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guildId).ConfigureAwait(false);
         }
