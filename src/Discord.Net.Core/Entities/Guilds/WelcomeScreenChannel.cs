@@ -37,6 +37,5 @@ public class WelcomeScreenChannel : ISnowflakeEntity
             Emoji = new Emoji(emojiName);
         else
             Emoji = null;
-
     }
 }

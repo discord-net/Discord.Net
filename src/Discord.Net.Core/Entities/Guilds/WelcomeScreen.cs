@@ -21,5 +21,4 @@ public class WelcomeScreen
 
         Channels = channels.ToImmutableArray();
     }
-
 }
