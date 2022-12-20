@@ -56,13 +56,11 @@ namespace Discord
         /// <summary>
         ///     Gets the guild this invite is linked to.
         /// </summary>
-        /// <remarks>
-        ///     The guild may be partially populated.
-        /// </remarks>
         /// <returns>
         ///     A guild object representing the guild that the invite points to.
         /// </returns>
         IGuild Guild { get; }
+
         /// <summary>
         ///     Gets the ID of the guild this invite is linked to.
         /// </summary>
