@@ -684,6 +684,14 @@ namespace Discord.Interactions
             }
         }
 
+        /// <summary>
+        ///     Unregister Application Commands from modules provided in <paramref name="modules"/> from a guild.
+        /// </summary>
+        /// <param name="guild">The target guild.</param>
+        /// <param name="modules">Modules to be deregistered from Discord.</param>
+        /// <returns>
+        ///     A task representing the command de-registration process. The task result contains the active application commands of the target guild.
+        /// </returns>
         public async Task<IReadOnlyCollection<RestGuildCommand>> RemoveModulesFromGuildAsync(IGuild guild, params ModuleInfo[] modules)
         {
             if (guild is null)
@@ -692,6 +700,14 @@ namespace Discord.Interactions
             return await RemoveModulesFromGuildAsync(guild.Id, modules).ConfigureAwait(false);
         }
 
+        /// <summary>
+        ///     Unregister Application Commands from modules provided in <paramref name="modules"/> from a guild.
+        /// </summary>
+        /// <param name="guildID">The target guild ID.</param>
+        /// <param name="modules">Modules to be deregistered from Discord.</param>
+        /// <returns>
+        ///     A task representing the command de-registration process. The task result contains the active application commands of the target guild.
+        /// </returns>
         public async Task<IReadOnlyCollection<RestGuildCommand>> RemoveModulesFromGuildAsync(ulong guildId, params ModuleInfo[] modules)
         {
             EnsureClientReady();
