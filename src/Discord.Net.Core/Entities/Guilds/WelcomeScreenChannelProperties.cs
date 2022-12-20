@@ -43,6 +43,10 @@ public class WelcomeScreenChannelProperties : ISnowflakeEntity
     /// <summary>
     ///     Initializes a new instance of <see cref="WelcomeScreenChannelProperties"/>.
     /// </summary>
+    public WelcomeScreenChannelProperties() { }
+    /// <summary>
+    ///     Initializes a new instance of <see cref="WelcomeScreenChannelProperties"/>.
+    /// </summary>
     /// <param name="channel">A welcome screen channel to modify.</param>
     /// <returns>A new instance of <see cref="WelcomeScreenChannelProperties"/>.</returns>
     public static WelcomeScreenChannelProperties FromWelcomeScreenChannel(WelcomeScreenChannel channel)

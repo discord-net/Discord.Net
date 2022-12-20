@@ -80,8 +80,10 @@ public class InviteGuild : ISnowflakeEntity
     /// <returns>
     ///     A URL pointing to the guild's icon; <see langword="null" /> if none is set.
     /// </returns>
-    public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);/// <summary>
-                                                             /// 
+    public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
+    
+    /// <summary>
+    /// 
     ///     Gets the level of requirements a user must fulfill before being allowed to post messages in this guild.
     /// </summary>
     /// <returns>
@@ -121,11 +123,22 @@ public class InviteGuild : ISnowflakeEntity
     /// </summary>
     /// <returns>
     ///     The welcome screen of this guild. <see langword="null" /> if none is set.
-    ///     The welcome screen of this guild. <see langword="null" /> if none is set.
     /// </returns>
     public WelcomeScreen WelcomeScreen { get; private set; }
 
-    internal InviteGuild(ulong id, string name, string description, string splashId, string bannerId, GuildFeatures features, string iconId, VerificationLevel verificationLevel, string vanityURLCode, int premiumSubscriptionCount, NsfwLevel nsfwLevel, WelcomeScreen welcomeScreen)
+    internal InviteGuild(
+        ulong id, 
+        string name, 
+        string description, 
+        string splashId, 
+        string bannerId, 
+        GuildFeatures features, 
+        string iconId, 
+        VerificationLevel verificationLevel, 
+        string vanityURLCode, 
+        int premiumSubscriptionCount, 
+        NsfwLevel nsfwLevel, 
+        WelcomeScreen welcomeScreen)
     {
         Id = id;
         Name = name;
