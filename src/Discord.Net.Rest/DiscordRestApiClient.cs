@@ -2490,6 +2490,16 @@ namespace Discord.API
             return await SendJsonAsync<IEnumerable<RoleConnectionMetadata>>("PUT", $"/applications/{CurrentApplicationId}/role-connections/metadata", roleConnections, options: options).ConfigureAwait(false);
         }
 
+        public async Task<RoleConnection> GetUserApplicationRoleConnection(RequestOptions options = null)
+        {
+            return await SendAsync<RoleConnection>("GET", $"/users/@me/applications/{CurrentApplicationId}/role-connection", options: options);
+        }
+
+        public async Task<RoleConnection> GetUserApplicationRoleConnection(RoleConnection connection, RequestOptions options = null)
+        {
+            return await SendJsonAsync<RoleConnection>("PUT", $"/users/@me/applications/{CurrentApplicationId}/role-connection", connection, options: options);
+        }
+
         #endregion
     }
 }
