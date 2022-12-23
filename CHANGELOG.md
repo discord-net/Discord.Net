@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.9.0] - 2022-11-13
+## [3.9.0] - 2022-12-23
 ### Added
 
 - #2469 Add missing properties in forum & thread channels (01ae904)
