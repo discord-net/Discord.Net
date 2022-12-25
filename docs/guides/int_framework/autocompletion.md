@@ -7,7 +7,7 @@ title: Command Autocompletion
 
 [Autocompleters] provide a similar pattern to TypeConverters.
 [Autocompleters] are cached, singleton services and they are used by the
-Interaction Service to handle Autocomplete Interations targeted to a specific Slash Command parameter.
+Interaction Service to handle Autocomplete Interactions targeted to a specific Slash Command parameter.
 
 To start using AutocompleteHandlers, use the `[AutocompleteAttribute(Type type)]` overload of the [AutocompleteAttribute].
 This will dynamically link the parameter to the [AutocompleteHandler] type.
