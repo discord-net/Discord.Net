@@ -34,7 +34,7 @@ namespace Discord.Rest
                 ? (DataModel)model.Data.Value
                 : null;
 
-            Data = new RestMessageComponentData(dataModel);
+            Data = new RestMessageComponentData(dataModel, client, Guild);
         }
 
         internal new static async Task<RestMessageComponent> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)

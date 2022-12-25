@@ -170,26 +170,28 @@ namespace Discord.Rest
                                     parsed.Url.GetValueOrDefault(),
                                     parsed.Disabled.GetValueOrDefault());
                             }
-                        case ComponentType.SelectMenu:
+                        case ComponentType.SelectMenu or ComponentType.ChannelSelect or ComponentType.RoleSelect or ComponentType.MentionableSelect or ComponentType.UserSelect:
                             {
                                 var parsed = (API.SelectMenuComponent)y;
                                 return new SelectMenuComponent(
                                     parsed.CustomId,
-                                    parsed.Options.Select(z => new SelectMenuOption(
+                                    parsed.Options?.Select(z => new SelectMenuOption(
                                         z.Label,
                                         z.Value,
                                         z.Description.GetValueOrDefault(),
                                         z.Emoji.IsSpecified
-                                        ? z.Emoji.Value.Id.HasValue
-                                            ? new Emote(z.Emoji.Value.Id.Value, z.Emoji.Value.Name, z.Emoji.Value.Animated.GetValueOrDefault())
-                                            : new Emoji(z.Emoji.Value.Name)
-                                        : null,
+                                            ? z.Emoji.Value.Id.HasValue
+                                                ? new Emote(z.Emoji.Value.Id.Value, z.Emoji.Value.Name, z.Emoji.Value.Animated.GetValueOrDefault())
+                                                : new Emoji(z.Emoji.Value.Name)
+                                            : null,
                                         z.Default.ToNullable())).ToList(),
                                     parsed.Placeholder.GetValueOrDefault(),
                                     parsed.MinValues,
                                     parsed.MaxValues,
-                                    parsed.Disabled
-                                    );
+                                    parsed.Disabled,
+                                    parsed.Type,
+                                    parsed.ChannelTypes.GetValueOrDefault()
+                                );
                             }
                         default:
                             return null;

@@ -21,6 +21,10 @@ namespace Discord.API
                 {
                     ComponentType.Button => new ButtonComponent(x as Discord.ButtonComponent),
                     ComponentType.SelectMenu => new SelectMenuComponent(x as Discord.SelectMenuComponent),
+                    ComponentType.ChannelSelect => new SelectMenuComponent(x as Discord.SelectMenuComponent),
+                    ComponentType.UserSelect => new SelectMenuComponent(x as Discord.SelectMenuComponent),
+                    ComponentType.RoleSelect => new SelectMenuComponent(x as Discord.SelectMenuComponent),
+                    ComponentType.MentionableSelect => new SelectMenuComponent(x as Discord.SelectMenuComponent),
                     ComponentType.TextInput => new TextInputComponent(x as Discord.TextInputComponent),
                     _ => null
                 };

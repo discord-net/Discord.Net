@@ -10,7 +10,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents data sent from a <see cref="InteractionType.ModalSubmit"/>.
     /// </summary>
-    public class SocketModalData : IDiscordInteractionData, IModalInteractionData
+    public class SocketModalData : IModalInteractionData
     {
         /// <summary>
         ///     Gets the <see cref="Modal"/>'s Custom Id.
@@ -22,12 +22,12 @@ namespace Discord.WebSocket
         /// </summary>
         public IReadOnlyCollection<SocketMessageComponentData> Components { get; }
 
-        internal SocketModalData(Model model)
+        internal SocketModalData(Model model, DiscordSocketClient discord, ClientState state, SocketGuild guild, API.User dmUser)
         {
             CustomId = model.CustomId;
             Components = model.Components
                 .SelectMany(x => x.Components)
-                .Select(x => new SocketMessageComponentData(x))
+                .Select(x => new SocketMessageComponentData(x, discord, state, guild, dmUser))
                 .ToArray();
         }
 
