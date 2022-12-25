@@ -1534,6 +1534,15 @@ namespace Discord.Rest
             else
                 return null;
         }
+
+        /// <inheritdoc/>
+        public Task<WelcomeScreen> GetWelcomeScreenAsync(RequestOptions options = null)
+            => GuildHelper.GetWelcomeScreenAsync(this, Discord, options);
+
+        /// <inheritdoc/>
+        public Task<WelcomeScreen> ModifyWelcomeScreenAsync(bool enabled, WelcomeScreenChannelProperties[] channels, string description = null, RequestOptions options = null)
+            => GuildHelper.ModifyWelcomeScreenAsync(enabled, description, channels, this, Discord, options);
+
         #endregion
     }
 }
