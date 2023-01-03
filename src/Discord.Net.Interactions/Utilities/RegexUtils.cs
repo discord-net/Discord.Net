@@ -1,5 +1,6 @@
 using Discord.Interactions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace System.Text.RegularExpressions
@@ -90,7 +91,7 @@ namespace System.Text.RegularExpressions
             return match.Count;
         }
 
-        internal static bool TryBuildRegexPattern<T>(T commandInfo, string wildCardStr, out string pattern) where T: class, ICommandInfo
+        internal static bool TryBuildRegexPattern<T>(T commandInfo, string wildCardStr, out string pattern) where T : class, ICommandInfo
         {
             if (commandInfo.TreatNameAsRegex)
             {
@@ -105,14 +106,72 @@ namespace System.Text.RegularExpressions
             }
 
             var escapedWildCard = Regex.Escape(wildCardStr);
-            var unquantified = Regex.Replace(commandInfo.Name, $@"(?<!\\){escapedWildCard}(?<delimiter>[^{escapedWildCard}]?)",
-                @"([^\n\t${delimiter}]+)${delimiter}");
+            var unquantifiedPattern = $@"(?<!\\){escapedWildCard}(?<delimiter>[^{escapedWildCard}]?)";
+            var quantifiedPattern = $@"(?<!\\){{(?<start>[0-9]+)(?<end>,[0-9]*)?(?<!\\)}}(?<delimiter>[^{escapedWildCard}]?)";
 
-            var quantified = Regex.Replace(unquantified, $@"(?<!\\){{(?<start>[0-9]+)(?<end>,[0-9]*)?(?<!\\)}}(?<delimiter>[^{escapedWildCard}]?)",
-                @"([^\n\t${delimiter}]{${start}${end}})${delimiter}");
+            string name = commandInfo.Name;
 
-            pattern = "\\A" + quantified + "\\Z";
+            var matchPairs = new SortedDictionary<int, MatchPair>();
+
+            foreach (Match match in Regex.Matches(name, unquantifiedPattern))
+                matchPairs.Add(match.Index, new(MatchType.Unquantified, match));
+
+            foreach (Match match in Regex.Matches(name, quantifiedPattern))
+                matchPairs.Add(match.Index, new(MatchType.Quantified, match));
+
+            var sb = new StringBuilder();
+
+            var previousMatch = 0;
+
+            foreach (var matchPair in matchPairs)
+            {
+                sb.Append(Regex.Escape(name.Substring(previousMatch, matchPair.Key - previousMatch)));
+                Match match = matchPair.Value.Match;
+                MatchType type = matchPair.Value.Type;
+
+                previousMatch = matchPair.Key + match.Length;
+
+                var delimiter = match.Groups["delimiter"].Value;
+
+                switch (type)
+                {
+                    case MatchType.Unquantified:
+                        {
+                            sb.Append(@$"([^\n\t{Regex.Escape(delimiter)}]+){Regex.Escape(delimiter)}");
+                        }
+                        break;
+                    case MatchType.Quantified:
+                        {
+                            var start = match.Groups["start"].Value;
+                            var end = match.Groups["end"].Value;
+
+                            sb.Append($@"([^\n\t{Regex.Escape(delimiter)}]{{{start}{end}}}){Regex.Escape(delimiter)}");
+                        }
+                        break;
+                }
+            }
+
+            pattern = "\\A" + sb.ToString() + "\\Z";
+
             return true;
+        }
+
+        private enum MatchType
+        {
+            Quantified,
+            Unquantified
+        }
+
+        private record MatchPair
+        {
+            public MatchType Type { get; }
+            public Match Match { get; }
+
+            public MatchPair(MatchType type, Match match)
+            {
+                Type = type;
+                Match = match;
+            }
         }
     }
 }
