@@ -257,11 +257,6 @@ namespace Discord.Rest
         /// </param>
         /// <param name="autoArchiveDuration">
         ///     The duration on which this thread archives after.
-        ///     <para>
-        ///         <b>Note: </b> Options <see cref="ThreadArchiveDuration.OneWeek"/> and <see cref="ThreadArchiveDuration.ThreeDays"/>
-        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the
-        ///         guild has the <b>THREE_DAY_THREAD_ARCHIVE</b> and <b>SEVEN_DAY_THREAD_ARCHIVE</b>.
-        ///     </para>
         /// </param>
         /// <param name="message">The message which to start the thread from.</param>
         /// <param name="options">The options to be used when sending the request.</param>
