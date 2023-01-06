@@ -12,10 +12,6 @@ namespace Discord
         /// <summary>
         ///     The target of the permission is a user.
         /// </summary>
-        User = 2,
-        /// <summary>
-        ///     The target of the permission is a channel.
-        /// </summary>
-        Channel = 3
+        User = 2
     }
 }
