@@ -596,6 +596,7 @@ namespace Discord.Interactions.Builders
             builder.Label = propertyInfo.Name;
             builder.DefaultValue = defaultValue;
             builder.WithType(propertyInfo.PropertyType);
+            builder.PropertyInfo = propertyInfo;
 
             foreach(var attribute in attributes)
             {
