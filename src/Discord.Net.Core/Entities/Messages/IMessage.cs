@@ -210,6 +210,14 @@ namespace Discord
         IMessageInteraction Interaction { get; }
 
         /// <summary>
+        ///     Gets the data of the role subscription purchase or renewal that prompted this <see cref="MessageType.RoleSubscriptionPurchase"/> message.
+        /// </summary> 
+        /// <returns>
+        ///     A <see cref="MessageRoleSubscriptionData"/> if the message is a role subscription purchase message; otherwise <see langword="null"/>.
+        /// </returns>
+        MessageRoleSubscriptionData RoleSubscriptionData { get; }
+
+        /// <summary>
         ///     Adds a reaction to this message.
         /// </summary>
         /// <example>
