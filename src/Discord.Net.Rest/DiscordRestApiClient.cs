@@ -2488,11 +2488,11 @@ namespace Discord.API
         public async Task<RoleConnectionMetadata[]> UpdateApplicationRoleConnectionMetadataRecordsAsync(RoleConnectionMetadata[] roleConnections, RequestOptions options = null)
         => await SendJsonAsync <RoleConnectionMetadata[]>("PUT", () => $"applications/{CurrentApplicationId}/role-connections/metadata", roleConnections, new BucketIds(), options: options).ConfigureAwait(false);
 
-        public async Task<RoleConnection> GetUserApplicationRoleConnection(RequestOptions options = null)
-        => await SendAsync<RoleConnection>("GET", () => $"users/@me/applications/{CurrentApplicationId}/role-connection", new BucketIds(), options: options);
+        public async Task<RoleConnection> GetUserApplicationRoleConnectionAsync(ulong applicationId, RequestOptions options = null)
+        => await SendAsync<RoleConnection>("GET", () => $"users/@me/applications/{applicationId}/role-connection", new BucketIds(), options: options);
 
-        public async Task<RoleConnection> GetUserApplicationRoleConnection(RoleConnection connection, RequestOptions options = null)
-        => await SendJsonAsync<RoleConnection>("PUT", () => $"users/@me/applications/{CurrentApplicationId}/role-connection", connection, new BucketIds(), options: options);
+        public async Task<RoleConnection> ModifyUserApplicationRoleConnectionAsync(ulong applicationId, RoleConnection connection, RequestOptions options = null)
+        => await SendJsonAsync<RoleConnection>("PUT", () => $"users/@me/applications/{applicationId}/role-connection", connection, new BucketIds(), options: options);
 
         #endregion
     }

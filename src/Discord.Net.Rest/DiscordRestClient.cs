@@ -241,6 +241,12 @@ namespace Discord.Rest
             return ClientHelper.ModifyRoleConnectionMetadataRecordsAsync(metadata, this, options);
         }
 
+        public Task<RoleConnection> GetUserApplicationRoleConnectionAsync(ulong applicationId, RequestOptions options = null)
+            => ClientHelper.GetUserRoleConnectionAsync(applicationId, this, options);
+
+        public Task<RoleConnection> ModifyUserApplicationRoleConnectionAsync(ulong applicationId, RoleConnectionProperties roleConnection, RequestOptions options = null)
+            => ClientHelper.ModifyUserRoleConnectionAsync(applicationId, roleConnection, this, options);
+
         #endregion
 
         #region IDiscordClient

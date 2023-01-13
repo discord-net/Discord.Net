@@ -120,5 +120,19 @@ public class RoleConnectionMetadataProperties
     ///     Initializes a new instance of <see cref="RoleConnectionMetadataProperties"/>.
     /// </summary>
     public RoleConnectionMetadataProperties() { }
+
+    /// <summary>
+    ///     Initializes a new <see cref="RoleConnectionMetadataProperties"/> with the data from provided <see cref="RoleConnectionMetadata"/>.
+    /// </summary>
+    public static RoleConnectionMetadataProperties FromRoleConnectionMetadata(RoleConnectionMetadata metadata)
+        => new()
+        {
+            Name = metadata.Name,
+            Description = metadata.Description,
+            Type = metadata.Type,
+            Key = metadata.Key,
+            NameLocalizations = metadata.NameLocalizations,
+            DescriptionLocalizations = metadata.DescriptionLocalizations
+        };
 }
 

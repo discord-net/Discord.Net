@@ -265,7 +265,7 @@ namespace Discord.Rest
             => client.ApiClient.RemoveRoleAsync(guildId, userId, roleId, options);
         #endregion
 
-        #region Role Subscription Metadata
+        #region Role Connection Metadata
 
         public static async Task<IReadOnlyCollection<RoleConnectionMetadata>> GetRoleConnectionMetadataRecordsAsync(BaseDiscordClient client, RequestOptions options = null)
             => (await client.ApiClient.GetApplicationRoleConnectionMetadataRecordsAsync(options))
@@ -307,6 +307,33 @@ namespace Discord.Rest
                             ? model.DescriptionLocalizations.Value?.ToImmutableDictionary()
                             : null))
                 .ToImmutableArray();
+
+        public static async Task<RoleConnection> GetUserRoleConnectionAsync(ulong applicationId, BaseDiscordClient client, RequestOptions options = null)
+        {
+            var roleConnection = await client.ApiClient.GetUserApplicationRoleConnectionAsync(applicationId, options);
+
+            return new RoleConnection(roleConnection.PlatformName.GetValueOrDefault(null),
+                roleConnection.PlatformUsername.GetValueOrDefault(null),
+                roleConnection.Metadata.GetValueOrDefault());
+        }
+
+        public static async Task<RoleConnection> ModifyUserRoleConnectionAsync(ulong applicationId, RoleConnectionProperties roleConnection, BaseDiscordClient client, RequestOptions options = null)
+        {
+            var updatedConnection = await client.ApiClient.ModifyUserApplicationRoleConnectionAsync(applicationId,
+                new API.RoleConnection
+                {
+                    PlatformName = roleConnection.PlatformName,
+                    PlatformUsername = roleConnection.PlatformUsername,
+                    Metadata = roleConnection.Metadata
+                }, options);
+
+            return new RoleConnection(
+                updatedConnection.PlatformName.GetValueOrDefault(null),
+                updatedConnection.PlatformUsername.GetValueOrDefault(null),
+                updatedConnection.Metadata.GetValueOrDefault()?.ToImmutableDictionary()
+                );
+        }
+
 
         #endregion
     }
