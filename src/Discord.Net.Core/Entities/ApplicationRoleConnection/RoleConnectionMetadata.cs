@@ -1,9 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Discord;
 
+/// <summary>
+///     Represents the role connection metadata object.
+/// </summary>
 public class RoleConnectionMetadata
 {
     /// <summary>

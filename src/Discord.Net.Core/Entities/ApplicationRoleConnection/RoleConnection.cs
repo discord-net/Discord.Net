@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Discord;
 
+/// <summary>
+///     Represents the connection object that the user has attached.
+/// </summary>
 public class RoleConnection
 {
     /// <summary>

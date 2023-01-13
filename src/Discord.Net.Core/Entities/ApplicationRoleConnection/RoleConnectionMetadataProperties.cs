@@ -4,6 +4,9 @@ using System.Collections.Immutable;
 
 namespace Discord;
 
+/// <summary>
+///     Properties object used to create or modify <see cref="RoleConnectionMetadata"/> object.
+/// </summary>
 public class RoleConnectionMetadataProperties
 {
     private const int MaxKeyLength = 50;
