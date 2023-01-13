@@ -18,8 +18,8 @@ public class RoleConnectionMetadata
     public string Description { get; set; }
 
     [JsonProperty("name_localizations")]
-    public Optional<IReadOnlyCollection<KeyValuePair<string, string>>> NameLocalizations { get; set; }
+    public Optional<Dictionary<string, string>> NameLocalizations { get; set; }
 
     [JsonProperty("description_localizations")]
-    public Optional<IReadOnlyCollection<KeyValuePair<string, string>>> DescriptionLocalizations { get; set; }
+    public Optional<Dictionary<string, string>> DescriptionLocalizations { get; set; }
 }

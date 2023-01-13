@@ -4,7 +4,9 @@ using Discord.Net;
 using Discord.Net.Converters;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
+
 using Newtonsoft.Json;
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -2480,25 +2482,17 @@ namespace Discord.API
 
         #region Application Role Connections Metadata
 
-        public async Task<IEnumerable<RoleConnectionMetadata>> GetApplicationRoleConnectionMetadataRecordsAsync(RequestOptions options = null)
-        {
-            return await SendAsync<IEnumerable<RoleConnectionMetadata>>("GET", $"/applications/{CurrentApplicationId}/role-connections/metadata", options: options).ConfigureAwait(false);
-        }
+        public async Task<RoleConnectionMetadata[]> GetApplicationRoleConnectionMetadataRecordsAsync(RequestOptions options = null)
+            => await SendAsync<RoleConnectionMetadata[]>("GET", () => $"applications/{CurrentApplicationId}/role-connections/metadata", new BucketIds(), options: options).ConfigureAwait(false);
 
-        public async Task<IEnumerable<RoleConnectionMetadata>> UpdateApplicationRoleConnectionMetadataRecordsAsync(IEnumerable<RoleConnectionMetadata> roleConnections, RequestOptions options = null)
-        {
-            return await SendJsonAsync<IEnumerable<RoleConnectionMetadata>>("PUT", $"/applications/{CurrentApplicationId}/role-connections/metadata", roleConnections, options: options).ConfigureAwait(false);
-        }
+        public async Task<RoleConnectionMetadata[]> UpdateApplicationRoleConnectionMetadataRecordsAsync(RoleConnectionMetadata[] roleConnections, RequestOptions options = null)
+        => await SendJsonAsync <RoleConnectionMetadata[]>("PUT", () => $"applications/{CurrentApplicationId}/role-connections/metadata", roleConnections, new BucketIds(), options: options).ConfigureAwait(false);
 
         public async Task<RoleConnection> GetUserApplicationRoleConnection(RequestOptions options = null)
-        {
-            return await SendAsync<RoleConnection>("GET", $"/users/@me/applications/{CurrentApplicationId}/role-connection", options: options);
-        }
+        => await SendAsync<RoleConnection>("GET", () => $"users/@me/applications/{CurrentApplicationId}/role-connection", new BucketIds(), options: options);
 
         public async Task<RoleConnection> GetUserApplicationRoleConnection(RoleConnection connection, RequestOptions options = null)
-        {
-            return await SendJsonAsync<RoleConnection>("PUT", $"/users/@me/applications/{CurrentApplicationId}/role-connection", connection, options: options);
-        }
+        => await SendJsonAsync<RoleConnection>("PUT", () => $"users/@me/applications/{CurrentApplicationId}/role-connection", connection, new BucketIds(), options: options);
 
         #endregion
     }

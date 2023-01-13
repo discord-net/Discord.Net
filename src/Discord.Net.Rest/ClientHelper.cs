@@ -264,5 +264,50 @@ namespace Discord.Rest
         public static Task RemoveRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
             => client.ApiClient.RemoveRoleAsync(guildId, userId, roleId, options);
         #endregion
+
+        #region Role Subscription Metadata
+
+        public static async Task<IReadOnlyCollection<RoleConnectionMetadata>> GetRoleConnectionMetadataRecordsAsync(BaseDiscordClient client, RequestOptions options = null)
+            => (await client.ApiClient.GetApplicationRoleConnectionMetadataRecordsAsync(options))
+                .Select(model
+                    => new RoleConnectionMetadata(
+                        model.Type,
+                        model.Key,
+                        model.Name,
+                        model.Description,
+                        model.NameLocalizations.IsSpecified
+                            ? model.NameLocalizations.Value?.ToImmutableDictionary()
+                            : null,
+                        model.DescriptionLocalizations.IsSpecified
+                            ? model.DescriptionLocalizations.Value?.ToImmutableDictionary()
+                            : null))
+                .ToImmutableArray();
+
+        public static async Task<IReadOnlyCollection<RoleConnectionMetadata>> ModifyRoleConnectionMetadataRecordsAsync(ICollection<RoleConnectionMetadataProperties> metadata, BaseDiscordClient client, RequestOptions options = null)
+            => (await client.ApiClient.UpdateApplicationRoleConnectionMetadataRecordsAsync(metadata
+                .Select(x => new API.RoleConnectionMetadata
+                {
+                    Name = x.Name,
+                    Description = x.Description,
+                    Key = x.Key,
+                    Type = x.Type,
+                    NameLocalizations = x.NameLocalizations?.ToDictionary(),
+                    DescriptionLocalizations = x.DescriptionLocalizations?.ToDictionary()
+                }).ToArray()))
+                .Select(model
+                    => new RoleConnectionMetadata(
+                        model.Type,
+                        model.Key,
+                        model.Name,
+                        model.Description,
+                        model.NameLocalizations.IsSpecified
+                            ? model.NameLocalizations.Value?.ToImmutableDictionary()
+                            : null,
+                        model.DescriptionLocalizations.IsSpecified
+                            ? model.DescriptionLocalizations.Value?.ToImmutableDictionary()
+                            : null))
+                .ToImmutableArray();
+
+        #endregion
     }
 }
