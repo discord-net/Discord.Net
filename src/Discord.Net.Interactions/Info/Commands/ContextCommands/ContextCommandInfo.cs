@@ -21,10 +21,13 @@ namespace Discord.Interactions
         public bool IsEnabledInDm { get; }
 
         /// <inheritdoc/>
+        public bool IsNsfw { get; }
+
+        /// <inheritdoc/>
         public GuildPermission? DefaultMemberPermissions { get; }
 
         /// <inheritdoc/>
-        public override IReadOnlyCollection<CommandParameterInfo> Parameters { get; }
+        public override IReadOnlyList<CommandParameterInfo> Parameters { get; }
 
         /// <inheritdoc/>
         public override bool SupportsWildCards => false;
@@ -37,6 +40,7 @@ namespace Discord.Interactions
         {
             CommandType = builder.CommandType;
             DefaultPermission = builder.DefaultPermission;
+            IsNsfw = builder.IsNsfw;
             IsEnabledInDm = builder.IsEnabledInDm;
             DefaultMemberPermissions = builder.DefaultMemberPermissions;
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();

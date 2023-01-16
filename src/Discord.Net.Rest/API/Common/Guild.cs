@@ -83,5 +83,8 @@ namespace Discord.API
         public Sticker[] Stickers { get; set; }
         [JsonProperty("premium_progress_bar_enabled")]
         public Optional<bool> IsBoostProgressBarEnabled { get; set; }
+
+        [JsonProperty("welcome_screen")]
+        public Optional<WelcomeScreen> WelcomeScreen { get; set; }
     }
 }

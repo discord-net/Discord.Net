@@ -17,5 +17,8 @@ namespace Discord.API
         public Optional<ulong?> EmojiId { get; set; }
         [JsonProperty("emoji_name")]
         public Optional<string> EmojiName { get; set; }
+
+        [JsonProperty("moderated")]
+        public bool Moderated { get; set; }
     }
 }

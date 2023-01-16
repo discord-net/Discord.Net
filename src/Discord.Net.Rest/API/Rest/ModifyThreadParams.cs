@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Discord.API.Rest
 {
@@ -18,5 +19,11 @@ namespace Discord.API.Rest
 
         [JsonProperty("rate_limit_per_user")]
         public Optional<int> Slowmode { get; set; }
+
+        [JsonProperty("applied_tags")]
+        public Optional<IEnumerable<ulong>> AppliedTags { get; set; }
+
+        [JsonProperty("flags")]
+        public Optional<ChannelFlags> Flags { get; set; }
     }
 }

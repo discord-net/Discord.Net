@@ -89,8 +89,14 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public bool? IsInvitable { get; private set; }
 
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ulong> AppliedTags { get; private set; }
+
         /// <inheritdoc cref="IThreadChannel.CreatedAt"/>
         public override DateTimeOffset CreatedAt { get; }
+
+        /// <inheritdoc cref="IThreadChannel.OwnerId"/>
+        ulong IThreadChannel.OwnerId => _ownerId;
 
         /// <summary>
         ///     Gets a collection of cached users within this thread.
@@ -149,6 +155,8 @@ namespace Discord.WebSocket
             }
 
             HasJoined = model.ThreadMember.IsSpecified;
+
+            AppliedTags = model.AppliedTags.GetValueOrDefault(Array.Empty<ulong>()).ToImmutableArray();
         }
 
         internal IReadOnlyCollection<SocketThreadUser> RemoveUsers(ulong[] users)
@@ -334,10 +342,11 @@ namespace Discord.WebSocket
             => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
-        /// <remarks>
-        ///     <b>This method is not supported in threads.</b>
-        /// </remarks>
         public override Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
+            => ThreadHelper.ModifyAsync(this, Discord, func, options);
+
+        /// <inheritdoc/>
+        public Task ModifyAsync(Action<ThreadChannelProperties> func, RequestOptions options = null)
             => ThreadHelper.ModifyAsync(this, Discord, func, options);
 
         /// <inheritdoc/>
@@ -366,6 +375,10 @@ namespace Discord.WebSocket
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task SyncPermissionsAsync(RequestOptions options = null)
+            => throw new NotSupportedException("This method is not supported in threads.");
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This method is not supported in threads.</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
             => throw new NotSupportedException("This method is not supported in threads.");
 
         string IChannel.Name => Name;

@@ -2,14 +2,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Discord.Interactions
 {
     internal class CommandMapNode<T> where T : class, ICommandInfo
-    {
-        private const string RegexWildCardExp = "(\\S+)?";
-
+    { 
         private readonly string _wildCardStr = "*";
         private readonly ConcurrentDictionary<string, CommandMapNode<T>> _nodes;
         private readonly ConcurrentDictionary<string, T> _commands;
@@ -35,10 +34,8 @@ namespace Discord.Interactions
         {
             if (keywords.Count == index + 1)
             {
-                if (commandInfo.SupportsWildCards && commandInfo.Name.Contains(_wildCardStr))
+                if (commandInfo.SupportsWildCards && RegexUtils.TryBuildRegexPattern(commandInfo, _wildCardStr, out var patternStr))
                 {
-                    var escapedStr = RegexUtils.EscapeExcluding(commandInfo.Name, _wildCardStr.ToArray());
-                    var patternStr = "\\A" + escapedStr.Replace(_wildCardStr, RegexWildCardExp) + "\\Z";
                     var regex = new Regex(patternStr, RegexOptions.Singleline | RegexOptions.Compiled);
 
                     if (!_wildCardCommands.TryAdd(regex, commandInfo))

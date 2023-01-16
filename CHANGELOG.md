@@ -1,5 +1,33 @@
 # Changelog
 
+## [3.9.0] - 2022-12-23
+### Added
+
+- #2469 Add missing properties in forum & thread channels (01ae904)
+- #2501 Add new discord stuff (ed38635)
+- #2521 Add missing property & new stuff (82b772a)
+- #2520 Implemented ClientDisconnect event for audio client. (4cad546)
+- #2509 Add SendFiles to UserExtensions ( 4cad546) 
+- #2528 Implement wildcard lenght quantifiers, TreatAsRegex property and solve catastrpohic backtracking (25cfb88)
+- #2531 Add Age restricted (NSFW) application commands support (60956c7)
+
+### Fixed
+
+- #2500 Fix duplicated members of DiscordErrorCode (6712ef4)
+- #2468 Fix TimestampTag being sadge (bc89d3c)
+- #2497 Avoid throwing on missing Application (7077c44)
+- #2485 Fixed an oversight clearing session data upon any disconnect. (c7ac59d)
+- #2526 Fix `GetActiveThreadsAsync` & add it to `ITextChannel` (bd2f719)
+- #2535 Fix deploy.yml (20d8fdf) 
+
+### Misc
+
+- #2471 Update samples to use `MessageContent` intent & update `v2 => v3 guide` (a4d34f6)
+- #2505 Update events.cs (ea039b8)
+- #2467 Update license and icon nuspec props (11ed0ff)
+- #2306 Command execution code rework & TypeConverters auto-scope fix (6869817)
+- #2534 Fully qualify SlashCommandBuilder namespace ( 3b107c2)
+
 ## [3.8.1] - 2022-09-12
 ### Added
 

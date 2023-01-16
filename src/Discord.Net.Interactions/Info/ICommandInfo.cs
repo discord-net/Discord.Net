@@ -65,6 +65,8 @@ namespace Discord.Interactions
         /// </summary>
         IReadOnlyCollection<IParameterInfo> Parameters { get; }
 
+        bool TreatNameAsRegex { get; }
+
         /// <summary>
         ///     Executes the command with the provided context.
         /// </summary>

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Threading.Tasks;
 namespace Discord.Interactions
@@ -20,7 +19,7 @@ namespace Discord.Interactions
         public override bool SupportsWildCards => true;
 
         /// <inheritdoc/>
-        public override IReadOnlyCollection<ModalCommandParameterInfo> Parameters { get; }
+        public override IReadOnlyList<ModalCommandParameterInfo> Parameters { get; }
 
         internal ModalCommandInfo(Builders.ModalCommandBuilder builder, ModuleInfo module, InteractionService commandService) : base(builder, module, commandService)
         {
@@ -30,34 +29,29 @@ namespace Discord.Interactions
 
         /// <inheritdoc/>
         public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
-            => await ExecuteAsync(context, services, null).ConfigureAwait(false);
-
-        /// <summary>
-        ///     Execute this command using dependency injection.
-        /// </summary>
-        /// <param name="context">Context that will be injected to the <see cref="InteractionModuleBase{T}"/>.</param>
-        /// <param name="services">Services that will be used while initializing the <see cref="InteractionModuleBase{T}"/>.</param>
-        /// <param name="additionalArgs">Provide additional string parameters to the method along with the auto generated parameters.</param>
-        /// <returns>
-        ///     A task representing the asynchronous command execution process.
-        /// </returns>
-        public async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services, params string[] additionalArgs)
         {
             if (context.Interaction is not IModalInteraction modalInteraction)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Modal Interaction.");
 
+            return await base.ExecuteAsync(context, services).ConfigureAwait(false);
+        }
+
+        protected override async Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
+        {
+            var captures = (context as IRouteMatchContainer)?.SegmentMatches?.ToList();
+            var captureCount = captures?.Count() ?? 0;
+
             try
             {
                 var args = new object[Parameters.Count];
-                var captureCount = additionalArgs?.Length ?? 0;
 
-                for(var i = 0; i < Parameters.Count; i++)
+                for (var i = 0; i < Parameters.Count; i++)
                 {
                     var parameter = Parameters.ElementAt(i);
 
-                    if(i < captureCount)
+                    if (i < captureCount)
                     {
-                        var readResult = await parameter.TypeReader.ReadAsync(context, additionalArgs[i], services).ConfigureAwait(false);
+                        var readResult = await parameter.TypeReader.ReadAsync(context, captures[i].Value, services).ConfigureAwait(false);
                         if (!readResult.IsSuccess)
                             return await InvokeEventAndReturn(context, readResult).ConfigureAwait(false);
 
@@ -69,13 +63,14 @@ namespace Discord.Interactions
                         if (!modalResult.IsSuccess)
                             return await InvokeEventAndReturn(context, modalResult).ConfigureAwait(false);
 
-                        if (modalResult is not ParseResult parseResult)
+                        if (modalResult is not TypeConverterResult converterResult)
                             return await InvokeEventAndReturn(context, ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command parameter parsing failed for an unknown reason."));
 
-                        args[i] = parseResult.Value;
+                        args[i] = converterResult.Value;
                     }
                 }
-                return await RunAsync(context, args, services);
+
+                return ParseResult.FromSuccess(args);
             }
             catch (Exception ex)
             {

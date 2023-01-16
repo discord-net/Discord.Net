@@ -60,6 +60,7 @@ namespace Discord
         ///     A guild object representing the guild that the invite points to.
         /// </returns>
         IGuild Guild { get; }
+
         /// <summary>
         ///     Gets the ID of the guild this invite is linked to.
         /// </summary>

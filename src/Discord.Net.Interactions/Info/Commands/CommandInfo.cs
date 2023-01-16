@@ -64,7 +64,9 @@ namespace Discord.Interactions
         public IReadOnlyCollection<PreconditionAttribute> Preconditions { get; }
 
         /// <inheritdoc cref="ICommandInfo.Parameters"/>
-        public abstract IReadOnlyCollection<TParameter> Parameters { get; }
+        public abstract IReadOnlyList<TParameter> Parameters { get; }
+
+        public bool TreatNameAsRegex { get; }
 
         internal CommandInfo(Builders.ICommandBuilder builder, ModuleInfo module, InteractionService commandService)
         {
@@ -78,6 +80,7 @@ namespace Discord.Interactions
             RunMode = builder.RunMode != RunMode.Default ? builder.RunMode : commandService._runMode;
             Attributes = builder.Attributes.ToImmutableArray();
             Preconditions = builder.Preconditions.ToImmutableArray();
+            TreatNameAsRegex = builder.TreatNameAsRegex && SupportsWildCards;
 
             _action = builder.Callback;
             _groupedPreconditions = builder.Preconditions.ToLookup(x => x.Group, x => x, StringComparer.Ordinal);
@@ -85,71 +88,16 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public abstract Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services);
-        protected abstract Task InvokeModuleEvent(IInteractionContext context, IResult result);
-        protected abstract string GetLogString(IInteractionContext context);
-
-        /// <inheritdoc/>
-        public async Task<PreconditionResult> CheckPreconditionsAsync(IInteractionContext context, IServiceProvider services)
-        {
-            async Task<PreconditionResult> CheckGroups(ILookup<string, PreconditionAttribute> preconditions, string type)
-            {
-                foreach (IGrouping<string, PreconditionAttribute> preconditionGroup in preconditions)
-                {
-                    if (preconditionGroup.Key == null)
-                    {
-                        foreach (PreconditionAttribute precondition in preconditionGroup)
-                        {
-                            var result = await precondition.CheckRequirementsAsync(context, this, services).ConfigureAwait(false);
-                            if (!result.IsSuccess)
-                                return result;
-                        }
-                    }
-                    else
-                    {
-                        var results = new List<PreconditionResult>();
-                        foreach (PreconditionAttribute precondition in preconditionGroup)
-                            results.Add(await precondition.CheckRequirementsAsync(context, this, services).ConfigureAwait(false));
-
-                        if (!results.Any(p => p.IsSuccess))
-                            return PreconditionGroupResult.FromError($"{type} precondition group {preconditionGroup.Key} failed.", results);
-                    }
-                }
-                return PreconditionGroupResult.FromSuccess();
-            }
-
-            var moduleResult = await CheckGroups(Module.GroupedPreconditions, "Module").ConfigureAwait(false);
-            if (!moduleResult.IsSuccess)
-                return moduleResult;
-
-            var commandResult = await CheckGroups(_groupedPreconditions, "Command").ConfigureAwait(false);
-            return !commandResult.IsSuccess ? commandResult : PreconditionResult.FromSuccess();
-        }
-
-        protected async Task<IResult> RunAsync(IInteractionContext context, object[] args, IServiceProvider services)
+        public virtual async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
         {
             switch (RunMode)
             {
                 case RunMode.Sync:
-                    {
-                        if (CommandService._autoServiceScopes)
-                        {
-                            using var scope = services?.CreateScope();
-                            return await ExecuteInternalAsync(context, args, scope?.ServiceProvider ?? EmptyServiceProvider.Instance).ConfigureAwait(false);
-                        }
-
-                        return await ExecuteInternalAsync(context, args, services).ConfigureAwait(false);
-                    }
+                    return await ExecuteInternalAsync(context, services).ConfigureAwait(false);
                 case RunMode.Async:
                     _ = Task.Run(async () =>
                     {
-                        if (CommandService._autoServiceScopes)
-                        {
-                            using var scope = services?.CreateScope();
-                            await ExecuteInternalAsync(context, args, scope?.ServiceProvider ?? EmptyServiceProvider.Instance).ConfigureAwait(false);
-                        }
-                        else
-                            await ExecuteInternalAsync(context, args, services).ConfigureAwait(false);
+                        await ExecuteInternalAsync(context, services).ConfigureAwait(false);
                     });
                     break;
                 default:
@@ -159,15 +107,32 @@ namespace Discord.Interactions
             return ExecuteResult.FromSuccess();
         }
 
-        private async Task<IResult> ExecuteInternalAsync(IInteractionContext context, object[] args, IServiceProvider services)
+        protected abstract Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services);
+
+        private async Task<IResult> ExecuteInternalAsync(IInteractionContext context, IServiceProvider services)
         {
             await CommandService._cmdLogger.DebugAsync($"Executing {GetLogString(context)}").ConfigureAwait(false);
+
+            using var scope = services?.CreateScope();
+            
+            if (CommandService._autoServiceScopes)
+                services = scope?.ServiceProvider ?? EmptyServiceProvider.Instance;
 
             try
             {
                 var preconditionResult = await CheckPreconditionsAsync(context, services).ConfigureAwait(false);
                 if (!preconditionResult.IsSuccess)
                     return await InvokeEventAndReturn(context, preconditionResult).ConfigureAwait(false);
+
+                var argsResult = await ParseArgumentsAsync(context, services).ConfigureAwait(false);
+
+                if (!argsResult.IsSuccess)
+                    return await InvokeEventAndReturn(context, argsResult).ConfigureAwait(false);
+
+                if(argsResult is not ParseResult parseResult)
+                    return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Complex command parsing failed for an unknown reason.");
+
+                var args = parseResult.Args;
 
                 var index = 0;
                 foreach (var parameter in Parameters)
@@ -221,7 +186,47 @@ namespace Discord.Interactions
             }
         }
 
-        protected async ValueTask<IResult> InvokeEventAndReturn(IInteractionContext context, IResult result)
+        protected abstract Task InvokeModuleEvent(IInteractionContext context, IResult result);
+        protected abstract string GetLogString(IInteractionContext context);
+
+        /// <inheritdoc/>
+        public async Task<PreconditionResult> CheckPreconditionsAsync(IInteractionContext context, IServiceProvider services)
+        {
+            async Task<PreconditionResult> CheckGroups(ILookup<string, PreconditionAttribute> preconditions, string type)
+            {
+                foreach (IGrouping<string, PreconditionAttribute> preconditionGroup in preconditions)
+                {
+                    if (preconditionGroup.Key == null)
+                    {
+                        foreach (PreconditionAttribute precondition in preconditionGroup)
+                        {
+                            var result = await precondition.CheckRequirementsAsync(context, this, services).ConfigureAwait(false);
+                            if (!result.IsSuccess)
+                                return result;
+                        }
+                    }
+                    else
+                    {
+                        var results = new List<PreconditionResult>();
+                        foreach (PreconditionAttribute precondition in preconditionGroup)
+                            results.Add(await precondition.CheckRequirementsAsync(context, this, services).ConfigureAwait(false));
+
+                        if (!results.Any(p => p.IsSuccess))
+                            return PreconditionGroupResult.FromError($"{type} precondition group {preconditionGroup.Key} failed.", results);
+                    }
+                }
+                return PreconditionGroupResult.FromSuccess();
+            }
+
+            var moduleResult = await CheckGroups(Module.GroupedPreconditions, "Module").ConfigureAwait(false);
+            if (!moduleResult.IsSuccess)
+                return moduleResult;
+
+            var commandResult = await CheckGroups(_groupedPreconditions, "Command").ConfigureAwait(false);
+            return !commandResult.IsSuccess ? commandResult : PreconditionResult.FromSuccess();
+        }
+
+        protected async Task<T> InvokeEventAndReturn<T>(IInteractionContext context, T result) where T : IResult
         {
             await InvokeModuleEvent(context, result).ConfigureAwait(false);
             return result;

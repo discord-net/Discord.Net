@@ -43,6 +43,11 @@ namespace Discord
         bool IsEnabledInDm { get; }
 
         /// <summary>
+        ///     Indicates whether the command is age restricted.
+        /// </summary>
+        bool IsNsfw { get; }
+
+        /// <summary>
         ///     Set of default <see cref="GuildPermission"/> required to invoke the command.
         /// </summary>
         GuildPermissions DefaultMemberPermissions { get; }

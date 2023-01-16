@@ -47,6 +47,11 @@ namespace Discord
         public bool IsDMEnabled { get; set; } = true;
 
         /// <summary>
+        ///     Gets or sets whether or not this command is age restricted.
+        /// </summary>
+        public bool IsNsfw { get; set; } = false;
+
+        /// <summary>
         ///     Gets or sets the default permission required to use this slash command.
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; set; }
@@ -66,7 +71,8 @@ namespace Discord
                 IsDefaultPermission = IsDefaultPermission,
                 IsDMEnabled = IsDMEnabled,
                 DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified,
-                NameLocalizations = NameLocalizations
+                NameLocalizations = NameLocalizations,
+                IsNsfw = IsNsfw,
             };
 
             return props;
@@ -121,13 +127,24 @@ namespace Discord
         }
         
         /// <summary>
-        ///     Sets whether or not this command can be used in dms
+        ///     Sets whether or not this command can be used in dms.
         /// </summary>
         /// <param name="permission"><see langword="true"/> if the command is available in dms, otherwise <see langword="false"/>.</param>
         /// <returns>The current builder.</returns>
         public UserCommandBuilder WithDMPermission(bool permission)
         {
             IsDMEnabled = permission;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets whether or not this command is age restricted.
+        /// </summary>
+        /// <param name="permission"><see langword="true"/> if the command is age restricted, otherwise <see langword="false"/>.</param>
+        /// <returns>The current builder.</returns>
+        public UserCommandBuilder WithNsfw(bool permission)
+        {
+            IsNsfw = permission;
             return this;
         }
 

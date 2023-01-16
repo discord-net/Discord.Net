@@ -288,6 +288,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task SyncPermissionsAsync(RequestOptions options = null)
             => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
+
+        /// <inheritdoc cref="ITextChannel.GetActiveThreadsAsync(RequestOptions)"/>
+        public virtual Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
+            => ThreadHelper.GetActiveThreadsAsync(Guild, Id, Discord, options);
         #endregion
 
         #region Invites
@@ -321,6 +325,10 @@ namespace Discord.Rest
 
         async Task<IThreadChannel> ITextChannel.CreateThreadAsync(string name, ThreadType type, ThreadArchiveDuration autoArchiveDuration, IMessage message, bool? invitable, int? slowmode, RequestOptions options)
             => await CreateThreadAsync(name, type, autoArchiveDuration, message, invitable, slowmode, options);
+
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IThreadChannel>> ITextChannel.GetActiveThreadsAsync(RequestOptions options)
+            => await GetActiveThreadsAsync(options);
         #endregion
 
         #region IMessageChannel

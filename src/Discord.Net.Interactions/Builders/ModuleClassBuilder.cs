@@ -101,6 +101,9 @@ namespace Discord.Interactions.Builders
                     case DontAutoRegisterAttribute dontAutoRegister:
                         builder.DontAutoRegister = true;
                         break;
+                    case NsfwCommandAttribute nsfwCommand:
+                        builder.SetNsfw(nsfwCommand.IsNsfw);
+                        break;
                     default:
                         builder.AddAttributes(attribute);
                         break;
@@ -192,6 +195,9 @@ namespace Discord.Interactions.Builders
                     case PreconditionAttribute precondition:
                         builder.WithPreconditions(precondition);
                         break;
+                    case NsfwCommandAttribute nsfwCommand:
+                        builder.SetNsfw(nsfwCommand.IsNsfw);
+                        break;
                     default:
                         builder.WithAttributes(attribute);
                         break;
@@ -244,6 +250,9 @@ namespace Discord.Interactions.Builders
                     case PreconditionAttribute precondition:
                         builder.WithPreconditions(precondition);
                         break;
+                    case NsfwCommandAttribute nsfwCommand:
+                        builder.SetNsfw(nsfwCommand.IsNsfw);
+                        break;
                     default:
                         builder.WithAttributes(attribute);
                         break;
@@ -274,6 +283,7 @@ namespace Discord.Interactions.Builders
                             builder.Name = interaction.CustomId;
                             builder.RunMode = interaction.RunMode;
                             builder.IgnoreGroupNames = interaction.IgnoreGroupNames;
+                            builder.TreatNameAsRegex = interaction.TreatAsRegex;
                         }
                         break;
                     case PreconditionAttribute precondition:
@@ -287,7 +297,7 @@ namespace Discord.Interactions.Builders
 
             var parameters = methodInfo.GetParameters();
 
-            var wildCardCount = Regex.Matches(Regex.Escape(builder.Name), Regex.Escape(commandService._wildCardExp)).Count;
+            var wildCardCount = RegexUtils.GetWildCardCount(builder.Name, commandService._wildCardExp);
 
             foreach (var parameter in parameters)
                 builder.AddParameter(x => BuildComponentParameter(x, parameter, parameter.Position >= wildCardCount));
@@ -355,6 +365,7 @@ namespace Discord.Interactions.Builders
                             builder.Name = modal.CustomId;
                             builder.RunMode = modal.RunMode;
                             builder.IgnoreGroupNames = modal.IgnoreGroupNames;
+                            builder.TreatNameAsRegex = modal.TreatAsRegex;
                         }
                         break;
                     case PreconditionAttribute precondition:

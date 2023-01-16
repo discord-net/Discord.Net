@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Invite;
 
@@ -27,7 +29,17 @@ namespace Discord.Rest
         public IUser TargetUser { get; private set; }
         /// <inheritdoc />
         public TargetUserType TargetUserType { get; private set; }
+
+        /// <summary>
+        ///     Gets the guild this invite is linked to.
+        /// </summary>
+        /// <returns>
+        ///     A partial guild object representing the guild that the invite points to.
+        /// </returns>
+        public InviteGuild InviteGuild { get; private set; }
+
         internal IChannel Channel { get; }
+        
         internal IGuild Guild { get; }
 
         /// <inheritdoc />
@@ -59,6 +71,32 @@ namespace Discord.Rest
             Inviter = model.Inviter.IsSpecified ? RestUser.Create(Discord, model.Inviter.Value) : null;
             TargetUser = model.TargetUser.IsSpecified ? RestUser.Create(Discord, model.TargetUser.Value) : null;
             TargetUserType = model.TargetUserType.IsSpecified ? model.TargetUserType.Value : TargetUserType.Undefined;
+
+            if (model.Guild.IsSpecified)
+            {
+                InviteGuild = new InviteGuild
+                (model.Guild.Value.Id,
+                    model.Guild.Value.Name,
+                    model.Guild.Value.Description.IsSpecified ? model.Guild.Value.Description.Value : null,
+                    model.Guild.Value.Splash.IsSpecified ? model.Guild.Value.Splash.Value : null,
+                    model.Guild.Value.BannerHash.IsSpecified ? model.Guild.Value.BannerHash.Value : null,
+                    model.Guild.Value.Features,
+                    model.Guild.Value.IconHash.IsSpecified ? model.Guild.Value.IconHash.Value : null,
+                    model.Guild.Value.VerificationLevel,
+                    model.Guild.Value.VanityUrlCode.IsSpecified ? model.Guild.Value.VanityUrlCode.Value : null,
+                    model.Guild.Value.PremiumSubscriptionCount.GetValueOrDefault(0),
+                    model.Guild.Value.NsfwLevel,
+                    model.Guild.Value.WelcomeScreen.IsSpecified
+                        ? new WelcomeScreen(
+                            model.Guild.Value.WelcomeScreen.Value.Description.IsSpecified ? model.Guild.Value.WelcomeScreen.Value.Description.Value : null,
+                            model.Guild.Value.WelcomeScreen.Value.WelcomeChannels.Select(ch =>
+                                new WelcomeScreenChannel(
+                                    ch.ChannelId,
+                                    ch.Description,
+                                    ch.EmojiName.IsSpecified ? ch.EmojiName.Value : null,
+                                    ch.EmojiId.IsSpecified ? ch.EmojiId.Value : null)).ToImmutableArray())
+                        : null);
+            }
         }
 
         /// <inheritdoc />

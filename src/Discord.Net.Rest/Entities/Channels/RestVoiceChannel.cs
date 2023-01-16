@@ -19,8 +19,7 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets whether or not the guild has Text-In-Voice enabled and the voice channel is a TiV channel.
         /// </summary>
-        public virtual bool IsTextInVoice
-            => Guild.Features.HasTextInVoice;
+        public virtual bool IsTextInVoice => true;
         /// <inheritdoc />
         public int Bitrate { get; private set; }
         /// <inheritdoc />
@@ -234,6 +233,10 @@ namespace Discord.Rest
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
             return base.TriggerTypingAsync(options);
         }
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">Threads are not supported in voice channels</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
+            => throw new NotSupportedException("Threads are not supported in voice channels");
 
         #endregion
 

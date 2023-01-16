@@ -2,9 +2,9 @@ using System;
 
 namespace Discord.Interactions
 {
-    internal struct ParseResult : IResult
+    public struct ParseResult : IResult
     {
-        public object Value { get; }
+        public object[] Args { get; }
 
         public InteractionCommandError? Error { get; }
 
@@ -12,15 +12,15 @@ namespace Discord.Interactions
 
         public bool IsSuccess => !Error.HasValue;
 
-        private ParseResult(object value, InteractionCommandError? error, string reason)
+        private ParseResult(object[] args, InteractionCommandError? error, string reason)
         {
-            Value = value;
+            Args = args;
             Error = error;
             ErrorReason = reason;
         }
 
-        public static ParseResult FromSuccess(object value) =>
-            new ParseResult(value, null, null);
+        public static ParseResult FromSuccess(object[] args) =>
+            new ParseResult(args, null, null);
 
         public static ParseResult FromError(Exception exception) =>
             new ParseResult(null, InteractionCommandError.Exception, exception.Message);

@@ -35,7 +35,7 @@ namespace Discord.WebSocket
                 ? (DataModel)model.Data.Value
                 : null;
 
-            Data = new SocketMessageComponentData(dataModel);
+            Data = new SocketMessageComponentData(dataModel, client, client.State, client.Guilds.FirstOrDefault(x => x.Id == model.GuildId.GetValueOrDefault()), model.User.GetValueOrDefault());
         }
 
         internal new static SocketMessageComponent Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)

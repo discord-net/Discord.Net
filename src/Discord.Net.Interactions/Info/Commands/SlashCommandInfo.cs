@@ -30,10 +30,13 @@ namespace Discord.Interactions
         public bool IsEnabledInDm { get; }
 
         /// <inheritdoc/>
+        public bool IsNsfw { get; }
+
+        /// <inheritdoc/>
         public GuildPermission? DefaultMemberPermissions { get; }
 
         /// <inheritdoc/>
-        public override IReadOnlyCollection<SlashCommandParameterInfo> Parameters { get; }
+        public override IReadOnlyList<SlashCommandParameterInfo> Parameters { get; }
 
         /// <inheritdoc/>
         public override bool SupportsWildCards => false;
@@ -41,13 +44,14 @@ namespace Discord.Interactions
         /// <summary>
         ///     Gets the flattened collection of command parameters and complex parameter fields.
         /// </summary>
-        public IReadOnlyCollection<SlashCommandParameterInfo> FlattenedParameters { get; }
+        public IReadOnlyList<SlashCommandParameterInfo> FlattenedParameters { get; }
 
-        internal SlashCommandInfo (Builders.SlashCommandBuilder builder, ModuleInfo module, InteractionService commandService) : base(builder, module, commandService)
+        internal SlashCommandInfo(Builders.SlashCommandBuilder builder, ModuleInfo module, InteractionService commandService) : base(builder, module, commandService)
         {
             Description = builder.Description;
             DefaultPermission = builder.DefaultPermission;
             IsEnabledInDm = builder.IsEnabledInDm;
+            IsNsfw = builder.IsNsfw;
             DefaultMemberPermissions = builder.DefaultMemberPermissions;
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
             FlattenedParameters = FlattenParameters(Parameters).ToImmutableArray();
@@ -60,49 +64,45 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public override async Task<IResult> ExecuteAsync (IInteractionContext context, IServiceProvider services)
+        public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
         {
-            if(context.Interaction is not ISlashCommandInteraction slashCommand)
+            if (context.Interaction is not ISlashCommandInteraction)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Slash Command Interaction");
 
-            var options = slashCommand.Data.Options;
-
-            while (options != null && options.Any(x => x.Type == ApplicationCommandOptionType.SubCommand || x.Type == ApplicationCommandOptionType.SubCommandGroup))
-                options = options.ElementAt(0)?.Options;
-
-            return await ExecuteAsync(context, Parameters, options?.ToList(), services);
+            return await base.ExecuteAsync(context, services);
         }
 
-        private async Task<IResult> ExecuteAsync (IInteractionContext context, IEnumerable<SlashCommandParameterInfo> paramList,
-            List<IApplicationCommandInteractionDataOption> argList, IServiceProvider services)
+        protected override async Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
         {
-            try
+            List<IApplicationCommandInteractionDataOption> GetOptions()
             {
-                var slashCommandParameterInfos = paramList.ToList();
-                var args = new object[slashCommandParameterInfos.Count];
+                var options = (context.Interaction as ISlashCommandInteraction).Data.Options;
 
-                for (var i = 0; i < slashCommandParameterInfos.Count; i++)
-                {
-                    var parameter = slashCommandParameterInfos[i];
-                    var result = await ParseArgument(parameter, context, argList, services).ConfigureAwait(false);
+                while (options != null && options.Any(x => x.Type == ApplicationCommandOptionType.SubCommand || x.Type == ApplicationCommandOptionType.SubCommandGroup))
+                    options = options.ElementAt(0)?.Options;
 
-                    if (!result.IsSuccess)
-                        return await InvokeEventAndReturn(context, result).ConfigureAwait(false);
-
-                    if (result is not ParseResult parseResult)
-                        return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command parameter parsing failed for an unknown reason.");
-
-                    args[i] = parseResult.Value;
-                }
-                return await RunAsync(context, args, services).ConfigureAwait(false);
+                return options.ToList();
             }
-            catch(Exception ex)
+
+            var options = GetOptions();
+            var args = new object[Parameters.Count];
+            for(var i = 0; i < Parameters.Count; i++)
             {
-                return await InvokeEventAndReturn(context, ExecuteResult.FromError(ex)).ConfigureAwait(false);
+                var parameter = Parameters[i];
+                var result = await ParseArgumentAsync(parameter, context, options, services).ConfigureAwait(false);
+
+                if (!result.IsSuccess)
+                    return await InvokeEventAndReturn(context, ParseResult.FromError(result)).ConfigureAwait(false);
+
+                if (result is not TypeConverterResult converterResult)
+                    return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Complex command parsing failed for an unknown reason.");
+
+                args[i] = converterResult.Value;
             }
+            return ParseResult.FromSuccess(args);
         }
 
-        private async Task<IResult> ParseArgument(SlashCommandParameterInfo parameterInfo, IInteractionContext context, List<IApplicationCommandInteractionDataOption> argList,
+        private async ValueTask<IResult> ParseArgumentAsync(SlashCommandParameterInfo parameterInfo, IInteractionContext context, List<IApplicationCommandInteractionDataOption> argList,
              IServiceProvider services)
         {
             if (parameterInfo.IsComplexParameter)
@@ -111,32 +111,29 @@ namespace Discord.Interactions
 
                 for (var i = 0; i < ctorArgs.Length; i++)
                 {
-                    var result = await ParseArgument(parameterInfo.ComplexParameterFields.ElementAt(i), context, argList, services).ConfigureAwait(false);
+                    var result = await ParseArgumentAsync(parameterInfo.ComplexParameterFields.ElementAt(i), context, argList, services).ConfigureAwait(false);
 
                     if (!result.IsSuccess)
                         return result;
 
-                    if (result is not ParseResult parseResult)
+                    if (result is not TypeConverterResult converterResult)
                         return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Complex command parsing failed for an unknown reason.");
 
-                    ctorArgs[i] = parseResult.Value;
+                    ctorArgs[i] = converterResult.Value;
                 }
 
-                return ParseResult.FromSuccess(parameterInfo._complexParameterInitializer(ctorArgs));
+                return TypeConverterResult.FromSuccess(parameterInfo._complexParameterInitializer(ctorArgs));
             }
 
             var arg = argList?.Find(x => string.Equals(x.Name, parameterInfo.Name, StringComparison.OrdinalIgnoreCase));
 
             if (arg == default)
                 return parameterInfo.IsRequired ? ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command was invoked with too few parameters") :
-                    ParseResult.FromSuccess(parameterInfo.DefaultValue);
+                    TypeConverterResult.FromSuccess(parameterInfo.DefaultValue);
 
             var typeConverter = parameterInfo.TypeConverter;
             var readResult = await typeConverter.ReadAsync(context, arg, services).ConfigureAwait(false);
-            if (!readResult.IsSuccess)
-                return readResult;
-
-            return ParseResult.FromSuccess(readResult.Value);
+            return readResult;
         }
 
         protected override Task InvokeModuleEvent (IInteractionContext context, IResult result)

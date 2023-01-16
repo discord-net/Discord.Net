@@ -29,6 +29,11 @@ namespace Discord.Interactions
         public RunMode RunMode { get; }
 
         /// <summary>
+        ///     Gets or sets whether the <see cref="CustomId"/> should be treated as a raw Regex pattern.
+        /// </summary>
+        public bool TreatAsRegex { get; set; } = false;
+
+        /// <summary>
         ///     Create a command for modal interaction handling.
         /// </summary>
         /// <param name="customId">String to compare the modal CustomIDs with.</param>

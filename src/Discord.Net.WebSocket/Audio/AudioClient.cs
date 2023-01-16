@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 
 namespace Discord.Audio
 {
@@ -277,6 +277,15 @@ namespace Discord.Audio
                             _ssrcMap[data.Ssrc] = data.UserId; //TODO: Memory Leak: SSRCs are never cleaned up
 
                             await _speakingUpdatedEvent.InvokeAsync(data.UserId, data.Speaking);
+                        }
+                        break;
+                    case VoiceOpCode.ClientDisconnect:
+                        {
+                            await _audioLogger.DebugAsync("Received ClientDisconnect").ConfigureAwait(false);
+
+                            var data = (payload as JToken).ToObject<ClientDisconnectEvent>(_serializer);
+
+                            await _clientDisconnectedEvent.InvokeAsync(data.UserId);
                         }
                         break;
                     default:

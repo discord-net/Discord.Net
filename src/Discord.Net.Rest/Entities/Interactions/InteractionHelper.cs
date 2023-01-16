@@ -107,7 +107,8 @@ namespace Discord.Rest
 
                 // TODO: better conversion to nullable optionals
                 DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
-                DmPermission = arg.IsDMEnabled.ToNullable() 
+                DmPermission = arg.IsDMEnabled.ToNullable(),
+                Nsfw = arg.IsNsfw.GetValueOrDefault(false),
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -147,8 +148,9 @@ namespace Discord.Rest
 
                     // TODO: better conversion to nullable optionals
                     DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
-                    DmPermission = arg.IsDMEnabled.ToNullable()
-                };
+                    DmPermission = arg.IsDMEnabled.ToNullable(),
+                    Nsfw = arg.IsNsfw.GetValueOrDefault(false)
+                    };
 
                 if (arg is SlashCommandProperties slashProps)
                 {
@@ -190,7 +192,8 @@ namespace Discord.Rest
 
                     // TODO: better conversion to nullable optionals
                     DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
-                    DmPermission = arg.IsDMEnabled.ToNullable()
+                    DmPermission = arg.IsDMEnabled.ToNullable(),
+                    Nsfw = arg.IsNsfw.GetValueOrDefault(false)
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -252,7 +255,9 @@ namespace Discord.Rest
                         ? args.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
                 NameLocalizations = args.NameLocalizations?.ToDictionary(),
-                DescriptionLocalizations = args.DescriptionLocalizations?.ToDictionary()
+                DescriptionLocalizations = args.DescriptionLocalizations?.ToDictionary(),
+                Nsfw = args.IsNsfw.GetValueOrDefault(false),
+                DefaultMemberPermission = args.DefaultMemberPermissions.ToNullable()
             };
 
             if (args is SlashCommandProperties slashProps)
@@ -312,7 +317,8 @@ namespace Discord.Rest
 
                 // TODO: better conversion to nullable optionals
                 DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
-                DmPermission = arg.IsDMEnabled.ToNullable()
+                DmPermission = arg.IsDMEnabled.ToNullable(),
+                Nsfw = arg.IsNsfw.GetValueOrDefault(false)
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -347,7 +353,9 @@ namespace Discord.Rest
                         ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
                 NameLocalizations = arg.NameLocalizations?.ToDictionary(),
-                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary()
+                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
+                Nsfw = arg.IsNsfw.GetValueOrDefault(false),
+                DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable()
             };
 
             if (arg is SlashCommandProperties slashProps)

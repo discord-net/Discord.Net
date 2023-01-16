@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord.Audio
@@ -47,5 +47,11 @@ namespace Discord.Audio
             remove { _speakingUpdatedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<ulong, bool, Task>> _speakingUpdatedEvent = new AsyncEvent<Func<ulong, bool, Task>>();
+        public event Func<ulong, Task> ClientDisconnected
+        {
+            add { _clientDisconnectedEvent.Add(value); }
+            remove { _clientDisconnectedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<ulong, Task>> _clientDisconnectedEvent = new AsyncEvent<Func<ulong, Task>>();
     }
 }
