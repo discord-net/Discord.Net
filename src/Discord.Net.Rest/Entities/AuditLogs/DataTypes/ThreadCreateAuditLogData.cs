@@ -23,7 +23,7 @@ namespace Discord.Rest
             SlowModeInterval = rateLimit;
         }
 
-        internal static ThreadCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static ThreadCreateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             var changes = entry.Changes;
 

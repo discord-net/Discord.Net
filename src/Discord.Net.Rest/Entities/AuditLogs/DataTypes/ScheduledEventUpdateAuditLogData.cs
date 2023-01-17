@@ -19,7 +19,7 @@ namespace Discord.Rest
             After  = after;
         }
 
-        internal static ScheduledEventUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static ScheduledEventUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             var changes = entry.Changes;
 

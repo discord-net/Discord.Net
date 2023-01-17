@@ -15,7 +15,7 @@ namespace Discord.Rest
             Target = bot;
         }
 
-        internal static BotAddAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static BotAddAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
             return new BotAddAuditLogData((userInfo != null) ? RestUser.Create(discord, userInfo) : null);

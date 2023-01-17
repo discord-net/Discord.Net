@@ -14,7 +14,7 @@ namespace Discord.Rest
             MemberCount = count;
         }
 
-        internal static MemberMoveAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static MemberMoveAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
         {
             return new MemberMoveAuditLogData(entry.Options.ChannelId.Value, entry.Options.Count.Value);
         }

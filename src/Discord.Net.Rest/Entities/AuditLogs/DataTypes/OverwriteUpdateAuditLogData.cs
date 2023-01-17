@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
@@ -19,7 +19,7 @@ namespace Discord.Rest
             OverwriteType = targetType;
         }
 
-        internal static OverwriteUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static OverwriteUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
         {
             var changes = entry.Changes;
 

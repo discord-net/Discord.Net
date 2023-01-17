@@ -17,7 +17,7 @@ namespace Discord.Rest
             Target = user;
         }
 
-        internal static MessageUnpinAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static MessageUnpinAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             RestUser user = null;
             if (entry.TargetId.HasValue)

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
@@ -19,7 +19,7 @@ namespace Discord.Rest
             ChannelId = channelId;
         }
 
-        internal static WebhookCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static WebhookCreateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             var changes = entry.Changes;
 

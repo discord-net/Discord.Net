@@ -17,7 +17,7 @@ namespace Discord.Rest
             Target = target;
         }
 
-        internal static MemberRoleAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static MemberRoleAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
         {
             var changes = entry.Changes;
 

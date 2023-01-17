@@ -17,7 +17,7 @@ namespace Discord.Rest
             After = after;
         }
 
-        internal static WebhookUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static WebhookUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             var changes = entry.Changes;
 

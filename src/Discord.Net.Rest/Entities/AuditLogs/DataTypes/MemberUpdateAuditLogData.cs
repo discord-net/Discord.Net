@@ -17,7 +17,7 @@ namespace Discord.Rest
             After = after;
         }
 
-        internal static MemberUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static MemberUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
         {
             var changes = entry.Changes;
 

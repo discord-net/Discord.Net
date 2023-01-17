@@ -19,7 +19,7 @@ namespace Discord.Rest
             Avatar = avatar;
         }
 
-        internal static WebhookDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static WebhookDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             var changes = entry.Changes;
 

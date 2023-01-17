@@ -1,4 +1,4 @@
-﻿using Model = Discord.API.AuditLog;
+using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
@@ -13,8 +13,8 @@ namespace Discord.Rest
             PruneDays = pruneDays;
             MembersRemoved = membersRemoved;
         }
-
-        internal static PruneAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+            
+        internal static PruneAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
         {
             return new PruneAuditLogData(entry.Options.PruneDeleteMemberDays.Value, entry.Options.PruneMembersRemoved.Value);
         }

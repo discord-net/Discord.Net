@@ -16,7 +16,7 @@ namespace Discord.Rest
             Overwrite = deletedOverwrite;
         }
 
-        internal static OverwriteDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static OverwriteDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
         {
             var changes = entry.Changes;
 

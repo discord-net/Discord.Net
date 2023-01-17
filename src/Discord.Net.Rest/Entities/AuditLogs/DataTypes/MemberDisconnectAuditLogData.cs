@@ -13,7 +13,7 @@ namespace Discord.Rest
             MemberCount = count;
         }
 
-        internal static MemberDisconnectAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static MemberDisconnectAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             return new MemberDisconnectAuditLogData(entry.Options.Count.Value);
         }

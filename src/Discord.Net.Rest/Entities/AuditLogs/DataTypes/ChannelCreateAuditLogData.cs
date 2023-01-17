@@ -22,7 +22,7 @@ namespace Discord.Rest
             Overwrites = overwrites;
         }
 
-        internal static ChannelCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static ChannelCreateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
         {
             var changes = entry.Changes;
 

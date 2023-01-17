@@ -17,7 +17,7 @@ namespace Discord.Rest
             Id = id;
         }
 
-        internal static ScheduledEventDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static ScheduledEventDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             var id = entry.TargetId.Value;
 

@@ -14,7 +14,7 @@ namespace Discord.Rest
             MessageCount = count;
         }
 
-        internal static MessageBulkDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static MessageBulkDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             return new MessageBulkDeleteAuditLogData(entry.TargetId.Value, entry.Options.Count.Value);
         }

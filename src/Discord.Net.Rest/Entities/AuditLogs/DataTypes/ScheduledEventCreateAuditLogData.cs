@@ -32,7 +32,7 @@ namespace Discord.Rest
             Image              = image             ;
         }
 
-        internal static ScheduledEventCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static ScheduledEventCreateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             var changes = entry.Changes;
 

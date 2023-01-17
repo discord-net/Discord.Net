@@ -16,7 +16,7 @@ namespace Discord.Rest
             Name = name;
         }
 
-        internal static EmoteCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static EmoteCreateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             var change = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "name");
 

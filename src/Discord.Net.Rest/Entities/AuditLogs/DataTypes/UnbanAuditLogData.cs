@@ -15,7 +15,7 @@ namespace Discord.Rest
             Target = user;
         }
 
-        internal static UnbanAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static UnbanAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
         {
             var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
             return new UnbanAuditLogData((userInfo != null) ? RestUser.Create(discord, userInfo) : null);

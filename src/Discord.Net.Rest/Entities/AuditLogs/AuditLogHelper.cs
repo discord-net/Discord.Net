@@ -8,10 +8,10 @@ namespace Discord.Rest
 {
     internal static class AuditLogHelper
     {
-        private static readonly Dictionary<ActionType, Func<BaseDiscordClient, Model, EntryModel, IAuditLogData>> CreateMapping
-            = new Dictionary<ActionType, Func<BaseDiscordClient, Model, EntryModel, IAuditLogData>>()
+        private static readonly Dictionary<ActionType, Func<BaseDiscordClient, EntryModel, Model,  IAuditLogData>> CreateMapping
+            = new ()
         {
-            [ActionType.GuildUpdated] = GuildUpdateAuditLogData.Create,
+            [ActionType.GuildUpdated] = GuildUpdateAuditLogData.Create, // log
 
             [ActionType.ChannelCreated] = ChannelCreateAuditLogData.Create,
             [ActionType.ChannelUpdated] = ChannelUpdateAuditLogData.Create,
@@ -61,10 +61,10 @@ namespace Discord.Rest
             [ActionType.ThreadDelete] = ThreadDeleteAuditLogData.Create,
         };
 
-        public static IAuditLogData CreateData(BaseDiscordClient discord, Model log, EntryModel entry)
+        public static IAuditLogData CreateData(BaseDiscordClient discord, EntryModel entry, Model log = null)
         {
             if (CreateMapping.TryGetValue(entry.Action, out var func))
-                return func(discord, log, entry);
+                return func(discord, entry, log);
 
             return null;
         }

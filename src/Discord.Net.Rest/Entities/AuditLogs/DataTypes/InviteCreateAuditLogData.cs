@@ -21,7 +21,7 @@ namespace Discord.Rest
             MaxUses = maxUses;
         }
 
-        internal static InviteCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static InviteCreateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             var changes = entry.Changes;
 

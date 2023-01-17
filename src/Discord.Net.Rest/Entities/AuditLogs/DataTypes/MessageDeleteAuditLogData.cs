@@ -18,7 +18,7 @@ namespace Discord.Rest
             Target = user;
         }
 
-        internal static MessageDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
+        internal static MessageDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
         {
             var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
             return new MessageDeleteAuditLogData(entry.Options.ChannelId.Value, entry.Options.Count.Value, userInfo != null ? RestUser.Create(discord, userInfo) : null);
