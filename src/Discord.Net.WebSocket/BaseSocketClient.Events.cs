@@ -892,5 +892,20 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<SocketGuild, SocketChannel, Task>> _webhooksUpdated = new AsyncEvent<Func<SocketGuild, SocketChannel, Task>>();
 
         #endregion
+
+        #region Audit Logs
+
+        /// <summary>
+        ///     Fired when a guild audit log entry is created.
+        /// </summary>
+        public event Func<IAuditLogEntry, SocketGuild, Task> AuditLogCreated
+        {
+            add { _auditLogCreated.Add(value); }
+            remove { _auditLogCreated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<IAuditLogEntry, SocketGuild, Task>> _auditLogCreated = new();
+
+        #endregion
     }
 }

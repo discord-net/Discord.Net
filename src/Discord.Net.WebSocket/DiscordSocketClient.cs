@@ -2879,6 +2879,23 @@ namespace Discord.WebSocket
 
                             #endregion
 
+                            #region Audit Logs
+
+                            case "GUILD_AUDIT_LOG_ENTRY_CREATE":
+                            {
+                                var data = (payload as JToken).ToObject<AuditLogCreatedEvent>(_serializer);
+                                type = "GUILD_AUDIT_LOG_ENTRY_CREATE";
+                                await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AUDIT_LOG_ENTRY_CREATE)").ConfigureAwait(false);
+
+                                var guild = State.GetGuild(data.GuildId);
+                                //var auditLog = RestAuditLogEntry.Create(this,null, data);
+
+                                await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), null, guild);
+                            }
+                                break;
+
+                            #endregion
+
                             #region Ignored (User only)
                             case "CHANNEL_PINS_ACK":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_ACK)").ConfigureAwait(false);
