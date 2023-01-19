@@ -44,6 +44,9 @@ namespace Discord.Interactions
         /// </summary>
         public Type Type { get; }
 
+        /// <summary>
+        ///     Gets the property linked to this component.
+        /// </summary>
         public PropertyInfo PropertyInfo { get; }
 
         /// <summary>
