@@ -9,7 +9,7 @@ namespace Discord;
 public class RoleConnection
 {
     /// <summary>
-    ///     Gets the vanity name of the platform a bot has connected.
+    ///     Gets the vanity name of the platform a bot has connected to.
     /// </summary>
     public string PlatformName { get; }
 
