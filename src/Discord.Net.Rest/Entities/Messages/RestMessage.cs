@@ -80,6 +80,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public MessageType Type { get; private set; }
 
+        /// <inheritdoc />
+        public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
+
         /// <inheritdoc/>
         public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
         /// <summary>
@@ -242,6 +245,15 @@ namespace Discord.Rest
                     }
                     _userMentions = newMentions.ToImmutable();
                 }
+            }
+
+            if (model.RoleSubscriptionData.IsSpecified)
+            {
+                RoleSubscriptionData = new(
+                    model.RoleSubscriptionData.Value.SubscriptionListingId,
+                    model.RoleSubscriptionData.Value.TierName,
+                    model.RoleSubscriptionData.Value.MonthsSubscribed,
+                    model.RoleSubscriptionData.Value.IsRenewal);
             }
         }
         /// <inheritdoc />

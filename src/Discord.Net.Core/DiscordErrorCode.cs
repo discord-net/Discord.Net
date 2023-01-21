@@ -98,13 +98,14 @@ namespace Discord
         MaximumStickersReached = 30039,
         MaximumPruneRequestReached = 30040,
         MaximumGuildWidgetsReached = 30042,
-        #endregion
-
-        #region General Request Errors (40XXX)
         BitrateIsTooHighForChannelOfThisType = 30052,
         MaximumNumberOfEditsReached = 30046,
         MaximumNumberOfPinnedThreadsInAForumChannelReached = 30047,
         MaximumNumberOfTagsInAForumChannelReached = 30048,
+        MaximumNumberOfWebhooksReached = 30058,
+        #endregion
+
+        #region General Request Errors (40XXX)
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
         OpeningDMTooFast = 40003,
@@ -118,10 +119,11 @@ namespace Discord
         ApplicationNameAlreadyExists = 40041,
         ApplicationInteractionFailedToSend = 40043,
         CannotSendAMessageInAForumChannel = 40058,
-        ThereAreNoTagsAvailableThatCanBeSetByNonModerators = 40066,
-        ATagIsRequiredToCreateAForumPostInThisChannel = 40067,
         InteractionHasAlreadyBeenAcknowledged = 40060,
         TagNamesMustBeUnique = 40061,
+        ServiceResourceIsBeingRateLimited = 40062,
+        ThereAreNoTagsAvailableThatCanBeSetByNonModerators = 40066,
+        ATagIsRequiredToCreateAForumPostInThisChannel = 40067,
         #endregion
 
         #region Action Preconditions/Checks (50XXX)
@@ -160,6 +162,7 @@ namespace Discord
         InvalidFileUpload = 50046,
         CannotSelfRedeemGift = 50054,
         InvalidGuild = 50055,
+        InvalidRequestOrigin = 50067,
         InvalidMessageType = 50068,
         PaymentSourceRequiredForGift = 50070,
         CannotModifySystemWebhook = 50073,
