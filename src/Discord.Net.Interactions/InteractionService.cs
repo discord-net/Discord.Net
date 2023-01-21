@@ -684,6 +684,42 @@ namespace Discord.Interactions
             }
         }
 
+        /// <summary>
+        ///     Unregister Application Commands from modules provided in <paramref name="modules"/> from a guild.
+        /// </summary>
+        /// <param name="guild">The target guild.</param>
+        /// <param name="modules">Modules to be deregistered from Discord.</param>
+        /// <returns>
+        ///     A task representing the command de-registration process. The task result contains the active application commands of the target guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestGuildCommand>> RemoveModulesFromGuildAsync(IGuild guild, params ModuleInfo[] modules)
+        {
+            if (guild is null)
+                throw new ArgumentNullException(nameof(guild));
+
+            return await RemoveModulesFromGuildAsync(guild.Id, modules).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Unregister Application Commands from modules provided in <paramref name="modules"/> from a guild.
+        /// </summary>
+        /// <param name="guildId">The target guild ID.</param>
+        /// <param name="modules">Modules to be deregistered from Discord.</param>
+        /// <returns>
+        ///     A task representing the command de-registration process. The task result contains the active application commands of the target guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestGuildCommand>> RemoveModulesFromGuildAsync(ulong guildId, params ModuleInfo[] modules)
+        {
+            EnsureClientReady();
+
+            var exclude = modules.SelectMany(x => x.ToApplicationCommandProps(true)).ToList();
+            var existing = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
+
+            var props = existing.Where(x => !exclude.Any(y => y.Name.IsSpecified && x.Name == y.Name.Value)).Select(x => x.ToApplicationCommandProps());
+
+            return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guildId).ConfigureAwait(false);
+        }
+
         private bool RemoveModuleInternal (ModuleInfo moduleInfo)
         {
             if (!_moduleDefs.Remove(moduleInfo))
