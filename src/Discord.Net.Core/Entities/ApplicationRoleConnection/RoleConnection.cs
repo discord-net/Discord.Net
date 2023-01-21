@@ -14,7 +14,7 @@ public class RoleConnection
     public string PlatformName { get; }
 
     /// <summary>
-    ///     Gets the username on the platform a bot has connected.
+    ///     Gets the username on the platform a bot has connected to.
     /// </summary>
     public string PlatformUsername { get; }
 
