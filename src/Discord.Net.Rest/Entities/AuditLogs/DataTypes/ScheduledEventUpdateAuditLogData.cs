@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Discord.API;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
@@ -35,13 +34,13 @@ namespace Discord.Rest
             var status = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "status");
             var entityType = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "entity_type");
             var entityId = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "entity_id");
-            var entityMetadata = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "entity_metadata");
+            var location = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "location");
             var userCount = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "user_count");
             var image = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "image");
 
             var before = new ScheduledEventInfo(
                 guildId?.OldValue.ToObject<ulong>(discord.ApiClient.Serializer),
-                channelId?.OldValue.ToObject<ulong?>(discord.ApiClient.Serializer),
+                channelId == null ? null : channelId.OldValue?.ToObject<ulong?>(discord.ApiClient.Serializer) ?? 0,
                 name?.OldValue.ToObject<string>(discord.ApiClient.Serializer),
                 description?.OldValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault(),
@@ -51,8 +50,7 @@ namespace Discord.Rest
                 status?.OldValue.ToObject<GuildScheduledEventStatus>(discord.ApiClient.Serializer),
                 entityType?.OldValue.ToObject<GuildScheduledEventType>(discord.ApiClient.Serializer),
                 entityId?.OldValue.ToObject<ulong?>(discord.ApiClient.Serializer),
-                entityMetadata?.OldValue.ToObject<GuildScheduledEventEntityMetadata>(discord.ApiClient.Serializer)
-                    ?.Location.GetValueOrDefault(),
+                location == null ? Optional<string>.Unspecified : new Optional<string>(location.OldValue?.ToObject<string>(discord.ApiClient.Serializer)),
                 userCount?.OldValue.ToObject<Optional<int>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault(),
                 image?.OldValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
@@ -60,7 +58,7 @@ namespace Discord.Rest
             );
             var after = new ScheduledEventInfo(
                 guildId?.NewValue.ToObject<ulong>(discord.ApiClient.Serializer),
-                channelId?.NewValue.ToObject<ulong?>(discord.ApiClient.Serializer),
+                channelId == null ? null : channelId.NewValue?.ToObject<ulong?>(discord.ApiClient.Serializer) ?? 0,
                 name?.NewValue.ToObject<string>(discord.ApiClient.Serializer),
                 description?.NewValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault(),
@@ -70,8 +68,7 @@ namespace Discord.Rest
                 status?.NewValue.ToObject<GuildScheduledEventStatus>(discord.ApiClient.Serializer),
                 entityType?.NewValue.ToObject<GuildScheduledEventType>(discord.ApiClient.Serializer),
                 entityId?.NewValue.ToObject<ulong?>(discord.ApiClient.Serializer),
-                entityMetadata?.NewValue.ToObject<GuildScheduledEventEntityMetadata>(discord.ApiClient.Serializer)
-                    ?.Location.GetValueOrDefault(),
+                location == null ? Optional<string>.Unspecified : new Optional<string>(location.NewValue?.ToObject<string>(discord.ApiClient.Serializer)),
                 userCount?.NewValue.ToObject<Optional<int>>(discord.ApiClient.Serializer)
                     .GetValueOrDefault(),
                 image?.NewValue.ToObject<Optional<string>>(discord.ApiClient.Serializer)
