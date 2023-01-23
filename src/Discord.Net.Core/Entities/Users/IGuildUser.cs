@@ -112,6 +112,11 @@ namespace Discord
         DateTimeOffset? TimedOutUntil { get; }
 
         /// <summary>
+        ///     Gets the public flags for this guild member.
+        /// </summary>
+        GuildUserFlags Flags { get; }
+
+        /// <summary>
         ///     Gets the level permissions granted to this user to a given channel.
         /// </summary>
         /// <example>

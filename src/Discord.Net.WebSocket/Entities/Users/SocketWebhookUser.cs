@@ -84,6 +84,8 @@ namespace Discord.WebSocket
         int IGuildUser.Hierarchy => 0;
         /// <inheritdoc />
         GuildPermissions IGuildUser.GuildPermissions => GuildPermissions.Webhook;
+        /// <inheritdoc />
+        GuildUserFlags IGuildUser.Flags => GuildUserFlags.None;
 
         /// <inheritdoc />
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel) => Permissions.ToChannelPerms(channel, GuildPermissions.Webhook.RawValue);

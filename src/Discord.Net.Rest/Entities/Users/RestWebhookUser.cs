@@ -71,6 +71,8 @@ namespace Discord.Rest
         DateTimeOffset? IGuildUser.TimedOutUntil => null;
         /// <inheritdoc />
         GuildPermissions IGuildUser.GuildPermissions => GuildPermissions.Webhook;
+        /// <inheritdoc />
+        GuildUserFlags IGuildUser.Flags => GuildUserFlags.None;
 
         /// <inheritdoc />
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel) => Permissions.ToChannelPerms(channel, GuildPermissions.Webhook.RawValue);

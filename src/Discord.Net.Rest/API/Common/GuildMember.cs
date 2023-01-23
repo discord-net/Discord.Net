@@ -25,5 +25,8 @@ namespace Discord.API
         public Optional<DateTimeOffset?> PremiumSince { get; set; }
         [JsonProperty("communication_disabled_until")]
         public Optional<DateTimeOffset?> TimedOutUntil { get; set; }
+
+        [JsonProperty("flags")]
+        public GuildUserFlags Flags { get; set; }
     }
 }
