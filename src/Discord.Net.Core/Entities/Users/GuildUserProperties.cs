@@ -82,5 +82,13 @@ namespace Discord
         ///     <see langword="null"/> or a time in the past to clear a currently existing timeout.
         /// </remarks>
         public Optional<DateTimeOffset?> TimedOutUntil { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the flags of the guild member.
+        /// </summary>
+        /// <remarks>
+        ///     Not all flags can be modified, these are reserved for Discord.
+        /// </remarks>
+        public Optional<GuildUserFlags> Flags { get; set; }
     }
 }

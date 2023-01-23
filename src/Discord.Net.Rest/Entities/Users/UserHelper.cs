@@ -40,7 +40,8 @@ namespace Discord.Rest
                 Deaf = args.Deaf,
                 Mute = args.Mute,
                 Nickname = args.Nickname,
-                TimedOutUntil = args.TimedOutUntil
+                TimedOutUntil = args.TimedOutUntil,
+                Flags = args.Flags
             };
 
             if (args.Channel.IsSpecified)
