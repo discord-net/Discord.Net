@@ -12,7 +12,7 @@ public enum GuildUserFlags
     None = 0,
 
     /// <summary>
-    ///     Member has leave and rejoined the guild.
+    ///     Member has left and rejoined the guild.
     /// </summary>
     /// <remarks>
     ///     Cannot be modified.
