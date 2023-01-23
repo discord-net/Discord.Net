@@ -87,7 +87,7 @@ namespace Discord
         ///     Gets or sets the flags of the guild member.
         /// </summary>
         /// <remarks>
-        ///     Not all flags can be modified and are reserved for Discord.
+        ///     Not all flags can be modified, these are reserved for Discord.
         /// </remarks>
         public Optional<GuildUserFlags> Flags { get; set; }
     }
