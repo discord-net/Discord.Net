@@ -130,3 +130,5 @@
   topicUid: Guides.Voice.SendingVoice
 - name: Deployment
   topicUid: Guides.Deployment
+- name: Working with Bearer token
+  topicUid: Guides.BearerToken
