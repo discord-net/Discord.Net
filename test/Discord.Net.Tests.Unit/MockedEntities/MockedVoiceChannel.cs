@@ -38,6 +38,8 @@ namespace Discord
 
         public ChannelFlags Flags => throw new NotImplementedException();
 
+        public VideoQualityMode VideoQualityMode => throw new NotImplementedException();
+
         public Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();
         public Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();
         public Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false) => throw new NotImplementedException();
