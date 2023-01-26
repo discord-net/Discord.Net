@@ -27,6 +27,11 @@ namespace Discord
         int? UserLimit { get; }
 
         /// <summary>
+        ///     Gets the video quality mode for this channel.
+        /// </summary>
+        VideoQualityMode VideoQualityMode { get; }
+
+        /// <summary>
         ///     Bulk-deletes multiple messages.
         /// </summary>
         /// <example>

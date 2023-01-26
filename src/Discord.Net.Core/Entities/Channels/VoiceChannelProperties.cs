@@ -17,5 +17,10 @@ namespace Discord
         ///     Gets or sets the channel voice region id, automatic when set to <see langword="null"/>.
         /// </summary>
         public Optional<string> RTCRegion { get; set; }
+
+        /// <summary>
+        ///     Get or sets the video quality mode for this channel.
+        /// </summary>
+        public Optional<VideoQualityMode> VideoQualityMode { get; set; }
     }
 }
