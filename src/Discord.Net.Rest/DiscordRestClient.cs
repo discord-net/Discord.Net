@@ -231,7 +231,23 @@ namespace Discord.Rest
             => MessageHelper.RemoveAllReactionsAsync(channelId, messageId, this, options);
         public Task RemoveAllReactionsForEmoteAsync(ulong channelId, ulong messageId, IEmote emote, RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsForEmoteAsync(channelId, messageId, emote, this, options);
-#endregion
+
+        public Task<IReadOnlyCollection<RoleConnectionMetadata>> GetRoleConnectionMetadataRecordsAsync(RequestOptions options = null)
+            => ClientHelper.GetRoleConnectionMetadataRecordsAsync(this, options);
+
+        public Task<IReadOnlyCollection<RoleConnectionMetadata>> ModifyRoleConnectionMetadataRecordsAsync(ICollection<RoleConnectionMetadataProperties> metadata, RequestOptions options = null)
+        {
+            Preconditions.AtMost(metadata.Count, 5, nameof(metadata), "An application can have a maximum of 5 metadata records.");
+            return ClientHelper.ModifyRoleConnectionMetadataRecordsAsync(metadata, this, options);
+        }
+
+        public Task<RoleConnection> GetUserApplicationRoleConnectionAsync(ulong applicationId, RequestOptions options = null)
+            => ClientHelper.GetUserRoleConnectionAsync(applicationId, this, options);
+
+        public Task<RoleConnection> ModifyUserApplicationRoleConnectionAsync(ulong applicationId, RoleConnectionProperties roleConnection, RequestOptions options = null)
+            => ClientHelper.ModifyUserRoleConnectionAsync(applicationId, roleConnection, this, options);
+
+        #endregion
 
         #region IDiscordClient
         /// <inheritdoc />

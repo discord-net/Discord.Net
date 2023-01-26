@@ -264,5 +264,77 @@ namespace Discord.Rest
         public static Task RemoveRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
             => client.ApiClient.RemoveRoleAsync(guildId, userId, roleId, options);
         #endregion
+
+        #region Role Connection Metadata
+
+        public static async Task<IReadOnlyCollection<RoleConnectionMetadata>> GetRoleConnectionMetadataRecordsAsync(BaseDiscordClient client, RequestOptions options = null)
+            => (await client.ApiClient.GetApplicationRoleConnectionMetadataRecordsAsync(options))
+                .Select(model
+                    => new RoleConnectionMetadata(
+                        model.Type,
+                        model.Key,
+                        model.Name,
+                        model.Description,
+                        model.NameLocalizations.IsSpecified
+                            ? model.NameLocalizations.Value?.ToImmutableDictionary()
+                            : null,
+                        model.DescriptionLocalizations.IsSpecified
+                            ? model.DescriptionLocalizations.Value?.ToImmutableDictionary()
+                            : null))
+                .ToImmutableArray();
+
+        public static async Task<IReadOnlyCollection<RoleConnectionMetadata>> ModifyRoleConnectionMetadataRecordsAsync(ICollection<RoleConnectionMetadataProperties> metadata, BaseDiscordClient client, RequestOptions options = null)
+            => (await client.ApiClient.UpdateApplicationRoleConnectionMetadataRecordsAsync(metadata
+                .Select(x => new API.RoleConnectionMetadata
+                {
+                    Name = x.Name,
+                    Description = x.Description,
+                    Key = x.Key,
+                    Type = x.Type,
+                    NameLocalizations = x.NameLocalizations?.ToDictionary(),
+                    DescriptionLocalizations = x.DescriptionLocalizations?.ToDictionary()
+                }).ToArray()))
+                .Select(model
+                    => new RoleConnectionMetadata(
+                        model.Type,
+                        model.Key,
+                        model.Name,
+                        model.Description,
+                        model.NameLocalizations.IsSpecified
+                            ? model.NameLocalizations.Value?.ToImmutableDictionary()
+                            : null,
+                        model.DescriptionLocalizations.IsSpecified
+                            ? model.DescriptionLocalizations.Value?.ToImmutableDictionary()
+                            : null))
+                .ToImmutableArray();
+
+        public static async Task<RoleConnection> GetUserRoleConnectionAsync(ulong applicationId, BaseDiscordClient client, RequestOptions options = null)
+        {
+            var roleConnection = await client.ApiClient.GetUserApplicationRoleConnectionAsync(applicationId, options);
+
+            return new RoleConnection(roleConnection.PlatformName.GetValueOrDefault(null),
+                roleConnection.PlatformUsername.GetValueOrDefault(null),
+                roleConnection.Metadata.GetValueOrDefault());
+        }
+
+        public static async Task<RoleConnection> ModifyUserRoleConnectionAsync(ulong applicationId, RoleConnectionProperties roleConnection, BaseDiscordClient client, RequestOptions options = null)
+        {
+            var updatedConnection = await client.ApiClient.ModifyUserApplicationRoleConnectionAsync(applicationId,
+                new API.RoleConnection
+                {
+                    PlatformName = roleConnection.PlatformName,
+                    PlatformUsername = roleConnection.PlatformUsername,
+                    Metadata = roleConnection.Metadata
+                }, options);
+
+            return new RoleConnection(
+                updatedConnection.PlatformName.GetValueOrDefault(null),
+                updatedConnection.PlatformUsername.GetValueOrDefault(null),
+                updatedConnection.Metadata.GetValueOrDefault()?.ToImmutableDictionary()
+                );
+        }
+
+
+        #endregion
     }
 }
