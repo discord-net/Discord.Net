@@ -1,4 +1,3 @@
-
 using Discord.API.Rest;
 using Discord.Net;
 using Discord.Net.Converters;
@@ -2203,6 +2202,14 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             return await SendJsonAsync<Channel>("POST", () => "users/@me/channels", args, new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
+        public async Task<GuildMember> GetCurrentUserGuildMember(ulong guildId, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds();
+            return await SendAsync<GuildMember>("GET", () => $"users/@me/guilds/{guildId}/member", ids, options: options).ConfigureAwait(false);
         }
         #endregion
 
