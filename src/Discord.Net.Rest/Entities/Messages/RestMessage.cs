@@ -84,12 +84,15 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the thread that was started from this message.
         /// </summary>
+        /// <returns>
+        ///    A <see cref="RestThreadChannel"/> object if this message has thread attached; otherwise <see langword="null"/>.
+        /// </returns>
         public RestThreadChannel Thread { get; private set; }
 
         /// <inheritdoc />
         public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="IMessage.Components"/>
         public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
         /// <summary>
         ///     Gets a collection of the mentioned users in the message.
