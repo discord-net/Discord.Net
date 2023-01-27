@@ -64,5 +64,8 @@ namespace Discord.API
         public Optional<StickerItem[]> StickerItems { get; set; }
         [JsonProperty("role_subscription_data")]
         public Optional<MessageRoleSubscriptionData> RoleSubscriptionData { get; set; }
+
+        [JsonProperty("thread")]
+        public Optional<Channel> Thread { get; set; }
     }
 }
