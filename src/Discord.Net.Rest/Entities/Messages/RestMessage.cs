@@ -80,6 +80,12 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public MessageType Type { get; private set; }
 
+
+        /// <summary>
+        ///     Gets the thread that was started from this message.
+        /// </summary>
+        public RestThreadChannel Thread { get; private set; }
+
         /// <inheritdoc />
         public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
 
@@ -255,6 +261,11 @@ namespace Discord.Rest
                     model.RoleSubscriptionData.Value.MonthsSubscribed,
                     model.RoleSubscriptionData.Value.IsRenewal);
             }
+
+            if (model.Thread.IsSpecified)
+            {
+                Thread = RestThreadChannel.Create(Discord, new RestGuild(Discord, model.Thread.Value.GuildId.Value), model.Thread.Value);
+            }
         }
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
@@ -274,11 +285,17 @@ namespace Discord.Rest
         /// </returns>
         public override string ToString() => Content;
 
+        #region IMessage
+
+        /// <inheritdoc />
         IUser IMessage.Author => Author;
+
         /// <inheritdoc />
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
+
         /// <inheritdoc />
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
+
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
 
@@ -290,6 +307,8 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         IReadOnlyCollection<IStickerItem> IMessage.Stickers => Stickers;
+        
+        #endregion
 
         /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x => new ReactionMetadata { ReactionCount = x.Count, IsMe = x.Me });
