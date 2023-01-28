@@ -902,14 +902,27 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleCreated = new AsyncEvent<Func<SocketAutoModRule, Task>>();
 
-        public event Func<SocketAutoModRule, Task> AutoModRuleDelted
+        public event Func<Cacheable<SocketAutoModRule, ulong>, SocketAutoModRule, Task> AutoModRuleUpdated
+        {
+            add => _autoModRuleUpdated.Add(value);
+            remove => _autoModRuleUpdated.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<Cacheable<SocketAutoModRule, ulong>, SocketAutoModRule, Task>> _autoModRuleUpdated = new ();
+
+        public event Func<SocketAutoModRule, Task> AutoModRuleDeleted
         {
             add => _autoModRuleDeleted.Add(value);
             remove => _autoModRuleDeleted.Remove(value);
         }
         internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleDeleted = new AsyncEvent<Func<SocketAutoModRule, Task>>();
 
-        //public event Func<SocketAutoModRule>
+        public event Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task> AutoModActionExecuted
+        {
+            add => _autoModActionExecuted.Add(value);
+            remove => _autoModActionExecuted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task>> _autoModActionExecuted = new ();
+        
         #endregion
     }
 }

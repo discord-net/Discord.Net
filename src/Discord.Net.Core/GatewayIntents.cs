@@ -48,13 +48,25 @@ namespace Discord
         ///     This intent includes GUILD_SCHEDULED_EVENT_CREATE, GUILD_SCHEDULED_EVENT_UPDATE, GUILD_SCHEDULED_EVENT_DELETE, GUILD_SCHEDULED_EVENT_USER_ADD, GUILD_SCHEDULED_EVENT_USER_REMOVE
         /// </summary>
         GuildScheduledEvents = 1 << 16,
+
+        /// <summary>
+        ///     This intent includes AUTO_MODERATION_RULE_CREATE, AUTO_MODERATION_RULE_UPDATE, AUTO_MODERATION_RULE_DELETE
+        /// </summary>
+        AutoModerationConfiguration = 1 << 20,
+
+        /// <summary>
+        ///     This intent includes AUTO_MODERATION_ACTION_EXECUTION
+        /// </summary>
+        AutoModerationActionExecution = 1 << 21,
+
         /// <summary>
         ///     This intent includes all but <see cref="GuildMembers"/> and <see cref="GuildPresences"/>
         ///     which are privileged and must be enabled in the Developer Portal.
         /// </summary>
         AllUnprivileged = Guilds | GuildBans | GuildEmojis | GuildIntegrations | GuildWebhooks | GuildInvites |
             GuildVoiceStates | GuildMessages | GuildMessageReactions | GuildMessageTyping | DirectMessages |
-            DirectMessageReactions | DirectMessageTyping | GuildScheduledEvents,
+            DirectMessageReactions | DirectMessageTyping | GuildScheduledEvents | AutoModerationConfiguration |
+            AutoModerationActionExecution,
         /// <summary>
         ///     This intent includes all of them, including privileged ones.
         /// </summary>
