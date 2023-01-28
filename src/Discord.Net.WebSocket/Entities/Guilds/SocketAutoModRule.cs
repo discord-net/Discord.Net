@@ -34,10 +34,19 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<string> KeywordFilter { get; private set; }
 
         /// <inheritdoc/>
+        public IReadOnlyCollection<string> RegexPatterns { get; private set; }
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<string> AllowList { get; private set; }
+
+        /// <inheritdoc/>
         public IReadOnlyCollection<KeywordPresetTypes> Presets { get; private set; }
 
         /// <inheritdoc/>
         public IReadOnlyCollection<AutoModRuleAction> Actions { get; private set; }
+
+        /// <inheritdoc/>
+        public int MentionTotalLimit { get; private set; }
 
         /// <inheritdoc/>
         public bool Enabled { get; private set; }
@@ -80,6 +89,9 @@ namespace Discord.WebSocket
             TriggerType = model.TriggerType;
             KeywordFilter = model.TriggerMetadata.KeywordFilter.ToImmutableArray();
             Presets = model.TriggerMetadata.Presets.ToImmutableArray();
+            RegexPatterns = model.TriggerMetadata.RegexPatterns.ToImmutableArray();
+            AllowList = model.TriggerMetadata.AllowList.ToImmutableArray();
+            MentionTotalLimit = model.TriggerMetadata.MentionLimit;
             Actions = model.Actions.Select(x => new AutoModRuleAction(x.Type, x.Metadata.GetValueOrDefault()?.ChannelId.ToNullable(), x.Metadata.GetValueOrDefault()?.DurationSeconds.ToNullable())).ToImmutableArray();
             Enabled = model.Enabled;
             ExemptRoles = model.ExemptRoles.Select(x => Guild.GetRole(x)).ToImmutableArray();

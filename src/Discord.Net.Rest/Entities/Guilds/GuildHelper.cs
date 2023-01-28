@@ -1062,7 +1062,7 @@ namespace Discord.Rest
         #endregion
 
         #region Auto Mod
-        public static Task ModifyRuleAsync(BaseDiscordClient client, IAutoModRule rule, Action<AutoModRuleProperties> func, RequestOptions options)
+        public static Task<AutoModerationRule> ModifyRuleAsync(BaseDiscordClient client, IAutoModRule rule, Action<AutoModRuleProperties> func, RequestOptions options)
         {
             var args = new AutoModRuleProperties();
             func(args);

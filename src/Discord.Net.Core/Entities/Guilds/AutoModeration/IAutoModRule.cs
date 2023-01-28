@@ -46,6 +46,24 @@ namespace Discord
         public IReadOnlyCollection<string> KeywordFilter { get; }
 
         /// <summary>
+        ///     Gets regex patterns for this rule.
+        /// </summary>
+        /// <remarks>
+        ///     This collection will be empty if <see cref="TriggerType"/> is not
+        ///     <see cref="AutoModTriggerType.Keyword"/>.
+        /// </remarks>
+        public IReadOnlyCollection<string> RegexPatterns { get; }
+
+        /// <summary>
+        ///     Gets the allow list patterns for this rule.
+        /// </summary>
+        /// <remarks>
+        ///     This collection will be empty if <see cref="TriggerType"/> is not
+        ///     <see cref="AutoModTriggerType.Keyword"/>.
+        /// </remarks>
+        public IReadOnlyCollection<string> AllowList { get; }
+
+        /// <summary>
         ///     Gets the preset keyword types for this rule.
         /// </summary>
         /// <remarks>
@@ -53,6 +71,15 @@ namespace Discord
         ///     <see cref="AutoModTriggerType.KeywordPreset"/>.
         /// </remarks>
         public IReadOnlyCollection<KeywordPresetTypes> Presets { get; }
+
+        /// <summary>
+        ///     Gets the total mention limit for this rule.
+        /// </summary>
+        /// <remarks>
+        ///     This collection will be empty if <see cref="TriggerType"/> is not
+        ///     <see cref="AutoModTriggerType.MentionSpam"/>.
+        /// </remarks>
+        public int MentionTotalLimit { get; }
 
         /// <summary>
         ///     Gets a collection of actions that will be preformed if a user breaks this rule.
