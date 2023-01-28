@@ -1810,6 +1810,22 @@ namespace Discord.WebSocket
         internal SocketGuild Clone() => MemberwiseClone() as SocketGuild;
         #endregion
 
+        #region AutoMod
+
+        /// <inheritdoc cref="IGuild.GetAutoModRuleAsync"/>
+        public Task<RestAutoModRule> GetAutoModRuleAsync(RequestOptions options = null)
+            => GuildHelper.GetAutoModRuleAsync(this, Discord, options);
+
+        /// <inheritdoc cref="IGuild.GetAutoModRulesAsync"/>
+        public Task<RestAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null)
+            => GuildHelper.GetAutoModRulesAsync(this, Discord, options);
+
+        /// <inheritdoc cref="IGuild.CreateAutoModRuleAsync"/>
+        public Task<RestAutoModRule> CreateAutoModRuleAsync(RequestOptions options = null)
+            => GuildHelper.CreateAutoModRuleAsync(this, Discord, options);
+
+        #endregion
+
         #region  IGuild
         /// <inheritdoc />
         ulong? IGuild.AFKChannelId => AFKChannelId;
@@ -2054,6 +2070,19 @@ namespace Discord.WebSocket
             _audioLock?.Dispose();
             _audioClient?.Dispose();
         }
+        
+        /// <inheritdoc/>
+        async Task<IAutoModRule> IGuild.GetAutoModRuleAsync(RequestOptions options)
+            => await GetAutoModRuleAsync(options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IAutoModRule[]> IGuild.GetAutoModRulesAsync(RequestOptions options)
+            => await GetAutoModRulesAsync(options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(RequestOptions options)
+            => await CreateAutoModRuleAsync(options).ConfigureAwait(false);
+
         #endregion
     }
 }
