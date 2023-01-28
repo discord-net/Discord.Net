@@ -76,10 +76,10 @@ namespace Discord
         ///     Gets the total mention limit for this rule.
         /// </summary>
         /// <remarks>
-        ///     This collection will be empty if <see cref="TriggerType"/> is not
+        ///     This property will be <see langword="null"/> if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.MentionSpam"/>.
         /// </remarks>
-        public int MentionTotalLimit { get; }
+        public int? MentionTotalLimit { get; }
 
         /// <summary>
         ///     Gets a collection of actions that will be preformed if a user breaks this rule.

@@ -46,7 +46,7 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<AutoModRuleAction> Actions { get; private set; }
 
         /// <inheritdoc/>
-        public int MentionTotalLimit { get; private set; }
+        public int? MentionTotalLimit { get; private set; }
 
         /// <inheritdoc/>
         public bool Enabled { get; private set; }
@@ -87,11 +87,13 @@ namespace Discord.WebSocket
             Creator ??= Guild.GetUser(_creatorId);
             EventType = model.EventType;
             TriggerType = model.TriggerType;
-            KeywordFilter = model.TriggerMetadata.KeywordFilter.ToImmutableArray();
-            Presets = model.TriggerMetadata.Presets.ToImmutableArray();
-            RegexPatterns = model.TriggerMetadata.RegexPatterns.ToImmutableArray();
-            AllowList = model.TriggerMetadata.AllowList.ToImmutableArray();
-            MentionTotalLimit = model.TriggerMetadata.MentionLimit;
+            KeywordFilter = model.TriggerMetadata.KeywordFilter.GetValueOrDefault(Array.Empty<string>()).ToImmutableArray();
+            Presets = model.TriggerMetadata.Presets.GetValueOrDefault(Array.Empty<KeywordPresetTypes>()).ToImmutableArray();
+            RegexPatterns = model.TriggerMetadata.RegexPatterns.GetValueOrDefault(Array.Empty<string>()).ToImmutableArray();
+            AllowList = model.TriggerMetadata.AllowList.GetValueOrDefault(Array.Empty<string>()).ToImmutableArray();
+            MentionTotalLimit = model.TriggerMetadata.MentionLimit.IsSpecified
+                ? model.TriggerMetadata.MentionLimit.Value
+                : null;
             Actions = model.Actions.Select(x => new AutoModRuleAction(x.Type, x.Metadata.GetValueOrDefault()?.ChannelId.ToNullable(), x.Metadata.GetValueOrDefault()?.DurationSeconds.ToNullable())).ToImmutableArray();
             Enabled = model.Enabled;
             ExemptRoles = model.ExemptRoles.Select(x => Guild.GetRole(x)).ToImmutableArray();

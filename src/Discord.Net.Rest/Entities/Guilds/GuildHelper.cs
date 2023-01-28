@@ -1087,6 +1087,9 @@ namespace Discord.Rest
                 TriggerMetadata = args.KeywordFilter.IsSpecified || args.Presets.IsSpecified ? new API.TriggerMetadata
                 {
                     KeywordFilter = args.KeywordFilter.GetValueOrDefault(Array.Empty<string>()),
+                    RegexPatterns = args.RegexPatterns.GetValueOrDefault(Array.Empty<string>()),
+                    AllowList = args.AllowList.GetValueOrDefault(Array.Empty<string>()),
+                    MentionLimit = args.MentionLimit,
                     Presets = args.Presets.GetValueOrDefault(Array.Empty<KeywordPresetTypes>())
                 } : Optional<API.TriggerMetadata>.Unspecified
             };

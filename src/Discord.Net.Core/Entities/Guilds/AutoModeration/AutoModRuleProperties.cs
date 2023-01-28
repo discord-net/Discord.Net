@@ -32,6 +32,21 @@ namespace Discord
         public Optional<string[]> KeywordFilter { get; set; }
 
         /// <summary>
+        ///     Gets or sets regex patterns for the rule.
+        /// </summary>
+        public Optional<string[]> RegexPatterns { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the allow list for the rule.
+        /// </summary>
+        public Optional<string[]> AllowList { get; set; }
+
+        /// <summary>
+        ///     Gets or sets total mention limit for the rule.
+        /// </summary>
+        public Optional<int> MentionLimit { get; set; }
+
+        /// <summary>
         ///     Gets or sets the presets for the rule.
         /// </summary>
         public Optional<KeywordPresetTypes[]> Presets { get; set; }
