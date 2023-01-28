@@ -1062,6 +1062,22 @@ namespace Discord.Rest
         #endregion
 
         #region Auto Mod
+
+        public static Task<AutoModerationRule> CreateAutoModRuleAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Task<AutoModerationRule> GetAutoModRuleAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Task<AutoModerationRule[]> GetAutoModRulesAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
         public static Task<AutoModerationRule> ModifyRuleAsync(BaseDiscordClient client, IAutoModRule rule, Action<AutoModRuleProperties> func, RequestOptions options)
         {
             var args = new AutoModRuleProperties();

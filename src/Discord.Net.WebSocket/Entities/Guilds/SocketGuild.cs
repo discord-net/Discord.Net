@@ -1813,16 +1813,25 @@ namespace Discord.WebSocket
         #region AutoMod
 
         /// <inheritdoc cref="IGuild.GetAutoModRuleAsync"/>
-        public Task<RestAutoModRule> GetAutoModRuleAsync(RequestOptions options = null)
-            => GuildHelper.GetAutoModRuleAsync(this, Discord, options);
+        public async Task<RestAutoModRule> GetAutoModRuleAsync(RequestOptions options = null)
+        {
+            var rule = await GuildHelper.GetAutoModRuleAsync(this, Discord, options);
+            throw new NotImplementedException();
+        }
 
         /// <inheritdoc cref="IGuild.GetAutoModRulesAsync"/>
-        public Task<RestAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null)
-            => GuildHelper.GetAutoModRulesAsync(this, Discord, options);
+        public async Task<RestAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null)
+        {
+            var rule = await GuildHelper.GetAutoModRulesAsync(this, Discord, options);
+            throw new NotImplementedException();
+        }
 
         /// <inheritdoc cref="IGuild.CreateAutoModRuleAsync"/>
-        public Task<RestAutoModRule> CreateAutoModRuleAsync(RequestOptions options = null)
-            => GuildHelper.CreateAutoModRuleAsync(this, Discord, options);
+        public async Task<RestAutoModRule> CreateAutoModRuleAsync(RequestOptions options = null)
+        {
+            var rule = await GuildHelper.CreateAutoModRuleAsync(this, Discord, options);
+            throw new NotImplementedException();
+        }
 
         #endregion
 
