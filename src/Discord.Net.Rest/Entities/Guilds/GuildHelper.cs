@@ -1064,10 +1064,8 @@ namespace Discord.Rest
 
         #region Auto Mod
 
-        public static Task<AutoModerationRule> CreateAutoModRuleAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
-        {
-            throw new NotImplementedException();
-        }
+        public static async Task<AutoModerationRule> CreateAutoModRuleAsync(IGuild guild, CreateAutoModRuleParams args, BaseDiscordClient client, RequestOptions options)
+            => await client.ApiClient.CreateGuildAutoModRuleAsync(guild.Id, args, options);
 
         public static async Task<AutoModerationRule> GetAutoModRuleAsync(ulong ruleId, IGuild guild, BaseDiscordClient client, RequestOptions options)
             => await client.ApiClient.GetGuildAutoModRuleAsync(guild.Id, ruleId, options);

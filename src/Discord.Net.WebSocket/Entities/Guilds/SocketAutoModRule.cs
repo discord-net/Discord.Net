@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.AutoModerationRule;
 
@@ -101,8 +100,11 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
-        public Task ModifyAsync(Action<AutoModRuleProperties> func, RequestOptions options = null)
-            => GuildHelper.ModifyRuleAsync(Discord, this, func, options);
+        public async Task ModifyAsync(Action<AutoModRuleProperties> func, RequestOptions options = null)
+        {
+            var model = await GuildHelper.ModifyRuleAsync(Discord, this, func, options);
+            Guild.AddOrUpdateAutoModRule(model);
+        }
 
         /// <inheritdoc/>
         public Task DeleteAsync(RequestOptions options = null)

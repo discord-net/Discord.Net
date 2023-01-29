@@ -1290,6 +1290,6 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="WelcomeScreen"/>.
         /// </returns>
-        Task<IAutoModRule> CreateAutoModRuleAsync(RequestOptions options = null);
+        Task<IAutoModRule> CreateAutoModRuleAsync(AutoModRuleBuilder builder, RequestOptions options = null);
     }
 }

@@ -89,8 +89,13 @@ public class RestAutoModRule : RestEntity<ulong>, IAutoModRule
     }
 
     /// <inheritdoc />
-    public Task ModifyAsync(Action<AutoModRuleProperties> func, RequestOptions options = null) => throw new NotImplementedException();
+    public async Task ModifyAsync(Action<AutoModRuleProperties> func, RequestOptions options = null)
+    {
+        var model = await GuildHelper.ModifyRuleAsync(Discord, this, func, options);
+        Update(model);
+    }
 
     /// <inheritdoc />
-    public Task DeleteAsync(RequestOptions options = null) => throw new NotImplementedException();
+    public Task DeleteAsync(RequestOptions options = null)
+        => GuildHelper.DeleteRuleAsync(Discord, this, options);
 }

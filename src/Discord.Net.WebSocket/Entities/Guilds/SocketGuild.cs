@@ -1827,7 +1827,10 @@ namespace Discord.WebSocket
             return socketRule;
         }
 
-        internal SocketAutoModRule GetAutoModRule(ulong id)
+        /// <summary>
+        ///     Gets a single rule configured in a guild from cache. Returns <see langword="null"/> if the rule was not found.
+        /// </summary>
+        public SocketAutoModRule GetAutoModRule(ulong id)
         {
             return _automodRules.TryGetValue(id, out var rule) ? rule : null;
         }
@@ -1864,10 +1867,11 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc cref="IGuild.CreateAutoModRuleAsync"/>
-        public async Task<SocketAutoModRule> CreateAutoModRuleAsync(RequestOptions options = null)
+        public async Task<SocketAutoModRule> CreateAutoModRuleAsync(AutoModRuleBuilder builder, RequestOptions options = null)
         {
-            var rule = await GuildHelper.CreateAutoModRuleAsync(this, Discord, options);
-            throw new NotImplementedException();
+            var rule = await GuildHelper.CreateAutoModRuleAsync(this, builder.ToProperties(), Discord, options);
+
+            return AddOrUpdateAutoModRule(rule);
         }
 
         #endregion
@@ -2126,8 +2130,8 @@ namespace Discord.WebSocket
             => await GetAutoModRulesAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(RequestOptions options)
-            => await CreateAutoModRuleAsync(options).ConfigureAwait(false);
+        async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(AutoModRuleBuilder builder, RequestOptions options)
+            => await CreateAutoModRuleAsync(builder, options).ConfigureAwait(false);
 
         #endregion
     }

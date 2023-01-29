@@ -214,5 +214,34 @@ namespace Discord.Rest
                 Id = interaction.Id,
             };
         }
+
+        public static API.Rest.CreateAutoModRuleParams ToProperties(this AutoModRuleBuilder builder)
+        {
+            return new API.Rest.CreateAutoModRuleParams
+            {
+                TriggerMetadata = new API.TriggerMetadata
+                {
+                    KeywordFilter = builder.KeywordFilter?.ToArray(),
+                    AllowList = builder.AllowList?.ToArray(),
+                    MentionLimit = builder.MentionLimit ?? Optional<int>.Unspecified,
+                    Presets = builder.Presets?.ToArray(),
+                    RegexPatterns = builder.RegexPatterns?.ToArray(),
+                },
+                TriggerType = builder.TriggerType,
+                Actions = builder.Actions?.Select(x => new API.AutoModAction
+                {
+                    Metadata = new API.ActionMetadata
+                    {
+                        ChannelId = x.ChannelId ?? Optional<ulong>.Unspecified,
+                        DurationSeconds = (int?)x.TimeoutDuration?.TotalSeconds ?? Optional<int>.Unspecified
+                    },
+                    Type = x.Type,
+                }).ToArray(),
+                Enabled = builder.Enabled,
+                EventType = builder.EventType,
+                ExemptChannels = builder.ExemptChannels?.ToArray() ?? Optional<ulong[]>.Unspecified,
+                ExemptRoles = builder.ExemptRoles?.ToArray() ?? Optional <ulong[]>.Unspecified,
+            };
+        }
     }
 }
