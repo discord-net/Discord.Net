@@ -22,6 +22,7 @@ using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
 using StickerModel = Discord.API.Sticker;
 using EventModel = Discord.API.GuildScheduledEvent;
+using AutoModRuleModel = Discord.API.AutoModerationRule;
 using System.IO;
 
 namespace Discord.WebSocket
@@ -43,7 +44,7 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
         private ConcurrentDictionary<ulong, SocketCustomSticker> _stickers;
         private ConcurrentDictionary<ulong, SocketGuildEvent> _events;
-        //private ConcurrentDictionary<ulong, SocketAutoModRule> _automodRules;
+        private ConcurrentDictionary<ulong, SocketAutoModRule> _automodRules;
         private ImmutableArray<GuildEmote> _emotes;
 
         private AudioClient _audioClient;
@@ -392,6 +393,7 @@ namespace Discord.WebSocket
         {
             _audioLock = new SemaphoreSlim(1, 1);
             _emotes = ImmutableArray.Create<GuildEmote>();
+            _automodRules = new ConcurrentDictionary<ulong, SocketAutoModRule>();
         }
         internal static SocketGuild Create(DiscordSocketClient discord, ClientState state, ExtendedModel model)
         {
@@ -1812,22 +1814,47 @@ namespace Discord.WebSocket
 
         #region AutoMod
 
-        /// <inheritdoc cref="IGuild.GetAutoModRuleAsync"/>
-        public async Task<RestAutoModRule> GetAutoModRuleAsync(RequestOptions options = null)
+        internal SocketAutoModRule AddOrUpdateAutoModRule(AutoModRuleModel model)
         {
-            var rule = await GuildHelper.GetAutoModRuleAsync(this, Discord, options);
-            throw new NotImplementedException();
+            if (_automodRules.TryGetValue(model.Id, out var rule))
+            {
+                rule.Update(model);
+                return rule;
+            }
+
+            var socketRule = SocketAutoModRule.Create(Discord, this, model);
+            _automodRules.TryAdd(model.Id, socketRule);
+            return socketRule;
+        }
+
+        internal SocketAutoModRule GetAutoModRule(ulong id)
+        {
+            return _automodRules.TryGetValue(id, out var rule) ? rule : null;
+        }
+
+        internal SocketAutoModRule RemoveAutoModRule(ulong id)
+        {
+            return _automodRules.TryRemove(id, out var rule) ? rule : null;
+        }
+
+        /// <inheritdoc cref="IGuild.GetAutoModRuleAsync"/>
+        public async Task<SocketAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions options = null)
+        {
+            var rule = await GuildHelper.GetAutoModRuleAsync(ruleId, this, Discord, options);
+
+            return AddOrUpdateAutoModRule(rule);
         }
 
         /// <inheritdoc cref="IGuild.GetAutoModRulesAsync"/>
-        public async Task<RestAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null)
+        public async Task<SocketAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null)
         {
-            var rule = await GuildHelper.GetAutoModRulesAsync(this, Discord, options);
-            throw new NotImplementedException();
+            var rules = await GuildHelper.GetAutoModRulesAsync(this, Discord, options);
+
+            return rules.Select(AddOrUpdateAutoModRule).ToArray();
         }
 
         /// <inheritdoc cref="IGuild.CreateAutoModRuleAsync"/>
-        public async Task<RestAutoModRule> CreateAutoModRuleAsync(RequestOptions options = null)
+        public async Task<SocketAutoModRule> CreateAutoModRuleAsync(RequestOptions options = null)
         {
             var rule = await GuildHelper.CreateAutoModRuleAsync(this, Discord, options);
             throw new NotImplementedException();
@@ -2081,8 +2108,8 @@ namespace Discord.WebSocket
         }
         
         /// <inheritdoc/>
-        async Task<IAutoModRule> IGuild.GetAutoModRuleAsync(RequestOptions options)
-            => await GetAutoModRuleAsync(options).ConfigureAwait(false);
+        async Task<IAutoModRule> IGuild.GetAutoModRuleAsync(ulong ruleId, RequestOptions options)
+            => await GetAutoModRuleAsync(ruleId, options).ConfigureAwait(false);
 
         /// <inheritdoc/>
         async Task<IAutoModRule[]> IGuild.GetAutoModRulesAsync(RequestOptions options)

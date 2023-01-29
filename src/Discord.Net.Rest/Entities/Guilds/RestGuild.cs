@@ -1203,17 +1203,17 @@ namespace Discord.Rest
 
 
         /// <inheritdoc cref="IGuild.GetAutoModRuleAsync"/>
-        public async Task<RestAutoModRule> GetAutoModRuleAsync(RequestOptions options = null)
+        public async Task<RestAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions options = null)
         {
-            var rule = await GuildHelper.GetAutoModRuleAsync(this, Discord, options);
-            throw new NotImplementedException();
+            var rule = await GuildHelper.GetAutoModRuleAsync(ruleId, this, Discord, options);
+            return RestAutoModRule.Create(Discord, rule);
         }
 
         /// <inheritdoc cref="IGuild.GetAutoModRulesAsync"/>
         public async Task<RestAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null)
         {
-            var rule = await GuildHelper.GetAutoModRulesAsync(this, Discord, options);
-            throw new NotImplementedException();
+            var rules = await GuildHelper.GetAutoModRulesAsync(this, Discord, options);
+            return rules.Select(x => RestAutoModRule.Create(Discord, x)).ToArray();
         }
 
         /// <inheritdoc cref="IGuild.CreateAutoModRuleAsync"/>
@@ -1572,8 +1572,8 @@ namespace Discord.Rest
 
 
         /// <inheritdoc/>
-        async Task<IAutoModRule> IGuild.GetAutoModRuleAsync(RequestOptions options)
-            => await GetAutoModRuleAsync(options).ConfigureAwait(false);
+        async Task<IAutoModRule> IGuild.GetAutoModRuleAsync(ulong ruleId, RequestOptions options)
+            => await GetAutoModRuleAsync(ruleId, options).ConfigureAwait(false);
 
         /// <inheritdoc/>
         async Task<IAutoModRule[]> IGuild.GetAutoModRulesAsync(RequestOptions options)

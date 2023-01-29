@@ -1282,7 +1282,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="IAutoModRule"/>.
         /// </returns>
-        Task<IAutoModRule> GetAutoModRuleAsync(RequestOptions options = null);
+        Task<IAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a new auto moderation rule.

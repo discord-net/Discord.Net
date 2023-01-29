@@ -10,6 +10,7 @@ using Model = Discord.API.Guild;
 using RoleModel = Discord.API.Role;
 using ImageModel = Discord.API.Image;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Discord.Rest
 {
@@ -1068,15 +1069,11 @@ namespace Discord.Rest
             throw new NotImplementedException();
         }
 
-        public static Task<AutoModerationRule> GetAutoModRuleAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
-        {
-            throw new NotImplementedException();
-        }
+        public static async Task<AutoModerationRule> GetAutoModRuleAsync(ulong ruleId, IGuild guild, BaseDiscordClient client, RequestOptions options)
+            => await client.ApiClient.GetGuildAutoModRuleAsync(guild.Id, ruleId, options);
 
-        public static Task<AutoModerationRule[]> GetAutoModRulesAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
-        {
-            throw new NotImplementedException();
-        }
+        public static async Task<AutoModerationRule[]> GetAutoModRulesAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+            => await client.ApiClient.GetGuildAutoModRulesAsync(guild.Id, options);
 
         public static Task<AutoModerationRule> ModifyRuleAsync(BaseDiscordClient client, IAutoModRule rule, Action<AutoModRuleProperties> func, RequestOptions options)
         {

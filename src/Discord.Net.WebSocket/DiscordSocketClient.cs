@@ -2957,10 +2957,15 @@ namespace Discord.WebSocket
                                             return null;
                                         });
 
-                                    var rule = new Cacheable<IAutoModRule, ulong>(null, data.RuleId, false, () => null);
+                                    var cachedRule = guild.GetAutoModRule(data.RuleId);
+
+                                    var cacheableRule = new Cacheable<IAutoModRule, ulong>(cachedRule,
+                                        data.RuleId,
+                                        cachedRule is not null,
+                                        async () => await guild.GetAutoModRuleAsync(data.RuleId));
 
                                     var eventData = new AutoModActionExecutedData(
-                                        rule,
+                                        cacheableRule,
                                         data.TriggerType,
                                         cacheableUser,
                                         cacheableChannel,
