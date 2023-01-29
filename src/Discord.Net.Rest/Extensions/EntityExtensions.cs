@@ -215,17 +215,18 @@ namespace Discord.Rest
             };
         }
 
-        public static API.Rest.CreateAutoModRuleParams ToProperties(this AutoModRuleBuilder builder)
+        public static API.Rest.CreateAutoModRuleParams ToProperties(this AutoModRule builder)
         {
             return new API.Rest.CreateAutoModRuleParams
             {
+                Name = builder.Name,
                 TriggerMetadata = new API.TriggerMetadata
                 {
-                    KeywordFilter = builder.KeywordFilter?.ToArray(),
-                    AllowList = builder.AllowList?.ToArray(),
+                    KeywordFilter = builder.KeywordFilter ?? Optional<string[]>.Unspecified,
+                    AllowList = builder.AllowList ?? Optional<string[]>.Unspecified,
                     MentionLimit = builder.MentionLimit ?? Optional<int>.Unspecified,
-                    Presets = builder.Presets?.ToArray(),
-                    RegexPatterns = builder.RegexPatterns?.ToArray(),
+                    Presets = builder.Presets ?? Optional<KeywordPresetTypes[]>.Unspecified,
+                    RegexPatterns = builder.RegexPatterns ?? Optional<string[]>.Unspecified,
                 },
                 TriggerType = builder.TriggerType,
                 Actions = builder.Actions?.Select(x => new API.AutoModAction
@@ -239,8 +240,8 @@ namespace Discord.Rest
                 }).ToArray(),
                 Enabled = builder.Enabled,
                 EventType = builder.EventType,
-                ExemptChannels = builder.ExemptChannels?.ToArray() ?? Optional<ulong[]>.Unspecified,
-                ExemptRoles = builder.ExemptRoles?.ToArray() ?? Optional <ulong[]>.Unspecified,
+                ExemptChannels = builder.ExemptChannels ?? Optional<ulong[]>.Unspecified,
+                ExemptRoles = builder.ExemptRoles ?? Optional<ulong[]>.Unspecified,
             };
         }
     }

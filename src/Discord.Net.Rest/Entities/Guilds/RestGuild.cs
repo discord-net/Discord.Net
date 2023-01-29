@@ -1217,9 +1217,9 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc cref="IGuild.CreateAutoModRuleAsync"/>
-        public async Task<RestAutoModRule> CreateAutoModRuleAsync(AutoModRuleBuilder builder, RequestOptions options = null)
+        public async Task<RestAutoModRule> CreateAutoModRuleAsync(AutoModRule props, RequestOptions options = null)
         {
-            var rule = await GuildHelper.CreateAutoModRuleAsync(this, builder.ToProperties(), Discord, options);
+            var rule = await GuildHelper.CreateAutoModRuleAsync(this, props.ToProperties(), Discord, options);
 
             return RestAutoModRule.Create(Discord, rule);
         }
@@ -1581,8 +1581,8 @@ namespace Discord.Rest
             => await GetAutoModRulesAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(AutoModRuleBuilder builder, RequestOptions options)
-            => await CreateAutoModRuleAsync(builder, options).ConfigureAwait(false);
+        async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(AutoModRule props, RequestOptions options)
+            => await CreateAutoModRuleAsync(props, options).ConfigureAwait(false);
 
         #endregion
     }
