@@ -2889,19 +2889,41 @@ namespace Discord.WebSocket
 
                             case "AUTO_MODERATION_RULE_CREATE":
                                 {
+                                    var data = (payload as JToken).ToObject<AutoModerationRule>(_serializer);
 
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    var rule = guild.AddOrUpdateAutoModRule(data);
+
+                                    await TimedInvokeAsync(_autoModRuleCreated, nameof(AutoModRuleCreated),  rule);
                                 }
                                 break;
 
                             case "AUTO_MODERATION_RULE_UPDATE":
                                 {
+                                    var data = (payload as JToken).ToObject<AutoModerationRule>(_serializer);
 
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    var cachedRule = guild.GetAutoModRule(data.Id);
+                                    var cacheableBefore = new Cacheable<SocketAutoModRule, ulong>(cachedRule.Clone(),
+                                        data.Id,
+                                        cachedRule is not null,
+                                        async () => await guild.GetAutoModRuleAsync(data.Id));
+
+                                    await TimedInvokeAsync(_autoModRuleUpdated, nameof(AutoModRuleUpdated), cacheableBefore, guild.AddOrUpdateAutoModRule(data));
                                 }
                                 break;
 
                             case "AUTO_MODERATION_RULE_DELETE":
                                 {
+                                    var data = (payload as JToken).ToObject<AutoModerationRule>(_serializer);
 
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    var rule = guild.RemoveAutoModRule(data);
+
+                                    await TimedInvokeAsync(_autoModRuleDeleted, nameof(AutoModRuleDeleted), rule);
                                 }
                                 break;
 

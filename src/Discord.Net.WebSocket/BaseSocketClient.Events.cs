@@ -900,7 +900,7 @@ namespace Discord.WebSocket
             add => _autoModRuleCreated.Add(value);
             remove => _autoModRuleCreated.Remove(value);
         }
-        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleCreated = new AsyncEvent<Func<SocketAutoModRule, Task>>();
+        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleCreated = new ();
 
         public event Func<Cacheable<SocketAutoModRule, ulong>, SocketAutoModRule, Task> AutoModRuleUpdated
         {
@@ -914,7 +914,7 @@ namespace Discord.WebSocket
             add => _autoModRuleDeleted.Add(value);
             remove => _autoModRuleDeleted.Remove(value);
         }
-        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleDeleted = new AsyncEvent<Func<SocketAutoModRule, Task>>();
+        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleDeleted = new ();
 
         public event Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task> AutoModActionExecuted
         {

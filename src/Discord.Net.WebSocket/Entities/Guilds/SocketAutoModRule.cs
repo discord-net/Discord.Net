@@ -108,6 +108,8 @@ namespace Discord.WebSocket
         public Task DeleteAsync(RequestOptions options = null)
             => GuildHelper.DeleteRuleAsync(Discord, this, options);
 
+        internal SocketAutoModRule Clone() => MemberwiseClone() as SocketAutoModRule;
+
         #region IAutoModRule
         IReadOnlyCollection<ulong> IAutoModRule.ExemptRoles => ExemptRoles.Select(x => x.Id).ToImmutableArray();
         IReadOnlyCollection<ulong> IAutoModRule.ExemptChannels => ExemptChannels.Select(x => x.Id).ToImmutableArray();

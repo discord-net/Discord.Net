@@ -1837,6 +1837,16 @@ namespace Discord.WebSocket
             return _automodRules.TryRemove(id, out var rule) ? rule : null;
         }
 
+        internal SocketAutoModRule RemoveAutoModRule(AutoModRuleModel model)
+        {
+            if (_automodRules.TryRemove(model.Id, out var rule))
+            {
+                rule.Update(model);
+            }
+
+            return rule is null ? SocketAutoModRule.Create(Discord, this, model) : rule;
+        }
+
         /// <inheritdoc cref="IGuild.GetAutoModRuleAsync"/>
         public async Task<SocketAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions options = null)
         {
