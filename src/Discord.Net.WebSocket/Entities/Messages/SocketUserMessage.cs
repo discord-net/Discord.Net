@@ -181,7 +181,7 @@ namespace Discord.WebSocket
 
             if (model.Thread.IsSpecified)
             {
-                Thread = SocketThreadChannel.Create(guild, state, model.Thread.Value);
+                Thread = guild!.AddOrUpdateChannel(state, model.Thread.Value) as SocketThreadChannel;
             }
         }
 
