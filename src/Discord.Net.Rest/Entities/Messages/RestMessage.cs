@@ -80,15 +80,6 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public MessageType Type { get; private set; }
 
-
-        /// <summary>
-        ///     Gets the thread that was started from this message.
-        /// </summary>
-        /// <returns>
-        ///    A <see cref="RestThreadChannel"/> object if this message has thread attached; otherwise <see langword="null"/>.
-        /// </returns>
-        public RestThreadChannel Thread { get; private set; }
-
         /// <inheritdoc />
         public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
 
@@ -263,11 +254,6 @@ namespace Discord.Rest
                     model.RoleSubscriptionData.Value.TierName,
                     model.RoleSubscriptionData.Value.MonthsSubscribed,
                     model.RoleSubscriptionData.Value.IsRenewal);
-            }
-
-            if (model.Thread.IsSpecified)
-            {
-                Thread = RestThreadChannel.Create(Discord, new RestGuild(Discord, model.Thread.Value.GuildId.Value), model.Thread.Value);
             }
         }
         /// <inheritdoc />
