@@ -154,9 +154,9 @@ namespace Discord.Rest
         
         public async Task<RestSelfUser> GetCurrentUserAsync(RequestOptions options = null)
         {
-            var user = RestSelfUser.Create(this, await ApiClient.GetMyUserAsync(options));
-            base.CurrentUser = user;
-            return user;
+            var user = await ApiClient.GetMyUserAsync(options);
+            CurrentUser.Update(user);
+            return CurrentUser;
         }
 
         public async Task<RestGuildUser> GetCurrentUserGuildMemberAsync(ulong guildId, RequestOptions options = null)
