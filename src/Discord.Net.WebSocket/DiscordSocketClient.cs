@@ -2906,7 +2906,7 @@ namespace Discord.WebSocket
                                     var guild = State.GetGuild(data.GuildId);
 
                                     var cachedRule = guild.GetAutoModRule(data.Id);
-                                    var cacheableBefore = new Cacheable<SocketAutoModRule, ulong>(cachedRule.Clone(),
+                                    var cacheableBefore = new Cacheable<SocketAutoModRule, ulong>(cachedRule?.Clone(),
                                         data.Id,
                                         cachedRule is not null,
                                         async () => await guild.GetAutoModRuleAsync(data.Id));
