@@ -104,13 +104,12 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets a collection of users within this thread.
         /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task representing the asynchronous get operation. The task returns a
-        ///     <see cref="IReadOnlyCollection{T}"/> of <see cref="RestThreadUser"/>'s.
+        ///     A task that represents the asynchronous get operation. The task result contains a collection of thread
+        ///     users found within this thread channel.
         /// </returns>
-        public new async Task<IReadOnlyCollection<RestThreadUser>> GetUsersAsync(RequestOptions options = null)
-            => (await ThreadHelper.GetUsersAsync(this, Discord, options).ConfigureAwait(false)).ToImmutableArray();
+        public IAsyncEnumerable<IReadOnlyCollection<RestThreadUser>> GetUsersAsync(int usersPerBatch = DiscordConfig.MaxThreadMembersPerBatch, RequestOptions options = null)
+            => ThreadHelper.GetUsersAsync(this, Discord, usersPerBatch, null, options);
 
         /// <inheritdoc/>
         public override async Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
