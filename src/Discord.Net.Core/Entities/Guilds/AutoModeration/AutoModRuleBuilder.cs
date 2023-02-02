@@ -12,20 +12,55 @@ namespace Discord;
 /// </summary>
 public class AutoModRuleBuilder
 {
-    private const int MaxKeywordCount = 1000;
-    private const int MaxKeywordLength = 30;
+    /// <summary>
+    ///     Returns the max keyword count for an AutoMod rule allowed by Discord.
+    /// </summary>
+    public const int MaxKeywordCount = 1000;
 
-    private const int MaxRegexPatternCount = 10;
-    private const int MaxRegexPatternLength = 260;
+    /// <summary>
+    ///     Returns the max keyword length for an AutoMod rule allowed by Discord.
+    /// </summary>
+    public const int MaxKeywordLength = 30;
 
-    private const int MaxAllowListCountKeyword = 100;
-    private const int MaxAllowListCountKeywordPreset = 1000;
-    private const int MaxAllowListEntryLength = 30;
+    /// <summary>
+    ///     Returns the max regex pattern count for an AutoMod rule allowed by Discord.
+    /// </summary>
+    public const int MaxRegexPatternCount = 10;
 
-    private const int MaxMentionLimit = 50;
+    /// <summary>
+    ///     Returns the max regex pattern length for an AutoMod rule allowed by Discord.
+    /// </summary>
+    public const int MaxRegexPatternLength = 260;
 
-    private const int MaxExemptRoles = 20;
-    private const int MaxExemptChannels = 50;
+    /// <summary>
+    ///     Returns the max allowlist keyword count for a <see cref="AutoModTriggerType.Keyword"/> AutoMod rule allowed by Discord.
+    /// </summary>
+    public const int MaxAllowListCountKeyword = 100;
+
+    /// <summary>
+    ///     Returns the max allowlist keyword count for a <see cref="AutoModTriggerType.KeywordPreset"/> AutoMod rule allowed by Discord.
+    /// </summary>
+    public const int MaxAllowListCountKeywordPreset = 1000;
+
+    /// <summary>
+    ///     Returns the max allowlist keyword length for an AutoMod rule allowed by Discord.
+    /// </summary>
+    public const int MaxAllowListEntryLength = 30;
+
+    /// <summary>
+    ///     Returns the max mention limit for an AutoMod rule allowed by Discord.
+    /// </summary>
+    public const int MaxMentionLimit = 50;
+
+    /// <summary>
+    ///     Returns the max exempt role count for an AutoMod rule allowed by Discord.
+    /// </summary>
+    public const int MaxExemptRoles = 20;
+
+    /// <summary>
+    ///     Returns the max exempt channel count for an AutoMod rule allowed by Discord.
+    /// </summary>
+    public const int MaxExemptChannels = 50;
 
     private List<string> _keywordFilter = new();
     private List<string> _regexPatterns = new();
@@ -33,11 +68,12 @@ public class AutoModRuleBuilder
 
     private List<ulong> _exemptRoles = new();
     private List<ulong> _exemptChannels = new();
+    private HashSet<KeywordPresetTypes> _presets = new();
 
     private int? _mentionLimit;
 
     /// <summary>
-    ///     
+    ///     Gets or sets the list of <see cref="string"/> of an <see cref="AutoModRule"/>.
     /// </summary>
     public List<string> KeywordFilter
     {
@@ -58,7 +94,7 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    ///     
+    ///     Gets or sets the list of <see cref="string"/> of an <see cref="AutoModRule"/>.
     /// </summary>
     public List<string> RegexPatterns
     {
@@ -79,7 +115,7 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    ///     
+    ///     Gets or sets the list of <see cref="string"/> of an <see cref="AutoModRule"/>.
     /// </summary>
     public List<string> AllowList
     {
@@ -103,7 +139,7 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    ///     
+    ///     Gets or sets the list of <see cref="ulong"/> of an <see cref="AutoModRule"/>.
     /// </summary>
     public List<ulong> ExemptRoles
     {
@@ -118,7 +154,7 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    ///     
+    ///     Gets or sets the list of <see cref="ulong"/> of an <see cref="AutoModRule"/>.
     /// </summary>
     public List<ulong> ExemptChannels
     {
@@ -133,7 +169,7 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Gets or sets the hashset of <see cref="KeywordPresetTypes"/> of an <see cref="AutoModRule"/>.
     /// </summary>
     public HashSet<KeywordPresetTypes> Presets
     {
@@ -148,22 +184,22 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Gets or sets the name of an <see cref="AutoModRule"/>.
     /// </summary>
     public string Name { get; set; }
 
     /// <summary>
-    /// 
+    ///     Gets or sets the event type of an <see cref="AutoModRule"/>.
     /// </summary>
     public AutoModEventType EventType { get; set; } = AutoModEventType.MessageSend;
 
     /// <summary>
-    /// 
+    ///     Gets the trigger type of an <see cref="AutoModRule"/>.
     /// </summary>
-    public AutoModTriggerType TriggerType { get; } 
+    public AutoModTriggerType TriggerType { get; }
 
     /// <summary>
-    /// 
+    ///     Gets or sets the mention limit of an <see cref="AutoModRule"/>.
     /// </summary>
     public int? MentionLimit
     {
@@ -180,30 +216,28 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Gets or sets the list of <see cref="AutoModRuleActionBuilder"/> of an <see cref="AutoModRule"/>.
     /// </summary>
     public List<AutoModRuleActionBuilder> Actions = new();
 
-    private HashSet<KeywordPresetTypes> _presets = new();
-
     /// <summary>
-    /// 
+    ///     Gets or sets the enabled status of an <see cref="AutoModRule"/>.
     /// </summary>
     public bool Enabled { get; set; } = false;
 
     /// <summary>
-    /// 
+    ///     Initializes a new instance of <see cref="AutoModRuleBuilder"/> used to create a new <see cref="AutoModRule"/>.
     /// </summary>
-    /// <param name="type"></param>
+    /// <param name="type">The trigger type of an <see cref="AutoModRule"/></param>
     public AutoModRuleBuilder(AutoModTriggerType type)
     {
         TriggerType = type;
     }
 
     /// <summary>
-    /// 
+    ///     Sets the name of an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current builder.</returns>
     public AutoModRuleBuilder WithName(string name)
     {
         Name = name;
@@ -211,9 +245,9 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Sets the enabled status of an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current builder.</returns>
     public AutoModRuleBuilder WithEnabled(bool enabled)
     {
         Enabled = enabled;
@@ -221,9 +255,9 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Sets the event type of an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current builder.</returns>
     public AutoModRuleBuilder WithEventType(AutoModEventType eventType)
     {
         EventType = eventType;
@@ -231,9 +265,9 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Sets the mention limit of an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current builder.</returns>
     public AutoModRuleBuilder WithMentionLimit(int limit)
     {
         MentionLimit = limit;
@@ -241,10 +275,10 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Adds a <see cref="string"/> keyword to an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
-    public AutoModRuleBuilder AddKeywordFilter(string keyword)
+    /// <returns>The current builder.</returns>
+    public AutoModRuleBuilder AddKeyword(string keyword)
     {
         if (TriggerType != AutoModTriggerType.Keyword)
             throw new ArgumentException(message: $"Keyword filter can only be used with 'Keyword' trigger type.");
@@ -261,10 +295,10 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Adds a <see cref="string"/> allow list keyword to an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
-    public AutoModRuleBuilder AddAllowList(string keyword)
+    /// <returns>The current builder.</returns>
+    public AutoModRuleBuilder AddAllowListKeyword(string keyword)
     {
         if (TriggerType is not AutoModTriggerType.Keyword or AutoModTriggerType.KeywordPreset)
             throw new ArgumentException(message: $"Allow list can only be used with 'Keyword' or 'KeywordPreset' trigger type.");
@@ -284,9 +318,9 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Adds a <see cref="KeyNotFoundException"/> to an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current builder.</returns>
     public AutoModRuleBuilder AddKeywordPreset(KeywordPresetTypes type)
     {
         if (TriggerType != AutoModTriggerType.KeywordPreset)
@@ -297,9 +331,9 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Adds a <see cref="string"/> regex pattern to an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current builder.</returns>
     public AutoModRuleBuilder AddRegexPattern(string regex)
     {
         if (TriggerType != AutoModTriggerType.Keyword)
@@ -317,9 +351,9 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Adds an exempt <see cref="IRole"/> to an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current builder.</returns>
     public AutoModRuleBuilder AddExemptRole(IRole role)
     {
         AddExemptRole(role.Id);
@@ -327,9 +361,9 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Adds a exempt role with <see cref="ulong"/> id keyword to an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current builder.</returns>
     public AutoModRuleBuilder AddExemptRole(ulong roleId)
     {
         ExemptRoles.Add(roleId);
@@ -337,9 +371,9 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Adds an exempt <see cref="IMessageChannel"/> keyword to an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current builder.</returns>
     public AutoModRuleBuilder AddExemptChannel(IMessageChannel channel)
     {
         AddExemptChannel(channel.Id);
@@ -347,9 +381,9 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Adds an exempt channel with <see cref="ulong"/> id keyword to an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current builder.</returns>
     public AutoModRuleBuilder AddExemptChannel(ulong channelId)
     {
         ExemptChannels.Add(channelId);
@@ -357,9 +391,9 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Adds an <see cref="AutoModRuleActionBuilder"/> to an <see cref="AutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current builder.</returns>
     public AutoModRuleBuilder AddAction(AutoModRuleActionBuilder builder)
     {
         Actions.Add(builder);
@@ -367,9 +401,9 @@ public class AutoModRuleBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Creates a new instance of <see cref="AutoModRuleBuilder"/> with data from a <see cref="IAutoModRule"/>.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The new builder.</returns>
     public static AutoModRuleBuilder FromAutoModRule(IAutoModRule rule)
         => new(rule.TriggerType)
         {
@@ -385,9 +419,9 @@ public class AutoModRuleBuilder
             Enabled = rule.Enabled,
             EventType = rule.EventType
         };
-    
+
     /// <summary>
-    /// 
+    ///     Builds the <see cref="AutoModRuleBuilder" /> into <see cref="AutoModRule"/> ready to be sent.
     /// </summary>
     /// <returns></returns>
     public AutoModRule Build()
@@ -460,7 +494,7 @@ public class AutoModRuleActionBuilder
     }
 
     /// <summary>
-    /// 
+    ///     Creates a new instance of <see cref="AutoModRuleActionBuilder"/> used to define actions of an <see cref="AutoModRule"/>.
     /// </summary>
     public AutoModRuleActionBuilder(AutoModActionType type, ulong? channelId = null, TimeSpan? duration = null)
     {

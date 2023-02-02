@@ -28,7 +28,7 @@ public class AutoModActionExecutedData
     ///     Gets the message that triggered the action.
     /// </summary>
     /// <remarks>
-    ///     This property will be <see langword="null"/> if the message was blocked byt automod.
+    ///     This property will be <see langword="null"/> if the message was blocked by the automod.
     /// </remarks>
     public Cacheable<IUserMessage, ulong> Message { get; }
 

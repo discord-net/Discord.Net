@@ -1847,7 +1847,7 @@ namespace Discord.WebSocket
                 rule.Update(model);
             }
 
-            return rule is null ? SocketAutoModRule.Create(Discord, this, model) : rule;
+            return rule ?? SocketAutoModRule.Create(Discord, this, model);
         }
 
         /// <inheritdoc cref="IGuild.GetAutoModRuleAsync"/>

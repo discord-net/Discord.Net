@@ -895,6 +895,9 @@ namespace Discord.WebSocket
 
         #region AutoModeration
 
+        /// <summary>
+        ///     Fired when an auto moderation rule is created.
+        /// </summary>
         public event Func<SocketAutoModRule, Task> AutoModRuleCreated
         {
             add => _autoModRuleCreated.Add(value);
@@ -902,6 +905,9 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleCreated = new ();
 
+        /// <summary>
+        ///     Fired when an auto moderation rule is modified.
+        /// </summary>
         public event Func<Cacheable<SocketAutoModRule, ulong>, SocketAutoModRule, Task> AutoModRuleUpdated
         {
             add => _autoModRuleUpdated.Add(value);
@@ -909,6 +915,9 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<Cacheable<SocketAutoModRule, ulong>, SocketAutoModRule, Task>> _autoModRuleUpdated = new ();
 
+        /// <summary>
+        ///     Fired when an auto moderation rule is deleted.
+        /// </summary>
         public event Func<SocketAutoModRule, Task> AutoModRuleDeleted
         {
             add => _autoModRuleDeleted.Add(value);
@@ -916,6 +925,9 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleDeleted = new ();
 
+        /// <summary>
+        ///     Fired when an auto moderation rule is triggered by a user.
+        /// </summary>
         public event Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task> AutoModActionExecuted
         {
             add => _autoModActionExecuted.Add(value);
