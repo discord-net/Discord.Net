@@ -1874,6 +1874,14 @@ namespace Discord.WebSocket
             return AddOrUpdateAutoModRule(rule);
         }
 
+        /// <summary>
+        ///     Gets the auto moderation rules defined in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     This property may not always return all auto moderation rules if they haven't been cached.
+        /// </remarks>
+        public IReadOnlyCollection<SocketAutoModRule> AutoModRules => _automodRules.ToReadOnlyCollection();
+
         #endregion
 
         #region  IGuild
