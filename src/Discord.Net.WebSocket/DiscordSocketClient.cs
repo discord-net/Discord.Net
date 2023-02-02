@@ -2991,7 +2991,7 @@ namespace Discord.WebSocket
                                         data.TriggerType,
                                         cacheableUser,
                                         cacheableChannel,
-                                        cacheableMessage,
+                                        cachedMsg is not null ? cacheableMessage : null,
                                         data.AlertSystemMessageId.GetValueOrDefault(0),
                                         data.Content,
                                         data.MatchedContent.IsSpecified

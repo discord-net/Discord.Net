@@ -30,7 +30,7 @@ public class AutoModActionExecutedData
     /// <remarks>
     ///     This property will be <see langword="null"/> if the message was blocked by the automod.
     /// </remarks>
-    public Cacheable<IUserMessage, ulong> Message { get; }
+    public Cacheable<IUserMessage, ulong>? Message { get; }
 
     /// <summary>
     ///     Gets the id of the system auto moderation messages posted as a result of this action.
@@ -66,7 +66,7 @@ public class AutoModActionExecutedData
         AutoModTriggerType triggerType,
         Cacheable<SocketGuildUser, ulong> user,
         Cacheable<ISocketMessageChannel, ulong> channel,
-        Cacheable<IUserMessage, ulong> message,
+        Cacheable<IUserMessage, ulong>? message,
         ulong alertMessageId,
         string content,
         string matchedContent,
