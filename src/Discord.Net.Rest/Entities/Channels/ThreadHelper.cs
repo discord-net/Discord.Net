@@ -85,10 +85,10 @@ namespace Discord.Rest
             return result.Threads.Select(x => RestThreadChannel.Create(client, channel.Guild, x)).ToImmutableArray();
         }
 
-        public static IAsyncEnumerable<IReadOnlyCollection<RestThreadUser>> GetUsersAsync(IThreadChannel channel, BaseDiscordClient client, int? limit = null, ulong? afterId = null, RequestOptions options = null)
+        public static IAsyncEnumerable<IReadOnlyCollection<RestThreadUser>> GetUsersAsync(IThreadChannel channel, BaseDiscordClient client, int limit = DiscordConfig.MaxThreadMembersPerBatch, ulong? afterId = null, RequestOptions options = null)
         {
             return new PagedAsyncEnumerable<RestThreadUser>(
-                DiscordConfig.MaxUsersPerBatch,
+                limit,
                 async (info, ct) =>
                 {
                     if (info.Position != null)
