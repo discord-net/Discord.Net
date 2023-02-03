@@ -65,7 +65,7 @@ namespace Discord.Webhook
         private string DebuggerDisplay => $"Webhook: {Name} ({Id})";
 
         IUser IWebhook.Creator => null;
-        ITextChannel IWebhook.Channel => null;
+        IIntegrationChannel IWebhook.Channel => null;
         IGuild IWebhook.Guild => null;
     }
 }

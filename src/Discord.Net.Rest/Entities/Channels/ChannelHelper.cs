@@ -568,7 +568,7 @@ namespace Discord.Rest
         #endregion
 
         #region Webhooks
-        public static async Task<RestWebhook> CreateWebhookAsync(ITextChannel channel, BaseDiscordClient client, string name, Stream avatar, RequestOptions options)
+        public static async Task<RestWebhook> CreateWebhookAsync(IIntegrationChannel channel, BaseDiscordClient client, string name, Stream avatar, RequestOptions options)
         {
             var args = new CreateWebhookParams { Name = name };
             if (avatar != null)
@@ -577,14 +577,14 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateWebhookAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestWebhook.Create(client, channel, model);
         }
-        public static async Task<RestWebhook> GetWebhookAsync(ITextChannel channel, BaseDiscordClient client, ulong id, RequestOptions options)
+        public static async Task<RestWebhook> GetWebhookAsync(IIntegrationChannel channel, BaseDiscordClient client, ulong id, RequestOptions options)
         {
             var model = await client.ApiClient.GetWebhookAsync(id, options: options).ConfigureAwait(false);
             if (model == null)
                 return null;
             return RestWebhook.Create(client, channel, model);
         }
-        public static async Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(ITextChannel channel, BaseDiscordClient client, RequestOptions options)
+        public static async Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(IIntegrationChannel channel, BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetChannelWebhooksAsync(channel.Id, options).ConfigureAwait(false);
             return models.Select(x => RestWebhook.Create(client, channel, x))

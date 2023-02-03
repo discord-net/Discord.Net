@@ -154,6 +154,18 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestThreadChannel>> GetPublicArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null)
             => ThreadHelper.GetPublicArchivedThreadsAsync(this, Discord, limit, before, options);
 
+        /// <inheritdoc cref="IIntegrationChannel.CreateWebhookAsync"/>
+        public Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
+            => ChannelHelper.CreateWebhookAsync(this, Discord, name, avatar, options);
+
+        /// <inheritdoc cref="IIntegrationChannel.GetWebhookAsync"/>
+        public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
+            => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
+
+        /// <inheritdoc cref="IIntegrationChannel.GetWebhooksAsync"/>
+        public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
+            => ChannelHelper.GetWebhooksAsync(this, Discord, options);
+
         #region IForumChannel
         async Task<IReadOnlyCollection<IThreadChannel>> IForumChannel.GetActiveThreadsAsync(RequestOptions options)
             => await GetActiveThreadsAsync(options).ConfigureAwait(false);
@@ -203,5 +215,20 @@ namespace Discord.Rest
         public Task SyncPermissionsAsync(RequestOptions options = null)
             => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
         #endregion
+
+        #region IIntegrationChannel
+
+        /// <inheritdoc />
+        async Task<IWebhook> IIntegrationChannel.CreateWebhookAsync(string name, Stream avatar, RequestOptions options)
+            => await CreateWebhookAsync(name, avatar, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IWebhook> IIntegrationChannel.GetWebhookAsync(ulong id, RequestOptions options)
+            => await GetWebhookAsync(id, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IWebhook>> IIntegrationChannel.GetWebhooksAsync(RequestOptions options)
+            => await GetWebhooksAsync(options).ConfigureAwait(false);
+
+        #endregion
+
     }
 }
