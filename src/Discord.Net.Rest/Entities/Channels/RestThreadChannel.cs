@@ -120,6 +120,7 @@ namespace Discord.Rest
         ///     A task representing the asynchronous get operation. The task returns a
         ///     <see cref="IReadOnlyCollection{T}"/> of <see cref="RestThreadUser"/>'s.
         /// </returns>
+        [Obsolete("Please use GetThreadUsersAsync instead of this. Will be removed in next major version.", false)]
         public new async Task<IReadOnlyCollection<RestThreadUser>> GetUsersAsync(RequestOptions options = null)
             => (await GetThreadUsersAsync(options: options).FlattenAsync()).ToImmutableArray();
 
