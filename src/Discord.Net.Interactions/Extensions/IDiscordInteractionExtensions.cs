@@ -45,12 +45,12 @@ namespace Discord.Interactions
         }
 
         /// <summary>
-        ///     Respond to an interaction with a <see cref="IModal"/> and fills the value fields of the modal using the property values of the provided
+        ///     Respond to an interaction with an <see cref="IModal"/> and fills the value fields of the modal using the property values of the provided
         ///     instance.
         /// </summary>
         /// <typeparam name="T">Type of the <see cref="IModal"/> implementation.</typeparam>
         /// <param name="interaction">The interaction to respond to.</param>
-        /// <param name="modal"><see cref="IModal"/> instance to get field values from.</param>
+        /// <param name="modal">The <see cref="IModal"/> instance to get field values from.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
         /// <returns></returns>
