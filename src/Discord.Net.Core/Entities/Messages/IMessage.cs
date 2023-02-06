@@ -90,6 +90,14 @@ namespace Discord
         IUser Author { get; }
 
         /// <summary>
+        ///     Gets the thread that was started from this message.
+        /// </summary>
+        /// <returns>
+        ///    An <see cref="IThreadChannel"/> object if this message has thread attached; otherwise <see langword="null"/>.
+        /// </returns>
+        IThreadChannel Thread { get; }
+
+        /// <summary>
         ///     Gets all attachments included in this message.
         /// </summary>
         /// <remarks>

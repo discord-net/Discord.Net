@@ -47,12 +47,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         public IUserMessage ReferencedMessage => _referencedMessage;
 
-        /// <inheritdoc cref="IUserMessage.Thread"/>
-        public RestThreadChannel Thread { get; private set; }
-
-        /// <inheritdoc />
-        IThreadChannel IUserMessage.Thread => Thread;
-
         internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id, channel, author, source)
         {
@@ -136,9 +130,6 @@ namespace Discord.Rest
                 else
                     _stickers = ImmutableArray.Create<StickerItem>();
             }
-
-            if(model.Thread.IsSpecified)
-                Thread = RestThreadChannel.Create(Discord, guild, model.Thread.Value);
         }
 
         /// <inheritdoc />

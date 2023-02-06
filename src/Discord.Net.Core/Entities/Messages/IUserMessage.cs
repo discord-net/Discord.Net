@@ -17,14 +17,6 @@ namespace Discord
         IUserMessage ReferencedMessage { get; }
 
         /// <summary>
-        ///     Gets the thread that was started from this message.
-        /// </summary>
-        /// <returns>
-        ///    An <see cref="IThreadChannel"/> object if this message has thread attached; otherwise <see langword="null"/>.
-        /// </returns>
-        IThreadChannel Thread { get; }
-
-        /// <summary>
         ///     Modifies this message.
         /// </summary>
         /// <remarks>

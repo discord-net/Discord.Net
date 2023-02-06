@@ -1,9 +1,13 @@
+using Discord.API;
+
 using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Model = Discord.API.Message;
 
 namespace Discord.Rest
@@ -44,6 +48,12 @@ namespace Discord.Rest
         public virtual DateTimeOffset? EditedTimestamp => null;
         /// <inheritdoc />
         public virtual bool MentionedEveryone => false;
+
+        /// <inheritdoc cref="IMessage.Thread"/>
+        public RestThreadChannel Thread { get; private set; }
+
+        /// <inheritdoc />
+        IThreadChannel IMessage.Thread => Thread;
 
         /// <summary>
         ///     Gets a collection of the <see cref="Attachment"/>'s on the message.
@@ -255,6 +265,9 @@ namespace Discord.Rest
                     model.RoleSubscriptionData.Value.MonthsSubscribed,
                     model.RoleSubscriptionData.Value.IsRenewal);
             }
+
+            if (model.Thread.IsSpecified)
+                Thread = RestThreadChannel.Create(Discord, new RestGuild(Discord, model.Thread.Value.GuildId.Value), model.Thread.Value);
         }
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
@@ -296,7 +309,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         IReadOnlyCollection<IStickerItem> IMessage.Stickers => Stickers;
-        
+
         #endregion
 
         /// <inheritdoc />

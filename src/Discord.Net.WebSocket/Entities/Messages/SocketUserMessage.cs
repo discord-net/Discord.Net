@@ -49,12 +49,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public IUserMessage ReferencedMessage => _referencedMessage;
 
-        /// <inheritdoc cref="IUserMessage.Thread"/>
-        public SocketThreadChannel Thread { get; private set; }
-
-        /// <inheritdoc />
-        IThreadChannel IUserMessage.Thread => Thread;
-
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
             : base(discord, id, channel, author, source)
         {
@@ -177,11 +171,6 @@ namespace Discord.WebSocket
                 }
                 else
                     _stickers = ImmutableArray.Create<SocketSticker>();
-            }
-
-            if (model.Thread.IsSpecified)
-            {
-                Thread = guild!.AddOrUpdateChannel(state, model.Thread.Value) as SocketThreadChannel;
             }
         }
 
