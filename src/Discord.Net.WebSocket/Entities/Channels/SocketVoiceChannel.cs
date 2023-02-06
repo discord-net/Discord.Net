@@ -34,6 +34,8 @@ namespace Discord.WebSocket
         public int? UserLimit { get; private set; }
         /// <inheritdoc />
         public string RTCRegion { get; private set; }
+        /// <inheritdoc/>
+        public VideoQualityMode VideoQualityMode { get; private set; }
 
         /// <summary>
         ///     Gets a collection of users that are currently connected to this voice channel.
@@ -60,6 +62,7 @@ namespace Discord.WebSocket
             base.Update(state, model);
             Bitrate = model.Bitrate.GetValueOrDefault(64000);
             UserLimit = model.UserLimit.GetValueOrDefault() != 0 ? model.UserLimit.Value : (int?)null;
+            VideoQualityMode = model.VideoQualityMode.GetValueOrDefault(VideoQualityMode.Auto);
             RTCRegion = model.RTCRegion.GetValueOrDefault(null);
         }
 
