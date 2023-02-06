@@ -81,17 +81,8 @@ namespace Discord
                     now = DateTime.UtcNow;
                 else
                     now = DateTime.Now;
-                if (now.Hour < 10)
-                    builder.Append('0');
-                builder.Append(now.Hour);
-                builder.Append(':');
-                if (now.Minute < 10)
-                    builder.Append('0');
-                builder.Append(now.Minute);
-                builder.Append(':');
-                if (now.Second < 10)
-                    builder.Append('0');
-                builder.Append(now.Second);
+                string format = "HH:mm:ss";
+                builder.Append(now.ToString(format));
                 builder.Append(' ');
             }
             if (sourceName != null)
