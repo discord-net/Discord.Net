@@ -1,2 +1,2 @@
-// fetches current user's connections.
+// fetches the current user's connections.
 var connections = await client.GetConnectionsAsync();
