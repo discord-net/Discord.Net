@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Reflection;
 
 namespace Discord.Interactions
 {
@@ -9,6 +10,10 @@ namespace Discord.Interactions
     /// </summary>
     public abstract class InputComponentInfo
     {
+        private Lazy<Func<object, object>> _getter;
+        internal Func<object, object> Getter => _getter.Value;
+
+
         /// <summary>
         ///     Gets the parent modal of this component.
         /// </summary>
@@ -40,6 +45,11 @@ namespace Discord.Interactions
         public Type Type { get; }
 
         /// <summary>
+        ///     Gets the property linked to this component.
+        /// </summary>
+        public PropertyInfo PropertyInfo { get; }
+
+        /// <summary>
         ///     Gets the <see cref="ComponentTypeConverter"/> assigned to this component.
         /// </summary>
         public ComponentTypeConverter TypeConverter { get; }
@@ -62,9 +72,12 @@ namespace Discord.Interactions
             IsRequired = builder.IsRequired;
             ComponentType = builder.ComponentType;
             Type = builder.Type;
+            PropertyInfo = builder.PropertyInfo;
             TypeConverter = builder.TypeConverter;
             DefaultValue = builder.DefaultValue;
             Attributes = builder.Attributes.ToImmutableArray();
+
+            _getter = new(() => ReflectionUtils<object>.CreateLambdaPropertyGetter(Modal.Type, PropertyInfo));
         }
     }
 }

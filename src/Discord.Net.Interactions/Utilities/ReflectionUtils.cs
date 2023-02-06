@@ -10,7 +10,6 @@ namespace Discord.Interactions
     internal static class ReflectionUtils<T>
     {
         private static readonly TypeInfo ObjectTypeInfo = typeof(object).GetTypeInfo();
-
         internal static T CreateObject (TypeInfo typeInfo, InteractionService commandService, IServiceProvider services = null) =>
             CreateBuilder(typeInfo, commandService)(services);
 
@@ -164,6 +163,21 @@ namespace Discord.Interactions
             var assign = Expression.Assign(prop, Expression.Convert(valueParam, propertyInfo.PropertyType));
 
             return Expression.Lambda<Action<T, object>>(assign, instanceParam, valueParam).Compile();
+        }
+
+        internal static Func<T, object> CreateLambdaPropertyGetter(PropertyInfo propertyInfo)
+        {
+            var instanceParam = Expression.Parameter(typeof(T), "instance");
+            var prop = Expression.Property(instanceParam, propertyInfo);
+            return Expression.Lambda<Func<T, object>>(prop, instanceParam).Compile();
+        }
+
+        internal static Func<T, object> CreateLambdaPropertyGetter(Type type, PropertyInfo propertyInfo)
+        {
+            var instanceParam = Expression.Parameter(typeof(T), "instance");
+            var instanceAccess = Expression.Convert(instanceParam, type);
+            var prop = Expression.Property(instanceAccess, propertyInfo);
+            return Expression.Lambda<Func<T, object>>(prop, instanceParam).Compile();
         }
 
         internal static Func<object[], object[], T> CreateLambdaMemberInit(TypeInfo typeInfo, ConstructorInfo constructor, Predicate<PropertyInfo> propertySelect = null)
