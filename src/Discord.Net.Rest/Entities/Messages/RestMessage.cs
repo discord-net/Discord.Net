@@ -1,9 +1,13 @@
+using Discord.API;
+
 using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Model = Discord.API.Message;
 
 namespace Discord.Rest
@@ -45,6 +49,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         public virtual bool MentionedEveryone => false;
 
+        /// <inheritdoc cref="IMessage.Thread"/>
+        public RestThreadChannel Thread { get; private set; }
+
+        /// <inheritdoc />
+        IThreadChannel IMessage.Thread => Thread;
+
         /// <summary>
         ///     Gets a collection of the <see cref="Attachment"/>'s on the message.
         /// </summary>
@@ -79,15 +89,6 @@ namespace Discord.Rest
         public MessageFlags? Flags { get; private set; }
         /// <inheritdoc/>
         public MessageType Type { get; private set; }
-
-
-        /// <summary>
-        ///     Gets the thread that was started from this message.
-        /// </summary>
-        /// <returns>
-        ///    A <see cref="RestThreadChannel"/> object if this message has thread attached; otherwise <see langword="null"/>.
-        /// </returns>
-        public RestThreadChannel Thread { get; private set; }
 
         /// <inheritdoc />
         public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
@@ -266,9 +267,7 @@ namespace Discord.Rest
             }
 
             if (model.Thread.IsSpecified)
-            {
                 Thread = RestThreadChannel.Create(Discord, new RestGuild(Discord, model.Thread.Value.GuildId.Value), model.Thread.Value);
-            }
         }
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
@@ -310,7 +309,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         IReadOnlyCollection<IStickerItem> IMessage.Stickers => Stickers;
-        
+
         #endregion
 
         /// <inheritdoc />
