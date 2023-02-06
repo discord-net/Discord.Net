@@ -18,5 +18,13 @@ namespace Discord
         ///     Returns the current user's permissions for this guild.
         /// </summary>
         GuildPermissions Permissions { get; }
+
+        /// <summary>
+        ///     Gets the features for this guild.
+        /// </summary>
+        /// <returns>
+        ///     A flags enum containing all the features for the guild.
+        /// </returns>
+        GuildFeatures Features { get; }
     }
 }

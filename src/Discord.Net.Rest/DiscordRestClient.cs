@@ -152,6 +152,19 @@ namespace Discord.Rest
 
         #endregion
         
+        public async Task<RestSelfUser> GetCurrentUserAsync(RequestOptions options = null)
+        {
+            var user = await ApiClient.GetMyUserAsync(options);
+            CurrentUser.Update(user);
+            return CurrentUser;
+        }
+
+        public async Task<RestGuildUser> GetCurrentUserGuildMemberAsync(ulong guildId, RequestOptions options = null)
+        {
+            var user = await ApiClient.GetCurrentUserGuildMember(guildId, options);
+            return RestGuildUser.Create(this, null, user, guildId);
+        }
+
         public async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
         {
             return _applicationInfo ??= await ClientHelper.GetApplicationInfoAsync(this, options).ConfigureAwait(false);
