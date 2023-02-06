@@ -31,6 +31,9 @@ namespace Discord.Interactions
         /// <summary>
         ///     Gets or sets whether the <see cref="CustomId"/> should be treated as a raw Regex pattern.
         /// </summary>
+        /// <remarks>
+        ///     <see langword="false"/> defaults to the pattern used before 3.9.0.
+        /// </remarks>
         public bool TreatAsRegex { get; set; } = false;
 
         /// <summary>
