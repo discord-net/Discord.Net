@@ -14,7 +14,7 @@ Some endpoints in Discord API require a Bearer token, which can be obtained thro
 
 The [DiscordRestClient] gets the current user when `LoginAsync()` is called. The user object can be found in the `CurrentUser` property.
 
-If you need to fetch the user again, the `GetGetCurrentUserAsync()` method can be used.
+If you need to fetch the user again, the `GetCurrentUserAsync()` method can be used.
 
 [!code-csharp[Get current user](samples/current_user.cs)]
 
