@@ -47,7 +47,7 @@ namespace Discord
         /// <summary>
         ///     Flag given to messages that failed to mention some roles and add their members to the thread.
         /// </summary>
-        FailedToMentionRolesInThreads = 1 << 8,
+        FailedToMentionRolesInThread = 1 << 8,
         /// <summary>
         ///     Flag give to messages that will not trigger push and desktop notifications.
         /// </summary>
