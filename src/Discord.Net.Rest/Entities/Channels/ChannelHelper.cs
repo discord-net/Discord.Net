@@ -590,6 +590,12 @@ namespace Discord.Rest
             return models.Select(x => RestWebhook.Create(client, channel, x))
                 .ToImmutableArray();
         }
+
+        public static async Task<ulong> FollowAnnouncementChannelAsync(INewsChannel newsChannel, ulong channelId, BaseDiscordClient client, RequestOptions options)
+        {
+            var model = await client.ApiClient.FollowChannelAsync(newsChannel.Id, channelId, options);
+            return model.WebhookId;
+        }
         #endregion
 
         #region Categories
