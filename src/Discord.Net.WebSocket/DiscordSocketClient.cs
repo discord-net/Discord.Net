@@ -2949,7 +2949,11 @@ namespace Discord.WebSocket
                                     var cacheableUser = new Cacheable<SocketGuildUser, ulong>(member,
                                             data.UserId,
                                             member is not null,
-                                            () => Task.FromResult((SocketGuildUser)null)
+                                            async () =>
+                                            {
+                                                var model = await ApiClient.GetGuildMemberAsync(data.GuildId, data.UserId);
+                                                return guild.AddOrUpdateUser(model);
+                                            }
                                         );
 
                                     ISocketMessageChannel channel = null;
