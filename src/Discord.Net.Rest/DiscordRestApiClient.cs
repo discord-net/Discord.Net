@@ -1139,14 +1139,14 @@ namespace Discord.API
             await SendAsync("POST", () => $"channels/{channelId}/messages/{messageId}/crosspost", ids, options: options).ConfigureAwait(false);
         }
 
-        public async Task<FollowedChannel> FollowChannelAsync(ulong newsChanneId, ulong followingChannelId, RequestOptions options = null)
+        public async Task<FollowedChannel> FollowChannelAsync(ulong newsChannelId, ulong followingChannelId, RequestOptions options = null)
         {
-            Preconditions.NotEqual(newsChanneId, 0, nameof(newsChanneId));
-            Preconditions.NotEqual(newsChanneId, 0, nameof(followingChannelId));
+            Preconditions.NotEqual(newsChannelId, 0, nameof(newsChannelId));
+            Preconditions.NotEqual(followingChannelId, 0, nameof(followingChannelId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: newsChanneId);
-            return await SendJsonAsync<FollowedChannel>("POST", () => $"channels/{newsChanneId}/followers", new { webhook_channel_id = followingChannelId}, ids, options: options).ConfigureAwait(false);
+            var ids = new BucketIds(channelId: newsChannelId);
+            return await SendJsonAsync<FollowedChannel>("POST", () => $"channels/{newsChannelId}/followers", new { webhook_channel_id = followingChannelId}, ids, options: options).ConfigureAwait(false);
         }
         #endregion
 
