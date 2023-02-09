@@ -29,7 +29,7 @@ namespace Discord
         /// <summary>
         ///     Gets the channel for this webhook.
         /// </summary>
-        ITextChannel Channel { get; }
+        IIntegrationChannel Channel { get; }
         /// <summary>
         ///     Gets the ID of the channel for this webhook.
         /// </summary>

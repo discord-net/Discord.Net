@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IForumChannel : IGuildChannel, IMentionable, INestedChannel
+    /// <summary>
+    ///     Represents a forum channel in a guild that can create posts.
+    /// </summary>
+    public interface IForumChannel : IMentionable, INestedChannel, IIntegrationChannel
     {
         /// <summary>
         ///     Gets a value that indicates whether the channel is NSFW.
