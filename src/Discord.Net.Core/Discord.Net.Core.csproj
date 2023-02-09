@@ -11,7 +11,7 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="System.Interactive.Async" Version="5.0.0" />
     <PackageReference Include="IDisposableAnalyzers" Version="3.4.15">
       <PrivateAssets>all</PrivateAssets>
