@@ -72,6 +72,9 @@ namespace Discord
         public Optional<ulong[]> ExemptChannels { get; set; }
     }
 
+    /// <summary>
+    ///     Provides properties used to modify a <see cref="AutoModRuleAction"/>.
+    /// </summary>
     public class AutoModRuleActionProperties
     {
         /// <summary>
