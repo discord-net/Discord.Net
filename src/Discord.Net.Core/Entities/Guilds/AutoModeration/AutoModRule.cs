@@ -32,22 +32,22 @@ namespace Discord
         public string[] KeywordFilter { get; }
 
         /// <summary>
-        ///     Gets regex patterns for the rule.
+        ///     Gets regex patterns for the rule. Empty if the rule has no regexes.
         /// </summary>
         public string[] RegexPatterns { get; }
 
         /// <summary>
-        ///     Gets the allow list for the rule.
+        ///     Gets the allow list for the rule. Empty if the rule has no allowed terms.
         /// </summary>
         public string[] AllowList { get; }
 
         /// <summary>
-        ///     Gets total mention limit for the rule.
+        ///     Gets total mention limit for the rule. <see langword="null"/> if not provided.
         /// </summary>
         public int? MentionLimit { get; }
 
         /// <summary>
-        ///     Gets the presets for the rule.
+        ///     Gets the presets for the rule. Empty if the rule has no presets.
         /// </summary>
         public KeywordPresetTypes[] Presets { get; }
 
@@ -62,12 +62,12 @@ namespace Discord
         public bool Enabled { get; }
 
         /// <summary>
-        ///     Gets the exempt roles for the rule.
+        ///     Gets the exempt roles for the rule. Empty if the rule has no exempt roles.
         /// </summary>
         public ulong[] ExemptRoles { get; }
 
         /// <summary>
-        ///     Gets the exempt channels for the rule.
+        ///     Gets the exempt channels for the rule. Empty if the rule has no exempt channels.
         /// </summary>
         public ulong[] ExemptChannels { get; }
         

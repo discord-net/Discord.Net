@@ -17,12 +17,12 @@ namespace Discord
         public AutoModActionType Type { get; }
 
         /// <summary>
-        ///     Get the channel id on which to post alerts.
+        ///     Get the channel id on which to post alerts. <see langword="null"/> if no channel has been provided.
         /// </summary>
         public ulong? ChannelId { get; }
 
         /// <summary>
-        ///     Gets the duration of which a user will be timed out for breaking this rule.
+        ///     Gets the duration of which a user will be timed out for breaking this rule. <see langword="null"/> if no timeout duration has been provided.
         /// </summary>
         public TimeSpan? TimeoutDuration { get; }
 

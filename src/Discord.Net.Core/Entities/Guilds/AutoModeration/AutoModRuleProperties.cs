@@ -47,7 +47,7 @@ namespace Discord
         public Optional<int> MentionLimit { get; set; }
 
         /// <summary>
-        ///     Gets or sets the presets for the rule.
+        ///     Gets or sets the presets for the rule. Empty if the rule has no presets.
         /// </summary>
         public Optional<KeywordPresetTypes[]> Presets { get; set; }
 
@@ -62,12 +62,12 @@ namespace Discord
         public Optional<bool> Enabled { get; set; }
 
         /// <summary>
-        ///     Gets or sets the exempt roles for the rule.
+        ///     Gets or sets the exempt roles for the rule. Empty if the rule has no exempt roles.
         /// </summary>
         public Optional<ulong[]> ExemptRoles { get; set; }
 
         /// <summary>
-        ///     Gets or sets the exempt channels for the rule.
+        ///     Gets or sets the exempt channels for the rule. Empty if the rule has no exempt channels.
         /// </summary>
         public Optional<ulong[]> ExemptChannels { get; set; }
     }

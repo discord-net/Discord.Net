@@ -12,7 +12,7 @@ namespace Discord
     public enum AutoModEventType
     {
         /// <summary>
-        ///     When a member sends or edits a message in the guild
+        ///     When a member sends or edits a message in the guild.
         /// </summary>
         MessageSend = 1
     }

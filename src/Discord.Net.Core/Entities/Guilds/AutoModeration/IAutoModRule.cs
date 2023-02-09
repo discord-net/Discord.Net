@@ -46,7 +46,7 @@ namespace Discord
         public IReadOnlyCollection<string> KeywordFilter { get; }
 
         /// <summary>
-        ///     Gets regex patterns for this rule.
+        ///     Gets regex patterns for this rule. Empty if the rule has no regexes.
         /// </summary>
         /// <remarks>
         ///     This collection will be empty if <see cref="TriggerType"/> is not
@@ -55,7 +55,7 @@ namespace Discord
         public IReadOnlyCollection<string> RegexPatterns { get; }
 
         /// <summary>
-        ///     Gets the allow list patterns for this rule.
+        ///     Gets the allow list patterns for this rule. Empty if the rule has no allowed terms.
         /// </summary>
         /// <remarks>
         ///     This collection will be empty if <see cref="TriggerType"/> is not
@@ -64,7 +64,7 @@ namespace Discord
         public IReadOnlyCollection<string> AllowList { get; }
 
         /// <summary>
-        ///     Gets the preset keyword types for this rule.
+        ///     Gets the preset keyword types for this rule. Empty if the rule has no presets.
         /// </summary>
         /// <remarks>
         ///     This collection will be empty if <see cref="TriggerType"/> is not
@@ -92,12 +92,12 @@ namespace Discord
         bool Enabled { get; }
 
         /// <summary>
-        ///     Gets a collection of role ids that are exempt from this rule.
+        ///     Gets a collection of role ids that are exempt from this rule. Empty if the rule has no exempt roles.
         /// </summary>
         IReadOnlyCollection<ulong> ExemptRoles { get; }
 
         /// <summary>
-        ///     Gets a collection of channel ids that are exempt from this rule.
+        ///     Gets a collection of channel ids that are exempt from this rule. Empty if the rule has no exempt channels.
         /// </summary>
         IReadOnlyCollection<ulong> ExemptChannels { get; }
 
