@@ -20,7 +20,7 @@ public class AutoModRuleBuilder
     /// <summary>
     ///     Returns the max keyword length for an AutoMod rule allowed by Discord.
     /// </summary>
-    public const int MaxKeywordLength = 30;
+    public const int MaxKeywordLength = 60;
 
     /// <summary>
     ///     Returns the max regex pattern count for an AutoMod rule allowed by Discord.
@@ -45,7 +45,7 @@ public class AutoModRuleBuilder
     /// <summary>
     ///     Returns the max allowlist keyword length for an AutoMod rule allowed by Discord.
     /// </summary>
-    public const int MaxAllowListEntryLength = 30;
+    public const int MaxAllowListEntryLength = 60;
 
     /// <summary>
     ///     Returns the max mention limit for an AutoMod rule allowed by Discord.
