@@ -214,5 +214,13 @@ namespace Discord
         ///     If set to <see langword="false"/>, this value will be "Discord#1234".
         /// </remarks>
         public bool FormatUsersInBidirectionalUnicode { get; set; } = true;
+
+        /// <summary> 
+        ///     Returns the max thread members allowed to be in a request. 
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of thread members that can be gotten per-batch.
+        /// </returns>
+        public const int MaxThreadMembersPerBatch = 100;
     }
 }

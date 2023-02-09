@@ -85,11 +85,27 @@ namespace Discord.Rest
             return result.Threads.Select(x => RestThreadChannel.Create(client, channel.Guild, x)).ToImmutableArray();
         }
 
-        public static async Task<RestThreadUser[]> GetUsersAsync(IThreadChannel channel, BaseDiscordClient client, RequestOptions options = null)
+        public static IAsyncEnumerable<IReadOnlyCollection<RestThreadUser>> GetUsersAsync(IThreadChannel channel, BaseDiscordClient client, int limit = DiscordConfig.MaxThreadMembersPerBatch, ulong? afterId = null, RequestOptions options = null)
         {
-            var users = await client.ApiClient.ListThreadMembersAsync(channel.Id, options);
-
-            return users.Select(x => RestThreadUser.Create(client, channel.Guild, x, channel)).ToArray();
+            return new PagedAsyncEnumerable<RestThreadUser>(
+                limit,
+                async (info, ct) =>
+                {
+                    if (info.Position != null)
+                        afterId = info.Position.Value;
+                    var users = await client.ApiClient.ListThreadMembersAsync(channel.Id, afterId, limit, options);
+                    return users.Select(x => RestThreadUser.Create(client, channel.Guild, x, channel)).ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != limit)
+                        return false;
+                    info.Position = lastPage.Max(x => x.Id);
+                    return true;
+                },
+                start: afterId,
+                count: limit
+            );
         }
 
         public static async Task<RestThreadUser> GetUserAsync(ulong userId, IThreadChannel channel, BaseDiscordClient client, RequestOptions options = null)
