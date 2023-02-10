@@ -48,8 +48,8 @@ namespace Discord
         {
             var result = new Override();
 
-            using(var textReader = new StringReader(json))
-            using(var reader = new JsonTextReader(textReader))
+            using (var textReader = new StringReader(json))
+            using (var reader = new JsonTextReader(textReader))
             {
                 var obj = JObject.ReadFrom(reader);
                 result.Id = obj["id"].ToObject<Guid>();
@@ -100,14 +100,14 @@ namespace Discord
         ///     Gets a read-only dictionary containing the currently loaded overrides.
         /// </summary>
         public IReadOnlyDictionary<Override, IReadOnlyCollection<LoadedOverride>> LoadedOverrides
-            => _loadedOverrides.Select(x => new KeyValuePair<Override, IReadOnlyCollection<LoadedOverride>> (x.Key, x.Value)).ToDictionary(x => x.Key, x => x.Value);
+            => _loadedOverrides.Select(x => new KeyValuePair<Override, IReadOnlyCollection<LoadedOverride>>(x.Key, x.Value)).ToDictionary(x => x.Key, x => x.Value);
 
         private static AssemblyLoadContext _overrideDomain;
         private static List<Func<Override, string, Task>> _logEvents = new();
         private static ConcurrentDictionary<Override, List<LoadedOverride>> _loadedOverrides = new ConcurrentDictionary<Override, List<LoadedOverride>>();
 
         private const string ApiUrl = "https://overrides.discordnet.dev";
-        
+
         static BuildOverrides()
         {
             _overrideDomain = new AssemblyLoadContext("Discord.Net.Overrides.Runtime");
@@ -258,14 +258,14 @@ namespace Discord
 
         private static async Task<Assembly> GetDependencyAsync(Guid id, string name)
         {
-            using(var client = new HttpClient())
+            using (var client = new HttpClient())
             {
                 var result = await client.PostAsync($"{ApiUrl}/overrides/{id}/dependency", new StringContent($"{{ \"info\": \"{name}\"}}", Encoding.UTF8, "application/json"));
 
                 if (!result.IsSuccessStatusCode)
                     throw new Exception("Failed to get dependency");
 
-                using(var ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     var innerStream = await result.Content.ReadAsStreamAsync();
                     await innerStream.CopyToAsync(ms);

@@ -563,7 +563,7 @@ namespace Discord.API
 
             await SendAsync("DELETE", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options).ConfigureAwait(false);
         }
-        
+
         public async Task<ThreadMember[]> ListThreadMembersAsync(ulong channelId, ulong? after = null, int? limit = null, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
@@ -1154,7 +1154,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: newsChannelId);
-            return await SendJsonAsync<FollowedChannel>("POST", () => $"channels/{newsChannelId}/followers", new { webhook_channel_id = followingChannelId}, ids, options: options).ConfigureAwait(false);
+            return await SendJsonAsync<FollowedChannel>("POST", () => $"channels/{newsChannelId}/followers", new { webhook_channel_id = followingChannelId }, ids, options: options).ConfigureAwait(false);
         }
         #endregion
 

@@ -72,7 +72,7 @@ namespace Discord
 
                 return true;
             }
-            
+
             public ValueTask DisposeAsync()
             {
                 Current = null;

@@ -44,10 +44,10 @@ namespace Discord.Rest
         {
             base.Update(model);
 
-            if(model.Bitrate.IsSpecified)
+            if (model.Bitrate.IsSpecified)
                 Bitrate = model.Bitrate.Value;
 
-            if(model.UserLimit.IsSpecified)
+            if (model.UserLimit.IsSpecified)
                 UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
 
             VideoQualityMode = model.VideoQualityMode.GetValueOrDefault(VideoQualityMode.Auto);

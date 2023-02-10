@@ -34,7 +34,7 @@ namespace Discord.Interactions
         {
             var objs = new List<object>();
 
-            if(_typeReader is not null && option.Values.Count > 0)
+            if (_typeReader is not null && option.Values.Count > 0)
                 foreach (var value in option.Values)
                 {
                     var result = await _typeReader.ReadAsync(context, value, services).ConfigureAwait(false);
@@ -52,13 +52,13 @@ namespace Discord.Interactions
                     foreach (var user in option.Users)
                         users[user.Id] = user;
 
-                if(option.Members is not null)
-                    foreach(var member in option.Members)
+                if (option.Members is not null)
+                    foreach (var member in option.Members)
                         users[member.Id] = member;
 
                 objs.AddRange(users.Values);
 
-                if(option.Roles is not null)
+                if (option.Roles is not null)
                     objs.AddRange(option.Roles);
 
                 if (option.Channels is not null)

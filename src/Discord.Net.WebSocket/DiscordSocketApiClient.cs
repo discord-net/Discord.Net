@@ -66,7 +66,7 @@ namespace Discord.API
 
         public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
             string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
-			bool useSystemClock = true, Func<IRateLimitInfo, Task> defaultRatelimitCallback = null)
+            bool useSystemClock = true, Func<IRateLimitInfo, Task> defaultRatelimitCallback = null)
             : base(restClientProvider, userAgent, defaultRetryMode, serializer, useSystemClock, defaultRatelimitCallback)
         {
             _gatewayUrl = url;
@@ -275,10 +275,12 @@ namespace Discord.API
             if (WebSocketClient == null)
                 throw new NotSupportedException("This client is not configured with WebSocket support.");
 
-            if (ConnectionState == ConnectionState.Disconnected) return;
+            if (ConnectionState == ConnectionState.Disconnected)
+                return;
             ConnectionState = ConnectionState.Disconnecting;
 
-            try { _connectCancelToken?.Cancel(false); }
+            try
+            { _connectCancelToken?.Cancel(false); }
             catch { }
 
             if (ex is GatewayReconnectException)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord.Audio
 {
@@ -15,7 +15,7 @@ namespace Discord.Audio
         public const int FrameSamplesPerChannel = SamplingRate / 1000 * FrameMillis;
         public const int FrameSamples = FrameSamplesPerChannel * Channels;
         public const int FrameBytes = FrameSamplesPerChannel * SampleBytes;
-        
+
         protected bool _isDisposed = false;
 
         protected virtual void Dispose(bool disposing)
@@ -32,7 +32,7 @@ namespace Discord.Audio
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        
+
         protected static void CheckError(int result)
         {
             if (result < 0)

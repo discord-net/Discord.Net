@@ -1,6 +1,6 @@
+using Discord.Rest;
 using System;
 using System.Threading.Tasks;
-using Discord.Rest;
 
 namespace Discord.WebSocket
 {

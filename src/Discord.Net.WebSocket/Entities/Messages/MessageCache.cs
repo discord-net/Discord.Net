@@ -48,8 +48,10 @@ namespace Discord.WebSocket
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="limit"/> is less than 0.</exception>
         public IReadOnlyCollection<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
-            if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
-            if (limit == 0) return ImmutableArray<SocketMessage>.Empty;
+            if (limit < 0)
+                throw new ArgumentOutOfRangeException(nameof(limit));
+            if (limit == 0)
+                return ImmutableArray<SocketMessage>.Empty;
 
             IEnumerable<ulong> cachedMessageIds;
             if (fromMessageId == null)

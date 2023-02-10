@@ -51,7 +51,7 @@ namespace Discord.Rest
             IDiscordInteraction interaction, RequestOptions options = null)
         {
             var model = await client.ApiClient.GetInteractionResponseAsync(interaction.Token, options).ConfigureAwait(false);
-            if(model != null)
+            if (model != null)
                 return RestInteractionMessage.Create(client, model, interaction.Token, channel);
             return null;
         }
@@ -150,7 +150,7 @@ namespace Discord.Rest
                     DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
                     DmPermission = arg.IsDMEnabled.ToNullable(),
                     Nsfw = arg.IsNsfw.GetValueOrDefault(false)
-                    };
+                };
 
                 if (arg is SlashCommandProperties slashProps)
                 {

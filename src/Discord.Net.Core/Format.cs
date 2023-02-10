@@ -80,7 +80,7 @@ namespace Discord
 
             return result.ToString();
         }
-        
+
         /// <summary>
         ///     Formats a string as a block quote.
         /// </summary>

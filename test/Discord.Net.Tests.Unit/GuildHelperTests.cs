@@ -1,4 +1,4 @@
-﻿using Discord.Rest;
+using Discord.Rest;
 using FluentAssertions;
 using Moq;
 using System;

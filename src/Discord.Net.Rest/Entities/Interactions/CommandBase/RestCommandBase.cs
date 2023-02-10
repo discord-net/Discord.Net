@@ -193,7 +193,7 @@ namespace Discord.Rest
             Preconditions.NotNull(fileStream, nameof(fileStream), "File Stream must have data");
             Preconditions.NotNullOrEmpty(fileName, nameof(fileName), "File Name must not be empty or null");
 
-            using(var file = new FileAttachment(fileStream, fileName))
+            using (var file = new FileAttachment(fileStream, fileName))
                 return await FollowupWithFileAsync(file, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
         }
 

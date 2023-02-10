@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 namespace Discord.Interactions
 {
     internal class CommandMapNode<T> where T : class, ICommandInfo
-    { 
+    {
         private readonly string _wildCardStr = "*";
         private readonly ConcurrentDictionary<string, CommandMapNode<T>> _nodes;
         private readonly ConcurrentDictionary<string, T> _commands;
@@ -19,7 +19,7 @@ namespace Discord.Interactions
         public IReadOnlyDictionary<Regex, T> WildCardCommands => _wildCardCommands;
         public string Name { get; }
 
-        public CommandMapNode (string name, string wildCardExp = null)
+        public CommandMapNode(string name, string wildCardExp = null)
         {
             Name = name;
             _nodes = new ConcurrentDictionary<string, CommandMapNode<T>>();
@@ -30,7 +30,7 @@ namespace Discord.Interactions
                 _wildCardStr = wildCardExp;
         }
 
-        public void AddCommand (IList<string> keywords, int index, T commandInfo)
+        public void AddCommand(IList<string> keywords, int index, T commandInfo)
         {
             if (keywords.Count == index + 1)
             {
@@ -54,7 +54,7 @@ namespace Discord.Interactions
             }
         }
 
-        public bool RemoveCommand (IList<string> keywords, int index)
+        public bool RemoveCommand(IList<string> keywords, int index)
         {
             if (keywords.Count == index + 1)
                 return _commands.TryRemove(keywords[index], out var _);
@@ -67,7 +67,7 @@ namespace Discord.Interactions
             }
         }
 
-        public SearchResult<T> GetCommand (IList<string> keywords, int index)
+        public SearchResult<T> GetCommand(IList<string> keywords, int index)
         {
             string name = string.Join(" ", keywords);
 
@@ -101,7 +101,7 @@ namespace Discord.Interactions
             return SearchResult<T>.FromError(name, InteractionCommandError.UnknownCommand, $"No {typeof(T).FullName} found for {name}");
         }
 
-        public SearchResult<T> GetCommand (string text, int index, char[] seperators)
+        public SearchResult<T> GetCommand(string text, int index, char[] seperators)
         {
             var keywords = text.Split(seperators);
             return GetCommand(keywords, index);

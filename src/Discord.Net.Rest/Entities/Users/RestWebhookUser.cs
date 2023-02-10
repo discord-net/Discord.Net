@@ -34,7 +34,7 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
-#endregion
+        #endregion
 
         #region IGuildUser
         /// <inheritdoc />

@@ -9,7 +9,7 @@ namespace Discord.Net
         public ApplicationCommandException(HttpException httpError)
             : base(httpError.HttpCode, httpError.Request, httpError.DiscordCode, httpError.Reason, httpError.Errors.ToArray())
         {
-           
+
         }
     }
 }

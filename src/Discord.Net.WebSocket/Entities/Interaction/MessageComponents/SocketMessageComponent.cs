@@ -1,12 +1,12 @@
+using Discord.Net.Rest;
+using Discord.Rest;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
 using DataModel = Discord.API.MessageComponentInteractionData;
-using Discord.Rest;
-using System.Collections.Generic;
-using Discord.Net.Rest;
-using System.IO;
+using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {

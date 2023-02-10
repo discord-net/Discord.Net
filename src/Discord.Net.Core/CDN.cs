@@ -146,10 +146,10 @@ namespace Discord
         /// </returns>
         public static string GetGuildBannerUrl(ulong guildId, string bannerId, ImageFormat format, ushort? size = null)
         {
-	        if (string.IsNullOrEmpty(bannerId))
-		        return null;
-	        string extension = FormatToExtension(format, bannerId);
-	        return $"{DiscordConfig.CDNUrl}banners/{guildId}/{bannerId}.{extension}" + (size.HasValue ? $"?size={size}" : string.Empty);
+            if (string.IsNullOrEmpty(bannerId))
+                return null;
+            string extension = FormatToExtension(format, bannerId);
+            return $"{DiscordConfig.CDNUrl}banners/{guildId}/{bannerId}.{extension}" + (size.HasValue ? $"?size={size}" : string.Empty);
         }
         /// <summary>
         ///     Returns an emoji URL.

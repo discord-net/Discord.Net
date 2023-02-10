@@ -51,7 +51,7 @@ namespace Discord.WebSocket
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)";
         internal new SocketWebhookUser Clone() => MemberwiseClone() as SocketWebhookUser;
-#endregion
+        #endregion
 
         #region IGuildUser
         /// <inheritdoc />

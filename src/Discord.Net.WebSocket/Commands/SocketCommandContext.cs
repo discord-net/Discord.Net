@@ -47,7 +47,7 @@ namespace Discord.Commands
             User = msg.Author;
             Message = msg;
         }
-#endregion
+        #endregion
 
         #region ICommandContext
         /// <inheritdoc/>

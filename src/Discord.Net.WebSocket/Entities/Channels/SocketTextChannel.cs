@@ -120,7 +120,7 @@ namespace Discord.WebSocket
 
             var thread = (SocketThreadChannel)Guild.AddOrUpdateChannel(Discord.State, model);
 
-            if(Discord.AlwaysDownloadUsers && Discord.HasGatewayIntent(GatewayIntents.GuildMembers))
+            if (Discord.AlwaysDownloadUsers && Discord.HasGatewayIntent(GatewayIntents.GuildMembers))
                 await thread.DownloadUsersAsync();
 
             return thread;
@@ -461,7 +461,7 @@ namespace Discord.WebSocket
             AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components,
             ISticker[] stickers, Embed[] embeds, MessageFlags flags)
             => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags).ConfigureAwait(false);
-        
+
         #endregion
 
         #region  INestedChannel

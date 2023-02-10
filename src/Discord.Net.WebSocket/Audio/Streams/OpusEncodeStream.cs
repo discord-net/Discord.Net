@@ -15,7 +15,7 @@ namespace Discord.Audio.Streams
         private int _partialFramePos;
         private ushort _seq;
         private uint _timestamp;
-        
+
         public OpusEncodeStream(AudioStream next, int bitrate, AudioApplication application, int packetLoss)
         {
             _next = next;

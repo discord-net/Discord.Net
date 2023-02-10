@@ -1,6 +1,6 @@
+using Discord.Commands.Builders;
 using System;
 using System.Threading.Tasks;
-using Discord.Commands.Builders;
 
 namespace Discord.Commands
 {

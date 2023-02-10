@@ -215,7 +215,7 @@ namespace Discord.Rest
 
             if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
                 throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
-            
+
             if (channel.Flags.HasFlag(ChannelFlags.RequireTag))
                 throw new ArgumentException($"The channel {channel.Name} requires posts to have at least one tag.");
 

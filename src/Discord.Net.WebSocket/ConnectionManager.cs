@@ -1,8 +1,8 @@
 using Discord.Logging;
+using Discord.Net;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord.Net;
 
 namespace Discord
 {
@@ -164,7 +164,8 @@ namespace Discord
         }
         private async Task DisconnectAsync(Exception ex, bool isReconnecting)
         {
-            if (State == ConnectionState.Disconnected) return;
+            if (State == ConnectionState.Disconnected)
+                return;
             State = ConnectionState.Disconnecting;
             await _logger.InfoAsync("Disconnecting").ConfigureAwait(false);
 

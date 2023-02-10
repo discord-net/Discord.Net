@@ -1,10 +1,10 @@
+using Discord.API.Rest;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.API.Rest;
-using Discord.Rest;
 using ImageModel = Discord.API.Image;
 using WebhookModel = Discord.API.Webhook;
 
@@ -115,18 +115,18 @@ namespace Discord.Webhook
             MessageComponent components, MessageFlags flags, ulong? threadId)
             => SendFileAsync(client, new FileAttachment(stream, filename, isSpoiler: isSpoiler), text, isTTS, embeds, username, avatarUrl, allowedMentions, components, options, flags, threadId);
 
-        public static Task<ulong> SendFileAsync(DiscordWebhookClient client, FileAttachment attachment, string text, bool isTTS, 
-            IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, 
+        public static Task<ulong> SendFileAsync(DiscordWebhookClient client, FileAttachment attachment, string text, bool isTTS,
+            IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions,
             MessageComponent components, RequestOptions options, MessageFlags flags, ulong? threadId)
             => SendFilesAsync(client, new FileAttachment[] { attachment }, text, isTTS, embeds, username, avatarUrl, allowedMentions, components, options, flags, threadId);
 
         public static async Task<ulong> SendFilesAsync(DiscordWebhookClient client,
-            IEnumerable<FileAttachment> attachments, string text, bool isTTS, IEnumerable<Embed> embeds, string username, 
+            IEnumerable<FileAttachment> attachments, string text, bool isTTS, IEnumerable<Embed> embeds, string username,
             string avatarUrl, AllowedMentions allowedMentions, MessageComponent components, RequestOptions options,
             MessageFlags flags, ulong? threadId)
         {
             embeds ??= Array.Empty<Embed>();
-           
+
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Count(), 10, nameof(embeds), "A max of 10 embeds are allowed.");
@@ -155,13 +155,14 @@ namespace Discord.Webhook
             if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
                 throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
 
-            var args = new UploadWebhookFileParams(attachments.ToArray()) 
+            var args = new UploadWebhookFileParams(attachments.ToArray())
             {
-                AvatarUrl = avatarUrl, 
-                Username = username, Content = text, 
-                IsTTS = isTTS, 
-                Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified, 
-                AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, 
+                AvatarUrl = avatarUrl,
+                Username = username,
+                Content = text,
+                IsTTS = isTTS,
+                Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
+                AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 MessageComponents = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 Flags = flags
             };

@@ -38,7 +38,7 @@ public class RoleConnectionProperties
         get => _platformUsername;
         set
         {
-            if(value is not null)
+            if (value is not null)
                 Preconditions.AtMost(value.Length, MaxPlatformUsernameLength, nameof(PlatformUsername), $"Platform username length must be less or equal to {MaxPlatformUsernameLength}");
             _platformUsername = value;
         }
@@ -103,7 +103,7 @@ public class RoleConnectionProperties
     internal RoleConnectionProperties AddMetadataRecord(string key, string value)
     {
         Metadata ??= new Dictionary<string, string>();
-        if(!Metadata.ContainsKey(key))
+        if (!Metadata.ContainsKey(key))
             Preconditions.AtMost(Metadata.Count + 1, MaxPlatformUsernameLength, nameof(Metadata), $"Metadata records count must be less or equal to {MaxMetadataRecords}");
 
         _metadata[key] = value;
@@ -126,7 +126,7 @@ public class RoleConnectionProperties
     /// <summary>
     ///     Initializes a new instance of <see cref="RoleConnectionProperties"/>.
     /// </summary>
-    public RoleConnectionProperties() {}
+    public RoleConnectionProperties() { }
 
     /// <summary>
     ///     Initializes a new <see cref="RoleConnectionProperties"/> with the data from provided <see cref="RoleConnection"/>.

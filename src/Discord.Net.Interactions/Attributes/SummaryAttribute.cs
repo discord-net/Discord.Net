@@ -23,7 +23,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="name">Name of the parameter.</param>
         /// <param name="description">Description of the parameter.</param>
-        public SummaryAttribute (string name = null, string description = null)
+        public SummaryAttribute(string name = null, string description = null)
         {
             Name = name;
             Description = description;

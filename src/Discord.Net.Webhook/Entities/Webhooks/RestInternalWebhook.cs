@@ -17,7 +17,7 @@ namespace Discord.Webhook
         public string Name { get; private set; }
         public string AvatarId { get; private set; }
         public ulong? GuildId { get; private set; }
-        public ulong? ApplicationId {  get; private set; }
+        public ulong? ApplicationId { get; private set; }
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 

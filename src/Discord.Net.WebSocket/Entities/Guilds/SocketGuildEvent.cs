@@ -86,9 +86,9 @@ namespace Discord.WebSocket
             {
                 var guildUser = Guild.GetUser(model.CreatorId.Value);
 
-                if(guildUser != null)
+                if (guildUser != null)
                 {
-                    if(model.Creator.IsSpecified)
+                    if (model.Creator.IsSpecified)
                         guildUser.Update(Discord.State, model.Creator.Value);
 
                     Creator = guildUser;

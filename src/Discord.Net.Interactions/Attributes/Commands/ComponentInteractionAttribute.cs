@@ -43,7 +43,7 @@ namespace Discord.Interactions
         /// <param name="customId">String to compare the Message Component CustomIDs with.</param>
         /// <param name="ignoreGroupNames">If <see langword="true"/> <see cref="GroupAttribute"/>s will be ignored while creating this command and this method will be treated as a top level command.</param>
         /// <param name="runMode">Set the run mode of the command.</param>
-        public ComponentInteractionAttribute (string customId, bool ignoreGroupNames = false, RunMode runMode = RunMode.Default)
+        public ComponentInteractionAttribute(string customId, bool ignoreGroupNames = false, RunMode runMode = RunMode.Default)
         {
             CustomId = customId;
             IgnoreGroupNames = ignoreGroupNames;

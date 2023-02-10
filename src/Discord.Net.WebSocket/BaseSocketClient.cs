@@ -1,9 +1,9 @@
+using Discord.API;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Discord.API;
-using Discord.Rest;
 
 namespace Discord.WebSocket
 {
@@ -283,7 +283,7 @@ namespace Discord.WebSocket
         ///     A <see cref="SocketSticker"/> if found, otherwise <see langword="null"/>.
         /// </returns>
         public abstract Task<SocketSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-#endregion
+        #endregion
 
         #region IDiscordClient
         /// <inheritdoc />

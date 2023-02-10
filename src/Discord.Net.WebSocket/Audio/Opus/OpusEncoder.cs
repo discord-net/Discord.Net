@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Discord.Audio
@@ -13,9 +13,9 @@ namespace Discord.Audio
         private static extern int Encode(IntPtr st, byte* pcm, int frame_size, byte* data, int max_data_bytes);
         [DllImport("opus", EntryPoint = "opus_encoder_ctl", CallingConvention = CallingConvention.Cdecl)]
         private static extern OpusError EncoderCtl(IntPtr st, OpusCtl request, int value);
-        
+
         public AudioApplication Application { get; }
-        public int BitRate { get;}
+        public int BitRate { get; }
 
         public OpusEncoder(int bitrate, AudioApplication application, int packetLoss)
         {

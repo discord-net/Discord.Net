@@ -41,7 +41,7 @@ namespace Discord.Rest
         internal void Update(Model model)
         {
             ThreadJoinedAt = model.JoinTimestamp;
-            if(model.GuildMember.IsSpecified)
+            if (model.GuildMember.IsSpecified)
                 GuildUser = RestGuildUser.Create(Discord, Guild, model.GuildMember.Value);
         }
 

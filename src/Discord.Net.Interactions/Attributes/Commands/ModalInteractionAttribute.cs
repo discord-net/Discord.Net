@@ -17,7 +17,7 @@ namespace Discord.Interactions
         ///     Gets the string to compare the Modal CustomIDs with.
         /// </summary>
         public string CustomId { get; }
-        
+
         /// <summary>
         ///     Gets <see langword="true"/> if <see cref="GroupAttribute"/>s will be ignored while creating this command and this method will be treated as a top level command.
         /// </summary>

@@ -61,7 +61,7 @@ namespace Discord.Commands
             if (GuildPermission.HasValue)
             {
                 if (guildUser == null)
-                    return Task.FromResult(PreconditionResult.FromError(NotAGuildErrorMessage ?? "Command must be used in a guild channel."));                
+                    return Task.FromResult(PreconditionResult.FromError(NotAGuildErrorMessage ?? "Command must be used in a guild channel."));
                 if (!guildUser.GuildPermissions.Has(GuildPermission.Value))
                     return Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"User requires guild permission {GuildPermission.Value}."));
             }
