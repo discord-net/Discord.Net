@@ -13,14 +13,7 @@ namespace Discord.Analyzers
     public sealed class GuildAccessAnalyzer : DiagnosticAnalyzer
     {
         private const string DiagnosticId = "DNET0001";
-
-/* Unmerged change from project 'Discord.Net.Analyzers(netstandard2.1)'
-Before:
         private const string Title = "Limit command to Guild contexts.";
-After:
-        private const string Title = "Limit command to Guild contexts";
-*/
-        private const string Title = "Limit command to Guild contexts";
         private const string MessageFormat = "Command method '{0}' is accessing 'Context.Guild' but is not restricted to Guild contexts.";
         private const string Description = "Accessing 'Context.Guild' in a command without limiting the command to run only in guilds.";
         private const string Category = "API Usage";
