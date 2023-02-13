@@ -390,6 +390,23 @@ namespace Discord.Interactions.Builders
             _modalCommands.Add(command);
             return this;
         }
+        
+        /// <summary>
+        ///     Adds a modal command builder to <see cref="ModalCommands"/>.
+        /// </summary>
+        /// <param name="name">Name of the command.</param>
+        /// <param name="callback">Command callback to be executed.</param>
+        /// <param name="configure"><see cref="ModalCommands"/> factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModuleBuilder AddModalCommand(string name, ExecuteCallback callback, Action<ModalCommandBuilder> configure)
+        {
+            var command = new ModalCommandBuilder(this, name, callback);
+            configure(command);
+            _modalCommands.Add(command);
+            return this;
+        }
 
         /// <summary>
         ///     Adds sub-module builder to <see cref="SubModules"/>.
