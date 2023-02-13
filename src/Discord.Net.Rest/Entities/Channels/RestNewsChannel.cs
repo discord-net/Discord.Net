@@ -29,6 +29,6 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public Task<ulong> FollowAnnouncementChannelAsync(ulong channelId, RequestOptions options = null)
-            =>  ChannelHelper.FollowAnnouncementChannelAsync(this, channelId, Discord, options);
+            => ChannelHelper.FollowAnnouncementChannelAsync(this, channelId, Discord, options);
     }
 }

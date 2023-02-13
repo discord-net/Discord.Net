@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.ThreadMember;
-using System.Collections.Immutable;
 
 namespace Discord.WebSocket
 {
@@ -142,7 +142,7 @@ namespace Discord.WebSocket
         {
             Thread = thread;
             Guild = guild;
-            if(member is not null)
+            if (member is not null)
                 GuildUser = member;
         }
 
@@ -156,7 +156,7 @@ namespace Discord.WebSocket
         internal static SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, SocketGuildUser owner)
         {
             // this is used for creating the owner of the thread.
-            var entity = new SocketThreadUser(guild, thread,  owner.Id, owner);
+            var entity = new SocketThreadUser(guild, thread, owner.Id, owner);
             entity.Update(new Model
             {
                 JoinTimestamp = thread.CreatedAt,
@@ -167,7 +167,7 @@ namespace Discord.WebSocket
         internal void Update(Model model)
         {
             ThreadJoinedAt = model.JoinTimestamp;
-            if(model.GuildMember.IsSpecified)
+            if (model.GuildMember.IsSpecified)
                 GuildUser = Guild.AddOrUpdateUser(model.GuildMember.Value);
         }
 

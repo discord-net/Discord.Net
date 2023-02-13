@@ -20,7 +20,7 @@ namespace Discord.Interactions
     /// <returns>
     ///     A task representing the execution operation.
     /// </returns>
-    public delegate Task ExecuteCallback (IInteractionContext context, object[] args, IServiceProvider serviceProvider, ICommandInfo commandInfo);
+    public delegate Task ExecuteCallback(IInteractionContext context, object[] args, IServiceProvider serviceProvider, ICommandInfo commandInfo);
 
     /// <summary>
     ///     The base information class for <see cref="InteractionService"/> commands.
@@ -114,7 +114,7 @@ namespace Discord.Interactions
             await CommandService._cmdLogger.DebugAsync($"Executing {GetLogString(context)}").ConfigureAwait(false);
 
             using var scope = services?.CreateScope();
-            
+
             if (CommandService._autoServiceScopes)
                 services = scope?.ServiceProvider ?? EmptyServiceProvider.Instance;
 
@@ -129,7 +129,7 @@ namespace Discord.Interactions
                 if (!argsResult.IsSuccess)
                     return await InvokeEventAndReturn(context, argsResult).ConfigureAwait(false);
 
-                if(argsResult is not ParseResult parseResult)
+                if (argsResult is not ParseResult parseResult)
                     return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Complex command parsing failed for an unknown reason.");
 
                 var args = parseResult.Args;

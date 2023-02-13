@@ -30,7 +30,8 @@ namespace InteractionFramework.Attributes
                         ? Task.FromResult(PreconditionResult.FromSuccess())
                         : Task.FromResult(PreconditionResult.FromError("User ID does not match component ID!"));
 
-                else return Task.FromResult(PreconditionResult.FromError("Parse cannot be done if no userID exists."));
+                else
+                    return Task.FromResult(PreconditionResult.FromError("Parse cannot be done if no userID exists."));
             }
         }
     }

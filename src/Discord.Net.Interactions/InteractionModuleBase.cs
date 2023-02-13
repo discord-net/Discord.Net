@@ -18,10 +18,10 @@ namespace Discord.Interactions
         public T Context { get; private set; }
 
         /// <inheritdoc/>
-        public virtual void AfterExecute (ICommandInfo command) { }
+        public virtual void AfterExecute(ICommandInfo command) { }
 
         /// <inheritdoc/>
-        public virtual void BeforeExecute (ICommandInfo command) { }
+        public virtual void BeforeExecute(ICommandInfo command) { }
 
         /// <inheritdoc/>
         public virtual Task BeforeExecuteAsync(ICommandInfo command) => Task.CompletedTask;
@@ -30,12 +30,12 @@ namespace Discord.Interactions
         public virtual Task AfterExecuteAsync(ICommandInfo command) => Task.CompletedTask;
 
         /// <inheritdoc/>
-        public virtual void OnModuleBuilding (InteractionService commandService, ModuleInfo module) { }
+        public virtual void OnModuleBuilding(InteractionService commandService, ModuleInfo module) { }
 
         /// <inheritdoc/>
-        public virtual void Construct (Builders.ModuleBuilder builder, InteractionService commandService) { }
+        public virtual void Construct(Builders.ModuleBuilder builder, InteractionService commandService) { }
 
-        internal void SetContext (IInteractionContext context)
+        internal void SetContext(IInteractionContext context)
         {
             var newValue = context as T;
             Context = newValue ?? throw new InvalidOperationException($"Invalid context type. Expected {typeof(T).Name}, got {context.GetType().Name}.");
@@ -46,7 +46,7 @@ namespace Discord.Interactions
             await Context.Interaction.DeferAsync(ephemeral, options).ConfigureAwait(false);
 
         /// <inheritdoc cref="IDiscordInteraction.RespondAsync(string, Embed[], bool, bool, AllowedMentions, MessageComponent, Embed, RequestOptions)"/>
-        protected virtual async Task RespondAsync (string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
+        protected virtual async Task RespondAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
             AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, Embed embed = null) =>
             await Context.Interaction.RespondAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
 
@@ -71,7 +71,7 @@ namespace Discord.Interactions
             => Context.Interaction.RespondWithFilesAsync(attachments, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);
 
         /// <inheritdoc cref="IDiscordInteraction.FollowupAsync(string, Embed[], bool, bool, AllowedMentions, MessageComponent, Embed, RequestOptions)"/>
-        protected virtual async Task<IUserMessage> FollowupAsync (string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
+        protected virtual async Task<IUserMessage> FollowupAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
             AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, Embed embed = null) =>
             await Context.Interaction.FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
 
@@ -96,7 +96,7 @@ namespace Discord.Interactions
             => Context.Interaction.FollowupWithFilesAsync(attachments, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);
 
         /// <inheritdoc cref="IMessageChannel.SendMessageAsync(string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
-        protected virtual async Task<IUserMessage> ReplyAsync (string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null,
+        protected virtual async Task<IUserMessage> ReplyAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null,
             AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null) =>
             await Context.Channel.SendMessageAsync(text, false, embed, options, allowedMentions, messageReference, components).ConfigureAwait(false);
 
@@ -114,10 +114,10 @@ namespace Discord.Interactions
             var response = await Context.Interaction.GetOriginalResponseAsync().ConfigureAwait(false);
             await response.DeleteAsync().ConfigureAwait(false);
         }
-        
+
         /// <inheritdoc cref="IDiscordInteraction.RespondWithModalAsync(Modal, RequestOptions)"/>
         protected virtual async Task RespondWithModalAsync(Modal modal, RequestOptions options = null) => await Context.Interaction.RespondWithModalAsync(modal);
-        
+
         /// <inheritdoc cref="IDiscordInteractionExtentions.RespondWithModalAsync{T}(IDiscordInteraction, string, RequestOptions, Action{ModalBuilder})"/>
         protected virtual async Task RespondWithModalAsync<TModal>(string customId, RequestOptions options = null) where TModal : class, IModal
             => await Context.Interaction.RespondWithModalAsync<TModal>(customId, options);
@@ -125,7 +125,7 @@ namespace Discord.Interactions
         //IInteractionModuleBase
 
         /// <inheritdoc/>
-        void IInteractionModuleBase.SetContext (IInteractionContext context) => SetContext(context);
+        void IInteractionModuleBase.SetContext(IInteractionContext context) => SetContext(context);
     }
 
     /// <summary>

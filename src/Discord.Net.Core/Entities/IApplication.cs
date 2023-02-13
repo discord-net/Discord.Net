@@ -34,7 +34,7 @@ namespace Discord
         /// <summary>
         ///     Gets the icon URL of the application.
         /// </summary>
-        string IconUrl  { get; }
+        string IconUrl { get; }
         /// <summary>
         ///     Gets if the bot is public.
         /// </summary>

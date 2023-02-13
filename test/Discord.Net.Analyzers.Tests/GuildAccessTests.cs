@@ -1,7 +1,7 @@
-using System;
+using Discord.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Discord.Analyzers;
+using System;
 using TestHelper;
 using Xunit;
 

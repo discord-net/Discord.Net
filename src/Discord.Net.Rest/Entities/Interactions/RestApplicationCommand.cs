@@ -101,7 +101,7 @@ namespace Discord.Rest
 
             NameLocalized = model.NameLocalized.GetValueOrDefault();
             DescriptionLocalized = model.DescriptionLocalized.GetValueOrDefault();
-            
+
             IsEnabledInDm = model.DmPermission.GetValueOrDefault(true).GetValueOrDefault(true);
             DefaultMemberPermissions = new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(0).GetValueOrDefault(0));
             IsNsfw = model.Nsfw.GetValueOrDefault(false).GetValueOrDefault(false);

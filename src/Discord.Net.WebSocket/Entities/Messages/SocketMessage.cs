@@ -309,7 +309,7 @@ namespace Discord.WebSocket
         /// </returns>
         public override string ToString() => Content;
         internal SocketMessage Clone() => MemberwiseClone() as SocketMessage;
-#endregion
+        #endregion
 
         #region IMessage
         /// <inheritdoc />

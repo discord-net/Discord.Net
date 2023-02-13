@@ -37,6 +37,6 @@ namespace Discord.Interactions
         /// <param name="context">The context of the command.</param>
         /// <param name="commandInfo">The command being executed.</param>
         /// <param name="services">The service collection used for dependency injection.</param>
-        public abstract Task<PreconditionResult> CheckRequirementsAsync (IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services);
+        public abstract Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services);
     }
 }

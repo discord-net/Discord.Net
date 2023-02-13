@@ -9,8 +9,8 @@ namespace Discord.Interactions
 {
     internal sealed class EnumConverter<T> : TypeConverter<T> where T : struct, Enum
     {
-        public override ApplicationCommandOptionType GetDiscordType ( ) => ApplicationCommandOptionType.String;
-        public override Task<TypeConverterResult> ReadAsync (IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
+        public override ApplicationCommandOptionType GetDiscordType() => ApplicationCommandOptionType.String;
+        public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
         {
             if (Enum.TryParse<T>((string)option.Value, out var result))
                 return Task.FromResult(TypeConverterResult.FromSuccess(result));
@@ -18,7 +18,7 @@ namespace Discord.Interactions
                 return Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"Value {option.Value} cannot be converted to {nameof(T)}"));
         }
 
-        public override void Write (ApplicationCommandOptionProperties properties, IParameterInfo parameterInfo)
+        public override void Write(ApplicationCommandOptionProperties properties, IParameterInfo parameterInfo)
         {
             var names = Enum.GetNames(typeof(T));
             var members = names.SelectMany(x => typeof(T).GetMember(x)).Where(x => !x.IsDefined(typeof(HideAttribute), true));

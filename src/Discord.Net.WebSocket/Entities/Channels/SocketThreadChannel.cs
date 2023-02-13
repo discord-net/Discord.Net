@@ -1,5 +1,6 @@
 using Discord.Rest;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -8,7 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 using ThreadMember = Discord.API.ThreadMember;
-using System.Collections.Concurrent;
 
 namespace Discord.WebSocket
 {

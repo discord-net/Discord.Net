@@ -33,7 +33,7 @@ namespace Discord.Audio.Streams
         {
             if (_hasHeader)
                 throw new InvalidOperationException("Header received with no payload");
-                
+
             _hasHeader = true;
             _nextSeq = seq;
             _nextTimestamp = timestamp;

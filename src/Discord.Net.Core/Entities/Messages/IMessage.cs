@@ -79,7 +79,7 @@ namespace Discord
         ///     Time of when the message was last edited; <c>null</c> if the message is never edited.
         /// </returns>
         DateTimeOffset? EditedTimestamp { get; }
-        
+
         /// <summary>
         ///     Gets the source channel of the message.
         /// </summary>
@@ -197,7 +197,7 @@ namespace Discord
         ///     A read-only collection of sticker item objects.
         /// </returns>
         IReadOnlyCollection<IStickerItem> Stickers { get; }
-        
+
         /// <summary>
         ///     Gets the flags related to this message.
         /// </summary>

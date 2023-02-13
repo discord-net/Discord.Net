@@ -22,7 +22,7 @@ namespace Discord.Net.Converters
             GuildFeature features = GuildFeature.None;
             List<string> experimental = new();
 
-            foreach(var item in arr)
+            foreach (var item in arr)
             {
                 if (Enum.TryParse<GuildFeature>(string.Concat(item.Split('_')), true, out var result))
                 {

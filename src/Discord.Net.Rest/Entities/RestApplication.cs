@@ -55,7 +55,7 @@ namespace Discord.Rest
             return entity;
         }
         internal void Update(Model model)
-        {            
+        {
             Description = model.Description;
             RPCOrigins = model.RPCOrigins.IsSpecified ? model.RPCOrigins.Value.ToImmutableArray() : ImmutableArray<string>.Empty;
             Name = model.Name;

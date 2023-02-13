@@ -70,7 +70,7 @@ namespace Discord.Rest
             if (model.ThreadRateLimitPerUser.IsSpecified)
                 DefaultSlowModeInterval = model.ThreadRateLimitPerUser.Value;
 
-            if(model.SlowMode.IsSpecified)
+            if (model.SlowMode.IsSpecified)
                 ThreadCreationInterval = model.SlowMode.Value;
 
             DefaultSortOrder = model.DefaultSortOrder.GetValueOrDefault();
@@ -90,7 +90,7 @@ namespace Discord.Rest
             }
 
             CategoryId = model.CategoryId.GetValueOrDefault();
-            DefaultLayout= model.DefaultForumLayout.GetValueOrDefault();
+            DefaultLayout = model.DefaultForumLayout.GetValueOrDefault();
         }
 
         /// <inheritdoc/>
@@ -101,7 +101,7 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc cref="IForumChannel.CreatePostAsync(string, ThreadArchiveDuration, int?, string, Embed, RequestOptions, AllowedMentions, MessageComponent, ISticker[], Embed[], MessageFlags, ForumTag[])"/>
-        public Task<RestThreadChannel> CreatePostAsync(string title, ThreadArchiveDuration archiveDuration = ThreadArchiveDuration.OneDay, int? slowmode = null, 
+        public Task<RestThreadChannel> CreatePostAsync(string title, ThreadArchiveDuration archiveDuration = ThreadArchiveDuration.OneDay, int? slowmode = null,
             string text = null, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageComponent components = null, ISticker[] stickers = null,
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None, ForumTag[] tags = null)
             => ThreadHelper.CreatePostAsync(this, Discord, title, archiveDuration, slowmode, text, embed, options, allowedMentions, components, stickers, embeds, flags, tags?.Select(tag => tag.Id).ToArray());

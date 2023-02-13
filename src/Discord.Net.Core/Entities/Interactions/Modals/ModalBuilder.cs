@@ -93,7 +93,7 @@ namespace Discord
         /// <param name="maxLength">The input's maximum length.</param>
         /// <param name="style">The input's style.</param>
         /// <returns>The current builder.</returns>
-        public ModalBuilder AddTextInput(string label, string customId, TextInputStyle style = TextInputStyle.Short, 
+        public ModalBuilder AddTextInput(string label, string customId, TextInputStyle style = TextInputStyle.Short,
             string placeholder = "", int? minLength = null, int? maxLength = null, bool? required = null, string value = null)
             => AddTextInput(new(label, customId, style, placeholder, minLength, maxLength, required, value));
 
@@ -204,7 +204,7 @@ namespace Discord
         /// <param name="maxLength">The input's maximum length.</param>
         /// <param name="style">The input's style.</param>
         /// <returns>The current builder.</returns>
-        public ModalComponentBuilder WithTextInput(string label, string customId, TextInputStyle style = TextInputStyle.Short, 
+        public ModalComponentBuilder WithTextInput(string label, string customId, TextInputStyle style = TextInputStyle.Short,
             string placeholder = null, int? minLength = null, int? maxLength = null, int row = 0, bool? required = null,
             string value = null)
             => WithTextInput(new(label, customId, style, placeholder, minLength, maxLength, required, value), row);
@@ -263,6 +263,6 @@ namespace Discord
         /// </summary>
         /// <returns>A <see cref="ModalComponent"/> representing the builder.</returns>
         public ModalComponent Build()
-            => new (ActionRows?.Select(x => x.Build()).ToList());
+            => new(ActionRows?.Select(x => x.Build()).ToList());
     }
 }

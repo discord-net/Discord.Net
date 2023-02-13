@@ -229,7 +229,7 @@ namespace Discord.Interactions.Builders
         {
             base.SetParameterType(type);
 
-            if(!IsComplexParameter)
+            if (!IsComplexParameter)
                 TypeConverter = Command.Module.InteractionService.GetTypeConverter(ParameterType, services);
 
             return this;
@@ -248,7 +248,7 @@ namespace Discord.Interactions.Builders
             SlashCommandParameterBuilder builder = new(Command);
             configure(builder);
 
-            if(builder.IsComplexParameter)
+            if (builder.IsComplexParameter)
                 throw new InvalidOperationException("You cannot create nested complex parameters.");
 
             _complexParameterFields.Add(builder);
@@ -265,7 +265,7 @@ namespace Discord.Interactions.Builders
         /// <exception cref="InvalidOperationException">Thrown if the added field has a <see cref="ComplexParameterAttribute"/>.</exception>
         public SlashCommandParameterBuilder AddComplexParameterFields(params SlashCommandParameterBuilder[] fields)
         {
-            if(fields.Any(x => x.IsComplexParameter))
+            if (fields.Any(x => x.IsComplexParameter))
                 throw new InvalidOperationException("You cannot create nested complex parameters.");
 
             _complexParameterFields.AddRange(fields);

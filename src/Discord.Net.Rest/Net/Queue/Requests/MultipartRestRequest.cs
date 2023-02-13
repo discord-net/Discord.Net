@@ -1,4 +1,4 @@
-﻿using Discord.Net.Rest;
+using Discord.Net.Rest;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,7 +7,7 @@ namespace Discord.Net.Queue
     public class MultipartRestRequest : RestRequest
     {
         public IReadOnlyDictionary<string, object> MultipartParams { get; }
-        
+
         public MultipartRestRequest(IRestClient client, string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, RequestOptions options)
             : base(client, method, endpoint, options)
         {

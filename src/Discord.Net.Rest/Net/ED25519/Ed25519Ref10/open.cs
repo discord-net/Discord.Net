@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord.Net.ED25519.Ed25519Ref10
 {
@@ -55,7 +55,8 @@ namespace Discord.Net.ED25519.Ed25519Ref10
             GroupElementP3 A;
             GroupElementP2 R;
 
-            if ((sig[sigoffset + 63] & 224) != 0) return false;
+            if ((sig[sigoffset + 63] & 224) != 0)
+                return false;
             if (GroupOperations.ge_frombytes_negate_vartime(out A, pk, pkoffset) != 0)
                 return false;
 

@@ -34,7 +34,7 @@ namespace Discord.Interactions
         /// <inheritdoc/>
         public IReadOnlyCollection<ParameterPreconditionAttribute> Preconditions { get; }
 
-        internal CommandParameterInfo (Builders.IParameterBuilder builder, ICommandInfo command)
+        internal CommandParameterInfo(Builders.IParameterBuilder builder, ICommandInfo command)
         {
             Command = command;
             Name = builder.Name;
@@ -47,7 +47,7 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public async Task<PreconditionResult> CheckPreconditionsAsync (IInteractionContext context, object value, IServiceProvider services)
+        public async Task<PreconditionResult> CheckPreconditionsAsync(IInteractionContext context, object value, IServiceProvider services)
         {
             foreach (var precondition in Preconditions)
             {

@@ -1,9 +1,9 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using Discord.Net.Converters;
 using Discord.Net.Rest;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 namespace Discord.API.Rest
 {

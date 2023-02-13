@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord.Net.ED25519.Ed25519Ref10
 {
@@ -16,7 +16,8 @@ namespace Discord.Net.ED25519.Ed25519Ref10
             GroupOperations.ge_scalarmult_base(out A, h, 0);
             GroupOperations.ge_p3_tobytes(pk, pkoffset, ref A);
 
-            for (i = 0; i < 32; ++i) sk[skoffset + 32 + i] = pk[pkoffset + i];
+            for (i = 0; i < 32; ++i)
+                sk[skoffset + 32 + i] = pk[pkoffset + i];
             CryptoBytes.Wipe(h);
         }
     }

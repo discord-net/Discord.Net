@@ -34,7 +34,7 @@ namespace Discord.Logging
             try
             {
                 if (severity <= Level)
-                await _messageEvent.InvokeAsync(new LogMessage(severity, source, message, ex)).ConfigureAwait(false);
+                    await _messageEvent.InvokeAsync(new LogMessage(severity, source, message, ex)).ConfigureAwait(false);
             }
             catch
             {

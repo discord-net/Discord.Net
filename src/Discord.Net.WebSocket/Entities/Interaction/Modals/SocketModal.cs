@@ -27,7 +27,7 @@ namespace Discord.WebSocket
             var dataModel = model.Data.IsSpecified
                 ? (DataModel)model.Data.Value
                 : null;
-            
+
             Data = new SocketModalData(dataModel, client, client.State, client.State.GetGuild(model.GuildId.GetValueOrDefault()), model.User.GetValueOrDefault());
         }
 
@@ -380,7 +380,7 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public override Task RespondWithModalAsync(Modal modal, RequestOptions options = null)
             => throw new NotSupportedException("You cannot respond to a modal with a modal!");
-            
+
         IModalInteractionData IModalInteraction.Data => Data;
     }
 }

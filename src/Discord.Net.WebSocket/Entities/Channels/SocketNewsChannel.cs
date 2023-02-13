@@ -19,7 +19,7 @@ namespace Discord.WebSocket
     public class SocketNewsChannel : SocketTextChannel, INewsChannel
     {
         internal SocketNewsChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
-            :base(discord, id, guild)
+            : base(discord, id, guild)
         {
         }
         internal new static SocketNewsChannel Create(SocketGuild guild, ClientState state, Model model)

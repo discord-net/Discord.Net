@@ -100,10 +100,10 @@ namespace Discord.Rest
 
         #region IWebhook
         /// <inheritdoc />
-        IGuild IWebhook.Guild 
+        IGuild IWebhook.Guild
             => Guild ?? throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
         /// <inheritdoc />
-        IIntegrationChannel IWebhook.Channel 
+        IIntegrationChannel IWebhook.Channel
             => Channel ?? throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
         /// <inheritdoc />
         Task IWebhook.ModifyAsync(Action<WebhookProperties> func, RequestOptions options)

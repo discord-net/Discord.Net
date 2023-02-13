@@ -15,7 +15,7 @@ namespace Discord.Interactions
         /// </summary>
         public object Value { get; }
 
-        internal ParameterChoice (string name, object value)
+        internal ParameterChoice(string name, object value)
         {
             Name = name;
             Value = value;

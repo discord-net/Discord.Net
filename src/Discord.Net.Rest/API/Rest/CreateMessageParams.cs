@@ -28,7 +28,7 @@ namespace Discord.API.Rest
 
         [JsonProperty("sticker_ids")]
         public Optional<ulong[]> Stickers { get; set; }
-        
+
         [JsonProperty("flags")]
         public Optional<MessageFlags> Flags { get; set; }
 

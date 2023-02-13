@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
-using Model = Discord.API.User;
 using EventUserModel = Discord.API.GuildScheduledEventUser;
-using System.Collections.Generic;
+using Model = Discord.API.User;
 
 namespace Discord.Rest
 {

@@ -128,7 +128,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.DeleteMessageAsync(messageId, options); 
+            return base.DeleteMessageAsync(messageId, options);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -136,7 +136,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.DeleteMessagesAsync(messages, options); 
+            return base.DeleteMessagesAsync(messages, options);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -144,7 +144,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.DeleteMessagesAsync(messageIds, options); 
+            return base.DeleteMessagesAsync(messageIds, options);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -160,7 +160,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.GetCachedMessage(id); 
+            return base.GetCachedMessage(id);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -192,7 +192,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.GetMessagesAsync(fromMessage, dir, limit, options); 
+            return base.GetMessagesAsync(fromMessage, dir, limit, options);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -232,7 +232,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.GetWebhooksAsync(options); 
+            return base.GetWebhooksAsync(options);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -256,7 +256,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.SendFileAsync(attachment, text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags); 
+            return base.SendFileAsync(attachment, text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>

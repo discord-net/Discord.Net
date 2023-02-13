@@ -1,8 +1,7 @@
 using System;
 using System.Linq;
-
-using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
+using Model = Discord.API.AuditLog;
 
 namespace Discord.Rest
 {
@@ -13,9 +12,9 @@ namespace Discord.Rest
     {
         private ScheduledEventUpdateAuditLogData(ulong id, ScheduledEventInfo before, ScheduledEventInfo after)
         {
-            Id     = id;
+            Id = id;
             Before = before;
-            After  = after;
+            After = after;
         }
 
         internal static ScheduledEventUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
