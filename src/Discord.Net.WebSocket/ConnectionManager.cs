@@ -78,14 +78,15 @@ namespace Discord
                             nextReconnectDelay = 1000; //Reset delay
                             await _connectionPromise.Task.ConfigureAwait(false);
                         }
-                        catch (OperationCanceledException ex)
-                        {
-                            // Added back for log out / stop to client. The connection promise would cancel and it would be logged as an error, shouldn't be the case.
-                            // ref #2026
+                        // remove for testing.
+                        //catch (OperationCanceledException ex)
+                        //{
+                        //    // Added back for log out / stop to client. The connection promise would cancel and it would be logged as an error, shouldn't be the case.
+                        //    // ref #2026
 
-                            Cancel(); //In case this exception didn't come from another Error call
-                            await DisconnectAsync(ex, !reconnectCancelToken.IsCancellationRequested).ConfigureAwait(false);
-                        }
+                        //    Cancel(); //In case this exception didn't come from another Error call
+                        //    await DisconnectAsync(ex, !reconnectCancelToken.IsCancellationRequested).ConfigureAwait(false);
+                        //}
                         catch (Exception ex)
                         {
                             Error(ex); //In case this exception didn't come from another Error call
