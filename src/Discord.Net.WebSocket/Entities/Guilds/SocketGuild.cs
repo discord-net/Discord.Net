@@ -1867,9 +1867,9 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc cref="IGuild.CreateAutoModRuleAsync"/>
-        public async Task<SocketAutoModRule> CreateAutoModRuleAsync(AutoModRule props, RequestOptions options = null)
+        public async Task<SocketAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options = null)
         {
-            var rule = await GuildHelper.CreateAutoModRuleAsync(this, props.ToProperties(), Discord, options);
+            var rule = await GuildHelper.CreateAutoModRuleAsync(this, props, Discord, options);
 
             return AddOrUpdateAutoModRule(rule);
         }
@@ -2138,7 +2138,7 @@ namespace Discord.WebSocket
             => await GetAutoModRulesAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(AutoModRule props, RequestOptions options)
+        async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options)
             => await CreateAutoModRuleAsync(props, options).ConfigureAwait(false);
 
         #endregion

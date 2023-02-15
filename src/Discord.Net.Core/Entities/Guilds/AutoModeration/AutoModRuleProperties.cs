@@ -12,6 +12,61 @@ namespace Discord
     public class AutoModRuleProperties
     {
         /// <summary>
+        ///     Returns the max keyword count for an AutoMod rule allowed by Discord.
+        /// </summary>
+        public const int MaxKeywordCount = 1000;
+
+        /// <summary>
+        ///     Returns the max keyword length for an AutoMod rule allowed by Discord.
+        /// </summary>
+        public const int MaxKeywordLength = 60;
+
+        /// <summary>
+        ///     Returns the max regex pattern count for an AutoMod rule allowed by Discord.
+        /// </summary>
+        public const int MaxRegexPatternCount = 10;
+
+        /// <summary>
+        ///     Returns the max regex pattern length for an AutoMod rule allowed by Discord.
+        /// </summary>
+        public const int MaxRegexPatternLength = 260;
+
+        /// <summary>
+        ///     Returns the max allowlist keyword count for a <see cref="AutoModTriggerType.Keyword"/> AutoMod rule allowed by Discord.
+        /// </summary>
+        public const int MaxAllowListCountKeyword = 100;
+
+        /// <summary>
+        ///     Returns the max allowlist keyword count for a <see cref="AutoModTriggerType.KeywordPreset"/> AutoMod rule allowed by Discord.
+        /// </summary>
+        public const int MaxAllowListCountKeywordPreset = 1000;
+
+        /// <summary>
+        ///     Returns the max allowlist keyword length for an AutoMod rule allowed by Discord.
+        /// </summary>
+        public const int MaxAllowListEntryLength = 60;
+
+        /// <summary>
+        ///     Returns the max mention limit for an AutoMod rule allowed by Discord.
+        /// </summary>
+        public const int MaxMentionLimit = 50;
+
+        /// <summary>
+        ///     Returns the max exempt role count for an AutoMod rule allowed by Discord.
+        /// </summary>
+        public const int MaxExemptRoles = 20;
+
+        /// <summary>
+        ///     Returns the max exempt channel count for an AutoMod rule allowed by Discord.
+        /// </summary>
+        public const int MaxExemptChannels = 50;
+
+        /// <summary>
+        ///     Returns the max timeout duration in seconds for an auto moderation rule action.
+        /// </summary>
+        public const int MaxTimeoutSeconds = 2419200;
+
+        /// <summary>
         ///     Gets or sets the name for the rule.
         /// </summary>
         public Optional<string> Name { get; set; }

@@ -1290,6 +1290,6 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IAutoModRule"/>.
         /// </returns>
-        Task<IAutoModRule> CreateAutoModRuleAsync(AutoModRule props, RequestOptions options = null);
+        Task<IAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options = null);
     }
 }
