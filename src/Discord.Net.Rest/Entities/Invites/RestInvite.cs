@@ -39,7 +39,7 @@ namespace Discord.Rest
         public InviteGuild InviteGuild { get; private set; }
 
         internal IChannel Channel { get; }
-        
+
         internal IGuild Guild { get; }
 
         /// <inheritdoc />

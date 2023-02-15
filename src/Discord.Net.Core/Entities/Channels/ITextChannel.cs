@@ -8,7 +8,7 @@ namespace Discord
     /// <summary>
     ///     Represents a generic channel in a guild that can send and receive messages.
     /// </summary>
-    public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel
+    public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel, IIntegrationChannel
     {
         /// <summary>
         ///     Gets a value that indicates whether the channel is NSFW.
@@ -94,37 +94,6 @@ namespace Discord
         /// </returns>
         /// <seealso cref="TextChannelProperties"/>
         Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null);
-        
-        /// <summary>
-        ///     Creates a webhook in this text channel.
-        /// </summary>
-        /// <param name="name">The name of the webhook.</param>
-        /// <param name="avatar">The avatar of the webhook.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
-        ///     webhook.
-        /// </returns>
-        Task<IWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null);
-        /// <summary>
-        ///     Gets a webhook available in this text channel.
-        /// </summary>
-        /// <param name="id">The identifier of the webhook.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a webhook associated
-        ///     with the identifier; <c>null</c> if the webhook is not found.
-        /// </returns>
-        Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
-        /// <summary>
-        ///     Gets the webhooks available in this text channel.
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
-        ///     of webhooks that is available in this channel.
-        /// </returns>
-        Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null);
 
         /// <summary>
         ///     Creates a thread within this <see cref="ITextChannel"/>.

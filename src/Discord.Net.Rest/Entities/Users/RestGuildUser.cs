@@ -201,7 +201,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, GuildId, GuildAvatarId, size, format);
-#endregion
+        #endregion
 
         #region IGuildUser
         /// <inheritdoc />

@@ -10,7 +10,7 @@ namespace Discord
         /// <summary>
         ///     Gets the identifier of this user's avatar.
         /// </summary>
-        string AvatarId { get; }     
+        string AvatarId { get; }
         /// <summary>
         ///     Gets the avatar URL for this user.
         /// </summary>

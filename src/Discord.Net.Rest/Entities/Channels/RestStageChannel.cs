@@ -39,7 +39,7 @@ namespace Discord.Rest
         internal void Update(StageInstance model, bool isLive = false)
         {
             IsLive = isLive;
-            if(isLive)
+            if (isLive)
             {
                 PrivacyLevel = model.PrivacyLevel;
                 IsDiscoverableDisabled = model.DiscoverableDisabled;

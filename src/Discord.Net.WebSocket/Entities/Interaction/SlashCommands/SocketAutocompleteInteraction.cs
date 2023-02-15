@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
 using DataModel = Discord.API.AutocompleteInteractionData;
+using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {

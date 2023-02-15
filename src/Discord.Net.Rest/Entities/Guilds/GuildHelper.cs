@@ -3,14 +3,13 @@ using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using WidgetModel = Discord.API.GuildWidget;
-using Model = Discord.API.Guild;
-using RoleModel = Discord.API.Role;
 using ImageModel = Discord.API.Image;
-using System.IO;
-using System.Runtime.CompilerServices;
+using Model = Discord.API.Guild
+using RoleModel = Discord.API.Role;
+using WidgetModel = Discord.API.GuildWidget;
 
 namespace Discord.Rest
 {
@@ -286,6 +285,8 @@ namespace Discord.Rest
                         Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
+                VideoQuality = props.VideoQualityMode,
+                RtcRegion = props.RTCRegion
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);

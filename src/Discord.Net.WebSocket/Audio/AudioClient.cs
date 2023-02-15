@@ -7,11 +7,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic; 
 
 namespace Discord.Audio
 {
@@ -137,7 +137,8 @@ namespace Discord.Audio
                 await keepaliveTask.ConfigureAwait(false);
             _keepaliveTask = null;
 
-            while (_heartbeatTimes.TryDequeue(out _)) { }
+            while (_heartbeatTimes.TryDequeue(out _))
+            { }
             _lastMessageTime = 0;
 
             await ClearInputStreamsAsync().ConfigureAwait(false);
@@ -149,7 +150,7 @@ namespace Discord.Audio
         public AudioOutStream CreateOpusStream(int bufferMillis)
         {
             var outputStream = new OutputStream(ApiClient); //Ignores header
-            var sodiumEncrypter = new SodiumEncryptStream( outputStream, this); //Passes header
+            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
             var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
             return new BufferedWriteStream(rtpWriter, this, bufferMillis, _connection.CancelToken, _audioLogger); //Generates header
         }

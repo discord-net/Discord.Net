@@ -7,23 +7,23 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoModRuleModel = Discord.API.AutoModerationRule;
 using ChannelModel = Discord.API.Channel;
 using EmojiUpdateModel = Discord.API.Gateway.GuildEmojiUpdateEvent;
+using EventModel = Discord.API.GuildScheduledEvent;
 using ExtendedModel = Discord.API.Gateway.ExtendedGuild;
 using GuildSyncModel = Discord.API.Gateway.GuildSyncEvent;
 using MemberModel = Discord.API.GuildMember;
 using Model = Discord.API.Guild;
 using PresenceModel = Discord.API.Presence;
 using RoleModel = Discord.API.Role;
+using StickerModel = Discord.API.Sticker;
 using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
-using StickerModel = Discord.API.Sticker;
-using EventModel = Discord.API.GuildScheduledEvent;
-using AutoModRuleModel = Discord.API.AutoModerationRule;
-using System.IO;
 
 namespace Discord.WebSocket
 {
@@ -406,7 +406,7 @@ namespace Discord.WebSocket
             IsAvailable = !(model.Unavailable ?? false);
             if (!IsAvailable)
             {
-                if(_events == null)
+                if (_events == null)
                     _events = new ConcurrentDictionary<ulong, SocketGuildEvent>();
                 if (_channels == null)
                     _channels = new ConcurrentDictionary<ulong, SocketGuildChannel>();
@@ -434,7 +434,7 @@ namespace Discord.WebSocket
                     channels.TryAdd(channel.Id, channel);
                 }
 
-                for(int i = 0; i < model.Threads.Length; i++)
+                for (int i = 0; i < model.Threads.Length; i++)
                 {
                     var threadChannel = SocketThreadChannel.Create(this, state, model.Threads[i]);
                     state.AddChannel(threadChannel);
@@ -990,7 +990,7 @@ namespace Discord.WebSocket
 
             Discord.State.PurgeCommands(x => !x.IsGlobalCommand && x.Guild.Id == Id);
 
-            foreach(var entity in entities)
+            foreach (var entity in entities)
             {
                 Discord.State.AddCommand(entity);
             }
@@ -1198,7 +1198,7 @@ namespace Discord.WebSocket
             var membersToKeep = Users.Where(x => !predicate.Invoke(x) || x?.Id == Discord.CurrentUser.Id);
 
             foreach (var member in membersToPurge)
-                if(_members.TryRemove(member.Id, out _))
+                if (_members.TryRemove(member.Id, out _))
                     member.GlobalUser.RemoveRef(Discord);
 
             foreach (var member in membersToKeep)
@@ -1350,7 +1350,7 @@ namespace Discord.WebSocket
             {
                 case GuildScheduledEventType.Stage:
                     CurrentUser.GuildPermissions.Ensure(GuildPermission.ManageEvents | GuildPermission.ManageChannels | GuildPermission.MuteMembers | GuildPermission.MoveMembers);
-                break;
+                    break;
                 case GuildScheduledEventType.Voice:
                     CurrentUser.GuildPermissions.Ensure(GuildPermission.ManageEvents | GuildPermission.ViewChannel | GuildPermission.Connect);
                     break;
@@ -2083,7 +2083,7 @@ namespace Discord.WebSocket
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (bool withLocalizations, string locale, RequestOptions options)
+        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync(bool withLocalizations, string locale, RequestOptions options)
             => await GetApplicationCommandsAsync(withLocalizations, locale, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options)

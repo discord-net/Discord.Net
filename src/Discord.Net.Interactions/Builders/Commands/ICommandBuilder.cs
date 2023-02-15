@@ -66,7 +66,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        ICommandBuilder WithName (string name);
+        ICommandBuilder WithName(string name);
 
         /// <summary>
         ///     Sets <see cref="MethodName"/>.
@@ -75,7 +75,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        ICommandBuilder WithMethodName (string name);
+        ICommandBuilder WithMethodName(string name);
 
         /// <summary>
         ///     Adds attributes to <see cref="Attributes"/>.
@@ -84,7 +84,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        ICommandBuilder WithAttributes (params Attribute[] attributes);
+        ICommandBuilder WithAttributes(params Attribute[] attributes);
 
         /// <summary>
         ///     Sets <see cref="RunMode"/>.
@@ -93,7 +93,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        ICommandBuilder SetRunMode (RunMode runMode);
+        ICommandBuilder SetRunMode(RunMode runMode);
 
         /// <summary>
         ///     Sets <see cref="TreatNameAsRegex"/>.
@@ -111,7 +111,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        ICommandBuilder AddParameters (params IParameterBuilder[] parameters);
+        ICommandBuilder AddParameters(params IParameterBuilder[] parameters);
 
         /// <summary>
         ///     Adds preconditions to <see cref="Preconditions"/>.
@@ -120,6 +120,6 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        ICommandBuilder WithPreconditions (params PreconditionAttribute[] preconditions);
+        ICommandBuilder WithPreconditions(params PreconditionAttribute[] preconditions);
     }
 }

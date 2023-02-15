@@ -12,7 +12,7 @@ namespace Discord.Audio
         public override bool CanWrite => false;
 
         /// <exception cref="InvalidOperationException">This stream does not accept headers.</exception>
-        public virtual void WriteHeader(ushort seq, uint timestamp, bool missed) => 
+        public virtual void WriteHeader(ushort seq, uint timestamp, bool missed) =>
             throw new InvalidOperationException("This stream does not accept headers.");
         public override void Write(byte[] buffer, int offset, int count)
         {
@@ -31,7 +31,7 @@ namespace Discord.Audio
 
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Reading stream length is not supported.</exception>
-        public override long Length => 
+        public override long Length =>
             throw new NotSupportedException();
 
         /// <inheritdoc />

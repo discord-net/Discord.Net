@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.CodeAnalysis;
 using Discord.Commands;
+using Microsoft.CodeAnalysis;
+using System;
 
 namespace Discord.Analyzers
 {

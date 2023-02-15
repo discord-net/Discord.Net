@@ -1,4 +1,4 @@
-﻿namespace Discord
+namespace Discord
 {
     public interface ITag
     {

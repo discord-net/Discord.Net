@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Model = Discord.API.Role;
 using BulkParams = Discord.API.Rest.ModifyGuildRolesParams;
+using Model = Discord.API.Role;
 
 namespace Discord.Rest
 {

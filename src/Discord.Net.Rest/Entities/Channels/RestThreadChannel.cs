@@ -104,13 +104,25 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets a collection of users within this thread.
         /// </summary>
+        /// <param name="limit">Sets the limit of the user count for each request. 100 by default.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a collection of thread
+        ///     users found within this thread channel.
+        /// </returns>
+        public IAsyncEnumerable<IReadOnlyCollection<RestThreadUser>> GetThreadUsersAsync(int limit = DiscordConfig.MaxThreadMembersPerBatch, RequestOptions options = null)
+            => ThreadHelper.GetUsersAsync(this, Discord, limit, null, options);
+
+        /// <summary>
+        ///     Gets a collection of users within this thread.
+        /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task representing the asynchronous get operation. The task returns a
         ///     <see cref="IReadOnlyCollection{T}"/> of <see cref="RestThreadUser"/>'s.
         /// </returns>
+        [Obsolete("Please use GetThreadUsersAsync instead of this. Will be removed in next major version.", false)]
         public new async Task<IReadOnlyCollection<RestThreadUser>> GetUsersAsync(RequestOptions options = null)
-            => (await ThreadHelper.GetUsersAsync(this, Discord, options).ConfigureAwait(false)).ToImmutableArray();
+            => (await GetThreadUsersAsync(options: options).FlattenAsync()).ToImmutableArray();
 
         /// <inheritdoc/>
         public override async Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)

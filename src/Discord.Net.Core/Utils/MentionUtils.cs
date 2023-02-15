@@ -61,7 +61,7 @@ namespace Discord
                     text = text.Substring(3, text.Length - 4); //<@!123>
                 else
                     text = text.Substring(2, text.Length - 3); //<@123>
-                
+
                 if (ulong.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out userId))
                     return true;
             }
@@ -87,7 +87,7 @@ namespace Discord
             if (text.Length >= 3 && text[0] == '<' && text[1] == '#' && text[text.Length - 1] == '>')
             {
                 text = text.Substring(2, text.Length - 3); //<#123>
-                
+
                 if (ulong.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out channelId))
                     return true;
             }
@@ -113,7 +113,7 @@ namespace Discord
             if (text.Length >= 4 && text[0] == '<' && text[1] == '@' && text[2] == '&' && text[text.Length - 1] == '>')
             {
                 text = text.Substring(3, text.Length - 4); //<@&123>
-                
+
                 if (ulong.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out roleId))
                     return true;
             }
@@ -136,27 +136,33 @@ namespace Discord
                 switch (tag.Type)
                 {
                     case TagType.UserMention:
-                        if (userHandling == TagHandling.Ignore) continue;
+                        if (userHandling == TagHandling.Ignore)
+                            continue;
                         newText = ResolveUserMention(tag, userHandling);
                         break;
                     case TagType.ChannelMention:
-                        if (channelHandling == TagHandling.Ignore) continue;
+                        if (channelHandling == TagHandling.Ignore)
+                            continue;
                         newText = ResolveChannelMention(tag, channelHandling);
                         break;
                     case TagType.RoleMention:
-                        if (roleHandling == TagHandling.Ignore) continue;
+                        if (roleHandling == TagHandling.Ignore)
+                            continue;
                         newText = ResolveRoleMention(tag, roleHandling);
                         break;
                     case TagType.EveryoneMention:
-                        if (everyoneHandling == TagHandling.Ignore) continue;
+                        if (everyoneHandling == TagHandling.Ignore)
+                            continue;
                         newText = ResolveEveryoneMention(tag, everyoneHandling);
                         break;
                     case TagType.HereMention:
-                        if (everyoneHandling == TagHandling.Ignore) continue;
+                        if (everyoneHandling == TagHandling.Ignore)
+                            continue;
                         newText = ResolveHereMention(tag, everyoneHandling);
                         break;
                     case TagType.Emoji:
-                        if (emojiHandling == TagHandling.Ignore) continue;
+                        if (emojiHandling == TagHandling.Ignore)
+                            continue;
                         newText = ResolveEmoji(tag, emojiHandling);
                         break;
                 }

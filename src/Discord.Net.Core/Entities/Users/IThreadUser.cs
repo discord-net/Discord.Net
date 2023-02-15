@@ -21,5 +21,10 @@ namespace Discord
         ///     Gets the guild this thread was created in.
         /// </summary>
         IGuild Guild { get; }
+
+        /// <summary>
+        ///     Gets the <see cref="IGuildUser"/> on the server this thread was created in.
+        /// </summary>
+        IGuildUser GuildUser { get; }
     }
 }

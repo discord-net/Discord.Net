@@ -19,7 +19,7 @@ namespace Discord
         ///     Gets a <see cref="OverwritePermissions" /> that grants all permissions for the given channel.
         /// </summary>
         /// <exception cref="ArgumentException">Unknown channel type.</exception>
-        public static OverwritePermissions AllowAll(IChannel channel) 
+        public static OverwritePermissions AllowAll(IChannel channel)
             => new OverwritePermissions(ChannelPermissions.All(channel).RawValue, 0);
         /// <summary>
         ///     Gets a <see cref="OverwritePermissions" /> that denies all permissions for the given channel.
@@ -116,24 +116,24 @@ namespace Discord
 
         private OverwritePermissions(ulong allowValue, ulong denyValue,
             PermValue? createInstantInvite = null,
-            PermValue? manageChannel = null, 
+            PermValue? manageChannel = null,
             PermValue? addReactions = null,
             PermValue? viewChannel = null,
             PermValue? sendMessages = null,
             PermValue? sendTTSMessages = null,
-            PermValue? manageMessages = null, 
+            PermValue? manageMessages = null,
             PermValue? embedLinks = null,
             PermValue? attachFiles = null,
             PermValue? readMessageHistory = null,
-            PermValue? mentionEveryone = null, 
+            PermValue? mentionEveryone = null,
             PermValue? useExternalEmojis = null,
             PermValue? connect = null,
             PermValue? speak = null,
-            PermValue? muteMembers = null, 
+            PermValue? muteMembers = null,
             PermValue? deafenMembers = null,
             PermValue? moveMembers = null,
             PermValue? useVoiceActivation = null,
-            PermValue? manageRoles = null, 
+            PermValue? manageRoles = null,
             PermValue? manageWebhooks = null,
             PermValue? prioritySpeaker = null,
             PermValue? stream = null,
@@ -194,7 +194,7 @@ namespace Discord
             PermValue viewChannel = PermValue.Inherit,
             PermValue sendMessages = PermValue.Inherit,
             PermValue sendTTSMessages = PermValue.Inherit,
-            PermValue manageMessages = PermValue.Inherit, 
+            PermValue manageMessages = PermValue.Inherit,
             PermValue embedLinks = PermValue.Inherit,
             PermValue attachFiles = PermValue.Inherit,
             PermValue readMessageHistory = PermValue.Inherit,
@@ -221,11 +221,12 @@ namespace Discord
             PermValue useExternalStickers = PermValue.Inherit,
             PermValue sendMessagesInThreads = PermValue.Inherit,
             PermValue startEmbeddedActivities = PermValue.Inherit)
-            : this(0, 0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages, 
-                  embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
+            : this(0, 0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
+                  embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers,
                   moveMembers, useVoiceActivation, manageRoles, manageWebhooks, prioritySpeaker, stream, useSlashCommands, useApplicationCommands,
                   requestToSpeak, manageThreads, createPublicThreads, createPrivateThreads, usePublicThreads, usePrivateThreads, useExternalStickers,
-                  sendMessagesInThreads, startEmbeddedActivities) { }
+                  sendMessagesInThreads, startEmbeddedActivities)
+        { }
 
         /// <summary>
         ///     Initializes a new <see cref="OverwritePermissions" /> from the current one, changing the provided
@@ -238,11 +239,11 @@ namespace Discord
             PermValue? viewChannel = null,
             PermValue? sendMessages = null,
             PermValue? sendTTSMessages = null,
-            PermValue? manageMessages = null, 
+            PermValue? manageMessages = null,
             PermValue? embedLinks = null,
             PermValue? attachFiles = null,
             PermValue? readMessageHistory = null,
-            PermValue? mentionEveryone = null, 
+            PermValue? mentionEveryone = null,
             PermValue? useExternalEmojis = null,
             PermValue? connect = null,
             PermValue? speak = null,
@@ -265,8 +266,8 @@ namespace Discord
             PermValue? useExternalStickers = null,
             PermValue? sendMessagesInThreads = null,
             PermValue? startEmbeddedActivities = null)
-            => new OverwritePermissions(AllowValue, DenyValue, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages, 
-                embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
+            => new OverwritePermissions(AllowValue, DenyValue, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
+                embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers,
                 moveMembers, useVoiceActivation, manageRoles, manageWebhooks, prioritySpeaker, stream, useSlashCommands, useApplicationCommands,
                   requestToSpeak, manageThreads, createPublicThreads, createPrivateThreads, usePublicThreads, usePrivateThreads, useExternalStickers,
                   sendMessagesInThreads, startEmbeddedActivities);
@@ -305,7 +306,7 @@ namespace Discord
         }
 
         public override string ToString() => $"Allow {AllowValue}, Deny {DenyValue}";
-        private string DebuggerDisplay => 
+        private string DebuggerDisplay =>
             $"Allow {string.Join(", ", ToAllowList())}, " +
             $"Deny {string.Join(", ", ToDenyList())}";
     }

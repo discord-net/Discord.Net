@@ -1,4 +1,4 @@
-﻿namespace Discord.Audio
+namespace Discord.Audio
 {
     //https://github.com/gcp/opus/blob/master/include/opus_defines.h
     internal enum OpusCtl : int

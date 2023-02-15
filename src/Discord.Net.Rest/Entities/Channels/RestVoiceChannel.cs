@@ -26,6 +26,8 @@ namespace Discord.Rest
         public int? UserLimit { get; private set; }
         /// <inheritdoc/>
         public string RTCRegion { get; private set; }
+        /// <inheritdoc/>
+        public VideoQualityMode VideoQualityMode { get; private set; }
 
         internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
@@ -42,11 +44,13 @@ namespace Discord.Rest
         {
             base.Update(model);
 
-            if(model.Bitrate.IsSpecified)
+            if (model.Bitrate.IsSpecified)
                 Bitrate = model.Bitrate.Value;
 
-            if(model.UserLimit.IsSpecified)
+            if (model.UserLimit.IsSpecified)
                 UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
+
+            VideoQualityMode = model.VideoQualityMode.GetValueOrDefault(VideoQualityMode.Auto);
 
             RTCRegion = model.RTCRegion.GetValueOrDefault(null);
         }

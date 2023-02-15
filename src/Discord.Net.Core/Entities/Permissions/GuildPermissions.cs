@@ -281,7 +281,7 @@ namespace Discord
                 manageThreads: manageThreads,
                 createPublicThreads: createPublicThreads,
                 createPrivateThreads: createPrivateThreads,
-				useExternalStickers: useExternalStickers,
+                useExternalStickers: useExternalStickers,
                 sendMessagesInThreads: sendMessagesInThreads,
                 startEmbeddedActivities: startEmbeddedActivities,
                 moderateMembers: moderateMembers)

@@ -4,7 +4,7 @@ namespace Discord.Net.Udp
 {
     public static class DefaultUdpSocketProvider
     {
-        public static readonly UdpSocketProvider Instance = () => 
+        public static readonly UdpSocketProvider Instance = () =>
         {
             try
             {

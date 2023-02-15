@@ -175,23 +175,23 @@ namespace Discord
         /// </remarks>
         internal bool DisplayInitialLog { get; set; } = true;
 
-		/// <summary>
-		/// 	Gets or sets whether or not rate-limits should use the system clock.
-		/// </summary>
-		/// <remarks>
-		///		If set to <c>false</c>, we will use the X-RateLimit-Reset-After header
-		///		to determine when a rate-limit expires, rather than comparing the
-		///		X-RateLimit-Reset timestamp to the system time.
-		///
-		///		This should only be changed to false if the system is known to have
-		/// 	a clock that is out of sync. Relying on the Reset-After header will
-		///		incur network lag.
-		///
-		///		Regardless of this property, we still rely on the system's wall-clock
-		///		to determine if a bucket is rate-limited; we do not use any monotonic
-		///		clock. Your system will still need a stable clock.
-		/// </remarks>
-		public bool UseSystemClock { get; set; } = true;
+        /// <summary>
+        /// 	Gets or sets whether or not rate-limits should use the system clock.
+        /// </summary>
+        /// <remarks>
+        ///		If set to <c>false</c>, we will use the X-RateLimit-Reset-After header
+        ///		to determine when a rate-limit expires, rather than comparing the
+        ///		X-RateLimit-Reset timestamp to the system time.
+        ///
+        ///		This should only be changed to false if the system is known to have
+        /// 	a clock that is out of sync. Relying on the Reset-After header will
+        ///		incur network lag.
+        ///
+        ///		Regardless of this property, we still rely on the system's wall-clock
+        ///		to determine if a bucket is rate-limited; we do not use any monotonic
+        ///		clock. Your system will still need a stable clock.
+        /// </remarks>
+        public bool UseSystemClock { get; set; } = true;
 
         /// <summary>
         ///     Gets or sets whether or not the internal experation check uses the system date
@@ -214,5 +214,13 @@ namespace Discord
         ///     If set to <see langword="false"/>, this value will be "Discord#1234".
         /// </remarks>
         public bool FormatUsersInBidirectionalUnicode { get; set; } = true;
+
+        /// <summary> 
+        ///     Returns the max thread members allowed to be in a request. 
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of thread members that can be gotten per-batch.
+        /// </returns>
+        public const int MaxThreadMembersPerBatch = 100;
     }
 }

@@ -79,7 +79,7 @@ namespace Discord
         ///     Time of when the message was last edited; <c>null</c> if the message is never edited.
         /// </returns>
         DateTimeOffset? EditedTimestamp { get; }
-        
+
         /// <summary>
         ///     Gets the source channel of the message.
         /// </summary>
@@ -88,6 +88,14 @@ namespace Discord
         ///     Gets the author of this message.
         /// </summary>
         IUser Author { get; }
+
+        /// <summary>
+        ///     Gets the thread that was started from this message.
+        /// </summary>
+        /// <returns>
+        ///    An <see cref="IThreadChannel"/> object if this message has thread attached; otherwise <see langword="null"/>.
+        /// </returns>
+        IThreadChannel Thread { get; }
 
         /// <summary>
         ///     Gets all attachments included in this message.
@@ -189,7 +197,7 @@ namespace Discord
         ///     A read-only collection of sticker item objects.
         /// </returns>
         IReadOnlyCollection<IStickerItem> Stickers { get; }
-        
+
         /// <summary>
         ///     Gets the flags related to this message.
         /// </summary>

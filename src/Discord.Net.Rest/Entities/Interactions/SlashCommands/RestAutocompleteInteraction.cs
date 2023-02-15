@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
 using DataModel = Discord.API.AutocompleteInteractionData;
-using System.IO;
+using Model = Discord.API.Interaction;
 
 namespace Discord.Rest
 {

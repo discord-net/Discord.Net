@@ -6,9 +6,9 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using UserModel = Discord.API.User;
 using MemberModel = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
+using UserModel = Discord.API.User;
 
 namespace Discord.WebSocket
 {

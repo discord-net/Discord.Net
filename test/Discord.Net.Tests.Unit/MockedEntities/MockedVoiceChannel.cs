@@ -1,9 +1,9 @@
+using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Discord.Audio;
 
 namespace Discord
 {
@@ -37,6 +37,8 @@ namespace Discord
         public string Mention => throw new NotImplementedException();
 
         public ChannelFlags Flags => throw new NotImplementedException();
+
+        public VideoQualityMode VideoQualityMode => throw new NotImplementedException();
 
         public Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();
         public Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();

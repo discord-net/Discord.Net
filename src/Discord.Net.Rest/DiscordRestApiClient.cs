@@ -1,4 +1,3 @@
-
 using Discord.API.Rest;
 using Discord.Net;
 using Discord.Net.Converters;
@@ -565,15 +564,22 @@ namespace Discord.API
             await SendAsync("DELETE", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options).ConfigureAwait(false);
         }
 
-        public async Task<ThreadMember[]> ListThreadMembersAsync(ulong channelId, RequestOptions options = null)
+        public async Task<ThreadMember[]> ListThreadMembersAsync(ulong channelId, ulong? after = null, int? limit = null, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            var query = "?with_member=true";
+
+            if (limit.HasValue)
+                query += $"&limit={limit}";
+            if (after.HasValue)
+                query += $"&after={after}";
 
             options = RequestOptions.CreateOrClone(options);
 
             var bucket = new BucketIds(channelId: channelId);
 
-            return await SendAsync<ThreadMember[]>("GET", () => $"channels/{channelId}/thread-members", bucket, options: options).ConfigureAwait(false);
+            return await SendAsync<ThreadMember[]>("GET", () => $"channels/{channelId}/thread-members{query}", bucket, options: options).ConfigureAwait(false);
         }
 
         public async Task<ThreadMember> GetThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
@@ -584,8 +590,9 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var bucket = new BucketIds(channelId: channelId);
+            var query = "?with_member=true";
 
-            return await SendAsync<ThreadMember>("GET", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options).ConfigureAwait(false);
+            return await SendAsync<ThreadMember>("GET", () => $"channels/{channelId}/thread-members/{userId}{query}", bucket, options: options).ConfigureAwait(false);
         }
 
         public async Task<ChannelThreads> GetActiveThreadsAsync(ulong guildId, RequestOptions options = null)
@@ -1138,6 +1145,16 @@ namespace Discord.API
 
             var ids = new BucketIds(channelId: channelId);
             await SendAsync("POST", () => $"channels/{channelId}/messages/{messageId}/crosspost", ids, options: options).ConfigureAwait(false);
+        }
+
+        public async Task<FollowedChannel> FollowChannelAsync(ulong newsChannelId, ulong followingChannelId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(newsChannelId, 0, nameof(newsChannelId));
+            Preconditions.NotEqual(followingChannelId, 0, nameof(followingChannelId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(channelId: newsChannelId);
+            return await SendJsonAsync<FollowedChannel>("POST", () => $"channels/{newsChannelId}/followers", new { webhook_channel_id = followingChannelId }, ids, options: options).ConfigureAwait(false);
         }
         #endregion
 
@@ -2256,6 +2273,14 @@ namespace Discord.API
 
             return await SendJsonAsync<Channel>("POST", () => "users/@me/channels", args, new BucketIds(), options: options).ConfigureAwait(false);
         }
+
+        public async Task<GuildMember> GetCurrentUserGuildMember(ulong guildId, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds();
+            return await SendAsync<GuildMember>("GET", () => $"users/@me/guilds/{guildId}/member", ids, options: options).ConfigureAwait(false);
+        }
         #endregion
 
         #region Voice Regions
@@ -2569,7 +2594,7 @@ namespace Discord.API
             => await SendAsync<RoleConnectionMetadata[]>("GET", () => $"applications/{CurrentApplicationId}/role-connections/metadata", new BucketIds(), options: options).ConfigureAwait(false);
 
         public async Task<RoleConnectionMetadata[]> UpdateApplicationRoleConnectionMetadataRecordsAsync(RoleConnectionMetadata[] roleConnections, RequestOptions options = null)
-        => await SendJsonAsync <RoleConnectionMetadata[]>("PUT", () => $"applications/{CurrentApplicationId}/role-connections/metadata", roleConnections, new BucketIds(), options: options).ConfigureAwait(false);
+        => await SendJsonAsync<RoleConnectionMetadata[]>("PUT", () => $"applications/{CurrentApplicationId}/role-connections/metadata", roleConnections, new BucketIds(), options: options).ConfigureAwait(false);
 
         public async Task<RoleConnection> GetUserApplicationRoleConnectionAsync(ulong applicationId, RequestOptions options = null)
         => await SendAsync<RoleConnection>("GET", () => $"users/@me/applications/{applicationId}/role-connection", new BucketIds(), options: options);

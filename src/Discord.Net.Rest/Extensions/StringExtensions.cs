@@ -1,7 +1,7 @@
 using Discord.Net.Converters;
 using Newtonsoft.Json;
-using System.Linq;
 using System;
+using System.Linq;
 
 namespace Discord.Rest
 {

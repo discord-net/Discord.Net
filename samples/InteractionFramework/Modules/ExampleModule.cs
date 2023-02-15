@@ -26,7 +26,7 @@ namespace InteractionFramework.Modules
 
         // [Summary] lets you customize the name and the description of a parameter
         [SlashCommand("echo", "Repeat the input")]
-        public async Task Echo(string echo, [Summary(description: "mention the user")]bool mention = false)
+        public async Task Echo(string echo, [Summary(description: "mention the user")] bool mention = false)
             => await RespondAsync(echo + (mention ? Context.User.Mention : string.Empty));
 
         [SlashCommand("ping", "Pings the bot and returns its latency.")]

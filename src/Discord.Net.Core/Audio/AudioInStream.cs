@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,7 +9,7 @@ namespace Discord.Audio
         public abstract int AvailableFrames { get; }
 
         public override bool CanRead => true;
-        public override bool CanWrite => true;        
+        public override bool CanWrite => true;
 
         public abstract Task<RTPFrame> ReadFrameAsync(CancellationToken cancelToken);
         public abstract bool TryReadFrame(CancellationToken cancelToken, out RTPFrame frame);

@@ -62,19 +62,19 @@ namespace Discord.Rest
 
         internal ScheduledEventInfo(ulong? guildId, ulong? channelId, string name, string description, DateTimeOffset? scheduledStartTime, DateTimeOffset? scheduledEndTime, GuildScheduledEventPrivacyLevel? privacyLevel, GuildScheduledEventStatus? status, GuildScheduledEventType? entityType, ulong? entityId, Optional<string> location, int? userCount, string image)
         {
-            GuildId            = guildId           ;
-            ChannelId          = channelId         ;
-            Name               = name              ;
-            Description        = description       ;
+            GuildId = guildId;
+            ChannelId = channelId;
+            Name = name;
+            Description = description;
             ScheduledStartTime = scheduledStartTime;
-            ScheduledEndTime   = scheduledEndTime  ;
-            PrivacyLevel       = privacyLevel      ;
-            Status             = status            ;
-            EntityType         = entityType        ;
-            EntityId           = entityId          ;
-            Location           = location          ;
-            UserCount          = userCount         ;
-            Image              = image             ;
+            ScheduledEndTime = scheduledEndTime;
+            PrivacyLevel = privacyLevel;
+            Status = status;
+            EntityType = entityType;
+            EntityId = entityId;
+            Location = location;
+            UserCount = userCount;
+            Image = image;
         }
     }
 }

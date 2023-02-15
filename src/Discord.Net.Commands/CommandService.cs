@@ -1,3 +1,5 @@
+using Discord.Commands.Builders;
+using Discord.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -6,8 +8,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord.Commands.Builders;
-using Discord.Logging;
 
 namespace Discord.Commands
 {
@@ -653,7 +653,7 @@ namespace Discord.Commands
                 var bestCandidate = preconditionResults
                    .OrderByDescending(x => x.Key.Command.Priority)
                    .FirstOrDefault(x => !x.Value.IsSuccess);
-                return MatchResult.FromSuccess(bestCandidate.Key,bestCandidate.Value);
+                return MatchResult.FromSuccess(bestCandidate.Key, bestCandidate.Value);
             }
 
             var parseResults = new Dictionary<CommandMatch, ParseResult>();
@@ -685,7 +685,7 @@ namespace Discord.Commands
                 .Where(x => x.Value.IsSuccess)
                 .ToArray();
 
-            if(successfulParses.Length == 0)
+            if (successfulParses.Length == 0)
             {
                 var bestMatch = parseResults
                     .FirstOrDefault(x => !x.Value.IsSuccess);

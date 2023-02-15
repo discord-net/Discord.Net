@@ -1,4 +1,4 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
     ///     Provides properties that are used to modify an <see cref="IAudioChannel" /> with the specified changes.

@@ -2,18 +2,18 @@ using System;
 
 namespace Discord.Net.ED25519.Ed25519Ref10
 {
-	internal static partial class FieldOperations
-	{
-		/*
+    internal static partial class FieldOperations
+    {
+        /*
 		Replace (f,g) with (g,g) if b == 1;
 		replace (f,g) with (f,g) if b == 0.
 
 		Preconditions: b in {0,1}.
 		*/
 
-		//void fe_cmov(fe f,const fe g,unsigned int b)
-		internal static void fe_cmov(ref FieldElement f, ref FieldElement g, int b)
-		{
+        //void fe_cmov(fe f,const fe g,unsigned int b)
+        internal static void fe_cmov(ref FieldElement f, ref FieldElement g, int b)
+        {
             int f0 = f.x0;
             int f1 = f.x1;
             int f2 = f.x2;
@@ -45,27 +45,27 @@ namespace Discord.Net.ED25519.Ed25519Ref10
             int x8 = f8 ^ g8;
             int x9 = f9 ^ g9;
 
-			b = -b;
-			x0 &= b;
-			x1 &= b;
-			x2 &= b;
-			x3 &= b;
-			x4 &= b;
-			x5 &= b;
-			x6 &= b;
-			x7 &= b;
-			x8 &= b;
-			x9 &= b;
-			f.x0 = f0 ^ x0;
-			f.x1 = f1 ^ x1;
-			f.x2 = f2 ^ x2;
-			f.x3 = f3 ^ x3;
-			f.x4 = f4 ^ x4;
-			f.x5 = f5 ^ x5;
-			f.x6 = f6 ^ x6;
-			f.x7 = f7 ^ x7;
-			f.x8 = f8 ^ x8;
-			f.x9 = f9 ^ x9;
-		}
-	}
+            b = -b;
+            x0 &= b;
+            x1 &= b;
+            x2 &= b;
+            x3 &= b;
+            x4 &= b;
+            x5 &= b;
+            x6 &= b;
+            x7 &= b;
+            x8 &= b;
+            x9 &= b;
+            f.x0 = f0 ^ x0;
+            f.x1 = f1 ^ x1;
+            f.x2 = f2 ^ x2;
+            f.x3 = f3 ^ x3;
+            f.x4 = f4 ^ x4;
+            f.x5 = f5 ^ x5;
+            f.x6 = f6 ^ x6;
+            f.x7 = f7 ^ x7;
+            f.x8 = f8 ^ x8;
+            f.x9 = f9 ^ x9;
+        }
+    }
 }

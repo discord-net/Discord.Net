@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.ThreadMember;
-using System.Collections.Immutable;
 
 namespace Discord.WebSocket
 {
@@ -134,19 +134,21 @@ namespace Discord.WebSocket
         public DateTimeOffset? RequestToSpeakTimestamp
             => GuildUser.RequestToSpeakTimestamp;
 
-        private SocketGuildUser GuildUser { get; set; }
+        /// <inheritdoc cref="IThreadUser.GuildUser"/>
+        public SocketGuildUser GuildUser { get; private set; }
 
-        internal SocketThreadUser(SocketGuild guild, SocketThreadChannel thread, SocketGuildUser member, ulong userId)
+        internal SocketThreadUser(SocketGuild guild, SocketThreadChannel thread, ulong userId, SocketGuildUser member = null)
             : base(guild.Discord, userId)
         {
             Thread = thread;
             Guild = guild;
-            GuildUser = member;
+            if (member is not null)
+                GuildUser = member;
         }
 
-        internal static SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, Model model, SocketGuildUser member)
+        internal static SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, Model model, SocketGuildUser guildUser = null)
         {
-            var entity = new SocketThreadUser(guild, thread, member, model.UserId.Value);
+            var entity = new SocketThreadUser(guild, thread, model.UserId.Value, guildUser);
             entity.Update(model);
             return entity;
         }
@@ -154,7 +156,7 @@ namespace Discord.WebSocket
         internal static SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, SocketGuildUser owner)
         {
             // this is used for creating the owner of the thread.
-            var entity = new SocketThreadUser(guild, thread, owner, owner.Id);
+            var entity = new SocketThreadUser(guild, thread, owner.Id, owner);
             entity.Update(new Model
             {
                 JoinTimestamp = thread.CreatedAt,
@@ -165,6 +167,8 @@ namespace Discord.WebSocket
         internal void Update(Model model)
         {
             ThreadJoinedAt = model.JoinTimestamp;
+            if (model.GuildMember.IsSpecified)
+                GuildUser = Guild.AddOrUpdateUser(model.GuildMember.Value);
         }
 
         /// <inheritdoc/>
@@ -213,6 +217,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         IGuild IGuildUser.Guild => Guild;
+
+        /// <inheritdoc />
+        IGuildUser IThreadUser.GuildUser => GuildUser;
 
         /// <inheritdoc/>
         ulong IGuildUser.GuildId => Guild.Id;

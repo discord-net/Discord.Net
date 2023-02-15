@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
@@ -34,7 +34,7 @@ namespace Discord
     }
 
     internal static class EventExtensions
-    { 
+    {
         public static async Task InvokeAsync(this AsyncEvent<Func<Task>> eventHandler)
         {
             var subscribers = eventHandler.Subscriptions;

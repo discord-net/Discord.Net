@@ -126,6 +126,8 @@
       topicUid: Guides.OtherLibs.MediatR
 - name: Emoji
   topicUid: Guides.Emoji
+- name: Bearer Tokens
+  topicUid: Guides.BearerToken
 - name: Voice
   topicUid: Guides.Voice.SendingVoice
 - name: Deployment

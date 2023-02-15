@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using Model = Discord.API.ModalInteractionData;
-using InterationModel = Discord.API.Interaction;
 using DataModel = Discord.API.MessageComponentInteractionData;
+using InterationModel = Discord.API.Interaction;
+using Model = Discord.API.ModalInteractionData;
 
 namespace Discord.WebSocket
 {

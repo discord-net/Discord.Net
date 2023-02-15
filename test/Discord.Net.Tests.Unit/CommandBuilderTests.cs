@@ -1,5 +1,5 @@
-﻿using System;
 using Discord;
+using System;
 using Xunit;
 
 namespace Discord;
@@ -17,7 +17,7 @@ public class CommandBuilderTests
             ApplicationCommandOptionType.String,
             "option1 description",
             isRequired: true,
-            choices: new []
+            choices: new[]
             {
                 new ApplicationCommandOptionChoiceProperties()
                 {

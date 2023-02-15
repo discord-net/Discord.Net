@@ -1,11 +1,11 @@
+using Discord.Logging;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Discord.Logging;
-using Discord.Rest;
 
 namespace Discord.Webhook
 {
@@ -18,13 +18,13 @@ namespace Discord.Webhook
         private readonly ulong _webhookId;
         internal IWebhook Webhook;
         internal readonly Logger _restLogger;
-        
+
         internal API.DiscordRestApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
 
         /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(IWebhook webhook)
-            : this(webhook.Id, webhook.Token, new DiscordRestConfig()) {  }
+            : this(webhook.Id, webhook.Token, new DiscordRestConfig()) { }
         /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken)
             : this(webhookId, webhookToken, new DiscordRestConfig()) { }
@@ -117,7 +117,7 @@ namespace Discord.Webhook
         /// <returns>
         ///     A task that represents the asynchronous deletion operation.
         /// </returns>
-        public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null, ulong ? threadId = null)
+        public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null, ulong? threadId = null)
             => WebhookClientHelper.DeleteMessageAsync(this, messageId, options, threadId);
 
         /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
@@ -141,7 +141,7 @@ namespace Discord.Webhook
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(FileAttachment attachment, string text, bool isTTS = false,
             IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
-            RequestOptions options = null, AllowedMentions allowedMentions = null, MessageComponent components = null, 
+            RequestOptions options = null, AllowedMentions allowedMentions = null, MessageComponent components = null,
             MessageFlags flags = MessageFlags.None, ulong? threadId = null)
             => WebhookClientHelper.SendFileAsync(this, attachment, text, isTTS, embeds, username,
                 avatarUrl, allowedMentions, components, options, flags, threadId);
@@ -150,7 +150,7 @@ namespace Discord.Webhook
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text, bool isTTS = false,
             IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
-            RequestOptions options = null, AllowedMentions allowedMentions = null, MessageComponent components = null, 
+            RequestOptions options = null, AllowedMentions allowedMentions = null, MessageComponent components = null,
             MessageFlags flags = MessageFlags.None, ulong? threadId = null)
             => WebhookClientHelper.SendFilesAsync(this, attachments, text, isTTS, embeds, username, avatarUrl,
                 allowedMentions, components, options, flags, threadId);

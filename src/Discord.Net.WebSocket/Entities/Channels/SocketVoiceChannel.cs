@@ -34,6 +34,8 @@ namespace Discord.WebSocket
         public int? UserLimit { get; private set; }
         /// <inheritdoc />
         public string RTCRegion { get; private set; }
+        /// <inheritdoc/>
+        public VideoQualityMode VideoQualityMode { get; private set; }
 
         /// <summary>
         ///     Gets a collection of users that are currently connected to this voice channel.
@@ -60,6 +62,7 @@ namespace Discord.WebSocket
             base.Update(state, model);
             Bitrate = model.Bitrate.GetValueOrDefault(64000);
             UserLimit = model.UserLimit.GetValueOrDefault() != 0 ? model.UserLimit.Value : (int?)null;
+            VideoQualityMode = model.VideoQualityMode.GetValueOrDefault(VideoQualityMode.Auto);
             RTCRegion = model.RTCRegion.GetValueOrDefault(null);
         }
 
@@ -125,7 +128,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.DeleteMessageAsync(messageId, options); 
+            return base.DeleteMessageAsync(messageId, options);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -133,7 +136,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.DeleteMessagesAsync(messages, options); 
+            return base.DeleteMessagesAsync(messages, options);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -141,7 +144,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.DeleteMessagesAsync(messageIds, options); 
+            return base.DeleteMessagesAsync(messageIds, options);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -157,7 +160,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.GetCachedMessage(id); 
+            return base.GetCachedMessage(id);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -189,7 +192,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.GetMessagesAsync(fromMessage, dir, limit, options); 
+            return base.GetMessagesAsync(fromMessage, dir, limit, options);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -229,7 +232,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.GetWebhooksAsync(options); 
+            return base.GetWebhooksAsync(options);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>
@@ -253,7 +256,7 @@ namespace Discord.WebSocket
         {
             if (!IsTextInVoice)
                 throw new NotSupportedException("This function is only supported in Text-In-Voice channels");
-            return base.SendFileAsync(attachment, text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags); 
+            return base.SendFileAsync(attachment, text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags);
         }
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This function is only supported in Text-In-Voice channels.</exception>

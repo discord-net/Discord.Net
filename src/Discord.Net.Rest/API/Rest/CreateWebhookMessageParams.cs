@@ -13,7 +13,7 @@ namespace Discord.API.Rest
         private static JsonSerializer _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
 
         [JsonProperty("content")]
-        public Optional<string> Content { get; set;  }
+        public Optional<string> Content { get; set; }
 
         [JsonProperty("nonce")]
         public Optional<string> Nonce { get; set; }

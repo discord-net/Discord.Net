@@ -68,7 +68,7 @@ namespace Discord.Rest
             ApiClient.CurrentUserId = user.Id;
             base.CurrentUser = RestSelfUser.Create(this, user);
 
-            if(tokenType == TokenType.Bot)
+            if (tokenType == TokenType.Bot)
             {
                 await GetApplicationInfoAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
                 ApiClient.CurrentApplicationId = _applicationInfo.Id;
@@ -151,7 +151,20 @@ namespace Discord.Rest
         }
 
         #endregion
-        
+
+        public async Task<RestSelfUser> GetCurrentUserAsync(RequestOptions options = null)
+        {
+            var user = await ApiClient.GetMyUserAsync(options);
+            CurrentUser.Update(user);
+            return CurrentUser;
+        }
+
+        public async Task<RestGuildUser> GetCurrentUserGuildMemberAsync(ulong guildId, RequestOptions options = null)
+        {
+            var user = await ApiClient.GetCurrentUserGuildMember(guildId, options);
+            return RestGuildUser.Create(this, null, user, guildId);
+        }
+
         public async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
         {
             return _applicationInfo ??= await ClientHelper.GetApplicationInfoAsync(this, options).ConfigureAwait(false);

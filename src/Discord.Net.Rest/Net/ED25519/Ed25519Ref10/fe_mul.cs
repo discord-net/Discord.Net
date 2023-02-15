@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 
 namespace Discord.Net.ED25519.Ed25519Ref10
 {
-	internal static partial class FieldOperations
-	{
-		/*
+    internal static partial class FieldOperations
+    {
+        /*
 		h = f * g
 		Can overlap h with f or g.
 
@@ -16,7 +16,7 @@ namespace Discord.Net.ED25519.Ed25519Ref10
 		   |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
 		*/
 
-		/*
+        /*
 		Notes on implementation strategy:
 
 		Using schoolbook multiplication.
@@ -36,8 +36,8 @@ namespace Discord.Net.ED25519.Ed25519Ref10
 		With tighter constraints on inputs can squeeze carries into int32.
 		*/
 
-		internal static void fe_mul(out FieldElement h, ref FieldElement f, ref FieldElement g)
-		{
+        internal static void fe_mul(out FieldElement h, ref FieldElement f, ref FieldElement g)
+        {
             int f0 = f.x0;
             int f1 = f.x1;
             int f2 = f.x2;
@@ -198,66 +198,90 @@ namespace Discord.Net.ED25519.Ed25519Ref10
             long carry8;
             long carry9;
 
-			/*
+            /*
 			|h0| <= (1.65*1.65*2^52*(1+19+19+19+19)+1.65*1.65*2^50*(38+38+38+38+38))
 			  i.e. |h0| <= 1.4*2^60; narrower ranges for h2, h4, h6, h8
 			|h1| <= (1.65*1.65*2^51*(1+1+19+19+19+19+19+19+19+19))
 			  i.e. |h1| <= 1.7*2^59; narrower ranges for h3, h5, h7, h9
 			*/
 
-			carry0 = (h0 + (long)(1 << 25)) >> 26; h1 += carry0; h0 -= carry0 << 26;
-			carry4 = (h4 + (long)(1 << 25)) >> 26; h5 += carry4; h4 -= carry4 << 26;
-			/* |h0| <= 2^25 */
-			/* |h4| <= 2^25 */
-			/* |h1| <= 1.71*2^59 */
-			/* |h5| <= 1.71*2^59 */
+            carry0 = (h0 + (long)(1 << 25)) >> 26;
+            h1 += carry0;
+            h0 -= carry0 << 26;
+            carry4 = (h4 + (long)(1 << 25)) >> 26;
+            h5 += carry4;
+            h4 -= carry4 << 26;
+            /* |h0| <= 2^25 */
+            /* |h4| <= 2^25 */
+            /* |h1| <= 1.71*2^59 */
+            /* |h5| <= 1.71*2^59 */
 
-			carry1 = (h1 + (long)(1 << 24)) >> 25; h2 += carry1; h1 -= carry1 << 25;
-			carry5 = (h5 + (long)(1 << 24)) >> 25; h6 += carry5; h5 -= carry5 << 25;
-			/* |h1| <= 2^24; from now on fits into int32 */
-			/* |h5| <= 2^24; from now on fits into int32 */
-			/* |h2| <= 1.41*2^60 */
-			/* |h6| <= 1.41*2^60 */
+            carry1 = (h1 + (long)(1 << 24)) >> 25;
+            h2 += carry1;
+            h1 -= carry1 << 25;
+            carry5 = (h5 + (long)(1 << 24)) >> 25;
+            h6 += carry5;
+            h5 -= carry5 << 25;
+            /* |h1| <= 2^24; from now on fits into int32 */
+            /* |h5| <= 2^24; from now on fits into int32 */
+            /* |h2| <= 1.41*2^60 */
+            /* |h6| <= 1.41*2^60 */
 
-			carry2 = (h2 + (long)(1 << 25)) >> 26; h3 += carry2; h2 -= carry2 << 26;
-			carry6 = (h6 + (long)(1 << 25)) >> 26; h7 += carry6; h6 -= carry6 << 26;
-			/* |h2| <= 2^25; from now on fits into int32 unchanged */
-			/* |h6| <= 2^25; from now on fits into int32 unchanged */
-			/* |h3| <= 1.71*2^59 */
-			/* |h7| <= 1.71*2^59 */
+            carry2 = (h2 + (long)(1 << 25)) >> 26;
+            h3 += carry2;
+            h2 -= carry2 << 26;
+            carry6 = (h6 + (long)(1 << 25)) >> 26;
+            h7 += carry6;
+            h6 -= carry6 << 26;
+            /* |h2| <= 2^25; from now on fits into int32 unchanged */
+            /* |h6| <= 2^25; from now on fits into int32 unchanged */
+            /* |h3| <= 1.71*2^59 */
+            /* |h7| <= 1.71*2^59 */
 
-			carry3 = (h3 + (long)(1 << 24)) >> 25; h4 += carry3; h3 -= carry3 << 25;
-			carry7 = (h7 + (long)(1 << 24)) >> 25; h8 += carry7; h7 -= carry7 << 25;
-			/* |h3| <= 2^24; from now on fits into int32 unchanged */
-			/* |h7| <= 2^24; from now on fits into int32 unchanged */
-			/* |h4| <= 1.72*2^34 */
-			/* |h8| <= 1.41*2^60 */
+            carry3 = (h3 + (long)(1 << 24)) >> 25;
+            h4 += carry3;
+            h3 -= carry3 << 25;
+            carry7 = (h7 + (long)(1 << 24)) >> 25;
+            h8 += carry7;
+            h7 -= carry7 << 25;
+            /* |h3| <= 2^24; from now on fits into int32 unchanged */
+            /* |h7| <= 2^24; from now on fits into int32 unchanged */
+            /* |h4| <= 1.72*2^34 */
+            /* |h8| <= 1.41*2^60 */
 
-			carry4 = (h4 + (long)(1 << 25)) >> 26; h5 += carry4; h4 -= carry4 << 26;
-			carry8 = (h8 + (long)(1 << 25)) >> 26; h9 += carry8; h8 -= carry8 << 26;
-			/* |h4| <= 2^25; from now on fits into int32 unchanged */
-			/* |h8| <= 2^25; from now on fits into int32 unchanged */
-			/* |h5| <= 1.01*2^24 */
-			/* |h9| <= 1.71*2^59 */
+            carry4 = (h4 + (long)(1 << 25)) >> 26;
+            h5 += carry4;
+            h4 -= carry4 << 26;
+            carry8 = (h8 + (long)(1 << 25)) >> 26;
+            h9 += carry8;
+            h8 -= carry8 << 26;
+            /* |h4| <= 2^25; from now on fits into int32 unchanged */
+            /* |h8| <= 2^25; from now on fits into int32 unchanged */
+            /* |h5| <= 1.01*2^24 */
+            /* |h9| <= 1.71*2^59 */
 
-			carry9 = (h9 + (long)(1 << 24)) >> 25; h0 += carry9 * 19; h9 -= carry9 << 25;
-			/* |h9| <= 2^24; from now on fits into int32 unchanged */
-			/* |h0| <= 1.1*2^39 */
+            carry9 = (h9 + (long)(1 << 24)) >> 25;
+            h0 += carry9 * 19;
+            h9 -= carry9 << 25;
+            /* |h9| <= 2^24; from now on fits into int32 unchanged */
+            /* |h0| <= 1.1*2^39 */
 
-			carry0 = (h0 + (long)(1 << 25)) >> 26; h1 += carry0; h0 -= carry0 << 26;
-			/* |h0| <= 2^25; from now on fits into int32 unchanged */
-			/* |h1| <= 1.01*2^24 */
+            carry0 = (h0 + (long)(1 << 25)) >> 26;
+            h1 += carry0;
+            h0 -= carry0 << 26;
+            /* |h0| <= 2^25; from now on fits into int32 unchanged */
+            /* |h1| <= 1.01*2^24 */
 
-			h.x0 = (int)h0;
-			h.x1 = (int)h1;
-			h.x2 = (int)h2;
-			h.x3 = (int)h3;
-			h.x4 = (int)h4;
-			h.x5 = (int)h5;
-			h.x6 = (int)h6;
-			h.x7 = (int)h7;
-			h.x8 = (int)h8;
-			h.x9 = (int)h9;
-		}
-	}
+            h.x0 = (int)h0;
+            h.x1 = (int)h1;
+            h.x2 = (int)h2;
+            h.x3 = (int)h3;
+            h.x4 = (int)h4;
+            h.x5 = (int)h5;
+            h.x6 = (int)h6;
+            h.x7 = (int)h7;
+            h.x8 = (int)h8;
+            h.x9 = (int)h9;
+        }
+    }
 }

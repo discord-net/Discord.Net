@@ -81,6 +81,12 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
 
+        /// <inheritdoc cref="IMessage.Thread"/>
+        public SocketThreadChannel Thread { get; private set; }
+
+        /// <inheritdoc />
+        IThreadChannel IMessage.Thread => Thread;
+
         /// <summary>
         ///     Returns all attachments included in this message.
         /// </summary>
@@ -283,6 +289,12 @@ namespace Discord.WebSocket
                     model.RoleSubscriptionData.Value.MonthsSubscribed,
                     model.RoleSubscriptionData.Value.IsRenewal);
             }
+
+            if (model.Thread.IsSpecified)
+            {
+                SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
+                Thread = guild?.AddOrUpdateChannel(state, model.Thread.Value) as SocketThreadChannel;
+            }
         }
 
         /// <inheritdoc />
@@ -297,7 +309,7 @@ namespace Discord.WebSocket
         /// </returns>
         public override string ToString() => Content;
         internal SocketMessage Clone() => MemberwiseClone() as SocketMessage;
-#endregion
+        #endregion
 
         #region IMessage
         /// <inheritdoc />
