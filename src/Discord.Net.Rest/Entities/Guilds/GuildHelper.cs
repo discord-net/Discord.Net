@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ImageModel = Discord.API.Image;
-using Model = Discord.API.Guild
+using Model = Discord.API.Guild;
 using RoleModel = Discord.API.Role;
 using WidgetModel = Discord.API.GuildWidget;
 
