@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    // when adding properties to guilds please check if they are returned in audit log events and add them to the
+    // 'GuildInfo.cs' file for socket and rest audit logs.
     /// <summary>
     ///     Represents a generic guild/server.
     /// </summary>
@@ -414,7 +416,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>
@@ -434,7 +436,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>
@@ -456,7 +458,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>

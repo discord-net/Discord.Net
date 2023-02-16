@@ -767,7 +767,7 @@ namespace Discord.WebSocket
                  _guildScheduledEventUserAdd.HasSubscribers;
 
             bool shardedClientHasGuildScheduledEventsSubscribers =
-                 _shardedClient is not null && 
+                 _shardedClient is not null &&
                  (_shardedClient._guildScheduledEventCancelled.HasSubscribers ||
                  _shardedClient._guildScheduledEventUserRemove.HasSubscribers ||
                  _shardedClient._guildScheduledEventCompleted.HasSubscribers ||
@@ -2349,7 +2349,7 @@ namespace Discord.WebSocket
                             case "INTERACTION_CREATE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (INTERACTION_CREATE)").ConfigureAwait(false);
-                                    
+
                                     var data = (payload as JToken).ToObject<API.Interaction>(_serializer);
 
                                     var guild = data.GuildId.IsSpecified ? GetGuild(data.GuildId.Value) : null;
@@ -2888,9 +2888,13 @@ namespace Discord.WebSocket
                                 await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AUDIT_LOG_ENTRY_CREATE)").ConfigureAwait(false);
 
                                 var guild = State.GetGuild(data.GuildId);
-                                //var auditLog = RestAuditLogEntry.Create(this,null, data);
+                                var auditLog = SocketAuditLogEntry.Create(this, data);
 
-                                await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), null, guild);
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.WriteLine(JsonConvert.SerializeObject(auditLog.Data as ChannelCreateAuditLogData, Formatting.Indented));
+                                Console.ResetColor();
+
+                                await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
                             }
                                 break;
 
