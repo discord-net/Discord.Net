@@ -1199,6 +1199,34 @@ namespace Discord.Rest
 
         #endregion
 
+        #region AutoMod
+
+
+        /// <inheritdoc cref="IGuild.GetAutoModRuleAsync"/>
+        public async Task<RestAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions options = null)
+        {
+            var rule = await GuildHelper.GetAutoModRuleAsync(ruleId, this, Discord, options);
+            return RestAutoModRule.Create(Discord, rule);
+        }
+
+        /// <inheritdoc cref="IGuild.GetAutoModRulesAsync"/>
+        public async Task<RestAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null)
+        {
+            var rules = await GuildHelper.GetAutoModRulesAsync(this, Discord, options);
+            return rules.Select(x => RestAutoModRule.Create(Discord, x)).ToArray();
+        }
+
+        /// <inheritdoc cref="IGuild.CreateAutoModRuleAsync"/>
+        public async Task<RestAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options = null)
+        {
+            var rule = await GuildHelper.CreateAutoModRuleAsync(this, props, Discord, options);
+
+            return RestAutoModRule.Create(Discord, rule);
+        }
+
+
+        #endregion
+
         #region IGuild
         /// <inheritdoc />
         bool IGuild.Available => Available;
@@ -1542,6 +1570,19 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public Task<WelcomeScreen> ModifyWelcomeScreenAsync(bool enabled, WelcomeScreenChannelProperties[] channels, string description = null, RequestOptions options = null)
             => GuildHelper.ModifyWelcomeScreenAsync(enabled, description, channels, this, Discord, options);
+
+
+        /// <inheritdoc/>
+        async Task<IAutoModRule> IGuild.GetAutoModRuleAsync(ulong ruleId, RequestOptions options)
+            => await GetAutoModRuleAsync(ruleId, options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IAutoModRule[]> IGuild.GetAutoModRulesAsync(RequestOptions options)
+            => await GetAutoModRulesAsync(options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options)
+            => await CreateAutoModRuleAsync(props, options).ConfigureAwait(false);
 
         #endregion
     }

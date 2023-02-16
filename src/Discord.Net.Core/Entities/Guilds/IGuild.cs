@@ -1267,5 +1267,29 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="WelcomeScreen"/>.
         /// </returns>
         Task<WelcomeScreen> ModifyWelcomeScreenAsync(bool enabled, WelcomeScreenChannelProperties[] channels, string description = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Get a list of all rules currently configured for the guild.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a collection of <see cref="IAutoModRule"/>.
+        /// </returns>
+        Task<IAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a single rule configured in a guild. Returns <see langword="null"/> if the rule was not found.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="IAutoModRule"/>.
+        /// </returns>
+        Task<IAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new auto moderation rule.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IAutoModRule"/>.
+        /// </returns>
+        Task<IAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options = null);
     }
 }

@@ -2119,6 +2119,58 @@ namespace Discord.API
 
         #endregion
 
+        #region Guild AutoMod
+
+        public async Task<AutoModerationRule[]> GetGuildAutoModRulesAsync(ulong guildId, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendAsync<AutoModerationRule[]>("GET", () => $"guilds/{guildId}/auto-moderation/rules", new BucketIds(guildId: guildId), options: options);
+        }
+
+        public async Task<AutoModerationRule> GetGuildAutoModRuleAsync(ulong guildId, ulong ruleId, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(ruleId, 0, nameof(ruleId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendAsync<AutoModerationRule>("GET", () => $"guilds/{guildId}/auto-moderation/rules/{ruleId}", new BucketIds(guildId), options: options);
+        }
+
+        public async Task<AutoModerationRule> CreateGuildAutoModRuleAsync(ulong guildId, CreateAutoModRuleParams args, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendJsonAsync<AutoModerationRule>("POST", () => $"guilds/{guildId}/auto-moderation/rules", args, new BucketIds(guildId: guildId), options: options);
+        }
+
+        public async Task<AutoModerationRule> ModifyGuildAutoModRuleAsync(ulong guildId, ulong ruleId, ModifyAutoModRuleParams args, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(ruleId, 0, nameof(ruleId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendJsonAsync<AutoModerationRule>("PATCH", () => $"guilds/{guildId}/auto-moderation/rules/{ruleId}", args, new BucketIds(guildId: guildId), options: options);
+        }
+
+        public async Task DeleteGuildAutoModRuleAsync(ulong guildId, ulong ruleId, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(ruleId, 0, nameof(ruleId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendAsync("DELETE", () => $"guilds/{guildId}/auto-moderation/rules/{ruleId}", new BucketIds(guildId: guildId), options: options);
+        }
+
+        #endregion
+
         #region Guild Welcome Screen
 
         public async Task<WelcomeScreen> GetGuildWelcomeScreenAsync(ulong guildId, RequestOptions options = null)

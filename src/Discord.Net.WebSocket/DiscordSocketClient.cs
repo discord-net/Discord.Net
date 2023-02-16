@@ -6,8 +6,10 @@ using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
 using Discord.Utils;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using GameModel = Discord.API.Game;
 
 namespace Discord.WebSocket
@@ -2877,6 +2880,132 @@ namespace Discord.WebSocket
                                     var channel = State.GetChannel(data.ChannelId);
 
                                     await TimedInvokeAsync(_webhooksUpdated, nameof(WebhooksUpdated), guild, channel);
+                                }
+                                break;
+
+                            #endregion
+
+                            #region Auto Moderation
+
+                            case "AUTO_MODERATION_RULE_CREATE":
+                                {
+                                    var data = (payload as JToken).ToObject<AutoModerationRule>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    var rule = guild.AddOrUpdateAutoModRule(data);
+
+                                    await TimedInvokeAsync(_autoModRuleCreated, nameof(AutoModRuleCreated),  rule);
+                                }
+                                break;
+
+                            case "AUTO_MODERATION_RULE_UPDATE":
+                                {
+                                    var data = (payload as JToken).ToObject<AutoModerationRule>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    var cachedRule = guild.GetAutoModRule(data.Id);
+                                    var cacheableBefore = new Cacheable<SocketAutoModRule, ulong>(cachedRule?.Clone(),
+                                        data.Id,
+                                        cachedRule is not null,
+                                        async () => await guild.GetAutoModRuleAsync(data.Id));
+
+                                    await TimedInvokeAsync(_autoModRuleUpdated, nameof(AutoModRuleUpdated), cacheableBefore, guild.AddOrUpdateAutoModRule(data));
+                                }
+                                break;
+
+                            case "AUTO_MODERATION_RULE_DELETE":
+                                {
+                                    var data = (payload as JToken).ToObject<AutoModerationRule>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    var rule = guild.RemoveAutoModRule(data);
+
+                                    await TimedInvokeAsync(_autoModRuleDeleted, nameof(AutoModRuleDeleted), rule);
+                                }
+                                break;
+
+                            case "AUTO_MODERATION_ACTION_EXECUTION":
+                                {
+                                    var data = (payload as JToken).ToObject<AutoModActionExecutedEvent>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+                                    var action = new AutoModRuleAction(data.Action.Type,
+                                        data.Action.Metadata.IsSpecified
+                                            ? data.Action.Metadata.Value.ChannelId.IsSpecified
+                                                ? data.Action.Metadata.Value.ChannelId.Value
+                                                : null
+                                            : null,
+                                        data.Action.Metadata.IsSpecified
+                                            ? data.Action.Metadata.Value.DurationSeconds.IsSpecified
+                                                ? data.Action.Metadata.Value.DurationSeconds.Value
+                                                : null
+                                            : null);
+
+                                    var member = guild.GetUser(data.UserId);
+
+                                    var cacheableUser = new Cacheable<SocketGuildUser, ulong>(member,
+                                            data.UserId,
+                                            member is not null,
+                                            async () =>
+                                            {
+                                                var model = await ApiClient.GetGuildMemberAsync(data.GuildId, data.UserId);
+                                                return guild.AddOrUpdateUser(model);
+                                            }
+                                        );
+
+                                    ISocketMessageChannel channel = null;
+                                    if (data.ChannelId.IsSpecified)
+                                        channel = GetChannel(data.ChannelId.Value) as ISocketMessageChannel;
+
+                                    var cacheableChannel = new Cacheable<ISocketMessageChannel, ulong>(channel,
+                                        data.ChannelId.GetValueOrDefault(0),
+                                        channel != null,
+                                        async () =>
+                                        {
+                                            if(data.ChannelId.IsSpecified)
+                                                return await GetChannelAsync(data.ChannelId.Value).ConfigureAwait(false) as ISocketMessageChannel;
+                                            return null;
+                                        });
+
+
+                                    var cachedMsg = channel?.GetCachedMessage(data.MessageId.GetValueOrDefault(0)) as IUserMessage;
+
+                                    var cacheableMessage = new Cacheable<IUserMessage, ulong>(cachedMsg,
+                                        data.MessageId.GetValueOrDefault(0),
+                                        cachedMsg is not null,
+                                        async () =>
+                                        {
+                                            if(data.MessageId.IsSpecified)
+                                                return (await channel.GetMessageAsync(data.MessageId.Value).ConfigureAwait(false)) as IUserMessage;
+                                            return null;
+                                        });
+
+                                    var cachedRule = guild.GetAutoModRule(data.RuleId);
+
+                                    var cacheableRule = new Cacheable<IAutoModRule, ulong>(cachedRule,
+                                        data.RuleId,
+                                        cachedRule is not null,
+                                        async () => await guild.GetAutoModRuleAsync(data.RuleId));
+
+                                    var eventData = new AutoModActionExecutedData(
+                                        cacheableRule,
+                                        data.TriggerType,
+                                        cacheableUser,
+                                        cacheableChannel,
+                                        cachedMsg is not null ? cacheableMessage : null,
+                                        data.AlertSystemMessageId.GetValueOrDefault(0),
+                                        data.Content,
+                                        data.MatchedContent.IsSpecified
+                                            ? data.MatchedContent.Value
+                                            : null,
+                                        data.MatchedKeyword.IsSpecified
+                                            ? data.MatchedKeyword.Value
+                                            : null);
+
+                                    await TimedInvokeAsync(_autoModActionExecuted, nameof(AutoModActionExecuted), guild, action, eventData);
                                 }
                                 break;
 

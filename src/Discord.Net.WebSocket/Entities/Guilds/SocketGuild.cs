@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoModRuleModel = Discord.API.AutoModerationRule;
 using ChannelModel = Discord.API.Channel;
 using EmojiUpdateModel = Discord.API.Gateway.GuildEmojiUpdateEvent;
 using EventModel = Discord.API.GuildScheduledEvent;
@@ -43,6 +44,7 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
         private ConcurrentDictionary<ulong, SocketCustomSticker> _stickers;
         private ConcurrentDictionary<ulong, SocketGuildEvent> _events;
+        private ConcurrentDictionary<ulong, SocketAutoModRule> _automodRules;
         private ImmutableArray<GuildEmote> _emotes;
 
         private AudioClient _audioClient;
@@ -391,6 +393,7 @@ namespace Discord.WebSocket
         {
             _audioLock = new SemaphoreSlim(1, 1);
             _emotes = ImmutableArray.Create<GuildEmote>();
+            _automodRules = new ConcurrentDictionary<ulong, SocketAutoModRule>();
         }
         internal static SocketGuild Create(DiscordSocketClient discord, ClientState state, ExtendedModel model)
         {
@@ -1809,6 +1812,78 @@ namespace Discord.WebSocket
         internal SocketGuild Clone() => MemberwiseClone() as SocketGuild;
         #endregion
 
+        #region AutoMod
+
+        internal SocketAutoModRule AddOrUpdateAutoModRule(AutoModRuleModel model)
+        {
+            if (_automodRules.TryGetValue(model.Id, out var rule))
+            {
+                rule.Update(model);
+                return rule;
+            }
+
+            var socketRule = SocketAutoModRule.Create(Discord, this, model);
+            _automodRules.TryAdd(model.Id, socketRule);
+            return socketRule;
+        }
+
+        /// <summary>
+        ///     Gets a single rule configured in a guild from cache. Returns <see langword="null"/> if the rule was not found.
+        /// </summary>
+        public SocketAutoModRule GetAutoModRule(ulong id)
+        {
+            return _automodRules.TryGetValue(id, out var rule) ? rule : null;
+        }
+
+        internal SocketAutoModRule RemoveAutoModRule(ulong id)
+        {
+            return _automodRules.TryRemove(id, out var rule) ? rule : null;
+        }
+
+        internal SocketAutoModRule RemoveAutoModRule(AutoModRuleModel model)
+        {
+            if (_automodRules.TryRemove(model.Id, out var rule))
+            {
+                rule.Update(model);
+            }
+
+            return rule ?? SocketAutoModRule.Create(Discord, this, model);
+        }
+
+        /// <inheritdoc cref="IGuild.GetAutoModRuleAsync"/>
+        public async Task<SocketAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions options = null)
+        {
+            var rule = await GuildHelper.GetAutoModRuleAsync(ruleId, this, Discord, options);
+
+            return AddOrUpdateAutoModRule(rule);
+        }
+
+        /// <inheritdoc cref="IGuild.GetAutoModRulesAsync"/>
+        public async Task<SocketAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null)
+        {
+            var rules = await GuildHelper.GetAutoModRulesAsync(this, Discord, options);
+
+            return rules.Select(AddOrUpdateAutoModRule).ToArray();
+        }
+
+        /// <inheritdoc cref="IGuild.CreateAutoModRuleAsync"/>
+        public async Task<SocketAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options = null)
+        {
+            var rule = await GuildHelper.CreateAutoModRuleAsync(this, props, Discord, options);
+
+            return AddOrUpdateAutoModRule(rule);
+        }
+
+        /// <summary>
+        ///     Gets the auto moderation rules defined in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     This property may not always return all auto moderation rules if they haven't been cached.
+        /// </remarks>
+        public IReadOnlyCollection<SocketAutoModRule> AutoModRules => _automodRules.ToReadOnlyCollection();
+
+        #endregion
+
         #region  IGuild
         /// <inheritdoc />
         ulong? IGuild.AFKChannelId => AFKChannelId;
@@ -2053,6 +2128,19 @@ namespace Discord.WebSocket
             _audioLock?.Dispose();
             _audioClient?.Dispose();
         }
+        
+        /// <inheritdoc/>
+        async Task<IAutoModRule> IGuild.GetAutoModRuleAsync(ulong ruleId, RequestOptions options)
+            => await GetAutoModRuleAsync(ruleId, options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IAutoModRule[]> IGuild.GetAutoModRulesAsync(RequestOptions options)
+            => await GetAutoModRulesAsync(options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options)
+            => await CreateAutoModRuleAsync(props, options).ConfigureAwait(false);
+
         #endregion
     }
 }
