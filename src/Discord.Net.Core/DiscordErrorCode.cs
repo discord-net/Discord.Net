@@ -82,6 +82,7 @@ namespace Discord
         MaximumWebhooksReached = 30007,
         MaximumEmojisReached = 30008,
         MaximumReactionsReached = 30010,
+        MaximumNumberOfGDMsReached = 30011,
         MaximumGuildChannelsReached = 30013,
         MaximumAttachmentsReached = 30015,
         MaximumInvitesReached = 30016,
@@ -103,6 +104,8 @@ namespace Discord
         MaximumNumberOfPinnedThreadsInAForumChannelReached = 30047,
         MaximumNumberOfTagsInAForumChannelReached = 30048,
         MaximumNumberOfWebhooksReached = 30058,
+        MaximumNumberOfChannelPermissionOverwritesReached = 30060,
+        TheChannelsForThisGuildAreTooLarge = 30061,
         #endregion
 
         #region General Request Errors (40XXX)
