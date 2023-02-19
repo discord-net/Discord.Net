@@ -115,7 +115,7 @@ namespace Discord
         public Optional<bool> IsBoostProgressBarEnabled { get; set; }
 
         /// <summary>
-        ///     Gets or sets the guild features enabled in this guild.
+        ///     Gets or sets the guild features enabled in this guild. Features that are not mutable will be ignored.
         /// </summary>
         public Optional<GuildFeature> Features { get; set; }
     }
