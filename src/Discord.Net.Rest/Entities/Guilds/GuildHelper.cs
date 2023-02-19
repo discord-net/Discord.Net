@@ -39,7 +39,8 @@ namespace Discord.Rest
                 VerificationLevel = args.VerificationLevel,
                 ExplicitContentFilter = args.ExplicitContentFilter,
                 SystemChannelFlags = args.SystemChannelFlags,
-                IsBoostProgressBarEnabled = args.IsBoostProgressBarEnabled
+                IsBoostProgressBarEnabled = args.IsBoostProgressBarEnabled,
+                GuildFeatures = args.Features.IsSpecified ? new GuildFeatures(args.Features.Value, Array.Empty<string>()) : Optional.Create<GuildFeatures>(),
             };
 
             if (apiArgs.Banner.IsSpecified)

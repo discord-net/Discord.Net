@@ -34,11 +34,11 @@ namespace Discord
         /// </summary>
         Commerce = 1L << 4,
         /// <summary>
-        ///     The guild can enable welcome screen, Membership Screening, stage channels and discovery, and receives community updates.
+        ///     The guild can enable welcome screen, Membership Screening, stage channels and discovery, and receives community updates. This feature is mutable.
         /// </summary>
         Community = 1L << 5,
         /// <summary>
-        ///     The guild is able to be discovered in the directory.
+        ///     The guild is able to be discovered in the directory. This feature is mutable.
         /// </summary>
         Discoverable = 1L << 6,
         /// <summary>
@@ -185,5 +185,13 @@ namespace Discord
         ///     The guild has been set as a support server on the App Directory.
         /// </summary>
         DeveloperSupportServer = 1L << 42,
+        /// <summary>
+        ///     The guild has invites disabled. This feature is mutable.
+        /// </summary>
+        InvitesDisabled = 1L << 43,
+        /// <summary>
+        ///     The guild has auto moderation enabled.
+        /// </summary>
+        AutoModeration = 1L << 44
     }
 }
