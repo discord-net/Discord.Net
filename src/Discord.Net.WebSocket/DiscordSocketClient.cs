@@ -2971,7 +2971,9 @@ namespace Discord.WebSocket
                                         });
 
 
-                                    var cachedMsg = channel?.GetCachedMessage(data.MessageId.GetValueOrDefault(0)) as IUserMessage;
+                                    IUserMessage cachedMsg = null;
+                                    if (data.MessageId.IsSpecified)
+                                        cachedMsg = channel?.GetCachedMessage(data.MessageId.GetValueOrDefault(0)) as IUserMessage;
 
                                     var cacheableMessage = new Cacheable<IUserMessage, ulong>(cachedMsg,
                                         data.MessageId.GetValueOrDefault(0),
@@ -2979,7 +2981,7 @@ namespace Discord.WebSocket
                                         async () =>
                                         {
                                             if(data.MessageId.IsSpecified)
-                                                return (await channel.GetMessageAsync(data.MessageId.Value).ConfigureAwait(false)) as IUserMessage;
+                                                return (await channel!.GetMessageAsync(data.MessageId.Value).ConfigureAwait(false)) as IUserMessage;
                                             return null;
                                         });
 
@@ -2995,7 +2997,7 @@ namespace Discord.WebSocket
                                         data.TriggerType,
                                         cacheableUser,
                                         cacheableChannel,
-                                        cachedMsg is not null ? cacheableMessage : null,
+                                        data.MessageId.IsSpecified ? cacheableMessage : null,
                                         data.AlertSystemMessageId.GetValueOrDefault(0),
                                         data.Content,
                                         data.MatchedContent.IsSpecified
