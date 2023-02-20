@@ -589,7 +589,7 @@ namespace Discord.Commands
 
                 var executeResult = await matchResult.Match.Value.ExecuteAsync(context, parseResult, services);
 
-                if (!executeResult.IsSuccess && !(executeResult is RuntimeResult || executeResult is ExecuteResult)) // succesful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deffered execution)
+                if (!executeResult.IsSuccess && !(executeResult is RuntimeResult || executeResult is ExecuteResult)) // successful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deferred execution)
                     await _commandExecutedEvent.InvokeAsync(matchResult.Match.Value.Command, context, executeResult);
                 return executeResult;
             }

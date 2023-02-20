@@ -69,7 +69,7 @@ namespace Discord
     public sealed class LoadedOverride
     {
         /// <summary>
-        ///     Gets the aseembly containing the overrides definition.
+        ///     Gets the assembly containing the overrides definition.
         /// </summary>
         public Assembly Assembly { get; internal set; }
 
@@ -119,7 +119,7 @@ namespace Discord
         ///     Gets details about a specific override.
         /// </summary>
         /// <remarks>
-        ///     <b>Note:</b> This method does not load an override, it simply retrives the info about it.
+        ///     <b>Note:</b> This method does not load an override, it simply retrieves the info about it.
         /// </remarks>
         /// <param name="name">The name of the override to get.</param>
         /// <returns>
@@ -147,12 +147,12 @@ namespace Discord
         ///     Adds an override to the current Discord.Net instance.
         /// </summary>
         /// <remarks>
-        ///     The override initialization is non-blocking, any errors that occor within
+        ///     The override initialization is non-blocking, any errors that occur within
         ///     the overrides initialization procedure will be sent in the <see cref="Log"/> event.
         /// </remarks>
         /// <param name="name">The name of the override to add.</param>
         /// <returns>
-        ///     A task representing the asynchronous add operaton. The tasks result is a boolean
+        ///     A task representing the asynchronous add operation. The tasks result is a boolean
         ///     determining if the add operation was successful.
         /// </returns>
         public static async Task<bool> AddOverrideAsync(string name)
@@ -169,12 +169,12 @@ namespace Discord
         ///     Adds an override to the current Discord.Net instance.
         /// </summary>
         /// <remarks>
-        ///     The override initialization is non-blocking, any errors that occor within
+        ///     The override initialization is non-blocking, any errors that occur within
         ///     the overrides initialization procedure will be sent in the <see cref="Log"/> event.
         /// </remarks>
         /// <param name="ovrride">The override to add.</param>
         /// <returns>
-        ///     A task representing the asynchronous add operaton. The tasks result is a boolean
+        ///     A task representing the asynchronous add operation. The tasks result is a boolean
         ///     determining if the add operation was successful.
         /// </returns>
         public static async Task<bool> AddOverrideAsync(Override ovrride)

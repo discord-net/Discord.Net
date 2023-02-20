@@ -34,7 +34,7 @@ namespace Discord.Interactions.Builders
         bool IsParameterArray { get; }
 
         /// <summary>
-        ///     Gets the deafult value of this parameter.
+        ///     Gets the default value of this parameter.
         /// </summary>
         object DefaultValue { get; }
 

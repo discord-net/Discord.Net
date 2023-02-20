@@ -202,7 +202,7 @@ namespace Discord.WebSocket
         /// <returns>A task representing the download operation.</returns>
         public async Task<IReadOnlyCollection<SocketThreadUser>> GetUsersAsync(RequestOptions options = null)
         {
-            // download all users if we havent
+            // download all users if we haven't
             if (!_usersDownloaded)
             {
                 await DownloadUsersAsync(options);

@@ -90,7 +90,7 @@ namespace BasicBot
 
             if (message.Content == "!ping")
             {
-                // Create a new componentbuilder, in which dropdowns & buttons can be created.
+                // Create a new ComponentBuilder, in which dropdowns & buttons can be created.
                 var cb = new ComponentBuilder()
                     .WithButton("Click me!", "unique-id", ButtonStyle.Primary);
 

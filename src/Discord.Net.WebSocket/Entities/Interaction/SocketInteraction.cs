@@ -401,7 +401,7 @@ namespace Discord.WebSocket
         #endregion
 
         /// <summary>
-        ///     Attepts to get the channel this interaction was executed in.
+        ///     Attempts to get the channel this interaction was executed in.
         /// </summary>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>

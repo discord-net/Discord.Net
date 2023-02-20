@@ -19,7 +19,7 @@ namespace Discord.Interactions
     public class InteractionService : IDisposable
     {
         /// <summary>
-        ///     Occurs when a Slash Command related information is recieved.
+        ///     Occurs when a Slash Command related information is received.
         /// </summary>
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new();

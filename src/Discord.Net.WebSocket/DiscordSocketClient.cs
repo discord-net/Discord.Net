@@ -2382,7 +2382,7 @@ namespace Discord.WebSocket
                                                 channel = CreateDMChannel(data.ChannelId.Value, user, State);
                                             }
 
-                                            // The channel isnt required when responding to an interaction, so we can leave the channel null.
+                                            // The channel isn't required when responding to an interaction, so we can leave the channel null.
                                         }
                                     }
                                     else if (data.User.IsSpecified)

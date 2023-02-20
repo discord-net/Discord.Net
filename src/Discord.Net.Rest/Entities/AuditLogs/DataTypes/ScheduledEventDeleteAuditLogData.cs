@@ -7,7 +7,7 @@ using Model = Discord.API.AuditLog;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Contains a piece of audit log data related to a scheduled event deleteion.
+    ///     Contains a piece of audit log data related to a scheduled event deletion.
     /// </summary>
     public class ScheduledEventDeleteAuditLogData : IAuditLogData
     {
