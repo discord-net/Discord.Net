@@ -20,6 +20,7 @@ namespace Discord.Webhook
                 throw new InvalidOperationException("Could not find a webhook with the supplied credentials.");
             return RestInternalWebhook.Create(client, model);
         }
+
         public static async Task<ulong> SendMessageAsync(DiscordWebhookClient client,
             string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl,
             AllowedMentions allowedMentions, RequestOptions options, MessageComponent components, MessageFlags flags, ulong? threadId = null)
@@ -82,26 +83,49 @@ namespace Discord.Webhook
                 }
             }
 
-            var apiArgs = new ModifyWebhookMessageParams
+            if (!args.Attachments.IsSpecified)
             {
-                Content = args.Content.IsSpecified ? args.Content.Value : Optional.Create<string>(),
-                Embeds =
-                    args.Embeds.IsSpecified
-                        ? args.Embeds.Value.Select(embed => embed.ToModel()).ToArray()
-                        : Optional.Create<API.Embed[]>(),
-                AllowedMentions = args.AllowedMentions.IsSpecified
-                    ? args.AllowedMentions.Value.ToModel()
-                    : Optional.Create<API.AllowedMentions>(),
-                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
-            };
+                var apiArgs = new ModifyWebhookMessageParams
+                {
+                    Content = args.Content.IsSpecified ? args.Content.Value : Optional.Create<string>(),
+                    Embeds =
+                        args.Embeds.IsSpecified
+                            ? args.Embeds.Value.Select(embed => embed.ToModel()).ToArray()
+                            : Optional.Create<API.Embed[]>(),
+                    AllowedMentions = args.AllowedMentions.IsSpecified
+                        ? args.AllowedMentions.Value.ToModel()
+                        : Optional.Create<API.AllowedMentions>(),
+                    Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                };
 
-            await client.ApiClient.ModifyWebhookMessageAsync(client.Webhook.Id, messageId, apiArgs, options, threadId)
-                .ConfigureAwait(false);
+                await client.ApiClient.ModifyWebhookMessageAsync(client.Webhook.Id, messageId, apiArgs, options, threadId)
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                var apiArgs = new UploadWebhookFileParams(args.Attachments.Value.ToArray())
+                {
+                    Content = args.Content.IsSpecified ? args.Content.Value : Optional.Create<string>(),
+                    Embeds =
+                        args.Embeds.IsSpecified
+                            ? args.Embeds.Value.Select(embed => embed.ToModel()).ToArray()
+                            : Optional.Create<API.Embed[]>(),
+                    AllowedMentions = args.AllowedMentions.IsSpecified
+                        ? args.AllowedMentions.Value.ToModel()
+                        : Optional.Create<API.AllowedMentions>(),
+                    MessageComponents = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                };
+
+                await client.ApiClient.ModifyWebhookMessageAsync(client.Webhook.Id, messageId, apiArgs, options, threadId)
+                    .ConfigureAwait(false);
+            }
         }
+
         public static async Task DeleteMessageAsync(DiscordWebhookClient client, ulong messageId, RequestOptions options, ulong? threadId)
         {
             await client.ApiClient.DeleteWebhookMessageAsync(client.Webhook.Id, messageId, options, threadId).ConfigureAwait(false);
         }
+
         public static async Task<ulong> SendFileAsync(DiscordWebhookClient client, string filePath, string text, bool isTTS,
             IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options,
             bool isSpoiler, MessageComponent components, MessageFlags flags = MessageFlags.None, ulong? threadId = null)
@@ -110,6 +134,7 @@ namespace Discord.Webhook
             using (var file = File.OpenRead(filePath))
                 return await SendFileAsync(client, file, filename, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, isSpoiler, components, flags, threadId).ConfigureAwait(false);
         }
+
         public static Task<ulong> SendFileAsync(DiscordWebhookClient client, Stream stream, string filename, string text, bool isTTS,
             IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options, bool isSpoiler,
             MessageComponent components, MessageFlags flags, ulong? threadId)
@@ -152,8 +177,8 @@ namespace Discord.Webhook
                 }
             }
 
-            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
-                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
+            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
+                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds, SuppressNotification and none.", nameof(flags));
 
             var args = new UploadWebhookFileParams(attachments.ToArray())
             {
@@ -170,8 +195,7 @@ namespace Discord.Webhook
             return msg.Id;
         }
 
-        public static async Task<WebhookModel> ModifyAsync(DiscordWebhookClient client,
-            Action<WebhookProperties> func, RequestOptions options)
+        public static async Task<WebhookModel> ModifyAsync(DiscordWebhookClient client, Action<WebhookProperties> func, RequestOptions options)
         {
             var args = new WebhookProperties();
             func(args);
