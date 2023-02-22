@@ -32,6 +32,23 @@ namespace Discord
         VideoQualityMode VideoQualityMode { get; }
 
         /// <summary>
+        ///     Gets a value that indicates whether the channel is NSFW.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if the channel has the NSFW flag enabled; otherwise <c>false</c>.
+        /// </returns>
+        bool IsNsfw { get; }
+
+        /// <summary>
+        ///     Gets the current slow-mode delay for this channel.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="int"/> representing the time in seconds required before the user can send another
+        ///     message; <c>0</c> if disabled.
+        /// </returns>
+        int SlowModeInterval { get; }
+
+        /// <summary>
         ///     Bulk-deletes multiple messages.
         /// </summary>
         /// <example>

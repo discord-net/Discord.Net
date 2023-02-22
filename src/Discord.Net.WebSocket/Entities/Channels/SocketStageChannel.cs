@@ -16,10 +16,11 @@ namespace Discord.WebSocket
     {
         /// <inheritdoc/>
         /// <remarks>
-        ///     This field is always false for stage channels.
+        ///     This field is always true for stage channels.
         /// </remarks>
+        [Obsolete("This property is no longer used because Discord enabled text-in-stage for all channels.")]
         public override bool IsTextInVoice
-            => false;
+            => true;
 
         /// <inheritdoc/>
         public StagePrivacyLevel? PrivacyLevel { get; private set; }

@@ -12,6 +12,7 @@ namespace Discord
         public int Bitrate => throw new NotImplementedException();
 
         public int? UserLimit => throw new NotImplementedException();
+        public int SlowModeInterval { get; }
         public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null) => throw new NotImplementedException();
 
         public Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null) => throw new NotImplementedException();
@@ -39,6 +40,7 @@ namespace Discord
         public ChannelFlags Flags => throw new NotImplementedException();
 
         public VideoQualityMode VideoQualityMode => throw new NotImplementedException();
+        public bool IsNsfw { get; }
 
         public Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();
         public Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();

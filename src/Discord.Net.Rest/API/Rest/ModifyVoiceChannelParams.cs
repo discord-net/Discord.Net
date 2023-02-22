@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    internal class ModifyVoiceChannelParams : ModifyGuildChannelParams
+    internal class ModifyVoiceChannelParams : ModifyTextChannelParams
     {
         [JsonProperty("bitrate")]
         public Optional<int> Bitrate { get; set; }
