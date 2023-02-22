@@ -100,10 +100,6 @@ namespace Discord.WebSocket
         public override Task<SocketThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
             => throw new InvalidOperationException("Voice channels cannot contain threads.");
 
-        /// <inheritdoc/> <exception cref="InvalidOperationException">Cannot modify text channel properties for voice channels.</exception>
-        public override Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
-            => throw new InvalidOperationException("Cannot modify text channel properties for voice channels.");
-
         #endregion
 
         #region TextOverrides

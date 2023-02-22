@@ -65,11 +65,6 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc/>
-        /// <exception cref="InvalidOperationException">Cannot modify text channel properties of a voice channel.</exception>
-        public override Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
-            => throw new InvalidOperationException("Cannot modify text channel properties of a voice channel");
-
-        /// <inheritdoc/>
         /// <exception cref="InvalidOperationException">Cannot create a thread within a voice channel.</exception>
         public override Task<RestThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
             => throw new InvalidOperationException("Cannot create a thread within a voice channel");
