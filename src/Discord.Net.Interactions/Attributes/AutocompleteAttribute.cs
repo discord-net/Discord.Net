@@ -33,4 +33,15 @@ namespace Discord.Interactions
         /// </summary>
         public AutocompleteAttribute() { }
     }
+
+    /// <summary>
+    ///     Set the <see cref="ApplicationCommandOptionProperties.IsAutocomplete"/> to <see langword="true"/>.
+    /// </summary>
+    /// <typeparam name="T">Type of the <see cref="AutocompleteHandler"/> that will be used to handle Autocomplete interactions targeting the parameter.</typeparam>
+    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
+    public class AutocompleteAttribute<T> : AutocompleteAttribute
+        where T: class, IAutocompleteHandler
+    {
+        public AutocompleteAttribute() : base(typeof(T)) { }
+    }
 }
