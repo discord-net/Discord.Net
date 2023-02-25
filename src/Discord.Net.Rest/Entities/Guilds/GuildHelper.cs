@@ -1071,6 +1071,8 @@ namespace Discord.Rest
             var args = new AutoModRuleProperties();
             func(args);
 
+            #region Validations
+
             if (!args.TriggerType.IsSpecified)
                 throw new ArgumentException(message: $"AutoMod rule must have a specified type.", paramName: nameof(args.TriggerType));
 
@@ -1078,9 +1080,7 @@ namespace Discord.Rest
                 throw new ArgumentException("Name of the rule must not be empty", paramName: nameof(args.Name));
 
             Preconditions.AtLeast(1, args.Actions.GetValueOrDefault(Array.Empty<AutoModRuleActionProperties>()).Length, nameof(args.Actions), "Auto moderation rule must have at least 1 action");
-
-            #region Keyword Validations
-
+            
             if (args.RegexPatterns.IsSpecified)
             {
                 if (args.TriggerType.Value is not AutoModTriggerType.Keyword)
@@ -1124,9 +1124,7 @@ namespace Discord.Rest
             
             if (args.TriggerType.Value is not AutoModTriggerType.KeywordPreset && args.Presets.IsSpecified)
                 throw new ArgumentException(message: $"Keyword presets scan only be used with 'KeywordPreset' trigger type.", paramName: nameof(args.Presets));
-
-            #endregion
-
+            
             if (args.MentionLimit.IsSpecified)
             {
                 if (args.TriggerType.Value is AutoModTriggerType.MentionSpam)
@@ -1154,6 +1152,11 @@ namespace Discord.Rest
             if (args.Actions.Value.Any(x => x.TimeoutDuration.GetValueOrDefault().TotalSeconds > AutoModRuleProperties.MaxTimeoutSeconds))
                 throw new ArgumentException(message: $"Field count must be less than or equal to {AutoModRuleProperties.MaxTimeoutSeconds}.", paramName: nameof(AutoModRuleActionProperties.TimeoutDuration));
 
+            if (args.Actions.Value.Any(x => x.CustomMessage.IsSpecified && x.CustomMessage.Value.Length > AutoModRuleProperties.MaxCustomBlockMessageLength))
+                throw new ArgumentException(message: $"Custom message length must be less than or equal to {AutoModRuleProperties.MaxCustomBlockMessageLength}.", paramName: nameof(AutoModRuleActionProperties.CustomMessage));
+
+            #endregion
+
             var props = new CreateAutoModRuleParams
             {
                 EventType = args.EventType.GetValueOrDefault(AutoModEventType.MessageSend),
@@ -1167,7 +1170,8 @@ namespace Discord.Rest
                     Metadata = new ActionMetadata
                     {
                         ChannelId = x.ChannelId ?? Optional<ulong>.Unspecified,
-                        DurationSeconds = (int?)x.TimeoutDuration?.TotalSeconds ?? Optional<int>.Unspecified
+                        DurationSeconds = (int?)x.TimeoutDuration?.TotalSeconds ?? Optional<int>.Unspecified,
+                        CustomMessage = x.CustomMessage,
                     },
                     Type = x.Type
                 }).ToArray(),
@@ -1203,7 +1207,8 @@ namespace Discord.Rest
                     Metadata = x.ChannelId.HasValue || x.TimeoutDuration.HasValue ? new API.ActionMetadata
                     {
                         ChannelId = x.ChannelId ?? Optional<ulong>.Unspecified,
-                        DurationSeconds = x.TimeoutDuration.HasValue ? (int)Math.Floor(x.TimeoutDuration.Value.TotalSeconds) : Optional<int>.Unspecified
+                        DurationSeconds = x.TimeoutDuration.HasValue ? (int)Math.Floor(x.TimeoutDuration.Value.TotalSeconds) : Optional<int>.Unspecified,
+                        CustomMessage = x.CustomMessage,
                     } : Optional<API.ActionMetadata>.Unspecified
                 }).ToArray() : Optional<API.AutoModAction[]>.Unspecified,
                 Enabled = args.Enabled,
