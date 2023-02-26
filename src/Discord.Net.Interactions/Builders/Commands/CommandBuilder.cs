@@ -23,7 +23,7 @@ namespace Discord.Interactions.Builders
         /// <inheritdoc/>
         public ModuleBuilder Module { get; }
 
-        //// <inheritdoc/>
+        /// <inheritdoc/>
         public ExecuteCallback Callback { get; internal set; }
 
         /// <inheritdoc/>

@@ -1212,7 +1212,7 @@ namespace Discord.WebSocket
         ///     Gets a collection of all users in this guild.
         /// </summary>
         /// <remarks>
-        ///     <para>This method retrieves all users found within this guild throught REST.</para>
+        ///     <para>This method retrieves all users found within this guild through REST.</para>
         ///     <para>Users returned by this method are not cached.</para>
         /// </remarks>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -2128,7 +2128,7 @@ namespace Discord.WebSocket
             _audioLock?.Dispose();
             _audioClient?.Dispose();
         }
-        
+
         /// <inheritdoc/>
         async Task<IAutoModRule> IGuild.GetAutoModRuleAsync(ulong ruleId, RequestOptions options)
             => await GetAutoModRuleAsync(ruleId, options).ConfigureAwait(false);

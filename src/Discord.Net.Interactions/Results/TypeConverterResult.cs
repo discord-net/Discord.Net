@@ -8,7 +8,7 @@ namespace Discord.Interactions
     public struct TypeConverterResult : IResult
     {
         /// <summary>
-        ///     Gets the result of the convertion if the operation was successful.
+        ///     Gets the result of the conversion if the operation was successful.
         /// </summary>
         public object Value { get; }
 
@@ -37,7 +37,7 @@ namespace Discord.Interactions
         /// <summary>
         ///     Returns a <see cref="TypeConverterResult" /> with <see cref="InteractionCommandError.Exception" /> and the <see cref="Exception.Message"/>.
         /// </summary>
-        /// <param name="exception">The exception that caused the type convertion to fail.</param>
+        /// <param name="exception">The exception that caused the type conversion to fail.</param>
         public static TypeConverterResult FromError(Exception exception) =>
             new TypeConverterResult(null, InteractionCommandError.Exception, exception.Message);
 

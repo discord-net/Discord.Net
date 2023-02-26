@@ -26,7 +26,7 @@ namespace Discord.Interactions
         bool IgnoreGroupNames { get; }
 
         /// <summary>
-        ///     Gets wheter this command supports wild card patterns.
+        ///     Gets whether this command supports wild card patterns.
         /// </summary>
         bool SupportsWildCards { get; }
 
