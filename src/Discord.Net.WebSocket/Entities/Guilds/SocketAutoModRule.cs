@@ -93,7 +93,16 @@ namespace Discord.WebSocket
             MentionTotalLimit = model.TriggerMetadata.MentionLimit.IsSpecified
                 ? model.TriggerMetadata.MentionLimit.Value
                 : null;
-            Actions = model.Actions.Select(x => new AutoModRuleAction(x.Type, x.Metadata.GetValueOrDefault()?.ChannelId.ToNullable(), x.Metadata.GetValueOrDefault()?.DurationSeconds.ToNullable())).ToImmutableArray();
+            Actions = model.Actions.Select(x => new AutoModRuleAction(
+                x.Type,
+                x.Metadata.GetValueOrDefault()?.ChannelId.ToNullable(),
+                x.Metadata.GetValueOrDefault()?.DurationSeconds.ToNullable(),
+                x.Metadata.IsSpecified
+                    ? x.Metadata.Value.CustomMessage.IsSpecified
+                        ? x.Metadata.Value.CustomMessage.Value
+                        : null
+                    : null
+                )).ToImmutableArray();
             Enabled = model.Enabled;
             ExemptRoles = model.ExemptRoles.Select(x => Guild.GetRole(x)).ToImmutableArray();
             ExemptChannels = model.ExemptChannels.Select(x => Guild.GetChannel(x)).ToImmutableArray();

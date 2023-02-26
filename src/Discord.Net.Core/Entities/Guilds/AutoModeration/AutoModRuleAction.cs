@@ -22,15 +22,22 @@ namespace Discord
         public ulong? ChannelId { get; }
 
         /// <summary>
+        ///     Gets the custom message that will be shown to members whenever their message is blocked.
+        ///     <see langword="null"/> if no message has been set.
+        /// </summary>
+        public Optional<string> CustomMessage { get; set; }
+
+        /// <summary>
         ///     Gets the duration of which a user will be timed out for breaking this rule. <see langword="null"/> if no timeout duration has been provided.
         /// </summary>
         public TimeSpan? TimeoutDuration { get; }
 
-        internal AutoModRuleAction(AutoModActionType type, ulong? channelId, int? duration)
+        internal AutoModRuleAction(AutoModActionType type, ulong? channelId, int? duration, string customMessage)
         {
             Type = type;
             ChannelId = channelId;
             TimeoutDuration = duration.HasValue ? TimeSpan.FromSeconds(duration.Value) : null;
+            CustomMessage = customMessage;
         }
     }
 }

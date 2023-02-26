@@ -67,6 +67,12 @@ namespace Discord
         public const int MaxTimeoutSeconds = 2419200;
 
         /// <summary>
+        ///     Returns the max custom message length AutoMod rule action allowed by Discord.
+        /// </summary>
+        public const int MaxCustomBlockMessageLength = 50;
+
+
+        /// <summary>
         ///     Gets or sets the name for the rule.
         /// </summary>
         public Optional<string> Name { get; set; }
@@ -146,6 +152,11 @@ namespace Discord
         ///     Gets or sets the duration of which a user will be timed out for breaking this rule.
         /// </summary>
         public TimeSpan? TimeoutDuration { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the custom message that will be shown to members whenever their message is blocked.
+        /// </summary>
+        public Optional<string> CustomMessage { get; set; }
     }
 
 }
