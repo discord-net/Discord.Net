@@ -5,7 +5,7 @@ title: Introduction to Guild Events
 
 # Guild Events
 
-Guild events are a way to host events within a guild. They offer alot of features and flexibility.
+Guild events are a way to host events within a guild. They offer a lot of features and flexibility.
 
 ## Getting started with guild events
 
