@@ -17,6 +17,11 @@ namespace Discord
         IGuild Guild { get; }
 
         /// <summary>
+        ///     Gets the id of the guild this event is scheduled in.
+        /// </summary>
+        ulong GuildId { get; }
+
+        /// <summary>
         ///     Gets the optional channel id where this event will be hosted.
         /// </summary>
         ulong? ChannelId { get; }

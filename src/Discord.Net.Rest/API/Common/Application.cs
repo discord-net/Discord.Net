@@ -32,5 +32,14 @@ namespace Discord.API
         public string TermsOfService { get; set; }
         [JsonProperty("privacy_policy_url")]
         public string PrivacyPolicy { get; set; }
+
+        [JsonProperty("custom_install_url")]
+        public Optional<string> CustomInstallUrl { get; set; }
+
+        [JsonProperty("role_connections_verification_url")]
+        public Optional<string> RoleConnectionsUrl { get; set; }
+
+        [JsonProperty("verify_key")]
+        public string VerifyKey { get; set; }
     }
 }

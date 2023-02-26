@@ -38,6 +38,17 @@ namespace Discord.Rest
         /// </returns>
         public InviteGuild InviteGuild { get; private set; }
 
+        /// <inheritdoc cref="IInvite.Application" />
+        public RestApplication Application { get; private set; }
+
+        /// <inheritdoc />
+        public DateTimeOffset? ExpiresAt { get; private set; }
+
+        /// <summary>
+        ///     Gets guild scheduled event data. <see langword="null" /> if event id was invalid.
+        /// </summary>
+        public RestGuildEvent ScheduledEvent { get; private set; }
+
         internal IChannel Channel { get; }
 
         internal IGuild Guild { get; }
@@ -97,6 +108,14 @@ namespace Discord.Rest
                                     ch.EmojiId.IsSpecified ? ch.EmojiId.Value : null)).ToImmutableArray())
                         : null);
             }
+
+            if(model.Application.IsSpecified)
+                Application = RestApplication.Create(Discord, model.Application.Value);
+
+            ExpiresAt = model.ExpiresAt.IsSpecified ? model.ExpiresAt.Value : null;
+
+            if(model.ScheduledEvent.IsSpecified)
+                ScheduledEvent = RestGuildEvent.Create(Discord, Guild, model.ScheduledEvent.Value);
         }
 
         /// <inheritdoc />
@@ -117,6 +136,8 @@ namespace Discord.Rest
         /// </returns>
         public override string ToString() => Url;
         private string DebuggerDisplay => $"{Url} ({GuildName} / {ChannelName})";
+
+        #region IInvite
 
         /// <inheritdoc />
         IGuild IInvite.Guild
@@ -140,5 +161,10 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
             }
         }
+
+        /// <inheritdoc />
+        IApplication IInvite.Application => Application;
+        
+        #endregion
     }
 }

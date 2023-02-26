@@ -1732,7 +1732,7 @@ namespace Discord.API
         #region Guild Invites
         /// <exception cref="ArgumentException"><paramref name="inviteId"/> cannot be blank.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="inviteId"/> must not be <see langword="null"/>.</exception>
-        public async Task<InviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null)
+        public async Task<InviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null, ulong? scheduledEventId = null)
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
             options = RequestOptions.CreateOrClone(options);
@@ -1745,9 +1745,13 @@ namespace Discord.API
             if (index >= 0)
                 inviteId = inviteId.Substring(index + 1);
 
+            var scheduledEventQuery = scheduledEventId is not null
+                ? $"&guild_scheduled_event_id={scheduledEventId}"
+                : string.Empty;
+
             try
             {
-                return await SendAsync<InviteMetadata>("GET", () => $"invites/{inviteId}?with_counts=true", new BucketIds(), options: options).ConfigureAwait(false);
+                return await SendAsync<InviteMetadata>("GET", () => $"invites/{inviteId}?with_counts=true&with_expiration=true{scheduledEventQuery}", new BucketIds(), options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }

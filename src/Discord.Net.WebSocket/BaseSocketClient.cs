@@ -268,11 +268,12 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="inviteId">The invitation identifier.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="scheduledEventId">The id of the guild scheduled event to include with the invite.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the invite information.
         /// </returns>
-        public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null)
-            => ClientHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default);
+        public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null, ulong? scheduledEventId = null)
+            => ClientHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default, scheduledEventId);
         /// <summary>
         ///     Gets a sticker.
         /// </summary>

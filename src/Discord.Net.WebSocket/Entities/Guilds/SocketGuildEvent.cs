@@ -19,6 +19,9 @@ namespace Discord.WebSocket
         /// </summary>
         public SocketGuild Guild { get; private set; }
 
+        /// <inheritdoc/>
+        public ulong GuildId { get; private set; }
+
         /// <summary>
         ///     Gets the channel of the event.
         /// </summary>
@@ -113,6 +116,7 @@ namespace Discord.WebSocket
             Status = model.Status;
             UserCount = model.UserCount.ToNullable();
             CoverImageId = model.Image;
+            GuildId = model.GuildId;
         }
 
         /// <inheritdoc/>
