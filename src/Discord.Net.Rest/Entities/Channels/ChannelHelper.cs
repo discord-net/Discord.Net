@@ -91,6 +91,8 @@ namespace Discord.Rest
                         Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
+                SlowModeInterval = args.SlowModeInterval,
+                IsNsfw = args.IsNsfw,
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }

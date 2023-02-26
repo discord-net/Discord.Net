@@ -14,5 +14,8 @@ namespace Discord.API
 
         [JsonProperty("duration_seconds")]
         public Optional<int> DurationSeconds { get; set; }
+
+        [JsonProperty("custom_message")]
+        public Optional<string> CustomMessage { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Respresents a <see cref="IMessageComponent"/> text input.
+    ///     Represents a <see cref="IMessageComponent"/> text input.
     /// </summary>
     public class TextInputComponent : IMessageComponent
     {
@@ -17,7 +17,7 @@ namespace Discord
         public string Label { get; }
 
         /// <summary>
-        ///     Gets the placeholder of the component. 
+        ///     Gets the placeholder of the component.
         /// </summary>
         public string Placeholder { get; }
 

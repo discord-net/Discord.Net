@@ -212,6 +212,8 @@ namespace Discord.Rest
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,
             RequestOptions options)
         {
+            if (msg.Channel is IVoiceChannel)
+                throw new NotSupportedException("Pinned messages are not supported in text-in-voice channels.");
             await client.ApiClient.AddPinAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
 

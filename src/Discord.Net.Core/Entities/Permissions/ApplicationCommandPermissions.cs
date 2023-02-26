@@ -99,7 +99,7 @@ namespace Discord
         /// <param name="guildId">Id of the target guild.</param>
         /// <param name="allow">The value of this permission.</param>
         /// <returns>
-        ///     Instance of <see cref="ApplicationCommandPermission"/> targeting everychannel in a guild.
+        ///     Instance of <see cref="ApplicationCommandPermission"/> targeting every channel in a guild.
         /// </returns>
         public static ApplicationCommandPermission ForAllChannels(ulong guildId, bool allow) =>
             new(guildId - 1, ApplicationCommandPermissionTarget.Channel, allow);
@@ -110,7 +110,7 @@ namespace Discord
         /// <param name="guild">Target guild.</param>
         /// <param name="allow">The value of this permission.</param>
         /// <returns>
-        ///     Instance of <see cref="ApplicationCommandPermission"/> targeting everychannel in a guild.
+        ///     Instance of <see cref="ApplicationCommandPermission"/> targeting every channel in a guild.
         /// </returns>
         public static ApplicationCommandPermission ForAllChannels(IGuild guild, bool allow) =>
             ForAllChannels(guild.Id, allow);

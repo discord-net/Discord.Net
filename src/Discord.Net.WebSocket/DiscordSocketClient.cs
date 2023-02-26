@@ -2382,7 +2382,7 @@ namespace Discord.WebSocket
                                                 channel = CreateDMChannel(data.ChannelId.Value, user, State);
                                             }
 
-                                            // The channel isnt required when responding to an interaction, so we can leave the channel null.
+                                            // The channel isn't required when responding to an interaction, so we can leave the channel null.
                                         }
                                     }
                                     else if (data.User.IsSpecified)
@@ -2895,7 +2895,7 @@ namespace Discord.WebSocket
 
                                     var rule = guild.AddOrUpdateAutoModRule(data);
 
-                                    await TimedInvokeAsync(_autoModRuleCreated, nameof(AutoModRuleCreated),  rule);
+                                    await TimedInvokeAsync(_autoModRuleCreated, nameof(AutoModRuleCreated), rule);
                                 }
                                 break;
 
@@ -2942,7 +2942,13 @@ namespace Discord.WebSocket
                                             ? data.Action.Metadata.Value.DurationSeconds.IsSpecified
                                                 ? data.Action.Metadata.Value.DurationSeconds.Value
                                                 : null
+                                            : null,
+                                        data.Action.Metadata.IsSpecified
+                                            ? data.Action.Metadata.Value.CustomMessage.IsSpecified
+                                                ? data.Action.Metadata.Value.CustomMessage.Value
+                                                : null
                                             : null);
+
 
                                     var member = guild.GetUser(data.UserId);
 
@@ -2965,7 +2971,7 @@ namespace Discord.WebSocket
                                         channel != null,
                                         async () =>
                                         {
-                                            if(data.ChannelId.IsSpecified)
+                                            if (data.ChannelId.IsSpecified)
                                                 return await GetChannelAsync(data.ChannelId.Value).ConfigureAwait(false) as ISocketMessageChannel;
                                             return null;
                                         });
@@ -2980,7 +2986,7 @@ namespace Discord.WebSocket
                                         cachedMsg is not null,
                                         async () =>
                                         {
-                                            if(data.MessageId.IsSpecified)
+                                            if (data.MessageId.IsSpecified)
                                                 return (await channel!.GetMessageAsync(data.MessageId.Value).ConfigureAwait(false)) as IUserMessage;
                                             return null;
                                         });

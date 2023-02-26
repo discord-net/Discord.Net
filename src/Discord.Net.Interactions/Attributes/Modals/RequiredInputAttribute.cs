@@ -14,7 +14,7 @@ namespace Discord.Interactions
         public bool IsRequired { get; }
 
         /// <summary>
-        ///     Sets the input as required or optinal.
+        ///     Sets the input as required or optional.
         /// </summary>
         /// <param name="isRequired">Whether or not user input is required for this input.</param>
         public RequiredInputAttribute(bool isRequired = true)

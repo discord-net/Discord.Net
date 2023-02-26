@@ -2388,7 +2388,7 @@ namespace Discord.API
                     .Append(args.ActionType.Value);
             }
 
-            // Still use string interp for the query w/o params, as this is necessary for CreateBucketId
+            // Still use string interpolation for the query w/o params, as this is necessary for CreateBucketId
             endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}{queryArgs.ToString()}";
             return await SendAsync<AuditLog>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }

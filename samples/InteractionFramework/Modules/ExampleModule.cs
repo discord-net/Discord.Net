@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace InteractionFramework.Modules
 {
-    // Interation modules must be public and inherit from an IInterationModuleBase
+    // Interaction modules must be public and inherit from an IInteractionModuleBase
     public class ExampleModule : InteractionModuleBase<SocketInteractionContext>
     {
         // Dependencies can be accessed through Property injection, public properties with public setters will be set by the service provider
