@@ -182,8 +182,8 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(RequestOptions options = null)
             => ClientHelper.GetConnectionsAsync(this, options);
 
-        public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null)
-            => ClientHelper.GetInviteAsync(this, inviteId, options);
+        public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null, ulong? scheduledEventId = null)
+            => ClientHelper.GetInviteAsync(this, inviteId, options, scheduledEventId);
 
         public Task<RestGuild> GetGuildAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildAsync(this, id, false, options);
