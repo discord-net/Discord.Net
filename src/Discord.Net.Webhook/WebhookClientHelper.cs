@@ -34,6 +34,8 @@ namespace Discord.Webhook
                 Flags = flags
             };
 
+            Preconditions.WebhookMessageAtLeastOneOf(text, components, embeds?.ToArray());
+
             if (embeds != null)
                 args.Embeds = embeds.Select(x => x.ToModel()).ToArray();
             if (username != null)
@@ -158,7 +160,9 @@ namespace Discord.Webhook
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
-            Preconditions.AtMost(embeds.Count(), 10, nameof(embeds), "A max of 10 embeds are allowed.");
+            Preconditions.AtMost(embeds.Count(), DiscordConfig.MaxEmbedsPerMessage, nameof(embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
+
+            Preconditions.WebhookMessageAtLeastOneOf(text, components, embeds.ToArray(), attachments);
 
             foreach (var attachment in attachments)
             {
