@@ -30,5 +30,15 @@ public interface IGuildOnboardingPromptOption : ISnowflakeEntity
     /// <summary>
     /// 
     /// </summary>
-    public IEmote Emoji { get; }
+    IEmote Emoji { get; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    string Title { get; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    string Description { get; }
 }

@@ -15,4 +15,10 @@ internal class GuildOnboardingPromptOption
 
     [JsonProperty("emoji")]
     public Emoji Emoji { get; set; }
+
+    [JsonProperty("title")]
+    public string Title { get; set; }
+
+    [JsonProperty("description")]
+    public Optional<string> Description { get; set; }
 }

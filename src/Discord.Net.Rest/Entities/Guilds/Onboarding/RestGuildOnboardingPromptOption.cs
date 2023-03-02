@@ -22,6 +22,12 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
     /// <inheritdoc />
     public IEmote Emoji { get; private set; }
 
+    /// <inheritdoc />
+    public string Title { get; private set; }
+
+    /// <inheritdoc />
+    public string Description { get; private set; }
+
     internal RestGuildOnboardingPromptOption(BaseDiscordClient discord, ulong id) : base(discord, id)
     {
     }

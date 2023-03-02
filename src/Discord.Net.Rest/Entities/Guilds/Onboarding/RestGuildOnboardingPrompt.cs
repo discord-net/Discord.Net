@@ -35,7 +35,7 @@ public class RestGuildOnboardingPrompt : RestEntity<ulong>, IGuildOnboardingProm
     #region IGuildOnboardingPrompt
 
     /// <inheritdoc />
-    IGuildOnboardingPromptOption IGuildOnboardingPrompt.Options => Options;
+    IGuildOnboardingPromptOption[] IGuildOnboardingPrompt.Options => Options;
 
     #endregion
 }
