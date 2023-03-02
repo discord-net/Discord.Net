@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+
 using Model = Discord.API.GuildOnboardingPromptOption;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
-public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardingPromptOption
+public class SocketGuildOnboardingPromptOption : SocketEntity<ulong>, IGuildOnboardingPromptOption
 {
     /// <inheritdoc />
     public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -14,11 +15,16 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
     /// <inheritdoc />
     public IReadOnlyCollection<ulong> ChannelIds { get; private set; }
 
+    /// <summary>
+    ///     
+    /// </summary>
+    public IReadOnlyCollection<SocketGuildChannel> Channels { get; private set; }
+
     /// <inheritdoc />
     public IReadOnlyCollection<ulong> RoleIds { get; private set; }
 
     /// <inheritdoc cref="IGuildOnboardingPromptOption.Roles" />
-    public IReadOnlyCollection<RestRole> Roles { get; private set; }
+    public IReadOnlyCollection<SocketRole> Roles { get; private set; }
 
     /// <inheritdoc />
     public IEmote Emoji { get; private set; }
@@ -29,13 +35,13 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
     /// <inheritdoc />
     public string Description { get; private set; }
 
-    internal RestGuildOnboardingPromptOption(BaseDiscordClient discord, ulong id, Model model, RestGuild guild = null) : base(discord, id)
+    internal SocketGuildOnboardingPromptOption(DiscordSocketClient discord, ulong id, Model model, SocketGuild guild) : base(discord, id)
     {
         ChannelIds = model.ChannelIds.ToImmutableArray();
         RoleIds = model.RoleIds.ToImmutableArray();
         Title = model.Title;
         Description = model.Description.IsSpecified ? model.Description.Value : null;
-        
+
         if (model.Emoji.Id.HasValue)
         {
             Emoji = new Emote(model.Emoji.Id.Value, model.Emoji.Name, model.Emoji.Animated ?? false);
@@ -48,12 +54,9 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
         {
             Emoji = null;
         }
-
-        if (guild is not null)
-        {
-            Roles = model.RoleIds.Select(guild.GetRole).ToImmutableArray();
-        }
-
+        
+        Roles = model.RoleIds.Select(guild.GetRole).ToImmutableArray();
+        Channels = model.ChannelIds.Select(guild.GetChannel).ToImmutableArray();
     }
 
     #region IGuildOnboardingPromptOption

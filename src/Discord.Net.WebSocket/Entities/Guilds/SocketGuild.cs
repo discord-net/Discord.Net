@@ -1,6 +1,7 @@
 using Discord.API.Gateway;
 using Discord.Audio;
 using Discord.Rest;
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using AutoModRuleModel = Discord.API.AutoModerationRule;
 using ChannelModel = Discord.API.Channel;
 using EmojiUpdateModel = Discord.API.Gateway.GuildEmojiUpdateEvent;
