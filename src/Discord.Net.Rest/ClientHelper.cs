@@ -17,6 +17,12 @@ namespace Discord.Rest
             return RestApplication.Create(client, model);
         }
 
+        public static async Task<RestApplication> GetCurrentBotInfoAsync(BaseDiscordClient client, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetCurrentBotApplicationAsync(options).ConfigureAwait(false);
+            return RestApplication.Create(client, model);
+        }
+
         public static async Task<RestChannel> GetChannelAsync(BaseDiscordClient client,
             ulong id, RequestOptions options)
         {

@@ -19,6 +19,8 @@ namespace Discord.Rest
     {
         #region DiscordRestClient
         private RestApplication _applicationInfo;
+        private RestApplication _currentBotInfo;
+
         internal static JsonSerializer Serializer = new JsonSerializer() { ContractResolver = new DiscordContractResolver(), NullValueHandling = NullValueHandling.Include };
 
         /// <summary>
@@ -168,6 +170,11 @@ namespace Discord.Rest
         public async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
         {
             return _applicationInfo ??= await ClientHelper.GetApplicationInfoAsync(this, options).ConfigureAwait(false);
+        }
+
+        public async Task<RestApplication> GetCurrentBotInfoAsync(RequestOptions options = null)
+        {
+            return _currentBotInfo = await ClientHelper.GetCurrentBotInfoAsync(this, options);
         }
 
         public Task<RestChannel> GetChannelAsync(ulong id, RequestOptions options = null)

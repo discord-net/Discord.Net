@@ -36,13 +36,13 @@ namespace Discord
         /// </summary>
         string IconUrl { get; }
         /// <summary>
-        ///     Gets if the bot is public.
+        ///     Gets if the bot is public. <see langword="null" /> if not set.
         /// </summary>
-        bool IsBotPublic { get; }
+        bool? IsBotPublic { get; }
         /// <summary>
-        ///     Gets if the bot requires code grant.
+        ///     Gets if the bot requires code grant. <see langword="null" /> if not set.
         /// </summary>
-        bool BotRequiresCodeGrant { get; }
+        bool? BotRequiresCodeGrant { get; }
         /// <summary>
         ///     Gets the team associated with this application if there is one.
         /// </summary>
@@ -75,5 +75,24 @@ namespace Discord
         /// </summary>
         public string VerifyKey { get; }
 
+        /// <summary>
+        ///     Gets the partial guild object of the application's developer's support server. <see langword="null" /> if not set.
+        /// </summary>
+        public PartialGuild Guild { get; }
+
+        /// <summary>
+        ///     Gets the redirect uris configured for the application.
+        /// </summary>
+        public IReadOnlyCollection<string> RedirectUris { get;}
+
+        /// <summary>
+        ///      Gets application's interactions endpoint url. <see langword="null" /> if not set.
+        /// </summary>
+        public string InteractionsEndpointUrl { get; }
+
+        /// <summary>
+        ///     Gets the approximate count of the guild the application was added to. <see langword="null" /> if not returned.
+        /// </summary>
+        public int? ApproximateGuildCount { get; }
     }
 }
