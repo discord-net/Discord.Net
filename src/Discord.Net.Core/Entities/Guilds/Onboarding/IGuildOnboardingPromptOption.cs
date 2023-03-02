@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Discord;
 
@@ -10,17 +11,17 @@ public interface IGuildOnboardingPromptOption : ISnowflakeEntity
     /// <summary>
     /// 
     /// </summary>
-    ulong[] ChannelIds { get; }
+    IReadOnlyCollection<ulong> ChannelIds { get; }
 
     /// <summary>
     /// 
     /// </summary>
-    ulong[] RoleIds { get; }
+    IReadOnlyCollection<ulong> RoleIds { get; }
 
     /// <summary>
     /// 
     /// </summary>
-    IRole[] Roles { get; }
+    IReadOnlyCollection<IRole> Roles { get; }
 
     /// <summary>
     /// 
