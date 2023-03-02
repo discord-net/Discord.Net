@@ -1,4 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using Model = Discord.API.GuildOnboardingPrompt;
 
 namespace Discord.Rest;
 
@@ -11,7 +15,7 @@ public class RestGuildOnboardingPrompt : RestEntity<ulong>, IGuildOnboardingProm
     public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
     
     /// <inheritdoc cref="IGuildOnboardingPrompt.Options"/>
-    public RestGuildOnboardingPromptOption[] Options { get; private set; }
+    public IReadOnlyCollection<RestGuildOnboardingPromptOption> Options { get; private set; }
 
     /// <inheritdoc />
     public string Title { get; private set; }
@@ -28,14 +32,21 @@ public class RestGuildOnboardingPrompt : RestEntity<ulong>, IGuildOnboardingProm
     /// <inheritdoc />
     public GuildOnboardingPromptType Type { get; private set; }
 
-    internal RestGuildOnboardingPrompt(BaseDiscordClient discord, ulong id) : base(discord, id)
+    internal RestGuildOnboardingPrompt(BaseDiscordClient discord, ulong id, Model model, RestGuild guild = null) : base(discord, id)
     {
+        Title = model.Title;
+        IsSingleSelect = model.IsSingleSelect;
+        IsInOnboarding = model.IsInOnboarding;
+        IsRequired = model.IsRequired;
+        Type = model.Type;
+
+        Options = model.Options.Select(option => new RestGuildOnboardingPromptOption(discord, option.Id, option, guild)).ToImmutableArray();
     }
 
     #region IGuildOnboardingPrompt
 
     /// <inheritdoc />
-    IGuildOnboardingPromptOption[] IGuildOnboardingPrompt.Options => Options;
+    IReadOnlyCollection<IGuildOnboardingPromptOption> IGuildOnboardingPrompt.Options => Options;
 
     #endregion
 }

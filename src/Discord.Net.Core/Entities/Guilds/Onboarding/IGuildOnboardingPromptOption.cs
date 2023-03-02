@@ -15,11 +15,6 @@ public interface IGuildOnboardingPromptOption : ISnowflakeEntity
     /// <summary>
     /// 
     /// </summary>
-    IGuildChannel[] Channels { get; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     ulong[] RoleIds { get; }
 
     /// <summary>

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Discord;
 
 /// <summary>
@@ -8,7 +10,7 @@ public interface IGuildOnboardingPrompt : ISnowflakeEntity
     /// <summary>
     /// 
     /// </summary>
-    IGuildOnboardingPromptOption[] Options { get; }
+    IReadOnlyCollection<IGuildOnboardingPromptOption> Options { get; }
 
     /// <summary>
     /// 

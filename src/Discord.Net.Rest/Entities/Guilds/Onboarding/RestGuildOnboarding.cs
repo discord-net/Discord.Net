@@ -1,5 +1,7 @@
 using System;
-
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using Model = Discord.API.GuildOnboarding;
 
 namespace Discord.Rest;
@@ -16,27 +18,31 @@ public class RestGuildOnboarding : IGuildOnboarding
     public RestGuild Guild { get; private set; }
 
     /// <inheritdoc />
-    public ulong[] DefaultChannelIds { get; private set; }
-
-    /// <inheritdoc cref="IGuildOnboarding.DefaultChannels" />
-    public RestGuildChannel[] DefaultChannels { get; private set; }
+    public IReadOnlyCollection<ulong> DefaultChannelIds { get; private set; }
 
     /// <inheritdoc />
     public bool IsEnabled { get; private set; }
 
     /// <inheritdoc cref="IGuildOnboarding.Prompts"/>
-    public RestGuildOnboardingPrompt[] Prompts { get; private set; }
+    public IReadOnlyCollection<RestGuildOnboardingPrompt> Prompts { get; private set; }
+
+    internal RestGuildOnboarding(BaseDiscordClient discord, Model model, RestGuild guild = null)
+    {
+        GuildId = model.GuildId;
+        DefaultChannelIds = model.DefaultChannelIds.ToImmutableArray();
+        IsEnabled = model.Enabled;
+
+        Guild = guild;
+        Prompts = model.Prompts.Select(prompt => new RestGuildOnboardingPrompt(discord, prompt.Id, prompt, guild)).ToImmutableArray();
+    }
 
     #region IGuildOnboarding
 
     /// <inheritdoc />
-    IGuildOnboardingPrompt[] IGuildOnboarding.Prompts => Prompts;
+    IReadOnlyCollection<IGuildOnboardingPrompt> IGuildOnboarding.Prompts => Prompts;
 
     /// <inheritdoc />
     IGuild IGuildOnboarding.Guild => Guild;
-
-    /// <inheritdoc />
-    IGuildChannel[] IGuildOnboarding.DefaultChannels => DefaultChannels;
 
     #endregion
 }

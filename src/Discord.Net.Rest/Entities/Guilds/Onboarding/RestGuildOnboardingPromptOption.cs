@@ -1,4 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using Model = Discord.API.GuildOnboardingPromptOption;
 
 namespace Discord.Rest;
 
@@ -8,16 +12,13 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
     public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
     /// <inheritdoc />
-    public ulong[] ChannelIds { get; private set; }
-
-    /// <inheritdoc cref="IGuildOnboardingPromptOption.Channels" />
-    public RestGuildChannel[] Channels { get; private set; }
+    public IReadOnlyCollection<ulong> ChannelIds { get; private set; }
 
     /// <inheritdoc />
-    public ulong[] RoleIds { get; private set; }
+    public IReadOnlyCollection<ulong> RoleIds { get; private set; }
 
     /// <inheritdoc cref="IGuildOnboardingPromptOption.Roles" />
-    public RestRole[] Roles { get; private set; }
+    public IReadOnlyCollection<RestRole> Roles { get; private set; }
 
     /// <inheritdoc />
     public IEmote Emoji { get; private set; }
@@ -28,17 +29,37 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
     /// <inheritdoc />
     public string Description { get; private set; }
 
-    internal RestGuildOnboardingPromptOption(BaseDiscordClient discord, ulong id) : base(discord, id)
+    internal RestGuildOnboardingPromptOption(BaseDiscordClient discord, ulong id, Model model, RestGuild guild = null) : base(discord, id)
     {
+        ChannelIds = model.ChannelIds.ToImmutableArray();
+        RoleIds = model.RoleIds.ToImmutableArray();
+        Title = model.Title;
+        Description = model.Description.IsSpecified ? model.Description.Value : null;
+        
+        if (model.Emoji.Id.HasValue)
+        {
+            Emoji = new Emote(model.Emoji.Id.Value, model.Emoji.Name, model.Emoji.Animated ?? false);
+        }
+        else if (!string.IsNullOrWhiteSpace(model.Emoji.Name))
+        {
+            Emoji = new Emoji(model.Emoji.Name);
+        }
+        else
+        {
+            Emoji = null;
+        }
+
+        if (guild is not null)
+        {
+            Roles = model.RoleIds.Select(role => guild.GetRole(role)).ToImmutableArray();
+        }
+
     }
 
     #region IGuildOnboardingPromptOption
 
     /// <inheritdoc />
-    IGuildChannel[] IGuildOnboardingPromptOption.Channels => Channels;
-
-    /// <inheritdoc />
-    IRole[] IGuildOnboardingPromptOption.Roles => Roles;
+    IReadOnlyCollection<IRole> IGuildOnboardingPromptOption.Roles => Roles;
 
     #endregion
 }
