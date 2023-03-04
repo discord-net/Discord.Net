@@ -2260,6 +2260,14 @@ namespace Discord.API
             return await SendAsync<Application>("GET", () => "applications/@me", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
+        public async Task<Application> ModifyCurrentBotApplicationAsync(ModifyCurrentApplicationBotParams args, RequestOptions options = null)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendJsonAsync<Application>("PATCH", () => "applications/@me", args, new BucketIds(), options: options);
+        }
+
         public async Task<User> ModifySelfAsync(Rest.ModifyCurrentUserParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));

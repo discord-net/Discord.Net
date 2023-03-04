@@ -19,7 +19,7 @@ namespace Discord.Rest
     {
         #region DiscordRestClient
         private RestApplication _applicationInfo;
-        private RestApplication _currentBotInfo;
+        private RestApplication _currentBotApplication;
 
         internal static JsonSerializer Serializer = new JsonSerializer() { ContractResolver = new DiscordContractResolver(), NullValueHandling = NullValueHandling.Include };
 
@@ -174,7 +174,18 @@ namespace Discord.Rest
 
         public async Task<RestApplication> GetCurrentBotInfoAsync(RequestOptions options = null)
         {
-            return _currentBotInfo = await ClientHelper.GetCurrentBotInfoAsync(this, options);
+            return _currentBotApplication = await ClientHelper.GetCurrentBotApplicationAsync(this, options);
+        }
+
+        public async Task<RestApplication> ModifyCurrentBotApplicationAsync(Action<ModifyApplicationProperties> args, RequestOptions options = null)
+        {
+            var model = await ClientHelper.ModifyCurrentBotApplicationAsync(this, args, options);
+
+            if (_currentBotApplication is null)
+                _currentBotApplication = RestApplication.Create(this, model);
+            else
+                _currentBotApplication.Update(model);
+            return _currentBotApplication;
         }
 
         public Task<RestChannel> GetChannelAsync(ulong id, RequestOptions options = null)
