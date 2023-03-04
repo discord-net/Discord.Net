@@ -2331,6 +2331,11 @@ namespace Discord.API
                 queryArgs.Append("&action_type=")
                     .Append(args.ActionType.Value);
             }
+            if (args.AfterEntryId.IsSpecified)
+            {
+                queryArgs.Append("&after=")
+                    .Append(args.AfterEntryId);
+            }
 
             // Still use string interpolation for the query w/o params, as this is necessary for CreateBucketId
             endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}{queryArgs.ToString()}";

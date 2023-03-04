@@ -610,7 +610,7 @@ namespace Discord.Rest
 
         #region Audit logs
         public static IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(IGuild guild, BaseDiscordClient client,
-            ulong? from, int? limit, RequestOptions options, ulong? userId = null, ActionType? actionType = null)
+            ulong? from, int? limit, RequestOptions options, ulong? userId = null, ActionType? actionType = null, ulong? afterId = null)
         {
             return new PagedAsyncEnumerable<RestAuditLogEntry>(
                 DiscordConfig.MaxAuditLogEntriesPerBatch,
@@ -626,6 +626,8 @@ namespace Discord.Rest
                         args.UserId = userId.Value;
                     if (actionType.HasValue)
                         args.ActionType = (int)actionType.Value;
+                    if (afterId.HasValue)
+                        args.AfterEntryId = afterId.Value;
                     var model = await client.ApiClient.GetAuditLogsAsync(guild.Id, args, options);
                     return model.Entries.Select((x) => RestAuditLogEntry.Create(client, model, x)).ToImmutableArray();
                 },
@@ -1080,7 +1082,7 @@ namespace Discord.Rest
                 throw new ArgumentException("Name of the rule must not be empty", paramName: nameof(args.Name));
 
             Preconditions.AtLeast(1, args.Actions.GetValueOrDefault(Array.Empty<AutoModRuleActionProperties>()).Length, nameof(args.Actions), "Auto moderation rule must have at least 1 action");
-            
+
             if (args.RegexPatterns.IsSpecified)
             {
                 if (args.TriggerType.Value is not AutoModTriggerType.Keyword)
@@ -1121,10 +1123,10 @@ namespace Discord.Rest
                     throw new ArgumentException(message: $"Allow list entry length must be less than or equal to {AutoModRuleProperties.MaxAllowListEntryLength}.", paramName: nameof(args.AllowList));
 
             }
-            
+
             if (args.TriggerType.Value is not AutoModTriggerType.KeywordPreset && args.Presets.IsSpecified)
                 throw new ArgumentException(message: $"Keyword presets scan only be used with 'KeywordPreset' trigger type.", paramName: nameof(args.Presets));
-            
+
             if (args.MentionLimit.IsSpecified)
             {
                 if (args.TriggerType.Value is AutoModTriggerType.MentionSpam)
