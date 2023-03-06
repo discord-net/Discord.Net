@@ -27,6 +27,8 @@ namespace Discord.Rest
         public bool IsNsfw { get; private set; }
         /// <inheritdoc />
         public ThreadArchiveDuration DefaultArchiveDuration { get; private set; }
+        /// <inheritdoc />
+        public int DefaultSlowModeInterval { get; private set; }
 
         internal RestTextChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
@@ -52,6 +54,8 @@ namespace Discord.Rest
                 DefaultArchiveDuration = model.AutoArchiveDuration.Value;
             else
                 DefaultArchiveDuration = ThreadArchiveDuration.OneDay;
+
+            DefaultSlowModeInterval = model.ThreadRateLimitPerUser.GetValueOrDefault(0);
             // basic value at channel creation. Shouldn't be called since guild text channels always have this property
         }
 

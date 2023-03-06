@@ -36,6 +36,15 @@ namespace Discord
         int SlowModeInterval { get; }
 
         /// <summary>
+        /// Gets the current default slow-mode delay for threads in this channel.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="int"/> representing the time in seconds required before the user can send another
+        ///     message; <c>0</c> if disabled.
+        /// </returns>
+        int DefaultSlowModeInterval { get; }
+
+        /// <summary>
         ///     Gets the default auto-archive duration for client-created threads in this channel.
         /// </summary>
         /// <remarks>
