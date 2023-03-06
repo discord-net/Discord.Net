@@ -9,6 +9,8 @@ namespace Discord
 {
     internal sealed class MockedVoiceChannel : IVoiceChannel
     {
+        public int DefaultSlowModeInterval => throw new NotImplementedException();
+
         public int Bitrate => throw new NotImplementedException();
 
         public int? UserLimit => throw new NotImplementedException();

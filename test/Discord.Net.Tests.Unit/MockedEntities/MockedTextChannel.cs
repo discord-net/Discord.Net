@@ -10,6 +10,8 @@ namespace Discord
     {
         public bool IsNsfw => throw new NotImplementedException();
 
+        public int DefaultSlowModeInterval => throw new NotImplementedException();
+
         public ThreadArchiveDuration DefaultArchiveDuration => throw new NotImplementedException();
 
         public string Topic => throw new NotImplementedException();
