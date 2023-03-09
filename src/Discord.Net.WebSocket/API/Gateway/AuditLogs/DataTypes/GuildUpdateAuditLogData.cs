@@ -1,6 +1,7 @@
 using System.Linq;
 
 using EntryModel = Discord.API.AuditLogEntry;
+using InfoModel = Discord.API.AuditLogs.GuildAuditLogInfoModel;
 
 namespace Discord.WebSocket
 {
@@ -9,7 +10,7 @@ namespace Discord.WebSocket
     /// </summary>
     public class GuildUpdateAuditLogData : IAuditLogData
     {
-        private GuildUpdateAuditLogData(GuildInfo before, GuildInfo after)
+        private GuildUpdateAuditLogData(SocketGuildInfo before, SocketGuildInfo after)
         {
             Before = before;
             After = after;
@@ -17,9 +18,10 @@ namespace Discord.WebSocket
 
         internal static GuildUpdateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
         {
-            GuildInfo before = new(entry.Changes, true), after = new(entry.Changes, false);
+            var info = Rest.AuditLogHelper.CreateAuditLogEntityInfo<InfoModel>(entry.Changes, discord);
 
-            return new(before, after);
+            var data = new GuildUpdateAuditLogData(SocketGuildInfo.Create(info.Item1), SocketGuildInfo.Create(info.Item2));
+            return data;
         }
 
         /// <summary>
@@ -28,13 +30,13 @@ namespace Discord.WebSocket
         /// <returns>
         ///     An information object containing the original guild information before the changes were made.
         /// </returns>
-        public GuildInfo Before { get; }
+        public SocketGuildInfo Before { get; }
         /// <summary>
         ///     Gets the guild information after the changes.
         /// </summary>
         /// <returns>
         ///     An information object containing the guild information after the changes were made.
         /// </returns>
-        public GuildInfo After { get; }
+        public SocketGuildInfo After { get; }
     }
 }

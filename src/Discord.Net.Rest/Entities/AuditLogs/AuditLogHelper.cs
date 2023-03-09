@@ -1,15 +1,17 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
+using AuditLogChange = Discord.API.AuditLogChange;
 
-namespace Discord.Rest
+namespace Discord.Rest;
+
+internal static class AuditLogHelper
 {
-    internal static class AuditLogHelper
-    {
-        private static readonly Dictionary<ActionType, Func<BaseDiscordClient, EntryModel, Model,  IAuditLogData>> CreateMapping
-            = new ()
+    private static readonly Dictionary<ActionType, Func<BaseDiscordClient, EntryModel, Model,  IAuditLogData>> CreateMapping
+        = new ()
         {
             [ActionType.GuildUpdated] = GuildUpdateAuditLogData.Create, // log
 
@@ -61,12 +63,35 @@ namespace Discord.Rest
             [ActionType.ThreadDelete] = ThreadDeleteAuditLogData.Create,
         };
 
-        public static IAuditLogData CreateData(BaseDiscordClient discord, EntryModel entry, Model log = null)
-        {
-            if (CreateMapping.TryGetValue(entry.Action, out var func))
-                return func(discord, entry, log);
+    public static IAuditLogData CreateData(BaseDiscordClient discord, EntryModel entry, Model log = null)
+    {
+        if (CreateMapping.TryGetValue(entry.Action, out var func))
+            return func(discord, entry, log);
 
-            return null;
+        return null;
+    }
+
+    internal static (T, T) CreateAuditLogEntityInfo<T>(AuditLogChange[] changes, BaseDiscordClient discord) where T : IAuditLogInfoModel
+    {
+        var oldModel = (T)Activator.CreateInstance(typeof(T))!;
+        var newModel = (T)Activator.CreateInstance(typeof(T))!;
+
+        var props = typeof(T).GetProperties();
+
+        foreach (var property in props)
+        {
+            if (property.GetCustomAttributes(typeof(JsonPropertyAttribute), true).FirstOrDefault() is not JsonPropertyAttribute jsonAttr)
+                continue;
+            
+            var change = changes.FirstOrDefault(x => x.ChangedProperty == jsonAttr.PropertyName);
+
+            if (change is null)
+                continue;
+
+            property.SetValue(oldModel, change.OldValue?.ToObject(property.PropertyType, discord.ApiClient.Serializer));
+            property.SetValue(newModel, change.NewValue?.ToObject(property.PropertyType, discord.ApiClient.Serializer));
         }
+
+        return (oldModel, newModel);
     }
 }
