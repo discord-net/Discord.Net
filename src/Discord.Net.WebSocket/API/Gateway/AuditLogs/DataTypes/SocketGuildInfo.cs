@@ -19,12 +19,31 @@ public class SocketGuildInfo
     {
         return new()
         {
-            Name = model.Name.GetValueOrDefault(null),
-            AfkTimeout = model.AfkTimeout.GetValueOrDefault(null).GetValueOrDefault(300),
-            IsEmbeddable = model.IsEmbeddable.IsSpecified ? model.IsEmbeddable.Value : null,
-            DefaultMessageNotifications = model.DefaultMessageNotifications.GetValueOrDefault(),
-            MfaLevel = model.MfaLevel.GetValueOrDefault(Discord.MfaLevel.Disabled),
-            Description = model.Description.IsSpecified ? model.Description.Value : null,
+            Name = model.Name,
+            AfkTimeout = model.AfkTimeout.GetValueOrDefault(),
+            IsEmbeddable = model.IsEmbeddable,
+            DefaultMessageNotifications = model.DefaultMessageNotifications,
+            MfaLevel = model.MfaLevel,
+            Description = model.Description,
+            PreferredLocale = model.PreferredLocale,   
+            IconHash = model.IconHash,
+            OwnerId = model.OwnerId,
+            AfkChannelId = model.AfkChannelId,
+            ApplicationId = model.ApplicationId,
+            BannerId = model.Banner,
+            DiscoverySplashId = model.DiscoverySplash,
+            EmbedChannelId = model.EmbeddedChannelId,
+            ExplicitContentFilter = model.ExplicitContentFilterLevel,
+            IsBoostProgressBarEnabled = model.ProgressBarEnabled,
+            NsfwLevel = model.NsfwLevel,
+            PublicUpdatesChannelId = model.PublicUpdatesChannelId,
+            RegionId = model.RegionId,
+            RulesChannelId = model.RulesChannelId,
+            SplashId = model.Splash,
+            SystemChannelFlags = model.SystemChannelFlags,
+            SystemChannelId = model.SystemChannelId,
+            VanityURLCode = model.VanityUrl,
+            VerificationLevel = model.VerificationLevel
         };
     }
 

@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,14 +79,14 @@ internal static class AuditLogHelper
 
         foreach (var property in props)
         {
-            if (property.GetCustomAttributes(typeof(JsonPropertyAttribute), true).FirstOrDefault() is not JsonPropertyAttribute jsonAttr)
+            if (property.GetCustomAttributes(typeof(JsonFieldAttribute), true).FirstOrDefault() is not JsonFieldAttribute jsonAttr)
                 continue;
             
-            var change = changes.FirstOrDefault(x => x.ChangedProperty == jsonAttr.PropertyName);
+            var change = changes.FirstOrDefault(x => x.ChangedProperty == jsonAttr.FieldName);
 
             if (change is null)
                 continue;
-
+            
             property.SetValue(oldModel, change.OldValue?.ToObject(property.PropertyType, discord.ApiClient.Serializer));
             property.SetValue(newModel, change.NewValue?.ToObject(property.PropertyType, discord.ApiClient.Serializer));
         }
