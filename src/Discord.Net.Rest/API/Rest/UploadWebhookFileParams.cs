@@ -1,9 +1,9 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using Discord.Net.Converters;
 using Discord.Net.Rest;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 namespace Discord.API.Rest
 {
@@ -22,6 +22,7 @@ namespace Discord.API.Rest
         public Optional<AllowedMentions> AllowedMentions { get; set; }
         public Optional<ActionRowComponent[]> MessageComponents { get; set; }
         public Optional<MessageFlags> Flags { get; set; }
+        public Optional<string> ThreadName { get; set; }
 
         public UploadWebhookFileParams(params FileAttachment[] files)
         {
@@ -51,6 +52,8 @@ namespace Discord.API.Rest
                 payload["allowed_mentions"] = AllowedMentions.Value;
             if (Flags.IsSpecified)
                 payload["flags"] = Flags.Value;
+            if (ThreadName.IsSpecified)
+                payload["thread_name"] = ThreadName.Value;
 
             List<object> attachments = new();
 

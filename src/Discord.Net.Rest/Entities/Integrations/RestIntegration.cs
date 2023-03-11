@@ -76,7 +76,7 @@ namespace Discord.Rest
 
             _syncedAtTicks = model.SyncedAt.IsSpecified ? model.SyncedAt.Value.UtcTicks : null;
         }
-        
+
         public async Task DeleteAsync()
         {
             await Discord.ApiClient.DeleteIntegrationAsync(GuildId, Id).ConfigureAwait(false);

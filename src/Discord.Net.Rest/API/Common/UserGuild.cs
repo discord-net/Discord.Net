@@ -14,5 +14,7 @@ namespace Discord.API
         public bool Owner { get; set; }
         [JsonProperty("permissions"), Int53]
         public string Permissions { get; set; }
+        [JsonProperty("features")]
+        public GuildFeatures Features { get; set; }
     }
 }

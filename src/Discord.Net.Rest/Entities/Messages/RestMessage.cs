@@ -1,9 +1,13 @@
+using Discord.API;
+
 using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Model = Discord.API.Message;
 
 namespace Discord.Rest
@@ -45,6 +49,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         public virtual bool MentionedEveryone => false;
 
+        /// <inheritdoc cref="IMessage.Thread"/>
+        public RestThreadChannel Thread { get; private set; }
+
+        /// <inheritdoc />
+        IThreadChannel IMessage.Thread => Thread;
+
         /// <summary>
         ///     Gets a collection of the <see cref="Attachment"/>'s on the message.
         /// </summary>
@@ -80,7 +90,10 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public MessageType Type { get; private set; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
+        public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
+
+        /// <inheritdoc cref="IMessage.Components"/>
         public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
         /// <summary>
         ///     Gets a collection of the mentioned users in the message.
@@ -243,6 +256,18 @@ namespace Discord.Rest
                     _userMentions = newMentions.ToImmutable();
                 }
             }
+
+            if (model.RoleSubscriptionData.IsSpecified)
+            {
+                RoleSubscriptionData = new(
+                    model.RoleSubscriptionData.Value.SubscriptionListingId,
+                    model.RoleSubscriptionData.Value.TierName,
+                    model.RoleSubscriptionData.Value.MonthsSubscribed,
+                    model.RoleSubscriptionData.Value.IsRenewal);
+            }
+
+            if (model.Thread.IsSpecified)
+                Thread = RestThreadChannel.Create(Discord, new RestGuild(Discord, model.Thread.Value.GuildId.Value), model.Thread.Value);
         }
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
@@ -262,11 +287,17 @@ namespace Discord.Rest
         /// </returns>
         public override string ToString() => Content;
 
+        #region IMessage
+
+        /// <inheritdoc />
         IUser IMessage.Author => Author;
+
         /// <inheritdoc />
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
+
         /// <inheritdoc />
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
+
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
 
@@ -278,6 +309,8 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         IReadOnlyCollection<IStickerItem> IMessage.Stickers => Stickers;
+
+        #endregion
 
         /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x => new ReactionMetadata { ReactionCount = x.Count, IsMe = x.Me });

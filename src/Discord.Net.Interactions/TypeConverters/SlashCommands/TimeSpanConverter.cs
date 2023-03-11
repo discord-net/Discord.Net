@@ -7,10 +7,10 @@ namespace Discord.Interactions
 {
     internal sealed class TimeSpanConverter : TypeConverter<TimeSpan>
     {
-        public override ApplicationCommandOptionType GetDiscordType ( ) => ApplicationCommandOptionType.String;
-        public override Task<TypeConverterResult> ReadAsync (IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
+        public override ApplicationCommandOptionType GetDiscordType() => ApplicationCommandOptionType.String;
+        public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
         {
-            return ( TimeSpan.TryParseExact(( option.Value as string ).ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out var timeSpan) )
+            return (TimeSpan.TryParseExact((option.Value as string).ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out var timeSpan))
                 ? Task.FromResult(TypeConverterResult.FromSuccess(timeSpan))
                 : Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, "Failed to parse TimeSpan"));
         }

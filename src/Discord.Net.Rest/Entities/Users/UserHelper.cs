@@ -1,10 +1,10 @@
 using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Model = Discord.API.User;
-using ImageModel = Discord.API.Image;
 using System.Linq;
+using System.Threading.Tasks;
+using ImageModel = Discord.API.Image;
+using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
@@ -40,7 +40,8 @@ namespace Discord.Rest
                 Deaf = args.Deaf,
                 Mute = args.Mute,
                 Nickname = args.Nickname,
-                TimedOutUntil = args.TimedOutUntil
+                TimedOutUntil = args.TimedOutUntil,
+                Flags = args.Flags
             };
 
             if (args.Channel.IsSpecified)
@@ -80,14 +81,18 @@ namespace Discord.Rest
 
         public static async Task AddRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<ulong> roleIds, RequestOptions options)
         {
-            foreach (var roleId in roleIds)
-                await client.ApiClient.AddRoleAsync(user.Guild.Id, user.Id, roleId, options).ConfigureAwait(false);
+            await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, args: new()
+            {
+                RoleIds = user.RoleIds.Except(new[] { user.Guild.Id }).Concat(roleIds).Distinct().ToArray()
+            }, options);
         }
 
         public static async Task RemoveRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<ulong> roleIds, RequestOptions options)
         {
-            foreach (var roleId in roleIds)
-                await client.ApiClient.RemoveRoleAsync(user.Guild.Id, user.Id, roleId, options).ConfigureAwait(false);
+            await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, args: new()
+            {
+                RoleIds = user.RoleIds.Except(new[] { user.Guild.Id }).Except(roleIds).ToArray()
+            }, options);
         }
 
         public static async Task SetTimeoutAsync(IGuildUser user, BaseDiscordClient client, TimeSpan span, RequestOptions options)

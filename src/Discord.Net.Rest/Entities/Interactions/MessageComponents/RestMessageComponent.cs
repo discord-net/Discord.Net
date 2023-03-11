@@ -1,12 +1,12 @@
+using Discord.Net.Rest;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
 using DataModel = Discord.API.MessageComponentInteractionData;
-using System.IO;
-using Discord.Net.Rest;
+using Model = Discord.API.Interaction;
 
 namespace Discord.Rest
 {
@@ -286,7 +286,7 @@ namespace Discord.Rest
             Preconditions.NotNull(fileStream, nameof(fileStream), "File Stream must have data");
             Preconditions.NotNullOrEmpty(fileName, nameof(fileName), "File Name must not be empty or null");
 
-            using(var file = new FileAttachment(fileStream, fileName))
+            using (var file = new FileAttachment(fileStream, fileName))
                 return await FollowupWithFileAsync(file, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
         }
 
@@ -308,7 +308,7 @@ namespace Discord.Rest
             fileName ??= Path.GetFileName(filePath);
             Preconditions.NotNullOrEmpty(fileName, nameof(fileName), "File Name must not be empty or null");
 
-            using(var file = new FileAttachment(File.OpenRead(filePath), fileName))
+            using (var file = new FileAttachment(File.OpenRead(filePath), fileName))
                 return await FollowupWithFileAsync(file, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
         }
 

@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using WidgetModel = Discord.API.GuildWidget;
 using Model = Discord.API.Guild;
-using System.IO;
+using WidgetModel = Discord.API.GuildWidget;
 
 namespace Discord.Rest
 {
@@ -950,7 +950,7 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of application commands found within the guild.
         /// </returns>
-        public async Task<IReadOnlyCollection<RestGuildCommand>> GetApplicationCommandsAsync (bool withLocalizations = false, string locale = null, RequestOptions options = null)
+        public async Task<IReadOnlyCollection<RestGuildCommand>> GetApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null)
             => await ClientHelper.GetGuildApplicationCommandsAsync(Discord, Id, withLocalizations, locale, options).ConfigureAwait(false);
         /// <summary>
         ///     Gets an application command within this guild with the specified id.
@@ -1119,7 +1119,7 @@ namespace Discord.Rest
 
             List<CustomSticker> stickers = new List<CustomSticker>();
 
-            foreach(var model in models)
+            foreach (var model in models)
             {
                 var entity = CustomSticker.Create(Discord, model, this, model.User.IsSpecified ? model.User.Value.Id : null);
                 stickers.Add(entity);
@@ -1196,6 +1196,34 @@ namespace Discord.Rest
             Image? coverImage = null,
             RequestOptions options = null)
             => GuildHelper.CreateGuildEventAsync(Discord, this, name, privacyLevel, startTime, type, description, endTime, channelId, location, coverImage, options);
+
+        #endregion
+
+        #region AutoMod
+
+
+        /// <inheritdoc cref="IGuild.GetAutoModRuleAsync"/>
+        public async Task<RestAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions options = null)
+        {
+            var rule = await GuildHelper.GetAutoModRuleAsync(ruleId, this, Discord, options);
+            return RestAutoModRule.Create(Discord, rule);
+        }
+
+        /// <inheritdoc cref="IGuild.GetAutoModRulesAsync"/>
+        public async Task<RestAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null)
+        {
+            var rules = await GuildHelper.GetAutoModRulesAsync(this, Discord, options);
+            return rules.Select(x => RestAutoModRule.Create(Discord, x)).ToArray();
+        }
+
+        /// <inheritdoc cref="IGuild.CreateAutoModRuleAsync"/>
+        public async Task<RestAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options = null)
+        {
+            var rule = await GuildHelper.CreateAutoModRuleAsync(this, props, Discord, options);
+
+            return RestAutoModRule.Create(Discord, rule);
+        }
+
 
         #endregion
 
@@ -1300,7 +1328,7 @@ namespace Discord.Rest
                 return null;
         }
         /// <inheritdoc />
-        async Task<IStageChannel> IGuild.GetStageChannelAsync(ulong id, CacheMode mode, RequestOptions options )
+        async Task<IStageChannel> IGuild.GetStageChannelAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
                 return await GetStageChannelAsync(id, options).ConfigureAwait(false);
@@ -1487,7 +1515,7 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (bool withLocalizations, string locale, RequestOptions options)
+        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync(bool withLocalizations, string locale, RequestOptions options)
             => await GetApplicationCommandsAsync(withLocalizations, locale, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options)
@@ -1542,6 +1570,19 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public Task<WelcomeScreen> ModifyWelcomeScreenAsync(bool enabled, WelcomeScreenChannelProperties[] channels, string description = null, RequestOptions options = null)
             => GuildHelper.ModifyWelcomeScreenAsync(enabled, description, channels, this, Discord, options);
+
+
+        /// <inheritdoc/>
+        async Task<IAutoModRule> IGuild.GetAutoModRuleAsync(ulong ruleId, RequestOptions options)
+            => await GetAutoModRuleAsync(ruleId, options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IAutoModRule[]> IGuild.GetAutoModRulesAsync(RequestOptions options)
+            => await GetAutoModRulesAsync(options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options)
+            => await CreateAutoModRuleAsync(props, options).ConfigureAwait(false);
 
         #endregion
     }

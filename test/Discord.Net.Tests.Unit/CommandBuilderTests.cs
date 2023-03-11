@@ -1,5 +1,5 @@
-﻿using System;
 using Discord;
+using System;
 using Xunit;
 
 namespace Discord;
@@ -17,7 +17,7 @@ public class CommandBuilderTests
             ApplicationCommandOptionType.String,
             "option1 description",
             isRequired: true,
-            choices: new [] 
+            choices: new[]
             {
                 new ApplicationCommandOptionChoiceProperties()
                 {
@@ -32,6 +32,24 @@ public class CommandBuilderTests
             .AddChannelType(ChannelType.Text)
             .AddChoice("choice1", "1")
             .AddChoice("choice2", "2"));
+        command.Build();
+    }
+
+    [Fact]
+    public void BuildSubSlashCommand()
+    {
+        var command = new SlashCommandBuilder()
+            .WithName("command").WithDescription("Command desc.")
+            .AddOptions(new SlashCommandOptionBuilder()
+                .WithType(ApplicationCommandOptionType.SubCommand)
+                .WithName("subcommand").WithDescription("Subcommand desc.")
+                .AddOptions(
+                    new SlashCommandOptionBuilder()
+                        .WithType(ApplicationCommandOptionType.String)
+                        .WithName("name1").WithDescription("desc1"),
+                    new SlashCommandOptionBuilder()
+                        .WithType(ApplicationCommandOptionType.String)
+                        .WithName("name2").WithDescription("desc2")));
         command.Build();
     }
 }

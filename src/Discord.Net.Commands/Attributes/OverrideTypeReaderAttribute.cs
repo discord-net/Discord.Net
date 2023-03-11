@@ -43,8 +43,8 @@ namespace Discord.Commands
         {
             if (!TypeReaderTypeInfo.IsAssignableFrom(overridenTypeReader.GetTypeInfo()))
                 throw new ArgumentException($"{nameof(overridenTypeReader)} must inherit from {nameof(TypeReader)}.");
-            
+
             TypeReader = overridenTypeReader;
         }
-    } 
+    }
 }

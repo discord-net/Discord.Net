@@ -46,15 +46,15 @@ namespace Discord.Net
 
             IsGlobal = headers.TryGetValue("X-RateLimit-Global", out string temp) &&
                        bool.TryParse(temp, out var isGlobal) && isGlobal;
-            Limit = headers.TryGetValue("X-RateLimit-Limit", out temp) && 
+            Limit = headers.TryGetValue("X-RateLimit-Limit", out temp) &&
                 int.TryParse(temp, NumberStyles.None, CultureInfo.InvariantCulture, out var limit) ? limit : (int?)null;
-            Remaining = headers.TryGetValue("X-RateLimit-Remaining", out temp) && 
+            Remaining = headers.TryGetValue("X-RateLimit-Remaining", out temp) &&
                 int.TryParse(temp, NumberStyles.None, CultureInfo.InvariantCulture, out var remaining) ? remaining : (int?)null;
-            Reset = headers.TryGetValue("X-RateLimit-Reset", out temp) && 
+            Reset = headers.TryGetValue("X-RateLimit-Reset", out temp) &&
                 double.TryParse(temp, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var reset) ? DateTimeOffset.FromUnixTimeMilliseconds((long)(reset * 1000)) : (DateTimeOffset?)null;
             RetryAfter = headers.TryGetValue("Retry-After", out temp) &&
                 int.TryParse(temp, NumberStyles.None, CultureInfo.InvariantCulture, out var retryAfter) ? retryAfter : (int?)null;
-			ResetAfter = headers.TryGetValue("X-RateLimit-Reset-After", out temp) &&
+            ResetAfter = headers.TryGetValue("X-RateLimit-Reset-After", out temp) &&
                 double.TryParse(temp, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var resetAfter) ? TimeSpan.FromSeconds(resetAfter) : (TimeSpan?)null;
             Bucket = headers.TryGetValue("X-RateLimit-Bucket", out temp) ? temp : null;
             Lag = headers.TryGetValue("Date", out temp) &&

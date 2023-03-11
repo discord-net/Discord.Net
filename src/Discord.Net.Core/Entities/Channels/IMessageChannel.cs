@@ -222,7 +222,7 @@ namespace Discord
         /// <returns>
         ///     Paged collection of messages.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, 
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch,
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
         ///     Gets a collection of messages in this channel.
@@ -263,7 +263,7 @@ namespace Discord
         /// <returns>
         ///     Paged collection of messages.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, 
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch,
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
         ///     Gets a collection of messages in this channel.
@@ -300,7 +300,7 @@ namespace Discord
         /// <returns>
         ///     Paged collection of messages.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, 
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch,
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
         ///     Gets a collection of pinned messages in this channel.

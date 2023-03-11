@@ -65,7 +65,7 @@ namespace Discord.Commands
                     .Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase))
                     .ForEachAsync(channelUser => AddResult(results, channelUser as T, channelUser.Username == input ? 0.65f : 0.55f))
                     .ConfigureAwait(false);
-                
+
                 foreach (var guildUser in guildUsers.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, guildUser as T, guildUser.Username == input ? 0.60f : 0.50f);
             }

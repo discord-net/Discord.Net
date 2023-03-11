@@ -12,8 +12,10 @@ namespace Discord
 
         private static ArgumentNullException CreateNotNullException(string name, string msg)
         {
-            if (msg == null) return new ArgumentNullException(paramName: name);
-            else return new ArgumentNullException(paramName: name, message: msg);
+            if (msg == null)
+                return new ArgumentNullException(paramName: name);
+            else
+                return new ArgumentNullException(paramName: name, message: msg);
         }
         #endregion
 
@@ -26,8 +28,10 @@ namespace Discord
         /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
         public static void NotNullOrEmpty(string obj, string name, string msg = null)
         {
-            if (obj == null) throw CreateNotNullException(name, msg);
-            if (obj.Length == 0) throw CreateNotEmptyException(name, msg);
+            if (obj == null)
+                throw CreateNotNullException(name, msg);
+            if (obj.Length == 0)
+                throw CreateNotEmptyException(name, msg);
         }
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
@@ -35,16 +39,20 @@ namespace Discord
         {
             if (obj.IsSpecified)
             {
-                if (obj.Value == null) throw CreateNotNullException(name, msg);
-                if (obj.Value.Length == 0) throw CreateNotEmptyException(name, msg);
+                if (obj.Value == null)
+                    throw CreateNotNullException(name, msg);
+                if (obj.Value.Length == 0)
+                    throw CreateNotEmptyException(name, msg);
             }
         }
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
         public static void NotNullOrWhitespace(string obj, string name, string msg = null)
         {
-            if (obj == null) throw CreateNotNullException(name, msg);
-            if (obj.Trim().Length == 0) throw CreateNotEmptyException(name, msg);
+            if (obj == null)
+                throw CreateNotNullException(name, msg);
+            if (obj.Trim().Length == 0)
+                throw CreateNotEmptyException(name, msg);
         }
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
@@ -52,8 +60,10 @@ namespace Discord
         {
             if (obj.IsSpecified)
             {
-                if (obj.Value == null) throw CreateNotNullException(name, msg);
-                if (obj.Value.Trim().Length == 0) throw CreateNotEmptyException(name, msg);
+                if (obj.Value == null)
+                    throw CreateNotNullException(name, msg);
+                if (obj.Value.Trim().Length == 0)
+                    throw CreateNotEmptyException(name, msg);
             }
         }
 
@@ -282,7 +292,8 @@ namespace Discord
             var minimum = SnowflakeUtils.ToSnowflake(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)));
             for (var i = 0; i < collection.Length; i++)
             {
-                if (collection[i] == 0) continue;
+                if (collection[i] == 0)
+                    continue;
                 if (collection[i] <= minimum)
                     throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks old.");
             }

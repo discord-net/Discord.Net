@@ -1,5 +1,6 @@
 using Discord.Rest;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -8,7 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 using ThreadMember = Discord.API.ThreadMember;
-using System.Collections.Concurrent;
 
 namespace Discord.WebSocket
 {
@@ -172,7 +172,7 @@ namespace Discord.WebSocket
             return threadUsers.ToImmutableArray();
         }
 
-        internal SocketThreadUser AddOrUpdateThreadMember(ThreadMember model, SocketGuildUser guildMember)
+        internal SocketThreadUser AddOrUpdateThreadMember(ThreadMember model, SocketGuildUser guildMember = null)
         {
             if (_members.TryGetValue(model.UserId.Value, out SocketThreadUser member))
                 member.Update(model);
@@ -202,7 +202,7 @@ namespace Discord.WebSocket
         /// <returns>A task representing the download operation.</returns>
         public async Task<IReadOnlyCollection<SocketThreadUser>> GetUsersAsync(RequestOptions options = null)
         {
-            // download all users if we havent
+            // download all users if we haven't
             if (!_usersDownloaded)
             {
                 await DownloadUsersAsync(options);
@@ -219,15 +219,21 @@ namespace Discord.WebSocket
         /// <returns>A task representing the asynchronous download operation.</returns>
         public async Task DownloadUsersAsync(RequestOptions options = null)
         {
-            var users = await Discord.ApiClient.ListThreadMembersAsync(Id, options);
+            var prevBatchCount = DiscordConfig.MaxThreadMembersPerBatch;
+            ulong? maxId = null;
 
-            lock (_downloadLock)
+            while (prevBatchCount == DiscordConfig.MaxThreadMembersPerBatch)
             {
-                foreach (var threadMember in users)
-                {
-                    var guildUser = Guild.GetUser(threadMember.UserId.Value);
+                var users = await Discord.ApiClient.ListThreadMembersAsync(Id, maxId, DiscordConfig.MaxThreadMembersPerBatch, options);
+                prevBatchCount = users.Length;
+                maxId = users.Max(x => x.UserId.GetValueOrDefault());
 
-                    AddOrUpdateThreadMember(threadMember, guildUser);
+                lock (_downloadLock)
+                {
+                    foreach (var threadMember in users)
+                    {
+                        AddOrUpdateThreadMember(threadMember);
+                    }
                 }
             }
         }

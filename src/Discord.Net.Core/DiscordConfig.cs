@@ -9,12 +9,12 @@ namespace Discord
     /// </summary>
     public class DiscordConfig
     {
-        /// <summary> 
-        ///     Returns the API version Discord.Net uses. 
+        /// <summary>
+        ///     Returns the API version Discord.Net uses.
         /// </summary>
         /// <returns>
         ///     An <see cref="int"/> representing the API version that Discord.Net uses to communicate with Discord.
-        ///     <para>A list of available API version can be seen on the official 
+        ///     <para>A list of available API version can be seen on the official
         ///     <see href="https://discord.com/developers/docs/reference#api-versioning">Discord API documentation</see>
         ///     .</para>
         /// </returns>
@@ -53,14 +53,14 @@ namespace Discord
         ///     The Discord API URL using <see cref="APIVersion"/>.
         /// </returns>
         public static readonly string APIUrl = $"https://discord.com/api/v{APIVersion}/";
-        /// <summary> 
-        ///     Returns the base Discord CDN URL. 
+        /// <summary>
+        ///     Returns the base Discord CDN URL.
         /// </summary>
         /// <returns>
         ///     The base Discord Content Delivery Network (CDN) URL.
         /// </returns>
         public const string CDNUrl = "https://cdn.discordapp.com/";
-        /// <summary> 
+        /// <summary>
         ///     Returns the base Discord invite URL.
         /// </summary>
         /// <returns>
@@ -68,28 +68,28 @@ namespace Discord
         /// </returns>
         public const string InviteUrl = "https://discord.gg/";
 
-        /// <summary> 
-        ///     Returns the default timeout for requests. 
+        /// <summary>
+        ///     Returns the default timeout for requests.
         /// </summary>
         /// <returns>
         ///     The amount of time it takes in milliseconds before a request is timed out.
         /// </returns>
         public const int DefaultRequestTimeout = 15000;
-        /// <summary> 
-        ///     Returns the max length for a Discord message. 
+        /// <summary>
+        ///     Returns the max length for a Discord message.
         /// </summary>
         /// <returns>
         ///     The maximum length of a message allowed by Discord.
         /// </returns>
         public const int MaxMessageSize = 2000;
-        /// <summary> 
-        ///     Returns the max messages allowed to be in a request. 
+        /// <summary>
+        ///     Returns the max messages allowed to be in a request.
         /// </summary>
         /// <returns>
         ///     The maximum number of messages that can be gotten per-batch.
         /// </returns>
         public const int MaxMessagesPerBatch = 100;
-        /// <summary> 
+        /// <summary>
         ///     Returns the max users allowed to be in a request.
         /// </summary>
         /// <returns>
@@ -110,8 +110,8 @@ namespace Discord
         ///     The maximum number of users that can be gotten per-batch.
         /// </returns>
         public const int MaxGuildEventUsersPerBatch = 100;
-        /// <summary> 
-        ///     Returns the max guilds allowed to be in a request. 
+        /// <summary>
+        ///     Returns the max guilds allowed to be in a request.
         /// </summary>
         /// <returns>
         ///     The maximum number of guilds that can be gotten per-batch.
@@ -124,8 +124,8 @@ namespace Discord
         ///     The maximum number of user reactions that can be gotten per-batch.
         /// </returns>
         public const int MaxUserReactionsPerBatch = 100;
-        /// <summary> 
-        ///     Returns the max audit log entries allowed to be in a request. 
+        /// <summary>
+        ///     Returns the max audit log entries allowed to be in a request.
         /// </summary>
         /// <returns>
         ///     The maximum number of audit log entries that can be gotten per-batch.
@@ -175,26 +175,26 @@ namespace Discord
         /// </remarks>
         internal bool DisplayInitialLog { get; set; } = true;
 
-		/// <summary>
-		/// 	Gets or sets whether or not rate-limits should use the system clock.
-		/// </summary>
-		/// <remarks>
-		///		If set to <c>false</c>, we will use the X-RateLimit-Reset-After header
-		///		to determine when a rate-limit expires, rather than comparing the
-		///		X-RateLimit-Reset timestamp to the system time.
-		///
-		///		This should only be changed to false if the system is known to have
-		/// 	a clock that is out of sync. Relying on the Reset-After header will
-		///		incur network lag.
-		///
-		///		Regardless of this property, we still rely on the system's wall-clock
-		///		to determine if a bucket is rate-limited; we do not use any monotonic
-		///		clock. Your system will still need a stable clock.
-		/// </remarks>
-		public bool UseSystemClock { get; set; } = true;
+        /// <summary>
+        /// 	Gets or sets whether or not rate-limits should use the system clock.
+        /// </summary>
+        /// <remarks>
+        ///		If set to <c>false</c>, we will use the X-RateLimit-Reset-After header
+        ///		to determine when a rate-limit expires, rather than comparing the
+        ///		X-RateLimit-Reset timestamp to the system time.
+        ///
+        ///		This should only be changed to false if the system is known to have
+        /// 	a clock that is out of sync. Relying on the Reset-After header will
+        ///		incur network lag.
+        ///
+        ///		Regardless of this property, we still rely on the system's wall-clock
+        ///		to determine if a bucket is rate-limited; we do not use any monotonic
+        ///		clock. Your system will still need a stable clock.
+        /// </remarks>
+        public bool UseSystemClock { get; set; } = true;
 
         /// <summary>
-        ///     Gets or sets whether or not the internal experation check uses the system date
+        ///     Gets or sets whether or not the internal expiration check uses the system date
         ///     + snowflake date to check if an interaction can be responded to.
         /// </summary>
         /// <remarks>
@@ -214,5 +214,13 @@ namespace Discord
         ///     If set to <see langword="false"/>, this value will be "Discord#1234".
         /// </remarks>
         public bool FormatUsersInBidirectionalUnicode { get; set; } = true;
+
+        /// <summary>
+        ///     Returns the max thread members allowed to be in a request.
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of thread members that can be gotten per-batch.
+        /// </returns>
+        public const int MaxThreadMembersPerBatch = 100;
     }
 }

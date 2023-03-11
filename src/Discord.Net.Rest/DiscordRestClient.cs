@@ -68,7 +68,7 @@ namespace Discord.Rest
             ApiClient.CurrentUserId = user.Id;
             base.CurrentUser = RestSelfUser.Create(this, user);
 
-            if(tokenType == TokenType.Bot)
+            if (tokenType == TokenType.Bot)
             {
                 await GetApplicationInfoAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
                 ApiClient.CurrentApplicationId = _applicationInfo.Id;
@@ -151,7 +151,20 @@ namespace Discord.Rest
         }
 
         #endregion
-        
+
+        public async Task<RestSelfUser> GetCurrentUserAsync(RequestOptions options = null)
+        {
+            var user = await ApiClient.GetMyUserAsync(options);
+            CurrentUser.Update(user);
+            return CurrentUser;
+        }
+
+        public async Task<RestGuildUser> GetCurrentUserGuildMemberAsync(ulong guildId, RequestOptions options = null)
+        {
+            var user = await ApiClient.GetCurrentUserGuildMember(guildId, options);
+            return RestGuildUser.Create(this, null, user, guildId);
+        }
+
         public async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
         {
             return _applicationInfo ??= await ClientHelper.GetApplicationInfoAsync(this, options).ConfigureAwait(false);
@@ -169,8 +182,8 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(RequestOptions options = null)
             => ClientHelper.GetConnectionsAsync(this, options);
 
-        public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null)
-            => ClientHelper.GetInviteAsync(this, inviteId, options);
+        public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null, ulong? scheduledEventId = null)
+            => ClientHelper.GetInviteAsync(this, inviteId, options, scheduledEventId);
 
         public Task<RestGuild> GetGuildAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildAsync(this, id, false, options);
@@ -231,7 +244,23 @@ namespace Discord.Rest
             => MessageHelper.RemoveAllReactionsAsync(channelId, messageId, this, options);
         public Task RemoveAllReactionsForEmoteAsync(ulong channelId, ulong messageId, IEmote emote, RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsForEmoteAsync(channelId, messageId, emote, this, options);
-#endregion
+
+        public Task<IReadOnlyCollection<RoleConnectionMetadata>> GetRoleConnectionMetadataRecordsAsync(RequestOptions options = null)
+            => ClientHelper.GetRoleConnectionMetadataRecordsAsync(this, options);
+
+        public Task<IReadOnlyCollection<RoleConnectionMetadata>> ModifyRoleConnectionMetadataRecordsAsync(ICollection<RoleConnectionMetadataProperties> metadata, RequestOptions options = null)
+        {
+            Preconditions.AtMost(metadata.Count, 5, nameof(metadata), "An application can have a maximum of 5 metadata records.");
+            return ClientHelper.ModifyRoleConnectionMetadataRecordsAsync(metadata, this, options);
+        }
+
+        public Task<RoleConnection> GetUserApplicationRoleConnectionAsync(ulong applicationId, RequestOptions options = null)
+            => ClientHelper.GetUserRoleConnectionAsync(applicationId, this, options);
+
+        public Task<RoleConnection> ModifyUserApplicationRoleConnectionAsync(ulong applicationId, RoleConnectionProperties roleConnection, RequestOptions options = null)
+            => ClientHelper.ModifyUserRoleConnectionAsync(applicationId, roleConnection, this, options);
+
+        #endregion
 
         #region IDiscordClient
         /// <inheritdoc />

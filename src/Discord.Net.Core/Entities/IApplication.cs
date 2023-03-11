@@ -34,7 +34,7 @@ namespace Discord
         /// <summary>
         ///     Gets the icon URL of the application.
         /// </summary>
-        string IconUrl  { get; }
+        string IconUrl { get; }
         /// <summary>
         ///     Gets if the bot is public.
         /// </summary>
@@ -59,6 +59,21 @@ namespace Discord
         ///     Gets the the url of the app's privacy policy.
         /// </summary>
         public string PrivacyPolicy { get; }
+
+        /// <summary>
+        ///     Gets application's default custom authorization url. <see langword="null" /> if disabled.
+        /// </summary>
+        public string CustomInstallUrl { get; }
+
+        /// <summary>
+        ///     Gets the application's role connection verification entry point. <see langword="null" /> if not set.
+        /// </summary>
+        public string RoleConnectionsVerificationUrl { get; }
+
+        /// <summary>
+        ///     Gets the hex encoded key for verification in interactions.
+        /// </summary>
+        public string VerifyKey { get; }
 
     }
 }

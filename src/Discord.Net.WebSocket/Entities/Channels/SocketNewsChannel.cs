@@ -1,3 +1,4 @@
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +19,7 @@ namespace Discord.WebSocket
     public class SocketNewsChannel : SocketTextChannel, INewsChannel
     {
         internal SocketNewsChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
-            :base(discord, id, guild)
+            : base(discord, id, guild)
         {
         }
         internal new static SocketNewsChannel Create(SocketGuild guild, ClientState state, Model model)
@@ -35,6 +36,14 @@ namespace Discord.WebSocket
         /// </remarks>
         public override int SlowModeInterval
             => throw new NotSupportedException("News channels do not support Slow Mode.");
+
+        /// <inheritdoc cref="INewsChannel.FollowAnnouncementChannelAsync"/>
+        public Task<ulong> FollowAnnouncementChannelAsync(ITextChannel channel, RequestOptions options = null)
+            => FollowAnnouncementChannelAsync(channel.Id, options);
+
+        /// <inheritdoc />
+        public Task<ulong> FollowAnnouncementChannelAsync(ulong channelId, RequestOptions options = null)
+            => ChannelHelper.FollowAnnouncementChannelAsync(this, channelId, Discord, options);
 
     }
 }

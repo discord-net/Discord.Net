@@ -111,10 +111,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
-        public virtual Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, 
+        public virtual Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null,
             RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null,
             MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
-            => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, allowedMentions, messageReference, 
+            => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, allowedMentions, messageReference,
                 components, stickers, options, embeds, flags);
 
         /// <inheritdoc />
@@ -143,39 +143,39 @@ namespace Discord.Rest
         /// <exception cref="IOException">An I/O error occurred while opening the file.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
-        public virtual Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, 
-            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, 
-            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, 
+        public virtual Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null,
+            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null,
+            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
-            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, allowedMentions, messageReference, 
+            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, allowedMentions, messageReference,
                 components, stickers, options, isSpoiler, embeds, flags);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
-        public virtual Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, 
-            Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, 
-            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, 
+        public virtual Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false,
+            Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null,
+            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
-            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, allowedMentions, messageReference, 
+            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, allowedMentions, messageReference,
                 components, stickers, options, isSpoiler, embeds, flags);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
-        public virtual Task<RestUserMessage> SendFileAsync(FileAttachment attachment, string text, bool isTTS = false, 
-            Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, 
-            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, 
+        public virtual Task<RestUserMessage> SendFileAsync(FileAttachment attachment, string text, bool isTTS = false,
+            Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
+            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
-            => ChannelHelper.SendFileAsync(this, Discord, attachment, text, isTTS, embed, allowedMentions, messageReference, 
+            => ChannelHelper.SendFileAsync(this, Discord, attachment, text, isTTS, embed, allowedMentions, messageReference,
                 components, stickers, options, embeds, flags);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
-        public virtual Task<RestUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text, bool isTTS = false, 
-            Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, 
-            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, 
+        public virtual Task<RestUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text, bool isTTS = false,
+            Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
+            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
             => ChannelHelper.SendFilesAsync(this, Discord, attachments, text, isTTS, embed, allowedMentions, messageReference, components, stickers, options, embeds, flags);
 
@@ -257,11 +257,6 @@ namespace Discord.Rest
         /// </param>
         /// <param name="autoArchiveDuration">
         ///     The duration on which this thread archives after.
-        ///     <para>
-        ///         <b>Note: </b> Options <see cref="ThreadArchiveDuration.OneWeek"/> and <see cref="ThreadArchiveDuration.ThreeDays"/>
-        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the
-        ///         guild has the <b>THREE_DAY_THREAD_ARCHIVE</b> and <b>SEVEN_DAY_THREAD_ARCHIVE</b>.
-        ///     </para>
         /// </param>
         /// <param name="message">The message which to start the thread from.</param>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -312,16 +307,21 @@ namespace Discord.Rest
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
         #endregion
 
-        #region ITextChannel
+        #region IIntegrationChannel
+
         /// <inheritdoc />
-        async Task<IWebhook> ITextChannel.CreateWebhookAsync(string name, Stream avatar, RequestOptions options)
+        async Task<IWebhook> IIntegrationChannel.CreateWebhookAsync(string name, Stream avatar, RequestOptions options)
             => await CreateWebhookAsync(name, avatar, options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IWebhook> ITextChannel.GetWebhookAsync(ulong id, RequestOptions options)
+        async Task<IWebhook> IIntegrationChannel.GetWebhookAsync(ulong id, RequestOptions options)
             => await GetWebhookAsync(id, options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IWebhook>> ITextChannel.GetWebhooksAsync(RequestOptions options)
+        async Task<IReadOnlyCollection<IWebhook>> IIntegrationChannel.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
+
+        #endregion
+
+        #region ITextChannel
 
         async Task<IThreadChannel> ITextChannel.CreateThreadAsync(string name, ThreadType type, ThreadArchiveDuration autoArchiveDuration, IMessage message, bool? invitable, int? slowmode, RequestOptions options)
             => await CreateThreadAsync(name, type, autoArchiveDuration, message, invitable, slowmode, options);
@@ -371,34 +371,34 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed,
-            RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions, MessageReference messageReference, 
+            RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions, MessageReference messageReference,
             MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags)
-            => await SendFileAsync(filePath, text, isTTS, embed, options, isSpoiler, allowedMentions, messageReference, 
+            => await SendFileAsync(filePath, text, isTTS, embed, options, isSpoiler, allowedMentions, messageReference,
             components, stickers, embeds, flags).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, 
-            Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions, MessageReference messageReference, 
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS,
+            Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions, MessageReference messageReference,
             MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler, allowedMentions, messageReference,
                 components, stickers, embeds, flags).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(FileAttachment attachment, string text, bool isTTS, 
-            Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference, 
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(FileAttachment attachment, string text, bool isTTS,
+            Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference,
             MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags)
             => await SendFileAsync(attachment, text, isTTS, embed, options, allowedMentions, messageReference, components,
                 stickers, embeds, flags).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendFilesAsync(IEnumerable<FileAttachment> attachments, string text, 
+        async Task<IUserMessage> IMessageChannel.SendFilesAsync(IEnumerable<FileAttachment> attachments, string text,
             bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference,
             MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags)
             => await SendFilesAsync(attachments, text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, 
-            AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components, 
+        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options,
+            AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components,
             ISticker[] stickers, Embed[] embeds, MessageFlags flags)
             => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags).ConfigureAwait(false);
         #endregion

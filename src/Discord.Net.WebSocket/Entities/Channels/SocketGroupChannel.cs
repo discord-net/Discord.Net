@@ -90,7 +90,7 @@ namespace Discord.WebSocket
         {
             throw new NotSupportedException("Voice is not yet supported for group channels.");
         }
-#endregion
+        #endregion
 
         #region Messages
         /// <inheritdoc />

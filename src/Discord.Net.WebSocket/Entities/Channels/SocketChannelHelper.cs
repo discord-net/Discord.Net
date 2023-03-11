@@ -68,11 +68,20 @@ namespace Discord.WebSocket
         {
             switch (channel)
             {
-                case SocketDMChannel dmChannel: dmChannel.AddMessage(msg); break;
-                case SocketGroupChannel groupChannel: groupChannel.AddMessage(msg); break;
-                case SocketThreadChannel threadChannel: threadChannel.AddMessage(msg); break;
-                case SocketTextChannel textChannel: textChannel.AddMessage(msg); break;
-                default: throw new NotSupportedException($"Unexpected {nameof(ISocketMessageChannel)} type.");
+                case SocketDMChannel dmChannel:
+                    dmChannel.AddMessage(msg);
+                    break;
+                case SocketGroupChannel groupChannel:
+                    groupChannel.AddMessage(msg);
+                    break;
+                case SocketThreadChannel threadChannel:
+                    threadChannel.AddMessage(msg);
+                    break;
+                case SocketTextChannel textChannel:
+                    textChannel.AddMessage(msg);
+                    break;
+                default:
+                    throw new NotSupportedException($"Unexpected {nameof(ISocketMessageChannel)} type.");
             }
         }
         /// <exception cref="NotSupportedException">Unexpected <see cref="ISocketMessageChannel"/> type.</exception>

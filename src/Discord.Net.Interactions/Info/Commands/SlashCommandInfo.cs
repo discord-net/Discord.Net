@@ -86,7 +86,7 @@ namespace Discord.Interactions
 
             var options = GetOptions();
             var args = new object[Parameters.Count];
-            for(var i = 0; i < Parameters.Count; i++)
+            for (var i = 0; i < Parameters.Count; i++)
             {
                 var parameter = Parameters[i];
                 var result = await ParseArgumentAsync(parameter, context, options, services).ConfigureAwait(false);
@@ -136,10 +136,10 @@ namespace Discord.Interactions
             return readResult;
         }
 
-        protected override Task InvokeModuleEvent (IInteractionContext context, IResult result)
+        protected override Task InvokeModuleEvent(IInteractionContext context, IResult result)
             => CommandService._slashCommandExecutedEvent.InvokeAsync(this, context, result);
 
-        protected override string GetLogString (IInteractionContext context)
+        protected override string GetLogString(IInteractionContext context)
         {
             if (context.Guild != null)
                 return $"Slash Command: \"{base.ToString()}\" for {context.User} in {context.Guild}/{context.Channel}";
@@ -153,7 +153,7 @@ namespace Discord.Interactions
                 if (!parameter.IsComplexParameter)
                     yield return parameter;
                 else
-                    foreach(var complexParameterField in parameter.ComplexParameterFields)
+                    foreach (var complexParameterField in parameter.ComplexParameterFields)
                         yield return complexParameterField;
         }
     }

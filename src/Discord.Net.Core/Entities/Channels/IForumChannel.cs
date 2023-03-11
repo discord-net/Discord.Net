@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IForumChannel : IGuildChannel, IMentionable, INestedChannel
+    /// <summary>
+    ///     Represents a forum channel in a guild that can create posts.
+    /// </summary>
+    public interface IForumChannel : IMentionable, INestedChannel, IIntegrationChannel
     {
         /// <summary>
         ///     Gets a value that indicates whether the channel is NSFW.
@@ -169,7 +172,7 @@ namespace Discord
         public Task<IThreadChannel> CreatePostWithFileAsync(string title, Stream stream, string filename, ThreadArchiveDuration archiveDuration = ThreadArchiveDuration.OneDay,
             int? slowmode = null, string text = null, Embed embed = null, RequestOptions options = null, bool isSpoiler = false,
             AllowedMentions allowedMentions = null, MessageComponent components = null,
-            ISticker[] stickers = null, Embed[] embeds = null,MessageFlags flags = MessageFlags.None, ForumTag[] tags = null);
+            ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None, ForumTag[] tags = null);
 
         /// <summary>
         ///     Creates a new post (thread) within the forum.

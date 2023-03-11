@@ -80,7 +80,7 @@ namespace Discord
 
             return result.ToString();
         }
-        
+
         /// <summary>
         ///     Formats a string as a block quote.
         /// </summary>
@@ -111,7 +111,7 @@ namespace Discord
         ///     Formats a user's username + discriminator.
         /// </summary>
         /// <param name="doBidirectional">To format the string in bidirectional unicode or not</param>
-        /// <param name="user">The user whos username and discriminator to format</param>
+        /// <param name="user">The user whose username and discriminator to format</param>
         /// <returns>The username + discriminator</returns>
         public static string UsernameAndDiscriminator(IUser user, bool doBidirectional)
         {

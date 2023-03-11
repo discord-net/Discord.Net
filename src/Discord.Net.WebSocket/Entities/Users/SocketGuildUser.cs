@@ -6,9 +6,9 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using UserModel = Discord.API.User;
 using MemberModel = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
+using UserModel = Discord.API.User;
 
 namespace Discord.WebSocket
 {
@@ -71,6 +71,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool? IsPending { get; private set; }
 
+        /// <inheritdoc />
+        public GuildUserFlags Flags { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
@@ -179,6 +181,8 @@ namespace Discord.WebSocket
                 _timedOutTicks = model.TimedOutUntil.Value?.UtcTicks;
             if (model.Pending.IsSpecified)
                 IsPending = model.Pending.Value;
+
+            Flags = model.Flags;
         }
         internal void Update(ClientState state, PresenceModel model, bool updatePresence)
         {

@@ -91,6 +91,8 @@ namespace Discord.Rest
                         Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
+                SlowModeInterval = args.SlowModeInterval,
+                IsNsfw = args.IsNsfw,
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
@@ -269,7 +271,7 @@ namespace Discord.Rest
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
         public static async Task<RestUserMessage> SendMessageAsync(IMessageChannel channel, BaseDiscordClient client,
-            string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, 
+            string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference,
             MessageComponent components, ISticker[] stickers, RequestOptions options, Embed[] embeds, MessageFlags flags)
         {
             embeds ??= Array.Empty<Embed>();
@@ -345,41 +347,41 @@ namespace Discord.Rest
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
-            string filePath, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, 
-            MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options, 
+            string filePath, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
+            MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
             bool isSpoiler, Embed[] embeds, MessageFlags flags = MessageFlags.None)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
-                return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, allowedMentions, 
+                return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, allowedMentions,
                 messageReference, components, stickers, options, isSpoiler, embeds, flags).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
-            Stream stream, string filename, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, 
-            MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options, 
+            Stream stream, string filename, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
+            MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
             bool isSpoiler, Embed[] embeds, MessageFlags flags = MessageFlags.None)
         {
             using (var file = new FileAttachment(stream, filename, isSpoiler: isSpoiler))
-                return await SendFileAsync(channel, client, file, text, isTTS, embed, allowedMentions, messageReference, 
+                return await SendFileAsync(channel, client, file, text, isTTS, embed, allowedMentions, messageReference,
                 components, stickers, options, embeds, flags).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
         public static Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
-            FileAttachment attachment, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, 
-            MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options, 
+            FileAttachment attachment, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
+            MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
             Embed[] embeds, MessageFlags flags = MessageFlags.None)
-            => SendFilesAsync(channel, client, new[] { attachment }, text, isTTS, embed, allowedMentions, messageReference, 
+            => SendFilesAsync(channel, client, new[] { attachment }, text, isTTS, embed, allowedMentions, messageReference,
                 components, stickers, options, embeds, flags);
 
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
         public static async Task<RestUserMessage> SendFilesAsync(IMessageChannel channel, BaseDiscordClient client,
-            IEnumerable<FileAttachment> attachments, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, 
-            MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options, 
+            IEnumerable<FileAttachment> attachments, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
+            MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
             Embed[] embeds, MessageFlags flags)
         {
             embeds ??= Array.Empty<Embed>();
@@ -389,8 +391,8 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
-            
-            foreach(var attachment in attachments)
+
+            foreach (var attachment in attachments)
             {
                 Preconditions.NotNullOrEmpty(attachment.FileName, nameof(attachment.FileName), "File Name must not be empty or null");
             }
@@ -429,18 +431,18 @@ namespace Discord.Rest
                 Preconditions.AtMost(stickers.Length, 3, nameof(stickers), "A max of 3 stickers are allowed.");
             }
 
-            var args = new UploadFileParams(attachments.ToArray()) 
-            { 
-                Content = text, 
+            var args = new UploadFileParams(attachments.ToArray())
+            {
+                Content = text,
                 IsTTS = isTTS,
-                Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified, 
-                AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, 
-                MessageReference = messageReference?.ToModel() ?? Optional<API.MessageReference>.Unspecified, 
+                Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
+                AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
+                MessageReference = messageReference?.ToModel() ?? Optional<API.MessageReference>.Unspecified,
                 MessageComponent = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified,
                 Flags = flags
             };
-            
+
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
@@ -568,7 +570,7 @@ namespace Discord.Rest
         #endregion
 
         #region Webhooks
-        public static async Task<RestWebhook> CreateWebhookAsync(ITextChannel channel, BaseDiscordClient client, string name, Stream avatar, RequestOptions options)
+        public static async Task<RestWebhook> CreateWebhookAsync(IIntegrationChannel channel, BaseDiscordClient client, string name, Stream avatar, RequestOptions options)
         {
             var args = new CreateWebhookParams { Name = name };
             if (avatar != null)
@@ -577,18 +579,24 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateWebhookAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestWebhook.Create(client, channel, model);
         }
-        public static async Task<RestWebhook> GetWebhookAsync(ITextChannel channel, BaseDiscordClient client, ulong id, RequestOptions options)
+        public static async Task<RestWebhook> GetWebhookAsync(IIntegrationChannel channel, BaseDiscordClient client, ulong id, RequestOptions options)
         {
             var model = await client.ApiClient.GetWebhookAsync(id, options: options).ConfigureAwait(false);
             if (model == null)
                 return null;
             return RestWebhook.Create(client, channel, model);
         }
-        public static async Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(ITextChannel channel, BaseDiscordClient client, RequestOptions options)
+        public static async Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(IIntegrationChannel channel, BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetChannelWebhooksAsync(channel.Id, options).ConfigureAwait(false);
             return models.Select(x => RestWebhook.Create(client, channel, x))
                 .ToImmutableArray();
+        }
+
+        public static async Task<ulong> FollowAnnouncementChannelAsync(INewsChannel newsChannel, ulong channelId, BaseDiscordClient client, RequestOptions options)
+        {
+            var model = await client.ApiClient.FollowChannelAsync(newsChannel.Id, channelId, options);
+            return model.WebhookId;
         }
         #endregion
 

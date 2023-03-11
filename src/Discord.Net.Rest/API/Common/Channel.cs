@@ -43,6 +43,9 @@ namespace Discord.API
         [JsonProperty("rtc_region")]
         public Optional<string> RTCRegion { get; set; }
 
+        [JsonProperty("video_quality_mode")]
+        public Optional<VideoQualityMode> VideoQualityMode { get; set; }
+
         //PrivateChannel
         [JsonProperty("recipients")]
         public Optional<User[]> Recipients { get; set; }

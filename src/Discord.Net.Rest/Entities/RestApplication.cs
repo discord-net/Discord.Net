@@ -35,6 +35,14 @@ namespace Discord.Rest
         public string TermsOfService { get; private set; }
         /// <inheritdoc />
         public string PrivacyPolicy { get; private set; }
+
+        /// <inheritdoc />
+        public string VerifyKey { get; private set; }
+        /// <inheritdoc />
+        public string CustomInstallUrl { get; private set; }
+        /// <inheritdoc />
+        public string RoleConnectionsVerificationUrl { get; private set; }
+
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
@@ -55,7 +63,7 @@ namespace Discord.Rest
             return entity;
         }
         internal void Update(Model model)
-        {            
+        {
             Description = model.Description;
             RPCOrigins = model.RPCOrigins.IsSpecified ? model.RPCOrigins.Value.ToImmutableArray() : ImmutableArray<string>.Empty;
             Name = model.Name;
@@ -74,6 +82,10 @@ namespace Discord.Rest
                 Owner = RestUser.Create(Discord, model.Owner.Value);
             if (model.Team != null)
                 Team = RestTeam.Create(Discord, model.Team);
+
+            CustomInstallUrl = model.CustomInstallUrl.IsSpecified ? model.CustomInstallUrl.Value : null;
+            RoleConnectionsVerificationUrl = model.RoleConnectionsUrl.IsSpecified ? model.RoleConnectionsUrl.Value : null;
+            VerifyKey = model.VerifyKey;
         }
 
         /// <exception cref="InvalidOperationException">Unable to update this object from a different application token.</exception>

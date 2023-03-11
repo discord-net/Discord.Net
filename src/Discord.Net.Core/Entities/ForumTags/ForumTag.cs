@@ -45,7 +45,7 @@ namespace Discord
         }
 
         public override int GetHashCode() => (Id, Name, Emoji, IsModerated).GetHashCode();
-        
+
         public override bool Equals(object? obj)
             => obj is ForumTag tag && Equals(tag);
 

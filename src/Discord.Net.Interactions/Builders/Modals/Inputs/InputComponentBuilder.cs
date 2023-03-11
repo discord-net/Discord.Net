@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Discord.Interactions.Builders
 {
@@ -32,6 +33,9 @@ namespace Discord.Interactions.Builders
 
         /// <inheritdoc/>
         public Type Type { get; private set; }
+
+        /// <inheritdoc/>
+        public PropertyInfo PropertyInfo { get; internal set; }
 
         /// <inheritdoc/>
         public ComponentTypeConverter TypeConverter { get; private set; }

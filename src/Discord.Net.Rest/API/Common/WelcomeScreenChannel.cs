@@ -14,5 +14,5 @@ internal class WelcomeScreenChannel
     public Optional<ulong?> EmojiId { get; set; }
 
     [JsonProperty("emoji_name")]
-    public Optional<string> EmojiName{ get; set; }
+    public Optional<string> EmojiName { get; set; }
 }

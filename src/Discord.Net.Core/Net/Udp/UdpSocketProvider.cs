@@ -1,4 +1,4 @@
-﻿namespace Discord.Net.Udp
+namespace Discord.Net.Udp
 {
     public delegate IUdpSocket UdpSocketProvider();
 }

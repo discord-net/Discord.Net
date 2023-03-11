@@ -3,13 +3,13 @@ using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using WidgetModel = Discord.API.GuildWidget;
+using ImageModel = Discord.API.Image;
 using Model = Discord.API.Guild;
 using RoleModel = Discord.API.Role;
-using ImageModel = Discord.API.Image;
-using System.IO;
+using WidgetModel = Discord.API.GuildWidget;
 
 namespace Discord.Rest
 {
@@ -39,7 +39,8 @@ namespace Discord.Rest
                 VerificationLevel = args.VerificationLevel,
                 ExplicitContentFilter = args.ExplicitContentFilter,
                 SystemChannelFlags = args.SystemChannelFlags,
-                IsBoostProgressBarEnabled = args.IsBoostProgressBarEnabled
+                IsBoostProgressBarEnabled = args.IsBoostProgressBarEnabled,
+                GuildFeatures = args.Features.IsSpecified ? new GuildFeatures(args.Features.Value, Array.Empty<string>()) : Optional.Create<GuildFeatures>(),
             };
 
             if (apiArgs.Banner.IsSpecified)
@@ -285,6 +286,8 @@ namespace Discord.Rest
                         Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
+                VideoQuality = props.VideoQualityMode,
+                RtcRegion = props.RTCRegion
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);
@@ -1038,7 +1041,7 @@ namespace Discord.Rest
             {
                 Enabled = enabled,
                 Description = description,
-                WelcomeChannels = channels?.Select(ch => new API.WelcomeScreenChannel 
+                WelcomeChannels = channels?.Select(ch => new API.WelcomeScreenChannel
                 {
                     ChannelId = ch.Id,
                     Description = ch.Description,
@@ -1049,7 +1052,7 @@ namespace Discord.Rest
 
             var model = await client.ApiClient.ModifyGuildWelcomeScreenAsync(args, guild.Id, options);
 
-            if(model.WelcomeChannels.Length == 0)
+            if (model.WelcomeChannels.Length == 0)
                 return null;
 
             return new WelcomeScreen(model.Description.GetValueOrDefault(null), model.WelcomeChannels.Select(
@@ -1059,6 +1062,176 @@ namespace Discord.Rest
                     x.EmojiId.GetValueOrDefault(0))).ToList());
         }
 
+        #endregion
+
+        #region Auto Mod
+
+        public static async Task<AutoModerationRule> CreateAutoModRuleAsync(IGuild guild, Action<AutoModRuleProperties> func, BaseDiscordClient client, RequestOptions options)
+        {
+            var args = new AutoModRuleProperties();
+            func(args);
+
+            #region Validations
+
+            if (!args.TriggerType.IsSpecified)
+                throw new ArgumentException(message: $"AutoMod rule must have a specified type.", paramName: nameof(args.TriggerType));
+
+            if (!args.Name.IsSpecified || string.IsNullOrWhiteSpace(args.Name.Value))
+                throw new ArgumentException("Name of the rule must not be empty", paramName: nameof(args.Name));
+
+            Preconditions.AtLeast(1, args.Actions.GetValueOrDefault(Array.Empty<AutoModRuleActionProperties>()).Length, nameof(args.Actions), "Auto moderation rule must have at least 1 action");
+            
+            if (args.RegexPatterns.IsSpecified)
+            {
+                if (args.TriggerType.Value is not AutoModTriggerType.Keyword)
+                    throw new ArgumentException(message: $"Regex patterns can only be used with 'Keyword' trigger type.", paramName: nameof(args.RegexPatterns));
+
+                Preconditions.AtMost(args.RegexPatterns.Value.Length, AutoModRuleProperties.MaxRegexPatternCount, nameof(args.RegexPatterns), $"Regex pattern count must be less than or equal to {AutoModRuleProperties.MaxRegexPatternCount}.");
+
+                if (args.RegexPatterns.Value.Any(x => x.Length > AutoModRuleProperties.MaxRegexPatternLength))
+                    throw new ArgumentException(message: $"Regex pattern must be less than or equal to {AutoModRuleProperties.MaxRegexPatternLength}.", paramName: nameof(args.RegexPatterns));
+            }
+
+            if (args.KeywordFilter.IsSpecified)
+            {
+                if (args.TriggerType.Value != AutoModTriggerType.Keyword)
+                    throw new ArgumentException(message: $"Keyword filter can only be used with 'Keyword' trigger type.", paramName: nameof(args.KeywordFilter));
+
+                Preconditions.AtMost(args.KeywordFilter.Value.Length, AutoModRuleProperties.MaxKeywordCount, nameof(args.KeywordFilter), $"Keyword count must be less than or equal to {AutoModRuleProperties.MaxKeywordCount}");
+
+                if (args.KeywordFilter.Value.Any(x => x.Length > AutoModRuleProperties.MaxKeywordLength))
+                    throw new ArgumentException(message: $"Keyword length must be less than or equal to {AutoModRuleProperties.MaxKeywordLength}.", paramName: nameof(args.KeywordFilter));
+            }
+
+            if (args.TriggerType.Value is AutoModTriggerType.Keyword)
+                Preconditions.AtLeast(args.KeywordFilter.GetValueOrDefault(Array.Empty<string>()).Length + args.RegexPatterns.GetValueOrDefault(Array.Empty<string>()).Length, 1, "KeywordFilter & RegexPatterns","Auto moderation rule must have at least 1 keyword or regex pattern");
+
+            if (args.AllowList.IsSpecified)
+            {
+                if (args.TriggerType.Value is not AutoModTriggerType.Keyword or AutoModTriggerType.KeywordPreset)
+                    throw new ArgumentException(message: $"Allow list can only be used with 'Keyword' or 'KeywordPreset' trigger type.", paramName: nameof(args.AllowList));
+
+                if (args.TriggerType.Value is AutoModTriggerType.Keyword)
+                    Preconditions.AtMost(args.AllowList.Value.Length, AutoModRuleProperties.MaxAllowListCountKeyword, nameof(args.AllowList), $"Allow list entry count must be less than or equal to {AutoModRuleProperties.MaxAllowListCountKeyword}.");
+
+                if (args.TriggerType.Value is AutoModTriggerType.KeywordPreset)
+                    Preconditions.AtMost(args.AllowList.Value.Length, AutoModRuleProperties.MaxAllowListCountKeywordPreset, nameof(args.AllowList), $"Allow list entry count must be less than or equal to {AutoModRuleProperties.MaxAllowListCountKeywordPreset}.");
+
+                if (args.AllowList.Value.Any(x => x.Length > AutoModRuleProperties.MaxAllowListEntryLength))
+                    throw new ArgumentException(message: $"Allow list entry length must be less than or equal to {AutoModRuleProperties.MaxAllowListEntryLength}.", paramName: nameof(args.AllowList));
+
+            }
+            
+            if (args.TriggerType.Value is not AutoModTriggerType.KeywordPreset && args.Presets.IsSpecified)
+                throw new ArgumentException(message: $"Keyword presets scan only be used with 'KeywordPreset' trigger type.", paramName: nameof(args.Presets));
+            
+            if (args.MentionLimit.IsSpecified)
+            {
+                if (args.TriggerType.Value is AutoModTriggerType.MentionSpam)
+                {
+                    Preconditions.AtMost(args.MentionLimit.Value, AutoModRuleProperties.MaxMentionLimit, nameof(args.MentionLimit), $"Mention limit must be less or equal to {AutoModRuleProperties.MaxMentionLimit}");
+                    Preconditions.AtLeast(args.MentionLimit.Value, 1, nameof(args.MentionLimit), $"Mention limit must be greater or equal to 1");
+                }
+                else
+                {
+                    throw new ArgumentException(message: $"MentionLimit can only be used with 'MentionSpam' trigger type.", paramName: nameof(args.MentionLimit));
+                }
+            }
+
+            if (args.ExemptRoles.IsSpecified)
+                Preconditions.AtMost(args.ExemptRoles.Value.Length, AutoModRuleProperties.MaxExemptRoles, nameof(args.ExemptRoles), $"Exempt roles count must be less than or equal to {AutoModRuleProperties.MaxExemptRoles}.");
+
+            if (args.ExemptChannels.IsSpecified)
+                Preconditions.AtMost(args.ExemptChannels.Value.Length, AutoModRuleProperties.MaxExemptChannels, nameof(args.ExemptChannels), $"Exempt channels count must be less than or equal to {AutoModRuleProperties.MaxExemptChannels}.");
+
+            if (!args.Actions.IsSpecified && args.Actions.Value.Length == 0)
+            {
+                throw new ArgumentException(message: $"At least 1 action must be set for an auto moderation rule.", paramName: nameof(args.Actions));
+            }
+
+            if (args.Actions.Value.Any(x => x.TimeoutDuration.GetValueOrDefault().TotalSeconds > AutoModRuleProperties.MaxTimeoutSeconds))
+                throw new ArgumentException(message: $"Field count must be less than or equal to {AutoModRuleProperties.MaxTimeoutSeconds}.", paramName: nameof(AutoModRuleActionProperties.TimeoutDuration));
+
+            if (args.Actions.Value.Any(x => x.CustomMessage.IsSpecified && x.CustomMessage.Value.Length > AutoModRuleProperties.MaxCustomBlockMessageLength))
+                throw new ArgumentException(message: $"Custom message length must be less than or equal to {AutoModRuleProperties.MaxCustomBlockMessageLength}.", paramName: nameof(AutoModRuleActionProperties.CustomMessage));
+
+            #endregion
+
+            var props = new CreateAutoModRuleParams
+            {
+                EventType = args.EventType.GetValueOrDefault(AutoModEventType.MessageSend),
+                Enabled = args.Enabled.GetValueOrDefault(true),
+                ExemptRoles = args.ExemptRoles.GetValueOrDefault(),
+                ExemptChannels = args.ExemptChannels.GetValueOrDefault(),
+                Name = args.Name.Value,
+                TriggerType = args.TriggerType.Value,
+                Actions = args.Actions.Value.Select(x => new AutoModAction
+                {
+                    Metadata = new ActionMetadata
+                    {
+                        ChannelId = x.ChannelId ?? Optional<ulong>.Unspecified,
+                        DurationSeconds = (int?)x.TimeoutDuration?.TotalSeconds ?? Optional<int>.Unspecified,
+                        CustomMessage = x.CustomMessage,
+                    },
+                    Type = x.Type
+                }).ToArray(),
+                TriggerMetadata = new TriggerMetadata
+                {
+                    AllowList = args.AllowList,
+                    KeywordFilter = args.KeywordFilter,
+                    MentionLimit = args.MentionLimit,
+                    Presets = args.Presets,
+                    RegexPatterns = args.RegexPatterns,
+                },
+            };
+
+            return await client.ApiClient.CreateGuildAutoModRuleAsync(guild.Id, props, options);
+        }
+
+        public static async Task<AutoModerationRule> GetAutoModRuleAsync(ulong ruleId, IGuild guild, BaseDiscordClient client, RequestOptions options)
+            => await client.ApiClient.GetGuildAutoModRuleAsync(guild.Id, ruleId, options);
+
+        public static async Task<AutoModerationRule[]> GetAutoModRulesAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+            => await client.ApiClient.GetGuildAutoModRulesAsync(guild.Id, options);
+
+        public static Task<AutoModerationRule> ModifyRuleAsync(BaseDiscordClient client, IAutoModRule rule, Action<AutoModRuleProperties> func, RequestOptions options)
+        {
+            var args = new AutoModRuleProperties();
+            func(args);
+
+            var apiArgs = new API.Rest.ModifyAutoModRuleParams
+            {
+                Actions = args.Actions.IsSpecified ? args.Actions.Value.Select(x => new API.AutoModAction()
+                {
+                    Type = x.Type,
+                    Metadata = x.ChannelId.HasValue || x.TimeoutDuration.HasValue ? new API.ActionMetadata
+                    {
+                        ChannelId = x.ChannelId ?? Optional<ulong>.Unspecified,
+                        DurationSeconds = x.TimeoutDuration.HasValue ? (int)Math.Floor(x.TimeoutDuration.Value.TotalSeconds) : Optional<int>.Unspecified,
+                        CustomMessage = x.CustomMessage,
+                    } : Optional<API.ActionMetadata>.Unspecified
+                }).ToArray() : Optional<API.AutoModAction[]>.Unspecified,
+                Enabled = args.Enabled,
+                EventType = args.EventType,
+                ExemptChannels = args.ExemptChannels,
+                ExemptRoles = args.ExemptRoles,
+                Name = args.Name,
+                TriggerType = args.TriggerType,
+                TriggerMetadata = args.KeywordFilter.IsSpecified || args.Presets.IsSpecified ? new API.TriggerMetadata
+                {
+                    KeywordFilter = args.KeywordFilter.GetValueOrDefault(Array.Empty<string>()),
+                    RegexPatterns = args.RegexPatterns.GetValueOrDefault(Array.Empty<string>()),
+                    AllowList = args.AllowList.GetValueOrDefault(Array.Empty<string>()),
+                    MentionLimit = args.MentionLimit,
+                    Presets = args.Presets.GetValueOrDefault(Array.Empty<KeywordPresetTypes>())
+                } : Optional<API.TriggerMetadata>.Unspecified
+            };
+
+            return client.ApiClient.ModifyGuildAutoModRuleAsync(rule.GuildId, rule.Id, apiArgs, options);
+        }
+
+        public static Task DeleteRuleAsync(BaseDiscordClient client, IAutoModRule rule, RequestOptions options)
+            => client.ApiClient.DeleteGuildAutoModRuleAsync(rule.GuildId, rule.Id, options);
         #endregion
     }
 }

@@ -6,6 +6,6 @@ namespace Discord.Interactions
     {
         public static EmptyServiceProvider Instance => new EmptyServiceProvider();
 
-        public object GetService (Type serviceType) => null;
+        public object GetService(Type serviceType) => null;
     }
 }

@@ -116,7 +116,7 @@ namespace Discord.Commands
                         argv = input.Substring(beginRead + 1, currentRead - beginRead - 1).Trim();
                         currentRead++;
                     }
-                    else 
+                    else
                         argv = input.Substring(beginRead, currentRead - beginRead);
 
                     return _tProps[currentParam];

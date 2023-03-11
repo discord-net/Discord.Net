@@ -50,5 +50,5 @@ public class WelcomeScreenChannelProperties : ISnowflakeEntity
     /// <param name="channel">A welcome screen channel to modify.</param>
     /// <returns>A new instance of <see cref="WelcomeScreenChannelProperties"/>.</returns>
     public static WelcomeScreenChannelProperties FromWelcomeScreenChannel(WelcomeScreenChannel channel)
-        => new (channel.Id, channel.Description, channel.Emoji);
+        => new(channel.Id, channel.Description, channel.Emoji);
 }

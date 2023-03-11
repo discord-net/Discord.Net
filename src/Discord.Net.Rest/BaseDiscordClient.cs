@@ -126,7 +126,8 @@ namespace Discord.Rest
         }
         internal virtual async Task LogoutInternalAsync()
         {
-            if (LoginState == LoginState.LoggedOut) return;
+            if (LoginState == LoginState.LoggedOut)
+                return;
             LoginState = LoginState.LoggingOut;
 
             await ApiClient.LogoutAsync().ConfigureAwait(false);

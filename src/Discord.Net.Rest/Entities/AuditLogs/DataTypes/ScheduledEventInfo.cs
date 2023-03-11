@@ -12,7 +12,7 @@ namespace Discord.Rest
         /// </summary>
         public ulong? GuildId { get; }
         /// <summary>
-        ///     Gets the snowflake id of the channel the event is associated with.
+        ///     Gets the snowflake id of the channel the event is associated with. 0 for events with external location.
         /// </summary>
         public ulong? ChannelId { get; }
         /// <summary>
@@ -48,9 +48,9 @@ namespace Discord.Rest
         /// </summary>
         public ulong? EntityId { get; }
         /// <summary>
-        ///     Gets the metadata for the entity associated with the event.
+        ///     Gets the metadata for the entity associated with the event. <see cref="Optional{T}.Unspecified"/> if there was no change.
         /// </summary>
-        public string Location { get; }
+        public Optional<string> Location { get; }
         /// <summary>
         ///     Gets the count of users interested in this event. 
         /// </summary>
@@ -60,21 +60,21 @@ namespace Discord.Rest
         /// </summary>
         public string Image { get; }
 
-        internal ScheduledEventInfo(ulong? guildId, ulong? channelId, string name, string description, DateTimeOffset? scheduledStartTime, DateTimeOffset? scheduledEndTime, GuildScheduledEventPrivacyLevel? privacyLevel, GuildScheduledEventStatus? status, GuildScheduledEventType? entityType, ulong? entityId, string location, int? userCount, string image)
+        internal ScheduledEventInfo(ulong? guildId, ulong? channelId, string name, string description, DateTimeOffset? scheduledStartTime, DateTimeOffset? scheduledEndTime, GuildScheduledEventPrivacyLevel? privacyLevel, GuildScheduledEventStatus? status, GuildScheduledEventType? entityType, ulong? entityId, Optional<string> location, int? userCount, string image)
         {
-            GuildId            = guildId           ;
-            ChannelId          = channelId         ;
-            Name               = name              ;
-            Description        = description       ;
+            GuildId = guildId;
+            ChannelId = channelId;
+            Name = name;
+            Description = description;
             ScheduledStartTime = scheduledStartTime;
-            ScheduledEndTime   = scheduledEndTime  ;
-            PrivacyLevel       = privacyLevel      ;
-            Status             = status            ;
-            EntityType         = entityType        ;
-            EntityId           = entityId          ;
-            Location           = location          ;
-            UserCount          = userCount         ;
-            Image              = image             ;
+            ScheduledEndTime = scheduledEndTime;
+            PrivacyLevel = privacyLevel;
+            Status = status;
+            EntityType = entityType;
+            EntityId = entityId;
+            Location = location;
+            UserCount = userCount;
+            Image = image;
         }
     }
 }

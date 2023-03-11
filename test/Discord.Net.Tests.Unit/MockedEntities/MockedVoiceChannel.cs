@@ -1,9 +1,9 @@
+using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Discord.Audio;
 
 namespace Discord
 {
@@ -12,9 +12,17 @@ namespace Discord
         public int Bitrate => throw new NotImplementedException();
 
         public int? UserLimit => throw new NotImplementedException();
+        public string Topic { get; }
+        public int SlowModeInterval { get; }
+        public ThreadArchiveDuration DefaultArchiveDuration { get; }
         public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null) => throw new NotImplementedException();
 
         public Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null) => throw new NotImplementedException();
+        public Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null) => throw new NotImplementedException();
+
+        public Task<IThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null) => throw new NotImplementedException();
+
+        public Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null) => throw new NotImplementedException();
 
         public ulong? CategoryId => throw new NotImplementedException();
 
@@ -37,6 +45,9 @@ namespace Discord
         public string Mention => throw new NotImplementedException();
 
         public ChannelFlags Flags => throw new NotImplementedException();
+
+        public VideoQualityMode VideoQualityMode => throw new NotImplementedException();
+        public bool IsNsfw { get; }
 
         public Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();
         public Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();
@@ -76,5 +87,10 @@ namespace Discord
         public Task TriggerTypingAsync(RequestOptions options = null) => throw new NotImplementedException();
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options) => throw new NotImplementedException();
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options) => throw new NotImplementedException();
+        public Task<IWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null) => throw new NotImplementedException();
+
+        public Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null) => throw new NotImplementedException();
+
+        public Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null) => throw new NotImplementedException();
     }
 }

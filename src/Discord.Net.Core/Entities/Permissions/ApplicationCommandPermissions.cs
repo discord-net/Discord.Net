@@ -58,5 +58,61 @@ namespace Discord
             Permission = allow;
             TargetType = ApplicationCommandPermissionTarget.Role;
         }
+
+        /// <summary>
+        ///     Creates a new <see cref="ApplicationCommandPermission"/> targeting <see cref="ApplicationCommandPermissionTarget.Channel"/>.
+        /// </summary>
+        /// <param name="channel">The channel you want to target this permission value for.</param>
+        /// <param name="allow">The value of this permission.</param>
+        public ApplicationCommandPermission(IChannel channel, bool allow)
+        {
+            TargetId = channel.Id;
+            Permission = allow;
+            TargetType = ApplicationCommandPermissionTarget.Channel;
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="ApplicationCommandPermission"/> targeting @everyone in a guild.
+        /// </summary>
+        /// <param name="guildId">Id of the target guild.</param>
+        /// <param name="allow">The value of this permission.</param>
+        /// <returns>
+        ///     Instance of <see cref="ApplicationCommandPermission"/> targeting @everyone in a guild.
+        /// </returns>
+        public static ApplicationCommandPermission ForEveryone(ulong guildId, bool allow) =>
+            new(guildId, ApplicationCommandPermissionTarget.User, allow);
+
+        /// <summary>
+        ///     Creates a new <see cref="ApplicationCommandPermission"/> targeting @everyone in a guild.
+        /// </summary>
+        /// <param name="guild">Target guild.</param>
+        /// <param name="allow">The value of this permission.</param>
+        /// <returns>
+        ///     Instance of <see cref="ApplicationCommandPermission"/> targeting @everyone in a guild.
+        /// </returns>
+        public static ApplicationCommandPermission ForEveryone(IGuild guild, bool allow) =>
+            ForEveryone(guild.Id, allow);
+
+        /// <summary>
+        ///     Creates a new <see cref="ApplicationCommandPermission"/> targeting every channel in a guild.
+        /// </summary>
+        /// <param name="guildId">Id of the target guild.</param>
+        /// <param name="allow">The value of this permission.</param>
+        /// <returns>
+        ///     Instance of <see cref="ApplicationCommandPermission"/> targeting every channel in a guild.
+        /// </returns>
+        public static ApplicationCommandPermission ForAllChannels(ulong guildId, bool allow) =>
+            new(guildId - 1, ApplicationCommandPermissionTarget.Channel, allow);
+
+        /// <summary>
+        ///     Creates a new <see cref="ApplicationCommandPermission"/> targeting every channel in a guild.
+        /// </summary>
+        /// <param name="guild">Target guild.</param>
+        /// <param name="allow">The value of this permission.</param>
+        /// <returns>
+        ///     Instance of <see cref="ApplicationCommandPermission"/> targeting every channel in a guild.
+        /// </returns>
+        public static ApplicationCommandPermission ForAllChannels(IGuild guild, bool allow) =>
+            ForAllChannels(guild.Id, allow);
     }
 }

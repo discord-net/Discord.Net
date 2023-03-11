@@ -146,10 +146,10 @@ namespace Discord
         /// </returns>
         public static string GetGuildBannerUrl(ulong guildId, string bannerId, ImageFormat format, ushort? size = null)
         {
-	        if (string.IsNullOrEmpty(bannerId))
-		        return null;
-	        string extension = FormatToExtension(format, bannerId);
-	        return $"{DiscordConfig.CDNUrl}banners/{guildId}/{bannerId}.{extension}" + (size.HasValue ? $"?size={size}" : string.Empty);
+            if (string.IsNullOrEmpty(bannerId))
+                return null;
+            string extension = FormatToExtension(format, bannerId);
+            return $"{DiscordConfig.CDNUrl}banners/{guildId}/{bannerId}.{extension}" + (size.HasValue ? $"?size={size}" : string.Empty);
         }
         /// <summary>
         ///     Returns an emoji URL.
@@ -218,7 +218,7 @@ namespace Discord
         /// <param name="size">The size of the image.</param>
         /// <returns></returns>
         public static string GetEventCoverImageUrl(ulong guildId, ulong eventId, string assetId, ImageFormat format = ImageFormat.Auto, ushort size = 1024)
-            => $"{DiscordConfig.CDNUrl}guild-events/{guildId}/{eventId}/{assetId}.{FormatToExtension(format, assetId)}?size={size}";
+            => $"{DiscordConfig.CDNUrl}guild-events/{eventId}/{assetId}.{FormatToExtension(format, assetId)}?size={size}";
 
         private static string FormatToExtension(StickerFormatType format)
         {

@@ -23,7 +23,7 @@ namespace Discord.WebSocket
         {
             base.Update(state, model);
         }
-        
+
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}, {Type})";
         internal new SocketSystemMessage Clone() => MemberwiseClone() as SocketSystemMessage;
     }

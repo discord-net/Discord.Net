@@ -13,7 +13,7 @@ namespace Discord.Audio.Streams
         {
             _client = client;
         }
-        
+
         public override void WriteHeader(ushort seq, uint timestamp, bool missed) { } //Ignore
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {

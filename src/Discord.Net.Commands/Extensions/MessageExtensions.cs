@@ -45,13 +45,17 @@ namespace Discord.Commands
         public static bool HasMentionPrefix(this IUserMessage msg, IUser user, ref int argPos)
         {
             var text = msg.Content;
-            if (string.IsNullOrEmpty(text) || text.Length <= 3 || text[0] != '<' || text[1] != '@') return false;
+            if (string.IsNullOrEmpty(text) || text.Length <= 3 || text[0] != '<' || text[1] != '@')
+                return false;
 
             int endPos = text.IndexOf('>');
-            if (endPos == -1) return false;
-            if (text.Length < endPos + 2 || text[endPos + 1] != ' ') return false; //Must end in "> "
+            if (endPos == -1)
+                return false;
+            if (text.Length < endPos + 2 || text[endPos + 1] != ' ')
+                return false; //Must end in "> "
 
-            if (!MentionUtils.TryParseUser(text.Substring(0, endPos + 1), out ulong userId)) return false;
+            if (!MentionUtils.TryParseUser(text.Substring(0, endPos + 1), out ulong userId))
+                return false;
             if (userId == user.Id)
             {
                 argPos = endPos + 2;

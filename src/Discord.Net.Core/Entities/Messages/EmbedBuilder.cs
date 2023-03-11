@@ -1,9 +1,9 @@
+using Discord.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Discord.Utils;
-using Newtonsoft.Json;
 
 namespace Discord
 {
@@ -50,7 +50,8 @@ namespace Discord
             get => _title;
             set
             {
-                if (value?.Length > MaxTitleLength) throw new ArgumentException(message: $"Title length must be less than or equal to {MaxTitleLength}.", paramName: nameof(Title));
+                if (value?.Length > MaxTitleLength)
+                    throw new ArgumentException(message: $"Title length must be less than or equal to {MaxTitleLength}.", paramName: nameof(Title));
                 _title = value;
             }
         }
@@ -63,7 +64,8 @@ namespace Discord
             get => _description;
             set
             {
-                if (value?.Length > MaxDescriptionLength) throw new ArgumentException(message: $"Description length must be less than or equal to {MaxDescriptionLength}.", paramName: nameof(Description));
+                if (value?.Length > MaxDescriptionLength)
+                    throw new ArgumentException(message: $"Description length must be less than or equal to {MaxDescriptionLength}.", paramName: nameof(Description));
                 _description = value;
             }
         }
@@ -100,8 +102,10 @@ namespace Discord
             get => _fields;
             set
             {
-                if (value == null) throw new ArgumentNullException(paramName: nameof(Fields), message: "Cannot set an embed builder's fields collection to null.");
-                if (value.Count > MaxFieldCount) throw new ArgumentException(message: $"Field count must be less than or equal to {MaxFieldCount}.", paramName: nameof(Fields));
+                if (value == null)
+                    throw new ArgumentNullException(paramName: nameof(Fields), message: "Cannot set an embed builder's fields collection to null.");
+                if (value.Count > MaxFieldCount)
+                    throw new ArgumentException(message: $"Field count must be less than or equal to {MaxFieldCount}.", paramName: nameof(Fields));
                 _fields = value;
             }
         }
@@ -157,11 +161,11 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Tries to parse a string into an <see cref="EmbedBuilder"/>. 
+        ///     Tries to parse a string into an <see cref="EmbedBuilder"/>.
         /// </summary>
         /// <param name="json">The json string to parse.</param>
         /// <param name="builder">The <see cref="EmbedBuilder"/> with populated values. An empty instance if method returns <see langword="false"/>.</param>
-        /// <returns><see langword="true"/> if <paramref name="json"/> was succesfully parsed. <see langword="false"/> if not.</returns>
+        /// <returns><see langword="true"/> if <paramref name="json"/> was successfully parsed. <see langword="false"/> if not.</returns>
         public static bool TryParse(string json, out EmbedBuilder builder)
         {
             builder = new EmbedBuilder();
@@ -470,7 +474,7 @@ namespace Discord
                 if (!string.IsNullOrEmpty(Author.IconUrl))
                     UrlValidation.Validate(Author.IconUrl, true);
             }
-            if(Footer != null)
+            if (Footer != null)
             {
                 if (!string.IsNullOrEmpty(Footer.IconUrl))
                     UrlValidation.Validate(Footer.IconUrl, true);
@@ -564,8 +568,10 @@ namespace Discord
             get => _name;
             set
             {
-                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(message: "Field name must not be null, empty or entirely whitespace.", paramName: nameof(Name));
-                if (value.Length > MaxFieldNameLength) throw new ArgumentException(message: $"Field name length must be less than or equal to {MaxFieldNameLength}.", paramName: nameof(Name));
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException(message: "Field name must not be null, empty or entirely whitespace.", paramName: nameof(Name));
+                if (value.Length > MaxFieldNameLength)
+                    throw new ArgumentException(message: $"Field name length must be less than or equal to {MaxFieldNameLength}.", paramName: nameof(Name));
                 _name = value;
             }
         }
@@ -587,8 +593,10 @@ namespace Discord
             set
             {
                 var stringValue = value?.ToString();
-                if (string.IsNullOrWhiteSpace(stringValue)) throw new ArgumentException(message: "Field value must not be null or empty.", paramName: nameof(Value));
-                if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException(message: $"Field value length must be less than or equal to {MaxFieldValueLength}.", paramName: nameof(Value));
+                if (string.IsNullOrWhiteSpace(stringValue))
+                    throw new ArgumentException(message: "Field value must not be null or empty.", paramName: nameof(Value));
+                if (stringValue.Length > MaxFieldValueLength)
+                    throw new ArgumentException(message: $"Field value length must be less than or equal to {MaxFieldValueLength}.", paramName: nameof(Value));
                 _value = stringValue;
             }
         }
@@ -704,7 +712,8 @@ namespace Discord
             get => _name;
             set
             {
-                if (value?.Length > MaxAuthorNameLength) throw new ArgumentException(message: $"Author name length must be less than or equal to {MaxAuthorNameLength}.", paramName: nameof(Name));
+                if (value?.Length > MaxAuthorNameLength)
+                    throw new ArgumentException(message: $"Author name length must be less than or equal to {MaxAuthorNameLength}.", paramName: nameof(Name));
                 _name = value;
             }
         }
@@ -836,7 +845,8 @@ namespace Discord
             get => _text;
             set
             {
-                if (value?.Length > MaxFooterTextLength) throw new ArgumentException(message: $"Footer text length must be less than or equal to {MaxFooterTextLength}.", paramName: nameof(Text));
+                if (value?.Length > MaxFooterTextLength)
+                    throw new ArgumentException(message: $"Footer text length must be less than or equal to {MaxFooterTextLength}.", paramName: nameof(Text));
                 _text = value;
             }
         }

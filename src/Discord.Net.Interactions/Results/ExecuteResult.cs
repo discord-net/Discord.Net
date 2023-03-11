@@ -21,7 +21,7 @@ namespace Discord.Interactions
         /// <inheritdoc/>
         public bool IsSuccess => !Error.HasValue;
 
-        private ExecuteResult (Exception exception, InteractionCommandError? commandError, string errorReason)
+        private ExecuteResult(Exception exception, InteractionCommandError? commandError, string errorReason)
         {
             Exception = exception;
             Error = commandError;
@@ -34,7 +34,7 @@ namespace Discord.Interactions
         /// <returns>
         ///     A <see cref="ExecuteResult" /> that does not contain any errors.
         /// </returns>
-        public static ExecuteResult FromSuccess ( ) =>
+        public static ExecuteResult FromSuccess() =>
             new ExecuteResult(null, null, null);
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Discord.Interactions
         /// <returns>
         ///     A <see cref="ExecuteResult" /> that contains a <see cref="InteractionCommandError" /> and reason.
         /// </returns>
-        public static ExecuteResult FromError (InteractionCommandError commandError, string reason) =>
+        public static ExecuteResult FromError(InteractionCommandError commandError, string reason) =>
             new ExecuteResult(null, commandError, reason);
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Discord.Interactions
         ///     with a <see cref="InteractionCommandError" /> of type <c>Exception</c> as well as the exception message as the
         ///     reason.
         /// </returns>
-        public static ExecuteResult FromError (Exception exception) =>
+        public static ExecuteResult FromError(Exception exception) =>
             new ExecuteResult(exception, InteractionCommandError.Exception, exception.Message);
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Discord.Interactions
         /// <returns>
         ///     A <see cref="ExecuteResult"/> that inherits the <see cref="IResult"/> error type and reason.
         /// </returns>
-        public static ExecuteResult FromError (IResult result) =>
+        public static ExecuteResult FromError(IResult result) =>
             new ExecuteResult(null, result.Error, result.ErrorReason);
 
         /// <summary>
@@ -81,6 +81,6 @@ namespace Discord.Interactions
         ///     <c>Success</c> if <see cref="IsSuccess"/> is <see langword="true"/>; otherwise "<see cref="Error"/>: 
         ///     <see cref="ErrorReason"/>".
         /// </returns>
-        public override string ToString ( ) => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
+        public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
     }
 }
