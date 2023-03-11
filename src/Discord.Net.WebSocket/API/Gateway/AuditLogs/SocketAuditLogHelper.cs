@@ -6,7 +6,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.WebSocket
 {
-    internal static class AuditLogHelper
+    internal static class SocketAuditLogHelper
     {
         private static readonly Dictionary<ActionType, Func<DiscordSocketClient, EntryModel,  IAuditLogData>> CreateMapping
             = new ()
