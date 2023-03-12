@@ -1,4 +1,4 @@
-using Model = Discord.API.AuditLogs.GuildAuditLogInfoModel;
+using Model = Discord.API.AuditLogs.GuildInfoAuditLogModel;
 
 namespace Discord.Rest;
 

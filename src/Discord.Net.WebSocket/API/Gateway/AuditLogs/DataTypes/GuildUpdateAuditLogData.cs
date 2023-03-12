@@ -1,7 +1,7 @@
 using System.Linq;
 
 using EntryModel = Discord.API.AuditLogEntry;
-using InfoModel = Discord.API.AuditLogs.GuildAuditLogInfoModel;
+using InfoModel = Discord.API.AuditLogs.GuildInfoAuditLogModel;
 
 namespace Discord.WebSocket
 {

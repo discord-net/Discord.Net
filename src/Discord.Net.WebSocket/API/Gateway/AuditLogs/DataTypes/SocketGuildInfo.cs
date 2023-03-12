@@ -1,10 +1,4 @@
-using Discord.API;
-using System.Globalization;
-using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using Model = Discord.API.AuditLogs.GuildAuditLogInfoModel;
+using Model = Discord.API.AuditLogs.GuildInfoAuditLogModel;
 
 namespace Discord.WebSocket;
 
@@ -13,8 +7,6 @@ namespace Discord.WebSocket;
 /// </summary>
 public class SocketGuildInfo
 {
-    internal SocketGuildInfo() { }
-
     internal static SocketGuildInfo Create(Model model)
     {
         return new()

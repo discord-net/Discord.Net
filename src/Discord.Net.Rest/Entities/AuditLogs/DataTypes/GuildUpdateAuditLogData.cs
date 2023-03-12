@@ -39,7 +39,7 @@ namespace Discord.Rest
                 newOwner = RestUser.Create(discord, newOwnerInfo);
             }
 
-            var (before, after) = AuditLogHelper.CreateAuditLogEntityInfo<GuildAuditLogInfoModel>(changes, discord);
+            var (before, after) = AuditLogHelper.CreateAuditLogEntityInfo<GuildInfoAuditLogModel>(changes, discord);
 
             return new GuildUpdateAuditLogData(new(before, oldOwner), new(after, newOwner));
         }
