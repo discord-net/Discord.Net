@@ -41,11 +41,6 @@ internal class ChannelInfoAuditLogModel : IAuditLogInfoModel
     [JsonField("default_reaction_emoji")]
     public ForumReactionEmoji DefaultEmoji { get; set; }
 
-    // Threads & forum posts
-
-    [JsonField("applied_tags")]
-    public ulong[] AppliedTags { get; set; }
-
     // Voice channels
 
     [JsonField("user_limit")]

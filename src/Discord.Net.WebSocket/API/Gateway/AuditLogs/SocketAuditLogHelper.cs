@@ -11,9 +11,9 @@ namespace Discord.WebSocket
         private static readonly Dictionary<ActionType, Func<DiscordSocketClient, EntryModel,  IAuditLogData>> CreateMapping
             = new ()
         {
-            [ActionType.GuildUpdated] = GuildUpdateAuditLogData.Create, // log
+            [ActionType.GuildUpdated] = GuildUpdateAuditLogData.Create,
 
-            // [ActionType.ChannelCreated] = ChannelCreateAuditLogData.Create,
+            [ActionType.ChannelCreated] = ChannelCreateAuditLogData.Create,
             // [ActionType.ChannelUpdated] = ChannelUpdateAuditLogData.Create,
             // [ActionType.ChannelDeleted] = ChannelDeleteAuditLogData.Create,
             //
