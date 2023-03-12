@@ -1042,9 +1042,9 @@ namespace Discord.Rest
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        public async Task<CustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options = null)
+        public async Task<CustomSticker> CreateStickerAsync(string name, Image image, IEnumerable<string> tags, string description = null, RequestOptions options = null)
         {
-            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, description, tags, image, options).ConfigureAwait(false);
+            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, image, tags, description, options).ConfigureAwait(false);
 
             return CustomSticker.Create(Discord, model, this, model.User.IsSpecified ? model.User.Value.Id : null);
         }
@@ -1059,11 +1059,11 @@ namespace Discord.Rest
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        public Task<CustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path,
+        public Task<CustomSticker> CreateStickerAsync(string name,  string path, IEnumerable<string> tags, string description = null,
             RequestOptions options = null)
         {
             var fs = File.OpenRead(path);
-            return CreateStickerAsync(name, description, tags, fs, Path.GetFileName(fs.Name), options);
+            return CreateStickerAsync(name, fs, Path.GetFileName(fs.Name), tags,  description,options);
         }
         /// <summary>
         ///     Creates a new sticker in this guild
@@ -1077,10 +1077,10 @@ namespace Discord.Rest
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        public async Task<CustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream,
-            string filename, RequestOptions options = null)
+        public async Task<CustomSticker> CreateStickerAsync(string name,  Stream stream, string filename, IEnumerable<string> tags,
+             string description = null, RequestOptions options = null)
         {
-            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, description, tags, stream, filename, options).ConfigureAwait(false);
+            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, stream, filename, tags, description, options).ConfigureAwait(false);
 
             return CustomSticker.Create(Discord, model, this, model.User.IsSpecified ? model.User.Value.Id : null);
         }
@@ -1518,14 +1518,14 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync(bool withLocalizations, string locale, RequestOptions options)
             => await GetApplicationCommandsAsync(withLocalizations, locale, options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options)
-            => await CreateStickerAsync(name, description, tags, image, options);
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name,  Image image, IEnumerable<string> tags, string description, RequestOptions options)
+            => await CreateStickerAsync(name, image, tags, description, options);
         /// <inheritdoc />
-        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream, string filename, RequestOptions options)
-            => await CreateStickerAsync(name, description, tags, stream, filename, options);
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name,  Stream stream, string filename, IEnumerable<string> tags, string description, RequestOptions options)
+            => await CreateStickerAsync(name, stream, filename, tags, description, options);
         /// <inheritdoc />
-        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path, RequestOptions options)
-            => await CreateStickerAsync(name, description, tags, path, options);
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name,  string path, IEnumerable<string> tags, string description, RequestOptions options)
+            => await CreateStickerAsync(name, path, tags, description, options);
         /// <inheritdoc />
         async Task<ICustomSticker> IGuild.GetStickerAsync(ulong id, CacheMode mode, RequestOptions options)
         {

@@ -705,49 +705,67 @@ namespace Discord.Rest
         public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
             => client.ApiClient.DeleteGuildEmoteAsync(guild.Id, id, options);
 
-        public static async Task<API.Sticker> CreateStickerAsync(BaseDiscordClient client, IGuild guild, string name, string description, IEnumerable<string> tags,
-            Image image, RequestOptions options = null)
+        public static async Task<API.Sticker> CreateStickerAsync(BaseDiscordClient client, IGuild guild, string name, Image image, IEnumerable<string> tags,
+            string description = null, RequestOptions options = null)
         {
             Preconditions.NotNull(name, nameof(name));
-            Preconditions.NotNull(description, nameof(description));
+
+            if (description is not null)
+            {
+                Preconditions.AtLeast(description.Length, 2, nameof(description));
+                Preconditions.AtMost(description.Length, 100, nameof(name));
+            }
+
+            var tagString = string.Join(", ", tags);
+
+            Preconditions.AtLeast(tagString.Length, 1, nameof(description));
+            Preconditions.AtMost(tagString.Length, 200, nameof(name));
+
 
             Preconditions.AtLeast(name.Length, 2, nameof(name));
-            Preconditions.AtLeast(description.Length, 2, nameof(description));
 
             Preconditions.AtMost(name.Length, 30, nameof(name));
-            Preconditions.AtMost(description.Length, 100, nameof(name));
 
             var apiArgs = new CreateStickerParams()
             {
                 Name = name,
                 Description = description,
                 File = image.Stream,
-                Tags = string.Join(", ", tags)
+                Tags = tagString
             };
 
             return await client.ApiClient.CreateGuildStickerAsync(apiArgs, guild.Id, options).ConfigureAwait(false);
         }
 
-        public static async Task<API.Sticker> CreateStickerAsync(BaseDiscordClient client, IGuild guild, string name, string description, IEnumerable<string> tags,
-            Stream file, string filename, RequestOptions options = null)
+        public static async Task<API.Sticker> CreateStickerAsync(BaseDiscordClient client, IGuild guild, string name, Stream file, string filename, IEnumerable<string> tags,
+            string description = null, RequestOptions options = null)
         {
             Preconditions.NotNull(name, nameof(name));
-            Preconditions.NotNull(description, nameof(description));
             Preconditions.NotNull(file, nameof(file));
             Preconditions.NotNull(filename, nameof(filename));
 
             Preconditions.AtLeast(name.Length, 2, nameof(name));
-            Preconditions.AtLeast(description.Length, 2, nameof(description));
 
             Preconditions.AtMost(name.Length, 30, nameof(name));
-            Preconditions.AtMost(description.Length, 100, nameof(name));
+
+
+            if (description is not null)
+            {
+                Preconditions.AtLeast(description.Length, 2, nameof(description));
+                Preconditions.AtMost(description.Length, 100, nameof(name));
+            }
+            
+            var tagString = string.Join(", ", tags);
+
+            Preconditions.AtLeast(tagString.Length, 1, nameof(description));
+            Preconditions.AtMost(tagString.Length, 200, nameof(name));
 
             var apiArgs = new CreateStickerParams()
             {
                 Name = name,
                 Description = description,
                 File = file,
-                Tags = string.Join(", ", tags),
+                Tags = tagString,
                 FileName = filename
             };
 
