@@ -14,8 +14,8 @@ namespace Discord.WebSocket
             [ActionType.GuildUpdated] = GuildUpdateAuditLogData.Create,
 
             [ActionType.ChannelCreated] = ChannelCreateAuditLogData.Create,
-            // [ActionType.ChannelUpdated] = ChannelUpdateAuditLogData.Create,
-            // [ActionType.ChannelDeleted] = ChannelDeleteAuditLogData.Create,
+            [ActionType.ChannelUpdated] = ChannelUpdateAuditLogData.Create,
+            [ActionType.ChannelDeleted] = ChannelDeleteAuditLogData.Create,
             //
             // [ActionType.OverwriteCreated] = OverwriteCreateAuditLogData.Create,
             // [ActionType.OverwriteUpdated] = OverwriteUpdateAuditLogData.Create,

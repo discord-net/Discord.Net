@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.WebSocket;
@@ -22,10 +21,6 @@ public class ChannelCreateAuditLogData : IAuditLogData
         SlowModeInterval = model.RateLimitPerUser;
         IsNsfw = model.IsNsfw;
         Bitrate = model.Bitrate;
-        Overwrites = model.Overwrites?.Select(x
-            => new Overwrite(x.TargetId,
-                x.TargetType,
-                new OverwritePermissions(x.Allow, x.Deny))).ToImmutableArray();
         Topic = model.Topic;
         AutoArchiveDuration = model.AutoArchiveDuration;
         DefaultSlowModeInterval = model.DefaultThreadRateLimitPerUser;
@@ -117,15 +112,6 @@ public class ChannelCreateAuditLogData : IAuditLogData
     ///     <c>null</c> if this is not mentioned in this entry.
     /// </returns>
     public int? Bitrate { get; }
-
-    /// <summary>
-    ///     Gets a collection of permission overwrites that was assigned to the created channel.
-    /// </summary>
-    /// <returns>
-    ///     A collection of permission <see cref="Overwrite"/>, containing the permission overwrites that were
-    ///     assigned to the created channel.
-    /// </returns>
-    public IReadOnlyCollection<Overwrite> Overwrites { get; }
 
     /// <summary>
     ///     Gets the thread archive duration that was set in the created channel.

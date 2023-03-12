@@ -38,6 +38,13 @@ public struct SocketChannelInfo
         }
         else
             DefaultReactionEmoji = null;
+        AutoArchiveDuration = model.AutoArchiveDuration;
+        DefaultSlowModeInterval = model.DefaultThreadRateLimitPerUser;
+
+        VideoQualityMode = model.VideoQualityMode;
+        RtcRegion = model.Region;
+        Flags = model.Flags;
+        UserLimit = model.UserLimit;
     }
 
     /// <inheritdoc cref="IChannel.Name"/>
@@ -96,5 +103,34 @@ public struct SocketChannelInfo
     /// </remarks>
     public IEmote DefaultReactionEmoji { get; }
 
+    /// <summary>
+    ///     Gets the user limit configured in the created voice channel.
+    /// </summary>
+    public int? UserLimit { get; }
+
+    /// <summary>
+    ///     Gets the video quality mode configured in the created voice channel.
+    /// </summary>
+    public VideoQualityMode? VideoQualityMode { get; }
+
+    /// <summary>
+    ///     Gets the region configured in the created voice channel.
+    /// </summary>
+    public string RtcRegion { get; }
+
+    /// <summary>
+    ///     Gets channel flags configured for the created channel.
+    /// </summary>
+    public ChannelFlags Flags { get; }
+
+    /// <summary>
+    ///     Gets the thread archive duration that was set in the created channel.
+    /// </summary>
+    public ThreadArchiveDuration? AutoArchiveDuration { get; }
+
+    /// <summary>
+    ///     Gets the default slow mode interval that will be set in child threads in the channel.
+    /// </summary>
+    public int? DefaultSlowModeInterval { get; }
 
 }
