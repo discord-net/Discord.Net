@@ -713,7 +713,7 @@ namespace Discord.Rest
             if (description is not null)
             {
                 Preconditions.AtLeast(description.Length, 2, nameof(description));
-                Preconditions.AtMost(description.Length, 100, nameof(name));
+                Preconditions.AtMost(description.Length, 100, nameof(description));
             }
 
             var tagString = string.Join(", ", tags);
