@@ -718,8 +718,8 @@ namespace Discord.Rest
 
             var tagString = string.Join(", ", tags);
 
-            Preconditions.AtLeast(tagString.Length, 1, nameof(description));
-            Preconditions.AtMost(tagString.Length, 200, nameof(name));
+            Preconditions.AtLeast(tagString.Length, 1, nameof(tags));
+            Preconditions.AtMost(tagString.Length, 200, nameof(tags));
 
 
             Preconditions.AtLeast(name.Length, 2, nameof(name));
@@ -752,13 +752,13 @@ namespace Discord.Rest
             if (description is not null)
             {
                 Preconditions.AtLeast(description.Length, 2, nameof(description));
-                Preconditions.AtMost(description.Length, 100, nameof(name));
+                Preconditions.AtMost(description.Length, 100, nameof(description));
             }
             
             var tagString = string.Join(", ", tags);
 
-            Preconditions.AtLeast(tagString.Length, 1, nameof(description));
-            Preconditions.AtMost(tagString.Length, 200, nameof(name));
+            Preconditions.AtLeast(tagString.Length, 1, nameof(tags));
+            Preconditions.AtMost(tagString.Length, 200, nameof(tags));
 
             var apiArgs = new CreateStickerParams()
             {
