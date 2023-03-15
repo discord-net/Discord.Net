@@ -37,6 +37,8 @@ namespace Discord.WebSocket
         public override int SlowModeInterval
             => throw new NotSupportedException("News channels do not support Slow Mode.");
 
+        private string DebuggerDisplay => $"{Name} ({Id}, News)";
+
         /// <inheritdoc cref="INewsChannel.FollowAnnouncementChannelAsync"/>
         public Task<ulong> FollowAnnouncementChannelAsync(ITextChannel channel, RequestOptions options = null)
             => FollowAnnouncementChannelAsync(channel.Id, options);
