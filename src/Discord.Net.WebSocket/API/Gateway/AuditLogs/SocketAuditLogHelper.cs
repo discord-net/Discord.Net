@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 
-using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.WebSocket
@@ -23,7 +22,7 @@ namespace Discord.WebSocket
             //
             // [ActionType.Kick] = KickAuditLogData.Create,
             // [ActionType.Prune] = PruneAuditLogData.Create,
-            // [ActionType.Ban] = BanAuditLogData.Create,
+            [ActionType.Ban] = BanAuditLogData.Create,
             // [ActionType.Unban] = UnbanAuditLogData.Create,
             // [ActionType.MemberUpdated] = MemberUpdateAuditLogData.Create,
             // [ActionType.MemberRoleUpdated] = MemberRoleAuditLogData.Create,
