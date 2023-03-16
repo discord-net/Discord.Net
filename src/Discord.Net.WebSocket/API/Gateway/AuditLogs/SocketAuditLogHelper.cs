@@ -20,10 +20,10 @@ namespace Discord.WebSocket
             // [ActionType.OverwriteUpdated] = OverwriteUpdateAuditLogData.Create,
             // [ActionType.OverwriteDeleted] = OverwriteDeleteAuditLogData.Create,
             //
-            // [ActionType.Kick] = KickAuditLogData.Create,
+            [ActionType.Kick] = KickAuditLogData.Create,
             // [ActionType.Prune] = PruneAuditLogData.Create,
             [ActionType.Ban] = BanAuditLogData.Create,
-            // [ActionType.Unban] = UnbanAuditLogData.Create,
+            [ActionType.Unban] = UnbanAuditLogData.Create,
             // [ActionType.MemberUpdated] = MemberUpdateAuditLogData.Create,
             // [ActionType.MemberRoleUpdated] = MemberRoleAuditLogData.Create,
             // [ActionType.MemberMoved] = MemberMoveAuditLogData.Create,
