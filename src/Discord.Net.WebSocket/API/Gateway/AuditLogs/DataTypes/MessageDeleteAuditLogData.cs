@@ -1,26 +1,35 @@
+using Discord.Rest;
 using System;
-using System.Linq;
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to message deletion(s).
 /// </summary>
 public class MessageDeleteAuditLogData : IAuditLogData
 {
-    private MessageDeleteAuditLogData(ulong channelId, int count, IUser user)
+    private MessageDeleteAuditLogData(ulong channelId, int count, Cacheable<SocketUser, RestUser, IUser, ulong> user)
     {
         ChannelId = channelId;
         MessageCount = count;
         Target = user;
     }
 
-    internal static MessageDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static MessageDeleteAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
-        var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-        return new MessageDeleteAuditLogData(entry.Options.ChannelId.Value, entry.Options.Count.Value, userInfo != null ? RestUser.Create(discord, userInfo) : null);
+        var cachedUser = discord.GetUser(entry.TargetId!.Value);
+        var cacheableUser = new Cacheable<SocketUser, RestUser, IUser, ulong>(
+            cachedUser,
+            entry.TargetId.Value,
+            cachedUser is not null,
+            async () =>
+            {
+                var user = await discord.ApiClient.GetUserAsync(entry.TargetId.Value);
+                return user is not null ? RestUser.Create(discord, user) : null;
+            });
+
+        return new MessageDeleteAuditLogData(entry.Options.ChannelId!.Value, entry.Options.Count!.Value, cacheableUser);
     }
 
     /// <summary>
@@ -30,6 +39,7 @@ public class MessageDeleteAuditLogData : IAuditLogData
     ///     An <see cref="int"/> representing the number of messages that were deleted from the channel.
     /// </returns>
     public int MessageCount { get; }
+
     /// <summary>
     ///     Gets the ID of the channel that the messages were deleted from.
     /// </summary>
@@ -38,6 +48,7 @@ public class MessageDeleteAuditLogData : IAuditLogData
     ///     deleted from.
     /// </returns>
     public ulong ChannelId { get; }
+
     /// <summary>
     ///     Gets the user of the messages that were deleted.
     /// </summary>
@@ -47,5 +58,5 @@ public class MessageDeleteAuditLogData : IAuditLogData
     /// <returns>
     ///     A user object representing the user that created the deleted messages.
     /// </returns>
-    public IUser Target { get; }
+    public Cacheable<SocketUser, RestUser, IUser, ulong> Target { get; }
 }

@@ -45,11 +45,11 @@ namespace Discord.WebSocket
             // [ActionType.EmojiCreated] = EmoteCreateAuditLogData.Create,
             // [ActionType.EmojiUpdated] = EmoteUpdateAuditLogData.Create,
             // [ActionType.EmojiDeleted] = EmoteDeleteAuditLogData.Create,
-            //
-            // [ActionType.MessageDeleted] = MessageDeleteAuditLogData.Create,
-            // [ActionType.MessageBulkDeleted] = MessageBulkDeleteAuditLogData.Create,
-            // [ActionType.MessagePinned] = MessagePinAuditLogData.Create,
-            // [ActionType.MessageUnpinned] = MessageUnpinAuditLogData.Create,
+            
+            [ActionType.MessageDeleted] = MessageDeleteAuditLogData.Create,
+            [ActionType.MessageBulkDeleted] = MessageBulkDeleteAuditLogData.Create,
+            [ActionType.MessagePinned] = MessagePinAuditLogData.Create,
+            [ActionType.MessageUnpinned] = MessageUnpinAuditLogData.Create,
             //
             // [ActionType.EventCreate] = ScheduledEventCreateAuditLogData.Create,
             // [ActionType.EventUpdate] = ScheduledEventUpdateAuditLogData.Create,

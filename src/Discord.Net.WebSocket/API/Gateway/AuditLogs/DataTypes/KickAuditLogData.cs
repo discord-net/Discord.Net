@@ -22,7 +22,7 @@ public class KickAuditLogData : IAuditLogData
             cachedUser is not null,
             async () =>
             {
-                var user = await discord.ApiClient.GetUserAsync(entry.Id);
+                var user = await discord.ApiClient.GetUserAsync(entry.TargetId!.Value);
                 return user is not null ? RestUser.Create(discord, user) : null;
             });
 

@@ -22,14 +22,14 @@ public class MemberUpdateAuditLogData : IAuditLogData
 
         var (before, after) = AuditLogHelper.CreateAuditLogEntityInfo<MemberInfoAuditLogModel>(changes, discord);
 
-        var cachedUser = discord.GetUser(entry.Id);
+        var cachedUser = discord.GetUser(entry.TargetId!.Value);
         var cacheableUser = new Cacheable<SocketUser, RestUser, IUser, ulong>(
             cachedUser,
-            entry.Id,
+            entry.TargetId.Value,
             cachedUser is not null,
             async () =>
             {
-                var user = await discord.ApiClient.GetUserAsync(entry.Id);
+                var user = await discord.ApiClient.GetUserAsync(entry.TargetId.Value);
                 return user is not null ? RestUser.Create(discord, user) : null;
             });
 

@@ -1,7 +1,6 @@
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to message deletion(s).
@@ -14,9 +13,9 @@ public class MessageBulkDeleteAuditLogData : IAuditLogData
         MessageCount = count;
     }
 
-    internal static MessageBulkDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static MessageBulkDeleteAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
-        return new MessageBulkDeleteAuditLogData(entry.TargetId.Value, entry.Options.Count.Value);
+        return new MessageBulkDeleteAuditLogData(entry.TargetId!.Value, entry.Options.Count!.Value);
     }
 
     /// <summary>
@@ -27,6 +26,7 @@ public class MessageBulkDeleteAuditLogData : IAuditLogData
     ///     deleted from.
     /// </returns>
     public ulong ChannelId { get; }
+
     /// <summary>
     ///     Gets the number of messages that were deleted.
     /// </summary>
