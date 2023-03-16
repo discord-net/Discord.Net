@@ -11,19 +11,19 @@ public class GuildInfoAuditLogModel : IAuditLogInfoModel
     public int? AfkTimeout { get; set; }
 
     [JsonField("widget_enabled")]
-    public bool IsEmbeddable { get; set; }
+    public bool? IsEmbeddable { get; set; }
 
     [JsonField("default_message_notifications")]
-    public DefaultMessageNotifications DefaultMessageNotifications { get; set; }
+    public DefaultMessageNotifications? DefaultMessageNotifications { get; set; }
 
     [JsonField("mfa_level")]
-    public MfaLevel MfaLevel { get; set; }
+    public MfaLevel? MfaLevel { get; set; }
 
     [JsonField("verification_level")]
-    public VerificationLevel VerificationLevel { get; set; }
+    public VerificationLevel? VerificationLevel { get; set; }
 
     [JsonField("explicit_content_filter")]
-    public ExplicitContentFilterLevel ExplicitContentFilterLevel { get; set; }
+    public ExplicitContentFilterLevel? ExplicitContentFilterLevel { get; set; }
 
     [JsonField("icon_hash")]
     public string IconHash { get; set; }
@@ -35,25 +35,25 @@ public class GuildInfoAuditLogModel : IAuditLogInfoModel
     public string Splash { get; set; }
 
     [JsonField("afk_channel_id")]
-    public ulong AfkChannelId { get; set; }
+    public ulong? AfkChannelId { get; set; }
 
     [JsonField("widget_channel_id")]
-    public ulong EmbeddedChannelId { get; set; }
+    public ulong? EmbeddedChannelId { get; set; }
 
     [JsonField("system_channel_id")]
-    public ulong SystemChannelId { get; set; }
+    public ulong? SystemChannelId { get; set; }
 
     [JsonField("rules_channel_id")]
-    public ulong RulesChannelId { get; set; }
+    public ulong? RulesChannelId { get; set; }
 
     [JsonField("public_updates_channel_id")]
-    public ulong PublicUpdatesChannelId { get; set; }
+    public ulong? PublicUpdatesChannelId { get; set; }
 
     [JsonField("owner_id")]
-    public ulong OwnerId { get; set; }
+    public ulong? OwnerId { get; set; }
 
     [JsonField("application_id")]
-    public ulong ApplicationId { get; set; }
+    public ulong? ApplicationId { get; set; }
 
     [JsonField("region")]
     public string RegionId { get; set; }
@@ -65,7 +65,7 @@ public class GuildInfoAuditLogModel : IAuditLogInfoModel
     public string VanityUrl { get; set; }
 
     [JsonField("system_channel_flags")]
-    public SystemChannelMessageDeny SystemChannelFlags { get; set; }
+    public SystemChannelMessageDeny? SystemChannelFlags { get; set; }
 
     [JsonField("description")]
     public string Description { get; set; }
@@ -74,9 +74,9 @@ public class GuildInfoAuditLogModel : IAuditLogInfoModel
     public string PreferredLocale { get; set; }
 
     [JsonField("nsfw_level")]
-    public NsfwLevel NsfwLevel { get; set; }
+    public NsfwLevel? NsfwLevel { get; set; }
 
     [JsonField("premium_progress_bar_enabled")]
-    public bool ProgressBarEnabled { get; set; }
+    public bool? ProgressBarEnabled { get; set; }
 
 }

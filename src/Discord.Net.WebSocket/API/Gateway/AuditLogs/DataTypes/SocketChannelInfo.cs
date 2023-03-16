@@ -121,7 +121,7 @@ public struct SocketChannelInfo
     /// <summary>
     ///     Gets channel flags configured for the created channel.
     /// </summary>
-    public ChannelFlags Flags { get; }
+    public ChannelFlags? Flags { get; }
 
     /// <summary>
     ///     Gets the thread archive duration that was set in the created channel.

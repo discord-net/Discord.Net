@@ -82,7 +82,7 @@ public class ChannelCreateAuditLogData : IAuditLogData
     /// <returns>
     ///     The type of channel that was created.
     /// </returns>
-    public ChannelType ChannelType { get; }
+    public ChannelType? ChannelType { get; }
 
     /// <summary>
     ///     Gets the current slow-mode delay of the created channel.
@@ -161,5 +161,5 @@ public class ChannelCreateAuditLogData : IAuditLogData
     /// <summary>
     ///     Gets channel flags configured for the created channel.
     /// </summary>
-    public ChannelFlags Flags { get; }
+    public ChannelFlags? Flags { get; }
 }

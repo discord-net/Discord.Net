@@ -88,7 +88,7 @@ public class ChannelDeleteAuditLogData : IAuditLogData
     /// <returns>
     ///     The type of channel that was deleted.
     /// </returns>
-    public ChannelType ChannelType { get; }
+    public ChannelType? ChannelType { get; }
 
     /// <summary>
     ///     Gets the slow-mode delay of the deleted channel.
@@ -144,7 +144,7 @@ public class ChannelDeleteAuditLogData : IAuditLogData
     /// <summary>
     ///     Gets channel flags configured for the created channel.
     /// </summary>
-    public ChannelFlags Flags { get; }
+    public ChannelFlags? Flags { get; }
 
     /// <summary>
     ///     Gets the thread archive duration that was configured for the created channel.
