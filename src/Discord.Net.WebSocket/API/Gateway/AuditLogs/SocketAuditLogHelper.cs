@@ -19,17 +19,17 @@ namespace Discord.WebSocket
             // [ActionType.OverwriteCreated] = OverwriteCreateAuditLogData.Create,
             // [ActionType.OverwriteUpdated] = OverwriteUpdateAuditLogData.Create,
             // [ActionType.OverwriteDeleted] = OverwriteDeleteAuditLogData.Create,
-            //
+            
             [ActionType.Kick] = KickAuditLogData.Create,
-            // [ActionType.Prune] = PruneAuditLogData.Create,
+            [ActionType.Prune] = PruneAuditLogData.Create,
             [ActionType.Ban] = BanAuditLogData.Create,
             [ActionType.Unban] = UnbanAuditLogData.Create,
-            // [ActionType.MemberUpdated] = MemberUpdateAuditLogData.Create,
-            // [ActionType.MemberRoleUpdated] = MemberRoleAuditLogData.Create,
-            // [ActionType.MemberMoved] = MemberMoveAuditLogData.Create,
-            // [ActionType.MemberDisconnected] = MemberDisconnectAuditLogData.Create,
-            // [ActionType.BotAdded] = BotAddAuditLogData.Create,
-            //
+            [ActionType.MemberUpdated] = MemberUpdateAuditLogData.Create,
+            [ActionType.MemberRoleUpdated] = MemberRoleAuditLogData.Create,
+            [ActionType.MemberMoved] = MemberMoveAuditLogData.Create,
+            [ActionType.MemberDisconnected] = MemberDisconnectAuditLogData.Create,
+            [ActionType.BotAdded] = BotAddAuditLogData.Create,
+            
             // [ActionType.RoleCreated] = RoleCreateAuditLogData.Create,
             // [ActionType.RoleUpdated] = RoleUpdateAuditLogData.Create,
             // [ActionType.RoleDeleted] = RoleDeleteAuditLogData.Create,

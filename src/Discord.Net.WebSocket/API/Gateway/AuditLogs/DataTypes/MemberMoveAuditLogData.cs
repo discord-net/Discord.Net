@@ -1,7 +1,6 @@
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to moving members between voice channels.
@@ -14,9 +13,9 @@ public class MemberMoveAuditLogData : IAuditLogData
         MemberCount = count;
     }
 
-    internal static MemberMoveAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
+    internal static MemberMoveAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
-        return new MemberMoveAuditLogData(entry.Options.ChannelId.Value, entry.Options.Count.Value);
+        return new MemberMoveAuditLogData(entry.Options.ChannelId!.Value, entry.Options.Count!.Value);
     }
 
     /// <summary>
@@ -26,6 +25,7 @@ public class MemberMoveAuditLogData : IAuditLogData
     ///     A <see cref="ulong"/> representing the snowflake identifier for the channel that the members were moved to.
     /// </returns>
     public ulong ChannelId { get; }
+
     /// <summary>
     ///     Gets the number of members that were moved.
     /// </summary>

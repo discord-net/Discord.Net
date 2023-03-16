@@ -1,22 +1,22 @@
+using Discord.Rest;
 using System.Collections.Generic;
 using System.Linq;
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to a change in a guild member's roles.
 /// </summary>
 public class MemberRoleAuditLogData : IAuditLogData
 {
-    private MemberRoleAuditLogData(IReadOnlyCollection<MemberRoleEditInfo> roles, IUser target)
+    private MemberRoleAuditLogData(IReadOnlyCollection<MemberRoleEditInfo> roles, Cacheable<SocketUser, RestUser, IUser, ulong> target)
     {
         Roles = roles;
         Target = target;
     }
 
-    internal static MemberRoleAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
+    internal static MemberRoleAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
@@ -25,10 +25,18 @@ public class MemberRoleAuditLogData : IAuditLogData
             .Select(x => new MemberRoleEditInfo(x.Role.Name, x.Role.Id, x.ChangedProperty == "$add"))
             .ToList();
 
-        var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-        RestUser user = (userInfo != null) ? RestUser.Create(discord, userInfo) : null;
+        var cachedUser = discord.GetUser(entry.Id);
+        var cacheableUser = new Cacheable<SocketUser, RestUser, IUser, ulong>(
+            cachedUser,
+            entry.Id,
+            cachedUser is not null,
+            async () =>
+            {
+                var user = await discord.ApiClient.GetUserAsync(entry.Id);
+                return user is not null ? RestUser.Create(discord, user) : null;
+            });
 
-        return new MemberRoleAuditLogData(roleInfos.ToReadOnlyCollection(), user);
+        return new MemberRoleAuditLogData(roleInfos.ToReadOnlyCollection(), cacheableUser);
     }
 
     /// <summary>
@@ -44,7 +52,7 @@ public class MemberRoleAuditLogData : IAuditLogData
     ///     Gets the user that the roles changes were performed on.
     /// </summary>
     /// <returns>
-    ///     A user object representing the user that the role changes were performed on.
+    ///     A cacheable user object representing the user that the role changes were performed on.
     /// </returns>
-    public IUser Target { get; }
+    public Cacheable<SocketUser, RestUser, IUser, ulong> Target { get; }
 }

@@ -1,32 +1,39 @@
 using Discord.API.AuditLogs;
-using System.Linq;
+using Discord.Rest;
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to a change in a guild member.
 /// </summary>
 public class MemberUpdateAuditLogData : IAuditLogData
 {
-    private MemberUpdateAuditLogData(IUser target, MemberInfo before, MemberInfo after)
+    private MemberUpdateAuditLogData(Cacheable<SocketUser, RestUser, IUser, ulong> target, MemberInfo before, MemberInfo after)
     {
         Target = target;
         Before = before;
         After = after;
     }
 
-    internal static MemberUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
+    internal static MemberUpdateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
         var (before, after) = AuditLogHelper.CreateAuditLogEntityInfo<MemberInfoAuditLogModel>(changes, discord);
 
-        var targetInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-        RestUser user = (targetInfo != null) ? RestUser.Create(discord, targetInfo) : null;
+        var cachedUser = discord.GetUser(entry.Id);
+        var cacheableUser = new Cacheable<SocketUser, RestUser, IUser, ulong>(
+            cachedUser,
+            entry.Id,
+            cachedUser is not null,
+            async () =>
+            {
+                var user = await discord.ApiClient.GetUserAsync(entry.Id);
+                return user is not null ? RestUser.Create(discord, user) : null;
+            });
 
-        return new MemberUpdateAuditLogData(user, new MemberInfo(before), new MemberInfo(after));
+        return new MemberUpdateAuditLogData(cacheableUser, new MemberInfo(before), new MemberInfo(after));
     }
 
     /// <summary>
@@ -38,7 +45,8 @@ public class MemberUpdateAuditLogData : IAuditLogData
     /// <returns>
     ///     A user object representing the user who the changes were performed on.
     /// </returns>
-    public IUser Target { get; }
+    public Cacheable<SocketUser, RestUser, IUser, ulong> Target { get; }
+
     /// <summary>
     ///     Gets the member information before the changes.
     /// </summary>
@@ -46,6 +54,7 @@ public class MemberUpdateAuditLogData : IAuditLogData
     ///     An information object containing the original member information before the changes were made.
     /// </returns>
     public MemberInfo Before { get; }
+
     /// <summary>
     ///     Gets the member information after the changes.
     /// </summary>
