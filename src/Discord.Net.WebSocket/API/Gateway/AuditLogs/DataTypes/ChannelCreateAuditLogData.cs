@@ -17,7 +17,7 @@ public class ChannelCreateAuditLogData : IAuditLogData
     {
         ChannelId = entry.TargetId!.Value;
         ChannelName = model.Name;
-        ChannelType = model.Type; 
+        ChannelType = model.Type!.Value; 
         SlowModeInterval = model.RateLimitPerUser;
         IsNsfw = model.IsNsfw;
         Bitrate = model.Bitrate;
@@ -26,7 +26,7 @@ public class ChannelCreateAuditLogData : IAuditLogData
         DefaultSlowModeInterval = model.DefaultThreadRateLimitPerUser;
         DefaultAutoArchiveDuration = model.DefaultArchiveDuration;
 
-        AvailableTags = model.AvailableTags.Select(x => new ForumTag(x.Id,
+        AvailableTags = model.AvailableTags?.Select(x => new ForumTag(x.Id,
             x.Name,
             x.EmojiId.GetValueOrDefault(null),
             x.EmojiName.GetValueOrDefault(null),
@@ -82,7 +82,7 @@ public class ChannelCreateAuditLogData : IAuditLogData
     /// <returns>
     ///     The type of channel that was created.
     /// </returns>
-    public ChannelType? ChannelType { get; }
+    public ChannelType ChannelType { get; }
 
     /// <summary>
     ///     Gets the current slow-mode delay of the created channel.
