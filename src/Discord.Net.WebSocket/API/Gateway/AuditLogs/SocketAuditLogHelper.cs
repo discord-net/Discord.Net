@@ -42,9 +42,9 @@ namespace Discord.WebSocket
             [ActionType.WebhookUpdated] = WebhookUpdateAuditLogData.Create,
             [ActionType.WebhookDeleted] = WebhookDeleteAuditLogData.Create,
             
-            // [ActionType.EmojiCreated] = EmoteCreateAuditLogData.Create,
-            // [ActionType.EmojiUpdated] = EmoteUpdateAuditLogData.Create,
-            // [ActionType.EmojiDeleted] = EmoteDeleteAuditLogData.Create,
+            [ActionType.EmojiCreated] = EmoteCreateAuditLogData.Create,
+            [ActionType.EmojiUpdated] = EmoteUpdateAuditLogData.Create,
+            [ActionType.EmojiDeleted] = EmoteDeleteAuditLogData.Create,
             
             [ActionType.MessageDeleted] = MessageDeleteAuditLogData.Create,
             [ActionType.MessageBulkDeleted] = MessageBulkDeleteAuditLogData.Create,

@@ -1,14 +1,13 @@
 using System.Linq;
 
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to an emoji update.
 /// </summary>
-public class EmoteUpdateAuditLogData : IAuditLogData
+public class EmoteUpdateAuditLogData : ISocketAuditLogData
 {
     private EmoteUpdateAuditLogData(ulong id, string oldName, string newName)
     {
@@ -17,14 +16,14 @@ public class EmoteUpdateAuditLogData : IAuditLogData
         NewName = newName;
     }
 
-    internal static EmoteUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static EmoteUpdateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var change = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "name");
 
         var newName = change.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
         var oldName = change.OldValue?.ToObject<string>(discord.ApiClient.Serializer);
 
-        return new EmoteUpdateAuditLogData(entry.TargetId.Value, oldName, newName);
+        return new EmoteUpdateAuditLogData(entry.TargetId!.Value, oldName, newName);
     }
 
     /// <summary>
