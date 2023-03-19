@@ -42,7 +42,7 @@ public struct SocketChannelInfo
         DefaultSlowModeInterval = model.DefaultThreadRateLimitPerUser;
 
         VideoQualityMode = model.VideoQualityMode;
-        RtcRegion = model.Region;
+        RTCRegion = model.Region;
         Flags = model.Flags;
         UserLimit = model.UserLimit;
     }
@@ -103,34 +103,40 @@ public struct SocketChannelInfo
     /// </remarks>
     public IEmote DefaultReactionEmoji { get; }
 
-    /// <summary>
-    ///     Gets the user limit configured in the created voice channel.
-    /// </summary>
+    /// <inheritdoc cref="IVoiceChannel.UserLimit"/>
+    /// <remarks>
+    ///     <see langword="null" /> if the value was not updated in this entry.
+    /// </remarks>
     public int? UserLimit { get; }
 
-    /// <summary>
-    ///     Gets the video quality mode configured in the created voice channel.
-    /// </summary>
+    /// <inheritdoc cref="IVoiceChannel.VideoQualityMode"/>
+    /// <remarks>
+    ///     <see langword="null" /> if the value was not updated in this entry.
+    /// </remarks>
     public VideoQualityMode? VideoQualityMode { get; }
 
-    /// <summary>
-    ///     Gets the region configured in the created voice channel.
-    /// </summary>
-    public string RtcRegion { get; }
+    /// <inheritdoc cref="IAudioChannel.RTCRegion"/>
+    /// <remarks>
+    ///     <see langword="null" /> if the value was not updated in this entry.
+    /// </remarks>
+    public string RTCRegion { get; }
 
-    /// <summary>
-    ///     Gets channel flags configured for the created channel.
-    /// </summary>
+    /// <inheritdoc cref="IGuildChannel.Flags"/>
+    /// <remarks>
+    ///     <see langword="null" /> if the value was not updated in this entry.
+    /// </remarks>
     public ChannelFlags? Flags { get; }
 
-    /// <summary>
-    ///     Gets the thread archive duration that was set in the created channel.
-    /// </summary>
+    /// <inheritdoc cref="IThreadChannel.AutoArchiveDuration"/>
+    /// <remarks>
+    ///     <see langword="null" /> if the value was not updated in this entry.
+    /// </remarks>
     public ThreadArchiveDuration? AutoArchiveDuration { get; }
 
-    /// <summary>
-    ///     Gets the default slow mode interval that will be set in child threads in the channel.
-    /// </summary>
+    /// <inheritdoc cref="IForumChannel.DefaultSlowModeInterval"/>
+    /// <remarks>
+    ///     <see langword="null" /> if the value was not updated in this entry.
+    /// </remarks>
     public int? DefaultSlowModeInterval { get; }
 
 }

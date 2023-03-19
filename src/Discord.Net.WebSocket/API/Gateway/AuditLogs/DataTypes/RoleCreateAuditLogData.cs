@@ -1,31 +1,29 @@
-using Discord.API.AuditLogs;
-
-using System.Linq;
+using Discord.Rest;
 
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
+using Model = Discord.API.AuditLogs.RoleInfoAuditLogModel;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to a role creation.
 /// </summary>
 public class RoleCreateAuditLogData : IAuditLogData
 {
-    private RoleCreateAuditLogData(ulong id, RoleEditInfo props)
+    private RoleCreateAuditLogData(ulong id, SocketRoleEditInfo props)
     {
         RoleId = id;
         Properties = props;
     }
 
-    internal static RoleCreateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static RoleCreateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
-        var (_, data) = AuditLogHelper.CreateAuditLogEntityInfo<RoleInfoAuditLogModel>(changes, discord);
+        var (_, data) = AuditLogHelper.CreateAuditLogEntityInfo<Model>(changes, discord);
 
         return new RoleCreateAuditLogData(entry.TargetId!.Value,
-            new RoleEditInfo(data));
+            new SocketRoleEditInfo(data));
     }
 
     /// <summary>
@@ -42,5 +40,5 @@ public class RoleCreateAuditLogData : IAuditLogData
     /// <return>
     ///     An information object representing the properties of the role that was created.
     /// </return>
-    public RoleEditInfo Properties { get; }
+    public SocketRoleEditInfo Properties { get; }
 }

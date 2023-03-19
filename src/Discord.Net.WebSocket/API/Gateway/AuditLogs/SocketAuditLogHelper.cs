@@ -30,9 +30,9 @@ namespace Discord.WebSocket
             [ActionType.MemberDisconnected] = MemberDisconnectAuditLogData.Create,
             [ActionType.BotAdded] = BotAddAuditLogData.Create,
             
-            // [ActionType.RoleCreated] = RoleCreateAuditLogData.Create,
-            // [ActionType.RoleUpdated] = RoleUpdateAuditLogData.Create,
-            // [ActionType.RoleDeleted] = RoleDeleteAuditLogData.Create,
+            [ActionType.RoleCreated] = RoleCreateAuditLogData.Create,
+            [ActionType.RoleUpdated] = RoleUpdateAuditLogData.Create,
+            [ActionType.RoleDeleted] = RoleDeleteAuditLogData.Create,
             //
             // [ActionType.InviteCreated] = InviteCreateAuditLogData.Create,
             // [ActionType.InviteUpdated] = InviteUpdateAuditLogData.Create,

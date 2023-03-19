@@ -1,23 +1,13 @@
 using Model = Discord.API.AuditLogs.RoleInfoAuditLogModel;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Represents information for a role edit.
 /// </summary>
-public struct RoleEditInfo
+public struct SocketRoleEditInfo
 {
-    internal RoleEditInfo(Color? color, bool? mentionable, bool? hoist, string name,
-        GuildPermissions? permissions)
-    {
-        Color = color;
-        Mentionable = mentionable;
-        Hoist = hoist;
-        Name = name;
-        Permissions = permissions;
-    }
-
-    internal RoleEditInfo(Model model)
+    internal SocketRoleEditInfo(Model model)
     {
         if (model.Color is not null)
             Color = new Color(model.Color.Value);
@@ -28,7 +18,7 @@ public struct RoleEditInfo
         Hoist = model.Hoist;
         Name = model.Name;
 
-        if (model.Permissions is not null)
+        if(model.Permissions is not null)
             Permissions = new GuildPermissions(model.Permissions.Value);
         else
             Permissions = null;
@@ -49,7 +39,7 @@ public struct RoleEditInfo
     ///     Gets a value that indicates whether this role is mentionable.
     /// </summary>
     /// <returns>
-    ///     <c>true</c> if other members can mention this role in a text channel; otherwise <c>false</c>; 
+    ///     <c>true</c> if other members can mention this role in a text channel; otherwise <c>false</c>;
     ///     <c>null</c> if this is not mentioned in this entry.
     /// </returns>
     public bool? Mentionable { get; }
@@ -59,7 +49,7 @@ public struct RoleEditInfo
     ///     section on the user list).
     /// </summary>
     /// <returns>
-    ///     <c>true</c> if this role's members will appear in a separate section in the user list; otherwise 
+    ///     <c>true</c> if this role's members will appear in a separate section in the user list; otherwise
     ///     <c>false</c>; <c>null</c> if this is not mentioned in this entry.
     /// </returns>
     public bool? Hoist { get; }

@@ -1,27 +1,28 @@
-using Discord.API.AuditLogs;
+using Discord.Rest;
 
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
+using Model = Discord.API.AuditLogs.RoleInfoAuditLogModel;
 
-namespace Discord.Rest;
+
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to a role update.
 /// </summary>
 public class RoleUpdateAuditLogData : IAuditLogData
 {
-    private RoleUpdateAuditLogData(ulong id, RoleEditInfo oldProps, RoleEditInfo newProps)
+    private RoleUpdateAuditLogData(ulong id, SocketRoleEditInfo oldProps, SocketRoleEditInfo newProps)
     {
         RoleId = id;
         Before = oldProps;
         After = newProps;
     }
 
-    internal static RoleUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static RoleUpdateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
-        var (before, after) = AuditLogHelper.CreateAuditLogEntityInfo<RoleInfoAuditLogModel>(changes, discord);
+        var (before, after) = AuditLogHelper.CreateAuditLogEntityInfo<Model>(changes, discord);
 
         return new RoleUpdateAuditLogData(entry.TargetId!.Value, new(before), new(after));
     }
@@ -33,20 +34,18 @@ public class RoleUpdateAuditLogData : IAuditLogData
     ///     A <see cref="ulong"/> representing the snowflake identifier of the role that was changed.
     /// </returns>
     public ulong RoleId { get; }
-
     /// <summary>
     ///     Gets the role information before the changes.
     /// </summary>
     /// <returns>
     ///     A role information object containing the role information before the changes were made.
     /// </returns>
-    public RoleEditInfo Before { get; }
-
+    public SocketRoleEditInfo Before { get; }
     /// <summary>
     ///     Gets the role information after the changes.
     /// </summary>
     /// <returns>
     ///     A role information object containing the role information after the changes were made.
     /// </returns>
-    public RoleEditInfo After { get; }
+    public SocketRoleEditInfo After { get; }
 }

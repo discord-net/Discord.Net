@@ -1,28 +1,28 @@
-using Discord.API.AuditLogs;
-
+using Discord.Rest;
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
+using Model = Discord.API.AuditLogs.RoleInfoAuditLogModel;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data relating to a role deletion.
 /// </summary>
 public class RoleDeleteAuditLogData : IAuditLogData
 {
-    private RoleDeleteAuditLogData(ulong id, RoleEditInfo props)
+    private RoleDeleteAuditLogData(ulong id, SocketRoleEditInfo props)
     {
         RoleId = id;
         Properties = props;
     }
 
-    internal static RoleDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static RoleDeleteAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
-        var (data, _) = AuditLogHelper.CreateAuditLogEntityInfo<RoleInfoAuditLogModel>(changes, discord);
+        var (data, _) = AuditLogHelper.CreateAuditLogEntityInfo<Model>(changes, discord);
 
-        return new RoleDeleteAuditLogData(entry.TargetId!.Value, new RoleEditInfo(data));
+        return new RoleDeleteAuditLogData(entry.TargetId!.Value,
+            new SocketRoleEditInfo(data));
     }
 
     /// <summary>
@@ -39,5 +39,5 @@ public class RoleDeleteAuditLogData : IAuditLogData
     /// <return>
     ///     An information object representing the properties of the role that was deleted.
     /// </return>
-    public RoleEditInfo Properties { get; }
+    public SocketRoleEditInfo Properties { get; }
 }
