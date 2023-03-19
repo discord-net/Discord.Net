@@ -38,10 +38,10 @@ namespace Discord.WebSocket
             [ActionType.InviteUpdated] = InviteUpdateAuditLogData.Create,
             [ActionType.InviteDeleted] = InviteDeleteAuditLogData.Create,
             
-            // [ActionType.WebhookCreated] = WebhookCreateAuditLogData.Create,
-            // [ActionType.WebhookUpdated] = WebhookUpdateAuditLogData.Create,
-            // [ActionType.WebhookDeleted] = WebhookDeleteAuditLogData.Create,
-            //
+            [ActionType.WebhookCreated] = WebhookCreateAuditLogData.Create,
+            [ActionType.WebhookUpdated] = WebhookUpdateAuditLogData.Create,
+            [ActionType.WebhookDeleted] = WebhookDeleteAuditLogData.Create,
+            
             // [ActionType.EmojiCreated] = EmoteCreateAuditLogData.Create,
             // [ActionType.EmojiUpdated] = EmoteUpdateAuditLogData.Create,
             // [ActionType.EmojiDeleted] = EmoteDeleteAuditLogData.Create,

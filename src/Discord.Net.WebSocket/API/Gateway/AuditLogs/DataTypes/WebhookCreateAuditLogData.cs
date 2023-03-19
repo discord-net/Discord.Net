@@ -1,19 +1,17 @@
-using Discord.API.AuditLogs;
-using System.Linq;
+using Discord.Rest;
 
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
+using Model = Discord.API.AuditLogs.WebhookInfoAuditLogModel;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to a webhook creation.
 /// </summary>
 public class WebhookCreateAuditLogData : IAuditLogData
 {
-    private WebhookCreateAuditLogData(IWebhook webhook, ulong webhookId, WebhookInfoAuditLogModel model)
+    private WebhookCreateAuditLogData(ulong webhookId, Model model)
     {
-        Webhook = webhook;
         WebhookId = webhookId;
         Name = model.Name;
         Type = model.Type!.Value;
@@ -21,30 +19,15 @@ public class WebhookCreateAuditLogData : IAuditLogData
         Avatar = model.AvatarHash;
     }
 
-    internal static WebhookCreateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static WebhookCreateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
-        var (_, data) = AuditLogHelper.CreateAuditLogEntityInfo<WebhookInfoAuditLogModel>(changes, discord);
+        var (_, data) = AuditLogHelper.CreateAuditLogEntityInfo<Model>(changes, discord);
 
-        var webhookInfo = log.Webhooks?.FirstOrDefault(x => x.Id == entry.TargetId);
-        var webhook = webhookInfo == null ? null : RestWebhook.Create(discord, (IGuild)null, webhookInfo);
-
-        return new WebhookCreateAuditLogData(webhook, entry.TargetId!.Value, data);
+        return new WebhookCreateAuditLogData(entry.TargetId!.Value, data);
     }
-
-    // Doc Note: Corresponds to the *current* data
-
-    /// <summary>
-    ///     Gets the webhook that was created if it still exists.
-    /// </summary>
-    /// <returns>
-    ///     A webhook object representing the webhook that was created if it still exists, otherwise returns <c>null</c>.
-    /// </returns>
-    public IWebhook Webhook { get; }
-
-    // Doc Note: Corresponds to the *audit log* data
-
+    
     /// <summary>
     ///     Gets the webhook id.
     /// </summary>
@@ -68,6 +51,7 @@ public class WebhookCreateAuditLogData : IAuditLogData
     ///     A string containing the name of the webhook.
     /// </returns>
     public string Name { get; }
+
     /// <summary>
     ///     Gets the ID of the channel that the webhook could send to.
     /// </summary>

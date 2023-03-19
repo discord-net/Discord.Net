@@ -1,13 +1,13 @@
 using Model = Discord.API.AuditLogs.WebhookInfoAuditLogModel;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Represents information for a webhook.
 /// </summary>
-public struct WebhookInfo
+public struct SocketWebhookInfo
 {
-    internal WebhookInfo(Model model)
+    internal SocketWebhookInfo(Model model)
     {
         Name = model.Name;
         ChannelId = model.ChannelId;
@@ -21,7 +21,6 @@ public struct WebhookInfo
     ///     A string containing the name of this webhook.
     /// </returns>
     public string Name { get; }
-
     /// <summary>
     ///     Gets the ID of the channel that this webhook sends to.
     /// </summary>
@@ -30,7 +29,6 @@ public struct WebhookInfo
     ///     to.
     /// </returns>
     public ulong? ChannelId { get; }
-
     /// <summary>
     ///     Gets the hash value of this webhook's avatar.
     /// </summary>

@@ -1,16 +1,16 @@
-using Discord.API.AuditLogs;
+using Discord.Rest;
 
+using Model = Discord.API.AuditLogs.WebhookInfoAuditLogModel;
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to a webhook deletion.
 /// </summary>
 public class WebhookDeleteAuditLogData : IAuditLogData
 {
-    private WebhookDeleteAuditLogData(ulong id, WebhookInfoAuditLogModel model)
+    private WebhookDeleteAuditLogData(ulong id, Model model)
     {
         WebhookId = id;
         ChannelId = model.ChannelId!.Value;
@@ -19,13 +19,13 @@ public class WebhookDeleteAuditLogData : IAuditLogData
         Avatar = model.AvatarHash;
     }
 
-    internal static WebhookDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static WebhookDeleteAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
-        var (data, _) = AuditLogHelper.CreateAuditLogEntityInfo<WebhookInfoAuditLogModel>(changes, discord);
+        var (data, _) = AuditLogHelper.CreateAuditLogEntityInfo<Model>(changes, discord);
 
-        return new WebhookDeleteAuditLogData(entry.TargetId!.Value, data);
+        return new WebhookDeleteAuditLogData(entry.TargetId!.Value,data);
     }
 
     /// <summary>
