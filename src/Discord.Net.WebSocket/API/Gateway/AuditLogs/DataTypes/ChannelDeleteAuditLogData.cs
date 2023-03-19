@@ -11,7 +11,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to a channel deletion.
 /// </summary>
-public class ChannelDeleteAuditLogData : IAuditLogData
+public class ChannelDeleteAuditLogData : ISocketAuditLogData
 {
     private ChannelDeleteAuditLogData(Model model, EntryModel entry)
     {

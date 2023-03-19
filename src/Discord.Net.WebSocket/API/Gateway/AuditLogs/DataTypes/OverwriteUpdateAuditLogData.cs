@@ -7,7 +7,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to the update of a permission overwrite.
 /// </summary>
-public class OverwriteUpdateAuditLogData : IAuditLogData
+public class OverwriteUpdateAuditLogData : ISocketAuditLogData
 {
     private OverwriteUpdateAuditLogData(ulong channelId, OverwritePermissions before, OverwritePermissions after, ulong targetId, PermissionTarget targetType)
     {

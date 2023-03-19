@@ -8,7 +8,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to an invite removal.
 /// </summary>
-public class InviteDeleteAuditLogData : IAuditLogData
+public class InviteDeleteAuditLogData : ISocketAuditLogData
 {
     private InviteDeleteAuditLogData(InviteInfoAuditLogModel model, Cacheable<SocketUser, RestUser, IUser, ulong>? inviter)
     {

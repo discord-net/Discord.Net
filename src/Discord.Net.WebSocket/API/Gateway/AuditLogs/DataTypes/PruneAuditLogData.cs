@@ -5,7 +5,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to a guild prune.
 /// </summary>
-public class PruneAuditLogData : IAuditLogData
+public class PruneAuditLogData : ISocketAuditLogData
 {
     private PruneAuditLogData(int pruneDays, int membersRemoved)
     {

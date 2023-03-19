@@ -7,7 +7,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data relating to an invite update.
 /// </summary>
-public class InviteUpdateAuditLogData : IAuditLogData
+public class InviteUpdateAuditLogData : ISocketAuditLogData
 {
     private InviteUpdateAuditLogData(SocketInviteInfo before, SocketInviteInfo after)
     {

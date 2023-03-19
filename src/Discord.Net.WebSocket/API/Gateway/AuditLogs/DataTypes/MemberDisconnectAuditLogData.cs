@@ -5,7 +5,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to disconnecting members from voice channels.
 /// </summary>
-public class MemberDisconnectAuditLogData : IAuditLogData
+public class MemberDisconnectAuditLogData : ISocketAuditLogData
 {
     private MemberDisconnectAuditLogData(int count)
     {

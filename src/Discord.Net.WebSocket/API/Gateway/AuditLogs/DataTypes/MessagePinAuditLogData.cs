@@ -6,7 +6,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to a pinned message.
 /// </summary>
-public class MessagePinAuditLogData : IAuditLogData
+public class MessagePinAuditLogData : ISocketAuditLogData
 {
     private MessagePinAuditLogData(ulong messageId, ulong channelId, Cacheable<SocketUser, RestUser, IUser, ulong>? user)
     {

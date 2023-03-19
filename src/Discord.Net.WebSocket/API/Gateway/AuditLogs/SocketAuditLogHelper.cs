@@ -7,7 +7,7 @@ namespace Discord.WebSocket
 {
     internal static class SocketAuditLogHelper
     {
-        private static readonly Dictionary<ActionType, Func<DiscordSocketClient, EntryModel,  IAuditLogData>> CreateMapping
+        private static readonly Dictionary<ActionType, Func<DiscordSocketClient, EntryModel, ISocketAuditLogData>> CreateMapping
             = new ()
         {
             [ActionType.GuildUpdated] = GuildUpdateAuditLogData.Create,
@@ -60,7 +60,7 @@ namespace Discord.WebSocket
             // [ActionType.ThreadDelete] = ThreadDeleteAuditLogData.Create,
         };
 
-        public static IAuditLogData CreateData(DiscordSocketClient discord, EntryModel entry)
+        public static ISocketAuditLogData CreateData(DiscordSocketClient discord, EntryModel entry)
         {
             if (CreateMapping.TryGetValue(entry.Action, out var func))
                 return func(discord, entry);

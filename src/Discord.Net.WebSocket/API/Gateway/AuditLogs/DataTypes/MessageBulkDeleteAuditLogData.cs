@@ -5,7 +5,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to message deletion(s).
 /// </summary>
-public class MessageBulkDeleteAuditLogData : IAuditLogData
+public class MessageBulkDeleteAuditLogData : ISocketAuditLogData
 {
     private MessageBulkDeleteAuditLogData(ulong channelId, int count)
     {

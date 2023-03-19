@@ -8,7 +8,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to an invite creation.
 /// </summary>
-public class InviteCreateAuditLogData : IAuditLogData
+public class InviteCreateAuditLogData : ISocketAuditLogData
 {
     private InviteCreateAuditLogData(InviteInfoAuditLogModel model, Cacheable<SocketUser, RestUser, IUser, ulong>? inviter)
     {

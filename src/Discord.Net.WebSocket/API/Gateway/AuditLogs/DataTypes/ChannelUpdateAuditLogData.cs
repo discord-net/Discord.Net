@@ -8,7 +8,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Contains a piece of audit log data related to a channel update.
     /// </summary>
-    public class ChannelUpdateAuditLogData : IAuditLogData
+    public class ChannelUpdateAuditLogData : ISocketAuditLogData
     {
         private ChannelUpdateAuditLogData(ulong id, SocketChannelInfo before, SocketChannelInfo after)
         {

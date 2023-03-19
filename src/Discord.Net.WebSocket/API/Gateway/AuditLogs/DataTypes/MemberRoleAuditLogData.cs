@@ -8,7 +8,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to a change in a guild member's roles.
 /// </summary>
-public class MemberRoleAuditLogData : IAuditLogData
+public class MemberRoleAuditLogData : ISocketAuditLogData
 {
     private MemberRoleAuditLogData(IReadOnlyCollection<MemberRoleEditInfo> roles, Cacheable<SocketUser, RestUser, IUser, ulong> target)
     {

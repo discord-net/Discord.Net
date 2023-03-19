@@ -8,7 +8,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to a webhook creation.
 /// </summary>
-public class WebhookCreateAuditLogData : IAuditLogData
+public class WebhookCreateAuditLogData : ISocketAuditLogData
 {
     private WebhookCreateAuditLogData(ulong webhookId, Model model)
     {

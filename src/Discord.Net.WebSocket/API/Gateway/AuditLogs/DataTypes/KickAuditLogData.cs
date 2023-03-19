@@ -6,7 +6,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to a kick.
 /// </summary>
-public class KickAuditLogData : IAuditLogData
+public class KickAuditLogData : ISocketAuditLogData
 {
     private KickAuditLogData(Cacheable<SocketUser, RestUser, IUser, ulong> user)
     {

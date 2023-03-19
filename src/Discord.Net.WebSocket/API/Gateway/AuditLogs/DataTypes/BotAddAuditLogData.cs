@@ -7,7 +7,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to a adding a bot to a guild.
 /// </summary>
-public class BotAddAuditLogData : IAuditLogData
+public class BotAddAuditLogData : ISocketAuditLogData
 {
     private BotAddAuditLogData(Cacheable<SocketUser, RestUser, IUser, ulong> bot)
     {

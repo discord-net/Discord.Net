@@ -5,7 +5,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to moving members between voice channels.
 /// </summary>
-public class MemberMoveAuditLogData : IAuditLogData
+public class MemberMoveAuditLogData : ISocketAuditLogData
 {
     private MemberMoveAuditLogData(ulong channelId, int count)
     {

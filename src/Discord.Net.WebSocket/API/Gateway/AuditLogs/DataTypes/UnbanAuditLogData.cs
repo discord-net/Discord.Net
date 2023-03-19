@@ -7,7 +7,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to an unban.
 /// </summary>
-public class UnbanAuditLogData : IAuditLogData
+public class UnbanAuditLogData : ISocketAuditLogData
 {
     private UnbanAuditLogData(Cacheable<SocketUser, RestUser, IUser, ulong> user)
     {

@@ -34,8 +34,8 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public ActionType Action { get; }
 
-        /// <inheritdoc/>
-        public IAuditLogData Data { get; }
+        /// <inheritdoc cref="IAuditLogEntry.Data"/>
+        public ISocketAuditLogData Data { get; }
 
         /// <inheritdoc cref="IAuditLogEntry.User" />
         public SocketUser User { get; private set; }
@@ -47,6 +47,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         IUser IAuditLogEntry.User => User;
+
+        /// <inheritdoc/>
+        IAuditLogData IAuditLogEntry.Data => Data;
 
         #endregion
     }

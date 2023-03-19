@@ -9,7 +9,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to a role update.
 /// </summary>
-public class RoleUpdateAuditLogData : IAuditLogData
+public class RoleUpdateAuditLogData : ISocketAuditLogData
 {
     private RoleUpdateAuditLogData(ulong id, SocketRoleEditInfo oldProps, SocketRoleEditInfo newProps)
     {

@@ -7,7 +7,7 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data relating to a role deletion.
 /// </summary>
-public class RoleDeleteAuditLogData : IAuditLogData
+public class RoleDeleteAuditLogData : ISocketAuditLogData
 {
     private RoleDeleteAuditLogData(ulong id, SocketRoleEditInfo props)
     {
