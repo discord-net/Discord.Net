@@ -1,9 +1,8 @@
 using System.Linq;
 
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data for a permissions overwrite creation.
@@ -16,7 +15,7 @@ public class OverwriteCreateAuditLogData : IAuditLogData
         Overwrite = overwrite;
     }
 
-    internal static OverwriteCreateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
+    internal static OverwriteCreateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
@@ -42,6 +41,7 @@ public class OverwriteCreateAuditLogData : IAuditLogData
     ///     created from.
     /// </returns>
     public ulong ChannelId { get; }
+
     /// <summary>
     ///     Gets the permission overwrite object that was created.
     /// </summary>

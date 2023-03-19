@@ -1,8 +1,7 @@
 using System.Linq;
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to the deletion of a permission overwrite.
@@ -15,7 +14,7 @@ public class OverwriteDeleteAuditLogData : IAuditLogData
         Overwrite = deletedOverwrite;
     }
 
-    internal static OverwriteDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
+    internal static OverwriteDeleteAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
@@ -30,7 +29,7 @@ public class OverwriteDeleteAuditLogData : IAuditLogData
         var id = entry.Options.OverwriteTargetId.Value;
         var type = entry.Options.OverwriteType;
 
-        return new OverwriteDeleteAuditLogData(entry.TargetId.Value, new Overwrite(id, type, permissions));
+        return new OverwriteDeleteAuditLogData(entry.TargetId!.Value, new Overwrite(id, type, permissions));
     }
 
     /// <summary>
@@ -41,6 +40,7 @@ public class OverwriteDeleteAuditLogData : IAuditLogData
     ///     deleted from.
     /// </returns>
     public ulong ChannelId { get; }
+
     /// <summary>
     ///     Gets the permission overwrite object that was deleted.
     /// </summary>

@@ -15,10 +15,10 @@ namespace Discord.WebSocket
             [ActionType.ChannelCreated] = ChannelCreateAuditLogData.Create,
             [ActionType.ChannelUpdated] = ChannelUpdateAuditLogData.Create,
             [ActionType.ChannelDeleted] = ChannelDeleteAuditLogData.Create,
-            //
-            // [ActionType.OverwriteCreated] = OverwriteCreateAuditLogData.Create,
-            // [ActionType.OverwriteUpdated] = OverwriteUpdateAuditLogData.Create,
-            // [ActionType.OverwriteDeleted] = OverwriteDeleteAuditLogData.Create,
+            
+            [ActionType.OverwriteCreated] = OverwriteCreateAuditLogData.Create,
+            [ActionType.OverwriteUpdated] = OverwriteUpdateAuditLogData.Create,
+            [ActionType.OverwriteDeleted] = OverwriteDeleteAuditLogData.Create,
             
             [ActionType.Kick] = KickAuditLogData.Create,
             [ActionType.Prune] = PruneAuditLogData.Create,

@@ -1,9 +1,8 @@
 using System.Linq;
 
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to the update of a permission overwrite.
@@ -19,7 +18,7 @@ public class OverwriteUpdateAuditLogData : IAuditLogData
         OverwriteType = targetType;
     }
 
-    internal static OverwriteUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
+    internal static OverwriteUpdateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
@@ -47,6 +46,7 @@ public class OverwriteUpdateAuditLogData : IAuditLogData
     ///     updated from.
     /// </returns>
     public ulong ChannelId { get; }
+
     /// <summary>
     ///     Gets the overwrite permissions before the changes.
     /// </summary>
@@ -55,6 +55,7 @@ public class OverwriteUpdateAuditLogData : IAuditLogData
     ///     the changes were made.
     /// </returns>
     public OverwritePermissions OldPermissions { get; }
+
     /// <summary>
     ///     Gets the overwrite permissions after the changes.
     /// </summary>
@@ -63,6 +64,7 @@ public class OverwriteUpdateAuditLogData : IAuditLogData
     ///     changes.
     /// </returns>
     public OverwritePermissions NewPermissions { get; }
+
     /// <summary>
     ///     Gets the ID of the overwrite that was updated.
     /// </summary>
@@ -70,6 +72,7 @@ public class OverwriteUpdateAuditLogData : IAuditLogData
     ///     A <see cref="ulong"/> representing the snowflake identifier of the overwrite that was updated.
     /// </returns>
     public ulong OverwriteTargetId { get; }
+
     /// <summary>
     ///     Gets the target of the updated permission overwrite.
     /// </summary>
