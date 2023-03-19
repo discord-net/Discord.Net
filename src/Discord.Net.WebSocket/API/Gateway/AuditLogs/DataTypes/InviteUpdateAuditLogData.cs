@@ -1,23 +1,21 @@
 using Discord.API.AuditLogs;
-
-using System.Linq;
+using Discord.Rest;
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data relating to an invite update.
 /// </summary>
 public class InviteUpdateAuditLogData : IAuditLogData
 {
-    private InviteUpdateAuditLogData(InviteInfo before, InviteInfo after)
+    private InviteUpdateAuditLogData(SocketInviteInfo before, SocketInviteInfo after)
     {
         Before = before;
         After = after;
     }
 
-    internal static InviteUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static InviteUpdateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
@@ -32,7 +30,7 @@ public class InviteUpdateAuditLogData : IAuditLogData
     /// <returns>
     ///     An information object containing the original invite information before the changes were made.
     /// </returns>
-    public InviteInfo Before { get; }
+    public SocketInviteInfo Before { get; }
 
     /// <summary>
     ///     Gets the invite information after the changes.
@@ -40,5 +38,5 @@ public class InviteUpdateAuditLogData : IAuditLogData
     /// <returns>
     ///     An information object containing the invite information after the changes were made.
     /// </returns>
-    public InviteInfo After { get; }
+    public SocketInviteInfo After { get; }
 }

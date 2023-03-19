@@ -1,13 +1,13 @@
 using Model = Discord.API.AuditLogs.InviteInfoAuditLogModel;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Represents information for an invite.
 /// </summary>
-public struct InviteInfo
+public struct SocketInviteInfo
 {
-    internal InviteInfo(Model model)
+    internal SocketInviteInfo(Model model)
     {
         MaxAge = model.MaxAge;
         Code = model.Code;

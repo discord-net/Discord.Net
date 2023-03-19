@@ -1,17 +1,16 @@
 using Discord.API.AuditLogs;
-using System.Linq;
+using Discord.Rest;
 
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to an invite removal.
 /// </summary>
 public class InviteDeleteAuditLogData : IAuditLogData
 {
-    private InviteDeleteAuditLogData(InviteInfoAuditLogModel model, IUser inviter)
+    private InviteDeleteAuditLogData(InviteInfoAuditLogModel model, Cacheable<SocketUser, RestUser, IUser, ulong>? inviter)
     {
         MaxAge = model.MaxAge!.Value;
         Code = model.Code;
@@ -22,21 +21,29 @@ public class InviteDeleteAuditLogData : IAuditLogData
         MaxUses = model.MaxUses!.Value;
     }
 
-    internal static InviteDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static InviteDeleteAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
         var (data, _) = AuditLogHelper.CreateAuditLogEntityInfo<InviteInfoAuditLogModel>(changes, discord);
 
-        RestUser inviter = null;
+        Cacheable<SocketUser, RestUser, IUser, ulong>? cacheableUser = null;
 
         if (data.InviterId != null)
         {
-            var inviterInfo = log.Users.FirstOrDefault(x => x.Id == data.InviterId);
-            inviter = (inviterInfo != null) ? RestUser.Create(discord, inviterInfo) : null;
+            var cachedUser = discord.GetUser(data.InviterId.Value);
+            cacheableUser = new Cacheable<SocketUser, RestUser, IUser, ulong>(
+                cachedUser,
+                data.InviterId.Value,
+                cachedUser is not null,
+                async () =>
+                {
+                    var user = await discord.ApiClient.GetUserAsync(data.InviterId.Value);
+                    return user is not null ? RestUser.Create(discord, user) : null;
+                });
         }
 
-        return new InviteDeleteAuditLogData(data, inviter);
+        return new InviteDeleteAuditLogData(data, cacheableUser);
     }
 
     /// <summary>
@@ -73,7 +80,7 @@ public class InviteDeleteAuditLogData : IAuditLogData
     /// <returns>
     ///     A user that created this invite or <see langword="null"/>.
     /// </returns>
-    public IUser Creator { get; }
+    public Cacheable<SocketUser, RestUser, IUser, ulong>? Creator { get; }
 
     /// <summary>
     ///     Gets the ID of the channel this invite is linked to.

@@ -7,16 +7,6 @@ namespace Discord.Rest;
 /// </summary>
 public struct RoleEditInfo
 {
-    internal RoleEditInfo(Color? color, bool? mentionable, bool? hoist, string name,
-        GuildPermissions? permissions)
-    {
-        Color = color;
-        Mentionable = mentionable;
-        Hoist = hoist;
-        Name = name;
-        Permissions = permissions;
-    }
-
     internal RoleEditInfo(Model model)
     {
         if (model.Color is not null)

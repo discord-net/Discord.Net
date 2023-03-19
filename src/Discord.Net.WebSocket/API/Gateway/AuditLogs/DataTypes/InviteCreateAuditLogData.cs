@@ -1,42 +1,50 @@
 using Discord.API.AuditLogs;
-using System.Linq;
+using Discord.Rest;
 
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
-///     Contains a piece of audit log data related to an invite removal.
+///     Contains a piece of audit log data related to an invite creation.
 /// </summary>
-public class InviteDeleteAuditLogData : IAuditLogData
+public class InviteCreateAuditLogData : IAuditLogData
 {
-    private InviteDeleteAuditLogData(InviteInfoAuditLogModel model, IUser inviter)
+    private InviteCreateAuditLogData(InviteInfoAuditLogModel model, Cacheable<SocketUser, RestUser, IUser, ulong>? inviter)
     {
         MaxAge = model.MaxAge!.Value;
         Code = model.Code;
         Temporary = model.Temporary!.Value;
-        Creator = inviter;
         ChannelId = model.ChannelId!.Value;
         Uses = model.Uses!.Value;
         MaxUses = model.MaxUses!.Value;
+
+        Creator = inviter;
     }
 
-    internal static InviteDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static InviteCreateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
-        var (data, _) = AuditLogHelper.CreateAuditLogEntityInfo<InviteInfoAuditLogModel>(changes, discord);
+        var (_, data) = AuditLogHelper.CreateAuditLogEntityInfo<InviteInfoAuditLogModel>(changes, discord);
 
-        RestUser inviter = null;
+        Cacheable<SocketUser, RestUser, IUser, ulong>? cacheableUser = null;
 
-        if (data.InviterId != null)
+        if (data.InviterId is not null)
         {
-            var inviterInfo = log.Users.FirstOrDefault(x => x.Id == data.InviterId);
-            inviter = (inviterInfo != null) ? RestUser.Create(discord, inviterInfo) : null;
+            var cachedUser = discord.GetUser(data.InviterId.Value);
+            cacheableUser = new Cacheable<SocketUser, RestUser, IUser, ulong>(
+                cachedUser,
+                data.InviterId.Value,
+                cachedUser is not null,
+                async () =>
+                {
+                    var user = await discord.ApiClient.GetUserAsync(data.InviterId.Value);
+                    return user is not null ? RestUser.Create(discord, user) : null;
+                });
         }
 
-        return new InviteDeleteAuditLogData(data, inviter);
+        return new InviteCreateAuditLogData(data, cacheableUser);
     }
 
     /// <summary>
@@ -56,7 +64,7 @@ public class InviteDeleteAuditLogData : IAuditLogData
     public string Code { get; }
 
     /// <summary>
-    ///     Gets a value that indicates whether the invite is a temporary one.
+    ///     Gets a value that determines whether the invite is a temporary one.
     /// </summary>
     /// <returns>
     ///     <c>true</c> if users accepting this invite will be removed from the guild when they log off; otherwise
@@ -73,7 +81,7 @@ public class InviteDeleteAuditLogData : IAuditLogData
     /// <returns>
     ///     A user that created this invite or <see langword="null"/>.
     /// </returns>
-    public IUser Creator { get; }
+    public Cacheable<SocketUser, RestUser, IUser, ulong>? Creator { get; }
 
     /// <summary>
     ///     Gets the ID of the channel this invite is linked to.
@@ -87,7 +95,7 @@ public class InviteDeleteAuditLogData : IAuditLogData
     ///     Gets the number of times this invite has been used.
     /// </summary>
     /// <returns>
-    ///     An <see cref="int"/> representing the number of times this invite has been used.
+    ///     An <see cref="int"/> representing the number of times this invite was used.
     /// </returns>
     public int Uses { get; }
 

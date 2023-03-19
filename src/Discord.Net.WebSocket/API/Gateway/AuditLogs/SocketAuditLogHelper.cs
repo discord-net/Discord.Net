@@ -33,11 +33,11 @@ namespace Discord.WebSocket
             [ActionType.RoleCreated] = RoleCreateAuditLogData.Create,
             [ActionType.RoleUpdated] = RoleUpdateAuditLogData.Create,
             [ActionType.RoleDeleted] = RoleDeleteAuditLogData.Create,
-            //
-            // [ActionType.InviteCreated] = InviteCreateAuditLogData.Create,
-            // [ActionType.InviteUpdated] = InviteUpdateAuditLogData.Create,
-            // [ActionType.InviteDeleted] = InviteDeleteAuditLogData.Create,
-            //
+            
+            [ActionType.InviteCreated] = InviteCreateAuditLogData.Create,
+            [ActionType.InviteUpdated] = InviteUpdateAuditLogData.Create,
+            [ActionType.InviteDeleted] = InviteDeleteAuditLogData.Create,
+            
             // [ActionType.WebhookCreated] = WebhookCreateAuditLogData.Create,
             // [ActionType.WebhookUpdated] = WebhookUpdateAuditLogData.Create,
             // [ActionType.WebhookDeleted] = WebhookDeleteAuditLogData.Create,
