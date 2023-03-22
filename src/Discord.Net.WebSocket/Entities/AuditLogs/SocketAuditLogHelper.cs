@@ -55,9 +55,9 @@ internal static class SocketAuditLogHelper
             [ActionType.EventUpdate] = ScheduledEventUpdateAuditLogData.Create,
             [ActionType.EventDelete] = ScheduledEventDeleteAuditLogData.Create,
             
-            // [ActionType.ThreadCreate] = ThreadCreateAuditLogData.Create,
-            // [ActionType.ThreadUpdate] = ThreadUpdateAuditLogData.Create,
-            // [ActionType.ThreadDelete] = ThreadDeleteAuditLogData.Create,
+            [ActionType.ThreadCreate] = ThreadCreateAuditLogData.Create,
+            [ActionType.ThreadUpdate] = ThreadUpdateAuditLogData.Create,
+            [ActionType.ThreadDelete] = ThreadDeleteAuditLogData.Create,
         };
 
     public static ISocketAuditLogData CreateData(DiscordSocketClient discord, EntryModel entry)

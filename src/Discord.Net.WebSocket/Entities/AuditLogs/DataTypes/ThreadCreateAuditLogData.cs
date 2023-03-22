@@ -1,20 +1,17 @@
 using Discord.API.AuditLogs;
-
+using Discord.Rest;
 using System.Collections.Generic;
-using System.Linq;
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to a thread creation.
 /// </summary>
-public class ThreadCreateAuditLogData : IAuditLogData
+public class ThreadCreateAuditLogData : ISocketAuditLogData
 {
-    private ThreadCreateAuditLogData(IThreadChannel thread, ulong id, ThreadInfoAuditLogModel model)
+    private ThreadCreateAuditLogData(ulong id, ThreadInfoAuditLogModel model)
     {
-        Thread = thread;
         ThreadId = id;
 
         ThreadName = model.Name;
@@ -27,26 +24,15 @@ public class ThreadCreateAuditLogData : IAuditLogData
         ThreadType = model.Type;
     }
 
-    internal static ThreadCreateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static ThreadCreateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
         var (_, data) = AuditLogHelper.CreateAuditLogEntityInfo<ThreadInfoAuditLogModel>(changes, discord);
 
-        var threadInfo = log.Threads.FirstOrDefault(x => x.Id == entry.TargetId!.Value);
-        var threadChannel = threadInfo == null ? null : RestThreadChannel.Create(discord, (IGuild)null, threadInfo);
-
-        return new ThreadCreateAuditLogData(threadChannel, entry.TargetId!.Value, data);
+        return new ThreadCreateAuditLogData(entry.TargetId!.Value, data);
     }
         
-    /// <summary>
-    ///     Gets the thread that was created if it still exists.
-    /// </summary>
-    /// <returns>
-    ///     A thread object representing the thread that was created if it still exists, otherwise returns <c>null</c>.
-    /// </returns>
-    public IThreadChannel Thread { get; }
-
     /// <summary>
     ///     Gets the snowflake ID of the thread.
     /// </summary>

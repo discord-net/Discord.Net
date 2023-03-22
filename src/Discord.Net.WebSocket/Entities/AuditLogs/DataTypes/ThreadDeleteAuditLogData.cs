@@ -1,14 +1,14 @@
 using Discord.API.AuditLogs;
+using Discord.Rest;
 using System.Collections.Generic;
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to a thread deletion.
 /// </summary>
-public class ThreadDeleteAuditLogData : IAuditLogData
+public class ThreadDeleteAuditLogData : ISocketAuditLogData
 {
     private ThreadDeleteAuditLogData(ulong id, ThreadInfoAuditLogModel model)
     {
@@ -24,7 +24,7 @@ public class ThreadDeleteAuditLogData : IAuditLogData
         ThreadType = model.Type;
     }
 
-    internal static ThreadDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static ThreadDeleteAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
