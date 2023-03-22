@@ -1,23 +1,22 @@
 using Discord.API.AuditLogs;
-
+using Discord.Rest;
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to a scheduled event updates.
 /// </summary>
-public class ScheduledEventUpdateAuditLogData : IAuditLogData
+public class ScheduledEventUpdateAuditLogData : ISocketAuditLogData
 {
-    private ScheduledEventUpdateAuditLogData(ulong id, ScheduledEventInfo before, ScheduledEventInfo after)
+    private ScheduledEventUpdateAuditLogData(ulong id, SocketScheduledEventInfo before, SocketScheduledEventInfo after)
     {
         Id = id;
         Before = before;
         After = after;
     }
 
-    internal static ScheduledEventUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static ScheduledEventUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
@@ -36,10 +35,10 @@ public class ScheduledEventUpdateAuditLogData : IAuditLogData
     /// <summary>
     ///     Gets the state before the change.
     /// </summary>
-    public ScheduledEventInfo Before { get; }
+    public SocketScheduledEventInfo Before { get; }
 
     /// <summary>
     ///     Gets the state after the change.
     /// </summary>
-    public ScheduledEventInfo After { get; }
+    public SocketScheduledEventInfo After { get; }
 }

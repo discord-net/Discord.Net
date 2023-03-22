@@ -1,14 +1,14 @@
 using Discord.API.AuditLogs;
+using Discord.Rest;
 using System;
 using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
 ///     Contains a piece of audit log data related to a scheduled event deletion.
 /// </summary>
-public class ScheduledEventDeleteAuditLogData : IAuditLogData
+public class ScheduledEventDeleteAuditLogData : ISocketAuditLogData
 {
     private ScheduledEventDeleteAuditLogData(ulong id, ScheduledEventInfoAuditLogModel model)
     {
@@ -26,7 +26,7 @@ public class ScheduledEventDeleteAuditLogData : IAuditLogData
         Image = model.Image;
     }
 
-    internal static ScheduledEventDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
+    internal static ScheduledEventDeleteAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 

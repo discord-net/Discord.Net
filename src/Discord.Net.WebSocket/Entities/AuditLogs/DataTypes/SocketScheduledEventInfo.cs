@@ -1,45 +1,13 @@
 using Discord.API.AuditLogs;
 using System;
-using EntryModel = Discord.API.AuditLogEntry;
-using Model = Discord.API.AuditLog;
 
-namespace Discord.Rest;
+namespace Discord.WebSocket;
 
 /// <summary>
-///     Contains a piece of audit log data related to a scheduled event deletion.
+///     Represents information for a scheduled event.
 /// </summary>
-public class ScheduledEventDeleteAuditLogData : IAuditLogData
+public class SocketScheduledEventInfo
 {
-    private ScheduledEventDeleteAuditLogData(ulong id, ScheduledEventInfoAuditLogModel model)
-    {
-        Id = id;
-        ChannelId = model.ChannelId;
-        Name = model.Name;
-        Description = model.Description;
-        ScheduledStartTime = model.StartTime;
-        ScheduledEndTime = model.EndTime;
-        PrivacyLevel = model.PrivacyLevel;
-        Status = model.EventStatus;
-        EntityType = model.EventType;
-        EntityId = model.EntityId;
-        Location = model.Location;
-        Image = model.Image;
-    }
-
-    internal static ScheduledEventDeleteAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
-    {
-        var changes = entry.Changes;
-
-        var (data, _) = AuditLogHelper.CreateAuditLogEntityInfo<ScheduledEventInfoAuditLogModel>(changes, discord);
-
-        return new ScheduledEventDeleteAuditLogData(entry.TargetId!.Value, data);
-    }
-    
-    /// <summary>
-    ///     Gets the snowflake id of the event.
-    /// </summary>
-    public ulong Id { get; }
-
     /// <summary>
     ///     Gets the snowflake id of the channel the event is associated with.
     /// </summary>
@@ -94,4 +62,19 @@ public class ScheduledEventDeleteAuditLogData : IAuditLogData
     ///     Gets the image hash of the image that was attached to the event. Null if not set.
     /// </summary>
     public string Image { get; }
+
+    internal SocketScheduledEventInfo(ScheduledEventInfoAuditLogModel model)
+    {
+        ChannelId = model.ChannelId;
+        Name = model.Name;
+        Description = model.Description;
+        ScheduledStartTime = model.StartTime;
+        ScheduledEndTime = model.EndTime;
+        PrivacyLevel = model.PrivacyLevel;
+        Status = model.EventStatus;
+        EntityType = model.EventType;
+        EntityId = model.EntityId;
+        Location = model.Location;
+        Image = model.Image;
+    }
 }
