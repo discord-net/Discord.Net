@@ -83,6 +83,8 @@ namespace Discord.WebSocket
         internal bool AlwaysResolveStickers { get; private set; }
         internal bool LogGatewayIntentWarnings { get; private set; }
         internal bool SuppressUnknownDispatchWarnings { get; private set; }
+        internal int AuditLogCacheSize { get; private set; }
+
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -200,6 +202,7 @@ namespace Discord.WebSocket
             };
 
             _largeGuilds = new ConcurrentQueue<ulong>();
+            AuditLogCacheSize = config.AuditLogCacheSize;
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayHost,
@@ -2895,6 +2898,7 @@ namespace Discord.WebSocket
 
                                 var guild = State.GetGuild(data.GuildId);
                                 var auditLog = SocketAuditLogEntry.Create(this, data);
+                                guild.AddAuditLog(auditLog);
 
                                 Console.ForegroundColor = ConsoleColor.Cyan;
                                 Console.WriteLine(JsonConvert.SerializeObject(auditLog.Data as ChannelCreateAuditLogData, Formatting.Indented));

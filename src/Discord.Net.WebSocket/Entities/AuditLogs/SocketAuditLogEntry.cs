@@ -8,7 +8,7 @@ using EntryModel = Discord.API.Gateway.AuditLogCreatedEvent;
 namespace Discord.WebSocket;
 
 /// <summary>
-///     Represents a REST-based audit log entry.
+///     Represents a Socket-based audit log entry.
 /// </summary>
 public class SocketAuditLogEntry : SocketEntity<ulong>, IAuditLogEntry
 {
