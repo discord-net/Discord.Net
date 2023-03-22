@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 using EntryModel = Discord.API.AuditLogEntry;
 
-namespace Discord.WebSocket
+namespace Discord.WebSocket;
+
+internal static class SocketAuditLogHelper
 {
-    internal static class SocketAuditLogHelper
-    {
-        private static readonly Dictionary<ActionType, Func<DiscordSocketClient, EntryModel, ISocketAuditLogData>> CreateMapping
-            = new ()
+    private static readonly Dictionary<ActionType, Func<DiscordSocketClient, EntryModel, ISocketAuditLogData>> CreateMapping
+        = new ()
         {
             [ActionType.GuildUpdated] = GuildUpdateAuditLogData.Create,
 
@@ -60,12 +60,11 @@ namespace Discord.WebSocket
             // [ActionType.ThreadDelete] = ThreadDeleteAuditLogData.Create,
         };
 
-        public static ISocketAuditLogData CreateData(DiscordSocketClient discord, EntryModel entry)
-        {
-            if (CreateMapping.TryGetValue(entry.Action, out var func))
-                return func(discord, entry);
+    public static ISocketAuditLogData CreateData(DiscordSocketClient discord, EntryModel entry)
+    {
+        if (CreateMapping.TryGetValue(entry.Action, out var func))
+            return func(discord, entry);
 
-            return null;
-        }
+        return null;
     }
 }
