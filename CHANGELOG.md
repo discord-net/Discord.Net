@@ -1,5 +1,64 @@
 # Changelog
 
+## [3.10.0] - 2023-03-27
+
+### Added
+- #2507 Added selects v2 support (48fb1b5)
+- #2509 Added `SendFileAsync` to `UserExtensions` (25cfb88)
+- #2510 Added missing invite guild properties & welcome screen support (7c535b9)
+- #2520 Added `ClientDisconnect` event for audio client. (4cad546)
+- #2521 Added `OwnerId` to `IThreadChannel` and `RestThreadChannel`
+- #2521 Added `ActiveDeveloper` to `UserProperies`
+- #2523 Added emojis from Emoji 13.0, Emoji 13.1 and Emoji 14.0 (23b2822)
+- #2528 Added wildcard length quantifiers and `TreatAsRegex` property
+- #2530 Added application Role Connections Metadata support (37d868f)
+- #2531 Added age restricted (NSFW) application commands support (56b1a93)
+- #2537 Added `RemoveModulesFromGuildAsync` (7acbcfd)
+- #2560 Added app Command channel target permission (2616d35)
+- #2562 Added new message types & error codes (a3ee855)
+- #2564 Added `RespondWithModal()` which accepts an `IModal` instance as template (e7bda0f)
+- #2571 Added guild member flags (7d8d6ec)
+- #2573 Added missing VoiceChannel properties (1e21a6e)
+- #2574 Added `GetCurrentUser` method to `DiscordRestClient` (e3da96f)
+- #2574 Added `GetCurrentUserGuildMemberAsync` method to `DiscordRestClient` and `RestGuild` (e3da96f)
+- #2574 Added `GuildFeatures` property to `IUserGuild` (e3da96f)
+- #2575 Added `Thread` property to `RestMessage` (91e2084)
+- #2578 Added AutoMod support (673b02d)
+- #2579 Added `Thread` property to `IUserMessage` (0998285)
+- #2580 Added thread user member & thread members pagination (b085621)
+- #2582 Added `IIntegrationChannel` (75f3c91)
+- #2582 Added support for creating webhooks in forums (75f3c91)
+- #2590 Added `FollowAnnouncementChannelAsync` to `INewsChannel` (bb056df)
+- #2591 Added support for silent mentions (2ea8af1)
+- #2599 Added `AddModalCommand` to `ModalBuilder` with option to specify callback (50e0e59)
+- #2605 Added `GuildFeatures` to `GuildProperties` (177df2c)
+- #2603 Added support for creating forum posts with `DiscordWebhookClient` (e69e27a)
+- #2610 Added Text-In-Stage support & missing `IVoiceChannel` properties (76bb901)
+- #2613 Added AutoMod custom block message (709364a)
+- #2615 Added missing invite properties (abfa8d1)
+
+### Fixed
+- #2483 Fixed an NRE when event was changed from in channel to external or vice versa (493f604)
+- #2526 Fixed `GetActiveThreadsAsync` & add it to `ITextChannel` (bd2f719)
+- #2528 Fixed catastrophic backtracking (3b107c2)
+- #2532 Fixed permissions on deleteMissing=false (274be5d)
+- #2540 Fixed `reason` not being included in audit logs when calling `AddBanAsync` and `BanAsync` (e71faf7)
+- #2541 Fixed `CreatePost` methods for `IForumChannel` (a53f1df)
+- #2549 Fixed `NullReferenceException` caused by Options being undefined. (02d3ce6)
+- #2557 Fixed `customId` template generator to escape regex metachars used in â€¦ (1602437)
+- #2577 Fixed `GetEventCoverImageUrl` (0af835a)
+- #2600 Fixed gateway deadlock (0c27395)
+- #2606 Fixed AutoMod action executed event message being null (7b321af)
+
+### Misc
+- #2542 Resolve inconsistencies with components (f224eb0)
+- #2546 Argument handling with thread tags(c67642a)
+- #2551 Format the project with 'dotnet format' (257f246)
+- #2561 Remove outdated checks (94996e7)
+- #2572 Reduce `DateTime` Boilerplate from `LogMessage` (14b2901)
+- #2614 Optimize `Add/RemoveRolesAsync` methods (11481a1)
+- #2617 Update IP discovery to send 74 bytes (66e6329)
+
 ## [3.9.0] - 2022-12-23
 ### Added
 
