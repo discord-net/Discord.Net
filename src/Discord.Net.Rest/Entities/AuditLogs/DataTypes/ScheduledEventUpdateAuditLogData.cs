@@ -1,5 +1,5 @@
 using Discord.API.AuditLogs;
-
+using System.Linq;
 using EntryModel = Discord.API.AuditLogEntry;
 using Model = Discord.API.AuditLog;
 
@@ -10,11 +10,13 @@ namespace Discord.Rest;
 /// </summary>
 public class ScheduledEventUpdateAuditLogData : IAuditLogData
 {
-    private ScheduledEventUpdateAuditLogData(ulong id, ScheduledEventInfo before, ScheduledEventInfo after)
+    private ScheduledEventUpdateAuditLogData(ulong id, ScheduledEventInfo before, ScheduledEventInfo after, IGuildScheduledEvent scheduledEvent)
     {
         Id = id;
         Before = before;
         After = after;
+        ScheduledEvent = scheduledEvent;
+
     }
 
     internal static ScheduledEventUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
@@ -23,8 +25,15 @@ public class ScheduledEventUpdateAuditLogData : IAuditLogData
 
         var (before, after) = AuditLogHelper.CreateAuditLogEntityInfo<ScheduledEventInfoAuditLogModel>(changes, discord);
 
-        return new ScheduledEventUpdateAuditLogData(entry.TargetId!.Value, new(before), new(after));
+        var scheduledEvent = log.GuildScheduledEvents.FirstOrDefault(x => x.Id == entry.TargetId);
+
+        return new ScheduledEventUpdateAuditLogData(entry.TargetId!.Value, new(before), new(after), RestGuildEvent.Create(discord, null, scheduledEvent));
     }
+
+    /// <summary>
+    ///     Gets the scheduled event this log corresponds to.
+    /// </summary>
+    public IGuildScheduledEvent ScheduledEvent { get; }
 
     // Doc Note: Corresponds to the *current* data
 

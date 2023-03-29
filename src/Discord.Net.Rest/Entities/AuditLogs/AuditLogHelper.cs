@@ -62,6 +62,26 @@ internal static class AuditLogHelper
             [ActionType.ThreadDelete] = ThreadDeleteAuditLogData.Create,
 
             [ActionType.ApplicationCommandPermissionUpdate] = CommandPermissionUpdateAuditLogData.Create,
+
+            //[ActionType.IntegrationCreated] = ,
+            //[ActionType.IntegrationUpdated] = ,
+            //[ActionType.IntegrationDeleted] = ,
+
+            //[ActionType.StageInstanceCreated] = ,
+            //[ActionType.StageInstanceUpdated] = ,
+            //[ActionType.StageInstanceDeleted] = ,
+
+            //[ActionType.StageInstanceCreated] = ,
+            //[ActionType.StageInstanceUpdated] = ,
+            //[ActionType.StageInstanceDeleted] = ,
+
+            //[ActionType.AutoModerationRuleCreate] = ,
+            //[ActionType.AutoModerationRuleUpdate] = ,
+            //[ActionType.AutoModerationRuleDelete] = ,
+
+            //[ActionType.AutoModerationBlockMessage] = ,
+            //[ActionType.AutoModerationFlagToChannel] = ,
+            //[ActionType.AutoModerationUserCommunicationDisabled] = ,
         };
 
     public static IAuditLogData CreateData(BaseDiscordClient discord, EntryModel entry, Model log = null)
