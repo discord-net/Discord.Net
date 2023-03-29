@@ -5,7 +5,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.WebSocket;
 
 /// <summary>
-///     Contains a piece of audit log data related to an integration authorization.
+///     Contains a piece of audit log data related to an integration removal.
 /// </summary>
 public class IntegrationDeletedAuditLogData : ISocketAuditLogData
 {

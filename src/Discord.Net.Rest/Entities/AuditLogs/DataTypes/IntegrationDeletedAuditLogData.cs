@@ -6,7 +6,7 @@ using Model = Discord.API.AuditLog;
 namespace Discord.Rest;
 
 /// <summary>
-///     Contains a piece of audit log data related to an integration authorization.
+///     Contains a piece of audit log data related to an integration removal.
 /// </summary>
 public class IntegrationDeletedAuditLogData : IAuditLogData
 {
