@@ -60,6 +60,8 @@ internal static class AuditLogHelper
             [ActionType.ThreadCreate] = ThreadCreateAuditLogData.Create,
             [ActionType.ThreadUpdate] = ThreadUpdateAuditLogData.Create,
             [ActionType.ThreadDelete] = ThreadDeleteAuditLogData.Create,
+
+            [ActionType.ApplicationCommandPermissionUpdate] = CommandPermissionUpdateAuditLogData.Create,
         };
 
     public static IAuditLogData CreateData(BaseDiscordClient discord, EntryModel entry, Model log = null)
