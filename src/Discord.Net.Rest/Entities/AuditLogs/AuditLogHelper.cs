@@ -63,9 +63,9 @@ internal static class AuditLogHelper
 
             [ActionType.ApplicationCommandPermissionUpdate] = CommandPermissionUpdateAuditLogData.Create,
 
-            //[ActionType.IntegrationCreated] = ,
-            //[ActionType.IntegrationUpdated] = ,
-            //[ActionType.IntegrationDeleted] = ,
+            [ActionType.IntegrationCreated] = IntegrationCreatedAuditLogData.Create,
+            [ActionType.IntegrationUpdated] = IntegrationUpdatedAuditLogData.Create,
+            [ActionType.IntegrationDeleted] = IntegrationDeletedAuditLogData.Create,
 
             //[ActionType.StageInstanceCreated] = ,
             //[ActionType.StageInstanceUpdated] = ,
