@@ -67,9 +67,9 @@ internal static class AuditLogHelper
             [ActionType.IntegrationUpdated] = IntegrationUpdatedAuditLogData.Create,
             [ActionType.IntegrationDeleted] = IntegrationDeletedAuditLogData.Create,
 
-            //[ActionType.StageInstanceCreated] = ,
-            //[ActionType.StageInstanceUpdated] = ,
-            //[ActionType.StageInstanceDeleted] = ,
+            [ActionType.StageInstanceCreated] = StageInstanceCreateAuditLogData.Create,
+            [ActionType.StageInstanceUpdated] = StageInstanceUpdatedAuditLogData.Create,
+            [ActionType.StageInstanceDeleted] = StageInstanceDeleteAuditLogData.Create,
 
             [ActionType.StickerCreated] = StickerCreatedAuditLogData.Create,
             [ActionType.StickerUpdated] = StickerUpdatedAuditLogData.Create,
