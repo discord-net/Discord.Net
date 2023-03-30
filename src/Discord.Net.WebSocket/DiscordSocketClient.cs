@@ -2900,10 +2900,6 @@ namespace Discord.WebSocket
                                 var auditLog = SocketAuditLogEntry.Create(this, data);
                                 guild.AddAuditLog(auditLog);
 
-                                Console.ForegroundColor = ConsoleColor.Cyan;
-                                Console.WriteLine(JsonConvert.SerializeObject(auditLog.Data as ChannelCreateAuditLogData, Formatting.Indented));
-                                Console.ResetColor();
-
                                 await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
                             }
                             break;

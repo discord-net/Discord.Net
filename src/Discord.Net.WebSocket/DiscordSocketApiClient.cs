@@ -1,4 +1,3 @@
-#define DEBUG_PACKETS
 using Discord.API.Gateway;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
