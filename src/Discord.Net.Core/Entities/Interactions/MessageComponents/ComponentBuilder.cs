@@ -305,6 +305,11 @@ namespace Discord
             if (_actionRows?.SelectMany(x => x.Components)?.Any(x => x.Type == ComponentType.TextInput) ?? false)
                 throw new ArgumentException("TextInputComponents are not allowed in messages.", nameof(ActionRows));
 
+            if (_actionRows?.Count > 0)
+                for (int i = 0; i < _actionRows.Count; i++)
+                    if (_actionRows[i].Components.Count == 0)
+                        _actionRows.RemoveAt(i);
+
             return _actionRows != null
                 ? new MessageComponent(_actionRows.Select(x => x.Build()).ToList())
                 : MessageComponent.Empty;
