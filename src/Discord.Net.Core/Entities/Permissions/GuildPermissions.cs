@@ -104,7 +104,7 @@ namespace Discord
         public bool StartEmbeddedActivities => Permissions.GetValue(RawValue, GuildPermission.StartEmbeddedActivities);
         /// <summary> If <c>true</c>, a user can timeout other users in this guild.</summary>
         public bool ModerateMembers => Permissions.GetValue(RawValue, GuildPermission.ModerateMembers);
-        /// <summary> If <c>true</c>, a user can timeout other users in this guild.</summary>
+        /// <summary> If <see langword="true"/>, a user can use soundboard in this guild.</summary>
         public bool UseSoundboard => Permissions.GetValue(RawValue, GuildPermission.UseSoundboard);
         /// <summary> If <c>true</c>, a user can timeout other users in this guild.</summary>
         public bool ViewMonetizationAnalytics => Permissions.GetValue(RawValue, GuildPermission.ViewMonetizationAnalytics);
