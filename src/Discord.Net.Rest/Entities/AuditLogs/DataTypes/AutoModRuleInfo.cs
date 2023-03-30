@@ -35,7 +35,8 @@ public class AutoModRuleInfo
         Enabled = model.Enabled;
         ExemptRoles = model.ExemptRoles?.ToImmutableArray();
         ExemptChannels = model.ExemptChannels?.ToImmutableArray();
-
+        TriggerType = model.TriggerType;
+        EventType = model.EventType;
     }
 
     /// <inheritdoc cref="IAutoModRule.Name"/>
