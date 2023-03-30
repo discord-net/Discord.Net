@@ -96,12 +96,19 @@ namespace Discord
         ///     Removes a component from the <see cref="ComponentBuilder"/>.
         /// </summary>
         /// <param name="customId">The custom id of the component.</param>
-        /// <returns></returns>
+        /// <returns>The current builder.</returns>
         public ComponentBuilder RemoveComponent(string customId)
         {
-            this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c.CustomId == customId));
+            this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c.CustomId == customId || (c is ButtonComponent b && b.Url == customId)));
             return this;
         }
+
+        /// <summary>
+        ///     Removes a Link Button from the <see cref="ComponentBuilder"/> based on its URL.
+        /// </summary>
+        /// <param name="url">The URL of the Link Button.</param>
+        /// <returns>The current builder.</returns>
+        public ComponentBuilder RemoveButtonByURL(string url) => RemoveComponent(url);
 
         /// <summary>
         ///     Adds a <see cref="SelectMenuBuilder"/> to the <see cref="ComponentBuilder"/> at the specific row.
