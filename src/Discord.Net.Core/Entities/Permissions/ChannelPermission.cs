@@ -100,7 +100,7 @@ namespace Discord
         /// <summary>
         ///     Allows for using voice-activity-detection in a voice channel.
         /// </summary>
-        UseVAD = 25,
+        UseVAD = 1L << 25,
 
         /// <summary>
         ///     Allows for using priority speaker in a voice channel.

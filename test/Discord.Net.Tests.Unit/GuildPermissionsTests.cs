@@ -100,6 +100,8 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(createPrivateThreads: true), GuildPermission.CreatePrivateThreads);
             AssertFlag(() => new GuildPermissions(useExternalStickers: true), GuildPermission.UseExternalStickers);
             AssertFlag(() => new GuildPermissions(moderateMembers: true), GuildPermission.ModerateMembers);
+            AssertFlag(() => new GuildPermissions(viewMonetizationAnalytics: true), GuildPermission.ViewMonetizationAnalytics);
+            AssertFlag(() => new GuildPermissions(useSoundboard: true), GuildPermission.UseSoundboard);
         }
 
         /// <summary>

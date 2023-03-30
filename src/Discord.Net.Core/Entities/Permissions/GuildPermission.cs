@@ -60,7 +60,7 @@ namespace Discord
         /// <summary>
         ///     Allows for viewing of guild insights
         /// </summary>
-        ViewGuildInsights = 0x00_08_00_00,
+        ViewGuildInsights = 1L << 19,
 
         // Text
         /// <summary>
@@ -109,13 +109,13 @@ namespace Discord
         /// <summary>
         ///     Allows for reading of message history.
         /// </summary>
-        ReadMessageHistory = 0x00_01_00_00,
+        ReadMessageHistory = 1 << 16,
 
         /// <summary>
         ///     Allows for using the @everyone tag to notify all users in a channel, and the @here tag to notify all
         ///     online users in a channel.
         /// </summary>
-        MentionEveryone = 0x00_02_00_00,
+        MentionEveryone = 1L << 17,
 
         /// <summary>
         ///     Allows the usage of custom emojis from other servers.
