@@ -38,12 +38,6 @@ public class AutoModRuleInfo
 
     }
 
-    /// <inheritdoc cref="IAutoModRule.Id"/>
-    /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
-    /// </remarks>
-    public ulong Id { get; set; }
-
     /// <inheritdoc cref="IAutoModRule.Name"/>
     /// <remarks>
     ///     <see langword="null"/> if this property is not mentioned in this entry.

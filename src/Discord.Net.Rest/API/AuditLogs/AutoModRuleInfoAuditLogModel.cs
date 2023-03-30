@@ -4,9 +4,6 @@ namespace Discord.API.AuditLogs;
 
 internal class AutoModRuleInfoAuditLogModel : IAuditLogInfoModel
 {
-    [JsonField("id")]
-    public ulong Id { get; set; }
-
     [JsonField("name")]
     public string Name { get; set; }
     
