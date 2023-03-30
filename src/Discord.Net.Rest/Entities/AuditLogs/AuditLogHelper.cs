@@ -79,9 +79,9 @@ internal static class AuditLogHelper
             [ActionType.AutoModerationRuleUpdate] = AutoModRuleUpdatedAuditLogData.Create,
             [ActionType.AutoModerationRuleDelete] = AutoModRuleDeletedAuditLogData.Create,
 
-            //[ActionType.AutoModerationBlockMessage] = ,
-            //[ActionType.AutoModerationFlagToChannel] = ,
-            //[ActionType.AutoModerationUserCommunicationDisabled] = ,
+            [ActionType.AutoModerationBlockMessage] = AutoModBlockedMessageAuditLogData.Create,
+            [ActionType.AutoModerationFlagToChannel] = AutoModFlaggedMessageAuditLogData.Create,
+            [ActionType.AutoModerationUserCommunicationDisabled] = AutoModTimeoutUserAuditLogData.Create,
         };
 
     public static IAuditLogData CreateData(BaseDiscordClient discord, EntryModel entry, Model log = null)
