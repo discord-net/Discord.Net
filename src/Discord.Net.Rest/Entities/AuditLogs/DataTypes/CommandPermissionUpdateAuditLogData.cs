@@ -14,11 +14,12 @@ namespace Discord.Rest;
 public class CommandPermissionUpdateAuditLogData : IAuditLogData
 {
     internal CommandPermissionUpdateAuditLogData(IReadOnlyCollection<ApplicationCommandPermission> before, IReadOnlyCollection<ApplicationCommandPermission> after,
-        IApplicationCommand command)
+        IApplicationCommand command, ulong appId)
     {
         Before = before;
         After = after;
         ApplicationCommand = command;
+        ApplicationId = appId;
     }
 
     internal static CommandPermissionUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
@@ -43,8 +44,13 @@ public class CommandPermissionUpdateAuditLogData : IAuditLogData
         var command = log.Commands.FirstOrDefault(x => x.Id == entry.TargetId);
         var appCommand = RestApplicationCommand.Create(discord, command, command?.GuildId.IsSpecified ?? false ? command.GuildId.Value : null);
 
-        return new(before.ToImmutableArray(), after.ToImmutableArray(), appCommand);
+        return new(before.ToImmutableArray(), after.ToImmutableArray(), appCommand, entry.Options.ApplicationId!.Value);
     }
+
+    /// <summary>
+    ///     Gets the ID of the app whose permissions were targeted.
+    /// </summary>
+    public ulong ApplicationId { get; set; }
 
     /// <summary>
     ///     Gets the application command which permissions were updated.

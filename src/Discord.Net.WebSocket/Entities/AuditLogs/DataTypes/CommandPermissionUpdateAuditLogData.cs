@@ -11,11 +11,12 @@ namespace Discord.WebSocket;
 public class CommandPermissionUpdateAuditLogData : ISocketAuditLogData
 {
     internal CommandPermissionUpdateAuditLogData(IReadOnlyCollection<ApplicationCommandPermission> before, IReadOnlyCollection<ApplicationCommandPermission> after,
-        ulong commandId)
+        ulong commandId, ulong appId)
     {
         Before = before;
         After = after;
-        Commandid = commandId;
+        ApplicationId = appId;
+        CommandId = commandId;
     }
 
     internal static CommandPermissionUpdateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
@@ -37,13 +38,18 @@ public class CommandPermissionUpdateAuditLogData : ISocketAuditLogData
                 after.Add(new ApplicationCommandPermission(newValue.Id, newValue.Type, newValue.Permission));
         }
 
-        return new(before.ToImmutableArray(), after.ToImmutableArray(), entry.TargetId!.Value);
+        return new(before.ToImmutableArray(), after.ToImmutableArray(), entry.TargetId!.Value, entry.Options.ApplicationId!.Value);
     }
+
+    /// <summary>
+    ///     Gets the ID of the app whose permissions were targeted.
+    /// </summary>
+    public ulong ApplicationId { get; set; }
 
     /// <summary>
     ///     Gets the id of the application command which permissions were updated.
     /// </summary>
-    public ulong Commandid { get; }
+    public ulong CommandId { get; }
     
     /// <summary>
     ///     Gets values of the permissions before the change if available.
