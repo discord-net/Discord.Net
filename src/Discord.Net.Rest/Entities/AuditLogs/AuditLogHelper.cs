@@ -75,9 +75,9 @@ internal static class AuditLogHelper
             [ActionType.StickerUpdated] = StickerUpdatedAuditLogData.Create,
             [ActionType.StickerDeleted] = StickerDeletedAuditLogData.Create,
 
-            //[ActionType.AutoModerationRuleCreate] = ,
-            //[ActionType.AutoModerationRuleUpdate] = ,
-            //[ActionType.AutoModerationRuleDelete] = ,
+            [ActionType.AutoModerationRuleCreate] = AutoModRuleCreatedAuditLogData.Create,
+            [ActionType.AutoModerationRuleUpdate] = AutoModRuleUpdatedAuditLogData.Create,
+            [ActionType.AutoModerationRuleDelete] = AutoModRuleDeletedAuditLogData.Create,
 
             //[ActionType.AutoModerationBlockMessage] = ,
             //[ActionType.AutoModerationFlagToChannel] = ,
