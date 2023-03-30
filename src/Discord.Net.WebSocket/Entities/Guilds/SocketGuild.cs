@@ -129,6 +129,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public int? MaxVideoChannelUsers { get; private set; }
         /// <inheritdoc />
+        public int? MaxStageVideoChannelUsers { get; private set; }
+        /// <inheritdoc />
         public NsfwLevel NsfwLevel { get; private set; }
         /// <inheritdoc />
         public CultureInfo PreferredCulture { get; private set; }
@@ -528,6 +530,8 @@ namespace Discord.WebSocket
                 MaxMembers = model.MaxMembers.Value;
             if (model.MaxVideoChannelUsers.IsSpecified)
                 MaxVideoChannelUsers = model.MaxVideoChannelUsers.Value;
+            if (model.MaxStageVideoChannelUsers.IsSpecified)
+                MaxStageVideoChannelUsers = model.MaxStageVideoChannelUsers.Value;
             PreferredLocale = model.PreferredLocale;
             PreferredCulture = PreferredLocale == null ? null : new CultureInfo(PreferredLocale);
             if (model.IsBoostProgressBarEnabled.IsSpecified)

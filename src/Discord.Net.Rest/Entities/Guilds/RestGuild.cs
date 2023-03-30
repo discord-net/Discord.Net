@@ -82,6 +82,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public int? MaxVideoChannelUsers { get; private set; }
         /// <inheritdoc />
+        public int? MaxStageVideoChannelUsers { get; private set; }
+        /// <inheritdoc />
         public int? ApproximateMemberCount { get; private set; }
         /// <inheritdoc />
         public int? ApproximatePresenceCount { get; private set; }
@@ -181,6 +183,8 @@ namespace Discord.Rest
                 MaxMembers = model.MaxMembers.Value;
             if (model.MaxVideoChannelUsers.IsSpecified)
                 MaxVideoChannelUsers = model.MaxVideoChannelUsers.Value;
+            if (model.MaxStageVideoChannelUsers.IsSpecified)
+                MaxStageVideoChannelUsers = model.MaxStageVideoChannelUsers.Value;
             PreferredLocale = model.PreferredLocale;
             PreferredCulture = new CultureInfo(PreferredLocale);
             if (model.ApproximateMemberCount.IsSpecified)
