@@ -400,7 +400,8 @@ namespace Discord.Rest
                 IsNsfw = props.IsNsfw,
                 Topic = props.Topic,
                 DefaultAutoArchiveDuration = props.AutoArchiveDuration,
-                DefaultSortOrder = props.DefaultSortOrder.GetValueOrDefault(ForumSortOrder.LatestActivity)
+                DefaultSortOrder = props.DefaultSortOrder.GetValueOrDefault(ForumSortOrder.LatestActivity),
+                DefaultLayout = props.DefaultLayout,
             };
 
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
