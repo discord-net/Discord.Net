@@ -306,8 +306,8 @@ namespace Discord
                 throw new ArgumentException("TextInputComponents are not allowed in messages.", nameof(ActionRows));
 
             if (_actionRows?.Count > 0)
-                for (int i = 0; i < _actionRows.Count; i++)
-                    if (_actionRows[i].Components.Count == 0)
+                for (int i = 0; i < _actionRows?.Count; i++)
+                    if (_actionRows[i]?.Components?.Count == 0)
                         _actionRows.RemoveAt(i);
 
             return _actionRows != null
