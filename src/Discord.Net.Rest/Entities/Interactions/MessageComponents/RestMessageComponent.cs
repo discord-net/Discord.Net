@@ -20,9 +20,7 @@ namespace Discord.Rest
         /// </summary>
         public new RestMessageComponentData Data { get; }
 
-        /// <summary>
-        ///     Gets the message that contained the trigger for this interaction.
-        /// </summary>
+        /// <inheritdoc cref="IComponentInteraction.Message"/>
         public RestUserMessage Message { get; private set; }
 
         private object _lock = new object();

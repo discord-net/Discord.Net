@@ -19,10 +19,8 @@ namespace Discord.WebSocket
         ///     Gets the data received with this interaction, contains the button that was clicked.
         /// </summary>
         public new SocketMessageComponentData Data { get; }
-
-        /// <summary>
-        ///     Gets the message that contained the trigger for this interaction.
-        /// </summary>
+        
+        /// <inheritdoc cref="IComponentInteraction.Message"/>
         public SocketUserMessage Message { get; private set; }
 
         private object _lock = new object();
