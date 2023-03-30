@@ -99,7 +99,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ComponentBuilder RemoveComponent(string customId)
         {
-            this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c.CustomId == customId || (c is ButtonComponent b && b.Url == customId)));
+            this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c.CustomId == customId));
             return this;
         }
 
@@ -108,7 +108,11 @@ namespace Discord
         /// </summary>
         /// <param name="url">The URL of the Link Button.</param>
         /// <returns>The current builder.</returns>
-        public ComponentBuilder RemoveButtonByURL(string url) => RemoveComponent(url);
+        public ComponentBuilder RemoveButtonByURL(string url)
+        {
+            this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c is ButtonComponent b && b.Url == url));
+            return this;
+        }
 
         /// <summary>
         ///     Adds a <see cref="SelectMenuBuilder"/> to the <see cref="ComponentBuilder"/> at the specific row.
