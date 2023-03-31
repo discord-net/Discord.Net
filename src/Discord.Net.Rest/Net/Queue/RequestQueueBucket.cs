@@ -358,9 +358,16 @@ namespace Discord.Net.Queue
                 if (info.Limit.HasValue && WindowCount != info.Limit.Value)
                 {
                     WindowCount = info.Limit.Value;
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Updated Limit to {WindowCount}");
+#endif
+                }
+
+                if (info.Remaining.HasValue && WindowCount != info.Remaining.Value)
+                {
                     _semaphore = info.Remaining.Value;
 #if DEBUG_LIMITS
-                    Debug.WriteLine($"[{id}] Upgraded Semaphore to {info.Remaining.Value}/{WindowCount}");
+                    Debug.WriteLine($"[{id}] Updated Semaphore (Remaining) to {_semaphore}");
 #endif
                 }
 
