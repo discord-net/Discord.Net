@@ -17,9 +17,13 @@ namespace Discord.API.Rest
             var d = new Dictionary<string, object>
             {
                 ["name"] = $"{Name}",
-                ["description"] = Description,
                 ["tags"] = Tags
             };
+
+            if (Description is not null)
+                d["description"] = Description;
+            else
+                d["description"] = string.Empty;
 
             string contentType;
             if (File is FileStream fileStream)
