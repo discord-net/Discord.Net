@@ -26,5 +26,9 @@ namespace Discord.Webhook
         ///     Gets or sets the components that the message should display.
         /// </summary>
         public Optional<MessageComponent> Components { get; set; }
+        /// <summary>
+        ///     Gets or sets the attachments for the message.
+        /// </summary>
+        public Optional<IEnumerable<FileAttachment>> Attachments { get; set; }
     }
 }
