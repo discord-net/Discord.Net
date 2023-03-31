@@ -251,7 +251,7 @@ namespace Discord.Net.Queue
 
                 DateTimeOffset? timeoutAt = request.TimeoutAt;
                 int semaphore = Interlocked.Decrement(ref _semaphore);
-                if (windowCount > 0 && semaphore < 0)
+                if (windowCount >= 0 && semaphore < 0)
                 {
                     if (!isRateLimited)
                     {
@@ -449,7 +449,7 @@ namespace Discord.Net.Queue
 
                 if (resetTick == null)
                 {
-                    WindowCount = 0; //No rate limit info, disable limits on this bucket
+                    WindowCount = -1; //No rate limit info, disable limits on this bucket
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Disabled Semaphore");
 #endif
