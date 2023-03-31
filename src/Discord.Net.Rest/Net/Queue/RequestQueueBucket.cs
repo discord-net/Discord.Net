@@ -363,7 +363,7 @@ namespace Discord.Net.Queue
 #endif
                 }
 
-                if (info.Remaining.HasValue && WindowCount != info.Remaining.Value)
+                if (info.Remaining.HasValue && _semaphore != info.Remaining.Value)
                 {
                     _semaphore = info.Remaining.Value;
 #if DEBUG_LIMITS
