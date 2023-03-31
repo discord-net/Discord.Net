@@ -2282,11 +2282,27 @@ namespace Discord.API
 
             return await SendAsync<IReadOnlyCollection<UserGuild>>("GET", () => $"users/@me/guilds?limit={limit}&after={afterGuildId}&with_counts=true", new BucketIds(), options: options).ConfigureAwait(false);
         }
+
         public async Task<Application> GetMyApplicationAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             return await SendAsync<Application>("GET", () => "oauth2/applications/@me", new BucketIds(), options: options).ConfigureAwait(false);
         }
+
+        public async Task<Application> GetCurrentBotApplicationAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<Application>("GET", () => "applications/@me", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
+        public async Task<Application> ModifyCurrentBotApplicationAsync(ModifyCurrentApplicationBotParams args, RequestOptions options = null)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendJsonAsync<Application>("PATCH", () => "applications/@me", args, new BucketIds(), options: options);
+        }
+
         public async Task<User> ModifySelfAsync(Rest.ModifyCurrentUserParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
