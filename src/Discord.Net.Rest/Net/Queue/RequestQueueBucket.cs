@@ -1,4 +1,5 @@
 using Discord.API;
+using Discord.Net.Rest;
 using Newtonsoft.Json;
 using System;
 #if DEBUG_LIMITS
@@ -62,10 +63,11 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                 Debug.WriteLine($"[{id}] Sending...");
 #endif
+                RestResponse response = default(RestResponse);
                 RateLimitInfo info = default(RateLimitInfo);
                 try
                 {
-                    var response = await request.SendAsync().ConfigureAwait(false);
+                    response = await request.SendAsync().ConfigureAwait(false);
                     info = new RateLimitInfo(response.Headers, request.Endpoint);
 
                     request.Options.ExecuteRatelimitCallback(info);
@@ -87,7 +89,6 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                                     Debug.WriteLine($"[{id}] (!) 429");
 #endif
-                                    UpdateRateLimit(id, request, info, true, body: response.Stream);
                                 }
                                 await _queue.RaiseRateLimitTriggered(Id, info, $"{request.Method} {request.Endpoint}").ConfigureAwait(false);
                                 continue; //Retry
@@ -156,7 +157,7 @@ namespace Discord.Net.Queue
                 }*/
                 finally
                 {
-                    UpdateRateLimit(id, request, info, false);
+                    UpdateRateLimit(id, request, info, response.StatusCode == (HttpStatusCode)429, body: response.Stream);
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Stop");
 #endif
