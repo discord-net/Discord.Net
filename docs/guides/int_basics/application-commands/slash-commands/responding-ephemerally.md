@@ -15,7 +15,7 @@ When responding with either `FollowupAsync` or `RespondAsync` you can pass in an
 Let's use this in our list role command.
 
 ```cs
-await command.RespondAsync(embed: embedBuiler.Build(), ephemeral: true);
+await command.RespondAsync(embed: embedBuilder.Build(), ephemeral: true);
 ```
 
 Running the command now only shows the message to us!

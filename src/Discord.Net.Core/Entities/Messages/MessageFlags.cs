@@ -43,6 +43,14 @@ namespace Discord
         /// <summary>
         ///     Flag given to messages that is an Interaction Response and the bot is "thinking"
         /// </summary>
-        Loading = 1 << 7
+        Loading = 1 << 7,
+        /// <summary>
+        ///     Flag given to messages that failed to mention some roles and add their members to the thread.
+        /// </summary>
+        FailedToMentionRolesInThread = 1 << 8,
+        /// <summary>
+        ///     Flag give to messages that will not trigger push and desktop notifications.
+        /// </summary>
+        SuppressNotification = 1 << 12
     }
 }

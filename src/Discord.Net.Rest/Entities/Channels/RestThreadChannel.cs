@@ -34,17 +34,32 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public int MessageCount { get; private set; }
 
+        /// <inheritdoc/>
+        public bool? IsInvitable { get; private set; }
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ulong> AppliedTags { get; private set; }
+
+        /// <inheritdoc/>
+        public ulong OwnerId { get; private set; }
+
+        /// <inheritdoc cref="IThreadChannel.CreatedAt"/>
+        public override DateTimeOffset CreatedAt { get; }
+
         /// <summary>
         ///     Gets the parent text channel id.
         /// </summary>
         public ulong ParentChannelId { get; private set; }
 
-        internal RestThreadChannel(BaseDiscordClient discord, IGuild guild, ulong id)
-            : base(discord, guild, id) { }
+        internal RestThreadChannel(BaseDiscordClient discord, IGuild guild, ulong id, DateTimeOffset? createdAt)
+            : base(discord, guild, id)
+        {
+            CreatedAt = createdAt ?? new DateTimeOffset(2022, 1, 9, 0, 0, 0, TimeSpan.Zero);
+        }
 
         internal new static RestThreadChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestThreadChannel(discord, guild, model.Id);
+            var entity = new RestThreadChannel(discord, guild, model.Id, model.ThreadMetadata.GetValueOrDefault()?.CreatedAt.GetValueOrDefault());
             entity.Update(model);
             return entity;
         }
@@ -57,16 +72,21 @@ namespace Discord.Rest
 
             if (model.ThreadMetadata.IsSpecified)
             {
+                IsInvitable = model.ThreadMetadata.Value.Invitable.ToNullable();
                 IsArchived = model.ThreadMetadata.Value.Archived;
                 AutoArchiveDuration = model.ThreadMetadata.Value.AutoArchiveDuration;
                 ArchiveTimestamp = model.ThreadMetadata.Value.ArchiveTimestamp;
                 IsLocked = model.ThreadMetadata.Value.Locked.GetValueOrDefault(false);
             }
 
+            OwnerId = model.OwnerId.GetValueOrDefault(0);
+
             MemberCount = model.MemberCount.GetValueOrDefault(0);
             MessageCount = model.MessageCount.GetValueOrDefault(0);
             Type = (ThreadType)model.Type;
             ParentChannelId = model.CategoryId.Value;
+
+            AppliedTags = model.AppliedTags.GetValueOrDefault(Array.Empty<ulong>()).ToImmutableArray();
         }
 
         /// <summary>
@@ -84,16 +104,35 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets a collection of users within this thread.
         /// </summary>
+        /// <param name="limit">Sets the limit of the user count for each request. 100 by default.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a collection of thread
+        ///     users found within this thread channel.
+        /// </returns>
+        public IAsyncEnumerable<IReadOnlyCollection<RestThreadUser>> GetThreadUsersAsync(int limit = DiscordConfig.MaxThreadMembersPerBatch, RequestOptions options = null)
+            => ThreadHelper.GetUsersAsync(this, Discord, limit, null, options);
+
+        /// <summary>
+        ///     Gets a collection of users within this thread.
+        /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task representing the asynchronous get operation. The task returns a
         ///     <see cref="IReadOnlyCollection{T}"/> of <see cref="RestThreadUser"/>'s.
         /// </returns>
+        [Obsolete("Please use GetThreadUsersAsync instead of this. Will be removed in next major version.", false)]
         public new async Task<IReadOnlyCollection<RestThreadUser>> GetUsersAsync(RequestOptions options = null)
-            => (await ThreadHelper.GetUsersAsync(this, Discord, options).ConfigureAwait(false)).ToImmutableArray();
+            => (await GetThreadUsersAsync(options: options).FlattenAsync()).ToImmutableArray();
 
         /// <inheritdoc/>
         public override async Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
+        {
+            var model = await ThreadHelper.ModifyAsync(this, Discord, func, options);
+            Update(model);
+        }
+
+        /// <inheritdoc/>
+        public async Task ModifyAsync(Action<ThreadChannelProperties> func, RequestOptions options = null)
         {
             var model = await ThreadHelper.ModifyAsync(this, Discord, func, options);
             Update(model);
@@ -219,5 +258,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public Task RemoveUserAsync(IGuildUser user, RequestOptions options = null)
             => Discord.ApiClient.RemoveThreadMemberAsync(Id, user.Id, options);
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This method is not supported in threads.</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
+            => throw new NotSupportedException("This method is not supported in threads.");
     }
 }

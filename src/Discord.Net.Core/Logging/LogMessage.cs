@@ -52,7 +52,7 @@ namespace Discord
             Message = message;
             Exception = exception;
         }
-        
+
         public override string ToString() => ToString();
         public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true, DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 11)
         {
@@ -60,9 +60,9 @@ namespace Discord
             string message = Message;
             string exMessage = fullException ? Exception?.ToString() : Exception?.Message;
 
-            int maxLength = 1 + 
+            int maxLength = 1 +
                 (prependTimestamp ? 8 : 0) + 1 +
-                (padSource.HasValue ? padSource.Value : sourceName?.Length ?? 0) + 1 + 
+                (padSource.HasValue ? padSource.Value : sourceName?.Length ?? 0) + 1 +
                 (message?.Length ?? 0) +
                 (exMessage?.Length ?? 0) + 3;
 
@@ -81,17 +81,8 @@ namespace Discord
                     now = DateTime.UtcNow;
                 else
                     now = DateTime.Now;
-                if (now.Hour < 10)
-                    builder.Append('0');
-                builder.Append(now.Hour);
-                builder.Append(':');
-                if (now.Minute < 10)
-                    builder.Append('0');
-                builder.Append(now.Minute);
-                builder.Append(':');
-                if (now.Second < 10)
-                    builder.Append('0');
-                builder.Append(now.Second);
+                string format = "HH:mm:ss";
+                builder.Append(now.ToString(format));
                 builder.Append(' ');
             }
             if (sourceName != null)

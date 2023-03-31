@@ -16,9 +16,9 @@ namespace Discord.Interactions
         ///     Register a method as a Message Context Command.
         /// </summary>
         /// <param name="name">Name of the context command.</param>
-        public MessageCommandAttribute (string name) : base(name, ApplicationCommandType.Message) { }
+        public MessageCommandAttribute(string name) : base(name, ApplicationCommandType.Message) { }
 
-        internal override void CheckMethodDefinition (MethodInfo methodInfo)
+        internal override void CheckMethodDefinition(MethodInfo methodInfo)
         {
             var parameters = methodInfo.GetParameters();
 

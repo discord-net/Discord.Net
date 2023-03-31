@@ -36,8 +36,10 @@ namespace Discord
 
         public override bool Equals(object other)
         {
-            if (!IsSpecified) return other == null;
-            if (other == null) return false;
+            if (!IsSpecified)
+                return other == null;
+            if (other == null)
+                return false;
             return _value.Equals(other);
         }
         public override int GetHashCode() => IsSpecified ? _value.GetHashCode() : 0;

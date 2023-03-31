@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-
-using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
+using Model = Discord.API.AuditLog;
 
 namespace Discord.Rest
 {
@@ -27,7 +26,7 @@ namespace Discord.Rest
                 .ToList();
 
             var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-            var user = RestUser.Create(discord, userInfo);
+            RestUser user = (userInfo != null) ? RestUser.Create(discord, userInfo) : null;
 
             return new MemberRoleAuditLogData(roleInfos.ToReadOnlyCollection(), user);
         }

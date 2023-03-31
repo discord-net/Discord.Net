@@ -8,6 +8,13 @@ title: Introduction to the Chat Command Service
 [Discord.Commands](xref:Discord.Commands) provides an attribute-based
 command parser.
 
+> [!IMPORTANT]
+> The 'Message Content' intent, required for text commands, is now a
+> privileged intent. Please use [Slash commands](xref:Guides.SlashCommands.Intro)
+> instead for making commands. For more information about this change
+> please check [this announcement made by discord](https://support-dev.discord.com/hc/en-us/articles/4404772028055-Message-Content-Privileged-Intent-FAQ)
+
+
 ## Get Started
 
 To use commands, you must create a [Command Service] and a command
@@ -187,7 +194,7 @@ service provider.
 
 ### Module Constructors
 
-Modules are constructed using [Dependency Injection](xref:Guides.TextCommands.DI). Any parameters
+Modules are constructed using [Dependency Injection](xref:Guides.DI.Intro). Any parameters
 that are placed in the Module's constructor must be injected into an
 @System.IServiceProvider first.
 

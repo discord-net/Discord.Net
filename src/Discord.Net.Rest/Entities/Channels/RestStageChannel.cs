@@ -12,7 +12,13 @@ namespace Discord.Rest
     public class RestStageChannel : RestVoiceChannel, IStageChannel
     {
         /// <inheritdoc/>
-        public string Topic { get; private set; }
+        /// <remarks>
+        ///     This field is always true for stage channels.
+        /// </remarks>
+        /// 
+        [Obsolete("This property is no longer used because Discord enabled text-in-voice and text-in-stage for all channels.")]
+        public override bool IsTextInVoice
+            => true;
 
         /// <inheritdoc/>
         public StagePrivacyLevel? PrivacyLevel { get; private set; }
@@ -35,15 +41,13 @@ namespace Discord.Rest
         internal void Update(StageInstance model, bool isLive = false)
         {
             IsLive = isLive;
-            if(isLive)
+            if (isLive)
             {
-                Topic = model.Topic;
                 PrivacyLevel = model.PrivacyLevel;
                 IsDiscoverableDisabled = model.DiscoverableDisabled;
             }
             else
             {
-                Topic = null;
                 PrivacyLevel = null;
                 IsDiscoverableDisabled = null;
             }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
@@ -14,33 +15,28 @@ namespace Discord.WebSocket
     ///     Represents a WebSocket-based voice channel in a guild.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketVoiceChannel : SocketGuildChannel, IVoiceChannel, ISocketAudioChannel
+    public class SocketVoiceChannel : SocketTextChannel, IVoiceChannel, ISocketAudioChannel
     {
         #region SocketVoiceChannel
+        /// <summary>
+        ///     Gets whether or not the guild has Text-In-Voice enabled and the voice channel is a TiV channel.
+        /// </summary>
+        /// <remarks>
+        ///     Discord currently doesn't have a way to disable Text-In-Voice yet so this field is always
+        ///     <see langword="true"/> on <see cref="SocketVoiceChannel"/>s and <see langword="true"/> on
+        ///     <see cref="SocketStageChannel"/>s.
+        /// </remarks>
+        [Obsolete("This property is no longer used because Discord enabled text-in-voice for all channels.")]
+        public virtual bool IsTextInVoice => true;
+
         /// <inheritdoc />
         public int Bitrate { get; private set; }
         /// <inheritdoc />
         public int? UserLimit { get; private set; }
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string RTCRegion { get; private set; }
-
-        /// <inheritdoc />
-        public ulong? CategoryId { get; private set; }
-        /// <summary>
-        ///     Gets the parent (category) channel of this channel.
-        /// </summary>
-        /// <returns>
-        ///     A category channel representing the parent of this channel; <c>null</c> if none is set.
-        /// </returns>
-        public ICategoryChannel Category
-            => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
-
-        /// <inheritdoc />
-        public string Mention => MentionUtils.MentionChannel(Id);
-
-        /// <inheritdoc />
-        public Task SyncPermissionsAsync(RequestOptions options = null)
-            => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
+        /// <inheritdoc/>
+        public VideoQualityMode VideoQualityMode { get; private set; }
 
         /// <summary>
         ///     Gets a collection of users that are currently connected to this voice channel.
@@ -48,7 +44,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A read-only collection of users that are currently connected to this voice channel.
         /// </returns>
-        public override IReadOnlyCollection<SocketGuildUser> Users
+        public IReadOnlyCollection<SocketGuildUser> ConnectedUsers
             => Guild.Users.Where(x => x.VoiceChannel?.Id == Id).ToImmutableArray();
 
         internal SocketVoiceChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
@@ -57,7 +53,7 @@ namespace Discord.WebSocket
         }
         internal new static SocketVoiceChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketVoiceChannel(guild.Discord, model.Id, guild);
+            var entity = new SocketVoiceChannel(guild?.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }
@@ -65,9 +61,9 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-            CategoryId = model.CategoryId;
-            Bitrate = model.Bitrate.Value;
-            UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
+            Bitrate = model.Bitrate.GetValueOrDefault(64000);
+            UserLimit = model.UserLimit.GetValueOrDefault() != 0 ? model.UserLimit.Value : (int?)null;
+            VideoQualityMode = model.VideoQualityMode.GetValueOrDefault(VideoQualityMode.Auto);
             RTCRegion = model.RTCRegion.GetValueOrDefault(null);
         }
 
@@ -99,28 +95,23 @@ namespace Discord.WebSocket
                 return user;
             return null;
         }
-#endregion
 
-        #region Invites
-        /// <inheritdoc />
-        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        public async Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteToApplicationAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, applicationId, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        public virtual async Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteToApplicationAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, (ulong)application, options);
-        /// <inheritdoc />
-        public async Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteToStreamAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, user, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
-            => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
+        /// <inheritdoc/> <exception cref="InvalidOperationException">Cannot create threads in voice channels.</exception>
+        public override Task<SocketThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
+            => throw new InvalidOperationException("Voice channels cannot contain threads.");
+
+        #endregion
+
+        #region TextOverrides
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">Threads are not supported in voice channels</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
+            => throw new NotSupportedException("Threads are not supported in voice channels");
+
+        #endregion
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
         internal new SocketVoiceChannel Clone() => MemberwiseClone() as SocketVoiceChannel;
-        #endregion
 
         #region IGuildChannel
         /// <inheritdoc />

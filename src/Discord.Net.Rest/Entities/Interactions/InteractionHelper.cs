@@ -3,6 +3,7 @@ using Discord.API.Rest;
 using Discord.Net;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -50,7 +51,7 @@ namespace Discord.Rest
             IDiscordInteraction interaction, RequestOptions options = null)
         {
             var model = await client.ApiClient.GetInteractionResponseAsync(interaction.Token, options).ConfigureAwait(false);
-            if(model != null)
+            if (model != null)
                 return RestInteractionMessage.Create(client, model, interaction.Token, channel);
             return null;
         }
@@ -100,7 +101,14 @@ namespace Discord.Rest
                 Type = arg.Type,
                 DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+                NameLocalizations = arg.NameLocalizations?.ToDictionary(),
+                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
+
+                // TODO: better conversion to nullable optionals
+                DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                DmPermission = arg.IsDMEnabled.ToNullable(),
+                Nsfw = arg.IsNsfw.GetValueOrDefault(false),
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -134,7 +142,14 @@ namespace Discord.Rest
                     Type = arg.Type,
                     DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+                    NameLocalizations = arg.NameLocalizations?.ToDictionary(),
+                    DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
+
+                    // TODO: better conversion to nullable optionals
+                    DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                    DmPermission = arg.IsDMEnabled.ToNullable(),
+                    Nsfw = arg.IsNsfw.GetValueOrDefault(false)
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -171,7 +186,14 @@ namespace Discord.Rest
                     Type = arg.Type,
                     DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+                    NameLocalizations = arg.NameLocalizations?.ToDictionary(),
+                    DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
+
+                    // TODO: better conversion to nullable optionals
+                    DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                    DmPermission = arg.IsDMEnabled.ToNullable(),
+                    Nsfw = arg.IsNsfw.GetValueOrDefault(false)
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -231,7 +253,11 @@ namespace Discord.Rest
                 Name = args.Name,
                 DefaultPermission = args.IsDefaultPermission.IsSpecified
                         ? args.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+                NameLocalizations = args.NameLocalizations?.ToDictionary(),
+                DescriptionLocalizations = args.DescriptionLocalizations?.ToDictionary(),
+                Nsfw = args.IsNsfw.GetValueOrDefault(false),
+                DefaultMemberPermission = args.DefaultMemberPermissions.ToNullable()
             };
 
             if (args is SlashCommandProperties slashProps)
@@ -285,7 +311,14 @@ namespace Discord.Rest
                 Type = arg.Type,
                 DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+                NameLocalizations = arg.NameLocalizations?.ToDictionary(),
+                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
+
+                // TODO: better conversion to nullable optionals
+                DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
+                DmPermission = arg.IsDMEnabled.ToNullable(),
+                Nsfw = arg.IsNsfw.GetValueOrDefault(false)
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -318,7 +351,11 @@ namespace Discord.Rest
                 Name = arg.Name,
                 DefaultPermission = arg.IsDefaultPermission.IsSpecified
                         ? arg.IsDefaultPermission.Value
-                        : Optional<bool>.Unspecified
+                        : Optional<bool>.Unspecified,
+                NameLocalizations = arg.NameLocalizations?.ToDictionary(),
+                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
+                Nsfw = arg.IsNsfw.GetValueOrDefault(false),
+                DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable()
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -352,7 +389,7 @@ namespace Discord.Rest
         #endregion
 
         #region Responses
-        public static async Task<Message> ModifyFollowupMessageAsync(BaseDiscordClient client, RestFollowupMessage message, Action<MessageProperties> func,
+        public static async Task<Discord.API.Message> ModifyFollowupMessageAsync(BaseDiscordClient client, RestFollowupMessage message, Action<MessageProperties> func,
             RequestOptions options = null)
         {
             var args = new MessageProperties();
@@ -387,14 +424,16 @@ namespace Discord.Rest
                 Content = args.Content,
                 Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
-                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified
+                Components = args.Components.IsSpecified
+                        ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
+                        : Optional<API.ActionRowComponent[]>.Unspecified,
             };
 
             return await client.ApiClient.ModifyInteractionFollowupMessageAsync(apiArgs, message.Id, message.Token, options).ConfigureAwait(false);
         }
         public static async Task DeleteFollowupMessageAsync(BaseDiscordClient client, RestFollowupMessage message, RequestOptions options = null)
             => await client.ApiClient.DeleteInteractionFollowupMessageAsync(message.Id, message.Token, options);
-        public static async Task<Message> ModifyInteractionResponseAsync(BaseDiscordClient client, string token, Action<MessageProperties> func,
+        public static async Task<API.Message> ModifyInteractionResponseAsync(BaseDiscordClient client, string token, Action<MessageProperties> func,
            RequestOptions options = null)
         {
             var args = new MessageProperties();
@@ -431,7 +470,9 @@ namespace Discord.Rest
                     Content = args.Content,
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
-                    Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                    Components = args.Components.IsSpecified
+                        ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
+                        : Optional<API.ActionRowComponent[]>.Unspecified,
                     Flags = args.Flags
                 };
 
@@ -444,7 +485,9 @@ namespace Discord.Rest
                     Content = args.Content,
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
-                    MessageComponents = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                    MessageComponents = args.Components.IsSpecified
+                        ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
+                        : Optional<API.ActionRowComponent[]>.Unspecified
                 };
 
                 return await client.ApiClient.ModifyInteractionResponseAsync(apiArgs, token, options).ConfigureAwait(false);

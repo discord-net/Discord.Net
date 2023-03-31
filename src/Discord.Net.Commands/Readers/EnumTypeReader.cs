@@ -23,7 +23,7 @@ namespace Discord.Commands
         private readonly IReadOnlyDictionary<T, object> _enumsByValue;
         private readonly Type _enumType;
         private readonly TryParseDelegate<T> _tryParse;
-        
+
         public EnumTypeReader(Type type, TryParseDelegate<T> parser)
         {
             _enumType = type;
@@ -33,7 +33,7 @@ namespace Discord.Commands
             var byValueBuilder = ImmutableDictionary.CreateBuilder<T, object>();
 
             foreach (var v in Enum.GetNames(_enumType))
-            {      
+            {
                 var parsedValue = Enum.Parse(_enumType, v);
                 byNameBuilder.Add(v.ToLower(), parsedValue);
                 if (!byValueBuilder.ContainsKey((T)parsedValue))

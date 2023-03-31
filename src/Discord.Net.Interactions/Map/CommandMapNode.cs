@@ -2,14 +2,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Discord.Interactions
 {
     internal class CommandMapNode<T> where T : class, ICommandInfo
     {
-        private const string RegexWildCardExp = "(\\S+)?";
-
         private readonly string _wildCardStr = "*";
         private readonly ConcurrentDictionary<string, CommandMapNode<T>> _nodes;
         private readonly ConcurrentDictionary<string, T> _commands;
@@ -20,7 +19,7 @@ namespace Discord.Interactions
         public IReadOnlyDictionary<Regex, T> WildCardCommands => _wildCardCommands;
         public string Name { get; }
 
-        public CommandMapNode (string name, string wildCardExp = null)
+        public CommandMapNode(string name, string wildCardExp = null)
         {
             Name = name;
             _nodes = new ConcurrentDictionary<string, CommandMapNode<T>>();
@@ -31,14 +30,12 @@ namespace Discord.Interactions
                 _wildCardStr = wildCardExp;
         }
 
-        public void AddCommand (IList<string> keywords, int index, T commandInfo)
+        public void AddCommand(IList<string> keywords, int index, T commandInfo)
         {
             if (keywords.Count == index + 1)
             {
-                if (commandInfo.SupportsWildCards && commandInfo.Name.Contains(_wildCardStr))
+                if (commandInfo.SupportsWildCards && RegexUtils.TryBuildRegexPattern(commandInfo, _wildCardStr, out var patternStr))
                 {
-                    var escapedStr = RegexUtils.EscapeExcluding(commandInfo.Name, _wildCardStr.ToArray());
-                    var patternStr = "\\A" + escapedStr.Replace(_wildCardStr, RegexWildCardExp) + "\\Z";
                     var regex = new Regex(patternStr, RegexOptions.Singleline | RegexOptions.Compiled);
 
                     if (!_wildCardCommands.TryAdd(regex, commandInfo))
@@ -57,7 +54,7 @@ namespace Discord.Interactions
             }
         }
 
-        public bool RemoveCommand (IList<string> keywords, int index)
+        public bool RemoveCommand(IList<string> keywords, int index)
         {
             if (keywords.Count == index + 1)
                 return _commands.TryRemove(keywords[index], out var _);
@@ -70,7 +67,7 @@ namespace Discord.Interactions
             }
         }
 
-        public SearchResult<T> GetCommand (IList<string> keywords, int index)
+        public SearchResult<T> GetCommand(IList<string> keywords, int index)
         {
             string name = string.Join(" ", keywords);
 
@@ -104,7 +101,7 @@ namespace Discord.Interactions
             return SearchResult<T>.FromError(name, InteractionCommandError.UnknownCommand, $"No {typeof(T).FullName} found for {name}");
         }
 
-        public SearchResult<T> GetCommand (string text, int index, char[] seperators)
+        public SearchResult<T> GetCommand(string text, int index, char[] seperators)
         {
             var keywords = text.Split(seperators);
             return GetCommand(keywords, index);

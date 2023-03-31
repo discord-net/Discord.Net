@@ -1,11 +1,13 @@
 using Discord.WebSocket;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Discord.Interactions
 {
     /// <summary>
     ///     Represents a Web-Socket based context of an <see cref="IDiscordInteraction"/>.
     /// </summary>
-    public class SocketInteractionContext<TInteraction> : IInteractionContext
+    public class SocketInteractionContext<TInteraction> : IInteractionContext, IRouteMatchContainer
         where TInteraction : SocketInteraction
     {
         /// <summary>
@@ -32,12 +34,15 @@ namespace Discord.Interactions
         public SocketUser User { get; }
 
         /// <summary>
-        ///     Gets the <see cref="SocketInteraction"/> the command was recieved with.
+        ///     Gets the <see cref="SocketInteraction"/> the command was received with.
         /// </summary>
         public TInteraction Interaction { get; }
 
+        /// <inheritdoc cref="IRouteMatchContainer.SegmentMatches"/>
+        public IReadOnlyCollection<IRouteSegmentMatch> SegmentMatches { get; private set; }
+
         /// <summary>
-        ///     Initializes a new <see cref="SocketInteractionContext{TInteraction}"/>. 
+        ///     Initializes a new <see cref="SocketInteractionContext{TInteraction}"/>.
         /// </summary>
         /// <param name="client">The underlying client.</param>
         /// <param name="interaction">The underlying interaction.</param>
@@ -49,6 +54,13 @@ namespace Discord.Interactions
             User = interaction.User;
             Interaction = interaction;
         }
+
+        /// <inheritdoc/>
+        public void SetSegmentMatches(IEnumerable<IRouteSegmentMatch> segmentMatches) => SegmentMatches = segmentMatches.ToImmutableArray();
+
+        //IRouteMatchContainer
+        /// <inheritdoc/>
+        IEnumerable<IRouteSegmentMatch> IRouteMatchContainer.SegmentMatches => SegmentMatches;
 
         // IInteractionContext
         /// <inheritdoc/>
@@ -73,7 +85,7 @@ namespace Discord.Interactions
     public class SocketInteractionContext : SocketInteractionContext<SocketInteraction>
     {
         /// <summary>
-        ///     Initializes a new <see cref="SocketInteractionContext"/> 
+        ///     Initializes a new <see cref="SocketInteractionContext"/>
         /// </summary>
         /// <param name="client">The underlying client</param>
         /// <param name="interaction">The underlying interaction</param>

@@ -19,7 +19,7 @@ namespace Discord.Interactions
         public override bool SupportsWildCards => true;
 
         /// <inheritdoc/>
-        public override IReadOnlyCollection<ModalCommandParameterInfo> Parameters { get; }
+        public override IReadOnlyList<ModalCommandParameterInfo> Parameters { get; }
 
         internal ModalCommandInfo(Builders.ModalCommandBuilder builder, ModuleInfo module, InteractionService commandService) : base(builder, module, commandService)
         {
@@ -29,39 +29,52 @@ namespace Discord.Interactions
 
         /// <inheritdoc/>
         public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
-            => await ExecuteAsync(context, services, null).ConfigureAwait(false);
-
-        /// <summary>
-        ///     Execute this command using dependency injection.
-        /// </summary>
-        /// <param name="context">Context that will be injected to the <see cref="InteractionModuleBase{T}"/>.</param>
-        /// <param name="services">Services that will be used while initializing the <see cref="InteractionModuleBase{T}"/>.</param>
-        /// <param name="additionalArgs">Provide additional string parameters to the method along with the auto generated parameters.</param>
-        /// <returns>
-        ///     A task representing the asynchronous command execution process.
-        /// </returns>
-        public async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services, params string[] additionalArgs)
         {
             if (context.Interaction is not IModalInteraction modalInteraction)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Modal Interaction.");
 
+            return await base.ExecuteAsync(context, services).ConfigureAwait(false);
+        }
+
+        protected override async Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
+        {
+            var captures = (context as IRouteMatchContainer)?.SegmentMatches?.ToList();
+            var captureCount = captures?.Count() ?? 0;
+
             try
             {
-                var args = new List<object>();
+                var args = new object[Parameters.Count];
 
-                if (additionalArgs is not null)
-                    args.AddRange(additionalArgs);
+                for (var i = 0; i < Parameters.Count; i++)
+                {
+                    var parameter = Parameters.ElementAt(i);
 
-                var modal = Modal.CreateModal(modalInteraction, Module.CommandService._exitOnMissingModalField);
-                args.Add(modal);
+                    if (i < captureCount)
+                    {
+                        var readResult = await parameter.TypeReader.ReadAsync(context, captures[i].Value, services).ConfigureAwait(false);
+                        if (!readResult.IsSuccess)
+                            return await InvokeEventAndReturn(context, readResult).ConfigureAwait(false);
 
-                return await RunAsync(context, args.ToArray(), services);
+                        args[i] = readResult.Value;
+                    }
+                    else
+                    {
+                        var modalResult = await Modal.CreateModalAsync(context, services, Module.CommandService._exitOnMissingModalField).ConfigureAwait(false);
+                        if (!modalResult.IsSuccess)
+                            return await InvokeEventAndReturn(context, modalResult).ConfigureAwait(false);
+
+                        if (modalResult is not TypeConverterResult converterResult)
+                            return await InvokeEventAndReturn(context, ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command parameter parsing failed for an unknown reason."));
+
+                        args[i] = converterResult.Value;
+                    }
+                }
+
+                return ParseResult.FromSuccess(args);
             }
             catch (Exception ex)
             {
-                var result = ExecuteResult.FromError(ex);
-                await InvokeModuleEvent(context, result).ConfigureAwait(false);
-                return result;
+                return await InvokeEventAndReturn(context, ExecuteResult.FromError(ex)).ConfigureAwait(false);
             }
         }
 

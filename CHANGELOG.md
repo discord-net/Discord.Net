@@ -1,5 +1,278 @@
 # Changelog
 
+## [3.10.0] - 2023-03-27
+
+### Added
+- #2507 Added selects v2 support (48fb1b5)
+- #2509 Added `SendFileAsync` to `UserExtensions` (25cfb88)
+- #2510 Added missing invite guild properties & welcome screen support (7c535b9)
+- #2520 Added `ClientDisconnect` event for audio client. (4cad546)
+- #2521 Added `OwnerId` to `IThreadChannel` and `RestThreadChannel`
+- #2521 Added `ActiveDeveloper` to `UserProperies`
+- #2523 Added emojis from Emoji 13.0, Emoji 13.1 and Emoji 14.0 (23b2822)
+- #2528 Added wildcard length quantifiers and `TreatAsRegex` property
+- #2530 Added application Role Connections Metadata support (37d868f)
+- #2531 Added age restricted (NSFW) application commands support (56b1a93)
+- #2537 Added `RemoveModulesFromGuildAsync` (7acbcfd)
+- #2560 Added app Command channel target permission (2616d35)
+- #2562 Added new message types & error codes (a3ee855)
+- #2564 Added `RespondWithModal()` which accepts an `IModal` instance as template (e7bda0f)
+- #2571 Added guild member flags (7d8d6ec)
+- #2573 Added missing VoiceChannel properties (1e21a6e)
+- #2574 Added `GetCurrentUser` method to `DiscordRestClient` (e3da96f)
+- #2574 Added `GetCurrentUserGuildMemberAsync` method to `DiscordRestClient` and `RestGuild` (e3da96f)
+- #2574 Added `GuildFeatures` property to `IUserGuild` (e3da96f)
+- #2575 Added `Thread` property to `RestMessage` (91e2084)
+- #2578 Added AutoMod support (673b02d)
+- #2579 Added `Thread` property to `IUserMessage` (0998285)
+- #2580 Added thread user member & thread members pagination (b085621)
+- #2582 Added `IIntegrationChannel` (75f3c91)
+- #2582 Added support for creating webhooks in forums (75f3c91)
+- #2590 Added `FollowAnnouncementChannelAsync` to `INewsChannel` (bb056df)
+- #2591 Added support for silent mentions (2ea8af1)
+- #2599 Added `AddModalCommand` to `ModalBuilder` with option to specify callback (50e0e59)
+- #2605 Added `GuildFeatures` to `GuildProperties` (177df2c)
+- #2603 Added support for creating forum posts with `DiscordWebhookClient` (e69e27a)
+- #2610 Added Text-In-Stage support & missing `IVoiceChannel` properties (76bb901)
+- #2613 Added AutoMod custom block message (709364a)
+- #2615 Added missing invite properties (abfa8d1)
+
+### Fixed
+- #2483 Fixed an NRE when event was changed from in channel to external or vice versa (493f604)
+- #2526 Fixed `GetActiveThreadsAsync` & add it to `ITextChannel` (bd2f719)
+- #2528 Fixed catastrophic backtracking (3b107c2)
+- #2532 Fixed permissions on deleteMissing=false (274be5d)
+- #2540 Fixed `reason` not being included in audit logs when calling `AddBanAsync` and `BanAsync` (e71faf7)
+- #2541 Fixed `CreatePost` methods for `IForumChannel` (a53f1df)
+- #2549 Fixed `NullReferenceException` caused by Options being undefined. (02d3ce6)
+- #2557 Fixed `customId` template generator to escape regex metachars used in â€¦ (1602437)
+- #2577 Fixed `GetEventCoverImageUrl` (0af835a)
+- #2600 Fixed gateway deadlock (0c27395)
+- #2606 Fixed AutoMod action executed event message being null (7b321af)
+
+### Misc
+- #2542 Resolve inconsistencies with components (f224eb0)
+- #2546 Argument handling with thread tags(c67642a)
+- #2551 Format the project with 'dotnet format' (257f246)
+- #2561 Remove outdated checks (94996e7)
+- #2572 Reduce `DateTime` Boilerplate from `LogMessage` (14b2901)
+- #2614 Optimize `Add/RemoveRolesAsync` methods (11481a1)
+- #2617 Update IP discovery to send 74 bytes (66e6329)
+
+## [3.9.0] - 2022-12-23
+### Added
+
+- #2469 Add missing properties in forum & thread channels (01ae904)
+- #2501 Add new discord stuff (ed38635)
+- #2521 Add missing property & new stuff (82b772a)
+- #2520 Implemented ClientDisconnect event for audio client. (4cad546)
+- #2509 Add SendFiles to UserExtensions ( 4cad546) 
+- #2528 Implement wildcard lenght quantifiers, TreatAsRegex property and solve catastrpohic backtracking (25cfb88)
+- #2531 Add Age restricted (NSFW) application commands support (60956c7)
+
+### Fixed
+
+- #2500 Fix duplicated members of DiscordErrorCode (6712ef4)
+- #2468 Fix TimestampTag being sadge (bc89d3c)
+- #2497 Avoid throwing on missing Application (7077c44)
+- #2485 Fixed an oversight clearing session data upon any disconnect. (c7ac59d)
+- #2526 Fix `GetActiveThreadsAsync` & add it to `ITextChannel` (bd2f719)
+- #2535 Fix deploy.yml (20d8fdf) 
+
+### Misc
+
+- #2471 Update samples to use `MessageContent` intent & update `v2 => v3 guide` (a4d34f6)
+- #2505 Update events.cs (ea039b8)
+- #2467 Update license and icon nuspec props (11ed0ff)
+- #2306 Command execution code rework & TypeConverters auto-scope fix (6869817)
+- #2534 Fully qualify SlashCommandBuilder namespace ( 3b107c2)
+
+## [3.8.1] - 2022-09-12
+### Added
+
+- #2437 Added scheduled event types to AuditLog ActionTypes (fca9c6b)
+- #2423 Added support for resume gateway url (d4c533a)
+
+### Fixed
+
+- #2443 Fixed typos of word length (adf012d)
+- #2438 Fixed http query symbol in ModifyWebhookMessageAsync (0aa381d)
+- #2444 Fixed BulkOverwriteCommands NRE (9feb703)
+- #2417 Fixed CommandService RemoveModuleMethod not removing modules (fca9c6b)
+- #2345 Fixed EmbedBuilder.Length NRE (11ece4b)
+- #2453 Fixed NRE on SlashCommandBuilder.Build method (5073afa)
+- #2457 Fixed typo in SlashCommandBuilder.AddNameLocalizationMethod (1b01fed)
+
+### Misc
+
+- #2462 Add additional checks for gateway event warnings (b45b152)
+- #2448 Bump to Discord API V10 (fbc5ad4)
+- #2451 Return a list instead of an array in GetModulePath and GetChoicePath methods (370bdfa)
+- #2453 Update app commands regex and fix localization on app context commands (3dec99f)
+- #2333 Update package logo (2b86a79)
+
+## [3.8.0] - 2022-08-27
+### Added
+- #2384 Added support for the WEBHOOKS_UPDATED event (010e8e8)
+- #2370 Add async callbacks for IModuleBase (503fa75)
+- #2367 Added DeleteMessagesAsync for TIV and added remaining rate limit in client log (f178660)
+- #2379 Added Max/Min length fields for ApplicationCommandOption (e551431)
+- #2369 Added support for using `RespondWithModalAsync<IModal>()` without prior IModal declaration (500e7b4)
+- #2347 Added Embed field comparison operators (89a8ea1)
+- #2359 Added support for creating lottie stickers (32b03c8)
+- #2395 Added App Command localization support and `ILocalizationManager` to IF (39bbd29)
+
+### Fixed
+- #2425 Fix missing Fact attribute in ColorTests (92215b1)
+- #2424 Fix IGuild.GetBansAsync() (b7b7964)
+- #2416 Fix role icon & emoji assignment (b6b5e95)
+- #2414 Fix NRE on RestCommandBase Data (02bc3b7)
+- #2421 Fix placeholder length being hardcoded (8dfe19f)
+- #2352 Fix issues related to the absence of bot scope (1eb42c6)
+- #2346 Fix IGuild.DisconnectAsync(IUser) not disconnecting users (ba02416)
+- #2404 Fix range of issues presented by 3rd party analyzer (902326d)
+- #2409 Removes GroupContext from requirecontext (b0b8167)
+
+### Misc
+- #2366 Fixed typo in ChannelUpdatedEvent's documentation (cfd2662)
+- #2408 Fix sharding sample throwing at appcommand registration (519deda)
+- #2420 Fix broken code snippet in dependency injection docs (ddcf68a)
+- #2430 Add a note about DontAutoRegisterAttribute (917118d)
+- #2418 Update xmldocs to reflect the ConnectedUsers split (65b98f8)
+- #2415 Adds missing DI entries in TOC (c49d483)
+- #2407 Introduces high quality dependency injection documentation (6fdcf98)
+- #2348 Added  `RequiredInput`  attribute to example in int.framework intro (ee6e0ad)
+- #2385 Add ServerStarter.Host to deployment.md (06ed995)
+- #2405 Add a note about  `IgnoreGroupNames`  to IF docs (cf25acd)
+- #2356 Makes voice section about precompiled binaries more visible (e0d68d4 )
+- #2405 IF intro docs improvements (246282d)
+- #2406 Labs deprecation & readme/docs edits (bf493ea)
+
+## [3.7.2] - 2022-06-02
+### Added
+- #2328 Add method overloads to InteractionService (0fad3e8)
+- #2336 Add support for attachments on interaction response type 7 (35db22e)
+- #2338 AddOptions no longer has an uneeded restriction, added AddOptions to SlashCommandOptionBuilder (3a37f89)
+
+### Fixed
+- #2342 Disable TIV restrictions for rollout of TIV (7adf516)
+
+## [3.7.1] - 2022-05-27
+### Added
+- #2325 Add missing interaction properties (d3a693a)
+- #2330 Add better call control in ParseHttpInteraction (a890de9)
+
+### Fixed
+- #2329 Voice perms not retaining text perms. (712a4ae)
+- #2331 NRE with Cacheable.DownloadAsync() (e1f9b76)
+
+## [3.7.0] - 2022-05-24
+### Added
+- #2269 Text-In-Voice (23656e8)
+- #2281 Optional API calling to RestInteraction (a24dde4)
+- #2283 Support FailIfNotExists on MessageReference (0ec8938)
+- #2284 Add Parse & TryParse to EmbedBuilder & Add ToJsonString extension (cea59b5)
+- #2289 Add UpdateAsync to SocketModal (b333de2)
+- #2291 Webhook support for threads (b0a3b65)
+- #2295 Add DefaultArchiveDuration to ITextChannel (1f01881)
+- #2296 Add `.With` methods to ActionRowBuilder (13ccc7c)
+- #2307 Add Nullable ComponentTypeConverter and TypeReader (6fbd396)
+- #2316 Forum channels (7a07fd6)
+
+### Fixed
+- #2290 Possible NRE in Sanitize (20ffa64)
+- #2293 Application commands are disabled to everyone except admins by default (b465d60)
+- #2299 Close-stage bucketId being null (725d255)
+- #2313 Upload file size limit being incorrectly calculated (54a5af7)
+- #2319 Use `IDiscordClient.GetUserAsync` impl in `DiscordSocketClient` (f47f319)
+- #2320 NRE with bot scope and user parameters (88f6168)
+
+## [3.6.1] - 2022-04-30
+### Added
+- #2272 add 50080 Error code (503e720)
+
+### Fixed
+- #2267 Permissions v2 Invalid Operation Exception (a8f6075)
+- #2271 null user on interaction without bot scope (f2bb55e)
+- #2274 Implement fix for Custom Id Segments NRE (0d74c5c)
+
+### Misc
+- 3.6.0 (27226f0)
+
+
+## [3.6.0] - 2022-04-28
+### Added
+- #2136 Passing CustomId matches into contexts (4ce1801)
+- #2222 V2 Permissions (d98b3cc)
+
+### Fixed
+- #2260 Guarding against empty descriptions in `SlashCommandBuilder`/`SlashCommandOptionBuilder` (0554ac2)
+- #2248 Fix SocketGuild not returning the AudioClient (daba58c)
+- #2254 Fix browser property (275b833)
+
+## [3.5.0] - 2022-04-05
+
+### Added
+- #2204 Added config option for bidirectional formatting of usernames (e38104b)
+- #2210 Add a way to remove type readers from the interaction/command service. (7339945)
+- #2213 Add global interaction post execution event. (a744948)
+- #2223 Add ban pagination support (d8757a5)
+- #2201 Add missing interface methods to IComponentInteraction (741ed80)
+- #2226 Add an action delegate parameter to `RespondWithModalAsync<T>()` for modifying the modal (d2118f0)
+- #2227 Add RespondWithModal methods to RestInteractinModuleBase (1c680db)
+
+### Fixed
+- #2168 Fix Integration model from GuildIntegration and added INTEGRATION gateway events (305d7f9)
+- #2187 Fix modal response failing (d656722)
+- #2188 Fix serialization error on thread creation timestamp. (d48a7bd)
+- #2209 Fix GuildPermissions.All not including newer permissions (91d8fab)
+- #2219 Fix ShardedClients not pushing PresenceUpdates (c4131cf)
+- #2225 Fix GuildMemberUpdated cacheable `before` entity being incorrect (bfd0d9b)
+- #2217 Fix gateway interactions not running without bot scope. (8522447)
+
+### Misc
+- #2193 Update GuildMemberUpdated comment regarding presence (82473bc)
+- #2206 Fixed typo (c286b99)
+- #2216 Fix small typo in modal example (0439437)
+- #2228 Correct minor typo (d1cf1bf)
+
+## [3.4.1] - 2022-03-9
+
+### Added
+- #2169 Component TypeConverters and CustomID TypeReaders (fb4250b)
+- #2180 Attachment description and content type (765c0c5)
+- #2162 Add configuration toggle to suppress Unknown dispatch warnings (1ba96d6)
+- #2178 Add 10065 Error code (cc6918d)
+
+### Fixed
+- #2179 Logging out sharded client throws (24b7bb5)
+- #2182 Thread owner always returns null (25aaa49)
+- #2165 Fix error with flag params when uploading files. (a5d3add)
+- #2181 Fix ambiguous reference for creating roles (f8ec3c7)
+
+## [3.4.0] - 2022-3-2
+
+### Added
+- #2146 Add FromDateTimeOffset in TimestampTag (553055b)
+- #2062 Add return statement to precondition handling (3e52fab)
+- #2131 Add support for sending Message Flags (1fb62de)
+- #2137 Add self_video to VoiceState (8bcd3da)
+- #2151 Add Image property to Guild Scheduled Events (1dc473c)
+- #2152 Add missing json error codes (202554f)
+- #2153 Add IsInvitable and CreatedAt to threads (6bf5818)
+- #2155 Add Interaction Service Complex Parameters (9ba64f6)
+- #2156 Add Display name support for enum type converter (c800674)
+
+### Fixed
+- #2117 Fix stream access exception when ratelimited (a1cfa41)
+- #2128 Fix context menu comand message type (f601e9b)
+- #2135 Fix NRE when ratelimmited requests don't return a body (b95b942)
+- #2154 Fix usage of CacheMode.AllowDownload in channels (b3370c3)
+
+### Misc
+- #2149 Clarify Users property on SocketGuildChannel (5594739)
+- #2157 Enforce valid button styles (507a18d)
+
 ## [3.3.2] - 2022-02-16
 
 ### Fixed

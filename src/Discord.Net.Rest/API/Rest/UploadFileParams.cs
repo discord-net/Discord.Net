@@ -32,12 +32,12 @@ namespace Discord.API.Rest
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
             var d = new Dictionary<string, object>();
-            
+
             var payload = new Dictionary<string, object>();
             if (Content.IsSpecified)
                 payload["content"] = Content.Value;
             if (IsTTS.IsSpecified)
-                payload["tts"] = IsTTS.Value.ToString();
+                payload["tts"] = IsTTS.Value;
             if (Nonce.IsSpecified)
                 payload["nonce"] = Nonce.Value;
             if (Embeds.IsSpecified)
@@ -51,11 +51,11 @@ namespace Discord.API.Rest
             if (Stickers.IsSpecified)
                 payload["sticker_ids"] = Stickers.Value;
             if (Flags.IsSpecified)
-                payload["flags"] = Flags;
+                payload["flags"] = Flags.Value;
 
             List<object> attachments = new();
 
-            for(int n = 0; n != Files.Length; n++)
+            for (int n = 0; n != Files.Length; n++)
             {
                 var attachment = Files[n];
 

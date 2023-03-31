@@ -1,5 +1,4 @@
 using Discord.Interactions.Builders;
-using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -11,10 +10,10 @@ namespace Discord.Interactions
     /// <summary>
     ///     Represents the info class of an attribute based method for handling Component Interaction events.
     /// </summary>
-    public class ComponentCommandInfo : CommandInfo<CommandParameterInfo>
+    public class ComponentCommandInfo : CommandInfo<ComponentCommandParameterInfo>
     {
         /// <inheritdoc/>
-        public override IReadOnlyCollection<CommandParameterInfo> Parameters { get; }
+        public override IReadOnlyList<ComponentCommandParameterInfo> Parameters { get; }
 
         /// <inheritdoc/>
         public override bool SupportsWildCards => true;
@@ -26,96 +25,46 @@ namespace Discord.Interactions
 
         /// <inheritdoc/>
         public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
-            => await ExecuteAsync(context, services, null).ConfigureAwait(false);
-
-        /// <summary>
-        ///     Execute this command using dependency injection.
-        /// </summary>
-        /// <param name="context">Context that will be injected to the <see cref="InteractionModuleBase{T}"/>.</param>
-        /// <param name="services">Services that will be used while initializing the <see cref="InteractionModuleBase{T}"/>.</param>
-        /// <param name="additionalArgs">Provide additional string parameters to the method along with the auto generated parameters.</param>
-        /// <returns>
-        ///     A task representing the asynchronous command execution process.
-        /// </returns>
-        public async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services, params string[] additionalArgs)
         {
-            if (context.Interaction is not IComponentInteraction componentInteraction)
+            if (context.Interaction is not IComponentInteraction)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Message Component Interaction");
 
-            var args = new List<string>();
-
-            if (additionalArgs is not null)
-                args.AddRange(additionalArgs);
-
-            if (componentInteraction.Data?.Values is not null)
-                args.AddRange(componentInteraction.Data.Values);
-
-            return await ExecuteAsync(context, Parameters, args, services);
+            return await base.ExecuteAsync(context, services).ConfigureAwait(false);
         }
 
-        /// <inheritdoc/>
-        public async Task<IResult> ExecuteAsync(IInteractionContext context, IEnumerable<CommandParameterInfo> paramList, IEnumerable<string> values,
-            IServiceProvider services)
+        protected override async Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
         {
-            if (context.Interaction is not IComponentInteraction messageComponent)
-                return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Component Command Interaction");
+            var captures = (context as IRouteMatchContainer)?.SegmentMatches?.ToList();
+            var captureCount = captures?.Count() ?? 0;
 
             try
             {
-                var strCount = Parameters.Count(x => x.ParameterType == typeof(string));
-
-                if (strCount > values?.Count())
-                    return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command was invoked with too few parameters");
-
-                var componentValues = messageComponent.Data?.Values;
-
+                var data = (context.Interaction as IComponentInteraction).Data;
                 var args = new object[Parameters.Count];
 
-                if (componentValues is not null)
+                for (var i = 0; i < Parameters.Count; i++)
                 {
-                    if (Parameters.Last().ParameterType == typeof(string[]))
-                        args[args.Length - 1] = componentValues.ToArray();
-                    else
-                        return ExecuteResult.FromError(InteractionCommandError.BadArgs, $"Select Menu Interaction handlers must accept a {typeof(string[]).FullName} as its last parameter");
+                    var parameter = Parameters[i];
+                    var isCapture = i < captureCount;
+
+                    if (isCapture ^ parameter.IsRouteSegmentParameter)
+                        return await InvokeEventAndReturn(context, ExecuteResult.FromError(InteractionCommandError.BadArgs, "Argument type and parameter type didn't match (Wild Card capture/Component value)")).ConfigureAwait(false);
+
+                    var readResult = isCapture ? await parameter.TypeReader.ReadAsync(context, captures[i].Value, services).ConfigureAwait(false) :
+                        await parameter.TypeConverter.ReadAsync(context, data, services).ConfigureAwait(false);
+
+                    if (!readResult.IsSuccess)
+                        return await InvokeEventAndReturn(context, readResult).ConfigureAwait(false);
+
+                    args[i] = readResult.Value;
                 }
 
-                for (var i = 0; i < strCount; i++)
-                    args[i] = values.ElementAt(i);
-
-                return await RunAsync(context, args, services).ConfigureAwait(false);
+                return ParseResult.FromSuccess(args);
             }
             catch (Exception ex)
             {
-                return ExecuteResult.FromError(ex);
+                return await InvokeEventAndReturn(context, ExecuteResult.FromError(ex)).ConfigureAwait(false);
             }
-        }
-
-        private static object[] GenerateArgs(IEnumerable<CommandParameterInfo> paramList, IEnumerable<string> argList)
-        {
-            var result = new object[paramList.Count()];
-
-            for (var i = 0; i < paramList.Count(); i++)
-            {
-                var parameter = paramList.ElementAt(i);
-
-                if (argList?.ElementAt(i) == null)
-                {
-                    if (!parameter.IsRequired)
-                        result[i] = parameter.DefaultValue;
-                    else
-                        throw new InvalidOperationException($"Component Interaction handler is executed with too few args.");
-                }
-                else if (parameter.IsParameterArray)
-                {
-                    string[] paramArray = new string[argList.Count() - i];
-                    argList.ToArray().CopyTo(paramArray, i);
-                    result[i] = paramArray;
-                }
-                else
-                    result[i] = argList?.ElementAt(i);
-            }
-
-            return result;
         }
 
         protected override Task InvokeModuleEvent(IInteractionContext context, IResult result)

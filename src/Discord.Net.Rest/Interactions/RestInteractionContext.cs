@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Discord.Rest
@@ -6,7 +8,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a Rest based context of an <see cref="IDiscordInteraction"/>.
     /// </summary>
-    public class RestInteractionContext<TInteraction> : IRestInteractionContext
+    public class RestInteractionContext<TInteraction> : IRestInteractionContext, IRouteMatchContainer
         where TInteraction : RestInteraction
     {
         /// <summary>
@@ -33,7 +35,7 @@ namespace Discord.Rest
         public RestUser User { get; }
 
         /// <summary>
-        ///     Gets the <see cref="RestInteraction"/> the command was recieved with.
+        ///     Gets the <see cref="RestInteraction"/> the command was received with.
         /// </summary>
         public TInteraction Interaction { get; }
 
@@ -45,8 +47,11 @@ namespace Discord.Rest
         /// </remarks>
         public Func<string, Task> InteractionResponseCallback { get; set; }
 
+        /// <inheritdoc cref="IRouteMatchContainer.SegmentMatches"/>
+        public IReadOnlyCollection<IRouteSegmentMatch> SegmentMatches { get; private set; }
+
         /// <summary>
-        ///     Initializes a new <see cref="RestInteractionContext{TInteraction}"/>. 
+        ///     Initializes a new <see cref="RestInteractionContext{TInteraction}"/>.
         /// </summary>
         /// <param name="client">The underlying client.</param>
         /// <param name="interaction">The underlying interaction.</param>
@@ -60,7 +65,7 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Initializes a new <see cref="RestInteractionContext{TInteraction}"/>. 
+        ///     Initializes a new <see cref="RestInteractionContext{TInteraction}"/>.
         /// </summary>
         /// <param name="client">The underlying client.</param>
         /// <param name="interaction">The underlying interaction.</param>
@@ -71,7 +76,14 @@ namespace Discord.Rest
             InteractionResponseCallback = interactionResponseCallback;
         }
 
-        // IInterationContext
+        /// <inheritdoc/>
+        public void SetSegmentMatches(IEnumerable<IRouteSegmentMatch> segmentMatches) => SegmentMatches = segmentMatches.ToImmutableArray();
+
+        //IRouteMatchContainer
+        /// <inheritdoc/>
+        IEnumerable<IRouteSegmentMatch> IRouteMatchContainer.SegmentMatches => SegmentMatches;
+
+        // IInteractionContext
         /// <inheritdoc/>
         IDiscordClient IInteractionContext.Client => Client;
 

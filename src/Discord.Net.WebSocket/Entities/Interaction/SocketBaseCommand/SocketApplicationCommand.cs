@@ -19,7 +19,7 @@ namespace Discord.WebSocket
         ///    Gets whether or not this command is a global application command.
         /// </summary>
         public bool IsGlobalCommand
-            => Guild == null;
+            => GuildId is null;
 
         /// <inheritdoc/>
         public ulong ApplicationId { get; private set; }
@@ -36,6 +36,15 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public bool IsDefaultPermission { get; private set; }
 
+        /// <inheritdoc/>
+        public bool IsEnabledInDm { get; private set; }
+
+        /// <inheritdoc/>
+        public bool IsNsfw { get; private set; }
+
+        /// <inheritdoc/>
+        public GuildPermissions DefaultMemberPermissions { get; private set; }
+
         /// <summary>
         ///     Gets a collection of <see cref="SocketApplicationCommandOption"/>s for this command.
         /// </summary>
@@ -43,6 +52,32 @@ namespace Discord.WebSocket
         ///     If the <see cref="Type"/> is not a slash command, this field will be an empty collection.
         /// </remarks>
         public IReadOnlyCollection<SocketApplicationCommandOption> Options { get; private set; }
+
+        /// <summary>
+        ///     Gets the localization dictionary for the name field of this command.
+        /// </summary>
+        public IReadOnlyDictionary<string, string> NameLocalizations { get; private set; }
+
+        /// <summary>
+        ///     Gets the localization dictionary for the description field of this command.
+        /// </summary>
+        public IReadOnlyDictionary<string, string> DescriptionLocalizations { get; private set; }
+
+        /// <summary>
+        ///     Gets the localized name of this command.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        /// </remarks>
+        public string NameLocalized { get; private set; }
+
+        /// <summary>
+        ///     Gets the localized description of this command.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        /// </remarks>
+        public string DescriptionLocalized { get; private set; }
 
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt
@@ -86,6 +121,19 @@ namespace Discord.WebSocket
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(SocketApplicationCommandOption.Create).ToImmutableArray()
                 : ImmutableArray.Create<SocketApplicationCommandOption>();
+
+            NameLocalizations = model.NameLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                ImmutableDictionary<string, string>.Empty;
+
+            DescriptionLocalizations = model.DescriptionLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                       ImmutableDictionary<string, string>.Empty;
+
+            NameLocalized = model.NameLocalized.GetValueOrDefault();
+            DescriptionLocalized = model.DescriptionLocalized.GetValueOrDefault();
+
+            IsEnabledInDm = model.DmPermission.GetValueOrDefault(true).GetValueOrDefault(true);
+            DefaultMemberPermissions = new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(0).GetValueOrDefault(0));
+            IsNsfw = model.Nsfw.GetValueOrDefault(false).GetValueOrDefault(false);
         }
 
         /// <inheritdoc/>

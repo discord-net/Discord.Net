@@ -1,7 +1,6 @@
-﻿using System.Linq;
-
-using Model = Discord.API.AuditLog;
+using System.Linq;
 using EntryModel = Discord.API.AuditLogEntry;
+using Model = Discord.API.AuditLog;
 
 namespace Discord.Rest
 {
@@ -18,7 +17,7 @@ namespace Discord.Rest
         internal static UnbanAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
             var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-            return new UnbanAuditLogData(RestUser.Create(discord, userInfo));
+            return new UnbanAuditLogData((userInfo != null) ? RestUser.Create(discord, userInfo) : null);
         }
 
         /// <summary>

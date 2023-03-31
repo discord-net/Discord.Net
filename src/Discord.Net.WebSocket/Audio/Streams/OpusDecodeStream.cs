@@ -26,7 +26,7 @@ namespace Discord.Audio.Streams
         public override void WriteHeader(ushort seq, uint timestamp, bool missed)
         {
             if (_hasHeader)
-                throw new InvalidOperationException("Header received with no payload.");                
+                throw new InvalidOperationException("Header received with no payload.");
             _hasHeader = true;
 
             _nextMissed = missed;

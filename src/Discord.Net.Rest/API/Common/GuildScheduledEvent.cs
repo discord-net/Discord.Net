@@ -39,5 +39,7 @@ namespace Discord.API
         public Optional<User> Creator { get; set; }
         [JsonProperty("user_count")]
         public Optional<int> UserCount { get; set; }
+        [JsonProperty("image")]
+        public string Image { get; set; }
     }
 }

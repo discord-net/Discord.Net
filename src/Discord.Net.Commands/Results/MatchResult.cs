@@ -1,7 +1,9 @@
-﻿using System;
+using System;
+using System.Diagnostics;
 
 namespace Discord.Commands
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class MatchResult : IResult
     {
         /// <summary>
@@ -12,7 +14,7 @@ namespace Discord.Commands
         /// <summary>
         ///     Gets on which pipeline stage the command may have matched or failed.
         /// </summary>
-        public IResult? Pipeline { get; }
+        public IResult Pipeline { get; }
 
         /// <inheritdoc />
         public CommandError? Error { get; }
@@ -21,7 +23,7 @@ namespace Discord.Commands
         /// <inheritdoc />
         public bool IsSuccess => !Error.HasValue;
 
-        private MatchResult(CommandMatch? match, IResult? pipeline, CommandError? error, string errorReason)
+        private MatchResult(CommandMatch? match, IResult pipeline, CommandError? error, string errorReason)
         {
             Match = match;
             Error = error;
@@ -30,13 +32,13 @@ namespace Discord.Commands
         }
 
         public static MatchResult FromSuccess(CommandMatch match, IResult pipeline)
-            => new MatchResult(match,pipeline,null, null);
+            => new MatchResult(match, pipeline, null, null);
         public static MatchResult FromError(CommandError error, string reason)
-            => new MatchResult(null,null,error, reason);
+            => new MatchResult(null, null, error, reason);
         public static MatchResult FromError(Exception ex)
             => FromError(CommandError.Exception, ex.Message);
         public static MatchResult FromError(IResult result)
-            => new MatchResult(null, null,result.Error, result.ErrorReason);
+            => new MatchResult(null, null, result.Error, result.ErrorReason);
         public static MatchResult FromError(IResult pipeline, CommandError error, string reason)
             => new MatchResult(null, pipeline, error, reason);
 

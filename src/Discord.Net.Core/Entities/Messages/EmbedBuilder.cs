@@ -1,8 +1,9 @@
+using Discord.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Discord.Utils;
 
 namespace Discord
 {
@@ -49,7 +50,8 @@ namespace Discord
             get => _title;
             set
             {
-                if (value?.Length > MaxTitleLength) throw new ArgumentException(message: $"Title length must be less than or equal to {MaxTitleLength}.", paramName: nameof(Title));
+                if (value?.Length > MaxTitleLength)
+                    throw new ArgumentException(message: $"Title length must be less than or equal to {MaxTitleLength}.", paramName: nameof(Title));
                 _title = value;
             }
         }
@@ -62,7 +64,8 @@ namespace Discord
             get => _description;
             set
             {
-                if (value?.Length > MaxDescriptionLength) throw new ArgumentException(message: $"Description length must be less than or equal to {MaxDescriptionLength}.", paramName: nameof(Description));
+                if (value?.Length > MaxDescriptionLength)
+                    throw new ArgumentException(message: $"Description length must be less than or equal to {MaxDescriptionLength}.", paramName: nameof(Description));
                 _description = value;
             }
         }
@@ -99,8 +102,10 @@ namespace Discord
             get => _fields;
             set
             {
-                if (value == null) throw new ArgumentNullException(paramName: nameof(Fields), message: "Cannot set an embed builder's fields collection to null.");
-                if (value.Count > MaxFieldCount) throw new ArgumentException(message: $"Field count must be less than or equal to {MaxFieldCount}.", paramName: nameof(Fields));
+                if (value == null)
+                    throw new ArgumentNullException(paramName: nameof(Fields), message: "Cannot set an embed builder's fields collection to null.");
+                if (value.Count > MaxFieldCount)
+                    throw new ArgumentException(message: $"Field count must be less than or equal to {MaxFieldCount}.", paramName: nameof(Fields));
                 _fields = value;
             }
         }
@@ -149,9 +154,58 @@ namespace Discord
                 int authorLength = Author?.Name?.Length ?? 0;
                 int descriptionLength = Description?.Length ?? 0;
                 int footerLength = Footer?.Text?.Length ?? 0;
-                int fieldSum = Fields.Sum(f => f.Name.Length + f.Value.ToString().Length);
+                int fieldSum = Fields.Sum(f => f.Name.Length + (f.Value?.ToString()?.Length ?? 0));
 
                 return titleLength + authorLength + descriptionLength + footerLength + fieldSum;
+            }
+        }
+
+        /// <summary>
+        ///     Tries to parse a string into an <see cref="EmbedBuilder"/>.
+        /// </summary>
+        /// <param name="json">The json string to parse.</param>
+        /// <param name="builder">The <see cref="EmbedBuilder"/> with populated values. An empty instance if method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if <paramref name="json"/> was successfully parsed. <see langword="false"/> if not.</returns>
+        public static bool TryParse(string json, out EmbedBuilder builder)
+        {
+            builder = new EmbedBuilder();
+            try
+            {
+                var model = JsonConvert.DeserializeObject<Embed>(json);
+
+                if (model is not null)
+                {
+                    builder = model.ToEmbedBuilder();
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        ///     Parses a string into an <see cref="EmbedBuilder"/>.
+        /// </summary>
+        /// <param name="json">The json string to parse.</param>
+        /// <returns>An <see cref="EmbedBuilder"/> with populated values from the passed <paramref name="json"/>.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the string passed is not valid json.</exception>
+        public static EmbedBuilder Parse(string json)
+        {
+            try
+            {
+                var model = JsonConvert.DeserializeObject<Embed>(json);
+
+                if (model is not null)
+                    return model.ToEmbedBuilder();
+
+                return new EmbedBuilder();
+            }
+            catch
+            {
+                throw;
             }
         }
 
@@ -420,7 +474,7 @@ namespace Discord
                 if (!string.IsNullOrEmpty(Author.IconUrl))
                     UrlValidation.Validate(Author.IconUrl, true);
             }
-            if(Footer != null)
+            if (Footer != null)
             {
                 if (!string.IsNullOrEmpty(Footer.IconUrl))
                     UrlValidation.Validate(Footer.IconUrl, true);
@@ -431,6 +485,55 @@ namespace Discord
 
             return new Embed(EmbedType.Rich, Title, Description, Url, Timestamp, Color, _image, null, Author?.Build(), Footer?.Build(), null, _thumbnail, fields.ToImmutable());
         }
+
+        public static bool operator ==(EmbedBuilder left, EmbedBuilder right)
+        => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedBuilder left, EmbedBuilder right)
+            => !(left == right);
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="EmbedBuilder"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedBuilder"/>, <see cref="Equals(EmbedBuilder)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="EmbedBuilder"/></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+            => obj is EmbedBuilder embedBuilder && Equals(embedBuilder);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedBuilder"/> is equal to the current <see cref="EmbedBuilder"/>
+        /// </summary>
+        /// <param name="embedBuilder">The <see cref="EmbedBuilder"/> to compare with the current <see cref="EmbedBuilder"/></param>
+        /// <returns></returns>
+        public bool Equals(EmbedBuilder embedBuilder)
+        {
+            if (embedBuilder is null)
+                return false;
+
+            if (Fields.Count != embedBuilder.Fields.Count)
+                return false;
+
+            for (var i = 0; i < _fields.Count; i++)
+                if (_fields[i] != embedBuilder._fields[i])
+                    return false;
+
+            return _title == embedBuilder?._title
+            && _description == embedBuilder?._description
+            && _image == embedBuilder?._image
+            && _thumbnail == embedBuilder?._thumbnail
+            && Timestamp == embedBuilder?.Timestamp
+            && Color == embedBuilder?.Color
+            && Author == embedBuilder?.Author
+            && Footer == embedBuilder?.Footer
+            && Url == embedBuilder?.Url;
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     /// <summary>
@@ -465,8 +568,10 @@ namespace Discord
             get => _name;
             set
             {
-                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(message: "Field name must not be null, empty or entirely whitespace.", paramName: nameof(Name));
-                if (value.Length > MaxFieldNameLength) throw new ArgumentException(message: $"Field name length must be less than or equal to {MaxFieldNameLength}.", paramName: nameof(Name));
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException(message: "Field name must not be null, empty or entirely whitespace.", paramName: nameof(Name));
+                if (value.Length > MaxFieldNameLength)
+                    throw new ArgumentException(message: $"Field name length must be less than or equal to {MaxFieldNameLength}.", paramName: nameof(Name));
                 _name = value;
             }
         }
@@ -488,8 +593,10 @@ namespace Discord
             set
             {
                 var stringValue = value?.ToString();
-                if (string.IsNullOrWhiteSpace(stringValue)) throw new ArgumentException(message: "Field value must not be null or empty.", paramName: nameof(Value));
-                if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException(message: $"Field value length must be less than or equal to {MaxFieldValueLength}.", paramName: nameof(Value));
+                if (string.IsNullOrWhiteSpace(stringValue))
+                    throw new ArgumentException(message: "Field value must not be null or empty.", paramName: nameof(Value));
+                if (stringValue.Length > MaxFieldValueLength)
+                    throw new ArgumentException(message: $"Field value length must be less than or equal to {MaxFieldValueLength}.", paramName: nameof(Value));
                 _value = stringValue;
             }
         }
@@ -547,6 +654,37 @@ namespace Discord
         /// </exception>
         public EmbedField Build()
             => new EmbedField(Name, Value.ToString(), IsInline);
+
+        public static bool operator ==(EmbedFieldBuilder left, EmbedFieldBuilder right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedFieldBuilder left, EmbedFieldBuilder right)
+            => !(left == right);
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="EmbedFieldBuilder"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedFieldBuilder"/>, <see cref="Equals(EmbedFieldBuilder)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="EmbedFieldBuilder"/></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+            => obj is EmbedFieldBuilder embedFieldBuilder && Equals(embedFieldBuilder);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedFieldBuilder"/> is equal to the current <see cref="EmbedFieldBuilder"/>
+        /// </summary>
+        /// <param name="embedFieldBuilder">The <see cref="EmbedFieldBuilder"/> to compare with the current <see cref="EmbedFieldBuilder"/></param>
+        /// <returns></returns>
+        public bool Equals(EmbedFieldBuilder embedFieldBuilder)
+            => _name == embedFieldBuilder?._name
+            && _value == embedFieldBuilder?._value
+            && IsInline == embedFieldBuilder?.IsInline;
+
+        /// <inheritdoc />
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     /// <summary>
@@ -574,7 +712,8 @@ namespace Discord
             get => _name;
             set
             {
-                if (value?.Length > MaxAuthorNameLength) throw new ArgumentException(message: $"Author name length must be less than or equal to {MaxAuthorNameLength}.", paramName: nameof(Name));
+                if (value?.Length > MaxAuthorNameLength)
+                    throw new ArgumentException(message: $"Author name length must be less than or equal to {MaxAuthorNameLength}.", paramName: nameof(Name));
                 _name = value;
             }
         }
@@ -647,6 +786,37 @@ namespace Discord
         /// </returns>
         public EmbedAuthor Build()
             => new EmbedAuthor(Name, Url, IconUrl, null);
+
+        public static bool operator ==(EmbedAuthorBuilder left, EmbedAuthorBuilder right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedAuthorBuilder left, EmbedAuthorBuilder right)
+            => !(left == right);
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="EmbedAuthorBuilder"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedAuthorBuilder"/>, <see cref="Equals(EmbedAuthorBuilder)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="EmbedAuthorBuilder"/></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+            => obj is EmbedAuthorBuilder embedAuthorBuilder && Equals(embedAuthorBuilder);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedAuthorBuilder"/> is equals to the current <see cref="EmbedAuthorBuilder"/>
+        /// </summary>
+        /// <param name="embedAuthorBuilder">The <see cref="EmbedAuthorBuilder"/> to compare with the current <see cref="EmbedAuthorBuilder"/></param>
+        /// <returns></returns>
+        public bool Equals(EmbedAuthorBuilder embedAuthorBuilder)
+            => _name == embedAuthorBuilder?._name
+            && Url == embedAuthorBuilder?.Url
+            && IconUrl == embedAuthorBuilder?.IconUrl;
+
+        /// <inheritdoc />
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     /// <summary>
@@ -675,7 +845,8 @@ namespace Discord
             get => _text;
             set
             {
-                if (value?.Length > MaxFooterTextLength) throw new ArgumentException(message: $"Footer text length must be less than or equal to {MaxFooterTextLength}.", paramName: nameof(Text));
+                if (value?.Length > MaxFooterTextLength)
+                    throw new ArgumentException(message: $"Footer text length must be less than or equal to {MaxFooterTextLength}.", paramName: nameof(Text));
                 _text = value;
             }
         }
@@ -727,5 +898,35 @@ namespace Discord
         /// </returns>
         public EmbedFooter Build()
             => new EmbedFooter(Text, IconUrl, null);
+
+        public static bool operator ==(EmbedFooterBuilder left, EmbedFooterBuilder right)
+            => left is null ? right is null
+                : left.Equals(right);
+
+        public static bool operator !=(EmbedFooterBuilder left, EmbedFooterBuilder right)
+            => !(left == right);
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="EmbedFooterBuilder"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the object passes is an <see cref="EmbedFooterBuilder"/>, <see cref="Equals(EmbedFooterBuilder)"/> will be called to compare the 2 instances
+        /// </remarks>
+        /// <param name="obj">The object to compare with the current <see cref="EmbedFooterBuilder"/></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+            => obj is EmbedFooterBuilder embedFooterBuilder && Equals(embedFooterBuilder);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="EmbedFooterBuilder"/> is equal to the current <see cref="EmbedFooterBuilder"/>
+        /// </summary>
+        /// <param name="embedFooterBuilder">The <see cref="EmbedFooterBuilder"/> to compare with the current <see cref="EmbedFooterBuilder"/></param>
+        /// <returns></returns>
+        public bool Equals(EmbedFooterBuilder embedFooterBuilder)
+            => _text == embedFooterBuilder?._text
+            && IconUrl == embedFooterBuilder?.IconUrl;
+
+        /// <inheritdoc />
+        public override int GetHashCode() => base.GetHashCode();
     }
 }

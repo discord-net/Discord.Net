@@ -17,7 +17,7 @@ namespace Discord.Interactions
         ///     Gets the string to compare the Modal CustomIDs with.
         /// </summary>
         public string CustomId { get; }
-        
+
         /// <summary>
         ///     Gets <see langword="true"/> if <see cref="GroupAttribute"/>s will be ignored while creating this command and this method will be treated as a top level command.
         /// </summary>
@@ -27,6 +27,14 @@ namespace Discord.Interactions
         ///     Gets the run mode this command gets executed with.
         /// </summary>
         public RunMode RunMode { get; }
+
+        /// <summary>
+        ///     Gets or sets whether the <see cref="CustomId"/> should be treated as a raw Regex pattern.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="false"/> defaults to the pattern used before 3.9.0.
+        /// </remarks>
+        public bool TreatAsRegex { get; set; } = false;
 
         /// <summary>
         ///     Create a command for modal interaction handling.

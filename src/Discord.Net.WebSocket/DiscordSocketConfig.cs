@@ -59,7 +59,7 @@ namespace Discord.WebSocket
         ///     Gets or sets whether or not the client should download the default stickers on startup.
         /// </summary>
         /// <remarks>
-        ///     When this is set to <see langword="false"/> default stickers arn't present and cannot be resolved by the client.
+        ///     When this is set to <see langword="false"/> default stickers aren't present and cannot be resolved by the client.
         ///     This will make all default stickers have the type of <see cref="SocketUnknownSticker"/>.
         /// </remarks>
         public bool AlwaysDownloadDefaultStickers { get; set; } = false;
@@ -187,6 +187,11 @@ namespace Discord.WebSocket
         ///     Gets or sets whether or not to log warnings related to guild intents and events.
         /// </summary>
         public bool LogGatewayIntentWarnings { get; set; } = true;
+
+        /// <summary>
+        ///     Gets or sets whether or not Unknown Dispatch event messages should be logged.
+        /// </summary>
+        public bool SuppressUnknownDispatchWarnings { get; set; } = true;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="DiscordSocketConfig"/> class with the default configuration.

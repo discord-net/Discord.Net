@@ -99,7 +99,7 @@ When we run the command, our modal should pop up:
 ### Respond to modals
 
 > [!WARNING]
-> Modals can not be sent when respoding to a modal.
+> Modals can not be sent when responding to a modal.
 
 Once a user has submitted the modal, we need to let everyone know what
 their favorite food is. We can start by hooking a task to the client's

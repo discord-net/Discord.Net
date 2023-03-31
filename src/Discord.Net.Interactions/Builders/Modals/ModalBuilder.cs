@@ -9,6 +9,7 @@ namespace Discord.Interactions.Builders
     /// </summary>
     public class ModalBuilder
     {
+        internal readonly InteractionService _interactionService;
         internal readonly List<IInputComponentBuilder> _components;
 
         /// <summary>
@@ -31,11 +32,14 @@ namespace Discord.Interactions.Builders
         /// </summary>
         public IReadOnlyCollection<IInputComponentBuilder> Components => _components;
 
-        internal ModalBuilder(Type type)
+        internal ModalBuilder(Type type, InteractionService interactionService)
         {
             if (!typeof(IModal).IsAssignableFrom(type))
                 throw new ArgumentException($"Must be an implementation of {nameof(IModal)}", nameof(type));
 
+            Type = type;
+
+            _interactionService = interactionService;
             _components = new();
         }
 
@@ -43,7 +47,7 @@ namespace Discord.Interactions.Builders
         ///     Initializes a new <see cref="ModalBuilder"/>
         /// </summary>
         /// <param name="modalInitializer">The initialization delegate for this modal.</param>
-        public ModalBuilder(Type type, ModalInitializer modalInitializer) : this(type)
+        public ModalBuilder(Type type, ModalInitializer modalInitializer, InteractionService interactionService) : this(type, interactionService)
         {
             ModalInitializer = modalInitializer;
         }
@@ -62,7 +66,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds text components to <see cref="TextComponents"/>.
+        ///     Adds text components to <see cref="Components"/>.
         /// </summary>
         /// <param name="configure">Text Component builder factory.</param>
         /// <returns>

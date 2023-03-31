@@ -39,16 +39,19 @@ namespace Discord.Rest
         {
         }
 
-        internal new static async Task<RestCommandBase> CreateAsync(DiscordRestClient client, Model model)
+        internal new static async Task<RestCommandBase> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
             var entity = new RestCommandBase(client, model);
-            await entity.UpdateAsync(client, model).ConfigureAwait(false);
+            await entity.UpdateAsync(client, model, doApiCall).ConfigureAwait(false);
             return entity;
         }
 
-        internal override async Task UpdateAsync(DiscordRestClient client, Model model)
+        internal override async Task UpdateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
-            await base.UpdateAsync(client, model).ConfigureAwait(false);
+            await base.UpdateAsync(client, model, doApiCall).ConfigureAwait(false);
+
+            if (model.Data.IsSpecified && model.Data.Value is RestCommandBaseData data)
+                Data = data;
         }
 
         /// <summary>
@@ -190,7 +193,7 @@ namespace Discord.Rest
             Preconditions.NotNull(fileStream, nameof(fileStream), "File Stream must have data");
             Preconditions.NotNullOrEmpty(fileName, nameof(fileName), "File Name must not be empty or null");
 
-            using(var file = new FileAttachment(fileStream, fileName))
+            using (var file = new FileAttachment(fileStream, fileName))
                 return await FollowupWithFileAsync(file, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
         }
 

@@ -19,6 +19,9 @@ namespace Discord.WebSocket
         /// </summary>
         public SocketGuild Guild { get; private set; }
 
+        /// <inheritdoc/>
+        public ulong GuildId { get; private set; }
+
         /// <summary>
         ///     Gets the channel of the event.
         /// </summary>
@@ -34,6 +37,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public string Description { get; private set; }
+
+        /// <inheritdoc/>
+        public string CoverImageId { get; private set; }
 
         /// <inheritdoc/>
         public DateTimeOffset StartTime { get; private set; }
@@ -83,9 +89,9 @@ namespace Discord.WebSocket
             {
                 var guildUser = Guild.GetUser(model.CreatorId.Value);
 
-                if(guildUser != null)
+                if (guildUser != null)
                 {
-                    if(model.Creator.IsSpecified)
+                    if (model.Creator.IsSpecified)
                         guildUser.Update(Discord.State, model.Creator.Value);
 
                     Creator = guildUser;
@@ -109,7 +115,13 @@ namespace Discord.WebSocket
             StartTime = model.ScheduledStartTime;
             Status = model.Status;
             UserCount = model.UserCount.ToNullable();
+            CoverImageId = model.Image;
+            GuildId = model.GuildId;
         }
+
+        /// <inheritdoc/>
+        public string GetCoverImageUrl(ImageFormat format = ImageFormat.Auto, ushort size = 1024)
+            => CDN.GetEventCoverImageUrl(Guild.Id, Id, CoverImageId, format, size);
 
         /// <inheritdoc/>
         public Task DeleteAsync(RequestOptions options = null)

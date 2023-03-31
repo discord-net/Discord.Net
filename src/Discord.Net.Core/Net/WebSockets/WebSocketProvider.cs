@@ -1,4 +1,4 @@
-﻿namespace Discord.Net.WebSockets
+namespace Discord.Net.WebSockets
 {
     public delegate IWebSocketClient WebSocketProvider();
 }

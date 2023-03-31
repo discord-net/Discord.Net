@@ -18,7 +18,7 @@ namespace Discord.Commands
         /// <summary> Gets the shard ID of the command context. </summary>
         private static int GetShardId(DiscordShardedClient client, IGuild guild)
             => guild == null ? 0 : client.GetShardIdFor(guild);
-#endregion
+        #endregion
 
         #region ICommandContext
         /// <inheritdoc />

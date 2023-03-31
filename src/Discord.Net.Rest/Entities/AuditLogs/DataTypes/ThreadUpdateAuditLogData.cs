@@ -1,7 +1,6 @@
 using System.Linq;
-
-using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
+using Model = Discord.API.AuditLog;
 
 namespace Discord.Rest
 {
@@ -15,7 +14,7 @@ namespace Discord.Rest
             Thread = thread;
             ThreadType = type;
             Before = before;
-            After = After;
+            After = after;
         }
 
         internal static ThreadUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
@@ -51,7 +50,7 @@ namespace Discord.Rest
             var threadInfo = log.Threads.FirstOrDefault(x => x.Id == id);
             var threadChannel = threadInfo == null ? null : RestThreadChannel.Create(discord, (IGuild)null, threadInfo);
 
-            return new ThreadUpdateAuditLogData(threadChannel,type, before, after);
+            return new ThreadUpdateAuditLogData(threadChannel, type, before, after);
         }
 
         // Doc Note: Corresponds to the *current* data

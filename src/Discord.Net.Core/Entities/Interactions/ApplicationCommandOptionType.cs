@@ -21,7 +21,7 @@ namespace Discord
         String = 3,
 
         /// <summary>
-        ///     An <see langword="int"/>.
+        ///     An <see langword="long"/>.
         /// </summary>
         Integer = 4,
 
@@ -56,7 +56,7 @@ namespace Discord
         Number = 10,
 
         /// <summary>
-        ///     A <see cref="Discord.Attachment"/>.
+        ///     A <see cref="IAttachment"/>.
         /// </summary>
         Attachment = 11
     }

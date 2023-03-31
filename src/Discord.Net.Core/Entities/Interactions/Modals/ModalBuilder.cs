@@ -64,18 +64,18 @@ namespace Discord
         /// <summary>
         ///     Sets the custom id of the current modal.
         /// </summary>
-        /// <param name="title">The value to set the custom id to.</param>
+        /// <param name="customId">The value to set the custom id to.</param>
         /// <returns>The current builder.</returns>
         public ModalBuilder WithCustomId(string customId)
         {
             CustomId = customId;
             return this;
         }
-        
+
         /// <summary>
         ///     Adds a component to the current builder.
         /// </summary>
-        /// <param name="title">The component to add.</param>
+        /// <param name="component">The component to add.</param>
         /// <returns>The current builder.</returns>
         public ModalBuilder AddTextInput(TextInputBuilder component)
         {
@@ -93,7 +93,7 @@ namespace Discord
         /// <param name="maxLength">The input's maximum length.</param>
         /// <param name="style">The input's style.</param>
         /// <returns>The current builder.</returns>
-        public ModalBuilder AddTextInput(string label, string customId, TextInputStyle style = TextInputStyle.Short, 
+        public ModalBuilder AddTextInput(string label, string customId, TextInputStyle style = TextInputStyle.Short,
             string placeholder = "", int? minLength = null, int? maxLength = null, bool? required = null, string value = null)
             => AddTextInput(new(label, customId, style, placeholder, minLength, maxLength, required, value));
 
@@ -204,7 +204,7 @@ namespace Discord
         /// <param name="maxLength">The input's maximum length.</param>
         /// <param name="style">The input's style.</param>
         /// <returns>The current builder.</returns>
-        public ModalComponentBuilder WithTextInput(string label, string customId, TextInputStyle style = TextInputStyle.Short, 
+        public ModalComponentBuilder WithTextInput(string label, string customId, TextInputStyle style = TextInputStyle.Short,
             string placeholder = null, int? minLength = null, int? maxLength = null, int row = 0, bool? required = null,
             string value = null)
             => WithTextInput(new(label, customId, style, placeholder, minLength, maxLength, required, value), row);
@@ -213,7 +213,7 @@ namespace Discord
         ///     Adds a <see cref="TextInputBuilder"/> to the <see cref="ModalComponentBuilder"/> at the specific row.
         ///     If the row cannot accept the component then it will add it to a row that can.
         /// </summary>
-        /// <param name="text">The <see cref="TextInputBuilder"> to add.</param>
+        /// <param name="text">The <see cref="TextInputBuilder"/> to add.</param>
         /// <param name="row">The row to add the text input.</param>
         /// <exception cref="InvalidOperationException">There are no more rows to add a text input to.</exception>
         /// <exception cref="ArgumentException"><paramref name="row"/> must be less than <see cref="MaxActionRowCount"/>.</exception>
@@ -263,6 +263,6 @@ namespace Discord
         /// </summary>
         /// <returns>A <see cref="ModalComponent"/> representing the builder.</returns>
         public ModalComponent Build()
-            => new (ActionRows?.Select(x => x.Build()).ToList());
+            => new(ActionRows?.Select(x => x.Build()).ToList());
     }
 }

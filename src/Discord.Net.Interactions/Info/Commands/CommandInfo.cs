@@ -20,7 +20,7 @@ namespace Discord.Interactions
     /// <returns>
     ///     A task representing the execution operation.
     /// </returns>
-    public delegate Task ExecuteCallback (IInteractionContext context, object[] args, IServiceProvider serviceProvider, ICommandInfo commandInfo);
+    public delegate Task ExecuteCallback(IInteractionContext context, object[] args, IServiceProvider serviceProvider, ICommandInfo commandInfo);
 
     /// <summary>
     ///     The base information class for <see cref="InteractionService"/> commands.
@@ -30,6 +30,8 @@ namespace Discord.Interactions
     {
         private readonly ExecuteCallback _action;
         private readonly ILookup<string, PreconditionAttribute> _groupedPreconditions;
+
+        internal IReadOnlyDictionary<string, TParameter> _parameterDictionary { get; }
 
         /// <inheritdoc/>
         public ModuleInfo Module { get; }
@@ -62,7 +64,9 @@ namespace Discord.Interactions
         public IReadOnlyCollection<PreconditionAttribute> Preconditions { get; }
 
         /// <inheritdoc cref="ICommandInfo.Parameters"/>
-        public abstract IReadOnlyCollection<TParameter> Parameters { get; }
+        public abstract IReadOnlyList<TParameter> Parameters { get; }
+
+        public bool TreatNameAsRegex { get; }
 
         internal CommandInfo(Builders.ICommandBuilder builder, ModuleInfo module, InteractionService commandService)
         {
@@ -76,13 +80,112 @@ namespace Discord.Interactions
             RunMode = builder.RunMode != RunMode.Default ? builder.RunMode : commandService._runMode;
             Attributes = builder.Attributes.ToImmutableArray();
             Preconditions = builder.Preconditions.ToImmutableArray();
+            TreatNameAsRegex = builder.TreatNameAsRegex && SupportsWildCards;
 
             _action = builder.Callback;
             _groupedPreconditions = builder.Preconditions.ToLookup(x => x.Group, x => x, StringComparer.Ordinal);
+            _parameterDictionary = Parameters?.ToDictionary(x => x.Name, x => x).ToImmutableDictionary();
         }
 
         /// <inheritdoc/>
-        public abstract Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services);
+        public virtual async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
+        {
+            switch (RunMode)
+            {
+                case RunMode.Sync:
+                    return await ExecuteInternalAsync(context, services).ConfigureAwait(false);
+                case RunMode.Async:
+                    _ = Task.Run(async () =>
+                    {
+                        await ExecuteInternalAsync(context, services).ConfigureAwait(false);
+                    });
+                    break;
+                default:
+                    throw new InvalidOperationException($"RunMode {RunMode} is not supported.");
+            }
+
+            return ExecuteResult.FromSuccess();
+        }
+
+        protected abstract Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services);
+
+        private async Task<IResult> ExecuteInternalAsync(IInteractionContext context, IServiceProvider services)
+        {
+            await CommandService._cmdLogger.DebugAsync($"Executing {GetLogString(context)}").ConfigureAwait(false);
+
+            using var scope = services?.CreateScope();
+
+            if (CommandService._autoServiceScopes)
+                services = scope?.ServiceProvider ?? EmptyServiceProvider.Instance;
+
+            try
+            {
+                var preconditionResult = await CheckPreconditionsAsync(context, services).ConfigureAwait(false);
+                if (!preconditionResult.IsSuccess)
+                    return await InvokeEventAndReturn(context, preconditionResult).ConfigureAwait(false);
+
+                var argsResult = await ParseArgumentsAsync(context, services).ConfigureAwait(false);
+
+                if (!argsResult.IsSuccess)
+                    return await InvokeEventAndReturn(context, argsResult).ConfigureAwait(false);
+
+                if (argsResult is not ParseResult parseResult)
+                    return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Complex command parsing failed for an unknown reason.");
+
+                var args = parseResult.Args;
+
+                var index = 0;
+                foreach (var parameter in Parameters)
+                {
+                    var result = await parameter.CheckPreconditionsAsync(context, args[index++], services).ConfigureAwait(false);
+                    if (!result.IsSuccess)
+                        return await InvokeEventAndReturn(context, result).ConfigureAwait(false);
+                }
+
+                var task = _action(context, args, services, this);
+
+                if (task is Task<IResult> resultTask)
+                {
+                    var result = await resultTask.ConfigureAwait(false);
+                    await InvokeModuleEvent(context, result).ConfigureAwait(false);
+                    if (result is RuntimeResult or ExecuteResult)
+                        return result;
+                }
+                else
+                {
+                    await task.ConfigureAwait(false);
+                    return await InvokeEventAndReturn(context, ExecuteResult.FromSuccess()).ConfigureAwait(false);
+                }
+
+                return await InvokeEventAndReturn(context, ExecuteResult.FromError(InteractionCommandError.Unsuccessful, "Command execution failed for an unknown reason")).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                var originalEx = ex;
+                while (ex is TargetInvocationException)
+                    ex = ex.InnerException;
+
+                await Module.CommandService._cmdLogger.ErrorAsync(ex).ConfigureAwait(false);
+
+                var result = ExecuteResult.FromError(ex);
+                await InvokeModuleEvent(context, result).ConfigureAwait(false);
+
+                if (Module.CommandService._throwOnError)
+                {
+                    if (ex == originalEx)
+                        throw;
+                    else
+                        ExceptionDispatchInfo.Capture(ex).Throw();
+                }
+
+                return result;
+            }
+            finally
+            {
+                await CommandService._cmdLogger.VerboseAsync($"Executed {GetLogString(context)}").ConfigureAwait(false);
+            }
+        }
+
         protected abstract Task InvokeModuleEvent(IInteractionContext context, IResult result);
         protected abstract string GetLogString(IInteractionContext context);
 
@@ -120,115 +223,13 @@ namespace Discord.Interactions
                 return moduleResult;
 
             var commandResult = await CheckGroups(_groupedPreconditions, "Command").ConfigureAwait(false);
-            if (!commandResult.IsSuccess)
-                return commandResult;
-
-            return PreconditionResult.FromSuccess();
+            return !commandResult.IsSuccess ? commandResult : PreconditionResult.FromSuccess();
         }
 
-        protected async Task<IResult> RunAsync(IInteractionContext context, object[] args, IServiceProvider services)
+        protected async Task<T> InvokeEventAndReturn<T>(IInteractionContext context, T result) where T : IResult
         {
-            switch (RunMode)
-            {
-                case RunMode.Sync:
-                    {
-                        if (CommandService._autoServiceScopes)
-                        {
-                            using var scope = services?.CreateScope();
-                            return await ExecuteInternalAsync(context, args, scope?.ServiceProvider ?? EmptyServiceProvider.Instance).ConfigureAwait(false);
-                        }
-                        else
-                            return await ExecuteInternalAsync(context, args, services).ConfigureAwait(false);
-                    }
-                case RunMode.Async:
-                    _ = Task.Run(async () =>
-                    {
-                        if (CommandService._autoServiceScopes)
-                        {
-                            using var scope = services?.CreateScope();
-                            await ExecuteInternalAsync(context, args, scope?.ServiceProvider ?? EmptyServiceProvider.Instance).ConfigureAwait(false);
-                        }
-                        else
-                            await ExecuteInternalAsync(context, args, services).ConfigureAwait(false);
-                    });
-                    break;
-                default:
-                    throw new InvalidOperationException($"RunMode {RunMode} is not supported.");
-            }
-
-            return ExecuteResult.FromSuccess();
-        }
-
-        private async Task<IResult> ExecuteInternalAsync(IInteractionContext context, object[] args, IServiceProvider services)
-        {
-            await CommandService._cmdLogger.DebugAsync($"Executing {GetLogString(context)}").ConfigureAwait(false);
-
-            try
-            {
-                var preconditionResult = await CheckPreconditionsAsync(context, services).ConfigureAwait(false);
-                if (!preconditionResult.IsSuccess)
-                {
-                    await InvokeModuleEvent(context, preconditionResult).ConfigureAwait(false);
-                    return preconditionResult;
-                }
-
-                var index = 0;
-                foreach (var parameter in Parameters)
-                {
-                    var result = await parameter.CheckPreconditionsAsync(context, args[index++], services).ConfigureAwait(false);
-                    if (!result.IsSuccess)
-                    {
-                        await InvokeModuleEvent(context, result).ConfigureAwait(false);
-                        return result;
-                    }
-                }
-
-                var task = _action(context, args, services, this);
-
-                if (task is Task<IResult> resultTask)
-                {
-                    var result = await resultTask.ConfigureAwait(false);
-                    await InvokeModuleEvent(context, result).ConfigureAwait(false);
-                    if (result is RuntimeResult || result is ExecuteResult)
-                        return result;
-                }
-                else
-                {
-                    await task.ConfigureAwait(false);
-                    var result = ExecuteResult.FromSuccess();
-                    await InvokeModuleEvent(context, result).ConfigureAwait(false);
-                    return result;
-                }
-
-                var failResult = ExecuteResult.FromError(InteractionCommandError.Unsuccessful, "Command execution failed for an unknown reason");
-                await InvokeModuleEvent(context, failResult).ConfigureAwait(false);
-                return failResult;
-            }
-            catch (Exception ex)
-            {
-                var originalEx = ex;
-                while (ex is TargetInvocationException)
-                    ex = ex.InnerException;
-
-                await Module.CommandService._cmdLogger.ErrorAsync(ex).ConfigureAwait(false);
-
-                var result = ExecuteResult.FromError(ex);
-                await InvokeModuleEvent(context, result).ConfigureAwait(false);
-
-                if (Module.CommandService._throwOnError)
-                {
-                    if (ex == originalEx)
-                        throw;
-                    else
-                        ExceptionDispatchInfo.Capture(ex).Throw();
-                }
-
-                return result;
-            }
-            finally
-            {
-                await CommandService._cmdLogger.VerboseAsync($"Executed {GetLogString(context)}").ConfigureAwait(false);
-            }
+            await InvokeModuleEvent(context, result).ConfigureAwait(false);
+            return result;
         }
 
         private static bool CheckTopLevel(ModuleInfo parent)

@@ -13,9 +13,9 @@ namespace Discord.Interactions.Builders
 
         public const int MaxCommandDepth = 3;
 
-        public static async Task<IEnumerable<TypeInfo>> SearchAsync (Assembly assembly, InteractionService commandService)
+        public static async Task<IEnumerable<TypeInfo>> SearchAsync(Assembly assembly, InteractionService commandService)
         {
-            static bool IsLoadableModule (TypeInfo info)
+            static bool IsLoadableModule(TypeInfo info)
             {
                 return info.DeclaredMethods.Any(x => x.GetCustomAttribute<SlashCommandAttribute>() != null);
             }
@@ -24,7 +24,7 @@ namespace Discord.Interactions.Builders
 
             foreach (var type in assembly.DefinedTypes)
             {
-                if (( type.IsPublic || type.IsNestedPublic ) && IsValidModuleDefinition(type))
+                if ((type.IsPublic || type.IsNestedPublic) && IsValidModuleDefinition(type))
                 {
                     result.Add(type);
                 }
@@ -36,7 +36,7 @@ namespace Discord.Interactions.Builders
             return result;
         }
 
-        public static async Task<Dictionary<Type, ModuleInfo>> BuildAsync (IEnumerable<TypeInfo> validTypes, InteractionService commandService,
+        public static async Task<Dictionary<Type, ModuleInfo>> BuildAsync(IEnumerable<TypeInfo> validTypes, InteractionService commandService,
             IServiceProvider services)
         {
             var topLevelGroups = validTypes.Where(x => x.DeclaringType == null || !IsValidModuleDefinition(x.DeclaringType.GetTypeInfo()));
@@ -62,7 +62,7 @@ namespace Discord.Interactions.Builders
             return result;
         }
 
-        private static void BuildModule (ModuleBuilder builder, TypeInfo typeInfo, InteractionService commandService,
+        private static void BuildModule(ModuleBuilder builder, TypeInfo typeInfo, InteractionService commandService,
             IServiceProvider services)
         {
             var attributes = typeInfo.GetCustomAttributes();
@@ -85,11 +85,24 @@ namespace Discord.Interactions.Builders
                             builder.DefaultPermission = defPermission.IsDefaultPermission;
                         }
                         break;
+                    case EnabledInDmAttribute enabledInDm:
+                        {
+                            builder.IsEnabledInDm = enabledInDm.IsEnabled;
+                        }
+                        break;
+                    case DefaultMemberPermissionsAttribute memberPermission:
+                        {
+                            builder.DefaultMemberPermissions = memberPermission.Permissions;
+                        }
+                        break;
                     case PreconditionAttribute precondition:
                         builder.AddPreconditions(precondition);
                         break;
                     case DontAutoRegisterAttribute dontAutoRegister:
                         builder.DontAutoRegister = true;
+                        break;
+                    case NsfwCommandAttribute nsfwCommand:
+                        builder.SetNsfw(nsfwCommand.IsNsfw);
                         break;
                     default:
                         builder.AddAttributes(attribute);
@@ -117,14 +130,14 @@ namespace Discord.Interactions.Builders
             foreach (var method in validInteractions)
                 builder.AddComponentCommand(x => BuildComponentCommand(x, createInstance, method, commandService, services));
 
-            foreach(var method in validAutocompleteCommands)
+            foreach (var method in validAutocompleteCommands)
                 builder.AddAutocompleteCommand(x => BuildAutocompleteCommand(x, createInstance, method, commandService, services));
 
-            foreach(var method in validModalCommands)
+            foreach (var method in validModalCommands)
                 builder.AddModalCommand(x => BuildModalCommand(x, createInstance, method, commandService, services));
         }
 
-        private static void BuildSubModules (ModuleBuilder parent, IEnumerable<TypeInfo> subModules, IList<TypeInfo> builtTypes, InteractionService commandService,
+        private static void BuildSubModules(ModuleBuilder parent, IEnumerable<TypeInfo> subModules, IList<TypeInfo> builtTypes, InteractionService commandService,
             IServiceProvider services, int slashGroupDepth = 0)
         {
             foreach (var submodule in subModules.Where(IsValidModuleDefinition))
@@ -145,7 +158,7 @@ namespace Discord.Interactions.Builders
             }
         }
 
-        private static void BuildSlashCommand (SlashCommandBuilder builder, Func<IServiceProvider, IInteractionModuleBase> createInstance, MethodInfo methodInfo,
+        private static void BuildSlashCommand(SlashCommandBuilder builder, Func<IServiceProvider, IInteractionModuleBase> createInstance, MethodInfo methodInfo,
             InteractionService commandService, IServiceProvider services)
         {
             var attributes = methodInfo.GetCustomAttributes();
@@ -169,8 +182,21 @@ namespace Discord.Interactions.Builders
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
                         }
                         break;
+                    case EnabledInDmAttribute enabledInDm:
+                        {
+                            builder.IsEnabledInDm = enabledInDm.IsEnabled;
+                        }
+                        break;
+                    case DefaultMemberPermissionsAttribute memberPermission:
+                        {
+                            builder.DefaultMemberPermissions = memberPermission.Permissions;
+                        }
+                        break;
                     case PreconditionAttribute precondition:
                         builder.WithPreconditions(precondition);
+                        break;
+                    case NsfwCommandAttribute nsfwCommand:
+                        builder.SetNsfw(nsfwCommand.IsNsfw);
                         break;
                     default:
                         builder.WithAttributes(attribute);
@@ -186,7 +212,7 @@ namespace Discord.Interactions.Builders
             builder.Callback = CreateCallback(createInstance, methodInfo, commandService);
         }
 
-        private static void BuildContextCommand (ContextCommandBuilder builder, Func<IServiceProvider, IInteractionModuleBase> createInstance, MethodInfo methodInfo,
+        private static void BuildContextCommand(ContextCommandBuilder builder, Func<IServiceProvider, IInteractionModuleBase> createInstance, MethodInfo methodInfo,
             InteractionService commandService, IServiceProvider services)
         {
             var attributes = methodInfo.GetCustomAttributes();
@@ -211,8 +237,21 @@ namespace Discord.Interactions.Builders
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
                         }
                         break;
+                    case EnabledInDmAttribute enabledInDm:
+                        {
+                            builder.IsEnabledInDm = enabledInDm.IsEnabled;
+                        }
+                        break;
+                    case DefaultMemberPermissionsAttribute memberPermission:
+                        {
+                            builder.DefaultMemberPermissions = memberPermission.Permissions;
+                        }
+                        break;
                     case PreconditionAttribute precondition:
                         builder.WithPreconditions(precondition);
+                        break;
+                    case NsfwCommandAttribute nsfwCommand:
+                        builder.SetNsfw(nsfwCommand.IsNsfw);
                         break;
                     default:
                         builder.WithAttributes(attribute);
@@ -228,12 +267,9 @@ namespace Discord.Interactions.Builders
             builder.Callback = CreateCallback(createInstance, methodInfo, commandService);
         }
 
-        private static void BuildComponentCommand (ComponentCommandBuilder builder, Func<IServiceProvider, IInteractionModuleBase> createInstance, MethodInfo methodInfo,
+        private static void BuildComponentCommand(ComponentCommandBuilder builder, Func<IServiceProvider, IInteractionModuleBase> createInstance, MethodInfo methodInfo,
             InteractionService commandService, IServiceProvider services)
         {
-            if (!methodInfo.GetParameters().All(x => x.ParameterType == typeof(string) || x.ParameterType == typeof(string[])))
-                throw new InvalidOperationException($"Interaction method parameters all must be types of {typeof(string).Name} or {typeof(string[]).Name}");
-
             var attributes = methodInfo.GetCustomAttributes();
 
             builder.MethodName = methodInfo.Name;
@@ -247,6 +283,7 @@ namespace Discord.Interactions.Builders
                             builder.Name = interaction.CustomId;
                             builder.RunMode = interaction.RunMode;
                             builder.IgnoreGroupNames = interaction.IgnoreGroupNames;
+                            builder.TreatNameAsRegex = interaction.TreatAsRegex;
                         }
                         break;
                     case PreconditionAttribute precondition:
@@ -260,8 +297,10 @@ namespace Discord.Interactions.Builders
 
             var parameters = methodInfo.GetParameters();
 
+            var wildCardCount = RegexUtils.GetWildCardCount(builder.Name, commandService._wildCardExp);
+
             foreach (var parameter in parameters)
-                builder.AddParameter(x => BuildParameter(x, parameter));
+                builder.AddParameter(x => BuildComponentParameter(x, parameter, parameter.Position >= wildCardCount));
 
             builder.Callback = CreateCallback(createInstance, methodInfo, commandService);
         }
@@ -273,7 +312,7 @@ namespace Discord.Interactions.Builders
 
             builder.MethodName = methodInfo.Name;
 
-            foreach(var attribute in attributes)
+            foreach (var attribute in attributes)
             {
                 switch (attribute)
                 {
@@ -310,8 +349,8 @@ namespace Discord.Interactions.Builders
             if (parameters.Count(x => typeof(IModal).IsAssignableFrom(x.ParameterType)) > 1)
                 throw new InvalidOperationException($"A modal command can only have one {nameof(IModal)} parameter.");
 
-            if (!parameters.All(x => x.ParameterType == typeof(string) || typeof(IModal).IsAssignableFrom(x.ParameterType)))
-                throw new InvalidOperationException($"All parameters of a modal command must be either a string or an implementation of {nameof(IModal)}");
+            if (!typeof(IModal).IsAssignableFrom(parameters.Last().ParameterType))
+                throw new InvalidOperationException($"Last parameter of a modal command must be an implementation of {nameof(IModal)}");
 
             var attributes = methodInfo.GetCustomAttributes();
 
@@ -326,6 +365,7 @@ namespace Discord.Interactions.Builders
                             builder.Name = modal.CustomId;
                             builder.RunMode = modal.RunMode;
                             builder.IgnoreGroupNames = modal.IgnoreGroupNames;
+                            builder.TreatNameAsRegex = modal.TreatAsRegex;
                         }
                         break;
                     case PreconditionAttribute precondition:
@@ -343,13 +383,13 @@ namespace Discord.Interactions.Builders
             builder.Callback = CreateCallback(createInstance, methodInfo, commandService);
         }
 
-        private static ExecuteCallback CreateCallback (Func<IServiceProvider, IInteractionModuleBase> createInstance,
+        private static ExecuteCallback CreateCallback(Func<IServiceProvider, IInteractionModuleBase> createInstance,
             MethodInfo methodInfo, InteractionService commandService)
         {
             Func<IInteractionModuleBase, object[], Task> commandInvoker = commandService._useCompiledLambda ?
                 ReflectionUtils<IInteractionModuleBase>.CreateMethodInvoker(methodInfo) : (module, args) => methodInfo.Invoke(module, args) as Task;
 
-            async Task<IResult> ExecuteCallback (IInteractionContext context, object[] args, IServiceProvider serviceProvider, ICommandInfo commandInfo)
+            async Task<IResult> ExecuteCallback(IInteractionContext context, object[] args, IServiceProvider serviceProvider, ICommandInfo commandInfo)
             {
                 var instance = createInstance(serviceProvider);
                 instance.SetContext(context);
@@ -380,7 +420,7 @@ namespace Discord.Interactions.Builders
                 {
                     await instance.AfterExecuteAsync(commandInfo).ConfigureAwait(false);
                     instance.AfterExecute(commandInfo);
-                    ( instance as IDisposable )?.Dispose();
+                    (instance as IDisposable)?.Dispose();
                 }
             }
 
@@ -388,7 +428,7 @@ namespace Discord.Interactions.Builders
         }
 
         #region Parameters
-        private static void BuildSlashParameter (SlashCommandParameterBuilder builder, ParameterInfo paramInfo, IServiceProvider services)
+        private static void BuildSlashParameter(SlashCommandParameterBuilder builder, ParameterInfo paramInfo, IServiceProvider services)
         {
             var attributes = paramInfo.GetCustomAttributes();
             var paramType = paramInfo.ParameterType;
@@ -397,7 +437,6 @@ namespace Discord.Interactions.Builders
             builder.Description = paramInfo.Name;
             builder.IsRequired = !paramInfo.IsOptional;
             builder.DefaultValue = paramInfo.DefaultValue;
-            builder.SetParameterType(paramType, services);
 
             foreach (var attribute in attributes)
             {
@@ -426,7 +465,7 @@ namespace Discord.Interactions.Builders
                         break;
                     case AutocompleteAttribute autocomplete:
                         builder.Autocomplete = true;
-                        if(autocomplete.AutocompleteHandlerType is not null)
+                        if (autocomplete.AutocompleteHandlerType is not null)
                             builder.WithAutocompleteHandler(autocomplete.AutocompleteHandlerType, services);
                         break;
                     case MaxValueAttribute maxValue:
@@ -435,17 +474,49 @@ namespace Discord.Interactions.Builders
                     case MinValueAttribute minValue:
                         builder.MinValue = minValue.Value;
                         break;
+                    case MinLengthAttribute minLength:
+                        builder.MinLength = minLength.Length;
+                        break;
+                    case MaxLengthAttribute maxLength:
+                        builder.MaxLength = maxLength.Length;
+                        break;
+                    case ComplexParameterAttribute complexParameter:
+                        {
+                            builder.IsComplexParameter = true;
+                            ConstructorInfo ctor = GetComplexParameterConstructor(paramInfo.ParameterType.GetTypeInfo(), complexParameter);
+
+                            foreach (var parameter in ctor.GetParameters())
+                            {
+                                if (parameter.IsDefined(typeof(ComplexParameterAttribute)))
+                                    throw new InvalidOperationException("You cannot create nested complex parameters.");
+
+                                builder.AddComplexParameterField(fieldBuilder => BuildSlashParameter(fieldBuilder, parameter, services));
+                            }
+
+                            var initializer = builder.Command.Module.InteractionService._useCompiledLambda ?
+                                ReflectionUtils<object>.CreateLambdaConstructorInvoker(paramInfo.ParameterType.GetTypeInfo()) : ctor.Invoke;
+                            builder.ComplexParameterInitializer = args => initializer(args);
+                        }
+                        break;
                     default:
                         builder.AddAttributes(attribute);
                         break;
                 }
             }
 
+            builder.SetParameterType(paramType, services);
+
             // Replace pascal casings with '-'
             builder.Name = Regex.Replace(builder.Name, "(?<=[a-z])(?=[A-Z])", "-").ToLower();
         }
 
-        private static void BuildParameter<TInfo, TBuilder> (ParameterBuilder<TInfo, TBuilder> builder, ParameterInfo paramInfo)
+        private static void BuildComponentParameter(ComponentCommandParameterBuilder builder, ParameterInfo paramInfo, bool isComponentParam)
+        {
+            builder.SetIsRouteSegment(!isComponentParam);
+            BuildParameter(builder, paramInfo);
+        }
+
+        private static void BuildParameter<TInfo, TBuilder>(ParameterBuilder<TInfo, TBuilder> builder, ParameterInfo paramInfo)
             where TInfo : class, IParameterInfo
             where TBuilder : ParameterBuilder<TInfo, TBuilder>
         {
@@ -476,7 +547,7 @@ namespace Discord.Interactions.Builders
         #endregion
 
         #region Modals
-        public static ModalInfo BuildModalInfo(Type modalType)
+        public static ModalInfo BuildModalInfo(Type modalType, InteractionService interactionService)
         {
             if (!typeof(IModal).IsAssignableFrom(modalType))
                 throw new InvalidOperationException($"{modalType.FullName} isn't an implementation of {typeof(IModal).FullName}");
@@ -485,7 +556,7 @@ namespace Discord.Interactions.Builders
 
             try
             {
-                var builder = new ModalBuilder(modalType)
+                var builder = new ModalBuilder(modalType, interactionService)
                 {
                     Title = instance.Title
                 };
@@ -525,8 +596,9 @@ namespace Discord.Interactions.Builders
             builder.Label = propertyInfo.Name;
             builder.DefaultValue = defaultValue;
             builder.WithType(propertyInfo.PropertyType);
+            builder.PropertyInfo = propertyInfo;
 
-            foreach(var attribute in attributes)
+            foreach (var attribute in attributes)
             {
                 switch (attribute)
                 {
@@ -553,30 +625,30 @@ namespace Discord.Interactions.Builders
         }
         #endregion
 
-        internal static bool IsValidModuleDefinition (TypeInfo typeInfo)
+        internal static bool IsValidModuleDefinition(TypeInfo typeInfo)
         {
             return ModuleTypeInfo.IsAssignableFrom(typeInfo) &&
                    !typeInfo.IsAbstract &&
                    !typeInfo.ContainsGenericParameters;
         }
 
-        private static bool IsValidSlashCommandDefinition (MethodInfo methodInfo)
+        private static bool IsValidSlashCommandDefinition(MethodInfo methodInfo)
         {
             return methodInfo.IsDefined(typeof(SlashCommandAttribute)) &&
-                   ( methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(Task<RuntimeResult>) ) &&
+                   (methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(Task<RuntimeResult>)) &&
                    !methodInfo.IsStatic &&
                    !methodInfo.IsGenericMethod;
         }
 
-        private static bool IsValidContextCommandDefinition (MethodInfo methodInfo)
+        private static bool IsValidContextCommandDefinition(MethodInfo methodInfo)
         {
             return methodInfo.IsDefined(typeof(ContextCommandAttribute)) &&
-                   ( methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(Task<RuntimeResult>) ) &&
+                   (methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(Task<RuntimeResult>)) &&
                    !methodInfo.IsStatic &&
                    !methodInfo.IsGenericMethod;
         }
 
-        private static bool IsValidComponentCommandDefinition (MethodInfo methodInfo)
+        private static bool IsValidComponentCommandDefinition(MethodInfo methodInfo)
         {
             return methodInfo.IsDefined(typeof(ComponentInteractionAttribute)) &&
                    (methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(Task<RuntimeResult>)) &&
@@ -584,7 +656,7 @@ namespace Discord.Interactions.Builders
                    !methodInfo.IsGenericMethod;
         }
 
-        private static bool IsValidAutocompleteCommandDefinition (MethodInfo methodInfo)
+        private static bool IsValidAutocompleteCommandDefinition(MethodInfo methodInfo)
         {
             return methodInfo.IsDefined(typeof(AutocompleteCommandAttribute)) &&
                 (methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(Task<RuntimeResult>)) &&
@@ -607,6 +679,42 @@ namespace Discord.Interactions.Builders
             return propertyInfo.SetMethod?.IsPublic == true &&
                 propertyInfo.SetMethod?.IsStatic == false &&
                 propertyInfo.IsDefined(typeof(ModalInputAttribute));
+        }
+
+        private static ConstructorInfo GetComplexParameterConstructor(TypeInfo typeInfo, ComplexParameterAttribute complexParameter)
+        {
+            var ctors = typeInfo.GetConstructors();
+
+            if (ctors.Length == 0)
+                throw new InvalidOperationException($"No constructor found for \"{typeInfo.FullName}\".");
+
+            if (complexParameter.PrioritizedCtorSignature is not null)
+            {
+                var ctor = typeInfo.GetConstructor(complexParameter.PrioritizedCtorSignature);
+
+                if (ctor is null)
+                    throw new InvalidOperationException($"No constructor was found with the signature: {string.Join(",", complexParameter.PrioritizedCtorSignature.Select(x => x.Name))}");
+
+                return ctor;
+            }
+
+            var prioritizedCtors = ctors.Where(x => x.IsDefined(typeof(ComplexParameterCtorAttribute), true));
+
+            switch (prioritizedCtors.Count())
+            {
+                case > 1:
+                    throw new InvalidOperationException($"{nameof(ComplexParameterCtorAttribute)} can only be used once in a type.");
+                case 1:
+                    return prioritizedCtors.First();
+            }
+
+            switch (ctors.Length)
+            {
+                case > 1:
+                    throw new InvalidOperationException($"Multiple constructors found for \"{typeInfo.FullName}\".");
+                default:
+                    return ctors.First();
+            }
         }
     }
 }

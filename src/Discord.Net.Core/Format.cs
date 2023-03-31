@@ -37,8 +37,9 @@ namespace Discord
         /// <summary> Sanitizes the string, safely escaping any Markdown sequences. </summary>
         public static string Sanitize(string text)
         {
-            foreach (string unsafeChar in SensitiveCharacters)
-                text = text.Replace(unsafeChar, $"\\{unsafeChar}");
+            if (text != null)
+                foreach (string unsafeChar in SensitiveCharacters)
+                    text = text.Replace(unsafeChar, $"\\{unsafeChar}");
             return text;
         }
 
@@ -79,7 +80,7 @@ namespace Discord
 
             return result.ToString();
         }
-        
+
         /// <summary>
         ///     Formats a string as a block quote.
         /// </summary>
@@ -107,13 +108,16 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Formats a user's username + discriminator while maintaining bidirectional unicode
+        ///     Formats a user's username + discriminator.
         /// </summary>
-        /// <param name="user">The user whos username and discriminator to format</param>
+        /// <param name="doBidirectional">To format the string in bidirectional unicode or not</param>
+        /// <param name="user">The user whose username and discriminator to format</param>
         /// <returns>The username + discriminator</returns>
-        public static string UsernameAndDiscriminator(IUser user)
+        public static string UsernameAndDiscriminator(IUser user, bool doBidirectional)
         {
-            return $"\u2066{user.Username}\u2069#{user.Discriminator}";
+            return doBidirectional
+                ? $"\u2066{user.Username}\u2069#{user.Discriminator}"
+                : $"{user.Username}#{user.Discriminator}";
         }
     }
 }

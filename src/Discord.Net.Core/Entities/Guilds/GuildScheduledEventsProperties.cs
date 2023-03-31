@@ -54,5 +54,10 @@ namespace Discord
         ///     Gets or sets the status of the event.
         /// </summary>
         public Optional<GuildScheduledEventStatus> Status { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the banner image of the event.
+        /// </summary>
+        public Optional<Image?> CoverImage { get; set; }
     }
 }

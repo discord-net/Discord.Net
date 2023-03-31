@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Immutable;
-using System.Linq;
+using Discord.Commands;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Discord.Commands;
+using System;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace Discord.Analyzers
 {

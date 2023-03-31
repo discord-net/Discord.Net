@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
 using DataModel = Discord.API.AutocompleteInteractionData;
-using System.IO;
+using Model = Discord.API.Interaction;
 
 namespace Discord.Rest
 {
@@ -32,10 +32,10 @@ namespace Discord.Rest
                 Data = new RestAutocompleteInteractionData(dataModel);
         }
 
-        internal new static async Task<RestAutocompleteInteraction> CreateAsync(DiscordRestClient client, Model model)
+        internal new static async Task<RestAutocompleteInteraction> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
             var entity = new RestAutocompleteInteraction(client, model);
-            await entity.UpdateAsync(client, model).ConfigureAwait(false);
+            await entity.UpdateAsync(client, model, doApiCall).ConfigureAwait(false);
             return entity;
         }
 

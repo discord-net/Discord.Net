@@ -17,18 +17,18 @@ namespace Discord
         ///         It will always be present and does not mean mentions will not be allowed.
         ///     </note>
         /// </remarks>
-        None        = 0,
+        None = 0,
         /// <summary>
         ///     Controls role mentions.
         /// </summary>
-        Roles       = 1,
+        Roles = 1,
         /// <summary>
         ///     Controls user mentions.
         /// </summary>
-        Users       = 2,
+        Users = 2,
         /// <summary>
         ///     Controls <code>@everyone</code> and <code>@here</code> mentions.
         /// </summary>
-        Everyone    = 4,
+        Everyone = 4,
     }
 }

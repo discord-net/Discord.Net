@@ -110,7 +110,8 @@ namespace Discord.Net.WebSockets
         {
             _isDisconnecting = true;
 
-            try { _disconnectTokenSource.Cancel(false); }
+            try
+            { _disconnectTokenSource.Cancel(false); }
             catch { }
 
             if (_client != null)
@@ -118,10 +119,12 @@ namespace Discord.Net.WebSockets
                 if (!isDisposing)
                 {
                     var status = (WebSocketCloseStatus)closeCode;
-                    try { await _client.CloseOutputAsync(status, "", new CancellationToken()); }
+                    try
+                    { await _client.CloseOutputAsync(status, "", new CancellationToken()); }
                     catch { }
                 }
-                try { _client.Dispose(); }
+                try
+                { _client.Dispose(); }
                 catch { }
 
                 _client = null;
@@ -176,7 +179,8 @@ namespace Discord.Net.WebSockets
             }
             try
             {
-                if (_client == null) return;
+                if (_client == null)
+                    return;
 
                 int frameCount = (int)Math.Ceiling((double)count / SendChunkSize);
 
@@ -223,7 +227,8 @@ namespace Discord.Net.WebSockets
                             stream.Write(buffer.Array, 0, socketResult.Count);
                             do
                             {
-                                if (cancelToken.IsCancellationRequested) return;
+                                if (cancelToken.IsCancellationRequested)
+                                    return;
                                 socketResult = await _client.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
                                 stream.Write(buffer.Array, 0, socketResult.Count);
                             }

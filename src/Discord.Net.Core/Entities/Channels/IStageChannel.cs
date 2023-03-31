@@ -9,14 +9,6 @@ namespace Discord
     public interface IStageChannel : IVoiceChannel
     {
         /// <summary>
-        ///     Gets the topic of the Stage instance.
-        /// </summary>
-        /// <remarks>
-        ///     If the stage isn't live then this property will be set to <see langword="null"/>.
-        /// </remarks>
-        string Topic { get; }
-
-        /// <summary>
         ///     Gets the <see cref="StagePrivacyLevel"/> of the current stage.
         /// </summary>
         /// <remarks>

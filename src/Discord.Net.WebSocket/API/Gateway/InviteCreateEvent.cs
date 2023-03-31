@@ -21,11 +21,17 @@ namespace Discord.API.Gateway
         public int MaxUses { get; set; }
         [JsonProperty("target_user")]
         public Optional<User> TargetUser { get; set; }
-        [JsonProperty("target_user_type")]
+        [JsonProperty("target_type")]
         public Optional<TargetUserType> TargetUserType { get; set; }
         [JsonProperty("temporary")]
         public bool Temporary { get; set; }
         [JsonProperty("uses")]
         public int Uses { get; set; }
+
+        [JsonProperty("target_application")]
+        public Optional<Application> Application { get; set; }
+
+        [JsonProperty("expires_at")]
+        public Optional<DateTimeOffset?> ExpiresAt { get; set; }
     }
 }

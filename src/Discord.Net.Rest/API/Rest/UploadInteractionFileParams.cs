@@ -41,7 +41,7 @@ namespace Discord.API.Rest
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
             var d = new Dictionary<string, object>();
-           
+
 
             var payload = new Dictionary<string, object>();
             payload["type"] = Type;
@@ -50,7 +50,7 @@ namespace Discord.API.Rest
             if (Content.IsSpecified)
                 data["content"] = Content.Value;
             if (IsTTS.IsSpecified)
-                data["tts"] = IsTTS.Value.ToString();
+                data["tts"] = IsTTS.Value;
             if (MessageComponents.IsSpecified)
                 data["components"] = MessageComponents.Value;
             if (Embeds.IsSpecified)

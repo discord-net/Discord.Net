@@ -20,6 +20,8 @@ namespace Discord.API.Gateway
         public User User { get; set; }
         [JsonProperty("session_id")]
         public string SessionId { get; set; }
+        [JsonProperty("resume_gateway_url")]
+        public string ResumeGatewayUrl { get; set; }
         [JsonProperty("read_state")]
         public ReadState[] ReadStates { get; set; }
         [JsonProperty("guilds")]

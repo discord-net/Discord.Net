@@ -41,7 +41,23 @@ namespace Discord.Interactions
         /// <summary>
         ///     Gets the default Permission of this module.
         /// </summary>
+        [Obsolete($"To be deprecated soon, use {nameof(IsEnabledInDm)} and {nameof(DefaultMemberPermissions)} instead.")]
         public bool DefaultPermission { get; }
+
+        /// <summary>
+        ///     Gets whether this command can be used in DMs.
+        /// </summary>
+        public bool IsEnabledInDm { get; }
+
+        /// <summary>
+        ///     Gets whether this command is age restricted.
+        /// </summary>
+        public bool IsNsfw { get; }
+
+        /// <summary>
+        ///     Gets the default permissions needed for executing this command.
+        /// </summary>
+        public GuildPermission? DefaultMemberPermissions { get; }
 
         /// <summary>
         ///     Gets the collection of Sub Modules of this module.
@@ -101,7 +117,7 @@ namespace Discord.Interactions
         /// </summary>
         public bool DontAutoRegister { get; }
 
-        internal ModuleInfo (ModuleBuilder builder, InteractionService commandService, IServiceProvider services, ModuleInfo parent = null)
+        internal ModuleInfo(ModuleBuilder builder, InteractionService commandService, IServiceProvider services, ModuleInfo parent = null)
         {
             CommandService = commandService;
 
@@ -110,6 +126,9 @@ namespace Discord.Interactions
             Description = builder.Description;
             Parent = parent;
             DefaultPermission = builder.DefaultPermission;
+            IsNsfw = builder.IsNsfw;
+            IsEnabledInDm = builder.IsEnabledInDm;
+            DefaultMemberPermissions = BuildDefaultMemberPermissions(builder);
             SlashCommands = BuildSlashCommands(builder).ToImmutableArray();
             ContextCommands = BuildContextCommands(builder).ToImmutableArray();
             ComponentCommands = BuildComponentCommands(builder).ToImmutableArray();
@@ -124,7 +143,7 @@ namespace Discord.Interactions
             GroupedPreconditions = Preconditions.ToLookup(x => x.Group, x => x, StringComparer.Ordinal);
         }
 
-        private IEnumerable<ModuleInfo> BuildSubModules (ModuleBuilder builder, InteractionService commandService, IServiceProvider services)
+        private IEnumerable<ModuleInfo> BuildSubModules(ModuleBuilder builder, InteractionService commandService, IServiceProvider services)
         {
             var result = new List<ModuleInfo>();
 
@@ -134,7 +153,7 @@ namespace Discord.Interactions
             return result;
         }
 
-        private IEnumerable<SlashCommandInfo> BuildSlashCommands (ModuleBuilder builder)
+        private IEnumerable<SlashCommandInfo> BuildSlashCommands(ModuleBuilder builder)
         {
             var result = new List<SlashCommandInfo>();
 
@@ -144,7 +163,7 @@ namespace Discord.Interactions
             return result;
         }
 
-        private IEnumerable<ContextCommandInfo> BuildContextCommands (ModuleBuilder builder)
+        private IEnumerable<ContextCommandInfo> BuildContextCommands(ModuleBuilder builder)
         {
             var result = new List<ContextCommandInfo>();
 
@@ -154,7 +173,7 @@ namespace Discord.Interactions
             return result;
         }
 
-        private IEnumerable<ComponentCommandInfo> BuildComponentCommands (ModuleBuilder builder)
+        private IEnumerable<ComponentCommandInfo> BuildComponentCommands(ModuleBuilder builder)
         {
             var result = new List<ComponentCommandInfo>();
 
@@ -164,7 +183,7 @@ namespace Discord.Interactions
             return result;
         }
 
-        private IEnumerable<AutocompleteCommandInfo> BuildAutocompleteCommands( ModuleBuilder builder)
+        private IEnumerable<AutocompleteCommandInfo> BuildAutocompleteCommands(ModuleBuilder builder)
         {
             var result = new List<AutocompleteCommandInfo>();
 
@@ -184,7 +203,7 @@ namespace Discord.Interactions
             return result;
         }
 
-        private IEnumerable<Attribute> BuildAttributes (ModuleBuilder builder)
+        private IEnumerable<Attribute> BuildAttributes(ModuleBuilder builder)
         {
             var result = new List<Attribute>();
             var currentParent = builder;
@@ -198,7 +217,7 @@ namespace Discord.Interactions
             return result;
         }
 
-        private static IEnumerable<PreconditionAttribute> BuildPreconditions (ModuleBuilder builder)
+        private static IEnumerable<PreconditionAttribute> BuildPreconditions(ModuleBuilder builder)
         {
             var preconditions = new List<PreconditionAttribute>();
 
@@ -213,7 +232,7 @@ namespace Discord.Interactions
             return preconditions;
         }
 
-        private static bool CheckTopLevel (ModuleInfo parent)
+        private static bool CheckTopLevel(ModuleInfo parent)
         {
             var currentParent = parent;
 
@@ -225,6 +244,21 @@ namespace Discord.Interactions
                 currentParent = currentParent.Parent;
             }
             return true;
+        }
+
+        private static GuildPermission? BuildDefaultMemberPermissions(ModuleBuilder builder)
+        {
+            var permissions = builder.DefaultMemberPermissions;
+
+            var parent = builder.Parent;
+
+            while (parent != null)
+            {
+                permissions = (permissions ?? 0) | (parent.DefaultMemberPermissions ?? 0).SanitizeGuildPermissions();
+                parent = parent.Parent;
+            }
+
+            return permissions;
         }
     }
 }

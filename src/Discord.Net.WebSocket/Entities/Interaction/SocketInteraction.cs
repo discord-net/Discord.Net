@@ -1,11 +1,11 @@
+using Discord.Net;
 using Discord.Rest;
 using System;
-using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
-using DataModel = Discord.API.ApplicationCommandInteractionData;
-using System.IO;
 using System.Collections.Generic;
-using Discord.Net;
+using System.IO;
+using System.Threading.Tasks;
+using DataModel = Discord.API.ApplicationCommandInteractionData;
+using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {
@@ -19,10 +19,13 @@ namespace Discord.WebSocket
         ///     Gets the <see cref="ISocketMessageChannel"/> this interaction was used in.
         /// </summary>
         /// <remarks>
-        ///     If the channel isn't cached or the bot doesn't have access to it then
+        ///     If the channel isn't cached, the bot scope isn't used, or the bot doesn't have access to it then
         ///     this property will be <see langword="null"/>.
         /// </remarks>
         public ISocketMessageChannel Channel { get; private set; }
+
+        /// <inheritdoc/>
+        public ulong? ChannelId { get; private set; }
 
         /// <summary>
         ///     Gets the <see cref="SocketUser"/> who triggered this interaction.
@@ -62,7 +65,11 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public bool IsDMInteraction { get; private set; }
 
-        private ulong? _channelId;
+        /// <inheritdoc/>
+        public ulong? GuildId { get; private set; }
+
+        /// <inheritdoc/>
+        public ulong ApplicationId { get; private set; }
 
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel, SocketUser user)
             : base(client, id)
@@ -109,13 +116,21 @@ namespace Discord.WebSocket
 
         internal virtual void Update(Model model)
         {
-            IsDMInteraction = !model.GuildId.IsSpecified;
+            ChannelId = model.ChannelId.IsSpecified
+                ? model.ChannelId.Value
+                : null;
 
-            _channelId = model.ChannelId.ToNullable();
+            GuildId = model.GuildId.IsSpecified
+                ? model.GuildId.Value
+                : null;
+
+            IsDMInteraction = GuildId is null;
+            ApplicationId = model.ApplicationId;
 
             Data = model.Data.IsSpecified
                 ? model.Data.Value
                 : null;
+
             Token = model.Token;
             Version = model.Version;
             Type = model.Type;
@@ -123,6 +138,7 @@ namespace Discord.WebSocket
             UserLocale = model.UserLocale.IsSpecified
                 ? model.UserLocale.Value
                 : null;
+
             GuildLocale = model.GuildLocale.IsSpecified
                 ? model.GuildLocale.Value
                 : null;
@@ -385,25 +401,25 @@ namespace Discord.WebSocket
         #endregion
 
         /// <summary>
-        ///     Attepts to get the channel this interaction was executed in.
+        ///     Attempts to get the channel this interaction was executed in.
         /// </summary>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>
         ///     A task that represents the asynchronous operation of fetching the channel.
         /// </returns>
-        public async ValueTask<IMessageChannel> GetChannelAsync(RequestOptions options  = null)
+        public async ValueTask<IMessageChannel> GetChannelAsync(RequestOptions options = null)
         {
             if (Channel != null)
                 return Channel;
 
-            if (!_channelId.HasValue)
+            if (!ChannelId.HasValue)
                 return null;
 
             try
             {
-                return (IMessageChannel)await Discord.GetChannelAsync(_channelId.Value, options).ConfigureAwait(false);
+                return (IMessageChannel)await Discord.GetChannelAsync(ChannelId.Value, options).ConfigureAwait(false);
             }
-            catch(HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions) { return null; } // bot can't view that channel, return null instead of throwing.
+            catch (HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions) { return null; } // bot can't view that channel, return null instead of throwing.
         }
 
         #region  IDiscordInteraction

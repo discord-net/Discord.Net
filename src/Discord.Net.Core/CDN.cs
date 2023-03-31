@@ -146,10 +146,10 @@ namespace Discord
         /// </returns>
         public static string GetGuildBannerUrl(ulong guildId, string bannerId, ImageFormat format, ushort? size = null)
         {
-	        if (string.IsNullOrEmpty(bannerId))
-		        return null;
-	        string extension = FormatToExtension(format, bannerId);
-	        return $"{DiscordConfig.CDNUrl}banners/{guildId}/{bannerId}.{extension}" + (size.HasValue ? $"?size={size}" : string.Empty);
+            if (string.IsNullOrEmpty(bannerId))
+                return null;
+            string extension = FormatToExtension(format, bannerId);
+            return $"{DiscordConfig.CDNUrl}banners/{guildId}/{bannerId}.{extension}" + (size.HasValue ? $"?size={size}" : string.Empty);
         }
         /// <summary>
         ///     Returns an emoji URL.
@@ -207,6 +207,18 @@ namespace Discord
         /// </returns>
         public static string GetStickerUrl(ulong stickerId, StickerFormatType format = StickerFormatType.Png)
             => $"{DiscordConfig.CDNUrl}stickers/{stickerId}.{FormatToExtension(format)}";
+
+        /// <summary>
+        ///     Returns an events cover image url.
+        /// </summary>
+        /// <param name="guildId">The guild id that the event is in.</param>
+        /// <param name="eventId">The id of the event.</param>
+        /// <param name="assetId">The id of the cover image asset.</param>
+        /// <param name="format">The format of the image.</param>
+        /// <param name="size">The size of the image.</param>
+        /// <returns></returns>
+        public static string GetEventCoverImageUrl(ulong guildId, ulong eventId, string assetId, ImageFormat format = ImageFormat.Auto, ushort size = 1024)
+            => $"{DiscordConfig.CDNUrl}guild-events/{eventId}/{assetId}.{FormatToExtension(format, assetId)}?size={size}";
 
         private static string FormatToExtension(StickerFormatType format)
         {

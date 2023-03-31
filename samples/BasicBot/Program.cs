@@ -1,8 +1,8 @@
+using Discord;
+using Discord.WebSocket;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 
 namespace BasicBot
 {
@@ -34,9 +34,16 @@ namespace BasicBot
 
         public Program()
         {
+            // Config used by DiscordSocketClient
+            // Define intents for the client
+            var config = new DiscordSocketConfig
+            {
+                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
+            };
+
             // It is recommended to Dispose of a client when you are finished
             // using it, at the end of your app's lifetime.
-            _client = new DiscordSocketClient();
+            _client = new DiscordSocketClient(config);
 
             // Subscribing to client events, so that we may receive them whenever they're invoked.
             _client.Log += LogAsync;
@@ -83,7 +90,7 @@ namespace BasicBot
 
             if (message.Content == "!ping")
             {
-                // Create a new componentbuilder, in which dropdowns & buttons can be created.
+                // Create a new ComponentBuilder, in which dropdowns & buttons can be created.
                 var cb = new ComponentBuilder()
                     .WithButton("Click me!", "unique-id", ButtonStyle.Primary);
 
@@ -105,7 +112,8 @@ namespace BasicBot
                 if (component.Data.CustomId == "unique-id")
                     await interaction.RespondAsync("Thank you for clicking my button!");
 
-                else Console.WriteLine("An ID has been received that has no handler!");
+                else
+                    Console.WriteLine("An ID has been received that has no handler!");
             }
         }
     }

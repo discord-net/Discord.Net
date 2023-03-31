@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
-using Model = Discord.API.User;
 using EventUserModel = Discord.API.GuildScheduledEventUser;
-using System.Collections.Generic;
+using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
@@ -129,8 +129,10 @@ namespace Discord.Rest
         /// <returns>
         ///     A string that resolves to Username#Discriminator of the user.
         /// </returns>
-        public override string ToString() => Format.UsernameAndDiscriminator(this);
-        private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this)} ({Id}{(IsBot ? ", Bot" : "")})";
+        public override string ToString()
+            => Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode);
+
+        private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this, Discord.FormatUsersInBidirectionalUnicode)} ({Id}{(IsBot ? ", Bot" : "")})";
         #endregion
 
         #region IUser

@@ -9,75 +9,66 @@ using System.Threading.Tasks;
 
 namespace InteractionFramework
 {
-    class Program
+    public class Program
     {
-        // Entry point of the program.
-        static void Main ( string[] args )
+        private readonly IConfiguration _configuration;
+        private readonly IServiceProvider _services;
+
+        private readonly DiscordSocketConfig _socketConfig = new()
         {
-            // One of the more flexable ways to access the configuration data is to use the Microsoft's Configuration model,
-            // this way we can avoid hard coding the environment secrets. I opted to use the Json and environment variable providers here.
-            IConfiguration config = new ConfigurationBuilder()
+            GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers,
+            AlwaysDownloadUsers = true,
+        };
+
+        public Program()
+        {
+            _configuration = new ConfigurationBuilder()
                 .AddEnvironmentVariables(prefix: "DC_")
                 .AddJsonFile("appsettings.json", optional: true)
                 .Build();
 
-            RunAsync(config).GetAwaiter().GetResult();
+            _services = new ServiceCollection()
+                .AddSingleton(_configuration)
+                .AddSingleton(_socketConfig)
+                .AddSingleton<DiscordSocketClient>()
+                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
+                .AddSingleton<InteractionHandler>()
+                .BuildServiceProvider();
         }
 
-        static async Task RunAsync (IConfiguration configuration)
-        {
-            // Dependency injection is a key part of the Interactions framework but it needs to be disposed at the end of the app's lifetime.
-            using var services = ConfigureServices(configuration);
+        static void Main(string[] args)
+            => new Program().RunAsync()
+                .GetAwaiter()
+                .GetResult();
 
-            var client = services.GetRequiredService<DiscordSocketClient>();
-            var commands = services.GetRequiredService<InteractionService>();
+        public async Task RunAsync()
+        {
+            var client = _services.GetRequiredService<DiscordSocketClient>();
 
             client.Log += LogAsync;
-            commands.Log += LogAsync;
-
-            // Slash Commands and Context Commands are can be automatically registered, but this process needs to happen after the client enters the READY state.
-            // Since Global Commands take around 1 hour to register, we should use a test guild to instantly update and test our commands. To determine the method we should
-            // register the commands with, we can check whether we are in a DEBUG environment and if we are, we can register the commands to a predetermined test guild.
-            client.Ready += async ( ) =>
-            {
-                if (IsDebug())
-                    // Id of the test guild can be provided from the Configuration object
-                    await commands.RegisterCommandsToGuildAsync(configuration.GetValue<ulong>("testGuild"), true);
-                else
-                    await commands.RegisterCommandsGloballyAsync(true);
-            };
 
             // Here we can initialize the service that will register and execute our commands
-            await services.GetRequiredService<CommandHandler>().InitializeAsync();
+            await _services.GetRequiredService<InteractionHandler>()
+                .InitializeAsync();
 
             // Bot token can be provided from the Configuration object we set up earlier
-            await client.LoginAsync(TokenType.Bot, configuration["token"]);
+            await client.LoginAsync(TokenType.Bot, _configuration["token"]);
             await client.StartAsync();
 
+            // Never quit the program until manually forced to.
             await Task.Delay(Timeout.Infinite);
         }
 
-        static Task LogAsync(LogMessage message)
-        {
-            Console.WriteLine(message.ToString());
-            return Task.CompletedTask;
-        }
+        private async Task LogAsync(LogMessage message)
+            => Console.WriteLine(message.ToString());
 
-        static ServiceProvider ConfigureServices ( IConfiguration configuration )
-            => new ServiceCollection()
-                .AddSingleton(configuration)
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
-                .AddSingleton<CommandHandler>()
-                .BuildServiceProvider();
-
-        static bool IsDebug ( )
+        public static bool IsDebug()
         {
-            #if DEBUG
-                return true;
-            #else
-                return false;
-            #endif
+#if DEBUG
+            return true;
+#else
+            return false;
+#endif
         }
     }
 }

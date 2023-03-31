@@ -22,7 +22,7 @@ public class Program
 		{
 			Console.WriteLine("Bot is connected!");
 			return Task.CompletedTask;
-		}
+		};
 		
 		await Task.Delay(-1);
 	}

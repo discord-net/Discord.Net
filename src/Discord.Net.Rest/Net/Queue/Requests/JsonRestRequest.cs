@@ -1,4 +1,4 @@
-﻿using Discord.Net.Rest;
+using Discord.Net.Rest;
 using System.Threading.Tasks;
 
 namespace Discord.Net.Queue

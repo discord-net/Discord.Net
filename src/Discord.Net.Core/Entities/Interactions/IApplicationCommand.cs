@@ -35,9 +35,53 @@ namespace Discord
         bool IsDefaultPermission { get; }
 
         /// <summary>
+        ///     Indicates whether the command is available in DMs with the app.
+        /// </summary>
+        /// <remarks>
+        ///     Only for globally-scoped commands.
+        /// </remarks>
+        bool IsEnabledInDm { get; }
+
+        /// <summary>
+        ///     Indicates whether the command is age restricted.
+        /// </summary>
+        bool IsNsfw { get; }
+
+        /// <summary>
+        ///     Set of default <see cref="GuildPermission"/> required to invoke the command.
+        /// </summary>
+        GuildPermissions DefaultMemberPermissions { get; }
+
+        /// <summary>
         ///     Gets a collection of options for this application command.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOption> Options { get; }
+
+        /// <summary>
+        ///     Gets the localization dictionary for the name field of this command.
+        /// </summary>
+        IReadOnlyDictionary<string, string> NameLocalizations { get; }
+
+        /// <summary>
+        ///     Gets the localization dictionary for the description field of this command.
+        /// </summary>
+        IReadOnlyDictionary<string, string> DescriptionLocalizations { get; }
+
+        /// <summary>
+        ///     Gets the localized name of this command.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        /// </remarks>
+        string NameLocalized { get; }
+
+        /// <summary>
+        ///     Gets the localized description of this command.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        /// </remarks>
+        string DescriptionLocalized { get; }
 
         /// <summary>
         ///     Modifies the current application command.

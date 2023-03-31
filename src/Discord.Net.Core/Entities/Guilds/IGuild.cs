@@ -134,6 +134,14 @@ namespace Discord
         /// </returns>
         ulong? WidgetChannelId { get; }
         /// <summary>
+        ///     Gets the ID of the channel assigned to the safety alerts channel of this guild.
+        /// </summary>
+        /// <returns>
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the safety alerts channel;
+        ///     <see langword="null" /> if none is set.
+        /// </returns>
+        ulong? SafetyAlertsChannelId { get; }
+        /// <summary>
         ///     Gets the ID of the channel where randomized welcome messages are sent.
         /// </summary>
         /// <returns>
@@ -294,6 +302,13 @@ namespace Discord
         /// </returns>
         int? MaxVideoChannelUsers { get; }
         /// <summary>
+        ///     Gets the maximum amount of users in a stage video channel.
+        /// </summary>
+        /// <returns>
+        ///     The maximum amount of users in a stage video channel.
+        /// </returns>
+        int? MaxStageVideoChannelUsers { get; }
+        /// <summary>
         ///     Gets the approximate number of members in this guild.
         /// </summary>
         /// <remarks>
@@ -409,17 +424,70 @@ namespace Discord
         ///     A task that represents the asynchronous leave operation.
         /// </returns>
         Task LeaveAsync(RequestOptions options = null);
-
         /// <summary>
-        ///     Gets a collection of all users banned in this guild.
+        ///     Gets <paramref name="limit"/> amount of bans from the guild ordered by user ID.
         /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///         The returned collection is an asynchronous enumerable object; one must call
+        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
+        ///         collection.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Do not fetch too many bans at once! This may cause unwanted preemptive rate limit or even actual
+        ///         rate limit, causing your bot to freeze!
+        ///     </note>
+        /// </remarks>
+        /// <param name="limit">The amount of bans to get from the guild.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
-        ///     ban objects that this guild currently possesses, with each object containing the user banned and reason
-        ///     behind the ban.
+        ///     A paged collection of bans.
         /// </returns>
-        Task<IReadOnlyCollection<IBan>> GetBansAsync(RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
+        /// <summary>
+        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUserId"/> ordered by user ID.
+        /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///         The returned collection is an asynchronous enumerable object; one must call
+        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
+        ///         collection.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Do not fetch too many bans at once! This may cause unwanted preemptive rate limit or even actual
+        ///         rate limit, causing your bot to freeze!
+        ///     </note>
+        /// </remarks>
+        /// <param name="fromUserId">The ID of the user to start to get bans from.</param>
+        /// <param name="dir">The direction of the bans to be gotten.</param>
+        /// <param name="limit">The number of bans to get.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A paged collection of bans.
+        /// </returns>
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
+        /// <summary>
+        ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUser"/> ordered by user ID.
+        /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///         The returned collection is an asynchronous enumerable object; one must call
+        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
+        ///         collection.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Do not fetch too many bans at once! This may cause unwanted preemptive rate limit or even actual
+        ///         rate limit, causing your bot to freeze!
+        ///     </note>
+        /// </remarks>
+        /// <param name="fromUser">The user to start to get bans from.</param>
+        /// <param name="dir">The direction of the bans to be gotten.</param>
+        /// <param name="limit">The number of bans to get.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A paged collection of bans.
+        /// </returns>
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
         /// <summary>
         ///     Gets a ban object for a banned user.
         /// </summary>
@@ -709,6 +777,18 @@ namespace Discord
         Task<ICategoryChannel> CreateCategoryAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null);
 
         /// <summary>
+        ///     Creates a new channel forum in this guild.
+        /// </summary>
+        /// <param name="name">The new name for the forum.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     forum channel.
+        /// </returns>
+        Task<IForumChannel> CreateForumChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null);
+
+        /// <summary>
         ///     Gets a collection of all the voice regions this guild can access.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -718,8 +798,25 @@ namespace Discord
         /// </returns>
         Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null);
 
-        Task<IReadOnlyCollection<IGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null);
-        Task<IGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a collection of all the integrations this guild contains.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     integrations the guild can has.
+        /// </returns>
+        Task<IReadOnlyCollection<IIntegration>> GetIntegrationsAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Deletes an integration.
+        /// </summary>
+        /// <param name="id">The id for the integration.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous removal operation.
+        /// </returns>
+        Task DeleteIntegrationAsync(ulong id, RequestOptions options = null);
 
         /// <summary>
         ///     Gets a collection of all invites in this guild.
@@ -906,13 +1003,14 @@ namespace Discord
         /// <param name="beforeId">The audit log entry ID to get entries before.</param>
         /// <param name="actionType">The type of actions to filter.</param>
         /// <param name="userId">The user ID to filter entries for.</param>
+        /// <param name="afterId">The audit log entry ID to get entries after.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of the requested audit log entries.
         /// </returns>
         Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogsAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null,
-            ActionType? actionType = null);
+            ActionType? actionType = null, ulong? afterId = null);
 
         /// <summary>
         ///     Gets a webhook found within this guild.
@@ -1006,7 +1104,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options = null);
+        Task<ICustomSticker> CreateStickerAsync(string name, Image image, IEnumerable<string> tags, string description = null, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a new sticker in this guild.
@@ -1019,7 +1117,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path, RequestOptions options = null);
+        Task<ICustomSticker> CreateStickerAsync(string name, string path, IEnumerable<string> tags, string description = null, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a new sticker in this guild.
@@ -1033,7 +1131,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream, string filename, RequestOptions options = null);
+        Task<ICustomSticker> CreateStickerAsync(string name, Stream stream, string filename, IEnumerable<string> tags, string description = null, RequestOptions options = null);
 
         /// <summary>
         ///     Gets a specific sticker within this guild.
@@ -1103,8 +1201,8 @@ namespace Discord
         ///     in order to use this property.
         ///     </remarks>
         /// </param>
-        /// <param name="speakers">A collection of speakers for the event.</param>
         /// <param name="location">The location of the event; links are supported</param>
+        /// <param name="coverImage">The optional banner image for the event.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous create operation.
@@ -1118,17 +1216,23 @@ namespace Discord
             DateTimeOffset? endTime = null,
             ulong? channelId = null,
             string location = null,
+            Image? coverImage = null,
             RequestOptions options = null);
 
         /// <summary>
         ///     Gets this guilds application commands.
         /// </summary>
+        /// <param name="withLocalizations">
+        ///     Whether to include full localization dictionaries in the returned objects,
+        ///     instead of the localized name and description fields.
+        /// </param>
+        /// <param name="locale">The target locale of the localized name and description fields. Sets the <c>X-Discord-Locale</c> header, which takes precedence over <c>Accept-Language</c>.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of application commands found within the guild.
         /// </returns>
-        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null);
 
         /// <summary>
         ///     Gets an application command within this guild with the specified id.
@@ -1163,5 +1267,45 @@ namespace Discord
         /// </returns>
         Task<IReadOnlyCollection<IApplicationCommand>> BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties,
             RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets the welcome screen of the guild. Returns <see langword="null"/> if the welcome channel is not set.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="WelcomeScreen"/>.
+        /// </returns>
+        Task<WelcomeScreen> GetWelcomeScreenAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies the welcome screen of the guild. Returns <see langword="null"/> if welcome screen is removed.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="WelcomeScreen"/>.
+        /// </returns>
+        Task<WelcomeScreen> ModifyWelcomeScreenAsync(bool enabled, WelcomeScreenChannelProperties[] channels, string description = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Get a list of all rules currently configured for the guild.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a collection of <see cref="IAutoModRule"/>.
+        /// </returns>
+        Task<IAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a single rule configured in a guild. Returns <see langword="null"/> if the rule was not found.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="IAutoModRule"/>.
+        /// </returns>
+        Task<IAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new auto moderation rule.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IAutoModRule"/>.
+        /// </returns>
+        Task<IAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options = null);
     }
 }

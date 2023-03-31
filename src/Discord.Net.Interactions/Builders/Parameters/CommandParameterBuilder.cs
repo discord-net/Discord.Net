@@ -9,7 +9,7 @@ namespace Discord.Interactions.Builders
     {
         protected override CommandParameterBuilder Instance => this;
 
-        internal CommandParameterBuilder (ICommandBuilder command) : base(command) { }
+        internal CommandParameterBuilder(ICommandBuilder command) : base(command) { }
 
         /// <summary>
         ///     Initializes a new <see cref="CommandParameterInfo"/>.
@@ -17,9 +17,9 @@ namespace Discord.Interactions.Builders
         /// <param name="command">Parent command of this parameter.</param>
         /// <param name="name">Name of this command.</param>
         /// <param name="type">Type of this parameter.</param>
-        public CommandParameterBuilder (ICommandBuilder command, string name, Type type) : base(command, name, type) { }
+        public CommandParameterBuilder(ICommandBuilder command, string name, Type type) : base(command, name, type) { }
 
-        internal override CommandParameterInfo Build (ICommandInfo command) =>
+        internal override CommandParameterInfo Build(ICommandInfo command) =>
             new CommandParameterInfo(this, command);
     }
 }

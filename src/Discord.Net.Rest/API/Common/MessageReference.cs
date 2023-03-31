@@ -12,5 +12,8 @@ namespace Discord.API
 
         [JsonProperty("guild_id")]
         public Optional<ulong> GuildId { get; set; }
+
+        [JsonProperty("fail_if_not_exists")]
+        public Optional<bool> FailIfNotExists { get; set; }
     }
 }

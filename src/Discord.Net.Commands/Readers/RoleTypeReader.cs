@@ -27,7 +27,7 @@ namespace Discord.Commands
 
                 //By Id (0.9)
                 if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                     AddResult(results, context.Guild.GetRole(id) as T, 0.90f);
+                    AddResult(results, context.Guild.GetRole(id) as T, 0.90f);
 
                 //By Name (0.7-0.8)
                 foreach (var role in roles.Where(x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)))
