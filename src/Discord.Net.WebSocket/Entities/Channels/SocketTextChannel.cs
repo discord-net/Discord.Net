@@ -25,6 +25,8 @@ namespace Discord.WebSocket
         public virtual int SlowModeInterval { get; private set; }
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
+        /// <inheritdoc />
+        public int DefaultSlowModeInterval { get; private set; }
         /// <summary>
         ///     Gets the parent (category) of this channel in the guild's channel list.
         /// </summary>
@@ -81,6 +83,8 @@ namespace Discord.WebSocket
                 DefaultArchiveDuration = model.AutoArchiveDuration.Value;
             else
                 DefaultArchiveDuration = ThreadArchiveDuration.OneDay;
+
+            DefaultSlowModeInterval = model.ThreadRateLimitPerUser.GetValueOrDefault(0);
             // basic value at channel creation. Shouldn't be called since guild text channels always have this property
         }
 
