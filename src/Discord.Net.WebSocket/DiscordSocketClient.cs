@@ -2289,6 +2289,13 @@ namespace Discord.WebSocket
 
                                 }
                                 break;
+
+                            case "VOICE_CHANNEL_EFFECT_SEND":
+                                {
+
+                                }
+                                break;
+
                             #endregion
 
                             #region Invites
@@ -3014,6 +3021,28 @@ namespace Discord.WebSocket
                                             : null);
 
                                     await TimedInvokeAsync(_autoModActionExecuted, nameof(AutoModActionExecuted), guild, action, eventData);
+                                }
+                                break;
+
+                            #endregion
+
+                            #region SoundBoard
+
+                            case "GUILD_SOUNDBOARD_SOUND_CREATE":
+                                {
+
+                                }
+                                break;
+
+                            case "GUILD_SOUNDBOARD_SOUND_UPDATE":
+                                {
+
+                                }
+                                break;
+
+                            case "GUILD_SOUNDBOARD_SOUND_DELETE ":
+                                {
+
                                 }
                                 break;
 

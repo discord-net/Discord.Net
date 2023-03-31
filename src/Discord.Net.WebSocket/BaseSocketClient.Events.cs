@@ -934,7 +934,55 @@ namespace Discord.WebSocket
             remove => _autoModActionExecuted.Remove(value);
         }
         internal readonly AsyncEvent<Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task>> _autoModActionExecuted = new ();
-        
+
+        #endregion
+
+        #region Voice
+
+        /// <summary>
+        ///     Fired when a voice channel effect is sent.
+        /// </summary>
+        public event Func<SocketGuild, Cacheable<SocketGuildUser, ulong>, Task> VoiceChannelEffectSend
+        {
+            add => _voiceChannelEffectSend.Add(value);
+            remove => _voiceChannelEffectSend.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketGuild, Cacheable<SocketGuildUser, ulong>, Task>> _voiceChannelEffectSend = new();
+
+        #endregion
+
+        #region SoundBoard
+
+        /// <summary>
+        ///     Fired when a soundboard sound is created.
+        /// </summary>
+        public event Func<SocketGuild, Task> SoundboardSoundCreated
+        {
+            add => _soundboardSoundCreated.Add(value);
+            remove => _soundboardSoundCreated.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketGuild, Task>> _soundboardSoundCreated = new();
+
+        /// <summary>
+        ///     Fired when a soundboard sound is created.
+        /// </summary>
+        public event Func<SocketGuild, Task> SoundboardSoundUpdated
+        {
+            add => _soundboardSoundUpdated.Add(value);
+            remove => _soundboardSoundUpdated.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketGuild, Task>> _soundboardSoundUpdated = new();
+
+        /// <summary>
+        ///     Fired when a soundboard sound is created.
+        /// </summary>
+        public event Func<SocketGuild, Task> SoundboardSoundDeleted
+        {
+            add => _soundboardSoundDeleted.Add(value);
+            remove => _soundboardSoundDeleted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketGuild, Task>> _soundboardSoundDeleted = new();
+
         #endregion
     }
 }
