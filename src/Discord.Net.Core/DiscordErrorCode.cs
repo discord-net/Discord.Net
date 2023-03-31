@@ -93,10 +93,10 @@ namespace Discord
         MaximumStickersReached = 30039,
         MaximumPruneRequestReached = 30040,
         MaximumGuildWigitsReached = 30042,
+        MaximumNumberOfPremiumEmojisReached = 30056,
         #endregion
 
         #region General Request Errors (40XXX)
-        MaximumNumberOfPremiumEmojisReached(25) = 30056,
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
         OpeningDMTooFast = 40003,
@@ -152,12 +152,12 @@ namespace Discord
         ServerLocaleUnavailable = 50095,
         ServerRequiresMonetization = 50097,
         ServerRequiresBoosts = 50101,
-        RequestBodyContainsInvalidJSON = 50109,
+        RequestBodyContainsInvalidJSON = 50109,        
+        CannotMixSubscriptionAndNonSubscriptionRolesForAnEmoji = 50144,
+        CannotConvertBetweenPremiumEmojiAndNormalEmoji = 50145,
         #endregion
 
         #region 2FA (60XXX)
-        CannotMixSubscriptionAndNonSubscriptionRolesForAnEmoji = 50144,
-        CannotConvertBetweenPremiumEmojiAndNormalEmoji = 50145,
         Requires2FA = 60003,
         #endregion
 
