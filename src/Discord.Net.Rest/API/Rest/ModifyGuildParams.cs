@@ -27,6 +27,8 @@ namespace Discord.API.Rest
         public Optional<Image?> Splash { get; set; }
         [JsonProperty("afk_channel_id")]
         public Optional<ulong?> AfkChannelId { get; set; }
+        [JsonProperty("safety_alerts_channel_id")]
+        public Optional<ulong> SafetyAlertsChannelId { get; set; }
         [JsonProperty("owner_id")]
         public Optional<ulong> OwnerId { get; set; }
         [JsonProperty("explicit_content_filter")]

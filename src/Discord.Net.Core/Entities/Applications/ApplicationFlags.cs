@@ -11,6 +11,8 @@ namespace Discord;
 /// </summary>
 public enum ApplicationFlags
 {
+    UsesAutoModApi = 1 << 6,
+
     GatewayPresence = 1 << 12,
 
     GatewayPresenceLimited = 1 << 13,
