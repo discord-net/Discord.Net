@@ -43,6 +43,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public ulong? WidgetChannelId { get; private set; }
         /// <inheritdoc />
+        public ulong? SafetyAlertsChannelId { get; private set; }
+        /// <inheritdoc />
         public ulong? SystemChannelId { get; private set; }
         /// <inheritdoc />
         public ulong? RulesChannelId { get; private set; }
@@ -151,6 +153,8 @@ namespace Discord.Rest
             AFKChannelId = model.AFKChannelId;
             if (model.WidgetChannelId.IsSpecified)
                 WidgetChannelId = model.WidgetChannelId.Value;
+            if (model.SafetyAlertsChannelId.IsSpecified)
+                SafetyAlertsChannelId = model.SafetyAlertsChannelId.Value;
             SystemChannelId = model.SystemChannelId;
             RulesChannelId = model.RulesChannelId;
             PublicUpdatesChannelId = model.PublicUpdatesChannelId;

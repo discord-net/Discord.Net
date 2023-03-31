@@ -44,6 +44,8 @@ namespace Discord.API
         public Optional<bool> WidgetEnabled { get; set; }
         [JsonProperty("widget_channel_id")]
         public Optional<ulong?> WidgetChannelId { get; set; }
+        [JsonProperty("safety_alerts_channel_id")]
+        public Optional<ulong?> SafetyAlertsChannelId { get; set; }
         [JsonProperty("system_channel_id")]
         public ulong? SystemChannelId { get; set; }
         [JsonProperty("premium_tier")]
