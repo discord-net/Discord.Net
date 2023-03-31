@@ -187,7 +187,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
-        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null,
+        public Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null,
             RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null,
             MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
@@ -196,7 +196,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
-        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false,
+        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false,
             Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null,
             MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
@@ -205,7 +205,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
-        public Task<RestUserMessage> SendFileAsync(FileAttachment attachment, string text, bool isTTS = false,
+        public Task<RestUserMessage> SendFileAsync(FileAttachment attachment, string text = null, bool isTTS = false,
             Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
             MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
@@ -214,7 +214,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
-        public Task<RestUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text, bool isTTS = false,
+        public Task<RestUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, bool isTTS = false,
             Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
             MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None)

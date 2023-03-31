@@ -136,6 +136,14 @@ namespace Discord
         /// </returns>
         ulong? WidgetChannelId { get; }
         /// <summary>
+        ///     Gets the ID of the channel assigned to the safety alerts channel of this guild.
+        /// </summary>
+        /// <returns>
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the safety alerts channel;
+        ///     <see langword="null" /> if none is set.
+        /// </returns>
+        ulong? SafetyAlertsChannelId { get; }
+        /// <summary>
         ///     Gets the ID of the channel where randomized welcome messages are sent.
         /// </summary>
         /// <returns>
@@ -295,6 +303,13 @@ namespace Discord
         ///     The maximum amount of users in a video channel.
         /// </returns>
         int? MaxVideoChannelUsers { get; }
+        /// <summary>
+        ///     Gets the maximum amount of users in a stage video channel.
+        /// </summary>
+        /// <returns>
+        ///     The maximum amount of users in a stage video channel.
+        /// </returns>
+        int? MaxStageVideoChannelUsers { get; }
         /// <summary>
         ///     Gets the approximate number of members in this guild.
         /// </summary>
@@ -990,13 +1005,14 @@ namespace Discord
         /// <param name="beforeId">The audit log entry ID to get entries before.</param>
         /// <param name="actionType">The type of actions to filter.</param>
         /// <param name="userId">The user ID to filter entries for.</param>
+        /// <param name="afterId">The audit log entry ID to get entries after.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of the requested audit log entries.
         /// </returns>
         Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogsAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null,
-            ActionType? actionType = null);
+            ActionType? actionType = null, ulong? afterId = null);
 
         /// <summary>
         ///     Gets a webhook found within this guild.
@@ -1090,7 +1106,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options = null);
+        Task<ICustomSticker> CreateStickerAsync(string name, Image image, IEnumerable<string> tags, string description = null, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a new sticker in this guild.
@@ -1103,7 +1119,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path, RequestOptions options = null);
+        Task<ICustomSticker> CreateStickerAsync(string name, string path, IEnumerable<string> tags, string description = null, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a new sticker in this guild.
@@ -1117,7 +1133,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream, string filename, RequestOptions options = null);
+        Task<ICustomSticker> CreateStickerAsync(string name, Stream stream, string filename, IEnumerable<string> tags, string description = null, RequestOptions options = null);
 
         /// <summary>
         ///     Gets a specific sticker within this guild.

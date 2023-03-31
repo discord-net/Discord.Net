@@ -65,6 +65,7 @@ namespace Discord.Rest
                         Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
+                DefaultSlowModeInterval = args.DefaultSlowModeInterval
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
@@ -280,7 +281,9 @@ namespace Discord.Rest
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
-            Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+            Preconditions.AtMost(embeds.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
+
+            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers);
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
@@ -303,12 +306,12 @@ namespace Discord.Rest
                 Preconditions.AtMost(stickers.Length, 3, nameof(stickers), "A max of 3 stickers are allowed.");
             }
 
-
-            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
+            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
                 throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
 
-            var args = new CreateMessageParams(text)
+            var args = new CreateMessageParams
             {
+                Content = text,
                 IsTTS = isTTS,
                 Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = allowedMentions?.ToModel(),
@@ -345,7 +348,7 @@ namespace Discord.Rest
         /// <exception cref="NotSupportedException"><paramref name="filePath" /> is in an invalid format.</exception>
         /// <exception cref="IOException">An I/O error occurred while opening the file.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
+        /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/>, <see cref="MessageFlags.SuppressNotification"/> and <see cref="MessageFlags.None"/>.</exception>
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             string filePath, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
             MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
@@ -378,7 +381,7 @@ namespace Discord.Rest
             => SendFilesAsync(channel, client, new[] { attachment }, text, isTTS, embed, allowedMentions, messageReference,
                 components, stickers, options, embeds, flags);
 
-        /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
+        /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/>, <see cref="MessageFlags.SuppressNotification"/> and <see cref="MessageFlags.None"/>.</exception>
         public static async Task<RestUserMessage> SendFilesAsync(IMessageChannel channel, BaseDiscordClient client,
             IEnumerable<FileAttachment> attachments, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
             MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
@@ -390,7 +393,9 @@ namespace Discord.Rest
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
-            Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+            Preconditions.AtMost(embeds.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
+
+            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers, attachments);
 
             foreach (var attachment in attachments)
             {
@@ -423,8 +428,8 @@ namespace Discord.Rest
                 }
             }
 
-            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
-                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
+            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
+                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds, SuppressNotification and none.", nameof(flags));
 
             if (stickers != null)
             {

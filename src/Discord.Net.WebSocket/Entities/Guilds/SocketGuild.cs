@@ -97,6 +97,7 @@ namespace Discord.WebSocket
 
         internal ulong? AFKChannelId { get; private set; }
         internal ulong? WidgetChannelId { get; private set; }
+        internal ulong? SafetyAlertsChannelId { get; private set; }
         internal ulong? SystemChannelId { get; private set; }
         internal ulong? RulesChannelId { get; private set; }
         internal ulong? PublicUpdatesChannelId { get; private set; }
@@ -132,6 +133,8 @@ namespace Discord.WebSocket
         public int? MaxMembers { get; private set; }
         /// <inheritdoc />
         public int? MaxVideoChannelUsers { get; private set; }
+        /// <inheritdoc />
+        public int? MaxStageVideoChannelUsers { get; private set; }
         /// <inheritdoc />
         public NsfwLevel NsfwLevel { get; private set; }
         /// <inheritdoc />
@@ -224,6 +227,22 @@ namespace Discord.WebSocket
                 return id.HasValue ? GetChannel(id.Value) : null;
             }
         }
+
+        /// <summary>
+        ///     Gets the safety alerts channel in this guild.
+        /// </summary>
+        /// <returns>
+        ///     The channel set for receiving safety alerts channel; <see langword="null"/> if none is set.
+        /// </returns>
+        public SocketGuildChannel SafetyAlertsChannel
+        {
+            get
+            {
+                var id = SafetyAlertsChannelId;
+                return id.HasValue ? GetChannel(id.Value) : null;
+            }
+        }
+
         /// <summary>
         ///     Gets the system channel where randomized welcome messages are sent in this guild.
         /// </summary>
@@ -503,6 +522,8 @@ namespace Discord.WebSocket
             AFKChannelId = model.AFKChannelId;
             if (model.WidgetChannelId.IsSpecified)
                 WidgetChannelId = model.WidgetChannelId.Value;
+            if (model.SafetyAlertsChannelId.IsSpecified)
+                SafetyAlertsChannelId = model.SafetyAlertsChannelId.Value;
             SystemChannelId = model.SystemChannelId;
             RulesChannelId = model.RulesChannelId;
             PublicUpdatesChannelId = model.PublicUpdatesChannelId;
@@ -533,6 +554,8 @@ namespace Discord.WebSocket
                 MaxMembers = model.MaxMembers.Value;
             if (model.MaxVideoChannelUsers.IsSpecified)
                 MaxVideoChannelUsers = model.MaxVideoChannelUsers.Value;
+            if (model.MaxStageVideoChannelUsers.IsSpecified)
+                MaxStageVideoChannelUsers = model.MaxStageVideoChannelUsers.Value;
             PreferredLocale = model.PreferredLocale;
             PreferredCulture = PreferredLocale == null ? null : new CultureInfo(PreferredLocale);
             if (model.IsBoostProgressBarEnabled.IsSpecified)
@@ -1379,12 +1402,13 @@ namespace Discord.WebSocket
         /// <param name="beforeId">The audit log entry ID to filter entries before.</param>
         /// <param name="actionType">The type of actions to filter.</param>
         /// <param name="userId">The user ID to filter entries for.</param>
+        /// <param name="afterId">The audit log entry ID to filter entries after.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of the requested audit log entries.
-        /// </returns>
-        public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null, ActionType? actionType = null)
-            => GuildHelper.GetAuditLogsAsync(this, Discord, beforeId, limit, options, userId: userId, actionType: actionType);
+        /// </returns>        
+        public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null, ActionType? actionType = null, ulong? afterId = null)
+            => GuildHelper.GetAuditLogsAsync(this, Discord, beforeId, limit, options, userId: userId, actionType: actionType, afterId: afterId);
 
         /// <summary>
         ///     Gets all cached audit log entries from this guild.
@@ -1411,8 +1435,6 @@ namespace Discord.WebSocket
 
         internal void AddAuditLog(SocketAuditLogEntry entry)
             => _auditLogs.Add(entry);
-
-        #endregion
 
         #region Webhooks
         /// <summary>
@@ -1548,10 +1570,10 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        public async Task<SocketCustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image,
+        public async Task<SocketCustomSticker> CreateStickerAsync(string name,  Image image, IEnumerable<string> tags, string description = null,
             RequestOptions options = null)
         {
-            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, description, tags, image, options).ConfigureAwait(false);
+            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, image, tags, description, options).ConfigureAwait(false);
 
             return AddOrUpdateSticker(model);
         }
@@ -1566,11 +1588,11 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        public Task<SocketCustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path,
+        public Task<SocketCustomSticker> CreateStickerAsync(string name,  string path, IEnumerable<string> tags, string description = null,
             RequestOptions options = null)
         {
             var fs = File.OpenRead(path);
-            return CreateStickerAsync(name, description, tags, fs, Path.GetFileName(fs.Name), options);
+            return CreateStickerAsync(name,  fs, Path.GetFileName(fs.Name), tags, description, options);
         }
         /// <summary>
         ///     Creates a new sticker in this guild
@@ -1584,10 +1606,10 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        public async Task<SocketCustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream,
-            string filename, RequestOptions options = null)
+        public async Task<SocketCustomSticker> CreateStickerAsync(string name, Stream stream, string filename, IEnumerable<string> tags, string description = null,
+             RequestOptions options = null)
         {
-            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, description, tags, stream, filename, options).ConfigureAwait(false);
+            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, stream, filename, tags, description, options).ConfigureAwait(false);
 
             return AddOrUpdateSticker(model);
         }
@@ -1926,6 +1948,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         ulong? IGuild.WidgetChannelId => WidgetChannelId;
         /// <inheritdoc />
+        ulong? IGuild.SafetyAlertsChannelId => SafetyAlertsChannelId;
+        /// <inheritdoc />
         ulong? IGuild.SystemChannelId => SystemChannelId;
         /// <inheritdoc />
         ulong? IGuild.RulesChannelId => RulesChannelId;
@@ -2100,10 +2124,10 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogsAsync(int limit, CacheMode cacheMode, RequestOptions options,
-            ulong? beforeId, ulong? userId, ActionType? actionType)
+            ulong? beforeId, ulong? userId, ActionType? actionType, ulong? afterId)
         {
             if (cacheMode == CacheMode.AllowDownload)
-                return (await GetAuditLogsAsync(limit, options, beforeId: beforeId, userId: userId, actionType: actionType).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();
+                return (await GetAuditLogsAsync(limit, options, beforeId: beforeId, userId: userId, actionType: actionType, afterId: afterId).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();
             else
                 return ImmutableArray.Create<IAuditLogEntry>();
         }
@@ -2117,15 +2141,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync(bool withLocalizations, string locale, RequestOptions options)
             => await GetApplicationCommandsAsync(withLocalizations, locale, options).ConfigureAwait(false);
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, Image image, IEnumerable<string> tags, string description, RequestOptions options)
+            => await CreateStickerAsync(name, image, tags, description, options);
         /// <inheritdoc />
-        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options)
-            => await CreateStickerAsync(name, description, tags, image, options);
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, Stream stream, string filename, IEnumerable<string> tags, string description, RequestOptions options)
+            => await CreateStickerAsync(name, stream, filename, tags, description, options);
         /// <inheritdoc />
-        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream, string filename, RequestOptions options)
-            => await CreateStickerAsync(name, description, tags, stream, filename, options);
-        /// <inheritdoc />
-        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path, RequestOptions options)
-            => await CreateStickerAsync(name, description, tags, path, options);
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string path, IEnumerable<string> tags, string description, RequestOptions options)
+            => await CreateStickerAsync(name, path, tags, description, options);
         /// <inheritdoc />
         async Task<ICustomSticker> IGuild.GetStickerAsync(ulong id, CacheMode mode, RequestOptions options)
             => await GetStickerAsync(id, mode, options);

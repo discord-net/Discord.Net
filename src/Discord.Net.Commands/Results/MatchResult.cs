@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 
 namespace Discord.Commands
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class MatchResult : IResult
     {
         /// <summary>

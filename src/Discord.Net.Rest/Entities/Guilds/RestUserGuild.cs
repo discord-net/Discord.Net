@@ -24,6 +24,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         public GuildFeatures Features { get; private set; }
 
+        /// <inheritdoc />
+        public int? ApproximateMemberCount { get; private set; }
+
+        /// <inheritdoc />
+        public int? ApproximatePresenceCount { get; private set; }
+
         internal RestUserGuild(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
@@ -42,6 +48,8 @@ namespace Discord.Rest
             Name = model.Name;
             Permissions = new GuildPermissions(model.Permissions);
             Features = model.Features;
+            ApproximateMemberCount = model.ApproximateMemberCount.IsSpecified ? model.ApproximateMemberCount.Value : null;
+            ApproximatePresenceCount = model.ApproximatePresenceCount.IsSpecified ? model.ApproximatePresenceCount.Value : null;
         }
 
         public async Task LeaveAsync(RequestOptions options = null)

@@ -1,11 +1,13 @@
 using Discord.Net.Rest;
 using Discord.Rest;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+
 using DataModel = Discord.API.ModalInteractionData;
 using ModelBase = Discord.API.Interaction;
 
@@ -21,12 +23,35 @@ namespace Discord.WebSocket
         /// </summary>
         public new SocketModalData Data { get; set; }
 
+        /// <inheritdoc cref="IModalInteraction.Message"/>
+        public SocketUserMessage Message { get; private set; }
+
+        IUserMessage IModalInteraction.Message => Message;
+
         internal SocketModal(DiscordSocketClient client, ModelBase model, ISocketMessageChannel channel, SocketUser user)
              : base(client, model.Id, channel, user)
         {
             var dataModel = model.Data.IsSpecified
                 ? (DataModel)model.Data.Value
                 : null;
+
+            if (model.Message.IsSpecified)
+            {
+                SocketUser author = null;
+                if (Channel is SocketGuildChannel ch)
+                {
+                    if (model.Message.Value.WebhookId.IsSpecified)
+                        author = SocketWebhookUser.Create(ch.Guild, Discord.State, model.Message.Value.Author.Value, model.Message.Value.WebhookId.Value);
+                    else if (model.Message.Value.Author.IsSpecified)
+                        author = ch.Guild.GetUser(model.Message.Value.Author.Value.Id);
+                }
+                else if (model.Message.Value.Author.IsSpecified)
+                    author = (Channel as SocketChannel)?.GetUser(model.Message.Value.Author.Value.Id);
+
+                author ??= Discord.State.GetOrAddUser(model.Message.Value.Author.Value.Id, _ => SocketGlobalUser.Create(Discord, Discord.State, model.Message.Value.Author.Value));
+
+                Message = SocketUserMessage.Create(Discord, Discord.State, author, Channel, model.Message.Value);
+            }
 
             Data = new SocketModalData(dataModel, client, client.State, client.State.GetGuild(model.GuildId.GetValueOrDefault()), model.User.GetValueOrDefault());
         }
@@ -174,6 +199,7 @@ namespace Discord.WebSocket
             HasResponded = true;
         }
 
+        /// <inheritdoc/>
         public async Task UpdateAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
             var args = new MessageProperties();
