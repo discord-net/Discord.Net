@@ -88,5 +88,8 @@ namespace Discord.API
 
         [JsonProperty("welcome_screen")]
         public Optional<WelcomeScreen> WelcomeScreen { get; set; }
+
+        [JsonProperty("max_stage_video_channel_users")]
+        public Optional<int> MaxStageVideoChannelUsers { get; set; }
     }
 }

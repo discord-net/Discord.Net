@@ -302,6 +302,13 @@ namespace Discord
         /// </returns>
         int? MaxVideoChannelUsers { get; }
         /// <summary>
+        ///     Gets the maximum amount of users in a stage video channel.
+        /// </summary>
+        /// <returns>
+        ///     The maximum amount of users in a stage video channel.
+        /// </returns>
+        int? MaxStageVideoChannelUsers { get; }
+        /// <summary>
         ///     Gets the approximate number of members in this guild.
         /// </summary>
         /// <remarks>
