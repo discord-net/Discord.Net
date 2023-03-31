@@ -1436,6 +1436,8 @@ namespace Discord.WebSocket
         internal void AddAuditLog(SocketAuditLogEntry entry)
             => _auditLogs.Add(entry);
 
+        #endregion
+
         #region Webhooks
         /// <summary>
         ///     Gets a webhook found within this guild.
