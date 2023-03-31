@@ -429,7 +429,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>
@@ -449,7 +449,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>
@@ -471,7 +471,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>
@@ -1003,13 +1003,14 @@ namespace Discord
         /// <param name="beforeId">The audit log entry ID to get entries before.</param>
         /// <param name="actionType">The type of actions to filter.</param>
         /// <param name="userId">The user ID to filter entries for.</param>
+        /// <param name="afterId">The audit log entry ID to get entries after.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of the requested audit log entries.
         /// </returns>
         Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogsAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null,
-            ActionType? actionType = null);
+            ActionType? actionType = null, ulong? afterId = null);
 
         /// <summary>
         ///     Gets a webhook found within this guild.
