@@ -134,6 +134,14 @@ namespace Discord
         /// </returns>
         ulong? WidgetChannelId { get; }
         /// <summary>
+        ///     Gets the ID of the channel assigned to the safety alerts channel of this guild.
+        /// </summary>
+        /// <returns>
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the safety alerts channel;
+        ///     <see langword="null" /> if none is set.
+        /// </returns>
+        ulong? SafetyAlertsChannelId { get; }
+        /// <summary>
         ///     Gets the ID of the channel where randomized welcome messages are sent.
         /// </summary>
         /// <returns>

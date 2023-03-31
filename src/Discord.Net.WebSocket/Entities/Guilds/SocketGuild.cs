@@ -93,6 +93,7 @@ namespace Discord.WebSocket
 
         internal ulong? AFKChannelId { get; private set; }
         internal ulong? WidgetChannelId { get; private set; }
+        internal ulong? SafetyAlertsChannelId { get; private set; }
         internal ulong? SystemChannelId { get; private set; }
         internal ulong? RulesChannelId { get; private set; }
         internal ulong? PublicUpdatesChannelId { get; private set; }
@@ -220,6 +221,22 @@ namespace Discord.WebSocket
                 return id.HasValue ? GetChannel(id.Value) : null;
             }
         }
+
+        /// <summary>
+        ///     Gets the safety alerts channel in this guild.
+        /// </summary>
+        /// <returns>
+        ///     The channel set for receiving safety alerts channel; <see langword="null"/> if none is set.
+        /// </returns>
+        public SocketGuildChannel SafetyAlertsChannel
+        {
+            get
+            {
+                var id = SafetyAlertsChannelId;
+                return id.HasValue ? GetChannel(id.Value) : null;
+            }
+        }
+
         /// <summary>
         ///     Gets the system channel where randomized welcome messages are sent in this guild.
         /// </summary>
@@ -498,6 +515,8 @@ namespace Discord.WebSocket
             AFKChannelId = model.AFKChannelId;
             if (model.WidgetChannelId.IsSpecified)
                 WidgetChannelId = model.WidgetChannelId.Value;
+            if (model.SafetyAlertsChannelId.IsSpecified)
+                SafetyAlertsChannelId = model.SafetyAlertsChannelId.Value;
             SystemChannelId = model.SystemChannelId;
             RulesChannelId = model.RulesChannelId;
             PublicUpdatesChannelId = model.PublicUpdatesChannelId;
@@ -1893,6 +1912,8 @@ namespace Discord.WebSocket
         bool IGuild.Available => true;
         /// <inheritdoc />
         ulong? IGuild.WidgetChannelId => WidgetChannelId;
+        /// <inheritdoc />
+        ulong? IGuild.SafetyAlertsChannelId => SafetyAlertsChannelId;
         /// <inheritdoc />
         ulong? IGuild.SystemChannelId => SystemChannelId;
         /// <inheritdoc />

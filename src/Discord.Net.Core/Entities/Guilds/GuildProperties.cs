@@ -118,5 +118,10 @@ namespace Discord
         ///     Gets or sets the guild features enabled in this guild. Features that are not mutable will be ignored.
         /// </summary>
         public Optional<GuildFeature> Features { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the ID of the safety alerts channel.
+        /// </summary>
+        public Optional<ulong> SafetyAlertsChannelId { get; set; }
     }
 }
