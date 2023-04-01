@@ -92,6 +92,7 @@ namespace Discord
             AssertFlag(() => new ChannelPermissions(startEmbeddedActivities: true), ChannelPermission.StartEmbeddedActivities);
             AssertFlag(() => new ChannelPermissions(useSoundboard: true), ChannelPermission.UseSoundboard);
             AssertFlag(() => new ChannelPermissions(createEvents: true), ChannelPermission.CreateEvents);
+            AssertFlag(() => new ChannelPermissions(useExternalSounds: true), ChannelPermission.UseExternalSounds);
         }
 
         /// <summary>

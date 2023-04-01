@@ -262,5 +262,10 @@ namespace Discord
         ///     Allows for using the soundboard.
         /// </summary>
         UseSoundboard = 1L << 42,
+
+        /// <summary>
+        ///     Allows members to use sounds from other servers.
+        /// </summary>
+        UseExternalSounds = 1L << 45,
     }
 }

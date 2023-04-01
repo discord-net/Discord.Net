@@ -102,10 +102,11 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(moderateMembers: true), GuildPermission.ModerateMembers);
             AssertFlag(() => new GuildPermissions(viewMonetizationAnalytics: true), GuildPermission.ViewMonetizationAnalytics);
             AssertFlag(() => new GuildPermissions(useSoundboard: true), GuildPermission.UseSoundboard);
+            AssertFlag(() => new GuildPermissions(useExternalSounds: true), GuildPermission.UseExternalSounds);
         }
 
         /// <summary>
-        ///     Tests the behavior of <see cref="Discord.GuildPermissions.Modify(bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?)"/>
+        ///     Tests the behavior of <see cref="GuildPermissions.Modify"/>
         ///     with each of the parameters.
         /// </summary>
         [Fact]
@@ -180,6 +181,7 @@ namespace Discord
             AssertUtil(GuildPermission.CreatePrivateThreads, x => x.CreatePrivateThreads, (p, enable) => p.Modify(createPrivateThreads: enable));
             AssertUtil(GuildPermission.UseExternalStickers, x => x.UseExternalStickers, (p, enable) => p.Modify(useExternalStickers: enable));
             AssertUtil(GuildPermission.ModerateMembers, x => x.ModerateMembers, (p, enable) => p.Modify(moderateMembers: enable));
+            AssertUtil(GuildPermission.UseExternalSounds, x => x.UseExternalSounds, (p, enable) => p.Modify(useExternalSounds: enable));
         }
     }
 }
