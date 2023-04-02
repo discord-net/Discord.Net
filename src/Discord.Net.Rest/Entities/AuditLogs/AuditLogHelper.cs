@@ -82,6 +82,10 @@ internal static class AuditLogHelper
             [ActionType.AutoModerationBlockMessage] = AutoModBlockedMessageAuditLogData.Create,
             [ActionType.AutoModerationFlagToChannel] = AutoModFlaggedMessageAuditLogData.Create,
             [ActionType.AutoModerationUserCommunicationDisabled] = AutoModTimeoutUserAuditLogData.Create,
+
+            [ActionType.OnboardingQuestionCreated] = OnboardingPromptCreatedAuditLogData.Create,
+            [ActionType.OnboardingQuestionUpdated] = OnboardingPromptUpdatedAuditLogData.Create,
+            [ActionType.OnboardingUpdated] = OnboardingUpdatedAuditLogData.Create,
         };
 
     public static IAuditLogData CreateData(BaseDiscordClient discord, EntryModel entry, Model log = null)

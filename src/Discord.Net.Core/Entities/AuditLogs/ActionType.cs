@@ -234,7 +234,21 @@ namespace Discord
         /// <summary>
         ///     Member was timed out by Auto Moderation.
         /// </summary>
-        AutoModerationUserCommunicationDisabled = 145
+        AutoModerationUserCommunicationDisabled = 145,
 
+        /// <summary>
+        ///     Guild Onboarding Question was created.
+        /// </summary>
+        OnboardingQuestionCreated = 163,
+
+        /// <summary>
+        ///     Guild Onboarding Question was updated.
+        /// </summary>
+        OnboardingQuestionUpdated = 164,
+
+        /// <summary>
+        ///     Guild Onboarding was updated.
+        /// </summary>
+        OnboardingUpdated = 167
     }
 }

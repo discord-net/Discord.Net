@@ -80,6 +80,10 @@ internal static class SocketAuditLogHelper
             [ActionType.AutoModerationBlockMessage] = SocketAutoModBlockedMessageAuditLogData.Create,
             [ActionType.AutoModerationFlagToChannel] = SocketAutoModFlaggedMessageAuditLogData.Create,
             [ActionType.AutoModerationUserCommunicationDisabled] = SocketAutoModTimeoutUserAuditLogData.Create,
+
+            [ActionType.OnboardingQuestionCreated] = SocketOnboardingPromptCreatedAuditLogData.Create,
+            [ActionType.OnboardingQuestionUpdated] = SocketOnboardingPromptUpdatedAuditLogData.Create,
+            [ActionType.OnboardingUpdated] = SocketOnboardingUpdatedAuditLogData.Create,
         };
 
     public static ISocketAuditLogData CreateData(DiscordSocketClient discord, EntryModel entry)
