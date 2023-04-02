@@ -31,7 +31,7 @@ public class RestGuildOnboarding : IGuildOnboarding
         IsEnabled = model.Enabled;
 
         Guild = guild;
-        Prompts = model.Prompts.Select(prompt => new RestGuildOnboardingPrompt(discord, prompt.Id, prompt, guild)).ToImmutableArray();
+        Prompts = model.Prompts.Select(prompt => new RestGuildOnboardingPrompt(discord, prompt.Id, prompt)).ToImmutableArray();
     }
 
     #region IGuildOnboarding

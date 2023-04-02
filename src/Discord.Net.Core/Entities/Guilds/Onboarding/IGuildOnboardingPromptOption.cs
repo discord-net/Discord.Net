@@ -18,11 +18,6 @@ public interface IGuildOnboardingPromptOption : ISnowflakeEntity
     IReadOnlyCollection<ulong> RoleIds { get; }
 
     /// <summary>
-    ///     Gets roles assigned to a member when the option is selected.
-    /// </summary>
-    IReadOnlyCollection<IRole> Roles { get; }
-
-    /// <summary>
     ///     Gets the emoji of the option. <see langword="null"/> if none is set.
     /// </summary>
     IEmote Emoji { get; }

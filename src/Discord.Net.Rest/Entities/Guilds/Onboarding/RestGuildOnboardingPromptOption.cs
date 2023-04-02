@@ -17,10 +17,7 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
 
     /// <inheritdoc />
     public IReadOnlyCollection<ulong> RoleIds { get; private set; }
-
-    /// <inheritdoc cref="IGuildOnboardingPromptOption.Roles" />
-    public IReadOnlyCollection<RestRole> Roles { get; private set; }
-
+    
     /// <inheritdoc />
     public IEmote Emoji { get; private set; }
 
@@ -30,7 +27,7 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
     /// <inheritdoc />
     public string Description { get; private set; }
 
-    internal RestGuildOnboardingPromptOption(BaseDiscordClient discord, ulong id, Model model, RestGuild guild = null) : base(discord, id)
+    internal RestGuildOnboardingPromptOption(BaseDiscordClient discord, ulong id, Model model) : base(discord, id)
     {
         ChannelIds = model.ChannelIds.ToImmutableArray();
         RoleIds = model.RoleIds.ToImmutableArray();
@@ -49,18 +46,5 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
         {
             Emoji = null;
         }
-
-        if (guild is not null)
-        {
-            Roles = model.RoleIds.Select(guild.GetRole).ToImmutableArray();
-        }
-
     }
-
-    #region IGuildOnboardingPromptOption
-
-    /// <inheritdoc />
-    IReadOnlyCollection<IRole> IGuildOnboardingPromptOption.Roles => Roles;
-
-    #endregion
 }
