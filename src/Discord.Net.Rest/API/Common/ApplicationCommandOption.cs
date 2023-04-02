@@ -93,7 +93,8 @@ namespace Discord.API
             Choices = option.Choices?.Select(x => new ApplicationCommandOptionChoice
             {
                 Name = x.Name,
-                Value = x.Value
+                Value = x.Value,
+                NameLocalizations = x.NameLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified,
             }).ToArray() ?? Optional<ApplicationCommandOptionChoice[]>.Unspecified;
 
             Options = option.Options?.Select(x => new ApplicationCommandOption(x)).ToArray() ?? Optional<ApplicationCommandOption[]>.Unspecified;
