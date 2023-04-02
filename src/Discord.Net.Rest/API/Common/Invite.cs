@@ -9,7 +9,7 @@ namespace Discord.API
         public string Code { get; set; }
 
         [JsonProperty("guild")]
-        public Optional<InviteGuild> Guild { get; set; }
+        public Optional<PartialGuild> Guild { get; set; }
 
         [JsonProperty("channel")]
         public InviteChannel Channel { get; set; }

@@ -1309,5 +1309,13 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IAutoModRule"/>.
         /// </returns>
         Task<IAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets the onboarding object configured for the guild.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IGuildOnboarding"/>.
+        /// </returns>
+        Task<IGuildOnboarding> GetOnboardingAsync(RequestOptions options = null);
     }
 }

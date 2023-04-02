@@ -2,13 +2,19 @@ using System;
 
 namespace Discord;
 
-public class InviteGuild : ISnowflakeEntity
+/// <summary>
+///     Represents a partial guild object.
+/// </summary>
+/// <remarks>
+///     Most of the fields can have <see langword="null" /> value.
+/// </remarks>
+public class PartialGuild : ISnowflakeEntity
 {
     /// <inheritdoc />
     public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
     /// <inheritdoc/>
-    public ulong Id { get; private set; }
+    public ulong Id { get; internal set; }
 
     /// <summary>
     ///     Gets the name of this guild.
@@ -16,7 +22,7 @@ public class InviteGuild : ISnowflakeEntity
     /// <returns>
     ///     A string containing the name of this guild.
     /// </returns>
-    public string Name { get; private set; }
+    public string Name { get; internal set; }
 
     /// <summary>
     ///     Gets the description for the guild.
@@ -24,7 +30,7 @@ public class InviteGuild : ISnowflakeEntity
     /// <returns>
     ///     The description for the guild; <see langword="null" /> if none is set.
     /// </returns>
-    public string Description { get; private set; }
+    public string Description { get; internal set; }
 
     /// <summary>
     ///     Gets the ID of this guild's splash image.
@@ -32,7 +38,7 @@ public class InviteGuild : ISnowflakeEntity
     /// <returns>
     ///     An identifier for the splash image; <see langword="null" /> if none is set.
     /// </returns>
-    public string SplashId { get; private set; }
+    public string SplashId { get; internal set; }
 
     /// <summary>
     ///     Gets the URL of this guild's splash image.
@@ -48,7 +54,7 @@ public class InviteGuild : ISnowflakeEntity
     /// <returns>
     ///     An identifier for the banner image; <see langword="null" /> if none is set.
     /// </returns>
-    public string BannerId { get; private set; }
+    public string BannerId { get; internal set; }
 
     /// <summary>
     ///     Gets the URL of this guild's banner image.
@@ -64,7 +70,7 @@ public class InviteGuild : ISnowflakeEntity
     /// <returns>
     ///     A flags enum containing all the features for the guild.
     /// </returns>
-    public GuildFeatures Features { get; private set; }
+    public GuildFeatures Features { get; internal set; }
 
     /// <summary>
     ///     Gets the ID of this guild's icon.
@@ -72,7 +78,7 @@ public class InviteGuild : ISnowflakeEntity
     /// <returns>
     ///     An identifier for the splash image; <see langword="null" /> if none is set.
     /// </returns>
-    public string IconId { get; private set; }
+    public string IconId { get; internal set; }
 
     /// <summary>
     ///     Gets the URL of this guild's icon.
@@ -87,9 +93,9 @@ public class InviteGuild : ISnowflakeEntity
     ///     Gets the level of requirements a user must fulfill before being allowed to post messages in this guild.
     /// </summary>
     /// <returns>
-    ///     The level of requirements.
+    ///     The level of requirements. <see langword="null" /> if none is was returned.
     /// </returns>
-    public VerificationLevel VerificationLevel { get; private set; }
+    public VerificationLevel? VerificationLevel { get; internal set; }
 
     /// <summary>
     ///     Gets the code for this guild's vanity invite URL.
@@ -97,7 +103,7 @@ public class InviteGuild : ISnowflakeEntity
     /// <returns>
     ///     A string containing the vanity invite code for this guild; <see langword="null" /> if none is set.
     /// </returns>
-    public string VanityURLCode { get; private set; }
+    public string VanityURLCode { get; internal set; }
 
     /// <summary>
     ///     Gets the number of premium subscribers of this guild.
@@ -106,17 +112,17 @@ public class InviteGuild : ISnowflakeEntity
     ///     This is the number of users who have boosted this guild.
     /// </remarks>
     /// <returns>
-    ///     The number of premium subscribers of this guild; 
+    ///     The number of premium subscribers of this guild; <see langword="null" /> if none was returned.
     /// </returns>
-    public int PremiumSubscriptionCount { get; private set; }
+    public int? PremiumSubscriptionCount { get; internal set; }
 
     /// <summary>
     ///     Gets the NSFW level of this guild.
     /// </summary>
     /// <returns>
-    ///     The NSFW level of this guild.
+    ///     The NSFW level of this guild. <see langword="null" /> if none was returned.
     /// </returns>
-    public NsfwLevel NsfwLevel { get; private set; }
+    public NsfwLevel? NsfwLevel { get; internal set; }
 
     /// <summary>
     ///     Gets the Welcome Screen of this guild
@@ -124,33 +130,18 @@ public class InviteGuild : ISnowflakeEntity
     /// <returns>
     ///     The welcome screen of this guild. <see langword="null" /> if none is set.
     /// </returns>
-    public WelcomeScreen WelcomeScreen { get; private set; }
+    public WelcomeScreen WelcomeScreen { get; internal set; }
 
-    internal InviteGuild(
-        ulong id,
-        string name,
-        string description,
-        string splashId,
-        string bannerId,
-        GuildFeatures features,
-        string iconId,
-        VerificationLevel verificationLevel,
-        string vanityURLCode,
-        int premiumSubscriptionCount,
-        NsfwLevel nsfwLevel,
-        WelcomeScreen welcomeScreen)
-    {
-        Id = id;
-        Name = name;
-        Description = description;
-        SplashId = splashId;
-        BannerId = bannerId;
-        Features = features;
-        IconId = iconId;
-        VerificationLevel = verificationLevel;
-        VanityURLCode = vanityURLCode;
-        PremiumSubscriptionCount = premiumSubscriptionCount;
-        NsfwLevel = nsfwLevel;
-        WelcomeScreen = welcomeScreen;
-    }
+    /// <summary>
+    ///     Gets the approximate member count in the guild. <see langword="null" /> if none was returned.
+    /// </summary>
+    public int? ApproximateMemberCount { get; internal set; }
+
+    /// <summary>
+    ///     Gets the approximate presence count in the guild.<see langword="null" /> if none was returned.
+    /// </summary>
+    public int? ApproximatePresenceCount { get; internal set; }
+
+    internal PartialGuild() { }
+
 }

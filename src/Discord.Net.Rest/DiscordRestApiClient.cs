@@ -2239,6 +2239,19 @@ namespace Discord.API
 
         #endregion
 
+        #region Guild Onboarding
+
+        public async Task<GuildOnboarding> GetGuildOnboardingAsync(ulong guildId, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendAsync<GuildOnboarding>("GET", () => $"guilds/{guildId}/onboarding", new BucketIds(guildId: guildId), options: options);
+        }
+
+        #endregion
+
         #region Users
         public async Task<User> GetUserAsync(ulong userId, RequestOptions options = null)
         {
@@ -2282,11 +2295,27 @@ namespace Discord.API
 
             return await SendAsync<IReadOnlyCollection<UserGuild>>("GET", () => $"users/@me/guilds?limit={limit}&after={afterGuildId}&with_counts=true", new BucketIds(), options: options).ConfigureAwait(false);
         }
+
         public async Task<Application> GetMyApplicationAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             return await SendAsync<Application>("GET", () => "oauth2/applications/@me", new BucketIds(), options: options).ConfigureAwait(false);
         }
+
+        public async Task<Application> GetCurrentBotApplicationAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<Application>("GET", () => "applications/@me", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
+        public async Task<Application> ModifyCurrentBotApplicationAsync(ModifyCurrentApplicationBotParams args, RequestOptions options = null)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendJsonAsync<Application>("PATCH", () => "applications/@me", args, new BucketIds(), options: options);
+        }
+
         public async Task<User> ModifySelfAsync(Rest.ModifyCurrentUserParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
