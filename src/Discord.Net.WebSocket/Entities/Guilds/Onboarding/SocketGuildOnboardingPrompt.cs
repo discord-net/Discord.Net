@@ -7,9 +7,8 @@ using Model = Discord.API.GuildOnboardingPrompt;
 
 namespace Discord.WebSocket;
 
-/// <summary>
-/// 
-/// </summary>
+
+/// <inheritdoc cref="IGuildOnboardingPrompt"/>
 public class SocketGuildOnboardingPrompt : SocketEntity<ulong>, IGuildOnboardingPrompt
 {
     /// <inheritdoc />

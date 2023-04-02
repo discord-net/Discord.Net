@@ -6,9 +6,7 @@ using Model = Discord.API.GuildOnboarding;
 
 namespace Discord.Rest;
 
-/// <summary>
-/// 
-/// </summary>
+/// <inheritdoc />
 public class RestGuildOnboarding : IGuildOnboarding
 {
     /// <inheritdoc />

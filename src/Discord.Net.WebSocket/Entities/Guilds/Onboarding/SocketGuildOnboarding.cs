@@ -5,6 +5,7 @@ using Model = Discord.API.GuildOnboarding;
 
 namespace Discord.WebSocket;
 
+/// <inheritdoc />
 public class SocketGuildOnboarding : IGuildOnboarding
 {
     /// <inheritdoc />
@@ -19,6 +20,9 @@ public class SocketGuildOnboarding : IGuildOnboarding
     /// <inheritdoc />
     public IReadOnlyCollection<ulong> DefaultChannelIds { get; private set; }
 
+    /// <summary>
+    ///     Gets channels members get opted in automatically.
+    /// </summary>
     public IReadOnlyCollection<SocketGuildChannel> DefaultChannels { get; private set; }
 
     /// <inheritdoc />

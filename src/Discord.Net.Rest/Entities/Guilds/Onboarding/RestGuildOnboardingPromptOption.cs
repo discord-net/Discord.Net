@@ -6,6 +6,7 @@ using Model = Discord.API.GuildOnboardingPromptOption;
 
 namespace Discord.Rest;
 
+/// <inheritdoc cref="IGuildOnboardingPromptOption"/>
 public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardingPromptOption
 {
     /// <inheritdoc />

@@ -7,6 +7,7 @@ using Model = Discord.API.GuildOnboardingPromptOption;
 
 namespace Discord.WebSocket;
 
+/// <inheritdoc cref="IGuildOnboardingPromptOption"/>
 public class SocketGuildOnboardingPromptOption : SocketEntity<ulong>, IGuildOnboardingPromptOption
 {
     /// <inheritdoc />
@@ -16,7 +17,7 @@ public class SocketGuildOnboardingPromptOption : SocketEntity<ulong>, IGuildOnbo
     public IReadOnlyCollection<ulong> ChannelIds { get; private set; }
 
     /// <summary>
-    ///     
+    ///     Gets channels a member is added to when the option is selected.
     /// </summary>
     public IReadOnlyCollection<SocketGuildChannel> Channels { get; private set; }
 
