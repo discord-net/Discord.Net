@@ -30,7 +30,7 @@ public class RestGuildOnboardingPrompt : RestEntity<ulong>, IGuildOnboardingProm
     /// <inheritdoc />
     public GuildOnboardingPromptType Type { get; private set; }
 
-    internal RestGuildOnboardingPrompt(BaseDiscordClient discord, ulong id, Model model, RestGuild guild = null) : base(discord, id)
+    internal RestGuildOnboardingPrompt(BaseDiscordClient discord, ulong id, Model model) : base(discord, id)
     {
         Title = model.Title;
         IsSingleSelect = model.IsSingleSelect;
@@ -38,7 +38,7 @@ public class RestGuildOnboardingPrompt : RestEntity<ulong>, IGuildOnboardingProm
         IsRequired = model.IsRequired;
         Type = model.Type;
 
-        Options = model.Options.Select(option => new RestGuildOnboardingPromptOption(discord, option.Id, option, guild)).ToImmutableArray();
+        Options = model.Options.Select(option => new RestGuildOnboardingPromptOption(discord, option.Id, option)).ToImmutableArray();
     }
 
     #region IGuildOnboardingPrompt

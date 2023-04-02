@@ -24,7 +24,9 @@ public class SocketGuildOnboardingPromptOption : SocketEntity<ulong>, IGuildOnbo
     /// <inheritdoc />
     public IReadOnlyCollection<ulong> RoleIds { get; private set; }
 
-    /// <inheritdoc cref="IGuildOnboardingPromptOption.Roles" />
+    /// <summary>
+    ///     Gets roles assigned to a member when the option is selected.
+    /// </summary>
     public IReadOnlyCollection<SocketRole> Roles { get; private set; }
 
     /// <inheritdoc />
@@ -59,11 +61,4 @@ public class SocketGuildOnboardingPromptOption : SocketEntity<ulong>, IGuildOnbo
         Roles = model.RoleIds.Select(guild.GetRole).ToImmutableArray();
         Channels = model.ChannelIds.Select(guild.GetChannel).ToImmutableArray();
     }
-
-    #region IGuildOnboardingPromptOption
-
-    /// <inheritdoc />
-    IReadOnlyCollection<IRole> IGuildOnboardingPromptOption.Roles => Roles;
-
-    #endregion
 }
