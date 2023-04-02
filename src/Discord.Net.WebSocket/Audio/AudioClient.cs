@@ -306,7 +306,7 @@ namespace Discord.Audio
             {
                 if (_connection.State == ConnectionState.Connecting)
                 {
-                    if (packet.Length != 70)
+                    if (packet.Length != 74)
                     {
                         await _audioLogger.DebugAsync("Malformed Packet").ConfigureAwait(false);
                         return;
@@ -315,8 +315,8 @@ namespace Discord.Audio
                     int port;
                     try
                     {
-                        ip = Encoding.UTF8.GetString(packet, 4, 70 - 6).TrimEnd('\0');
-                        port = (packet[69] << 8) | packet[68];
+                        ip = Encoding.UTF8.GetString(packet, 8, 74 - 10).TrimEnd('\0');
+                        port = (packet[73] << 8) | packet[72];
                     }
                     catch (Exception ex)
                     {

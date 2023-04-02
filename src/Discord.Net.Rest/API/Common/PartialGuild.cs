@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API
 {
-    internal class InviteGuild
+    internal class PartialGuild
     {
         [JsonProperty("id")]
         public ulong Id { get; set; }
@@ -23,10 +23,10 @@ namespace Discord.API
         public Optional<string> IconHash { get; set; }
 
         [JsonProperty("features")]
-        public GuildFeatures Features { get; set; }
+        public Optional<GuildFeatures> Features { get; set; }
 
         [JsonProperty("verification_level")]
-        public VerificationLevel VerificationLevel { get; set; }
+        public Optional<VerificationLevel> VerificationLevel { get; set; }
 
         [JsonProperty("vanity_url_code")]
         public Optional<string> VanityUrlCode { get; set; }
@@ -38,9 +38,16 @@ namespace Discord.API
         public Optional<bool?> Nsfw { get; set; }
 
         [JsonProperty("nsfw_level")]
-        public NsfwLevel NsfwLevel { get; set; }
+        public Optional<NsfwLevel> NsfwLevel { get; set; }
 
         [JsonProperty("welcome_screen")]
         public Optional<WelcomeScreen> WelcomeScreen { get; set; }
+
+        [JsonProperty("approximate_member_count")]
+        public Optional<int> ApproximateMemberCount { get; set; }
+
+        [JsonProperty("approximate_presence_count")]
+        public Optional<int> ApproximatePresenceCount { get; set; }
+
     }
 }

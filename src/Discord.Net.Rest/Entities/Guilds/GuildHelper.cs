@@ -400,7 +400,8 @@ namespace Discord.Rest
                 IsNsfw = props.IsNsfw,
                 Topic = props.Topic,
                 DefaultAutoArchiveDuration = props.AutoArchiveDuration,
-                DefaultSortOrder = props.DefaultSortOrder.GetValueOrDefault(ForumSortOrder.LatestActivity)
+                DefaultSortOrder = props.DefaultSortOrder.GetValueOrDefault(ForumSortOrder.LatestActivity),
+                DefaultLayout = props.DefaultLayout,
             };
 
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
@@ -610,7 +611,7 @@ namespace Discord.Rest
 
         #region Audit logs
         public static IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(IGuild guild, BaseDiscordClient client,
-            ulong? from, int? limit, RequestOptions options, ulong? userId = null, ActionType? actionType = null)
+            ulong? from, int? limit, RequestOptions options, ulong? userId = null, ActionType? actionType = null, ulong? afterId = null)
         {
             return new PagedAsyncEnumerable<RestAuditLogEntry>(
                 DiscordConfig.MaxAuditLogEntriesPerBatch,
@@ -626,6 +627,8 @@ namespace Discord.Rest
                         args.UserId = userId.Value;
                     if (actionType.HasValue)
                         args.ActionType = (int)actionType.Value;
+                    if (afterId.HasValue)
+                        args.AfterEntryId = afterId.Value;
                     var model = await client.ApiClient.GetAuditLogsAsync(guild.Id, args, options);
                     return model.Entries.Select((x) => RestAuditLogEntry.Create(client, model, x)).ToImmutableArray();
                 },
@@ -705,49 +708,67 @@ namespace Discord.Rest
         public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
             => client.ApiClient.DeleteGuildEmoteAsync(guild.Id, id, options);
 
-        public static async Task<API.Sticker> CreateStickerAsync(BaseDiscordClient client, IGuild guild, string name, string description, IEnumerable<string> tags,
-            Image image, RequestOptions options = null)
+        public static async Task<API.Sticker> CreateStickerAsync(BaseDiscordClient client, IGuild guild, string name, Image image, IEnumerable<string> tags,
+            string description = null, RequestOptions options = null)
         {
             Preconditions.NotNull(name, nameof(name));
-            Preconditions.NotNull(description, nameof(description));
+
+            if (description is not null)
+            {
+                Preconditions.AtLeast(description.Length, 2, nameof(description));
+                Preconditions.AtMost(description.Length, 100, nameof(description));
+            }
+
+            var tagString = string.Join(", ", tags);
+
+            Preconditions.AtLeast(tagString.Length, 1, nameof(tags));
+            Preconditions.AtMost(tagString.Length, 200, nameof(tags));
+
 
             Preconditions.AtLeast(name.Length, 2, nameof(name));
-            Preconditions.AtLeast(description.Length, 2, nameof(description));
 
             Preconditions.AtMost(name.Length, 30, nameof(name));
-            Preconditions.AtMost(description.Length, 100, nameof(name));
 
             var apiArgs = new CreateStickerParams()
             {
                 Name = name,
                 Description = description,
                 File = image.Stream,
-                Tags = string.Join(", ", tags)
+                Tags = tagString
             };
 
             return await client.ApiClient.CreateGuildStickerAsync(apiArgs, guild.Id, options).ConfigureAwait(false);
         }
 
-        public static async Task<API.Sticker> CreateStickerAsync(BaseDiscordClient client, IGuild guild, string name, string description, IEnumerable<string> tags,
-            Stream file, string filename, RequestOptions options = null)
+        public static async Task<API.Sticker> CreateStickerAsync(BaseDiscordClient client, IGuild guild, string name, Stream file, string filename, IEnumerable<string> tags,
+            string description = null, RequestOptions options = null)
         {
             Preconditions.NotNull(name, nameof(name));
-            Preconditions.NotNull(description, nameof(description));
             Preconditions.NotNull(file, nameof(file));
             Preconditions.NotNull(filename, nameof(filename));
 
             Preconditions.AtLeast(name.Length, 2, nameof(name));
-            Preconditions.AtLeast(description.Length, 2, nameof(description));
 
             Preconditions.AtMost(name.Length, 30, nameof(name));
-            Preconditions.AtMost(description.Length, 100, nameof(name));
+
+
+            if (description is not null)
+            {
+                Preconditions.AtLeast(description.Length, 2, nameof(description));
+                Preconditions.AtMost(description.Length, 100, nameof(description));
+            }
+            
+            var tagString = string.Join(", ", tags);
+
+            Preconditions.AtLeast(tagString.Length, 1, nameof(tags));
+            Preconditions.AtMost(tagString.Length, 200, nameof(tags));
 
             var apiArgs = new CreateStickerParams()
             {
                 Name = name,
                 Description = description,
                 File = file,
-                Tags = string.Join(", ", tags),
+                Tags = tagString,
                 FileName = filename
             };
 
@@ -1080,7 +1101,7 @@ namespace Discord.Rest
                 throw new ArgumentException("Name of the rule must not be empty", paramName: nameof(args.Name));
 
             Preconditions.AtLeast(1, args.Actions.GetValueOrDefault(Array.Empty<AutoModRuleActionProperties>()).Length, nameof(args.Actions), "Auto moderation rule must have at least 1 action");
-            
+
             if (args.RegexPatterns.IsSpecified)
             {
                 if (args.TriggerType.Value is not AutoModTriggerType.Keyword)
@@ -1121,10 +1142,10 @@ namespace Discord.Rest
                     throw new ArgumentException(message: $"Allow list entry length must be less than or equal to {AutoModRuleProperties.MaxAllowListEntryLength}.", paramName: nameof(args.AllowList));
 
             }
-            
+
             if (args.TriggerType.Value is not AutoModTriggerType.KeywordPreset && args.Presets.IsSpecified)
                 throw new ArgumentException(message: $"Keyword presets scan only be used with 'KeywordPreset' trigger type.", paramName: nameof(args.Presets));
-            
+
             if (args.MentionLimit.IsSpecified)
             {
                 if (args.TriggerType.Value is AutoModTriggerType.MentionSpam)

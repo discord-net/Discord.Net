@@ -9,9 +9,6 @@ internal class ModifyForumChannelParams : ModifyTextChannelParams
     [JsonProperty("available_tags")]
     public Optional<ModifyForumTagParams[]> Tags { get; set; }
 
-    [JsonProperty("default_thread_rate_limit_per_user")]
-    public Optional<int> DefaultSlowModeInterval { get; set; }
-
     [JsonProperty("rate_limit_per_user")]
     public Optional<int> ThreadCreationInterval { get; set; }
 

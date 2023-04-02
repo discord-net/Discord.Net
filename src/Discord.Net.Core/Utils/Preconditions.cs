@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord
 {
@@ -69,6 +71,50 @@ namespace Discord
 
         private static ArgumentException CreateNotEmptyException(string name, string msg)
             => new ArgumentException(message: msg ?? "Argument cannot be blank.", paramName: name);
+
+        #endregion
+
+        #region Message Validation
+
+        public static void WebhookMessageAtLeastOneOf(string text = null, MessageComponent components = null, ICollection<IEmbed> embeds = null,
+            IEnumerable<FileAttachment> attachments = null)
+        {
+            if (!string.IsNullOrEmpty(text))
+                return;
+
+            if (components != null && components.Components.Count != 0)
+                return;
+
+            if (attachments != null && attachments.Count() != 0)
+                return;
+
+            if (embeds != null && embeds.Count != 0)
+                return;
+
+            throw new ArgumentException($"At least one of 'Content', 'Embeds', 'Components' or 'Attachments' must be specified.");
+        }
+
+        public static void MessageAtLeastOneOf(string text = null, MessageComponent components = null, ICollection<IEmbed> embeds = null,
+                    ICollection<ISticker> stickers = null, IEnumerable<FileAttachment> attachments = null)
+        {
+            if (!string.IsNullOrEmpty(text))
+                return;
+
+            if (components != null && components.Components.Count != 0)
+                return;
+
+            if (stickers != null && stickers.Count != 0)
+                return;
+
+            if (attachments != null && attachments.Count() != 0)
+                return;
+
+            if (embeds != null && embeds.Count != 0)
+                return;
+
+            throw new ArgumentException($"At least one of 'Content', 'Embeds', 'Components', 'Stickers' or 'Attachments' must be specified.");
+        }
+
         #endregion
 
         #region Numerics

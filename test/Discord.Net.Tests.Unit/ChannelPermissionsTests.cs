@@ -89,10 +89,13 @@ namespace Discord
             AssertFlag(() => new ChannelPermissions(createPrivateThreads: true), ChannelPermission.CreatePrivateThreads);
             AssertFlag(() => new ChannelPermissions(createPublicThreads: true), ChannelPermission.CreatePublicThreads);
             AssertFlag(() => new ChannelPermissions(sendMessagesInThreads: true), ChannelPermission.SendMessagesInThreads);
+            AssertFlag(() => new ChannelPermissions(startEmbeddedActivities: true), ChannelPermission.StartEmbeddedActivities);
+            AssertFlag(() => new ChannelPermissions(useSoundboard: true), ChannelPermission.UseSoundboard);
+            AssertFlag(() => new ChannelPermissions(createEvents: true), ChannelPermission.CreateEvents);
         }
 
         /// <summary>
-        ///     Tests the behavior of <see cref="Discord.ChannelPermissions.Modify(bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?)"/>
+        ///     Tests the behavior of <see cref="Discord.ChannelPermissions.Modify"/>
         ///     with each of the parameters.
         /// </summary>
         [Fact]
