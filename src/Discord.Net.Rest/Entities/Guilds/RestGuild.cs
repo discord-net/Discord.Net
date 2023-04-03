@@ -1062,7 +1062,7 @@ namespace Discord.Rest
         public Task<CustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path,
             RequestOptions options = null)
         {
-            var fs = File.OpenRead(path);
+            using var fs = File.OpenRead(path);
             return CreateStickerAsync(name, description, tags, fs, Path.GetFileName(fs.Name), options);
         }
         /// <summary>
