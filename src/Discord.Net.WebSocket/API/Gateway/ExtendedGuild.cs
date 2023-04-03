@@ -31,5 +31,8 @@ namespace Discord.API.Gateway
 
         [JsonProperty("guild_scheduled_events")]
         public GuildScheduledEvent[] GuildScheduledEvents { get; set; }
+
+        [JsonProperty("stage_instances")]
+        public StageInstance[] StageInstances { get; set; }
     }
 }
