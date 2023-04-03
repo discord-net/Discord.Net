@@ -18,17 +18,17 @@ namespace Discord
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for text channels.
         /// </summary>
-        public static readonly ChannelPermissions Text = new(0b0_11111_0101100_0000000_1111111110001_010001);
+        public static readonly ChannelPermissions Text = new(0b01_001111_110010_110011_111101_111111_111101_010001);
 
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for voice channels.
         /// </summary>
-        public static readonly ChannelPermissions Voice = new(0b1_11111_0101100_1111110_1111111111101_010001); // (0b1_00000_0000100_1111110_0000000011100_010001 (<- voice only perms) |= Text)
-
+        public static readonly ChannelPermissions Voice = new(0b01_001010_001010_110011_111101_111111_111101_010001); // (0b1_00000_0000100_1111110_0000000011100_010001 (<- voice only perms) |= Text)
+            
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for stage channels.
         /// </summary>
-        public static readonly ChannelPermissions Stage = new(0b0_00000_1000100_0111010_0000000010000_010001);
+        public static readonly ChannelPermissions Stage = new(0b0010_001110_010001_010101_111111_111001_010001);
 
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for category channels.
@@ -46,6 +46,11 @@ namespace Discord
         public static readonly ChannelPermissions Group = new(0b00000_1000110_0001101100000_000000);
 
         /// <summary>
+        ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for forum channels.
+        /// </summary>
+        public static readonly ChannelPermissions Forum = new(0b01_001110_010010_110011_111101_111111_111101_010001);
+
+        /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for a given channel type.
         /// </summary>
         /// <exception cref="ArgumentException">Unknown channel type.</exception>
@@ -59,6 +64,7 @@ namespace Discord
                 ICategoryChannel _ => Category,
                 IDMChannel _ => DM,
                 IGroupChannel _ => Group,
+                IForumChannel => Forum,
                 _ => throw new ArgumentException(message: "Unknown channel type.", paramName: nameof(channel)),
             };
         }
@@ -66,70 +72,74 @@ namespace Discord
         /// <summary> Gets a packed value representing all the permissions in this <see cref="ChannelPermissions"/>.</summary>
         public ulong RawValue { get; }
 
-        /// <summary> If <c>true</c>, a user may create invites.</summary>
+        /// <summary> If <see langword="true"/>, a user may create invites.</summary>
         public bool CreateInstantInvite => Permissions.GetValue(RawValue, ChannelPermission.CreateInstantInvite);
-        /// <summary> If <c>true</c>, a user may create, delete and modify this channel.</summary>
+        /// <summary> If <see langword="true"/>, a user may create, delete and modify this channel.</summary>
         public bool ManageChannel => Permissions.GetValue(RawValue, ChannelPermission.ManageChannels);
 
-        /// <summary> If <c>true</c>, a user may add reactions.</summary>
+        /// <summary> If <see langword="true"/>, a user may add reactions.</summary>
         public bool AddReactions => Permissions.GetValue(RawValue, ChannelPermission.AddReactions);
-        /// <summary> If <c>true</c>, a user may view channels.</summary>
+        /// <summary> If <see langword="true"/>, a user may view channels.</summary>
         public bool ViewChannel => Permissions.GetValue(RawValue, ChannelPermission.ViewChannel);
 
-        /// <summary> If <c>true</c>, a user may send messages.</summary>
+        /// <summary> If <see langword="true"/>, a user may send messages.</summary>
         public bool SendMessages => Permissions.GetValue(RawValue, ChannelPermission.SendMessages);
-        /// <summary> If <c>true</c>, a user may send text-to-speech messages.</summary>
+        /// <summary> If <see langword="true"/>, a user may send text-to-speech messages.</summary>
         public bool SendTTSMessages => Permissions.GetValue(RawValue, ChannelPermission.SendTTSMessages);
-        /// <summary> If <c>true</c>, a user may delete messages.</summary>
+        /// <summary> If <see langword="true"/>, a user may delete messages.</summary>
         public bool ManageMessages => Permissions.GetValue(RawValue, ChannelPermission.ManageMessages);
-        /// <summary> If <c>true</c>, Discord will auto-embed links sent by this user.</summary>
+        /// <summary> If <see langword="true"/>, Discord will auto-embed links sent by this user.</summary>
         public bool EmbedLinks => Permissions.GetValue(RawValue, ChannelPermission.EmbedLinks);
-        /// <summary> If <c>true</c>, a user may send files.</summary>
+        /// <summary> If <see langword="true"/>, a user may send files.</summary>
         public bool AttachFiles => Permissions.GetValue(RawValue, ChannelPermission.AttachFiles);
-        /// <summary> If <c>true</c>, a user may read previous messages.</summary>
+        /// <summary> If <see langword="true"/>, a user may read previous messages.</summary>
         public bool ReadMessageHistory => Permissions.GetValue(RawValue, ChannelPermission.ReadMessageHistory);
-        /// <summary> If <c>true</c>, a user may mention @everyone.</summary>
+        /// <summary> If <see langword="true"/>, a user may mention @everyone.</summary>
         public bool MentionEveryone => Permissions.GetValue(RawValue, ChannelPermission.MentionEveryone);
-        /// <summary> If <c>true</c>, a user may use custom emoji from other guilds.</summary>
+        /// <summary> If <see langword="true"/>, a user may use custom emoji from other guilds.</summary>
         public bool UseExternalEmojis => Permissions.GetValue(RawValue, ChannelPermission.UseExternalEmojis);
 
-        /// <summary> If <c>true</c>, a user may connect to a voice channel.</summary>
+        /// <summary> If <see langword="true"/>, a user may connect to a voice channel.</summary>
         public bool Connect => Permissions.GetValue(RawValue, ChannelPermission.Connect);
-        /// <summary> If <c>true</c>, a user may speak in a voice channel.</summary>
+        /// <summary> If <see langword="true"/>, a user may speak in a voice channel.</summary>
         public bool Speak => Permissions.GetValue(RawValue, ChannelPermission.Speak);
-        /// <summary> If <c>true</c>, a user may mute users.</summary>
+        /// <summary> If <see langword="true"/>, a user may mute users.</summary>
         public bool MuteMembers => Permissions.GetValue(RawValue, ChannelPermission.MuteMembers);
-        /// <summary> If <c>true</c>, a user may deafen users.</summary>
+        /// <summary> If <see langword="true"/>, a user may deafen users.</summary>
         public bool DeafenMembers => Permissions.GetValue(RawValue, ChannelPermission.DeafenMembers);
-        /// <summary> If <c>true</c>, a user may move other users between voice channels.</summary>
+        /// <summary> If <see langword="true"/>, a user may move other users between voice channels.</summary>
         public bool MoveMembers => Permissions.GetValue(RawValue, ChannelPermission.MoveMembers);
-        /// <summary> If <c>true</c>, a user may use voice-activity-detection rather than push-to-talk.</summary>
+        /// <summary> If <see langword="true"/>, a user may use voice-activity-detection rather than push-to-talk.</summary>
         public bool UseVAD => Permissions.GetValue(RawValue, ChannelPermission.UseVAD);
-        /// <summary> If <c>true</c>, a user may use priority speaker in a voice channel.</summary>
+        /// <summary> If <see langword="true"/>, a user may use priority speaker in a voice channel.</summary>
         public bool PrioritySpeaker => Permissions.GetValue(RawValue, ChannelPermission.PrioritySpeaker);
-        /// <summary> If <c>true</c>, a user may stream video in a voice channel.</summary>
+        /// <summary> If <see langword="true"/>, a user may stream video in a voice channel.</summary>
         public bool Stream => Permissions.GetValue(RawValue, ChannelPermission.Stream);
 
-        /// <summary> If <c>true</c>, a user may adjust role permissions. This also implicitly grants all other permissions.</summary>
+        /// <summary> If <see langword="true"/>, a user may adjust role permissions. This also implicitly grants all other permissions.</summary>
         public bool ManageRoles => Permissions.GetValue(RawValue, ChannelPermission.ManageRoles);
-        /// <summary> If <c>true</c>, a user may edit the webhooks for this channel.</summary>
+        /// <summary> If <see langword="true"/>, a user may edit the webhooks for this channel.</summary>
         public bool ManageWebhooks => Permissions.GetValue(RawValue, ChannelPermission.ManageWebhooks);
-        /// <summary> If <c>true</c>, a user may use application commands in this guild.</summary>
+        /// <summary> If <see langword="true"/>, a user may use application commands in this guild.</summary>
         public bool UseApplicationCommands => Permissions.GetValue(RawValue, ChannelPermission.UseApplicationCommands);
-        /// <summary> If <c>true</c>, a user may request to speak in stage channels.</summary>
+        /// <summary> If <see langword="true"/>, a user may request to speak in stage channels.</summary>
         public bool RequestToSpeak => Permissions.GetValue(RawValue, ChannelPermission.RequestToSpeak);
-        /// <summary> If <c>true</c>, a user may manage threads in this guild.</summary>
+        /// <summary> If <see langword="true"/>, a user may manage threads in this guild.</summary>
         public bool ManageThreads => Permissions.GetValue(RawValue, ChannelPermission.ManageThreads);
-        /// <summary> If <c>true</c>, a user may create public threads in this guild.</summary>
+        /// <summary> If <see langword="true"/>, a user may create public threads in this guild.</summary>
         public bool CreatePublicThreads => Permissions.GetValue(RawValue, ChannelPermission.CreatePublicThreads);
-        /// <summary> If <c>true</c>, a user may create private threads in this guild.</summary>
+        /// <summary> If <see langword="true"/>, a user may create private threads in this guild.</summary>
         public bool CreatePrivateThreads => Permissions.GetValue(RawValue, ChannelPermission.CreatePrivateThreads);
-        /// <summary> If <c>true</c>, a user may use external stickers in this guild.</summary>
+        /// <summary> If <see langword="true"/>, a user may use external stickers in this guild.</summary>
         public bool UseExternalStickers => Permissions.GetValue(RawValue, ChannelPermission.UseExternalStickers);
-        /// <summary> If <c>true</c>, a user may send messages in threads in this guild.</summary>
+        /// <summary> If <see langword="true"/>, a user may send messages in threads in this guild.</summary>
         public bool SendMessagesInThreads => Permissions.GetValue(RawValue, ChannelPermission.SendMessagesInThreads);
-        /// <summary> If <c>true</c>, a user launch application activities in voice channels in this guild.</summary>
+        /// <summary> If <see langword="true"/>, a user launch application activities in voice channels in this guild.</summary>
         public bool StartEmbeddedActivities => Permissions.GetValue(RawValue, ChannelPermission.StartEmbeddedActivities);
+        /// <summary> If <see langword="true"/>, a user can use soundboard in a voice channel.</summary>
+        public bool UseSoundboard => Permissions.GetValue(RawValue, ChannelPermission.UseSoundboard);
+        /// <summary> If <see langword="true"/>, a user can edit and cancel events in this channel.</summary>
+        public bool CreateEvents => Permissions.GetValue(RawValue, ChannelPermission.CreateEvents);
 
         /// <summary> Creates a new <see cref="ChannelPermissions"/> with the provided packed value.</summary>
         public ChannelPermissions(ulong rawValue) { RawValue = rawValue; }
@@ -164,7 +174,9 @@ namespace Discord
             bool? createPrivateThreads = null,
             bool? useExternalStickers = null,
             bool? sendMessagesInThreads = null,
-            bool? startEmbeddedActivities = null)
+            bool? startEmbeddedActivities = null,
+            bool? useSoundboard = null,
+            bool? createEvents = null)
         {
             ulong value = initialValue;
 
@@ -198,6 +210,8 @@ namespace Discord
             Permissions.SetValue(ref value, useExternalStickers, ChannelPermission.UseExternalStickers);
             Permissions.SetValue(ref value, sendMessagesInThreads, ChannelPermission.SendMessagesInThreads);
             Permissions.SetValue(ref value, startEmbeddedActivities, ChannelPermission.StartEmbeddedActivities);
+            Permissions.SetValue(ref value, useSoundboard, ChannelPermission.UseSoundboard);
+            Permissions.SetValue(ref value, createEvents, ChannelPermission.CreateEvents);
 
             RawValue = value;
         }
@@ -233,12 +247,14 @@ namespace Discord
             bool createPrivateThreads = false,
             bool useExternalStickers = false,
             bool sendMessagesInThreads = false,
-            bool startEmbeddedActivities = false)
+            bool startEmbeddedActivities = false,
+            bool useSoundboard = false,
+            bool createEvents = false)
             : this(0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect,
                 speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, prioritySpeaker, stream, manageRoles, manageWebhooks,
                 useApplicationCommands, requestToSpeak, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
-                startEmbeddedActivities)
+                startEmbeddedActivities, useSoundboard, createEvents)
         { }
 
         /// <summary> Creates a new <see cref="ChannelPermissions"/> from this one, changing the provided non-null permissions.</summary>
@@ -272,7 +288,9 @@ namespace Discord
             bool? createPrivateThreads = null,
             bool? useExternalStickers = null,
             bool? sendMessagesInThreads = null,
-            bool? startEmbeddedActivities = null)
+            bool? startEmbeddedActivities = null,
+            bool? useSoundboard = null,
+            bool? createEvents = null)
             => new ChannelPermissions(RawValue,
                 createInstantInvite,
                 manageChannel,
@@ -303,7 +321,9 @@ namespace Discord
                 createPrivateThreads,
                 useExternalStickers,
                 sendMessagesInThreads,
-                startEmbeddedActivities);
+                startEmbeddedActivities,
+                useSoundboard,
+                createEvents);
 
         public bool Has(ChannelPermission permission) => Permissions.GetValue(RawValue, permission);
 

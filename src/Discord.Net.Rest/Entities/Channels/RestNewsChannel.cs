@@ -27,6 +27,8 @@ namespace Discord.Rest
         }
         public override int SlowModeInterval => throw new NotSupportedException("News channels do not support Slow Mode.");
 
+        private string DebuggerDisplay => $"{Name} ({Id}, News)";
+
         /// <inheritdoc />
         public Task<ulong> FollowAnnouncementChannelAsync(ulong channelId, RequestOptions options = null)
             => ChannelHelper.FollowAnnouncementChannelAsync(this, channelId, Discord, options);

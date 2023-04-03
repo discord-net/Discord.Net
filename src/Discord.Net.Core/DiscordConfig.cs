@@ -222,5 +222,15 @@ namespace Discord
         ///     The maximum number of thread members that can be gotten per-batch.
         /// </returns>
         public const int MaxThreadMembersPerBatch = 100;
+
+        /// <summary>
+        ///     Returns the max length of an application tag.
+        /// </summary>
+        public const int MaxApplicationTagLength = 20;
+
+        /// <summary>
+        ///     Returns the max length of an application description.
+        /// </summary>
+        public const int MaxApplicationDescriptionLength = 400;
     }
 }
