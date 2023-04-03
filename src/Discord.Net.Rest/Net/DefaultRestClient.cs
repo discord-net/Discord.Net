@@ -109,7 +109,6 @@ namespace Discord.Net.Rest
                     foreach (var header in requestHeaders)
                         restRequest.Headers.Add(header.Key, header.Value);
                 var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
-                MemoryStream memoryStream = null;
                 if (multipartParams != null)
                 {
                     foreach (var p in multipartParams)
@@ -125,18 +124,16 @@ namespace Discord.Net.Rest
                                 { content.Add(new StreamContent(streamValue), p.Key); continue; }
                             case MultipartFile fileValue:
                                 {
-                                    var stream = fileValue.Stream;
-                                    if (!stream.CanSeek)
+                                    MemoryStream memoryStream = new();
+                                    await fileValue.Stream.CopyToAsync(memoryStream).ConfigureAwait(false);
+                                    memoryStream.Position = 0;
+
+                                    if (fileValue.Stream.CanSeek)
                                     {
-                                        memoryStream = new MemoryStream();
-                                        await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
-                                        memoryStream.Position = 0;
-#pragma warning disable IDISP001
-                                        stream = memoryStream;
-#pragma warning restore IDISP001
+                                        fileValue.Stream.Position = 0;
                                     }
 
-                                    var streamContent = new StreamContent(stream);
+                                    var streamContent = new StreamContent(memoryStream);
                                     var extension = fileValue.Filename.Split('.').Last();
 
                                     if (fileValue.ContentType != null)
@@ -153,9 +150,7 @@ namespace Discord.Net.Rest
                     }
                 }
                 restRequest.Content = content;
-                var result = await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
-                memoryStream?.Dispose();
-                return result;
+                return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
         }
 
