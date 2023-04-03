@@ -228,7 +228,7 @@ namespace Discord.Rest
             fileName ??= Path.GetFileName(filePath);
             Preconditions.NotNullOrEmpty(fileName, nameof(fileName), "File Name must not be empty or null");
 
-            using var fileStream = string.IsNullOrEmpty(filePath) ? new MemoryStream(File.ReadAllBytes(filePath), false) : null;
+            using var fileStream = !string.IsNullOrEmpty(filePath) ? new MemoryStream(File.ReadAllBytes(filePath), false) : null;
             var args = new API.Rest.CreateWebhookMessageParams
             {
                 Content = text,
