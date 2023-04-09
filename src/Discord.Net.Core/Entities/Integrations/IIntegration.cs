@@ -90,7 +90,7 @@ namespace Discord
         ///     Gets the bot/OAuth2 application for a discord integration.
         /// </summary>
         IIntegrationApplication Application { get; }
-        
+
         IGuild Guild { get; }
         ulong GuildId { get; }
     }

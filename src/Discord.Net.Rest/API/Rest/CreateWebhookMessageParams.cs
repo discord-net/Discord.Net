@@ -13,7 +13,7 @@ namespace Discord.API.Rest
         private static JsonSerializer _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
 
         [JsonProperty("content")]
-        public Optional<string> Content { get; set;  }
+        public Optional<string> Content { get; set; }
 
         [JsonProperty("nonce")]
         public Optional<string> Nonce { get; set; }
@@ -41,6 +41,9 @@ namespace Discord.API.Rest
 
         [JsonProperty("file")]
         public Optional<MultipartFile> File { get; set; }
+
+        [JsonProperty("thread_name")]
+        public Optional<string> ThreadName { get; set; }
 
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
@@ -70,6 +73,8 @@ namespace Discord.API.Rest
                 payload["allowed_mentions"] = AllowedMentions.Value;
             if (Components.IsSpecified)
                 payload["components"] = Components.Value;
+            if (ThreadName.IsSpecified)
+                payload["thread_name"] = ThreadName.Value;
 
             var json = new StringBuilder();
             using (var text = new StringWriter(json))

@@ -107,7 +107,7 @@ By default, your methods can feature the following parameter types:
 | `IVoiceChannel`     | Voice Channels                |
 | `IDMChannel`        | DM Channels                   |
 | `IGroupChannel`     | Group Channels                |
-| `ICategory Channel` | Category Channels             |
+| `ICategoryChannel` | Category Channels             |
 | `INewsChannel`      | News Channels                 |
 | `IThreadChannel`    | Public, Private, News Threads |
 | `ITextChannel`      | Text Channels                 |
@@ -200,13 +200,16 @@ And the captured words will be passed on to the command method in the same order
 You may use as many wild card characters as you want.
 
 > [!NOTE]
-> If Interaction Service recieves a component interaction with **player:play,rickroll** custom id,
+> If Interaction Service receives a component interaction with **player:play,rickroll** custom id,
 > `op` will be *play* and `name` will be *rickroll*
 
 ## Select Menus
 
 Unlike button interactions, select menu interactions also contain the values of the selected menu items.
 In this case, you should structure your method to accept a string array.
+
+> [!NOTE]
+> Use arrays of `IUser`, `IChannel`, `IRole`, `IMentionable` or their implementations to get data from a select menu with respective type.
 
 [!code-csharp[Dropdown](samples/intro/dropdown.cs)]
 
@@ -230,9 +233,9 @@ A Modal implementation would look like this:
 [!code-csharp[Modal Command](samples/intro/modal.cs)]
 
 > [!NOTE]
-> If you are using Modals in the interaction service it is **highly 
+> If you are using Modals in the interaction service it is **highly
 > recommended** that you enable `PreCompiledLambdas` in your config
-> to prevent performance issues. 
+> to prevent performance issues.
 
 ## Interaction Context
 
@@ -259,7 +262,7 @@ One problem with using the concrete type InteractionContexts is that you cannot 
 
 > [!INFO]
 > Message component interactions have access to a special method called `UpdateAsync()` to update the body of the method the interaction originated from.
-> Normally this wouldn't be accessable without casting the `Context.Interaction`.
+> Normally this wouldn't be accessible without casting the `Context.Interaction`.
 
 [!code-csharp[Context Example](samples/intro/context.cs)]
 
@@ -288,7 +291,7 @@ Module groups allow you to create sub-commands and sub-commands groups.
 By nesting commands inside a module that is tagged with [GroupAttribute] you can create prefixed commands.
 
 > [!WARNING]
-> Although creating nested module stuctures are allowed,
+> Although creating nested module structures are allowed,
 > you are not permitted to use more than 2 [GroupAttribute]'s in module hierarchy.
 
 > [!NOTE]
@@ -315,7 +318,7 @@ An example of executing a command from an event can be seen here:
 
 [!code-csharp[Command Event Example](samples/intro/event.cs)]
 
-Commands can be either executed on the gateway thread or on a seperate thread from the thread pool.
+Commands can be either executed on the gateway thread or on a separate thread from the thread pool.
 This behaviour can be configured by changing the `RunMode` property of `InteractionServiceConfig` or by setting the *runMode* parameter of a command attribute.
 
 > [!WARNING]
@@ -351,12 +354,12 @@ can be used to register cherry picked modules or commands to global/guild scopes
 
 > [!NOTE]
 > In debug environment, since Global commands can take up to 1 hour to register/update,
-> it is adviced to register your commands to a test guild for your changes to take effect immediately.
+> it is advised to register your commands to a test guild for your changes to take effect immediately.
 > You can use preprocessor directives to create a simple logic for registering commands as seen above.
 
 ## Interaction Utility
 
-Interaction Service ships with a static `InteractionUtiliy`
+Interaction Service ships with a static `InteractionUtility`
 class which contains some helper methods to asynchronously waiting for Discord Interactions.
 For instance, `WaitForInteractionAsync()` method allows you to wait for an Interaction for a given amount of time.
 This method returns the first encountered Interaction that satisfies the provided predicate.
@@ -367,7 +370,7 @@ This method returns the first encountered Interaction that satisfies the provide
 
 ## Webhook Based Interactions
 
-Instead of using the gateway to recieve Discord Interactions, Discord allows you to recieve Interaction events over Webhooks.
+Instead of using the gateway to receive Discord Interactions, Discord allows you to receive Interaction events over Webhooks.
 Interaction Service also supports this Interaction type but to be able to
 respond to the Interactions within your command modules you need to perform the following:
 

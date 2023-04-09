@@ -1,12 +1,12 @@
+using Discord.Net.Rest;
+using Discord.Rest;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
 using DataModel = Discord.API.MessageComponentInteractionData;
-using Discord.Rest;
-using System.Collections.Generic;
-using Discord.Net.Rest;
-using System.IO;
+using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {
@@ -19,10 +19,8 @@ namespace Discord.WebSocket
         ///     Gets the data received with this interaction, contains the button that was clicked.
         /// </summary>
         public new SocketMessageComponentData Data { get; }
-
-        /// <summary>
-        ///     Gets the message that contained the trigger for this interaction.
-        /// </summary>
+        
+        /// <inheritdoc cref="IComponentInteraction.Message"/>
         public SocketUserMessage Message { get; private set; }
 
         private object _lock = new object();
@@ -35,7 +33,7 @@ namespace Discord.WebSocket
                 ? (DataModel)model.Data.Value
                 : null;
 
-            Data = new SocketMessageComponentData(dataModel);
+            Data = new SocketMessageComponentData(dataModel, client, client.State, client.Guilds.FirstOrDefault(x => x.Id == model.GuildId.GetValueOrDefault()), model.User.GetValueOrDefault());
         }
 
         internal new static SocketMessageComponent Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)

@@ -48,8 +48,8 @@ namespace Discord
         {
             var result = new Override();
 
-            using(var textReader = new StringReader(json))
-            using(var reader = new JsonTextReader(textReader))
+            using (var textReader = new StringReader(json))
+            using (var reader = new JsonTextReader(textReader))
             {
                 var obj = JObject.ReadFrom(reader);
                 result.Id = obj["id"].ToObject<Guid>();
@@ -69,7 +69,7 @@ namespace Discord
     public sealed class LoadedOverride
     {
         /// <summary>
-        ///     Gets the aseembly containing the overrides definition.
+        ///     Gets the assembly containing the overrides definition.
         /// </summary>
         public Assembly Assembly { get; internal set; }
 
@@ -100,14 +100,14 @@ namespace Discord
         ///     Gets a read-only dictionary containing the currently loaded overrides.
         /// </summary>
         public IReadOnlyDictionary<Override, IReadOnlyCollection<LoadedOverride>> LoadedOverrides
-            => _loadedOverrides.Select(x => new KeyValuePair<Override, IReadOnlyCollection<LoadedOverride>> (x.Key, x.Value)).ToDictionary(x => x.Key, x => x.Value);
+            => _loadedOverrides.Select(x => new KeyValuePair<Override, IReadOnlyCollection<LoadedOverride>>(x.Key, x.Value)).ToDictionary(x => x.Key, x => x.Value);
 
         private static AssemblyLoadContext _overrideDomain;
         private static List<Func<Override, string, Task>> _logEvents = new();
         private static ConcurrentDictionary<Override, List<LoadedOverride>> _loadedOverrides = new ConcurrentDictionary<Override, List<LoadedOverride>>();
 
         private const string ApiUrl = "https://overrides.discordnet.dev";
-        
+
         static BuildOverrides()
         {
             _overrideDomain = new AssemblyLoadContext("Discord.Net.Overrides.Runtime");
@@ -119,7 +119,7 @@ namespace Discord
         ///     Gets details about a specific override.
         /// </summary>
         /// <remarks>
-        ///     <b>Note:</b> This method does not load an override, it simply retrives the info about it.
+        ///     <b>Note:</b> This method does not load an override, it simply retrieves the info about it.
         /// </remarks>
         /// <param name="name">The name of the override to get.</param>
         /// <returns>
@@ -147,12 +147,12 @@ namespace Discord
         ///     Adds an override to the current Discord.Net instance.
         /// </summary>
         /// <remarks>
-        ///     The override initialization is non-blocking, any errors that occor within
+        ///     The override initialization is non-blocking, any errors that occur within
         ///     the overrides initialization procedure will be sent in the <see cref="Log"/> event.
         /// </remarks>
         /// <param name="name">The name of the override to add.</param>
         /// <returns>
-        ///     A task representing the asynchronous add operaton. The tasks result is a boolean
+        ///     A task representing the asynchronous add operation. The tasks result is a boolean
         ///     determining if the add operation was successful.
         /// </returns>
         public static async Task<bool> AddOverrideAsync(string name)
@@ -169,12 +169,12 @@ namespace Discord
         ///     Adds an override to the current Discord.Net instance.
         /// </summary>
         /// <remarks>
-        ///     The override initialization is non-blocking, any errors that occor within
+        ///     The override initialization is non-blocking, any errors that occur within
         ///     the overrides initialization procedure will be sent in the <see cref="Log"/> event.
         /// </remarks>
         /// <param name="ovrride">The override to add.</param>
         /// <returns>
-        ///     A task representing the asynchronous add operaton. The tasks result is a boolean
+        ///     A task representing the asynchronous add operation. The tasks result is a boolean
         ///     determining if the add operation was successful.
         /// </returns>
         public static async Task<bool> AddOverrideAsync(Override ovrride)
@@ -258,14 +258,14 @@ namespace Discord
 
         private static async Task<Assembly> GetDependencyAsync(Guid id, string name)
         {
-            using(var client = new HttpClient())
+            using (var client = new HttpClient())
             {
                 var result = await client.PostAsync($"{ApiUrl}/overrides/{id}/dependency", new StringContent($"{{ \"info\": \"{name}\"}}", Encoding.UTF8, "application/json"));
 
                 if (!result.IsSuccessStatusCode)
                     throw new Exception("Failed to get dependency");
 
-                using(var ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     var innerStream = await result.Content.ReadAsStreamAsync();
                     await innerStream.CopyToAsync(ms);

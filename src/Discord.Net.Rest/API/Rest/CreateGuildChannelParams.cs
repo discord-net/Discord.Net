@@ -31,6 +31,10 @@ namespace Discord.API.Rest
         public Optional<int> Bitrate { get; set; }
         [JsonProperty("user_limit")]
         public Optional<int?> UserLimit { get; set; }
+        [JsonProperty("video_quality_mode")]
+        public Optional<VideoQualityMode> VideoQuality { get; set; }
+        [JsonProperty("rtc_region")]
+        public Optional<string> RtcRegion { get; set; }
 
         //Forum channels
         [JsonProperty("default_reaction_emoji")]
@@ -41,6 +45,9 @@ namespace Discord.API.Rest
         public Optional<ModifyForumTagParams[]> AvailableTags { get; set; }
         [JsonProperty("default_sort_order")]
         public Optional<ForumSortOrder?> DefaultSortOrder { get; set; }
+
+        [JsonProperty("default_forum_layout ")]
+        public Optional<ForumLayout> DefaultLayout { get; set; }
 
         public CreateGuildChannelParams(string name, ChannelType type)
         {

@@ -24,7 +24,7 @@ namespace Discord.Commands
                     args[i] = GetMember(commands, services, parameters[i].ParameterType, typeInfo);
                 var obj = InvokeConstructor<T>(constructor, args, typeInfo);
 
-                foreach(var property in properties)
+                foreach (var property in properties)
                     property.SetValue(obj, GetMember(commands, services, property.PropertyType, typeInfo));
                 return obj;
             };

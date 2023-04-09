@@ -892,5 +892,49 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<SocketGuild, SocketChannel, Task>> _webhooksUpdated = new AsyncEvent<Func<SocketGuild, SocketChannel, Task>>();
 
         #endregion
+
+        #region AutoModeration
+
+        /// <summary>
+        ///     Fired when an auto moderation rule is created.
+        /// </summary>
+        public event Func<SocketAutoModRule, Task> AutoModRuleCreated
+        {
+            add => _autoModRuleCreated.Add(value);
+            remove => _autoModRuleCreated.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleCreated = new ();
+
+        /// <summary>
+        ///     Fired when an auto moderation rule is modified.
+        /// </summary>
+        public event Func<Cacheable<SocketAutoModRule, ulong>, SocketAutoModRule, Task> AutoModRuleUpdated
+        {
+            add => _autoModRuleUpdated.Add(value);
+            remove => _autoModRuleUpdated.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<Cacheable<SocketAutoModRule, ulong>, SocketAutoModRule, Task>> _autoModRuleUpdated = new ();
+
+        /// <summary>
+        ///     Fired when an auto moderation rule is deleted.
+        /// </summary>
+        public event Func<SocketAutoModRule, Task> AutoModRuleDeleted
+        {
+            add => _autoModRuleDeleted.Add(value);
+            remove => _autoModRuleDeleted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleDeleted = new ();
+
+        /// <summary>
+        ///     Fired when an auto moderation rule is triggered by a user.
+        /// </summary>
+        public event Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task> AutoModActionExecuted
+        {
+            add => _autoModActionExecuted.Add(value);
+            remove => _autoModActionExecuted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task>> _autoModActionExecuted = new ();
+        
+        #endregion
     }
 }

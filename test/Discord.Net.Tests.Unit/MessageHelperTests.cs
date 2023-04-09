@@ -1,5 +1,5 @@
-using Xunit;
 using Discord.Rest;
+using Xunit;
 
 namespace Discord
 {

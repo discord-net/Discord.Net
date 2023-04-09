@@ -23,7 +23,7 @@ namespace Discord.Interactions
         /// </summary>
         public object Value { get; }
 
-        private ChoiceAttribute (string name)
+        private ChoiceAttribute(string name)
         {
             Name = name;
         }
@@ -33,7 +33,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="name">Name of the choice.</param>
         /// <param name="value">Predefined value of the choice.</param>
-        public ChoiceAttribute (string name, string value) : this(name)
+        public ChoiceAttribute(string name, string value) : this(name)
         {
             Type = SlashCommandChoiceType.String;
             Value = value;
@@ -44,7 +44,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="name">Name of the choice.</param>
         /// <param name="value">Predefined value of the choice.</param>
-        public ChoiceAttribute (string name, int value) : this(name)
+        public ChoiceAttribute(string name, int value) : this(name)
         {
             Type = SlashCommandChoiceType.Integer;
             Value = value;
@@ -55,7 +55,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="name">Name of the choice.</param>
         /// <param name="value">Predefined value of the choice.</param>
-        public ChoiceAttribute (string name, double value) : this(name)
+        public ChoiceAttribute(string name, double value) : this(name)
         {
             Type = SlashCommandChoiceType.Number;
             Value = value;

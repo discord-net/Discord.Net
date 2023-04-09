@@ -1,9 +1,8 @@
+using Discord.API;
 using System;
 using System.Linq;
-using Discord.API;
-
-using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
+using Model = Discord.API.AuditLog;
 
 namespace Discord.Rest
 {
@@ -14,22 +13,22 @@ namespace Discord.Rest
     {
         private ScheduledEventCreateAuditLogData(ulong id, ulong guildId, ulong? channelId, ulong? creatorId, string name, string description, DateTimeOffset scheduledStartTime, DateTimeOffset? scheduledEndTime, GuildScheduledEventPrivacyLevel privacyLevel, GuildScheduledEventStatus status, GuildScheduledEventType entityType, ulong? entityId, string location, RestUser creator, int userCount, string image)
         {
-            Id                 = id                ;
-            GuildId            = guildId           ;
-            ChannelId          = channelId         ;
-            CreatorId          = creatorId         ;
-            Name               = name              ;
-            Description        = description       ;
+            Id = id;
+            GuildId = guildId;
+            ChannelId = channelId;
+            CreatorId = creatorId;
+            Name = name;
+            Description = description;
             ScheduledStartTime = scheduledStartTime;
-            ScheduledEndTime   = scheduledEndTime  ;
-            PrivacyLevel       = privacyLevel      ;
-            Status             = status            ;
-            EntityType         = entityType        ;
-            EntityId           = entityId          ;
-            Location           = location          ;
-            Creator            = creator           ;
-            UserCount          = userCount         ;
-            Image              = image             ;
+            ScheduledEndTime = scheduledEndTime;
+            PrivacyLevel = privacyLevel;
+            Status = status;
+            EntityType = entityType;
+            EntityId = entityId;
+            Location = location;
+            Creator = creator;
+            UserCount = userCount;
+            Image = image;
         }
 
         internal static ScheduledEventCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)

@@ -2,11 +2,11 @@ using Discord.API;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading;
-using System.Collections.Immutable;
+using System.Threading.Tasks;
 
 namespace Discord.WebSocket
 {
@@ -170,7 +170,7 @@ namespace Discord.WebSocket
                 await _shards[i].LoginAsync(tokenType, token);
             }
 
-            if(_defaultStickers.Length == 0 && _baseConfig.AlwaysDownloadDefaultStickers)
+            if (_defaultStickers.Length == 0 && _baseConfig.AlwaysDownloadDefaultStickers)
                 await DownloadDefaultStickersAsync().ConfigureAwait(false);
 
         }
@@ -370,7 +370,8 @@ namespace Discord.WebSocket
         /// <exception cref="ArgumentNullException"><paramref name="guilds"/> is <see langword="null"/></exception>
         public override async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
         {
-            if (guilds == null) throw new ArgumentNullException(nameof(guilds));
+            if (guilds == null)
+                throw new ArgumentNullException(nameof(guilds));
             for (int i = 0; i < _shards.Length; i++)
             {
                 int id = _shardIds[i];

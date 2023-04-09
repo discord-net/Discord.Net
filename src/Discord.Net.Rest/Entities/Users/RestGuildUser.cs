@@ -38,6 +38,10 @@ namespace Discord.Rest
         public ulong GuildId { get; }
         /// <inheritdoc />
         public bool? IsPending { get; private set; }
+
+        /// <inheritdoc />
+        public GuildUserFlags Flags { get; private set; }
+
         /// <inheritdoc />
         public int Hierarchy
         {
@@ -114,6 +118,7 @@ namespace Discord.Rest
                 _timedOutTicks = model.TimedOutUntil.Value?.UtcTicks;
             if (model.Pending.IsSpecified)
                 IsPending = model.Pending.Value;
+            Flags = model.Flags;
         }
         private void UpdateRoles(ulong[] roleIds)
         {
@@ -196,7 +201,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, GuildId, GuildAvatarId, size, format);
-#endregion
+        #endregion
 
         #region IGuildUser
         /// <inheritdoc />

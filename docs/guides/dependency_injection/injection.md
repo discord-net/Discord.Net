@@ -26,7 +26,7 @@ Injecting through properties is also allowed as follows.
 
 > [!WARNING]
 > Dependency Injection will not resolve missing services in property injection, and it will not pick a constructor instead.
-> If a publically accessible property is attempted to be injected and its service is missing, the application will throw an error.
+> If a publicly accessible property is attempted to be injected and its service is missing, the application will throw an error.
 
 ## Using the provider itself
 

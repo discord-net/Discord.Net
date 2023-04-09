@@ -35,9 +35,12 @@ namespace Discord.API.Rest
         [JsonProperty("default_member_permissions")]
         public Optional<GuildPermission?> DefaultMemberPermission { get; set; }
 
+        [JsonProperty("nsfw")]
+        public Optional<bool> Nsfw { get; set; }
+
         public CreateApplicationCommandParams() { }
         public CreateApplicationCommandParams(string name, string description, ApplicationCommandType type, ApplicationCommandOption[] options = null,
-            IDictionary<string, string> nameLocalizations = null, IDictionary<string, string> descriptionLocalizations = null)
+            IDictionary<string, string> nameLocalizations = null, IDictionary<string, string> descriptionLocalizations = null, bool nsfw = false)
         {
             Name = name;
             Description = description;
@@ -45,6 +48,7 @@ namespace Discord.API.Rest
             Type = type;
             NameLocalizations = nameLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
             DescriptionLocalizations = descriptionLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
+            Nsfw = nsfw;
         }
     }
 }

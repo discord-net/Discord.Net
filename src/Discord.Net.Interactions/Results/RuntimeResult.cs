@@ -19,7 +19,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="error">The type of failure, or <c>null</c> if none.</param>
         /// <param name="reason">The reason of failure.</param>
-        protected RuntimeResult (InteractionCommandError? error, string reason)
+        protected RuntimeResult(InteractionCommandError? error, string reason)
         {
             Error = error;
             ErrorReason = reason;
@@ -32,6 +32,6 @@ namespace Discord.Interactions
         ///     <c>Success</c> if <see cref="IsSuccess"/> is <c>true</c>; otherwise "<see cref="Error"/>: 
         ///     <see cref="ErrorReason"/>".
         /// </returns>
-        public override string ToString ( ) => ErrorReason ?? ( IsSuccess ? "Successful" : "Unsuccessful" );
+        public override string ToString() => ErrorReason ?? (IsSuccess ? "Successful" : "Unsuccessful");
     }
 }

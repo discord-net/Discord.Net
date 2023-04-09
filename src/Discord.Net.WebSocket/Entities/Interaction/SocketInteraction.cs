@@ -1,11 +1,11 @@
+using Discord.Net;
 using Discord.Rest;
 using System;
-using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
-using DataModel = Discord.API.ApplicationCommandInteractionData;
-using System.IO;
 using System.Collections.Generic;
-using Discord.Net;
+using System.IO;
+using System.Threading.Tasks;
+using DataModel = Discord.API.ApplicationCommandInteractionData;
+using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {
@@ -130,7 +130,7 @@ namespace Discord.WebSocket
             Data = model.Data.IsSpecified
                 ? model.Data.Value
                 : null;
-            
+
             Token = model.Token;
             Version = model.Version;
             Type = model.Type;
@@ -398,16 +398,16 @@ namespace Discord.WebSocket
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
         public abstract Task RespondWithModalAsync(Modal modal, RequestOptions options = null);
-#endregion
+        #endregion
 
         /// <summary>
-        ///     Attepts to get the channel this interaction was executed in.
+        ///     Attempts to get the channel this interaction was executed in.
         /// </summary>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>
         ///     A task that represents the asynchronous operation of fetching the channel.
         /// </returns>
-        public async ValueTask<IMessageChannel> GetChannelAsync(RequestOptions options  = null)
+        public async ValueTask<IMessageChannel> GetChannelAsync(RequestOptions options = null)
         {
             if (Channel != null)
                 return Channel;
@@ -419,10 +419,10 @@ namespace Discord.WebSocket
             {
                 return (IMessageChannel)await Discord.GetChannelAsync(ChannelId.Value, options).ConfigureAwait(false);
             }
-            catch(HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions) { return null; } // bot can't view that channel, return null instead of throwing.
+            catch (HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions) { return null; } // bot can't view that channel, return null instead of throwing.
         }
 
-#region  IDiscordInteraction
+        #region  IDiscordInteraction
         /// <inheritdoc/>
         IUser IDiscordInteraction.User => User;
 
@@ -452,6 +452,6 @@ namespace Discord.WebSocket
         async Task<IUserMessage> IDiscordInteraction.FollowupWithFileAsync(FileAttachment attachment, string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options)
             => await FollowupWithFileAsync(attachment, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
 #endif
-#endregion
+        #endregion
     }
 }

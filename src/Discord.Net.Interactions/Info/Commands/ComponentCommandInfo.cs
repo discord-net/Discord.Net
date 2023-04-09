@@ -42,7 +42,7 @@ namespace Discord.Interactions
                 var data = (context.Interaction as IComponentInteraction).Data;
                 var args = new object[Parameters.Count];
 
-                for(var i = 0; i < Parameters.Count; i++)
+                for (var i = 0; i < Parameters.Count; i++)
                 {
                     var parameter = Parameters[i];
                     var isCapture = i < captureCount;

@@ -30,7 +30,7 @@ namespace Discord
         public TEntity Value { get; }
         private Func<Task<TEntity>> DownloadFunc { get; }
 
-        internal Cacheable(TEntity value, TId id, bool hasValue , Func<Task<TEntity>> downloadFunc)
+        internal Cacheable(TEntity value, TId id, bool hasValue, Func<Task<TEntity>> downloadFunc)
         {
             Value = value;
             Id = id;

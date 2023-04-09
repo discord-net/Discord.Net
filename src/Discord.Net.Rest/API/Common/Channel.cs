@@ -43,6 +43,9 @@ namespace Discord.API
         [JsonProperty("rtc_region")]
         public Optional<string> RTCRegion { get; set; }
 
+        [JsonProperty("video_quality_mode")]
+        public Optional<VideoQualityMode> VideoQualityMode { get; set; }
+
         //PrivateChannel
         [JsonProperty("recipients")]
         public Optional<User[]> Recipients { get; set; }
@@ -88,6 +91,9 @@ namespace Discord.API
 
         [JsonProperty("default_reaction_emoji")]
         public Optional<ForumReactionEmoji> DefaultReactionEmoji { get; set; }
+
+        [JsonProperty("default_forum_layout")]
+        public Optional<ForumLayout> DefaultForumLayout { get; set; }
 
     }
 }

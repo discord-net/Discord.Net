@@ -64,7 +64,7 @@ namespace Discord.Interactions
         {
             var keywords = new List<string>() { ParameterName, CommandName };
 
-            if(!IgnoreGroupNames)
+            if (!IgnoreGroupNames)
             {
                 var currentParent = Module;
 

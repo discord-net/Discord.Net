@@ -49,7 +49,7 @@ namespace Discord.Interactions
 
         public SearchResult<T> GetCommand(string input)
         {
-            if(_seperators.Any())
+            if (_seperators.Any())
                 return GetCommand(input.Split(_seperators));
             else
                 return GetCommand(new string[] { input });

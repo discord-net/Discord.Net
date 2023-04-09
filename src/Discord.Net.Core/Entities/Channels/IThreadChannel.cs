@@ -75,6 +75,11 @@ namespace Discord
         new DateTimeOffset CreatedAt { get; }
 
         /// <summary>
+        ///     Gets the id of the creator of the thread.
+        /// </summary>
+        ulong OwnerId { get; }
+
+        /// <summary>
         ///     Joins the current thread.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>

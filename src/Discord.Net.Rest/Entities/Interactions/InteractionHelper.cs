@@ -51,7 +51,7 @@ namespace Discord.Rest
             IDiscordInteraction interaction, RequestOptions options = null)
         {
             var model = await client.ApiClient.GetInteractionResponseAsync(interaction.Token, options).ConfigureAwait(false);
-            if(model != null)
+            if (model != null)
                 return RestInteractionMessage.Create(client, model, interaction.Token, channel);
             return null;
         }
@@ -107,7 +107,8 @@ namespace Discord.Rest
 
                 // TODO: better conversion to nullable optionals
                 DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
-                DmPermission = arg.IsDMEnabled.ToNullable() 
+                DmPermission = arg.IsDMEnabled.ToNullable(),
+                Nsfw = arg.IsNsfw.GetValueOrDefault(false),
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -147,7 +148,8 @@ namespace Discord.Rest
 
                     // TODO: better conversion to nullable optionals
                     DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
-                    DmPermission = arg.IsDMEnabled.ToNullable()
+                    DmPermission = arg.IsDMEnabled.ToNullable(),
+                    Nsfw = arg.IsNsfw.GetValueOrDefault(false)
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -190,7 +192,8 @@ namespace Discord.Rest
 
                     // TODO: better conversion to nullable optionals
                     DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
-                    DmPermission = arg.IsDMEnabled.ToNullable()
+                    DmPermission = arg.IsDMEnabled.ToNullable(),
+                    Nsfw = arg.IsNsfw.GetValueOrDefault(false)
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -252,7 +255,9 @@ namespace Discord.Rest
                         ? args.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
                 NameLocalizations = args.NameLocalizations?.ToDictionary(),
-                DescriptionLocalizations = args.DescriptionLocalizations?.ToDictionary()
+                DescriptionLocalizations = args.DescriptionLocalizations?.ToDictionary(),
+                Nsfw = args.IsNsfw.GetValueOrDefault(false),
+                DefaultMemberPermission = args.DefaultMemberPermissions.ToNullable()
             };
 
             if (args is SlashCommandProperties slashProps)
@@ -312,7 +317,8 @@ namespace Discord.Rest
 
                 // TODO: better conversion to nullable optionals
                 DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
-                DmPermission = arg.IsDMEnabled.ToNullable()
+                DmPermission = arg.IsDMEnabled.ToNullable(),
+                Nsfw = arg.IsNsfw.GetValueOrDefault(false)
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -347,7 +353,9 @@ namespace Discord.Rest
                         ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified,
                 NameLocalizations = arg.NameLocalizations?.ToDictionary(),
-                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary()
+                DescriptionLocalizations = arg.DescriptionLocalizations?.ToDictionary(),
+                Nsfw = arg.IsNsfw.GetValueOrDefault(false),
+                DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable()
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -416,7 +424,9 @@ namespace Discord.Rest
                 Content = args.Content,
                 Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
-                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified
+                Components = args.Components.IsSpecified
+                        ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
+                        : Optional<API.ActionRowComponent[]>.Unspecified,
             };
 
             return await client.ApiClient.ModifyInteractionFollowupMessageAsync(apiArgs, message.Id, message.Token, options).ConfigureAwait(false);
@@ -460,7 +470,9 @@ namespace Discord.Rest
                     Content = args.Content,
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
-                    Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                    Components = args.Components.IsSpecified
+                        ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
+                        : Optional<API.ActionRowComponent[]>.Unspecified,
                     Flags = args.Flags
                 };
 
@@ -473,7 +485,9 @@ namespace Discord.Rest
                     Content = args.Content,
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
-                    MessageComponents = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                    MessageComponents = args.Components.IsSpecified
+                        ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
+                        : Optional<API.ActionRowComponent[]>.Unspecified
                 };
 
                 return await client.ApiClient.ModifyInteractionResponseAsync(apiArgs, token, options).ConfigureAwait(false);

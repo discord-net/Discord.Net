@@ -3,7 +3,7 @@ uid: Guides.DI.Scaling
 title: Scaling your DI
 ---
 
-# Scaling your DI 
+# Scaling your DI
 
 Dependency injection has a lot of use cases, and is very suitable for scaled applications.
 There are a few ways to make registering & using services easier in large amounts.

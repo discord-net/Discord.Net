@@ -20,7 +20,7 @@ namespace Discord.Interactions
     /// <returns>
     ///     A task representing the execution operation.
     /// </returns>
-    public delegate Task ExecuteCallback (IInteractionContext context, object[] args, IServiceProvider serviceProvider, ICommandInfo commandInfo);
+    public delegate Task ExecuteCallback(IInteractionContext context, object[] args, IServiceProvider serviceProvider, ICommandInfo commandInfo);
 
     /// <summary>
     ///     The base information class for <see cref="InteractionService"/> commands.
@@ -66,6 +66,8 @@ namespace Discord.Interactions
         /// <inheritdoc cref="ICommandInfo.Parameters"/>
         public abstract IReadOnlyList<TParameter> Parameters { get; }
 
+        public bool TreatNameAsRegex { get; }
+
         internal CommandInfo(Builders.ICommandBuilder builder, ModuleInfo module, InteractionService commandService)
         {
             CommandService = commandService;
@@ -78,6 +80,7 @@ namespace Discord.Interactions
             RunMode = builder.RunMode != RunMode.Default ? builder.RunMode : commandService._runMode;
             Attributes = builder.Attributes.ToImmutableArray();
             Preconditions = builder.Preconditions.ToImmutableArray();
+            TreatNameAsRegex = builder.TreatNameAsRegex && SupportsWildCards;
 
             _action = builder.Callback;
             _groupedPreconditions = builder.Preconditions.ToLookup(x => x.Group, x => x, StringComparer.Ordinal);
@@ -111,7 +114,7 @@ namespace Discord.Interactions
             await CommandService._cmdLogger.DebugAsync($"Executing {GetLogString(context)}").ConfigureAwait(false);
 
             using var scope = services?.CreateScope();
-            
+
             if (CommandService._autoServiceScopes)
                 services = scope?.ServiceProvider ?? EmptyServiceProvider.Instance;
 
@@ -126,7 +129,7 @@ namespace Discord.Interactions
                 if (!argsResult.IsSuccess)
                     return await InvokeEventAndReturn(context, argsResult).ConfigureAwait(false);
 
-                if(argsResult is not ParseResult parseResult)
+                if (argsResult is not ParseResult parseResult)
                     return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Complex command parsing failed for an unknown reason.");
 
                 var args = parseResult.Args;

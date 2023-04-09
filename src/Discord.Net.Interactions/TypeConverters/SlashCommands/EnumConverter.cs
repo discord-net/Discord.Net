@@ -1,6 +1,7 @@
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -9,8 +10,8 @@ namespace Discord.Interactions
 {
     internal sealed class EnumConverter<T> : TypeConverter<T> where T : struct, Enum
     {
-        public override ApplicationCommandOptionType GetDiscordType ( ) => ApplicationCommandOptionType.String;
-        public override Task<TypeConverterResult> ReadAsync (IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
+        public override ApplicationCommandOptionType GetDiscordType() => ApplicationCommandOptionType.String;
+        public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
         {
             if (Enum.TryParse<T>((string)option.Value, out var result))
                 return Task.FromResult(TypeConverterResult.FromSuccess(result));
@@ -18,10 +19,11 @@ namespace Discord.Interactions
                 return Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"Value {option.Value} cannot be converted to {nameof(T)}"));
         }
 
-        public override void Write (ApplicationCommandOptionProperties properties, IParameterInfo parameterInfo)
+        public override void Write(ApplicationCommandOptionProperties properties, IParameterInfo parameterInfo)
         {
             var names = Enum.GetNames(typeof(T));
             var members = names.SelectMany(x => typeof(T).GetMember(x)).Where(x => !x.IsDefined(typeof(HideAttribute), true));
+            var localizationManager = parameterInfo.Command.Module.CommandService.LocalizationManager;
 
             if (members.Count() <= 25)
             {
@@ -33,7 +35,8 @@ namespace Discord.Interactions
                     choices.Add(new ApplicationCommandOptionChoiceProperties
                     {
                         Name = displayValue,
-                        Value = member.Name
+                        Value = member.Name,
+                        NameLocalizations = localizationManager?.GetAllNames(parameterInfo.GetChoicePath(new ParameterChoice(displayValue.ToLower(), member.Name)), LocalizationTarget.Choice) ?? ImmutableDictionary<string, string>.Empty
                     });
                 }
                 properties.Choices = choices;
@@ -45,7 +48,7 @@ namespace Discord.Interactions
     ///     Enum values tagged with this attribute will not be displayed as a parameter choice
     /// </summary>
     /// <remarks>
-    ///     This attributer must be used along with the default <see cref="EnumConverter{T}"/>
+    ///     This attribute must be used along with the default <see cref="EnumConverter{T}"/>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
     public sealed class HideAttribute : Attribute { }

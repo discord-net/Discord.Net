@@ -33,7 +33,7 @@ namespace Discord
         /// </returns>
         bool? IsRevoked { get; }
         /// <summary>
-        ///     Gets a <see cref="IReadOnlyCollection{T}"/> of integration parials.
+        ///     Gets a <see cref="IReadOnlyCollection{T}"/> of integration partials.
         /// </summary>
         IReadOnlyCollection<IIntegration> Integrations { get; }
         /// <summary>

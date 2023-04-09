@@ -79,9 +79,9 @@ namespace Discord
         private static int DefaultConcurrencyLevel => ConcurrentHashSet.DefaultConcurrencyLevel;
 
         private volatile Tables _tables;
-        private readonly IEqualityComparer<T> _comparer; 
+        private readonly IEqualityComparer<T> _comparer;
         private readonly bool _growLockArray;
-        private int _budget;        
+        private int _budget;
 
         public int Count
         {
@@ -149,19 +149,20 @@ namespace Discord
             }
         }
 
-        public ConcurrentHashSet() 
+        public ConcurrentHashSet()
             : this(DefaultConcurrencyLevel, DefaultCapacity, true, EqualityComparer<T>.Default) { }
-        public ConcurrentHashSet(int concurrencyLevel, int capacity) 
+        public ConcurrentHashSet(int concurrencyLevel, int capacity)
             : this(concurrencyLevel, capacity, false, EqualityComparer<T>.Default) { }
-        public ConcurrentHashSet(IEnumerable<T> collection) 
+        public ConcurrentHashSet(IEnumerable<T> collection)
             : this(collection, EqualityComparer<T>.Default) { }
-        public ConcurrentHashSet(IEqualityComparer<T> comparer) 
+        public ConcurrentHashSet(IEqualityComparer<T> comparer)
             : this(DefaultConcurrencyLevel, DefaultCapacity, true, comparer) { }
         /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c></exception>
-        public ConcurrentHashSet(IEnumerable<T> collection, IEqualityComparer<T> comparer) 
+        public ConcurrentHashSet(IEnumerable<T> collection, IEqualityComparer<T> comparer)
             : this(comparer)
         {
-            if (collection == null) throw new ArgumentNullException(paramName: nameof(collection));
+            if (collection == null)
+                throw new ArgumentNullException(paramName: nameof(collection));
             InitializeFromCollection(collection);
         }
         /// <exception cref="ArgumentNullException">
@@ -170,18 +171,23 @@ namespace Discord
         public ConcurrentHashSet(int concurrencyLevel, IEnumerable<T> collection, IEqualityComparer<T> comparer)
             : this(concurrencyLevel, DefaultCapacity, false, comparer)
         {
-            if (collection == null) throw new ArgumentNullException(paramName: nameof(collection));
-            if (comparer == null) throw new ArgumentNullException(paramName: nameof(comparer));
+            if (collection == null)
+                throw new ArgumentNullException(paramName: nameof(collection));
+            if (comparer == null)
+                throw new ArgumentNullException(paramName: nameof(comparer));
             InitializeFromCollection(collection);
-        }        
+        }
         public ConcurrentHashSet(int concurrencyLevel, int capacity, IEqualityComparer<T> comparer)
             : this(concurrencyLevel, capacity, false, comparer) { }
         internal ConcurrentHashSet(int concurrencyLevel, int capacity, bool growLockArray, IEqualityComparer<T> comparer)
         {
-            if (concurrencyLevel < 1) throw new ArgumentOutOfRangeException(paramName: nameof(concurrencyLevel));
-            if (capacity < 0) throw new ArgumentOutOfRangeException(paramName: nameof(capacity));
-            if (comparer == null) throw new ArgumentNullException(paramName: nameof(comparer));
-                        
+            if (concurrencyLevel < 1)
+                throw new ArgumentOutOfRangeException(paramName: nameof(concurrencyLevel));
+            if (capacity < 0)
+                throw new ArgumentOutOfRangeException(paramName: nameof(capacity));
+            if (comparer == null)
+                throw new ArgumentNullException(paramName: nameof(comparer));
+
             if (capacity < concurrencyLevel)
                 capacity = concurrencyLevel;
 
@@ -201,7 +207,8 @@ namespace Discord
         {
             foreach (var value in collection)
             {
-                if (value == null) throw new ArgumentNullException(paramName: "key");
+                if (value == null)
+                    throw new ArgumentNullException(paramName: "key");
 
                 if (!TryAddInternal(value, _comparer.GetHashCode(value), false))
                     throw new ArgumentException();
@@ -213,7 +220,8 @@ namespace Discord
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c></exception>
         public bool ContainsKey(T value)
         {
-            if (value == null) throw new ArgumentNullException(paramName: "key");
+            if (value == null)
+                throw new ArgumentNullException(paramName: "key");
             return ContainsKeyInternal(value, _comparer.GetHashCode(value));
         }
         private bool ContainsKeyInternal(T value, int hashcode)
@@ -221,7 +229,7 @@ namespace Discord
             Tables tables = _tables;
 
             int bucketNo = GetBucket(hashcode, tables._buckets.Length);
-            
+
             Node n = Volatile.Read(ref tables._buckets[bucketNo]);
 
             while (n != null)
@@ -230,14 +238,15 @@ namespace Discord
                     return true;
                 n = n._next;
             }
-            
+
             return false;
         }
 
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c></exception>
         public bool TryAdd(T value)
         {
-            if (value == null) throw new ArgumentNullException(paramName: "key");
+            if (value == null)
+                throw new ArgumentNullException(paramName: "key");
             return TryAddInternal(value, _comparer.GetHashCode(value), true);
         }
         private bool TryAddInternal(T value, int hashcode, bool acquireLock)
@@ -266,7 +275,8 @@ namespace Discord
                     }
 
                     Volatile.Write(ref tables._buckets[bucketNo], new Node(value, hashcode, tables._buckets[bucketNo]));
-                    checked { tables._countPerLock[lockNo]++; }
+                    checked
+                    { tables._countPerLock[lockNo]++; }
 
                     if (tables._countPerLock[lockNo] > _budget)
                         resizeDesired = true;
@@ -279,7 +289,7 @@ namespace Discord
 
                 if (resizeDesired)
                     GrowTable(tables);
-                
+
                 return true;
             }
         }
@@ -287,9 +297,10 @@ namespace Discord
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c></exception>
         public bool TryRemove(T value)
         {
-            if (value == null) throw new ArgumentNullException(paramName: "key");
+            if (value == null)
+                throw new ArgumentNullException(paramName: "key");
             return TryRemoveInternal(value);
-        }        
+        }
         private bool TryRemoveInternal(T value)
         {
             int hashcode = _comparer.GetHashCode(value);
@@ -325,7 +336,7 @@ namespace Discord
                 return false;
             }
         }
-        
+
         public void Clear()
         {
             int locksAcquired = 0;
@@ -342,7 +353,7 @@ namespace Discord
                 ReleaseLocks(0, locksAcquired);
             }
         }
-        
+
         public IEnumerator<T> GetEnumerator()
         {
             Node[] buckets = _tables._buckets;
@@ -432,7 +443,8 @@ namespace Discord
 
                         newBuckets[newBucketNo] = new Node(current._value, current._hashcode, newBuckets[newBucketNo]);
 
-                        checked { newCountPerLock[newLockNo]++; }
+                        checked
+                        { newCountPerLock[newLockNo]++; }
 
                         current = next;
                     }
@@ -471,6 +483,6 @@ namespace Discord
         {
             for (int i = fromInclusive; i < toExclusive; i++)
                 Monitor.Exit(_tables._locks[i]);
-        }                
+        }
     }
 }

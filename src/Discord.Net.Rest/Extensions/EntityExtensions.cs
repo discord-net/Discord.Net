@@ -43,7 +43,8 @@ namespace Discord.Rest
         }
         public static API.Embed ToModel(this Embed entity)
         {
-            if (entity == null) return null;
+            if (entity == null)
+                return null;
             var model = new API.Embed
             {
                 Type = entity.Type,
@@ -71,7 +72,8 @@ namespace Discord.Rest
 
         public static API.AllowedMentions ToModel(this AllowedMentions entity)
         {
-            if (entity == null) return null;
+            if (entity == null)
+                return null;
             return new API.AllowedMentions()
             {
                 Parse = entity.AllowedTypes?.EnumerateMentionTypes().ToArray(),
@@ -187,7 +189,7 @@ namespace Discord.Rest
                     Flags = data.Flags,
                 };
 
-                if(interaction is IApplicationCommandInteraction command)
+                if (interaction is IApplicationCommandInteraction command)
                 {
                     messageModel.Interaction = new API.MessageInteraction
                     {

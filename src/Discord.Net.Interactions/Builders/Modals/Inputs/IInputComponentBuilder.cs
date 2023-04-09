@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Discord.Interactions.Builders
 {
@@ -37,6 +38,11 @@ namespace Discord.Interactions.Builders
         ///     Get the reference type of this input component.
         /// </summary>
         Type Type { get; }
+
+        /// <summary>
+        ///     Get the <see cref="PropertyInfo"/> of this component's property.
+        /// </summary>
+        PropertyInfo PropertyInfo { get; }
 
         /// <summary>
         ///     Get the <see cref="ComponentTypeConverter"/> assigned to this input.

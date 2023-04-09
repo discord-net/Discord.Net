@@ -11,17 +11,17 @@ namespace Discord.Interactions
     public static class InteractionUtility
     {
         /// <summary>
-        ///     Wait for an Interaction event for a given amount of time as an asynchronous opration.
+        ///     Wait for an Interaction event for a given amount of time as an asynchronous operation.
         /// </summary>
         /// <param name="client">Client that should be listened to for the <see cref="BaseSocketClient.InteractionCreated"/> event.</param>
         /// <param name="timeout">Timeout duration for this operation.</param>
-        /// <param name="predicate">Delegate for cheking whether an Interaction meets the requirements.</param>
+        /// <param name="predicate">Delegate for checking whether an Interaction meets the requirements.</param>
         /// <param name="cancellationToken">Token for canceling the wait operation.</param>
         /// <returns>
-        ///     A Task representing the asyncronous waiting operation. If the user responded in the given amount of time, Task result contains the user response,
+        ///     A Task representing the asynchronous waiting operation. If the user responded in the given amount of time, Task result contains the user response,
         ///     otherwise the Task result is <see langword="null"/>.
         /// </returns>
-        public static async Task<SocketInteraction> WaitForInteractionAsync (BaseSocketClient client, TimeSpan timeout,
+        public static async Task<SocketInteraction> WaitForInteractionAsync(BaseSocketClient client, TimeSpan timeout,
             Predicate<SocketInteraction> predicate, CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<SocketInteraction>();
@@ -34,7 +34,7 @@ namespace Discord.Interactions
                         tcs.SetResult(null);
                 });
 
-            cancellationToken.Register(( ) => tcs.SetCanceled());
+            cancellationToken.Register(() => tcs.SetCanceled());
 
             client.InteractionCreated += HandleInteraction;
             var result = await tcs.Task.ConfigureAwait(false);
@@ -42,7 +42,7 @@ namespace Discord.Interactions
 
             return result;
 
-            Task HandleInteraction (SocketInteraction interaction)
+            Task HandleInteraction(SocketInteraction interaction)
             {
                 if (predicate(interaction))
                 {
@@ -55,20 +55,20 @@ namespace Discord.Interactions
         }
 
         /// <summary>
-        ///    Wait for an Message Component Interaction event for a given amount of time as an asynchronous opration .
+        ///    Wait for an Message Component Interaction event for a given amount of time as an asynchronous operation .
         /// </summary>
         /// <param name="client">Client that should be listened to for the <see cref="BaseSocketClient.InteractionCreated"/> event.</param>
         /// <param name="fromMessage">The message that <see cref="BaseSocketClient.ButtonExecuted"/> or <see cref="BaseSocketClient.SelectMenuExecuted"/> should originate from.</param>
         /// <param name="timeout">Timeout duration for this operation.</param>
         /// <param name="cancellationToken">Token for canceling the wait operation.</param>
         /// <returns>
-        ///     A Task representing the asyncronous waiting operation with a <see cref="IDiscordInteraction"/> result,
+        ///     A Task representing the asynchronous waiting operation with a <see cref="IDiscordInteraction"/> result,
         ///     the result is null if the process timed out before receiving a valid Interaction.
         /// </returns>
         public static Task<SocketInteraction> WaitForMessageComponentAsync(BaseSocketClient client, IUserMessage fromMessage, TimeSpan timeout,
             CancellationToken cancellationToken = default)
         {
-            bool Predicate (SocketInteraction interaction) => interaction is SocketMessageComponent component &&
+            bool Predicate(SocketInteraction interaction) => interaction is SocketMessageComponent component &&
                 component.Message.Id == fromMessage.Id;
 
             return WaitForInteractionAsync(client, timeout, Predicate, cancellationToken);
@@ -83,10 +83,10 @@ namespace Discord.Interactions
         /// <param name="message">Optional custom prompt message.</param>
         /// <param name="cancellationToken">Token for canceling the wait operation.</param>
         /// <returns>
-        ///     A Task representing the asyncronous waiting operation with a <see cref="bool"/> result,
+        ///     A Task representing the asynchronous waiting operation with a <see cref="bool"/> result,
         ///     the result is <see langword="false"/> if the user declined the prompt or didnt answer in time, <see langword="true"/> if the user confirmed the prompt.
         /// </returns>
-        public static async Task<bool> ConfirmAsync (BaseSocketClient client, IMessageChannel channel, TimeSpan timeout, string message = null,
+        public static async Task<bool> ConfirmAsync(BaseSocketClient client, IMessageChannel channel, TimeSpan timeout, string message = null,
             CancellationToken cancellationToken = default)
         {
             message ??= "Would you like to continue?";
