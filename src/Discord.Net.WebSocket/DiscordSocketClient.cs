@@ -83,6 +83,8 @@ namespace Discord.WebSocket
         internal bool AlwaysResolveStickers { get; private set; }
         internal bool LogGatewayIntentWarnings { get; private set; }
         internal bool SuppressUnknownDispatchWarnings { get; private set; }
+        internal int AuditLogCacheSize { get; private set; }
+
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -200,6 +202,7 @@ namespace Discord.WebSocket
             };
 
             _largeGuilds = new ConcurrentQueue<ulong>();
+            AuditLogCacheSize = config.AuditLogCacheSize;
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayHost,
@@ -2885,6 +2888,23 @@ namespace Discord.WebSocket
 
                             #endregion
 
+                            #region Audit Logs
+
+                            case "GUILD_AUDIT_LOG_ENTRY_CREATE":
+                            {
+                                var data = (payload as JToken).ToObject<AuditLogCreatedEvent>(_serializer);
+                                type = "GUILD_AUDIT_LOG_ENTRY_CREATE";
+                                await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AUDIT_LOG_ENTRY_CREATE)").ConfigureAwait(false);
+
+                                var guild = State.GetGuild(data.GuildId);
+                                var auditLog = SocketAuditLogEntry.Create(this, data);
+                                guild.AddAuditLog(auditLog);
+
+                                await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
+                            }
+                            break;
+                            #endregion
+                            
                             #region Auto Moderation
 
                             case "AUTO_MODERATION_RULE_CREATE":

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    // when adding properties to guilds please check if they are returned in audit log events and add them to the
+    // 'GuildInfo.cs' file for socket and rest audit logs.
     /// <summary>
     ///     Represents a generic guild/server.
     /// </summary>

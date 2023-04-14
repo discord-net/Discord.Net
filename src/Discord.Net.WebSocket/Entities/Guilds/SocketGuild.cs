@@ -49,6 +49,8 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketAutoModRule> _automodRules;
         private ImmutableArray<GuildEmote> _emotes;
 
+        private readonly AuditLogCache _auditLogs;
+
         private AudioClient _audioClient;
         private VoiceStateUpdateParams _voiceStateUpdateParams;
 #pragma warning restore IDISP002, IDISP006
@@ -415,6 +417,7 @@ namespace Discord.WebSocket
             _audioLock = new SemaphoreSlim(1, 1);
             _emotes = ImmutableArray.Create<GuildEmote>();
             _automodRules = new ConcurrentDictionary<ulong, SocketAutoModRule>();
+            _auditLogs = new AuditLogCache(client);
         }
         internal static SocketGuild Create(DiscordSocketClient discord, ClientState state, ExtendedModel model)
         {
@@ -1403,9 +1406,36 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of the requested audit log entries.
-        /// </returns>
+        /// </returns>        
         public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null, ActionType? actionType = null, ulong? afterId = null)
             => GuildHelper.GetAuditLogsAsync(this, Discord, beforeId, limit, options, userId: userId, actionType: actionType, afterId: afterId);
+
+        /// <summary>
+        ///     Gets all cached audit log entries from this guild.
+        /// </summary>
+        public IReadOnlyCollection<SocketAuditLogEntry> CachedAuditLogs => _auditLogs?.AuditLogs ?? ImmutableArray.Create<SocketAuditLogEntry>();
+
+        /// <summary>
+        ///     Gets cached audit log entry with the provided id.
+        /// </summary>
+        /// <remarks>
+        ///     Returns <see langword="null"/> if no entry with provided id was found in cache.
+        /// </remarks>
+        public SocketAuditLogEntry GetCachedAuditLog(ulong id)
+            => _auditLogs.Get(id);
+
+        /// <summary>
+        ///     Gets audit log entries with the specified type from cache.
+        /// </summary>
+        public IReadOnlyCollection<SocketAuditLogEntry> GetCachedAuditLogs(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch, ActionType? action = null,
+            ulong? fromEntryId = null, Direction direction = Direction.Before)
+        {
+            return _auditLogs.GetMany(fromEntryId, direction, limit, action);
+        }
+
+        internal void AddAuditLog(SocketAuditLogEntry entry)
+            => _auditLogs.Add(entry);
+
         #endregion
 
         #region Webhooks

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    internal class ForumTags
+    internal class ForumTag
     {
         [JsonProperty("id")]
         public ulong Id { get; set; }
