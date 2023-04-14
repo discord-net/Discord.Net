@@ -139,7 +139,7 @@ namespace Discord.Rest
             {
                 PremiumTier.Tier2 => 50,
                 PremiumTier.Tier3 => 100,
-                _ => 8
+                _ => 25
             };
 
             var mebibyte = Math.Pow(2, 20);
