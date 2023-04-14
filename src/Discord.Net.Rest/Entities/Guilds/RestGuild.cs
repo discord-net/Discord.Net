@@ -1068,11 +1068,11 @@ namespace Discord.Rest
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        public Task<CustomSticker> CreateStickerAsync(string name,  string path, IEnumerable<string> tags, string description = null,
+        public async Task<CustomSticker> CreateStickerAsync(string name,  string path, IEnumerable<string> tags, string description = null,
             RequestOptions options = null)
         {
-            var fs = File.OpenRead(path);
-            return CreateStickerAsync(name, fs, Path.GetFileName(fs.Name), tags,  description,options);
+            using var fs = File.OpenRead(path);
+            return await CreateStickerAsync(name, fs, Path.GetFileName(fs.Name), tags,  description,options);
         }
         /// <summary>
         ///     Creates a new sticker in this guild
