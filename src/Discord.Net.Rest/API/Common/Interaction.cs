@@ -23,6 +23,9 @@ namespace Discord.API
         [JsonProperty("channel_id")]
         public Optional<ulong> ChannelId { get; set; }
 
+        [JsonProperty("channel")]
+        public Optional<Channel> Channel { get; set; }
+
         [JsonProperty("member")]
         public Optional<GuildMember> Member { get; set; }
 
