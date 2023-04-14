@@ -1236,6 +1236,18 @@ namespace Discord.Rest
 
         #endregion
 
+        #region Onboarding
+
+        /// <inheritdoc cref="IGuild.GetOnboardingAsync"/>
+        public async Task<RestGuildOnboarding> GetOnboardingAsync(RequestOptions options = null)
+        {
+            var model = await GuildHelper.GetGuildOnboardingAsync(this, Discord, options);
+
+            return new RestGuildOnboarding(Discord, model, this);
+        }
+
+        #endregion
+
         #region IGuild
         /// <inheritdoc />
         bool IGuild.Available => Available;
@@ -1592,6 +1604,10 @@ namespace Discord.Rest
         /// <inheritdoc/>
         async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options)
             => await CreateAutoModRuleAsync(props, options).ConfigureAwait(false);
+        
+        /// <inheritdoc/>
+        async Task<IGuildOnboarding> IGuild.GetOnboardingAsync(RequestOptions options)
+            => await GetOnboardingAsync(options);
 
         #endregion
     }

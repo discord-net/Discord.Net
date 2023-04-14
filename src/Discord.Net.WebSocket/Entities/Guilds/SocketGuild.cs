@@ -1,6 +1,7 @@
 using Discord.API.Gateway;
 using Discord.Audio;
 using Discord.Rest;
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using AutoModRuleModel = Discord.API.AutoModerationRule;
 using ChannelModel = Discord.API.Channel;
 using EmojiUpdateModel = Discord.API.Gateway.GuildEmojiUpdateEvent;
@@ -1908,6 +1910,18 @@ namespace Discord.WebSocket
 
         #endregion
 
+        #region Onboarding
+
+        /// <inheritdoc cref="IGuild.GetOnboardingAsync"/>
+        public async Task<SocketGuildOnboarding> GetOnboardingAsync(RequestOptions options = null)
+        {
+            var model = await GuildHelper.GetGuildOnboardingAsync(this, Discord, options);
+
+            return new SocketGuildOnboarding(Discord, model, this);
+        }
+
+        #endregion
+
         #region  IGuild
         /// <inheritdoc />
         ulong? IGuild.AFKChannelId => AFKChannelId;
@@ -2165,6 +2179,10 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options)
             => await CreateAutoModRuleAsync(props, options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IGuildOnboarding> IGuild.GetOnboardingAsync(RequestOptions options)
+            => await GetOnboardingAsync(options);
 
         #endregion
     }
