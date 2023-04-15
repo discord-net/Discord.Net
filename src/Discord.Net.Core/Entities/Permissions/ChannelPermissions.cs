@@ -23,7 +23,7 @@ namespace Discord
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for voice channels.
         /// </summary>
-        public static readonly ChannelPermissions Voice = new(0b10001_001010_001010_110011_111101_111111_111101_010001); 
+        public static readonly ChannelPermissions Voice = new(0b11001_001010_001010_110011_111101_111111_111101_010001); 
 
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for stage channels.
