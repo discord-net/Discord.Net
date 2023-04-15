@@ -139,7 +139,7 @@ namespace Discord.Rest
             {
                 PremiumTier.Tier2 => 50,
                 PremiumTier.Tier3 => 100,
-                _ => 8
+                _ => 25
             };
 
             var mebibyte = Math.Pow(2, 20);
@@ -193,7 +193,7 @@ namespace Discord.Rest
                 },
                 start: fromUserId,
                 count: limit
-                );
+            );
         }
 
         public static async Task<RestBan> GetBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, RequestOptions options)
@@ -427,7 +427,7 @@ namespace Discord.Rest
         }
         public static async Task DeleteIntegrationAsync(IGuild guild, BaseDiscordClient client, ulong id,
             RequestOptions options) =>
-                await client.ApiClient.DeleteIntegrationAsync(guild.Id, id, options).ConfigureAwait(false);
+            await client.ApiClient.DeleteIntegrationAsync(guild.Id, id, options).ConfigureAwait(false);
         #endregion
 
         #region Interactions
@@ -810,7 +810,7 @@ namespace Discord.Rest
         }
 
         public static IAsyncEnumerable<IReadOnlyCollection<RestUser>> GetEventUsersAsync(BaseDiscordClient client, IGuildScheduledEvent guildEvent,
-           ulong? fromUserId, int? limit, RequestOptions options)
+            ulong? fromUserId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestUser>(
                 DiscordConfig.MaxGuildEventUsersPerBatch,
@@ -1253,6 +1253,13 @@ namespace Discord.Rest
 
         public static Task DeleteRuleAsync(BaseDiscordClient client, IAutoModRule rule, RequestOptions options)
             => client.ApiClient.DeleteGuildAutoModRuleAsync(rule.GuildId, rule.Id, options);
+        #endregion
+
+        #region Onboarding
+
+        public static async Task<GuildOnboarding> GetGuildOnboardingAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+            => await client.ApiClient.GetGuildOnboardingAsync(guild.Id, options);
+
         #endregion
     }
 }

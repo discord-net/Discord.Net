@@ -9,8 +9,8 @@ namespace Discord;
 public class GuildHelperTests
 {
     [Theory]
-    [InlineData(PremiumTier.None, 8)]
-    [InlineData(PremiumTier.Tier1, 8)]
+    [InlineData(PremiumTier.None, 25)]
+    [InlineData(PremiumTier.Tier1, 25)]
     [InlineData(PremiumTier.Tier2, 50)]
     [InlineData(PremiumTier.Tier3, 100)]
     public void GetUploadLimit(PremiumTier tier, ulong factor)

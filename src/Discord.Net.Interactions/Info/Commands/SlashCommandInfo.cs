@@ -92,7 +92,7 @@ namespace Discord.Interactions
                 var result = await ParseArgumentAsync(parameter, context, options, services).ConfigureAwait(false);
 
                 if (!result.IsSuccess)
-                    return await InvokeEventAndReturn(context, ParseResult.FromError(result)).ConfigureAwait(false);
+                    return ParseResult.FromError(result);
 
                 if (result is not TypeConverterResult converterResult)
                     return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Complex command parsing failed for an unknown reason.");

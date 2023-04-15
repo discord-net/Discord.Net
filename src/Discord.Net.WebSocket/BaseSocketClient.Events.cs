@@ -893,6 +893,21 @@ namespace Discord.WebSocket
 
         #endregion
 
+        #region Audit Logs
+
+        /// <summary>
+        ///     Fired when a guild audit log entry is created.
+        /// </summary>
+        public event Func<SocketAuditLogEntry, SocketGuild, Task> AuditLogCreated
+        {
+            add { _auditLogCreated.Add(value); }
+            remove { _auditLogCreated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<SocketAuditLogEntry, SocketGuild, Task>> _auditLogCreated = new();
+
+        #endregion
+        
         #region AutoModeration
 
         /// <summary>

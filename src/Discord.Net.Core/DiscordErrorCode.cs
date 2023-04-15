@@ -188,6 +188,7 @@ namespace Discord
         CannotConvertBetweenPremiumEmojiAndNormalEmoji = 50145,
         UploadedFileNotFound = 50146,
         FeatureInProcessOfRollingOut = 50155,
+        CannotSendVoiceMessageInThisChannel = 50173,
         MissingPermissionToSendThisSticker = 50600,
         #endregion
 

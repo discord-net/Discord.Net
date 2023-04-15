@@ -228,6 +228,7 @@ namespace Discord.Rest
             fileName ??= Path.GetFileName(filePath);
             Preconditions.NotNullOrEmpty(fileName, nameof(fileName), "File Name must not be empty or null");
 
+            using var fileStream = !string.IsNullOrEmpty(filePath) ? new MemoryStream(File.ReadAllBytes(filePath), false) : null;
             var args = new API.Rest.CreateWebhookMessageParams
             {
                 Content = text,
@@ -235,7 +236,7 @@ namespace Discord.Rest
                 IsTTS = isTTS,
                 Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                 Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
-                File = !string.IsNullOrEmpty(filePath) ? new MultipartFile(new MemoryStream(File.ReadAllBytes(filePath), false), fileName) : Optional<MultipartFile>.Unspecified
+                File = fileStream != null ? new MultipartFile(fileStream, fileName) : Optional<MultipartFile>.Unspecified
             };
 
             if (ephemeral)

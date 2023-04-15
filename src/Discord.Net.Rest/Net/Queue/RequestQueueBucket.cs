@@ -1,4 +1,5 @@
 using Discord.API;
+using Discord.Net.Rest;
 using Newtonsoft.Json;
 using System;
 #if DEBUG_LIMITS
@@ -62,10 +63,11 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                 Debug.WriteLine($"[{id}] Sending...");
 #endif
+                RestResponse response = default(RestResponse);
                 RateLimitInfo info = default(RateLimitInfo);
                 try
                 {
-                    var response = await request.SendAsync().ConfigureAwait(false);
+                    response = await request.SendAsync().ConfigureAwait(false);
                     info = new RateLimitInfo(response.Headers, request.Endpoint);
 
                     request.Options.ExecuteRatelimitCallback(info);
@@ -87,7 +89,6 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                                     Debug.WriteLine($"[{id}] (!) 429");
 #endif
-                                    UpdateRateLimit(id, request, info, true, body: response.Stream);
                                 }
                                 await _queue.RaiseRateLimitTriggered(Id, info, $"{request.Method} {request.Endpoint}").ConfigureAwait(false);
                                 continue; //Retry
@@ -156,7 +157,7 @@ namespace Discord.Net.Queue
                 }*/
                 finally
                 {
-                    UpdateRateLimit(id, request, info, false);
+                    UpdateRateLimit(id, request, info, response.StatusCode == (HttpStatusCode)429, body: response.Stream);
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Stop");
 #endif
@@ -251,7 +252,7 @@ namespace Discord.Net.Queue
 
                 DateTimeOffset? timeoutAt = request.TimeoutAt;
                 int semaphore = Interlocked.Decrement(ref _semaphore);
-                if (windowCount > 0 && semaphore < 0)
+                if (windowCount >= 0 && semaphore < 0)
                 {
                     if (!isRateLimited)
                     {
@@ -358,9 +359,16 @@ namespace Discord.Net.Queue
                 if (info.Limit.HasValue && WindowCount != info.Limit.Value)
                 {
                     WindowCount = info.Limit.Value;
-                    _semaphore = is429 ? 0 : info.Remaining.Value;
 #if DEBUG_LIMITS
-                    Debug.WriteLine($"[{id}] Upgraded Semaphore to {info.Remaining.Value}/{WindowCount}");
+                    Debug.WriteLine($"[{id}] Updated Limit to {WindowCount}");
+#endif
+                }
+
+                if (info.Remaining.HasValue && _semaphore != info.Remaining.Value)
+                {
+                    _semaphore = info.Remaining.Value;
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Updated Semaphore (Remaining) to {_semaphore}");
 #endif
                 }
 
@@ -374,6 +382,9 @@ namespace Discord.Net.Queue
                 }*/
                 if (is429)
                 {
+                    // Stop all requests until the QueueReset task is complete
+                    _semaphore = 0;
+
                     // use the payload reset after value
                     var payload = info.ReadRatelimitPayload(body);
 
@@ -439,7 +450,7 @@ namespace Discord.Net.Queue
 
                 if (resetTick == null)
                 {
-                    WindowCount = 0; //No rate limit info, disable limits on this bucket
+                    WindowCount = -1; //No rate limit info, disable limits on this bucket
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Disabled Semaphore");
 #endif

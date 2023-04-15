@@ -93,6 +93,7 @@ namespace Discord
             AssertFlag(() => new ChannelPermissions(useSoundboard: true), ChannelPermission.UseSoundboard);
             AssertFlag(() => new ChannelPermissions(createEvents: true), ChannelPermission.CreateEvents);
             AssertFlag(() => new ChannelPermissions(useExternalSounds: true), ChannelPermission.UseExternalSounds);
+            AssertFlag(() => new ChannelPermissions(sendVoiceMessages: true), ChannelPermission.SendVoiceMessages);
         }
 
         /// <summary>
@@ -157,6 +158,8 @@ namespace Discord
             AssertUtil(ChannelPermission.ManageWebhooks, x => x.ManageWebhooks, (p, enable) => p.Modify(manageWebhooks: enable));
             AssertUtil(ChannelPermission.PrioritySpeaker, x => x.PrioritySpeaker, (p, enable) => p.Modify(prioritySpeaker: enable));
             AssertUtil(ChannelPermission.Stream, x => x.Stream, (p, enable) => p.Modify(stream: enable));
+            AssertUtil(ChannelPermission.SendVoiceMessages, x => x.SendVoiceMessages, (p, enable) => p.Modify(sendVoiceMessages: enable));
+            AssertUtil(ChannelPermission.UseExternalSounds, x => x.UseExternalSounds, (p, enable) => p.Modify(useExternalSounds: enable));
         }
 
         /// <summary>

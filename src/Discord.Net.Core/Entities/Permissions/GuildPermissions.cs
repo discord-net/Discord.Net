@@ -108,6 +108,8 @@ namespace Discord
         public bool UseSoundboard => Permissions.GetValue(RawValue, GuildPermission.UseSoundboard);
         /// <summary> If <see langword="true"/>, a user can view monetization analytics in this guild.</summary>
         public bool ViewMonetizationAnalytics => Permissions.GetValue(RawValue, GuildPermission.ViewMonetizationAnalytics);
+        /// <summary> If <see langword="true"/>, a user can send voice messages in this channel.</summary>
+        public bool SendVoiceMessages => Permissions.GetValue(RawValue, GuildPermission.SendVoiceMessages);
         /// <summary> If <see langword="true"/>, a user can use sounds from other servers.</summary>
         public bool UseExternalSounds => Permissions.GetValue(RawValue, GuildPermission.UseExternalSounds);
 
@@ -161,6 +163,7 @@ namespace Discord
             bool? moderateMembers = null,
             bool? useSoundboard = null,
             bool? viewMonetizationAnalytics = null,
+            bool? sendVoiceMessages = null,
             bool? useExternalSounds = null)
         {
             ulong value = initialValue;
@@ -208,6 +211,7 @@ namespace Discord
             Permissions.SetValue(ref value, moderateMembers, GuildPermission.ModerateMembers);
             Permissions.SetValue(ref value, useSoundboard, GuildPermission.UseSoundboard);
             Permissions.SetValue(ref value, viewMonetizationAnalytics, GuildPermission.ViewMonetizationAnalytics);
+            Permissions.SetValue(ref value, sendVoiceMessages, GuildPermission.SendVoiceMessages);
             Permissions.SetValue(ref value, useExternalSounds, GuildPermission.UseExternalSounds);
 
             RawValue = value;
@@ -258,6 +262,7 @@ namespace Discord
             bool moderateMembers = false,
             bool useSoundboard = false,
             bool viewMonetizationAnalytics = false,
+            bool sendVoiceMessages = false,
             bool useExternalSounds = false)
             : this(0,
                 createInstantInvite: createInstantInvite,
@@ -303,6 +308,7 @@ namespace Discord
                 moderateMembers: moderateMembers,
                 useSoundboard: useSoundboard,
                 viewMonetizationAnalytics: viewMonetizationAnalytics,
+                sendVoiceMessages: sendVoiceMessages,
                 useExternalSounds: useExternalSounds)
         { }
 
@@ -351,13 +357,14 @@ namespace Discord
             bool? moderateMembers = null,
             bool? useSoundboard = null,
             bool? viewMonetizationAnalytics = null,
+            bool? sendVoiceMessages = null,
             bool? useExternalSounds = null)
             => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
                 viewAuditLog, viewGuildInsights, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojisAndStickers,
                 useApplicationCommands, requestToSpeak, manageEvents, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
-                startEmbeddedActivities, moderateMembers, useSoundboard, viewMonetizationAnalytics, useExternalSounds);
+                startEmbeddedActivities, moderateMembers, useSoundboard, viewMonetizationAnalytics, sendVoiceMessages, useExternalSounds);
 
         /// <summary>
         ///     Returns a value that indicates if a specific <see cref="GuildPermission"/> is enabled

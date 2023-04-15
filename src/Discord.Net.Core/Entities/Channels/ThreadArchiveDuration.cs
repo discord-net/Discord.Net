@@ -17,17 +17,11 @@ namespace Discord
 
         /// <summary>
         ///     Three days (4320 minutes).
-        ///     <remarks>
-        ///         This option is explicitly available to nitro users.
-        ///     </remarks>
         /// </summary>
         ThreeDays = 4320,
 
         /// <summary>
         ///     One week (10080 minutes).
-        ///     <remarks>
-        ///         This option is explicitly available to nitro users.
-        ///     </remarks>
         /// </summary>
         OneWeek = 10080
     }

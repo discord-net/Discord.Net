@@ -1,6 +1,7 @@
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ namespace Discord.Interactions
         {
             var names = Enum.GetNames(typeof(T));
             var members = names.SelectMany(x => typeof(T).GetMember(x)).Where(x => !x.IsDefined(typeof(HideAttribute), true));
+            var localizationManager = parameterInfo.Command.Module.CommandService.LocalizationManager;
 
             if (members.Count() <= 25)
             {
@@ -33,7 +35,8 @@ namespace Discord.Interactions
                     choices.Add(new ApplicationCommandOptionChoiceProperties
                     {
                         Name = displayValue,
-                        Value = member.Name
+                        Value = member.Name,
+                        NameLocalizations = localizationManager?.GetAllNames(parameterInfo.GetChoicePath(new ParameterChoice(displayValue.ToLower(), member.Name)), LocalizationTarget.Choice) ?? ImmutableDictionary<string, string>.Empty
                     });
                 }
                 properties.Choices = choices;
