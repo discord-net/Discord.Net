@@ -81,6 +81,12 @@ namespace Discord.WebSocket
         public int MessageCacheSize { get; set; } = 0;
 
         /// <summary>
+        ///     Gets or sets the number of audit logs per guild that should be kept in cache. Setting this to zero
+        ///     disables the audit log cache entirely.
+        /// </summary>
+        public int AuditLogCacheSize { get; set; } = 0;
+
+        /// <summary>
         ///     Gets or sets the max number of users a guild may have for offline users to be included in the READY
         ///     packet. The maximum value allowed is 250.
         /// </summary>

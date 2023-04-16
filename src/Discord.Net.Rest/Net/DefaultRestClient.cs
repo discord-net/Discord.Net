@@ -1,7 +1,7 @@
-using Discord.Net.Converters;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -101,62 +101,68 @@ namespace Discord.Net.Rest
             IEnumerable<KeyValuePair<string, IEnumerable<string>>> requestHeaders = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
-            using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
-            {
-                if (reason != null)
-                    restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
-                if (requestHeaders != null)
-                    foreach (var header in requestHeaders)
-                        restRequest.Headers.Add(header.Key, header.Value);
-                var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
-                MemoryStream memoryStream = null;
-                if (multipartParams != null)
-                {
-                    foreach (var p in multipartParams)
-                    {
-                        switch (p.Value)
-                        {
+
+            // HttpRequestMessage implements IDisposable but we do not need to dispose it as it merely disposes of its Content property,
+            // which we can do as needed. And regarding that, we do not want to take responsibility for disposing of content provided by
+            // the caller of this function, since it's possible that the caller wants to reuse it or is forced to reuse it because of a
+            // 429 response. Therefore, by convention, we only dispose the content objects created in this function (if any).
+            //
+            // See this comment explaining why this is safe: https://github.com/aspnet/Security/issues/886#issuecomment-229181249
+            // See also the source for HttpRequestMessage: https://github.com/microsoft/referencesource/blob/master/System/net/System/Net/Http/HttpRequestMessage.cs
 #pragma warning disable IDISP004
-                            case string stringValue:
-                                { content.Add(new StringContent(stringValue, Encoding.UTF8, "text/plain"), p.Key); continue; }
-                            case byte[] byteArrayValue:
-                                { content.Add(new ByteArrayContent(byteArrayValue), p.Key); continue; }
-                            case Stream streamValue:
-                                { content.Add(new StreamContent(streamValue), p.Key); continue; }
-                            case MultipartFile fileValue:
-                                {
-                                    var stream = fileValue.Stream;
-                                    if (!stream.CanSeek)
-                                    {
-                                        memoryStream = new MemoryStream();
-                                        await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
-                                        memoryStream.Position = 0;
-#pragma warning disable IDISP001
-                                        stream = memoryStream;
-#pragma warning restore IDISP001
-                                    }
-
-                                    var streamContent = new StreamContent(stream);
-                                    var extension = fileValue.Filename.Split('.').Last();
-
-                                    if (fileValue.ContentType != null)
-                                        streamContent.Headers.ContentType = new MediaTypeHeaderValue(fileValue.ContentType);
-
-                                    content.Add(streamContent, p.Key, fileValue.Filename);
+            var restRequest = new HttpRequestMessage(GetMethod(method), uri);
 #pragma warning restore IDISP004
 
-                                    continue;
-                                }
-                            default:
-                                throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\".");
-                        }
-                    }
+            if (reason != null)
+                restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
+            if (requestHeaders != null)
+                foreach (var header in requestHeaders)
+                    restRequest.Headers.Add(header.Key, header.Value);
+            var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
+
+            static StreamContent GetStreamContent(Stream stream)
+            {
+                if (stream.CanSeek)
+                {
+                    // Reset back to the beginning; it may have been used elsewhere or in a previous request.
+                    stream.Position = 0;
                 }
-                restRequest.Content = content;
-                var result = await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
-                memoryStream?.Dispose();
-                return result;
+
+#pragma warning disable IDISP004
+                return new StreamContent(stream);
+#pragma warning restore IDISP004
             }
+
+            foreach (var p in multipartParams ?? ImmutableDictionary<string, object>.Empty)
+            {
+                switch (p.Value)
+                {
+#pragma warning disable IDISP004
+                    case string stringValue:
+                        { content.Add(new StringContent(stringValue, Encoding.UTF8, "text/plain"), p.Key); continue; }
+                    case byte[] byteArrayValue:
+                        { content.Add(new ByteArrayContent(byteArrayValue), p.Key); continue; }
+                    case Stream streamValue:
+                        { content.Add(GetStreamContent(streamValue), p.Key); continue; }
+                    case MultipartFile fileValue:
+                        {
+                            var streamContent = GetStreamContent(fileValue.Stream);
+
+                            if (fileValue.ContentType != null)
+                                streamContent.Headers.ContentType = new MediaTypeHeaderValue(fileValue.ContentType);
+
+                            content.Add(streamContent, p.Key, fileValue.Filename);
+#pragma warning restore IDISP004
+
+                            continue;
+                        }
+                    default:
+                        throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\".");
+                }
+            }
+
+            restRequest.Content = content;
+            return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
         }
 
         private async Task<RestResponse> SendInternalAsync(HttpRequestMessage request, CancellationToken cancelToken, bool headerOnly)

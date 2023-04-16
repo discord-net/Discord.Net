@@ -94,7 +94,7 @@ By default, your methods can feature the following parameter types:
 - `sbyte`, `byte`
 - `int16`, `int32`, `int64`
 - `uint16`, `uint32`, `uint64`
-- `enum` (Values are registered as multiple choice options and are enforced by Discord. Use `[HideAttribute]` on enum values to prevent them from getting registered.)
+- `enum` (Values are registered as multiple choice options and are enforced by Discord. Use the `[Hide]` attribute on enum values to prevent them from getting registered.)
 - `DateTime`
 - `TimeSpan`
 

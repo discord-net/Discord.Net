@@ -14,7 +14,7 @@ namespace Discord.Rest
             : base(discord, model.Id)
         {
             Action = model.Action;
-            Data = AuditLogHelper.CreateData(discord, fullLog, model);
+            Data = AuditLogHelper.CreateData(discord, model, fullLog);
             User = user;
             Reason = model.Reason;
         }

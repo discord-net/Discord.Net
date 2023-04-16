@@ -37,7 +37,7 @@ namespace Discord.Net.Converters
         {
             if (type.IsArray)
                 return MakeGenericConverter(property, propInfo, typeof(ArrayConverter<>), type.GetElementType(), depth);
-            if (type.IsConstructedGenericType)
+            if (type.IsConstructedGenericType)                 
             {
                 Type genericType = type.GetGenericTypeDefinition();
                 if (depth == 0 && genericType == typeof(Optional<>))

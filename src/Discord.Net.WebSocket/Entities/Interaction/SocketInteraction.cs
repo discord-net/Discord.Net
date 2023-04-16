@@ -116,8 +116,8 @@ namespace Discord.WebSocket
 
         internal virtual void Update(Model model)
         {
-            ChannelId = model.ChannelId.IsSpecified
-                ? model.ChannelId.Value
+            ChannelId = model.Channel.IsSpecified
+                ? model.Channel.Value.Id
                 : null;
 
             GuildId = model.GuildId.IsSpecified

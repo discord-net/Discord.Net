@@ -72,7 +72,7 @@ namespace Discord.API
 
         //ForumChannel
         [JsonProperty("available_tags")]
-        public Optional<ForumTags[]> ForumTags { get; set; }
+        public Optional<ForumTag[]> ForumTags { get; set; }
 
         [JsonProperty("applied_tags")]
         public Optional<ulong[]> AppliedTags { get; set; }

@@ -177,5 +177,10 @@ namespace Discord
         ///     Allows members to edit and cancel events in this channel.
         /// </summary>
         CreateEvents = 1L << 44,
+
+        /// <summary>
+        ///     Allows sending voice messages.
+        /// </summary>
+        SendVoiceMessages = 1L << 46,
     }
 }
