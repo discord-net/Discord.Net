@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,6 +22,25 @@ namespace Discord.Audio.Streams
             _next = next;
             _encoder = new OpusEncoder(bitrate, application, packetLoss);
             _buffer = new byte[OpusConverter.FrameBytes];
+        }
+
+        public async Task WriteSilentFramesAsync()
+        {
+            byte[] frameBytes = new byte[OpusConverter.FrameBytes];
+
+            // Magic silence numbers.
+            // https://discord.com/developers/docs/topics/voice-connections#voice-data-interpolation
+            frameBytes[0] = 0xF8;
+            frameBytes[1] = 0xFF;
+            frameBytes[2] = 0xFE;
+
+            // The rest of the array is already zeroes, so no need to fill the rest.
+
+            const int frameCount = 5;
+            for (int i = 0; i < frameCount; i += 1)
+            {
+                await WriteAsync(frameBytes, 0, frameBytes.Length);
+            } 
         }
 
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
