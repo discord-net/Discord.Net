@@ -24,6 +24,10 @@ namespace Discord.Audio.Streams
             _buffer = new byte[OpusConverter.FrameBytes];
         }
 
+        /// <summary>
+        /// Sends silent frames to avoid interpolation errors after breaks in data transmission.
+        /// </summary>
+        /// <returns></returns>
         public async Task WriteSilentFramesAsync()
         {
             // https://discord.com/developers/docs/topics/voice-connections#voice-data-interpolation
