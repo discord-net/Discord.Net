@@ -26,10 +26,11 @@ namespace Discord.Audio.Streams
 
         public async Task WriteSilentFramesAsync()
         {
+            // https://discord.com/developers/docs/topics/voice-connections#voice-data-interpolation
+
             byte[] frameBytes = new byte[OpusConverter.FrameBytes];
 
             // Magic silence numbers.
-            // https://discord.com/developers/docs/topics/voice-connections#voice-data-interpolation
             frameBytes[0] = 0xF8;
             frameBytes[1] = 0xFF;
             frameBytes[2] = 0xFE;
