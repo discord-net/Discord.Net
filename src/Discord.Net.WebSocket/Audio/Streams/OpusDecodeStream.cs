@@ -34,7 +34,7 @@ namespace Discord.Audio.Streams
         }
 
         /// <exception cref="InvalidOperationException">Received payload without an RTP header.</exception>
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             if (!_hasHeader)
                 throw new InvalidOperationException("Received payload without an RTP header.");
@@ -44,7 +44,7 @@ namespace Discord.Audio.Streams
                 ? _decoder.DecodeFrame(buffer, offset, count, _buffer, 0, false)
                 : _decoder.DecodeFrame(null, 0, 0, _buffer, 0, false);
 
-            await _next.WriteAsync(_buffer, 0, count, cancelToken).ConfigureAwait(false);
+            return _next.WriteAsync(_buffer, 0, count, cancelToken);
         }
 
         public override async Task FlushAsync(CancellationToken cancelToken)
