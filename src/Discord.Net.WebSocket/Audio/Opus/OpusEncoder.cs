@@ -49,7 +49,6 @@ namespace Discord.Audio
             CheckError(error);
             CheckError(EncoderCtl(_ptr, OpusCtl.SetSignal, (int)opusSignal));
             CheckError(EncoderCtl(_ptr, OpusCtl.SetPacketLossPercent, packetLoss)); //%
-            CheckError(EncoderCtl(_ptr, OpusCtl.SetInbandFEC, 1)); //True
             CheckError(EncoderCtl(_ptr, OpusCtl.SetBitrate, bitrate));
         }
 

@@ -40,21 +40,11 @@ namespace Discord.Audio.Streams
                 throw new InvalidOperationException("Received payload without an RTP header.");
             _hasHeader = false;
 
-            if (!_nextMissed)
-            {
-                count = _decoder.DecodeFrame(buffer, offset, count, _buffer, 0, false);
-                await _next.WriteAsync(_buffer, 0, count, cancelToken).ConfigureAwait(false);
-            }
-            else if (count > 0)
-            {
-                count = _decoder.DecodeFrame(buffer, offset, count, _buffer, 0, true);
-                await _next.WriteAsync(_buffer, 0, count, cancelToken).ConfigureAwait(false);
-            }
-            else
-            {
-                count = _decoder.DecodeFrame(null, 0, 0, _buffer, 0, true);
-                await _next.WriteAsync(_buffer, 0, count, cancelToken).ConfigureAwait(false);
-            }
+            count = !_nextMissed || count > 0
+                ? _decoder.DecodeFrame(buffer, offset, count, _buffer, 0, false)
+                : _decoder.DecodeFrame(null, 0, 0, _buffer, 0, false);
+
+            await _next.WriteAsync(_buffer, 0, count, cancelToken).ConfigureAwait(false);
         }
 
         public override async Task FlushAsync(CancellationToken cancelToken)
