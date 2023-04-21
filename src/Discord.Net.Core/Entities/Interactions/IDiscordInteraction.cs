@@ -103,8 +103,7 @@ namespace Discord
         /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
         /// <param name="options">The request options for this response.</param>
         /// <returns>
-        ///     A task that represents an asynchronous send operation for delivering the message. The task result
-        ///     contains the sent message.
+        ///     A task that represents an asynchronous send operation for delivering the message.
         /// </returns>
         Task RespondAsync(string text = null, Embed[] embeds = null, bool isTTS = false,
             bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
