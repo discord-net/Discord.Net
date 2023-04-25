@@ -16,13 +16,13 @@ namespace Discord.Rest
         public const double ResponseAndFollowupLimit = 15;
 
         #region InteractionHelper
-        public static bool CanSendResponse(IDiscordInteraction _)
+        public static bool CanSendResponse(IDiscordInteraction interaction)
         {
-            return true;
+            return (DateTime.UtcNow - interaction.CreatedAt).TotalSeconds < ResponseTimeLimit;
         }
-        public static bool CanRespondOrFollowup(IDiscordInteraction _)
+        public static bool CanRespondOrFollowup(IDiscordInteraction interaction)
         {
-            return true;
+            return (DateTime.UtcNow - interaction.CreatedAt).TotalMinutes <= ResponseAndFollowupLimit;
         }
 
         public static Task DeleteAllGuildCommandsAsync(BaseDiscordClient client, ulong guildId, RequestOptions options = null)
