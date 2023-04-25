@@ -35,7 +35,7 @@ public struct SocketMemberRoleEditInfo
     /// </returns>
     public bool Added { get; }
     /// <summary>
-    ///     Gets a value indicating whether the role has been deleted from the user
+    ///     Gets a value indicating that the user role has been removed.
     /// </summary>
     /// <returns>
     /// <c>true</c> if the role has been removed from the user; otherwise <c>false</c>.
