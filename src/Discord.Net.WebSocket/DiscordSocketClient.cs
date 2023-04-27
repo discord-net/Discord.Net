@@ -37,6 +37,7 @@ namespace Discord.WebSocket
         private readonly ConnectionManager _connection;
         private readonly Logger _gatewayLogger;
         private readonly SemaphoreSlim _stateLock;
+        private readonly ConcurrentDictionary<string, TaskCompletionSource<bool>> _guildMembersRequestTasks;
 
         private string _sessionId;
         private int _lastSeq;
@@ -51,6 +52,7 @@ namespace Discord.WebSocket
         private GatewayIntents _gatewayIntents;
         private ImmutableArray<StickerPack<SocketSticker>> _defaultStickers;
         private SocketSelfUser _previousSessionUser;
+        private long _guildMembersRequestCounter;
 
         /// <summary>
         ///     Provides access to a REST-only client with a shared state from this client.
@@ -182,6 +184,8 @@ namespace Discord.WebSocket
                 _gatewayLogger.WarningAsync("Serializer Error", e.ErrorContext.Error).GetAwaiter().GetResult();
                 e.ErrorContext.Handled = true;
             };
+
+            _guildMembersRequestTasks = new ConcurrentDictionary<string, TaskCompletionSource<bool>>();
 
             ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.ReceivedGatewayEvent += ProcessMessageAsync;
@@ -627,30 +631,33 @@ namespace Discord.WebSocket
         {
             var cachedGuilds = guilds.ToImmutableArray();
 
-            const short batchSize = 1;
-            ulong[] batchIds = new ulong[Math.Min(batchSize, cachedGuilds.Length)];
-            Task[] batchTasks = new Task[batchIds.Length];
-            int batchCount = (cachedGuilds.Length + (batchSize - 1)) / batchSize;
-
-            for (int i = 0, k = 0; i < batchCount; i++)
+            foreach (var guild in cachedGuilds)
             {
-                bool isLast = i == batchCount - 1;
-                int count = isLast ? (cachedGuilds.Length - (batchCount - 1) * batchSize) : batchSize;
-
-                for (int j = 0; j < count; j++, k++)
-                {
-                    var guild = cachedGuilds[k];
-                    batchIds[j] = guild.Id;
-                    batchTasks[j] = guild.DownloaderPromise;
-                }
-
-                await ApiClient.SendRequestMembersAsync(batchIds).ConfigureAwait(false);
-
-                if (isLast && batchCount > 1)
-                    await Task.WhenAll(batchTasks.Take(count)).ConfigureAwait(false);
-                else
-                    await Task.WhenAll(batchTasks).ConfigureAwait(false);
+                await ApiClient.SendRequestMembersAsync(guild.Id).ConfigureAwait(false);
+                await guild.DownloaderPromise.ConfigureAwait(false);
             }
+        }
+
+        public async Task DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds)
+        {
+            if (ConnectionState == ConnectionState.Connected)
+            {
+                EnsureGatewayIntent(GatewayIntents.GuildMembers);
+
+                var socketGuild = GetGuild(guild.Id);
+                if (socketGuild != null)
+                {
+                    await ProcessUserDownloadsAsync(socketGuild, userIds).ConfigureAwait(false);
+                }
+            }
+        }
+
+
+        private async Task ProcessUserDownloadsAsync(SocketGuild guild, IEnumerable<ulong> userIds)
+        {
+            var nonce = Interlocked.Increment(ref _guildMembersRequestCounter).ToString();
+            _guildMembersRequestTasks.TryAdd(nonce, new TaskCompletionSource<bool>());
+            await ApiClient.SendRequestMembersAsync(guild.Id, userIds, nonce).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -1409,6 +1416,13 @@ namespace Discord.WebSocket
                                         {
                                             guild.CompleteDownloadUsers();
                                             await TimedInvokeAsync(_guildMembersDownloadedEvent, nameof(GuildMembersDownloaded), guild).ConfigureAwait(false);
+                                        }
+
+                                        if (data.Nonce != null
+                                            && data.ChunkIndex + 1 >= data.ChunkCount
+                                            && _guildMembersRequestTasks.TryRemove(data.Nonce, out var tcs))
+                                        {
+                                            tcs.TrySetResult(true);
                                         }
                                     }
                                     else
@@ -2904,7 +2918,7 @@ namespace Discord.WebSocket
                             }
                             break;
                             #endregion
-                            
+
                             #region Auto Moderation
 
                             case "AUTO_MODERATION_RULE_CREATE":

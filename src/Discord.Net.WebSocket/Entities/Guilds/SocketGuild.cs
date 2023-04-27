@@ -1260,6 +1260,12 @@ namespace Discord.WebSocket
         {
             await Discord.DownloadUsersAsync(new[] { this }).ConfigureAwait(false);
         }
+
+        public async Task DownloadUsersAsync(IEnumerable<ulong> userIds)
+        {
+            await Discord.DownloadUsersAsync(this, userIds).ConfigureAwait(false);
+        }
+
         internal void CompleteDownloadUsers()
         {
             _downloaderPromise.TrySetResultAsync(true);
@@ -1406,7 +1412,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of the requested audit log entries.
-        /// </returns>        
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null, ActionType? actionType = null, ulong? afterId = null)
             => GuildHelper.GetAuditLogsAsync(this, Discord, beforeId, limit, options, userId: userId, actionType: actionType, afterId: afterId);
 

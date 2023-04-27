@@ -379,11 +379,17 @@ namespace Discord.API
             options.BucketId = GatewayBucket.Get(GatewayBucketType.PresenceUpdate).Id;
             await SendGatewayAsync(GatewayOpCode.PresenceUpdate, args, options: options).ConfigureAwait(false);
         }
-        public async Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
+        public async Task SendRequestMembersAsync(ulong guildId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            await SendGatewayAsync(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildIds = guildIds, Query = "", Limit = 0 }, options: options).ConfigureAwait(false);
+            await SendGatewayAsync(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildId = guildId, Query = "", Limit = 0 }, options: options).ConfigureAwait(false);
         }
+        public async Task SendRequestMembersAsync(ulong guildId, IEnumerable<ulong> userIds, string nonce, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            await SendGatewayAsync(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildId = guildId, Limit = 0, UserIds = userIds, Nonce = nonce }, options: options).ConfigureAwait(false);
+        }
+
         public async Task SendVoiceStateUpdateAsync(ulong guildId, ulong? channelId, bool selfDeaf, bool selfMute, RequestOptions options = null)
         {
             var payload = new VoiceStateUpdateParams
