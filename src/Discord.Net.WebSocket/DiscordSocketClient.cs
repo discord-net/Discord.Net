@@ -638,7 +638,8 @@ namespace Discord.WebSocket
             }
         }
 
-        public async Task DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds)
+        /// <inheritdoc />
+        public override async Task DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds)
         {
             if (ConnectionState == ConnectionState.Connected)
             {

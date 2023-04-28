@@ -235,6 +235,15 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous download operation.
         /// </returns>
         public abstract Task DownloadUsersAsync(IEnumerable<IGuild> guilds);
+        /// <summary>
+        ///     Attempts to download specific users into the user cache for the selected guilds.
+        /// </summary>
+        /// <param name="guild">The guild to download the members from.</param>
+        /// <param name="userIds">The list of Discord user IDs to download.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous download operation.
+        /// </returns>
+        public abstract Task DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds);
 
         /// <summary>
         ///     Creates a guild for the logged-in user who is in less than 10 active guilds.
