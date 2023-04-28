@@ -656,8 +656,10 @@ namespace Discord.WebSocket
         private async Task ProcessUserDownloadsAsync(SocketGuild guild, IEnumerable<ulong> userIds)
         {
             var nonce = Interlocked.Increment(ref _guildMembersRequestCounter).ToString();
-            _guildMembersRequestTasks.TryAdd(nonce, new TaskCompletionSource<bool>());
+            var tcs = new TaskCompletionSource<bool>();
+            _guildMembersRequestTasks.TryAdd(nonce, tcs);
             await ApiClient.SendRequestMembersAsync(guild.Id, userIds, nonce).ConfigureAwait(false);
+            await tcs.Task.ConfigureAwait(false);
         }
 
         /// <inheritdoc />
