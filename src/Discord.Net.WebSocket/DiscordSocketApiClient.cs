@@ -386,8 +386,15 @@ namespace Discord.API
         }
         public async Task SendRequestMembersAsync(ulong guildId, IEnumerable<ulong> userIds, string nonce, RequestOptions options = null)
         {
+            var payload = new RequestMembersParams
+            {
+                GuildId = guildId,
+                Limit = 0,
+                UserIds = new Optional<IEnumerable<ulong>>(userIds),
+                Nonce = nonce
+            };
             options = RequestOptions.CreateOrClone(options);
-            await SendGatewayAsync(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildId = guildId, Limit = 0, UserIds = userIds, Nonce = nonce }, options: options).ConfigureAwait(false);
+            await SendGatewayAsync(GatewayOpCode.RequestGuildMembers, payload, options: options).ConfigureAwait(false);
         }
 
         public async Task SendVoiceStateUpdateAsync(ulong guildId, ulong? channelId, bool selfDeaf, bool selfMute, RequestOptions options = null)

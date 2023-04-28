@@ -959,6 +959,17 @@ namespace Discord
         /// </returns>
         Task DownloadUsersAsync();
         /// <summary>
+        ///     Downloads specific users for this guild.
+        /// </summary>
+        /// <remarks>
+        ///     This method downloads all users specified in <paramref name="userIds" /> through the Gateway and caches them.
+        /// </remarks>
+        /// <param name="userIds">The list of Discord user IDs to download</param>
+        /// <returns>
+        ///     A task that represents the asynchronous download operation.
+        /// </returns>
+        Task DownloadUsersAsync(IEnumerable<ulong> userIds);
+        /// <summary>
         ///     Prunes inactive users.
         /// </summary>
         /// <remarks>

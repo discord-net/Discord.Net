@@ -383,7 +383,7 @@ namespace Discord.WebSocket
         ///         </para>
         ///         <para>
         ///             Otherwise, you may need to enable <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/> to fetch
-        ///             the full user list upon startup, or use <see cref="DownloadUsersAsync"/> to manually download
+        ///             the full user list upon startup, or use <see cref="DownloadUsersAsync()"/> to manually download
         ///             the users.
         ///         </para>
         ///     </note>
@@ -1261,6 +1261,7 @@ namespace Discord.WebSocket
             await Discord.DownloadUsersAsync(new[] { this }).ConfigureAwait(false);
         }
 
+        /// <inheritdoc />
         public async Task DownloadUsersAsync(IEnumerable<ulong> userIds)
         {
             await Discord.DownloadUsersAsync(this, userIds).ConfigureAwait(false);

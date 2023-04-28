@@ -1512,6 +1512,10 @@ namespace Discord.Rest
         Task IGuild.DownloadUsersAsync() =>
             throw new NotSupportedException();
         /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Downloading users is not supported for a REST-based guild.</exception>
+        Task IGuild.DownloadUsersAsync(IEnumerable<ulong> userIds) =>
+            throw new NotSupportedException();
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IGuildUser>> IGuild.SearchUsersAsync(string query, int limit, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -1604,7 +1608,7 @@ namespace Discord.Rest
         /// <inheritdoc/>
         async Task<IAutoModRule> IGuild.CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options)
             => await CreateAutoModRuleAsync(props, options).ConfigureAwait(false);
-        
+
         /// <inheritdoc/>
         async Task<IGuildOnboarding> IGuild.GetOnboardingAsync(RequestOptions options)
             => await GetOnboardingAsync(options);

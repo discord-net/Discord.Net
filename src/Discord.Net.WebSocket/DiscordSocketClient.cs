@@ -1418,9 +1418,9 @@ namespace Discord.WebSocket
                                             await TimedInvokeAsync(_guildMembersDownloadedEvent, nameof(GuildMembersDownloaded), guild).ConfigureAwait(false);
                                         }
 
-                                        if (data.Nonce != null
+                                        if (data.Nonce.IsSpecified
                                             && data.ChunkIndex + 1 >= data.ChunkCount
-                                            && _guildMembersRequestTasks.TryRemove(data.Nonce, out var tcs))
+                                            && _guildMembersRequestTasks.TryRemove(data.Nonce.Value, out var tcs))
                                         {
                                             tcs.TrySetResult(true);
                                         }
