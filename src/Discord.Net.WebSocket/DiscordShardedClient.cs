@@ -394,6 +394,7 @@ namespace Discord.WebSocket
                 if (GetShardIdFor(guild) == id)
                 {
                     await _shards[i].DownloadUsersAsync(guild, userIds).ConfigureAwait(false);
+                    break;
                 }
             }
         }
