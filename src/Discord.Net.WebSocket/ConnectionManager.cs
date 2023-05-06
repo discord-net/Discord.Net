@@ -25,17 +25,22 @@ namespace Discord
 
         private bool _isDisposed;
 
+        private bool _handleConnectionClosedException;
+
         public ConnectionState State { get; private set; }
         public CancellationToken CancelToken { get; private set; }
 
         internal ConnectionManager(SemaphoreSlim stateLock, Logger logger, int connectionTimeout,
-            Func<Task> onConnecting, Func<Exception, Task> onDisconnecting, Action<Func<Exception, Task>> clientDisconnectHandler)
+            Func<Task> onConnecting, Func<Exception, Task> onDisconnecting, Action<Func<Exception, Task>> clientDisconnectHandler,
+            bool handleConnectionClosedException = true)
         {
             _stateLock = stateLock;
             _logger = logger;
             _connectionTimeout = connectionTimeout;
             _onConnecting = onConnecting;
             _onDisconnecting = onDisconnecting;
+
+            _handleConnectionClosedException = handleConnectionClosedException;
 
             clientDisconnectHandler(ex =>
             {

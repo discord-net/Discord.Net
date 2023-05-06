@@ -123,7 +123,7 @@ namespace Discord.Net.Udp
                 var newData = new byte[count];
                 Buffer.BlockCopy(data, index, newData, 0, count);
                 data = newData;
-            }
+            } 
             await _udp.SendAsync(data, count, _destination).ConfigureAwait(false);
         }
 
