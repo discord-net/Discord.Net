@@ -1,4 +1,4 @@
-using Discord.API; 
+using Discord.API;
 using Discord.API.Voice;
 using Discord.Net.Converters;
 using Discord.Net.Udp;
@@ -36,8 +36,6 @@ namespace Discord.Audio
         private readonly AsyncEvent<Func<byte[], Task>> _receivedPacketEvent = new AsyncEvent<Func<byte[], Task>>();
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
-        public event Func<Task> ConnectionClosed { add { _connectionClosedEvent.Add(value); } remove { _connectionClosedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<Task>> _connectionClosedEvent = new AsyncEvent<Func<Task>>();
 
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
@@ -92,7 +90,8 @@ namespace Discord.Audio
             };
             WebSocketClient.Closed += async ex =>
             {
-                await _connectionClosedEvent.InvokeAsync().ConfigureAwait(false);
+                await DisconnectAsync().ConfigureAwait(false);
+                await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
             };
 
             _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
@@ -130,15 +129,6 @@ namespace Discord.Audio
         #endregion
 
         #region WebSocket
-        public async Task SendResumeConnectionAsync(string sessionId, string token)
-        {
-            await SendAsync(VoiceOpCode.Resume, new ResumeParams
-            {
-                GuildId = GuildId,
-                SessionId = sessionId,
-                Token = token
-            }).ConfigureAwait(false);
-        }
         public async Task SendHeartbeatAsync(RequestOptions options = null)
         {
             await SendAsync(VoiceOpCode.Heartbeat, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), options: options).ConfigureAwait(false);
