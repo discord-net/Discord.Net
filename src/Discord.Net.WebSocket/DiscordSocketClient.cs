@@ -1975,12 +1975,13 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (PRESENCE_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Presence>(_serializer);
+                                    SocketGuild guild = null;
 
                                     SocketUser user = null;
 
                                     if (data.GuildId.IsSpecified)
                                     {
-                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        guild = State.GetGuild(data.GuildId.Value);
                                         if (guild == null)
                                         {
                                             await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
@@ -2024,7 +2025,7 @@ namespace Discord.WebSocket
                                     var before = user.Presence?.Clone();
                                     user.Update(State, data.User);
                                     user.Update(data);
-                                    await TimedInvokeAsync(_presenceUpdated, nameof(PresenceUpdated), user, before, user.Presence).ConfigureAwait(false);
+                                    await TimedInvokeAsync(_presenceUpdated, nameof(PresenceUpdated), user, guild, before, user.Presence).ConfigureAwait(false);
                                 }
                                 break;
                             case "TYPING_START":
@@ -2904,7 +2905,7 @@ namespace Discord.WebSocket
                             }
                             break;
                             #endregion
-                            
+
                             #region Auto Moderation
 
                             case "AUTO_MODERATION_RULE_CREATE":

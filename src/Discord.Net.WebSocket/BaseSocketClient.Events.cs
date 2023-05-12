@@ -531,12 +531,12 @@ namespace Discord.WebSocket
         #region Presence
 
         /// <summary> Fired when a users presence is updated. </summary>
-        public event Func<SocketUser, SocketPresence, SocketPresence, Task> PresenceUpdated
+        public event Func<SocketUser, SocketGuild, SocketPresence, SocketPresence, Task> PresenceUpdated
         {
             add { _presenceUpdated.Add(value); }
             remove { _presenceUpdated.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<SocketUser, SocketPresence, SocketPresence, Task>> _presenceUpdated = new AsyncEvent<Func<SocketUser, SocketPresence, SocketPresence, Task>>();
+        internal readonly AsyncEvent<Func<SocketUser, SocketGuild, SocketPresence, SocketPresence, Task>> _presenceUpdated = new AsyncEvent<Func<SocketUser, SocketGuild, SocketPresence, SocketPresence, Task>>();
 
         #endregion
 
@@ -907,7 +907,7 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<SocketAuditLogEntry, SocketGuild, Task>> _auditLogCreated = new();
 
         #endregion
-        
+
         #region AutoModeration
 
         /// <summary>
@@ -949,7 +949,7 @@ namespace Discord.WebSocket
             remove => _autoModActionExecuted.Remove(value);
         }
         internal readonly AsyncEvent<Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task>> _autoModActionExecuted = new ();
-        
+
         #endregion
     }
 }
