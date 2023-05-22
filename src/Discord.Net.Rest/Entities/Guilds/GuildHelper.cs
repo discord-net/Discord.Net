@@ -1244,11 +1244,11 @@ namespace Discord.Rest
                                   || args.RegexPatterns.IsSpecified
                                   || args.AllowList.IsSpecified ? new API.TriggerMetadata
                 {
-                    KeywordFilter = args.KeywordFilter,
-                    RegexPatterns = args.RegexPatterns,
-                    AllowList = args.AllowList,
-                    MentionLimit = args.MentionLimit,
-                    Presets = args.Presets
+                    KeywordFilter = args.KeywordFilter.IsSpecified ? args.KeywordFilter : rule.KeywordFilter.ToArray(),
+                    RegexPatterns = args.RegexPatterns.IsSpecified ? args.RegexPatterns : rule.RegexPatterns.ToArray(),
+                    AllowList = args.AllowList.IsSpecified ? args.AllowList : rule.AllowList.ToArray(),
+                    MentionLimit = args.MentionLimit.IsSpecified ? args.MentionLimit : rule.MentionTotalLimit ?? Optional<int>.Unspecified,
+                    Presets = args.Presets.IsSpecified ? args.Presets : rule.Presets.ToArray(),
                 } : Optional<API.TriggerMetadata>.Unspecified
             };
 
