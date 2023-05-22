@@ -1238,7 +1238,11 @@ namespace Discord.Rest
                 ExemptRoles = args.ExemptRoles,
                 Name = args.Name,
                 TriggerType = args.TriggerType,
-                TriggerMetadata = args.KeywordFilter.IsSpecified || args.Presets.IsSpecified ? new API.TriggerMetadata
+                TriggerMetadata = args.KeywordFilter.IsSpecified
+                                  || args.Presets.IsSpecified
+                                  || args.MentionLimit.IsSpecified
+                                  || args.RegexPatterns.IsSpecified
+                                  || args.AllowList.IsSpecified ? new API.TriggerMetadata
                 {
                     KeywordFilter = args.KeywordFilter.GetValueOrDefault(Array.Empty<string>()),
                     RegexPatterns = args.RegexPatterns.GetValueOrDefault(Array.Empty<string>()),
