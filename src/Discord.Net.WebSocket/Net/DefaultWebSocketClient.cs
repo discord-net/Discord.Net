@@ -120,16 +120,19 @@ namespace Discord.Net.WebSockets
                     {
                         await _client.CloseOutputAsync(status, "", new CancellationToken());
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.ToString());
-                    }
+                    catch { }
                 }
+
                 try
-                { _client.Dispose(); }
+                {
+                    _client.Dispose();
+                }
                 catch { }
+
                 try
-                { _disconnectTokenSource.Cancel(false); }
+                {
+                    _disconnectTokenSource.Cancel(false);
+                }
                 catch { }
 
                 _client = null;
