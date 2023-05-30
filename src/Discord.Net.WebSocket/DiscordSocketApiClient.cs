@@ -279,14 +279,16 @@ namespace Discord.API
                 return;
             ConnectionState = ConnectionState.Disconnecting;
 
-            try
-            { _connectCancelToken?.Cancel(false); }
-            catch { }
-
             if (ex is GatewayReconnectException)
                 await WebSocketClient.DisconnectAsync(4000).ConfigureAwait(false);
             else
                 await WebSocketClient.DisconnectAsync().ConfigureAwait(false);
+
+            try
+            {
+                _connectCancelToken?.Cancel(false);
+            }
+            catch { }
 
             ConnectionState = ConnectionState.Disconnected;
         }

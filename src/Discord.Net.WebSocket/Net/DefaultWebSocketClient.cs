@@ -110,9 +110,6 @@ namespace Discord.Net.WebSockets
         {
             _isDisconnecting = true;
 
-            try
-            { _disconnectTokenSource.Cancel(false); }
-            catch { }
 
             if (_client != null)
             {
@@ -120,11 +117,19 @@ namespace Discord.Net.WebSockets
                 {
                     var status = (WebSocketCloseStatus)closeCode;
                     try
-                    { await _client.CloseOutputAsync(status, "", new CancellationToken()); }
-                    catch { }
+                    {
+                        await _client.CloseOutputAsync(status, "", new CancellationToken());
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
                 }
                 try
                 { _client.Dispose(); }
+                catch { }
+                try
+                { _disconnectTokenSource.Cancel(false); }
                 catch { }
 
                 _client = null;
