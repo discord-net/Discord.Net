@@ -5,7 +5,7 @@ namespace Discord.API
     /// <summary>
     /// Represents a vanity invite.
     /// </summary>
-    public class InviteVanity
+    internal class InviteVanity
     {
         /// <summary>
         /// The unique code for the invite link.
