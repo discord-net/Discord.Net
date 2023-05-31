@@ -27,21 +27,21 @@ namespace Discord
         ///     Gets a value that indicates whether the role can be separated in the user list.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if users of this role are separated in the user list; otherwise <c>false</c>.
+        ///     <see langword="true" /> if users of this role are separated in the user list; otherwise <see langword="false" />.
         /// </returns>
         bool IsHoisted { get; }
         /// <summary>
         ///     Gets a value that indicates whether the role is managed by Discord.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this role is automatically managed by Discord; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this role is automatically managed by Discord; otherwise <see langword="false" />.
         /// </returns>
         bool IsManaged { get; }
         /// <summary>
         ///     Gets a value that indicates whether the role is mentionable.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this role may be mentioned in messages; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this role may be mentioned in messages; otherwise <see langword="false" />.
         /// </returns>
         bool IsMentionable { get; }
         /// <summary>

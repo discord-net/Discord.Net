@@ -71,7 +71,7 @@ namespace Discord.WebSocket
         /// <param name="id">TThe ID of the message.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     The message gotten from either the cache or the download, or <c>null</c> if none is found.
+        ///     The message gotten from either the cache or the download, or <see langword="null" /> if none is found.
         /// </returns>
         public async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)
         {
@@ -215,7 +215,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="id">The snowflake identifier of the user.</param>
         /// <returns>
-        ///     A <see cref="SocketUser"/> object that is a recipient of this channel; otherwise <c>null</c>.
+        ///     A <see cref="SocketUser"/> object that is a recipient of this channel; otherwise <see langword="null" />.
         /// </returns>
         public new SocketUser GetUser(ulong id)
         {

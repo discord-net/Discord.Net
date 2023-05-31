@@ -7,11 +7,11 @@ namespace Discord
         /// </summary>
         string Name { get; }
         /// <summary>
-        ///     Gets the icon URL associated with this guild, or <c>null</c> if one is not set.
+        ///     Gets the icon URL associated with this guild, or <see langword="null" /> if one is not set.
         /// </summary>
         string IconUrl { get; }
         /// <summary>
-        ///     Returns <c>true</c> if the current user owns this guild.
+        ///     Returns <see langword="true" /> if the current user owns this guild.
         /// </summary>
         bool IsOwner { get; }
         /// <summary>

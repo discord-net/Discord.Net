@@ -43,7 +43,7 @@ public class ThreadCreateAuditLogData : IAuditLogData
     ///     Gets the thread that was created if it still exists.
     /// </summary>
     /// <returns>
-    ///     A thread object representing the thread that was created if it still exists, otherwise returns <c>null</c>.
+    ///     A thread object representing the thread that was created if it still exists, otherwise returns <see langword="null" />.
     /// </returns>
     public IThreadChannel Thread { get; }
 
@@ -75,7 +75,7 @@ public class ThreadCreateAuditLogData : IAuditLogData
     ///     Gets the value that indicates whether the thread is archived.
     /// </summary>
     /// <returns>
-    ///     <c>true</c> if this thread has the Archived flag enabled; otherwise <c>false</c>.
+    ///     <see langword="true" /> if this thread has the Archived flag enabled; otherwise <see langword="false" />.
     /// </returns>
     public bool IsArchived { get; }
 
@@ -91,7 +91,7 @@ public class ThreadCreateAuditLogData : IAuditLogData
     ///     Gets the value that indicates whether the thread is locked.
     /// </summary>
     /// <returns>
-    ///     <c>true</c> if this thread has the Locked flag enabled; otherwise <c>false</c>.
+    ///     <see langword="true" /> if this thread has the Locked flag enabled; otherwise <see langword="false" />.
     /// </returns>
     public bool IsLocked { get; }
 
@@ -101,7 +101,7 @@ public class ThreadCreateAuditLogData : IAuditLogData
     /// <returns>
     ///     An <see cref="int"/> representing the time in seconds required before the user can send another
     ///     message; <c>0</c> if disabled.
-    ///     <c>null</c> if this is not mentioned in this entry.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public int? SlowModeInterval { get; }
 

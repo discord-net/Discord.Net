@@ -34,7 +34,7 @@ namespace Discord.Commands
         /// <param name="embed">An embed to be displayed alongside the <paramref name="message"/>.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the <paramref name="message"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>

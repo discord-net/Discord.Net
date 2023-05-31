@@ -21,28 +21,28 @@ namespace Discord
         ///     Gets the value that indicates whether this message was meant to be read-aloud by Discord.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this message was sent as a text-to-speech message; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this message was sent as a text-to-speech message; otherwise <see langword="false" />.
         /// </returns>
         bool IsTTS { get; }
         /// <summary>
         ///     Gets the value that indicates whether this message is pinned.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this message was added to its channel's pinned messages; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this message was added to its channel's pinned messages; otherwise <see langword="false" />.
         /// </returns>
         bool IsPinned { get; }
         /// <summary>
         ///     Gets the value that indicates whether or not this message's embeds are suppressed.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the embeds in this message have been suppressed (made invisible); otherwise <c>false</c>.
+        ///     <see langword="true" /> if the embeds in this message have been suppressed (made invisible); otherwise <see langword="false" />.
         /// </returns>
         bool IsSuppressed { get; }
         /// <summary>
         ///     Gets the value that indicates whether this message mentioned everyone.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this message mentioned everyone; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this message mentioned everyone; otherwise <see langword="false" />.
         /// </returns>
         bool MentionedEveryone { get; }
         /// <summary>
@@ -76,7 +76,7 @@ namespace Discord
         ///     Gets the time of this message's last edit.
         /// </summary>
         /// <returns>
-        ///     Time of when the message was last edited; <c>null</c> if the message is never edited.
+        ///     Time of when the message was last edited; <see langword="null" /> if the message is never edited.
         /// </returns>
         DateTimeOffset? EditedTimestamp { get; }
 

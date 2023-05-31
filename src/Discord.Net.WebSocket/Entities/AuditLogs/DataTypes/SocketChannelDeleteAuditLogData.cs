@@ -96,7 +96,7 @@ public class SocketChannelDeleteAuditLogData : ISocketAuditLogData
     /// <returns>
     ///     An <see cref="int"/> representing the time in seconds required before the user can send another
     ///     message; <c>0</c> if disabled.
-    ///     <c>null</c> if this is not mentioned in this entry.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public int? SlowModeInterval { get; }
 
@@ -104,8 +104,8 @@ public class SocketChannelDeleteAuditLogData : ISocketAuditLogData
     ///     Gets the value that indicates whether the deleted channel was NSFW.
     /// </summary>
     /// <returns>
-    ///     <c>true</c> if this channel had the NSFW flag enabled; otherwise <c>false</c>.
-    ///     <c>null</c> if this is not mentioned in this entry.
+    ///     <see langword="true" /> if this channel had the NSFW flag enabled; otherwise <see langword="false" />.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public bool? IsNsfw { get; }
 
@@ -114,7 +114,7 @@ public class SocketChannelDeleteAuditLogData : ISocketAuditLogData
     /// </summary>
     /// <returns>
     ///     An <see cref="int"/> representing the bit-rate set of the voice channel.
-    ///     <c>null</c> if this is not mentioned in this entry.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public int? Bitrate { get; }
 

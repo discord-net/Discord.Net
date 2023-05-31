@@ -31,7 +31,7 @@ namespace Discord.WebSocket
         ///     Gets the parent (category) of this channel in the guild's channel list.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ICategoryChannel"/> representing the parent of this channel; <c>null</c> if none is set.
+        ///     An <see cref="ICategoryChannel"/> representing the parent of this channel; <see langword="null" /> if none is set.
         /// </returns>
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
@@ -151,7 +151,7 @@ namespace Discord.WebSocket
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents an asynchronous get operation for retrieving the message. The task result contains
-        ///     the retrieved message; <c>null</c> if no message is found with the specified identifier.
+        ///     the retrieved message; <see langword="null" /> if no message is found with the specified identifier.
         /// </returns>
         public virtual async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)
         {
@@ -332,7 +332,7 @@ namespace Discord.WebSocket
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a webhook associated
-        ///     with the identifier; <c>null</c> if the webhook is not found.
+        ///     with the identifier; <see langword="null" /> if the webhook is not found.
         /// </returns>
         public virtual Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);

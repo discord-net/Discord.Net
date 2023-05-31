@@ -31,7 +31,7 @@ namespace Discord.WebSocket
         public const string GatewayEncoding = "json";
 
         /// <summary>
-        ///     Gets or sets the WebSocket host to connect to. If <c>null</c>, the client will use the
+        ///     Gets or sets the WebSocket host to connect to. If <see langword="null" />, the client will use the
         ///     /gateway endpoint.
         /// </summary>
         public string GatewayHost { get; set; } = null;
@@ -136,7 +136,7 @@ namespace Discord.WebSocket
 
         /// <summary>
         ///     Gets or sets the timeout for event handlers, in milliseconds, after which a warning will be logged.
-        ///     Setting this property to <c>null</c>disables this check.
+        ///     Setting this property to <see langword="null" />disables this check.
         /// </summary>
         public int? HandlerTimeout { get; set; } = 3000;
 

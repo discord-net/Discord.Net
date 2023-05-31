@@ -28,7 +28,7 @@ public interface IIntegrationChannel : IGuildChannel
     /// <param name="options">The options to be used when sending the request.</param>
     /// <returns>
     ///     A task that represents the asynchronous get operation. The task result contains a webhook associated
-    ///     with the identifier; <c>null</c> if the webhook is not found.
+    ///     with the identifier; <see langword="null" /> if the webhook is not found.
     /// </returns>
     Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
 

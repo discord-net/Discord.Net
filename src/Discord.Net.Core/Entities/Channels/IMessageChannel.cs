@@ -25,7 +25,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
@@ -67,7 +67,7 @@ namespace Discord
         /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
@@ -105,7 +105,7 @@ namespace Discord
         /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
@@ -135,7 +135,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
@@ -165,7 +165,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
@@ -186,7 +186,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents an asynchronous get operation for retrieving the message. The task result contains
-        ///     the retrieved message; <c>null</c> if no message is found with the specified identifier.
+        ///     the retrieved message; <see langword="null" /> if no message is found with the specified identifier.
         /// </returns>
         Task<IMessage> GetMessageAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 

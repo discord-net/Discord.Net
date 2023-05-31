@@ -23,7 +23,7 @@ namespace Discord.Commands
         /// </summary>
         /// <returns>
         ///     A <see cref="ParameterInfo" /> indicating the parameter info of the error that may have occurred during parsing; 
-        ///     <c>null</c> if the parsing was successful or the parsing error is not specific to a single parameter.
+        ///     <see langword="null" /> if the parsing was successful or the parsing error is not specific to a single parameter.
         /// </returns>
         public ParameterInfo ErrorParameter { get; }
 

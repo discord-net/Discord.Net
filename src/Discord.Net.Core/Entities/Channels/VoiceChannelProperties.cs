@@ -12,7 +12,7 @@ public class VoiceChannelProperties : TextChannelProperties
     /// </summary>
     public Optional<int> Bitrate { get; set; }
     /// <summary>
-    ///     Gets or sets the maximum number of users that can be present in a channel, or <c>null</c> if none.
+    ///     Gets or sets the maximum number of users that can be present in a channel, or <see langword="null" /> if none.
     /// </summary>
     public Optional<int?> UserLimit { get; set; }
     /// <summary>

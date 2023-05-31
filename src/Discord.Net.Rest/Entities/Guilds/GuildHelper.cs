@@ -16,7 +16,7 @@ namespace Discord.Rest
     internal static class GuildHelper
     {
         #region General
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null" />.</exception>
         public static async Task<Model> ModifyAsync(IGuild guild, BaseDiscordClient client,
             Action<GuildProperties> func, RequestOptions options)
         {
@@ -90,7 +90,7 @@ namespace Discord.Rest
 
             return await client.ApiClient.ModifyGuildAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null" />.</exception>
         public static async Task<WidgetModel> ModifyWidgetAsync(IGuild guild, BaseDiscordClient client,
             Action<GuildWidgetProperties> func, RequestOptions options)
         {
@@ -230,7 +230,7 @@ namespace Discord.Rest
             var models = await client.ApiClient.GetGuildChannelsAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestGuildChannel.Create(client, guild, x)).ToImmutableArray();
         }
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestTextChannel> CreateTextChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<TextChannelProperties> func = null)
         {
@@ -261,7 +261,7 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
         }
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestVoiceChannel> CreateVoiceChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<VoiceChannelProperties> func = null)
         {
@@ -320,7 +320,7 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestStageChannel.Create(client, guild, model);
         }
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<GuildChannelProperties> func = null)
         {
@@ -348,7 +348,7 @@ namespace Discord.Rest
             return RestCategoryChannel.Create(client, guild, model);
         }
 
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestForumChannel> CreateForumChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<ForumChannelProperties> func = null)
         {
@@ -466,7 +466,7 @@ namespace Discord.Rest
         #endregion
 
         #region Roles
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
             string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options)
         {
@@ -685,7 +685,7 @@ namespace Discord.Rest
             var emote = await client.ApiClient.CreateGuildEmoteAsync(guild.Id, apiargs, options).ConfigureAwait(false);
             return emote.ToEntity();
         }
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null" />.</exception>
         public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func,
             RequestOptions options)
         {
