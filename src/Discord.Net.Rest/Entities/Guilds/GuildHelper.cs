@@ -1100,7 +1100,7 @@ namespace Discord.Rest
             if (!args.Name.IsSpecified || string.IsNullOrWhiteSpace(args.Name.Value))
                 throw new ArgumentException("Name of the rule must not be empty", paramName: nameof(args.Name));
 
-            Preconditions.AtLeast(1, args.Actions.GetValueOrDefault(Array.Empty<AutoModRuleActionProperties>()).Length, nameof(args.Actions), "Auto moderation rule must have at least 1 action");
+            Preconditions.AtLeast(args.Actions.GetValueOrDefault(Array.Empty<AutoModRuleActionProperties>()).Length, 1, nameof(args.Actions), "Auto moderation rule must have at least 1 action");
 
             if (args.RegexPatterns.IsSpecified)
             {
