@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net.WebSocket" Version="3.8.1"/>
+    <PackageReference Include="Discord.Net.WebSocket" Version="3.10.0"/>
   </ItemGroup>
 
 </Project>
