@@ -202,9 +202,9 @@ namespace Discord
                             return "";
                     case TagHandling.Sanitize:
                         if (guildUser != null && guildUser.Nickname == null)
-                            return MentionUser($"{SanitizeChar}{tag.Key}", false);
+                            return MentionUser($"{SanitizeChar}{tag.Key}");
                         else
-                            return MentionUser($"{SanitizeChar}{tag.Key}", true);
+                            return MentionUser($"{SanitizeChar}{tag.Key}");
                 }
             }
             return "";
