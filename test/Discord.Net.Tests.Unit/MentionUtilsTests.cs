@@ -18,7 +18,6 @@ namespace Discord
         {
             Assert.Equal("<@123>", MentionUtils.MentionUser(123u));
             Assert.Equal("<@123>", MentionUtils.MentionUser("123"));
-            Assert.Equal("<@123>", MentionUtils.MentionUser("123"));
         }
         /// <summary>
         ///     Tests <see cref="MentionUtils.MentionChannel(string)"/>
