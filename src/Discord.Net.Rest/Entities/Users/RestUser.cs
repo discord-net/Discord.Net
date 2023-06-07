@@ -125,7 +125,9 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public string GetDefaultAvatarUrl()
-            => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
+            => DiscriminatorValue != 0
+                ? CDN.GetDefaultUserAvatarUrl(DiscriminatorValue)
+                : CDN.GetDefaultUserAvatarUrl(Id);
 
         /// <summary>
         ///     Gets the Username#Discriminator of the user.
