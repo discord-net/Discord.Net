@@ -30,6 +30,8 @@ namespace Discord.Rest
         public Color? AccentColor { get; private set; }
         /// <inheritdoc />
         public UserProperties? PublicFlags { get; private set; }
+        /// <inheritdoc />
+        public string GlobalName { get; internal set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -92,6 +94,8 @@ namespace Discord.Rest
                 Username = model.Username.Value;
             if (model.PublicFlags.IsSpecified)
                 PublicFlags = model.PublicFlags.Value;
+            if (model.GlobalName.IsSpecified)
+                GlobalName = model.GlobalName.Value;
         }
 
         /// <inheritdoc />

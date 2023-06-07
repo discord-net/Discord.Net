@@ -204,6 +204,7 @@ namespace Discord.Rest
                             Discriminator = command.User.Discriminator,
                             PublicFlags = command.User.PublicFlags.HasValue ? command.User.PublicFlags.Value : Optional<UserProperties>.Unspecified,
                             Id = command.User.Id,
+                            GlobalName = command.User.GlobalName,
                         }
                     };
                 }

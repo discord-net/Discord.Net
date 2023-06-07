@@ -48,7 +48,10 @@ namespace Discord.WebSocket
             }
         }
 
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Global)";
+        private string DebuggerDisplay => DiscriminatorValue != 0
+            ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)"
+            : $"{Username} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
+
         internal new SocketGlobalUser Clone() => MemberwiseClone() as SocketGlobalUser;
     }
 }

@@ -91,7 +91,10 @@ namespace Discord.WebSocket
         public Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null)
             => UserHelper.ModifyAsync(this, Discord, func, options);
 
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Self)";
+        private string DebuggerDisplay => DiscriminatorValue != 0
+            ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Self)"
+            : $"{Username} ({Id}{(IsBot ? ", Bot" : "")}, Self)";
+
         internal new SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;
     }
 }

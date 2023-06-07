@@ -425,8 +425,8 @@ namespace Discord.WebSocket
         public override SocketUser GetUser(ulong id)
             => State.GetUser(id);
         /// <inheritdoc />
-        public override SocketUser GetUser(string username, string discriminator)
-            => State.Users.FirstOrDefault(x => x.Discriminator == discriminator && x.Username == username);
+        public override SocketUser GetUser(string username, string discriminator = null)
+            => State.Users.FirstOrDefault(x => (discriminator is null || x.Discriminator == discriminator) && x.Username == username);
 
         /// <summary>
         ///     Gets a global application command.

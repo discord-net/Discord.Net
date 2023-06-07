@@ -49,7 +49,10 @@ namespace Discord.WebSocket
             return entity;
         }
 
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)";
+        private string DebuggerDisplay => DiscriminatorValue != 0
+            ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)"
+            : $"{Username} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)";
+
         internal new SocketWebhookUser Clone() => MemberwiseClone() as SocketWebhookUser;
         #endregion
 

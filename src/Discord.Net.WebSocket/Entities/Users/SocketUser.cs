@@ -33,6 +33,9 @@ namespace Discord.WebSocket
         internal abstract SocketPresence Presence { get; set; }
 
         /// <inheritdoc />
+        public string GlobalName { get; internal set; }
+
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public string Discriminator => DiscriminatorValue.ToString("D4");
@@ -88,6 +91,11 @@ namespace Discord.WebSocket
             if (model.PublicFlags.IsSpecified && model.PublicFlags.Value != PublicFlags)
             {
                 PublicFlags = model.PublicFlags.Value;
+                hasChanges = true;
+            }
+            if (model.GlobalName.IsSpecified)
+            {
+                GlobalName = model.GlobalName.Value;
                 hasChanges = true;
             }
             return hasChanges;
