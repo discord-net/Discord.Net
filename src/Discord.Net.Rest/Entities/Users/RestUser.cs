@@ -87,7 +87,7 @@ namespace Discord.Rest
             if (model.AccentColor.IsSpecified)
                 AccentColor = model.AccentColor.Value;
             if (model.Discriminator.IsSpecified)
-                DiscriminatorValue = ushort.Parse(model.Discriminator.Value ?? "0", NumberStyles.None, CultureInfo.InvariantCulture);
+                DiscriminatorValue = ushort.Parse(model.Discriminator.GetValueOrDefault(null) ?? "0", NumberStyles.None, CultureInfo.InvariantCulture);
             if (model.Bot.IsSpecified)
                 IsBot = model.Bot.Value;
             if (model.Username.IsSpecified)

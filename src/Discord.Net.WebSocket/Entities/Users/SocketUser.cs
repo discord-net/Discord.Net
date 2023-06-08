@@ -71,10 +71,10 @@ namespace Discord.WebSocket
             }
             if (model.Discriminator.IsSpecified)
             {
-                var newVal = ushort.Parse(model.Discriminator.Value ?? "0", NumberStyles.None, CultureInfo.InvariantCulture);
+                var newVal = ushort.Parse(model.Discriminator.GetValueOrDefault(null) ?? "0", NumberStyles.None, CultureInfo.InvariantCulture);
                 if (newVal != DiscriminatorValue)
                 {
-                    DiscriminatorValue = ushort.Parse(model.Discriminator.Value ?? "0", NumberStyles.None, CultureInfo.InvariantCulture);
+                    DiscriminatorValue = ushort.Parse(model.Discriminator.GetValueOrDefault(null) ?? "0", NumberStyles.None, CultureInfo.InvariantCulture);
                     hasChanges = true;
                 }
             }
