@@ -135,8 +135,8 @@ namespace Discord.Rest
 
         internal virtual async Task UpdateAsync(DiscordRestClient discord, Model model, bool doApiCall)
         {
-            ChannelId = model.ChannelId.IsSpecified
-                ? model.ChannelId.Value
+            ChannelId = model.Channel.IsSpecified
+                ? model.Channel.Value.Id
                 : null;
 
             GuildId = model.GuildId.IsSpecified
@@ -186,8 +186,23 @@ namespace Discord.Rest
                         Channel = (IRestMessageChannel)await discord.GetChannelAsync(ChannelId.Value);
                     else
                     {
-                        Channel = null;
-
+                        if (model.Channel.IsSpecified)
+                        {
+                            Channel = model.Channel.Value.Type switch
+                            {
+                                ChannelType.News or
+                                ChannelType.Text or
+                                ChannelType.Voice or
+                                ChannelType.Stage or
+                                ChannelType.NewsThread or
+                                ChannelType.PrivateThread or
+                                ChannelType.PublicThread
+                                    => RestGuildChannel.Create(discord, Guild, model.Channel.Value) as IRestMessageChannel,
+                                ChannelType.DM => RestDMChannel.Create(discord, model.Channel.Value),
+                                ChannelType.Group => RestGroupChannel.Create(discord, model.Channel.Value),
+                                _ => null
+                            };
+                        }
                         _getChannel = async (opt, ul) =>
                         {
                             if (Guild is null)

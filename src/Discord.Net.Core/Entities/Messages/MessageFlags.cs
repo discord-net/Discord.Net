@@ -51,6 +51,11 @@ namespace Discord
         /// <summary>
         ///     Flag give to messages that will not trigger push and desktop notifications.
         /// </summary>
-        SuppressNotification = 1 << 12
+        SuppressNotification = 1 << 12,
+
+        /// <summary>
+        ///     This message is a voice message.
+        /// </summary>
+        VoiceMessage = 1 << 13,
     }
 }

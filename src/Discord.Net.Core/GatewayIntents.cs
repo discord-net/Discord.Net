@@ -60,7 +60,7 @@ namespace Discord
         AutoModerationActionExecution = 1 << 21,
 
         /// <summary>
-        ///     This intent includes all but <see cref="GuildMembers"/> and <see cref="GuildPresences"/>
+        ///     This intent includes all but <see cref="GuildMembers"/>, <see cref="GuildPresences"/> and <see cref="MessageContent"/>
         ///     which are privileged and must be enabled in the Developer Portal.
         /// </summary>
         AllUnprivileged = Guilds | GuildBans | GuildEmojis | GuildIntegrations | GuildWebhooks | GuildInvites |

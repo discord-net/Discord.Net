@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    // when adding properties to guilds please check if they are returned in audit log events and add them to the
+    // 'GuildInfo.cs' file for socket and rest audit logs.
     /// <summary>
     ///     Represents a generic guild/server.
     /// </summary>
@@ -1307,5 +1309,13 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IAutoModRule"/>.
         /// </returns>
         Task<IAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets the onboarding object configured for the guild.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IGuildOnboarding"/>.
+        /// </returns>
+        Task<IGuildOnboarding> GetOnboardingAsync(RequestOptions options = null);
     }
 }

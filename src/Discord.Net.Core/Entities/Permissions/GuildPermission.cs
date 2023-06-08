@@ -262,5 +262,10 @@ namespace Discord
         ///     Allows for using the soundboard.
         /// </summary>
         UseSoundboard = 1L << 42,
+
+        /// <summary>
+        ///     Allows sending voice messages.
+        /// </summary>
+        SendVoiceMessages = 1L << 46,
     }
 }
