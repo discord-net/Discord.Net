@@ -1,11 +1,12 @@
 using Discord.Rest;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Model = Discord.API.Channel;
-using StageInstance = Discord.API.StageInstance;
 
 namespace Discord.WebSocket
 {
@@ -50,7 +51,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc cref="IStageChannel.StartStageAsync" />
-        public async Task<RestStageInstance> StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, bool sendStartNotification = false, 
+        public async Task<RestStageInstance> StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, bool sendStartNotification = false,
             RequestOptions options = null)
         {
             var args = new API.Rest.CreateStageInstanceParams
@@ -62,21 +63,17 @@ namespace Discord.WebSocket
             };
 
             var model = await Discord.ApiClient.CreateStageInstanceAsync(args, options).ConfigureAwait(false);
-            
+
             return RestStageInstance.Create(Discord, model);
         }
 
         /// <inheritdoc/>
-        public async Task ModifyInstanceAsync(Action<StageInstanceProperties> func, RequestOptions options = null)
-        {
-            var model = await ChannelHelper.ModifyStageAsync(this, Discord, func, options);
-        }
+        public Task ModifyInstanceAsync(Action<StageInstanceProperties> func, RequestOptions options = null)
+            => ChannelHelper.ModifyStageAsync(this, Discord, func, options);
 
         /// <inheritdoc/>
-        public async Task StopStageAsync(RequestOptions options = null)
-        {
-            await Discord.ApiClient.DeleteStageInstanceAsync(Id, options);
-        }
+        public Task StopStageAsync(RequestOptions options = null)
+            => Discord.ApiClient.DeleteStageInstanceAsync(Id, options);
 
         /// <inheritdoc/>
         public Task RequestToSpeakAsync(RequestOptions options = null)
