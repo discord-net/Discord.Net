@@ -18,6 +18,30 @@ namespace Discord.Commands
         public RunMode RunMode { get; set; } = RunMode.Default;
         public bool? IgnoreExtraArgs { get; }
 
+        /// <summary>
+        ///     Attaches a summary to your command.
+        /// </summary>
+        /// <remarks>
+        ///     <see cref="Summay"/> overrides the value of this property if present.
+        /// </remarks>
+        public string Summay { get; set; }
+
+        /// <summary>
+        ///     Marks the aliases for a command.
+        /// </summary>
+        /// <remarks>
+        ///     <see cref="AliasAttribute"/> extends the base value of this if present.
+        /// </remarks>
+        public string[] Aliases { get; set; }
+
+        /// <summary>
+        ///     Attaches remarks to your commands.
+        /// </summary>
+        /// <remarks>
+        ///     <see cref="RemainderAttribute"/> overrides the value of this property if present.
+        /// </remarks>
+        public string Remarks { get; set; }
+
         /// <inheritdoc />
         public CommandAttribute()
         {

@@ -154,6 +154,8 @@ namespace Discord.Commands
                 switch (attribute)
                 {
                     case CommandAttribute command:
+                        builder.Summary ??= command.Summay;
+                        builder.Remarks ??= command.Remarks;
                         builder.AddAliases(command.Text);
                         builder.RunMode = command.RunMode;
                         builder.Name ??= command.Text;
