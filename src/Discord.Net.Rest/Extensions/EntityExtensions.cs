@@ -169,6 +169,11 @@ namespace Discord.Rest
             return new API.Image(entity.Stream);
         }
 
+        public static API.Sound ToModel(this Sound entity)
+        {
+            return new API.Sound(entity.Stream);
+        }
+
         public static Overwrite ToEntity(this API.Overwrite model)
         {
             return new Overwrite(model.TargetId, model.TargetType, new OverwritePermissions(model.Allow, model.Deny));

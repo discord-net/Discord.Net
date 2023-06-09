@@ -83,6 +83,8 @@ namespace Discord.Net.Converters
             //Special
             if (type == typeof(API.Image))
                 return ImageConverter.Instance;
+            if (type == typeof(API.Sound))
+                return SoundConverter.Instance;
             if (typeof(IMessageComponent).IsAssignableFrom(type))
                 return MessageComponentConverter.Instance;
             if (type == typeof(API.Interaction))

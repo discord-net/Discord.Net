@@ -1610,5 +1610,22 @@ namespace Discord.Rest
             => await GetOnboardingAsync(options);
 
         #endregion
+
+        #region Soundboard
+
+        public Task<SoundboardSound> CreateSoundboardSoundAsync(Sound sound, string name, IEmote emoji = null, double volume = 1.0, RequestOptions options = null)
+        {
+            string emojiName = null;
+            ulong? emojiId = null;
+
+            if (emoji is Emoji emj)
+                emojiName = emj.Name;
+            else if (emoji is Emote emt)
+                emojiId = emt.Id;
+
+            return GuildHelper.CreateSoundboardSoundAsync(Discord, this, sound, name, volume, emojiName, emojiId, options);
+        }
+
+        #endregion
     }
 }

@@ -2676,5 +2676,20 @@ namespace Discord.API
         => await SendJsonAsync<RoleConnection>("PUT", () => $"users/@me/applications/{applicationId}/role-connection", connection, new BucketIds(), options: options);
 
         #endregion
+
+        #region Soundboard
+
+        public async Task<SoundboardSound> CreateSoundboardSoundAsync(ulong guildId, CreateSoundboardSoundParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+
+            options = RequestOptions.CreateOrClone(options);
+            var ids = new BucketIds(guildId: guildId);
+
+            return await SendJsonAsync<SoundboardSound>("POST", () => $"guilds/{guildId}/soundboard-sounds", args, ids, options: options).ConfigureAwait(false);
+        }
+
+        #endregion
     }
 }

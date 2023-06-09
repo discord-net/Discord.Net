@@ -1261,5 +1261,33 @@ namespace Discord.Rest
             => await client.ApiClient.GetGuildOnboardingAsync(guild.Id, options);
 
         #endregion
+
+        #region Soundboard
+
+        public static async Task<SoundboardSound> CreateSoundboardSoundAsync(BaseDiscordClient client, IGuild guild, Sound sound, string name, double volume, string emojiName = null, ulong? emojiId = null, RequestOptions options = null)
+        {
+            var args = new CreateSoundboardSoundParams()
+            {
+                Name = name,
+                Volume = volume,
+                EmojiName = emojiName ?? Optional<string>.Unspecified,
+                EmojiId = emojiId ?? Optional<ulong?>.Unspecified,
+                Sound = sound.ToModel()
+            };
+
+            var model = await client.ApiClient.CreateSoundboardSoundAsync(guild.Id, args, options);
+
+            return new SoundboardSound(model.Id,
+                model.Name,
+                model.UserId,
+                model.Volume,
+                model.OverridePath,
+                model.Name,
+                model.EmojiId.GetValueOrDefault(null),
+                model.User.IsSpecified ? RestUser.Create(client, model.User.Value) : null,
+                model.Available.IsSpecified ? model.Available.Value : null);
+        }
+
+        #endregion
     }
 }
