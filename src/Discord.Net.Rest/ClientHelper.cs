@@ -45,6 +45,8 @@ namespace Discord.Rest
             }, options);
         }
 
+        #endregion
+
         public static async Task<RestChannel> GetChannelAsync(BaseDiscordClient client,
             ulong id, RequestOptions options)
         {
@@ -290,7 +292,12 @@ namespace Discord.Rest
 
         public static Task RemoveRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
             => client.ApiClient.RemoveRoleAsync(guildId, userId, roleId, options);
-        #endregion
+
+        public static async Task<RestStageInstance> GetStageInstanceAsync(BaseDiscordClient client, ulong channelId, RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetStageInstanceAsync(channelId, options);
+            return model is null ? null : RestStageInstance.Create(client, model);
+        }
 
         #region Role Connection Metadata
 

@@ -22,14 +22,8 @@ namespace Discord.WebSocket
         public override bool IsTextInVoice
             => true;
 
-        /// <inheritdoc/>
-        public StagePrivacyLevel? PrivacyLevel { get; private set; }
-
-        /// <inheritdoc/>
-        public bool? IsDiscoverableDisabled { get; private set; }
-
-        /// <inheritdoc/>
-        public bool IsLive { get; private set; }
+        /// <inheritdoc cref="IStageChannel.StageInstance"/>
+        public SocketStageInstance StageInstance => Guild.StageInstances.FirstOrDefault(x => x.ChannelId == Id);
 
         /// <summary>
         ///     Returns <see langword="true"/> if the current user is a speaker within the stage, otherwise <see langword="false"/>.
@@ -54,50 +48,34 @@ namespace Discord.WebSocket
             entity.Update(state, model);
             return entity;
         }
-        internal void Update(StageInstance model, bool isLive = false)
-        {
-            IsLive = isLive;
-            if (isLive)
-            {
-                PrivacyLevel = model.PrivacyLevel;
-                IsDiscoverableDisabled = model.DiscoverableDisabled;
-            }
-            else
-            {
-                PrivacyLevel = null;
-                IsDiscoverableDisabled = null;
-            }
-        }
 
-        /// <inheritdoc/>
-        public async Task StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, RequestOptions options = null)
+        /// <inheritdoc cref="IStageChannel.StartStageAsync" />
+        public async Task<RestStageInstance> StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, bool sendStartNotification = false, 
+            RequestOptions options = null)
         {
             var args = new API.Rest.CreateStageInstanceParams
             {
                 ChannelId = Id,
                 Topic = topic,
-                PrivacyLevel = privacyLevel
+                PrivacyLevel = privacyLevel,
+                SendNotification = sendStartNotification
             };
 
             var model = await Discord.ApiClient.CreateStageInstanceAsync(args, options).ConfigureAwait(false);
-
-            Update(model, true);
+            
+            return RestStageInstance.Create(Discord, model);
         }
 
         /// <inheritdoc/>
         public async Task ModifyInstanceAsync(Action<StageInstanceProperties> func, RequestOptions options = null)
         {
-            var model = await ChannelHelper.ModifyAsync(this, Discord, func, options);
-
-            Update(model, true);
+            var model = await ChannelHelper.ModifyStageAsync(this, Discord, func, options);
         }
 
         /// <inheritdoc/>
         public async Task StopStageAsync(RequestOptions options = null)
         {
             await Discord.ApiClient.DeleteStageInstanceAsync(Id, options);
-
-            Update(null);
         }
 
         /// <inheritdoc/>
@@ -156,5 +134,16 @@ namespace Discord.WebSocket
 
             return Discord.ApiClient.ModifyUserVoiceState(Guild.Id, user.Id, args);
         }
+
+        #region IStageChannel
+
+        /// <inheritdoc/>
+        async Task<IStageInstance> IStageChannel.StartStageAsync(string topic, StagePrivacyLevel privacyLevel, bool sendStartNotification, RequestOptions options)
+            => await StartStageAsync(topic, privacyLevel, sendStartNotification, options);
+
+        /// <inheritdoc/>
+        IStageInstance IStageChannel.StageInstance => StageInstance;
+
+        #endregion
     }
 }

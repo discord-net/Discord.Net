@@ -2718,7 +2718,8 @@ namespace Discord.WebSocket
                             #endregion
 
                             #region Stage Channels
-                            case "STAGE_INSTANCE_CREATE" or "STAGE_INSTANCE_UPDATE" or "STAGE_INSTANCE_DELETE":
+
+                            case "STAGE_INSTANCE_CREATE":
                                 {
                                     await _gatewayLogger.DebugAsync($"Received Dispatch ({type})").ConfigureAwait(false);
 
@@ -2732,30 +2733,54 @@ namespace Discord.WebSocket
                                         return;
                                     }
 
-                                    var stageChannel = guild.GetStageChannel(data.ChannelId);
+                                    var stageInstance = guild.AddOrUpdateStageInstance(data);
 
-                                    if (stageChannel == null)
+                                    await TimedInvokeAsync(_stageStarted, nameof(StageStarted), stageInstance).ConfigureAwait(false);
+                                }
+                                break;
+
+                            case "STAGE_INSTANCE_UPDATE":
+                                {
+                                    await _gatewayLogger.DebugAsync($"Received Dispatch ({type})").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<StageInstance>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    if (guild == null)
                                     {
-                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
 
-                                    SocketStageChannel before = type == "STAGE_INSTANCE_UPDATE" ? stageChannel.Clone() : null;
+                                    var stageInstance = guild.GetStageInstance(data.Id);
 
-                                    stageChannel.Update(data, type == "STAGE_INSTANCE_CREATE");
+                                    var before = stageInstance.Clone();
 
-                                    switch (type)
+                                    stageInstance.Update(data);
+
+                                    await TimedInvokeAsync(_stageUpdated, nameof(StageUpdated), before, stageInstance).ConfigureAwait(false);
+                                }
+                                break;
+
+                            case "STAGE_INSTANCE_DELETE":
+                                {
+                                    await _gatewayLogger.DebugAsync($"Received Dispatch ({type})").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<StageInstance>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    if (guild == null)
                                     {
-                                        case "STAGE_INSTANCE_CREATE":
-                                            await TimedInvokeAsync(_stageStarted, nameof(StageStarted), stageChannel).ConfigureAwait(false);
-                                            return;
-                                        case "STAGE_INSTANCE_DELETE":
-                                            await TimedInvokeAsync(_stageEnded, nameof(StageEnded), stageChannel).ConfigureAwait(false);
-                                            return;
-                                        case "STAGE_INSTANCE_UPDATE":
-                                            await TimedInvokeAsync(_stageUpdated, nameof(StageUpdated), before, stageChannel).ConfigureAwait(false);
-                                            return;
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
+                                        return;
                                     }
+
+                                    var stageInstance = guild.RemoveStageInstance(data.Id);
+
+                                    await TimedInvokeAsync(_stageEnded, nameof(StageEnded), stageInstance).ConfigureAwait(false);
+
                                 }
                                 break;
                             #endregion
@@ -2891,20 +2916,20 @@ namespace Discord.WebSocket
                             #region Audit Logs
 
                             case "GUILD_AUDIT_LOG_ENTRY_CREATE":
-                            {
-                                var data = (payload as JToken).ToObject<AuditLogCreatedEvent>(_serializer);
-                                type = "GUILD_AUDIT_LOG_ENTRY_CREATE";
-                                await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AUDIT_LOG_ENTRY_CREATE)").ConfigureAwait(false);
+                                {
+                                    var data = (payload as JToken).ToObject<AuditLogCreatedEvent>(_serializer);
+                                    type = "GUILD_AUDIT_LOG_ENTRY_CREATE";
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AUDIT_LOG_ENTRY_CREATE)").ConfigureAwait(false);
 
-                                var guild = State.GetGuild(data.GuildId);
-                                var auditLog = SocketAuditLogEntry.Create(this, data);
-                                guild.AddAuditLog(auditLog);
+                                    var guild = State.GetGuild(data.GuildId);
+                                    var auditLog = SocketAuditLogEntry.Create(this, data);
+                                    guild.AddAuditLog(auditLog);
 
-                                await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
-                            }
-                            break;
+                                    await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
+                                }
+                                break;
                             #endregion
-                            
+
                             #region Auto Moderation
 
                             case "AUTO_MODERATION_RULE_CREATE":

@@ -278,6 +278,9 @@ namespace Discord.Rest
         public Task<RoleConnection> ModifyUserApplicationRoleConnectionAsync(ulong applicationId, RoleConnectionProperties roleConnection, RequestOptions options = null)
             => ClientHelper.ModifyUserRoleConnectionAsync(applicationId, roleConnection, this, options);
 
+        public Task<RestStageInstance> GetStageInstanceAsync(ulong channelId, RequestOptions options = null)
+            => ClientHelper.GetStageInstanceAsync(this, channelId, options);
+
         #endregion
 
         #region IDiscordClient

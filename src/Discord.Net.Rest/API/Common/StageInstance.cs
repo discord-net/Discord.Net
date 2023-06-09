@@ -23,5 +23,5 @@ internal class StageInstance
     public bool DiscoverableDisabled { get; set; }
 
     [JsonProperty("guild_scheduled_event_id")]
-    public Optional<ulong> ScheduledEventId { get; set; }
+    public ulong? ScheduledEventId { get; set; }
 }

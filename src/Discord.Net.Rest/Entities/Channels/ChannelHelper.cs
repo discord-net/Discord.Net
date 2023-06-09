@@ -98,7 +98,7 @@ namespace Discord.Rest
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
 
-        public static async Task<StageInstance> ModifyAsync(IStageChannel channel, BaseDiscordClient client,
+        public static async Task<StageInstance> ModifyStageAsync(IStageChannel channel, BaseDiscordClient client,
             Action<StageInstanceProperties> func, RequestOptions options = null)
         {
             var args = new StageInstanceProperties();
