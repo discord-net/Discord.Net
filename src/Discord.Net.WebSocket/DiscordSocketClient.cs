@@ -374,6 +374,19 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override SocketChannel GetChannel(ulong id)
             => State.GetChannel(id);
+
+        /// <summary>
+        ///     Gets a stage instance from cache. Returns <see langword="null" /> if the stage instance could not be found.
+        /// </summary>
+        public SocketStageInstance GetStageInstance(ulong channelId)
+            => State.GetChannel(channelId) is SocketStageChannel channel ? channel.StageInstance : null;
+
+        /// <summary>
+        ///     Gets a stage instance from cache or does a rest request if unavailable. Returns <see langword="null" /> if the stage instance could not be found.
+        /// </summary>
+        public async Task<IStageInstance> GetStageInstanceAsync(ulong channelId, RequestOptions options = null)
+            => GetStageInstance(channelId) ?? (IStageInstance)await Rest.GetStageInstanceAsync(channelId, options);
+
         /// <summary>
         ///     Gets a generic channel from the cache or does a rest request if unavailable.
         /// </summary>
