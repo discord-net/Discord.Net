@@ -192,8 +192,8 @@ namespace Discord.Net.Queue
             if (!(_cancelTokenSource is null))
             {
                 _cancelTokenSource.Cancel();
-                _cancelTokenSource.Dispose();
                 _cleanupTask.GetAwaiter().GetResult();
+                _cancelTokenSource.Dispose();
             }
             _tokenLock?.Dispose();
             _clearToken?.Dispose();
@@ -205,8 +205,8 @@ namespace Discord.Net.Queue
             if (!(_cancelTokenSource is null))
             {
                 _cancelTokenSource.Cancel();
-                _cancelTokenSource.Dispose();
                 await _cleanupTask.ConfigureAwait(false);
+                _cancelTokenSource.Dispose();
             }
             _tokenLock?.Dispose();
             _clearToken?.Dispose();
