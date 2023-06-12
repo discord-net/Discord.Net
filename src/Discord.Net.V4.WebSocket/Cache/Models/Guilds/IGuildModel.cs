@@ -59,6 +59,6 @@ namespace Discord.WebSocket.Cache
         ulong? ChannelId { get; }
         string? Description { get; }
         ulong? EmojiId { get; }
-        string? UnicodeEmoji { get; }
+        string? EmojiName { get; }
     }
 }
