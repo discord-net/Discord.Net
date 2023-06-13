@@ -22,9 +22,9 @@ namespace Discord.Commands
         ///     Attaches a summary to your command.
         /// </summary>
         /// <remarks>
-        ///     <see cref="Summay"/> overrides the value of this property if present.
+        ///     <see cref="Summary"/> overrides the value of this property if present.
         /// </remarks>
-        public string Summay { get; set; }
+        public string Summary { get; set; }
 
         /// <summary>
         ///     Marks the aliases for a command.
