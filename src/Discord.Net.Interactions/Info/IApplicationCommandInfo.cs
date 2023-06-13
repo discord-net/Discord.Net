@@ -29,6 +29,11 @@ namespace Discord.Interactions
         public bool IsEnabledInDm { get; }
 
         /// <summary>
+        ///     Gets whether this command can is age restricted.
+        /// </summary>
+        public bool IsNsfw { get; }
+
+        /// <summary>
         ///     Gets the default permissions needed for executing this command.
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; }

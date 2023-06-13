@@ -87,8 +87,8 @@ exist under a category.
 ![IInteractionChart](images/IInteraction.png)
 
 * A **Slash command** ([ISlashCommandInteraction]) is an application command executed in the text box, with provided parameters.
-* A **Message Command** ([IMessageCommandInteraction]) is an application command targetting a message.
-* An **User Command** ([IUserCommandInteraction]) is an application command targetting a user.
+* A **Message Command** ([IMessageCommandInteraction]) is an application command targeting a message.
+* An **User Command** ([IUserCommandInteraction]) is an application command targeting a user.
 * An **Application Command** ([IApplicationCommandInteraction]) is any of the above.
 * A **Message component** ([IMessageComponent]) is the interaction of a button being clicked/dropdown option(s) entered.
 * An **Autocomplete Interaction** ([IAutocompleteinteraction]) is an interaction that has been automatically completed.

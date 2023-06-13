@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord.Net.ED25519.Ed25519Ref10
 {

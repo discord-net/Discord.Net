@@ -34,7 +34,7 @@ namespace Discord.Interactions.Builders
         bool IsParameterArray { get; }
 
         /// <summary>
-        ///     Gets the deafult value of this parameter.
+        ///     Gets the default value of this parameter.
         /// </summary>
         object DefaultValue { get; }
 
@@ -55,7 +55,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        IParameterBuilder WithName (string name);
+        IParameterBuilder WithName(string name);
 
         /// <summary>
         ///     Sets <see cref="ParameterType"/>.
@@ -64,7 +64,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        IParameterBuilder SetParameterType (Type type);
+        IParameterBuilder SetParameterType(Type type);
 
         /// <summary>
         ///     Sets <see cref="IsRequired"/>.
@@ -73,7 +73,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        IParameterBuilder SetRequired (bool isRequired);
+        IParameterBuilder SetRequired(bool isRequired);
 
         /// <summary>
         ///     Sets <see cref="DefaultValue"/>.
@@ -82,7 +82,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        IParameterBuilder SetDefaultValue (object defaultValue);
+        IParameterBuilder SetDefaultValue(object defaultValue);
 
         /// <summary>
         ///     Adds attributes to <see cref="Attributes"/>.
@@ -91,7 +91,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        IParameterBuilder AddAttributes (params Attribute[] attributes);
+        IParameterBuilder AddAttributes(params Attribute[] attributes);
 
         /// <summary>
         ///     Adds preconditions to <see cref="Preconditions"/>.
@@ -100,6 +100,6 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        IParameterBuilder AddPreconditions (params ParameterPreconditionAttribute[] preconditions);
+        IParameterBuilder AddPreconditions(params ParameterPreconditionAttribute[] preconditions);
     }
 }

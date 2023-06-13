@@ -26,7 +26,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="name">Name of the group.</param>
         /// <param name="description">Description of the group.</param>
-        public GroupAttribute (string name, string description)
+        public GroupAttribute(string name, string description)
         {
             Name = name;
             Description = description;

@@ -1,4 +1,4 @@
-﻿namespace Discord.Rest
+namespace Discord.Rest
 {
     public interface IRestAudioChannel : IAudioChannel
     {

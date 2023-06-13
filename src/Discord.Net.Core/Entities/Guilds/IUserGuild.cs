@@ -18,5 +18,29 @@ namespace Discord
         ///     Returns the current user's permissions for this guild.
         /// </summary>
         GuildPermissions Permissions { get; }
+
+        /// <summary>
+        ///     Gets the features for this guild.
+        /// </summary>
+        /// <returns>
+        ///     A flags enum containing all the features for the guild.
+        /// </returns>
+        GuildFeatures Features { get; }
+
+        /// <summary>
+        ///     Gets the approximate number of members in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     Only available when getting a guild via REST when `with_counts` is true.
+        /// </remarks>
+        int? ApproximateMemberCount { get; }
+
+        /// <summary>
+        ///     Gets the approximate number of non-offline members in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     Only available when getting a guild via REST when `with_counts` is true.
+        /// </remarks>
+        int? ApproximatePresenceCount { get; }
     }
 }

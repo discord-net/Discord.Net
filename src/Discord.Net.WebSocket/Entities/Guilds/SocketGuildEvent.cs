@@ -19,6 +19,9 @@ namespace Discord.WebSocket
         /// </summary>
         public SocketGuild Guild { get; private set; }
 
+        /// <inheritdoc/>
+        public ulong GuildId { get; private set; }
+
         /// <summary>
         ///     Gets the channel of the event.
         /// </summary>
@@ -86,9 +89,9 @@ namespace Discord.WebSocket
             {
                 var guildUser = Guild.GetUser(model.CreatorId.Value);
 
-                if(guildUser != null)
+                if (guildUser != null)
                 {
-                    if(model.Creator.IsSpecified)
+                    if (model.Creator.IsSpecified)
                         guildUser.Update(Discord.State, model.Creator.Value);
 
                     Creator = guildUser;
@@ -113,6 +116,7 @@ namespace Discord.WebSocket
             Status = model.Status;
             UserCount = model.UserCount.ToNullable();
             CoverImageId = model.Image;
+            GuildId = model.GuildId;
         }
 
         /// <inheritdoc/>

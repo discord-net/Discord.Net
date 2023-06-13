@@ -24,5 +24,9 @@ namespace Discord.API
         public Optional<int> Width { get; set; }
         [JsonProperty("ephemeral")]
         public Optional<bool> Ephemeral { get; set; }
+        [JsonProperty("duration_secs")]
+        public Optional<double> DurationSeconds { get; set; }
+        [JsonProperty("waveform")]
+        public Optional<string> Waveform { get; set; }
     }
 }

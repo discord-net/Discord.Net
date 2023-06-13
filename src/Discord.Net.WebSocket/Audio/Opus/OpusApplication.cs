@@ -1,4 +1,4 @@
-﻿namespace Discord.Audio
+namespace Discord.Audio
 {
     internal enum OpusApplication : int
     {

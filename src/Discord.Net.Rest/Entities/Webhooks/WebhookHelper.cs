@@ -1,6 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
 using Discord.API.Rest;
+using System;
+using System.Threading.Tasks;
 using ImageModel = Discord.API.Image;
 using Model = Discord.API.Webhook;
 

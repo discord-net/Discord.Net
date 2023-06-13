@@ -26,6 +26,12 @@ namespace Discord.API
         [JsonProperty("disabled")]
         public bool Disabled { get; set; }
 
+        [JsonProperty("channel_types")]
+        public Optional<ChannelType[]> ChannelTypes { get; set; }
+
+        [JsonProperty("resolved")]
+        public Optional<MessageComponentInteractionDataResolved> Resolved { get; set; }
+
         [JsonProperty("values")]
         public Optional<string[]> Values { get; set; }
         public SelectMenuComponent() { }
@@ -34,11 +40,12 @@ namespace Discord.API
         {
             Type = component.Type;
             CustomId = component.CustomId;
-            Options = component.Options.Select(x => new SelectMenuOption(x)).ToArray();
+            Options = component.Options?.Select(x => new SelectMenuOption(x)).ToArray();
             Placeholder = component.Placeholder;
             MinValues = component.MinValues;
             MaxValues = component.MaxValues;
             Disabled = component.IsDisabled;
+            ChannelTypes = component.ChannelTypes.ToArray();
         }
     }
 }

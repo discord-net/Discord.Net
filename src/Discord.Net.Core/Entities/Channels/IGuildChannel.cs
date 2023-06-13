@@ -22,6 +22,17 @@ namespace Discord
         int Position { get; }
 
         /// <summary>
+        ///     Gets the flags related to this channel.
+        /// </summary>
+        /// <remarks>
+        ///     This value is determined by bitwise OR-ing <see cref="ChannelFlags"/> values together.
+        /// </remarks>
+        /// <returns>
+        ///     A channel's flags, if any is associated.
+        /// </returns>
+        ChannelFlags Flags { get; }
+
+        /// <summary>
         ///     Gets the guild associated with this channel.
         /// </summary>
         /// <returns>

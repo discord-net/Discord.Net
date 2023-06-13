@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Discord
 {
     /// <summary>
@@ -5,5 +7,12 @@ namespace Discord
     /// </summary>
     public interface INewsChannel : ITextChannel
     {
+        /// <summary>
+        ///     Follow this channel to send messages to a target channel.
+        /// </summary>
+        /// <returns>
+        ///     The Id of the created webhook.
+        /// </returns>
+        Task<ulong> FollowAnnouncementChannelAsync(ulong channelId, RequestOptions options);
     }
 }

@@ -45,7 +45,7 @@ namespace Discord
         public object Value
         {
             get => _value;
-            set 
+            set
             {
                 if (value is not string && !value.IsNumericType())
                     throw new ArgumentException($"{nameof(value)} must be a numeric type or a string!");

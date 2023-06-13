@@ -1,6 +1,6 @@
 # Ratelimits
 
-Ratelimits are a core concept of any API - Discords API is no exception. each verified library must follow the ratelimit guidelines.
+Ratelimits are a core concept of any API - Discords API is no exception. Each verified library must follow the ratelimit guidelines.
 
 ### Using the ratelimit callback
 

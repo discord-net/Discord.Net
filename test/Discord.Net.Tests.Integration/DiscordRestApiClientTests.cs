@@ -1,4 +1,4 @@
-﻿using Discord.API;
+using Discord.API;
 using Discord.API.Rest;
 using Discord.Net;
 using Discord.Rest;

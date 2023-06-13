@@ -66,6 +66,7 @@ namespace Discord
         ActionSlowmode = 20016,
         OnlyOwnerAction = 20018,
         AnnouncementEditRatelimit = 20022,
+        UnderMinimumAge = 20024,
         ChannelWriteRatelimit = 20028,
         WriteRatelimitReached = 20029,
         WordsNotAllowed = 20031,
@@ -81,6 +82,7 @@ namespace Discord
         MaximumWebhooksReached = 30007,
         MaximumEmojisReached = 30008,
         MaximumReactionsReached = 30010,
+        MaximumNumberOfGDMsReached = 30011,
         MaximumGuildChannelsReached = 30013,
         MaximumAttachmentsReached = 30015,
         MaximumInvitesReached = 30016,
@@ -88,19 +90,26 @@ namespace Discord
         MaximumServerMembersReached = 30019,
         MaximumServerCategoriesReached = 30030,
         GuildTemplateAlreadyExists = 30031,
+        MaximumNumberOfApplicationCommandsReached = 30032,
         MaximumThreadMembersReached = 30033,
+        MaxNumberOfDailyApplicationCommandCreatesHasBeenReached = 30034,
         MaximumBansForNonGuildMembersReached = 30035,
         MaximumBanFetchesReached = 30037,
-        MaximumUncompleteGuildScheduledEvents = 30038,
+        MaximumUncompletedGuildScheduledEvents = 30038,
         MaximumStickersReached = 30039,
         MaximumPruneRequestReached = 30040,
-        MaximumGuildWigitsReached = 30042,
-        #endregion
-
-        #region General Request Errors (40XXX)
+        MaximumGuildWidgetsReached = 30042,
+        BitrateIsTooHighForChannelOfThisType = 30052,
         MaximumNumberOfEditsReached = 30046,
         MaximumNumberOfPinnedThreadsInAForumChannelReached = 30047,
         MaximumNumberOfTagsInAForumChannelReached = 30048,
+        MaximumNumberOfPremiumEmojisReached = 30056,
+        MaximumNumberOfWebhooksReached = 30058,
+        MaximumNumberOfChannelPermissionOverwritesReached = 30060,
+        TheChannelsForThisGuildAreTooLarge = 30061,
+        #endregion
+
+        #region General Request Errors (40XXX)
         TokenUnauthorized = 40001,
         InvalidVerification = 40002,
         OpeningDMTooFast = 40003,
@@ -108,23 +117,29 @@ namespace Discord
         RequestEntityTooLarge = 40005,
         FeatureDisabled = 40006,
         UserBanned = 40007,
+        ConnectionHasBeenRevoked = 40012,
         TargetUserNotInVoice = 40032,
         MessageAlreadyCrossposted = 40033,
         ApplicationNameAlreadyExists = 40041,
+        ApplicationInteractionFailedToSend = 40043,
+        CannotSendAMessageInAForumChannel = 40058,
+        InteractionHasAlreadyBeenAcknowledged = 40060,
+        TagNamesMustBeUnique = 40061,
+        ServiceResourceIsBeingRateLimited = 40062,
+        ThereAreNoTagsAvailableThatCanBeSetByNonModerators = 40066,
+        ATagIsRequiredToCreateAForumPostInThisChannel = 40067,
         #endregion
 
         #region Action Preconditions/Checks (50XXX)
-        InteractionHasAlreadyBeenAcknowledged = 40060,
-        TagNamesMustBeUnique = 40061,
         MissingPermissions = 50001,
         InvalidAccountType = 50002,
         CannotExecuteForDM = 50003,
-        GuildWigitDisabled = 50004,
+        GuildWidgetDisabled = 50004,
         CannotEditOtherUsersMessage = 50005,
         CannotSendEmptyMessage = 50006,
         CannotSendMessageToUser = 50007,
         CannotSendMessageToVoiceChannel = 50008,
-        ChannelVerificationTooHight = 50009,
+        ChannelVerificationTooHigh = 50009,
         OAuth2ApplicationDoesntHaveBot = 50010,
         OAuth2ApplicationLimitReached = 50011,
         InvalidOAuth2State = 50012,
@@ -132,6 +147,7 @@ namespace Discord
         InvalidAuthenticationToken = 50014,
         NoteTooLong = 50015,
         ProvidedMessageDeleteCountOutOfBounds = 50016,
+        InvalidMFALevel = 50017,
         InvalidPinChannel = 50019,
         InvalidInvite = 50020,
         CannotExecuteOnSystemMessage = 50021,
@@ -144,13 +160,16 @@ namespace Discord
         BulkDeleteMessageTooOld = 50034,
         InvalidFormBody = 50035,
         InviteAcceptedForGuildThatBotIsntIn = 50036,
+        InvalidActivityAction = 50039,
         InvalidAPIVersion = 50041,
         FileUploadTooBig = 50045,
         InvalidFileUpload = 50046,
         CannotSelfRedeemGift = 50054,
         InvalidGuild = 50055,
+        InvalidRequestOrigin = 50067,
         InvalidMessageType = 50068,
         PaymentSourceRequiredForGift = 50070,
+        CannotModifySystemWebhook = 50073,
         CannotDeleteRequiredCommunityChannel = 50074,
         CannotEditStickersWithinAMessage = 50080,
         InvalidSticker = 50081,
@@ -158,14 +177,22 @@ namespace Discord
         InvalidThreadNotificationSettings = 50084,
         BeforeValueEarlierThanThreadCreation = 50085,
         CommunityServerChannelsMustBeTextChannels = 50086,
+        TheEntityTypeOfTheEventIsDifferentFromTheEntityYouAreTryingToStartTheEventFor = 50091,
         ServerLocaleUnavailable = 50095,
         ServerRequiresMonetization = 50097,
         ServerRequiresBoosts = 50101,
         RequestBodyContainsInvalidJSON = 50109,
+        OwnershipCannotBeTransferredToABotUser = 50132,
+        FailedToResizeAssetBelowTheMaximumSize = 50138,
+        CannotMixSubscriptionAndNonSubscriptionRolesForAnEmoji = 50144,
+        CannotConvertBetweenPremiumEmojiAndNormalEmoji = 50145,
+        UploadedFileNotFound = 50146,
+        FeatureInProcessOfRollingOut = 50155,
+        CannotSendVoiceMessageInThisChannel = 50173,
+        MissingPermissionToSendThisSticker = 50600,
         #endregion
 
         #region 2FA (60XXX)
-        MissingPermissionToSendThisSticker = 50600,
         Requires2FA = 60003,
         #endregion
 
@@ -178,6 +205,7 @@ namespace Discord
         #endregion
 
         #region API Status (130XXX)
+        ApplicationNotYetAvailable = 110001,
         APIOverloaded = 130000,
         #endregion
 
@@ -198,14 +226,24 @@ namespace Discord
         LottieCantContainRasters = 170002,
         StickerMaximumFramerateExceeded = 170003,
         StickerMaximumFrameCountExceeded = 170004,
-        LottieMaximumDimentionsExceeded = 170005,
-        StickerFramerateBoundsExceeed = 170006,
+        LottieMaximumDimensionsExceeded = 170005,
+        StickerFramerateBoundsExceeded = 170006,
         StickerAnimationDurationTooLong = 170007,
         #endregion
 
         #region Guild Scheduled Events
         CannotUpdateFinishedEvent = 180000,
         FailedStageCreation = 180002,
+        #endregion
+
+        #region Forum & Automod
+        MessageWasBlockedByAutomaticModeration = 200000,
+        TitleWasBlockedByAutomaticModeration = 200001,
+        WebhooksPostedToForumChannelsMustHaveAThreadNameOrThreadId = 220001,
+        WebhooksPostedToForumChannelsCannotHaveBothAThreadNameAndThreadId = 220002,
+        WebhooksCanOnlyCreateThreadsInForumChannels = 220003,
+        WebhookServicesCannotBeUsedInForumChannels = 220004,
+        MessageBlockedByHarmfulLinksFilter = 240000,
         #endregion
     }
 }

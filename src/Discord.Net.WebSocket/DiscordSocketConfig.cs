@@ -59,7 +59,7 @@ namespace Discord.WebSocket
         ///     Gets or sets whether or not the client should download the default stickers on startup.
         /// </summary>
         /// <remarks>
-        ///     When this is set to <see langword="false"/> default stickers arn't present and cannot be resolved by the client.
+        ///     When this is set to <see langword="false"/> default stickers aren't present and cannot be resolved by the client.
         ///     This will make all default stickers have the type of <see cref="SocketUnknownSticker"/>.
         /// </remarks>
         public bool AlwaysDownloadDefaultStickers { get; set; } = false;
@@ -79,6 +79,12 @@ namespace Discord.WebSocket
         ///     disables the message cache entirely.
         /// </summary>
         public int MessageCacheSize { get; set; } = 0;
+
+        /// <summary>
+        ///     Gets or sets the number of audit logs per guild that should be kept in cache. Setting this to zero
+        ///     disables the audit log cache entirely.
+        /// </summary>
+        public int AuditLogCacheSize { get; set; } = 0;
 
         /// <summary>
         ///     Gets or sets the max number of users a guild may have for offline users to be included in the READY

@@ -13,12 +13,12 @@ as well as users that register and handle commands manually.
 
 The difference between these 3 functions is in how you handle the command response.
 [RespondAsync] and
-[DeferAsync] let the API know you have succesfully received the command. This is also called 'acknowledging' a command.
+[DeferAsync] let the API know you have successfully received the command. This is also called 'acknowledging' a command.
 DeferAsync will not send out a response, RespondAsync will.
-[FollowupAsync] follows up on succesful acknowledgement. 
+[FollowupAsync] follows up on successful acknowledgement.
 
 > [!WARNING]
-> If you have not acknowledged the command FollowupAsync will not work! the interaction has not been resonded to, so you cannot follow it up!
+> If you have not acknowledged the command FollowupAsync will not work! the interaction has not been responded to, so you cannot follow it up!
 
 [RespondAsync]: xref:Discord.IDiscordInteraction
 [DeferAsync]: xref:Discord.IDiscordInteraction

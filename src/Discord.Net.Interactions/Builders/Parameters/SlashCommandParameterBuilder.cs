@@ -29,6 +29,16 @@ namespace Discord.Interactions.Builders
         public double? MinValue { get; set; }
 
         /// <summary>
+        ///     Gets or sets the minimum length allowed for a string type parameter.
+        /// </summary>
+        public int? MinLength { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the maximum length allowed for a string type parameter.
+        /// </summary>
+        public int? MaxLength { get; set; }
+
+        /// <summary>
         ///     Gets a collection of the choices of this command.
         /// </summary>
         public IReadOnlyCollection<ParameterChoice> Choices => _choices;
@@ -126,6 +136,32 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
+        ///     Sets <see cref="MinLength"/>.
+        /// </summary>
+        /// <param name="length">New value of the <see cref="MinLength"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public SlashCommandParameterBuilder WithMinLength(int length)
+        {
+            MinLength = length;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets <see cref="MaxLength"/>.
+        /// </summary>
+        /// <param name="length">New value of the <see cref="MaxLength"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public SlashCommandParameterBuilder WithMaxLength(int length)
+        {
+            MaxLength = length;
+            return this;
+        }
+
+        /// <summary>
         ///     Adds parameter choices to <see cref="Choices"/>.
         /// </summary>
         /// <param name="options">New choices to be added to <see cref="Choices"/>.</param>
@@ -193,7 +229,7 @@ namespace Discord.Interactions.Builders
         {
             base.SetParameterType(type);
 
-            if(!IsComplexParameter)
+            if (!IsComplexParameter)
                 TypeConverter = Command.Module.InteractionService.GetTypeConverter(ParameterType, services);
 
             return this;
@@ -212,7 +248,7 @@ namespace Discord.Interactions.Builders
             SlashCommandParameterBuilder builder = new(Command);
             configure(builder);
 
-            if(builder.IsComplexParameter)
+            if (builder.IsComplexParameter)
                 throw new InvalidOperationException("You cannot create nested complex parameters.");
 
             _complexParameterFields.Add(builder);
@@ -229,7 +265,7 @@ namespace Discord.Interactions.Builders
         /// <exception cref="InvalidOperationException">Thrown if the added field has a <see cref="ComplexParameterAttribute"/>.</exception>
         public SlashCommandParameterBuilder AddComplexParameterFields(params SlashCommandParameterBuilder[] fields)
         {
-            if(fields.Any(x => x.IsComplexParameter))
+            if (fields.Any(x => x.IsComplexParameter))
                 throw new InvalidOperationException("You cannot create nested complex parameters.");
 
             _complexParameterFields.AddRange(fields);

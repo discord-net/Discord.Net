@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace Discord.Net.ED25519.Ed25519Ref10
 {
-	/*
+    /*
 	ge means group element.
 
 	Here the group is the set of pairs (x,y) of field elements (see fe.h)
@@ -16,48 +16,48 @@ namespace Discord.Net.ED25519.Ed25519Ref10
 	  ge_precomp (Duif): (y+x,y-x,2dxy)
 	*/
 
-	internal struct GroupElementP2
-	{
-		public FieldElement X;
-		public FieldElement Y;
-		public FieldElement Z;
-	} ;
+    internal struct GroupElementP2
+    {
+        public FieldElement X;
+        public FieldElement Y;
+        public FieldElement Z;
+    };
 
-	internal struct GroupElementP3
-	{
-		public FieldElement X;
-		public FieldElement Y;
-		public FieldElement Z;
-		public FieldElement T;
-	} ;
+    internal struct GroupElementP3
+    {
+        public FieldElement X;
+        public FieldElement Y;
+        public FieldElement Z;
+        public FieldElement T;
+    };
 
-	internal struct GroupElementP1P1
-	{
-		public FieldElement X;
-		public FieldElement Y;
-		public FieldElement Z;
-		public FieldElement T;
-	} ;
+    internal struct GroupElementP1P1
+    {
+        public FieldElement X;
+        public FieldElement Y;
+        public FieldElement Z;
+        public FieldElement T;
+    };
 
-	internal struct GroupElementPreComp
-	{
-		public FieldElement yplusx;
-		public FieldElement yminusx;
-		public FieldElement xy2d;
+    internal struct GroupElementPreComp
+    {
+        public FieldElement yplusx;
+        public FieldElement yminusx;
+        public FieldElement xy2d;
 
-		public GroupElementPreComp(FieldElement yplusx, FieldElement yminusx, FieldElement xy2d)
-		{
-			this.yplusx = yplusx;
-			this.yminusx = yminusx;
-			this.xy2d = xy2d;
-		}
-	} ;
+        public GroupElementPreComp(FieldElement yplusx, FieldElement yminusx, FieldElement xy2d)
+        {
+            this.yplusx = yplusx;
+            this.yminusx = yminusx;
+            this.xy2d = xy2d;
+        }
+    };
 
-	internal struct GroupElementCached
-	{
-		public FieldElement YplusX;
-		public FieldElement YminusX;
-		public FieldElement Z;
-		public FieldElement T2d;
-	} ;
+    internal struct GroupElementCached
+    {
+        public FieldElement YplusX;
+        public FieldElement YminusX;
+        public FieldElement Z;
+        public FieldElement T2d;
+    };
 }

@@ -10,7 +10,7 @@ namespace Discord.Rest
     {
         #region RestWebhook
         internal IGuild Guild { get; private set; }
-        internal ITextChannel Channel { get; private set; }
+        internal IIntegrationChannel Channel { get; private set; }
 
         /// <inheritdoc />
         public string Token { get; }
@@ -38,7 +38,7 @@ namespace Discord.Rest
             Token = token;
             ChannelId = channelId;
         }
-        internal RestWebhook(BaseDiscordClient discord, ITextChannel channel, ulong id, string token, ulong channelId)
+        internal RestWebhook(BaseDiscordClient discord, IIntegrationChannel channel, ulong id, string token, ulong channelId)
             : this(discord, channel.Guild, id, token, channelId)
         {
             Channel = channel;
@@ -50,7 +50,7 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
-        internal static RestWebhook Create(BaseDiscordClient discord, ITextChannel channel, Model model)
+        internal static RestWebhook Create(BaseDiscordClient discord, IIntegrationChannel channel, Model model)
         {
             var entity = new RestWebhook(discord, channel, model.Id, model.Token, model.ChannelId);
             entity.Update(model);
@@ -100,10 +100,10 @@ namespace Discord.Rest
 
         #region IWebhook
         /// <inheritdoc />
-        IGuild IWebhook.Guild 
+        IGuild IWebhook.Guild
             => Guild ?? throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
         /// <inheritdoc />
-        ITextChannel IWebhook.Channel 
+        IIntegrationChannel IWebhook.Channel
             => Channel ?? throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
         /// <inheritdoc />
         Task IWebhook.ModifyAsync(Action<WebhookProperties> func, RequestOptions options)

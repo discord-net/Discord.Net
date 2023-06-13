@@ -10,11 +10,10 @@ namespace Discord.Interactions
     internal static class ReflectionUtils<T>
     {
         private static readonly TypeInfo ObjectTypeInfo = typeof(object).GetTypeInfo();
-
-        internal static T CreateObject (TypeInfo typeInfo, InteractionService commandService, IServiceProvider services = null) =>
+        internal static T CreateObject(TypeInfo typeInfo, InteractionService commandService, IServiceProvider services = null) =>
             CreateBuilder(typeInfo, commandService)(services);
 
-        internal static Func<IServiceProvider, T> CreateBuilder (TypeInfo typeInfo, InteractionService commandService)
+        internal static Func<IServiceProvider, T> CreateBuilder(TypeInfo typeInfo, InteractionService commandService)
         {
             var constructor = GetConstructor(typeInfo);
             var parameters = constructor.GetParameters();
@@ -33,7 +32,7 @@ namespace Discord.Interactions
             };
         }
 
-        private static T InvokeConstructor (ConstructorInfo constructor, object[] args, TypeInfo ownerType)
+        private static T InvokeConstructor(ConstructorInfo constructor, object[] args, TypeInfo ownerType)
         {
             try
             {
@@ -44,7 +43,7 @@ namespace Discord.Interactions
                 throw new Exception($"Failed to create \"{ownerType.FullName}\".", ex);
             }
         }
-        private static ConstructorInfo GetConstructor (TypeInfo ownerType)
+        private static ConstructorInfo GetConstructor(TypeInfo ownerType)
         {
             var constructors = ownerType.DeclaredConstructors.Where(x => !x.IsStatic).ToArray();
             if (constructors.Length == 0)
@@ -53,7 +52,7 @@ namespace Discord.Interactions
                 throw new InvalidOperationException($"Multiple constructors found for \"{ownerType.FullName}\".");
             return constructors[0];
         }
-        private static PropertyInfo[] GetProperties (TypeInfo ownerType)
+        private static PropertyInfo[] GetProperties(TypeInfo ownerType)
         {
             var result = new List<PropertyInfo>();
             while (ownerType != ObjectTypeInfo)
@@ -67,7 +66,7 @@ namespace Discord.Interactions
             }
             return result.ToArray();
         }
-        private static object GetMember (InteractionService commandService, IServiceProvider services, Type memberType, TypeInfo ownerType)
+        private static object GetMember(InteractionService commandService, IServiceProvider services, Type memberType, TypeInfo ownerType)
         {
             if (memberType == typeof(InteractionService))
                 return commandService;
@@ -79,7 +78,7 @@ namespace Discord.Interactions
             throw new InvalidOperationException($"Failed to create \"{ownerType.FullName}\", dependency \"{memberType.Name}\" was not found.");
         }
 
-        internal static Func<T, object[], Task> CreateMethodInvoker (MethodInfo methodInfo)
+        internal static Func<T, object[], Task> CreateMethodInvoker(MethodInfo methodInfo)
         {
             var parameters = methodInfo.GetParameters();
             var paramsExp = new Expression[parameters.Length];
@@ -106,7 +105,7 @@ namespace Discord.Interactions
         /// <summary>
         /// Create a type initializer using compiled lambda expressions
         /// </summary>
-        internal static Func<IServiceProvider, T> CreateLambdaBuilder (TypeInfo typeInfo, InteractionService commandService)
+        internal static Func<IServiceProvider, T> CreateLambdaBuilder(TypeInfo typeInfo, InteractionService commandService)
         {
             var constructor = GetConstructor(typeInfo);
             var parameters = constructor.GetParameters();
@@ -164,6 +163,21 @@ namespace Discord.Interactions
             var assign = Expression.Assign(prop, Expression.Convert(valueParam, propertyInfo.PropertyType));
 
             return Expression.Lambda<Action<T, object>>(assign, instanceParam, valueParam).Compile();
+        }
+
+        internal static Func<T, object> CreateLambdaPropertyGetter(PropertyInfo propertyInfo)
+        {
+            var instanceParam = Expression.Parameter(typeof(T), "instance");
+            var prop = Expression.Property(instanceParam, propertyInfo);
+            return Expression.Lambda<Func<T, object>>(prop, instanceParam).Compile();
+        }
+
+        internal static Func<T, object> CreateLambdaPropertyGetter(Type type, PropertyInfo propertyInfo)
+        {
+            var instanceParam = Expression.Parameter(typeof(T), "instance");
+            var instanceAccess = Expression.Convert(instanceParam, type);
+            var prop = Expression.Property(instanceAccess, propertyInfo);
+            return Expression.Lambda<Func<T, object>>(prop, instanceParam).Compile();
         }
 
         internal static Func<object[], object[], T> CreateLambdaMemberInit(TypeInfo typeInfo, ConstructorInfo constructor, Predicate<PropertyInfo> propertySelect = null)

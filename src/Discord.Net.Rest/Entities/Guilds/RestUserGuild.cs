@@ -21,6 +21,14 @@ namespace Discord.Rest
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public string IconUrl => CDN.GetGuildIconUrl(Id, _iconId);
+        /// <inheritdoc />
+        public GuildFeatures Features { get; private set; }
+
+        /// <inheritdoc />
+        public int? ApproximateMemberCount { get; private set; }
+
+        /// <inheritdoc />
+        public int? ApproximatePresenceCount { get; private set; }
 
         internal RestUserGuild(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -39,12 +47,22 @@ namespace Discord.Rest
             IsOwner = model.Owner;
             Name = model.Name;
             Permissions = new GuildPermissions(model.Permissions);
+            Features = model.Features;
+            ApproximateMemberCount = model.ApproximateMemberCount.IsSpecified ? model.ApproximateMemberCount.Value : null;
+            ApproximatePresenceCount = model.ApproximatePresenceCount.IsSpecified ? model.ApproximatePresenceCount.Value : null;
         }
-        
+
         public async Task LeaveAsync(RequestOptions options = null)
         {
             await Discord.ApiClient.LeaveGuildAsync(Id, options).ConfigureAwait(false);
         }
+
+        public async Task<RestGuildUser> GetCurrentUserGuildMemberAsync(RequestOptions options = null)
+        {
+            var user = await Discord.ApiClient.GetCurrentUserGuildMember(Id, options);
+            return RestGuildUser.Create(Discord, null, user, Id);
+        }
+
         /// <inheritdoc />
         public async Task DeleteAsync(RequestOptions options = null)
         {

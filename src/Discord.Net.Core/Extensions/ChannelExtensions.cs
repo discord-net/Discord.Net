@@ -46,6 +46,9 @@ namespace Discord
 
                 case ITextChannel:
                     return ChannelType.Text;
+
+                case IForumChannel:
+                    return ChannelType.Forum;
             }
 
             return null;

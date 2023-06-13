@@ -1,4 +1,8 @@
 using Newtonsoft.Json;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace Discord.API.Rest
 {
@@ -19,19 +23,32 @@ namespace Discord.API.Rest
         [JsonProperty("default_permission")]
         public Optional<bool> DefaultPermission { get; set; }
 
+        [JsonProperty("name_localizations")]
+        public Optional<Dictionary<string, string>> NameLocalizations { get; set; }
+
+        [JsonProperty("description_localizations")]
+        public Optional<Dictionary<string, string>> DescriptionLocalizations { get; set; }
+
         [JsonProperty("dm_permission")]
         public Optional<bool?> DmPermission { get; set; }
 
         [JsonProperty("default_member_permissions")]
         public Optional<GuildPermission?> DefaultMemberPermission { get; set; }
 
+        [JsonProperty("nsfw")]
+        public Optional<bool> Nsfw { get; set; }
+
         public CreateApplicationCommandParams() { }
-        public CreateApplicationCommandParams(string name, string description, ApplicationCommandType type, ApplicationCommandOption[] options = null)
+        public CreateApplicationCommandParams(string name, string description, ApplicationCommandType type, ApplicationCommandOption[] options = null,
+            IDictionary<string, string> nameLocalizations = null, IDictionary<string, string> descriptionLocalizations = null, bool nsfw = false)
         {
             Name = name;
             Description = description;
             Options = Optional.Create(options);
             Type = type;
+            NameLocalizations = nameLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
+            DescriptionLocalizations = descriptionLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
+            Nsfw = nsfw;
         }
     }
 }

@@ -16,5 +16,8 @@ namespace Discord.API
 
         [JsonProperty("flags")]
         public int Flags { get; set; } // No enum type (yet?)
+
+        [JsonProperty("member")]
+        public Optional<GuildMember> GuildMember { get; set; }
     }
 }

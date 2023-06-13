@@ -1,5 +1,6 @@
 using Discord.Rest;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -8,7 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 using ThreadMember = Discord.API.ThreadMember;
-using System.Collections.Concurrent;
 
 namespace Discord.WebSocket
 {
@@ -89,8 +89,14 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public bool? IsInvitable { get; private set; }
 
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ulong> AppliedTags { get; private set; }
+
         /// <inheritdoc cref="IThreadChannel.CreatedAt"/>
         public override DateTimeOffset CreatedAt { get; }
+
+        /// <inheritdoc cref="IThreadChannel.OwnerId"/>
+        ulong IThreadChannel.OwnerId => _ownerId;
 
         /// <summary>
         ///     Gets a collection of cached users within this thread.
@@ -149,6 +155,8 @@ namespace Discord.WebSocket
             }
 
             HasJoined = model.ThreadMember.IsSpecified;
+
+            AppliedTags = model.AppliedTags.GetValueOrDefault(Array.Empty<ulong>()).ToImmutableArray();
         }
 
         internal IReadOnlyCollection<SocketThreadUser> RemoveUsers(ulong[] users)
@@ -164,7 +172,7 @@ namespace Discord.WebSocket
             return threadUsers.ToImmutableArray();
         }
 
-        internal SocketThreadUser AddOrUpdateThreadMember(ThreadMember model, SocketGuildUser guildMember)
+        internal SocketThreadUser AddOrUpdateThreadMember(ThreadMember model, SocketGuildUser guildMember = null)
         {
             if (_members.TryGetValue(model.UserId.Value, out SocketThreadUser member))
                 member.Update(model);
@@ -194,7 +202,7 @@ namespace Discord.WebSocket
         /// <returns>A task representing the download operation.</returns>
         public async Task<IReadOnlyCollection<SocketThreadUser>> GetUsersAsync(RequestOptions options = null)
         {
-            // download all users if we havent
+            // download all users if we haven't
             if (!_usersDownloaded)
             {
                 await DownloadUsersAsync(options);
@@ -211,15 +219,21 @@ namespace Discord.WebSocket
         /// <returns>A task representing the asynchronous download operation.</returns>
         public async Task DownloadUsersAsync(RequestOptions options = null)
         {
-            var users = await Discord.ApiClient.ListThreadMembersAsync(Id, options);
+            var prevBatchCount = DiscordConfig.MaxThreadMembersPerBatch;
+            ulong? maxId = null;
 
-            lock (_downloadLock)
+            while (prevBatchCount == DiscordConfig.MaxThreadMembersPerBatch)
             {
-                foreach (var threadMember in users)
-                {
-                    var guildUser = Guild.GetUser(threadMember.UserId.Value);
+                var users = await Discord.ApiClient.ListThreadMembersAsync(Id, maxId, DiscordConfig.MaxThreadMembersPerBatch, options);
+                prevBatchCount = users.Length;
+                maxId = users.Max(x => x.UserId.GetValueOrDefault());
 
-                    AddOrUpdateThreadMember(threadMember, guildUser);
+                lock (_downloadLock)
+                {
+                    foreach (var threadMember in users)
+                    {
+                        AddOrUpdateThreadMember(threadMember);
+                    }
                 }
             }
         }
@@ -334,10 +348,11 @@ namespace Discord.WebSocket
             => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
-        /// <remarks>
-        ///     <b>This method is not supported in threads.</b>
-        /// </remarks>
         public override Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
+            => ThreadHelper.ModifyAsync(this, Discord, func, options);
+
+        /// <inheritdoc/>
+        public Task ModifyAsync(Action<ThreadChannelProperties> func, RequestOptions options = null)
             => ThreadHelper.ModifyAsync(this, Discord, func, options);
 
         /// <inheritdoc/>
@@ -366,6 +381,10 @@ namespace Discord.WebSocket
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task SyncPermissionsAsync(RequestOptions options = null)
+            => throw new NotSupportedException("This method is not supported in threads.");
+
+        /// <inheritdoc/> <exception cref="NotSupportedException">This method is not supported in threads.</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
             => throw new NotSupportedException("This method is not supported in threads.");
 
         string IChannel.Name => Name;

@@ -53,7 +53,7 @@ namespace Discord.WebSocket
         public bool IsStreaming => (_voiceStates & Flags.SelfStream) != 0;
         /// <inheritdoc />
         public bool IsVideoing => (_voiceStates & Flags.SelfVideo) != 0;
-        
+
 
         internal SocketVoiceState(SocketVoiceChannel voiceChannel, DateTimeOffset? requestToSpeak, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed, bool isStream, bool isVideo)
         {

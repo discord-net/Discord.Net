@@ -33,7 +33,7 @@ namespace Discord.Net.Queue
 
         public static ClientBucket Get(ClientBucketType type) => DefsByType[type];
         public static ClientBucket Get(BucketId id) => DefsById[id];
-        
+
         public ClientBucketType Type { get; }
         public BucketId Id { get; }
         public int WindowCount { get; }

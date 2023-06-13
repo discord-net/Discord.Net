@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Discord.Overrides
 {
     /// <summary>
-    ///     Represents context thats passed to an override in the initialization step.
+    ///     Represents context that's passed to an override in the initialization step.
     /// </summary>
     public sealed class OverrideContext
     {

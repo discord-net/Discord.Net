@@ -1,10 +1,10 @@
 using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Model = Discord.API.User;
-using ImageModel = Discord.API.Image;
 using System.Linq;
+using System.Threading.Tasks;
+using ImageModel = Discord.API.Image;
+using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
@@ -40,7 +40,8 @@ namespace Discord.Rest
                 Deaf = args.Deaf,
                 Mute = args.Mute,
                 Nickname = args.Nickname,
-                TimedOutUntil = args.TimedOutUntil
+                TimedOutUntil = args.TimedOutUntil,
+                Flags = args.Flags
             };
 
             if (args.Channel.IsSpecified)

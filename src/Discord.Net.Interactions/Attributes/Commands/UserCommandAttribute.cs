@@ -16,9 +16,9 @@ namespace Discord.Interactions
         ///     Register a command as a User Context Command.
         /// </summary>
         /// <param name="name">Name of this User Context Command.</param>
-        public UserCommandAttribute (string name) : base(name, ApplicationCommandType.User) { }
+        public UserCommandAttribute(string name) : base(name, ApplicationCommandType.User) { }
 
-        internal override void CheckMethodDefinition (MethodInfo methodInfo)
+        internal override void CheckMethodDefinition(MethodInfo methodInfo)
         {
             var parameters = methodInfo.GetParameters();
 

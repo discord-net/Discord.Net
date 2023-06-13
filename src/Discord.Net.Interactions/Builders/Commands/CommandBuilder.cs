@@ -23,7 +23,7 @@ namespace Discord.Interactions.Builders
         /// <inheritdoc/>
         public ModuleBuilder Module { get; }
 
-        //// <inheritdoc/>
+        /// <inheritdoc/>
         public ExecuteCallback Callback { get; internal set; }
 
         /// <inheritdoc/>
@@ -34,6 +34,9 @@ namespace Discord.Interactions.Builders
 
         /// <inheritdoc/>
         public bool IgnoreGroupNames { get; set; }
+
+        /// <inheritdoc/>
+        public bool TreatNameAsRegex { get; set; }
 
         /// <inheritdoc/>
         public RunMode RunMode { get; set; }
@@ -50,7 +53,7 @@ namespace Discord.Interactions.Builders
         /// <inheritdoc/>
         IReadOnlyList<IParameterBuilder> ICommandBuilder.Parameters => Parameters;
 
-        internal CommandBuilder (ModuleBuilder module)
+        internal CommandBuilder(ModuleBuilder module)
         {
             _attributes = new List<Attribute>();
             _preconditions = new List<PreconditionAttribute>();
@@ -59,7 +62,7 @@ namespace Discord.Interactions.Builders
             Module = module;
         }
 
-        protected CommandBuilder (ModuleBuilder module, string name, ExecuteCallback callback) : this(module)
+        protected CommandBuilder(ModuleBuilder module, string name, ExecuteCallback callback) : this(module)
         {
             Name = name;
             Callback = callback;
@@ -72,7 +75,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public TBuilder WithName (string name)
+        public TBuilder WithName(string name)
         {
             Name = name;
             return Instance;
@@ -85,7 +88,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public TBuilder WithMethodName (string name)
+        public TBuilder WithMethodName(string name)
         {
             MethodName = name;
             return Instance;
@@ -98,7 +101,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public TBuilder WithAttributes (params Attribute[] attributes)
+        public TBuilder WithAttributes(params Attribute[] attributes)
         {
             _attributes.AddRange(attributes);
             return Instance;
@@ -111,9 +114,22 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public TBuilder SetRunMode (RunMode runMode)
+        public TBuilder SetRunMode(RunMode runMode)
         {
             RunMode = runMode;
+            return Instance;
+        }
+
+        /// <summary>
+        ///     Sets <see cref="TreatNameAsRegex"/>.
+        /// </summary>
+        /// <param name="value">New value of the <see cref="TreatNameAsRegex"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public TBuilder WithNameAsRegex(bool value)
+        {
+            TreatNameAsRegex = value;
             return Instance;
         }
 
@@ -124,7 +140,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public TBuilder AddParameters (params TParamBuilder[] parameters)
+        public TBuilder AddParameters(params TParamBuilder[] parameters)
         {
             _parameters.AddRange(parameters);
             return Instance;
@@ -137,38 +153,42 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public TBuilder WithPreconditions (params PreconditionAttribute[] preconditions)
+        public TBuilder WithPreconditions(params PreconditionAttribute[] preconditions)
         {
             _preconditions.AddRange(preconditions);
             return Instance;
         }
 
         /// <inheritdoc/>
-        public abstract TBuilder AddParameter (Action<TParamBuilder> configure);
+        public abstract TBuilder AddParameter(Action<TParamBuilder> configure);
 
-        internal abstract TInfo Build (ModuleInfo module, InteractionService commandService);
+        internal abstract TInfo Build(ModuleInfo module, InteractionService commandService);
 
         //ICommandBuilder
         /// <inheritdoc/>
-        ICommandBuilder ICommandBuilder.WithName (string name) =>
+        ICommandBuilder ICommandBuilder.WithName(string name) =>
             WithName(name);
 
         /// <inheritdoc/>
-        ICommandBuilder ICommandBuilder.WithMethodName (string name) =>
+        ICommandBuilder ICommandBuilder.WithMethodName(string name) =>
             WithMethodName(name);
-        ICommandBuilder ICommandBuilder.WithAttributes (params Attribute[] attributes) =>
+        ICommandBuilder ICommandBuilder.WithAttributes(params Attribute[] attributes) =>
             WithAttributes(attributes);
 
         /// <inheritdoc/>
-        ICommandBuilder ICommandBuilder.SetRunMode (RunMode runMode) =>
+        ICommandBuilder ICommandBuilder.SetRunMode(RunMode runMode) =>
             SetRunMode(runMode);
 
         /// <inheritdoc/>
-        ICommandBuilder ICommandBuilder.AddParameters (params IParameterBuilder[] parameters) =>
+        ICommandBuilder ICommandBuilder.WithNameAsRegex(bool value) =>
+            WithNameAsRegex(value);
+
+        /// <inheritdoc/>
+        ICommandBuilder ICommandBuilder.AddParameters(params IParameterBuilder[] parameters) =>
             AddParameters(parameters as TParamBuilder);
 
         /// <inheritdoc/>
-        ICommandBuilder ICommandBuilder.WithPreconditions (params PreconditionAttribute[] preconditions) =>
+        ICommandBuilder ICommandBuilder.WithPreconditions(params PreconditionAttribute[] preconditions) =>
             WithPreconditions(preconditions);
     }
 }

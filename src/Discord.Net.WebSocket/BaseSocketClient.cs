@@ -1,9 +1,9 @@
+using Discord.API;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Discord.API;
-using Discord.Rest;
 
 namespace Discord.WebSocket
 {
@@ -268,11 +268,12 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="inviteId">The invitation identifier.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="scheduledEventId">The id of the guild scheduled event to include with the invite.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the invite information.
         /// </returns>
-        public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null)
-            => ClientHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default);
+        public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null, ulong? scheduledEventId = null)
+            => ClientHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default, scheduledEventId);
         /// <summary>
         ///     Gets a sticker.
         /// </summary>
@@ -283,7 +284,7 @@ namespace Discord.WebSocket
         ///     A <see cref="SocketSticker"/> if found, otherwise <see langword="null"/>.
         /// </returns>
         public abstract Task<SocketSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-#endregion
+        #endregion
 
         #region IDiscordClient
         /// <inheritdoc />

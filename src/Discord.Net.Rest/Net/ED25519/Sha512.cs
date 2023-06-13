@@ -45,7 +45,7 @@ namespace Discord.Net.ED25519
         /// <param name="length">Sequence length</param>
         public void Update(byte[] data, int index, int length)
         {
-            
+
             Array16<ulong> block;
             int bytesInBuffer = (int)_totalBytes & (BlockSize - 1);
             _totalBytes += (uint)length;

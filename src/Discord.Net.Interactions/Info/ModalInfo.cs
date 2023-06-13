@@ -95,15 +95,15 @@ namespace Discord.Interactions
         ///     Creates an <see cref="IModal"/> and fills it with provided message components.
         /// </summary>
         /// <param name="context">Context of the <see cref="IModalInteraction"/> that will be injected into the modal.</param>
-        /// <param name="services">Services to be passed onto the <see cref="ComponentTypeConverter"/>s of the modal fiels.</param>
-        /// <param name="throwOnMissingField">Wheter or not this method should exit on encountering a missing modal field.</param>
+        /// <param name="services">Services to be passed onto the <see cref="ComponentTypeConverter"/>s of the modal fields.</param>
+        /// <param name="throwOnMissingField">Whether or not this method should exit on encountering a missing modal field.</param>
         /// <returns>
         ///     A <see cref="TypeConverterResult"/> if a type conversion has failed, else  a <see cref="ParseResult"/>.
         /// </returns>
         public async Task<IResult> CreateModalAsync(IInteractionContext context, IServiceProvider services = null, bool throwOnMissingField = false)
         {
             if (context.Interaction is not IModalInteraction modalInteraction)
-                return ParseResult.FromError(InteractionCommandError.Unsuccessful, "Provided context doesn't belong to a Modal Interaction.");
+                return TypeConverterResult.FromError(InteractionCommandError.Unsuccessful, "Provided context doesn't belong to a Modal Interaction.");
 
             services ??= EmptyServiceProvider.Instance;
 
@@ -120,7 +120,7 @@ namespace Discord.Interactions
                     if (!throwOnMissingField)
                         args[i] = input.DefaultValue;
                     else
-                        return ParseResult.FromError(InteractionCommandError.BadArgs, $"Modal interaction is missing the required field: {input.CustomId}");
+                        return TypeConverterResult.FromError(InteractionCommandError.BadArgs, $"Modal interaction is missing the required field: {input.CustomId}");
                 }
                 else
                 {
@@ -133,7 +133,7 @@ namespace Discord.Interactions
                 }
             }
 
-            return ParseResult.FromSuccess(_initializer(args));
+            return TypeConverterResult.FromSuccess(_initializer(args));
         }
     }
 }

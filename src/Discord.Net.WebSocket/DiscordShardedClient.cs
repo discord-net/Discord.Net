@@ -2,11 +2,11 @@ using Discord.API;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading;
-using System.Collections.Immutable;
+using System.Threading.Tasks;
 
 namespace Discord.WebSocket
 {
@@ -139,9 +139,9 @@ namespace Discord.WebSocket
 
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
+            var botGateway = await GetBotGatewayAsync().ConfigureAwait(false);
             if (_automaticShards)
             {
-                var botGateway = await GetBotGatewayAsync().ConfigureAwait(false);
                 _shardIds = Enumerable.Range(0, botGateway.Shards).ToArray();
                 _totalShards = _shardIds.Length;
                 _shards = new DiscordSocketClient[_shardIds.Length];
@@ -163,9 +163,14 @@ namespace Discord.WebSocket
 
             //Assume thread safe: already in a connection lock
             for (int i = 0; i < _shards.Length; i++)
-                await _shards[i].LoginAsync(tokenType, token);
+            {
+                // Set the gateway URL to the one returned by Discord, if a custom one isn't set.
+                _shards[i].ApiClient.GatewayUrl = botGateway.Url;
 
-            if(_defaultStickers.Length == 0 && _baseConfig.AlwaysDownloadDefaultStickers)
+                await _shards[i].LoginAsync(tokenType, token);
+            }
+
+            if (_defaultStickers.Length == 0 && _baseConfig.AlwaysDownloadDefaultStickers)
                 await DownloadDefaultStickersAsync().ConfigureAwait(false);
 
         }
@@ -175,7 +180,12 @@ namespace Discord.WebSocket
             if (_shards != null)
             {
                 for (int i = 0; i < _shards.Length; i++)
+                {
+                    // Reset the gateway URL set for the shard.
+                    _shards[i].ApiClient.GatewayUrl = null;
+
                     await _shards[i].LogoutAsync();
+                }
             }
 
             if (_automaticShards)
@@ -360,7 +370,8 @@ namespace Discord.WebSocket
         /// <exception cref="ArgumentNullException"><paramref name="guilds"/> is <see langword="null"/></exception>
         public override async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
         {
-            if (guilds == null) throw new ArgumentNullException(nameof(guilds));
+            if (guilds == null)
+                throw new ArgumentNullException(nameof(guilds));
             for (int i = 0; i < _shards.Length; i++)
             {
                 int id = _shardIds[i];
@@ -496,6 +507,9 @@ namespace Discord.WebSocket
             client.GuildScheduledEventStarted += (arg) => _guildScheduledEventStarted.InvokeAsync(arg);
             client.GuildScheduledEventUserAdd += (arg1, arg2) => _guildScheduledEventUserAdd.InvokeAsync(arg1, arg2);
             client.GuildScheduledEventUserRemove += (arg1, arg2) => _guildScheduledEventUserRemove.InvokeAsync(arg1, arg2);
+
+            client.WebhooksUpdated += (arg1, arg2) => _webhooksUpdated.InvokeAsync(arg1, arg2);
+            client.AuditLogCreated += (arg1, arg2) => _auditLogCreated.InvokeAsync(arg1, arg2);
         }
         #endregion
 

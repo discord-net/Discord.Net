@@ -45,7 +45,7 @@ namespace Discord.Audio.Streams
 
             if (_client.SecretKey == null)
                 return;
-                
+
             Buffer.BlockCopy(buffer, offset, _nonce, 0, 12); //Copy nonce from RTP header
             count = SecretBox.Encrypt(buffer, offset + 12, count - 12, buffer, 12, _nonce, _client.SecretKey);
             _next.WriteHeader(_nextSeq, _nextTimestamp, false);

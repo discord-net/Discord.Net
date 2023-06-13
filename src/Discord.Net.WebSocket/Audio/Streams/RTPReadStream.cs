@@ -29,7 +29,7 @@ namespace Discord.Audio.Streams
 
             int headerSize = GetHeaderSize(buffer, offset);
 
-            ushort seq =  (ushort)((buffer[offset + 2] << 8) |
+            ushort seq = (ushort)((buffer[offset + 2] << 8) |
                 (buffer[offset + 3] << 0));
 
             uint timestamp = (uint)((buffer[offset + 4] << 24) |
@@ -46,7 +46,7 @@ namespace Discord.Audio.Streams
             ssrc = 0;
             if (buffer.Length - offset < 12)
                 return false;
-                
+
             int version = (buffer[offset + 0] & 0b1100_0000) >> 6;
             if (version != 2)
                 return false;
@@ -71,8 +71,8 @@ namespace Discord.Audio.Streams
                 return 12 + csics * 4;
 
             int extensionOffset = offset + 12 + (csics * 4);
-            int extensionLength = 
-                (buffer[extensionOffset + 2] << 8) | 
+            int extensionLength =
+                (buffer[extensionOffset + 2] << 8) |
                 (buffer[extensionOffset + 3]);
             return extensionOffset + 4 + (extensionLength * 4);
         }
