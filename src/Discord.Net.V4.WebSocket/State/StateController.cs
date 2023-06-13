@@ -1,3 +1,5 @@
+using Discord.Net.V4.Core.API.Models.Guilds;
+using Discord.Net.V4.Core.API.Models.Users;
 using Discord.WebSocket;
 using System;
 using System.Collections.Concurrent;
@@ -6,10 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord.WebSocket.Cache;
-using UserBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketUser, Discord.WebSocket.Cache.IUserModel>;
-using MemberBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildUser, Discord.WebSocket.Cache.IMemberModel, Discord.WebSocket.Cache.IUserModel>;
-using PresenseBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketPresense, Discord.WebSocket.Cache.IPresenseModel>;
-using GuildBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuild, Discord.WebSocket.Cache.IGuildModel, Discord.WebSocket.SocketGuild.FactoryArgs>;
+using UserBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketUser, Discord.Net.V4.Core.API.Models.Users.IUserModel>;
+using MemberBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildUser, Discord.Net.V4.Core.API.Models.Users.IMemberModel, Discord.Net.V4.Core.API.Models.Users.IUserModel>;
+using PresenseBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketPresense, Discord.Net.V4.Core.API.Models.Presense.IPresenseModel>;
+using GuildBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuild, Discord.Net.V4.Core.API.Models.Guilds.IGuildModel, Discord.WebSocket.SocketGuild.FactoryArgs>;
 using CleanupFunction = System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task>;
 
 

@@ -1,3 +1,4 @@
+using Discord.Net.V4.Core.API.Models.Channels;
 using Discord.WebSocket.Cache;
 using System;
 using System.Collections.Generic;

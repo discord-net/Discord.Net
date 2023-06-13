@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
-    <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
+    <ProjectReference Include="..\Discord.Net.V4.Core\Discord.Net.V4.Core.csproj" />
+    <ProjectReference Include="..\Discord.Net.V4.Rest\Discord.Net.V4.Rest.csproj" />
   </ItemGroup>
 
 </Project>

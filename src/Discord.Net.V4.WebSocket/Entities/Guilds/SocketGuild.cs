@@ -1,4 +1,7 @@
 using Discord.Audio;
+using Discord.Net.V4.Core.API.Models;
+using Discord.Net.V4.Core.API.Models.Channels;
+using Discord.Net.V4.Core.API.Models.Guilds;
 using Discord.WebSocket.Cache;
 using System;
 using System.Collections.Generic;

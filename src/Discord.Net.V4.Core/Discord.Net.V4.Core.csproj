@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\marketing\logo\PackageLogo.png" Link="PackageLogo.png">
+      <PackagePath></PackagePath>
+      <Pack>true</Pack>
+    </None>
+  </ItemGroup>
+
+</Project>
