@@ -28,6 +28,9 @@ namespace Discord.WebSocket
             _source = model;
         }
 
+        internal override IChannelModel GetModel()
+            => _source;
+
         public Task<IUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
     }

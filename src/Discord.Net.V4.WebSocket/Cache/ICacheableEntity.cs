@@ -28,11 +28,14 @@ namespace Discord.WebSocket.Cache
         }
     }
 
-    internal interface ICacheableEntity<TId> : IEntity<TId>, IScopedClonable
+    internal interface ICacheableEntity<TId> : IEntity<TId>, IScopedClonable, IDisposable, IAsyncDisposable
         where TId : IEquatable<TId>
     {
         IEntityModel<TId> GetModel();
 
         void Update(IEntityModel<TId> model);
+
+        void AcceptHandle(IEntityHandle handle);
+        void DereferenceHandle(IEntityHandle handle);
     }
 }

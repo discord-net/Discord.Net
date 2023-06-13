@@ -9,8 +9,15 @@ using System.Threading.Tasks;
 
 namespace Discord.WebSocket
 {
-    internal class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
+    public class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
     {
+        internal record FactoryArgs(
+            IEnumerable<IChannelModel>? Channels = null,
+            IEnumerable<IRoleModel>? Roles = null,
+            IEnumerable<IEmojiModel>? Emotes = null,
+            IEnumerable<IStickerModel>? Stickers = null
+        );
+
         public IAudioClient AudioClient => throw new NotImplementedException(); // TODO
 
         public IRole EveryoneRole => throw new NotImplementedException(); // TODO
@@ -160,7 +167,7 @@ namespace Discord.WebSocket
         private IGuildModel _source;
         private GuildFeatures _features;
 
-        public SocketGuild(DiscordSocketClient discord, ulong id, IGuildModel model) : base(discord, id)
+        internal SocketGuild(DiscordSocketClient discord, ulong id, IGuildModel model, FactoryArgs args) : base(discord, id)
         {
             _source = model;
             _features = new GuildFeatures(model.Features, model.ExperimentalFeatures);

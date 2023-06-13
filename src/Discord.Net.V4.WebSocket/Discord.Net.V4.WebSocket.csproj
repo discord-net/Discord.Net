@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
+    <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
   </ItemGroup>
 
 </Project>

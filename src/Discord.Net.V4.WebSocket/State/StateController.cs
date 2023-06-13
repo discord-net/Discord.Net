@@ -9,6 +9,7 @@ using Discord.WebSocket.Cache;
 using UserBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketUser, Discord.WebSocket.Cache.IUserModel>;
 using MemberBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildUser, Discord.WebSocket.Cache.IMemberModel, Discord.WebSocket.Cache.IUserModel>;
 using PresenseBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketPresense, Discord.WebSocket.Cache.IPresenseModel>;
+using GuildBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuild, Discord.WebSocket.Cache.IGuildModel, Discord.WebSocket.SocketGuild.FactoryArgs>;
 using CleanupFunction = System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task>;
 
 
@@ -59,22 +60,20 @@ namespace Discord.WebSocket.State
         public UserBroker Users
             => _userBroker ??= new UserBroker(
                     this,
-                    p => GetStore(StoreType.Users),
+                    p => GetStoreAsync(StoreType.Users),
                     (_, __, model) => ValueTask.FromResult(new SocketUser(_client, model))
                );
-
         private UserBroker? _userBroker;
 
         public MemberBroker Members
-            => _memberBroker ??= new MemberBroker(this, p => GetSubStoreAsync(p, StoreType.GuildUsers), ConstructGuildUser);
+            => _memberBroker ??= new MemberBroker(this, p => GetSubStoreAsync(p, StoreType.GuildUsers), ConstructGuildUserAsync);
         private MemberBroker? _memberBroker;
-
-        private async ValueTask<SocketGuildUser> ConstructGuildUser(IUserModel? userModel, ulong guildId, IMemberModel model)
+        private async ValueTask<SocketGuildUser> ConstructGuildUserAsync(IUserModel? userModel, ulong guildId, IMemberModel model)
         {
             // user information is required
             if(userModel is null)
             {
-                var rawUserModel = await (await GetStore(StoreType.Users)).GetAsync(model.Id)
+                var rawUserModel = await (await GetStoreAsync(StoreType.Users)).GetAsync(model.Id)
                     ?? throw new NullReferenceException($"No user information could be found for the member ({model.Id})");
 
                 if (rawUserModel is not IUserModel user)
@@ -88,18 +87,34 @@ namespace Discord.WebSocket.State
             return new SocketGuildUser(_client, guildId, model, userModel);
         }
 
-        public PresenseBroker PresenseBroker
+        public PresenseBroker Presense
             => _presenseBroker ??= new PresenseBroker(
                     this,
                     p => GetSubStoreAsync(p, StoreType.Presence),
                     (_, __, model) => ValueTask.FromResult(new SocketPresense(_client, model))
                );
-
         private PresenseBroker? _presenseBroker;
+
+        public GuildBroker Guilds
+            => _guilds ??= new GuildBroker(
+                    this,
+                    p => GetStoreAsync(StoreType.GuildStage),
+                    ConstructGuildAsync
+               );
+        private GuildBroker? _guilds;
+        private ValueTask<SocketGuild> ConstructGuildAsync(SocketGuild.FactoryArgs? args, ulong parent, IGuildModel model)
+        {
+            // TODO: load dependants based on configuration
+            args ??= new SocketGuild.FactoryArgs();
+
+
+            return ValueTask.FromResult(new SocketGuild(_client, model.Id, model, args));
+        }
+
         #endregion
 
         #region GetStores
-        public ValueTask<IEntityStore<ulong>> GetStore(StoreType type)
+        public ValueTask<IEntityStore<ulong>> GetStoreAsync(StoreType type)
             => _cache.GetStoreAsync<ulong>(type);
 
         public ValueTask<IEntityStore<TId>> GetStoreAsync<TId>(StoreType type)
