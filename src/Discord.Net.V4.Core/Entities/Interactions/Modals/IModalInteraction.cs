@@ -30,6 +30,6 @@ namespace Discord
         /// <remarks>
         ///     This method can be used only if the modal was created from a message component.
         /// </remarks>
-        Task UpdateAsync(Action<MessageProperties> func, RequestOptions options = null);
+        Task UpdateAsync(Action<MessageProperties> func, RequestOptions? options = null);
     }
 }

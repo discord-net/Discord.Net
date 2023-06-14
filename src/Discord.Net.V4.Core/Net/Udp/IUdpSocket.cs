@@ -1,21 +1,16 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+namespace Discord.Net.Udp;
 
-namespace Discord.Net.Udp
+public interface IUdpSocket : IDisposable
 {
-    public interface IUdpSocket : IDisposable
-    {
-        event Func<byte[], int, int, Task> ReceivedDatagram;
+    event Func<byte[], int, int, Task> ReceivedDatagram;
 
-        ushort Port { get; }
+    ushort Port { get; }
 
-        void SetCancelToken(CancellationToken cancelToken);
-        void SetDestination(string ip, int port);
+    void SetCancelToken(CancellationToken cancelToken);
+    void SetDestination(string ip, int port);
 
-        Task StartAsync();
-        Task StopAsync();
+    Task StartAsync();
+    Task StopAsync();
 
-        Task SendAsync(byte[] data, int index, int count);
-    }
+    Task SendAsync(byte[] data, int index, int count);
 }

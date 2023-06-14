@@ -11,6 +11,6 @@ namespace Discord
         ///     Deletes this object and all its children.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
-        Task DeleteAsync(RequestOptions options = null);
+        Task DeleteAsync(RequestOptions? options = null);
     }
 }

@@ -22,6 +22,6 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous close operation.
         /// </returns>
-        Task CloseAsync(RequestOptions options = null);
+        Task CloseAsync(RequestOptions? options = null);
     }
 }

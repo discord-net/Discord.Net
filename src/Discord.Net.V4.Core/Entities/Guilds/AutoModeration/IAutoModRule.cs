@@ -106,6 +106,6 @@ namespace Discord
         /// </summary>
         /// <param name="func">The delegate containing the properties to modify the rule with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        Task ModifyAsync(Action<AutoModRuleProperties> func, RequestOptions options = null);
+        Task ModifyAsync(Action<AutoModRuleProperties> func, RequestOptions? options = null);
     }
 }

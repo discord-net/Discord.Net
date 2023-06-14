@@ -99,7 +99,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
-        Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null);
+        Task ModifyAsync(Action<RoleProperties> func, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets the image url of the icon role.

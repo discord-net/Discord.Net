@@ -25,7 +25,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the category channel
         ///     representing the parent of this channel; <c>null</c> if none is set.
         /// </returns>
-        Task<ICategoryChannel> GetCategoryAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<ICategoryChannel> GetCategoryAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
 
         /// <summary>
         ///     Syncs the permissions of this nested channel with its parent's.
@@ -34,7 +34,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous operation for syncing channel permissions with its parent's.
         /// </returns>
-        Task SyncPermissionsAsync(RequestOptions options = null);
+        Task SyncPermissionsAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Creates a new invite to this channel.
@@ -55,7 +55,7 @@ namespace Discord
         ///     A task that represents the asynchronous invite creation operation. The task result contains an invite
         ///     metadata object containing information for the created invite.
         /// </returns>
-        Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
+        Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions? options = null);
 
         /// <summary>
         ///     Creates a new invite to this channel.
@@ -70,7 +70,7 @@ namespace Discord
         ///     A task that represents the asynchronous invite creation operation. The task result contains an invite
         ///     metadata object containing information for the created invite.
         /// </returns>
-        Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
+        Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions? options = null);
 
         /// <summary>
         ///     Creates a new invite to this channel.
@@ -85,7 +85,7 @@ namespace Discord
         ///     A task that represents the asynchronous invite creation operation. The task result contains an invite
         ///     metadata object containing information for the created invite.
         /// </returns>
-        Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
+        Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions? options = null);
 
         /// <summary>
         ///     Creates a new invite to this channel.
@@ -107,7 +107,7 @@ namespace Discord
         ///     A task that represents the asynchronous invite creation operation. The task result contains an invite
         ///     metadata object containing information for the created invite.
         /// </returns>
-        Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
+        Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions? options = null);
         /// <summary>
         ///     Gets a collection of all invites to this channel.
         /// </summary>B
@@ -125,6 +125,6 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of invite metadata that are created for this channel.
         /// </returns>
-        Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions? options = null);
     }
 }

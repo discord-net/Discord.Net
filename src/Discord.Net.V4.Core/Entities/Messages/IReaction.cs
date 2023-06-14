@@ -1,13 +1,12 @@
-namespace Discord
+namespace Discord;
+
+/// <summary>
+///     Represents a generic reaction object.
+/// </summary>
+public interface IReaction
 {
     /// <summary>
-    ///     Represents a generic reaction object.
+    ///     The <see cref="IEmote" /> used in the reaction.
     /// </summary>
-    public interface IReaction
-    {
-        /// <summary>
-        ///     The <see cref="IEmote" /> used in the reaction.
-        /// </summary>
-        IEmote Emote { get; }
-    }
+    IEmote Emote { get; }
 }

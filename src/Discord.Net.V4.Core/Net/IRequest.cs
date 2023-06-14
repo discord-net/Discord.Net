@@ -1,13 +1,10 @@
-using System;
+namespace Discord.Net;
 
-namespace Discord.Net
+/// <summary>
+///     Represents a generic request to be sent to Discord.
+/// </summary>
+public interface IRequest
 {
-    /// <summary>
-    ///     Represents a generic request to be sent to Discord.
-    /// </summary>
-    public interface IRequest
-    {
-        DateTimeOffset? TimeoutAt { get; }
-        RequestOptions Options { get; }
-    }
+    DateTimeOffset? TimeoutAt { get; }
+    RequestOptions Options { get; }
 }

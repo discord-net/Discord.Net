@@ -35,7 +35,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous start operation.
         /// </returns>
-        Task StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, RequestOptions options = null);
+        Task StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, RequestOptions? options = null);
 
         /// <summary>
         ///     Modifies the current stage instance.
@@ -45,7 +45,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous modify operation.
         /// </returns>
-        Task ModifyInstanceAsync(Action<StageInstanceProperties> func, RequestOptions options = null);
+        Task ModifyInstanceAsync(Action<StageInstanceProperties> func, RequestOptions? options = null);
 
         /// <summary>
         ///     Stops the stage, deleting the stage instance.
@@ -54,7 +54,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous stop operation.
         /// </returns>
-        Task StopStageAsync(RequestOptions options = null);
+        Task StopStageAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Indicates that the bot would like to speak within a stage channel.
@@ -63,7 +63,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous request to speak operation.
         /// </returns>
-        Task RequestToSpeakAsync(RequestOptions options = null);
+        Task RequestToSpeakAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Makes the current user become a speaker within a stage.
@@ -72,7 +72,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous speaker modify operation.
         /// </returns>
-        Task BecomeSpeakerAsync(RequestOptions options = null);
+        Task BecomeSpeakerAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Makes the current user a listener.
@@ -81,7 +81,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous stop operation.
         /// </returns>
-        Task StopSpeakingAsync(RequestOptions options = null);
+        Task StopSpeakingAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Makes a user a speaker within a stage.
@@ -91,7 +91,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous move operation.
         /// </returns>
-        Task MoveToSpeakerAsync(IGuildUser user, RequestOptions options = null);
+        Task MoveToSpeakerAsync(IGuildUser user, RequestOptions? options = null);
 
         /// <summary>
         ///     Removes a user from speaking.
@@ -101,6 +101,6 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous remove operation.
         /// </returns>
-        Task RemoveFromSpeakerAsync(IGuildUser user, RequestOptions options = null);
+        Task RemoveFromSpeakerAsync(IGuildUser user, RequestOptions? options = null);
     }
 }

@@ -46,6 +46,6 @@ namespace Discord
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         /// <seealso cref="AudioChannelProperties"/>
-        Task ModifyAsync(Action<AudioChannelProperties> func, RequestOptions options = null);
+        Task ModifyAsync(Action<AudioChannelProperties> func, RequestOptions? options = null);
     }
 }

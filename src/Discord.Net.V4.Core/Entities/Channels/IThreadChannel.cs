@@ -86,7 +86,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous join operation.
         /// </returns>
-        Task JoinAsync(RequestOptions options = null);
+        Task JoinAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Leaves the current thread.
@@ -95,7 +95,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous leave operation.
         /// </returns>
-        Task LeaveAsync(RequestOptions options = null);
+        Task LeaveAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Adds a user to this thread.
@@ -105,7 +105,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous operation of adding a member to a thread.
         /// </returns>
-        Task AddUserAsync(IGuildUser user, RequestOptions options = null);
+        Task AddUserAsync(IGuildUser user, RequestOptions? options = null);
 
         /// <summary>
         ///     Removes a user from this thread.
@@ -115,7 +115,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous operation of removing a user from this thread.
         /// </returns>
-        Task RemoveUserAsync(IGuildUser user, RequestOptions options = null);
+        Task RemoveUserAsync(IGuildUser user, RequestOptions? options = null);
 
         /// <summary>
         ///     Modifies this thread channel.
@@ -126,6 +126,6 @@ namespace Discord
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         /// <seealso cref="ThreadChannelProperties"/>
-        Task ModifyAsync(Action<ThreadChannelProperties> func, RequestOptions options = null);
+        Task ModifyAsync(Action<ThreadChannelProperties> func, RequestOptions? options = null);
     }
 }

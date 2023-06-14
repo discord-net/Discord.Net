@@ -76,7 +76,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous bulk-removal operation.
         /// </returns>
-        Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);
+        Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions? options = null);
         /// <summary>
         ///     Bulk-deletes multiple messages.
         /// </summary>
@@ -91,7 +91,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous bulk-removal operation.
         /// </returns>
-        Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null);
+        Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions? options = null);
 
         /// <summary>
         ///     Modifies this text channel.
@@ -102,7 +102,7 @@ namespace Discord
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         /// <seealso cref="TextChannelProperties"/>
-        Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null);
+        Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions? options = null);
 
         /// <summary>
         ///     Creates a thread within this <see cref="ITextChannel"/>.
@@ -137,7 +137,7 @@ namespace Discord
         ///     A task that represents the asynchronous create operation. The task result contains a <see cref="IThreadChannel"/>
         /// </returns>
         Task<IThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay,
-            IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null);
+            IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a collection of active threads within this channel.
@@ -147,6 +147,6 @@ namespace Discord
         ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
         ///     a collection of active threads.
         /// </returns>
-        Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions? options = null);
     }
 }

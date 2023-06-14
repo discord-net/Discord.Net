@@ -10,6 +10,6 @@ internal static class GenericCollectionExtensions
         value2 = kvp.Value;
     }
 
-    public static Dictionary<T1, T2> ToDictionary<T1, T2>(this IEnumerable<KeyValuePair<T1, T2>> kvp) =>
+    public static Dictionary<T1, T2> ToDictionary<T1, T2>(this IEnumerable<KeyValuePair<T1, T2>> kvp) where T1 : notnull =>
         kvp.ToDictionary(x => x.Key, x => x.Value);
 }

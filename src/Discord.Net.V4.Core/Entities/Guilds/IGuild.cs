@@ -384,7 +384,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
-        Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null);
+        Task ModifyAsync(Action<GuildProperties> func, RequestOptions? options = null);
         /// <summary>
         ///     Modifies this guild's widget.
         /// </summary>
@@ -393,7 +393,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
-        Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions options = null);
+        Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions? options = null);
         /// <summary>
         ///     Bulk-modifies the order of channels in this guild.
         /// </summary>
@@ -402,7 +402,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous reorder operation.
         /// </returns>
-        Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null);
+        Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions? options = null);
         /// <summary>
         ///     Bulk-modifies the order of roles in this guild.
         /// </summary>
@@ -411,7 +411,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous reorder operation.
         /// </returns>
-        Task ReorderRolesAsync(IEnumerable<ReorderRoleProperties> args, RequestOptions options = null);
+        Task ReorderRolesAsync(IEnumerable<ReorderRoleProperties> args, RequestOptions? options = null);
         /// <summary>
         ///     Leaves this guild.
         /// </summary>
@@ -425,7 +425,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous leave operation.
         /// </returns>
-        Task LeaveAsync(RequestOptions options = null);
+        Task LeaveAsync(RequestOptions? options = null);
         /// <summary>
         ///     Gets <paramref name="limit"/> amount of bans from the guild ordered by user ID.
         /// </summary>
@@ -445,7 +445,7 @@ namespace Discord
         /// <returns>
         ///     A paged collection of bans.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(int limit = DiscordConfig.MaxBansPerBatch, RequestOptions? options = null);
         /// <summary>
         ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUserId"/> ordered by user ID.
         /// </summary>
@@ -467,7 +467,7 @@ namespace Discord
         /// <returns>
         ///     A paged collection of bans.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions? options = null);
         /// <summary>
         ///     Gets <paramref name="limit"/> amount of bans from the guild starting at the provided <paramref name="fromUser"/> ordered by user ID.
         /// </summary>
@@ -489,7 +489,7 @@ namespace Discord
         /// <returns>
         ///     A paged collection of bans.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IBan>> GetBansAsync(IUser fromUser, Direction dir, int limit = DiscordConfig.MaxBansPerBatch, RequestOptions? options = null);
         /// <summary>
         ///     Gets a ban object for a banned user.
         /// </summary>
@@ -499,7 +499,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a ban object, which
         ///     contains the user information and the reason for the ban; <see langword="null" /> if the ban entry cannot be found.
         /// </returns>
-        Task<IBan> GetBanAsync(IUser user, RequestOptions options = null);
+        Task<IBan> GetBanAsync(IUser user, RequestOptions? options = null);
         /// <summary>
         ///     Gets a ban object for a banned user.
         /// </summary>
@@ -509,7 +509,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a ban object, which
         ///     contains the user information and the reason for the ban; <see langword="null" /> if the ban entry cannot be found.
         /// </returns>
-        Task<IBan> GetBanAsync(ulong userId, RequestOptions options = null);
+        Task<IBan> GetBanAsync(ulong userId, RequestOptions? options = null);
         /// <summary>
         ///     Bans the user from this guild and optionally prunes their recent messages.
         /// </summary>
@@ -521,7 +521,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous add operation for the ban.
         /// </returns>
-        Task AddBanAsync(IUser user, int pruneDays = 0, string reason = null, RequestOptions options = null);
+        Task AddBanAsync(IUser user, int pruneDays = 0, string reason = null, RequestOptions? options = null);
         /// <summary>
         ///     Bans the user from this guild and optionally prunes their recent messages.
         /// </summary>
@@ -533,7 +533,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous add operation for the ban.
         /// </returns>
-        Task AddBanAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions options = null);
+        Task AddBanAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions? options = null);
         /// <summary>
         ///     Unbans the user if they are currently banned.
         /// </summary>
@@ -542,7 +542,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous removal operation for the ban.
         /// </returns>
-        Task RemoveBanAsync(IUser user, RequestOptions options = null);
+        Task RemoveBanAsync(IUser user, RequestOptions? options = null);
         /// <summary>
         ///     Unbans the user if they are currently banned.
         /// </summary>
@@ -551,7 +551,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous removal operation for the ban.
         /// </returns>
-        Task RemoveBanAsync(ulong userId, RequestOptions options = null);
+        Task RemoveBanAsync(ulong userId, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a collection of all channels in this guild.
@@ -562,7 +562,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     generic channels found within this guild.
         /// </returns>
-        Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a channel in this guild.
         /// </summary>
@@ -573,7 +573,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the generic channel
         ///     associated with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
-        Task<IGuildChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IGuildChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a collection of all text channels in this guild.
         /// </summary>
@@ -583,7 +583,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     message channels found within this guild.
         /// </returns>
-        Task<IReadOnlyCollection<ITextChannel>> GetTextChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<ITextChannel>> GetTextChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a text channel in this guild.
         /// </summary>
@@ -594,7 +594,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the text channel
         ///     associated with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
-        Task<ITextChannel> GetTextChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<ITextChannel> GetTextChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a collection of all voice channels in this guild.
         /// </summary>
@@ -604,7 +604,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     voice channels found within this guild.
         /// </returns>
-        Task<IReadOnlyCollection<IVoiceChannel>> GetVoiceChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<IVoiceChannel>> GetVoiceChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a collection of all category channels in this guild.
         /// </summary>
@@ -614,7 +614,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     category channels found within this guild.
         /// </returns>
-        Task<IReadOnlyCollection<ICategoryChannel>> GetCategoriesAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<ICategoryChannel>> GetCategoriesAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a voice channel in this guild.
         /// </summary>
@@ -625,7 +625,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the voice channel associated
         ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
-        Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a stage channel in this guild.
         /// </summary>
@@ -636,7 +636,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the stage channel associated
         ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
-        Task<IStageChannel> GetStageChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IStageChannel> GetStageChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a collection of all stage channels in this guild.
         /// </summary>
@@ -646,7 +646,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     stage channels found within this guild.
         /// </returns>
-        Task<IReadOnlyCollection<IStageChannel>> GetStageChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<IStageChannel>> GetStageChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets the AFK voice channel in this guild.
         /// </summary>
@@ -656,7 +656,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the voice channel that the
         ///     AFK users will be moved to after they have idled for too long; <see langword="null" /> if none is set.
         /// </returns>
-        Task<IVoiceChannel> GetAFKChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IVoiceChannel> GetAFKChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets the system channel where randomized welcome messages are sent in this guild.
         /// </summary>
@@ -666,7 +666,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the text channel where
         ///     randomized welcome messages will be sent to; <see langword="null" /> if none is set.
         /// </returns>
-        Task<ITextChannel> GetSystemChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<ITextChannel> GetSystemChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets the first viewable text channel in this guild.
         /// </summary>
@@ -676,7 +676,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the first viewable text
         ///     channel in this guild; <see langword="null" /> if none is found.
         /// </returns>
-        Task<ITextChannel> GetDefaultChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<ITextChannel> GetDefaultChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets the widget channel (i.e. the channel set in the guild's widget settings) in this guild.
         /// </summary>
@@ -686,7 +686,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the widget channel set
         ///     within the server's widget settings; <see langword="null" /> if none is set.
         /// </returns>
-        Task<IGuildChannel> GetWidgetChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IGuildChannel> GetWidgetChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets the text channel where Community guilds can display rules and/or guidelines.
         /// </summary>
@@ -696,7 +696,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the text channel
         ///     where Community guilds can display rules and/or guidelines; <see langword="null" /> if none is set.
         /// </returns>
-        Task<ITextChannel> GetRulesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<ITextChannel> GetRulesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets the text channel where admins and moderators of Community guilds receive notices from Discord.
         /// </summary>
@@ -706,7 +706,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the text channel where
         ///     admins and moderators of Community guilds receive notices from Discord; <see langword="null" /> if none is set.
         /// </returns>
-        Task<ITextChannel> GetPublicUpdatesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<ITextChannel> GetPublicUpdatesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a thread channel within this guild.
         /// </summary>
@@ -716,7 +716,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the thread channel.
         /// </returns>
-        Task<IThreadChannel> GetThreadChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IThreadChannel> GetThreadChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a collection of all thread channels in this guild.
         /// </summary>
@@ -726,7 +726,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     thread channels found within this guild.
         /// </returns>
-        Task<IReadOnlyCollection<IThreadChannel>> GetThreadChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<IThreadChannel>> GetThreadChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
 
         /// <summary>
         ///     Creates a new text channel in this guild.
@@ -743,7 +743,7 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     text channel.
         /// </returns>
-        Task<ITextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null);
+        Task<ITextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions? options = null);
         /// <summary>
         ///     Creates a new voice channel in this guild.
         /// </summary>
@@ -754,7 +754,7 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     voice channel.
         /// </returns>
-        Task<IVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null);
+        Task<IVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions? options = null);
         /// <summary>
         ///     Creates a new stage channel in this guild.
         /// </summary>
@@ -765,7 +765,7 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     stage channel.
         /// </returns>
-        Task<IStageChannel> CreateStageChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null);
+        Task<IStageChannel> CreateStageChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions? options = null);
         /// <summary>
         ///     Creates a new channel category in this guild.
         /// </summary>
@@ -776,7 +776,7 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     category channel.
         /// </returns>
-        Task<ICategoryChannel> CreateCategoryAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null);
+        Task<ICategoryChannel> CreateCategoryAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions? options = null);
 
         /// <summary>
         ///     Creates a new channel forum in this guild.
@@ -788,7 +788,7 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     forum channel.
         /// </returns>
-        Task<IForumChannel> CreateForumChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null);
+        Task<IForumChannel> CreateForumChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a collection of all the voice regions this guild can access.
@@ -798,7 +798,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     voice regions the guild can access.
         /// </returns>
-        Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a collection of all the integrations this guild contains.
@@ -808,7 +808,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     integrations the guild can has.
         /// </returns>
-        Task<IReadOnlyCollection<IIntegration>> GetIntegrationsAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IIntegration>> GetIntegrationsAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Deletes an integration.
@@ -818,7 +818,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
-        Task DeleteIntegrationAsync(ulong id, RequestOptions options = null);
+        Task DeleteIntegrationAsync(ulong id, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a collection of all invites in this guild.
@@ -828,7 +828,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     invite metadata, each representing information for an invite found within this guild.
         /// </returns>
-        Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions? options = null);
         /// <summary>
         ///     Gets the vanity invite URL of this guild.
         /// </summary>
@@ -837,7 +837,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the partial metadata of
         ///     the vanity invite found within this guild; <see langword="null" /> if none is found.
         /// </returns>
-        Task<IInviteMetadata> GetVanityInviteAsync(RequestOptions options = null);
+        Task<IInviteMetadata> GetVanityInviteAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a role in this guild.
@@ -859,7 +859,7 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, RequestOptions options = null);
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, RequestOptions? options = null);
         // TODO remove CreateRoleAsync overload that does not have isMentionable when breaking change is acceptable
         /// <summary>
         ///     Creates a new role with the provided name.
@@ -874,7 +874,7 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null);
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions? options = null);
 
         /// <summary>
         ///     Adds a user to this guild.
@@ -887,7 +887,7 @@ namespace Discord
         /// <param name="func">The delegate containing the properties to be applied to the user upon being added to the guild.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>A guild user associated with the specified <paramref name="userId" />; <see langword="null" /> if the user is already in the guild.</returns>
-        Task<IGuildUser> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions options = null);
+        Task<IGuildUser> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions? options = null);
         /// <summary>
         ///     Disconnects the user from its current voice channel.
         /// </summary>
@@ -910,7 +910,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a collection of guild
         ///     users found within this guild.
         /// </returns>
-        Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a user from this guild.
         /// </summary>
@@ -928,7 +928,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the guild user
         ///     associated with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
-        Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets the current user for this guild.
         /// </summary>
@@ -938,7 +938,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the currently logged-in
         ///     user within this guild.
         /// </returns>
-        Task<IGuildUser> GetCurrentUserAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IGuildUser> GetCurrentUserAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets the owner of this guild.
         /// </summary>
@@ -947,7 +947,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the owner of this guild.
         /// </returns>
-        Task<IGuildUser> GetOwnerAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IGuildUser> GetOwnerAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Downloads all users for this guild if the current list is incomplete.
         /// </summary>
@@ -978,7 +978,7 @@ namespace Discord
         ///     A task that represents the asynchronous prune operation. The task result contains the number of users to
         ///     be or has been removed from this guild.
         /// </returns>
-        Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null);
+        Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions? options = null, IEnumerable<ulong> includeRoleIds = null);
         /// <summary>
         ///     Gets a collection of users in this guild that the name or nickname starts with the
         ///     provided <see cref="string"/> at <paramref name="query"/>.
@@ -994,7 +994,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a collection of guild
         ///     users that the name or nickname starts with the provided <see cref="string"/> at <paramref name="query"/>.
         /// </returns>
-        Task<IReadOnlyCollection<IGuildUser>> SearchUsersAsync(string query, int limit = DiscordConfig.MaxUsersPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<IGuildUser>> SearchUsersAsync(string query, int limit = DiscordConfig.MaxUsersPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets the specified number of audit log entries for this guild.
@@ -1011,7 +1011,7 @@ namespace Discord
         ///     of the requested audit log entries.
         /// </returns>
         Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogsAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
-            CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null,
+            CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null, ulong? beforeId = null, ulong? userId = null,
             ActionType? actionType = null, ulong? afterId = null);
 
         /// <summary>
@@ -1023,7 +1023,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the webhook with the
         ///     specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
-        Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
+        Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions? options = null);
         /// <summary>
         ///     Gets a collection of all webhook from this guild.
         /// </summary>
@@ -1032,7 +1032,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of webhooks found within the guild.
         /// </returns>
-        Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a collection of emotes from this guild.
@@ -1042,7 +1042,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of emotes found within the guild.
         /// </returns>
-        Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions? options = null);
         /// <summary>
         ///     Gets a specific emote from this guild.
         /// </summary>
@@ -1052,7 +1052,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the emote found with the
         ///     specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
-        Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null);
+        Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions? options = null);
         /// <summary>
         ///     Creates a new <see cref="GuildEmote"/> in this guild.
         /// </summary>
@@ -1063,7 +1063,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created emote.
         /// </returns>
-        Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions options = null);
+        Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions? options = null);
 
         /// <summary>
         ///     Modifies an existing <see cref="GuildEmote"/> in this guild.
@@ -1075,7 +1075,7 @@ namespace Discord
         ///     A task that represents the asynchronous modification operation. The task result contains the modified
         ///     emote.
         /// </returns>
-        Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null);
+        Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions? options = null);
 
         /// <summary>
         /// Moves the user to the voice channel.
@@ -1093,7 +1093,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
-        Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null);
+        Task DeleteEmoteAsync(GuildEmote emote, RequestOptions? options = null);
 
         /// <summary>
         ///     Creates a new sticker in this guild.
@@ -1106,7 +1106,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        Task<ICustomSticker> CreateStickerAsync(string name, Image image, IEnumerable<string> tags, string description = null, RequestOptions options = null);
+        Task<ICustomSticker> CreateStickerAsync(string name, Image image, IEnumerable<string> tags, string description = null, RequestOptions? options = null);
 
         /// <summary>
         ///     Creates a new sticker in this guild.
@@ -1119,7 +1119,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        Task<ICustomSticker> CreateStickerAsync(string name, string path, IEnumerable<string> tags, string description = null, RequestOptions options = null);
+        Task<ICustomSticker> CreateStickerAsync(string name, string path, IEnumerable<string> tags, string description = null, RequestOptions? options = null);
 
         /// <summary>
         ///     Creates a new sticker in this guild.
@@ -1133,7 +1133,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
-        Task<ICustomSticker> CreateStickerAsync(string name, Stream stream, string filename, IEnumerable<string> tags, string description = null, RequestOptions options = null);
+        Task<ICustomSticker> CreateStickerAsync(string name, Stream stream, string filename, IEnumerable<string> tags, string description = null, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a specific sticker within this guild.
@@ -1145,7 +1145,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the sticker found with the
         ///     specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
-        Task<ICustomSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<ICustomSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a collection of all stickers within this guild.
@@ -1156,7 +1156,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of stickers found within the guild.
         /// </returns>
-        Task<IReadOnlyCollection<ICustomSticker>> GetStickersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<ICustomSticker>> GetStickersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
 
         /// <summary>
         ///     Deletes a sticker within this guild.
@@ -1166,7 +1166,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
-        Task DeleteStickerAsync(ICustomSticker sticker, RequestOptions options = null);
+        Task DeleteStickerAsync(ICustomSticker sticker, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a event within this guild.
@@ -1176,7 +1176,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous get operation.
         /// </returns>
-        Task<IGuildScheduledEvent> GetEventAsync(ulong id, RequestOptions options = null);
+        Task<IGuildScheduledEvent> GetEventAsync(ulong id, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a collection of events within this guild.
@@ -1185,7 +1185,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous get operation.
         /// </returns>
-        Task<IReadOnlyCollection<IGuildScheduledEvent>> GetEventsAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IGuildScheduledEvent>> GetEventsAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Creates an event within this guild.
@@ -1219,7 +1219,7 @@ namespace Discord
             ulong? channelId = null,
             string location = null,
             Image? coverImage = null,
-            RequestOptions options = null);
+            RequestOptions? options = null);
 
         /// <summary>
         ///     Gets this guilds application commands.
@@ -1234,7 +1234,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of application commands found within the guild.
         /// </returns>
-        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null);
+        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets an application command within this guild with the specified id.
@@ -1247,7 +1247,7 @@ namespace Discord
         ///     if found, otherwise <see langword="null"/>.
         /// </returns>
         Task<IApplicationCommand> GetApplicationCommandAsync(ulong id, CacheMode mode = CacheMode.AllowDownload,
-            RequestOptions options = null);
+            RequestOptions? options = null);
 
         /// <summary>
         ///     Creates an application command within this guild.
@@ -1257,7 +1257,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the command that was created.
         /// </returns>
-        Task<IApplicationCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null);
+        Task<IApplicationCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions? options = null);
 
         /// <summary>
         ///     Overwrites the application commands within this guild.
@@ -1268,7 +1268,7 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains a collection of commands that was created.
         /// </returns>
         Task<IReadOnlyCollection<IApplicationCommand>> BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties,
-            RequestOptions options = null);
+            RequestOptions? options = null);
 
         /// <summary>
         ///     Gets the welcome screen of the guild. Returns <see langword="null"/> if the welcome channel is not set.
@@ -1276,7 +1276,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="WelcomeScreen"/>.
         /// </returns>
-        Task<WelcomeScreen> GetWelcomeScreenAsync(RequestOptions options = null);
+        Task<WelcomeScreen> GetWelcomeScreenAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Modifies the welcome screen of the guild. Returns <see langword="null"/> if welcome screen is removed.
@@ -1284,7 +1284,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="WelcomeScreen"/>.
         /// </returns>
-        Task<WelcomeScreen> ModifyWelcomeScreenAsync(bool enabled, WelcomeScreenChannelProperties[] channels, string description = null, RequestOptions options = null);
+        Task<WelcomeScreen> ModifyWelcomeScreenAsync(bool enabled, WelcomeScreenChannelProperties[] channels, string description = null, RequestOptions? options = null);
 
         /// <summary>
         ///     Get a list of all rules currently configured for the guild.
@@ -1292,7 +1292,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains a collection of <see cref="IAutoModRule"/>.
         /// </returns>
-        Task<IAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null);
+        Task<IAutoModRule[]> GetAutoModRulesAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a single rule configured in a guild. Returns <see langword="null"/> if the rule was not found.
@@ -1300,7 +1300,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="IAutoModRule"/>.
         /// </returns>
-        Task<IAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions options = null);
+        Task<IAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions? options = null);
 
         /// <summary>
         ///     Creates a new auto moderation rule.
@@ -1308,7 +1308,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IAutoModRule"/>.
         /// </returns>
-        Task<IAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions options = null);
+        Task<IAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets the onboarding object configured for the guild.
@@ -1316,6 +1316,6 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IGuildOnboarding"/>.
         /// </returns>
-        Task<IGuildOnboarding> GetOnboardingAsync(RequestOptions options = null);
+        Task<IGuildOnboarding> GetOnboardingAsync(RequestOptions? options = null);
     }
 }

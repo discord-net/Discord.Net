@@ -14,6 +14,6 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous leave operation.
         /// </returns>
-        Task LeaveAsync(RequestOptions options = null);
+        Task LeaveAsync(RequestOptions? options = null);
     }
 }

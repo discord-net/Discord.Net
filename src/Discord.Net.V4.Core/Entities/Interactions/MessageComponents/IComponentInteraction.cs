@@ -24,7 +24,7 @@ namespace Discord
         /// <param name="func">A delegate containing the properties to modify the message with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>A task that represents the asynchronous operation of updating the message.</returns>
-        Task UpdateAsync(Action<MessageProperties> func, RequestOptions options = null);
+        Task UpdateAsync(Action<MessageProperties> func, RequestOptions? options = null);
 
         /// <summary>
         ///     Defers an interaction with the response type 5 (<see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>).
@@ -32,6 +32,6 @@ namespace Discord
         /// <param name="ephemeral"><see langword="true"/> to defer ephemerally, otherwise <see langword="false"/>.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>A task that represents the asynchronous operation of acknowledging the interaction.</returns>
-        Task DeferLoadingAsync(bool ephemeral = false, RequestOptions options = null);
+        Task DeferLoadingAsync(bool ephemeral = false, RequestOptions? options = null);
     }
 }

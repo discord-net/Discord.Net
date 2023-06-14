@@ -106,7 +106,7 @@ namespace Discord
         ///     A task that represents an asynchronous send operation for delivering the message.
         /// </returns>
         Task RespondAsync(string text = null, Embed[] embeds = null, bool isTTS = false,
-            bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
+            bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null);
 
         /// <summary>
         ///     Responds to this interaction with a file attachment.
@@ -127,7 +127,7 @@ namespace Discord
         /// </returns>
 #if NETCOREAPP3_0_OR_GREATER
         async Task RespondWithFileAsync(Stream fileStream, string fileName, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null)
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null)
         {
             using (var file = new FileAttachment(fileStream, fileName))
             {
@@ -136,7 +136,7 @@ namespace Discord
         }
 #else
         Task RespondWithFileAsync(Stream fileStream, string fileName, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null);
 #endif
         /// <summary>
         ///     Responds to this interaction with a file attachment.
@@ -157,7 +157,7 @@ namespace Discord
         /// </returns>
 #if NETCOREAPP3_0_OR_GREATER
         async Task RespondWithFileAsync(string filePath, string fileName = null, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null)
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null)
         {
             using (var file = new FileAttachment(filePath, fileName))
             {
@@ -166,7 +166,7 @@ namespace Discord
         }
 #else
         Task RespondWithFileAsync(string filePath, string fileName = null, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null);
 #endif
         /// <summary>
         ///     Responds to this interaction with a file attachment.
@@ -186,11 +186,11 @@ namespace Discord
         /// </returns>
 #if NETCOREAPP3_0_OR_GREATER
         Task RespondWithFileAsync(FileAttachment attachment, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null)
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null)
             => RespondWithFilesAsync(new FileAttachment[] { attachment }, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);
 #else
         Task RespondWithFileAsync(FileAttachment attachment, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null);
 #endif
         /// <summary>
         ///     Responds to this interaction with a collection of file attachments.
@@ -209,7 +209,7 @@ namespace Discord
         ///     contains the sent message.
         /// </returns>
         Task RespondWithFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null);
         /// <summary>
         ///     Sends a followup message for this interaction.
         /// </summary>
@@ -226,7 +226,7 @@ namespace Discord
         ///     contains the sent message.
         /// </returns>
         Task<IUserMessage> FollowupAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-             AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
+             AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null);
         /// <summary>
         ///     Sends a followup message for this interaction.
         /// </summary>
@@ -246,7 +246,7 @@ namespace Discord
         /// </returns>
 #if NETCOREAPP3_0_OR_GREATER
         async Task<IUserMessage> FollowupWithFileAsync(Stream fileStream, string fileName, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null)
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null)
         {
             using (var file = new FileAttachment(fileStream, fileName))
             {
@@ -255,7 +255,7 @@ namespace Discord
         }
 #else
         Task<IUserMessage> FollowupWithFileAsync(Stream fileStream, string fileName, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null);
 #endif
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -276,7 +276,7 @@ namespace Discord
         /// </returns>
 #if NETCOREAPP3_0_OR_GREATER
         async Task<IUserMessage> FollowupWithFileAsync(string filePath, string fileName = null, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null)
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null)
         {
             using (var file = new FileAttachment(filePath, fileName))
             {
@@ -285,7 +285,7 @@ namespace Discord
         }
 #else
         Task<IUserMessage> FollowupWithFileAsync(string filePath, string fileName = null, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null);
 #endif
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -305,11 +305,11 @@ namespace Discord
         /// </returns>
 #if NETCOREAPP3_0_OR_GREATER
         Task<IUserMessage> FollowupWithFileAsync(FileAttachment attachment, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null)
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null)
             => FollowupWithFilesAsync(new FileAttachment[] { attachment }, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);
 #else
         Task<IUserMessage> FollowupWithFileAsync(FileAttachment attachment, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null);
 #endif
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -328,13 +328,13 @@ namespace Discord
         ///     contains the sent message.
         /// </returns>
         Task<IUserMessage> FollowupWithFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions? options = null);
         /// <summary>
         ///     Gets the original response for this interaction.
         /// </summary>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A <see cref="IUserMessage"/> that represents the initial response.</returns>
-        Task<IUserMessage> GetOriginalResponseAsync(RequestOptions options = null);
+        Task<IUserMessage> GetOriginalResponseAsync(RequestOptions? options = null);
         /// <summary>
         ///     Edits original response for this interaction.
         /// </summary>
@@ -344,7 +344,7 @@ namespace Discord
         ///     A task that represents an asynchronous modification operation. The task result
         ///     contains the updated message.
         /// </returns>
-        Task<IUserMessage> ModifyOriginalResponseAsync(Action<MessageProperties> func, RequestOptions options = null);
+        Task<IUserMessage> ModifyOriginalResponseAsync(Action<MessageProperties> func, RequestOptions? options = null);
         /// <summary>
         ///     Deletes the original response to this interaction.
         /// </summary>
@@ -352,14 +352,14 @@ namespace Discord
         /// <returns>
         ///     A task that represents an asynchronous deletion operation.
         /// </returns>
-        Task DeleteOriginalResponseAsync(RequestOptions options = null);
+        Task DeleteOriginalResponseAsync(RequestOptions? options = null);
         /// <summary>
         ///     Acknowledges this interaction.
         /// </summary>
         /// <returns>
         ///     A task that represents the asynchronous operation of deferring the interaction.
         /// </returns>
-        Task DeferAsync(bool ephemeral = false, RequestOptions options = null);
+        Task DeferAsync(bool ephemeral = false, RequestOptions? options = null);
 
         /// <summary>
         ///     Responds to the interaction with a modal.
@@ -367,6 +367,6 @@ namespace Discord
         /// <param name="modal">The modal to respond with.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
-        Task RespondWithModalAsync(Modal modal, RequestOptions options = null);
+        Task RespondWithModalAsync(Modal modal, RequestOptions? options = null);
     }
 }

@@ -105,7 +105,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous start operation.
         /// </returns>
-        Task StartAsync(RequestOptions options = null);
+        Task StartAsync(RequestOptions? options = null);
         /// <summary>
         ///     Ends or cancels the event.
         /// </summary>
@@ -113,7 +113,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous end operation.
         /// </returns>
-        Task EndAsync(RequestOptions options = null);
+        Task EndAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Modifies the guild event.
@@ -123,7 +123,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
-        Task ModifyAsync(Action<GuildScheduledEventsProperties> func, RequestOptions options = null);
+        Task ModifyAsync(Action<GuildScheduledEventsProperties> func, RequestOptions? options = null);
 
         /// <summary>
         ///     Deletes the current event.
@@ -132,7 +132,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous delete operation.
         /// </returns>
-        Task DeleteAsync(RequestOptions options = null);
+        Task DeleteAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a collection of N users interested in the event.
@@ -153,7 +153,7 @@ namespace Discord
         /// <returns>
         ///     Paged collection of users.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetUsersAsync(RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetUsersAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a collection of N users interested in the event.
@@ -183,6 +183,6 @@ namespace Discord
         /// <returns>
         ///     Paged collection of users.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetUsersAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxGuildEventUsersPerBatch, RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetUsersAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxGuildEventUsersPerBatch, RequestOptions? options = null);
     }
 }

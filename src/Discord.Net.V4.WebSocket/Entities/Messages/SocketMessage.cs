@@ -1,4 +1,4 @@
-using Discord.Net.V4.Core.API.Models.Messages;
+using Discord.Models;
 using Discord.WebSocket.Cache;
 using System;
 using System.Collections.Generic;

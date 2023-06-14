@@ -8,10 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\docs\marketing\logo\PackageLogo.png" Link="PackageLogo.png">
-      <PackagePath></PackagePath>
-      <Pack>true</Pack>
-    </None>
+    <PackageReference Include="System.Interactive.Async" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

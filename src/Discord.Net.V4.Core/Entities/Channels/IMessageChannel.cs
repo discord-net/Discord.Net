@@ -37,7 +37,7 @@ namespace Discord
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+        Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions? options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
@@ -78,7 +78,7 @@ namespace Discord
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+        Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions? options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
@@ -116,7 +116,7 @@ namespace Discord
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+        Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions? options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
@@ -146,7 +146,7 @@ namespace Discord
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        Task<IUserMessage> SendFileAsync(FileAttachment attachment, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+        Task<IUserMessage> SendFileAsync(FileAttachment attachment, string text = null, bool isTTS = false, Embed embed = null, RequestOptions? options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
         /// <summary>
         ///     Sends a collection of files to this message channel.
         /// </summary>
@@ -176,7 +176,7 @@ namespace Discord
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        Task<IUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+        Task<IUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, bool isTTS = false, Embed embed = null, RequestOptions? options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
 
         /// <summary>
         ///     Gets a message from this message channel.
@@ -188,7 +188,7 @@ namespace Discord
         ///     A task that represents an asynchronous get operation for retrieving the message. The task result contains
         ///     the retrieved message; <c>null</c> if no message is found with the specified identifier.
         /// </returns>
-        Task<IMessage> GetMessageAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IMessage> GetMessageAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets the last N messages from this message channel.
@@ -224,7 +224,7 @@ namespace Discord
         ///     Paged collection of messages.
         /// </returns>
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch,
-            CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+            CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a collection of messages in this channel.
         /// </summary>
@@ -265,7 +265,7 @@ namespace Discord
         ///     Paged collection of messages.
         /// </returns>
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch,
-            CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+            CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a collection of messages in this channel.
         /// </summary>
@@ -302,7 +302,7 @@ namespace Discord
         ///     Paged collection of messages.
         /// </returns>
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch,
-            CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+            CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a collection of pinned messages in this channel.
         /// </summary>
@@ -311,7 +311,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation for retrieving pinned messages in this channel.
         ///     The task result contains a collection of messages found in the pinned messages.
         /// </returns>
-        Task<IReadOnlyCollection<IMessage>> GetPinnedMessagesAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IMessage>> GetPinnedMessagesAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Deletes a message.
@@ -321,14 +321,14 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
-        Task DeleteMessageAsync(ulong messageId, RequestOptions options = null);
+        Task DeleteMessageAsync(ulong messageId, RequestOptions? options = null);
         /// <summary> Deletes a message based on the provided message in this channel. </summary>
         /// <param name="message">The message that would be removed.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
-        Task DeleteMessageAsync(IMessage message, RequestOptions options = null);
+        Task DeleteMessageAsync(IMessage message, RequestOptions? options = null);
 
         /// <summary>
         ///     Modifies a message.
@@ -343,7 +343,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
-        Task<IUserMessage> ModifyMessageAsync(ulong messageId, Action<MessageProperties> func, RequestOptions options = null);
+        Task<IUserMessage> ModifyMessageAsync(ulong messageId, Action<MessageProperties> func, RequestOptions? options = null);
 
         /// <summary>
         ///     Broadcasts the "user is typing" message to all users in this channel, lasting 10 seconds.
@@ -352,7 +352,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous operation that triggers the broadcast.
         /// </returns>
-        Task TriggerTypingAsync(RequestOptions options = null);
+        Task TriggerTypingAsync(RequestOptions? options = null);
         /// <summary>
         ///     Continuously broadcasts the "user is typing" message to all users in this channel until the returned
         ///     object is disposed.
@@ -367,6 +367,6 @@ namespace Discord
         ///     A disposable object that, upon its disposal, will stop the client from broadcasting its typing state in
         ///     this channel.
         /// </returns>
-        IDisposable EnterTypingState(RequestOptions options = null);
+        IDisposable EnterTypingState(RequestOptions? options = null);
     }
 }

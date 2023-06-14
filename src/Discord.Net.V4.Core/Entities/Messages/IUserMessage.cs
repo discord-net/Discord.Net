@@ -34,7 +34,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
-        Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null);
+        Task ModifyAsync(Action<MessageProperties> func, RequestOptions? options = null);
         /// <summary>
         ///     Adds this message to its channel's pinned messages.
         /// </summary>
@@ -42,7 +42,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous operation for pinning this message.
         /// </returns>
-        Task PinAsync(RequestOptions options = null);
+        Task PinAsync(RequestOptions? options = null);
         /// <summary>
         ///     Removes this message from its channel's pinned messages.
         /// </summary>
@@ -50,7 +50,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous operation for unpinning this message.
         /// </returns>
-        Task UnpinAsync(RequestOptions options = null);
+        Task UnpinAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Publishes (crossposts) this message.
@@ -65,7 +65,7 @@ namespace Discord
         ///     </note>
         ///     This method will publish (crosspost) the message. Please note, publishing (crossposting), is only available in news channels.
         /// </remarks>
-        Task CrosspostAsync(RequestOptions options = null);
+        Task CrosspostAsync(RequestOptions? options = null);
 
         /// <summary>
         ///     Transforms this message's text into a human-readable form by resolving its tags.

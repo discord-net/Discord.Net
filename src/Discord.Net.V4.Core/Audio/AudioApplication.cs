@@ -1,9 +1,8 @@
-namespace Discord.Audio
+namespace Discord.Audio;
+
+public enum AudioApplication : int
 {
-    public enum AudioApplication : int
-    {
-        Voice,
-        Music,
-        Mixed
-    }
+    Voice,
+    Music,
+    Mixed
 }

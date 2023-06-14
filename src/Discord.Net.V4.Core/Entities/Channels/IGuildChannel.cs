@@ -67,7 +67,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
-        Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null);
+        Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets the permission overwrite for a specific role.
@@ -93,7 +93,7 @@ namespace Discord
         /// <returns>
         ///     A task representing the asynchronous operation for removing the specified permissions from the channel.
         /// </returns>
-        Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null);
+        Task RemovePermissionOverwriteAsync(IRole role, RequestOptions? options = null);
         /// <summary>
         ///     Removes the permission overwrite for the given user, if one exists.
         /// </summary>
@@ -102,7 +102,7 @@ namespace Discord
         /// <returns>
         ///     A task representing the asynchronous operation for removing the specified permissions from the channel.
         /// </returns>
-        Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null);
+        Task RemovePermissionOverwriteAsync(IUser user, RequestOptions? options = null);
 
         /// <summary>
         ///     Adds or updates the permission overwrite for the given role.
@@ -122,7 +122,7 @@ namespace Discord
         ///     A task representing the asynchronous permission operation for adding the specified permissions to the
         ///     channel.
         /// </returns>
-        Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null);
+        Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions? options = null);
         /// <summary>
         ///     Adds or updates the permission overwrite for the given user.
         /// </summary>
@@ -140,7 +140,7 @@ namespace Discord
         /// <returns>
         ///     A task representing the asynchronous permission operation for adding the specified permissions to the channel.
         /// </returns>
-        Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null);
+        Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions? options = null);
 
         /// <summary>
         ///     Gets a collection of users that are able to view the channel or are currently in this channel.
@@ -154,7 +154,7 @@ namespace Discord
         /// <returns>
         ///     Paged collection of users.
         /// </returns>
-        new IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        new IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
         /// <summary>
         ///     Gets a user in this channel.
         /// </summary>
@@ -165,6 +165,6 @@ namespace Discord
         ///     A task representing the asynchronous get operation. The task result contains a guild user object that
         ///     represents the user; <c>null</c> if none is found.
         /// </returns>
-        new Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        new Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null);
     }
 }

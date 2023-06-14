@@ -1,14 +1,19 @@
-namespace Discord
+namespace Discord;
+
+/// <summary>
+/// Represents the type of a webhook.
+/// </summary>
+/// <remarks>
+/// This type is currently unused, and is only returned in audit log responses.
+/// </remarks>
+public enum WebhookType
 {
     /// <summary>
-    /// Represents the type of a webhook.
+    ///     An incoming webhook
     /// </summary>
-    /// <remarks>
-    /// This type is currently unused, and is only returned in audit log responses.
-    /// </remarks>
-    public enum WebhookType
-    {
-        /// <summary> An incoming webhook </summary>
-        Incoming = 1
-    }
+    Incoming = 1,
+
+    ChannelFollower = 2,
+
+    Application = 3,
 }
