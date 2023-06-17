@@ -31,7 +31,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public string DisplayName
-            => GuildUser.Nickname ?? GuildUser.Username;
+            => GuildUser.Nickname ?? GuildUser.GlobalName ?? GuildUser.Username;
 
         /// <inheritdoc/>
         public string Nickname
