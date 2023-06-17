@@ -108,7 +108,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Formats a user's username + discriminator. Returns the username if the user has migrated to new username system.
+        ///     Formats a user's username and optional discriminator.
         /// </summary>
         /// <param name="doBidirectional">To format the string in bidirectional unicode or not</param>
         /// <param name="user">The user whose username and discriminator to format</param>

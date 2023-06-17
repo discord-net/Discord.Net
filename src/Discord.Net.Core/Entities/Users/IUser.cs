@@ -47,11 +47,11 @@ namespace Discord
         /// </returns>
         string GetDefaultAvatarUrl();
         /// <summary>
-        ///     Gets the per-username unique ID for this user. This will return "0000" for users, who have migrated to new username system.
+        ///     Gets the per-username unique ID for this user. This will return "0000" for users who have migrated to new username system.
         /// </summary>
         string Discriminator { get; }
         /// <summary>
-        ///     Gets the per-username unique ID for this user. This will return 0 for users, who have migrated to new username system.
+        ///     Gets the per-username unique ID for this user. This will return 0 for users who have migrated to new username system.
         /// </summary>
         ushort DiscriminatorValue { get; }
         /// <summary>
