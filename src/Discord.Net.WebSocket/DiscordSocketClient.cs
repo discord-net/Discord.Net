@@ -2046,8 +2046,8 @@ namespace Discord.WebSocket
                                     var user = (channel as SocketChannel)?.GetUser(data.UserId);
                                     if (user == null)
                                     {
-                                        if (guild != null)
-                                            user = guild.AddOrUpdateUser(data.Member);
+                                        if (guild != null && data.Member.IsSpecified)
+                                            user = guild.AddOrUpdateUser(data.Member.Value);
                                     }
                                     var cacheableUser = new Cacheable<IUser, ulong>(user, data.UserId, user != null, async () => await GetUserAsync(data.UserId).ConfigureAwait(false));
 
