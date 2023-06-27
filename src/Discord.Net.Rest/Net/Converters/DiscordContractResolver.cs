@@ -91,6 +91,8 @@ namespace Discord.Net.Converters
                 return DiscordErrorConverter.Instance;
             if (type == typeof(GuildFeatures))
                 return GuildFeaturesConverter.Instance;
+            if(type == typeof(Color))
+                return ColorConverter.Instance;
 
             //Entities
             var typeInfo = type.GetTypeInfo();

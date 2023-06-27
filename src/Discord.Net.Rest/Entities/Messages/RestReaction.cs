@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Model = Discord.API.Reaction;
 
 namespace Discord.Rest
@@ -9,20 +10,38 @@ namespace Discord.Rest
     {
         /// <inheritdoc />
         public IEmote Emote { get; }
+
         /// <summary>
         ///     Gets the number of reactions added.
         /// </summary>
         public int Count { get; }
+
         /// <summary>
         ///     Gets whether the reactions is added by the user.
         /// </summary>
         public bool Me { get; }
 
-        internal RestReaction(IEmote emote, int count, bool me)
+        /// <summary>
+        ///     Gets the number of burst reactions added.
+        /// </summary>
+        public int BurstCount { get; }
+
+        /// <summary>
+        ///     Gets the number of normal reactions added.
+        /// </summary>
+        public int NormalCount { get; }
+
+        /// <inheritdoc />
+        public IReadOnlyCollection<Color> BurstColors { get; }
+
+        internal RestReaction(IEmote emote, int count, bool me, int burst, int normal, IReadOnlyCollection<Color> colors)
         {
             Emote = emote;
             Count = count;
             Me = me;
+            BurstCount = burst;
+            NormalCount = normal;
+            BurstColors = colors;
         }
         internal static RestReaction Create(Model model)
         {
@@ -31,7 +50,12 @@ namespace Discord.Rest
                 emote = new Emote(model.Emoji.Id.Value, model.Emoji.Name, model.Emoji.Animated.GetValueOrDefault());
             else
                 emote = new Emoji(model.Emoji.Name);
-            return new RestReaction(emote, model.Count, model.Me);
+            return new RestReaction(emote,
+                model.Count,
+                model.Me,
+                model.CountDetails.BurstCount,
+                model.CountDetails.NormalCount,
+                model.Colors.ToReadOnlyCollection());
         }
     }
 }

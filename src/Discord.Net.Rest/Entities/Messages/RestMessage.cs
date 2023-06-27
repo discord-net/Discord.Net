@@ -313,7 +313,14 @@ namespace Discord.Rest
         #endregion
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x => new ReactionMetadata { ReactionCount = x.Count, IsMe = x.Me });
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x => new ReactionMetadata
+        {
+            ReactionCount = x.Count,
+            IsMe = x.Me,
+            BurstColors = x.BurstColors,
+            BurstCount = x.BurstCount,
+            NormalCount = x.NormalCount,
+        });
 
         /// <inheritdoc />
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)

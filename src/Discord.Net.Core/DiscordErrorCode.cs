@@ -202,6 +202,7 @@ namespace Discord
 
         #region Reactions (90XXX)
         ReactionBlocked = 90001,
+        CannotUseBurstReaction = 90002,
         #endregion
 
         #region API Status (130XXX)
