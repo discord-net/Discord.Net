@@ -2584,7 +2584,7 @@ namespace Discord.WebSocket
                                         return;
                                     }
 
-                                    var thread = (SocketThreadChannel)guild.GetChannel(data.Id);
+                                    var thread = (SocketThreadChannel)guild.RemoveChannel(State, data.Id);
 
                                     var cacheable = new Cacheable<SocketThreadChannel, ulong>(thread, data.Id, thread != null, null);
 
