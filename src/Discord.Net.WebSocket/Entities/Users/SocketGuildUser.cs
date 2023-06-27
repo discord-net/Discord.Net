@@ -29,8 +29,10 @@ namespace Discord.WebSocket
         ///     Gets the guild the user is in.
         /// </summary>
         public SocketGuild Guild { get; }
-        /// <inheritdoc />
-        public string DisplayName => Nickname ?? Username;
+
+        /// <inheritdoc cref="IGuildUser.DisplayName"/>
+        public string DisplayName => Nickname ?? GlobalName ?? Username;
+
         /// <inheritdoc />
         public string Nickname { get; private set; }
         /// <inheritdoc/>
@@ -265,7 +267,9 @@ namespace Discord.WebSocket
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, Guild.Id, GuildAvatarId, size, format);
 
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
+        private string DebuggerDisplay => DiscriminatorValue != 0
+            ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)"
+            : $"{Username} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
 
         internal new SocketGuildUser Clone()
         {

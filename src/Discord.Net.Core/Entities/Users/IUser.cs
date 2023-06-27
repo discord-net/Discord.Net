@@ -47,11 +47,11 @@ namespace Discord
         /// </returns>
         string GetDefaultAvatarUrl();
         /// <summary>
-        ///     Gets the per-username unique ID for this user.
+        ///     Gets the per-username unique ID for this user. This will return "0000" for users who have migrated to new username system.
         /// </summary>
         string Discriminator { get; }
         /// <summary>
-        ///     Gets the per-username unique ID for this user.
+        ///     Gets the per-username unique ID for this user. This will return 0 for users who have migrated to new username system.
         /// </summary>
         ushort DiscriminatorValue { get; }
         /// <summary>
@@ -86,6 +86,14 @@ namespace Discord
         ///     The value of public flags for this user.
         /// </returns>
         UserProperties? PublicFlags { get; }
+
+        /// <summary>
+        ///     Gets the user's display name, if it is set. For bots, this will get the application name.
+        /// </summary>
+        /// <remarks>
+        ///     This property will be <see langword="null"/> if user has no display name set.
+        /// </remarks>
+        string GlobalName { get; }
 
         /// <summary>
         ///     Creates the direct message channel of this user.

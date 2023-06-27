@@ -42,7 +42,10 @@ namespace Discord.WebSocket
             return entity;
         }
 
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Unknown)";
+        private string DebuggerDisplay => DiscriminatorValue != 0
+            ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Unknown)"
+            : $"{Username} ({Id}{(IsBot ? ", Bot" : "")}, Unknown)";
+
         internal new SocketUnknownUser Clone() => MemberwiseClone() as SocketUnknownUser;
     }
 }

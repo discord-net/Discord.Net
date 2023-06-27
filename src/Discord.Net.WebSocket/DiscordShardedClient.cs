@@ -343,7 +343,7 @@ namespace Discord.WebSocket
             return null;
         }
         /// <inheritdoc />
-        public override SocketUser GetUser(string username, string discriminator)
+        public override SocketUser GetUser(string username, string discriminator = null)
         {
             for (int i = 0; i < _shards.Length; i++)
             {

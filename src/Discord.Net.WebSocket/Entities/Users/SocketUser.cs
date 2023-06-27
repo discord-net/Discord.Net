@@ -33,6 +33,9 @@ namespace Discord.WebSocket
         internal abstract SocketPresence Presence { get; set; }
 
         /// <inheritdoc />
+        public string GlobalName { get; internal set; }
+
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public string Discriminator => DiscriminatorValue.ToString("D4");
@@ -68,10 +71,10 @@ namespace Discord.WebSocket
             }
             if (model.Discriminator.IsSpecified)
             {
-                var newVal = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
+                var newVal = ushort.Parse(model.Discriminator.GetValueOrDefault(null) ?? "0", NumberStyles.None, CultureInfo.InvariantCulture);
                 if (newVal != DiscriminatorValue)
                 {
-                    DiscriminatorValue = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
+                    DiscriminatorValue = ushort.Parse(model.Discriminator.GetValueOrDefault(null) ?? "0", NumberStyles.None, CultureInfo.InvariantCulture);
                     hasChanges = true;
                 }
             }
@@ -88,6 +91,11 @@ namespace Discord.WebSocket
             if (model.PublicFlags.IsSpecified && model.PublicFlags.Value != PublicFlags)
             {
                 PublicFlags = model.PublicFlags.Value;
+                hasChanges = true;
+            }
+            if (model.GlobalName.IsSpecified)
+            {
+                GlobalName = model.GlobalName.Value;
                 hasChanges = true;
             }
             return hasChanges;
@@ -109,7 +117,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public string GetDefaultAvatarUrl()
-            => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
+            => DiscriminatorValue != 0
+                ? CDN.GetDefaultUserAvatarUrl(DiscriminatorValue)
+                : CDN.GetDefaultUserAvatarUrl(Id);
 
         /// <summary>
         ///     Gets the full name of the user (e.g. Example#0001).

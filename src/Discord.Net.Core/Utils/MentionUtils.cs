@@ -12,14 +12,14 @@ namespace Discord
         private const char SanitizeChar = '\x200b';
 
         //If the system can't be positive a user doesn't have a nickname, assume useNickname = true (source: Jake)
-        internal static string MentionUser(string id, bool useNickname = true) => useNickname ? $"<@!{id}>" : $"<@{id}>";
+        internal static string MentionUser(string id) => $"<@{id}>";
         /// <summary>
         ///     Returns a mention string based on the user ID.
         /// </summary>
         /// <returns>
         ///     A user mention string (e.g. &lt;@80351110224678912&gt;).
         /// </returns>
-        public static string MentionUser(ulong id) => MentionUser(id.ToString(), true);
+        public static string MentionUser(ulong id) => MentionUser(id.ToString());
         internal static string MentionChannel(string id) => $"<#{id}>";
         /// <summary>
         ///     Returns a mention string based on the channel ID.
@@ -192,19 +192,19 @@ namespace Discord
                             return "";
                     case TagHandling.FullName:
                         if (user != null)
-                            return $"@{user.Username}#{user.Discriminator}";
+                            return user.DiscriminatorValue != 0 ? $"@{user.Username}#{user.Discriminator}" : user.Username;
                         else
                             return "";
                     case TagHandling.FullNameNoPrefix:
                         if (user != null)
-                            return $"{user.Username}#{user.Discriminator}";
+                            return user.DiscriminatorValue != 0 ? $"@{user.Username}#{user.Discriminator}" : user.Username;
                         else
                             return "";
                     case TagHandling.Sanitize:
                         if (guildUser != null && guildUser.Nickname == null)
-                            return MentionUser($"{SanitizeChar}{tag.Key}", false);
+                            return MentionUser($"{SanitizeChar}{tag.Key}");
                         else
-                            return MentionUser($"{SanitizeChar}{tag.Key}", true);
+                            return MentionUser($"{SanitizeChar}{tag.Key}");
                 }
             }
             return "";

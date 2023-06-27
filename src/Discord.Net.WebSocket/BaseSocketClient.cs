@@ -140,7 +140,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A generic WebSocket-based user; <see langword="null" /> when the user cannot be found.
         /// </returns>
-        public abstract SocketUser GetUser(string username, string discriminator);
+        public abstract SocketUser GetUser(string username, string discriminator = null);
         /// <summary>
         ///     Gets a channel.
         /// </summary>
