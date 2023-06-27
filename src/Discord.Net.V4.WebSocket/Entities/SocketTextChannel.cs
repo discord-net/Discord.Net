@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord.WebSocket
 {
-    public interface ISocketMessageChannel : IMessageChannel
+    internal class SocketTextChannel
     {
-        IAsyncEnumerable<SocketMessage> GetCachedMessages(CancellationToken token = default);
-
-
     }
 }

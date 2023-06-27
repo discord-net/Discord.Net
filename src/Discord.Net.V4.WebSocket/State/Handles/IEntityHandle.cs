@@ -1,3 +1,4 @@
+using Discord.WebSocket.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,12 @@ namespace Discord.WebSocket
 
         IDisposable? IEntityHandle.CreateScopedClone(out object? cloned)
             => CreateScopedClone(out cloned);
+
+        IEntityHandle<TId, TNewEntity> Transform<TNewEntity>()
+            where TNewEntity : class, TEntity
+        {
+            return new TransformativeHandle<TId, TEntity, TNewEntity>(this);
+        }
     }
 
     public interface IEntityHandle : IDisposable, IAsyncDisposable

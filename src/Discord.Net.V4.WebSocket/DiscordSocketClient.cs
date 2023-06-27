@@ -13,7 +13,7 @@ namespace Discord.WebSocket
 
         public DiscordSocketClient()
         {
-            State = new ();
+            State = new (this);
         }
     }
 }

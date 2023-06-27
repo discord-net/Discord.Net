@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.Net.V4.WebSocket.Cache.Models.Channels
+namespace Discord.WebSocket.Cache
 {
-    public interface IGroupDMChannelModel : IAudioChannelModel
+    public interface IGroupDMChannelModel : IAudioChannelModel, IChannelModel
     {
         ulong[] Recipients { get; }
     }

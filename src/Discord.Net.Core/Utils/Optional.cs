@@ -56,5 +56,9 @@ namespace Discord
         public static T? ToNullable<T>(this Optional<T> val)
             where T : struct
             => val.IsSpecified ? val.Value : null;
+
+        public static Optional<T> ToOptional<T>(this T? value)
+            where T : struct
+            => value.HasValue ? Create(value.Value) : Optional<T>.Unspecified;
     }
 }

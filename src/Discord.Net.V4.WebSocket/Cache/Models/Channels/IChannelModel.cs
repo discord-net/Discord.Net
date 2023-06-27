@@ -9,5 +9,6 @@ namespace Discord.WebSocket.Cache
     public interface IChannelModel : IEntityModel<ulong>
     {
         string Name { get; }
+        ChannelType Type { get; }
     }
 }

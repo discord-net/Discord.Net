@@ -11,12 +11,16 @@ namespace Discord.WebSocket
         where TId : IEquatable<TId>
         where TModel : IEntityModel<TId>
     {
+        protected abstract TModel Model { get; }
+
         internal SocketCacheableEntity(DiscordSocketClient discord, TId id)
             : base(discord, id)
         {
         }
 
-        internal abstract TModel GetModel();
+        internal virtual TModel GetModel()
+            => Model;
+
         internal abstract void Update(TModel model);
 
         internal override void Update(IEntityModel<TId> model)

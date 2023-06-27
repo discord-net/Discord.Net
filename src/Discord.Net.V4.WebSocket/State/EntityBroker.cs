@@ -15,7 +15,7 @@ namespace Discord.WebSocket.State
         where TId : IEquatable<TId>
     {
         public EntityBroker(StateController controller,
-            Func<TId?, ValueTask<IEntityStore<TId>>> getStore,
+            StoreFactory getStore,
             EntityFactory factory)
             : base(controller, getStore, factory)
         {
@@ -28,11 +28,12 @@ namespace Discord.WebSocket.State
         where TModel : IEntityModel<TId>
         where TId : IEquatable<TId>
     {
-        public delegate ValueTask<TEntity> EntityFactory(TFactoryArgs? args, TId? parent, TModel model);
+        public delegate ValueTask<TEntity> EntityFactory(TFactoryArgs? args, Optional<TId> parent, TModel model);
+        public delegate ValueTask<IEntityStore<TId>> StoreFactory(Optional<TId> parent);
 
         private readonly ConcurrentDictionary<TId, EntityReference> _referenceCache;
 
-        private readonly Func<TId?, ValueTask<IEntityStore<TId>>> _getStore;
+        private readonly StoreFactory _getStore;
         private readonly StateController _controller;
         private readonly EntityFactory _factory;
 
@@ -40,7 +41,7 @@ namespace Discord.WebSocket.State
 
         public EntityBroker(
             StateController controller,
-            Func<TId?, ValueTask<IEntityStore<TId>>> getStore,
+            StoreFactory getStore,
             EntityFactory factory)
         {
             _cleanupSemaphore = new(1, 1);
@@ -88,7 +89,7 @@ namespace Discord.WebSocket.State
         public ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(TFactoryArgs factoryArgs, TModel model)
             => CreateAsync(default, factoryArgs, model);
 
-        public async ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(TId? parent, TFactoryArgs factoryArgs, TModel model)
+        public async ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(Optional<TId> parent, TFactoryArgs factoryArgs, TModel model)
         {
             var store = await _getStore(parent);
 
@@ -106,7 +107,7 @@ namespace Discord.WebSocket.State
             return await CreateAndAllocateHandle(store, parent, factoryArgs, model);
         }
 
-        public ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TId? parent, TId id)
+        public ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(Optional<TId> parent, TId id)
             => GetAsync(parent, default, id);
 
         public ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TId id)
@@ -115,7 +116,7 @@ namespace Discord.WebSocket.State
         public ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TFactoryArgs args, TId id)
             => GetAsync(default, args, id);
 
-        public async ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TId? parent, TFactoryArgs? args, TId id)
+        public async ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(Optional<TId> parent, TFactoryArgs? args, TId id)
         {
             var store = await _getStore(parent);
 
@@ -142,7 +143,7 @@ namespace Discord.WebSocket.State
         public ValueTask<IAsyncEnumerable<IEntityHandle<TId, TEntity>>> GetAllAsync(TFactoryArgs args)
             => GetAllAsync(default, args);
 
-        public async ValueTask<IAsyncEnumerable<IEntityHandle<TId, TEntity>>> GetAllAsync(TId? parent, TFactoryArgs args)
+        public async ValueTask<IAsyncEnumerable<IEntityHandle<TId, TEntity>>> GetAllAsync(Optional<TId> parent, TFactoryArgs args)
         {
             var store = await _getStore(parent);
 
@@ -161,7 +162,7 @@ namespace Discord.WebSocket.State
             return entityModel;
         }
 
-        private async ValueTask<IEntityHandle<TId, TEntity>> CreateAndAllocateHandle(IEntityStore<TId> store, TId? parent, TFactoryArgs? args, TModel model)
+        private async ValueTask<IEntityHandle<TId, TEntity>> CreateAndAllocateHandle(IEntityStore<TId> store, Optional<TId> parent, TFactoryArgs? args, TModel model)
         {
             var handle = _controller.AllocateHandle(store, await _factory(args, parent, model));
             _ = _referenceCache.GetOrAdd(model.Id, CreateTrackedReference, handle);
@@ -211,7 +212,8 @@ namespace Discord.WebSocket.State
         where TId : IEquatable<TId>
     {
         bool TryGetReferenced(TId id, [NotNullWhen(true)] out TEntity? entity);
-        ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TId? parent, TId id);
+        ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(Optional<TId> parent, TId id);
+        ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TId id);
     }
 
     internal interface IEntityBroker

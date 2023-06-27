@@ -3,75 +3,205 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace Discord.WebSocket
 {
-    public sealed class SocketMessage : SocketCacheableEntity<ulong, IMessageModel>, IMessage
+    public abstract class SocketMessage : SocketCacheableEntity<ulong, IMessageModel>, IMessage
     {
+        public MessageChannelCacheable Channel { get; }
+
+        public UserCacheable Author { get; }
+
         public MessageType Type
             => _source.Type;
 
-        public MessageSource Source => throw new NotImplementedException();
+        public abstract MessageSource Source { get; }
 
-        public bool IsTTS => throw new NotImplementedException();
+        public bool IsTTS
+            => _source.IsTTS;
 
-        public bool IsPinned => throw new NotImplementedException();
+        public bool IsPinned
+            => _source.IsPinned;
 
-        public bool IsSuppressed => throw new NotImplementedException();
+        public virtual bool IsSuppressed
+            => false;
 
-        public bool MentionedEveryone => throw new NotImplementedException();
+        public bool MentionedEveryone
+            => _source.MentionsEveryone;
 
-        public string Content => throw new NotImplementedException();
+        public string? Content
+            => _source.Content;
 
-        public string CleanContent => throw new NotImplementedException();
+        public string? CleanContent
+            => _source.Content; // MessageHelper.SanitizeMessage(this); TODO
 
-        public DateTimeOffset Timestamp => throw new NotImplementedException();
+        public DateTimeOffset Timestamp
+            => _source.Timestamp;
 
-        public DateTimeOffset? EditedTimestamp => throw new NotImplementedException();
+        public DateTimeOffset? EditedTimestamp
+            => _source.EditedTimestamp;
 
-        public IMessageChannel Channel => throw new NotImplementedException();
+        public IReadOnlyCollection<ulong> MentionedChannelIds
+            => _source.MentionedChannels.ToReadOnlyCollection();
 
-        public IUser Author => throw new NotImplementedException();
+        public IReadOnlyCollection<ulong> MentionedRoleIds
+            => _source.MentionedRoles.ToReadOnlyCollection();
 
-        public IReadOnlyCollection<IAttachment> Attachments => throw new NotImplementedException();
+        public IReadOnlyCollection<ulong> MentionedUserIds
+            => _source.MentionedUsers.ToReadOnlyCollection();
 
-        public IReadOnlyCollection<IEmbed> Embeds => throw new NotImplementedException();
+        public MessageFlags? Flags
+            => _source.Flags;
 
-        public IReadOnlyCollection<ITag> Tags => throw new NotImplementedException();
+        public DateTimeOffset CreatedAt
+            => SnowflakeUtils.FromSnowflake(Id);
 
-        public IReadOnlyCollection<ulong> MentionedChannelIds => throw new NotImplementedException();
+        public MessageActivity? Activity { get; private set; }
 
-        public IReadOnlyCollection<ulong> MentionedRoleIds => throw new NotImplementedException();
+        public MessageApplication? Application { get; private set; }
 
-        public IReadOnlyCollection<ulong> MentionedUserIds => throw new NotImplementedException();
+        public MessageReference? Reference { get; private set; }
 
-        public MessageActivity Activity => throw new NotImplementedException();
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => throw new NotImplementedException(); // TODO
 
-        public MessageApplication Application => throw new NotImplementedException();
+        public IReadOnlyCollection<IMessageComponent> Components => throw new NotImplementedException(); // TODO
 
-        public MessageReference Reference => throw new NotImplementedException();
+        public IReadOnlyCollection<IStickerItem> Stickers => throw new NotImplementedException(); // TODO
 
-        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => throw new NotImplementedException();
+        public IMessageInteraction Interaction => throw new NotImplementedException(); // TODO
 
-        public IReadOnlyCollection<IMessageComponent> Components => throw new NotImplementedException();
+        public IReadOnlyCollection<IAttachment> Attachments => throw new NotImplementedException(); // TODO: model -> class
 
-        public IReadOnlyCollection<IStickerItem> Stickers => throw new NotImplementedException();
+        public IReadOnlyCollection<IEmbed> Embeds => throw new NotImplementedException(); // TODO: model -> class
 
-        public MessageFlags? Flags => throw new NotImplementedException();
-
-        public IMessageInteraction Interaction => throw new NotImplementedException();
-
-        public DateTimeOffset CreatedAt => throw new NotImplementedException();
+        public IReadOnlyCollection<ITag> Tags => throw new NotImplementedException(); // TODO: model -> class
 
         private IMessageModel _source;
-        public SocketMessage(DiscordSocketClient discord, ulong id, IMessageModel model)
+
+        public SocketMessage(DiscordSocketClient discord, ulong channelId, ulong id, IMessageModel model)
             : base(discord, id)
         {
             _source = model;
+            Channel = new(
+                channelId,
+                discord,
+                discord.State.Channels
+                    .SourceSpecific(channelId)
+                    .TransformChannel<SocketMessageChannel>()
+            );
+
+            Author = new(model.AuthorId, discord, discord.State.Users.SourceSpecific(model.AuthorId));
+
+            UpdateStructures();
         }
 
-        
+        internal override IMessageModel GetModel()
+            => _source;
+        internal override void Update(IMessageModel model)
+        {
+            _source = model;
+            UpdateStructures();
+        }
+
+        private void UpdateStructures()
+        {
+            var hasActivity = _source.MessageActivityId is not null || _source.MessageActivityType is not null;
+            
+            if (Activity is not null)
+            {
+                if(!hasActivity)
+                {
+                    Activity = null;
+                }
+                else
+                {
+                    if (Activity.PartyId != _source.MessageActivityId)
+                        Activity.PartyId = _source.MessageActivityId;
+
+                    if (Activity.Type != _source.MessageActivityType)
+                        Activity.Type = _source.MessageActivityType.GetValueOrDefault(MessageActivityType.Join); // TODO: nullable?
+                }
+            }
+            else if (Activity is null && hasActivity)
+            {
+                Activity = new MessageActivity()
+                {
+                    PartyId = _source.MessageActivityId,
+                    Type = _source.MessageActivityType.GetValueOrDefault(MessageActivityType.Join)
+                };
+            }
+
+            var hasApplication = _source.MessageAppId is not null
+                || _source.MessageAppIcon is not null
+                || _source.MessageAppCoverImage is not null
+                || _source.MessageAppDescription is not null
+                || _source.MessageAppName is not null;
+
+            if(Application is not null)
+            {
+                if (!hasApplication)
+                    Application = null;
+                else
+                {
+                    if (Application.CoverImage != _source.MessageAppCoverImage)
+                        Application.CoverImage = _source.MessageAppCoverImage;
+
+                    if (Application.Description != _source.MessageAppDescription)
+                        Application.Description = _source.MessageAppDescription;
+
+                    if (Application.Icon != _source.MessageAppIcon)
+                        Application.Icon = _source.MessageAppIcon;
+
+                    if (Application.Id != _source.MessageAppId && _source.MessageAppId.HasValue)
+                        Application.Id = _source.MessageAppId.Value;
+
+                    if (Application.Name != _source.MessageAppName)
+                        Application.Name = _source.MessageAppName;
+                }
+            } 
+            else if(Application is null && hasApplication && _source.MessageAppId.HasValue)
+            {
+                Application = new MessageApplication
+                {
+                    Name = _source.MessageAppName,
+                    CoverImage = _source.MessageAppCoverImage,
+                    Description = _source.MessageAppDescription,
+                    Icon = _source.MessageAppIcon,
+                    Id = _source.MessageAppId.Value
+                };
+            }
+
+            var hasReference = _source.ReferenceMessageId.HasValue
+                || _source.ReferenceChannelId.HasValue
+                || _source.ReferenceGuildId.HasValue;
+
+            if(Reference is not null)
+            {
+                if (!_source.ReferenceMessageId.HasValue)
+                    Reference = null;
+                else
+                {
+                    if (!Reference.MessageId.Equals(_source.ReferenceMessageId))
+                        Reference.MessageId = _source.ReferenceGuildId.ToOptional();
+
+                    if (!Reference.InternalChannelId.Equals(_source.ReferenceChannelId))
+                        Reference.InternalChannelId = _source.ReferenceChannelId.ToOptional();
+
+                    if (Reference.GuildId.Equals(_source.ReferenceGuildId))
+                        Reference.GuildId = _source.ReferenceGuildId.ToOptional();
+                }
+            }
+            else if (hasReference)
+            {
+                Reference = new MessageReference(
+                    _source.ReferenceMessageId,
+                    _source.ReferenceChannelId,
+                    _source.ReferenceGuildId
+                );
+            }
+        }
 
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null) => throw new NotImplementedException();
         public Task DeleteAsync(RequestOptions options = null) => throw new NotImplementedException();
@@ -83,11 +213,8 @@ namespace Discord.WebSocket
         internal override object Clone() => throw new NotImplementedException();
         internal override void DisposeClone() => throw new NotImplementedException();
 
-        internal override IMessageModel GetModel()
-            => _source;
-        internal override void Update(IMessageModel model)
-        {
-            _source = model;
-        }
+        IMessageChannel? IMessage.Channel => Channel.Value;
+
+        IUser? IMessage.Author => Author.Value;
     }
 }
