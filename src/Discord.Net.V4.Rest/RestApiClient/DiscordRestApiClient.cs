@@ -11,4 +11,6 @@ public partial class DiscordRestApiClient : IRestApiProvider
     public Task LoginAsync(TokenType tokenType, string token, bool validateToken, CancellationToken? cancellationToken = null) => throw new NotImplementedException();
 
     public Task LogoutAsync(CancellationToken? cancellationToken = null) => throw new NotImplementedException();
+
+    public Task<IReadOnlyCollection<IVoiceRegion>> ListVoiceRegionsAsync(CancellationToken? cancellationToken = null, RequestOptions? options = null) => throw new NotImplementedException();
 }

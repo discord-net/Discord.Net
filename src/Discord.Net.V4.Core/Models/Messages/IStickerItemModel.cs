@@ -1,9 +1,8 @@
-namespace Discord.Models
+namespace Discord.Models;
+
+public interface IStickerItemModel
 {
-    public interface IStickerItemModel
-    {
-        ulong Id { get; }
-        string Name { get; }
-        StickerFormatType FormatType { get; }
-    }
+    ulong Id { get; }
+    string Name { get; }
+    StickerFormatType FormatType { get; }
 }
