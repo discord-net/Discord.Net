@@ -27,7 +27,7 @@ namespace Discord.Audio.Streams
         /// <summary>
         ///     Sends silent frames to avoid interpolation errors after breaks in data transmission.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A task representing the asynchronous operation of sending a silent frame.</returns>
         public async Task WriteSilentFramesAsync()
         {
             // https://discord.com/developers/docs/topics/voice-connections#voice-data-interpolation
