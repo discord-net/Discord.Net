@@ -6,13 +6,13 @@ public partial class DiscordRestApiClient
 {
     public Task<IUserModel> GetCurrentUserAsync(CancellationToken? cancellationToken = null, RequestOptions? options = null) => throw new NotImplementedException();
 
-    public Task<IUserModel?> GetUserAsync(ulong userId, CancellationToken? cancellationToken = null, RequestOptions? options = null) => throw new NotImplementedException();
+    public Task<IUserModel> GetUserAsync(ulong userId, CancellationToken? cancellationToken = null, RequestOptions? options = null) => throw new NotImplementedException();
 
     public Task<IUserModel> ModifyCurrentUserAsync(string username, Image? image = null, CancellationToken? cancellationToken = null, RequestOptions? options = null) => throw new NotImplementedException();
 
     public Task<IReadOnlyCollection<IGuildModel>> GetCurrentUserGuildsAsync(CancellationToken? cancellationToken = null, RequestOptions? options = null) => throw new NotImplementedException();
 
-    public Task<IUserModel?> GetCurrentUserGuildMemberAsync(ulong guildId, CancellationToken? cancellationToken = null, RequestOptions? options = null) => throw new NotImplementedException();
+    public Task<IUserModel> GetCurrentUserGuildMemberAsync(ulong guildId, CancellationToken? cancellationToken = null, RequestOptions? options = null) => throw new NotImplementedException();
 
     public Task LeaveGuildAsync(ulong guildId, CancellationToken? cancellationToken = null, RequestOptions? options = null) => throw new NotImplementedException();
 

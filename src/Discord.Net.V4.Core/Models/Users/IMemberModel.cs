@@ -4,7 +4,7 @@ public interface IMemberModel : IEntityModel<ulong>
 {
     string? Nickname { get; set; }
     string? GuildAvatar { get; set; }
-    ulong[] Roles { get; set; }
+    ICollection<ulong> RoleIds { get; set; }
     DateTimeOffset? JoinedAt { get; set; }
     DateTimeOffset? PremiumSince { get; set; }
     bool? IsPending { get; set; }
