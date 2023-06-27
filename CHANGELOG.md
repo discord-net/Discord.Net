@@ -1,5 +1,41 @@
 # Changelog
 
+## [3.11.0] - 2023-6-27
+
+### Added
+- #2616 Added guild Onboarding support (3a8f76c)
+- #2627 Added `Audit Log Created` gateway event support (dff6a57)
+- #2645 Added `Message` property and `UpdateAsync()` to `IModalInteraction` (83dfa0c)
+- #2648 Added `MaxStageVideoChannelUsers` property to `IGuild` (bdd755b)
+- #2665 Added voice messages support (f171684)
+- #2619 Added get current bot application information (9ef5a76)
+- #2649 Added `SafetyAlertsChannelId` to `IGuild` (2112e1f)
+- #2696 Added support for the new username system (df717e6)
+- #2620 Added support for filtering audit log entries by after id (529fe3d)
+- #2622 Added default thread ratelimit in guild text channels (f9c8530)
+
+### Fixed
+- #2628 Allow creating stickers with no description (c950106)
+- #2682 Fixed missing `JsonProperty` attributes in params for modifying automod rules (9df4438)
+- #2702 Fixed `TypingStartedEvent` model to support Clyde (547bc92)
+- #2652 Fixed streams being incorrectly disposed in `DefaultRestClient` (84431de)
+- #2708 Fixed threads not getting removed from cache on `THREAD_DELETE` (fe4130d)
+- #2688 Fixed some internal classes being public (9ddd922)
+- #2687 Allow more than 1 action to be registered per automod rule (200bed7)
+- #2683 Fixed mention limit, regex patterns & allowlist for automod rules (a41fa62)
+- #2663 Fixed T3 file upload size to be 25MiB (98f974d)
+- #2662 Fixed duplicate `SlashCommandExecuted` event on failed result (fe9657a)
+- #2651 Fixed name translations (`NameLocalizations`) for `ChoiceAttribute` (75ae488)
+- #2647 Fixed `ChannelPermissions.All()` exception on forums (6265dd5)
+- #2642 Enforce rate limits on 429s (69cce5b)
+
+### Misc
+- #2601 Add missing json error (a8ae1e9)
+- #2609 Refactor `SendMessageAsync` & `SendFile(s)Async` methods & modify webhook message attachments (898ee56)
+- #2646 Create forum channels with default layout (0720049)
+- #2666 Switch `channel` to `channel_id` in interactions (d5ba7d2)
+- #2670 Disable FEC in OPUS (2be9b00)
+
 ## [3.10.0] - 2023-03-27
 
 ### Added
