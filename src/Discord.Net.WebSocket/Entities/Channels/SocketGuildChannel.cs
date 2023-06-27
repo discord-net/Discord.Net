@@ -93,7 +93,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="user">The user to get the overwrite from.</param>
         /// <returns>
-        ///     An overwrite object for the targeted user; <c>null</c> if none is set.
+        ///     An overwrite object for the targeted user; <see langword="null" /> if none is set.
         /// </returns>
         public virtual OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
@@ -109,7 +109,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="role">The role to get the overwrite from.</param>
         /// <returns>
-        ///     An overwrite object for the targeted role; <c>null</c> if none is set.
+        ///     An overwrite object for the targeted role; <see langword="null" /> if none is set.
         /// </returns>
         public virtual OverwritePermissions? GetPermissionOverwrite(IRole role)
         {

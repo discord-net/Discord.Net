@@ -17,7 +17,7 @@ namespace Discord
         ///     Gets a value that indicates whether the current user has reacted to this.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the user has reacted to the message; otherwise <c>false</c>.
+        ///     <see langword="true" /> if the user has reacted to the message; otherwise <see langword="false" />.
         /// </returns>
         public bool IsMe { get; internal set; }
     }

@@ -873,7 +873,7 @@ namespace Discord.Rest
         ///         This method removes all users that have not logged on in the provided number of <paramref name="days"/>.
         ///     </para>
         ///     <para>
-        ///         If <paramref name="simulate" /> is <c>true</c>, this method will only return the number of users that
+        ///         If <paramref name="simulate" /> is <see langword="true" />, this method will only return the number of users that
         ///         would be removed without kicking the users.
         ///     </para>
         /// </remarks>

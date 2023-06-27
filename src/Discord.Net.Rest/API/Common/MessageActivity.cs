@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class MessageActivity
+    internal class MessageActivity
     {
         [JsonProperty("type")]
         public Optional<MessageActivityType> Type { get; set; }

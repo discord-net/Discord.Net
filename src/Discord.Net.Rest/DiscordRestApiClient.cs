@@ -1471,7 +1471,8 @@ namespace Discord.API
         {
             if ((!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0)
                 && (!args.Content.IsSpecified || args.Content.Value is null || string.IsNullOrWhiteSpace(args.Content.Value))
-                && (!args.Components.IsSpecified || args.Components.Value is null || args.Components.Value.Length == 0))
+                && (!args.Components.IsSpecified || args.Components.Value is null || args.Components.Value.Length == 0)
+                && (!args.File.IsSpecified))
             {
                 throw new ArgumentException("At least one of 'Content', 'Embeds', 'File' or 'Components' must be specified.", nameof(args));
             }
@@ -1494,7 +1495,8 @@ namespace Discord.API
         {
             if ((!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0)
                 && (!args.Content.IsSpecified || args.Content.Value is null || string.IsNullOrWhiteSpace(args.Content.Value))
-                && (!args.MessageComponents.IsSpecified || args.MessageComponents.Value is null || args.MessageComponents.Value.Length == 0))
+                && (!args.MessageComponents.IsSpecified || args.MessageComponents.Value is null || args.MessageComponents.Value.Length == 0)
+                && (args.Files.Length == 0))
             {
                 throw new ArgumentException("At least one of 'Content', 'Embeds', 'Files' or 'Components' must be specified.", nameof(args));
             }

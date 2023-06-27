@@ -2,7 +2,7 @@ using Discord.Rest;
 
 namespace Discord.API.AuditLogs;
 
-public class GuildInfoAuditLogModel : IAuditLogInfoModel
+internal class GuildInfoAuditLogModel : IAuditLogInfoModel
 {
     [JsonField("name")]
     public string Name { get; set; }

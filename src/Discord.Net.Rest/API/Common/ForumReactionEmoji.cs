@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API;
 
-public class ForumReactionEmoji
+internal class ForumReactionEmoji
 {
     [JsonProperty("emoji_id")]
     public ulong? EmojiId { get; set; }

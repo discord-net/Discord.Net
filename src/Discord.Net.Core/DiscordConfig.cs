@@ -170,7 +170,7 @@ namespace Discord
         ///     Gets or sets whether the initial log entry should be printed.
         /// </summary>
         /// <remarks>
-        ///     If set to <c>true</c>, the library will attempt to print the current version of the library, as well as
+        ///     If set to <see langword="true" />, the library will attempt to print the current version of the library, as well as
         ///     the API version it uses on startup.
         /// </remarks>
         internal bool DisplayInitialLog { get; set; } = true;
@@ -179,7 +179,7 @@ namespace Discord
         /// 	Gets or sets whether or not rate-limits should use the system clock.
         /// </summary>
         /// <remarks>
-        ///		If set to <c>false</c>, we will use the X-RateLimit-Reset-After header
+        ///		If set to <see langword="false" />, we will use the X-RateLimit-Reset-After header
         ///		to determine when a rate-limit expires, rather than comparing the
         ///		X-RateLimit-Reset timestamp to the system time.
         ///

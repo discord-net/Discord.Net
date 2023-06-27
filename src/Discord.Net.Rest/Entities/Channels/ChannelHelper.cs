@@ -329,7 +329,7 @@ namespace Discord.Rest
         /// invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="filePath" /> is <c>null</c>.
+        /// <paramref name="filePath" /> is <see langword="null" />.
         /// </exception>
         /// <exception cref="PathTooLongException">
         /// The specified path, file name, or both exceed the system-defined maximum length. For example, on

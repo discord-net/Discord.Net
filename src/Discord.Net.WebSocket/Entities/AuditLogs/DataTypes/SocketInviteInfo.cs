@@ -21,7 +21,7 @@ public struct SocketInviteInfo
     ///     Gets the time (in seconds) until the invite expires.
     /// </summary>
     /// <returns>
-    ///     An <see cref="int"/> representing the time in seconds until this invite expires; <c>null</c> if this
+    ///     An <see cref="int"/> representing the time in seconds until this invite expires; <see langword="null" /> if this
     ///     invite never expires or not specified.
     /// </returns>
     public int? MaxAge { get; }
@@ -38,8 +38,8 @@ public struct SocketInviteInfo
     ///     Gets a value that indicates whether the invite is a temporary one.
     /// </summary>
     /// <returns>
-    ///     <c>true</c> if users accepting this invite will be removed from the guild when they log off, 
-    ///     <c>false</c> if not; <c>null</c> if not specified.
+    ///     <see langword="true" /> if users accepting this invite will be removed from the guild when they log off, 
+    ///     <see langword="false" /> if not; <see langword="null" /> if not specified.
     /// </returns>
     public bool? Temporary { get; }
 
@@ -48,7 +48,7 @@ public struct SocketInviteInfo
     /// </summary>
     /// <returns>
     ///     A <see cref="ulong"/> representing the channel snowflake identifier that the invite points to; 
-    ///     <c>null</c> if not specified.
+    ///     <see langword="null" /> if not specified.
     /// </returns>
     public ulong? ChannelId { get; }
 
@@ -57,7 +57,7 @@ public struct SocketInviteInfo
     /// </summary>
     /// <returns>
     ///     An <see cref="int"/> representing the number of uses this invite may be accepted until it is removed
-    ///     from the guild; <c>null</c> if none is specified.
+    ///     from the guild; <see langword="null" /> if none is specified.
     /// </returns>
     public int? MaxUses { get; }
 

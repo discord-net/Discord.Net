@@ -46,7 +46,7 @@ namespace Discord.API.Rest
         [JsonProperty("default_sort_order")]
         public Optional<ForumSortOrder?> DefaultSortOrder { get; set; }
 
-        [JsonProperty("default_forum_layout ")]
+        [JsonProperty("default_forum_layout")]
         public Optional<ForumLayout> DefaultLayout { get; set; }
 
         public CreateGuildChannelParams(string name, ChannelType type)
