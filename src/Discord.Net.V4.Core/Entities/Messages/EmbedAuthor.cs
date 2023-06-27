@@ -13,20 +13,23 @@ namespace Discord
         ///     Gets the name of the author field.
         /// </summary>
         public string Name { get; internal set; }
+
         /// <summary>
         ///     Gets the URL of the author field.
         /// </summary>
-        public string Url { get; internal set; }
+        public string? Url { get; internal set; }
+
         /// <summary>
         ///     Gets the icon URL of the author field.
         /// </summary>
-        public string IconUrl { get; internal set; }
+        public string? IconUrl { get; internal set; }
+
         /// <summary>
         ///     Gets the proxified icon URL of the author field.
         /// </summary>
-        public string ProxyIconUrl { get; internal set; }
+        public string? ProxyIconUrl { get; internal set; }
 
-        internal EmbedAuthor(string name, string url, string iconUrl, string proxyIconUrl)
+        internal EmbedAuthor(string name, string? url, string? iconUrl, string? proxyIconUrl)
         {
             Name = name;
             Url = url;
@@ -58,7 +61,7 @@ namespace Discord
         /// </remarks>
         /// <param name="obj">The object to compare with the current <see cref="EmbedAuthor"/></param>
         /// <returns></returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is EmbedAuthor embedAuthor && Equals(embedAuthor);
 
         /// <summary>

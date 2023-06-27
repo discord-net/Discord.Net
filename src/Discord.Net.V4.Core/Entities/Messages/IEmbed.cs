@@ -13,7 +13,7 @@ public interface IEmbed
     /// <returns>
     ///     A string containing the URL set in a title of the embed.
     /// </returns>
-    string Url { get; }
+    string? Url { get; }
 
     /// <summary>
     ///     Gets the title of this embed.

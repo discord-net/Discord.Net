@@ -1,4 +1,4 @@
-namespace Discord;s
+namespace Discord;
 
 /// <summary>
 ///     A metadata containing reaction information.

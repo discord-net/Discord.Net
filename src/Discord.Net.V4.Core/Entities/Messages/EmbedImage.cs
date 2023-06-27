@@ -40,7 +40,7 @@ public struct EmbedImage
     /// </returns>
     public int? Width { get; }
 
-    internal EmbedImage(string url, string? proxyUrl, int? height, int? width)
+    internal EmbedImage(string? url, string? proxyUrl, int? height, int? width)
     {
         Url = url;
         ProxyUrl = proxyUrl;

@@ -2,53 +2,43 @@ using System.Diagnostics;
 
 namespace Discord;
 
-//Based on https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/Nullable.cs
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-public struct Optional<T>
+public readonly struct Optional<T>
 {
     public static Optional<T> Unspecified => default;
-    private readonly T _value;
 
-    /// <summary> Gets the value for this parameter. </summary>
+    /// <summary>
+    ///     Gets the value for this parameter.
+    /// </summary>
     /// <exception cref="InvalidOperationException" accessor="get">This property has no value set.</exception>
-    public T Value
-    {
-        get
-        {
-            if (!IsSpecified)
-                throw new InvalidOperationException("This property has no value set.");
-            return _value;
-        }
-    }
-    /// <summary> Returns true if this value has been specified. </summary>
+    public T Value { get; }
+
+    /// <summary>
+    ///     Returns true if this value has been specified.
+    /// </summary>
     public bool IsSpecified { get; }
 
-    /// <summary> Creates a new Parameter with the provided value. </summary>
+    /// <summary>
+    ///     Creates a new Parameter with the provided value.
+    /// </summary>
     public Optional(T value)
     {
-        _value = value;
+        Value = value;
         IsSpecified = true;
     }
 
-    public T GetValueOrDefault() => _value;
-    public T GetValueOrDefault(T defaultValue) => IsSpecified ? _value : defaultValue;
+    public T GetValueOrDefault() => Value!;
+    public T GetValueOrDefault(T defaultValue) => IsSpecified ? Value : defaultValue;
 
-    public override bool Equals(object? other)
-    {
-        if (!IsSpecified)
-            return other == null;
-        if (other == null)
-            return false;
-        return _value!.Equals(other);
-    }
-    public override int GetHashCode() => IsSpecified ? _value?.GetHashCode() ?? 0 : 0;
+    public override int GetHashCode() => IsSpecified ? Value?.GetHashCode() ?? 0 : 0;
 
-    public override string? ToString() => IsSpecified ? _value?.ToString() : null;
-    private string DebuggerDisplay => IsSpecified ? _value?.ToString() ?? "<null>" : "<unspecified>";
+    public override string? ToString() => IsSpecified ? Value?.ToString() : null;
+    private string DebuggerDisplay => IsSpecified ? Value?.ToString() ?? "<null>" : "<unspecified>";
 
     public static implicit operator Optional<T>(T value) => new(value);
     public static explicit operator T(Optional<T> value) => value.Value;
 }
+
 public static class Optional
 {
     public static Optional<T> Create<T>() => Optional<T>.Unspecified;
