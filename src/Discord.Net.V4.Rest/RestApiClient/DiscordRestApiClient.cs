@@ -1,3 +1,5 @@
+using Discord.Models;
+
 namespace Discord.Rest;
 
 public partial class DiscordRestApiClient : IRestApiProvider
