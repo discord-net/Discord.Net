@@ -308,7 +308,10 @@ public static class MentionUtils
         if (mode == TagHandling.Remove)
             return string.Empty;
 
-        var emoji = (Emote)tag.Value;
+        var emoji = (Emote?)tag.Value;
+
+        if (string.IsNullOrEmpty(emoji?.Name))
+            return string.Empty;
 
         //Remove if its name contains any bad chars (prevents a few tag exploits)
         foreach (var c in emoji.Name)

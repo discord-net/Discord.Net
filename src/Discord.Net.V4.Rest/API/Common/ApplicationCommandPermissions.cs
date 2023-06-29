@@ -1,16 +1,15 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
-namespace Discord.API
+namespace Discord.API;
+
+internal class ApplicationCommandPermissions
 {
-    internal class ApplicationCommandPermissions
-    {
-        [JsonPropertyName("id")]
-        public ulong Id { get; set; }
+    [JsonPropertyName("id")]
+    public ulong Id { get; set; }
 
-        [JsonPropertyName("type")]
-        public ApplicationCommandPermissionTarget Type { get; set; }
+    [JsonPropertyName("type")]
+    public ApplicationCommandPermissionTarget Type { get; set; }
 
-        [JsonPropertyName("permission")]
-        public bool Permission { get; set; }
-    }
+    [JsonPropertyName("permission")]
+    public bool Permission { get; set; }
 }

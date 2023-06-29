@@ -1,4 +1,3 @@
-using Discord.Net.V4.Rest.API.Common;
 using System.Text.Json.Serialization;
 
 namespace Discord.API;

@@ -1,63 +1,62 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
-namespace Discord.API
+namespace Discord.API;
+
+internal class ButtonComponent : IMessageComponent
 {
-    internal class ButtonComponent : IMessageComponent
+    [JsonPropertyName("type")]
+    public ComponentType Type { get; set; }
+
+    [JsonPropertyName("style")]
+    public ButtonStyle Style { get; set; }
+
+    [JsonPropertyName("label")]
+    public Optional<string> Label { get; set; }
+
+    [JsonPropertyName("emoji")]
+    public Optional<Emoji> Emote { get; set; }
+
+    [JsonPropertyName("custom_id")]
+    public Optional<string> CustomId { get; set; }
+
+    [JsonPropertyName("url")]
+    public Optional<string> Url { get; set; }
+
+    [JsonPropertyName("disabled")]
+    public Optional<bool> Disabled { get; set; }
+
+    public ButtonComponent() { }
+
+    public ButtonComponent(Discord.ButtonComponent c)
     {
-        [JsonPropertyName("type")]
-        public ComponentType Type { get; set; }
+        Type = c.Type;
+        Style = c.Style;
+        Label = c.Label ?? Optional<string>.Unspecified;
+        CustomId = c.CustomId ?? Optional<string>.Unspecified;
+        Url = c.Url ?? Optional<string>.Unspecified;
+        Disabled = c.IsDisabled;
 
-        [JsonPropertyName("style")]
-        public ButtonStyle Style { get; set; }
-
-        [JsonPropertyName("label")]
-        public Optional<string> Label { get; set; }
-
-        [JsonPropertyName("emoji")]
-        public Optional<Emoji> Emote { get; set; }
-
-        [JsonPropertyName("custom_id")]
-        public Optional<string> CustomId { get; set; }
-
-        [JsonPropertyName("url")]
-        public Optional<string> Url { get; set; }
-
-        [JsonPropertyName("disabled")]
-        public Optional<bool> Disabled { get; set; }
-
-        public ButtonComponent() { }
-
-        public ButtonComponent(Discord.ButtonComponent c)
+        if (c.Emote is not null)
         {
-            Type = c.Type;
-            Style = c.Style;
-            Label = c.Label;
-            CustomId = c.CustomId;
-            Url = c.Url;
-            Disabled = c.IsDisabled;
-
-            if (c.Emote != null)
+            if (c.Emote is Emote e)
             {
-                if (c.Emote is Emote e)
+                Emote = new Emoji
                 {
-                    Emote = new Emoji
-                    {
-                        Name = e.Name,
-                        Animated = e.Animated,
-                        Id = e.Id
-                    };
-                }
-                else
+                    Name = e.Name,
+                    Animated = e.Animated,
+                    Id = e.Id
+                };
+            }
+            else
+            {
+                Emote = new Emoji
                 {
-                    Emote = new Emoji
-                    {
-                        Name = c.Emote.Name
-                    };
-                }
+                    Name = c.Emote.Name
+                };
             }
         }
-
-        [JsonIgnore]
-        string IMessageComponent.CustomId => CustomId.GetValueOrDefault();
     }
+
+    [JsonIgnore]
+    string IMessageComponent.CustomId => CustomId.GetValueOrDefault();
 }

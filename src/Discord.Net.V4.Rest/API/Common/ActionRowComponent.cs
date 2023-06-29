@@ -18,18 +18,18 @@ internal class ActionRowComponent : IMessageComponent
         {
             return x.Type switch
             {
-                ComponentType.Button => new ButtonComponent(x as Discord.ButtonComponent),
-                ComponentType.SelectMenu => new SelectMenuComponent(x as Discord.SelectMenuComponent),
-                ComponentType.ChannelSelect => new SelectMenuComponent(x as Discord.SelectMenuComponent),
-                ComponentType.UserSelect => new SelectMenuComponent(x as Discord.SelectMenuComponent),
-                ComponentType.RoleSelect => new SelectMenuComponent(x as Discord.SelectMenuComponent),
-                ComponentType.MentionableSelect => new SelectMenuComponent(x as Discord.SelectMenuComponent),
-                ComponentType.TextInput => new TextInputComponent(x as Discord.TextInputComponent),
-                _ => null
+                ComponentType.Button => new ButtonComponent((Discord.ButtonComponent)x),
+                ComponentType.SelectMenu => new SelectMenuComponent((Discord.SelectMenuComponent)x),
+                ComponentType.ChannelSelect => new SelectMenuComponent((Discord.SelectMenuComponent)x),
+                ComponentType.UserSelect => new SelectMenuComponent((Discord.SelectMenuComponent)x),
+                ComponentType.RoleSelect => new SelectMenuComponent((Discord.SelectMenuComponent)x),
+                ComponentType.MentionableSelect => new SelectMenuComponent((Discord.SelectMenuComponent)x),
+                ComponentType.TextInput => new TextInputComponent((Discord.TextInputComponent)x),
+                _ => null!
             };
-        }).ToArray();
+        }).ToArray() ?? Array.Empty<IMessageComponent>();
     }
 
     [JsonIgnore]
-    string IMessageComponent.CustomId => null;
+    string IMessageComponent.CustomId => null!;
 }

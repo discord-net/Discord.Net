@@ -3,7 +3,7 @@ using Discord.Rest.Converters;
 
 namespace Discord.API;
 
-[JsonConverter<DiscordErrorConverter>]
+[JsonConverter(typeof(DiscordErrorConverter))]
 internal class DiscordError
 {
     [JsonPropertyName("message")]

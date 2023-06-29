@@ -1,6 +1,4 @@
-using Newtonsoft.Json;
-using System.Collections.Generic;
-
+using System.Text.Json.Serialization;
 namespace Discord.API;
 
 internal class MessageComponentInteractionDataResolved
