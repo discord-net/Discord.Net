@@ -1,17 +1,17 @@
-namespace Discord
+namespace Discord;
+
+/// <summary>
+///     The behavior of expiring subscribers for an <see cref="IIntegration" />.
+/// </summary>
+public enum IntegrationExpireBehavior
 {
     /// <summary>
-    ///     The behavior of expiring subscribers for an <see cref="IIntegration" />.
+    ///     Removes a role from an expired subscriber.
     /// </summary>
-    public enum IntegrationExpireBehavior
-    {
-        /// <summary>
-        ///     Removes a role from an expired subscriber.
-        /// </summary>
-        RemoveRole = 0,
-        /// <summary>
-        ///     Kicks an expired subscriber from the guild.
-        /// </summary>
-        Kick = 1
-    }
+    RemoveRole = 0,
+
+    /// <summary>
+    ///     Kicks an expired subscriber from the guild.
+    /// </summary>
+    Kick = 1
 }

@@ -1,0 +1,19 @@
+using Newtonsoft.Json;
+
+namespace Discord.API
+{
+    internal class GuildApplicationCommandPermission
+    {
+        [JsonPropertyName("id")]
+        public ulong Id { get; set; }
+
+        [JsonPropertyName("application_id")]
+        public ulong ApplicationId { get; set; }
+
+        [JsonPropertyName("guild_id")]
+        public ulong GuildId { get; set; }
+
+        [JsonPropertyName("permissions")]
+        public ApplicationCommandPermissions[] Permissions { get; set; }
+    }
+}

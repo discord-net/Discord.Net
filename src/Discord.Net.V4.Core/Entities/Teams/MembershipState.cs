@@ -1,11 +1,10 @@
-namespace Discord
+namespace Discord;
+
+/// <summary>
+///     Represents the membership state of a team member.
+/// </summary>
+public enum MembershipState
 {
-    /// <summary>
-    ///     Represents the membership state of a team member.
-    /// </summary>
-    public enum MembershipState
-    {
-        Invited,
-        Accepted,
-    }
+    Invited,
+    Accepted,
 }

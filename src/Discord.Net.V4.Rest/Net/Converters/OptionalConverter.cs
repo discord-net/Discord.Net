@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Discord.Rest.Converter;
+namespace Discord.Rest.Converters;
 
 public class OptionalConverter : JsonConverterFactory
 {

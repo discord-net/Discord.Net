@@ -4,6 +4,7 @@ namespace Discord;
 /// <summary>
 ///     Represents public flags for a guild member.
 /// </summary>
+[Flags]
 public enum GuildUserFlags
 {
     /// <summary>
