@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Model = Discord.API.Guild;
 using WidgetModel = Discord.API.GuildWidget;
@@ -1514,6 +1515,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Downloading users is not supported for a REST-based guild.</exception>
         Task IGuild.DownloadUsersAsync(IEnumerable<ulong> userIds) =>
+            throw new NotSupportedException();
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Downloading users is not supported for a REST-based guild.</exception>
+        Task IGuild.DownloadUsersAsync(IEnumerable<ulong> userIds, CancellationToken cancelToken) =>
             throw new NotSupportedException();
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IGuildUser>> IGuild.SearchUsersAsync(string query, int limit, CacheMode mode, RequestOptions options)

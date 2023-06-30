@@ -232,5 +232,10 @@ namespace Discord
         ///     Returns the max length of an application description.
         /// </summary>
         public const int MaxApplicationDescriptionLength = 400;
+
+        /// <summary>
+        ///     Returns the max number of user IDs that can be requested in a Request Guild Members chunk.
+        /// </summary>
+        public const int MaxRequestedUserIdsPerRequestGuildMembersChunk = 100;
     }
 }

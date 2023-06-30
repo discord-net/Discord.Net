@@ -639,7 +639,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public override async Task DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds)
+        public override async Task DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default)
         {
             if (ConnectionState == ConnectionState.Connected)
             {
@@ -648,19 +648,35 @@ namespace Discord.WebSocket
                 var socketGuild = GetGuild(guild.Id);
                 if (socketGuild != null)
                 {
-                    await ProcessUserDownloadsAsync(socketGuild, userIds).ConfigureAwait(false);
+                    foreach (var chunk in userIds.Chunk(DiscordConfig.MaxRequestedUserIdsPerRequestGuildMembersChunk))
+                    {
+                        await ProcessUserDownloadsAsync(socketGuild, chunk, cancelToken).ConfigureAwait(false);
+                    }
                 }
+            }
+            else
+            {
+                throw new InvalidOperationException("Client not connected");
             }
         }
 
 
-        private async Task ProcessUserDownloadsAsync(SocketGuild guild, IEnumerable<ulong> userIds)
+        private async Task ProcessUserDownloadsAsync(SocketGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default)
         {
             var nonce = Interlocked.Increment(ref _guildMembersRequestCounter).ToString();
             var tcs = new TaskCompletionSource<bool>();
+            using var registration = cancelToken.Register(() => tcs.TrySetCanceled());
             _guildMembersRequestTasks.TryAdd(nonce, tcs);
-            await ApiClient.SendRequestMembersAsync(guild.Id, userIds, nonce).ConfigureAwait(false);
-            await tcs.Task.ConfigureAwait(false);
+            try
+            {
+                await ApiClient.SendRequestMembersAsync(guild.Id, userIds, nonce).ConfigureAwait(false);
+                await tcs.Task.ConfigureAwait(false);
+                cancelToken.ThrowIfCancellationRequested();
+            }
+            finally
+            {
+                _guildMembersRequestTasks.TryRemove(nonce, out _);
+            }
         }
 
         /// <inheritdoc />
