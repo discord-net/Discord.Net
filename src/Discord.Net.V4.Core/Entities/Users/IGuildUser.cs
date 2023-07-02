@@ -10,7 +10,7 @@ public interface IGuildUser : IUser, IVoiceState
     /// </summary>
     /// <returns>
     ///     A <see cref="DateTimeOffset"/> representing the time of which the user has joined the guild; 
-    ///     <c>null</c> when it cannot be obtained.
+    ///     <see langword="null"/> when it cannot be obtained.
     /// </returns>
     DateTimeOffset? JoinedAt { get; }
 
@@ -26,7 +26,7 @@ public interface IGuildUser : IUser, IVoiceState
     ///     Gets the nickname for this user.
     /// </summary>
     /// <returns>
-    ///     A string representing the nickname of the user; <c>null</c> if none is set.
+    ///     A string representing the nickname of the user; <see langword="null"/> if none is set.
     /// </returns>
     string Nickname { get; }
 
@@ -76,7 +76,7 @@ public interface IGuildUser : IUser, IVoiceState
     ///     Gets the date and time for when this user's guild boost began.
     /// </summary>
     /// <returns>
-    ///     A <see cref="DateTimeOffset"/> for when the user began boosting this guild; <c>null</c> if they are not boosting the guild.
+    ///     A <see cref="DateTimeOffset"/> for when the user began boosting this guild; <see langword="null"/> if they are not boosting the guild.
     /// </returns>
     DateTimeOffset? PremiumSince { get; }
 

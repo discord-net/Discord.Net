@@ -35,7 +35,7 @@ public struct LogMessage
     ///     Gets the exception of this log entry.
     /// </summary>
     /// <returns>
-    ///     An <see cref="Discord.LogMessage.Exception" /> object associated with an incident; otherwise <c>null</c>.
+    ///     An <see cref="Discord.LogMessage.Exception" /> object associated with an incident; otherwise <see langword="null"/>.
     /// </returns>
     public Exception? Exception { get; }
 

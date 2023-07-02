@@ -8,7 +8,7 @@ public interface ITeam
     /// <summary>
     ///     Gets the team icon url.
     /// </summary>
-    string IconUrl { get; }
+    string? IconUrl { get; }
 
     /// <summary>
     ///     Gets the team unique identifier.

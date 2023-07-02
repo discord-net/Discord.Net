@@ -17,7 +17,7 @@ public interface IUser : ISnowflakeEntity, IMentionable, IPresence
     /// </summary>
     /// <remarks>
     ///     This property retrieves a URL for this user's avatar. In event that the user does not have a valid avatar
-    ///     (i.e. their avatar identifier is not set), this method will return <c>null</c>. If you wish to
+    ///     (i.e. their avatar identifier is not set), this method will return <see langword="null"/>. If you wish to
     ///     retrieve the default avatar for this user, consider using <see cref="IUser.GetDefaultAvatarUrl"/> (see
     ///     example).
     /// </remarks>
@@ -32,7 +32,7 @@ public interface IUser : ISnowflakeEntity, IMentionable, IPresence
     /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
     /// </param>
     /// <returns>
-    ///     A string representing the user's avatar URL; <c>null</c> if the user does not have an avatar in place.
+    ///     A string representing the user's avatar URL; <see langword="null"/> if the user does not have an avatar in place.
     /// </returns>
     string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
 
@@ -67,7 +67,7 @@ public interface IUser : ISnowflakeEntity, IMentionable, IPresence
     ///     (indicated by the blue BOT tag within the official chat client).
     /// </remarks>
     /// <returns>
-    ///     <c>true</c> if the user is a bot application; otherwise <c>false</c>.
+    ///     <see langword="true"/> if the user is a bot application; otherwise <see langword="false"/>.
     /// </returns>
     bool IsBot { get; }
 
@@ -75,7 +75,7 @@ public interface IUser : ISnowflakeEntity, IMentionable, IPresence
     ///     Gets a value that indicates whether this user is a webhook user.
     /// </summary>
     /// <returns>
-    ///     <c>true</c> if the user is a webhook; otherwise <c>false</c>.
+    ///     <see langword="true"/> if the user is a webhook; otherwise <see langword="false"/>.
     /// </returns>
     bool IsWebhook { get; }
 

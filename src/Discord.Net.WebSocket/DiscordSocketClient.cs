@@ -390,7 +390,7 @@ namespace Discord.WebSocket
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the channel associated
-        ///     with the snowflake identifier; <c>null</c> when the channel cannot be found.
+        ///     with the snowflake identifier; <see langword="null"/> when the channel cannot be found.
         /// </returns>
         public async ValueTask<IChannel> GetChannelAsync(ulong id, RequestOptions options = null)
             => GetChannel(id) ?? (IChannel)await ClientHelper.GetChannelAsync(this, id, options).ConfigureAwait(false);
@@ -408,7 +408,7 @@ namespace Discord.WebSocket
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the user associated with
-        ///     the snowflake identifier; <c>null</c> if the user is not found.
+        ///     the snowflake identifier; <see langword="null"/> if the user is not found.
         /// </returns>
         public async ValueTask<IUser> GetUserAsync(ulong id, RequestOptions options = null)
             => await ((IDiscordClient)this).GetUserAsync(id, CacheMode.AllowDownload, options).ConfigureAwait(false);

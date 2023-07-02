@@ -156,7 +156,7 @@ internal class ConcurrentHashSet<T> : IReadOnlyCollection<T>
         : this(collection, EqualityComparer<T?>.Default) { }
     public ConcurrentHashSet(IEqualityComparer<T?> comparer)
         : this(DefaultConcurrencyLevel, DefaultCapacity, true, comparer) { }
-    /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c></exception>
+    /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <see langword="null"/></exception>
     public ConcurrentHashSet(IEnumerable<T?> collection, IEqualityComparer<T?> comparer)
         : this(comparer)
     {
@@ -165,7 +165,7 @@ internal class ConcurrentHashSet<T> : IReadOnlyCollection<T>
         InitializeFromCollection(collection);
     }
     /// <exception cref="ArgumentNullException">
-    /// <paramref name="collection" /> or <paramref name="comparer" /> is <c>null</c>
+    /// <paramref name="collection" /> or <paramref name="comparer" /> is <see langword="null"/>
     /// </exception>
     public ConcurrentHashSet(int concurrencyLevel, IEnumerable<T?> collection, IEqualityComparer<T?> comparer)
         : this(concurrencyLevel, DefaultCapacity, false, comparer)
@@ -216,7 +216,7 @@ internal class ConcurrentHashSet<T> : IReadOnlyCollection<T>
         if (_budget == 0)
             _budget = _tables._buckets.Length / _tables._locks.Length;
     }
-    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c></exception>
+    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/></exception>
     public bool ContainsKey(T? value)
     {
         if (value == null)
@@ -241,7 +241,7 @@ internal class ConcurrentHashSet<T> : IReadOnlyCollection<T>
         return false;
     }
 
-    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c></exception>
+    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/></exception>
     public bool TryAdd(T? value)
     {
         if (value == null)
@@ -294,7 +294,7 @@ internal class ConcurrentHashSet<T> : IReadOnlyCollection<T>
         }
     }
 
-    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c></exception>
+    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/></exception>
     public bool TryRemove(T? value)
     {
         if (value == null)

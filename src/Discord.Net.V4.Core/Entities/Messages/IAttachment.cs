@@ -49,7 +49,7 @@ public interface IAttachment
     ///     Gets the height of this attachment.
     /// </summary>
     /// <returns>
-    ///     The height of this attachment if it is a picture; otherwise <c>null</c>.
+    ///     The height of this attachment if it is a picture; otherwise <see langword="null"/>.
     /// </returns>
     int? Height { get; }
 
@@ -57,7 +57,7 @@ public interface IAttachment
     ///     Gets the width of this attachment.
     /// </summary>
     /// <returns>
-    ///     The width of this attachment if it is a picture; otherwise <c>null</c>.
+    ///     The width of this attachment if it is a picture; otherwise <see langword="null"/>.
     /// </returns>
     int? Width { get; }
 

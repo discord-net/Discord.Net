@@ -17,7 +17,7 @@ public class RequestOptions
     /// </summary>
     /// <remarks>
     ///     Gets or set the max time, in milliseconds, to wait for this request to complete. If
-    ///     <c>null</c>, a request will not time out. If a rate limit has been triggered for this request's bucket
+    ///     <see langword="null"/>, a request will not time out. If a rate limit has been triggered for this request's bucket
     ///     and will not be unpaused in time, this request will fail immediately.
     /// </remarks>
     /// <returns>
@@ -52,7 +52,7 @@ public class RequestOptions
 
     /// <summary>
     ///		Gets or sets whether or not this request should use the system
-    ///		clock for rate-limiting. Defaults to <c>true</c>.
+    ///		clock for rate-limiting. Defaults to <see langword="true"/>.
     /// </summary>
     /// <remarks>
     ///		This property can also be set in <see cref="DiscordConfig"/>.

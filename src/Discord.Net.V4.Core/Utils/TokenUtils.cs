@@ -143,7 +143,7 @@ public static class TokenUtils
     /// </summary>
     /// <param name="tokenType"> The type of token to validate. </param>
     /// <param name="token"> The token value to validate. </param>
-    /// <exception cref="ArgumentNullException"> Thrown when the supplied token string is <c>null</c>, empty, or contains only whitespace.</exception>
+    /// <exception cref="ArgumentNullException"> Thrown when the supplied token string is <see langword="null"/>, empty, or contains only whitespace.</exception>
     /// <exception cref="ArgumentException"> Thrown when the supplied <see cref="TokenType"/> or token value is invalid. </exception>
     public static void ValidateToken(TokenType tokenType, string token)
     {

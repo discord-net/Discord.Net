@@ -27,7 +27,7 @@ public struct EmbedImage
     /// </summary>
     /// <returns>
     ///     A <see cref="int"/> representing the height of this image if it can be retrieved; otherwise 
-    ///     <c>null</c>.
+    ///     <see langword="null"/>.
     /// </returns>
     public int? Height { get; }
 
@@ -36,7 +36,7 @@ public struct EmbedImage
     /// </summary>
     /// <returns>
     ///     A <see cref="int"/> representing the width of this image if it can be retrieved; otherwise 
-    ///     <c>null</c>.
+    ///     <see langword="null"/>.
     /// </returns>
     public int? Width { get; }
 
