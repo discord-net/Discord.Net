@@ -124,8 +124,8 @@ public class ForumTagBuilder
     public ForumTagProperties Build()
     {
         if (_name is null)
-            throw new ArgumentNullException(nameof(Name), "Name must be set to build the tag");
-        return new ForumTagProperties(_name!, _emoji, _moderated);
+            throw new ArgumentNullException(nameof(Name), "Name must be set to build the tag.");
+        return new ForumTagProperties(_id, _name, _emoji, _moderated);
     }
 
     /// <summary>
