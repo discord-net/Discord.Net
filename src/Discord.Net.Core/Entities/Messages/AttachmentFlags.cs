@@ -13,5 +13,5 @@ public enum AttachmentFlags
     /// <summary>
     ///     Indicates that this attachment has been edited using the remix feature on mobile.
     /// </summary>
-    Remix = 0,
+    Remix = 1 << 2,
 }
