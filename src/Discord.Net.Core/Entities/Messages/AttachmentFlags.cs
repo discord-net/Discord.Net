@@ -14,7 +14,6 @@ public enum AttachmentFlags
     ///     Indicates that this attachment is a clip.
     /// </summary>
     IsClip = 1 << 0,
-    
 
     /// <summary>
     ///     Indicates that this attachment is a thumbnail.
