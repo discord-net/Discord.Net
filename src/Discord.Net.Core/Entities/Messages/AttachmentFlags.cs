@@ -11,7 +11,17 @@ public enum AttachmentFlags
     None = 0,
 
     /// <summary>
+    ///     Indicates that this attachment is a thumbnail.
+    /// </summary>
+    IsThumbnail = 1 << 0,
+    
+    /// <summary>
+    ///     Indicates that this attachment is a clip.
+    /// </summary>
+    IsClip = 1 << 1,
+    
+    /// <summary>
     ///     Indicates that this attachment has been edited using the remix feature on mobile.
     /// </summary>
-    Remix = 1 << 2,
+    IsRemix = 1 << 2,
 }
