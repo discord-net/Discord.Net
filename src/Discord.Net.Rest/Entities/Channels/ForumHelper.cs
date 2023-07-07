@@ -58,6 +58,13 @@ internal static class ForumHelper
                 : Optional<ModifyForumReactionEmojiParams>.Unspecified,
             DefaultSortOrder = args.DefaultSortOrder,
             DefaultLayout = args.DefaultLayout,
+            IconEmoji = args.IconEmoji.IsSpecified
+                ? args.IconEmoji.Value is Emote iconEmote
+                    ? new API.Emoji { Id = iconEmote.Id, Name = iconEmote.Name }
+                    : args.IconEmoji.GetValueOrDefault(null) is Emoji iconEmoji
+                        ? new API.Emoji { Name = iconEmoji.Name }
+                        : null
+                : Optional<API.Emoji>.Unspecified,
         };
         return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
     }

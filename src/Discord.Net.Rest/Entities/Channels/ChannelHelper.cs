@@ -39,9 +39,17 @@ namespace Discord.Rest
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
                 Flags = args.Flags.GetValueOrDefault(),
+                IconEmoji = args.IconEmoji.IsSpecified
+                    ? args.IconEmoji.Value is Emote emote
+                        ? new API.Emoji { Id = emote.Id, Name = emote.Name }
+                        : args.IconEmoji.GetValueOrDefault(null) is Emoji emoji
+                            ? new API.Emoji { Name = emoji.Name }
+                            : null
+                    : Optional<API.Emoji>.Unspecified,
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
+
         public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client,
             Action<TextChannelProperties> func,
             RequestOptions options)
@@ -65,7 +73,15 @@ namespace Discord.Rest
                         Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
-                DefaultSlowModeInterval = args.DefaultSlowModeInterval
+                DefaultSlowModeInterval = args.DefaultSlowModeInterval,
+                Flags = args.Flags.GetValueOrDefault(),
+                IconEmoji = args.IconEmoji.IsSpecified
+                    ? args.IconEmoji.Value is Emote emote
+                        ? new API.Emoji { Id = emote.Id, Name = emote.Name }
+                        : args.IconEmoji.GetValueOrDefault(null) is Emoji emoji
+                            ? new API.Emoji { Name = emoji.Name }
+                            : null
+                    : Optional<API.Emoji>.Unspecified,
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
@@ -94,6 +110,14 @@ namespace Discord.Rest
                     : Optional.Create<API.Overwrite[]>(),
                 SlowModeInterval = args.SlowModeInterval,
                 IsNsfw = args.IsNsfw,
+                Flags = args.Flags.GetValueOrDefault(),
+                IconEmoji = args.IconEmoji.IsSpecified
+                    ? args.IconEmoji.Value is Emote emote
+                        ? new API.Emoji { Id = emote.Id, Name = emote.Name }
+                        : args.IconEmoji.GetValueOrDefault(null) is Emoji emoji
+                            ? new API.Emoji { Name = emoji.Name }
+                            : null
+                    : Optional<API.Emoji>.Unspecified,
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }

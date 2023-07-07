@@ -25,13 +25,18 @@ namespace Discord.WebSocket
         ///     A guild object that this channel belongs to.
         /// </returns>
         public SocketGuild Guild { get; }
-        /// <inheritdoc />
+
+        /// <inheritdoc cref="IChannel.Name"/>
         public string Name { get; private set; }
+
         /// <inheritdoc />
         public int Position { get; private set; }
 
         /// <inheritdoc />
         public ChannelFlags Flags { get; private set; }
+
+        /// <inheritdoc/>
+        public virtual IEmote IconEmoji { get; private set; }
 
         /// <inheritdoc />
         public virtual IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
@@ -79,6 +84,16 @@ namespace Discord.WebSocket
             _overwrites = newOverwrites.ToImmutable();
 
             Flags = model.Flags.GetValueOrDefault(ChannelFlags.None);
+
+            if (model.IconEmoji is { IsSpecified: true, Value: not null })
+            {
+                if (model.IconEmoji.Value.Id is not null)
+                    IconEmoji = new Emote(model.IconEmoji.Value.Id.Value, model.IconEmoji.Value.Name, false);
+                else if (model.IconEmoji.Value.Name is not null)
+                    IconEmoji = new Emoji(model.IconEmoji.Value.Name);
+                else
+                    IconEmoji = null;
+            }
         }
 
         /// <inheritdoc />

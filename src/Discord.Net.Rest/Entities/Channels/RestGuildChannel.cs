@@ -19,15 +19,21 @@ namespace Discord.Rest
         public virtual IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
 
         internal IGuild Guild { get; }
+
         /// <inheritdoc />
         public string Name { get; private set; }
+
         /// <inheritdoc />
         public int Position { get; private set; }
+
         /// <inheritdoc />
         public ulong GuildId => Guild.Id;
 
         /// <inheritdoc />
         public ChannelFlags Flags { get; private set; }
+
+        /// <inheritdoc/>
+        public virtual IEmote IconEmoji { get; private set; }
 
         internal RestGuildChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, id)
@@ -67,6 +73,16 @@ namespace Discord.Rest
             }
 
             Flags = model.Flags.GetValueOrDefault(ChannelFlags.None);
+
+            if (model.IconEmoji is { IsSpecified: true, Value: not null })
+            {
+                if (model.IconEmoji.Value.Id is not null)
+                    IconEmoji = new Emote(model.IconEmoji.Value.Id.Value, model.IconEmoji.Value.Name, false);
+                else if (model.IconEmoji.Value.Name is not null)
+                    IconEmoji = new Emoji(model.IconEmoji.Value.Name);
+                else
+                    IconEmoji = null;
+            }
         }
 
         /// <inheritdoc />

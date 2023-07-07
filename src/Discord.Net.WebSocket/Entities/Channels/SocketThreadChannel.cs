@@ -98,6 +98,12 @@ namespace Discord.WebSocket
         /// <inheritdoc cref="IThreadChannel.OwnerId"/>
         ulong IThreadChannel.OwnerId => _ownerId;
 
+        /// <inheritdoc/>
+        /// <remarks>
+        ///     Thread channels have no icon emoji.
+        /// </remarks>
+        public override IEmote IconEmoji { get => null; }
+
         /// <summary>
         ///     Gets a collection of cached users within this thread.
         /// </summary>

@@ -25,6 +25,9 @@ namespace Discord.API
         [JsonProperty("parent_id")]
         public ulong? CategoryId { get; set; }
 
+        [JsonProperty("icon_emoji")]
+        public Optional<Emoji> IconEmoji { get; set; }
+
         //TextChannel
         [JsonProperty("topic")]
         public Optional<string> Topic { get; set; }

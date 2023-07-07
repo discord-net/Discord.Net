@@ -39,6 +39,7 @@ namespace Discord
         ///     A guild object that this channel belongs to.
         /// </returns>
         IGuild Guild { get; }
+
         /// <summary>
         ///     Gets the guild ID associated with this channel.
         /// </summary>
@@ -47,6 +48,7 @@ namespace Discord
         ///     belongs to.
         /// </returns>
         ulong GuildId { get; }
+
         /// <summary>
         ///     Gets a collection of permission overwrites for this channel.
         /// </summary>
@@ -54,6 +56,11 @@ namespace Discord
         ///     A collection of overwrites associated with this channel.
         /// </returns>
         IReadOnlyCollection<Overwrite> PermissionOverwrites { get; }
+
+        /// <summary>
+        ///     Gets the channel emoji of this channel. <see langword="null"/> if no emoji is set.
+        /// </summary>
+        IEmote IconEmoji { get; }
 
         /// <summary>
         ///     Modifies this guild channel.

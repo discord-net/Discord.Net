@@ -19,10 +19,12 @@ namespace Discord
         ///     </note>
         /// </remarks>
         public Optional<string> Name { get; set; }
+
         /// <summary>
         ///     Moves the channel to the following position. This property is zero-based.
         /// </summary>
         public Optional<int> Position { get; set; }
+
         /// <summary>
         ///     Gets or sets the category ID for this channel.
         /// </summary>
@@ -32,6 +34,7 @@ namespace Discord
         ///     is set.
         /// </remarks>
         public Optional<ulong?> CategoryId { get; set; }
+
         /// <summary>
         ///     Gets or sets the permission overwrites for this channel.
         /// </summary>
@@ -41,5 +44,13 @@ namespace Discord
         ///     Gets or sets the flags of the channel.
         /// </summary>
         public Optional<ChannelFlags> Flags { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the icon emoji for this channel.
+        /// </summary>
+        /// <remarks>
+        ///     The icon emoji cannot be set on category channels.
+        /// </remarks>
+        public Optional<IEmote> IconEmoji { get; set; }
     }
 }

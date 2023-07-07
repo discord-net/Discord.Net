@@ -46,6 +46,12 @@ namespace Discord.Rest
         /// <inheritdoc cref="IThreadChannel.CreatedAt"/>
         public override DateTimeOffset CreatedAt { get; }
 
+        /// <inheritdoc/>
+        /// <remarks>
+        ///     Thread channels have no icon emoji.
+        /// </remarks>
+        public override IEmote IconEmoji { get => null; }
+
         /// <summary>
         ///     Gets the parent text channel id.
         /// </summary>

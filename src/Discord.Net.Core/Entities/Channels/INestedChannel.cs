@@ -16,6 +16,7 @@ namespace Discord
         ///     <see langword="null" /> if none is set.
         /// </returns>
         ulong? CategoryId { get; }
+
         /// <summary>
         ///     Gets the parent (category) channel of this channel.
         /// </summary>
