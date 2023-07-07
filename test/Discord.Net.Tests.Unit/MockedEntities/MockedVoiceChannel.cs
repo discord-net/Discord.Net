@@ -35,6 +35,7 @@ namespace Discord
         public ulong GuildId => throw new NotImplementedException();
 
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => throw new NotImplementedException();
+        public IEmote IconEmoji { get; }
 
         public string RTCRegion => throw new NotImplementedException();
 
