@@ -31,5 +31,13 @@ namespace Discord
         ///     This method can be used only if the modal was created from a message component.
         /// </remarks>
         Task UpdateAsync(Action<MessageProperties> func, RequestOptions options = null);
+
+        /// <summary>
+        ///     Defers an interaction with the response type 5 (<see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>).
+        /// </summary>
+        /// <param name="ephemeral"><see langword="true"/> to defer ephemerally, otherwise <see langword="false"/>.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>A task that represents the asynchronous operation of acknowledging the interaction.</returns>
+        Task DeferLoadingAsync(bool ephemeral = false, RequestOptions options = null);
     }
 }

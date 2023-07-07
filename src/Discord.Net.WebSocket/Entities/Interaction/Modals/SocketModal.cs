@@ -404,6 +404,30 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
+        public async Task DeferLoadingAsync(bool ephemeral = false, RequestOptions options = null)
+        {
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot defer an interaction after {InteractionHelper.ResponseTimeLimit} seconds of no response/acknowledgement");
+
+            var response = new API.InteractionResponse
+            {
+                Type = InteractionResponseType.DeferredChannelMessageWithSource,
+                Data = ephemeral ? new API.InteractionCallbackData { Flags = MessageFlags.Ephemeral } : Optional<API.InteractionCallbackData>.Unspecified
+            };
+
+            lock (_lock)
+            {
+                if (HasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond or defer twice to the same interaction");
+                }
+            }
+
+            await Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options).ConfigureAwait(false);
+            HasResponded = true;
+        }
+
+        /// <inheritdoc/>
         public override Task RespondWithModalAsync(Modal modal, RequestOptions options = null)
             => throw new NotSupportedException("You cannot respond to a modal with a modal!");
 
