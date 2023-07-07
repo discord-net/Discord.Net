@@ -51,6 +51,11 @@ namespace Discord
         public static readonly ChannelPermissions Forum = new(0b01_001110_010010_110011_111101_111111_111101_010001);
 
         /// <summary>
+        ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for media channels.
+        /// </summary>
+        public static readonly ChannelPermissions Media = new(0b01_001110_010010_110011_111101_111111_111101_010001);
+
+        /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for a given channel type.
         /// </summary>
         /// <exception cref="ArgumentException">Unknown channel type.</exception>
@@ -64,6 +69,7 @@ namespace Discord
                 ICategoryChannel _ => Category,
                 IDMChannel _ => DM,
                 IGroupChannel _ => Group,
+                IMediaChannel _ => Media,
                 IForumChannel => Forum,
                 _ => throw new ArgumentException(message: "Unknown channel type.", paramName: nameof(channel)),
             };
