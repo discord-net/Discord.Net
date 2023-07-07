@@ -43,7 +43,8 @@ namespace Discord.Rest
         private object _lock = new object();
 
         /// <summary>
-        ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>.
+        ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/> if the modal was created
+        ///     in a response to a message component interaction, <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/> otherwise.
         /// </summary>
         /// <returns>
         ///     A string that contains json to write back to the incoming http request.
@@ -55,7 +56,9 @@ namespace Discord.Rest
 
             var response = new API.InteractionResponse
             {
-                Type = InteractionResponseType.DeferredUpdateMessage,
+                Type = Message is not null
+                    ? InteractionResponseType.DeferredUpdateMessage
+                    : InteractionResponseType.DeferredChannelMessageWithSource,
                 Data = new API.InteractionCallbackData
                 {
                     Flags = ephemeral ? MessageFlags.Ephemeral : Optional<MessageFlags>.Unspecified

@@ -376,6 +376,10 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
+        /// <remarks>     
+        ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/> if the modal was created
+        ///     in a response to a message component interaction, <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/> otherwise.
+        /// </remarks>
         public override async Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
         {
             if (!InteractionHelper.CanSendResponse(this))
@@ -383,7 +387,9 @@ namespace Discord.WebSocket
 
             var response = new API.InteractionResponse
             {
-                Type = InteractionResponseType.DeferredUpdateMessage,
+                Type = Message is not null
+                    ? InteractionResponseType.DeferredUpdateMessage
+                    : InteractionResponseType.DeferredChannelMessageWithSource,
                 Data = ephemeral ? new API.InteractionCallbackData { Flags = MessageFlags.Ephemeral } : Optional<API.InteractionCallbackData>.Unspecified
             };
 
