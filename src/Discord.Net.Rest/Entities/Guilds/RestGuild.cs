@@ -447,6 +447,64 @@ namespace Discord.Rest
         }
 
         /// <summary>
+        ///     Gets a forum channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the forum channel.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the text channel
+        ///     associated with the specified <paramref name="id"/>; <see langword="null"/> if none is found.
+        /// </returns>
+        public async Task<RestForumChannel> GetForumChannelAsync(ulong id, RequestOptions options = null)
+        {
+            var channel = await GuildHelper.GetChannelAsync(this, Discord, id, options).ConfigureAwait(false);
+            return channel as RestForumChannel;
+        }
+
+        /// <summary>
+        ///     Gets a collection of all forum channels in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     forum channels found within this guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestForumChannel>> GetForumChannelsAsync(RequestOptions options = null)
+        {
+            var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
+            return channels.OfType<RestForumChannel>().ToImmutableArray();
+        }
+
+        /// <summary>
+        ///     Gets a media channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the text channel.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the media channel
+        ///     associated with the specified <paramref name="id"/>; <see langword="null"/> if none is found.
+        /// </returns>
+        public async Task<RestMediaChannel> GetMediaChannelAsync(ulong id, RequestOptions options = null)
+        {
+            var channel = await GuildHelper.GetChannelAsync(this, Discord, id, options).ConfigureAwait(false);
+            return channel as RestMediaChannel;
+        }
+
+        /// <summary>
+        ///     Gets a collection of all media channels in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     media channels found within this guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestMediaChannel>> GetMediaChannelsAsync(RequestOptions options = null)
+        {
+            var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
+            return channels.OfType<RestMediaChannel>().ToImmutableArray();
+        }
+
+        /// <summary>
         ///     Gets a thread channel in this guild.
         /// </summary>
         /// <param name="id">The snowflake identifier for the thread channel.</param>
@@ -726,10 +784,23 @@ namespace Discord.Rest
         /// <param name="options">The options to be used when sending the request.</param>
         /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null"/>.</exception>
         /// <returns>
-        ///     The created category channel.
+        ///     The created forum channel.
         /// </returns>
         public Task<RestForumChannel> CreateForumChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateForumChannelAsync(this, Discord, name, options, func);
+
+        /// <summary>
+        ///     Creates a new media channel in this guild.
+        /// </summary>
+        /// <param name="name">The new name for the media channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     media channel.
+        /// </returns>
+        public Task<RestMediaChannel> CreateMediaChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null)
+            => GuildHelper.CreateMediaChannelAsync(this, Discord, name, options, func);
 
         /// <summary>
         ///     Gets a collection of all the voice regions this guild can access.
@@ -1316,6 +1387,43 @@ namespace Discord.Rest
             else
                 return null;
         }
+
+        /// <inheritdoc />
+        async Task<IForumChannel> IGuild.GetForumChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetForumChannelAsync(id, options).ConfigureAwait(false);
+            else
+                return null;
+        }
+
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IForumChannel>> IGuild.GetForumChannelsAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetForumChannelsAsync(options).ConfigureAwait(false);
+            else
+                return null;
+        }
+
+        /// <inheritdoc />
+        async Task<IMediaChannel> IGuild.GetMediaChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetMediaChannelAsync(id, options).ConfigureAwait(false);
+            else
+                return null;
+        }
+
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IMediaChannel>> IGuild.GetMediaChannelsAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetMediaChannelsAsync(options).ConfigureAwait(false);
+            else
+                return null;
+        }
+
         /// <inheritdoc />
         async Task<IThreadChannel> IGuild.GetThreadChannelAsync(ulong id, CacheMode mode, RequestOptions options)
         {
@@ -1435,6 +1543,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IForumChannel> IGuild.CreateForumChannelAsync(string name, Action<ForumChannelProperties> func, RequestOptions options)
             => await CreateForumChannelAsync(name, func, options).ConfigureAwait(false);
+
+        /// <inheritdoc />
+        async Task<IMediaChannel> IGuild.CreateMediaChannelAsync(string name, Action<ForumChannelProperties> func, RequestOptions options)
+            => await CreateMediaChannelAsync(name, func, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IVoiceRegion>> IGuild.GetVoiceRegionsAsync(RequestOptions options)
