@@ -29,22 +29,25 @@ public class ForumChannelProperties : TextChannelProperties
     public Optional<int> ThreadCreationInterval { get; set; }
 
     /// <summary>
-    /// Gets or sets a collection of tags inside of this forum channel.
+    ///     Gets or sets a collection of tags inside of this forum channel.
     /// </summary>
     public Optional<IEnumerable<ForumTagProperties>> Tags { get; set; }
 
     /// <summary>
-    /// Gets or sets a new default reaction emoji in this forum channel.
+    ///     Gets or sets a new default reaction emoji in this forum channel.
     /// </summary>
     public Optional<IEmote> DefaultReactionEmoji { get; set; }
 
     /// <summary>
-    /// Gets or sets the rule used to order posts in forum channels.
+    ///     Gets or sets the rule used to order posts in forum channels.
     /// </summary>
     public Optional<ForumSortOrder> DefaultSortOrder { get; set; }
 
     /// <summary>
-    /// Gets or sets the rule used to display posts in a forum channel.
+    ///     Gets or sets the rule used to display posts in a forum channel.
     /// </summary>
+    /// <remarks>
+    ///     This property cannot be changed in media channels.
+    /// </remarks>
     public Optional<ForumLayout> DefaultLayout { get; set; }
 }

@@ -407,6 +407,66 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestForumChannel.Create(client, guild, model);
         }
+
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
+        public static async Task<RestMediaChannel> CreateMediaChannelAsync(IGuild guild, BaseDiscordClient client,
+            string name, RequestOptions options, Action<ForumChannelProperties> func = null)
+        {
+            if (name == null)
+                throw new ArgumentNullException(paramName: nameof(name));
+
+            var props = new ForumChannelProperties();
+            func?.Invoke(props);
+
+            Preconditions.AtMost(props.Tags.IsSpecified ? props.Tags.Value.Count() : 0, 5, nameof(props.Tags), "Forum channel can have max 20 tags.");
+
+            var args = new CreateGuildChannelParams(name, ChannelType.Forum)
+            {
+                Position = props.Position,
+                Overwrites = props.PermissionOverwrites.IsSpecified
+                    ? props.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
+                SlowModeInterval = props.ThreadCreationInterval,
+                AvailableTags = props.Tags.GetValueOrDefault(Array.Empty<ForumTagProperties>()).Select(
+                    x => new ModifyForumTagParams
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        EmojiId = x.Emoji is Emote emote
+                            ? emote.Id
+                            : Optional<ulong?>.Unspecified,
+                        EmojiName = x.Emoji is Emoji emoji
+                            ? emoji.Name
+                            : Optional<string>.Unspecified,
+                        Moderated = x.IsModerated
+                    }).ToArray(),
+                DefaultReactionEmoji = props.DefaultReactionEmoji.IsSpecified
+                    ? new API.ModifyForumReactionEmojiParams
+                    {
+                        EmojiId = props.DefaultReactionEmoji.Value is Emote emote ?
+                            emote.Id : Optional<ulong?>.Unspecified,
+                        EmojiName = props.DefaultReactionEmoji.Value is Emoji emoji ?
+                            emoji.Name : Optional<string>.Unspecified
+                    }
+                    : Optional<ModifyForumReactionEmojiParams>.Unspecified,
+                ThreadRateLimitPerUser = props.DefaultSlowModeInterval,
+                CategoryId = props.CategoryId,
+                IsNsfw = props.IsNsfw,
+                Topic = props.Topic,
+                DefaultAutoArchiveDuration = props.AutoArchiveDuration,
+                DefaultSortOrder = props.DefaultSortOrder.GetValueOrDefault(ForumSortOrder.LatestActivity),
+            };
+
+            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
+            return RestMediaChannel.Create(client, guild, model);
+        }
+
         #endregion
 
         #region Voice Regions
