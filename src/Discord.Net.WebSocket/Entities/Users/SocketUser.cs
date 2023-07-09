@@ -93,7 +93,7 @@ namespace Discord.WebSocket
                 PublicFlags = model.PublicFlags.Value;
                 hasChanges = true;
             }
-            if (model.GlobalName.IsSpecified)
+            if (model.GlobalName.IsSpecified && model.GlobalName.Value != GlobalName)
             {
                 GlobalName = model.GlobalName.Value;
                 hasChanges = true;
