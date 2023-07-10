@@ -777,7 +777,7 @@ namespace Discord.Rest
             => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options, func);
 
         /// <summary>
-        ///     Creates a category channel with the provided name.
+        ///     Creates a new forum channel with the provided name.
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
         /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
