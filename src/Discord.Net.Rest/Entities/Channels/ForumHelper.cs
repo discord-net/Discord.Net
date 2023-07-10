@@ -61,7 +61,7 @@ internal static class ForumHelper
             IconEmoji = args.IconEmoji.IsSpecified
                 ? args.IconEmoji.Value is Emote iconEmote
                     ? new API.Emoji { Id = iconEmote.Id, Name = iconEmote.Name }
-                    : args.IconEmoji.GetValueOrDefault(null) is Emoji iconEmoji
+                    : args.IconEmoji.Value is Emoji iconEmoji
                         ? new API.Emoji { Name = iconEmoji.Name }
                         : null
                 : Optional<API.Emoji>.Unspecified,

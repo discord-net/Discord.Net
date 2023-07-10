@@ -42,7 +42,7 @@ namespace Discord.Rest
                 IconEmoji = args.IconEmoji.IsSpecified
                     ? args.IconEmoji.Value is Emote emote
                         ? new API.Emoji { Id = emote.Id, Name = emote.Name }
-                        : args.IconEmoji.GetValueOrDefault(null) is Emoji emoji
+                        : args.IconEmoji.Value is Emoji emoji
                             ? new API.Emoji { Name = emoji.Name }
                             : null
                     : Optional<API.Emoji>.Unspecified,
@@ -78,7 +78,7 @@ namespace Discord.Rest
                 IconEmoji = args.IconEmoji.IsSpecified
                     ? args.IconEmoji.Value is Emote emote
                         ? new API.Emoji { Id = emote.Id, Name = emote.Name }
-                        : args.IconEmoji.GetValueOrDefault(null) is Emoji emoji
+                        : args.IconEmoji.Value is Emoji emoji
                             ? new API.Emoji { Name = emoji.Name }
                             : null
                     : Optional<API.Emoji>.Unspecified,
@@ -114,7 +114,7 @@ namespace Discord.Rest
                 IconEmoji = args.IconEmoji.IsSpecified
                     ? args.IconEmoji.Value is Emote emote
                         ? new API.Emoji { Id = emote.Id, Name = emote.Name }
-                        : args.IconEmoji.GetValueOrDefault(null) is Emoji emoji
+                        : args.IconEmoji.Value is Emoji emoji
                             ? new API.Emoji { Name = emoji.Name }
                             : null
                     : Optional<API.Emoji>.Unspecified,
