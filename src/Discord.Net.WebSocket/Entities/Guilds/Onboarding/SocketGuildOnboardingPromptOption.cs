@@ -43,7 +43,7 @@ public class SocketGuildOnboardingPromptOption : SocketEntity<ulong>, IGuildOnbo
         ChannelIds = model.ChannelIds.ToImmutableArray();
         RoleIds = model.RoleIds.ToImmutableArray();
         Title = model.Title;
-        Description = model.Description.IsSpecified ? model.Description.Value : null;
+        Description = model.Description;
 
         if (model.Emoji.Id.HasValue)
         {

@@ -1983,6 +1983,14 @@ namespace Discord.WebSocket
             return new SocketGuildOnboarding(Discord, model, this);
         }
 
+        /// <inheritdoc cref="IGuild.ModifyOnboardingAsync"/>
+        public async Task<SocketGuildOnboarding> ModifyOnboardingAsync(Action<GuildOnboardingProperties> props, RequestOptions options = null)
+        {
+            var model = await GuildHelper.ModifyGuildOnboardingAsync(this, props, Discord, options);
+
+            return new SocketGuildOnboarding(Discord, model, this);
+        }
+
         #endregion
 
         #region  IGuild
@@ -2265,6 +2273,10 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         async Task<IGuildOnboarding> IGuild.GetOnboardingAsync(RequestOptions options)
             => await GetOnboardingAsync(options);
+
+        /// <inheritdoc/>
+        async Task<IGuildOnboarding> IGuild.ModifyOnboardingAsync(Action<GuildOnboardingProperties> props, RequestOptions options)
+            => await ModifyOnboardingAsync(props, options);
 
         #endregion
     }
