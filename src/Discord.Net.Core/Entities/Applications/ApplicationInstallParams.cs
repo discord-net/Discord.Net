@@ -20,6 +20,8 @@ public class ApplicationInstallParams
 
     public ApplicationInstallParams(string[] scopes, GuildPermission permission)
     {
+        Preconditions.NotNull(scopes, nameof(scopes));
+
         Scopes = scopes.ToImmutableArray();
         Permission = permission;
     }

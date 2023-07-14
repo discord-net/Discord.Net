@@ -1,5 +1,6 @@
 using Discord.API;
 using Discord.API.Rest;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -36,7 +37,7 @@ namespace Discord.Rest
                     Preconditions.AtMost(tag.Length, DiscordConfig.MaxApplicationTagLength, nameof(args.Tags), $"An application tag must have length less or equal to {DiscordConfig.MaxApplicationTagLength}");
             }
 
-            if(args.Description.IsSpecified)
+            if (args.Description.IsSpecified)
                 Preconditions.AtMost(args.Description.Value.Length, DiscordConfig.MaxApplicationDescriptionLength, nameof(args.Description), $"An application description tag mus have length less or equal to {DiscordConfig.MaxApplicationDescriptionLength}");
 
             return await client.ApiClient.ModifyCurrentBotApplicationAsync(new()
