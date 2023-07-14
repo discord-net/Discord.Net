@@ -29,4 +29,29 @@ public class ModifyApplicationProperties
     ///     Gets or sets the icon of the application.
     /// </summary>
     public Optional<Image?> Icon { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the default rich presence invite cover image of the application.
+    /// </summary>
+    public Optional<Image?> CoverImage { get; set; }
+
+    /// <summary>
+    ///     Gets or set the default custom authorization URL for the app, if enabled.
+    /// </summary>
+    public Optional<string> CustomInstallUrl { get; set; }
+
+    /// <summary>
+    ///     Gets or sets settings for the app's default in-app authorization link, if enabled.
+    /// </summary>
+    public Optional<ApplicationInstallParams> InstallParams { get; set; }
+
+    /// <summary>
+    ///     Gets or sets app's public flags.
+    /// </summary>
+    /// <remarks>
+    ///     Only <see cref="ApplicationFlags.GatewayGuildMembersLimited"/>, <see cref="ApplicationFlags.GatewayMessageContentLimited"/> and
+    ///     <see cref="ApplicationFlags.GatewayPresenceLimited"/> flags can be updated.
+    /// </remarks>
+    public Optional<ApplicationFlags> Flags { get; set; }
+
 }
