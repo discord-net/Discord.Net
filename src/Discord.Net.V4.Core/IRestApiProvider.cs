@@ -56,5 +56,4 @@ public interface IRestApiProvider : IAsyncDisposable, IDisposable
 
     #endregion
 
-
 }

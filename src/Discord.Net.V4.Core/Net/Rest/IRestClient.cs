@@ -19,7 +19,7 @@ public interface IRestClient : IDisposable
     void SetCancelToken(CancellationToken cancelToken);
 
     /// <summary>
-    /// Sends a REST request.
+    ///     Sends a REST request.
     /// </summary>
     /// <param name="method">The method used to send this request (i.e. HTTP verb such as <c>GET</c>, <c>POST</c>).</param>
     /// <param name="endpoint">The endpoint to send this request to.</param>
@@ -27,13 +27,12 @@ public interface IRestClient : IDisposable
     /// <param name="headerOnly">Indicates whether to send the header only.</param>
     /// <param name="reason">The audit log reason.</param>
     /// <param name="requestHeaders">Additional headers to be sent with the request.</param>
-    /// <returns></returns>
-    Task<RestResponse> SendAsync(string method, string endpoint, CancellationToken cancelToken, bool headerOnly = false, string reason = null,
+    Task<RestResponse> SendAsync(string method, string endpoint, CancellationToken cancelToken, bool headerOnly = false, string? reason = null,
         IEnumerable<KeyValuePair<string, IEnumerable<string>>>? requestHeaders = null);
 
-    Task<RestResponse> SendAsync(string method, string endpoint, string json, CancellationToken cancelToken, bool headerOnly = false, string reason = null,
+    Task<RestResponse> SendAsync(string method, string endpoint, string? json, CancellationToken cancelToken, bool headerOnly = false, string? reason = null,
         IEnumerable<KeyValuePair<string, IEnumerable<string>>>? requestHeaders = null);
 
-    Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly = false, string reason = null,
+    Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly = false, string? reason = null,
         IEnumerable<KeyValuePair<string, IEnumerable<string>>>? requestHeaders = null);
 }
