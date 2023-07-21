@@ -31,7 +31,7 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Deletes this object and all of it's children.
+        ///     Deletes this object and all of its children.
         /// </summary>
         /// <returns>A task that represents the asynchronous delete operation.</returns>
         public Task DeleteAsync()
