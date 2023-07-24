@@ -313,7 +313,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
-        public override async Task<RestFollowupMessage> FollowupAsync(
+        public override Task<RestFollowupMessage> FollowupAsync(
             string text = null,
             Embed[] embeds = null,
             bool isTTS = false,
@@ -346,11 +346,11 @@ namespace Discord.WebSocket
             if (ephemeral)
                 args.Flags = MessageFlags.Ephemeral;
 
-            return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
+            return InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
         }
 
         /// <inheritdoc/>
-        public override async Task<RestFollowupMessage> FollowupWithFilesAsync(
+        public override Task<RestFollowupMessage> FollowupWithFilesAsync(
             IEnumerable<FileAttachment> attachments,
             string text = null,
             Embed[] embeds = null,
@@ -399,7 +399,7 @@ namespace Discord.WebSocket
                 flags |= MessageFlags.Ephemeral;
 
             var args = new API.Rest.UploadWebhookFileParams(attachments.ToArray()) { Flags = flags, Content = text, IsTTS = isTTS, Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified, AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, MessageComponents = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified };
-            return await InteractionHelper.SendFollowupAsync(Discord, args, Token, Channel, options).ConfigureAwait(false);
+            return InteractionHelper.SendFollowupAsync(Discord, args, Token, Channel, options);
         }
 
         /// <inheritdoc/>

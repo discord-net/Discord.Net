@@ -177,14 +177,11 @@ namespace Discord
             await _logger.InfoAsync("Disconnected").ConfigureAwait(false);
         }
 
-        public async Task CompleteAsync()
-        {
-            await _readyPromise.TrySetResultAsync(true).ConfigureAwait(false);
-        }
-        public async Task WaitAsync()
-        {
-            await _readyPromise.Task.ConfigureAwait(false);
-        }
+        public Task CompleteAsync()
+            => _readyPromise.TrySetResultAsync(true);
+
+        public Task WaitAsync()
+            => _readyPromise.Task;
 
         public void Cancel()
         {

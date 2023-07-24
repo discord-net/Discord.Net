@@ -11,7 +11,7 @@ namespace Discord.Rest
 {
     internal static class ThreadHelper
     {
-        public static async Task<Model> CreateThreadAsync(BaseDiscordClient client, ITextChannel channel, string name, ThreadType type = ThreadType.PublicThread,
+        public static Task<Model> CreateThreadAsync(BaseDiscordClient client, ITextChannel channel, string name, ThreadType type = ThreadType.PublicThread,
             ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
         {
             if (channel is INewsChannel && type != ThreadType.NewsThread)
@@ -26,17 +26,13 @@ namespace Discord.Rest
                 Ratelimit = slowmode.HasValue ? slowmode.Value : Optional<int?>.Unspecified,
             };
 
-            Model model;
-
             if (message != null)
-                model = await client.ApiClient.StartThreadAsync(channel.Id, message.Id, args, options).ConfigureAwait(false);
+                return client.ApiClient.StartThreadAsync(channel.Id, message.Id, args, options);
             else
-                model = await client.ApiClient.StartThreadAsync(channel.Id, args, options).ConfigureAwait(false);
-
-            return model;
+                return client.ApiClient.StartThreadAsync(channel.Id, args, options);
         }
 
-        public static async Task<Model> ModifyAsync(IThreadChannel channel, BaseDiscordClient client,
+        public static Task<Model> ModifyAsync(IThreadChannel channel, BaseDiscordClient client,
             Action<ThreadChannelProperties> func,
             RequestOptions options)
         {
@@ -55,7 +51,7 @@ namespace Discord.Rest
                 AppliedTags = args.AppliedTags,
                 Flags = args.Flags,
             };
-            return await client.ApiClient.ModifyThreadAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyThreadAsync(channel.Id, apiArgs, options);
         }
 
         public static async Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(IGuild guild, ulong channelId, BaseDiscordClient client, RequestOptions options)

@@ -13,13 +13,13 @@ namespace Discord.Interactions
         /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
-        public static async Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+        public static Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
             if (!ModalUtils.TryGet<T>(out var modalInfo))
                 throw new ArgumentException($"{typeof(T).FullName} isn't referenced by any registered Modal Interaction Command and doesn't have a cached {typeof(ModalInfo)}");
 
-            await SendModalResponseAsync(interaction, customId, modalInfo, options, modifyModal);
+            return SendModalResponseAsync(interaction, customId, modalInfo, options, modifyModal);
         }
 
         /// <summary>
@@ -35,13 +35,13 @@ namespace Discord.Interactions
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
         /// <returns></returns>
-        public static async Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, InteractionService interactionService,
+        public static Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, InteractionService interactionService,
             RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
             var modalInfo = ModalUtils.GetOrAdd<T>(interactionService);
 
-            await SendModalResponseAsync(interaction, customId, modalInfo, options, modifyModal);
+            return SendModalResponseAsync(interaction, customId, modalInfo, options, modifyModal);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Discord.Interactions
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
         /// <returns></returns>
-        public static async Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, T modal, RequestOptions options = null,
+        public static Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, T modal, RequestOptions options = null,
             Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
@@ -79,10 +79,10 @@ namespace Discord.Interactions
             if (modifyModal is not null)
                 modifyModal(builder);
 
-            await interaction.RespondWithModalAsync(builder.Build(), options).ConfigureAwait(false);
+            return interaction.RespondWithModalAsync(builder.Build(), options);
         }
 
-        private static async Task SendModalResponseAsync(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+        private static Task SendModalResponseAsync(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
         {
             var builder = new ModalBuilder(modalInfo.Title, customId);
 
@@ -100,7 +100,7 @@ namespace Discord.Interactions
             if (modifyModal is not null)
                 modifyModal(builder);
 
-            await interaction.RespondWithModalAsync(builder.Build(), options).ConfigureAwait(false);
+            return interaction.RespondWithModalAsync(builder.Build(), options);
         }
     }
 }

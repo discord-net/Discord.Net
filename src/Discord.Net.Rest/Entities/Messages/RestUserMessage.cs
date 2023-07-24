@@ -156,14 +156,14 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">This operation may only be called on a <see cref="INewsChannel"/> channel.</exception>
-        public async Task CrosspostAsync(RequestOptions options = null)
+        public Task CrosspostAsync(RequestOptions options = null)
         {
             if (!(Channel is INewsChannel))
             {
                 throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
             }
 
-            await MessageHelper.CrosspostAsync(this, Discord, options);
+            return MessageHelper.CrosspostAsync(this, Discord, options);
         }
 
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";

@@ -26,14 +26,14 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public async Task<IResult> ExecuteAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter,
+        public Task<IResult> ExecuteAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter,
             IServiceProvider services)
         {
             switch (InteractionService._runMode)
             {
                 case RunMode.Sync:
                     {
-                        return await ExecuteInternalAsync(context, autocompleteInteraction, parameter, services).ConfigureAwait(false);
+                        return ExecuteInternalAsync(context, autocompleteInteraction, parameter, services);
                     }
                 case RunMode.Async:
                     _ = Task.Run(async () =>
@@ -45,7 +45,7 @@ namespace Discord.Interactions
                     throw new InvalidOperationException($"RunMode {InteractionService._runMode} is not supported.");
             }
 
-            return ExecuteResult.FromSuccess();
+            return Task.FromResult((IResult)ExecuteResult.FromSuccess());
         }
 
         private async Task<IResult> ExecuteInternalAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter,
