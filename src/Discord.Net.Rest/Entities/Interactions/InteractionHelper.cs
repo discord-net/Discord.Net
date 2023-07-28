@@ -473,15 +473,16 @@ namespace Discord.Rest
                     Components = args.Components.IsSpecified
                         ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
                         : Optional<API.ActionRowComponent[]>.Unspecified,
-                    Flags = args.Flags,
-                    Attatchments = args.Attachments.GetValueOrDefault() == new FileAttachment[] { } ? new IAttachment[] { } : Optional<IAttachment[]>.Unspecified
+                    Flags = args.Flags
                 };
 
                 return await client.ApiClient.ModifyInteractionResponseAsync(apiArgs, token, options).ConfigureAwait(false);
             }
             else
             {
-                var apiArgs = new UploadWebhookFileParams(args.Attachments.Value.ToArray())
+                var attatchments = args.Attachments.Value?.ToArray() ?? new FileAttachment[] { };
+
+                var apiArgs = new UploadWebhookFileParams(attatchments)
                 {
                     Content = args.Content,
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,

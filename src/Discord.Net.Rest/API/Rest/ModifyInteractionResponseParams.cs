@@ -18,8 +18,5 @@ namespace Discord.API.Rest
 
         [JsonProperty("flags")]
         public Optional<MessageFlags?> Flags { get; set; }
-
-        [JsonProperty("attachments")]
-        public Optional<IAttachment[]> Attatchments { get; set; }
     }
 }
