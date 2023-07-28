@@ -480,9 +480,9 @@ namespace Discord.Rest
             }
             else
             {
-                var attatchments = args.Attachments.Value?.ToArray() ?? new FileAttachment[] { };
+                var attachments = args.Attachments.Value?.ToArray() ?? new FileAttachment[] { };
 
-                var apiArgs = new UploadWebhookFileParams(attatchments)
+                var apiArgs = new UploadWebhookFileParams(attachments)
                 {
                     Content = args.Content,
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
