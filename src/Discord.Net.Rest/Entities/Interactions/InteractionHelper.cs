@@ -473,7 +473,8 @@ namespace Discord.Rest
                     Components = args.Components.IsSpecified
                         ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
                         : Optional<API.ActionRowComponent[]>.Unspecified,
-                    Flags = args.Flags
+                    Flags = args.Flags,
+                    Attatchments = args.Attachments.GetValueOrDefault() == new FileAttachment[] { } ? new IAttachment[] { } : Optional<IAttachment[]>.Unspecified
                 };
 
                 return await client.ApiClient.ModifyInteractionResponseAsync(apiArgs, token, options).ConfigureAwait(false);
