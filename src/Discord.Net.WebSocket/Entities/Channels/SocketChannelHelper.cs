@@ -55,6 +55,7 @@ namespace Discord.WebSocket
                         return result;
                 }
 
+                //Download remaining messages
                 var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, fromMessageId, dir, limit, options);
                 if (!ignoreCache && cachedMessages.Count != 0)
                     return result.Concat(downloadedMessages);
