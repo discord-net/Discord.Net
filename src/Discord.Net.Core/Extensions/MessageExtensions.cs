@@ -89,6 +89,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the message.</param>
+        /// <param name="flags">Message flags combined as a bitfield.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
