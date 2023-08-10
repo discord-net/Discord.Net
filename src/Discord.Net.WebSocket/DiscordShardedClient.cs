@@ -412,6 +412,14 @@ namespace Discord.WebSocket
                 await _shards[i].SetActivityAsync(activity).ConfigureAwait(false);
         }
 
+        /// <inheritdoc />
+        public override async Task SetCustomStatusAsync(string status)
+        {
+            var statusGame = new CustomStatusGame(status);
+            for (int i = 0; i < _shards.Length; i++)
+                await _shards[i].SetActivityAsync(statusGame).ConfigureAwait(false);
+        }
+
         private void RegisterEvents(DiscordSocketClient client, bool isPrimary)
         {
             client.Log += (msg) => _logEvent.InvokeAsync(msg);

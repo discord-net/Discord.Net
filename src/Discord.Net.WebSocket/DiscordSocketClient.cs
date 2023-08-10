@@ -694,6 +694,7 @@ namespace Discord.WebSocket
                 Activity = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
+
         /// <inheritdoc />
         public override async Task SetActivityAsync(IActivity activity)
         {
@@ -701,11 +702,20 @@ namespace Discord.WebSocket
             await SendStatusAsync().ConfigureAwait(false);
         }
 
+        /// <inheritdoc />
+        public override async Task SetCustomStatusAsync(string status)
+        {
+            var statusGame = new CustomStatusGame(status);
+            await SetActivityAsync(statusGame);
+        }
+
         private async Task SendStatusAsync()
         {
             if (CurrentUser == null)
                 return;
-            var activities = _activity.IsSpecified ? ImmutableList.Create(_activity.Value) : null;
+            var activities = _activity.IsSpecified
+                ? ImmutableList.Create(_activity.Value)
+                : null;
             CurrentUser.Presence = new SocketPresence(Status, null, activities);
 
             var presence = BuildCurrentStatus() ?? (UserStatus.Online, false, null, null);
@@ -738,6 +748,8 @@ namespace Discord.WebSocket
                 gameModel.Type = Activity.Type;
                 if (Activity is StreamingGame streamGame)
                     gameModel.StreamUrl = streamGame.Url;
+                if (Activity is CustomStatusGame customStatus)
+                    gameModel.State = customStatus.State;
                 game = gameModel;
             }
             else if (activity.IsSpecified)
