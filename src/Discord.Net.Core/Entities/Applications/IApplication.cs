@@ -24,7 +24,7 @@ namespace Discord
         /// </summary>
         ApplicationFlags Flags { get; }
         /// <summary>
-        ///     Gets a collection of install parameters for this application. <see langword="null"/> if disabled.
+        ///     Gets a collection of install parameters for this application; <see langword="null"/> if disabled.
         /// </summary>
         ApplicationInstallParams InstallParams { get; }
         /// <summary>
