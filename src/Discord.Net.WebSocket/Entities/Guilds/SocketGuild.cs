@@ -383,7 +383,7 @@ namespace Discord.WebSocket
         ///         </para>
         ///         <para>
         ///             Otherwise, you may need to enable <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/> to fetch
-        ///             the full user list upon startup, or use <see cref="DownloadUsersAsync"/> to manually download
+        ///             the full user list upon startup, or use <see cref="DownloadUsersAsync()"/> to manually download
         ///             the users.
         ///         </para>
         ///     </note>
@@ -1260,6 +1260,20 @@ namespace Discord.WebSocket
         {
             await Discord.DownloadUsersAsync(new[] { this }).ConfigureAwait(false);
         }
+
+        /// <inheritdoc />
+        public async Task DownloadUsersAsync(IEnumerable<ulong> userIds)
+        {
+            using var cts = new CancellationTokenSource(DiscordConfig.DefaultRequestTimeout);
+            await DownloadUsersAsync(userIds, cts.Token).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public async Task DownloadUsersAsync(IEnumerable<ulong> userIds, CancellationToken cancelToken)
+        {
+            await Discord.DownloadUsersAsync(this, userIds, cancelToken).ConfigureAwait(false);
+        }
+
         internal void CompleteDownloadUsers()
         {
             _downloaderPromise.TrySetResultAsync(true);
@@ -1406,7 +1420,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of the requested audit log entries.
-        /// </returns>        
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null, ActionType? actionType = null, ulong? afterId = null)
             => GuildHelper.GetAuditLogsAsync(this, Discord, beforeId, limit, options, userId: userId, actionType: actionType, afterId: afterId);
 

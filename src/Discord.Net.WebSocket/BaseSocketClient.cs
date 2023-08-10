@@ -3,6 +3,7 @@ using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.WebSocket
@@ -245,6 +246,17 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous download operation.
         /// </returns>
         public abstract Task DownloadUsersAsync(IEnumerable<IGuild> guilds);
+
+        /// <summary>
+        ///     Attempts to download specific users into the user cache for the selected guild.
+        /// </summary>
+        /// <param name="guild">The guild to download the members from.</param>
+        /// <param name="userIds">The list of Discord user IDs to download.</param>
+        /// <param name="cancelToken">The cancellation token used to cancel the task.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous download operation.
+        /// </returns>
+        public abstract Task DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default);
 
         /// <summary>
         ///     Creates a guild for the logged-in user who is in less than 10 active guilds.

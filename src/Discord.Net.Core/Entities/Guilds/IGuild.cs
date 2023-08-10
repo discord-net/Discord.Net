@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -958,6 +959,33 @@ namespace Discord
         ///     A task that represents the asynchronous download operation.
         /// </returns>
         Task DownloadUsersAsync();
+
+        /// <summary>
+        ///     Downloads specific users for this guild with the default request timeout.
+        /// </summary>
+        /// <remarks>
+        ///     This method downloads all users specified in <paramref name="userIds" /> through the Gateway and caches them.
+        ///     Consider using <see cref="DownloadUsersAsync(IEnumerable{ulong}, CancellationToken)"/> when downloading a large number of users.
+        /// </remarks>
+        /// <param name="userIds">The list of Discord user IDs to download.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous download operation.
+        /// </returns>
+        /// <exception cref="OperationCanceledException">The timeout has elapsed.</exception>
+        Task DownloadUsersAsync(IEnumerable<ulong> userIds);
+
+        /// <summary>
+        ///     Downloads specific users for this guild.
+        /// </summary>
+        /// <remarks>
+        ///     This method downloads all users specified in <paramref name="userIds" /> through the Gateway and caches them.
+        /// </remarks>
+        /// <param name="userIds">The list of Discord user IDs to download.</param>
+        /// <param name="cancelToken">The cancellation token used to cancel the task.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous download operation.
+        /// </returns>
+        Task DownloadUsersAsync(IEnumerable<ulong> userIds, CancellationToken cancelToken);
         /// <summary>
         ///     Prunes inactive users.
         /// </summary>

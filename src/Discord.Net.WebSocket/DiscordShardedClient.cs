@@ -381,6 +381,23 @@ namespace Discord.WebSocket
             }
         }
 
+        /// <inheritdoc />
+        /// <exception cref="ArgumentNullException"><paramref name="guild"/> is <see langword="null"/></exception>
+        public override async Task DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default)
+        {
+            Preconditions.NotNull(guild, nameof(guild));
+
+            for (int i = 0; i < _shards.Length; i++)
+            {
+                int id = _shardIds[i];
+                if (GetShardIdFor(guild) == id)
+                {
+                    await _shards[i].DownloadUsersAsync(guild, userIds, cancelToken).ConfigureAwait(false);
+                    break;
+                }
+            }
+        }
+
         private int GetLatency()
         {
             int total = 0;
