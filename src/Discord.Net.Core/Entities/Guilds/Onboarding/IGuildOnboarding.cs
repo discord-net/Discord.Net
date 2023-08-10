@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Discord;
 
@@ -31,4 +33,19 @@ public interface IGuildOnboarding
     ///     Gets whether onboarding is enabled in the guild.
     /// </summary>
     bool IsEnabled { get; }
+
+    /// <summary>
+    ///     Gets the current mode of onboarding.
+    /// </summary>
+    GuildOnboardingMode Mode { get; }
+
+    /// <summary>
+    ///     Gets whether the server does not meet requirements to enable guild onboarding.
+    /// </summary>
+    bool IsBelowRequirements { get; }
+
+    /// <summary>
+    ///     Modifies the onboarding object.
+    /// </summary>
+    Task ModifyAsync(Action<GuildOnboardingProperties> props, RequestOptions options = null);
 }

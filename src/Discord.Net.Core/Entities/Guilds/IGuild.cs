@@ -1317,5 +1317,13 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IGuildOnboarding"/>.
         /// </returns>
         Task<IGuildOnboarding> GetOnboardingAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies the onboarding object configured for the guild.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="IGuildOnboarding"/>.
+        /// </returns>
+        Task<IGuildOnboarding> ModifyOnboardingAsync(Action<GuildOnboardingProperties> props, RequestOptions options = null);
     }
 }
