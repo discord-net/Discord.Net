@@ -229,7 +229,8 @@ namespace Discord.Rest
                 MessageComponent = components?.Components?.Any() ?? false ? components.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
                 Slowmode = slowmode,
                 Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified,
-                Title = title
+                Title = title,
+                TagIds = tagIds
             };
 
             var model = await client.ApiClient.CreatePostAsync(channel.Id, args, options);
