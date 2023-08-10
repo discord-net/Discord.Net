@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,6 +22,30 @@ namespace Discord.Audio.Streams
             _next = next;
             _encoder = new OpusEncoder(bitrate, application, packetLoss);
             _buffer = new byte[OpusConverter.FrameBytes];
+        }
+
+        /// <summary>
+        ///     Sends silent frames to avoid interpolation errors after breaks in data transmission.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation of sending a silent frame.</returns>
+        public async Task WriteSilentFramesAsync()
+        {
+            // https://discord.com/developers/docs/topics/voice-connections#voice-data-interpolation
+
+            byte[] frameBytes = new byte[OpusConverter.FrameBytes];
+
+            // Magic silence numbers.
+            frameBytes[0] = 0xF8;
+            frameBytes[1] = 0xFF;
+            frameBytes[2] = 0xFE;
+
+            // The rest of the array is already zeroes, so no need to fill the rest.
+
+            const int frameCount = 5;
+            for (int i = 0; i < frameCount; i += 1)
+            {
+                await WriteAsync(frameBytes, 0, frameBytes.Length).ConfigureAwait(false);
+            } 
         }
 
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
