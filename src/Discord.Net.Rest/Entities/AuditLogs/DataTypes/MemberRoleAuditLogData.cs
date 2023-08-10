@@ -22,7 +22,7 @@ public class MemberRoleAuditLogData : IAuditLogData
 
         var roleInfos = changes.SelectMany(x => x.NewValue.ToObject<API.Role[]>(discord.ApiClient.Serializer),
                 (model, role) => new { model.ChangedProperty, Role = role })
-            .Select(x => new MemberRoleEditInfo(x.Role.Name, x.Role.Id, x.ChangedProperty == "$add"))
+            .Select(x => new MemberRoleEditInfo(x.Role.Name, x.Role.Id, x.ChangedProperty == "$add", x.ChangedProperty == "$remove"))
             .ToList();
 
         var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);

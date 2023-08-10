@@ -5,11 +5,12 @@ namespace Discord.Rest;
 /// </summary>
 public struct MemberRoleEditInfo
 {
-    internal MemberRoleEditInfo(string name, ulong roleId, bool added)
+    internal MemberRoleEditInfo(string name, ulong roleId, bool added, bool removed)
     {
         Name = name;
         RoleId = roleId;
         Added = added;
+        Removed = removed;
     }
 
     /// <summary>
@@ -35,4 +36,11 @@ public struct MemberRoleEditInfo
     ///     <see langword="true" /> if the role was added to the user; otherwise <see langword="false" />.
     /// </returns>
     public bool Added { get; }
+    /// <summary>
+    ///     Gets a value indicating that the user role has been removed.
+    /// </summary>
+    /// <returns>
+    ///      <c>true</c> if the role has been removed from the user; otherwise <c>false</c>.
+    /// </returns>
+    public bool Removed { get; }
 }
