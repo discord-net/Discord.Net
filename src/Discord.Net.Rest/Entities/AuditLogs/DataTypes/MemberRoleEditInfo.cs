@@ -40,7 +40,7 @@ public struct MemberRoleEditInfo
     ///     Gets a value indicating that the user role has been removed.
     /// </summary>
     /// <returns>
-    /// <c>true</c> if the role has been removed from the user; otherwise <c>false</c>.
+    ///      <c>true</c> if the role has been removed from the user; otherwise <c>false</c>.
     /// </returns>
     public bool Removed { get; }
 }
