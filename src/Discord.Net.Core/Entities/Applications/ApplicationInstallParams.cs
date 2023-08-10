@@ -22,6 +22,9 @@ public class ApplicationInstallParams
     {
         Preconditions.NotNull(scopes, nameof(scopes));
 
+        foreach (var s in scopes)
+            Preconditions.NotNull(s, nameof(scopes));
+
         Scopes = scopes.ToImmutableArray();
         Permission = permission;
     }
