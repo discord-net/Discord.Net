@@ -9,7 +9,7 @@ namespace Discord
     public interface IWebhook : IDeletable, ISnowflakeEntity
     {
         /// <summary>
-        ///     Gets the token of this webhook. <see langword="null"/> if the <see cref="Type"/> is <see cref="WebhookType.ChannelFollower"/>.
+        ///     Gets the token of this webhook; <see langword="null"/> if the <see cref="Type"/> is <see cref="WebhookType.ChannelFollower"/>.
         /// </summary>
         string Token { get; }
 
@@ -34,7 +34,7 @@ namespace Discord
         IIntegrationChannel Channel { get; }
 
         /// <summary>
-        ///     Gets the ID of the channel for this webhook. <see langword="null"/> for <see cref="WebhookType.Application"/> webhooks.
+        ///     Gets the ID of the channel for this webhook; <see langword="null"/> for <see cref="WebhookType.Application"/> webhooks.
         /// </summary>
         ulong? ChannelId { get; }
 
@@ -58,7 +58,7 @@ namespace Discord
         ulong? ApplicationId { get; }
 
         /// <summary>
-        ///     Gets the type of the webhook.
+        ///     Gets the type of this webhook.
         /// </summary>
         WebhookType Type { get; }
 
