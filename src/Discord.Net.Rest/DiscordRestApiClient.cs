@@ -1926,8 +1926,6 @@ namespace Discord.API
 
             bool isCurrentUser = userId == CurrentUserId;
 
-            if (args.RoleIds.IsSpecified)
-                Preconditions.NotEveryoneRole(args.RoleIds.Value, guildId, nameof(args.RoleIds));
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
                 var nickArgs = new Rest.ModifyCurrentUserNickParams(args.Nickname.Value ?? "");
