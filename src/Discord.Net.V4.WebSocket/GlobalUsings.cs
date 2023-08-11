@@ -1,1 +1,26 @@
 global using GuildCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuild, Discord.Rest.RestGuild, Discord.IGuild>;
+global using GuildUserCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuildUser, Discord.Rest.RestGuildUser, Discord.IGuildUser>;
+global using UserCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketUser, Discord.Rest.RestUser, Discord.IUser>;
+global using MessageCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketMessage, Discord.Rest.RestMessage, Discord.IMessage>;
+global using MessageChannelCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketMessageChannel, Discord.Rest.IRestMessageChannel, Discord.IMessageChannel>;
+global using GuildChannelCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuildChannel, Discord.Rest.RestGuildChannel, Discord.IGuildChannel>;
+global using GuildStickerCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketCustomSticker, Discord.Rest.CustomSticker, Discord.ICustomSticker>;
+global using GuildRoleCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketRole, Discord.Rest.RestRole, Discord.IRole>;
+global using GuildMemberCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuildUser, Discord.Rest.RestGuildUser, Discord.IGuildUser>;
+global using GuildEmoteCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuildEmote>;
+
+global using GuildEmotesCacheable = Discord.WebSocket.CacheableCollection<
+    Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuildEmote>,
+    ulong, Discord.WebSocket.SocketGuildEmote>;
+
+global using GuildStickersCacheable = Discord.WebSocket.CacheableCollection<
+    Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketCustomSticker, Discord.Rest.CustomSticker, Discord.ICustomSticker>,
+    ulong, Discord.WebSocket.SocketCustomSticker>;
+
+global using GuildChannelsCacheable = Discord.WebSocket.CacheableCollection<
+    Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuildChannel, Discord.Rest.RestGuildChannel, Discord.IGuildChannel>,
+    ulong, Discord.WebSocket.SocketGuildChannel>;
+
+global using GuildRolesCacheable = Discord.WebSocket.CacheableCollection<
+    Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketRole, Discord.Rest.RestRole, Discord.IRole>,
+    ulong, Discord.WebSocket.SocketRole>;

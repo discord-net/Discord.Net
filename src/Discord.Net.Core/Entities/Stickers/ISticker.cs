@@ -18,9 +18,10 @@ namespace Discord
         ///     Gets the ID of the pack of this sticker.
         /// </summary>
         /// <returns>
-        ///     A snowflake ID associated with the pack of this sticker.
+        ///     A snowflake ID associated with the pack of this sticker if it's
+        ///     from a pack; otherwise <see langword="null"/>.
         /// </returns>
-        ulong PackId { get; }
+        ulong? PackId { get; }
         /// <summary>
         ///     Gets the name of this sticker.
         /// </summary>

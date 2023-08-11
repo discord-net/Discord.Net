@@ -1,19 +1,14 @@
-namespace Discord;
-
-/// <summary>
-///     Represents a partial sticker item received with a message.
-/// </summary>
-public interface IStickerItem
+namespace Discord
 {
     /// <summary>
-    ///     The id of the sticker.
+    ///     Represents a partial sticker item received with a message.
     /// </summary>
-    ulong Id { get; }
-
-    /// <summary>
-    ///     The name of the sticker.
-    /// </summary>
-    string Name { get; }
+    public interface IStickerItem : IEntity<ulong>
+    {
+        /// <summary>
+        ///     The name of the sticker.
+        /// </summary>
+        string Name { get; }
 
     /// <summary>
     ///     The format of the sticker.

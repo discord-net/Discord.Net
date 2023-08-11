@@ -8,5 +8,6 @@ namespace Discord
 {
     public interface IGatewayClient
     {
+        string Name { get; }
     }
 }

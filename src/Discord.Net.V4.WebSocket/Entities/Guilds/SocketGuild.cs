@@ -6,23 +6,19 @@ namespace Discord.WebSocket;
 
 public class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
 {
-    internal record FactoryArgs(
-        IEnumerable<IChannelModel>? Channels = null,
-        IEnumerable<IRoleModel>? Roles = null,
-        IEnumerable<IEmojiModel>? Emotes = null,
-        IEnumerable<IStickerModel>? Stickers = null
-    );
+    protected override IGuildModel Model
+        => _source;
+
+    public GuildChannelsCacheable Channels { get; }
+    public GuildStickersCacheable Stickers { get; }
+    public GuildRolesCacheable Roles { get; }
+    public GuildRoleCacheable EveryoneRole { get; }
+    public GuildEmotesCacheable Emotes { get; }
 
     public IAudioClient AudioClient => throw new NotImplementedException(); // TODO
 
-    public IRole EveryoneRole => throw new NotImplementedException(); // TODO
 
-    public IReadOnlyCollection<GuildEmote> Emotes => throw new NotImplementedException(); // TODO
-
-    public IReadOnlyCollection<ICustomSticker> Stickers => throw new NotImplementedException(); // TODO
-
-    public IReadOnlyCollection<IRole> Roles => throw new NotImplementedException(); // TODO
-
+    #region Model props
     public string Name
         => _source.Name;
 
@@ -156,27 +152,31 @@ public class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
         => 0; // TODO: GuildHelper.GetUploadLimit(this);
 
     public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+    #endregion
 
     public bool Available { get; internal set; }
 
     private IGuildModel _source;
     private GuildFeatures _features;
 
-    internal SocketGuild(DiscordSocketClient discord, ulong id, IGuildModel model, FactoryArgs args) : base(discord, id)
+    internal SocketGuild(DiscordSocketClient discord, ulong id, IGuildModel model) : base(discord, id)
     {
         _source = model;
         _features = new GuildFeatures(model.Features, model.ExperimentalFeatures);
+
+        Channels = new(id, discord.State.GuildChannels, channelId => new GuildChannelCacheable(id, channelId, discord, discord.State.GuildChannels.SourceSpecific(channelId, id)));
+        Stickers = new(id, discord.State.GuildStickers, stickerId => new GuildStickerCacheable(id, stickerId, discord, discord.State.GuildStickers.SourceSpecific(stickerId, id)));
+        Roles = new(id, discord.State.GuildRoles, roleId => new GuildRoleCacheable(id, roleId, discord, discord.State.GuildRoles.SourceSpecific(roleId, id)));
+        EveryoneRole = new(id, id, discord, discord.State.GuildRoles.SourceSpecific(id)); // everyone role is the same ID as the guild.
+        Emotes = new(id, discord.State.GuildEmotes, emoteId => new GuildEmoteCacheable(id, emoteId, discord, discord.State.GuildEmotes.SourceSpecific(emoteId, id)));
     }
 
     internal override object Clone() => throw new NotImplementedException();
     internal override void DisposeClone() => throw new NotImplementedException();
 
-    internal override IGuildModel GetModel()
-        => _source;
-
     internal override void Update(IGuildModel model)
     {
-        if(_source.Features != model.Features || !_source.ExperimentalFeatures.SequenceEqual(model.ExperimentalFeatures))
+        if (_source.Features != model.Features || !_source.ExperimentalFeatures.SequenceEqual(model.ExperimentalFeatures))
         {
             _features = new GuildFeatures(model.Features, model.ExperimentalFeatures);
         }
@@ -184,6 +184,7 @@ public class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
         _source = model;
     }
 
+    #region Methods
     public Task AddBanAsync(IUser user, int pruneDays = 0, string? reason = null, RequestOptions? options = null) => throw new NotImplementedException();
     public Task AddBanAsync(ulong userId, int pruneDays = 0, string? reason = null, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IGuildUser> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties>? func = null, RequestOptions? options = null) => throw new NotImplementedException();
@@ -259,5 +260,16 @@ public class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
     public Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions? options = null) => throw new NotImplementedException();
     public Task ReorderRolesAsync(IEnumerable<ReorderRoleProperties> args, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IReadOnlyCollection<IGuildUser>> SearchUsersAsync(string query, int limit = 1000, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
-        
+    #endregion
+
+    #region IGuild
+    IRole? IGuild.EveryoneRole => EveryoneRole.Value;
+
+    IReadOnlyCollection<GuildEmote> IGuild.Emotes => null!; // TODO
+
+    IReadOnlyCollection<ICustomSticker> IGuild.Stickers => null!; // TODO: sync lookup? IDs are not ensured to be in memory.
+
+    IReadOnlyCollection<IRole> IGuild.Roles => null!; // TODO
+    #endregion
+
 }

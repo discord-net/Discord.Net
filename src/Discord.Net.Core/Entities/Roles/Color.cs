@@ -80,14 +80,14 @@ namespace Discord
         ///     This value is encoded as an unsigned integer value. The most-significant 8 bits contain the red value,
         ///     the middle 8 bits contain the green value, and the least-significant 8 bits contain the blue value.
         /// </remarks>
-        public uint RawValue { get; }
+        public readonly uint RawValue;
 
         /// <summary> Gets the red component for this color. </summary>
-        public byte R => (byte)(RawValue >> 16);
+        public readonly byte R => (byte)(RawValue >> 16);
         /// <summary> Gets the green component for this color. </summary>
-        public byte G => (byte)(RawValue >> 8);
+        public readonly byte G => (byte)(RawValue >> 8);
         /// <summary> Gets the blue component for this color. </summary>
-        public byte B => (byte)(RawValue);
+        public readonly byte B => (byte)(RawValue);
 
         /// <summary>
         ///     Initializes a <see cref="Color"/> struct with the given raw value.
