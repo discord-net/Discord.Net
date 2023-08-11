@@ -1,7 +1,6 @@
-namespace Discord.Models
+namespace Discord.Models;
+
+public interface IChannelModel : IEntityModel<ulong>
 {
-    public interface IChannelModel : IEntityModel<ulong>
-    {
-        string Name { get; }
-    }
+    string Name { get; }
 }

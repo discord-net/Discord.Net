@@ -14,10 +14,8 @@ public interface IGuildModel : IEntityModel<ulong>
     VerificationLevel VerificationLevel { get; }
     DefaultMessageNotifications DefaultMessageNotification { get; }
     ExplicitContentFilterLevel ExplicitContentFilter { get; }
-    ICollection<IRoleModel> Roles { get; }
-    ICollection<IEmojiModel> Emojis { get; }
     GuildFeature Features { get; }
-    ICollection<string> ExperimentalFeatures { get; }
+    string[] ExperimentalFeatures { get; }
     MfaLevel MFALevel { get; }
     ulong? ApplicationId { get; }
     ulong? SystemChannel { get; }
@@ -37,7 +35,6 @@ public interface IGuildModel : IEntityModel<ulong>
     int ApproximateMemberCount { get; }
     IWelcomeScreenModel? WelcomeScreen { get; }
     NsfwLevel NsfwLevel { get; }
-    ICollection<IStickerModel> Stickers { get; }
     bool? PremiumProgressBarEnabled { get; }
     ulong? SafetyAlertsChannel { get; }
 }
@@ -45,7 +42,7 @@ public interface IGuildModel : IEntityModel<ulong>
 public interface IWelcomeScreenModel
 {
     string? Description { get; }
-    ICollection<IWelcomeScreenChannelModel> WelcomeChannels { get; }
+    IWelcomeScreenChannelModel[] WelcomeChannels { get; }
 }
 
 public interface IWelcomeScreenChannelModel
@@ -55,3 +52,4 @@ public interface IWelcomeScreenChannelModel
     ulong? EmojiId { get; }
     string? EmojiName { get; }
 }
+

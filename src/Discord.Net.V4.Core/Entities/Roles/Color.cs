@@ -100,7 +100,7 @@ public struct Color
     ///     This value is encoded as an unsigned integer value. The most-significant 8 bits contain the red value,
     ///     the middle 8 bits contain the green value, and the least-significant 8 bits contain the blue value.
     /// </remarks>
-    public uint RawValue { get; }
+    public readonly uint RawValue;
 
     /// <summary> Gets the red component for this color. </summary>
     public readonly byte R => (byte)(RawValue >> 16);

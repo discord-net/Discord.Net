@@ -64,6 +64,8 @@ public class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
     public ulong? WidgetChannelId
         => _source.WidgetChannel;
 
+    public ulong? SafetyAlertsChannelId { get; }
+
     public ulong? SystemChannelId
         => _source.SystemChannel;
 
@@ -93,7 +95,9 @@ public class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
         => _source.Banner;
 
     public string? BannerUrl
-        => CDN.GetGuildBannerUrl(Id, BannerId, ImageFormat.Auto);
+        => BannerId is not null
+            ? CDN.GetGuildBannerUrl(Id, BannerId, ImageFormat.Auto)
+            : null;
 
     public string? VanityURLCode
         => _source.Vanity;
@@ -115,6 +119,8 @@ public class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
 
     public int? MaxVideoChannelUsers
         => _source.MaxVideoChannelUsers;
+
+    public int? MaxStageVideoChannelUsers { get; }
 
     public int? ApproximateMemberCount
         => _source.ApproximateMemberCount;
@@ -189,15 +195,35 @@ public class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
     public Task AddBanAsync(ulong userId, int pruneDays = 0, string? reason = null, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IGuildUser> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties>? func = null, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IReadOnlyCollection<IApplicationCommand>> BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties, RequestOptions? options = null) => throw new NotImplementedException();
+    public Task<WelcomeScreen> GetWelcomeScreenAsync(RequestOptions? options = null) => throw new NotImplementedException();
+
+    public Task<WelcomeScreen> ModifyWelcomeScreenAsync(bool enabled, WelcomeScreenChannelProperties[] channels, string description = null, RequestOptions? options = null) => throw new NotImplementedException();
+
+    public Task<IAutoModRule[]> GetAutoModRulesAsync(RequestOptions? options = null) => throw new NotImplementedException();
+
+    public Task<IAutoModRule> GetAutoModRuleAsync(ulong ruleId, RequestOptions? options = null) => throw new NotImplementedException();
+
+    public Task<IAutoModRule> CreateAutoModRuleAsync(Action<AutoModRuleProperties> props, RequestOptions? options = null) => throw new NotImplementedException();
+
+    public Task<IGuildOnboarding> GetOnboardingAsync(RequestOptions? options = null) => throw new NotImplementedException();
+
     public Task<IApplicationCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<ICategoryChannel> CreateCategoryAsync(string name, Action<GuildChannelProperties>? func = null, RequestOptions? options = null) => throw new NotImplementedException();
+    public Task<IForumChannel> CreateForumChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions? options = null) => throw new NotImplementedException();
+
     public Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IGuildScheduledEvent> CreateEventAsync(string name, DateTimeOffset startTime, GuildScheduledEventType type, GuildScheduledEventPrivacyLevel privacyLevel = GuildScheduledEventPrivacyLevel.Private, string? description = null, DateTimeOffset? endTime = null, ulong? channelId = null, string? location = null, Image? coverImage = null, RequestOptions? options = null) => throw new NotImplementedException();
+    public Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions? options = null) => throw new NotImplementedException();
+
     public Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IStageChannel> CreateStageChannelAsync(string name, Action<VoiceChannelProperties>? func = null, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions? options = null) => throw new NotImplementedException();
+    public Task<ICustomSticker> CreateStickerAsync(string name, Image image, IEnumerable<string> tags, string description = null, RequestOptions? options = null) => throw new NotImplementedException();
+
     public Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path, RequestOptions? options = null) => throw new NotImplementedException();
+    public Task<ICustomSticker> CreateStickerAsync(string name, Stream stream, string filename, IEnumerable<string> tags, string description = null, RequestOptions? options = null) => throw new NotImplementedException();
+
     public Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream, string filename, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<ITextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties>? func = null, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties>? func = null, RequestOptions? options = null) => throw new NotImplementedException();
@@ -246,6 +272,8 @@ public class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
     public Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IReadOnlyCollection<IVoiceChannel>> GetVoiceChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync(RequestOptions? options = null) => throw new NotImplementedException();
+    public Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogsAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null, ulong? beforeId = null, ulong? userId = null, ActionType? actionType = null, ulong? afterId = null) => throw new NotImplementedException();
+
     public Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions? options = null) => throw new NotImplementedException();
     public Task<IGuildChannel> GetWidgetChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();

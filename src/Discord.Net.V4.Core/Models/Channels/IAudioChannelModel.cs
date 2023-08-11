@@ -1,7 +1,6 @@
-namespace Discord.Models
+namespace Discord.Models;
+
+public interface IAudioChannelModel : IChannel
 {
-    public interface IAudioChannelModel : IChannel
-    {
-        string? RTCRegion { get; }
-    }
+    string? RTCRegion { get; }
 }

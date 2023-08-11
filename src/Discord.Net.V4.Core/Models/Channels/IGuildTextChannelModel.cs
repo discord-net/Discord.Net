@@ -1,10 +1,9 @@
-namespace Discord.Models
+namespace Discord.Models;
+
+public interface IGuildTextChannelModel : IGuildChannelModel
 {
-    public interface IGuildTextChannelModel : IGuildChannelModel
-    {
-        bool IsNsfw { get; }
-        string? Topic { get; }
-        int Slowmode { get; }
-        ThreadArchiveDuration DefaultArchiveDuration { get; }
-    }
+    bool IsNsfw { get; }
+    string? Topic { get; }
+    int Slowmode { get; }
+    ThreadArchiveDuration DefaultArchiveDuration { get; }
 }

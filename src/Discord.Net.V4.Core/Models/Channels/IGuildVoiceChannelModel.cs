@@ -1,8 +1,7 @@
-namespace Discord.Models
+namespace Discord.Models;
+
+public interface IGuildVoiceChannelModel : IGuildTextChannelModel, IAudioChannelModel
 {
-    public interface IGuildVoiceChannelModel : IGuildTextChannelModel, IAudioChannelModel
-    {
-        int Bitrate { get; }
-        int? UserLimit { get; }
-    }
+    int Bitrate { get; }
+    int? UserLimit { get; }
 }

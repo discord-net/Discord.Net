@@ -1,9 +1,8 @@
-namespace Discord.Models
+namespace Discord.Models;
+
+public interface IGuildChannelModel : IChannelModel
 {
-    public interface IGuildChannelModel : IChannelModel
-    {
-        ulong? Parent { get; }
-        int Position { get; }
-        IOverwriteModel[] Permissions { get; }
-    }
+    ulong? Parent { get; }
+    int Position { get; }
+    IOverwriteModel[] Permissions { get; }
 }
