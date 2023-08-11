@@ -3,13 +3,8 @@ namespace Discord
     /// <summary>
     ///     Represents a partial sticker item received with a message.
     /// </summary>
-    public interface IStickerItem
+    public interface IStickerItem : IEntity<ulong>
     {
-        /// <summary>
-        ///     The id of the sticker.
-        /// </summary>
-        ulong Id { get; }
-
         /// <summary>
         ///     The name of the sticker.
         /// </summary>

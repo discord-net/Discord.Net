@@ -1,8 +1,13 @@
 using UserBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketUser, Discord.WebSocket.Cache.IUserModel>;
 using MemberBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildUser, Discord.WebSocket.Cache.IMemberModel, Discord.WebSocket.Cache.IUserModel>;
 using PresenseBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketPresense, Discord.WebSocket.Cache.IPresenseModel>;
-using GuildBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuild, Discord.WebSocket.Cache.IGuildModel, Discord.WebSocket.SocketGuild.FactoryArgs>;
+using GuildBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuild, Discord.WebSocket.Cache.IGuildModel>;
 using ChannelBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketChannel, Discord.WebSocket.Cache.IChannelModel>;
+using GuildChannelBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildChannel, Discord.WebSocket.Cache.IGuildChannelModel>;
+using CustomStickerBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketCustomSticker, Discord.WebSocket.Cache.IStickerModel>;
+using GuildRoleBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketRole, Discord.WebSocket.Cache.IRoleModel>;
+using GuildEmoteBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildEmote, Discord.WebSocket.Cache.IGuildEmoteModel>;
+
 using Discord.WebSocket.Cache;
 
 namespace Discord.WebSocket.State;
@@ -65,14 +70,70 @@ internal partial class StateController
                 ConstructGuildAsync
            );
     private GuildBroker? _guilds;
-    private ValueTask<SocketGuild> ConstructGuildAsync(SocketGuild.FactoryArgs? args, Optional<ulong> parent, IGuildModel model)
+    private ValueTask<SocketGuild> ConstructGuildAsync(object? args, Optional<ulong> parent, IGuildModel model)
     {
-        // TODO: load dependants based on configuration
-        args ??= new SocketGuild.FactoryArgs();
-
-
-        return ValueTask.FromResult(new SocketGuild(_client, model.Id, model, args));
+        return ValueTask.FromResult(new SocketGuild(_client, model.Id, model));
     }
+
+    public GuildChannelBroker GuildChannels
+        => _guildChannels ??= new GuildChannelBroker(
+                this,
+                p => GetSubStoreAsync(p.Value, StoreType.GuildChannel),
+                ConstructGuildChannelAsync
+            );
+    private GuildChannelBroker? _guildChannels;
+    private ValueTask<SocketGuildChannel> ConstructGuildChannelAsync(object? args, Optional<ulong> guildId, IGuildChannelModel model)
+    {
+        // TODO: switch model.Type;
+    }
+
+    public CustomStickerBroker GuildStickers
+        => _guildStickers ??= new CustomStickerBroker(
+                this,
+                p => GetSubStoreAsync(p.Value, StoreType.GuildStickers),
+                ConstructGuildStickerAsync
+            );
+    private CustomStickerBroker? _guildStickers;
+    private ValueTask<SocketCustomSticker> ConstructGuildStickerAsync(object? args, Optional<ulong> guildId, IStickerModel model)
+    {
+        if (!guildId.IsSpecified)
+            throw new InvalidOperationException($"{nameof(guildId)} is required for guild stickers");
+
+        return ValueTask.FromResult(new SocketCustomSticker(_client, model, guildId.Value));
+    }
+
+
+    public GuildRoleBroker GuildRoles
+        => _guildRoles ??= new GuildRoleBroker(
+                this,
+                p => GetSubStoreAsync(p.Value, StoreType.Roles),
+                ConstructGuildRoleAsync
+            );
+    private GuildRoleBroker? _guildRoles;
+    private ValueTask<SocketRole> ConstructGuildRoleAsync(object? args, Optional<ulong> guildId, IRoleModel model)
+    {
+        if (!guildId.IsSpecified)
+            throw new InvalidOperationException($"{nameof(guildId)} is required for guild roles");
+
+        return ValueTask.FromResult(new SocketRole(_client, model.Id, guildId.Value, model));
+    }
+
+
+    public GuildEmoteBroker GuildEmotes
+        => _guildEmotes ??= new GuildEmoteBroker(
+                this,
+                p => GetSubStoreAsync(p.Value, StoreType.Emotes),
+                ConstructGuildEmoteAsync
+            );
+    private GuildEmoteBroker? _guildEmotes;
+    private ValueTask<SocketGuildEmote> ConstructGuildEmoteAsync(object? args, Optional<ulong> guildId, IGuildEmoteModel model)
+    {
+        if (!guildId.IsSpecified)
+            throw new InvalidOperationException($"{nameof(guildId)} is required for guild emotes");
+
+        return ValueTask.FromResult(new SocketGuildEmote(_client, guildId.Value, model));
+    }
+
     #endregion
 
     #region Channels

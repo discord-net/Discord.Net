@@ -14,4 +14,10 @@
     <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Entities\Stickers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Entities\Stickers\" />
+  </ItemGroup>
 </Project>

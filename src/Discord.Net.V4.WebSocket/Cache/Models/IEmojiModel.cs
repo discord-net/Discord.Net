@@ -6,16 +6,8 @@ using System.Threading.Tasks;
 
 namespace Discord.WebSocket.Cache
 {
-    public interface IEmojiModel
+    public interface IEmojiModel : IEntityModel<string>
     {
-        ulong? Id { get; }
-        string Name { get; }
-        ulong[] Roles { get; }
-        bool RequireColons { get; }
-        bool IsManaged { get; }
-        bool IsAnimated { get; }
-        bool IsAvailable { get; }
 
-        ulong? CreatorId { get; }
     }
 }

@@ -20,8 +20,6 @@ namespace Discord.WebSocket.Cache
         VerificationLevel VerificationLevel { get; }
         DefaultMessageNotifications DefaultMessageNotification { get; }
         ExplicitContentFilterLevel ExplicitContentFilter { get; }
-        IRoleModel[] Roles { get; }
-        IEmojiModel[] Emojis { get; }
         GuildFeature Features { get; }
         string[] ExperimentalFeatures { get; }
         MfaLevel MFALevel { get; }
@@ -43,7 +41,6 @@ namespace Discord.WebSocket.Cache
         int ApproximateMemberCount { get; }
         IWelcomeScreenModel? WelcomeScreen { get; }
         NsfwLevel NsfwLevel { get; }
-        IStickerModel[] Stickers { get; }
         bool? PremiumProgressBarEnabled { get; }
         ulong? SafetyAlertsChannel { get; }
     }

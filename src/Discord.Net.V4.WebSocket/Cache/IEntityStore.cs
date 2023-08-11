@@ -28,6 +28,8 @@ namespace Discord.WebSocket.Cache
 
         IAsyncEnumerable<IEntityModel<TId>> GetAllAsync();
 
+        IAsyncEnumerable<TId> GetAllIdsAsync();
+
         ValueTask AddOrUpdateAsync(IEntityModel<TId> model);
 
         ValueTask AddOrUpdateBatchAsync(IEnumerable<IEntityModel<TId>> model);

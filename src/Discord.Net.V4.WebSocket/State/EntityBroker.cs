@@ -152,6 +152,13 @@ namespace Discord.WebSocket.State
                 .SelectAwait(entity => CreateAndAllocateHandle(store, parent, args, entity));
         }
 
+        public async ValueTask<IAsyncEnumerable<TId>> GetAllIdsAsync(Optional<TId> parent)
+        {
+            var store = await _getStore(parent);
+
+            return store.GetAllIdsAsync();
+        }
+
         private TModel VerifyCorrectModel(IEntityModel<TId> raw)
         {
             if (raw is not TModel entityModel)
@@ -214,6 +221,7 @@ namespace Discord.WebSocket.State
         bool TryGetReferenced(TId id, [NotNullWhen(true)] out TEntity? entity);
         ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(Optional<TId> parent, TId id);
         ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TId id);
+        ValueTask<IAsyncEnumerable<TId>> GetAllIdsAsync(Optional<TId> parent);
     }
 
     internal interface IEntityBroker

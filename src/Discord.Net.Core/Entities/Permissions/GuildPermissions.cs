@@ -16,94 +16,94 @@ namespace Discord
         public static readonly GuildPermissions All = new GuildPermissions(ulong.MaxValue);
 
         /// <summary> Gets a packed value representing all the permissions in this <see cref="GuildPermissions"/>. </summary>
-        public ulong RawValue { get; }
+        public readonly ulong RawValue;
 
         /// <summary> If <c>true</c>, a user may create invites. </summary>
-        public bool CreateInstantInvite => Permissions.GetValue(RawValue, GuildPermission.CreateInstantInvite);
+        public readonly bool CreateInstantInvite => Permissions.GetValue(RawValue, GuildPermission.CreateInstantInvite);
         /// <summary> If <c>true</c>, a user may ban users from the guild. </summary>
-        public bool BanMembers => Permissions.GetValue(RawValue, GuildPermission.BanMembers);
+        public readonly bool BanMembers => Permissions.GetValue(RawValue, GuildPermission.BanMembers);
         /// <summary> If <c>true</c>, a user may kick users from the guild. </summary>
-        public bool KickMembers => Permissions.GetValue(RawValue, GuildPermission.KickMembers);
+        public readonly bool KickMembers => Permissions.GetValue(RawValue, GuildPermission.KickMembers);
         /// <summary> If <c>true</c>, a user is granted all permissions, and cannot have them revoked via channel permissions. </summary>
-        public bool Administrator => Permissions.GetValue(RawValue, GuildPermission.Administrator);
+        public readonly bool Administrator => Permissions.GetValue(RawValue, GuildPermission.Administrator);
         /// <summary> If <c>true</c>, a user may create, delete and modify channels. </summary>
-        public bool ManageChannels => Permissions.GetValue(RawValue, GuildPermission.ManageChannels);
+        public readonly bool ManageChannels => Permissions.GetValue(RawValue, GuildPermission.ManageChannels);
         /// <summary> If <c>true</c>, a user may adjust guild properties. </summary>
-        public bool ManageGuild => Permissions.GetValue(RawValue, GuildPermission.ManageGuild);
+        public readonly bool ManageGuild => Permissions.GetValue(RawValue, GuildPermission.ManageGuild);
 
         /// <summary> If <c>true</c>, a user may add reactions. </summary>
-        public bool AddReactions => Permissions.GetValue(RawValue, GuildPermission.AddReactions);
+        public readonly bool AddReactions => Permissions.GetValue(RawValue, GuildPermission.AddReactions);
         /// <summary> If <c>true</c>, a user may view the audit log. </summary>
-        public bool ViewAuditLog => Permissions.GetValue(RawValue, GuildPermission.ViewAuditLog);
+        public readonly bool ViewAuditLog => Permissions.GetValue(RawValue, GuildPermission.ViewAuditLog);
         /// <summary> If <c>true</c>, a user may view the guild insights. </summary>
-        public bool ViewGuildInsights => Permissions.GetValue(RawValue, GuildPermission.ViewGuildInsights);
+        public readonly bool ViewGuildInsights => Permissions.GetValue(RawValue, GuildPermission.ViewGuildInsights);
 
         /// <summary> If True, a user may view channels. </summary>
-        public bool ViewChannel => Permissions.GetValue(RawValue, GuildPermission.ViewChannel);
+        public readonly bool ViewChannel => Permissions.GetValue(RawValue, GuildPermission.ViewChannel);
         /// <summary> If True, a user may send messages. </summary>
-        public bool SendMessages => Permissions.GetValue(RawValue, GuildPermission.SendMessages);
+        public readonly bool SendMessages => Permissions.GetValue(RawValue, GuildPermission.SendMessages);
         /// <summary> If <c>true</c>, a user may send text-to-speech messages. </summary>
-        public bool SendTTSMessages => Permissions.GetValue(RawValue, GuildPermission.SendTTSMessages);
+        public readonly bool SendTTSMessages => Permissions.GetValue(RawValue, GuildPermission.SendTTSMessages);
         /// <summary> If <c>true</c>, a user may delete messages. </summary>
-        public bool ManageMessages => Permissions.GetValue(RawValue, GuildPermission.ManageMessages);
+        public readonly bool ManageMessages => Permissions.GetValue(RawValue, GuildPermission.ManageMessages);
         /// <summary> If <c>true</c>, Discord will auto-embed links sent by this user. </summary>
-        public bool EmbedLinks => Permissions.GetValue(RawValue, GuildPermission.EmbedLinks);
+        public readonly bool EmbedLinks => Permissions.GetValue(RawValue, GuildPermission.EmbedLinks);
         /// <summary> If <c>true</c>, a user may send files. </summary>
-        public bool AttachFiles => Permissions.GetValue(RawValue, GuildPermission.AttachFiles);
+        public readonly bool AttachFiles => Permissions.GetValue(RawValue, GuildPermission.AttachFiles);
         /// <summary> If <c>true</c>, a user may read previous messages. </summary>
-        public bool ReadMessageHistory => Permissions.GetValue(RawValue, GuildPermission.ReadMessageHistory);
+        public readonly bool ReadMessageHistory => Permissions.GetValue(RawValue, GuildPermission.ReadMessageHistory);
         /// <summary> If <c>true</c>, a user may mention @everyone. </summary>
-        public bool MentionEveryone => Permissions.GetValue(RawValue, GuildPermission.MentionEveryone);
+        public readonly bool MentionEveryone => Permissions.GetValue(RawValue, GuildPermission.MentionEveryone);
         /// <summary> If <c>true</c>, a user may use custom emoji from other guilds. </summary>
-        public bool UseExternalEmojis => Permissions.GetValue(RawValue, GuildPermission.UseExternalEmojis);
+        public readonly bool UseExternalEmojis => Permissions.GetValue(RawValue, GuildPermission.UseExternalEmojis);
 
         /// <summary> If <c>true</c>, a user may connect to a voice channel. </summary>
-        public bool Connect => Permissions.GetValue(RawValue, GuildPermission.Connect);
+        public readonly bool Connect => Permissions.GetValue(RawValue, GuildPermission.Connect);
         /// <summary> If <c>true</c>, a user may speak in a voice channel. </summary>
-        public bool Speak => Permissions.GetValue(RawValue, GuildPermission.Speak);
+        public readonly bool Speak => Permissions.GetValue(RawValue, GuildPermission.Speak);
         /// <summary> If <c>true</c>, a user may mute users. </summary>
-        public bool MuteMembers => Permissions.GetValue(RawValue, GuildPermission.MuteMembers);
+        public readonly bool MuteMembers => Permissions.GetValue(RawValue, GuildPermission.MuteMembers);
         /// <summary> If <c>true</c>, a user may deafen users. </summary>
-        public bool DeafenMembers => Permissions.GetValue(RawValue, GuildPermission.DeafenMembers);
+        public readonly bool DeafenMembers => Permissions.GetValue(RawValue, GuildPermission.DeafenMembers);
         /// <summary> If <c>true</c>, a user may move other users between voice channels. </summary>
-        public bool MoveMembers => Permissions.GetValue(RawValue, GuildPermission.MoveMembers);
+        public readonly bool MoveMembers => Permissions.GetValue(RawValue, GuildPermission.MoveMembers);
         /// <summary> If <c>true</c>, a user may use voice-activity-detection rather than push-to-talk. </summary>
-        public bool UseVAD => Permissions.GetValue(RawValue, GuildPermission.UseVAD);
+        public readonly bool UseVAD => Permissions.GetValue(RawValue, GuildPermission.UseVAD);
         /// <summary> If True, a user may use priority speaker in a voice channel. </summary>
-        public bool PrioritySpeaker => Permissions.GetValue(RawValue, GuildPermission.PrioritySpeaker);
+        public readonly bool PrioritySpeaker => Permissions.GetValue(RawValue, GuildPermission.PrioritySpeaker);
         /// <summary> If True, a user may stream video in a voice channel. </summary>
-        public bool Stream => Permissions.GetValue(RawValue, GuildPermission.Stream);
+        public readonly bool Stream => Permissions.GetValue(RawValue, GuildPermission.Stream);
 
         /// <summary> If <c>true</c>, a user may change their own nickname. </summary>
-        public bool ChangeNickname => Permissions.GetValue(RawValue, GuildPermission.ChangeNickname);
+        public readonly bool ChangeNickname => Permissions.GetValue(RawValue, GuildPermission.ChangeNickname);
         /// <summary> If <c>true</c>, a user may change the nickname of other users. </summary>
-        public bool ManageNicknames => Permissions.GetValue(RawValue, GuildPermission.ManageNicknames);
+        public readonly bool ManageNicknames => Permissions.GetValue(RawValue, GuildPermission.ManageNicknames);
         /// <summary> If <c>true</c>, a user may adjust roles. </summary>
-        public bool ManageRoles => Permissions.GetValue(RawValue, GuildPermission.ManageRoles);
+        public readonly bool ManageRoles => Permissions.GetValue(RawValue, GuildPermission.ManageRoles);
         /// <summary> If <c>true</c>, a user may edit the webhooks for this guild. </summary>
-        public bool ManageWebhooks => Permissions.GetValue(RawValue, GuildPermission.ManageWebhooks);
+        public readonly bool ManageWebhooks => Permissions.GetValue(RawValue, GuildPermission.ManageWebhooks);
         /// <summary> If <c>true</c>, a user may edit the emojis and stickers for this guild. </summary>
-        public bool ManageEmojisAndStickers => Permissions.GetValue(RawValue, GuildPermission.ManageEmojisAndStickers);
+        public readonly bool ManageEmojisAndStickers => Permissions.GetValue(RawValue, GuildPermission.ManageEmojisAndStickers);
         /// <summary> If <c>true</c>, a user may use slash commands in this guild. </summary>
-        public bool UseApplicationCommands => Permissions.GetValue(RawValue, GuildPermission.UseApplicationCommands);
+        public readonly bool UseApplicationCommands => Permissions.GetValue(RawValue, GuildPermission.UseApplicationCommands);
         /// <summary> If <c>true</c>, a user may request to speak in stage channels. </summary>
-        public bool RequestToSpeak => Permissions.GetValue(RawValue, GuildPermission.RequestToSpeak);
+        public readonly bool RequestToSpeak => Permissions.GetValue(RawValue, GuildPermission.RequestToSpeak);
         /// <summary> If <c>true</c>, a user may create, edit, and delete events. </summary>
-        public bool ManageEvents => Permissions.GetValue(RawValue, GuildPermission.ManageEvents);
+        public readonly bool ManageEvents => Permissions.GetValue(RawValue, GuildPermission.ManageEvents);
         /// <summary> If <c>true</c>, a user may manage threads in this guild. </summary>
-        public bool ManageThreads => Permissions.GetValue(RawValue, GuildPermission.ManageThreads);
+        public readonly bool ManageThreads => Permissions.GetValue(RawValue, GuildPermission.ManageThreads);
         /// <summary> If <c>true</c>, a user may create public threads in this guild. </summary>
-        public bool CreatePublicThreads => Permissions.GetValue(RawValue, GuildPermission.CreatePublicThreads);
+        public readonly bool CreatePublicThreads => Permissions.GetValue(RawValue, GuildPermission.CreatePublicThreads);
         /// <summary> If <c>true</c>, a user may create private threads in this guild. </summary>
-        public bool CreatePrivateThreads => Permissions.GetValue(RawValue, GuildPermission.CreatePrivateThreads);
+        public readonly bool CreatePrivateThreads => Permissions.GetValue(RawValue, GuildPermission.CreatePrivateThreads);
         /// <summary> If <c>true</c>, a user may use external stickers in this guild. </summary>
-        public bool UseExternalStickers => Permissions.GetValue(RawValue, GuildPermission.UseExternalStickers);
+        public readonly bool UseExternalStickers => Permissions.GetValue(RawValue, GuildPermission.UseExternalStickers);
         /// <summary> If <c>true</c>, a user may send messages in threads in this guild. </summary>
-        public bool SendMessagesInThreads => Permissions.GetValue(RawValue, GuildPermission.SendMessagesInThreads);
+        public readonly bool SendMessagesInThreads => Permissions.GetValue(RawValue, GuildPermission.SendMessagesInThreads);
         /// <summary> If <c>true</c>, a user launch application activities in voice channels in this guild. </summary>
-        public bool StartEmbeddedActivities => Permissions.GetValue(RawValue, GuildPermission.StartEmbeddedActivities);
+        public readonly bool StartEmbeddedActivities => Permissions.GetValue(RawValue, GuildPermission.StartEmbeddedActivities);
         /// <summary> If <c>true</c>, a user can timeout other users in this guild.</summary>
-        public bool ModerateMembers => Permissions.GetValue(RawValue, GuildPermission.ModerateMembers);
+        public readonly bool ModerateMembers => Permissions.GetValue(RawValue, GuildPermission.ModerateMembers);
         /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value. </summary>
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
 
@@ -343,14 +343,14 @@ namespace Discord
         /// </summary>
         /// <param name="permission">The permission value to check for.</param>
         /// <returns><c>true</c> if the permission is enabled, <c>false</c> otherwise.</returns>
-        public bool Has(GuildPermission permission) => Permissions.GetValue(RawValue, permission);
+        public readonly bool Has(GuildPermission permission) => Permissions.GetValue(RawValue, permission);
 
         /// <summary>
         ///     Returns a <see cref="List{T}"/> containing all of the <see cref="GuildPermission"/>
         ///     flags that are enabled.
         /// </summary>
         /// <returns>A <see cref="List{T}"/> containing <see cref="GuildPermission"/> flags. Empty if none are enabled.</returns>
-        public List<GuildPermission> ToList()
+        public readonly List<GuildPermission> ToList()
         {
             var perms = new List<GuildPermission>();
 

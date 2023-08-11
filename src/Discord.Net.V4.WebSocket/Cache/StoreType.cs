@@ -44,6 +44,10 @@ namespace Discord.WebSocket.Cache
         ///     or as a root store if the channel is a DM/Group channel.
         /// </summary>
         Channel,
+        /// <summary>
+        ///     Much like the <see cref="Channel"/> store type, this store type represents any channel within a guild.
+        /// </summary>
+        GuildChannel,
         DMs,
         GuildText,
         GuildVoice,
@@ -57,6 +61,7 @@ namespace Discord.WebSocket.Cache
         GuildForum,
         #endregion
 
+
         Messages,
         Reactions,
         Presence,
@@ -64,6 +69,7 @@ namespace Discord.WebSocket.Cache
         Roles,
         Emotes,
         Stickers,
+        GuildStickers,
         AuditLogs
     }
 }

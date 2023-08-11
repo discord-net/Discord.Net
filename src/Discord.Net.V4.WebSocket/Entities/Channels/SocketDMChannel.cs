@@ -36,7 +36,7 @@ namespace Discord.WebSocket
 
         public IReadOnlyCollection<IUser> Recipients => throw new NotImplementedException(); // TODO: concat current user
 
-        public Task CloseAsync(RequestOptions options = null) => throw new NotImplementedException();
+        public Task CloseAsync(RequestOptions? options = null) => throw new NotImplementedException();
         internal override object Clone() => throw new NotImplementedException();
         internal override void DisposeClone() => throw new NotImplementedException();
 
