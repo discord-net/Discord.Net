@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.WebSocket.Cache;
 using System;
 using System.Collections.Generic;

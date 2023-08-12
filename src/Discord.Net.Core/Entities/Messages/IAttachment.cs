@@ -59,25 +59,25 @@ namespace Discord
         ///     Gets whether or not this attachment is ephemeral.
         /// </summary>
         /// <returns>
-        ///     <see langword="true"/> if the attachment is ephemeral; otherwise <see langword="false"/>.
+        ///     <see langword="true" /> if the attachment is ephemeral; otherwise <see langword="false" />.
         /// </returns>
         bool Ephemeral { get; }
         /// <summary>
-        ///     Gets the description of the attachment; or <see langword="null"/> if there is none set.
+        ///     Gets the description of the attachment; or <see langword="null" /> if there is none set.
         /// </summary>
         string Description { get; }
         /// <summary>
-        ///     Gets the media's <see href="https://en.wikipedia.org/wiki/Media_type">MIME type</see> if present; otherwise <see langword="null"/>.
+        ///     Gets the media's <see href="https://en.wikipedia.org/wiki/Media_type">MIME type</see> if present; otherwise <see langword="null" />.
         /// </summary>
         string ContentType { get; }
 
         /// <summary>
-        ///     Gets the duration of the audio file. <see langword="null"/> if the attachment is not a voice message.
+        ///     Gets the duration of the audio file. <see langword="null" /> if the attachment is not a voice message.
         /// </summary>
         double? Duration { get; }
 
         /// <summary>
-        ///     Gets the base64 encoded bytearray representing a sampled waveform. <see langword="null"/> if the attachment is not a voice message.
+        ///     Gets the base64 encoded bytearray representing a sampled waveform. <see langword="null" /> if the attachment is not a voice message.
         /// </summary>
         public string Waveform { get; }
 

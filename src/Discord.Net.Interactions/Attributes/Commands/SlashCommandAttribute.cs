@@ -22,7 +22,7 @@ namespace Discord.Interactions
         public string Description { get; }
 
         /// <summary>
-        ///     Gets <see langword="true"/> if <see cref="GroupAttribute"/>s will be ignored while creating this command and this method will be treated as a top level command.
+        ///     Gets <see langword="true" /> if <see cref="GroupAttribute"/>s will be ignored while creating this command and this method will be treated as a top level command.
         /// </summary>
         public bool IgnoreGroupNames { get; }
 
@@ -36,7 +36,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="name">Name of the command.</param>
         /// <param name="description">Description of the command.</param>
-        /// <param name="ignoreGroupNames"> If <see langword="true"/>, <see cref="GroupAttribute"/>s will be ignored while creating this command and this method will be treated as a top level command.</param>
+        /// <param name="ignoreGroupNames"> If <see langword="true" />, <see cref="GroupAttribute"/>s will be ignored while creating this command and this method will be treated as a top level command.</param>
         /// <param name="runMode">Set the run mode of the command.</param>
         public SlashCommandAttribute(string name, string description, bool ignoreGroupNames = false, RunMode runMode = RunMode.Default)
         {

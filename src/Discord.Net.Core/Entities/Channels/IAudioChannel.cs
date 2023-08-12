@@ -13,7 +13,7 @@ namespace Discord
         ///     Gets the RTC region for this audio channel.
         /// </summary>
         /// <remarks>
-        ///     This property can be <see langword="null"/>.
+        ///     This property can be <see langword="null" />.
         /// </remarks>
         string RTCRegion { get; }
 

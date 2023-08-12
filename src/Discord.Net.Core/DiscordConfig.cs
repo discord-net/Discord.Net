@@ -198,7 +198,7 @@ namespace Discord
         ///     + snowflake date to check if an interaction can be responded to.
         /// </summary>
         /// <remarks>
-        ///     If set to <see langword="false"/> then the CreatedAt property in an interaction
+        ///     If set to <see langword="false" /> then the CreatedAt property in an interaction
         ///     will be set to when it was received instead of the snowflakes date.
         ///     <br/>
         ///     <b>This will still require a stable clock on your system.</b>
@@ -211,7 +211,7 @@ namespace Discord
         /// <remarks>
         ///     By default, the returned value will be "?Discord?#1234", to work with bidirectional usernames.
         ///     <br/>
-        ///     If set to <see langword="false"/>, this value will be "Discord#1234".
+        ///     If set to <see langword="false" />, this value will be "Discord#1234".
         /// </remarks>
         public bool FormatUsersInBidirectionalUnicode { get; set; } = true;
 

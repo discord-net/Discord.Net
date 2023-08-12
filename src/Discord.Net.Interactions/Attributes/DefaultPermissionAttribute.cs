@@ -17,7 +17,7 @@ namespace Discord.Interactions
         /// <summary>
         ///     Set the default permission of a Slash Command.
         /// </summary>
-        /// <param name="isDefaultPermission"><see langword="true"/> if the users are allowed to use this command.</param>
+        /// <param name="isDefaultPermission"><see langword="true" /> if the users are allowed to use this command.</param>
         public DefaultPermissionAttribute(bool isDefaultPermission)
         {
             IsDefaultPermission = isDefaultPermission;

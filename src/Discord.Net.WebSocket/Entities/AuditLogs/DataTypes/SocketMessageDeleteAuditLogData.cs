@@ -53,7 +53,7 @@ public class SocketMessageDeleteAuditLogData : ISocketAuditLogData
     ///     Gets the user of the messages that were deleted.
     /// </summary>
     /// <remarks>
-    ///     Will be <see langword="null"/> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
+    ///     Will be <see langword="null" /> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
     /// </remarks>
     /// <returns>
     ///     A user object representing the user that created the deleted messages.

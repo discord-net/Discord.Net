@@ -14,7 +14,7 @@ namespace Discord
         ///     Gets the guild the interaction originated from.
         /// </summary>
         /// <remarks>
-        ///     Will be <see langword="null"/> if the interaction originated from a DM channel or the interaction was a Context Command interaction.
+        ///     Will be <see langword="null" /> if the interaction originated from a DM channel or the interaction was a Context Command interaction.
         /// </remarks>
         IGuild Guild { get; }
 

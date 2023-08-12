@@ -8,12 +8,12 @@ namespace Discord.Interactions.Builders
     public class ComponentCommandParameterBuilder : ParameterBuilder<ComponentCommandParameterInfo, ComponentCommandParameterBuilder>
     {
         /// <summary>
-        ///     Get the <see cref="ComponentTypeConverter"/> assigned to this parameter, if <see cref="IsRouteSegmentParameter"/> is <see langword="false"/>.
+        ///     Get the <see cref="ComponentTypeConverter"/> assigned to this parameter, if <see cref="IsRouteSegmentParameter"/> is <see langword="false" />.
         /// </summary>
         public ComponentTypeConverter TypeConverter { get; private set; }
 
         /// <summary>
-        ///     Get the <see cref="Discord.Interactions.TypeReader"/> assigned to this parameter, if <see cref="IsRouteSegmentParameter"/> is <see langword="true"/>.
+        ///     Get the <see cref="Discord.Interactions.TypeReader"/> assigned to this parameter, if <see cref="IsRouteSegmentParameter"/> is <see langword="true" />.
         /// </summary>
         public TypeReader TypeReader { get; private set; }
 

@@ -75,10 +75,10 @@ public class SocketInviteDeleteAuditLogData : ISocketAuditLogData
     ///     Gets the user that created this invite if available.
     /// </summary>
     /// <remarks>
-    ///     Will be <see langword="null"/> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
+    ///     Will be <see langword="null" /> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
     /// </remarks>
     /// <returns>
-    ///     A user that created this invite or <see langword="null"/>.
+    ///     A user that created this invite or <see langword="null" />.
     /// </returns>
     public Cacheable<SocketUser, RestUser, IUser, ulong>? Creator { get; }
 

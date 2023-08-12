@@ -27,7 +27,7 @@ namespace Discord.WebSocket
         public SocketStageInstance StageInstance => Guild.StageInstances.FirstOrDefault(x => x.ChannelId == Id);
 
         /// <summary>
-        ///     Returns <see langword="true"/> if the current user is a speaker within the stage, otherwise <see langword="false"/>.
+        ///     Returns <see langword="true" /> if the current user is a speaker within the stage, otherwise <see langword="false" />.
         /// </summary>
         public bool IsSpeaker
             => !Guild.CurrentUser.IsSuppressed;

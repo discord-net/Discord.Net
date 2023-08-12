@@ -86,7 +86,7 @@ namespace Discord
         ///     Gets the localized name of this command option.
         /// </summary>
         /// <remarks>
-        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false" /> when requesting the command.
         /// </remarks>
         string NameLocalized { get; }
 

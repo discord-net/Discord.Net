@@ -13,6 +13,11 @@ namespace Discord
         /// </summary>
         IStageInstance StageInstance { get; }
 
+        /// <remarks>
+        ///     If the stage isn't live then this property will be set to <see langword="null" />.
+        /// </remarks>
+        StagePrivacyLevel? PrivacyLevel { get; }
+
         /// <summary>
         ///     Starts the stage, creating a stage instance.
         /// </summary>

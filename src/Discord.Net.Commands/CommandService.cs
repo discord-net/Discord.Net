@@ -417,9 +417,9 @@ namespace Discord.Commands
         ///     You need to reload the modules for the changes to take effect.
         /// </remarks>
         /// <param name="type">The type to remove the readers from.</param>
-        /// <param name="isDefaultTypeReader"><see langword="true"/> if the default readers for <paramref name="type"/> should be removed; otherwise <see langword="false"/>.</param>
+        /// <param name="isDefaultTypeReader"><see langword="true" /> if the default readers for <paramref name="type"/> should be removed; otherwise <see langword="false" />.</param>
         /// <param name="readers">The removed collection of type readers.</param>
-        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true" /> if the remove operation was successful; otherwise <see langword="false" />.</returns>
         public bool TryRemoveTypeReader(Type type, bool isDefaultTypeReader, out IDictionary<Type, TypeReader> readers)
         {
             readers = new Dictionary<Type, TypeReader>();

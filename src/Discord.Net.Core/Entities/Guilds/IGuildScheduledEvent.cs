@@ -40,7 +40,7 @@ namespace Discord
         ///     Gets the description of the event.
         /// </summary>
         /// <remarks>
-        ///     This field is <see langword="null"/> when the event doesn't have a description.
+        ///     This field is <see langword="null" /> when the event doesn't have a description.
         /// </remarks>
         string Description { get; }
 

@@ -96,7 +96,7 @@ namespace Discord.WebSocket
         ///     Creates a thread within this <see cref="ITextChannel"/>.
         /// </summary>
         /// <remarks>
-        ///     When <paramref name="message"/> is <see langword="null"/> the thread type will be based off of the
+        ///     When <paramref name="message"/> is <see langword="null" /> the thread type will be based off of the
         ///     channel its created in. When called on a <see cref="ITextChannel"/>, it creates a <see cref="ThreadType.PublicThread"/>.
         ///     When called on a <see cref="INewsChannel"/>, it creates a <see cref="ThreadType.NewsThread"/>. The id of the created
         ///     thread will be the same as the id of the message, and as such a message can only have a

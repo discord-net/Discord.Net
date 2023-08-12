@@ -93,7 +93,7 @@ namespace Discord
         ///     Gets the thread that was started from this message.
         /// </summary>
         /// <returns>
-        ///    An <see cref="IThreadChannel"/> object if this message has thread attached; otherwise <see langword="null"/>.
+        ///    An <see cref="IThreadChannel"/> object if this message has thread attached; otherwise <see langword="null" />.
         /// </returns>
         IThreadChannel Thread { get; }
 
@@ -213,7 +213,7 @@ namespace Discord
         ///     Gets the interaction this message is a response to.
         /// </summary>
         /// <returns>
-        ///     A <see cref="IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null"/>.
+        ///     A <see cref="IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null" />.
         /// </returns>
         IMessageInteraction Interaction { get; }
 
@@ -221,7 +221,7 @@ namespace Discord
         ///     Gets the data of the role subscription purchase or renewal that prompted this <see cref="MessageType.RoleSubscriptionPurchase"/> message.
         /// </summary> 
         /// <returns>
-        ///     A <see cref="MessageRoleSubscriptionData"/> if the message is a role subscription purchase message; otherwise <see langword="null"/>.
+        ///     A <see cref="MessageRoleSubscriptionData"/> if the message is a role subscription purchase message; otherwise <see langword="null" />.
         /// </returns>
         MessageRoleSubscriptionData RoleSubscriptionData { get; }
 

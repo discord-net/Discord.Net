@@ -29,7 +29,7 @@ namespace Discord
         /// <summary>
         ///     Defers an interaction with the response type 5 (<see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>).
         /// </summary>
-        /// <param name="ephemeral"><see langword="true"/> to defer ephemerally, otherwise <see langword="false"/>.</param>
+        /// <param name="ephemeral"><see langword="true" /> to defer ephemerally, otherwise <see langword="false" />.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>A task that represents the asynchronous operation of acknowledging the interaction.</returns>
         Task DeferLoadingAsync(bool ephemeral = false, RequestOptions options = null);

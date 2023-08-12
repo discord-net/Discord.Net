@@ -392,9 +392,9 @@ namespace Discord.API
         /// <paramref name="args.Position"/> must be greater than zero.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="args"/> must not be <see langword="null"/>.
+        /// <paramref name="args"/> must not be <see langword="null" />.
         /// -and-
-        /// <paramref name="args.Name"/> must not be <see langword="null"/> or empty.
+        /// <paramref name="args.Name"/> must not be <see langword="null" /> or empty.
         /// </exception>
         public async Task<Channel> ModifyGuildChannelAsync(ulong channelId, Rest.ModifyGuildChannelParams args, RequestOptions options = null)
         {
@@ -1691,7 +1691,7 @@ namespace Discord.API
         /// -and-
         /// <paramref name="args.DeleteMessageDays"/> must be between 0 to 7.
         /// </exception>
-        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null" />.</exception>
         public async Task CreateGuildBanAsync(ulong guildId, ulong userId, CreateGuildBanParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -1733,7 +1733,7 @@ namespace Discord.API
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
         /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null" />.</exception>
         public async Task<GuildWidget> ModifyGuildWidgetAsync(ulong guildId, Rest.ModifyGuildWidgetParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
@@ -1768,7 +1768,7 @@ namespace Discord.API
 
         #region Guild Invites
         /// <exception cref="ArgumentException"><paramref name="inviteId"/> cannot be blank.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="inviteId"/> must not be <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="inviteId"/> must not be <see langword="null" />.</exception>
         public async Task<InviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null, ulong? scheduledEventId = null)
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
@@ -1826,7 +1826,7 @@ namespace Discord.API
         /// -and-
         /// <paramref name="args.MaxAge"/> must be lesser than 86400.
         /// </exception>
-        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null" />.</exception>
         public async Task<InviteMetadata> CreateChannelInviteAsync(ulong channelId, CreateChannelInviteParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));

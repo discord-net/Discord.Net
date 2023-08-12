@@ -23,7 +23,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <remarks>
         ///     Discord currently doesn't have a way to disable Text-In-Voice yet so this field is always
-        ///     <see langword="true"/> on <see cref="SocketVoiceChannel"/>s and <see langword="true"/> on
+        ///     <see langword="true" /> on <see cref="SocketVoiceChannel"/>s and <see langword="true" /> on
         ///     <see cref="SocketStageChannel"/>s.
         /// </remarks>
         [Obsolete("This property is no longer used because Discord enabled text-in-voice for all channels.")]

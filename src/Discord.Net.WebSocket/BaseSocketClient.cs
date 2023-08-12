@@ -291,7 +291,7 @@ namespace Discord.WebSocket
         /// <param name="id">The id of the sticker to get.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A <see cref="SocketSticker"/> if found, otherwise <see langword="null"/>.
+        ///     A <see cref="SocketSticker"/> if found, otherwise <see langword="null" />.
         /// </returns>
         public abstract Task<SocketSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         #endregion

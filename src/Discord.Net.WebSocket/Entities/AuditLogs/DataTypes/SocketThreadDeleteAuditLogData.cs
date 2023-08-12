@@ -97,7 +97,7 @@ public class SocketThreadDeleteAuditLogData : ISocketAuditLogData
     ///     Gets the applied tags of this thread.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if this is not mentioned in this entry.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </remarks>
     public IReadOnlyCollection<ulong> AppliedTags { get; }
 
@@ -105,7 +105,7 @@ public class SocketThreadDeleteAuditLogData : ISocketAuditLogData
     ///     Gets the flags of the thread channel.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if this is not mentioned in this entry.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </remarks>
     public ChannelFlags? Flags { get; }
 }

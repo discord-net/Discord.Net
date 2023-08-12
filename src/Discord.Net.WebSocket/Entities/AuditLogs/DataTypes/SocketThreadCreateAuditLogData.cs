@@ -95,7 +95,7 @@ public class SocketThreadCreateAuditLogData : ISocketAuditLogData
     ///     Gets the applied tags of this thread.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if the property was not updated.
+    ///     <see langword="null" /> if the property was not updated.
     /// </remarks>
     public IReadOnlyCollection<ulong> AppliedTags { get; }
 
@@ -103,7 +103,7 @@ public class SocketThreadCreateAuditLogData : ISocketAuditLogData
     ///     Gets the flags of the thread channel.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if the property was not updated.
+    ///     <see langword="null" /> if the property was not updated.
     /// </remarks>
     public ChannelFlags? Flags { get; }
 }

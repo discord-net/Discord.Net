@@ -164,8 +164,8 @@ namespace Discord
         ///     Tries to parse a string into an <see cref="EmbedBuilder"/>.
         /// </summary>
         /// <param name="json">The json string to parse.</param>
-        /// <param name="builder">The <see cref="EmbedBuilder"/> with populated values. An empty instance if method returns <see langword="false"/>.</param>
-        /// <returns><see langword="true"/> if <paramref name="json"/> was successfully parsed. <see langword="false"/> if not.</returns>
+        /// <param name="builder">The <see cref="EmbedBuilder"/> with populated values. An empty instance if method returns <see langword="false" />.</param>
+        /// <returns><see langword="true" /> if <paramref name="json"/> was successfully parsed. <see langword="false" /> if not.</returns>
         public static bool TryParse(string json, out EmbedBuilder builder)
         {
             builder = new EmbedBuilder();

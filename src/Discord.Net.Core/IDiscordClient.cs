@@ -148,7 +148,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the application command if found, otherwise
-        ///     <see langword="null"/>.
+        ///     <see langword="null" />.
         /// </returns>
         Task<IApplicationCommand> GetGlobalApplicationCommandAsync(ulong id, RequestOptions options = null);
 

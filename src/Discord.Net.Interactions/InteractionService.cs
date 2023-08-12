@@ -378,7 +378,7 @@ namespace Discord.Interactions
         ///     Register Application Commands from <see cref="ContextCommands"/> and <see cref="SlashCommands"/> to a guild.
         /// </summary>
         /// <param name="guildId">Id of the target guild.</param>
-        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="deleteMissing">If <see langword="false" />, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
         /// </returns>
@@ -403,7 +403,7 @@ namespace Discord.Interactions
         /// <summary>
         ///     Register Application Commands from <see cref="ContextCommands"/> and <see cref="SlashCommands"/> to Discord on in global scope.
         /// </summary>
-        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="deleteMissing">If <see langword="false" />, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <returns>
         ///    A task representing the command registration process. The task result contains the active global application commands of bot.
         /// </returns>
@@ -432,7 +432,7 @@ namespace Discord.Interactions
         ///     use <see cref="AddModulesToGuildAsync(IGuild, bool, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
         /// </remarks>
         /// <param name="guild">The target guild.</param>
-        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="deleteMissing">If <see langword="false" />, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="commands">Commands to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
@@ -453,7 +453,7 @@ namespace Discord.Interactions
         ///     use <see cref="AddModulesToGuildAsync(ulong, bool, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
         /// </remarks>
         /// <param name="guildId">The target guild ID.</param>
-        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="deleteMissing">If <see langword="false" />, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="commands">Commands to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
@@ -493,7 +493,7 @@ namespace Discord.Interactions
         ///     Register Application Commands from modules provided in <paramref name="modules"/> to a guild.
         /// </summary>
         /// <param name="guild">The target guild.</param>
-        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="deleteMissing">If <see langword="false" />, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="modules">Modules to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
@@ -510,7 +510,7 @@ namespace Discord.Interactions
         ///     Register Application Commands from modules provided in <paramref name="modules"/> to a guild.
         /// </summary>
         /// <param name="guildId">The target guild ID.</param>
-        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="deleteMissing">If <see langword="false" />, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="modules">Modules to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
@@ -534,7 +534,7 @@ namespace Discord.Interactions
         /// <summary>
         ///     Register Application Commands from modules provided in <paramref name="modules"/> as global commands.
         /// </summary>
-        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="deleteMissing">If <see langword="false" />, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="modules">Modules to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
@@ -562,7 +562,7 @@ namespace Discord.Interactions
         ///     Commands will be registered as standalone commands, if you want the <see cref="GroupAttribute"/> to take effect,
         ///     use <see cref="AddModulesToGuildAsync(IGuild, bool, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
         /// </remarks>
-        /// <param name="deleteMissing">If <see langword="false"/>, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
+        /// <param name="deleteMissing">If <see langword="false" />, this operation will not delete the commands that are missing from <see cref="InteractionService"/>.</param>
         /// <param name="commands">Commands to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
@@ -1037,7 +1037,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <typeparam name="T">The type to remove the readers from.</typeparam>
         /// <param name="reader">The reader if the resulting remove operation was successful.</param>
-        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true" /> if the remove operation was successful; otherwise <see langword="false" />.</returns>
         public bool TryRemoveTypeReader<T>(out TypeReader reader)
             => TryRemoveTypeReader(typeof(T), out reader);
 
@@ -1050,7 +1050,7 @@ namespace Discord.Interactions
         /// </remarks>
         /// <param name="type">The type to remove the reader from.</param>
         /// <param name="reader">The reader if the resulting remove operation was successful.</param>
-        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true" /> if the remove operation was successful; otherwise <see langword="false" />.</returns>
         public bool TryRemoveTypeReader(Type type, out TypeReader reader)
             => _typeReaderMap.TryRemoveConcrete(type, out reader);
 
@@ -1063,7 +1063,7 @@ namespace Discord.Interactions
         /// </remarks>
         /// <typeparam name="T">The type to remove the readers from.</typeparam>
         /// <param name="readerType">The removed readers type.</param>
-        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true" /> if the remove operation was successful; otherwise <see langword="false" />.</returns>
         public bool TryRemoveGenericTypeReader<T>(out Type readerType)
             => TryRemoveGenericTypeReader(typeof(T), out readerType);
 
@@ -1076,7 +1076,7 @@ namespace Discord.Interactions
         /// </remarks>
         /// <param name="type">The type to remove the reader from.</param>
         /// <param name="readerType">The readers type if the remove operation was successful.</param>
-        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true" /> if the remove operation was successful; otherwise <see langword="false" />.</returns>
         public bool TryRemoveGenericTypeReader(Type type, out Type readerType)
             => _typeReaderMap.TryRemoveGeneric(type, out readerType);
 

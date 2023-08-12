@@ -13,7 +13,7 @@ namespace Discord
         public DateTimeOffset Time { get; }
 
         /// <summary>
-        ///     Gets the style of this tag. <see langword="null"/> if none was provided.
+        ///     Gets the style of this tag. <see langword="null" /> if none was provided.
         /// </summary>
         public TimestampTagStyles? Style { get; }
 

@@ -43,7 +43,7 @@ namespace Discord.Rest
         ///     Gets or sets the callback to use when the service has outgoing json for the rest webhook.
         /// </summary>
         /// <remarks>
-        ///     If this property is <see langword="null"/> the default callback will be used.
+        ///     If this property is <see langword="null" /> the default callback will be used.
         /// </remarks>
         public Func<string, Task> InteractionResponseCallback { get; set; }
 

@@ -7,9 +7,9 @@ namespace Discord
     internal static class Preconditions
     {
         #region Objects
-        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
         public static void NotNull<T>(T obj, string name, string msg = null) where T : class { if (obj == null) throw CreateNotNullException(name, msg); }
-        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
         public static void NotNull<T>(Optional<T> obj, string name, string msg = null) where T : class { if (obj.IsSpecified && obj.Value == null) throw CreateNotNullException(name, msg); }
 
         private static ArgumentNullException CreateNotNullException(string name, string msg)
@@ -27,7 +27,7 @@ namespace Discord
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
         public static void NotEmpty(Optional<string> obj, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length == 0) throw CreateNotEmptyException(name, msg); }
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
         public static void NotNullOrEmpty(string obj, string name, string msg = null)
         {
             if (obj == null)
@@ -36,7 +36,7 @@ namespace Discord
                 throw CreateNotEmptyException(name, msg);
         }
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
         public static void NotNullOrEmpty(Optional<string> obj, string name, string msg = null)
         {
             if (obj.IsSpecified)
@@ -48,7 +48,7 @@ namespace Discord
             }
         }
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
         public static void NotNullOrWhitespace(string obj, string name, string msg = null)
         {
             if (obj == null)
@@ -57,7 +57,7 @@ namespace Discord
                 throw CreateNotEmptyException(name, msg);
         }
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
         public static void NotNullOrWhitespace(Optional<string> obj, string name, string msg = null)
         {
             if (obj.IsSpecified)

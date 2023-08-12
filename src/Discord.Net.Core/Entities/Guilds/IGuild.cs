@@ -367,7 +367,7 @@ namespace Discord
         ///     Gets whether the guild has the boost progress bar enabled.
         /// </summary>
         /// <returns>
-        ///     <see langword="true"/> if the boost progress bar is enabled; otherwise <see langword="false"/>.
+        ///     <see langword="true" /> if the boost progress bar is enabled; otherwise <see langword="false" />.
         /// </returns>
         bool IsBoostProgressBarEnabled { get; }
 
@@ -1244,7 +1244,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A ValueTask that represents the asynchronous get operation. The task result contains a <see cref="IApplicationCommand"/>
-        ///     if found, otherwise <see langword="null"/>.
+        ///     if found, otherwise <see langword="null" />.
         /// </returns>
         Task<IApplicationCommand> GetApplicationCommandAsync(ulong id, CacheMode mode = CacheMode.AllowDownload,
             RequestOptions options = null);
@@ -1271,7 +1271,7 @@ namespace Discord
             RequestOptions options = null);
 
         /// <summary>
-        ///     Gets the welcome screen of the guild. Returns <see langword="null"/> if the welcome channel is not set.
+        ///     Gets the welcome screen of the guild. Returns <see langword="null" /> if the welcome channel is not set.
         /// </summary>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="WelcomeScreen"/>.
@@ -1279,7 +1279,7 @@ namespace Discord
         Task<WelcomeScreen> GetWelcomeScreenAsync(RequestOptions options = null);
 
         /// <summary>
-        ///     Modifies the welcome screen of the guild. Returns <see langword="null"/> if welcome screen is removed.
+        ///     Modifies the welcome screen of the guild. Returns <see langword="null" /> if welcome screen is removed.
         /// </summary>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="WelcomeScreen"/>.
@@ -1295,7 +1295,7 @@ namespace Discord
         Task<IAutoModRule[]> GetAutoModRulesAsync(RequestOptions options = null);
 
         /// <summary>
-        ///     Gets a single rule configured in a guild. Returns <see langword="null"/> if the rule was not found.
+        ///     Gets a single rule configured in a guild. Returns <see langword="null" /> if the rule was not found.
         /// </summary>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="IAutoModRule"/>.

@@ -49,7 +49,7 @@ namespace Discord.Interactions.Builders
         public IReadOnlyCollection<ChannelType> ChannelTypes => _channelTypes;
 
         /// <summary>
-        ///     Gets the constructor parameters of this parameter, if <see cref="IsComplexParameter"/> is <see langword="true"/>.
+        ///     Gets the constructor parameters of this parameter, if <see cref="IsComplexParameter"/> is <see langword="true" />.
         /// </summary>
         public IReadOnlyCollection<SlashCommandParameterBuilder> ComplexParameterFields => _complexParameterFields;
 
@@ -69,7 +69,7 @@ namespace Discord.Interactions.Builders
         public bool IsComplexParameter { get; internal set; }
 
         /// <summary>
-        ///     Gets the initializer delegate for this parameter, if <see cref="IsComplexParameter"/> is <see langword="true"/>.
+        ///     Gets the initializer delegate for this parameter, if <see cref="IsComplexParameter"/> is <see langword="true" />.
         /// </summary>
         public ComplexParameterInitializer ComplexParameterInitializer { get; internal set; }
 
