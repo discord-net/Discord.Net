@@ -2,8 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest;
 
-internal class ModifyCurrentUserNickParams
+internal class ModifyCurrentMemberParams
 {
     [JsonPropertyName("nick")]
-    public string Nickname { get; set; }
+    public Optional<string?> Nickname { get; set; }
 }

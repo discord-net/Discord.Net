@@ -11,7 +11,7 @@ internal class ModifyForumChannelParams : ModifyTextChannelParams
     public Optional<int> ThreadCreationInterval { get; set; }
 
     [JsonPropertyName("default_reaction_emoji")]
-    public Optional<ModifyForumReactionEmojiParams> DefaultReactionEmoji { get; set; }
+    public Optional<DefaultReaction?> DefaultReactionEmoji { get; set; }
 
     [JsonPropertyName("default_sort_order")]
     public Optional<ForumSortOrder> DefaultSortOrder { get; set; }

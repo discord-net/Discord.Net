@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest;
 
-internal class CreateAutoModRuleParams
+internal class CreateAutoModerationRuleParams
 {
     [JsonPropertyName("name")]
     public string Name { get; set; }
@@ -17,7 +17,7 @@ internal class CreateAutoModRuleParams
     public Optional<TriggerMetadata> TriggerMetadata { get; set; }
 
     [JsonPropertyName("actions")]
-    public AutoModAction[] Actions { get; set; }
+    public AutoModerationAction[] Actions { get; set; }
 
     [JsonPropertyName("enabled")]
     public Optional<bool> Enabled { get; set; }

@@ -1,10 +1,9 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
-namespace Discord.API.Rest
+namespace Discord.API.Rest;
+
+internal class ModifyGuildApplicationCommandPermissionsParams
 {
-    internal class ModifyGuildApplicationCommandPermissionsParams
-    {
-        [JsonPropertyName("permissions")]
-        public ApplicationCommandPermissions[] Permissions { get; set; }
-    }
+    [JsonPropertyName("permissions")]
+    public ApplicationCommandPermissions[] Permissions { get; set; }
 }

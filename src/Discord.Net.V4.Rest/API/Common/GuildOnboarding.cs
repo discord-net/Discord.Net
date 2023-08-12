@@ -15,4 +15,7 @@ internal class GuildOnboardings
 
     [JsonPropertyName("enabled")]
     public bool Enabled { get; set; }
+
+    [JsonPropertyName("mode")]
+    public GuildOnboardingMode Mode { get; set; }
 }

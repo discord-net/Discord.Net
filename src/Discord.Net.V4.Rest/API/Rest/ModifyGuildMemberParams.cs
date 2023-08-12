@@ -4,17 +4,17 @@ namespace Discord.API.Rest;
 
 internal class ModifyGuildMemberParams
 {
-    [JsonPropertyName("mute")]
-    public Optional<bool> Mute { get; set; }
-
-    [JsonPropertyName("deaf")]
-    public Optional<bool> Deaf { get; set; }
-
     [JsonPropertyName("nick")]
     public Optional<string> Nickname { get; set; }
 
     [JsonPropertyName("roles")]
     public Optional<ulong[]> RoleIds { get; set; }
+
+    [JsonPropertyName("mute")]
+    public Optional<bool> IsMuted { get; set; }
+
+    [JsonPropertyName("deaf")]
+    public Optional<bool> IsDeaf { get; set; }
 
     [JsonPropertyName("channel_id")]
     public Optional<ulong?> ChannelId { get; set; }

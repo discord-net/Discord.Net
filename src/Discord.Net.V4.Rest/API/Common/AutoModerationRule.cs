@@ -26,7 +26,7 @@ internal class AutoModerationRule
     public TriggerMetadata TriggerMetadata { get; set; }
 
     [JsonPropertyName("actions")]
-    public AutoModAction[] Actions { get; set; }
+    public AutoModerationAction[] Actions { get; set; }
 
     [JsonPropertyName("enabled")]
     public bool Enabled { get; set; }

@@ -1178,7 +1178,7 @@ namespace Discord.Rest
 
             #endregion
 
-            var props = new CreateAutoModRuleParams
+            var props = new CreateAutoModerationRuleParams
             {
                 EventType = args.EventType.GetValueOrDefault(AutoModEventType.MessageSend),
                 Enabled = args.Enabled.GetValueOrDefault(true),
@@ -1186,7 +1186,7 @@ namespace Discord.Rest
                 ExemptChannels = args.ExemptChannels.GetValueOrDefault(),
                 Name = args.Name.Value,
                 TriggerType = args.TriggerType.Value,
-                Actions = args.Actions.Value.Select(x => new AutoModAction
+                Actions = args.Actions.Value.Select(x => new AutoModerationAction
                 {
                     Metadata = new ActionMetadata
                     {
@@ -1220,9 +1220,9 @@ namespace Discord.Rest
             var args = new AutoModRuleProperties();
             func(args);
 
-            var apiArgs = new API.Rest.ModifyAutoModRuleParams
+            var apiArgs = new API.Rest.ModifyAutoModerationRuleParams
             {
-                Actions = args.Actions.IsSpecified ? args.Actions.Value.Select(x => new API.AutoModAction()
+                Actions = args.Actions.IsSpecified ? args.Actions.Value.Select(x => new API.AutoModerationAction()
                 {
                     Type = x.Type,
                     Metadata = x.ChannelId.HasValue || x.TimeoutDuration.HasValue ? new API.ActionMetadata
@@ -1231,7 +1231,7 @@ namespace Discord.Rest
                         DurationSeconds = x.TimeoutDuration.HasValue ? (int)Math.Floor(x.TimeoutDuration.Value.TotalSeconds) : Optional<int>.Unspecified,
                         CustomMessage = x.CustomMessage,
                     } : Optional<API.ActionMetadata>.Unspecified
-                }).ToArray() : Optional<API.AutoModAction[]>.Unspecified,
+                }).ToArray() : Optional<API.AutoModerationAction[]>.Unspecified,
                 Enabled = args.Enabled,
                 EventType = args.EventType,
                 ExemptChannels = args.ExemptChannels,

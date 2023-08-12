@@ -9,7 +9,7 @@ internal class CreatePostParams
     public string Title { get; set; }
 
     [JsonPropertyName("auto_archive_duration")]
-    public ThreadArchiveDuration ArchiveDuration { get; set; }
+    public Optional<ThreadArchiveDuration> AutoArchiveDuration { get; set; }
 
     [JsonPropertyName("rate_limit_per_user")]
     public Optional<int?> Slowmode { get; set; }

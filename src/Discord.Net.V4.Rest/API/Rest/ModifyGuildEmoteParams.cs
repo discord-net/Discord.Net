@@ -8,5 +8,5 @@ internal class ModifyGuildEmoteParams
     public Optional<string> Name { get; set; }
 
     [JsonPropertyName("roles")]
-    public Optional<ulong[]> RoleIds { get; set; }
+    public Optional<ulong[]?> RoleIds { get; set; }
 }

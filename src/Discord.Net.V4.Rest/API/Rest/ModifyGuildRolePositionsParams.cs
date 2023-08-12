@@ -2,11 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest;
 
-internal class ModifyGuildRolesParams : ModifyGuildRoleParams
+internal class ModifyGuildRolePositionsParams : ModifyGuildRoleParams
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
 
     [JsonPropertyName("position")]
-    public int Position { get; set; }
+    public Optional<int?> Position { get; set; }
 }

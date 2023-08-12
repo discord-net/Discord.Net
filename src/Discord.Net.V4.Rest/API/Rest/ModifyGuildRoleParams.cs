@@ -23,5 +23,5 @@ internal class ModifyGuildRoleParams
     public Optional<string> Emoji { get; set; }
 
     [JsonPropertyName("mentionable")]
-    public Optional<bool> Mentionable { get; set; }
+    public Optional<bool> IsMentionable { get; set; }
 }

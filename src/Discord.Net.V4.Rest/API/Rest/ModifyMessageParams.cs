@@ -8,14 +8,14 @@ internal class ModifyMessageParams
     public Optional<string> Content { get; set; }
 
     [JsonPropertyName("embeds")]
-    public Optional<API.Embed[]> Embeds { get; set; }
-
-    [JsonPropertyName("components")]
-    public Optional<API.ActionRowComponent[]> Components { get; set; }
+    public Optional<Embed[]> Embeds { get; set; }
 
     [JsonPropertyName("flags")]
-    public Optional<MessageFlags?> Flags { get; set; }
+    public Optional<MessageFlags> Flags { get; set; }
 
     [JsonPropertyName("allowed_mentions")]
     public Optional<AllowedMentions> AllowedMentions { get; set; }
+
+    [JsonPropertyName("components")]
+    public Optional<ActionRowComponent[]> Components { get; set; }
 }

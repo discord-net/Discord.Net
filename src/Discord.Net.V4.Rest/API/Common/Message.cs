@@ -23,22 +23,22 @@ internal class Message
     public DateTimeOffset? EditedTimestamp { get; set; }
 
     [JsonPropertyName("tts")]
-    public Optional<bool> IsTextToSpeech { get; set; }
+    public bool IsTextToSpeech { get; set; }
 
     [JsonPropertyName("mention_everyone")]
-    public Optional<bool> MentionEveryone { get; set; }
+    public bool MentionEveryone { get; set; }
 
     [JsonPropertyName("mentions")]
-    public Optional<User[]> UserMentions { get; set; }
+    public User[] UserMentions { get; set; }
 
     [JsonPropertyName("mention_roles")]
-    public Optional<ulong[]> RoleMentions { get; set; }
+    public ulong[] RoleMentions { get; set; }
 
     [JsonPropertyName("mention_channels")]
     public Optional<MessageMentionedChannel[]> ChannelMentions { get; set; }
 
     [JsonPropertyName("embeds")]
-    public Optional<Embed[]> Embeds { get; set; }
+    public Embed[] Embeds { get; set; }
 
     [JsonPropertyName("reactions")]
     public Optional<Reaction[]> Reactions { get; set; }
@@ -50,7 +50,7 @@ internal class Message
     public Optional<string> Nonce { get; set; }
 
     [JsonPropertyName("pinned")]
-    public Optional<bool> IsPinned { get; set; }
+    public bool IsPinned { get; set; }
 
     [JsonPropertyName("webhook_id")]
     public Optional<ulong> WebhookId { get; set; }

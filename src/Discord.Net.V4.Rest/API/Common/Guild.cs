@@ -32,7 +32,7 @@ internal class Guild
     public ulong? AFKChannelId { get; set; }
 
     [JsonPropertyName("afk_timeout")]
-    public int AFKTimeout { get; set; }
+    public AfkTimeout AFKTimeout { get; set; }
 
     [JsonPropertyName("widget_enabled")]
     public Optional<bool> WidgetEnabled { get; set; }

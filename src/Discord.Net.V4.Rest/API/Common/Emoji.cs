@@ -20,11 +20,11 @@ internal class Emoji
     public Optional<bool> RequireColons { get; set; }
 
     [JsonPropertyName("managed")]
-    public Optional<bool> Managed { get; set; }
+    public Optional<bool> IsManaged { get; set; }
 
     [JsonPropertyName("animated")]
-    public Optional<bool> Animated { get; set; }
+    public Optional<bool> IsAnimated { get; set; }
 
     [JsonPropertyName("available")]
-    public Optional<bool> Available { get; set; }
+    public Optional<bool> IsAvailable { get; set; }
 }

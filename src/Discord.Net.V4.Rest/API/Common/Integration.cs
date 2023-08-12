@@ -7,9 +7,6 @@ internal class Integration
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
 
-    [JsonPropertyName("guild_id")]
-    public Optional<ulong> GuildId { get; set; }
-
     [JsonPropertyName("name")]
     public string Name { get; set; }
 
@@ -17,10 +14,10 @@ internal class Integration
     public string Type { get; set; }
 
     [JsonPropertyName("enabled")]
-    public bool Enabled { get; set; }
+    public bool IsEnabled { get; set; }
 
     [JsonPropertyName("syncing")]
-    public Optional<bool> Syncing { get; set; }
+    public Optional<bool> IsSyncing { get; set; }
 
     [JsonPropertyName("role_id")]
     public Optional<ulong> RoleId { get; set; }

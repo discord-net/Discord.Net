@@ -14,7 +14,7 @@ internal class ModifyForumTagParams
     public Optional<ulong?> EmojiId { get; set; }
 
     [JsonPropertyName("emoji_name")]
-    public Optional<string> EmojiName { get; set; }
+    public Optional<string?> EmojiName { get; set; }
 
     [JsonPropertyName("moderated")]
     public bool Moderated { get; set; }

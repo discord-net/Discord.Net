@@ -39,4 +39,7 @@ internal class Attachment
 
     [JsonPropertyName("waveform")]
     public Optional<string> Waveform { get; set; }
+
+    [JsonPropertyName("flags")]
+    public Optional<AttachmentFlags> Flags { get; set; }
 }
