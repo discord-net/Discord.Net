@@ -20,6 +20,7 @@ namespace Discord.WebSocket
         public GuildRolesCacheable Roles { get; }
         public GuildRoleCacheable EveryoneRole { get; }
         public GuildEmotesCacheable Emotes { get; }
+        public GuildEventsCacheable Events { get; }
 
         public IAudioClient AudioClient => throw new NotImplementedException(); // TODO
 
@@ -170,11 +171,12 @@ namespace Discord.WebSocket
             _source = model;
             _features = new GuildFeatures(model.Features, model.ExperimentalFeatures);
 
-            Channels = new(id, discord.State.GuildChannels, channelId => new GuildChannelCacheable(id, channelId, discord, discord.State.GuildChannels.SourceSpecific(channelId, id)));
-            Stickers = new(id, discord.State.GuildStickers, stickerId => new GuildStickerCacheable(id, stickerId, discord, discord.State.GuildStickers.SourceSpecific(stickerId, id)));
-            Roles = new(id, discord.State.GuildRoles, roleId => new GuildRoleCacheable(id, roleId, discord, discord.State.GuildRoles.SourceSpecific(roleId, id)));
+            Channels = new(id, discord.State.GuildChannels, channelId => new GuildChannelCacheable(channelId, id, discord, discord.State.GuildChannels.SourceSpecific(channelId, id)));
+            Stickers = new(id, discord.State.GuildStickers, stickerId => new GuildStickerCacheable(stickerId, id, discord, discord.State.GuildStickers.SourceSpecific(stickerId, id)));
+            Roles = new(id, discord.State.GuildRoles, roleId => new GuildRoleCacheable(roleId, id, discord, discord.State.GuildRoles.SourceSpecific(roleId, id)));
             EveryoneRole = new(id, id, discord, discord.State.GuildRoles.SourceSpecific(id)); // everyone role is the same ID as the guild.
-            Emotes = new(id, discord.State.GuildEmotes, emoteId => new GuildEmoteCacheable(id, emoteId, discord, discord.State.GuildEmotes.SourceSpecific(emoteId, id)));
+            Emotes = new(id, discord.State.GuildEmotes, emoteId => new GuildEmoteCacheable(emoteId, id, discord, discord.State.GuildEmotes.SourceSpecific(emoteId, id)));
+            Events = new(id, discord.State.GuildEvents, eventId => new GuildEventCacheable(eventId, id, discord, discord.State.GuildEvents.SourceSpecific(eventId, id)));
         }
 
         internal override object Clone() => throw new NotImplementedException();

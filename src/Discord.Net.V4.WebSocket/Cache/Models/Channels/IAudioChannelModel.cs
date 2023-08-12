@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Discord.WebSocket.Cache
 {
-    public interface IAudioChannelModel : IChannel
+    public interface IAudioChannelModel : IChannelModel
     {
         string? RTCRegion { get; }
+        VideoQualityMode VideoQualityMode { get; }
     }
 }

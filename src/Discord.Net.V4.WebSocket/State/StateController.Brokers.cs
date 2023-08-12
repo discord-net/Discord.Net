@@ -7,7 +7,8 @@ using GuildChannelBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.W
 using CustomStickerBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketCustomSticker, Discord.WebSocket.Cache.IStickerModel>;
 using GuildRoleBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketRole, Discord.WebSocket.Cache.IRoleModel>;
 using GuildEmoteBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildEmote, Discord.WebSocket.Cache.IGuildEmoteModel>;
-
+using GuildEventBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildEvent, Discord.WebSocket.Cache.IGuildEventModel>;
+using GuildStageInstanceBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketStageInstance, Discord.WebSocket.Cache.IStageInstanceModel>;
 using Discord.WebSocket.Cache;
 
 namespace Discord.WebSocket.State;
@@ -133,6 +134,27 @@ internal partial class StateController
 
         return ValueTask.FromResult(new SocketGuildEmote(_client, guildId.Value, model));
     }
+
+    public GuildEventBroker GuildEvents
+        => _guildEvents ??= new GuildEventBroker(
+                this,
+                p => GetSubStoreAsync(p.Value, StoreType.Events),
+                ConstructGuildEventAsync
+            );
+    private GuildEventBroker? _guildEvents;
+    private ValueTask<SocketGuildEvent> ConstructGuildEventAsync(object? args, Optional<ulong> guildId, IGuildEventModel model)
+        => ValueTask.FromResult(new SocketGuildEvent(_client, model));
+
+    public GuildStageInstanceBroker StageInstances
+        => _stageInstances ??= new GuildStageInstanceBroker(
+                this,
+                p => GetSubStoreAsync(p.Value, StoreType.StageInstances),
+                ConstructStageInstanceEventAsync
+            );
+    private GuildStageInstanceBroker? _stageInstances;
+    private ValueTask<SocketStageInstance> ConstructStageInstanceEventAsync(object? args, Optional<ulong> guildId, IStageInstanceModel model)
+        => ValueTask.FromResult(new SocketStageInstance(_client, model));
+
 
     #endregion
 

@@ -68,6 +68,8 @@ namespace Discord.WebSocket.Cache
         Guilds,
         Roles,
         Emotes,
+        Events,
+        StageInstances,
         Stickers,
         GuildStickers,
         AuditLogs
