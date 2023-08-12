@@ -1,4 +1,3 @@
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Immutable;
 
@@ -9,7 +8,7 @@ namespace Discord.WebSocket
         public static async ValueTask<IReadOnlyCollection<TCommon>> GetOrFetchAllAsync
             <TId, TGateway, TRest, TCommon>
         (
-            this CacheableCollection<Cacheable<TId, TGateway, TRest, TCommon>, TId, TGateway, TRest, TCommon> cacheable,
+            this CacheableCollection<Cacheable<TId, TGateway, TRest, TCommon>, TId, TGateway> cacheable,
             CancellationToken token = default
         )
             where TGateway : SocketCacheableEntity<TId>, TCommon
@@ -23,7 +22,7 @@ namespace Discord.WebSocket
         public static async ValueTask<IReadOnlyCollection<TGateway?>> GetAllAsync
             <TId, TGateway, TRest, TCommon>
         (
-            this CacheableCollection<Cacheable<TId, TGateway, TRest, TCommon>, TId, TGateway, TRest, TCommon> cacheable,
+            this CacheableCollection<Cacheable<TId, TGateway, TRest, TCommon>, TId, TGateway> cacheable,
             CancellationToken token = default
         )
             where TGateway : SocketCacheableEntity<TId>, TCommon
@@ -37,7 +36,7 @@ namespace Discord.WebSocket
         public static async ValueTask<IReadOnlyCollection<TRest>> FetchAllAsync
             <TId, TGateway, TRest, TCommon>
         (
-            this CacheableCollection<Cacheable<TId, TGateway, TRest, TCommon>, TId, TGateway, TRest, TCommon> cacheable,
+            this CacheableCollection<Cacheable<TId, TGateway, TRest, TCommon>, TId, TGateway> cacheable,
             CancellationToken token = default
         )
             where TGateway : SocketCacheableEntity<TId>, TCommon

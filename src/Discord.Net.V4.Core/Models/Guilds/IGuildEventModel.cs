@@ -1,6 +1,5 @@
-using Newtonsoft.Json;
 using System;
-namespace Discord.WebSocket.Cache
+namespace Discord.Models
 {
     public interface IGuildEventModel : IEntityModel<ulong>
     {

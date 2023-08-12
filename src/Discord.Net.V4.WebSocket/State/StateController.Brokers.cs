@@ -1,14 +1,14 @@
-using UserBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketUser, Discord.WebSocket.Cache.IUserModel>;
-using MemberBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildUser, Discord.WebSocket.Cache.IMemberModel, Discord.WebSocket.Cache.IUserModel>;
-using PresenseBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketPresense, Discord.WebSocket.Cache.IPresenseModel>;
-using GuildBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuild, Discord.WebSocket.Cache.IGuildModel>;
-using ChannelBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketChannel, Discord.WebSocket.Cache.IChannelModel>;
-using GuildChannelBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildChannel, Discord.WebSocket.Cache.IGuildChannelModel>;
-using CustomStickerBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketCustomSticker, Discord.WebSocket.Cache.IStickerModel>;
-using GuildRoleBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketRole, Discord.WebSocket.Cache.IRoleModel>;
-using GuildEmoteBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildEmote, Discord.WebSocket.Cache.IGuildEmoteModel>;
-using GuildEventBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildEvent, Discord.WebSocket.Cache.IGuildEventModel>;
-using GuildStageInstanceBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketStageInstance, Discord.WebSocket.Cache.IStageInstanceModel>;
+using UserBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketUser, Discord.Models.IUserModel>;
+using MemberBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildUser, Discord.Models.IMemberModel, Discord.Models.IUserModel>;
+using PresenseBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketPresense, Discord.Models.IPresenseModel>;
+using GuildBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuild, Discord.Models.IGuildModel>;
+using ChannelBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketChannel, Discord.Models.IChannelModel>;
+using GuildChannelBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildChannel, Discord.Models.IGuildChannelModel>;
+using CustomStickerBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketCustomSticker, Discord.Models.IStickerModel>;
+using GuildRoleBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketRole, Discord.Models.IRoleModel>;
+using GuildEmoteBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildEmote, Discord.Models.IGuildEmoteModel>;
+using GuildEventBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildEvent, Discord.Models.IGuildEventModel>;
+using GuildStageInstanceBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketStageInstance, Discord.Models.IStageInstanceModel>;
 using Discord.WebSocket.Cache;
 
 namespace Discord.WebSocket.State;
@@ -27,7 +27,11 @@ internal partial class StateController
 
     #region Members
     public MemberBroker Members
-        => _memberBroker ??= new MemberBroker(this, p => GetSubStoreAsync(p.Value, StoreType.GuildUsers), ConstructGuildUserAsync);
+        => _memberBroker ??= new MemberBroker(
+                this,
+                p => GetSubStoreAsync(p.Value, StoreType.GuildUsers),
+                ConstructGuildUserAsync
+            );
     private MemberBroker? _memberBroker;
     private async ValueTask<SocketGuildUser> ConstructGuildUserAsync(IUserModel? userModel, Optional<ulong> guildId, IMemberModel model)
     {

@@ -1,4 +1,4 @@
-namespace Discord.WebSocket.Cache;
+namespace Discord.Models;
 
 public interface IGuildEmoteModel : IEntityModel<ulong>
 {

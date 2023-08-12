@@ -5,6 +5,8 @@ namespace Discord.WebSocket
 {
     public sealed class SocketStageChannel : SocketVoiceChannel, IStageChannel
     {
+        public IStageInstance StageInstance => throw new NotImplementedException();
+
         public SocketStageChannel(DiscordSocketClient discord, ulong guildId, IGuildVoiceChannelModel model)
             : base(discord, guildId, model)
         {
@@ -17,36 +19,18 @@ namespace Discord.WebSocket
             if (guild is null)
                 return null;
 
-            return (await guild.StageInstances.FirstOrDefaultAwaitAsync(async cacheable =>
-            {
-                var entity = await cacheable.GetAsync(token);
-
-                if (entity is null)
-                    return false;
-
-                return entity.EntityId == Id && entity.Type is GuildScheduledEventType.Stage;
-            })).GetAsync(token);
+            return (await guild.StageInstances.FlattenAsync(token)).FirstOrDefault(x => x?.ChannelId == Id);
         }
 
         public async ValueTask<IStageInstance?> GetOrFetchStageInstance(RequestOptions? options = null, CancellationToken token = default)
         {
-            var guild = await Guild.GetOrFetchAsync(options, token);
+            var cachedInstance = await GetStageInstance(token);
 
-            if (guild is null)
-                return null;
+            if (cachedInstance is not null)
+                return cachedInstance;
 
-            if(guild is SocketGuild sg)
-            {
-                return (await sg.StageInstances.FirstOrDefaultAwaitAsync(async cacheable =>
-                {
-                    var entity = await cacheable.GetOrFetchAsync(token);
-
-                    if (entity is null)
-                        return false;
-
-                    return entity.EntityId == Id && entity.Type is GuildScheduledEventType.Stage;
-                })).GetAsync(token);
-            }
+            // TODO: REST impl
+            return null;
         }
 
         public Task BecomeSpeakerAsync(RequestOptions? options = null) => throw new NotImplementedException();

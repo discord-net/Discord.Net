@@ -1,5 +1,4 @@
 using Discord.WebSocket.State;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Immutable;
@@ -15,7 +14,7 @@ namespace Discord.WebSocket
             => (await (await _idsFactory(_parent)).ToArrayAsync()).ToImmutableArray();
 
         internal delegate TCacheable CacheableFactory(TId id);
-        private delegate ValueTask<IAsyncEnumerable<TId>> IdsFactory(Optional<TId> parent);
+        private delegate ValueTask<IAsyncEnumerable<TId>> IdsFactory(Optional<TId> parent, CancellationToken token = default);
 
         private sealed class WrappingEnumerator<T> : IAsyncEnumerator<T>
         {
@@ -52,8 +51,9 @@ namespace Discord.WebSocket
 
             public Enumerator(
                 Optional<TId> parent, IdsFactory idsFactory,
-                CacheableFactory factory, CancellationToken token,
-                Func<CancellationToken, ValueTask>? cleanTask)
+                CacheableFactory factory,
+                Func<CancellationToken, ValueTask>? cleanTask,
+                CancellationToken token)
             {
                 _cleanTask = cleanTask;
                 _token = token;
@@ -96,42 +96,63 @@ namespace Discord.WebSocket
         private readonly IdsFactory _idsFactory;
         private readonly Func<CancellationToken, ValueTask>? _cleanupTask;
         private readonly Optional<TId> _parent;
+        private readonly IEntityBroker<TId, TGateway>? _broker;
 
         internal CacheableCollection(IEntityBroker<TId, TGateway> broker, CacheableFactory factory)
-            : this(Optional<TId>.Unspecified, broker.GetAllIdsAsync, factory) { }
+            : this(Optional<TId>.Unspecified, broker.GetAllIdsAsync, factory, broker: broker) { }
 
         internal CacheableCollection(Func<IEnumerable<TId>> idsSupplier, CacheableFactory factory)
             : this(
                   Optional<TId>.Unspecified,
-                  parent => ValueTask.FromResult(AsyncEnumerable.Create(token => new WrappingEnumerator<TId>(idsSupplier().GetEnumerator()))),
+                  (parent, _) => ValueTask.FromResult(AsyncEnumerable.Create(token => new WrappingEnumerator<TId>(idsSupplier().GetEnumerator()))),
                   factory
               )
         { }
 
         internal CacheableCollection(TId parent, IEntityBroker<TId, TGateway> broker, CacheableFactory factory)
-            : this(parent, broker.GetAllIdsAsync, factory) { }
+            : this(parent, broker.GetAllIdsAsync, factory, broker: broker) { }
 
         internal CacheableCollection(TId parent, Func<IEnumerable<TId>> idsSupplier, CacheableFactory factory)
             : this(
                   parent,
-                  parent => ValueTask.FromResult(AsyncEnumerable.Create(token => new WrappingEnumerator<TId>(idsSupplier().GetEnumerator()))),
+                  (parent, _) => ValueTask.FromResult(AsyncEnumerable.Create(token => new WrappingEnumerator<TId>(idsSupplier().GetEnumerator()))),
                   factory
               )
         { }
 
         private CacheableCollection(
             Optional<TId> parent, IdsFactory idsFactory,
-            CacheableFactory factory, Func<CancellationToken, ValueTask>? cleanTask = null)
+            CacheableFactory factory,
+            Func<CancellationToken, ValueTask>? cleanTask = null,
+            IEntityBroker<TId, TGateway>? broker = null)
         {
             _parent = parent;
             _factory = factory;
             _idsFactory = idsFactory;
             _cleanupTask = cleanTask;
+            _broker = broker;
+        }
+
+        public async ValueTask<IReadOnlyCollection<TGateway?>> FlattenAsync(CancellationToken token = default)
+        {
+            // if we can use the `GetAllAsync()` method
+            if(_broker is not null)
+            {
+                var enumerable = await _broker.GetAllAsync(_parent, token);
+
+                return (await enumerable.Select(x => x.Entity).ToArrayAsync(token)).ToImmutableArray();
+            }
+
+            // use path:
+            // - IEntityStore.GetAllIdsAsync()
+            // - iter ->
+            //   - IEntityStore.GetAsync(iter.Id)
+            return (await this.SelectAwait(x => x.GetAsync(token)).ToArrayAsync(token)).ToImmutableArray();
         }
 
         public IAsyncEnumerator<TCacheable> GetAsyncEnumerator(CancellationToken token = default)
         {
-            return new Enumerator(_parent, _idsFactory, _factory, token, _cleanupTask);
+            return new Enumerator(_parent, _idsFactory, _factory, _cleanupTask, token);
         }
     }
 }

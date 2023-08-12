@@ -13,9 +13,10 @@ global using GuildEventCacheable = Discord.WebSocket.Cacheable<ulong, Discord.We
 global using GuildStageInstanceCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketStageInstance, Discord.Rest.RestStageInstance, Discord.IStageInstance>;
 
 
-global using GuildStageInstancesCacheable = Discord.WebSocket.Cacheable<ulong,
+global using GuildStageInstancesCacheable = Discord.WebSocket.CacheableCollection<
     Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketStageInstance, Discord.Rest.RestStageInstance, Discord.IStageInstance>,
     ulong, Discord.WebSocket.SocketStageInstance>;
+
 global using GuildEventsCacheable = Discord.WebSocket.CacheableCollection<
     Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuildEvent, Discord.Rest.RestGuildEvent, Discord.IGuildScheduledEvent>,
     ulong, Discord.WebSocket.SocketGuildEvent>;

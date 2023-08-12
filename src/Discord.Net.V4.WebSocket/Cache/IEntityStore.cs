@@ -10,32 +10,32 @@ namespace Discord.WebSocket.Cache
         where TModel : IEntityModel<TId>
         where TId : IEquatable<TId>
     {
-        new ValueTask<TModel?> GetAsync(TId id);
+        new ValueTask<TModel?> GetAsync(TId id, CancellationToken token = default);
 
-        ValueTask AddOrUpdateAsync(TModel model);
+        ValueTask AddOrUpdateAsync(TModel model, CancellationToken token = default);
 
-        ValueTask AddOrUpdateBatchAsync(IEnumerable<TModel> model);
+        ValueTask AddOrUpdateBatchAsync(IEnumerable<TModel> model, CancellationToken token = default);
 
 
-        async ValueTask<IEntityModel<TId>?> IEntityStore<TId>.GetAsync(TId id)
-            => await GetAsync(id);
+        async ValueTask<IEntityModel<TId>?> IEntityStore<TId>.GetAsync(TId id, CancellationToken token)
+            => await GetAsync(id, token);
     }
 
     public interface IEntityStore<TId> 
         where TId : IEquatable<TId>
     {
-        ValueTask<IEntityModel<TId>?> GetAsync(TId id);
+        ValueTask<IEntityModel<TId>?> GetAsync(TId id, CancellationToken token = default);
 
-        IAsyncEnumerable<IEntityModel<TId>> GetAllAsync();
+        IAsyncEnumerable<IEntityModel<TId>> GetAllAsync(CancellationToken token = default);
 
-        IAsyncEnumerable<TId> GetAllIdsAsync();
+        IAsyncEnumerable<TId> GetAllIdsAsync(CancellationToken token = default);
 
-        ValueTask AddOrUpdateAsync(IEntityModel<TId> model);
+        ValueTask AddOrUpdateAsync(IEntityModel<TId> model, CancellationToken token = default);
 
-        ValueTask AddOrUpdateBatchAsync(IEnumerable<IEntityModel<TId>> model);
+        ValueTask AddOrUpdateBatchAsync(IEnumerable<IEntityModel<TId>> model, CancellationToken token = default);
 
-        ValueTask RemoveAsync(TId id);
+        ValueTask RemoveAsync(TId id, CancellationToken token = default);
 
-        ValueTask PurgeAllAsync();
+        ValueTask PurgeAllAsync(CancellationToken token = default);
     }
 }

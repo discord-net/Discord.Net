@@ -36,10 +36,10 @@ public interface IStageInstance : ISnowflakeEntity
     /// <summary>
     ///     Modifies the stage instance.
     /// </summary>
-    Task ModifyAsync(Action<StageInstanceProperties> func, RequestOptions options = null);
+    Task ModifyAsync(Action<StageInstanceProperties> func, RequestOptions? options = null);
 
     /// <summary>
     ///     Stops the stage instance.
     /// </summary>
-    Task StopAsync(RequestOptions options = null);
+    Task StopAsync(RequestOptions? options = null);
 }
