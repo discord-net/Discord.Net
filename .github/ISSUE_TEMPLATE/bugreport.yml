@@ -89,7 +89,7 @@ body:
   - type: textarea
     id: environment
     attributes:
-      label: Hosting environment
+      label: Environment
       description: Please list your OS name and version, .NET runtime or SDK you're using, host architecture
       placeholder: |
         - **OS**: Windows 11 23H2 25915
