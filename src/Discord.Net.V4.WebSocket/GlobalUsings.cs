@@ -1,3 +1,5 @@
+global using Discord.Models;
+
 global using GuildCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuild, Discord.Rest.RestGuild, Discord.IGuild>;
 global using GuildUserCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuildUser, Discord.Rest.RestGuildUser, Discord.IGuildUser>;
 global using UserCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketUser, Discord.Rest.RestUser, Discord.IUser>;
