@@ -15,7 +15,7 @@ namespace Discord.Interactions
 
         /// <summary>
         ///     Gets the <see cref="TypeReader"/> that will be used to convert a CustomId segment value into
-        ///     <see cref="CommandParameterInfo.ParameterType"/>, if <see cref="IsRouteSegmentParameter"/> is <see langword="true"/>.
+        ///     <see cref="CommandParameterInfo.ParameterType"/>, if <see cref="IsRouteSegmentParameter"/> is <see langword="true" />.
         /// </summary>
         public TypeReader TypeReader { get; }
 

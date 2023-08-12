@@ -17,7 +17,7 @@ public class SocketThreadInfo
     ///     Gets the value that indicates whether the thread is archived.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if the property was not updated.
+    ///     <see langword="null" /> if the property was not updated.
     /// </remarks>
     public bool? IsArchived { get; }
 
@@ -25,7 +25,7 @@ public class SocketThreadInfo
     ///     Gets the auto archive duration of thread.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if the property was not updated.
+    ///     <see langword="null" /> if the property was not updated.
     /// </remarks>
     public ThreadArchiveDuration? AutoArchiveDuration { get; }
 
@@ -33,7 +33,7 @@ public class SocketThreadInfo
     ///     Gets the value that indicates whether the thread is locked.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if the property was not updated.
+    ///     <see langword="null" /> if the property was not updated.
     /// </remarks>
     public bool? IsLocked { get; }
 
@@ -41,7 +41,7 @@ public class SocketThreadInfo
     ///     Gets the slow-mode delay of the thread.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if the property was not updated.
+    ///     <see langword="null" /> if the property was not updated.
     /// </remarks>
     public int? SlowModeInterval { get; }
 
@@ -49,7 +49,7 @@ public class SocketThreadInfo
     ///     Gets the applied tags of this thread.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if the property was not updated.
+    ///     <see langword="null" /> if the property was not updated.
     /// </remarks>
     public IReadOnlyCollection<ulong> AppliedTags { get; }
 
@@ -57,7 +57,7 @@ public class SocketThreadInfo
     ///     Gets the flags of the thread channel.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if the property was not updated.
+    ///     <see langword="null" /> if the property was not updated.
     /// </remarks>
     public ChannelFlags? Flags { get; }
 
@@ -65,7 +65,7 @@ public class SocketThreadInfo
     ///     Gets the type of the thread.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if the property was not updated.
+    ///     <see langword="null" /> if the property was not updated.
     /// </remarks>
     public ThreadType Type { get; }
 

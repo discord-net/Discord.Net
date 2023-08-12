@@ -20,7 +20,7 @@ namespace Discord.Rest
         ///     Gets the type of application command this interaction represents.
         /// </summary>
         /// <remarks>
-        ///     This will be <see langword="null"/> if the <see cref="Type"/> is not <see cref="InteractionType.ApplicationCommand"/>.
+        ///     This will be <see langword="null" /> if the <see cref="Type"/> is not <see cref="InteractionType.ApplicationCommand"/>.
         /// </remarks>
         public ApplicationCommandType? CommandType { get; }
 
@@ -44,7 +44,7 @@ namespace Discord.Rest
         ///     Gets the guild ID of the interaction.
         /// </summary>
         /// <remarks>
-        ///     This will be <see langword="null"/> if this interaction was not executed in a guild.
+        ///     This will be <see langword="null" /> if this interaction was not executed in a guild.
         /// </remarks>
         public ulong? GuildId { get; }
 
@@ -52,7 +52,7 @@ namespace Discord.Rest
         ///     Gets the channel ID of the interaction.
         /// </summary>
         /// <remarks>
-        ///     This will be <see langword="null"/> if this interaction is <see cref="InteractionType.Ping"/>.
+        ///     This will be <see langword="null" /> if this interaction is <see cref="InteractionType.Ping"/>.
         /// </remarks>
         public ulong? ChannelId { get; }
 

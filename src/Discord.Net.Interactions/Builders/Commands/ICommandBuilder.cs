@@ -29,7 +29,7 @@ namespace Discord.Interactions.Builders
         string MethodName { get; set; }
 
         /// <summary>
-        ///     Gets or sets <see langword="true"/> if this command will be registered and executed as a standalone command, unaffected by the <see cref="GroupAttribute"/>s of
+        ///     Gets or sets <see langword="true" /> if this command will be registered and executed as a standalone command, unaffected by the <see cref="GroupAttribute"/>s of
         ///     of the commands parents.
         /// </summary>
         bool IgnoreGroupNames { get; set; }

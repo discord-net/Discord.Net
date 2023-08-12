@@ -50,7 +50,7 @@ namespace Discord.WebSocket
         ///     Returns a value that determines if the role is an @everyone role.
         /// </summary>
         /// <returns>
-        ///     <see langword="true"/> if the role is @everyone; otherwise <see langword="false"/>.
+        ///     <see langword="true" /> if the role is @everyone; otherwise <see langword="false" />.
         /// </returns>
         public bool IsEveryone => Id == Guild.Id;
         /// <inheritdoc />

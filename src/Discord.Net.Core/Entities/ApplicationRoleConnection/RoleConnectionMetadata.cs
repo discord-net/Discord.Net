@@ -29,12 +29,12 @@ public class RoleConnectionMetadata
     public string Description { get; }
 
     /// <summary>
-    ///     Gets translations of the name. <see langword="null"/> if not set.
+    ///     Gets translations of the name. <see langword="null" /> if not set.
     /// </summary>
     public IReadOnlyDictionary<string, string> NameLocalizations { get; }
 
     /// <summary>
-    ///     Gets translations of the description. <see langword="null"/> if not set.
+    ///     Gets translations of the description. <see langword="null" /> if not set.
     /// </summary>
     public IReadOnlyDictionary<string, string> DescriptionLocalizations { get; }
 

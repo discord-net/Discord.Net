@@ -18,7 +18,7 @@ namespace Discord.Interactions
         public bool IsModalParameter { get; }
 
         /// <summary>
-        ///     Gets the <see cref="TypeReader"/> assigned to this parameter, if <see cref="IsModalParameter"/> is <see langword="true"/>.
+        ///     Gets the <see cref="TypeReader"/> assigned to this parameter, if <see cref="IsModalParameter"/> is <see langword="true" />.
         /// </summary>
         public TypeReader TypeReader { get; }
 

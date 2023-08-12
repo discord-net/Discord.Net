@@ -54,7 +54,7 @@ namespace Discord.WebSocket
         ///     Attempts to try to find the sticker.
         /// </summary>
         /// <returns>
-        ///     The sticker representing this unknown stickers Id, if none is found then <see langword="null"/>.
+        ///     The sticker representing this unknown stickers Id, if none is found then <see langword="null" />.
         /// </returns>
         public Task<SocketSticker> ResolveAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
             => Discord.GetStickerAsync(Id, mode, options);

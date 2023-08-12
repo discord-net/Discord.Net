@@ -20,7 +20,7 @@ namespace Discord.Interactions
         string MethodName { get; }
 
         /// <summary>
-        ///     Gets <see langword="true"/> if this command will be registered and executed as a standalone command, unaffected by the <see cref="GroupAttribute"/>s of
+        ///     Gets <see langword="true" /> if this command will be registered and executed as a standalone command, unaffected by the <see cref="GroupAttribute"/>s of
         ///     of the commands parents.
         /// </summary>
         bool IgnoreGroupNames { get; }
@@ -31,7 +31,7 @@ namespace Discord.Interactions
         bool SupportsWildCards { get; }
 
         /// <summary>
-        ///     Gets <see langword="true"/> if this command is a top level command and none of its parents have a <see cref="GroupAttribute"/>.
+        ///     Gets <see langword="true" /> if this command is a top level command and none of its parents have a <see cref="GroupAttribute"/>.
         /// </summary>
         bool IsTopLevelCommand { get; }
 

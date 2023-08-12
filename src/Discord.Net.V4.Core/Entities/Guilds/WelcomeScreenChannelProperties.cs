@@ -16,7 +16,7 @@ public class WelcomeScreenChannelProperties : ISnowflakeEntity
     public string Description { get; set; }
 
     /// <summary>
-    ///     Gets or sets the emoji for this channel. <see cref="Emoji"/> if it is unicode emoji, <see cref="Emote"/> if it is a custom one and <see langword="null"/> if none is set.
+    ///     Gets or sets the emoji for this channel. <see cref="Emoji"/> if it is unicode emoji, <see cref="Emote"/> if it is a custom one and <see langword="null" /> if none is set.
     /// </summary>
     /// <remarks>
     ///     If the emoji is <see cref="Emote"/> only the <see cref="Emote.Id"/> will be populated.

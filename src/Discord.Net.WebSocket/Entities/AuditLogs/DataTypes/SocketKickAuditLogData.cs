@@ -33,7 +33,7 @@ public class SocketKickAuditLogData : ISocketAuditLogData
     ///     Gets the user that was kicked.
     /// </summary>
     /// <remarks>
-    ///     Download method may return <see langword="null"/> if the user is a 'Deleted User#....'
+    ///     Download method may return <see langword="null" /> if the user is a 'Deleted User#....'
     ///     because Discord does send user data for deleted users.
     /// </remarks>
     /// <returns>

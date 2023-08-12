@@ -55,10 +55,10 @@ public class SocketMessageUnpinAuditLogData : ISocketAuditLogData
     ///     Gets the user of the message that was unpinned if available.
     /// </summary>
     /// <remarks>
-    ///     Will be <see langword="null"/> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
+    ///     Will be <see langword="null" /> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
     /// </remarks>
     /// <returns>
-    ///     A user object representing the user that created the unpinned message or <see langword="null"/>.
+    ///     A user object representing the user that created the unpinned message or <see langword="null" />.
     /// </returns>
     public Cacheable<SocketUser, RestUser, IUser, ulong>? Target { get; }
 }

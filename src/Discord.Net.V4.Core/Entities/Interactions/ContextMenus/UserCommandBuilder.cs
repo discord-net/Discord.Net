@@ -129,7 +129,7 @@ namespace Discord
         /// <summary>
         ///     Sets whether or not this command can be used in dms.
         /// </summary>
-        /// <param name="permission"><see langword="true"/> if the command is available in dms, otherwise <see langword="false"/>.</param>
+        /// <param name="permission"><see langword="true" /> if the command is available in dms, otherwise <see langword="false" />.</param>
         /// <returns>The current builder.</returns>
         public UserCommandBuilder WithDMPermission(bool permission)
         {
@@ -140,7 +140,7 @@ namespace Discord
         /// <summary>
         ///     Sets whether or not this command is age restricted.
         /// </summary>
-        /// <param name="permission"><see langword="true"/> if the command is age restricted, otherwise <see langword="false"/>.</param>
+        /// <param name="permission"><see langword="true" /> if the command is age restricted, otherwise <see langword="false" />.</param>
         /// <returns>The current builder.</returns>
         public UserCommandBuilder WithNsfw(bool permission)
         {

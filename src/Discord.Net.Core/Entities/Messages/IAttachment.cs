@@ -45,39 +45,39 @@ namespace Discord
         ///     Gets the height of this attachment.
         /// </summary>
         /// <returns>
-        ///     The height of this attachment if it is a picture; otherwise <see langword="null"/>.
+        ///     The height of this attachment if it is a picture; otherwise <see langword="null" />.
         /// </returns>
         int? Height { get; }
         /// <summary>
         ///     Gets the width of this attachment.
         /// </summary>
         /// <returns>
-        ///     The width of this attachment if it is a picture; otherwise <see langword="null"/>.
+        ///     The width of this attachment if it is a picture; otherwise <see langword="null" />.
         /// </returns>
         int? Width { get; }
         /// <summary>
         ///     Gets whether or not this attachment is ephemeral.
         /// </summary>
         /// <returns>
-        ///     <see langword="true"/> if the attachment is ephemeral; otherwise <see langword="false"/>.
+        ///     <see langword="true" /> if the attachment is ephemeral; otherwise <see langword="false" />.
         /// </returns>
         bool Ephemeral { get; }
         /// <summary>
-        ///     Gets the description of the attachment; or <see langword="null"/> if there is none set.
+        ///     Gets the description of the attachment; or <see langword="null" /> if there is none set.
         /// </summary>
         string Description { get; }
         /// <summary>
-        ///     Gets the media's <see href="https://en.wikipedia.org/wiki/Media_type">MIME type</see> if present; otherwise <see langword="null"/>.
+        ///     Gets the media's <see href="https://en.wikipedia.org/wiki/Media_type">MIME type</see> if present; otherwise <see langword="null" />.
         /// </summary>
         string ContentType { get; }
 
         /// <summary>
-        ///     Gets the duration of the audio file. <see langword="null"/> if the attachment is not a voice message.
+        ///     Gets the duration of the audio file. <see langword="null" /> if the attachment is not a voice message.
         /// </summary>
         double? Duration { get; }
 
         /// <summary>
-        ///     Gets the base64 encoded bytearray representing a sampled waveform. <see langword="null"/> if the attachment is not a voice message.
+        ///     Gets the base64 encoded bytearray representing a sampled waveform. <see langword="null" /> if the attachment is not a voice message.
         /// </summary>
         public string Waveform { get; }
     }

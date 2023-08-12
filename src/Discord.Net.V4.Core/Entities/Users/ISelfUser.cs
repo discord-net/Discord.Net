@@ -14,7 +14,7 @@ public interface ISelfUser : IUser
     ///     Indicates whether or not this user has their email verified.
     /// </summary>
     /// <returns>
-    ///     <see langword="true"/> if this user's email has been verified; <see langword="false"/> if not.
+    ///     <see langword="true" /> if this user's email has been verified; <see langword="false" /> if not.
     /// </returns>
     bool IsVerified { get; }
 
@@ -22,7 +22,7 @@ public interface ISelfUser : IUser
     ///     Indicates whether or not this user has MFA enabled on their account.
     /// </summary>
     /// <returns>
-    ///     <see langword="true"/> if this user has enabled multi-factor authentication on their account; <see langword="false"/> if not.
+    ///     <see langword="true" /> if this user has enabled multi-factor authentication on their account; <see langword="false" /> if not.
     /// </returns>
     bool IsMfaEnabled { get; }
 

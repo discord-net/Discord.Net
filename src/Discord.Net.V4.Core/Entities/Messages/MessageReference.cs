@@ -17,7 +17,7 @@ public class MessageReference
     ///     Gets the Channel ID of the original message.
     /// </summary>
     /// <remarks>
-    ///     It only will be the default value (zero) if it was instantiated with a <see langword="null"/> in the constructor.
+    ///     It only will be the default value (zero) if it was instantiated with a <see langword="null" /> in the constructor.
     /// </remarks>
     public ulong ChannelId { get => InternalChannelId.GetValueOrDefault(); }
     internal Optional<ulong> InternalChannelId;

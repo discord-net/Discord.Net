@@ -14,7 +14,7 @@ namespace Discord
         ///     Gets a value that indicates whether the channel is NSFW.
         /// </summary>
         /// <returns>
-        ///     <see langword="true"/> if the channel has the NSFW flag enabled; otherwise <see langword="false"/>.
+        ///     <see langword="true" /> if the channel has the NSFW flag enabled; otherwise <see langword="false" />.
         /// </returns>
         bool IsNsfw { get; }
 
@@ -22,7 +22,7 @@ namespace Discord
         ///     Gets the current topic for this text channel.
         /// </summary>
         /// <returns>
-        ///     A string representing the topic set in the channel; <see langword="null"/> if none is set.
+        ///     A string representing the topic set in the channel; <see langword="null" /> if none is set.
         /// </returns>
         string Topic { get; }
 
@@ -108,7 +108,7 @@ namespace Discord
         ///     Creates a thread within this <see cref="ITextChannel"/>.
         /// </summary>
         /// <remarks>
-        ///     When <paramref name="message"/> is <see langword="null"/> the thread type will be based off of the
+        ///     When <paramref name="message"/> is <see langword="null" /> the thread type will be based off of the
         ///     channel its created in. When called on a <see cref="ITextChannel"/>, it creates a <see cref="ThreadType.PublicThread"/>.
         ///     When called on a <see cref="INewsChannel"/>, it creates a <see cref="ThreadType.NewsThread"/>. The id of the created
         ///     thread will be the same as the id of the message, and as such a message can only have a

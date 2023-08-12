@@ -66,8 +66,8 @@ public class SocketInviteDeleteAuditLogData : ISocketAuditLogData
     ///     Gets a value that indicates whether the invite is a temporary one.
     /// </summary>
     /// <returns>
-    ///     <see langword="true"/> if users accepting this invite will be removed from the guild when they log off; otherwise
-    ///     <see langword="false"/>.
+    ///     <see langword="true" /> if users accepting this invite will be removed from the guild when they log off; otherwise
+    ///     <see langword="false" />.
     /// </returns>
     public bool Temporary { get; }
 
@@ -75,10 +75,10 @@ public class SocketInviteDeleteAuditLogData : ISocketAuditLogData
     ///     Gets the user that created this invite if available.
     /// </summary>
     /// <remarks>
-    ///     Will be <see langword="null"/> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
+    ///     Will be <see langword="null" /> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
     /// </remarks>
     /// <returns>
-    ///     A user that created this invite or <see langword="null"/>.
+    ///     A user that created this invite or <see langword="null" />.
     /// </returns>
     public Cacheable<SocketUser, RestUser, IUser, ulong>? Creator { get; }
 
@@ -103,7 +103,7 @@ public class SocketInviteDeleteAuditLogData : ISocketAuditLogData
     /// </summary>
     /// <returns>
     ///     An <see cref="int"/> representing the number of uses this invite may be accepted until it is removed
-    ///     from the guild; <see langword="null"/> if none is set.
+    ///     from the guild; <see langword="null" /> if none is set.
     /// </returns>
     public int MaxUses { get; }
 }

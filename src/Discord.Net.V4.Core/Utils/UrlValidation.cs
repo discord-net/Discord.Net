@@ -9,7 +9,7 @@ internal static class UrlValidation
     /// <see cref="ValidateButton(string)"/> should be used for url buttons.
     /// </summary>
     /// <param name="url">The URL to validate before sending to Discord.</param>
-    /// <param name="allowAttachments"><see langword="true"/> to allow the <b>attachment://</b> protocol; otherwise <see langword="false"/>.</param>
+    /// <param name="allowAttachments"><see langword="true" /> to allow the <b>attachment://</b> protocol; otherwise <see langword="false" />.</param>
     /// <exception cref="InvalidOperationException">A URL must include a protocol (http or https).</exception>
     /// <returns>true if URL is valid by our standard, false if null, throws an error upon invalid.</returns>
     public static bool Validate(string url, bool allowAttachments = false)

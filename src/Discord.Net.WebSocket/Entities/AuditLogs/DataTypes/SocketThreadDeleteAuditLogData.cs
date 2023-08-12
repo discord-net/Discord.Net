@@ -63,7 +63,7 @@ public class SocketThreadDeleteAuditLogData : ISocketAuditLogData
     ///     Gets the value that indicates whether the deleted thread was archived.
     /// </summary>
     /// <returns>
-    ///     <see langword="true"/> if this thread had the Archived flag enabled; otherwise <see langword="false"/>.
+    ///     <see langword="true" /> if this thread had the Archived flag enabled; otherwise <see langword="false" />.
     /// </returns>
     public bool IsArchived { get; }
 
@@ -79,7 +79,7 @@ public class SocketThreadDeleteAuditLogData : ISocketAuditLogData
     ///     Gets the value that indicates whether the deleted thread was locked.
     /// </summary>
     /// <returns>
-    ///     <see langword="true"/> if this thread had the Locked flag enabled; otherwise <see langword="false"/>.
+    ///     <see langword="true" /> if this thread had the Locked flag enabled; otherwise <see langword="false" />.
     /// </returns>
     public bool IsLocked { get; }
 
@@ -89,7 +89,7 @@ public class SocketThreadDeleteAuditLogData : ISocketAuditLogData
     /// <returns>
     ///     An <see cref="int"/> representing the time in seconds required before the user can send another
     ///     message; <c>0</c> if disabled.
-    ///     <see langword="null"/> if this is not mentioned in this entry.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public int? SlowModeInterval { get; }
 
@@ -97,7 +97,7 @@ public class SocketThreadDeleteAuditLogData : ISocketAuditLogData
     ///     Gets the applied tags of this thread.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if this is not mentioned in this entry.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </remarks>
     public IReadOnlyCollection<ulong> AppliedTags { get; }
 
@@ -105,7 +105,7 @@ public class SocketThreadDeleteAuditLogData : ISocketAuditLogData
     ///     Gets the flags of the thread channel.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if this is not mentioned in this entry.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </remarks>
     public ChannelFlags? Flags { get; }
 }

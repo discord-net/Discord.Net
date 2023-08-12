@@ -28,7 +28,7 @@ public class AutoModActionExecutedData
     ///     Gets the message that triggered the action.
     /// </summary>
     /// <remarks>
-    ///     This property will be <see langword="null"/> if the message was blocked by the automod.
+    ///     This property will be <see langword="null" /> if the message was blocked by the automod.
     /// </remarks>
     public Cacheable<IUserMessage, ulong>? Message { get; }
 
@@ -36,7 +36,7 @@ public class AutoModActionExecutedData
     ///     Gets the id of the system auto moderation messages posted as a result of this action.
     /// </summary>
     /// <remarks>
-    ///     This property will be <see langword="null"/> if this event does not correspond to an action
+    ///     This property will be <see langword="null" /> if this event does not correspond to an action
     ///     with type <see cref="AutoModActionType.SendAlertMessage"/>.
     /// </remarks>
     public ulong AlertMessageId { get; }

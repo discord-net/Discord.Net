@@ -20,7 +20,7 @@ public interface ISticker : IStickerItem
     /// </summary>
     /// <returns>
     ///     A snowflake ID associated with the pack of this sticker if it's
-    ///     from a pack; otherwise <see langword="null"/>.
+    ///     from a pack; otherwise <see langword="null" />.
     /// </returns>
     ulong? PackId { get; }
 

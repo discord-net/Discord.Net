@@ -67,7 +67,7 @@ namespace Discord.WebSocket
         ///     Gets the localized name of this command.
         /// </summary>
         /// <remarks>
-        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false" /> when requesting the command.
         /// </remarks>
         public string NameLocalized { get; private set; }
 
@@ -75,7 +75,7 @@ namespace Discord.WebSocket
         ///     Gets the localized description of this command.
         /// </summary>
         /// <remarks>
-        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false" /> when requesting the command.
         /// </remarks>
         public string DescriptionLocalized { get; private set; }
 
@@ -84,7 +84,7 @@ namespace Discord.WebSocket
             => SnowflakeUtils.FromSnowflake(Id);
 
         /// <summary>
-        ///     Gets the guild this command resides in; if this command is a global command then it will return <see langword="null"/>
+        ///     Gets the guild this command resides in; if this command is a global command then it will return <see langword="null" />
         /// </summary>
         public SocketGuild Guild
             => GuildId.HasValue ? Discord.GetGuild(GuildId.Value) : null;

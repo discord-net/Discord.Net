@@ -98,7 +98,7 @@ namespace Discord
         ///     Returns whether or not this guild has a feature.
         /// </summary>
         /// <param name="feature">The feature(s) to check for.</param>
-        /// <returns><see langword="true"/> if this guild has the provided feature(s), otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true" /> if this guild has the provided feature(s), otherwise <see langword="false" />.</returns>
         public bool HasFeature(GuildFeature feature)
             => Value.HasFlag(feature);
 
@@ -106,7 +106,7 @@ namespace Discord
         ///     Returns whether or not this guild has a feature.
         /// </summary>
         /// <param name="feature">The feature to check for.</param>
-        /// <returns><see langword="true"/> if this guild has the provided feature, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true" /> if this guild has the provided feature, otherwise <see langword="false" />.</returns>
         public bool HasFeature(string feature)
             => Experimental.Contains(feature);
 

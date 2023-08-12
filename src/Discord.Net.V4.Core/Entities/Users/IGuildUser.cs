@@ -10,7 +10,7 @@ public interface IGuildUser : IUser, IVoiceState
     /// </summary>
     /// <returns>
     ///     A <see cref="DateTimeOffset"/> representing the time of which the user has joined the guild; 
-    ///     <see langword="null"/> when it cannot be obtained.
+    ///     <see langword="null" /> when it cannot be obtained.
     /// </returns>
     DateTimeOffset? JoinedAt { get; }
 
@@ -26,7 +26,7 @@ public interface IGuildUser : IUser, IVoiceState
     ///     Gets the nickname for this user.
     /// </summary>
     /// <returns>
-    ///     A string representing the nickname of the user; <see langword="null"/> if none is set.
+    ///     A string representing the nickname of the user; <see langword="null" /> if none is set.
     /// </returns>
     string Nickname { get; }
 
@@ -35,7 +35,7 @@ public interface IGuildUser : IUser, IVoiceState
     /// </summary>
     /// <returns>
     ///     The users displayed avatar hash. If the user does not have a guild avatar, this will be the regular avatar.
-    ///     If the user also does not have a regular avatar, this will be <see langword="null"/>.
+    ///     If the user also does not have a regular avatar, this will be <see langword="null" />.
     /// </returns>
     string DisplayAvatarId { get; }
 
@@ -43,7 +43,7 @@ public interface IGuildUser : IUser, IVoiceState
     ///     Gets the guild specific avatar for this user.
     /// </summary>
     /// <returns>
-    ///     The users guild avatar hash if they have one; otherwise <see langword="null"/>.
+    ///     The users guild avatar hash if they have one; otherwise <see langword="null" />.
     /// </returns>
     string GuildAvatarId { get; }
 
@@ -76,7 +76,7 @@ public interface IGuildUser : IUser, IVoiceState
     ///     Gets the date and time for when this user's guild boost began.
     /// </summary>
     /// <returns>
-    ///     A <see cref="DateTimeOffset"/> for when the user began boosting this guild; <see langword="null"/> if they are not boosting the guild.
+    ///     A <see cref="DateTimeOffset"/> for when the user began boosting this guild; <see langword="null" /> if they are not boosting the guild.
     /// </returns>
     DateTimeOffset? PremiumSince { get; }
 
@@ -108,7 +108,7 @@ public interface IGuildUser : IUser, IVoiceState
     ///     Gets the date and time that indicates if and for how long a user has been timed out.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> or a timestamp in the past if the user is not timed out.
+    ///     <see langword="null" /> or a timestamp in the past if the user is not timed out.
     /// </remarks>
     /// <returns>
     ///     A <see cref="DateTimeOffset"/> indicating how long the user will be timed out for.
@@ -143,13 +143,13 @@ public interface IGuildUser : IUser, IVoiceState
     /// </summary>
     /// <remarks>
     ///     This property retrieves a URL for this guild user's guild specific avatar. In event that the user does not have a valid guild avatar
-    ///     (i.e. their avatar identifier is not set), this method will return <see langword="null"/>.
+    ///     (i.e. their avatar identifier is not set), this method will return <see langword="null" />.
     /// </remarks>
     /// <param name="format">The format to return.</param>
     /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
     /// </param>
     /// <returns>
-    ///     A string representing the user's avatar URL; <see langword="null"/> if the user does not have an avatar in place.
+    ///     A string representing the user's avatar URL; <see langword="null" /> if the user does not have an avatar in place.
     /// </returns>
     string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
     /// <summary>
@@ -162,7 +162,7 @@ public interface IGuildUser : IUser, IVoiceState
     /// <param name="format">The format to return.</param>
     /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
     /// <returns>
-    ///     A string representing the URL of the displayed avatar for this user. <see langword="null"/> if the user does not have an avatar in place.
+    ///     A string representing the URL of the displayed avatar for this user. <see langword="null" /> if the user does not have an avatar in place.
     /// </returns>
     string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
     /// <summary>

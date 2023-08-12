@@ -163,7 +163,7 @@ namespace Discord.Commands
         ///     </code>
         /// </example>
         /// <typeparam name="T">The type of module.</typeparam>
-        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <see langword="null"/>.</param>
+        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <see langword="null" />.</param>
         /// <exception cref="ArgumentException">This module has already been added.</exception>
         /// <exception cref="InvalidOperationException">
         /// The <see cref="ModuleInfo"/> fails to be built; an invalid type may have been provided.
@@ -178,7 +178,7 @@ namespace Discord.Commands
         ///     Adds a command module from a <see cref="Type" />.
         /// </summary>
         /// <param name="type">The type of module.</param>
-        /// <param name="services">The <see cref="IServiceProvider" /> for your dependency injection solution if using one; otherwise, pass <see langword="null"/> .</param>
+        /// <param name="services">The <see cref="IServiceProvider" /> for your dependency injection solution if using one; otherwise, pass <see langword="null" /> .</param>
         /// <exception cref="ArgumentException">This module has already been added.</exception>
         /// <exception cref="InvalidOperationException">
         /// The <see cref="ModuleInfo"/> fails to be built; an invalid type may have been provided.
@@ -217,7 +217,7 @@ namespace Discord.Commands
         ///     Add command modules from an <see cref="Assembly"/>.
         /// </summary>
         /// <param name="assembly">The <see cref="Assembly"/> containing command modules.</param>
-        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <see langword="null"/>.</param>
+        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <see langword="null" />.</param>
         /// <returns>
         ///     A task that represents the asynchronous operation for adding the command modules. The task result
         ///     contains an enumerable collection of modules added.
@@ -417,9 +417,9 @@ namespace Discord.Commands
         ///     You need to reload the modules for the changes to take effect.
         /// </remarks>
         /// <param name="type">The type to remove the readers from.</param>
-        /// <param name="isDefaultTypeReader"><see langword="true"/> if the default readers for <paramref name="type"/> should be removed; otherwise <see langword="false"/>.</param>
+        /// <param name="isDefaultTypeReader"><see langword="true" /> if the default readers for <paramref name="type"/> should be removed; otherwise <see langword="false" />.</param>
         /// <param name="readers">The removed collection of type readers.</param>
-        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true" /> if the remove operation was successful; otherwise <see langword="false" />.</returns>
         public bool TryRemoveTypeReader(Type type, bool isDefaultTypeReader, out IDictionary<Type, TypeReader> readers)
         {
             readers = new Dictionary<Type, TypeReader>();

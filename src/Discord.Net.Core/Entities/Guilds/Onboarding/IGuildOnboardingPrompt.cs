@@ -29,7 +29,7 @@ public interface IGuildOnboardingPrompt : ISnowflakeEntity
 
     /// <summary>
     ///     Indicates whether the prompt is present in the onboarding flow.
-    ///     If <see langword="false"/>, the prompt will only appear in the Channels and Roles tab.
+    ///     If <see langword="false" />, the prompt will only appear in the Channels and Roles tab.
     /// </summary>
     bool IsInOnboarding { get; }
 

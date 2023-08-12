@@ -40,7 +40,7 @@ public class SocketMemberUpdateAuditLogData : ISocketAuditLogData
     ///     Gets the user that the changes were performed on.
     /// </summary>
     /// <remarks>
-    ///     Will be <see langword="null"/> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
+    ///     Will be <see langword="null" /> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
     /// </remarks>
     /// <returns>
     ///     A user object representing the user who the changes were performed on.

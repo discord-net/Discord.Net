@@ -17,18 +17,18 @@ namespace Discord
         public AutoModActionType Type { get; }
 
         /// <summary>
-        ///     Get the channel id on which to post alerts. <see langword="null"/> if no channel has been provided.
+        ///     Get the channel id on which to post alerts. <see langword="null" /> if no channel has been provided.
         /// </summary>
         public ulong? ChannelId { get; }
 
         /// <summary>
         ///     Gets the custom message that will be shown to members whenever their message is blocked.
-        ///     <see langword="null"/> if no message has been set.
+        ///     <see langword="null" /> if no message has been set.
         /// </summary>
         public Optional<string> CustomMessage { get; set; }
 
         /// <summary>
-        ///     Gets the duration of which a user will be timed out for breaking this rule. <see langword="null"/> if no timeout duration has been provided.
+        ///     Gets the duration of which a user will be timed out for breaking this rule. <see langword="null" /> if no timeout duration has been provided.
         /// </summary>
         public TimeSpan? TimeoutDuration { get; }
 

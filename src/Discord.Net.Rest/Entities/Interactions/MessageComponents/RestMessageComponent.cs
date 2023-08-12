@@ -58,8 +58,8 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
         /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
@@ -381,7 +381,7 @@ namespace Discord.Rest
         /// <summary>
         ///     Defers an interaction and responds with type 5 (<see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>)
         /// </summary>
-        /// <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
+        /// <param name="ephemeral"><see langword="true" /> to send this message ephemerally, otherwise <see langword="false" />.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>
         ///     A string that contains json to write back to the incoming http request.

@@ -45,7 +45,7 @@ namespace Discord.Rest
         /// <param name="result">
         ///     The set of choices for the user to pick from.
         ///     <remarks>
-        ///         A max of 25 choices are allowed. Passing <see langword="null"/> for this argument will show the executing user that
+        ///         A max of 25 choices are allowed. Passing <see langword="null" /> for this argument will show the executing user that
         ///         there is no choices for their autocompleted input.
         ///     </remarks>
         /// </param>
@@ -89,7 +89,7 @@ namespace Discord.Rest
         /// <param name="result">
         ///  The set of choices for the user to pick from.
         ///     <remarks>
-        ///         A max of 25 choices are allowed. Passing <see langword="null"/> for this argument will show the executing user that
+        ///         A max of 25 choices are allowed. Passing <see langword="null" /> for this argument will show the executing user that
         ///         there is no choices for their autocompleted input.
         ///     </remarks>
         /// </param>

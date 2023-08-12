@@ -23,7 +23,7 @@ namespace Discord.Rest
         ///     Gets the guild that this custom sticker is in.
         /// </summary>
         /// <remarks>
-        ///     <b>Note</b>: This property can be <see langword="null"/> if the sticker wasn't fetched from a guild.
+        ///     <b>Note</b>: This property can be <see langword="null" /> if the sticker wasn't fetched from a guild.
         /// </remarks>
         public RestGuild Guild { get; private set; }
 

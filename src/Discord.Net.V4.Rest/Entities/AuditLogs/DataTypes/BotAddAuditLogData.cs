@@ -24,7 +24,7 @@ public class BotAddAuditLogData : IAuditLogData
     ///     Gets the bot that was added.
     /// </summary>
     /// <remarks>
-    ///     Will be <see langword="null"/> if the bot is a 'Deleted User#....' because Discord does send user data for deleted users.
+    ///     Will be <see langword="null" /> if the bot is a 'Deleted User#....' because Discord does send user data for deleted users.
     /// </remarks>
     /// <returns>
     ///     A user object representing the bot.

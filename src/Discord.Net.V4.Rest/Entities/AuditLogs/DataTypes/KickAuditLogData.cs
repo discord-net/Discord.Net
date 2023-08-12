@@ -24,7 +24,7 @@ public class KickAuditLogData : IAuditLogData
     ///     Gets the user that was kicked.
     /// </summary>
     /// <remarks>
-    ///     Will be <see langword="null"/> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
+    ///     Will be <see langword="null" /> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
     /// </remarks>
     /// <returns>
     ///     A user object representing the kicked user.

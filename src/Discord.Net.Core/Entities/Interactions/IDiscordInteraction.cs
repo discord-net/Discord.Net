@@ -53,12 +53,12 @@ namespace Discord
         ///     Gets the preferred locale of the invoking User.
         /// </summary>
         /// <remarks>
-        ///     This property returns <see langword="null"/> if the interaction is a REST ping interaction.
+        ///     This property returns <see langword="null" /> if the interaction is a REST ping interaction.
         /// </remarks>
         string UserLocale { get; }
 
         /// <summary>
-        ///     Gets the preferred locale of the guild this interaction was executed in. <see langword="null"/> if not executed in a guild.
+        ///     Gets the preferred locale of the guild this interaction was executed in. <see langword="null" /> if not executed in a guild.
         /// </summary>
         /// <remarks>
         ///     Non-community guilds (With no locale setting available) will have en-US as the default value sent by Discord.
@@ -74,7 +74,7 @@ namespace Discord
         ///     Gets the ID of the channel this interaction was executed in.
         /// </summary>
         /// <remarks>
-        ///     This property returns <see langword="null"/> if the interaction is a REST ping interaction.
+        ///     This property returns <see langword="null" /> if the interaction is a REST ping interaction.
         /// </remarks>
         ulong? ChannelId { get; }
 
@@ -82,7 +82,7 @@ namespace Discord
         ///     Gets the ID of the guild this interaction was executed in.
         /// </summary>
         /// <remarks>
-        ///     This property returns <see langword="null"/> if the interaction was not executed in a guild.
+        ///     This property returns <see langword="null" /> if the interaction was not executed in a guild.
         /// </remarks>
         ulong? GuildId { get; }
 
@@ -96,8 +96,8 @@ namespace Discord
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
         /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
@@ -115,8 +115,8 @@ namespace Discord
         /// <param name="fileName">The file name of the attachment.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
         /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
@@ -145,8 +145,8 @@ namespace Discord
         /// <param name="fileName">The file name of the attachment.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -174,8 +174,8 @@ namespace Discord
         /// <param name="attachment">The attachment containing the file and description.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -198,8 +198,8 @@ namespace Discord
         /// <param name="attachments">A collection of attachments to upload.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -215,8 +215,8 @@ namespace Discord
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -234,8 +234,8 @@ namespace Discord
         /// <param name="fileName">The file name of the attachment.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -264,8 +264,8 @@ namespace Discord
         /// <param name="fileName">The file name of the attachment.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -293,8 +293,8 @@ namespace Discord
         /// <param name="attachment">The attachment containing the file and description.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -317,8 +317,8 @@ namespace Discord
         /// <param name="attachments">A collection of attachments to upload.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>

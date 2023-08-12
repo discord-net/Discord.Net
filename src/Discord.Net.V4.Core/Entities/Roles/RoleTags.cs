@@ -10,7 +10,7 @@ public class RoleTags
     /// </summary>
     /// <returns>
     ///     A <see langword="ulong"/> if this role belongs to a bot; otherwise
-    ///     <see langword="null"/>.
+    ///     <see langword="null" />.
     /// </returns>
     public ulong? BotId { get; }
 
@@ -19,7 +19,7 @@ public class RoleTags
     /// </summary>
     /// <returns>
     ///     A <see langword="ulong"/> if this role belongs to an integration; otherwise
-    ///     <see langword="null"/>.
+    ///     <see langword="null" />.
     /// </returns>
     public ulong? IntegrationId { get; }
 
@@ -27,8 +27,8 @@ public class RoleTags
     ///     Gets if this role is the guild's premium subscriber (booster) role.
     /// </summary>
     /// <returns>
-    ///     <see langword="true"/> if this role is the guild's premium subscriber role;
-    ///     otherwise <see langword="false"/>.
+    ///     <see langword="true" /> if this role is the guild's premium subscriber role;
+    ///     otherwise <see langword="false" />.
     /// </returns>
     public bool IsPremiumSubscriberRole { get; }
 

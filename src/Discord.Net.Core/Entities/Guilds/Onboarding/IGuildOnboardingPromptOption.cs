@@ -18,7 +18,7 @@ public interface IGuildOnboardingPromptOption : ISnowflakeEntity
     IReadOnlyCollection<ulong> RoleIds { get; }
 
     /// <summary>
-    ///     Gets the emoji of the option. <see langword="null"/> if none is set.
+    ///     Gets the emoji of the option. <see langword="null" /> if none is set.
     /// </summary>
     IEmote Emoji { get; }
 
@@ -28,7 +28,7 @@ public interface IGuildOnboardingPromptOption : ISnowflakeEntity
     string Title { get; }
 
     /// <summary>
-    ///     Gets the description of the option. <see langword="null"/> if none is set.
+    ///     Gets the description of the option. <see langword="null" /> if none is set.
     /// </summary>
     string Description { get; }
 }

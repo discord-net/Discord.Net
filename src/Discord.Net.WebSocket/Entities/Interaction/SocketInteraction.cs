@@ -20,7 +20,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <remarks>
         ///     If the channel isn't cached, the bot scope isn't used, or the bot doesn't have access to it then
-        ///     this property will be <see langword="null"/>.
+        ///     this property will be <see langword="null" />.
         /// </remarks>
         public ISocketMessageChannel Channel { get; private set; }
 
@@ -149,8 +149,8 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
         /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
@@ -167,8 +167,8 @@ namespace Discord.WebSocket
         /// <param name="fileName">The file name of the attachment.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
         /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
@@ -193,8 +193,8 @@ namespace Discord.WebSocket
         /// <param name="fileName">The file name of the attachment.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -218,8 +218,8 @@ namespace Discord.WebSocket
         /// <param name="attachment">The attachment containing the file and description.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -238,8 +238,8 @@ namespace Discord.WebSocket
         /// <param name="attachments">A collection of attachments to upload.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -256,8 +256,8 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
         /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
@@ -275,8 +275,8 @@ namespace Discord.WebSocket
         /// <param name="fileStream">The file to upload.</param>
         /// <param name="fileName">The file name of the attachment.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
         /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
@@ -300,8 +300,8 @@ namespace Discord.WebSocket
         /// <param name="filePath">The file to upload.</param>
         /// <param name="fileName">The file name of the attachment.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
         /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
@@ -324,8 +324,8 @@ namespace Discord.WebSocket
         /// <param name="attachment">The attachment containing the file and description.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -344,8 +344,8 @@ namespace Discord.WebSocket
         /// <param name="attachments">A collection of attachments to upload.</param>
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="embeds">A array of embeds to send with this response. Max 10.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="isTTS"><see langword="true" /> if the message should be read out by a text-to-speech reader, otherwise <see langword="false" />.</param>
+        /// <param name="ephemeral"><see langword="true" /> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false" />.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
@@ -384,7 +384,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Acknowledges this interaction.
         /// </summary>
-        /// <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
+        /// <param name="ephemeral"><see langword="true" /> to send this message ephemerally, otherwise <see langword="false" />.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.

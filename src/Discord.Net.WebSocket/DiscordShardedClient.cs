@@ -367,7 +367,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="guilds"/> is <see langword="null"/></exception>
+        /// <exception cref="ArgumentNullException"><paramref name="guilds"/> is <see langword="null" /></exception>
         public override async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
         {
             if (guilds == null)

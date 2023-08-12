@@ -71,7 +71,7 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the guild that this slash command resides in.
         /// </summary>
-        /// <param name="withCounts"><see langword="true"/> if you want the approximate member and presence counts for the guild, otherwise <see langword="false"/>.</param>
+        /// <param name="withCounts"><see langword="true" /> if you want the approximate member and presence counts for the guild, otherwise <see langword="false" />.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a

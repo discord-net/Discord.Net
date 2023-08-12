@@ -16,7 +16,7 @@ public class ApplicationCommandPermission
     public ApplicationCommandPermissionTarget TargetType { get; }
 
     /// <summary>
-    ///     <see langword="true"/> to allow, otherwise <see langword="false"/>.
+    ///     <see langword="true" /> to allow, otherwise <see langword="false" />.
     /// </summary>
     public bool Permission { get; }
 

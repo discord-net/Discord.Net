@@ -19,7 +19,7 @@ namespace Discord.Interactions
         /// <param name="cancellationToken">Token for canceling the wait operation.</param>
         /// <returns>
         ///     A Task representing the asynchronous waiting operation. If the user responded in the given amount of time, Task result contains the user response,
-        ///     otherwise the Task result is <see langword="null"/>.
+        ///     otherwise the Task result is <see langword="null" />.
         /// </returns>
         public static async Task<SocketInteraction> WaitForInteractionAsync(BaseSocketClient client, TimeSpan timeout,
             Predicate<SocketInteraction> predicate, CancellationToken cancellationToken = default)
@@ -84,7 +84,7 @@ namespace Discord.Interactions
         /// <param name="cancellationToken">Token for canceling the wait operation.</param>
         /// <returns>
         ///     A Task representing the asynchronous waiting operation with a <see cref="bool"/> result,
-        ///     the result is <see langword="false"/> if the user declined the prompt or didnt answer in time, <see langword="true"/> if the user confirmed the prompt.
+        ///     the result is <see langword="false" /> if the user declined the prompt or didnt answer in time, <see langword="true" /> if the user confirmed the prompt.
         /// </returns>
         public static async Task<bool> ConfirmAsync(BaseSocketClient client, IMessageChannel channel, TimeSpan timeout, string message = null,
             CancellationToken cancellationToken = default)

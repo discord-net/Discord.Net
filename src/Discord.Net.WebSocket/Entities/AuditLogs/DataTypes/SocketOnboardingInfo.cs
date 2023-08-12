@@ -17,19 +17,19 @@ public class SocketOnboardingInfo
 
     /// <inheritdoc cref="IGuildOnboarding.Prompts"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     IReadOnlyCollection<IGuildOnboardingPrompt> Prompts { get; }
 
     /// <inheritdoc cref="IGuildOnboarding.DefaultChannelIds"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     IReadOnlyCollection<ulong> DefaultChannelIds { get; }
 
     /// <inheritdoc cref="IGuildOnboarding.IsEnabled"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     bool? IsEnabled { get; }
 }

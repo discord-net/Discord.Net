@@ -43,7 +43,7 @@ public class ThreadCreateAuditLogData : IAuditLogData
     ///     Gets the thread that was created if it still exists.
     /// </summary>
     /// <returns>
-    ///     A thread object representing the thread that was created if it still exists, otherwise returns <see langword="null"/>.
+    ///     A thread object representing the thread that was created if it still exists, otherwise returns <see langword="null" />.
     /// </returns>
     public IThreadChannel Thread { get; }
 
@@ -75,7 +75,7 @@ public class ThreadCreateAuditLogData : IAuditLogData
     ///     Gets the value that indicates whether the thread is archived.
     /// </summary>
     /// <returns>
-    ///     <see langword="true"/> if this thread has the Archived flag enabled; otherwise <see langword="false"/>.
+    ///     <see langword="true" /> if this thread has the Archived flag enabled; otherwise <see langword="false" />.
     /// </returns>
     public bool IsArchived { get; }
 
@@ -91,7 +91,7 @@ public class ThreadCreateAuditLogData : IAuditLogData
     ///     Gets the value that indicates whether the thread is locked.
     /// </summary>
     /// <returns>
-    ///     <see langword="true"/> if this thread has the Locked flag enabled; otherwise <see langword="false"/>.
+    ///     <see langword="true" /> if this thread has the Locked flag enabled; otherwise <see langword="false" />.
     /// </returns>
     public bool IsLocked { get; }
 
@@ -101,7 +101,7 @@ public class ThreadCreateAuditLogData : IAuditLogData
     /// <returns>
     ///     An <see cref="int"/> representing the time in seconds required before the user can send another
     ///     message; <c>0</c> if disabled.
-    ///     <see langword="null"/> if this is not mentioned in this entry.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public int? SlowModeInterval { get; }
 
@@ -109,7 +109,7 @@ public class ThreadCreateAuditLogData : IAuditLogData
     ///     Gets the applied tags of this thread.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if the property was not updated.
+    ///     <see langword="null" /> if the property was not updated.
     /// </remarks>
     public IReadOnlyCollection<ulong> AppliedTags { get; }
 
@@ -117,7 +117,7 @@ public class ThreadCreateAuditLogData : IAuditLogData
     ///     Gets the flags of the thread channel.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> if the property was not updated.
+    ///     <see langword="null" /> if the property was not updated.
     /// </remarks>
     public ChannelFlags? Flags { get; }
 }

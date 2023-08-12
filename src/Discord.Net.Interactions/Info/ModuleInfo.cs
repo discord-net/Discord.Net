@@ -29,12 +29,12 @@ namespace Discord.Interactions
         public string SlashGroupName { get; }
 
         /// <summary>
-        ///     Gets <see langword="true"/> if this module is marked with a <see cref="GroupAttribute"/>.
+        ///     Gets <see langword="true" /> if this module is marked with a <see cref="GroupAttribute"/>.
         /// </summary>
         public bool IsSlashGroup => !string.IsNullOrEmpty(SlashGroupName);
 
         /// <summary>
-        ///     Gets the description of this module if <see cref="IsSlashGroup"/> is <see langword="true"/>.
+        ///     Gets the description of this module if <see cref="IsSlashGroup"/> is <see langword="true" />.
         /// </summary>
         public string Description { get; }
 
@@ -87,12 +87,12 @@ namespace Discord.Interactions
         public IReadOnlyCollection<ModalCommandInfo> ModalCommands { get; }
 
         /// <summary>
-        ///     Gets the declaring type of this module, if <see cref="IsSubModule"/> is <see langword="true"/>.
+        ///     Gets the declaring type of this module, if <see cref="IsSubModule"/> is <see langword="true" />.
         /// </summary>
         public ModuleInfo Parent { get; }
 
         /// <summary>
-        ///     Gets <see langword="true"/> if this module is declared by another <see cref="InteractionModuleBase{T}"/>.
+        ///     Gets <see langword="true" /> if this module is declared by another <see cref="InteractionModuleBase{T}"/>.
         /// </summary>
         public bool IsSubModule => Parent != null;
 
@@ -107,12 +107,12 @@ namespace Discord.Interactions
         public IReadOnlyCollection<PreconditionAttribute> Preconditions { get; }
 
         /// <summary>
-        ///     Gets <see langword="true"/> if this module has a valid <see cref="GroupAttribute"/> and has no parent with a <see cref="GroupAttribute"/>.
+        ///     Gets <see langword="true" /> if this module has a valid <see cref="GroupAttribute"/> and has no parent with a <see cref="GroupAttribute"/>.
         /// </summary>
         public bool IsTopLevelGroup { get; }
 
         /// <summary>
-        ///     Gets <see langword="true"/> if this module will not be registered by <see cref="InteractionService.RegisterCommandsGloballyAsync(bool)"/>
+        ///     Gets <see langword="true" /> if this module will not be registered by <see cref="InteractionService.RegisterCommandsGloballyAsync(bool)"/>
         ///     or <see cref="InteractionService.RegisterCommandsToGuildAsync(ulong, bool)"/> methods.
         /// </summary>
         public bool DontAutoRegister { get; }

@@ -12,11 +12,11 @@ public class VoiceChannelProperties : TextChannelProperties
     /// </summary>
     public Optional<int> Bitrate { get; set; }
     /// <summary>
-    ///     Gets or sets the maximum number of users that can be present in a channel, or <see langword="null"/> if none.
+    ///     Gets or sets the maximum number of users that can be present in a channel, or <see langword="null" /> if none.
     /// </summary>
     public Optional<int?> UserLimit { get; set; }
     /// <summary>
-    ///     Gets or sets the channel voice region id, automatic when set to <see langword="null"/>.
+    ///     Gets or sets the channel voice region id, automatic when set to <see langword="null" />.
     /// </summary>
     public Optional<string> RTCRegion { get; set; }
 

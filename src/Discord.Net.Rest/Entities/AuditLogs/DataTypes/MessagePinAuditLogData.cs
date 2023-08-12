@@ -48,10 +48,10 @@ public class MessagePinAuditLogData : IAuditLogData
     ///     Gets the user of the message that was pinned if available.
     /// </summary>
     /// <remarks>
-    ///     Will be <see langword="null"/> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
+    ///     Will be <see langword="null" /> if the user is a 'Deleted User#....' because Discord does send user data for deleted users.
     /// </remarks>
     /// <returns>
-    ///     A user object representing the user that created the pinned message or <see langword="null"/>.
+    ///     A user object representing the user that created the pinned message or <see langword="null" />.
     /// </returns>
     public IUser Target { get; }
 }

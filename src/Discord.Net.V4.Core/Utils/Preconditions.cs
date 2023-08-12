@@ -4,13 +4,13 @@ internal static class Preconditions
 {
     #region Objects
 
-    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
     public static void NotNull<T>(T obj, string name, string? msg = null) where T : class
     {
         if (obj == null) throw CreateNotNullException(name, msg);
     }
 
-    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
     public static void NotNull<T>(Optional<T> obj, string name, string? msg = null) where T : class
     {
         if (obj.IsSpecified && obj.Value == null) throw CreateNotNullException(name, msg);
@@ -36,7 +36,7 @@ internal static class Preconditions
     }
 
     /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
-    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
     public static void NotNullOrEmpty(string obj, string name, string? msg = null)
     {
         if (obj == null)
@@ -45,7 +45,7 @@ internal static class Preconditions
             throw CreateNotEmptyException(name, msg);
     }
     /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
-    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
     public static void NotNullOrEmpty(Optional<string> obj, string name, string? msg = null)
     {
         if (obj.IsSpecified)
@@ -57,7 +57,7 @@ internal static class Preconditions
         }
     }
     /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
-    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
     public static void NotNullOrWhitespace(string obj, string name, string? msg = null)
     {
         if (obj == null)
@@ -66,7 +66,7 @@ internal static class Preconditions
             throw CreateNotEmptyException(name, msg);
     }
     /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
-    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null" />.</exception>
     public static void NotNullOrWhitespace(Optional<string> obj, string name, string? msg = null)
     {
         if (obj.IsSpecified)

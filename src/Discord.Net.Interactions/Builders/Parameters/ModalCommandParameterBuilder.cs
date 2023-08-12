@@ -11,7 +11,7 @@ namespace Discord.Interactions.Builders
         protected override ModalCommandParameterBuilder Instance => this;
 
         /// <summary>
-        ///     Gets the built <see cref="ModalInfo"/> class for this parameter, if <see cref="IsModalParameter"/> is <see langword="true"/>.
+        ///     Gets the built <see cref="ModalInfo"/> class for this parameter, if <see cref="IsModalParameter"/> is <see langword="true" />.
         /// </summary>
         public ModalInfo Modal { get; private set; }
 
@@ -21,7 +21,7 @@ namespace Discord.Interactions.Builders
         public bool IsModalParameter => Modal is not null;
 
         /// <summary>
-        ///     Gets the <see cref="TypeReader"/> assigned to this parameter, if <see cref="IsModalParameter"/> is <see langword="true"/>.
+        ///     Gets the <see cref="TypeReader"/> assigned to this parameter, if <see cref="IsModalParameter"/> is <see langword="true" />.
         /// </summary>
         public TypeReader TypeReader { get; private set; }
 

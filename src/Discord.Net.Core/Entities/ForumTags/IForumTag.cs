@@ -13,7 +13,7 @@ public interface IForumTag
     string Name { get; }
 
     /// <summary>
-    ///     Gets the emoji of the tag or <see langword="null"/> if none is set.
+    ///     Gets the emoji of the tag or <see langword="null" /> if none is set.
     /// </summary>
     /// <remarks>
     ///     If the emoji is <see cref="Emote"/> only the <see cref="Emote.Id"/> will be populated.

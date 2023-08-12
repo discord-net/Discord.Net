@@ -124,7 +124,7 @@ namespace Discord
         /// <param name="name">The name of the override to get.</param>
         /// <returns>
         ///     A task representing the asynchronous get operation. The tasks result is an <see cref="Override"/>
-        ///     if it exists; otherwise <see langword="null"/>.
+        ///     if it exists; otherwise <see langword="null" />.
         /// </returns>
         public static async Task<Override> GetOverrideAsync(string name)
         {

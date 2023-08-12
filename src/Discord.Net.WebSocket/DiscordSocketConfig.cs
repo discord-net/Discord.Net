@@ -31,7 +31,7 @@ namespace Discord.WebSocket
         public const string GatewayEncoding = "json";
 
         /// <summary>
-        ///     Gets or sets the WebSocket host to connect to. If <see langword="null"/>, the client will use the
+        ///     Gets or sets the WebSocket host to connect to. If <see langword="null" />, the client will use the
         ///     /gateway endpoint.
         /// </summary>
         public string GatewayHost { get; set; } = null;
@@ -50,7 +50,7 @@ namespace Discord.WebSocket
         ///     Gets or sets the total number of shards for this application.
         /// </summary>
         /// <remarks>
-        ///     If this is left <see langword="null"/> in a sharded client the bot will get the recommended shard
+        ///     If this is left <see langword="null" /> in a sharded client the bot will get the recommended shard
         ///     count from discord and use that.
         /// </remarks>
         public int? TotalShards { get; set; } = null;
@@ -59,7 +59,7 @@ namespace Discord.WebSocket
         ///     Gets or sets whether or not the client should download the default stickers on startup.
         /// </summary>
         /// <remarks>
-        ///     When this is set to <see langword="false"/> default stickers aren't present and cannot be resolved by the client.
+        ///     When this is set to <see langword="false" /> default stickers aren't present and cannot be resolved by the client.
         ///     This will make all default stickers have the type of <see cref="SocketUnknownSticker"/>.
         /// </remarks>
         public bool AlwaysDownloadDefaultStickers { get; set; } = false;
@@ -136,7 +136,7 @@ namespace Discord.WebSocket
 
         /// <summary>
         ///     Gets or sets the timeout for event handlers, in milliseconds, after which a warning will be logged.
-        ///     Setting this property to <see langword="null"/>disables this check.
+        ///     Setting this property to <see langword="null" />disables this check.
         /// </summary>
         public int? HandlerTimeout { get; set; } = 3000;
 

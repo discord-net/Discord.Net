@@ -14,7 +14,7 @@ namespace Discord.Commands
         /// <param name="c">The char prefix.</param>
         /// <param name="argPos">References where the command starts.</param>
         /// <returns>
-        ///     <see langword="true"/> if the message begins with the char <paramref name="c"/>; otherwise <see langword="false"/>.
+        ///     <see langword="true" /> if the message begins with the char <paramref name="c"/>; otherwise <see langword="false" />.
         /// </returns>
         public static bool HasCharPrefix(this IUserMessage msg, char c, ref int argPos)
         {

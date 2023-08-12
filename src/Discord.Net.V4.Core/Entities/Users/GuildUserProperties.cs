@@ -10,7 +10,7 @@ public class GuildUserProperties
     ///     Gets or sets whether the user should be muted in a voice channel.
     /// </summary>
     /// <remarks>
-    ///     If this value is set to <see langword="true"/>, no user will be able to hear this user speak in the guild.
+    ///     If this value is set to <see langword="true" />, no user will be able to hear this user speak in the guild.
     /// </remarks>
     public Optional<bool> Mute { get; set; }
 
@@ -18,7 +18,7 @@ public class GuildUserProperties
     ///     Gets or sets whether the user should be deafened in a voice channel.
     /// </summary>
     /// <remarks>
-    ///     If this value is set to <see langword="true"/>, this user will not be able to hear anyone speak in the guild.
+    ///     If this value is set to <see langword="true" />, this user will not be able to hear anyone speak in the guild.
     /// </remarks>
     public Optional<bool> Deaf { get; set; }
 
@@ -26,7 +26,7 @@ public class GuildUserProperties
     ///     Gets or sets the user's nickname.
     /// </summary>
     /// <remarks>
-    ///     To clear the user's nickname, this value can be set to <see langword="null"/> or
+    ///     To clear the user's nickname, this value can be set to <see langword="null" /> or
     ///     <see cref="string.Empty"/>.
     /// </remarks>
     public Optional<string> Nickname { get; set; }
@@ -62,7 +62,7 @@ public class GuildUserProperties
     public Optional<IEnumerable<ulong>> RoleIds { get; set; }
 
     /// <summary>
-    ///     Moves a user to a voice channel. If <see langword="null"/>, this user will be disconnected from their current voice channel.
+    ///     Moves a user to a voice channel. If <see langword="null" />, this user will be disconnected from their current voice channel.
     /// </summary>
     /// <remarks>
     ///     This user MUST already be in a <see cref="IVoiceChannel"/> for this to work.
@@ -71,7 +71,7 @@ public class GuildUserProperties
     public Optional<IVoiceChannel> Channel { get; set; }
 
     /// <summary>
-    ///     Moves a user to a voice channel. Set <see cref="Channel"/> to <see langword="null"/> to disconnect this user from their current voice channel.
+    ///     Moves a user to a voice channel. Set <see cref="Channel"/> to <see langword="null" /> to disconnect this user from their current voice channel.
     /// </summary>
     /// <remarks>
     ///     This user MUST already be in a <see cref="IVoiceChannel"/> for this to work.
@@ -82,7 +82,7 @@ public class GuildUserProperties
     ///     Sets a timestamp how long a user should be timed out for.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> or a time in the past to clear a currently existing timeout.
+    ///     <see langword="null" /> or a time in the past to clear a currently existing timeout.
     /// </remarks>
     public Optional<DateTimeOffset?> TimedOutUntil { get; set; }
 

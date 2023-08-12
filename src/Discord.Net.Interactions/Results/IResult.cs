@@ -10,7 +10,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <returns>
         ///     A <see cref="InteractionCommandError" /> indicating the type of error that may have occurred during the operation; 
-        ///     <see langword="null"/> if the operation was successful.
+        ///     <see langword="null" /> if the operation was successful.
         /// </returns>
         InteractionCommandError? Error { get; }
 
@@ -26,7 +26,7 @@ namespace Discord.Interactions
         ///     Indicates whether the operation was successful or not.
         /// </summary>
         /// <returns>
-        ///     <see langword="true"/> if the result is positive; otherwise <see langword="false"/>.
+        ///     <see langword="true" /> if the result is positive; otherwise <see langword="false" />.
         /// </returns>
         bool IsSuccess { get; }
     }

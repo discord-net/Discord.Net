@@ -168,7 +168,7 @@ public class DiscordConfig
     ///     Gets or sets whether the initial log entry should be printed.
     /// </summary>
     /// <remarks>
-    ///     If set to <see langword="true"/>, the library will attempt to print the current version of the library, as well as
+    ///     If set to <see langword="true" />, the library will attempt to print the current version of the library, as well as
     ///     the API version it uses on startup.
     /// </remarks>
     internal bool DisplayInitialLog { get; set; } = true;
@@ -177,7 +177,7 @@ public class DiscordConfig
     /// 	Gets or sets whether or not rate-limits should use the system clock.
     /// </summary>
     /// <remarks>
-    ///		If set to <see langword="false"/>, we will use the X-RateLimit-Reset-After header
+    ///		If set to <see langword="false" />, we will use the X-RateLimit-Reset-After header
     ///		to determine when a rate-limit expires, rather than comparing the
     ///		X-RateLimit-Reset timestamp to the system time.
     ///
@@ -196,7 +196,7 @@ public class DiscordConfig
     ///     + snowflake date to check if an interaction can be responded to.
     /// </summary>
     /// <remarks>
-    ///     If set to <see langword="false"/> then the CreatedAt property in an interaction
+    ///     If set to <see langword="false" /> then the CreatedAt property in an interaction
     ///     will be set to when it was received instead of the snowflakes date.
     ///     <br/>
     ///     <b>This will still require a stable clock on your system.</b>
@@ -209,7 +209,7 @@ public class DiscordConfig
     /// <remarks>
     ///     By default, the returned value will be "?Discord?#1234", to work with bidirectional usernames.
     ///     <br/>
-    ///     If set to <see langword="false"/>, this value will be "Discord#1234".
+    ///     If set to <see langword="false" />, this value will be "Discord#1234".
     /// </remarks>
     public bool FormatUsersInBidirectionalUnicode { get; set; } = true;
 

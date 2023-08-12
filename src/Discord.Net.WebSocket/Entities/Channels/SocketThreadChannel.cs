@@ -58,7 +58,7 @@ namespace Discord.WebSocket
         public bool HasJoined { get; private set; }
 
         /// <summary>
-        ///     <see langword="true"/> if this thread is private, otherwise <see langword="false"/>
+        ///     <see langword="true" /> if this thread is private, otherwise <see langword="false" />
         /// </summary>
         public bool IsPrivateThread
             => Type == ThreadType.PrivateThread;

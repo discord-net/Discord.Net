@@ -390,7 +390,7 @@ namespace Discord.WebSocket
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the channel associated
-        ///     with the snowflake identifier; <see langword="null"/> when the channel cannot be found.
+        ///     with the snowflake identifier; <see langword="null" /> when the channel cannot be found.
         /// </returns>
         public async ValueTask<IChannel> GetChannelAsync(ulong id, RequestOptions options = null)
             => GetChannel(id) ?? (IChannel)await ClientHelper.GetChannelAsync(this, id, options).ConfigureAwait(false);
@@ -408,7 +408,7 @@ namespace Discord.WebSocket
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the user associated with
-        ///     the snowflake identifier; <see langword="null"/> if the user is not found.
+        ///     the snowflake identifier; <see langword="null" /> if the user is not found.
         /// </returns>
         public async ValueTask<IUser> GetUserAsync(ulong id, RequestOptions options = null)
             => await ((IDiscordClient)this).GetUserAsync(id, CacheMode.AllowDownload, options).ConfigureAwait(false);
@@ -435,7 +435,7 @@ namespace Discord.WebSocket
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A ValueTask that represents the asynchronous get operation. The task result contains the application command if found, otherwise
-        ///     <see langword="null"/>.
+        ///     <see langword="null" />.
         /// </returns>
         public async ValueTask<SocketApplicationCommand> GetGlobalApplicationCommandAsync(ulong id, RequestOptions options = null)
         {
@@ -577,7 +577,7 @@ namespace Discord.WebSocket
         ///     Gets a sticker.
         /// </summary>
         /// <param name="id">The unique identifier of the sticker.</param>
-        /// <returns>A sticker if found, otherwise <see langword="null"/>.</returns>
+        /// <returns>A sticker if found, otherwise <see langword="null" />.</returns>
         public SocketSticker GetSticker(ulong id)
             => GetStickerAsync(id, CacheMode.CacheOnly).GetAwaiter().GetResult();
 

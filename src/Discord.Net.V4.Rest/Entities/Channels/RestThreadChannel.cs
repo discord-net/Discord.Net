@@ -96,7 +96,7 @@ namespace Discord.Rest
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task representing the asynchronous get operation. The task returns a
-        ///     <see cref="RestThreadUser"/> if found, otherwise <see langword="null"/>.
+        ///     <see cref="RestThreadUser"/> if found, otherwise <see langword="null" />.
         /// </returns>
         public new Task<RestThreadUser> GetUserAsync(ulong userId, RequestOptions options = null)
             => ThreadHelper.GetUserAsync(userId, this, Discord, options);

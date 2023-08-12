@@ -12,7 +12,7 @@ namespace Discord
         ///     Gets the <see cref="StagePrivacyLevel"/> of the current stage.
         /// </summary>
         /// <remarks>
-        ///     If the stage isn't live then this property will be set to <see langword="null"/>.
+        ///     If the stage isn't live then this property will be set to <see langword="null" />.
         /// </remarks>
         StagePrivacyLevel? PrivacyLevel { get; }
 

@@ -26,7 +26,7 @@ namespace Discord
         /// </summary>
         /// <returns>
         ///     A <see cref="int"/> representing the height of this thumbnail if it can be retrieved; otherwise 
-        ///     <see langword="null"/>.
+        ///     <see langword="null" />.
         /// </returns>
         public int? Height { get; }
         /// <summary>
@@ -34,7 +34,7 @@ namespace Discord
         /// </summary>
         /// <returns>
         ///     A <see cref="int"/> representing the width of this thumbnail if it can be retrieved; otherwise 
-        ///     <see langword="null"/>.
+        ///     <see langword="null" />.
         /// </returns>
         public int? Width { get; }
 

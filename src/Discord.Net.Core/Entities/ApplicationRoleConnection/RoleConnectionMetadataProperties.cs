@@ -65,7 +65,7 @@ public class RoleConnectionMetadataProperties
     }
 
     /// <summary>
-    ///     Gets or sets translations of the name. <see langword="null"/> if not set.
+    ///     Gets or sets translations of the name. <see langword="null" /> if not set.
     /// </summary>
     public IReadOnlyDictionary<string, string> NameLocalizations
     {
@@ -81,7 +81,7 @@ public class RoleConnectionMetadataProperties
     }
 
     /// <summary>
-    ///     Gets or sets translations of the description. <see langword="null"/> if not set.
+    ///     Gets or sets translations of the description. <see langword="null" /> if not set.
     /// </summary>
     public IReadOnlyDictionary<string, string> DescriptionLocalizations
     {

@@ -32,7 +32,7 @@ public struct MemberRoleEditInfo
     ///     Gets a value that indicates whether the role was added to the user.
     /// </summary>
     /// <returns>
-    ///     <see langword="true"/> if the role was added to the user; otherwise <see langword="false"/>.
+    ///     <see langword="true" /> if the role was added to the user; otherwise <see langword="false" />.
     /// </returns>
     public bool Added { get; }
 }

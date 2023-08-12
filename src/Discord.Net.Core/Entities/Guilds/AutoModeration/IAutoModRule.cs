@@ -76,7 +76,7 @@ namespace Discord
         ///     Gets the total mention limit for this rule.
         /// </summary>
         /// <remarks>
-        ///     This property will be <see langword="null"/> if <see cref="TriggerType"/> is not
+        ///     This property will be <see langword="null" /> if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.MentionSpam"/>.
         /// </remarks>
         public int? MentionTotalLimit { get; }

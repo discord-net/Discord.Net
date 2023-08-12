@@ -41,73 +41,73 @@ public class AutoModRuleInfo
 
     /// <inheritdoc cref="IAutoModRule.Name"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public string Name { get; set; }
 
     /// <inheritdoc cref="IAutoModRule.EventType"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public AutoModEventType? EventType { get; set; }
 
     /// <inheritdoc cref="IAutoModRule.TriggerType"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public AutoModTriggerType? TriggerType { get; set; }
 
     /// <inheritdoc cref="IAutoModRule.Enabled"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public bool? Enabled { get; set; }
 
     /// <inheritdoc cref="IAutoModRule.ExemptRoles"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public IReadOnlyCollection<ulong> ExemptRoles { get; set; }
 
     /// <inheritdoc cref="IAutoModRule.ExemptChannels"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public IReadOnlyCollection<ulong> ExemptChannels { get; set; }
 
     /// <inheritdoc cref="IAutoModRule.KeywordFilter"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public IReadOnlyCollection<string> KeywordFilter { get; }
 
     /// <inheritdoc cref="IAutoModRule.RegexPatterns"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public IReadOnlyCollection<string> RegexPatterns { get; }
 
     /// <inheritdoc cref="IAutoModRule.AllowList"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public IReadOnlyCollection<string> AllowList { get; }
 
     /// <inheritdoc cref="IAutoModRule.Presets"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public IReadOnlyCollection<KeywordPresetTypes> Presets { get; }
 
     /// <inheritdoc cref="IAutoModRule.MentionTotalLimit"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public int? MentionTotalLimit { get; }
 
     /// <inheritdoc cref="IAutoModRule.Actions"/>
     /// <remarks>
-    ///     <see langword="null"/> if this property is not mentioned in this entry.
+    ///     <see langword="null" /> if this property is not mentioned in this entry.
     /// </remarks>
     public IReadOnlyCollection<AutoModRuleAction> Actions { get; private set; }
 }
