@@ -721,7 +721,7 @@ namespace Discord.API
 
             try
             {
-                return await SendAsync<StageInstance>("POST", () => $"stage-instances/{channelId}", bucket, options: options).ConfigureAwait(false);
+                return await SendAsync<StageInstance>("GET", () => $"stage-instances/{channelId}", bucket, options: options).ConfigureAwait(false);
             }
             catch (HttpException httpEx) when (httpEx.HttpCode == HttpStatusCode.NotFound)
             {

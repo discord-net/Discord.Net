@@ -26,6 +26,7 @@ using RoleModel = Discord.API.Role;
 using StickerModel = Discord.API.Sticker;
 using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
+using StageInstanceModel = Discord.API.StageInstance;
 
 namespace Discord.WebSocket
 {
@@ -47,6 +48,7 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketCustomSticker> _stickers;
         private ConcurrentDictionary<ulong, SocketGuildEvent> _events;
         private ConcurrentDictionary<ulong, SocketAutoModRule> _automodRules;
+        private ConcurrentDictionary<ulong, SocketStageInstance> _stagesInstances;
         private ImmutableArray<GuildEmote> _emotes;
 
         private readonly AuditLogCache _auditLogs;
@@ -510,6 +512,15 @@ namespace Discord.WebSocket
             }
             _events = events;
 
+            var stageInstances = new ConcurrentDictionary<ulong, SocketStageInstance>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.StageInstances.Length * 1.05));
+            {
+                foreach (var stageInstanceModel in model.StageInstances)
+                {
+                    var stageInstance = SocketStageInstance.Create(Discord, stageInstanceModel);
+                    stageInstances.TryAdd(stageInstance.Id, stageInstance);
+                }
+            }
+            _stagesInstances = stageInstances;
 
             _syncPromise = new TaskCompletionSource<bool>();
             _downloaderPromise = new TaskCompletionSource<bool>();
@@ -894,6 +905,38 @@ namespace Discord.WebSocket
 
             _channels.Clear();
         }
+
+        /// <summary>
+        ///     Gets stage instances currently running in the guild.
+        /// </summary>
+        public IReadOnlyCollection<SocketStageInstance> StageInstances => _stagesInstances.ToReadOnlyCollection();
+
+        internal SocketStageInstance AddOrUpdateStageInstance(StageInstanceModel model)
+        {
+            if (_stagesInstances.TryGetValue(model.Id, out var stageInstance))
+            {
+                stageInstance.Update(model);
+                return stageInstance;
+            }
+
+            stageInstance = SocketStageInstance.Create(Discord, model);
+            _stagesInstances.TryAdd(model.Id, stageInstance);
+            return stageInstance;
+        }
+
+        /// <summary>
+        ///     Gets a stage instance from cache. Returns <see langword="null"/> if the stage instance was not found.
+        /// </summary>
+        public SocketStageInstance GetStageInstance(ulong id)
+        {
+            return _stagesInstances.TryGetValue(id, out var stageInstance) ? stageInstance : null;
+        }
+
+        internal SocketStageInstance RemoveStageInstance(ulong id)
+        {
+            return _stagesInstances.TryRemove(id, out var stageInstance) ? stageInstance : null;
+        }
+
         #endregion
 
         #region Voice Regions

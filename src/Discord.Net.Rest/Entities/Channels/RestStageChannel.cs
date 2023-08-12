@@ -20,14 +20,13 @@ namespace Discord.Rest
         public override bool IsTextInVoice
             => true;
 
-        /// <inheritdoc/>
-        public StagePrivacyLevel? PrivacyLevel { get; private set; }
+        /// <inheritdoc cref="IStageChannel.StageInstance" />
+        /// <remarks>
+        ///     This property might be <see langword="null" /> even if the stage is actually running. Use <see cref="UpdateAsync"/> to
+        ///     update entity's state.
+        /// </remarks>
+        public RestStageInstance StageInstance { get; set; }
 
-        /// <inheritdoc/>
-        public bool? IsDiscoverableDisabled { get; private set; }
-
-        /// <inheritdoc/>
-        public bool IsLive { get; private set; }
         internal RestStageChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id) { }
 
@@ -38,42 +37,45 @@ namespace Discord.Rest
             return entity;
         }
 
-        internal void Update(StageInstance model, bool isLive = false)
+        internal void UpdateStageInstance(StageInstance model)
         {
-            IsLive = isLive;
-            if (isLive)
+            if (model is null)
             {
-                PrivacyLevel = model.PrivacyLevel;
-                IsDiscoverableDisabled = model.DiscoverableDisabled;
+                StageInstance = null;
+                return;
             }
+
+            if (StageInstance is null)
+                StageInstance = RestStageInstance.Create(Discord, model, this);
             else
-            {
-                PrivacyLevel = null;
-                IsDiscoverableDisabled = null;
-            }
+                StageInstance.Update(model);
         }
 
         /// <inheritdoc/>
         public async Task ModifyInstanceAsync(Action<StageInstanceProperties> func, RequestOptions options = null)
         {
-            var model = await ChannelHelper.ModifyAsync(this, Discord, func, options);
+            var model = await ChannelHelper.ModifyStageAsync(this, Discord, func, options);
 
-            Update(model, true);
+            UpdateStageInstance(model);
         }
 
-        /// <inheritdoc/>
-        public async Task StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, RequestOptions options = null)
+        /// <inheritdoc cref="IStageChannel.StartStageAsync" />
+        public async Task<RestStageInstance> StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, bool sendStartNotification = false,
+            RequestOptions options = null)
         {
             var args = new CreateStageInstanceParams
             {
                 ChannelId = Id,
                 PrivacyLevel = privacyLevel,
-                Topic = topic
+                Topic = topic,
+                SendNotification = sendStartNotification
             };
 
             var model = await Discord.ApiClient.CreateStageInstanceAsync(args, options);
 
-            Update(model, true);
+            StageInstance = RestStageInstance.Create(Discord, model, this);
+
+            return StageInstance;
         }
 
         /// <inheritdoc/>
@@ -81,17 +83,15 @@ namespace Discord.Rest
         {
             await Discord.ApiClient.DeleteStageInstanceAsync(Id, options);
 
-            Update(null);
+            UpdateStageInstance(null);
         }
 
         /// <inheritdoc/>
         public override async Task UpdateAsync(RequestOptions options = null)
         {
             await base.UpdateAsync(options);
-
-            var model = await Discord.ApiClient.GetStageInstanceAsync(Id, options);
-
-            Update(model, model != null);
+            
+            UpdateStageInstance(await Discord.ApiClient.GetStageInstanceAsync(Id, options));
         }
 
         /// <inheritdoc/>
@@ -150,5 +150,16 @@ namespace Discord.Rest
 
             return Discord.ApiClient.ModifyUserVoiceState(Guild.Id, user.Id, args);
         }
+
+        #region IStageChannel
+
+        /// <inheritdoc/>
+        IStageInstance IStageChannel.StageInstance => StageInstance;
+
+        /// <inheritdoc/>
+        async Task<IStageInstance> IStageChannel.StartStageAsync(string topic, StagePrivacyLevel privacyLevel, bool sendStartNotification, RequestOptions options)
+            => await StartStageAsync(topic, privacyLevel, sendStartNotification, options);
+
+        #endregion
     }
 }
