@@ -1,4 +1,6 @@
+using Discord.API;
 using Discord.API.Rest;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -28,11 +30,14 @@ namespace Discord.Rest
             var args = new ModifyApplicationProperties();
             func(args);
 
-            if(args.Tags.IsSpecified)
+            if (args.Tags.IsSpecified)
+            {
+                Preconditions.AtMost(args.Tags.Value.Length, DiscordConfig.MaxApplicationTagCount, nameof(args.Tags), $"An application can have a maximum of {DiscordConfig.MaxApplicationTagCount} applied.");
                 foreach (var tag in args.Tags.Value)
                     Preconditions.AtMost(tag.Length, DiscordConfig.MaxApplicationTagLength, nameof(args.Tags), $"An application tag must have length less or equal to {DiscordConfig.MaxApplicationTagLength}");
+            }
 
-            if(args.Description.IsSpecified)
+            if (args.Description.IsSpecified)
                 Preconditions.AtMost(args.Description.Value.Length, DiscordConfig.MaxApplicationDescriptionLength, nameof(args.Description), $"An application description tag mus have length less or equal to {DiscordConfig.MaxApplicationDescriptionLength}");
 
             return await client.ApiClient.ModifyCurrentBotApplicationAsync(new()
@@ -42,6 +47,18 @@ namespace Discord.Rest
                 Icon = args.Icon.IsSpecified ? args.Icon.Value?.ToModel() : Optional<API.Image?>.Unspecified,
                 InteractionsEndpointUrl = args.InteractionsEndpointUrl,
                 RoleConnectionsEndpointUrl = args.RoleConnectionsEndpointUrl,
+                Flags = args.Flags,
+                CoverImage = args.CoverImage.IsSpecified ? args.CoverImage.Value?.ToModel() : Optional<API.Image?>.Unspecified,
+                CustomInstallUrl = args.CustomInstallUrl,
+                InstallParams = args.InstallParams.IsSpecified
+                    ? args.InstallParams.Value is null
+                        ? null
+                        : new InstallParams
+                        {
+                            Permission = (ulong)args.InstallParams.Value.Permission,
+                            Scopes = args.InstallParams.Value.Scopes.ToArray()
+                        }
+                    : Optional<InstallParams>.Unspecified,
             }, options);
         }
 

@@ -45,6 +45,9 @@ namespace Discord.WebSocket
         public RoleTags Tags { get; private set; }
 
         /// <inheritdoc />
+        public RoleFlags Flags { get; private set; }
+
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <summary>
         ///     Returns a value that determines if the role is an @everyone role.
@@ -82,6 +85,8 @@ namespace Discord.WebSocket
             Position = model.Position;
             Color = new Color(model.Color);
             Permissions = new GuildPermissions(model.Permissions);
+            Flags = model.Flags;
+
             if (model.Tags.IsSpecified)
                 Tags = model.Tags.Value.ToEntity();
 

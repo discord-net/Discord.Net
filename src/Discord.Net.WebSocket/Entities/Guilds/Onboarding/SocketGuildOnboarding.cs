@@ -1,6 +1,9 @@
+using Discord.Rest;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using Model = Discord.API.GuildOnboarding;
 
 namespace Discord.WebSocket;
@@ -8,6 +11,8 @@ namespace Discord.WebSocket;
 /// <inheritdoc />
 public class SocketGuildOnboarding : IGuildOnboarding
 {
+    internal DiscordSocketClient Discord;
+
     /// <inheritdoc />
     public ulong GuildId { get; private set; }
 
@@ -28,17 +33,38 @@ public class SocketGuildOnboarding : IGuildOnboarding
     /// <inheritdoc />
     public bool IsEnabled { get; private set; }
 
+    /// <inheritdoc />
+    public bool IsBelowRequirements { get; private set; }
+
+    /// <inheritdoc />
+    public GuildOnboardingMode Mode { get; private set; }
+
     internal SocketGuildOnboarding(DiscordSocketClient discord, Model model, SocketGuild guild)
     {
-        GuildId = model.GuildId;
+        Discord = discord;
         Guild = guild;
+        Update(model);
+    }
+
+    internal void Update(Model model)
+    {
+        GuildId = model.GuildId;
         IsEnabled = model.Enabled;
+        Mode = model.Mode;
+        IsBelowRequirements = model.IsBelowRequirements;
 
         DefaultChannelIds = model.DefaultChannelIds;
+        DefaultChannels = model.DefaultChannelIds.Select(Guild.GetChannel).ToImmutableArray();
 
-        DefaultChannels = model.DefaultChannelIds.Select(guild.GetChannel).ToImmutableArray();
-        Prompts = model.Prompts.Select(x => new SocketGuildOnboardingPrompt(discord, x.Id, x, guild)).ToImmutableArray();
+        Prompts = model.Prompts.Select(x => new SocketGuildOnboardingPrompt(Discord, x.Id, x, Guild)).ToImmutableArray();
+    }
 
+    ///<inheritdoc/>
+    public async Task ModifyAsync(Action<GuildOnboardingProperties> props, RequestOptions options = null)
+    {
+        var model = await GuildHelper.ModifyGuildOnboardingAsync(Guild, props, Discord, options);
+
+        Update(model);
     }
 
     #region IGuildOnboarding

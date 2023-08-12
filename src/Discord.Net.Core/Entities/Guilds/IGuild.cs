@@ -115,7 +115,7 @@ namespace Discord
         ///     This boolean is used to determine if the guild is currently connected to the WebSocket and is ready to be used/accessed.
         /// </remarks>
         /// <returns>
-        ///     <see langword="true" /> if this guild is currently connected and ready to be used; otherwise <see langword="false" />.
+        ///     <see langword="true" /> if this guild is currently connected and ready to be used; otherwise <see langword="false"/>.
         /// </returns>
         bool Available { get; }
 
@@ -1317,5 +1317,13 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IGuildOnboarding"/>.
         /// </returns>
         Task<IGuildOnboarding> GetOnboardingAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies the onboarding object configured for the guild.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="IGuildOnboarding"/>.
+        /// </returns>
+        Task<IGuildOnboarding> ModifyOnboardingAsync(Action<GuildOnboardingProperties> props, RequestOptions options = null);
     }
 }

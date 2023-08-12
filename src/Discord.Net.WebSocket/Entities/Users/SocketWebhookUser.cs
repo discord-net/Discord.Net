@@ -25,7 +25,8 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get; internal set; }
         /// <inheritdoc />
         public override string AvatarId { get; internal set; }
-
+        /// <inheritdoc />
+        public override string GlobalName { get; internal set; }
 
         /// <inheritdoc />
         public override bool IsBot { get; internal set; }
@@ -49,7 +50,10 @@ namespace Discord.WebSocket
             return entity;
         }
 
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)";
+        private string DebuggerDisplay => DiscriminatorValue != 0
+            ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)"
+            : $"{Username} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)";
+
         internal new SocketWebhookUser Clone() => MemberwiseClone() as SocketWebhookUser;
         #endregion
 

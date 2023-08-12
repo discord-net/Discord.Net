@@ -357,8 +357,8 @@ namespace Discord
         ///     in these permissions.
         /// </summary>
         /// <param name="permission">The permission value to check for.</param>
-        /// <returns><see langword="true" /> if the permission is enabled, <see langword="false" /> otherwise.</returns>
-        public readonly bool Has(GuildPermission permission) => Permissions.GetValue(RawValue, permission);
+        /// <returns><see langword="true"/> if the permission is enabled, <see langword="false" /> otherwise.</returns>
+        public bool Has(GuildPermission permission) => Permissions.GetValue(RawValue, permission);
 
         /// <summary>
         ///     Returns a <see cref="List{T}"/> containing all of the <see cref="GuildPermission"/>

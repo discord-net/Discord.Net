@@ -19,6 +19,9 @@ namespace Discord.API
         [JsonProperty("accent_color")]
         public Optional<uint?> AccentColor { get; set; }
 
+        [JsonProperty("global_name")]
+        public Optional<string> GlobalName { get; set; }
+
         //CurrentUser
         [JsonProperty("verified")]
         public Optional<bool> Verified { get; set; }

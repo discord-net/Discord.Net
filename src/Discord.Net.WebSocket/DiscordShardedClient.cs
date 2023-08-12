@@ -343,7 +343,7 @@ namespace Discord.WebSocket
             return null;
         }
         /// <inheritdoc />
-        public override SocketUser GetUser(string username, string discriminator)
+        public override SocketUser GetUser(string username, string discriminator = null)
         {
             for (int i = 0; i < _shards.Length; i++)
             {
@@ -410,6 +410,14 @@ namespace Discord.WebSocket
         {
             for (int i = 0; i < _shards.Length; i++)
                 await _shards[i].SetActivityAsync(activity).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public override async Task SetCustomStatusAsync(string status)
+        {
+            var statusGame = new CustomStatusGame(status);
+            for (int i = 0; i < _shards.Length; i++)
+                await _shards[i].SetActivityAsync(statusGame).ConfigureAwait(false);
         }
 
         private void RegisterEvents(DiscordSocketClient client, bool isPrimary)

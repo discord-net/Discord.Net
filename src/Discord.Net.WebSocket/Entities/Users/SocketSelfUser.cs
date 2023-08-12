@@ -29,6 +29,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
         /// <inheritdoc />
+        public override string GlobalName { get { return GlobalUser.GlobalName; } internal set { GlobalUser.GlobalName = value; } }
+        /// <inheritdoc />
         internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
         /// <inheritdoc />
         public UserProperties Flags { get; internal set; }
@@ -91,7 +93,10 @@ namespace Discord.WebSocket
         public Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null)
             => UserHelper.ModifyAsync(this, Discord, func, options);
 
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Self)";
+        private string DebuggerDisplay => DiscriminatorValue != 0
+            ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Self)"
+            : $"{Username} ({Id}{(IsBot ? ", Bot" : "")}, Self)";
+
         internal new SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;
     }
 }

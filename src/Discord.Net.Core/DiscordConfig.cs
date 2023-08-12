@@ -232,5 +232,10 @@ namespace Discord
         ///     Returns the max length of an application description.
         /// </summary>
         public const int MaxApplicationDescriptionLength = 400;
+
+        /// <summary>
+        ///     Returns the max amount of tags applied to an application.
+        /// </summary>
+        public const int MaxApplicationTagCount = 5;
     }
 }

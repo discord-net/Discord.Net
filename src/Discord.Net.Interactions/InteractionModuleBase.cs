@@ -97,8 +97,9 @@ namespace Discord.Interactions
 
         /// <inheritdoc cref="IMessageChannel.SendMessageAsync(string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
         protected virtual async Task<IUserMessage> ReplyAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null,
-            AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null) =>
-            await Context.Channel.SendMessageAsync(text, false, embed, options, allowedMentions, messageReference, components).ConfigureAwait(false);
+            AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
+            Embed[] embeds = null, MessageFlags flags = MessageFlags.None) =>
+            await Context.Channel.SendMessageAsync(text, false, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags).ConfigureAwait(false);
 
         /// <inheritdoc cref="IDiscordInteraction.GetOriginalResponseAsync(RequestOptions)"/>
         protected virtual Task<IUserMessage> GetOriginalResponseAsync(RequestOptions options = null)

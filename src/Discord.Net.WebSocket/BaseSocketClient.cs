@@ -140,7 +140,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A generic WebSocket-based user; <see langword="null" /> when the user cannot be found.
         /// </returns>
-        public abstract SocketUser GetUser(string username, string discriminator);
+        public abstract SocketUser GetUser(string username, string discriminator = null);
         /// <summary>
         ///     Gets a channel.
         /// </summary>
@@ -227,6 +227,16 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous set operation.
         /// </returns>
         public abstract Task SetActivityAsync(IActivity activity);
+
+        /// <summary>
+        ///     Sets the custom status of the logged-in user.
+        /// </summary>
+        /// <param name="status">The string that will be displayed as status.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous set operation.
+        /// </returns>
+        public abstract Task SetCustomStatusAsync(string status);
+
         /// <summary>
         ///     Attempts to download users into the user cache for the selected guilds.
         /// </summary>
