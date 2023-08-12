@@ -88,4 +88,9 @@ public interface IAttachment
     ///     Gets the base64 encoded bytearray representing a sampled waveform. <see langword="null" /> if the attachment is not a voice message.
     /// </summary>
     public string Waveform { get; }
+
+    /// <summary>
+    ///     Gets flags related to this to this attachment.
+    /// </summary>
+    public AttachmentFlags Flags { get; }
 }

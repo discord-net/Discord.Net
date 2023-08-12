@@ -32,7 +32,7 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
         ChannelIds = model.ChannelIds.ToImmutableArray();
         RoleIds = model.RoleIds.ToImmutableArray();
         Title = model.Title;
-        Description = model.Description.IsSpecified ? model.Description.Value : null;
+        Description = model.Description;
         
         if (model.Emoji.Id.HasValue)
         {

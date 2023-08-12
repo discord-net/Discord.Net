@@ -58,6 +58,11 @@ public interface IWebhook : IDeletable, ISnowflakeEntity
     ulong? ApplicationId { get; }
 
     /// <summary>
+    ///     Gets the type of this webhook.
+    /// </summary>
+    WebhookType Type { get; }
+
+    /// <summary>
     ///     Modifies this webhook.
     /// </summary>
     Task ModifyAsync(Action<WebhookProperties> func, RequestOptions? options = null);
