@@ -147,7 +147,7 @@ namespace Discord
                 //Give/Take User permissions
                 perms = channel.GetPermissionOverwrite(user);
                 if (perms != null)
-                    resolvedPermissions = (resolvedPermissions  & ~perms.Value.DenyValue) | perms.Value.AllowValue;
+                    resolvedPermissions = (resolvedPermissions & ~perms.Value.DenyValue) | perms.Value.AllowValue;
 
                 if (channel is ITextChannel)
                 {

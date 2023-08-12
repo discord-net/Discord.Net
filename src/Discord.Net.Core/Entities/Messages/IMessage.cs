@@ -21,33 +21,36 @@ namespace Discord
         ///     Gets the value that indicates whether this message was meant to be read-aloud by Discord.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this message was sent as a text-to-speech message; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this message was sent as a text-to-speech message; otherwise <see langword="false" />.
         /// </returns>
         bool IsTTS { get; }
         /// <summary>
         ///     Gets the value that indicates whether this message is pinned.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this message was added to its channel's pinned messages; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this message was added to its channel's pinned messages; otherwise <see langword="false" />.
         /// </returns>
         bool IsPinned { get; }
         /// <summary>
         ///     Gets the value that indicates whether or not this message's embeds are suppressed.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the embeds in this message have been suppressed (made invisible); otherwise <c>false</c>.
+        ///     <see langword="true" /> if the embeds in this message have been suppressed (made invisible); otherwise <see langword="false" />.
         /// </returns>
         bool IsSuppressed { get; }
         /// <summary>
         ///     Gets the value that indicates whether this message mentioned everyone.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this message mentioned everyone; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this message mentioned everyone; otherwise <see langword="false" />.
         /// </returns>
         bool MentionedEveryone { get; }
         /// <summary>
         ///     Gets the content for this message.
         /// </summary>
+        /// <remarks>
+        ///     This will be empty if the privileged <see cref="GatewayIntents.MessageContent"/> is disabled.
+        /// </remarks>
         /// <returns>
         ///     A string that contains the body of the message; note that this field may be empty if there is an embed.
         /// </returns>
@@ -55,6 +58,9 @@ namespace Discord
         /// <summary>
         ///     Gets the clean content for this message.
         /// </summary>
+        /// <remarks>
+        ///     This will be empty if the privileged <see cref="GatewayIntents.MessageContent"/> is disabled.
+        /// </remarks>
         /// <returns>
         ///     A string that contains the body of the message stripped of mentions, markdown, emojis and pings; note that this field may be empty if there is an embed.
         /// </returns>
@@ -70,10 +76,10 @@ namespace Discord
         ///     Gets the time of this message's last edit.
         /// </summary>
         /// <returns>
-        ///     Time of when the message was last edited; <c>null</c> if the message is never edited.
+        ///     Time of when the message was last edited; <see langword="null" /> if the message is never edited.
         /// </returns>
         DateTimeOffset? EditedTimestamp { get; }
-        
+
         /// <summary>
         ///     Gets the source channel of the message.
         /// </summary>
@@ -82,6 +88,14 @@ namespace Discord
         ///     Gets the author of this message.
         /// </summary>
         IUser Author { get; }
+
+        /// <summary>
+        ///     Gets the thread that was started from this message.
+        /// </summary>
+        /// <returns>
+        ///    An <see cref="IThreadChannel"/> object if this message has thread attached; otherwise <see langword="null"/>.
+        /// </returns>
+        IThreadChannel Thread { get; }
 
         /// <summary>
         ///     Gets all attachments included in this message.
@@ -183,7 +197,7 @@ namespace Discord
         ///     A read-only collection of sticker item objects.
         /// </returns>
         IReadOnlyCollection<IStickerItem> Stickers { get; }
-        
+
         /// <summary>
         ///     Gets the flags related to this message.
         /// </summary>
@@ -202,6 +216,14 @@ namespace Discord
         ///     A <see cref="IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null"/>.
         /// </returns>
         IMessageInteraction Interaction { get; }
+
+        /// <summary>
+        ///     Gets the data of the role subscription purchase or renewal that prompted this <see cref="MessageType.RoleSubscriptionPurchase"/> message.
+        /// </summary> 
+        /// <returns>
+        ///     A <see cref="MessageRoleSubscriptionData"/> if the message is a role subscription purchase message; otherwise <see langword="null"/>.
+        /// </returns>
+        MessageRoleSubscriptionData RoleSubscriptionData { get; }
 
         /// <summary>
         ///     Adds a reaction to this message.

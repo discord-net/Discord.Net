@@ -8,17 +8,21 @@ title: Terminology
 ## Preface
 
 Most terms for objects remain the same between 0.9 and 1.0 and above.
-The major difference is that the ``Server`` is now called ``Guild``
+The major difference is that the `Server` is now called `Guild`
 to stay in line with Discord internally.
 
 ## Implementation Specific Entities
 
 Discord.Net is split into a core library and two different
 implementations - `Discord.Net.Core`, `Discord.Net.Rest`, and
-`Discord.Net.WebSockets`.
+`Discord.Net.WebSocket`.
 
-As a bot developer, you will only need to use `Discord.Net.WebSockets`,
+You will typically only need to use `Discord.Net.WebSocket`,
 but you should be aware of the differences between them.
+
+> [!TIP]
+> If you are looking to implement Rest based interactions, or handle calls over REST in any other way,
+> `Discord.Net.Rest` is the resource most applicable to you. 
 
 `Discord.Net.Core` provides a set of interfaces that models Discord's
 API. These interfaces are consistent throughout all implementations of

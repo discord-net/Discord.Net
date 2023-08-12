@@ -35,7 +35,7 @@ namespace Discord
         /// </summary>
         /// <returns>
         ///     An <see cref="ulong"/> snowflake identifier representing the user who created this emoji; 
-        ///     <c>null</c> if unknown.
+        ///     <see langword="null" /> if unknown.
         /// </returns>
         public ulong? CreatorId { get; }
 

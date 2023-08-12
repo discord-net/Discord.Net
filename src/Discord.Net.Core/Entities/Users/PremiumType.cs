@@ -16,6 +16,11 @@ namespace Discord
         /// <summary>
         ///     Nitro subscription. Includes app perks as well as the games subscription service.
         /// </summary>
-        Nitro = 2
+        Nitro = 2,
+
+        /// <summary>
+        ///     Nitro Basic subscription. Includes app perks like video backgrounds, sending bigger files.
+        /// </summary>
+        NitroBasic = 3
     }
 }

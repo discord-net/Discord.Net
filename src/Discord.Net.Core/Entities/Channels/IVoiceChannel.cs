@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -6,7 +7,7 @@ namespace Discord
     /// <summary>
     ///     Represents a generic voice channel in a guild.
     /// </summary>
-    public interface IVoiceChannel : IMessageChannel, INestedChannel, IAudioChannel, IMentionable
+    public interface IVoiceChannel : ITextChannel, IAudioChannel
     {
         /// <summary>
         ///     Gets the bit-rate that the clients in this voice channel are requested to use.
@@ -21,9 +22,14 @@ namespace Discord
         /// </summary>
         /// <returns>
         ///     An <see cref="int"/> representing the maximum number of users that are allowed to be connected to this
-        ///     channel at once; <c>null</c> if a limit is not set.
+        ///     channel at once; <see langword="null" /> if a limit is not set.
         /// </returns>
         int? UserLimit { get; }
+
+        /// <summary>
+        ///     Gets the video quality mode for this channel.
+        /// </summary>
+        VideoQualityMode VideoQualityMode { get; }
 
         /// <summary>
         ///     Modifies this voice channel.

@@ -37,6 +37,8 @@ namespace Discord.Interactions.Builders
             if (!typeof(IModal).IsAssignableFrom(type))
                 throw new ArgumentException($"Must be an implementation of {nameof(IModal)}", nameof(type));
 
+            Type = type;
+
             _interactionService = interactionService;
             _components = new();
         }

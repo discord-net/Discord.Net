@@ -17,9 +17,9 @@ namespace Discord.Interactions
         /// <summary>
         ///     Initializes a new <see cref="RuntimeResult" /> class with the type of error and reason.
         /// </summary>
-        /// <param name="error">The type of failure, or <c>null</c> if none.</param>
+        /// <param name="error">The type of failure, or <see langword="null" /> if none.</param>
         /// <param name="reason">The reason of failure.</param>
-        protected RuntimeResult (InteractionCommandError? error, string reason)
+        protected RuntimeResult(InteractionCommandError? error, string reason)
         {
             Error = error;
             ErrorReason = reason;
@@ -29,9 +29,9 @@ namespace Discord.Interactions
         ///     Gets a string that indicates the runtime result.
         /// </summary>
         /// <returns>
-        ///     <c>Success</c> if <see cref="IsSuccess"/> is <c>true</c>; otherwise "<see cref="Error"/>: 
+        ///     <c>Success</c> if <see cref="IsSuccess"/> is <see langword="true" />; otherwise "<see cref="Error"/>: 
         ///     <see cref="ErrorReason"/>".
         /// </returns>
-        public override string ToString ( ) => ErrorReason ?? ( IsSuccess ? "Successful" : "Unsuccessful" );
+        public override string ToString() => ErrorReason ?? (IsSuccess ? "Successful" : "Unsuccessful");
     }
 }

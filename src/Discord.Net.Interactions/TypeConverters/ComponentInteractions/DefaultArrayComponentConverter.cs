@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord.Interactions
@@ -17,27 +19,56 @@ namespace Discord.Interactions
                 throw new InvalidOperationException($"{nameof(DefaultArrayComponentConverter<T>)} cannot be used to convert a non-array type.");
 
             _underlyingType = typeof(T).GetElementType();
-            _typeReader = interactionService.GetTypeReader(_underlyingType);
+
+            _typeReader = true switch
+            {
+                _ when typeof(IUser).IsAssignableFrom(_underlyingType)
+                    || typeof(IChannel).IsAssignableFrom(_underlyingType)
+                    || typeof(IMentionable).IsAssignableFrom(_underlyingType)
+                    || typeof(IRole).IsAssignableFrom(_underlyingType) => null,
+                _ => interactionService.GetTypeReader(_underlyingType)
+            };
         }
 
         public override async Task<TypeConverterResult> ReadAsync(IInteractionContext context, IComponentInteractionData option, IServiceProvider services)
         {
-            var results = new List<TypeConverterResult>();
+            var objs = new List<object>();
 
-            foreach (var value in option.Values)
+            if (_typeReader is not null && option.Values.Count > 0)
+                foreach (var value in option.Values)
+                {
+                    var result = await _typeReader.ReadAsync(context, value, services).ConfigureAwait(false);
+
+                    if (!result.IsSuccess)
+                        return result;
+
+                    objs.Add(result.Value);
+                }
+            else
             {
-                var result = await _typeReader.ReadAsync(context, value, services).ConfigureAwait(false);
+                var users = new Dictionary<ulong, IUser>();
 
-                if (!result.IsSuccess)
-                    return result;
+                if (option.Users is not null)
+                    foreach (var user in option.Users)
+                        users[user.Id] = user;
 
-                results.Add(result);
+                if (option.Members is not null)
+                    foreach (var member in option.Members)
+                        users[member.Id] = member;
+
+                objs.AddRange(users.Values);
+
+                if (option.Roles is not null)
+                    objs.AddRange(option.Roles);
+
+                if (option.Channels is not null)
+                    objs.AddRange(option.Channels);
             }
 
-            var destination = Array.CreateInstance(_underlyingType, results.Count);
+            var destination = Array.CreateInstance(_underlyingType, objs.Count);
 
-            for (var i = 0; i < results.Count; i++)
-                destination.SetValue(results[i].Value, i);
+            for (var i = 0; i < objs.Count; i++)
+                destination.SetValue(objs[i], i);
 
             return TypeConverterResult.FromSuccess(destination);
         }

@@ -26,6 +26,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public ulong GuildId => Guild.Id;
 
+        /// <inheritdoc />
+        public ChannelFlags Flags { get; private set; }
+
         internal RestGuildChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, id)
         {
@@ -62,6 +65,8 @@ namespace Discord.Rest
                     newOverwrites.Add(overwrites[i].ToEntity());
                 _overwrites = newOverwrites.ToImmutable();
             }
+
+            Flags = model.Flags.GetValueOrDefault(ChannelFlags.None);
         }
 
         /// <inheritdoc />
@@ -85,7 +90,7 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="user">The user to get the overwrite from.</param>
         /// <returns>
-        ///     An overwrite object for the targeted user; <c>null</c> if none is set.
+        ///     An overwrite object for the targeted user; <see langword="null" /> if none is set.
         /// </returns>
         public virtual OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
@@ -102,7 +107,7 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="role">The role to get the overwrite from.</param>
         /// <returns>
-        ///     An overwrite object for the targeted role; <c>null</c> if none is set.
+        ///     An overwrite object for the targeted role; <see langword="null" /> if none is set.
         /// </returns>
         public virtual OverwritePermissions? GetPermissionOverwrite(IRole role)
         {

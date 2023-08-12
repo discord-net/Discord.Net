@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord
 {
@@ -12,8 +14,10 @@ namespace Discord
 
         private static ArgumentNullException CreateNotNullException(string name, string msg)
         {
-            if (msg == null) return new ArgumentNullException(paramName: name);
-            else return new ArgumentNullException(paramName: name, message: msg);
+            if (msg == null)
+                return new ArgumentNullException(paramName: name);
+            else
+                return new ArgumentNullException(paramName: name, message: msg);
         }
         #endregion
 
@@ -26,8 +30,10 @@ namespace Discord
         /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
         public static void NotNullOrEmpty(string obj, string name, string msg = null)
         {
-            if (obj == null) throw CreateNotNullException(name, msg);
-            if (obj.Length == 0) throw CreateNotEmptyException(name, msg);
+            if (obj == null)
+                throw CreateNotNullException(name, msg);
+            if (obj.Length == 0)
+                throw CreateNotEmptyException(name, msg);
         }
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
@@ -35,16 +41,20 @@ namespace Discord
         {
             if (obj.IsSpecified)
             {
-                if (obj.Value == null) throw CreateNotNullException(name, msg);
-                if (obj.Value.Length == 0) throw CreateNotEmptyException(name, msg);
+                if (obj.Value == null)
+                    throw CreateNotNullException(name, msg);
+                if (obj.Value.Length == 0)
+                    throw CreateNotEmptyException(name, msg);
             }
         }
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
         public static void NotNullOrWhitespace(string obj, string name, string msg = null)
         {
-            if (obj == null) throw CreateNotNullException(name, msg);
-            if (obj.Trim().Length == 0) throw CreateNotEmptyException(name, msg);
+            if (obj == null)
+                throw CreateNotNullException(name, msg);
+            if (obj.Trim().Length == 0)
+                throw CreateNotEmptyException(name, msg);
         }
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
@@ -52,13 +62,59 @@ namespace Discord
         {
             if (obj.IsSpecified)
             {
-                if (obj.Value == null) throw CreateNotNullException(name, msg);
-                if (obj.Value.Trim().Length == 0) throw CreateNotEmptyException(name, msg);
+                if (obj.Value == null)
+                    throw CreateNotNullException(name, msg);
+                if (obj.Value.Trim().Length == 0)
+                    throw CreateNotEmptyException(name, msg);
             }
-        }        
+        }
 
         private static ArgumentException CreateNotEmptyException(string name, string msg)
             => new ArgumentException(message: msg ?? "Argument cannot be blank.", paramName: name);
+
+        #endregion
+
+        #region Message Validation
+
+        public static void WebhookMessageAtLeastOneOf(string text = null, MessageComponent components = null, ICollection<IEmbed> embeds = null,
+            IEnumerable<FileAttachment> attachments = null)
+        {
+            if (!string.IsNullOrEmpty(text))
+                return;
+
+            if (components != null && components.Components.Count != 0)
+                return;
+
+            if (attachments != null && attachments.Count() != 0)
+                return;
+
+            if (embeds != null && embeds.Count != 0)
+                return;
+
+            throw new ArgumentException($"At least one of 'Content', 'Embeds', 'Components' or 'Attachments' must be specified.");
+        }
+
+        public static void MessageAtLeastOneOf(string text = null, MessageComponent components = null, ICollection<IEmbed> embeds = null,
+                    ICollection<ISticker> stickers = null, IEnumerable<FileAttachment> attachments = null)
+        {
+            if (!string.IsNullOrEmpty(text))
+                return;
+
+            if (components != null && components.Components.Count != 0)
+                return;
+
+            if (stickers != null && stickers.Count != 0)
+                return;
+
+            if (attachments != null && attachments.Count() != 0)
+                return;
+
+            if (embeds != null && embeds.Count != 0)
+                return;
+
+            throw new ArgumentException($"At least one of 'Content', 'Embeds', 'Components', 'Stickers' or 'Attachments' must be specified.");
+        }
+
         #endregion
 
         #region Numerics
@@ -129,7 +185,7 @@ namespace Discord
 
         private static ArgumentException CreateNotEqualException<T>(string name, string msg, T value)
             => new ArgumentException(message: msg ?? $"Value may not be equal to {value}.", paramName: name);
-        
+
         /// <exception cref="ArgumentException">Value must be at least <paramref name="value"/>.</exception>
         public static void AtLeast(sbyte obj, sbyte value, string name, string msg = null) { if (obj < value) throw CreateAtLeastException(name, msg, value); }
         /// <exception cref="ArgumentException">Value must be at least <paramref name="value"/>.</exception>
@@ -165,7 +221,7 @@ namespace Discord
 
         private static ArgumentException CreateAtLeastException<T>(string name, string msg, T value)
             => new ArgumentException(message: msg ?? $"Value must be at least {value}.", paramName: name);
-        
+
         /// <exception cref="ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
         public static void GreaterThan(sbyte obj, sbyte value, string name, string msg = null) { if (obj <= value) throw CreateGreaterThanException(name, msg, value); }
         /// <exception cref="ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
@@ -201,7 +257,7 @@ namespace Discord
 
         private static ArgumentException CreateGreaterThanException<T>(string name, string msg, T value)
             => new ArgumentException(message: msg ?? $"Value must be greater than {value}.", paramName: name);
-        
+
         /// <exception cref="ArgumentException">Value must be at most <paramref name="value"/>.</exception>
         public static void AtMost(sbyte obj, sbyte value, string name, string msg = null) { if (obj > value) throw CreateAtMostException(name, msg, value); }
         /// <exception cref="ArgumentException">Value must be at most <paramref name="value"/>.</exception>
@@ -237,7 +293,7 @@ namespace Discord
 
         private static ArgumentException CreateAtMostException<T>(string name, string msg, T value)
             => new ArgumentException(message: msg ?? $"Value must be at most {value}.", paramName: name);
-        
+
         /// <exception cref="ArgumentException">Value must be less than <paramref name="value"/>.</exception>
         public static void LessThan(sbyte obj, sbyte value, string name, string msg = null) { if (obj >= value) throw CreateLessThanException(name, msg, value); }
         /// <exception cref="ArgumentException">Value must be less than <paramref name="value"/>.</exception>
@@ -282,7 +338,8 @@ namespace Discord
             var minimum = SnowflakeUtils.ToSnowflake(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)));
             for (var i = 0; i < collection.Length; i++)
             {
-                if (collection[i] == 0) continue;
+                if (collection[i] == 0)
+                    continue;
                 if (collection[i] <= minimum)
                     throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks old.");
             }

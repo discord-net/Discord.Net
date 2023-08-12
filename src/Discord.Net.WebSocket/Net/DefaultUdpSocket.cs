@@ -87,14 +87,17 @@ namespace Discord.Net.Udp
         }
         public async Task StopInternalAsync(bool isDisposing = false)
         {
-            try { _stopCancelTokenSource.Cancel(false); } catch { }
+            try
+            { _stopCancelTokenSource.Cancel(false); }
+            catch { }
 
             if (!isDisposing)
                 await (_task ?? Task.Delay(0)).ConfigureAwait(false);
 
             if (_udp != null)
             {
-                try { _udp.Dispose(); }
+                try
+                { _udp.Dispose(); }
                 catch { }
                 _udp = null;
             }

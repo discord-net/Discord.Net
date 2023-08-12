@@ -27,13 +27,19 @@ namespace Discord.Rest
         public bool? IsRequired { get; private set; }
 
         /// <inheritdoc/>
-        public bool? IsAutocomplete { get; private set; } 
+        public bool? IsAutocomplete { get; private set; }
 
         /// <inheritdoc/>
         public double? MinValue { get; private set; }
 
         /// <inheritdoc/>
         public double? MaxValue { get; private set; }
+
+        /// <inheritdoc/>
+        public int? MinLength { get; private set; }
+
+        /// <inheritdoc/>
+        public int? MaxLength { get; private set; }
 
         /// <summary>
         ///     Gets a collection of <see cref="RestApplicationCommandChoice"/>s for this command.
@@ -47,6 +53,32 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public IReadOnlyCollection<ChannelType> ChannelTypes { get; private set; }
+
+        /// <summary>
+        ///     Gets the localization dictionary for the name field of this command option.
+        /// </summary>
+        public IReadOnlyDictionary<string, string> NameLocalizations { get; private set; }
+
+        /// <summary>
+        ///     Gets the localization dictionary for the description field of this command option.
+        /// </summary>
+        public IReadOnlyDictionary<string, string> DescriptionLocalizations { get; private set; }
+
+        /// <summary>
+        ///     Gets the localized name of this command option.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        /// </remarks>
+        public string NameLocalized { get; private set; }
+
+        /// <summary>
+        ///     Gets the localized description of this command option.
+        /// </summary>
+        /// <remarks>
+        ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
+        /// </remarks>
+        public string DescriptionLocalized { get; private set; }
 
         internal RestApplicationCommandOption() { }
 
@@ -78,6 +110,9 @@ namespace Discord.Rest
             if (model.Autocomplete.IsSpecified)
                 IsAutocomplete = model.Autocomplete.Value;
 
+            MinLength = model.MinLength.ToNullable();
+            MaxLength = model.MaxLength.ToNullable();
+
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(Create).ToImmutableArray()
                 : ImmutableArray.Create<RestApplicationCommandOption>();
@@ -89,6 +124,15 @@ namespace Discord.Rest
             ChannelTypes = model.ChannelTypes.IsSpecified
                 ? model.ChannelTypes.Value.ToImmutableArray()
                 : ImmutableArray.Create<ChannelType>();
+
+            NameLocalizations = model.NameLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                ImmutableDictionary<string, string>.Empty;
+
+            DescriptionLocalizations = model.DescriptionLocalizations.GetValueOrDefault(null)?.ToImmutableDictionary() ??
+                                       ImmutableDictionary<string, string>.Empty;
+
+            NameLocalized = model.NameLocalized.GetValueOrDefault();
+            DescriptionLocalized = model.DescriptionLocalized.GetValueOrDefault();
         }
         #endregion
 

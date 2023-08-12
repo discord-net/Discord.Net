@@ -60,6 +60,11 @@ namespace Discord.Interactions.Builders
         public bool IsEnabledInDm { get; set; } = true;
 
         /// <summary>
+        ///     Gets whether this command is age restricted.
+        /// </summary>
+        public bool IsNsfw { get; set; } = false;
+
+        /// <summary>
         ///     Gets the default permissions needed for executing this command.
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; set; } = null;
@@ -111,7 +116,7 @@ namespace Discord.Interactions.Builders
 
         internal TypeInfo TypeInfo { get; set; }
 
-        internal ModuleBuilder (InteractionService interactionService, ModuleBuilder parent = null)
+        internal ModuleBuilder(InteractionService interactionService, ModuleBuilder parent = null)
         {
             InteractionService = interactionService;
             Parent = parent;
@@ -122,7 +127,7 @@ namespace Discord.Interactions.Builders
             _contextCommands = new List<ContextCommandBuilder>();
             _componentCommands = new List<ComponentCommandBuilder>();
             _autocompleteCommands = new List<AutocompleteCommandBuilder>();
-            _modalCommands = new List<ModalCommandBuilder> ();
+            _modalCommands = new List<ModalCommandBuilder>();
             _preconditions = new List<PreconditionAttribute>();
         }
 
@@ -132,7 +137,7 @@ namespace Discord.Interactions.Builders
         /// <param name="interactionService">The underlying Interaction Service.</param>
         /// <param name="name">Name of this module.</param>
         /// <param name="parent">Parent module of this sub-module.</param>
-        public ModuleBuilder (InteractionService interactionService, string name, ModuleBuilder parent = null) : this(interactionService, parent)
+        public ModuleBuilder(InteractionService interactionService, string name, ModuleBuilder parent = null) : this(interactionService, parent)
         {
             Name = name;
         }
@@ -144,7 +149,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModuleBuilder WithGroupName (string name)
+        public ModuleBuilder WithGroupName(string name)
         {
             SlashGroupName = name;
             return this;
@@ -157,7 +162,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModuleBuilder WithDescription (string description)
+        public ModuleBuilder WithDescription(string description)
         {
             Description = description;
             return this;
@@ -171,7 +176,7 @@ namespace Discord.Interactions.Builders
         ///     The builder instance.
         /// </returns>
         [Obsolete($"To be deprecated soon, use {nameof(SetEnabledInDm)} and {nameof(WithDefaultMemberPermissions)} instead.")]
-        public ModuleBuilder WithDefaultPermission (bool permission)
+        public ModuleBuilder WithDefaultPermission(bool permission)
         {
             DefaultPermission = permission;
             return this;
@@ -187,6 +192,19 @@ namespace Discord.Interactions.Builders
         public ModuleBuilder SetEnabledInDm(bool isEnabled)
         {
             IsEnabledInDm = isEnabled;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets <see cref="IsNsfw"/>.
+        /// </summary>
+        /// <param name="isNsfw">New value of the <see cref="IsNsfw"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModuleBuilder SetNsfw(bool isNsfw)
+        {
+            IsNsfw = isNsfw;
             return this;
         }
 
@@ -210,7 +228,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModuleBuilder AddAttributes (params Attribute[] attributes)
+        public ModuleBuilder AddAttributes(params Attribute[] attributes)
         {
             _attributes.AddRange(attributes);
             return this;
@@ -223,7 +241,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModuleBuilder AddPreconditions (params PreconditionAttribute[] preconditions)
+        public ModuleBuilder AddPreconditions(params PreconditionAttribute[] preconditions)
         {
             _preconditions.AddRange(preconditions);
             return this;
@@ -236,7 +254,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModuleBuilder AddSlashCommand (Action<SlashCommandBuilder> configure)
+        public ModuleBuilder AddSlashCommand(Action<SlashCommandBuilder> configure)
         {
             var command = new SlashCommandBuilder(this);
             configure(command);
@@ -268,7 +286,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModuleBuilder AddContextCommand (Action<ContextCommandBuilder> configure)
+        public ModuleBuilder AddContextCommand(Action<ContextCommandBuilder> configure)
         {
             var command = new ContextCommandBuilder(this);
             configure(command);
@@ -300,7 +318,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModuleBuilder AddComponentCommand (Action<ComponentCommandBuilder> configure)
+        public ModuleBuilder AddComponentCommand(Action<ComponentCommandBuilder> configure)
         {
             var command = new ComponentCommandBuilder(this);
             configure(command);
@@ -372,6 +390,23 @@ namespace Discord.Interactions.Builders
             _modalCommands.Add(command);
             return this;
         }
+        
+        /// <summary>
+        ///     Adds a modal command builder to <see cref="ModalCommands"/>.
+        /// </summary>
+        /// <param name="name">Name of the command.</param>
+        /// <param name="callback">Command callback to be executed.</param>
+        /// <param name="configure"><see cref="ModalCommands"/> factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModuleBuilder AddModalCommand(string name, ExecuteCallback callback, Action<ModalCommandBuilder> configure)
+        {
+            var command = new ModalCommandBuilder(this, name, callback);
+            configure(command);
+            _modalCommands.Add(command);
+            return this;
+        }
 
         /// <summary>
         ///     Adds sub-module builder to <see cref="SubModules"/>.
@@ -380,7 +415,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModuleBuilder AddModule (Action<ModuleBuilder> configure)
+        public ModuleBuilder AddModule(Action<ModuleBuilder> configure)
         {
             var subModule = new ModuleBuilder(InteractionService, this);
             configure(subModule);
@@ -388,7 +423,7 @@ namespace Discord.Interactions.Builders
             return this;
         }
 
-        internal ModuleInfo Build (InteractionService interactionService, IServiceProvider services, ModuleInfo parent = null)
+        internal ModuleInfo Build(InteractionService interactionService, IServiceProvider services, ModuleInfo parent = null)
         {
             if (TypeInfo is not null && ModuleClassBuilder.IsValidModuleDefinition(TypeInfo))
             {

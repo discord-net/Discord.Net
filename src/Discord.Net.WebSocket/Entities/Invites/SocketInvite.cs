@@ -90,6 +90,12 @@ namespace Discord.WebSocket
         /// </summary>
         public TargetUserType TargetUserType { get; private set; }
 
+        /// <inheritdoc cref="IInvite.Application" />
+        public RestApplication Application { get; private set; }
+
+        /// <inheritdoc />
+        public DateTimeOffset? ExpiresAt { get; private set; }
+        
         /// <inheritdoc />
         public string Code => Id;
         /// <inheritdoc />
@@ -119,6 +125,8 @@ namespace Discord.WebSocket
             Uses = model.Uses;
             _createdAtTicks = model.CreatedAt.UtcTicks;
             TargetUserType = model.TargetUserType.IsSpecified ? model.TargetUserType.Value : TargetUserType.Undefined;
+            ExpiresAt = model.ExpiresAt.IsSpecified ? model.ExpiresAt.Value : null;
+            Application = model.Application.IsSpecified ? RestApplication.Create(Discord, model.Application.Value) : null;
         }
 
         /// <inheritdoc />
@@ -134,6 +142,8 @@ namespace Discord.WebSocket
         public override string ToString() => Url;
         private string DebuggerDisplay => $"{Url} ({Guild?.Name} / {Channel.Name})";
 
+        #region IInvite
+
         /// <inheritdoc />
         IGuild IInvite.Guild => Guild;
         /// <inheritdoc />
@@ -142,5 +152,10 @@ namespace Discord.WebSocket
         IUser IInvite.Inviter => Inviter;
         /// <inheritdoc />
         IUser IInvite.TargetUser => TargetUser;
+
+        /// <inheritdoc />
+        IApplication IInvite.Application => Application;
+        
+        #endregion
     }
 }

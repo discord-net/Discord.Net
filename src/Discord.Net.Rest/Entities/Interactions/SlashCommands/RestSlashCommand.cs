@@ -20,7 +20,7 @@ namespace Discord.Rest
 
         internal RestSlashCommand(DiscordRestClient client, Model model)
             : base(client, model)
-        {   
+        {
         }
 
         internal new static async Task<RestSlashCommand> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)

@@ -32,7 +32,7 @@ Interaction Result come in a handful of different flavours:
 
 > [!NOTE]
 > You can either use the [IResult.Error] property of an Interaction result or create type check for the
-> afformentioned result types to branch out your post-execution logic to handle different situations.
+> aforementioned result types to branch out your post-execution logic to handle different situations.
 
 
 [AutocompletionResult]: xref:Discord.AutocompleteResult

@@ -228,12 +228,14 @@ namespace Discord.Audio
         #region Udp
         public async Task SendDiscoveryAsync(uint ssrc)
         {
-            var packet = new byte[70];
-            packet[0] = (byte)(ssrc >> 24);
-            packet[1] = (byte)(ssrc >> 16);
-            packet[2] = (byte)(ssrc >> 8);
-            packet[3] = (byte)(ssrc >> 0);
-            await SendAsync(packet, 0, 70).ConfigureAwait(false);
+            var packet = new byte[74];
+            packet[1] = 1;
+            packet[3] = 70;
+            packet[4] = (byte)(ssrc >> 24);
+            packet[5] = (byte)(ssrc >> 16);
+            packet[6] = (byte)(ssrc >> 8);
+            packet[7] = (byte)(ssrc >> 0);
+            await SendAsync(packet, 0, 74).ConfigureAwait(false);
             await _sentDiscoveryEvent.InvokeAsync().ConfigureAwait(false);
         }
         public async Task<ulong> SendKeepaliveAsync()

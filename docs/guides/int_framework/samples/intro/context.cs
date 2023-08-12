@@ -7,8 +7,8 @@ discordClient.ButtonExecuted += async (interaction) =>
 public class MessageComponentModule : InteractionModuleBase<SocketInteractionContext<SocketMessageComponent>>
 {
     [ComponentInteraction("custom_id")]
-    public async Command()
+    public async Task Command()
     {
-        Context.Interaction.UpdateAsync(...);
+        await Context.Interaction.UpdateAsync(...);
     }
 }

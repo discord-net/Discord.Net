@@ -85,7 +85,7 @@ namespace Discord.Rest
 
             Preconditions.AtMost(apiEmbeds?.Count ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
 
-            if(!args.Attachments.IsSpecified)
+            if (!args.Attachments.IsSpecified)
             {
                 var apiArgs = new API.Rest.ModifyMessageParams
                 {
@@ -212,6 +212,8 @@ namespace Discord.Rest
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,
             RequestOptions options)
         {
+            if (msg.Channel is IVoiceChannel)
+                throw new NotSupportedException("Pinned messages are not supported in text-in-voice channels.");
             await client.ApiClient.AddPinAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
 
@@ -267,10 +269,13 @@ namespace Discord.Rest
             while (true)
             {
                 index = text.IndexOf('<', index);
-                if (index == -1) break;
+                if (index == -1)
+                    break;
                 int endIndex = text.IndexOf('>', index + 1);
-                if (endIndex == -1) break;
-                if (CheckWrappedCode()) break;
+                if (endIndex == -1)
+                    break;
+                if (CheckWrappedCode())
+                    break;
                 string content = text.Substring(index, endIndex - index + 1);
 
                 if (MentionUtils.TryParseUser(content, out ulong id))
@@ -317,8 +322,10 @@ namespace Discord.Rest
             while (true)
             {
                 index = text.IndexOf("@everyone", index);
-                if (index == -1) break;
-                if (CheckWrappedCode()) break;
+                if (index == -1)
+                    break;
+                if (CheckWrappedCode())
+                    break;
                 var tagIndex = FindIndex(tags, index);
                 if (tagIndex.HasValue)
                     tags.Insert(tagIndex.Value, new Tag<IRole>(TagType.EveryoneMention, index, "@everyone".Length, 0, guild?.EveryoneRole));
@@ -330,8 +337,10 @@ namespace Discord.Rest
             while (true)
             {
                 index = text.IndexOf("@here", index);
-                if (index == -1) break;
-                if (CheckWrappedCode()) break;
+                if (index == -1)
+                    break;
+                if (CheckWrappedCode())
+                    break;
                 var tagIndex = FindIndex(tags, index);
                 if (tagIndex.HasValue)
                     tags.Insert(tagIndex.Value, new Tag<IRole>(TagType.HereMention, index, "@here".Length, 0, guild?.EveryoneRole));

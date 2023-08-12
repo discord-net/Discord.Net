@@ -1,10 +1,10 @@
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Rest;
 using Model = Discord.API.Channel;
 
 namespace Discord.WebSocket
@@ -39,7 +39,7 @@ namespace Discord.WebSocket
         }
         internal new static SocketCategoryChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketCategoryChannel(guild.Discord, model.Id, guild);
+            var entity = new SocketCategoryChannel(guild?.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }

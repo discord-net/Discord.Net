@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 
 namespace Discord.Commands
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class MatchResult : IResult
     {
         /// <summary>
@@ -30,13 +32,13 @@ namespace Discord.Commands
         }
 
         public static MatchResult FromSuccess(CommandMatch match, IResult pipeline)
-            => new MatchResult(match,pipeline,null, null);
+            => new MatchResult(match, pipeline, null, null);
         public static MatchResult FromError(CommandError error, string reason)
-            => new MatchResult(null,null,error, reason);
+            => new MatchResult(null, null, error, reason);
         public static MatchResult FromError(Exception ex)
             => FromError(CommandError.Exception, ex.Message);
         public static MatchResult FromError(IResult result)
-            => new MatchResult(null, null,result.Error, result.ErrorReason);
+            => new MatchResult(null, null, result.Error, result.ErrorReason);
         public static MatchResult FromError(IResult pipeline, CommandError error, string reason)
             => new MatchResult(null, pipeline, error, reason);
 

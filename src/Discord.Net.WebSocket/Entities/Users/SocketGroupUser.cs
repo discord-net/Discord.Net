@@ -30,6 +30,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
         /// <inheritdoc />
+        public override string GlobalName { get { return GlobalUser.GlobalName; } internal set { GlobalUser.GlobalName = value; } }
+        /// <inheritdoc />
         internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
 
         /// <inheritdoc />
@@ -48,7 +50,10 @@ namespace Discord.WebSocket
             return entity;
         }
 
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Group)";
+        private string DebuggerDisplay => DiscriminatorValue != 0
+            ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Group)"
+            : $"{Username} ({Id}{(IsBot ? ", Bot" : "")}, Group)";
+
         internal new SocketGroupUser Clone() => MemberwiseClone() as SocketGroupUser;
         #endregion
 

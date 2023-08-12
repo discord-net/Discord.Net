@@ -27,6 +27,7 @@ namespace Discord.API.Rest
         public Optional<ActionRowComponent[]> MessageComponent { get; set; }
         public Optional<MessageFlags?> Flags { get; set; }
         public Optional<ulong[]> Stickers { get; set; }
+        public Optional<ulong[]> TagIds { get; set; }
 
         public CreateMultipartPostAsync(params FileAttachment[] attachments)
         {
@@ -45,6 +46,8 @@ namespace Discord.API.Rest
 
             if (Slowmode.IsSpecified)
                 payload["rate_limit_per_user"] = Slowmode.Value;
+            if (TagIds.IsSpecified)
+                payload["applied_tags"] = TagIds.Value;
 
             // message
             if (Content.IsSpecified)

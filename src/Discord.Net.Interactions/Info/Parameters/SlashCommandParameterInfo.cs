@@ -34,9 +34,19 @@ namespace Discord.Interactions
         public double? MinValue { get; }
 
         /// <summary>
-        ///     Gets the maxmimum value permitted for a number type parameter.
+        ///     Gets the maximum value permitted for a number type parameter.
         /// </summary>
         public double? MaxValue { get; }
+
+        /// <summary>
+        ///     Gets the minimum length allowed for a string type parameter.
+        /// </summary>
+        public int? MinLength { get; }
+
+        /// <summary>
+        ///     Gets the maximum length allowed for a string type parameter.
+        /// </summary>
+        public int? MaxLength { get; }
 
         /// <summary>
         ///     Gets the <see cref="TypeConverter{T}"/> that will be used to convert the incoming <see cref="Discord.WebSocket.SocketSlashCommandDataOption"/> into
@@ -45,7 +55,7 @@ namespace Discord.Interactions
         public TypeConverter TypeConverter { get; }
 
         /// <summary>
-        ///     Gets the <see cref="IAutocompleteHandler"/> thats linked to this parameter.
+        ///     Gets the <see cref="IAutocompleteHandler"/> that's linked to this parameter.
         /// </summary>
         public IAutocompleteHandler AutocompleteHandler { get; }
 
@@ -86,6 +96,8 @@ namespace Discord.Interactions
             Description = builder.Description;
             MaxValue = builder.MaxValue;
             MinValue = builder.MinValue;
+            MinLength = builder.MinLength;
+            MaxLength = builder.MaxLength;
             IsComplexParameter = builder.IsComplexParameter;
             IsAutocomplete = builder.Autocomplete;
             Choices = builder.Choices.ToImmutableArray();

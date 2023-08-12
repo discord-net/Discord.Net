@@ -52,6 +52,6 @@ namespace Discord.Interactions
         /// <summary>
         ///     Check if an execution context meets the parameter precondition requirements.
         /// </summary>
-        Task<PreconditionResult> CheckPreconditionsAsync (IInteractionContext context, object value, IServiceProvider services);
+        Task<PreconditionResult> CheckPreconditionsAsync(IInteractionContext context, object value, IServiceProvider services);
     }
 }

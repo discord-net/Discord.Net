@@ -1,12 +1,12 @@
+using Discord.Net.Rest;
+using Discord.Rest;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
 using DataModel = Discord.API.MessageComponentInteractionData;
-using Discord.Rest;
-using System.Collections.Generic;
-using Discord.Net.Rest;
-using System.IO;
+using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {
@@ -19,10 +19,8 @@ namespace Discord.WebSocket
         ///     Gets the data received with this interaction, contains the button that was clicked.
         /// </summary>
         public new SocketMessageComponentData Data { get; }
-
-        /// <summary>
-        ///     Gets the message that contained the trigger for this interaction.
-        /// </summary>
+        
+        /// <inheritdoc cref="IComponentInteraction.Message"/>
         public SocketUserMessage Message { get; private set; }
 
         private object _lock = new object();
@@ -35,7 +33,7 @@ namespace Discord.WebSocket
                 ? (DataModel)model.Data.Value
                 : null;
 
-            Data = new SocketMessageComponentData(dataModel);
+            Data = new SocketMessageComponentData(dataModel, client, client.State, client.Guilds.FirstOrDefault(x => x.Id == model.GuildId.GetValueOrDefault()), model.User.GetValueOrDefault());
         }
 
         internal new static SocketMessageComponent Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
@@ -61,7 +59,9 @@ namespace Discord.WebSocket
                             author = channel.Guild.GetUser(model.Message.Value.Author.Value.Id);
                     }
                     else if (model.Message.Value.Author.IsSpecified)
-                        author = (Channel as SocketChannel).GetUser(model.Message.Value.Author.Value.Id);
+                        author = (Channel as SocketChannel)?.GetUser(model.Message.Value.Author.Value.Id);
+
+                    author ??= Discord.State.GetOrAddUser(model.Message.Value.Author.Value.Id, _ => SocketGlobalUser.Create(Discord, Discord.State, model.Message.Value.Author.Value));
 
                     Message = SocketUserMessage.Create(Discord, Discord.State, author, Channel, model.Message.Value);
                 }
@@ -226,8 +226,12 @@ namespace Discord.WebSocket
 
             bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(Message.Content);
             bool hasEmbeds = embed.IsSpecified && embed.Value != null || embeds.IsSpecified && embeds.Value?.Length > 0 || Message.Embeds.Any();
+            bool hasComponents = args.Components.IsSpecified && args.Components.Value != null;
+            bool hasAttachments = args.Attachments.IsSpecified;
+            bool hasFlags = args.Flags.IsSpecified;
 
-            if (!hasText && !hasEmbeds)
+            // No content needed if modifying flags
+            if ((!hasComponents && !hasText && !hasEmbeds && !hasAttachments) && !hasFlags)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
             var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
@@ -261,20 +265,41 @@ namespace Discord.WebSocket
                 }
             }
 
-            var response = new API.InteractionResponse
+            if (!args.Attachments.IsSpecified)
             {
-                Type = InteractionResponseType.UpdateMessage,
-                Data = new API.InteractionCallbackData
+                var response = new API.InteractionResponse
                 {
+                    Type = InteractionResponseType.UpdateMessage,
+                    Data = new API.InteractionCallbackData
+                    {
+                        Content = args.Content,
+                        AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
+                        Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
+                        Components = args.Components.IsSpecified
+                            ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
+                            : Optional<API.ActionRowComponent[]>.Unspecified,
+                        Flags = args.Flags.IsSpecified ? args.Flags.Value ?? Optional<MessageFlags>.Unspecified : Optional<MessageFlags>.Unspecified
+                    }
+                };
+
+                await InteractionHelper.SendInteractionResponseAsync(Discord, response, this, Channel, options).ConfigureAwait(false);
+            }
+            else
+            {
+                var response = new API.Rest.UploadInteractionFileParams(args.Attachments.Value.ToArray())
+                {
+                    Type = InteractionResponseType.UpdateMessage,
                     Content = args.Content,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
-                    Components = args.Components.IsSpecified
+                    MessageComponents = args.Components.IsSpecified
                         ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
                         : Optional<API.ActionRowComponent[]>.Unspecified,
                     Flags = args.Flags.IsSpecified ? args.Flags.Value ?? Optional<MessageFlags>.Unspecified : Optional<MessageFlags>.Unspecified
-                }
-            };
+                };
+
+                await InteractionHelper.SendInteractionResponseAsync(Discord, response, this, Channel, options).ConfigureAwait(false);
+            }
 
             lock (_lock)
             {
@@ -284,7 +309,6 @@ namespace Discord.WebSocket
                 }
             }
 
-            await InteractionHelper.SendInteractionResponseAsync(Discord, response, this, Channel, options).ConfigureAwait(false);
             HasResponded = true;
         }
 

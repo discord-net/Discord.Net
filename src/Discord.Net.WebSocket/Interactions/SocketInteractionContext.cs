@@ -34,7 +34,7 @@ namespace Discord.Interactions
         public SocketUser User { get; }
 
         /// <summary>
-        ///     Gets the <see cref="SocketInteraction"/> the command was recieved with.
+        ///     Gets the <see cref="SocketInteraction"/> the command was received with.
         /// </summary>
         public TInteraction Interaction { get; }
 
@@ -42,7 +42,7 @@ namespace Discord.Interactions
         public IReadOnlyCollection<IRouteSegmentMatch> SegmentMatches { get; private set; }
 
         /// <summary>
-        ///     Initializes a new <see cref="SocketInteractionContext{TInteraction}"/>. 
+        ///     Initializes a new <see cref="SocketInteractionContext{TInteraction}"/>.
         /// </summary>
         /// <param name="client">The underlying client.</param>
         /// <param name="interaction">The underlying interaction.</param>
@@ -85,7 +85,7 @@ namespace Discord.Interactions
     public class SocketInteractionContext : SocketInteractionContext<SocketInteraction>
     {
         /// <summary>
-        ///     Initializes a new <see cref="SocketInteractionContext"/> 
+        ///     Initializes a new <see cref="SocketInteractionContext"/>
         /// </summary>
         /// <param name="client">The underlying client</param>
         /// <param name="interaction">The underlying interaction</param>

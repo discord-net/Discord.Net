@@ -76,7 +76,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the channel associated
-        ///     with the snowflake identifier; <c>null</c> when the channel cannot be found.
+        ///     with the snowflake identifier; <see langword="null" /> when the channel cannot be found.
         /// </returns>
         Task<IChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -155,12 +155,14 @@ namespace Discord
         /// <summary>
         ///     Gets a collection of all global commands.
         /// </summary>
+        /// <param name="withLocalizations">Whether to include full localization dictionaries in the returned objects, instead of the name localized and description localized fields.</param>
+        /// <param name="locale">The target locale of the localized name and description fields. Sets <c>X-Discord-Locale</c> header, which takes precedence over <c>Accept-Language</c>.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of global
         ///     application commands.
         /// </returns>
-        Task<IReadOnlyCollection<IApplicationCommand>> GetGlobalApplicationCommandsAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<IApplicationCommand>> GetGlobalApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a global application command.
@@ -190,7 +192,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the guild associated
-        ///     with the snowflake identifier; <c>null</c> when the guild cannot be found.
+        ///     with the snowflake identifier; <see langword="null" /> when the guild cannot be found.
         /// </returns>
         Task<IGuild> GetGuildAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -246,7 +248,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the user associated with
-        ///     the snowflake identifier; <c>null</c> if the user is not found.
+        ///     the snowflake identifier; <see langword="null" /> if the user is not found.
         /// </returns>
         Task<IUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -264,7 +266,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the user associated with
-        ///     the name and the discriminator; <c>null</c> if the user is not found.
+        ///     the name and the discriminator; <see langword="null" /> if the user is not found.
         /// </returns>
         Task<IUser> GetUserAsync(string username, string discriminator, RequestOptions options = null);
 
@@ -291,7 +293,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the voice region
-        ///     associated with the identifier; <c>null</c> if the voice region is not found.
+        ///     associated with the identifier; <see langword="null" /> if the voice region is not found.
         /// </returns>
         Task<IVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null);
 
@@ -302,7 +304,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a webhook associated
-        ///     with the identifier; <c>null</c> if the webhook is not found.
+        ///     with the identifier; <see langword="null" /> if the webhook is not found.
         /// </returns>
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
 

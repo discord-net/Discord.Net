@@ -86,11 +86,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override bool Equals(object other)
         {
-            if (other == null) return false;
-            if (other == this) return true;
+            if (other == null)
+                return false;
+            if (other == this)
+                return true;
 
             var otherReaction = other as SocketReaction;
-            if (otherReaction == null) return false;
+            if (otherReaction == null)
+                return false;
 
             return UserId == otherReaction.UserId && MessageId == otherReaction.MessageId && Emote.Equals(otherReaction.Emote);
         }

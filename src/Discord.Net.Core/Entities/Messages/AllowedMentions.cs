@@ -29,7 +29,7 @@ namespace Discord
         ///     The <see cref="AllowedMentionTypes.Users"/> flag is mutually exclusive with the <see cref="UserIds"/>
         ///     property, and the <see cref="AllowedMentionTypes.Roles"/> flag is mutually exclusive with the
         ///     <see cref="RoleIds"/> property.
-        ///     If <c>null</c>, only the ids specified in <see cref="UserIds"/> and <see cref="RoleIds"/> will be mentioned.
+        ///     If <see langword="null" />, only the ids specified in <see cref="UserIds"/> and <see cref="RoleIds"/> will be mentioned.
         /// </remarks>
         public AllowedMentionTypes? AllowedTypes { get; set; }
 
@@ -37,7 +37,7 @@ namespace Discord
         ///     Gets or sets the list of all role ids that will be mentioned.
         ///     This property is mutually exclusive with the <see cref="AllowedMentionTypes.Roles"/>
         ///     flag of the <see cref="AllowedTypes"/> property. If the flag is set, the value of this property
-        ///     must be <c>null</c> or empty.
+        ///     must be <see langword="null" /> or empty.
         /// </summary>
         public List<ulong> RoleIds { get; set; } = new List<ulong>();
 
@@ -45,7 +45,7 @@ namespace Discord
         ///     Gets or sets the list of all user ids that will be mentioned.
         ///     This property is mutually exclusive with the <see cref="AllowedMentionTypes.Users"/>
         ///     flag of the <see cref="AllowedTypes"/> property. If the flag is set, the value of this property
-        ///     must be <c>null</c> or empty.
+        ///     must be <see langword="null" /> or empty.
         /// </summary>
         public List<ulong> UserIds { get; set; } = new List<ulong>();
 
@@ -62,7 +62,7 @@ namespace Discord
         /// </summary>
         /// <param name="allowedTypes">
         ///     The types of mentions to parse from the message content.
-        ///     If <c>null</c>, only the ids specified in <see cref="UserIds"/> and <see cref="RoleIds"/> will be mentioned.
+        ///     If <see langword="null" />, only the ids specified in <see cref="UserIds"/> and <see cref="RoleIds"/> will be mentioned.
         /// </param>
         public AllowedMentions(AllowedMentionTypes? allowedTypes = null)
         {

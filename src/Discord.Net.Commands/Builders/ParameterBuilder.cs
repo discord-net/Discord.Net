@@ -1,8 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-
-using System.Collections.Generic;
 
 namespace Discord.Commands.Builders
 {
@@ -25,7 +24,7 @@ namespace Discord.Commands.Builders
 
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions => _preconditions;
         public IReadOnlyList<Attribute> Attributes => _attributes;
-#endregion
+        #endregion
 
         #region Automatic
         internal ParameterBuilder(CommandBuilder command)

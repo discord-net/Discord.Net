@@ -31,13 +31,16 @@ namespace Discord.WebSocket
         public int Position { get; private set; }
 
         /// <inheritdoc />
+        public ChannelFlags Flags { get; private set; }
+
+        /// <inheritdoc />
         public virtual IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
         /// <summary>
         ///     Gets a collection of users that are able to view the channel.
         /// </summary>
         /// <remarks>
-        ///     If this channel is a voice channel, a collection of users who are currently connected to this channel
-        ///     is returned.
+        ///     If this channel is a voice channel, use <see cref="SocketVoiceChannel.ConnectedUsers"/> to retrieve a
+        ///     collection of users who are currently connected to this channel.
         /// </remarks>
         /// <returns>
         ///     A read-only collection of users that can access the channel (i.e. the users seen in the user list).
@@ -74,6 +77,8 @@ namespace Discord.WebSocket
             for (int i = 0; i < overwrites.Length; i++)
                 newOverwrites.Add(overwrites[i].ToEntity());
             _overwrites = newOverwrites.ToImmutable();
+
+            Flags = model.Flags.GetValueOrDefault(ChannelFlags.None);
         }
 
         /// <inheritdoc />
@@ -88,7 +93,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="user">The user to get the overwrite from.</param>
         /// <returns>
-        ///     An overwrite object for the targeted user; <c>null</c> if none is set.
+        ///     An overwrite object for the targeted user; <see langword="null" /> if none is set.
         /// </returns>
         public virtual OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
@@ -104,7 +109,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="role">The role to get the overwrite from.</param>
         /// <returns>
-        ///     An overwrite object for the targeted role; <c>null</c> if none is set.
+        ///     An overwrite object for the targeted role; <see langword="null" /> if none is set.
         /// </returns>
         public virtual OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
@@ -179,7 +184,7 @@ namespace Discord.WebSocket
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}, Guild)";
         internal new SocketGuildChannel Clone() => MemberwiseClone() as SocketGuildChannel;
-#endregion
+        #endregion
 
         #region SocketChannel
         /// <inheritdoc />

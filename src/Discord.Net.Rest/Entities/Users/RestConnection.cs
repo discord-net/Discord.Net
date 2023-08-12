@@ -31,7 +31,8 @@ namespace Discord.Rest
 
         internal BaseDiscordClient Discord { get; }
 
-        internal RestConnection(BaseDiscordClient discord) {
+        internal RestConnection(BaseDiscordClient discord)
+        {
             Discord = discord;
         }
 
@@ -48,7 +49,7 @@ namespace Discord.Rest
             Name = model.Name;
             Type = model.Type;
             IsRevoked = model.Revoked.IsSpecified ? model.Revoked.Value : null;
-            Integrations = model.Integrations.IsSpecified ?model.Integrations.Value
+            Integrations = model.Integrations.IsSpecified ? model.Integrations.Value
                 .Select(intergration => RestIntegration.Create(Discord, null, intergration)).ToImmutableArray() : null;
             Verified = model.Verified;
             FriendSync = model.FriendSync;

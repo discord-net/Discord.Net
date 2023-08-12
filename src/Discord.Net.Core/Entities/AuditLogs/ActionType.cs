@@ -180,6 +180,20 @@ namespace Discord
         ///     A sticker was deleted.
         /// </summary>
         StickerDeleted = 92,
+
+        /// <summary>
+        ///     A scheduled event was created.
+        /// </summary>
+        EventCreate = 100,
+        /// <summary>
+        ///     A scheduled event was created.
+        /// </summary>
+        EventUpdate = 101,
+        /// <summary>
+        ///     A scheduled event was created.
+        /// </summary>
+        EventDelete = 102,
+
         /// <summary>
         ///     A thread was created.
         /// </summary>
@@ -191,6 +205,50 @@ namespace Discord
         /// <summary>
         ///     A thread was deleted.
         /// </summary>
-        ThreadDelete = 112
+        ThreadDelete = 112,
+        /// <summary>
+        ///     Permissions were updated for a command.
+        /// </summary>
+        ApplicationCommandPermissionUpdate = 121,
+
+        /// <summary>
+        ///     Auto Moderation rule was created.
+        /// </summary>
+        AutoModerationRuleCreate = 140,
+        /// <summary>
+        ///     Auto Moderation rule was updated.
+        /// </summary>
+        AutoModerationRuleUpdate = 141,
+        /// <summary>
+        ///     Auto Moderation rule was deleted.
+        /// </summary>
+        AutoModerationRuleDelete = 142,
+        /// <summary>
+        ///     Message was blocked by Auto Moderation.
+        /// </summary>
+        AutoModerationBlockMessage = 143,
+        /// <summary>
+        ///     Message was flagged by Auto Moderation.
+        /// </summary>
+        AutoModerationFlagToChannel = 144,
+        /// <summary>
+        ///     Member was timed out by Auto Moderation.
+        /// </summary>
+        AutoModerationUserCommunicationDisabled = 145,
+
+        /// <summary>
+        ///     Guild Onboarding Question was created.
+        /// </summary>
+        OnboardingQuestionCreated = 163,
+
+        /// <summary>
+        ///     Guild Onboarding Question was updated.
+        /// </summary>
+        OnboardingQuestionUpdated = 164,
+
+        /// <summary>
+        ///     Guild Onboarding was updated.
+        /// </summary>
+        OnboardingUpdated = 167
     }
 }

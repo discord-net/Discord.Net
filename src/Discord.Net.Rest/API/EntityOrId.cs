@@ -1,4 +1,4 @@
-﻿namespace Discord.API
+namespace Discord.API
 {
     internal struct EntityOrId<T>
     {

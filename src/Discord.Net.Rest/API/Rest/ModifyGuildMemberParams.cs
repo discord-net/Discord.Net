@@ -18,5 +18,8 @@ namespace Discord.API.Rest
         public Optional<ulong?> ChannelId { get; set; }
         [JsonProperty("communication_disabled_until")]
         public Optional<DateTimeOffset?> TimedOutUntil { get; set; }
+
+        [JsonProperty("flags")]
+        public Optional<GuildUserFlags> Flags { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Discord.Audio
@@ -19,7 +19,7 @@ namespace Discord.Audio
             _ptr = CreateDecoder(SamplingRate, Channels, out var error);
             CheckError(error);
         }
-        
+
         public unsafe int DecodeFrame(byte[] input, int inputOffset, int inputCount, byte[] output, int outputOffset, bool decodeFEC)
         {
             int result = 0;

@@ -69,5 +69,10 @@ namespace Discord
         ///     Flag given to bots that use only outgoing webhooks, exclusively.
         /// </summary>
         BotHTTPInteractions = 1 << 19,
+
+        /// <summary>
+        ///     Flag given to users that are active developers.
+        /// </summary>
+        ActiveDeveloper = 1 << 22
     }
 }

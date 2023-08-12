@@ -43,9 +43,7 @@ namespace Discord.WebSocket
                 ? (DataModel)model.Data.Value
                 : null;
 
-            ulong? guildId = null;
-            if (Channel is SocketGuildChannel guildChannel)
-                guildId = guildChannel.Guild.Id;
+            ulong? guildId = model.GuildId.ToNullable();
 
             Data = SocketCommandBaseData.Create(client, dataModel, model.Id, guildId);
         }
@@ -271,7 +269,7 @@ namespace Discord.WebSocket
 
             return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
         }
-        
+
         /// <inheritdoc/>
         public override async Task<RestFollowupMessage> FollowupWithFilesAsync(
             IEnumerable<FileAttachment> attachments,

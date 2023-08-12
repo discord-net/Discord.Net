@@ -43,6 +43,9 @@ namespace Discord.API
         [JsonProperty("rtc_region")]
         public Optional<string> RTCRegion { get; set; }
 
+        [JsonProperty("video_quality_mode")]
+        public Optional<VideoQualityMode> VideoQualityMode { get; set; }
+
         //PrivateChannel
         [JsonProperty("recipients")]
         public Optional<User[]> Recipients { get; set; }
@@ -69,9 +72,28 @@ namespace Discord.API
 
         //ForumChannel
         [JsonProperty("available_tags")]
-        public Optional<ForumTags[]> ForumTags { get; set; }
-        
+        public Optional<ForumTag[]> ForumTags { get; set; }
+
+        [JsonProperty("applied_tags")]
+        public Optional<ulong[]> AppliedTags { get; set; }
+
         [JsonProperty("default_auto_archive_duration")]
         public Optional<ThreadArchiveDuration> AutoArchiveDuration { get; set; }
+
+        [JsonProperty("default_thread_rate_limit_per_user")]
+        public Optional<int> ThreadRateLimitPerUser { get; set; }
+
+        [JsonProperty("flags")]
+        public Optional<ChannelFlags> Flags { get; set; }
+
+        [JsonProperty("default_sort_order")]
+        public Optional<ForumSortOrder?> DefaultSortOrder { get; set; }
+
+        [JsonProperty("default_reaction_emoji")]
+        public Optional<ForumReactionEmoji> DefaultReactionEmoji { get; set; }
+
+        [JsonProperty("default_forum_layout")]
+        public Optional<ForumLayout> DefaultForumLayout { get; set; }
+
     }
 }

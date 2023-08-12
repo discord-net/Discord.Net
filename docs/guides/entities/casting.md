@@ -18,7 +18,7 @@ Casting only works for types that inherit the base type that you want to unbox f
 A boxed object is the definition of an object that was simplified (or trimmed) by incoming traffic,
 but still owns the data of the originally constructed type. Boxing is an implicit operation.
 
-Through casting, we can **unbox** this type, and access the properties that were unaccessible before.
+Through casting, we can **unbox** this type, and access the properties that were inaccessible before.
 
 ## Unboxing
 

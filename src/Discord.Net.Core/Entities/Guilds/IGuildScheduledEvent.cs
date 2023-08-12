@@ -17,6 +17,11 @@ namespace Discord
         IGuild Guild { get; }
 
         /// <summary>
+        ///     Gets the id of the guild this event is scheduled in.
+        /// </summary>
+        ulong GuildId { get; }
+
+        /// <summary>
         ///     Gets the optional channel id where this event will be hosted.
         /// </summary>
         ulong? ChannelId { get; }
@@ -35,7 +40,7 @@ namespace Discord
         ///     Gets the description of the event.
         /// </summary>
         /// <remarks>
-        ///     This field is <see langword="null"/> when the event doesn't have a discription.
+        ///     This field is <see langword="null"/> when the event doesn't have a description.
         /// </remarks>
         string Description { get; }
 
@@ -71,7 +76,7 @@ namespace Discord
 
         /// <summary>
         ///     Gets the optional entity id of the event. The "entity" of the event
-        ///     can be a stage instance event as is seperate from <see cref="ChannelId"/>.
+        ///     can be a stage instance event as is separate from <see cref="ChannelId"/>.
         /// </summary>
         ulong? EntityId { get; }
 
@@ -102,7 +107,7 @@ namespace Discord
         /// </returns>
         Task StartAsync(RequestOptions options = null);
         /// <summary>
-        ///     Ends or canceles the event.
+        ///     Ends or cancels the event.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
@@ -134,7 +139,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>
@@ -155,7 +160,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual users as a
         ///         collection.
         ///     </note>
@@ -165,7 +170,7 @@ namespace Discord
         ///     </note>
         ///     This method will attempt to fetch the number of users specified under <paramref name="limit"/> around
         ///     the user <paramref name="fromUserId"/> depending on the <paramref name="dir"/>. The library will
-        ///     attempt to split up the requests according to your <paramref name="limit"/> and 
+        ///     attempt to split up the requests according to your <paramref name="limit"/> and
         ///     <see cref="DiscordConfig.MaxGuildEventUsersPerBatch"/>. In other words, should the user request 500 users,
         ///     and the <see cref="Discord.DiscordConfig.MaxGuildEventUsersPerBatch"/> constant is <c>100</c>, the request will
         ///     be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need

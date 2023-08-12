@@ -1,3 +1,5 @@
+using System;
+
 namespace Discord
 {
     /// <summary>
@@ -60,6 +62,7 @@ namespace Discord
         ///     A guild object representing the guild that the invite points to.
         /// </returns>
         IGuild Guild { get; }
+
         /// <summary>
         ///     Gets the ID of the guild this invite is linked to.
         /// </summary>
@@ -79,7 +82,7 @@ namespace Discord
         /// </summary>
         /// <returns>
         ///     An <see cref="System.Int32" /> representing the approximated online member count of the guild that the
-        ///     invite points to; <c>null</c> if one cannot be obtained.
+        ///     invite points to; <see langword="null" /> if one cannot be obtained.
         /// </returns>
         int? PresenceCount { get; }
         /// <summary>
@@ -87,7 +90,7 @@ namespace Discord
         /// </summary>
         /// <returns>
         ///     An <see cref="System.Int32" /> representing the approximated total member count of the guild that the
-        ///     invite points to; <c>null</c> if one cannot be obtained.
+        ///     invite points to; <see langword="null" /> if one cannot be obtained.
         /// </returns>
         int? MemberCount { get; }
         /// <summary>
@@ -104,5 +107,19 @@ namespace Discord
         ///     The type of the linked user that is linked to this invite.
         /// </returns>
         TargetUserType TargetUserType { get; }
+
+        /// <summary>
+        ///     Gets the embedded application to open for this voice channel embedded application invite.
+        /// </summary>
+        /// <returns>
+        ///     A partial <see cref="IApplication"/> object. <see langword="null" /> if <see cref="TargetUserType"/>
+        ///     is not <see cref="TargetUserType.EmbeddedApplication"/>.
+        /// </returns>
+        IApplication Application { get; }
+
+        /// <summary>
+        ///     Gets the expiration date of this invite. <see langword="null" /> if the invite never expires.
+        /// </summary>
+        DateTimeOffset? ExpiresAt { get; }
     }
 }

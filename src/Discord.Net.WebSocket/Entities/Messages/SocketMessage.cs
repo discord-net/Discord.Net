@@ -78,6 +78,15 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public MessageType Type { get; private set; }
 
+        /// <inheritdoc />
+        public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
+
+        /// <inheritdoc cref="IMessage.Thread"/>
+        public SocketThreadChannel Thread { get; private set; }
+
+        /// <inheritdoc />
+        IThreadChannel IMessage.Thread => Thread;
+
         /// <summary>
         ///     Returns all attachments included in this message.
         /// </summary>
@@ -118,7 +127,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     Collection of WebSocket-based users.
         /// </returns>
-        public IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions; 
+        public IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions;
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
@@ -226,7 +235,9 @@ namespace Discord.WebSocket
                                     parsed.Placeholder.GetValueOrDefault(),
                                     parsed.MinValues,
                                     parsed.MaxValues,
-                                    parsed.Disabled
+                                    parsed.Disabled,
+                                    parsed.Type,
+                                    parsed.ChannelTypes.GetValueOrDefault()
                                     );
                             }
                         default:
@@ -269,6 +280,21 @@ namespace Discord.WebSocket
 
             if (model.Flags.IsSpecified)
                 Flags = model.Flags.Value;
+
+            if (model.RoleSubscriptionData.IsSpecified)
+            {
+                RoleSubscriptionData = new(
+                    model.RoleSubscriptionData.Value.SubscriptionListingId,
+                    model.RoleSubscriptionData.Value.TierName,
+                    model.RoleSubscriptionData.Value.MonthsSubscribed,
+                    model.RoleSubscriptionData.Value.IsRenewal);
+            }
+
+            if (model.Thread.IsSpecified)
+            {
+                SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
+                Thread = guild?.AddOrUpdateChannel(state, model.Thread.Value) as SocketThreadChannel;
+            }
         }
 
         /// <inheritdoc />
@@ -283,7 +309,7 @@ namespace Discord.WebSocket
         /// </returns>
         public override string ToString() => Content;
         internal SocketMessage Clone() => MemberwiseClone() as SocketMessage;
-#endregion
+        #endregion
 
         #region IMessage
         /// <inheritdoc />

@@ -25,12 +25,12 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This value is not guaranteed to be set; in cases where the entity cannot be pulled from cache, it is
-        ///     <c>null</c>.
+        ///     <see langword="null" />.
         /// </remarks>
         public TEntity Value { get; }
         private Func<Task<TEntity>> DownloadFunc { get; }
 
-        internal Cacheable(TEntity value, TId id, bool hasValue , Func<Task<TEntity>> downloadFunc)
+        internal Cacheable(TEntity value, TId id, bool hasValue, Func<Task<TEntity>> downloadFunc)
         {
             Value = value;
             Id = id;
@@ -81,7 +81,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This value is not guaranteed to be set; in cases where the entity cannot be pulled from cache, it is
-        ///     <c>null</c>.
+        ///     <see langword="null" />.
         /// </remarks>
         public TCachedEntity Value { get; }
         private Func<Task<TDownloadableEntity>> DownloadFunc { get; }

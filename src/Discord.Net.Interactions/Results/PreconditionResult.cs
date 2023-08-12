@@ -22,7 +22,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="error">The type of failure.</param>
         /// <param name="reason">The reason of failure.</param>
-        protected PreconditionResult (InteractionCommandError? error, string reason)
+        protected PreconditionResult(InteractionCommandError? error, string reason)
         {
             Error = error;
             ErrorReason = reason;
@@ -31,21 +31,21 @@ namespace Discord.Interactions
         /// <summary>
         ///     Returns a <see cref="PreconditionResult" /> with no errors.
         /// </summary>
-        public static PreconditionResult FromSuccess ( ) =>
+        public static PreconditionResult FromSuccess() =>
             new PreconditionResult(null, null);
 
         /// <summary>
         ///     Returns a <see cref="PreconditionResult" /> with <see cref="InteractionCommandError.Exception" /> and the <see cref="Exception.Message"/>.
         /// </summary>
         /// <param name="exception">The exception that caused the precondition check to fail.</param>
-        public static PreconditionResult FromError (Exception exception) =>
+        public static PreconditionResult FromError(Exception exception) =>
             new PreconditionResult(InteractionCommandError.Exception, exception.Message);
 
         /// <summary>
         ///     Returns a <see cref="PreconditionResult" /> with the specified <paramref name="result"/> type.
         /// </summary>
         /// <param name="result">The result of failure.</param>
-        public static PreconditionResult FromError (IResult result) =>
+        public static PreconditionResult FromError(IResult result) =>
             new PreconditionResult(result.Error, result.ErrorReason);
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Discord.Interactions
         ///     specified reason.
         /// </summary>
         /// <param name="reason">The reason of failure.</param>
-        public static PreconditionResult FromError (string reason) =>
+        public static PreconditionResult FromError(string reason) =>
             new PreconditionResult(InteractionCommandError.UnmetPrecondition, reason);
     }
 }
