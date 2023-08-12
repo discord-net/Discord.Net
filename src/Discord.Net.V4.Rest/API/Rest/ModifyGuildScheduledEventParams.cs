@@ -8,7 +8,7 @@ internal class ModifyGuildScheduledEventParams
     public Optional<ulong?> ChannelId { get; set; }
 
     [JsonPropertyName("entity_metadata")]
-    public Optional<GuildScheduledEventEntityMetadata> EntityMetadata { get; set; }
+    public Optional<GuildScheduledEventEntityMetadata?> EntityMetadata { get; set; }
 
     [JsonPropertyName("name")]
     public Optional<string> Name { get; set; }
@@ -23,7 +23,7 @@ internal class ModifyGuildScheduledEventParams
     public Optional<DateTimeOffset> EndTime { get; set; }
 
     [JsonPropertyName("description")]
-    public Optional<string> Description { get; set; }
+    public Optional<string?> Description { get; set; }
 
     [JsonPropertyName("entity_type")]
     public Optional<GuildScheduledEventType> Type { get; set; }

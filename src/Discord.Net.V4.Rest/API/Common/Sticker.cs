@@ -8,7 +8,7 @@ internal class Sticker
     public ulong Id { get; set; }
 
     [JsonPropertyName("pack_id")]
-    public ulong? PackId { get; set; }
+    public Optional<ulong> PackId { get; set; }
 
     [JsonPropertyName("name")]
     public string Name { get; set; }

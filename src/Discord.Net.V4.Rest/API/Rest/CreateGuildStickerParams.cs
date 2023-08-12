@@ -2,7 +2,7 @@ using Discord.Net.Rest;
 
 namespace Discord.API.Rest;
 
-internal class CreateStickerParams
+internal class CreateGuildStickerParams
 {
     public Stream File { get; set; }
     public string Name { get; set; }

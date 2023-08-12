@@ -14,13 +14,13 @@ internal class Connection
     public string Type { get; set; }
 
     [JsonPropertyName("revoked")]
-    public Optional<bool> Revoked { get; set; }
+    public Optional<bool> IsRevoked { get; set; }
 
     [JsonPropertyName("integrations")]
     public Optional<Integration[]> Integrations { get; set; }
 
     [JsonPropertyName("verified")]
-    public bool Verified { get; set; }
+    public bool IsVerified { get; set; }
 
     [JsonPropertyName("friend_sync")]
     public bool FriendSync { get; set; }
@@ -29,7 +29,7 @@ internal class Connection
     public bool ShowActivity { get; set; }
 
     [JsonPropertyName("two_way_link")]
-    public bool TwoWayLink { get; set; }
+    public bool IsTwoWayLink { get; set; }
 
     [JsonPropertyName("visibility")]
     public ConnectionVisibility Visibility { get; set; }

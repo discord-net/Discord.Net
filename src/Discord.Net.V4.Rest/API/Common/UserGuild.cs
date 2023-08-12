@@ -14,7 +14,7 @@ internal class UserGuild
     public string Icon { get; set; }
 
     [JsonPropertyName("owner")]
-    public bool Owner { get; set; }
+    public bool IsOwner { get; set; }
 
     [JsonPropertyName("permissions")]
     public GuildPermission Permissions { get; set; }

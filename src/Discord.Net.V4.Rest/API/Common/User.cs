@@ -51,4 +51,7 @@ internal class User
 
     [JsonPropertyName("public_flags")]
     public Optional<UserProperties> PublicFlags { get; set; }
+
+    [JsonPropertyName("avatar_decoration")]
+    public Optional<string?> AvatarDecoration { get; set; }
 }

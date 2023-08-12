@@ -13,5 +13,10 @@ public enum CacheMode
     /// <summary>
     ///     Only allows the object to be pulled from the existing cache.
     /// </summary>
-    CacheOnly
+    CacheOnly,
+
+    /// <summary>
+    ///     Only allows the object to be fetched with a REST API call.
+    /// </summary>
+    DownloadOnly
 }

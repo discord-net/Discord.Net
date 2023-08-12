@@ -17,11 +17,11 @@ internal class StickerPack
     public ulong SkuId { get; set; }
 
     [JsonPropertyName("cover_sticker_id")]
-    public ulong? CoverStickerId { get; set; }
+    public Optional<ulong> CoverStickerId { get; set; }
 
     [JsonPropertyName("description")]
     public string Description { get; set; }
 
     [JsonPropertyName("banner_asset_id")]
-    public ulong? BannerAssetId { get; set; }
+    public Optional<ulong> BannerAssetId { get; set; }
 }

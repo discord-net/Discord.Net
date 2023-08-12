@@ -729,7 +729,7 @@ namespace Discord.Rest
 
             Preconditions.AtMost(name.Length, 30, nameof(name));
 
-            var apiArgs = new CreateStickerParams()
+            var apiArgs = new CreateGuildStickerParams()
             {
                 Name = name,
                 Description = description,
@@ -763,7 +763,7 @@ namespace Discord.Rest
             Preconditions.AtLeast(tagString.Length, 1, nameof(tags));
             Preconditions.AtMost(tagString.Length, 200, nameof(tags));
 
-            var apiArgs = new CreateStickerParams()
+            var apiArgs = new CreateGuildStickerParams()
             {
                 Name = name,
                 Description = description,
@@ -784,7 +784,7 @@ namespace Discord.Rest
             var props = new StickerProperties();
             func(props);
 
-            var apiArgs = new ModifyStickerParams()
+            var apiArgs = new ModifyGuildStickerParams()
             {
                 Description = props.Description,
                 Name = props.Name,
