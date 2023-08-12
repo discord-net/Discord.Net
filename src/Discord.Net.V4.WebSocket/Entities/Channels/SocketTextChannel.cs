@@ -31,6 +31,8 @@ namespace Discord.WebSocket
         protected override IGuildTextChannelModel Model
             => _source;
 
+        public int DefaultSlowModeInterval => throw new NotImplementedException(); // TODO
+
         private IGuildTextChannelModel _source;
 
         public SocketTextChannel(DiscordSocketClient discord, ulong guildId, IGuildTextChannelModel model)
@@ -87,6 +89,7 @@ namespace Discord.WebSocket
         
         internal override object Clone() => throw new NotImplementedException();
         internal override void DisposeClone() => throw new NotImplementedException();
+        public Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null) => throw new NotImplementedException();
     }
 }
 
