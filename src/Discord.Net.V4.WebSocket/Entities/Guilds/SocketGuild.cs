@@ -22,6 +22,7 @@ namespace Discord.WebSocket
         public GuildRoleCacheable EveryoneRole { get; }
         public GuildEmotesCacheable Emotes { get; }
         public GuildEventsCacheable Events { get; }
+        public GuildStageInstancesCacheable StageInstances { get; }
 
         public IAudioClient AudioClient => throw new NotImplementedException(); // TODO
 
@@ -178,6 +179,7 @@ namespace Discord.WebSocket
             EveryoneRole = new(id, id, discord, discord.State.GuildRoles.SourceSpecific(id)); // everyone role is the same ID as the guild.
             Emotes = new(id, discord.State.GuildEmotes, emoteId => new GuildEmoteCacheable(emoteId, id, discord, discord.State.GuildEmotes.SourceSpecific(emoteId, id)));
             Events = new(id, discord.State.GuildEvents, eventId => new GuildEventCacheable(eventId, id, discord, discord.State.GuildEvents.SourceSpecific(eventId, id)));
+            StageInstances = new(id, discord.State.StageInstances, stageInstanceId => new GuildStageInstanceCacheable(stageInstanceId, id, discord, discord.State.StageInstances.SourceSpecific(id)));
         }
 
         internal override object Clone() => throw new NotImplementedException();
