@@ -790,32 +790,32 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Fired when a stage is started.
         /// </summary>
-        public event Func<SocketStageChannel, Task> StageStarted
+        public event Func<SocketStageInstance, Task> StageStarted
         {
             add { _stageStarted.Add(value); }
             remove { _stageStarted.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<SocketStageChannel, Task>> _stageStarted = new AsyncEvent<Func<SocketStageChannel, Task>>();
+        internal readonly AsyncEvent<Func<SocketStageInstance, Task>> _stageStarted = new ();
 
         /// <summary>
         ///     Fired when a stage ends.
         /// </summary>
-        public event Func<SocketStageChannel, Task> StageEnded
+        public event Func<SocketStageInstance, Task> StageEnded
         {
             add { _stageEnded.Add(value); }
             remove { _stageEnded.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<SocketStageChannel, Task>> _stageEnded = new AsyncEvent<Func<SocketStageChannel, Task>>();
+        internal readonly AsyncEvent<Func<SocketStageInstance, Task>> _stageEnded = new ();
 
         /// <summary>
         ///     Fired when a stage is updated.
         /// </summary>
-        public event Func<SocketStageChannel, SocketStageChannel, Task> StageUpdated
+        public event Func<SocketStageInstance, SocketStageInstance, Task> StageUpdated
         {
             add { _stageUpdated.Add(value); }
             remove { _stageUpdated.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<SocketStageChannel, SocketStageChannel, Task>> _stageUpdated = new AsyncEvent<Func<SocketStageChannel, SocketStageChannel, Task>>();
+        internal readonly AsyncEvent<Func<SocketStageInstance, SocketStageInstance, Task>> _stageUpdated = new ();
 
         /// <summary>
         ///     Fired when a user requests to speak within a stage channel.

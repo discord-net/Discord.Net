@@ -99,7 +99,7 @@ namespace Discord
         public RequestOptions()
         {
             Timeout = DiscordConfig.DefaultRequestTimeout;
-            RequestHeaders = new Dictionary<string, IEnumerable<string>>();
+            RequestHeaders = new Dictionary<string, IEnumerable<string?>>();
         }
 
         public RequestOptions Clone() => MemberwiseClone() as RequestOptions;

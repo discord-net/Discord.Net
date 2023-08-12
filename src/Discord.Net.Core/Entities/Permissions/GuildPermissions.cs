@@ -104,6 +104,13 @@ namespace Discord
         public readonly bool StartEmbeddedActivities => Permissions.GetValue(RawValue, GuildPermission.StartEmbeddedActivities);
         /// <summary> If <see langword="true" />, a user can timeout other users in this guild.</summary>
         public readonly bool ModerateMembers => Permissions.GetValue(RawValue, GuildPermission.ModerateMembers);
+        /// <summary> If <see langword="true"/>, a user can use soundboard in this guild.</summary>
+        public readonly bool UseSoundboard => Permissions.GetValue(RawValue, GuildPermission.UseSoundboard);
+        /// <summary> If <see langword="true"/>, a user can view monetization analytics in this guild.</summary>
+        public readonly bool ViewMonetizationAnalytics => Permissions.GetValue(RawValue, GuildPermission.ViewMonetizationAnalytics);
+        /// <summary> If <see langword="true"/>, a user can send voice messages in this channel.</summary>
+        public readonly bool SendVoiceMessages => Permissions.GetValue(RawValue, GuildPermission.SendVoiceMessages);
+
         /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value. </summary>
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
 
@@ -358,7 +365,7 @@ namespace Discord
         /// </summary>
         /// <param name="permission">The permission value to check for.</param>
         /// <returns><see langword="true"/> if the permission is enabled, <see langword="false" /> otherwise.</returns>
-        public bool Has(GuildPermission permission) => Permissions.GetValue(RawValue, permission);
+        public readonly bool Has(GuildPermission permission) => Permissions.GetValue(RawValue, permission);
 
         /// <summary>
         ///     Returns a <see cref="List{T}"/> containing all of the <see cref="GuildPermission"/>

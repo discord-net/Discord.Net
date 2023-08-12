@@ -19,8 +19,8 @@ namespace Discord.WebSocket
 
         protected abstract override IGuildChannelModel Model { get; }
 
-        internal SocketGuildChannel(DiscordSocketClient discord, ulong guildId, ulong id, IGuildChannelModel model)
-            : base(discord, id, model)
+        internal SocketGuildChannel(DiscordSocketClient discord, ulong guildId, IGuildChannelModel model)
+            : base(discord, model.Id, model)
         {
             Guild = new(guildId, discord, discord.State.Guilds.SourceSpecific(guildId));
         }
