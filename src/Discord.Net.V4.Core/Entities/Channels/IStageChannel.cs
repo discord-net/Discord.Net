@@ -9,22 +9,14 @@ namespace Discord
     public interface IStageChannel : IVoiceChannel
     {
         /// <summary>
-        ///     Gets the <see cref="StagePrivacyLevel"/> of the current stage.
+        ///     Gets the stage instance currently running in the channel. <see langword="null" /> if no instance is running.
         /// </summary>
+        IStageInstance StageInstance { get; }
+
         /// <remarks>
         ///     If the stage isn't live then this property will be set to <see langword="null" />.
         /// </remarks>
         StagePrivacyLevel? PrivacyLevel { get; }
-
-        /// <summary>
-        ///     Gets whether or not stage discovery is disabled. 
-        /// </summary>
-        bool? IsDiscoverableDisabled { get; }
-
-        /// <summary>
-        ///     Gets whether or not the stage is live.
-        /// </summary>
-        bool IsLive { get; }
 
         /// <summary>
         ///     Starts the stage, creating a stage instance.
@@ -32,10 +24,12 @@ namespace Discord
         /// <param name="topic">The topic for the stage/</param>
         /// <param name="privacyLevel">The privacy level of the stage.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="sendStartNotification">Notify @everyone that a Stage instance has started</param>
         /// <returns>
         ///     A task that represents the asynchronous start operation.
         /// </returns>
-        Task StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, RequestOptions? options = null);
+        Task<IStageInstance> StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, bool sendStartNotification = false,
+            RequestOptions? options = null);
 
         /// <summary>
         ///     Modifies the current stage instance.
