@@ -13,7 +13,7 @@ namespace Discord
         /// <returns>
         ///     A user object that represents the other user in this channel.
         /// </returns>
-        IUser Recipient { get; }
+        IEntitySource<IUser, ulong> Recipient { get; }
 
         /// <summary>
         ///     Closes this private channel, removing it from your channel list.

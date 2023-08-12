@@ -33,7 +33,7 @@ namespace Discord
         /// <returns>
         ///     A user object.
         /// </returns>
-        IUser User { get; }
+        IEntitySource<IUser, ulong> User { get; }
 
         /// <summary>
         ///     Gets the reason behind the change.

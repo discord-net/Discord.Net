@@ -38,7 +38,7 @@ namespace Discord
         /// <returns>
         ///     A guild object that this channel belongs to.
         /// </returns>
-        IGuild Guild { get; }
+        IEntitySource<IGuild, ulong> Guild { get; }
         /// <summary>
         ///     Gets the guild ID associated with this channel.
         /// </summary>
