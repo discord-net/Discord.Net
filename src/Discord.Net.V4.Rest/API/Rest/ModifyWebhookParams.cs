@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest;
 
-internal class ModifyWebhookParams
+public class ModifyWebhookParams
 {
     [JsonPropertyName("name")]
     public Optional<string> Name { get; set; }

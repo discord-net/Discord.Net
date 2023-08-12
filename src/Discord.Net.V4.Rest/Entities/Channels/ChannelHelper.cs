@@ -159,7 +159,7 @@ namespace Discord.Rest
                 IsUnique = isUnique,
                 MaxAge = maxAge ?? 0,
                 MaxUses = maxUses ?? 0,
-                TargetType = TargetUserType.Stream,
+                TargetType = InviteTargetType.Stream,
                 TargetUserId = user.Id
             };
             var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
@@ -183,7 +183,7 @@ namespace Discord.Rest
                 IsUnique = isUnique,
                 MaxAge = maxAge ?? 0,
                 MaxUses = maxUses ?? 0,
-                TargetType = TargetUserType.EmbeddedApplication,
+                TargetType = InviteTargetType.EmbeddedApplication,
                 TargetApplicationId = applicationId
             };
             var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);

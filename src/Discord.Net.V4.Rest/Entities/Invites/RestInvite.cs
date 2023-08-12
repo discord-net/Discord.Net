@@ -28,7 +28,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public IUser TargetUser { get; private set; }
         /// <inheritdoc />
-        public TargetUserType TargetUserType { get; private set; }
+        public InviteTargetType InviteTargetType { get; private set; }
 
         /// <summary>
         ///     Gets the guild this invite is linked to.
@@ -81,7 +81,7 @@ namespace Discord.Rest
             ChannelType = (ChannelType)model.Channel.Type;
             Inviter = model.Inviter.IsSpecified ? RestUser.Create(Discord, model.Inviter.Value) : null;
             TargetUser = model.TargetUser.IsSpecified ? RestUser.Create(Discord, model.TargetUser.Value) : null;
-            TargetUserType = model.TargetUserType.IsSpecified ? model.TargetUserType.Value : TargetUserType.Undefined;
+            InviteTargetType = model.TargetUserType.IsSpecified ? model.TargetUserType.Value : InviteTargetType.Undefined;
 
             if (model.Guild.IsSpecified)
             {

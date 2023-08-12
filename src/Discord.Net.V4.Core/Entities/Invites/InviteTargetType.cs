@@ -1,6 +1,6 @@
 namespace Discord;
 
-public enum TargetUserType
+public enum InviteTargetType
 {
     /// <summary>
     ///     The invite whose target user type is not defined.

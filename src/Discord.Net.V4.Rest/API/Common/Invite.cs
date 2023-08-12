@@ -17,7 +17,7 @@ internal class Invite
     public Optional<User> Inviter { get; set; }
 
     [JsonPropertyName("target_type")]
-    public Optional<TargetUserType> TargetUserType { get; set; }
+    public Optional<InviteTargetType> TargetUserType { get; set; }
 
     [JsonPropertyName("target_user")]
     public Optional<User> TargetUser { get; set; }

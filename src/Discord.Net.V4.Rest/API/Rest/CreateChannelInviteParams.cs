@@ -17,7 +17,7 @@ internal class CreateChannelInviteParams
     public Optional<bool> IsUnique { get; set; }
 
     [JsonPropertyName("target_type")]
-    public Optional<TargetUserType> TargetType { get; set; }
+    public Optional<InviteTargetType> TargetType { get; set; }
 
     [JsonPropertyName("target_user_id")]
     public Optional<ulong> TargetUserId { get; set; }

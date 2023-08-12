@@ -1,4 +1,3 @@
-using System;
 namespace Discord.Models
 {
     public interface IGuildEventModel : IEntityModel<ulong>

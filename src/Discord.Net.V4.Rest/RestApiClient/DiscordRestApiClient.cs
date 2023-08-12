@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Net;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
@@ -11,7 +12,6 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Discord.Rest;
 
@@ -22,7 +22,7 @@ public partial class DiscordRestApiClient : IRestApiProvider
     private JsonSerializerOptions _serializerOptions;
     protected readonly SemaphoreSlim _stateLock;
     private readonly RestClientProvider _restClientProvider;
-    private CancellationTokenSource? _loginCancelToken;
+    private CancellationTokenSource? _loginCancelToken = null;
 
     protected bool IsDisposed;
 
@@ -74,12 +74,28 @@ public partial class DiscordRestApiClient : IRestApiProvider
 
     public void Dispose() => throw new NotImplementedException();
 
-    public Task LoginAsync(TokenType tokenType, string token, bool validateToken, CancellationToken? cancellationToken = null) => throw new NotImplementedException();
+    public Task LoginAsync(TokenType tokenType, string token, bool validateToken, CancellationToken? cancellationToken = null)
+        => throw new NotImplementedException();
 
     public Task LogoutAsync(CancellationToken? cancellationToken = null) => throw new NotImplementedException();
 
-    public virtual Task<IReadOnlyCollection<IVoiceRegion>> ListVoiceRegionsAsync(CancellationToken? cancellationToken = null, RequestOptions? options = null) => throw new NotImplementedException();
+    #region Voice
 
+    public virtual Task<IReadOnlyCollection<IVoiceRegion>> ListVoiceRegionsAsync(CancellationToken? cancellationToken = null, RequestOptions? options = null)
+        => throw new NotImplementedException();
+
+    #endregion
+
+    #region Invite
+
+    public virtual Task<IInviteModel> GetInviteAsync(string inviteCode, bool withCounts = true, bool withExpiration = true, ulong? scheduledEventId = null,
+        CancellationToken? cancellationToken = null, RequestOptions? options = null)
+        => throw new NotImplementedException();
+
+    public virtual Task<IInviteModel> DeleteInviteAsync(string inviteCode, CancellationToken? cancellationToken = null, RequestOptions? options = null)
+        => throw new NotImplementedException();
+
+    #endregion
 
     /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
     internal void SetBaseUrl(string baseUrl, bool dispose = true)
@@ -139,9 +155,9 @@ public partial class DiscordRestApiClient : IRestApiProvider
 
     #region Net
 
-    internal Task SendAsync(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, CancellationToken? cancellationToken = null, RequestOptions? options = null, [CallerMemberName] string? funcName = null)
-            => SendAsync(method, GetEndpoint(endpointExpr), GetBucketId(method, ids, endpointExpr, funcName!), clientBucket, cancellationToken, options);
+    internal Task SendAsync(string method, Expression<Func<string>> endpointExpr, BucketIds ids, ClientBucketType clientBucket = ClientBucketType.Unbucketed,
+        CancellationToken? cancellationToken = null, RequestOptions? options = null, [CallerMemberName] string? funcName = null)
+        => SendAsync(method, GetEndpoint(endpointExpr), GetBucketId(method, ids, endpointExpr, funcName!), clientBucket, cancellationToken, options);
 
     public async Task SendAsync(string method, string endpoint, BucketId? bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed,
         CancellationToken? cancellationToken = null, RequestOptions? options = null)
@@ -158,8 +174,8 @@ public partial class DiscordRestApiClient : IRestApiProvider
         CancellationToken? cancellationToken = null, RequestOptions? options = null, [CallerMemberName] string? funcName = null)
         => SendJsonAsync(method, GetEndpoint(endpointExpr), payload, GetBucketId(method, ids, endpointExpr, funcName!), clientBucket, cancellationToken, options);
 
-    public async Task SendJsonAsync(string method, string endpoint, object? payload,
-        BucketId? bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, CancellationToken? cancellationToken = null, RequestOptions? options = null)
+    public async Task SendJsonAsync(string method, string endpoint, object? payload, BucketId? bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed,
+        CancellationToken? cancellationToken = null, RequestOptions? options = null)
     {
         options ??= new RequestOptions();
         options.HeaderOnly = true;

@@ -94,7 +94,7 @@ namespace Discord
         /// </returns>
         int? MemberCount { get; }
         /// <summary>
-        ///     Gets the user this invite is linked to via <see cref="TargetUserType"/>.
+        ///     Gets the user this invite is linked to via <see cref="InviteTargetType"/>.
         /// </summary>
         /// <returns>
         ///     A user that is linked to this invite.
@@ -106,14 +106,14 @@ namespace Discord
         /// <returns>
         ///     The type of the linked user that is linked to this invite.
         /// </returns>
-        TargetUserType TargetUserType { get; }
+        InviteTargetType InviteTargetType { get; }
 
         /// <summary>
         ///     Gets the embedded application to open for this voice channel embedded application invite.
         /// </summary>
         /// <returns>
-        ///     A partial <see cref="IApplication"/> object. <see langword="null" /> if <see cref="TargetUserType"/>
-        ///     is not <see cref="TargetUserType.EmbeddedApplication"/>.
+        ///     A partial <see cref="IApplication"/> object. <see langword="null" /> if <see cref="InviteTargetType"/>
+        ///     is not <see cref="InviteTargetType.EmbeddedApplication"/>.
         /// </returns>
         IApplication Application { get; }
 

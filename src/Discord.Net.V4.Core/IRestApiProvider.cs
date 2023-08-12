@@ -1,4 +1,6 @@
 using Discord.Models;
+using Discord.Models.RestRequests;
+using Discord.Models.Webhooks;
 
 namespace Discord;
 
@@ -50,10 +52,40 @@ public interface IRestApiProvider : IAsyncDisposable, IDisposable
 
     #endregion
 
+    #region Invite
+
+    
+
+    #endregion
+
     #region Voice
 
     Task<IReadOnlyCollection<IVoiceRegion>> ListVoiceRegionsAsync(CancellationToken? cancellationToken = null, RequestOptions? options = null);
 
     #endregion
 
+    #region Webhook
+
+    Task<IWebhookModel> CreateWebhookAsync(string name, Image? avatar = null, CancellationToken? cancellationToken = null, RequestOptions? options = null);
+
+    Task<IWebhookModel[]> GetChannelWebhooksAsync(ulong channelId, CancellationToken? cancellationToken = null, RequestOptions? options = null);
+
+    Task<IWebhookModel[]> GetGuildWebhooks(ulong guildId, CancellationToken? cancellationToken = null, RequestOptions? options = null);
+
+    Task<IWebhookModel> GetWebhookAsync(ulong webhookId, CancellationToken? cancellationToken = null, RequestOptions? options = null);
+
+    Task<IWebhookModel> GetWebhookWithTokenAsync(ulong webhookId, string webhookToken, CancellationToken? cancellationToken = null,
+        RequestOptions? options = null);
+
+    Task<IWebhookModel> ModifyWebhookAsync(ulong webhookId, IModifyWebhookParams args, CancellationToken? cancellationToken = null,
+        RequestOptions? options = null);
+
+    Task<IWebhookModel> ModifyWebhookWithTokenAsync(ulong webhookId, string webhookToken, IModifyWebhookParams args, CancellationToken? cancellationToken = null,
+        RequestOptions? options = null);
+
+    Task DeleteWebhookAsync(ulong webhookId, CancellationToken? cancellationToken = null, RequestOptions? options = null);
+
+    Task DeleteWebhookWithTokenAsync(ulong webhookId, string webhookToken, CancellationToken? cancellationToken = null, RequestOptions? options = null)
+
+    #endregion
 }
