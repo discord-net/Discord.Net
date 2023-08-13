@@ -71,7 +71,7 @@ public interface ISticker : IStickerItem
     /// <summary>
     ///     Gets the user that uploaded the guild sticker.
     /// </summary>
-    IUser User { get; }
+    IEntitySource<IUser, ulong>? User { get; }
 
     /// <summary>
     ///     Gets the image url for this sticker.

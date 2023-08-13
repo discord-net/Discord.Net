@@ -9,15 +9,7 @@ namespace Discord;
 /// </summary>
 public interface IGuildOnboarding
 {
-    /// <summary>
-    ///     Gets the ID of the guild this onboarding is part of.
-    /// </summary>
-    ulong GuildId { get; }
-
-    /// <summary>
-    ///     Gets the guild this onboarding is part of.
-    /// </summary>
-    IGuild Guild { get; }
+    IEntitySource<IGuild, ulong> Guild { get; }
 
     /// <summary>
     ///     Gets prompts shown during onboarding and in customize community.

@@ -92,12 +92,12 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// <summary>
     ///     Gets the source channel of the message.
     /// </summary>
-    IMessageChannel Channel { get; }
+    IEntitySource<IMessageChannel, ulong> Channel { get; }
 
     /// <summary>
     ///     Gets the author of this message.
     /// </summary>
-    IUser Author { get; }
+    IEntitySource<IUser, ulong> Author { get; }
 
     /// <summary>
     ///     Gets the thread that was started from this message.
@@ -105,7 +105,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// <returns>
     ///    An <see cref="IThreadChannel"/> object if this message has thread attached; otherwise <see langword="null" />.
     /// </returns>
-    IThreadChannel Thread { get; }
+    IEntitySource<IThreadChannel, ulong>? Thread { get; }
 
     /// <summary>
     ///     Gets all attachments included in this message.
@@ -139,28 +139,19 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     IReadOnlyCollection<ITag> Tags { get; }
 
     /// <summary>
-    ///     Gets the IDs of channels mentioned in this message.
+    ///     Gets the channels mentioned in this message.
     /// </summary>
-    /// <returns>
-    ///     A read-only collection of channel IDs.
-    /// </returns>
-    IReadOnlyCollection<ulong> MentionedChannelIds { get; }
+    IEntityEnumerableSource<IChannel, ulong> MentionedChannels { get; }
 
     /// <summary>
-    ///     Gets the IDs of roles mentioned in this message.
+    ///     Gets the roles mentioned in this message.
     /// </summary>
-    /// <returns>
-    ///     A read-only collection of role IDs.
-    /// </returns>
-    IReadOnlyCollection<ulong> MentionedRoleIds { get; }
+    IEntityEnumerableSource<IRole, ulong> MentionedRoles { get; }
 
     /// <summary>
-    ///     Gets the IDs of users mentioned in this message.
+    ///     Gets the users mentioned in this message.
     /// </summary>
-    /// <returns>
-    ///     A read-only collection of user IDs.
-    /// </returns>
-    IReadOnlyCollection<ulong> MentionedUserIds { get; }
+    IEntityEnumerableSource<IUser, ulong> MentionedUsers { get; }
 
     /// <summary>
     ///     Gets the activity associated with a message.

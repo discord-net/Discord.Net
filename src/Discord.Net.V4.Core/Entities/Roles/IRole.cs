@@ -8,10 +8,7 @@ public interface IRole : ISnowflakeEntity, IDeletable, IMentionable, IComparable
     /// <summary>
     ///     Gets the guild that owns this role.
     /// </summary>
-    /// <returns>
-    ///     A guild representing the parent guild of this role.
-    /// </returns>
-    IGuild Guild { get; }
+    IEntitySource<IGuild, ulong> Guild { get; }
 
     /// <summary>
     ///     Gets the color given to users of this role.

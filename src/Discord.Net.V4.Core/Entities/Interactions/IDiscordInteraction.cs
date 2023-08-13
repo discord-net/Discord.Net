@@ -47,7 +47,7 @@ namespace Discord
         /// <summary>
         ///     Gets the user who invoked the interaction.
         /// </summary>
-        IUser User { get; }
+        IEntitySource<IUser, ulong> User { get; }
 
         /// <summary>
         ///     Gets the preferred locale of the invoking User.

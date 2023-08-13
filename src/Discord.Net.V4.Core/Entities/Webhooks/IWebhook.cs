@@ -30,27 +30,17 @@ public interface IWebhook : IDeletable, ISnowflakeEntity
     /// <summary>
     ///     Gets the channel for this webhook.
     /// </summary>
-    IIntegrationChannel Channel { get; }
-
-    /// <summary>
-    ///     Gets the ID of the channel for this webhook.
-    /// </summary>
-    ulong? ChannelId { get; }
+    IEntitySource<IIntegrationChannel, ulong> Channel { get; }
 
     /// <summary>
     ///     Gets the guild owning this webhook.
     /// </summary>
-    IGuild? Guild { get; }
-
-    /// <summary>
-    ///     Gets the ID of the guild owning this webhook.
-    /// </summary>
-    ulong? GuildId { get; }
+    IEntitySource<IGuild, ulong>? Guild { get; }
 
     /// <summary>
     ///     Gets the user that created this webhook.
     /// </summary>
-    IUser Creator { get; }
+    IEntitySource<IUser, ulong> Creator { get; }
 
     /// <summary>
     ///     Gets the ID of the application owning this webhook.

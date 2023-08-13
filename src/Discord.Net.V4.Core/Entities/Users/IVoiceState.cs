@@ -57,7 +57,7 @@ public interface IVoiceState
     ///     A generic voice channel object representing the voice channel that the user is currently in; <see langword="null" />
     ///     if none.
     /// </returns>
-    IVoiceChannel VoiceChannel { get; }
+    IEntitySource<IVoiceChannel, ulong> VoiceChannel { get; }
 
     /// <summary>
     ///     Gets the unique identifier for this user's voice session.

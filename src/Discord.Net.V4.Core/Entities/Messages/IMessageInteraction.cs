@@ -23,5 +23,5 @@ public interface IMessageInteraction
     /// <summary>
     ///     Gets the <seealso cref="IUser"/> who invoked the interaction.
     /// </summary>
-    IUser User { get; }
+    IEntitySource<IUser, ulong> User { get; }
 }

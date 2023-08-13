@@ -66,7 +66,7 @@ namespace Discord
         /// <summary>
         ///     Gets the user for this integration.
         /// </summary>
-        IUser User { get; }
+        IEntitySource<IUser, ulong> User { get; }
         /// <summary>
         ///     Gets integration account information.
         /// </summary>
@@ -91,7 +91,6 @@ namespace Discord
         /// </summary>
         IIntegrationApplication Application { get; }
 
-        IGuild Guild { get; }
-        ulong GuildId { get; }
+        IEntitySource<IGuild, ulong> Guild { get; }
     }
 }

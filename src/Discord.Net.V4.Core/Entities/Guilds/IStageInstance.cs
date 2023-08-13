@@ -8,15 +8,9 @@ namespace Discord;
 /// </summary>
 public interface IStageInstance : ISnowflakeEntity
 {
-    /// <summary>
-    ///     Gets the guild id of the associated Stage channel.
-    /// </summary>
-    public ulong GuildId { get; }
+    IEntitySource<IGuild, ulong> Guild { get; }
 
-    /// <summary>
-    ///     Gets the id of the associated Stage channel.
-    /// </summary>
-    public ulong ChannelId { get; }
+    IEntitySource<IGuildChannel, ulong> Channel { get; }
 
     /// <summary>
     ///     Gets the topic of the Stage instance.

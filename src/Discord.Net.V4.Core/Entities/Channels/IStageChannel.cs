@@ -11,7 +11,7 @@ namespace Discord
         /// <summary>
         ///     Gets the stage instance currently running in the channel. <see langword="null" /> if no instance is running.
         /// </summary>
-        IStageInstance StageInstance { get; }
+        IEntitySource<IStageInstance, ulong>? StageInstance { get; }
 
         /// <summary>
         ///     Starts the stage, creating a stage instance.

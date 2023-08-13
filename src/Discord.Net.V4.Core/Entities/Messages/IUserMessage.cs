@@ -14,7 +14,7 @@ namespace Discord
         /// <returns>
         ///     The referenced message, if any is associated and still exists.
         /// </returns>
-        IUserMessage ReferencedMessage { get; }
+        IEntitySource<IUserMessage, ulong> ReferencedMessage { get; }
 
         /// <summary>
         ///     Modifies this message.

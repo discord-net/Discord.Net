@@ -201,21 +201,21 @@ namespace Discord
         /// <returns>
         ///     A role object that represents an <c>@everyone</c> role in this guild.
         /// </returns>
-        IRole EveryoneRole { get; }
+        IEntitySource<IRole, ulong> EveryoneRole { get; }
         /// <summary>
         ///     Gets a collection of all custom emotes for this guild.
         /// </summary>
         /// <returns>
         ///     A read-only collection of all custom emotes for this guild.
         /// </returns>
-        IReadOnlyCollection<GuildEmote> Emotes { get; }
+        IEntityEnumerableSource<GuildEmote, ulong> Emotes { get; }
         /// <summary>
         ///     Gets a collection of all custom stickers for this guild.
         /// </summary>
         /// <returns>
         ///     A read-only collection of all custom stickers for this guild.
         /// </returns>
-        IReadOnlyCollection<ICustomSticker> Stickers { get; }
+        IEntityEnumerableSource<ICustomSticker, ulong> Stickers { get; }
         /// <summary>
         ///     Gets the features for this guild.
         /// </summary>
@@ -229,7 +229,7 @@ namespace Discord
         /// <returns>
         ///     A read-only collection of roles found within this guild.
         /// </returns>
-        IReadOnlyCollection<IRole> Roles { get; }
+        IEntityEnumerableSource<IRole, ulong> Roles { get; }
         /// <summary>
         ///     Gets the tier of guild boosting in this guild.
         /// </summary>

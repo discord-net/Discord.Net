@@ -28,6 +28,6 @@ namespace Discord
         /// <summary>
         ///     Gets the bot associated with this application.
         /// </summary>
-        IUser Bot { get; }
+        IEntitySource<IUser, ulong> Bot { get; }
     }
 }

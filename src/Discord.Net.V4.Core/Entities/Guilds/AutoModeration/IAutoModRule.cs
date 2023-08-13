@@ -11,20 +11,14 @@ namespace Discord
     /// </summary>
     public interface IAutoModRule : ISnowflakeEntity, IDeletable
     {
-        /// <summary>
-        ///     Gets the guild id on which this rule exists.
-        /// </summary>
-        ulong GuildId { get; }
+        IEntitySource<IGuild, ulong> Guild { get; }
 
         /// <summary>
         ///     Get the name of this rule.
         /// </summary>
         string Name { get; }
 
-        /// <summary>
-        ///     Gets the id of the user who created this use.
-        /// </summary>
-        ulong CreatorId { get; }
+        IEntitySource<IGuildUser, ulong> Creator { get; }
 
         /// <summary>
         ///     Gets the event type on which this rule is triggered.
@@ -43,7 +37,7 @@ namespace Discord
         ///     This collection will be empty if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.Keyword"/>.
         /// </remarks>
-        public IReadOnlyCollection<string> KeywordFilter { get; }
+        IReadOnlyCollection<string> KeywordFilter { get; }
 
         /// <summary>
         ///     Gets regex patterns for this rule. Empty if the rule has no regexes.
@@ -52,7 +46,7 @@ namespace Discord
         ///     This collection will be empty if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.Keyword"/>.
         /// </remarks>
-        public IReadOnlyCollection<string> RegexPatterns { get; }
+        IReadOnlyCollection<string> RegexPatterns { get; }
 
         /// <summary>
         ///     Gets the allow list patterns for this rule. Empty if the rule has no allowed terms.
@@ -61,7 +55,7 @@ namespace Discord
         ///     This collection will be empty if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.Keyword"/>.
         /// </remarks>
-        public IReadOnlyCollection<string> AllowList { get; }
+        IReadOnlyCollection<string> AllowList { get; }
 
         /// <summary>
         ///     Gets the preset keyword types for this rule. Empty if the rule has no presets.
@@ -70,7 +64,7 @@ namespace Discord
         ///     This collection will be empty if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.KeywordPreset"/>.
         /// </remarks>
-        public IReadOnlyCollection<KeywordPresetTypes> Presets { get; }
+        IReadOnlyCollection<KeywordPresetTypes> Presets { get; }
 
         /// <summary>
         ///     Gets the total mention limit for this rule.
@@ -79,7 +73,7 @@ namespace Discord
         ///     This property will be <see langword="null" /> if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.MentionSpam"/>.
         /// </remarks>
-        public int? MentionTotalLimit { get; }
+        int? MentionTotalLimit { get; }
 
         /// <summary>
         ///     Gets a collection of actions that will be preformed if a user breaks this rule.

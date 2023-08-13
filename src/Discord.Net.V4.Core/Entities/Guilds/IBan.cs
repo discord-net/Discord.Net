@@ -11,7 +11,7 @@ namespace Discord
         /// <returns>
         ///     A user that was banned.
         /// </returns>
-        IUser User { get; }
+        IEntitySource<IUser, ulong> User { get; }
         /// <summary>
         ///     Gets the reason why the user is banned if specified.
         /// </summary>

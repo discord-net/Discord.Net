@@ -23,5 +23,5 @@ public interface ITeamMember
     /// <summary>
     ///     Gets the Discord user of this team member.
     /// </summary>
-    IUser User { get; }
+    IEntitySource<IUser, ulong> User { get; }
 }

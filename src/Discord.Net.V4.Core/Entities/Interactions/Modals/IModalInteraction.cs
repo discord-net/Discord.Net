@@ -19,7 +19,7 @@ namespace Discord
         /// <remarks>
         ///     This property is only populated if the modal was created from a message component.
         /// </remarks>
-        IUserMessage Message { get; }
+        IEntitySource<IUserMessage, ulong> Message { get; }
 
         /// <summary>
         ///     Updates the message which this modal originates from with the type <see cref="InteractionResponseType.UpdateMessage"/>

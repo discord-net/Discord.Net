@@ -14,22 +14,11 @@ namespace Discord
         /// <summary>
         ///     Gets the guild this event is scheduled in.
         /// </summary>
-        IGuild Guild { get; }
+        IEntitySource<IGuild, ulong> Guild { get; }
 
-        /// <summary>
-        ///     Gets the id of the guild this event is scheduled in.
-        /// </summary>
-        ulong GuildId { get; }
+        IEntitySource<IGuildUser, ulong> Creator { get; }
 
-        /// <summary>
-        ///     Gets the optional channel id where this event will be hosted.
-        /// </summary>
-        ulong? ChannelId { get; }
-
-        /// <summary>
-        ///     Gets the user who created the event.
-        /// </summary>
-        IUser Creator { get; }
+        IEntitySource<IGuildChannel, ulong>? Channel { get; }
 
         /// <summary>
         ///     Gets the name of the event.

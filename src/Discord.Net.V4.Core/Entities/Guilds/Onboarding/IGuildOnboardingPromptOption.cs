@@ -7,15 +7,8 @@ namespace Discord;
 /// </summary>
 public interface IGuildOnboardingPromptOption : ISnowflakeEntity
 {
-    /// <summary>
-    ///     Gets IDs of channels a member is added to when the option is selected.
-    /// </summary>
-    IReadOnlyCollection<ulong> ChannelIds { get; }
-
-    /// <summary>
-    ///     Gets IDs of roles assigned to a member when the option is selected.
-    /// </summary>
-    IReadOnlyCollection<ulong> RoleIds { get; }
+    IEntityEnumerableSource<IGuildChannel, ulong> Channels { get; }
+    IEntityEnumerableSource<IRole, ulong> Roles { get; }
 
     /// <summary>
     ///     Gets the emoji of the option. <see langword="null" /> if none is set.

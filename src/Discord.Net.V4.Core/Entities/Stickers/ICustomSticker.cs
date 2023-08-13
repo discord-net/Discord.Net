@@ -16,7 +16,7 @@ public interface ICustomSticker : ISticker
     /// <summary>
     ///     Gets the guild that this custom sticker is in.
     /// </summary>
-    IGuild Guild { get; }
+    IEntitySource<IGuild, ulong> Guild { get; }
 
     /// <summary>
     ///     Modifies this sticker.

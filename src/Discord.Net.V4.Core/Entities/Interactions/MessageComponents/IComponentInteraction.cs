@@ -16,7 +16,7 @@ namespace Discord
         /// <summary>
         ///     Gets the message that contained the trigger for this interaction.
         /// </summary>
-        IUserMessage Message { get; }
+        IEntitySource<IUserMessage, ulong> Message { get; }
 
         /// <summary>
         ///     Updates the message which this component resides in with the type <see cref="InteractionResponseType.UpdateMessage"/>

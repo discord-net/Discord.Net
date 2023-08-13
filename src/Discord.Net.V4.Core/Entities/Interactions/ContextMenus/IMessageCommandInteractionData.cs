@@ -8,6 +8,6 @@ namespace Discord
         /// <summary>
         ///     Gets the message associated with this message command.
         /// </summary>
-        IMessage Message { get; }
+        IEntitySource<IMessage, ulong> Message { get; }
     }
 }

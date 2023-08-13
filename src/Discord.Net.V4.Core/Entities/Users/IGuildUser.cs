@@ -62,15 +62,7 @@ public interface IGuildUser : IUser, IVoiceState
     /// <returns>
     ///     A guild object that this user belongs to.
     /// </returns>
-    IGuild Guild { get; }
-
-    /// <summary>
-    ///     Gets the ID of the guild for this user.
-    /// </summary>
-    /// <returns>
-    ///     An <see cref="ulong"/> representing the snowflake identifier of the guild that this user belongs to.
-    /// </returns>
-    ulong GuildId { get; }
+    IEntitySource<IGuild, ulong> Guild { get; }
 
     /// <summary>
     ///     Gets the date and time for when this user's guild boost began.

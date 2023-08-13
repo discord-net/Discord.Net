@@ -25,22 +25,22 @@ namespace Discord
         /// <summary>
         ///     Gets the channels(s) of a <see cref="ComponentType.ChannelSelect"/> interaction response. <see langword="null" /> if select type is different.
         /// </summary> 
-        IReadOnlyCollection<IChannel> Channels { get; }
+        IEntityEnumerableSource<IChannel, ulong> Channels { get; }
 
         /// <summary>
         ///     Gets the user(s) of a <see cref="ComponentType.UserSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response. <see langword="null" /> if select type is different.
         /// </summary>
-        IReadOnlyCollection<IUser> Users { get; }
+        IEntityEnumerableSource<IUser, ulong> Users { get; }
 
         /// <summary>
         ///     Gets the roles(s) of a <see cref="ComponentType.RoleSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response. <see langword="null" /> if select type is different.
         /// </summary>
-        IReadOnlyCollection<IRole> Roles { get; }
+        IEntityEnumerableSource<IRole, ulong> Roles { get; }
 
         /// <summary>
         ///     Gets the guild member(s) of a <see cref="ComponentType.UserSelect"/> or <see cref="ComponentType.MentionableSelect"/> interaction response. <see langword="null" /> if type select is different.
         /// </summary>
-        IReadOnlyCollection<IGuildUser> Members { get; }
+        IEntityEnumerableSource<IGuildUser, ulong> Members { get; }
 
         /// <summary>
         ///     Gets the value of a <see cref="ComponentType.TextInput"/> interaction response.

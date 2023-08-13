@@ -28,25 +28,19 @@ namespace Discord
         /// <returns>
         ///     A user that created this invite.
         /// </returns>
-        IUser Inviter { get; }
+        IEntitySource<IUser, ulong> Inviter { get; }
         /// <summary>
         ///     Gets the channel this invite is linked to.
         /// </summary>
         /// <returns>
         ///     A generic channel that the invite points to.
         /// </returns>
-        IChannel Channel { get; }
+        IEntitySource<IChannel, ulong> Channel { get; }
         /// <summary>
         ///     Gets the type of the channel this invite is linked to.
         /// </summary>
         ChannelType ChannelType { get; }
-        /// <summary>
-        ///     Gets the ID of the channel this invite is linked to.
-        /// </summary>
-        /// <returns>
-        ///     An <see cref="ulong"/> representing the channel snowflake identifier that the invite points to.
-        /// </returns>
-        ulong ChannelId { get; }
+
         /// <summary>
         ///     Gets the name of the channel this invite is linked to.
         /// </summary>
@@ -61,15 +55,8 @@ namespace Discord
         /// <returns>
         ///     A guild object representing the guild that the invite points to.
         /// </returns>
-        IGuild Guild { get; }
+        IEntitySource<IGuild, ulong> Guild { get; }
 
-        /// <summary>
-        ///     Gets the ID of the guild this invite is linked to.
-        /// </summary>
-        /// <returns>
-        ///     An <see cref="ulong"/> representing the guild snowflake identifier that the invite points to.
-        /// </returns>
-        ulong? GuildId { get; }
         /// <summary>
         ///     Gets the name of the guild this invite is linked to.
         /// </summary>
@@ -99,7 +86,7 @@ namespace Discord
         /// <returns>
         ///     A user that is linked to this invite.
         /// </returns>
-        IUser TargetUser { get; }
+        IEntitySource<IUser, ulong>? TargetUser { get; }
         /// <summary>
         ///     Gets the type of the linked <see cref="TargetUser"/> for this invite.
         /// </summary>

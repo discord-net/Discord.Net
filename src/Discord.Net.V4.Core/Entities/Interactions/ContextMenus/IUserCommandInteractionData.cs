@@ -8,6 +8,6 @@ namespace Discord
         /// <summary>
         ///     Gets the user who this command targets.
         /// </summary>
-        IUser User { get; }
+        IEntitySource<IUser, ulong> User { get; }
     }
 }
