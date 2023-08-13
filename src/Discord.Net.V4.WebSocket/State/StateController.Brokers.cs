@@ -9,6 +9,7 @@ using GuildRoleBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebS
 using GuildEmoteBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildEmote, Discord.Models.IGuildEmoteModel>;
 using GuildEventBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketGuildEvent, Discord.Models.IGuildEventModel>;
 using GuildStageInstanceBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketStageInstance, Discord.Models.IStageInstanceModel>;
+using MessageBroker = Discord.WebSocket.State.EntityBroker<ulong, Discord.WebSocket.SocketMessage, Discord.Models.IMessageModel>;
 using Discord.WebSocket.Cache;
 
 namespace Discord.WebSocket.State;
@@ -19,8 +20,8 @@ internal partial class StateController
     public UserBroker Users
             => _userBroker ??= new UserBroker(
                     this,
-                    p => GetStoreAsync(StoreType.Users),
-                    (_, __, model) => ValueTask.FromResult(new SocketUser(_client, model))
+                    (parentId, token) => GetStoreAsync(StoreType.Users, token),
+                    (_, __, model, ___) => ValueTask.FromResult(new SocketUser(_client, model))
                );
     private UserBroker? _userBroker;
     #endregion
@@ -29,11 +30,11 @@ internal partial class StateController
     public MemberBroker Members
         => _memberBroker ??= new MemberBroker(
                 this,
-                p => GetSubStoreAsync(p.Value, StoreType.GuildUsers),
+                (parentId, token) => GetSubStoreAsync(parentId.Value, StoreType.GuildUsers, token),
                 ConstructGuildUserAsync
             );
     private MemberBroker? _memberBroker;
-    private async ValueTask<SocketGuildUser> ConstructGuildUserAsync(IUserModel? userModel, Optional<ulong> guildId, IMemberModel model)
+    private async ValueTask<SocketGuildUser> ConstructGuildUserAsync(IUserModel? userModel, Optional<ulong> guildId, IMemberModel model, CancellationToken token)
     {
         if (!guildId.IsSpecified)
             throw new ArgumentException("Guild id must be specified to construct a guild user");
@@ -41,7 +42,7 @@ internal partial class StateController
         // user information is required
         if (userModel is null)
         {
-            var rawUserModel = await (await GetStoreAsync(StoreType.Users)).GetAsync(model.Id)
+            var rawUserModel = await (await GetStoreAsync(StoreType.Users, token)).GetAsync(model.Id, token)
                 ?? throw new NullReferenceException($"No user information could be found for the member ({model.Id})");
 
             if (rawUserModel is not IUserModel user)
@@ -61,8 +62,8 @@ internal partial class StateController
     public PresenseBroker Presense
         => _presenseBroker ??= new PresenseBroker(
                 this,
-                p => GetSubStoreAsync(p.Value, StoreType.Presence),
-                (_, __, model) => ValueTask.FromResult(new SocketPresense(_client, model))
+                (parentId, token) => GetSubStoreAsync(parentId.Value, StoreType.Presence, token),
+                (_, __, model, ___) => ValueTask.FromResult(new SocketPresense(_client, model))
            );
     private PresenseBroker? _presenseBroker;
     #endregion
@@ -71,11 +72,11 @@ internal partial class StateController
     public GuildBroker Guilds
         => _guilds ??= new GuildBroker(
                 this,
-                p => GetStoreAsync(StoreType.GuildStage),
+                (parentId, token) => GetStoreAsync(StoreType.GuildStage, token),
                 ConstructGuildAsync
            );
     private GuildBroker? _guilds;
-    private ValueTask<SocketGuild> ConstructGuildAsync(object? args, Optional<ulong> parent, IGuildModel model)
+    private ValueTask<SocketGuild> ConstructGuildAsync(object? args, Optional<ulong> parent, IGuildModel model, CancellationToken token)
     {
         return ValueTask.FromResult(new SocketGuild(_client, model.Id, model));
     }
@@ -83,11 +84,11 @@ internal partial class StateController
     public GuildChannelBroker GuildChannels
         => _guildChannels ??= new GuildChannelBroker(
                 this,
-                p => GetSubStoreAsync(p.Value, StoreType.GuildChannel),
+                (parentId, token) => GetSubStoreAsync(parentId.Value, StoreType.GuildChannel, token),
                 ConstructGuildChannelAsync
             );
     private GuildChannelBroker? _guildChannels;
-    private ValueTask<SocketGuildChannel> ConstructGuildChannelAsync(object? args, Optional<ulong> guildId, IGuildChannelModel model)
+    private ValueTask<SocketGuildChannel> ConstructGuildChannelAsync(object? args, Optional<ulong> guildId, IGuildChannelModel model, CancellationToken token)
     {
         // TODO: switch model.Type;
     }
@@ -95,11 +96,11 @@ internal partial class StateController
     public CustomStickerBroker GuildStickers
         => _guildStickers ??= new CustomStickerBroker(
                 this,
-                p => GetSubStoreAsync(p.Value, StoreType.GuildStickers),
+                (parentId, token) => GetSubStoreAsync(parentId.Value, StoreType.GuildStickers, token),
                 ConstructGuildStickerAsync
             );
     private CustomStickerBroker? _guildStickers;
-    private ValueTask<SocketCustomSticker> ConstructGuildStickerAsync(object? args, Optional<ulong> guildId, IStickerModel model)
+    private ValueTask<SocketCustomSticker> ConstructGuildStickerAsync(object? args, Optional<ulong> guildId, IStickerModel model, CancellationToken token)
     {
         if (!guildId.IsSpecified)
             throw new InvalidOperationException($"{nameof(guildId)} is required for guild stickers");
@@ -111,11 +112,11 @@ internal partial class StateController
     public GuildRoleBroker GuildRoles
         => _guildRoles ??= new GuildRoleBroker(
                 this,
-                p => GetSubStoreAsync(p.Value, StoreType.Roles),
+                (parentId, token) => GetSubStoreAsync(parentId.Value, StoreType.Roles, token),
                 ConstructGuildRoleAsync
             );
     private GuildRoleBroker? _guildRoles;
-    private ValueTask<SocketRole> ConstructGuildRoleAsync(object? args, Optional<ulong> guildId, IRoleModel model)
+    private ValueTask<SocketRole> ConstructGuildRoleAsync(object? args, Optional<ulong> guildId, IRoleModel model, CancellationToken token)
     {
         if (!guildId.IsSpecified)
             throw new InvalidOperationException($"{nameof(guildId)} is required for guild roles");
@@ -127,11 +128,11 @@ internal partial class StateController
     public GuildEmoteBroker GuildEmotes
         => _guildEmotes ??= new GuildEmoteBroker(
                 this,
-                p => GetSubStoreAsync(p.Value, StoreType.Emotes),
+                (parentId, token) => GetSubStoreAsync(parentId.Value, StoreType.Emotes, token),
                 ConstructGuildEmoteAsync
             );
     private GuildEmoteBroker? _guildEmotes;
-    private ValueTask<SocketGuildEmote> ConstructGuildEmoteAsync(object? args, Optional<ulong> guildId, IGuildEmoteModel model)
+    private ValueTask<SocketGuildEmote> ConstructGuildEmoteAsync(object? args, Optional<ulong> guildId, IGuildEmoteModel model, CancellationToken token)
     {
         if (!guildId.IsSpecified)
             throw new InvalidOperationException($"{nameof(guildId)} is required for guild emotes");
@@ -142,21 +143,21 @@ internal partial class StateController
     public GuildEventBroker GuildEvents
         => _guildEvents ??= new GuildEventBroker(
                 this,
-                p => GetSubStoreAsync(p.Value, StoreType.Events),
+                (parentId, token) => GetSubStoreAsync(parentId.Value, StoreType.Events, token),
                 ConstructGuildEventAsync
             );
     private GuildEventBroker? _guildEvents;
-    private ValueTask<SocketGuildEvent> ConstructGuildEventAsync(object? args, Optional<ulong> guildId, IGuildEventModel model)
+    private ValueTask<SocketGuildEvent> ConstructGuildEventAsync(object? args, Optional<ulong> guildId, IGuildEventModel model, CancellationToken token)
         => ValueTask.FromResult(new SocketGuildEvent(_client, model));
 
     public GuildStageInstanceBroker StageInstances
         => _stageInstances ??= new GuildStageInstanceBroker(
                 this,
-                p => GetSubStoreAsync(p.Value, StoreType.StageInstances),
+                (parentId, token) => GetSubStoreAsync(parentId.Value, StoreType.StageInstances, token),
                 ConstructStageInstanceEventAsync
             );
     private GuildStageInstanceBroker? _stageInstances;
-    private ValueTask<SocketStageInstance> ConstructStageInstanceEventAsync(object? args, Optional<ulong> guildId, IStageInstanceModel model)
+    private ValueTask<SocketStageInstance> ConstructStageInstanceEventAsync(object? args, Optional<ulong> guildId, IStageInstanceModel model, CancellationToken token)
         => ValueTask.FromResult(new SocketStageInstance(_client, model));
 
 
@@ -166,16 +167,32 @@ internal partial class StateController
     public ChannelBroker Channels
         => _channels ??= new ChannelBroker(
                 this,
-                p => GetGenericStoreAsync(p, StoreType.Channel),
+                (parentId, token) => GetGenericStoreAsync(parentId, StoreType.Channel, token),
                 ConstructChannelAsync
            );
 
     private ChannelBroker? _channels;
 
-    private ValueTask<SocketChannel> ConstructChannelAsync(object? args, Optional<ulong> parent, IChannelModel model)
+    private ValueTask<SocketChannel> ConstructChannelAsync(object? args, Optional<ulong> parent, IChannelModel model, CancellationToken token)
     {
         // TODO: construct sub-channel type
         return default;
     }
+    #endregion
+
+    public MessageBroker Messages
+        => _messages ??= new MessageBroker(
+                this,
+                (parentId, token) => GetGenericStoreAsync(parentId, StoreType.Messages, token),
+                ConstructMessageAsync
+            );
+    private MessageBroker? _messages;
+    private ValueTask<SocketMessage> ConstructMessageAsync(object? args, Optional<ulong> parent, IMessageModel model, CancellationToken token)
+    {
+        return ValueTask.FromResult(new SocketMessage())
+    }
+
+    #region Messages
+
     #endregion
 }

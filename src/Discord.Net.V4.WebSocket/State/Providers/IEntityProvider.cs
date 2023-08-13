@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.WebSocket.State
 {
-    internal interface IEntitySource<TId, TEntity>
+    internal interface IEntityProvider<TId, TEntity>
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>
     {

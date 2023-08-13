@@ -9,48 +9,42 @@ namespace Discord.WebSocket.State
 {
     internal sealed class TransformativeHandle<TId, TRootEntity, TTargetEntity> : IEntityHandle<TId, TTargetEntity>
         where TRootEntity : class, IEntity<TId>
-        where TTargetEntity : class, TRootEntity
+        where TTargetEntity : class, IEntity<TId>
         where TId : IEquatable<TId>
     {
         public TId EntityId
             => _handle.EntityId;
+
         public TTargetEntity? Entity
-        {
-            get
-            {
-                var entity = _handle.Entity;
-                ref var target = ref VerifyDecendant(ref entity);
-                return target;
-            }
-        }
+            => PreformCast(_handle.Entity);
 
         public Guid HandleId
             => _handle.HandleId;
 
         private readonly IEntityHandle<TId, TRootEntity> _handle;
+        private readonly Func<TRootEntity, TTargetEntity> _castFunc;
 
-        public TransformativeHandle(IEntityHandle<TId, TRootEntity> handle)
+        public TransformativeHandle(IEntityHandle<TId, TRootEntity> handle, Func<TRootEntity, TTargetEntity> castFunc)
         {
+            _castFunc = castFunc;
             _handle = handle;
         }
 
-        private static ref TTargetEntity? VerifyDecendant(ref TRootEntity? root)
+        private TTargetEntity? PreformCast(TRootEntity? root)
         {
             if (root is null)
-                return ref Unsafe.NullRef<TTargetEntity?>();
+                return null;
 
-            if (root is not TTargetEntity)
-                throw new InvalidCastException($"Expected {typeof(TTargetEntity).Name} but got {typeof(TRootEntity).Name}");
-
-            return ref Unsafe.As<TRootEntity?, TTargetEntity?>(ref root);
+            return _castFunc(root);
         }
 
         public IDisposable? CreateScopedClone(out TTargetEntity? cloned)
         {
             var scope = _handle.CreateScopedClone(out TRootEntity? root);
-            cloned = VerifyDecendant(ref root);
+            cloned = PreformCast(root);
             return scope;
         }
+
         public Task DeleteAsync(CancellationToken token = default(CancellationToken))
             => _handle.DeleteAsync(token);
         public void Dispose()

@@ -47,25 +47,25 @@ namespace Discord.WebSocket.State
            => _cleanQueue.Enqueue(new CleanupTask(task));
 
         #region GetStores
-        public ValueTask<IEntityStore<ulong>> GetStoreAsync(StoreType type)
-            => _cache.GetStoreAsync<ulong>(type);
+        public ValueTask<IEntityStore<ulong>> GetStoreAsync(StoreType type, CancellationToken token = default)
+            => _cache.GetStoreAsync<ulong>(type, token);
 
-        public ValueTask<IEntityStore<TId>> GetStoreAsync<TId>(StoreType type)
+        public ValueTask<IEntityStore<TId>> GetStoreAsync<TId>(StoreType type, CancellationToken token = default)
             where TId : IEquatable<TId>
-            => _cache.GetStoreAsync<TId>(type);
+            => _cache.GetStoreAsync<TId>(type, token);
 
-        public ValueTask<IEntityStore<ulong>> GetSubStoreAsync(ulong id, StoreType type)
-            => _cache.GetSubStoreAsync(type, id);
+        public ValueTask<IEntityStore<ulong>> GetSubStoreAsync(ulong id, StoreType type, CancellationToken token = default)
+            => _cache.GetSubStoreAsync(type, id, token);
 
-        public ValueTask<IEntityStore<TId>> GetSubStoreAsync<TId>(TId id, StoreType type)
+        public ValueTask<IEntityStore<TId>> GetSubStoreAsync<TId>(TId id, StoreType type, CancellationToken token = default)
             where TId : IEquatable<TId>
-            => _cache.GetSubStoreAsync(type, id);
+            => _cache.GetSubStoreAsync(type, id, token);
 
-        public ValueTask<IEntityStore<TId>> GetGenericStoreAsync<TId>(Optional<TId> parent, StoreType type)
+        public ValueTask<IEntityStore<TId>> GetGenericStoreAsync<TId>(Optional<TId> parent, StoreType type, CancellationToken token = default)
             where TId : IEquatable<TId>
             => parent.IsSpecified
-                ? GetSubStoreAsync(parent.Value, type)
-                : GetStoreAsync<TId>(type);
+                ? GetSubStoreAsync(parent.Value, type, token)
+                : GetStoreAsync<TId>(type, token);
         #endregion
 
         public IEntityHandle<TId, TEntity> AllocateHandle<TId, TEntity>(

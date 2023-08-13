@@ -8,10 +8,10 @@ namespace Discord.WebSocket.Cache
 {
     public interface ICacheProvider
     {
-        ValueTask<IEntityStore<TId>> GetStoreAsync<TId>(StoreType type)
+        ValueTask<IEntityStore<TId>> GetStoreAsync<TId>(StoreType type, CancellationToken token = default)
             where TId : IEquatable<TId>;
 
-        ValueTask<IEntityStore<TId>> GetSubStoreAsync<TId>(StoreType type, TId parentId)
+        ValueTask<IEntityStore<TId>> GetSubStoreAsync<TId>(StoreType type, TId parentId, CancellationToken token = default)
            where TId : IEquatable<TId>;
     }
 }

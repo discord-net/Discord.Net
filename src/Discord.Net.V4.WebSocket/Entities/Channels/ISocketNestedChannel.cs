@@ -9,6 +9,6 @@ namespace Discord.WebSocket
 {
     public interface ISocketNestedChannel
     {
-        Cacheable<ulong, SocketGuildChannel, RestGuildChannel, IGuildChannel> Parent { get; }
+        GuildChannelCacheable Parent { get; }
     }
 }

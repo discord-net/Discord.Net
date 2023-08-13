@@ -35,10 +35,10 @@ namespace Discord.WebSocket
         internal SocketCustomSticker(DiscordSocketClient client, IStickerModel model, ulong guildId)
             : base(client, model)
         {
-            Guild = new(guildId, Discord, Discord.State.Guilds.SourceSpecific(guildId));
+            Guild = new(guildId, Discord, Discord.State.Guilds.ProvideSpecific(guildId));
             AuthorId = model.AuthorId;
             Author = model.AuthorId.HasValue
-                ? new(model.AuthorId.Value, Discord, Discord.State.Members.SourceSpecific(model.AuthorId.Value))
+                ? new(model.AuthorId.Value, Discord, Discord.State.Members.ProvideSpecific(model.AuthorId.Value))
                 : null;
         }
 

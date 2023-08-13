@@ -2,6 +2,7 @@ using Discord.Models;
 using Discord.WebSocket.Cache;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Channels;
@@ -14,6 +15,8 @@ namespace Discord.WebSocket
         public MessageChannelCacheable Channel { get; }
 
         public UserCacheable Author { get; }
+
+        public ThreadChannelCacheable? Thread { get; }
 
         public MessageType Type
             => _source.Type;
@@ -59,163 +62,75 @@ namespace Discord.WebSocket
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(Id);
 
-        public MessageActivity? Activity { get; private set; }
 
-        public MessageApplication? Application { get; private set; }
+        public IReadOnlyCollection<IAttachment> Attachments => throw new NotImplementedException();
 
-        public MessageReference? Reference { get; private set; }
+        public IReadOnlyCollection<IEmbed> Embeds => throw new NotImplementedException();
 
-        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => throw new NotImplementedException(); // TODO
+        public IReadOnlyCollection<ITag> Tags => throw new NotImplementedException();
 
-        public IReadOnlyCollection<IMessageComponent> Components => throw new NotImplementedException(); // TODO
+        public IEntityEnumerableSource<IChannel, ulong>? MentionedChannels => throw new NotImplementedException();
 
-        public IReadOnlyCollection<IStickerItem> Stickers => throw new NotImplementedException(); // TODO
+        public IEntityEnumerableSource<IRole, ulong>? MentionedRoles => throw new NotImplementedException();
 
-        public IMessageInteraction Interaction => throw new NotImplementedException(); // TODO
+        public IEntityEnumerableSource<IUser, ulong>? MentionedUsers => throw new NotImplementedException();
 
-        public IReadOnlyCollection<IAttachment> Attachments => throw new NotImplementedException(); // TODO: model -> class
+        public MessageActivity? Activity => throw new NotImplementedException();
 
-        public IReadOnlyCollection<IEmbed> Embeds => throw new NotImplementedException(); // TODO: model -> class
+        public MessageApplication? Application => throw new NotImplementedException();
 
-        public IReadOnlyCollection<ITag> Tags => throw new NotImplementedException(); // TODO: model -> class
+        public MessageReference? Reference => throw new NotImplementedException();
+
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => throw new NotImplementedException();
+
+        public IReadOnlyCollection<IMessageComponent> Components => throw new NotImplementedException();
+
+        public IReadOnlyCollection<IStickerItem> Stickers => throw new NotImplementedException();
+
+        public IMessageInteraction? Interaction => throw new NotImplementedException();
+
+        public MessageRoleSubscriptionData? RoleSubscriptionData => throw new NotImplementedException();
 
         private IMessageModel _source;
 
-        public SocketMessage(DiscordSocketClient discord, ulong channelId, ulong id, IMessageModel model)
-            : base(discord, id)
+        public SocketMessage(DiscordSocketClient discord, IMessageModel model)
+            : base(discord, model.Id)
         {
-            _source = model;
+            Update(model);
+
             Channel = new(
-                channelId,
+                model.ChannelId,
                 discord,
                 discord.State.Channels
-                    .SourceSpecific(channelId)
-                    .TransformChannel<SocketMessageChannel>()
+                    .ProvideSpecific(model.ChannelId)
+                    .Transform(channel => channel is ISocketMessageChannel mc
+                        ? mc
+                        : throw new InvalidCastException($"Expected ISocketMessageChannel, got {channel.GetType().Name}")
+                    )
             );
 
-            Author = new(model.AuthorId, discord, discord.State.Users.SourceSpecific(model.AuthorId));
+            Author = new(model.AuthorId, discord, discord.State.Users.ProvideSpecific(model.AuthorId));
 
-            UpdateStructures();
         }
 
-        internal override IMessageModel GetModel()
-            => _source;
+        [MemberNotNull(nameof(_source))]
         internal override void Update(IMessageModel model)
         {
             _source = model;
-            UpdateStructures();
         }
 
-        private void UpdateStructures()
-        {
-            var hasActivity = _source.MessageActivityId is not null || _source.MessageActivityType is not null;
-            
-            if (Activity is not null)
-            {
-                if(!hasActivity)
-                {
-                    Activity = null;
-                }
-                else
-                {
-                    if (Activity.PartyId != _source.MessageActivityId)
-                        Activity.PartyId = _source.MessageActivityId;
+        public Task AddReactionAsync(IEmote emote, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task RemoveAllReactionsAsync(RequestOptions? options = null) => throw new NotImplementedException();
+        public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions? options = null) => throw new NotImplementedException();
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task DeleteAsync(RequestOptions? options = null) => throw new NotImplementedException();
 
-                    if (Activity.Type != _source.MessageActivityType)
-                        Activity.Type = _source.MessageActivityType.GetValueOrDefault(MessageActivityType.Join); // TODO: nullable?
-                }
-            }
-            else if (Activity is null && hasActivity)
-            {
-                Activity = new MessageActivity()
-                {
-                    PartyId = _source.MessageActivityId,
-                    Type = _source.MessageActivityType.GetValueOrDefault(MessageActivityType.Join)
-                };
-            }
+        IEntitySource<IMessageChannel, ulong> IMessage.Channel => Channel;
 
-            var hasApplication = _source.MessageAppId is not null
-                || _source.MessageAppIcon is not null
-                || _source.MessageAppCoverImage is not null
-                || _source.MessageAppDescription is not null
-                || _source.MessageAppName is not null;
+        IEntitySource<IUser, ulong> IMessage.Author => Author;
 
-            if(Application is not null)
-            {
-                if (!hasApplication)
-                    Application = null;
-                else
-                {
-                    if (Application.CoverImage != _source.MessageAppCoverImage)
-                        Application.CoverImage = _source.MessageAppCoverImage;
-
-                    if (Application.Description != _source.MessageAppDescription)
-                        Application.Description = _source.MessageAppDescription;
-
-                    if (Application.Icon != _source.MessageAppIcon)
-                        Application.Icon = _source.MessageAppIcon;
-
-                    if (Application.Id != _source.MessageAppId && _source.MessageAppId.HasValue)
-                        Application.Id = _source.MessageAppId.Value;
-
-                    if (Application.Name != _source.MessageAppName)
-                        Application.Name = _source.MessageAppName;
-                }
-            } 
-            else if(Application is null && hasApplication && _source.MessageAppId.HasValue)
-            {
-                Application = new MessageApplication
-                {
-                    Name = _source.MessageAppName,
-                    CoverImage = _source.MessageAppCoverImage,
-                    Description = _source.MessageAppDescription,
-                    Icon = _source.MessageAppIcon,
-                    Id = _source.MessageAppId.Value
-                };
-            }
-
-            var hasReference = _source.ReferenceMessageId.HasValue
-                || _source.ReferenceChannelId.HasValue
-                || _source.ReferenceGuildId.HasValue;
-
-            if(Reference is not null)
-            {
-                if (!_source.ReferenceMessageId.HasValue)
-                    Reference = null;
-                else
-                {
-                    if (!Reference.MessageId.Equals(_source.ReferenceMessageId))
-                        Reference.MessageId = _source.ReferenceGuildId.ToOptional();
-
-                    if (!Reference.InternalChannelId.Equals(_source.ReferenceChannelId))
-                        Reference.InternalChannelId = _source.ReferenceChannelId.ToOptional();
-
-                    if (Reference.GuildId.Equals(_source.ReferenceGuildId))
-                        Reference.GuildId = _source.ReferenceGuildId.ToOptional();
-                }
-            }
-            else if (hasReference)
-            {
-                Reference = new MessageReference(
-                    _source.ReferenceMessageId,
-                    _source.ReferenceChannelId,
-                    _source.ReferenceGuildId
-                );
-            }
-        }
-
-        public Task AddReactionAsync(IEmote emote, RequestOptions options = null) => throw new NotImplementedException();
-        public Task DeleteAsync(RequestOptions options = null) => throw new NotImplementedException();
-        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null) => throw new NotImplementedException();
-        public Task RemoveAllReactionsAsync(RequestOptions options = null) => throw new NotImplementedException();
-        public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null) => throw new NotImplementedException();
-        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null) => throw new NotImplementedException();
-        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null) => throw new NotImplementedException();
-        internal override object Clone() => throw new NotImplementedException();
-        internal override void DisposeClone() => throw new NotImplementedException();
-
-        IMessageChannel? IMessage.Channel => Channel.Value;
-
-        IUser? IMessage.Author => Author.Value;
+        IEntitySource<IThreadChannel, ulong>? IMessage.Thread => Thread;
     }
 }

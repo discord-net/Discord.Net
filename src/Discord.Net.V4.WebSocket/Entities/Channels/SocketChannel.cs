@@ -1,4 +1,3 @@
-using Discord.Net.V4.Core.API.Models.Channels;
 using Discord.WebSocket.Cache;
 using System;
 using System.Collections.Generic;
@@ -16,8 +15,8 @@ namespace Discord.WebSocket
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(Id);
 
-        internal SocketChannel(DiscordSocketClient discord, ulong id, IChannelModel model)
-            : base(discord, id)
+        internal SocketChannel(DiscordSocketClient discord, IChannelModel model)
+            : base(discord, model.Id)
         {
 
         }

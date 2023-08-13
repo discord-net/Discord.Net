@@ -9,7 +9,7 @@ namespace Discord
     /// <typeparam name="TEntity">The entity type of the source.</typeparam>
     /// <typeparam name="TId">The ID type of the source.</typeparam>
     public interface IEntitySource<TEntity, TId>
-        where TEntity : IEntity<TId>
+        where TEntity : class, IEntity<TId>
         where TId : IEquatable<TId>
     {
         /// <summary>
@@ -18,17 +18,9 @@ namespace Discord
         TId Id { get; }
 
         /// <summary>
-        ///     Gets the entity.
+        ///     Gets the entity if present; otherwise <see langword="null"/>.
         /// </summary>
-        /// <remarks>
-        ///     Optionality is provided for cases when the relation being
-        ///     <see langword="null"/> can signify information between the
-        ///     relation. If <see cref="Optional{T}.Unspecified"/> is returned,
-        ///     the library has no reference currently loaded for the entity;
-        ///     othwise, a <see cref="Optional{T}"/> is returned with a
-        ///     populated value.
-        /// </remarks>
-        Optional<TEntity?> Value { get; }
+        TEntity? Value { get; }
 
         /// <summary>
         ///     Loads the entity from an asynchronous source. This method

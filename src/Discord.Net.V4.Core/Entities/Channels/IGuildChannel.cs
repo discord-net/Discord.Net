@@ -39,14 +39,7 @@ namespace Discord
         ///     A guild object that this channel belongs to.
         /// </returns>
         IEntitySource<IGuild, ulong> Guild { get; }
-        /// <summary>
-        ///     Gets the guild ID associated with this channel.
-        /// </summary>
-        /// <returns>
-        ///     An <see cref="ulong"/> representing the guild snowflake identifier for the guild that this channel
-        ///     belongs to.
-        /// </returns>
-        ulong GuildId { get; }
+
         /// <summary>
         ///     Gets a collection of permission overwrites for this channel.
         /// </summary>

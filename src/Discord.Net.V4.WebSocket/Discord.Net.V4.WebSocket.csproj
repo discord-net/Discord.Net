@@ -17,8 +17,10 @@
 
   <ItemGroup>
     <None Remove="Entities\Stickers\" />
+    <None Remove="Cache\CacheProviders\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Entities\Stickers\" />
+    <Folder Include="Cache\CacheProviders\" />
   </ItemGroup>
 </Project>

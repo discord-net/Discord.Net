@@ -38,8 +38,8 @@ namespace Discord.WebSocket
         {
             Update(model);
 
-            Guild = new(model.GuildId, discord, discord.State.Guilds.SourceSpecific(model.GuildId));
-            Channel = new(model.ChannelId, discord, discord.State.GuildChannels.SourceSpecific(model.ChannelId));
+            Guild = new(model.GuildId, discord, discord.State.Guilds.ProvideSpecific(model.GuildId));
+            Channel = new(model.ChannelId, discord, discord.State.GuildChannels.ProvideSpecific(model.ChannelId));
         }
 
 

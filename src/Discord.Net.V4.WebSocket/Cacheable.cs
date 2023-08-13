@@ -9,40 +9,41 @@ using System.Threading.Tasks;
 
 namespace Discord.WebSocket
 {
-    public class Cacheable<TId, TGateway, TRest, TCommon> : Cacheable<TId, TGateway>
-        where TGateway : SocketCacheableEntity<TId>, TCommon
-        where TRest : IEntity<TId>, TCommon // TODO: RestEntity<TId>
-        where TCommon : IEntity<TId>
+    public class Cacheable<TId, TGateway, TRest, TCommon> : Cacheable<TId, TGateway>, IEntitySource<TCommon, TId>
+        where TGateway : class, ICacheableEntity<TId>, TCommon
+        where TRest : class, IEntity<TId>, TCommon // TODO: RestEntity<TId>
+        where TCommon : class, IEntity<TId>
         where TId : IEquatable<TId>
     {
-        internal Cacheable(Optional<TId> id, DiscordSocketClient client, IEntitySource<TId, TGateway> source)
+
+        internal Cacheable(TId id, DiscordSocketClient client, IEntityProvider<TId, TGateway> source)
             : base(id, client, source)
         {
         }
 
-        internal Cacheable(Optional<TId> id, Optional<TId> parent, DiscordSocketClient client, IEntitySource<TId, TGateway> source)
+        internal Cacheable(TId id, Optional<TId> parent, DiscordSocketClient client, IEntityProvider<TId, TGateway> source)
             : base(id, parent, client, source)
         {
 
         }
 
-        internal Cacheable(Func<Optional<TId>> idFunc, DiscordSocketClient client, CacheableSourceFactory source)
+        internal Cacheable(Func<TId> idFunc, DiscordSocketClient client, CacheableSourceFactory source)
             : base(idFunc, () => default, client, source)
         {
         }
 
-        internal Cacheable(Func<Optional<TId>> idFunc, Func<Optional<TId>> parentIdFunc, DiscordSocketClient client, CacheableSourceFactory source)
+        internal Cacheable(Func<TId> idFunc, Func<Optional<TId>> parentIdFunc, DiscordSocketClient client, CacheableSourceFactory source)
             : base(idFunc, parentIdFunc, client, source)
         {
         }
 
-        public ValueTask<TRest> FetchAsync(RequestOptions? options = null, CancellationToken token = default)
+        public ValueTask<TRest?> FetchAsync(RequestOptions? options = null, CancellationToken token = default)
         {
             // TODO: fetch from rest
             return default!;
         }
 
-        public async ValueTask<TCommon> GetOrFetchAsync(RequestOptions? options = null, CancellationToken token = default)
+        public async ValueTask<TCommon?> GetOrFetchAsync(RequestOptions? options = null, CancellationToken token = default)
         {
             TCommon? entity = await GetAsync(token);
 
@@ -51,30 +52,27 @@ namespace Discord.WebSocket
 
             return await FetchAsync(options, token);
         }
+
+        TCommon? IEntitySource<TCommon, TId>.Value => Value;
+
+        ValueTask<TCommon?> IEntitySource<TCommon, TId>.LoadAsync(RequestOptions? options, CancellationToken token)
+            => GetOrFetchAsync(options, token);
     }
 
-    public class Cacheable<TId, TGateway>
-        where TGateway : SocketCacheableEntity<TId>
+    public class Cacheable<TId, TGateway> : IEntitySource<TGateway, TId>
+        where TGateway : class, ICacheableEntity<TId>
         where TId : IEquatable<TId>
     {
-        internal delegate IEntitySource<TId, TGateway>? CacheableSourceFactory(TId? id, Optional<TId> parent);
+        internal delegate IEntityProvider<TId, TGateway>? CacheableSourceFactory(TId id, Optional<TId> parent);
 
-        public Optional<TId> Id
+        public TId Id
             => _idFunc();
-
-        public bool IsAvailable
-            => _idFunc().IsSpecified;
 
         public TGateway? Value
         {
             get
             {
-                var id = _idFunc();
-
-                if (!id.IsSpecified)
-                    return null;
-
-                var source = _sourceFactory(id.Value, _parentIdFunc());
+                var source = _sourceFactory(_idFunc(), _parentIdFunc());
 
                 if (source is null)
                     return null;
@@ -85,19 +83,19 @@ namespace Discord.WebSocket
 
         protected readonly DiscordSocketClient Client;
 
-        private readonly Func<Optional<TId>> _idFunc;
+        private readonly Func<TId> _idFunc;
         private readonly Func<Optional<TId>> _parentIdFunc;
         private readonly CacheableSourceFactory _sourceFactory;
 
-        internal Cacheable(Optional<TId> id, DiscordSocketClient client, IEntitySource<TId, TGateway> source)
+        internal Cacheable(TId id, DiscordSocketClient client, IEntityProvider<TId, TGateway> source)
             : this(id, default, client, source)
         { }
 
-        internal Cacheable(Optional<TId> id, Optional<TId> parent, DiscordSocketClient client, IEntitySource<TId, TGateway> source)
+        internal Cacheable(TId id, Optional<TId> parent, DiscordSocketClient client, IEntityProvider<TId, TGateway> source)
             : this(() => id, () => parent, client, (_, __) => source)
         { }
 
-        internal Cacheable(Func<Optional<TId>> idFunc, Func<Optional<TId>> parentFunc, DiscordSocketClient client, CacheableSourceFactory cacheableSource)
+        internal Cacheable(Func<TId> idFunc, Func<Optional<TId>> parentFunc, DiscordSocketClient client, CacheableSourceFactory cacheableSource)
         {
             _idFunc = idFunc;
             _parentIdFunc = parentFunc;
@@ -107,19 +105,11 @@ namespace Discord.WebSocket
 
         public virtual ValueTask<IEntityHandle<TId, TGateway>?> GetHandleAsync(CancellationToken token = default)
         {
-            var id = _idFunc();
-
-            if (!id.IsSpecified)
-                return ValueTask.FromResult<IEntityHandle<TId, TGateway>?>(null);
-
-            return _sourceFactory(id.Value, _parentIdFunc())?.GetHandleAsync(token) ?? ValueTask.FromResult<IEntityHandle<TId, TGateway>?>(null);
+            return _sourceFactory(_idFunc(), _parentIdFunc())?.GetHandleAsync(token) ?? ValueTask.FromResult<IEntityHandle<TId, TGateway>?>(null);
         }
 
         public virtual async ValueTask<TGateway?> GetAsync(CancellationToken token = default)
         {
-            if (!IsAvailable)
-                return null;
-
             // lifetime for the entity extends to the callee
             using var handle = await GetHandleAsync(token);
 
@@ -130,5 +120,10 @@ namespace Discord.WebSocket
 
             return null;
         }
+
+        ValueTask<TGateway?> IEntitySource<TGateway, TId>.LoadAsync(RequestOptions? options, CancellationToken token)
+            => GetAsync(token);
+
+        public static implicit operator TGateway?(Cacheable<TId, TGateway> cacheable) => cacheable.Value;
     }
 }

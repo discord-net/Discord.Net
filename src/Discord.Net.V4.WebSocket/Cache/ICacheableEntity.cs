@@ -1,4 +1,3 @@
-using Discord.Net.V4.WebSocket.State.Handles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord.WebSocket.Cache
 {
-    internal interface ICacheableEntity<TId, TModel> : ICacheableEntity<TId>, IEntity<TId>, IScopedClonable
+    public interface ICacheableEntity<TId, TModel> : ICacheableEntity<TId>, IEntity<TId>, IScopedClonable
         where TId : IEquatable<TId>
         where TModel : IEntityModel<TId>
     {
@@ -29,7 +28,7 @@ namespace Discord.WebSocket.Cache
         }
     }
 
-    internal interface ICacheableEntity<TId> : IEntity<TId>, IScopedClonable, IDisposable, IAsyncDisposable
+    public interface ICacheableEntity<TId> : IEntity<TId>, IScopedClonable, IDisposable, IAsyncDisposable
         where TId : IEquatable<TId>
     {
         IEntityModel<TId> GetModel();

@@ -5,13 +5,13 @@ using System.Collections.Immutable;
 
 namespace Discord.WebSocket
 {
-    public sealed class CacheableCollection<TCacheable, TId, TGateway> : IAsyncEnumerable<TCacheable>
-        where TCacheable : Cacheable<TId, TGateway>
+    public sealed class CacheableCollection<TCacheable, TId, TGateway> : IEntityEnumerableSource<TGateway, TId>
+        where TCacheable : Cacheable<TId, TGateway>, IEntitySource<TGateway, TId>
         where TGateway : SocketCacheableEntity<TId>
         where TId : IEquatable<TId>
     {
-        public async ValueTask<IReadOnlyCollection<TId>> GetIdsAsync()
-            => (await (await _idsFactory(_parent)).ToArrayAsync()).ToImmutableArray();
+        public async ValueTask<IReadOnlyCollection<TId>> GetIdsAsync(CancellationToken token = default)
+            => (await (await _idsFactory(_parent, token)).ToArrayAsync(token)).ToImmutableArray();
 
         internal delegate TCacheable CacheableFactory(TId id);
         private delegate ValueTask<IAsyncEnumerable<TId>> IdsFactory(Optional<TId> parent, CancellationToken token = default);
@@ -98,6 +98,8 @@ namespace Discord.WebSocket
         private readonly Optional<TId> _parent;
         private readonly IEntityBroker<TId, TGateway>? _broker;
 
+        private readonly Func<IEnumerable<TId>>? _syncIds;
+
         internal CacheableCollection(IEntityBroker<TId, TGateway> broker, CacheableFactory factory)
             : this(Optional<TId>.Unspecified, broker.GetAllIdsAsync, factory, broker: broker) { }
 
@@ -107,7 +109,9 @@ namespace Discord.WebSocket
                   (parent, _) => ValueTask.FromResult(AsyncEnumerable.Create(token => new WrappingEnumerator<TId>(idsSupplier().GetEnumerator()))),
                   factory
               )
-        { }
+        {
+            _syncIds = idsSupplier;
+        }
 
         internal CacheableCollection(TId parent, IEntityBroker<TId, TGateway> broker, CacheableFactory factory)
             : this(parent, broker.GetAllIdsAsync, factory, broker: broker) { }
@@ -118,7 +122,9 @@ namespace Discord.WebSocket
                   (parent, _) => ValueTask.FromResult(AsyncEnumerable.Create(token => new WrappingEnumerator<TId>(idsSupplier().GetEnumerator()))),
                   factory
               )
-        { }
+        {
+            _syncIds = idsSupplier;
+        }
 
         private CacheableCollection(
             Optional<TId> parent, IdsFactory idsFactory,
@@ -133,7 +139,7 @@ namespace Discord.WebSocket
             _broker = broker;
         }
 
-        public async ValueTask<IReadOnlyCollection<TGateway?>> FlattenAsync(CancellationToken token = default)
+        public async ValueTask<IReadOnlyCollection<TGateway>> FlattenAsync(RequestOptions? options = null, CancellationToken token = default)
         {
             // if we can use the `GetAllAsync()` method
             if(_broker is not null)
@@ -147,13 +153,16 @@ namespace Discord.WebSocket
             // - IEntityStore.GetAllIdsAsync()
             // - iter ->
             //   - IEntityStore.GetAsync(iter.Id)
-            return (await this.SelectAwait(x => x.GetAsync(token)).ToArrayAsync(token)).ToImmutableArray();
+            return (await this.SelectAwait(x => x.LoadAsync(options, token)).ToArrayAsync(token)).ToImmutableArray();
         }
 
         public IAsyncEnumerator<TCacheable> GetAsyncEnumerator(CancellationToken token = default)
         {
             return new Enumerator(_parent, _idsFactory, _factory, _cleanupTask, token);
         }
+
+        IAsyncEnumerator<IEntitySource<TGateway, TId>> IAsyncEnumerable<IEntitySource<TGateway, TId>>.GetAsyncEnumerator(CancellationToken cancellationToken)
+            => GetAsyncEnumerator(cancellationToken);
     }
 }
 

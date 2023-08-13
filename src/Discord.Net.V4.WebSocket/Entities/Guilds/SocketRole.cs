@@ -59,7 +59,7 @@ namespace Discord.WebSocket
         internal SocketRole(DiscordSocketClient discord, ulong id, ulong guildId, IRoleModel model)
             : base(discord, id)
         {
-            Guild = new(guildId, discord, discord.State.Guilds.SourceSpecific(guildId));
+            Guild = new(guildId, discord, discord.State.Guilds.ProvideSpecific(guildId));
             Update(model);
         }
 

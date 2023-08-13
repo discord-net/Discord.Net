@@ -53,9 +53,9 @@ namespace Discord.WebSocket
         {
             Update(model);
 
-            Guild = new(model.GuildId, discord, discord.State.Guilds.SourceSpecific(model.GuildId));
+            Guild = new(model.GuildId, discord, discord.State.Guilds.ProvideSpecific(model.GuildId));
             Channel = new(() => model.ChannelId.ToOptional(), discord, discord.State.GuildChannels.SourceSpecific);
-            Creator = new(model.CreatorId, discord, discord.State.Members.SourceSpecific(model.CreatorId));
+            Creator = new(model.CreatorId, discord, discord.State.Members.ProvideSpecific(model.CreatorId));
         }
 
         [MemberNotNull(nameof(_source))]

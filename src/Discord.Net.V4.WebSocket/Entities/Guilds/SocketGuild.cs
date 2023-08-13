@@ -173,13 +173,13 @@ namespace Discord.WebSocket
             _source = model;
             _features = new GuildFeatures(model.Features, model.ExperimentalFeatures);
 
-            Channels = new(id, discord.State.GuildChannels, channelId => new GuildChannelCacheable(channelId, id, discord, discord.State.GuildChannels.SourceSpecific(channelId, id)));
-            Stickers = new(id, discord.State.GuildStickers, stickerId => new GuildStickerCacheable(stickerId, id, discord, discord.State.GuildStickers.SourceSpecific(stickerId, id)));
-            Roles = new(id, discord.State.GuildRoles, roleId => new GuildRoleCacheable(roleId, id, discord, discord.State.GuildRoles.SourceSpecific(roleId, id)));
-            EveryoneRole = new(id, id, discord, discord.State.GuildRoles.SourceSpecific(id)); // everyone role is the same ID as the guild.
-            Emotes = new(id, discord.State.GuildEmotes, emoteId => new GuildEmoteCacheable(emoteId, id, discord, discord.State.GuildEmotes.SourceSpecific(emoteId, id)));
-            Events = new(id, discord.State.GuildEvents, eventId => new GuildEventCacheable(eventId, id, discord, discord.State.GuildEvents.SourceSpecific(eventId, id)));
-            StageInstances = new(id, discord.State.StageInstances, stageInstanceId => new GuildStageInstanceCacheable(stageInstanceId, id, discord, discord.State.StageInstances.SourceSpecific(id)));
+            Channels = new(id, discord.State.GuildChannels, channelId => new GuildChannelCacheable(channelId, id, discord, discord.State.GuildChannels.ProvideSpecific(channelId, id)));
+            Stickers = new(id, discord.State.GuildStickers, stickerId => new GuildStickerCacheable(stickerId, id, discord, discord.State.GuildStickers.ProvideSpecific(stickerId, id)));
+            Roles = new(id, discord.State.GuildRoles, roleId => new GuildRoleCacheable(roleId, id, discord, discord.State.GuildRoles.ProvideSpecific(roleId, id)));
+            EveryoneRole = new(id, id, discord, discord.State.GuildRoles.ProvideSpecific(id)); // everyone role is the same ID as the guild.
+            Emotes = new(id, discord.State.GuildEmotes, emoteId => new GuildEmoteCacheable(emoteId, id, discord, discord.State.GuildEmotes.ProvideSpecific(emoteId, id)));
+            Events = new(id, discord.State.GuildEvents, eventId => new GuildEventCacheable(eventId, id, discord, discord.State.GuildEvents.ProvideSpecific(eventId, id)));
+            StageInstances = new(id, discord.State.StageInstances, stageInstanceId => new GuildStageInstanceCacheable(stageInstanceId, id, discord, discord.State.StageInstances.ProvideSpecific(id)));
         }
 
         internal override object Clone() => throw new NotImplementedException();

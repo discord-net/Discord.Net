@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord.WebSocket.Cache
 {
-    internal interface IScopedClonable : ICloneable
+    public interface IScopedClonable : ICloneable
     {
         void DisposeClone();
     }

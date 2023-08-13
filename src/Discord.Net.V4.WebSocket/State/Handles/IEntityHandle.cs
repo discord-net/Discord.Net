@@ -21,10 +21,10 @@ namespace Discord.WebSocket
         IDisposable? IEntityHandle.CreateScopedClone(out object? cloned)
             => CreateScopedClone(out cloned);
 
-        IEntityHandle<TId, TNewEntity> Transform<TNewEntity>()
-            where TNewEntity : class, TEntity
+        IEntityHandle<TId, TNewEntity> Transform<TNewEntity>(Func<TEntity, TNewEntity> castFunc)
+            where TNewEntity : class, IEntity<TId>
         {
-            return new TransformativeHandle<TId, TEntity, TNewEntity>(this);
+            return new TransformativeHandle<TId, TEntity, TNewEntity>(this, castFunc);
         }
     }
 

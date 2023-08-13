@@ -40,8 +40,8 @@ namespace Discord.WebSocket
             : base(discord, model.Id)
         {
             Update(model);
-            Roles = new(guildId, () => _source.Roles, id => new GuildRoleCacheable(id, discord, discord.State.GuildRoles.SourceSpecific(id)));
-            Author = new(guildId, model.CreatorId, discord, discord.State.Members.SourceSpecific(model.CreatorId, guildId));
+            Roles = new(guildId, () => _source.Roles, id => new GuildRoleCacheable(id, discord, discord.State.GuildRoles.ProvideSpecific(id)));
+            Author = new(guildId, model.CreatorId, discord, discord.State.Members.ProvideSpecific(model.CreatorId, guildId));
         }
 
         [MemberNotNull(nameof(_source))]

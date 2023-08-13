@@ -13,6 +13,6 @@ namespace Discord
         /// <returns>
         ///     A read-only collection of users that can access this channel.
         /// </returns>
-        IReadOnlyCollection<IUser> Recipients { get; }
+        IEntityEnumerableSource<IUser, ulong> Recipients { get; }
     }
 }

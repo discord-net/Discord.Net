@@ -8,7 +8,7 @@ public class MessageApplication
     /// <summary>
     ///     Gets the snowflake ID of the application.
     /// </summary>
-    public ulong Id { get; internal set; }
+    public ulong Id { get; }
 
     /// <summary>
     ///     Gets the ID of the embed's image asset.
@@ -35,6 +35,15 @@ public class MessageApplication
     ///     Gets the name of the application.
     /// </summary>
     public string Name { get; internal set; }
+
+    internal MessageApplication(ulong id, string coverImage, string description, string icon, string name)
+    {
+        Id = id;
+        CoverImage = coverImage;
+        Description = description;
+        Icon = icon;
+        Name = name;
+    }
 
     private string DebuggerDisplay
         => $"{Name} ({Id}): {Description}";

@@ -60,7 +60,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// <returns>
     ///     A string that contains the body of the message; note that this field may be empty if there is an embed.
     /// </returns>
-    string Content { get; }
+    string? Content { get; }
 
     /// <summary>
     ///     Gets the clean content for this message.
@@ -71,7 +71,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// <returns>
     ///     A string that contains the body of the message stripped of mentions, markdown, emojis and pings; note that this field may be empty if there is an embed.
     /// </returns>
-    string CleanContent { get; }
+    string? CleanContent { get; }
 
     /// <summary>
     ///     Gets the time this message was sent.
@@ -141,17 +141,17 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// <summary>
     ///     Gets the channels mentioned in this message.
     /// </summary>
-    IEntityEnumerableSource<IChannel, ulong> MentionedChannels { get; }
+    IEntityEnumerableSource<IChannel, ulong>? MentionedChannels { get; }
 
     /// <summary>
     ///     Gets the roles mentioned in this message.
     /// </summary>
-    IEntityEnumerableSource<IRole, ulong> MentionedRoles { get; }
+    IEntityEnumerableSource<IRole, ulong>? MentionedRoles { get; }
 
     /// <summary>
     ///     Gets the users mentioned in this message.
     /// </summary>
-    IEntityEnumerableSource<IUser, ulong> MentionedUsers { get; }
+    IEntityEnumerableSource<IUser, ulong>? MentionedUsers { get; }
 
     /// <summary>
     ///     Gets the activity associated with a message.
@@ -163,7 +163,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// <returns>
     ///     A message's activity, if any is associated.
     /// </returns>
-    MessageActivity Activity { get; }
+    MessageActivity? Activity { get; }
 
     /// <summary>
     ///     Gets the application associated with a message.
@@ -186,7 +186,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// <returns>
     ///     A message's reference, if any is associated.
     /// </returns>
-    MessageReference Reference { get; }
+    MessageReference? Reference { get; }
 
     /// <summary>
     ///     Gets all reactions included in this message.
@@ -223,7 +223,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// <returns>
     ///     A <see cref="IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null" />.
     /// </returns>
-    IMessageInteraction Interaction { get; }
+    IMessageInteraction? Interaction { get; }
 
     /// <summary>
     ///     Gets the data of the role subscription purchase or renewal that prompted this <see cref="MessageType.RoleSubscriptionPurchase"/> message.
@@ -231,7 +231,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// <returns>
     ///     A <see cref="MessageRoleSubscriptionData"/> if the message is a role subscription purchase message; otherwise <see langword="null" />.
     /// </returns>
-    MessageRoleSubscriptionData RoleSubscriptionData { get; }
+    MessageRoleSubscriptionData? RoleSubscriptionData { get; }
 
     /// <summary>
     ///     Adds a reaction to this message.

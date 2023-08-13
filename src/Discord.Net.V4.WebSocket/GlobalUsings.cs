@@ -11,7 +11,8 @@ global using GuildMemberCacheable = Discord.WebSocket.Cacheable<ulong, Discord.W
 global using GuildEmoteCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuildEmote>;
 global using GuildEventCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketGuildEvent, Discord.Rest.RestGuildEvent, Discord.IGuildScheduledEvent>;
 global using GuildStageInstanceCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketStageInstance, Discord.Rest.RestStageInstance, Discord.IStageInstance>;
-
+global using MessageChannelCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.ISocketMessageChannel, Discord.Rest.IRestMessageChannel, Discord.IMessageChannel>;
+global using ThreadChannelCacheable = Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketThreadChannel, Discord.Rest.RestThreadChannel, Discord.IThreadChannel>;
 
 global using GuildStageInstancesCacheable = Discord.WebSocket.CacheableCollection<
     Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketStageInstance, Discord.Rest.RestStageInstance, Discord.IStageInstance>,
@@ -36,3 +37,7 @@ global using GuildChannelsCacheable = Discord.WebSocket.CacheableCollection<
 global using GuildRolesCacheable = Discord.WebSocket.CacheableCollection<
     Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketRole, Discord.Rest.RestRole, Discord.IRole>,
     ulong, Discord.WebSocket.SocketRole>;
+
+global using MessagesCacheable = Discord.WebSocket.CacheableCollection<
+    Discord.WebSocket.Cacheable<ulong, Discord.WebSocket.SocketMessage, Discord.Rest.RestMessage, Discord.IMessage>,
+    ulong, Discord.WebSocket.SocketMessage>;

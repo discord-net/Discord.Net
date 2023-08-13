@@ -1,4 +1,3 @@
-using Discord.Net.V4.Core.API.Models.Channels;
 using Discord.WebSocket.Cache;
 using System;
 using System.Collections.Generic;
@@ -15,8 +14,8 @@ namespace Discord.WebSocket
 
         private IGuildChannelModel _source;
 
-        public SocketCategoryChannel(DiscordSocketClient discord, ulong guildId, ulong id, IGuildChannelModel model)
-            : base(discord, guildId, id, model)
+        public SocketCategoryChannel(DiscordSocketClient discord, ulong guildId, IGuildChannelModel model)
+            : base(discord, guildId, model)
         {
             _source = model;
         }

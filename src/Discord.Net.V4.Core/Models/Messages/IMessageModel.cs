@@ -3,6 +3,7 @@ namespace Discord.Models;
 public interface IMessageModel : IEntityModel<ulong>
 {
     ulong AuthorId { get; }
+    ulong ChannelId { get; }
     string? Content { get; }
     DateTimeOffset Timestamp { get; }
     DateTimeOffset EditedTimestamp { get; }
