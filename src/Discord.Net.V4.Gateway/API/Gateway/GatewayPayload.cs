@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API.Gateway
 {
-    internal sealed class GatewayPayload
+    public sealed class GatewayPayload
     {
         [JsonPropertyName("op")]
         public int Operation { get; set; }

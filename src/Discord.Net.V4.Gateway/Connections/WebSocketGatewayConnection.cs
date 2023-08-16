@@ -7,16 +7,24 @@ namespace Discord.Gateway
     {
         public event Func<GatewayPayload, ValueTask> PayloadReceived
         {
-
+            add => _payloadReceived.Add(value);
+            remove => _payloadReceived.Remove(value);
         }
 
-        public Task Connect(DiscordGatewayClient client)
+        private readonly AsyncEvent<Func<GatewayPayload, ValueTask>> _payloadReceived;
+
+        public WebSocketGatewayConnection()
+        {
+            _payloadReceived = new();
+        }
+
+        public Task ConnectAsync(DiscordGatewayClient client)
         {
 
         }
 
 
-        public Task SendPayload(GatewayPayload payload)
+        public Task SendPayloadAsync(GatewayPayload payload)
         {
 
         }

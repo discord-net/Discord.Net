@@ -2,12 +2,12 @@ using Discord.API.Gateway;
 using System;
 namespace Discord.Gateway
 {
-    internal interface IGatewayConnection
+    public interface IGatewayConnection
     {
-        Task Connect(DiscordGatewayClient client);
+        Task ConnectAsync(DiscordGatewayClient client);
 
         event Func<GatewayPayload, ValueTask> PayloadReceived; 
-        Task SendPayload(GatewayPayload payload);
+        Task SendPayloadAsync(GatewayPayload payload);
     }
 }
 

@@ -32,7 +32,7 @@ namespace Discord.Gateway.State
 
         private readonly SemaphoreSlim _cleanupSemaphore;
 
-        public StateController(DiscordGatewayClient client, ICacheProvider cache)
+        public StateController(DiscordGatewayClient client, in ICacheProvider cache)
         {
             _client = client;
             _cache = cache;
