@@ -46,7 +46,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{BB59
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.BuildOverrides", "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj", "{115F4921-B44D-4F69-996B-69796959C99D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.V4.WebSocket", "src\Discord.Net.V4.WebSocket\Discord.Net.V4.WebSocket.csproj", "{ED101B80-B0BB-42BE-85C4-5DEE315D4EC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.V4.Gateway", "src\Discord.Net.V4.Gateway\Discord.Net.V4.Gateway.csproj", "{ED101B80-B0BB-42BE-85C4-5DEE315D4EC4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.V4.Rest", "src\Discord.Net.V4.Rest\Discord.Net.V4.Rest.csproj", "{2341577A-49B7-4F3C-915F-787974832DEF}"
 EndProject

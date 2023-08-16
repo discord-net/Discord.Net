@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>11.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <WarningLevel>9999</WarningLevel>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <IsAotCompatible>false</IsAotCompatible>
+    <RootNamespace>Discord.Gateway</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Discord.Net.V4.Core\Discord.Net.V4.Core.csproj" />
+    <ProjectReference Include="..\Discord.Net.V4.Rest\Discord.Net.V4.Rest.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Entities\Stickers\" />
+    <None Remove="Cache\CacheProviders\" />
+    <None Remove="Connections\" />
+    <None Remove="API\" />
+    <None Remove="API\Gateway\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Entities\Stickers\" />
+    <Folder Include="Cache\CacheProviders\" />
+    <Folder Include="Connections\" />
+    <Folder Include="API\" />
+    <Folder Include="API\Gateway\" />
+  </ItemGroup>
+</Project>
