@@ -237,5 +237,14 @@ namespace Discord
         ///     Returns the max amount of tags applied to an application.
         /// </summary>
         public const int MaxApplicationTagCount = 5;
+
+        /// <summary>
+        ///     Returns the factor to reduce the heartbeat interval.
+        /// </summary>
+        /// <remarks>
+        ///     If a heartbeat takes longer than the interval estimated by Discord, the connection will be closed.
+        ///     This factor is used to reduce the interval and ensure that Discord will get the heartbeat within the estimated interval.
+        /// </remarks>
+        internal const double HeartbeatIntervalFactor = 0.9;
     }
 }
