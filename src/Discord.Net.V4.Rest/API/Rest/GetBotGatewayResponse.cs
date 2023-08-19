@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest;
 
-internal class GetBotGatewayResponse
+public sealed class GetBotGatewayResponse
 {
     [JsonPropertyName("url")]
     public string Url { get; set; }

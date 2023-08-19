@@ -9,6 +9,7 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <IsAotCompatible>false</IsAotCompatible>
     <RootNamespace>Discord.Gateway</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,10 @@
     <None Remove="Connections\" />
     <None Remove="API\" />
     <None Remove="API\Gateway\" />
+    <None Remove="Utils\" />
+    <None Remove="Connections\WebSocket\" />
+    <None Remove="GatewayProtocolFormat\" />
+    <None Remove="ETFEncoding\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Entities\Stickers\" />
@@ -29,5 +34,9 @@
     <Folder Include="Connections\" />
     <Folder Include="API\" />
     <Folder Include="API\Gateway\" />
+    <Folder Include="Utils\" />
+    <Folder Include="Connections\WebSocket\" />
+    <Folder Include="GatewayProtocolFormat\" />
+    <Folder Include="ETFEncoding\" />
   </ItemGroup>
 </Project>

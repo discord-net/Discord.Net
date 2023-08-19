@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest;
 
-internal class SessionStartLimit
+public sealed class SessionStartLimit
 {
     [JsonPropertyName("total")]
     public int Total { get; set; }
