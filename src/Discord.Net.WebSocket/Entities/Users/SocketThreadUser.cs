@@ -58,6 +58,13 @@ namespace Discord.WebSocket
             get => GuildUser.AvatarId;
             internal set => GuildUser.AvatarId = value;
         }
+
+        /// <inheritdoc />
+        public override string GlobalName
+        {
+            get => GlobalUser.GlobalName;
+            internal set => GlobalUser.GlobalName = value; 
+        }
         /// <inheritdoc/>
         public string DisplayAvatarId => GuildAvatarId ?? AvatarId;
 

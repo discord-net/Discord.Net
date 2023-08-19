@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.12.0] - 2023-08-10
+
+### Added
+- #2644 Added `ComponentBuilder` component removal methods. (d5d7378)
+- #2668 Added a method for sending silent audio frames on `OpusEncodeStream`. (59094d2)
+- #2675 Added missing `remove` property to `MemberRoleAudit`. (5fb9152)
+- #2720 Added role & attachment flags (a421715)
+- #2723 Added missing properties to webhook implementation (2b8584d)
+- #2729 Added new onboarding methods/properties (8cd4c1c)
+- #2730 Added new `ModifyCurrentApplication` features (166d40f)
+- #2749 Added support for setting custom status (b2820d5)
+
+### Fixed
+- #2711 Fixed modifying guild resets preferred locale (12c50f2)
+- #2713 Fixed some `ReplyAsync` methods missing `MessageFlags` parameter. (56769cb)
+- #2714 Fixed disconnecting socket client not sending close code. (6bb3777)
+- #2722 Fixed modal's `DeferAsync` implementation (5f580f6)
+- #2726 Fixed global name not being passed to `UserUpdated` event (9dfd4d7)
+- #2742 Fixed `ModifyAsync` attachments #2236 (0c12079)
+- #2745 Fixed `GetMessagesAsync` with `Direction.After` not working as expected (c922497)
+
+
 ## [3.11.0] - 2023-6-27
 
 ### Added

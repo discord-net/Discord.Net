@@ -12,6 +12,20 @@ namespace Discord
         internal CustomStatusGame() { }
 
         /// <summary>
+        ///     Creates a new custom status activity.
+        /// </summary>
+        /// <remarks>
+        ///     Bots can't set custom status emoji.
+        /// </remarks>
+        /// <param name="state">The string displayed as bot's custom status.</param>
+        public CustomStatusGame(string state)
+        {
+            Name = "Custom Status";
+            State = state;
+            Type = ActivityType.CustomStatus;
+        }
+
+        /// <summary>
         ///     Gets the emote, if it is set.
         /// </summary>
         /// <returns>

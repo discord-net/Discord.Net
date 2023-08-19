@@ -706,11 +706,20 @@ namespace Discord.WebSocket
             return SendStatusAsync();
         }
 
+        /// <inheritdoc />
+        public override Task SetCustomStatusAsync(string status)
+        {
+            var statusGame = new CustomStatusGame(status);
+            return SetActivityAsync(statusGame);
+        }
+
         private Task SendStatusAsync()
         {
             if (CurrentUser == null)
                 return Task.CompletedTask;
-            var activities = _activity.IsSpecified ? ImmutableList.Create(_activity.Value) : null;
+            var activities = _activity.IsSpecified
+                ? ImmutableList.Create(_activity.Value)
+                : null;
             CurrentUser.Presence = new SocketPresence(Status, null, activities);
 
             var presence = BuildCurrentStatus() ?? (UserStatus.Online, false, null, null);
@@ -743,6 +752,8 @@ namespace Discord.WebSocket
                 gameModel.Type = Activity.Type;
                 if (Activity is StreamingGame streamGame)
                     gameModel.StreamUrl = streamGame.Url;
+                if (Activity is CustomStatusGame customStatus)
+                    gameModel.State = customStatus.State;
                 game = gameModel;
             }
             else if (activity.IsSpecified)

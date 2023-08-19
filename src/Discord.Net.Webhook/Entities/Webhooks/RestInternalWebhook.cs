@@ -13,11 +13,12 @@ namespace Discord.Webhook
         public ulong Id { get; }
         public string Token { get; }
 
-        public ulong ChannelId { get; private set; }
+        public ulong? ChannelId { get; private set; }
         public string Name { get; private set; }
         public string AvatarId { get; private set; }
         public ulong? GuildId { get; private set; }
         public ulong? ApplicationId { get; private set; }
+        public WebhookType Type { get; private set; }
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
@@ -26,7 +27,7 @@ namespace Discord.Webhook
             _client = apiClient;
             Id = model.Id;
             ChannelId = model.Id;
-            Token = model.Token;
+            Token = model.Token.GetValueOrDefault(null);
         }
         internal static RestInternalWebhook Create(DiscordWebhookClient client, Model model)
         {
@@ -45,6 +46,8 @@ namespace Discord.Webhook
                 GuildId = model.GuildId.Value;
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
+
+            Type = model.Type;
 
             ApplicationId = model.ApplicationId;
         }

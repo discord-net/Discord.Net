@@ -47,6 +47,8 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
         /// <inheritdoc />
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
+        /// <inheritdoc />
+        public override string GlobalName { get { return GlobalUser.GlobalName; } internal set { GlobalUser.GlobalName = value; } }
 
         /// <inheritdoc />
         public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild, this));

@@ -88,6 +88,11 @@ namespace Discord
         RoleTags Tags { get; }
 
         /// <summary>
+        ///     Gets flags related to this role.
+        /// </summary>
+        RoleFlags Flags { get; }
+
+        /// <summary>
         ///     Modifies this role.
         /// </summary>
         /// <remarks>

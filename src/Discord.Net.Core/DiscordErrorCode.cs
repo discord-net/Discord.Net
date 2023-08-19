@@ -231,7 +231,7 @@ namespace Discord
         StickerAnimationDurationTooLong = 170007,
         #endregion
 
-        #region Guild Scheduled Events
+        #region Guild Scheduled Events (180XXX)
         CannotUpdateFinishedEvent = 180000,
         FailedStageCreation = 180002,
         #endregion
@@ -244,6 +244,11 @@ namespace Discord
         WebhooksCanOnlyCreateThreadsInForumChannels = 220003,
         WebhookServicesCannotBeUsedInForumChannels = 220004,
         MessageBlockedByHarmfulLinksFilter = 240000,
+        #endregion
+
+        #region Onboarding (350XXX)
+        CannotEnableOnboardingUnmetRequirements = 350000,
+        CannotUpdateOnboardingBelowRequirements = 350001
         #endregion
     }
 }
