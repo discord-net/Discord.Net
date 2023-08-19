@@ -1260,7 +1260,7 @@ namespace Discord.Rest
         public static Task<GuildOnboarding> GetGuildOnboardingAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
             => client.ApiClient.GetGuildOnboardingAsync(guild.Id, options);
 
-        public static async Task<GuildOnboarding> ModifyGuildOnboardingAsync(IGuild guild, Action<GuildOnboardingProperties> func, BaseDiscordClient client, RequestOptions options)
+        public static Task<GuildOnboarding> ModifyGuildOnboardingAsync(IGuild guild, Action<GuildOnboardingProperties> func, BaseDiscordClient client, RequestOptions options)
         {
             var props = new GuildOnboardingProperties();
             func(props);
@@ -1297,7 +1297,7 @@ namespace Discord.Rest
                 : Optional<GuildOnboardingPromptParams[]>.Unspecified,
             };
 
-            return await client.ApiClient.ModifyGuildOnboardingAsync(guild.Id, args, options);
+            return client.ApiClient.ModifyGuildOnboardingAsync(guild.Id, args, options);
         }
 
         #endregion

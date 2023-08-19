@@ -2289,13 +2289,13 @@ namespace Discord.API
             return SendAsync<GuildOnboarding>("GET", () => $"guilds/{guildId}/onboarding", new BucketIds(guildId: guildId), options: options);
         }
 
-        public async Task<GuildOnboarding> ModifyGuildOnboardingAsync(ulong guildId, ModifyGuildOnboardingParams args,  RequestOptions options)
+        public Task<GuildOnboarding> ModifyGuildOnboardingAsync(ulong guildId, ModifyGuildOnboardingParams args,  RequestOptions options)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<GuildOnboarding>("PUT", () => $"guilds/{guildId}/onboarding", args, new BucketIds(guildId: guildId), options: options);
+            return SendJsonAsync<GuildOnboarding>("PUT", () => $"guilds/{guildId}/onboarding", args, new BucketIds(guildId: guildId), options: options);
         }
 
         #endregion
