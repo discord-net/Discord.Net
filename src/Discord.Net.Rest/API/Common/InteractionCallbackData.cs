@@ -30,5 +30,8 @@ namespace Discord.API
 
         [JsonProperty("custom_id")]
         public Optional<string> CustomId { get; set; }
+
+        [JsonProperty("attachments")]
+        public Optional<FileAttachment[]> Attachments { get; set; }
     }
 }

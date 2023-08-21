@@ -269,7 +269,8 @@ namespace Discord.WebSocket
                     Components = args.Components.IsSpecified
                         ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
                         : Optional<API.ActionRowComponent[]>.Unspecified,
-                    Flags = args.Flags.IsSpecified ? args.Flags.Value ?? Optional<MessageFlags>.Unspecified : Optional<MessageFlags>.Unspecified
+                    Flags = args.Flags.IsSpecified ? args.Flags.Value ?? Optional<MessageFlags>.Unspecified : Optional<MessageFlags>.Unspecified,
+                    Attachments = args.Attachments.Value?.ToArray() ?? Array.Empty<FileAttachment>()
                 }
             };
 
