@@ -99,7 +99,9 @@ namespace Discord.Rest
             }
             else
             {
-                var apiArgs = new UploadFileParams(args.Attachments.Value.ToArray())
+                var attachments = args.Attachments.Value?.ToArray() ?? Array.Empty<FileAttachment>();
+
+                var apiArgs = new UploadFileParams(attachments)
                 {
                     Content = args.Content,
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
