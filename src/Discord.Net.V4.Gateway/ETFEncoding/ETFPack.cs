@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Discord.Gateway
 {
-    public sealed class ETFPack
+    internal sealed class ETFPack
     {
         public enum FormatType : byte
         {
@@ -40,6 +41,24 @@ namespace Discord.Gateway
 
         public const byte FORMAT_VERSION = 131;
 
+        private static readonly ConcurrentDictionary<Type, StructureDecoder> _decoders = new();
+
+        #region Decoding
+
+        public static T ReadObject<T>(ref ETFPackDecoder decoder)
+        {
+            decoder.Expect(FormatType.MAP_EXT);
+
+            var value = _decoders.GetOrAdd(typeof(T), t => new StructureDecoder(t))
+                .Decode(ref decoder);
+
+            if (value is not T t)
+                throw new InvalidCastException($"Expected type {typeof(T)} but got {value?.GetType().Name ?? "null"}");
+
+            return t;
+        }
+
+        #endregion
 
         #region Encoding
         public static ReadOnlyMemory<byte> Encode<T>(in T? value)

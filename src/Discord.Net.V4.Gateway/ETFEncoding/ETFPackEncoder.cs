@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Discord.Gateway
 {
@@ -258,6 +260,90 @@ namespace Discord.Gateway
             WriteType(ETFPack.FormatType.MAP_EXT);
             BinaryUtils.CorrectEndianness(ref size);
             WriteUnmanaged(ref size);
+        }
+
+        public void Write(object? value)
+        {
+            switch(value)
+            {
+                case byte b:
+                    Write(b);
+                    break;
+                case sbyte sb:
+                    Write(sb); // as int
+                    break;
+                case short s:
+                    Write(s);
+                    break;
+                case ushort us:
+                    Write(us); // as int
+                    break;
+                case int i:
+                    Write(i);
+                    break;
+                case uint ui:
+                    Write(ui); // as long
+                    break;
+                case long l:
+                    Write(l);
+                    break;
+                case ulong ul:
+                    Write(ul);
+                    break;
+                case double d:
+                    Write(d);
+                    break;
+                case float f:
+                    Write(f); // as double
+                    break;
+                case bool b:
+                    Write(b);
+                    break;
+                case string s:
+                    Write(s);
+                    break;
+                case Array array:
+                    if (array.Length == 0)
+                    {
+                        WriteNilExt();
+                        break;
+                    }
+
+                    WriteListHeader(array.Length);
+                    for(int i = 0; i != array.Length; i++)
+                    {
+                        Write(array.GetValue(i));
+                    }
+                    break;
+                case IDictionary dict:
+                    WriteMapHeader(dict.Count);
+                    foreach (DictionaryEntry kvp in dict)
+                    {
+                        Write(kvp.Key);
+                        Write(kvp.Value);
+                    }
+                    break;
+                case IEnumerable enumerable:
+                    List<object> items = new();
+                    foreach (var item in enumerable)
+                        items.Add(item);
+
+                    if (items.Count == 0)
+                    {
+                        WriteNilExt();
+                        return;
+                    }
+                    WriteListHeader(items.Count);
+                    for (int i = 0; i != items.Count; i++)
+                    {
+                        Write(items[i]);
+                    }
+                    WriteNilExt();
+                    break;
+
+                default:
+                    throw new NotSupportedException($"Cannot serialize {value?.GetType().Name ?? "null"}");
+            }
         }
 
         public readonly void Dispose()
