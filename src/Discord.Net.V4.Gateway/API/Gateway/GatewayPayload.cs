@@ -6,7 +6,7 @@ namespace Discord.API.Gateway
     public sealed class GatewayPayload
     {
         [JsonPropertyName("op")]
-        public int Operation { get; set; }
+        public GatewayOpCode Operation { get; set; }
         [JsonPropertyName("t")]
         public string? Type { get; set; }
         [JsonPropertyName("s")]

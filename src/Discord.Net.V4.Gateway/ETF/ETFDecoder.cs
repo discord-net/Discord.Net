@@ -8,62 +8,52 @@ using DiscordGatewayTest.ETF.Models;
 
 namespace Discord.Gateway
 {
-    internal unsafe ref struct ETFPackDecoder
+    internal readonly unsafe struct ETFDecoder
     {
         public const byte FLOAT_LENGTH = 31;
 
-        private ref FrameSource _source;
+        private readonly Stream _stream;
 
-        public ETFPackDecoder(ref FrameSource source)
+        public ETFDecoder(Stream stream)
         {
-            _source = ref source;
+            _stream = stream;
         }
 
-        public ETFPack.FormatType ReadType(bool peek = false)
-            => (ETFPack.FormatType)ReadUnmanaged<byte>(peek);
+        public ETF.FormatType ReadType()
+            => (ETF.FormatType)ReadUnmanaged<byte>();
 
-
-        public T ReadUnmanaged<T>(bool peek = false)
+        public T ReadUnmanaged<T>()
             where T : unmanaged
         {
             T value;
-            ReadUnmanaged(&value, peek);
+            ReadUnmanaged(&value);
             return value;
         }
 
-        public T ReadUnmanaged<T>(T* v, bool peek = false)
+        public void ReadUnmanaged<T>(T* v)
             where T : unmanaged
         {
-            ReadInto(v, sizeof(T), peek);
+            ReadInto(v, sizeof(T));
             ref var value = ref Unsafe.AsRef<T>(v);
             BinaryUtils.CorrectEndianness(ref value);
-            return value;
         }
 
-        public void ReadInto(scoped Span<byte> bytes, bool peek = false)
+        public void ReadInto(scoped Span<byte> bytes)
+            => _stream.Read(bytes);
+
+        public void ReadInto(void* ptr, int length)
         {
-            if (_source.Size < _source.Position + bytes.Length)
-                throw new InternalBufferOverflowException("The requested read operation would overflow the buffer");
-
-            if (peek)
-                _source.PeekSegment(bytes);
-            else
-                _source.ReadSegment(bytes); 
+            ReadInto(new Span<byte>(ptr, length));
         }
 
-        public void ReadInto(void* ptr, int length, bool peek = false)
-        {
-            ReadInto(new Span<byte>(ptr, length), peek);
-        }
-
-        public void Expect(ETFPack.FormatType expected)
+        public void Expect(ETF.FormatType expected)
         {
             var actual = ReadType();
             if (actual != expected)
                 throw new InvalidDataException($"Expected ERL format type {expected} but got {actual}");
         }
 
-        public T ReadScalar<T>(ETFPack.FormatType type)
+        public T ReadScalar<T>(ETF.FormatType type)
             where T : unmanaged
         {
             Scalar<T> scalar;
@@ -133,8 +123,20 @@ namespace Discord.Gateway
 
         public long ReadSmallLong()
             => ReadLong(ReadByte());
+
         public long ReadLongLong()
             => ReadLong(ReadInt());
+
+        private BigInteger ReadBigInt(int size)
+        {
+            Span<byte> bytes = stackalloc byte[size + 1]; // for sign byte
+            ReadInto(bytes);
+
+            // fix sign bit
+            bytes[0] = bytes[0] == 1 ? (byte)0x80 : (byte)0;
+
+            return new BigInteger(bytes);
+        }
 
         private long ReadLong(int digits)
         {
@@ -170,7 +172,7 @@ namespace Discord.Gateway
             return array;
         }
 
-        private static object? ProcessAtom(string atom)
+        private object? ProcessAtom(string atom)
             => atom switch
             {
                 "nil" => null,
@@ -186,44 +188,44 @@ namespace Discord.Gateway
 
             switch (type)
             {
-                case ETFPack.FormatType.ATOM_UTF8_EXT:
+                case ETF.FormatType.ATOM_UTF8_EXT:
                     return ProcessAtom(ReadRawAtom(true));
-                case ETFPack.FormatType.ATOM_EXT:
+                case ETF.FormatType.ATOM_EXT:
                     return ProcessAtom(ReadRawAtom(false));
-                case ETFPack.FormatType.BINARY_EXT:
+                case ETF.FormatType.BINARY_EXT:
                     return ReadString(ReadInt(), false);
-                case ETFPack.FormatType.BIT_BINARY_EXT:
+                case ETF.FormatType.BIT_BINARY_EXT:
                     // TODO:
                     break;
-                case ETFPack.FormatType.COMPRESSED:
+                case ETF.FormatType.COMPRESSED:
                     // TODO
                     break;
-                case ETFPack.FormatType.EXPORT_EXT:
+                case ETF.FormatType.EXPORT_EXT:
                     return new ETFExport(
                         Read(),
                         Read(),
                         Read()
                     );
-                case ETFPack.FormatType.FLOAT_EXT:
+                case ETF.FormatType.FLOAT_EXT:
                     return ReadFloat();
-                case ETFPack.FormatType.FUN_EXT:
+                case ETF.FormatType.FUN_EXT:
                     // TODO
                     break;
-                case ETFPack.FormatType.INTEGER_EXT:
+                case ETF.FormatType.INTEGER_EXT:
                     return ReadInt();
-                case ETFPack.FormatType.LARGE_BIG_EXT:
-                    break;
-                case ETFPack.FormatType.LARGE_TUPLE_EXT:
+                case ETF.FormatType.LARGE_BIG_EXT:
+                    return ReadBigInt(ReadInt());
+                case ETF.FormatType.LARGE_TUPLE_EXT:
                     return ReadArray(ReadInt());
-                case ETFPack.FormatType.LIST_EXT:
+                case ETF.FormatType.LIST_EXT:
                     {
                         var arr = ReadArray(ReadInt());
                         var marker = ReadType();
-                        if (marker is not ETFPack.FormatType.NIL_EXT)
+                        if (marker is not ETF.FormatType.NIL_EXT)
                             throw new InvalidDataException($"Expected NIL_EXT tail marker, but got {marker}");
                         return arr;
                     }
-                case ETFPack.FormatType.MAP_EXT:
+                case ETF.FormatType.MAP_EXT:
                     {
                         var length = ReadInt();
                         var map = new Dictionary<object, object?>();
@@ -236,15 +238,15 @@ namespace Discord.Gateway
                             map.Add(key, value);
                         }
 
-                        return map;
+                        return new ETFObject(map);
                     }
-                case ETFPack.FormatType.NEW_FLOAT_EXT:
+                case ETF.FormatType.NEW_FLOAT_EXT:
                     // TODO
                     break;
-                case ETFPack.FormatType.NEW_FUN_EXT:
+                case ETF.FormatType.NEW_FUN_EXT:
                     // not supported
                     break;
-                case ETFPack.FormatType.NEW_REFERENCE_EXT:
+                case ETF.FormatType.NEW_REFERENCE_EXT:
                     {
                         var length = ReadUShort();
 
@@ -263,22 +265,22 @@ namespace Discord.Gateway
 
                         return new ETFReference(node, creation, ids);
                     }
-                case ETFPack.FormatType.NIL_EXT:
+                case ETF.FormatType.NIL_EXT:
                     return Array.Empty<object>();
-                case ETFPack.FormatType.PID_EXT:
+                case ETF.FormatType.PID_EXT:
                     return new ETFPID(
                         Read(),
                         ReadInt(),
                         ReadInt(),
                         ReadByte()
                     );
-                case ETFPack.FormatType.PORT_EXT:
+                case ETF.FormatType.PORT_EXT:
                     return new ETFPort(
                         Read(),
                         ReadInt(),
                         ReadByte()
                     );
-                case ETFPack.FormatType.REFERENCE_EXT:
+                case ETF.FormatType.REFERENCE_EXT:
                     {
                         var node = Read();
                         var id = ReadInt();
@@ -289,18 +291,17 @@ namespace Discord.Gateway
                             new int[] { id }
                         );
                     }
-                case ETFPack.FormatType.SMALL_ATOM_EXT:
+                case ETF.FormatType.SMALL_ATOM_EXT:
                     return ProcessAtom(ReadRawSmallAtom(false));
-                case ETFPack.FormatType.SMALL_ATOM_UTF8_EXT:
+                case ETF.FormatType.SMALL_ATOM_UTF8_EXT:
                     return ProcessAtom(ReadRawSmallAtom(true));
-                case ETFPack.FormatType.SMALL_BIG_EXT:
-                    // TODO
-                    break;
-                case ETFPack.FormatType.SMALL_INTEGER_EXT:
+                case ETF.FormatType.SMALL_BIG_EXT:
+                    return ReadBigInt(ReadByte());
+                case ETF.FormatType.SMALL_INTEGER_EXT:
                     return ReadByte();
-                case ETFPack.FormatType.SMALL_TUPLE_EXT:
+                case ETF.FormatType.SMALL_TUPLE_EXT:
                     return ReadArray(ReadByte());
-                case ETFPack.FormatType.STRING_EXT:
+                case ETF.FormatType.STRING_EXT:
                     return ReadString(ReadUShort(), false);
                 default:
                     break;
@@ -313,7 +314,7 @@ namespace Discord.Gateway
         private struct Scalar<T>
             where T : unmanaged
         {
-            public ETFPack.FormatType Type;
+            public ETF.FormatType Type;
             public T Value;
         }
     }

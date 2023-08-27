@@ -93,6 +93,7 @@ public interface IRestApiProvider : IAsyncDisposable, IDisposable
     #region Gateway
 
     Task<GetBotGatewayResponse> GetBotGatewayAsync(CancellationToken token = default);
+    Task<GetGatewayResponse> GetGatewayAsync(CancellationToken token = default);
 
     #endregion
 }

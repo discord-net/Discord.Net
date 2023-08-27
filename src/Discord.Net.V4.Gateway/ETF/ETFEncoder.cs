@@ -1,82 +1,80 @@
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Discord.Gateway
 {
     // TODO: could be useful and preformant to pool the allocs and reuse them.
-    internal unsafe ref struct ETFPackEncoder
+    internal unsafe ref struct ETFEncoder
     {
         public static readonly byte[] NIL_BYTES =
         {
-            (byte)ETFPack.FormatType.SMALL_ATOM_EXT,
+            (byte)ETF.FormatType.SMALL_ATOM_EXT,
             0x03,
             0x6e, 0x69, 0x6c
         };
 
         public static readonly byte[] TRUE_BYTES =
         {
-            (byte)ETFPack.FormatType.SMALL_ATOM_EXT,
+            (byte)ETF.FormatType.SMALL_ATOM_EXT,
             0x04,
             0x74, 0x72, 0x75, 0x65
         };
 
         public static readonly byte[] FALSE_BYTES =
         {
-            (byte)ETFPack.FormatType.SMALL_ATOM_EXT,
+            (byte)ETF.FormatType.SMALL_ATOM_EXT,
             0x05,
             0x66, 0x61, 0x6c, 0x73, 0x65
         };
 
 
+        private readonly ArrayPool<byte> _pool;
+
         private Span<byte> _buffer;
-        private byte* _ptr;
+        private byte[] _rented;
+
         private int _pos;
 
-        public ETFPackEncoder(nuint sz)
+        public ETFEncoder(int size, ArrayPool<byte> pool)
         {
-            _ptr = (byte*)NativeMemory.Alloc(sz);
-            _buffer = new Span<byte>(_ptr, checked((int)sz));
+            _rented = pool.Rent(size);
+            _buffer = _rented.AsSpan();
+            _pool = pool;
         }
 
         public readonly ReadOnlyMemory<byte> GetBytes()
         {
-            var buff = new byte[_pos];
-            Unsafe.CopyBlockUnaligned(ref buff[0], ref Unsafe.AsRef<byte>(_ptr), (uint)_pos);
-            return buff;
+            var buffer = new byte[_pos];
+
+            _buffer[.._pos].CopyTo(buffer);
+
+            return buffer;
         }
 
-        private void Resize(int t)
+        private void Resize(int requested)
         {
-            var newSize = (_buffer.Length + t) * 2;
+            var newBuffer = _pool.Rent((_buffer.Length + requested) * 2);
 
-            var newBuff = (byte*)NativeMemory.Alloc((nuint)newSize);
+            _buffer.CopyTo(newBuffer);
 
-            Unsafe.CopyBlockUnaligned(ref Unsafe.AsRef<byte>(newBuff), ref _buffer[0], (uint)_buffer.Length);
-
-            _buffer = new(newBuff, newSize);
-
-            NativeMemory.Free(_ptr);
-
-            _ptr = newBuff;
+            _pool.Return(_rented);
+            _buffer = newBuffer.AsSpan();
+            _rented = newBuffer;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void Append(ref byte b, int size)
-            => Append(Unsafe.AsPointer(ref b), size);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void Append(void* ptr, int size)
+        private void Append(ref byte bytes, int size)
         {
             if(size + _pos > _buffer.Length)
             {
                 Resize(size);
             }
 
-            Unsafe.CopyBlockUnaligned(_ptr + _pos, ptr, (uint)size);
+            Unsafe.CopyBlockUnaligned(ref _buffer[_pos], ref bytes, (uint)size);
             _pos += size;
         }
 
@@ -89,7 +87,7 @@ namespace Discord.Gateway
                 Resize(sizeof(T));
             }
 
-            Append(Unsafe.AsPointer(ref value), sizeof(T));
+            Append(ref Unsafe.As<T, byte>(ref value), sizeof(T));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -103,12 +101,12 @@ namespace Discord.Gateway
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteType(ETFPack.FormatType type)
+        private void WriteType(ETF.FormatType type)
             => WriteByte((byte)type);
 
 
         public void WriteVersion()
-            => WriteByte(ETFPack.FORMAT_VERSION);
+            => WriteByte(ETF.FORMAT_VERSION);
 
         public void WriteNil()
             => Append(ref NIL_BYTES[0], NIL_BYTES.Length);
@@ -123,20 +121,20 @@ namespace Discord.Gateway
 
         public void Write(byte b)
         {
-            WriteType(ETFPack.FormatType.SMALL_INTEGER_EXT);
+            WriteType(ETF.FormatType.SMALL_INTEGER_EXT);
             WriteUnmanaged(ref b);
         }
 
         public void Write(int i)
         {
-            WriteType(ETFPack.FormatType.INTEGER_EXT);
+            WriteType(ETF.FormatType.INTEGER_EXT);
             BinaryUtils.CorrectEndianness(ref i);
             WriteUnmanaged(ref i);
         }
 
         public void Write(long l)
         {
-            WriteType(ETFPack.FormatType.SMALL_BIG_EXT);
+            WriteType(ETF.FormatType.SMALL_BIG_EXT);
             WriteByte(0x08); // byte count
             WriteByte((byte)(l < 0 ? 1 : 0)); // sign
             BinaryUtils.CorrectEndianness(ref l);
@@ -145,7 +143,7 @@ namespace Discord.Gateway
 
         public void Write(ulong l)
         {
-            WriteType(ETFPack.FormatType.SMALL_BIG_EXT);
+            WriteType(ETF.FormatType.SMALL_BIG_EXT);
             WriteByte(0x08); // byte count
             WriteByte(0); // sign
             BinaryUtils.CorrectEndianness(ref l);
@@ -154,7 +152,7 @@ namespace Discord.Gateway
 
         public void Write(double d)
         {
-            WriteType(ETFPack.FormatType.NEW_FLOAT_EXT);
+            WriteType(ETF.FormatType.NEW_FLOAT_EXT);
             BinaryUtils.CorrectEndianness(ref d);
             WriteUnmanaged(ref d);
         }
@@ -163,7 +161,7 @@ namespace Discord.Gateway
         {
             if(bytes.Length < 255)
             {
-                WriteType(ETFPack.FormatType.SMALL_ATOM_EXT);
+                WriteType(ETF.FormatType.SMALL_ATOM_EXT);
                 WriteByte(checked((byte)bytes.Length));
                 Append(ref bytes[0], bytes.Length);
                 return;
@@ -172,7 +170,7 @@ namespace Discord.Gateway
             if (bytes.Length > 0xFFFF)
                 throw new ArgumentOutOfRangeException($"Cannot write a buffer with a size greater than {0xFFFF} bytes");
 
-            WriteType(ETFPack.FormatType.ATOM_EXT);
+            WriteType(ETF.FormatType.ATOM_EXT);
 
             var sz = (ushort)bytes.Length;
 
@@ -187,7 +185,7 @@ namespace Discord.Gateway
 
             if (bytes.Length < 255)
             {
-                WriteType(ETFPack.FormatType.SMALL_ATOM_UTF8_EXT);
+                WriteType(ETF.FormatType.SMALL_ATOM_UTF8_EXT);
                 WriteByte(checked((byte)bytes.Length));
                 Append(ref bytes[0], bytes.Length);
                 return;
@@ -196,7 +194,7 @@ namespace Discord.Gateway
             if (bytes.Length > 0xFFFF)
                 throw new ArgumentOutOfRangeException($"Cannot write a buffer with a size greater than {0xFFFF} bytes");
 
-            WriteType(ETFPack.FormatType.ATOM_UTF8_EXT);
+            WriteType(ETF.FormatType.ATOM_UTF8_EXT);
 
             var sz = (ushort)bytes.Length;
 
@@ -208,11 +206,16 @@ namespace Discord.Gateway
         public void Write(Span<byte> bytes)
         {
             var sz = bytes.Length;
-            WriteType(ETFPack.FormatType.BINARY_EXT);
+            WriteType(ETF.FormatType.BINARY_EXT);
             BinaryUtils.CorrectEndianness(ref sz);
             WriteUnmanaged(ref sz);
 
             Append(ref bytes[0], bytes.Length);
+        }
+
+        public void WriteBinary(string s)
+        {
+            Write(Encoding.ASCII.GetBytes(s).AsSpan());
         }
 
         public void Write(string str)
@@ -223,7 +226,7 @@ namespace Discord.Gateway
                 throw new ArgumentOutOfRangeException($"Cannot write a string with a size greater than {0xFFFF}");
 
 
-            WriteType(ETFPack.FormatType.STRING_EXT);
+            WriteType(ETF.FormatType.STRING_EXT);
             var sz = (ushort)buff.Length;
             BinaryUtils.CorrectEndianness(ref sz);
             WriteUnmanaged(ref sz);
@@ -235,29 +238,29 @@ namespace Discord.Gateway
         {
             if(size < 255)
             {
-                WriteType(ETFPack.FormatType.SMALL_TUPLE_EXT);
+                WriteType(ETF.FormatType.SMALL_TUPLE_EXT);
                 WriteByte(checked((byte)size));
                 return;
             }
 
-            WriteType(ETFPack.FormatType.LARGE_TUPLE_EXT);
+            WriteType(ETF.FormatType.LARGE_TUPLE_EXT);
             BinaryUtils.CorrectEndianness(ref size);
             WriteUnmanaged(ref size);
         }
 
         public void WriteNilExt()
-            => WriteType(ETFPack.FormatType.NIL_EXT);
+            => WriteType(ETF.FormatType.NIL_EXT);
 
         public void WriteListHeader(int size)
         {
-            WriteType(ETFPack.FormatType.LIST_EXT);
+            WriteType(ETF.FormatType.LIST_EXT);
             BinaryUtils.CorrectEndianness(ref size);
             WriteUnmanaged(ref size);
         }
 
         public void WriteMapHeader(int size)
         {
-            WriteType(ETFPack.FormatType.MAP_EXT);
+            WriteType(ETF.FormatType.MAP_EXT);
             BinaryUtils.CorrectEndianness(ref size);
             WriteUnmanaged(ref size);
         }
@@ -300,7 +303,7 @@ namespace Discord.Gateway
                     Write(b);
                     break;
                 case string s:
-                    Write(s);
+                    WriteBinary(s);
                     break;
                 case Array array:
                     if (array.Length == 0)
@@ -340,15 +343,22 @@ namespace Discord.Gateway
                     }
                     WriteNilExt();
                     break;
+                case Enum e:
+                    value = Convert.ChangeType(value, Enum.GetUnderlyingType(e.GetType()));
+                    Write(value);
+                    break;
+                case object obj when obj.GetType().Assembly == typeof(ETFEncoder).Assembly:
+                    var encoder = ETF.GetOrCreateEncoder(obj.GetType());
+                    
+                    encoder.Encode(obj, ref this);
+                    break;
 
-                default:
-                    throw new NotSupportedException($"Cannot serialize {value?.GetType().Name ?? "null"}");
             }
         }
 
         public readonly void Dispose()
         {
-            NativeMemory.Free(_ptr);
+            _pool.Return(_rented);
         }
     }
 }

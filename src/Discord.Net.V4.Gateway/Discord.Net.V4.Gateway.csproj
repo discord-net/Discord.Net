@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>11.0</LangVersion>
     <Nullable>enable</Nullable>
@@ -25,8 +25,8 @@
     <None Remove="API\Gateway\" />
     <None Remove="Utils\" />
     <None Remove="Connections\WebSocket\" />
-    <None Remove="GatewayProtocolFormat\" />
-    <None Remove="ETFEncoding\" />
+    <None Remove="EventProcessors\" />
+    <None Remove="GatwayEncoding\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Entities\Stickers\" />
@@ -36,7 +36,7 @@
     <Folder Include="API\Gateway\" />
     <Folder Include="Utils\" />
     <Folder Include="Connections\WebSocket\" />
-    <Folder Include="GatewayProtocolFormat\" />
-    <Folder Include="ETFEncoding\" />
+    <Folder Include="EventProcessors\" />
+    <Folder Include="GatwayEncoding\" />
   </ItemGroup>
 </Project>

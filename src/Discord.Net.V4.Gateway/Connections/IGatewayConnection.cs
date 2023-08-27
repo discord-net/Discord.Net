@@ -6,13 +6,13 @@ namespace Discord.Gateway
     public interface IGatewayConnection
     {
         Task ConnectAsync(
-            GetBotGatewayResponse botGateway,
+            Uri url,
             CancellationToken token = default);
 
         Task DisconnectAsync(CancellationToken token = default);
 
-        ValueTask SendPayloadAsync(in GatewayPayload payload, CancellationToken token = default);
-        ValueTask<GatewayPayload> ReadPayloadAsync(CancellationToken token = default);
+        ValueTask SendAsync(ReadOnlyMemory<byte> buffer, CancellationToken token = default);
+        ValueTask<Stream> ReadAsync(CancellationToken token = default);
     }
 }
 
