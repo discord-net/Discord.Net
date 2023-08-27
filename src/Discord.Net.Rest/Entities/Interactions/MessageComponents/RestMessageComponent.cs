@@ -141,7 +141,6 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="func">A delegate containing the properties to modify the message with.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
-        /// <returns>A string that contains json to write back to the incoming http request.</returns>
         public async Task Update(Action<MessageProperties> func, RequestOptions options = null)
         {
             var args = new MessageProperties();
