@@ -142,7 +142,7 @@ namespace Discord.Rest
         /// <param name="func">A delegate containing the properties to modify the message with.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A string that contains json to write back to the incoming http request.</returns>
-        public string Update(Action<MessageProperties> func, RequestOptions options = null)
+        public async Task Update(Action<MessageProperties> func, RequestOptions options = null)
         {
             var args = new MessageProperties();
             func(args);
@@ -200,7 +200,6 @@ namespace Discord.Rest
                 }
             }
 
-            string result;
             if (!args.Attachments.IsSpecified)
             {
                 var response = new API.InteractionResponse
@@ -217,7 +216,8 @@ namespace Discord.Rest
                         Flags = args.Flags.IsSpecified ? args.Flags.Value ?? Optional<MessageFlags>.Unspecified : Optional<MessageFlags>.Unspecified
                     }
                 };
-                result = SerializePayload(response);
+
+                await InteractionHelper.SendInteractionResponseAsync(Discord, response, this, Channel, options).ConfigureAwait(false);
             }
             else
             {
@@ -234,7 +234,8 @@ namespace Discord.Rest
                         : Optional<API.ActionRowComponent[]>.Unspecified,
                     Flags = args.Flags.IsSpecified ? args.Flags.Value ?? Optional<MessageFlags>.Unspecified : Optional<MessageFlags>.Unspecified
                 };
-                result = SerializePayload(response);
+
+                await InteractionHelper.SendInteractionResponseAsync(Discord, response, this, Channel, options).ConfigureAwait(false);
             }
 
             lock (_lock)
@@ -243,11 +244,9 @@ namespace Discord.Rest
                 {
                     throw new InvalidOperationException("Cannot respond, update, or defer twice to the same interaction");
                 }
-
-                HasResponded = true;
             }
 
-            return result;
+            HasResponded = true;
         }
 
         /// <inheritdoc/>
@@ -515,7 +514,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         Task IComponentInteraction.UpdateAsync(Action<MessageProperties> func, RequestOptions options)
-            => Task.FromResult(Update(func, options));
+            => Update(func, options);
 
         /// <inheritdoc />
         Task IComponentInteraction.DeferLoadingAsync(bool ephemeral, RequestOptions options)
