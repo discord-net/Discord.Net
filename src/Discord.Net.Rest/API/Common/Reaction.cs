@@ -10,6 +10,9 @@ internal class Reaction
     [JsonProperty("me")]
     public bool Me { get; set; }
 
+    [JsonProperty("me_burst")]
+    public bool MeBurst { get; set; }
+
     [JsonProperty("emoji")]
     public Emoji Emoji { get; set; }
 

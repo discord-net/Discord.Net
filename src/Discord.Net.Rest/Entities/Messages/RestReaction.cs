@@ -17,9 +17,14 @@ namespace Discord.Rest
         public int Count { get; }
 
         /// <summary>
-        ///     Gets whether the reactions is added by the user.
+        ///     Gets whether the reaction is added by the user.
         /// </summary>
         public bool Me { get; }
+
+        /// <summary>
+        ///     Gets whether the super-reaction is added by the user.
+        /// </summary>
+        public bool MeBurst { get; }
 
         /// <summary>
         ///     Gets the number of burst reactions added.
@@ -34,7 +39,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public IReadOnlyCollection<Color> BurstColors { get; }
 
-        internal RestReaction(IEmote emote, int count, bool me, int burst, int normal, IReadOnlyCollection<Color> colors)
+        internal RestReaction(IEmote emote, int count, bool me, int burst, int normal, IReadOnlyCollection<Color> colors, bool meBurst)
         {
             Emote = emote;
             Count = count;
@@ -42,6 +47,7 @@ namespace Discord.Rest
             BurstCount = burst;
             NormalCount = normal;
             BurstColors = colors;
+            MeBurst = meBurst;
         }
         internal static RestReaction Create(Model model)
         {
@@ -55,7 +61,8 @@ namespace Discord.Rest
                 model.Me,
                 model.CountDetails.BurstCount,
                 model.CountDetails.NormalCount,
-                model.Colors.ToReadOnlyCollection());
+                model.Colors.ToReadOnlyCollection(),
+                model.MeBurst);
         }
     }
 }
