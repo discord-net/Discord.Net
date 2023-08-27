@@ -19,7 +19,7 @@ namespace Discord
         public ChannelsTests(RestGuildFixture guildFixture, ITestOutputHelper output)
         {
             guild = guildFixture.Guild;
-            output = output;
+            this.output = output;
             output.WriteLine($"RestGuildFixture using guild: {guild.Id}");
             // capture all console output
             guildFixture.Client.Log += LogAsync;
