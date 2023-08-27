@@ -141,7 +141,7 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="func">A delegate containing the properties to modify the message with.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
-        public async Task Update(Action<MessageProperties> func, RequestOptions options = null)
+        public async Task UpdateAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
             var args = new MessageProperties();
             func(args);
@@ -513,7 +513,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         Task IComponentInteraction.UpdateAsync(Action<MessageProperties> func, RequestOptions options)
-            => Update(func, options);
+            => UpdateAsync(func, options);
 
         /// <inheritdoc />
         Task IComponentInteraction.DeferLoadingAsync(bool ephemeral, RequestOptions options)
