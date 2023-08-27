@@ -3,7 +3,10 @@ using Discord.API.Gateway;
 using Discord.Gateway.Cache;
 using Discord.Gateway.EventProcessors;
 using Discord.Gateway.State;
+using Discord.Logging;
 using Discord.Rest;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Buffers;
 using System.Collections.Concurrent;
@@ -26,6 +29,7 @@ namespace Discord.Gateway
 
         internal DiscordRestClient Rest { get; }
 
+        internal ILogger<DiscordGatewayClient> Logger { get; }
 
         internal readonly ICacheProvider CacheProvider;
         internal readonly IGatewayConnection Connection;
@@ -53,9 +57,11 @@ namespace Discord.Gateway
 
         private int _heartbeatInterval = -1;
 
-
-        public DiscordGatewayClient(DiscordGatewayConfig config)
+        public DiscordGatewayClient(
+            ILogger<DiscordGatewayClient> logger,
+            DiscordGatewayConfig config)
         {
+            Logger = logger;
             _heartbeats = new();
             _gatewayUrl = config.CustomGatewayUrl;
             _token = config.Token;
@@ -72,8 +78,11 @@ namespace Discord.Gateway
             Rest = new DiscordRestClient(config);
             State = new(this, in CacheProvider);
             _lifecycleTask = Task.Run(RunLifecycleAsync);
-
         }
+
+        public DiscordGatewayClient(DiscordGatewayConfig config)
+            : this(NullLogger<DiscordGatewayClient>.Instance, config)
+        { }
 
         private async Task ProcessGatewayMessageAsync(GatewayPayload message)
         {

@@ -24,6 +24,7 @@ namespace Discord.Gateway
         public ArrayPool<byte> BufferPool { get; set; } = ArrayPool<byte>.Shared;
 
         public int MaxClientMessageTimeout { get; set; } = 120000;
+        public byte MaxUnacknowledgedHeartbeats { get; set; } = 3;
 
         public DiscordGatewayConfig(DiscordToken token)
             : base(token)
