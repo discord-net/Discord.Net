@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Gateway
 {
-    public sealed class SocketGuildEmote : SocketCacheableEntity<ulong, IGuildEmoteModel>, IEmote
+    public sealed class GatewayGuildEmote : GatewayCacheableEntity<ulong, IGuildEmoteModel>, IEmote
     {
         public GuildRolesCacheable Roles { get; }
         public GuildMemberCacheable Author { get; }
@@ -36,7 +36,7 @@ namespace Discord.Gateway
 
         private IGuildEmoteModel _source;
 
-        public SocketGuildEmote(DiscordGatewayClient discord, ulong guildId, IGuildEmoteModel model)
+        public GatewayGuildEmote(DiscordGatewayClient discord, ulong guildId, IGuildEmoteModel model)
             : base(discord, model.Id)
         {
             Update(model);

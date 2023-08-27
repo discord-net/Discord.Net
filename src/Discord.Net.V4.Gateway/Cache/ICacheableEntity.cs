@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway.Cache
 {
-    public interface ICacheableEntity<TId, TModel> : ICacheableEntity<TId>, IEntity<TId>, IScopedClonable
+    public interface ICacheableEntity<TId, TModel> : ICacheableEntity<TId>, ICacheUpdatable<TId, TModel>, IEntity<TId>, IScopedClonable
         where TId : IEquatable<TId>
         where TModel : IEntityModel<TId>
     {
         new TModel GetModel();
-
-        void Update(TModel model);
 
         IEntityModel<TId> ICacheableEntity<TId>.GetModel()
             => GetModel();
@@ -25,6 +23,13 @@ namespace Discord.Gateway.Cache
             }
 
             Update(entityModel);
+        }
+
+
+        void ICacheUpdatable<TId, TModel>.Update(TModel model, CacheOperation operation)
+        {
+            if (operation is CacheOperation.Create or CacheOperation.Update)
+                Update(model);
         }
     }
 

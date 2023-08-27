@@ -4,10 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Gateway
 {
-    public sealed class SocketGuildEvent : SocketCacheableEntity<ulong, IGuildEventModel>, IGuildScheduledEvent
+    public sealed class GatewayGuildEvent : GatewayCacheableEntity<ulong, IGuildEventModel>, IGuildScheduledEvent
     {
         public GuildCacheable Guild { get; }
-        public GuildChannelCacheable Channel { get; }
+        public GuildChannelCacheable? Channel { get; private set; }
         public GuildUserCacheable Creator { get; }
 
         public string Name
@@ -48,13 +48,12 @@ namespace Discord.Gateway
 
         private IGuildEventModel _source;
 
-        public SocketGuildEvent(DiscordGatewayClient discord, IGuildEventModel model)
+        public GatewayGuildEvent(DiscordGatewayClient discord, IGuildEventModel model)
             : base(discord, model.Id)
         {
             Update(model);
 
             Guild = new(model.GuildId, discord, discord.State.Guilds.ProvideSpecific(model.GuildId));
-            Channel = new(() => model.ChannelId.ToOptional(), discord, discord.State.GuildChannels.SourceSpecific);
             Creator = new(model.CreatorId, discord, discord.State.Members.ProvideSpecific(model.CreatorId));
         }
 
@@ -62,6 +61,13 @@ namespace Discord.Gateway
         internal override void Update(IGuildEventModel model)
         {
             _source = model;
+
+            Channel = EntityUtils.UpdateCacheableFrom(
+                Discord,
+                Channel,
+                Discord.State.GuildChannels,
+                model.ChannelId, model.GuildId
+            );
         }
 
         public Task DeleteAsync(RequestOptions? options = null) => throw new NotImplementedException();
@@ -74,13 +80,11 @@ namespace Discord.Gateway
         internal override object Clone() => throw new NotImplementedException();
         internal override void DisposeClone() => throw new NotImplementedException();
 
-        IGuild? IGuildScheduledEvent.Guild => Guild.Value;
+        IEntitySource<IGuild, ulong> IGuildScheduledEvent.Guild => Guild;
 
-        ulong IGuildScheduledEvent.GuildId => Guild.Id.Value;
+        IEntitySource<IGuildUser, ulong> IGuildScheduledEvent.Creator => Creator;
 
-        ulong? IGuildScheduledEvent.ChannelId => Channel.Id.ToNullable();
-
-        IUser? IGuildScheduledEvent.Creator => Creator.Value;
+        IEntitySource<IGuildChannel, ulong>? IGuildScheduledEvent.Channel => Channel;
     }
 }
 

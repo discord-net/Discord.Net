@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public abstract class SocketCacheableEntity<TId, TModel> : SocketCacheableEntity<TId>, ICacheableEntity<TId, TModel>
+    public abstract class GatewayCacheableEntity<TId, TModel> : GatewayCacheableEntity<TId>, ICacheableEntity<TId, TModel>
         where TId : IEquatable<TId>
         where TModel : IEntityModel<TId>
     {
         protected abstract TModel Model { get; }
 
-        internal SocketCacheableEntity(DiscordGatewayClient discord, TId id)
+        internal GatewayCacheableEntity(DiscordGatewayClient discord, TId id)
             : base(discord, id)
         {
         }
@@ -36,12 +36,12 @@ namespace Discord.Gateway
         void ICacheableEntity<TId, TModel>.Update(TModel model) => Update(model);
     }
 
-    public abstract class SocketCacheableEntity<TId> : SocketEntity<TId>, ICacheableEntity<TId>
+    public abstract class GatewayCacheableEntity<TId> : GatewayEntity<TId>, ICacheableEntity<TId>
         where TId : IEquatable<TId>
     {
         internal readonly HashSet<IEntityHandle> Handles;
 
-        internal SocketCacheableEntity(DiscordGatewayClient discord, TId id)
+        internal GatewayCacheableEntity(DiscordGatewayClient discord, TId id)
             : base(discord, id)
         {
             Handles = new();
@@ -53,7 +53,7 @@ namespace Discord.Gateway
         internal void DereferenceHandle(IEntityHandle handle)
             => Handles.Remove(handle);
 
-        ~SocketCacheableEntity()
+        ~GatewayCacheableEntity()
         {
             Dispose();
         }

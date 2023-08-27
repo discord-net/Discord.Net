@@ -3,34 +3,39 @@ using System;
 
 namespace Discord.Gateway
 {
-    public sealed class SocketStageChannel : SocketVoiceChannel, IStageChannel
+    public sealed class GatewayStageChannel : GatewayVoiceChannel, IStageChannel, ICacheUpdatable<ulong, IStageInstanceModel>
     {
-        public IStageInstance StageInstance => throw new NotImplementedException();
+        public GuildStageInstanceCacheable? Instance { get; private set; }
 
-        public SocketStageChannel(DiscordGatewayClient discord, ulong guildId, IGuildVoiceChannelModel model)
+        public GatewayStageChannel(DiscordGatewayClient discord, ulong guildId, IGuildVoiceChannelModel model)
             : base(discord, guildId, model)
         {
+
         }
 
-        public async ValueTask<SocketStageInstance?> GetStageInstance(CancellationToken token = default)
+        internal void Update(IStageInstanceModel model, CacheOperation operation)
         {
-            var guild = await Guild.GetAsync(token);
+            // new model channel id isn't ours
+            if (Instance is not null && operation is CacheOperation.Update && model.ChannelId != Id)
+            {
+                Instance = null;
+                return;
+            }
 
-            if (guild is null)
-                return null;
+            // the model isn't for us
+            if (model.ChannelId != Id)
+                return;
 
-            return (await guild.StageInstances.FlattenAsync(token)).FirstOrDefault(x => x?.ChannelId == Id);
-        }
-
-        public async ValueTask<IStageInstance?> GetOrFetchStageInstance(RequestOptions? options = null, CancellationToken token = default)
-        {
-            var cachedInstance = await GetStageInstance(token);
-
-            if (cachedInstance is not null)
-                return cachedInstance;
-
-            // TODO: REST impl
-            return null;
+            // if our instance cacheable is null and the models channel id points to us.
+            if (Instance is null && operation is CacheOperation.Create or CacheOperation.Update)
+            {
+                Instance = new GuildStageInstanceCacheable(model.Id, Guild.Id, Discord, Discord.State.StageInstances.ProvideSpecific(model.Id, Guild.Id));
+            }
+            // if the operation was a delete and we still hold the instance
+            else if (operation is CacheOperation.Delete && Instance is not null)
+            {
+                Instance = null;
+            }
         }
 
         public Task BecomeSpeakerAsync(RequestOptions? options = null) => throw new NotImplementedException();
@@ -41,6 +46,11 @@ namespace Discord.Gateway
         public Task<IStageInstance> StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, bool sendStartNotification = false, RequestOptions? options = null) => throw new NotImplementedException();
         public Task StopSpeakingAsync(RequestOptions? options = null) => throw new NotImplementedException();
         public Task StopStageAsync(RequestOptions? options = null) => throw new NotImplementedException();
+
+        void ICacheUpdatable<ulong, IStageInstanceModel>.Update(IStageInstanceModel model, CacheOperation operation)
+            => Update(model, operation);
+
+        IEntitySource<IStageInstance, ulong>? IStageChannel.StageInstance => throw new NotImplementedException();
     }
 }
 

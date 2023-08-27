@@ -7,7 +7,7 @@ namespace Discord.Gateway
 {
     public sealed class CacheableCollection<TCacheable, TId, TGateway> : IEntityEnumerableSource<TGateway, TId>
         where TCacheable : Cacheable<TId, TGateway>, IEntitySource<TGateway, TId>
-        where TGateway : SocketCacheableEntity<TId>
+        where TGateway : GatewayCacheableEntity<TId>
         where TId : IEquatable<TId>
     {
         public async ValueTask<IReadOnlyCollection<TId>> GetIdsAsync(CancellationToken token = default)

@@ -23,7 +23,7 @@ namespace Discord.Gateway
 
 
         internal SocketGuildChannel(DiscordGatewayClient discord, ulong guildId, IGuildChannelModel model)
-            : base(discord, model.Id, model)
+            : base(discord, model)
         {
             Guild = new(guildId, discord, discord.State.Guilds.ProvideSpecific(guildId));
         }

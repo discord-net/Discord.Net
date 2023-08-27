@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public abstract class SocketMessage : SocketCacheableEntity<ulong, IMessageModel>, IMessage
+    public abstract class GatewayMessage : GatewayCacheableEntity<ulong, IMessageModel>, IMessage
     {
         public MessageChannelCacheable Channel { get; }
 
@@ -93,7 +93,7 @@ namespace Discord.Gateway
 
         private IMessageModel _source;
 
-        public SocketMessage(DiscordGatewayClient discord, IMessageModel model)
+        public GatewayMessage(DiscordGatewayClient discord, IMessageModel model)
             : base(discord, model.Id)
         {
             Update(model);

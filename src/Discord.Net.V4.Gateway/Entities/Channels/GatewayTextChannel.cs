@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Gateway
 {
-    public class SocketTextChannel : SocketGuildChannel, ITextChannel, ISocketNestedChannel
+    public class GatewayTextChannel : SocketGuildChannel, ITextChannel, ISocketNestedChannel
     {
         public bool IsNsfw
             => _source.IsNsfw;
@@ -25,8 +25,7 @@ namespace Discord.Gateway
         public ulong? CategoryId
             => _source.Parent;
 
-        public GuildChannelCacheable Parent { get; }
-
+        public GuildChannelCacheable? Category { get; private set; }
 
         protected override IGuildTextChannelModel Model
             => _source;
@@ -35,27 +34,32 @@ namespace Discord.Gateway
 
         private IGuildTextChannelModel _source;
 
-        public SocketTextChannel(DiscordGatewayClient discord, ulong guildId, IGuildTextChannelModel model)
+        public GatewayTextChannel(DiscordGatewayClient discord, ulong guildId, IGuildTextChannelModel model)
             : base(discord, guildId, model)
         {
             Update(model);
-
-            Parent = new(() => _source.Parent.ToOptional(), Discord, discord.State.GuildChannels.SourceSpecific);
         }
 
         [MemberNotNull(nameof(_source))]
         internal void Update(IGuildTextChannelModel model)
         {
             _source = model;
+
+            Category = EntityUtils.UpdateCacheableFrom(
+                Discord,
+                Category,
+                Discord.State.GuildChannels,
+                model.Parent,
+                Guild.Id
+            );
         }
 
         internal override void Update(IChannelModel model)
         {
-            if(model is IGuildTextChannelModel guildTextChannelModel)
-            {
-                Update(guildTextChannelModel);
-            }
+            if (model is IGuildChannelModel gcm)
+                Update(gcm);
         }
+
 
         public Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions? options = null) => throw new NotImplementedException();
@@ -89,7 +93,9 @@ namespace Discord.Gateway
         
         internal override object Clone() => throw new NotImplementedException();
         internal override void DisposeClone() => throw new NotImplementedException();
-        public Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null) => throw new NotImplementedException();
+        public Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions? options = null) => throw new NotImplementedException();
+
+        IEntitySource<ICategoryChannel, ulong>? INestedChannel.Category => Category; // TODO: category cacheable
     }
 }
 

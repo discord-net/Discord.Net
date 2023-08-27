@@ -4,17 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Gateway
 {
-    public sealed class SocketStageInstance : SocketCacheableEntity<ulong, IStageInstanceModel>, IStageInstance
+    public sealed class GatewayStageInstance : GatewayCacheableEntity<ulong, IStageInstanceModel>, IStageInstance
     {
         public GuildCacheable Guild { get; }
+
         public GuildChannelCacheable Channel { get; }
-
-
-        public ulong GuildId
-            => _source.GuildId;
-
-        public ulong ChannelId
-            => _source.ChannelId;
 
         public string Topic
             => _source.Topic;
@@ -33,7 +27,7 @@ namespace Discord.Gateway
 
         private IStageInstanceModel _source;
 
-        public SocketStageInstance(DiscordGatewayClient discord, IStageInstanceModel model)
+        public GatewayStageInstance(DiscordGatewayClient discord, IStageInstanceModel model)
             : base(discord, model.Id)
         {
             Update(model);
@@ -53,6 +47,10 @@ namespace Discord.Gateway
         public Task StopAsync(RequestOptions? options = null) => throw new NotImplementedException();
         internal override object Clone() => throw new NotImplementedException();
         internal override void DisposeClone() => throw new NotImplementedException();
+
+        IEntitySource<IGuild, ulong> IStageInstance.Guild => Guild;
+
+        IEntitySource<IGuildChannel, ulong> IStageInstance.Channel => Channel;
     }
 }
 

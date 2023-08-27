@@ -31,12 +31,12 @@ namespace Discord
         /// <remarks>
         ///     This field is <see langword="null" /> when the event doesn't have a description.
         /// </remarks>
-        string Description { get; }
+        string? Description { get; }
 
         /// <summary>
         ///     Gets the banner asset id of the event.
         /// </summary>
-        string CoverImageId { get; }
+        string? CoverImageId { get; }
 
         /// <summary>
         ///     Gets the start time of the event.
@@ -72,7 +72,7 @@ namespace Discord
         /// <summary>
         ///     Gets the location of the event if the <see cref="Type"/> is external.
         /// </summary>
-        string Location { get; }
+        string? Location { get; }
 
         /// <summary>
         ///     Gets the user count of the event.

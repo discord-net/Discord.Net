@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Discord.Gateway
 {
-    public sealed class SocketRole : SocketCacheableEntity<ulong, IRoleModel>, IRole
+    public sealed class GatewayRole : GatewayCacheableEntity<ulong, IRoleModel>, IRole
     {
         public GuildCacheable Guild { get; }
 
@@ -42,6 +42,9 @@ namespace Discord.Gateway
         public RoleTags Tags
             => _tags;
 
+        public RoleFlags Flags
+            => _source.Flags;
+
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(Id);
 
@@ -56,7 +59,7 @@ namespace Discord.Gateway
         private RoleTags _tags;
         private int _tagsVersion;
 
-        internal SocketRole(DiscordGatewayClient discord, ulong id, ulong guildId, IRoleModel model)
+        internal GatewayRole(DiscordGatewayClient discord, ulong id, ulong guildId, IRoleModel model)
             : base(discord, id)
         {
             Guild = new(guildId, discord, discord.State.Guilds.ProvideSpecific(guildId));
@@ -98,7 +101,7 @@ namespace Discord.Gateway
         public string GetIconUrl() => throw new NotImplementedException();
         public Task ModifyAsync(Action<RoleProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
 
-        IGuild? IRole.Guild => Guild.Value;
+        IEntitySource<IGuild, ulong> IRole.Guild => Guild;
     }
 }
 

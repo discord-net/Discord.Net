@@ -6,14 +6,6 @@ namespace Discord;
 public interface ISticker : IStickerItem
 {
     /// <summary>
-    ///     Gets the ID of this sticker.
-    /// </summary>
-    /// <returns>
-    ///     A snowflake ID associated with this sticker.
-    /// </returns>
-    new ulong Id { get; }
-
-    /// <summary>
     ///     Gets the ID of the pack of this sticker.
     /// </summary>
     /// <returns>
@@ -22,20 +14,12 @@ public interface ISticker : IStickerItem
     ulong? PackId { get; }
 
     /// <summary>
-    ///     Gets the name of this sticker.
-    /// </summary>
-    /// <returns>
-    ///     A <see langword="string"/> with the name of this sticker.
-    /// </returns>
-    new string Name { get; }
-
-    /// <summary>
     ///     Gets the description of this sticker.
     /// </summary>
     /// <returns>
     ///     A <see langword="string"/> with the description of this sticker.
     /// </returns>
-    string Description { get; }
+    string? Description { get; }
 
     /// <summary>
     ///     Gets the list of tags of this sticker.
@@ -51,14 +35,6 @@ public interface ISticker : IStickerItem
     StickerType Type { get; }
 
     /// <summary>
-    ///     Gets the format type of this sticker.
-    /// </summary>
-    /// <returns>
-    ///     A <see cref="StickerFormatType"/> with the format type of this sticker.
-    /// </returns>
-    new StickerFormatType Format { get; }
-
-    /// <summary>
     ///     Gets whether this guild sticker can be used, may be false due to loss of Server Boosts.
     /// </summary>
     bool? IsAvailable { get; }
@@ -67,11 +43,6 @@ public interface ISticker : IStickerItem
     ///     Gets the standard sticker's sort order within its pack.
     /// </summary>
     int? SortOrder { get; }
-
-    /// <summary>
-    ///     Gets the user that uploaded the guild sticker.
-    /// </summary>
-    IEntitySource<IUser, ulong>? User { get; }
 
     /// <summary>
     ///     Gets the image url for this sticker.

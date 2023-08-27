@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public sealed class SocketPresense : SocketCacheableEntity<ulong, IPresenseModel>, IPresence
+    public sealed class GatewayPresense : GatewayCacheableEntity<ulong, IPresenseModel>, IPresence
     {
         public UserStatus Status
             => _source.Status;
@@ -17,9 +17,12 @@ namespace Discord.Gateway
 
         public IReadOnlyCollection<IActivity> Activities => throw new NotImplementedException(); // TODO: model -> activity
 
+        protected override IPresenseModel Model
+            => _source;
+
         private IPresenseModel _source;
 
-        public SocketPresense(DiscordGatewayClient discord, IPresenseModel model)
+        public GatewayPresense(DiscordGatewayClient discord, IPresenseModel model)
             : base(discord, model.UserId)
         {
             _source = model;

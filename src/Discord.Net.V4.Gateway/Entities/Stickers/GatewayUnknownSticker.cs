@@ -10,7 +10,7 @@ namespace Discord.Gateway
     ///     Represents an unknown sticker received over the gateway.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketUnknownSticker : SocketSticker
+    public class GatewayUnknownSticker : GatewaySticker
     {
         /// <inheritdoc/>
         public override IReadOnlyCollection<string> Tags
@@ -36,7 +36,7 @@ namespace Discord.Gateway
         public new StickerType? Type
             => null;
 
-        internal SocketUnknownSticker(DiscordGatewayClient client, ulong id, IStickerModel model)
+        internal GatewayUnknownSticker(DiscordGatewayClient client, ulong id, IStickerModel model)
             : base(client, id, model) { }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Discord.Gateway
         /// <returns>
         ///     The sticker representing this unknown stickers Id, if none is found then <see langword="null" />.
         /// </returns>
-        public Task<SocketSticker?> ResolveAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null)
+        public Task<GatewaySticker?> ResolveAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null)
             => throw new NotImplementedException();
 
         private new string DebuggerDisplay => $"{Name} ({Id})";

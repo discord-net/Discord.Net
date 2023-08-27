@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public abstract class SocketChannel : SocketCacheableEntity<ulong, IChannelModel>, IChannel
+    public abstract class SocketChannel : GatewayCacheableEntity<ulong, IChannelModel>, IChannel
     {
         public string Name
             => Model.Name;

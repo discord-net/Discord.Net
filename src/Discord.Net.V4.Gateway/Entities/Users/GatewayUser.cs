@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public class SocketUser : SocketCacheableEntity<ulong, IUserModel>, IUser
+    public class GatewayUser : GatewayCacheableEntity<ulong, IUserModel>, IUser
     {
         public string? AvatarId
             => _source.AvatarHash;
@@ -41,9 +41,12 @@ namespace Discord.Gateway
 
         public virtual bool IsWebhook { get => false; }
 
+        protected override IUserModel Model
+            => _source;
+
         private IUserModel _source;
 
-        internal SocketUser(DiscordGatewayClient client, IUserModel model)
+        internal GatewayUser(DiscordGatewayClient client, IUserModel model)
             : base(client, model.Id)
         {
             _source = model;

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public class SocketGuild : SocketCacheableEntity<ulong, IGuildModel>, IGuild
+    public class GatewayGuild : GatewayCacheableEntity<ulong, IGuildModel>, IGuild
     {
         protected override IGuildModel Model
             => _source;
@@ -168,7 +168,7 @@ namespace Discord.Gateway
         private IGuildModel _source;
         private GuildFeatures _features;
 
-        internal SocketGuild(DiscordGatewayClient discord, ulong id, IGuildModel model) : base(discord, id)
+        internal GatewayGuild(DiscordGatewayClient discord, ulong id, IGuildModel model) : base(discord, id)
         {
             _source = model;
             _features = new GuildFeatures(model.Features, model.ExperimentalFeatures);

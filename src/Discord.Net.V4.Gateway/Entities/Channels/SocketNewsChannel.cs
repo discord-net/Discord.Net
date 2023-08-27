@@ -2,7 +2,7 @@ using Discord.Gateway.Cache;
 using System;
 namespace Discord.Gateway
 {
-    public sealed class SocketNewsChannel : SocketTextChannel, INewsChannel
+    public sealed class SocketNewsChannel : GatewayTextChannel, INewsChannel
     {
         public SocketNewsChannel(DiscordGatewayClient discord, ulong guildId, IGuildTextChannelModel model)
             : base(discord, guildId, model)

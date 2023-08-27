@@ -15,7 +15,7 @@ namespace Discord
         /// <remarks>
         ///     This property can be <see langword="null" />.
         /// </remarks>
-        string RTCRegion { get; }
+        string? RTCRegion { get; }
 
         /// <summary>
         ///     Connects to this audio channel.

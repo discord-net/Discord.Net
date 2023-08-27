@@ -24,7 +24,7 @@ namespace Discord
         /// <returns>
         ///     A string representing the topic set in the channel; <see langword="null" /> if none is set.
         /// </returns>
-        string Topic { get; }
+        string? Topic { get; }
 
         /// <summary>
         ///     Gets the current slow-mode delay for this channel.

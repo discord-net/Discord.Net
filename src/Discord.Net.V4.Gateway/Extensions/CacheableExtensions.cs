@@ -11,7 +11,7 @@ namespace Discord.Gateway
             this CacheableCollection<Cacheable<TId, TGateway, TRest, TCommon>, TId, TGateway> cacheable,
             CancellationToken token = default
         )
-            where TGateway : SocketCacheableEntity<TId>, TCommon
+            where TGateway : GatewayCacheableEntity<TId>, TCommon
             where TRest : IEntity<TId>, TCommon // TODO: RestEntity<TId>
             where TCommon : IEntity<TId>
             where TId : IEquatable<TId>
@@ -25,7 +25,7 @@ namespace Discord.Gateway
             this CacheableCollection<Cacheable<TId, TGateway, TRest, TCommon>, TId, TGateway> cacheable,
             CancellationToken token = default
         )
-            where TGateway : SocketCacheableEntity<TId>, TCommon
+            where TGateway : GatewayCacheableEntity<TId>, TCommon
             where TRest : IEntity<TId>, TCommon // TODO: RestEntity<TId>
             where TCommon : IEntity<TId>
             where TId : IEquatable<TId>
@@ -39,7 +39,7 @@ namespace Discord.Gateway
             this CacheableCollection<Cacheable<TId, TGateway, TRest, TCommon>, TId, TGateway> cacheable,
             CancellationToken token = default
         )
-            where TGateway : SocketCacheableEntity<TId>, TCommon
+            where TGateway : GatewayCacheableEntity<TId>, TCommon
             where TRest : IEntity<TId>, TCommon // TODO: RestEntity<TId>
             where TCommon : IEntity<TId>
             where TId : IEquatable<TId>

@@ -21,8 +21,11 @@ namespace Discord.Gateway.State
 
         public HashSet<Guid> Handles { get; }
 
-        public EntityReference(object entity)
+        public IEntityBroker Broker { get; }
+
+        public EntityReference(object entity, IEntityBroker broker)
         {
+            Broker = broker;
             Reference = new WeakReference(entity);
             Handles = new();
         }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public abstract class SocketEntity<T> : IEntity<T>
+    public abstract class GatewayEntity<T> : IEntity<T>
         where T : IEquatable<T>
     {
         internal DiscordGatewayClient Discord { get; }
@@ -14,7 +14,7 @@ namespace Discord.Gateway
         /// <inheritdoc />
         public T Id { get; }
 
-        internal SocketEntity(DiscordGatewayClient discord, T id)
+        internal GatewayEntity(DiscordGatewayClient discord, T id)
         {
             Discord = discord;
             Id = id;

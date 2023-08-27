@@ -28,7 +28,7 @@ public interface IGuildUser : IUser, IVoiceState
     /// <returns>
     ///     A string representing the nickname of the user; <see langword="null" /> if none is set.
     /// </returns>
-    string Nickname { get; }
+    string? Nickname { get; }
 
     /// <summary>
     ///     Gets the displayed avatar for this user.
@@ -37,7 +37,7 @@ public interface IGuildUser : IUser, IVoiceState
     ///     The users displayed avatar hash. If the user does not have a guild avatar, this will be the regular avatar.
     ///     If the user also does not have a regular avatar, this will be <see langword="null" />.
     /// </returns>
-    string DisplayAvatarId { get; }
+    string? DisplayAvatarId { get; }
 
     /// <summary>
     ///     Gets the guild specific avatar for this user.
@@ -45,7 +45,7 @@ public interface IGuildUser : IUser, IVoiceState
     /// <returns>
     ///     The users guild avatar hash if they have one; otherwise <see langword="null" />.
     /// </returns>
-    string GuildAvatarId { get; }
+    string? GuildAvatarId { get; }
 
     /// <summary>
     ///     Gets the guild-level permissions for this user.

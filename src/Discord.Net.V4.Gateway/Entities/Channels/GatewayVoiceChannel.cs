@@ -4,7 +4,7 @@ using System;
 
 namespace Discord.Gateway
 {
-    public class SocketVoiceChannel : SocketTextChannel, IVoiceChannel, ISocketNestedChannel
+    public class GatewayVoiceChannel : GatewayTextChannel, IVoiceChannel, ISocketNestedChannel
     {
         public int Bitrate
             => _source.Bitrate;
@@ -23,7 +23,7 @@ namespace Discord.Gateway
 
         private IGuildVoiceChannelModel _source;
 
-        public SocketVoiceChannel(DiscordGatewayClient discord, ulong guildId, IGuildVoiceChannelModel model)
+        public GatewayVoiceChannel(DiscordGatewayClient discord, ulong guildId, IGuildVoiceChannelModel model)
             : base(discord, guildId, model)
         {
             _source = model;

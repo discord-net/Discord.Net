@@ -124,7 +124,7 @@ namespace Discord.Gateway
                 case GatewayOpCode.VoiceStateUpdate:
                 case GatewayOpCode.PresenceUpdate:
                 case GatewayOpCode.Identify:
-                    // TODO: log that we attempted to process outbound message
+                    Logger.LogWarning("Attempted to process the outbound message {Message}, ignoring.", message.Operation);
                     break;
             }
         }

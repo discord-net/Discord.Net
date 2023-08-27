@@ -1,3 +1,4 @@
+using Discord.API;
 using Discord.Gateway.Cache;
 using System;
 using System.Collections.Generic;
@@ -8,11 +9,9 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public sealed class SocketGuildUser : SocketUser, ICacheableEntity<ulong, IMemberModel>, IGuildUser
+    public sealed class GatewayGuildUser : GatewayUser, ICacheableEntity<ulong, IMemberModel>, IGuildUser
     {
-        public ulong GuildId { get; }
-
-        // TODO: guild cacheable
+        public GuildCacheable Guild { get; }
 
         public DateTimeOffset? JoinedAt
             => _source.JoinedAt;
@@ -29,6 +28,9 @@ namespace Discord.Gateway
         public string? GuildAvatarId
             => _source.GuildAvatar;
 
+        public GuildUserFlags Flags
+            => _source.Flags;
+
         public GuildPermissions GuildPermissions
             => default!; // TODO: resolve guild
 
@@ -37,7 +39,7 @@ namespace Discord.Gateway
             => _source.PremiumSince;
 
         public IReadOnlyCollection<ulong> RoleIds
-            => _source.Roles.ToImmutableArray();
+            => _source.RoleIds.ToImmutableArray();
 
         public bool? IsPending
             => _source.IsPending;
@@ -71,10 +73,10 @@ namespace Discord.Gateway
 
         private IMemberModel _source;
 
-        internal SocketGuildUser(DiscordGatewayClient client, ulong guildId, IMemberModel model, IUserModel user)
+        internal GatewayGuildUser(DiscordGatewayClient client, ulong guildId, IMemberModel model, IUserModel user)
             : base(client, user)
         {
-            GuildId = guildId;
+            Guild = new(guildId, client, client.State.Guilds.ProvideSpecific(guildId));
             _source = model;
         }
 
@@ -112,5 +114,9 @@ namespace Discord.Gateway
             else if (model is IUserModel user)
                 base.Update(user);
         }
+
+        IEntitySource<IGuild, ulong> IGuildUser.Guild => Guild;
+
+        IEntitySource<IVoiceChannel, ulong> IVoiceState.VoiceChannel => throw new NotImplementedException();
     }
 }

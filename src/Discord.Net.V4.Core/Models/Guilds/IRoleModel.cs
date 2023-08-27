@@ -12,6 +12,8 @@ public interface IRoleModel : IEntityModel<ulong>
     bool IsManaged { get; }
     bool IsMentionable { get; }
 
+    RoleFlags Flags { get; }
+
     // tags
     ulong? BotId { get; }
     ulong? IntegrationId { get; }

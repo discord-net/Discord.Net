@@ -10,7 +10,7 @@ namespace Discord.Gateway
     ///     Represents a custom sticker within a guild received over the gateway.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketCustomSticker : SocketSticker, ICustomSticker
+    public class GatewayCustomSticker : GatewaySticker, ICustomSticker
     {
         #region SocketCustomSticker
         /// <summary>
@@ -29,14 +29,10 @@ namespace Discord.Gateway
         /// </summary>
         public GuildCacheable Guild { get; }
 
-        /// <inheritdoc/>
-        public ulong? AuthorId { get; set; }
-
-        internal SocketCustomSticker(DiscordGatewayClient client, IStickerModel model, ulong guildId)
+        internal GatewayCustomSticker(DiscordGatewayClient client, IStickerModel model, ulong guildId)
             : base(client, model)
         {
             Guild = new(guildId, Discord, Discord.State.Guilds.ProvideSpecific(guildId));
-            AuthorId = model.AuthorId;
             Author = model.AuthorId.HasValue
                 ? new(model.AuthorId.Value, Discord, Discord.State.Members.ProvideSpecific(model.AuthorId.Value))
                 : null;
@@ -54,11 +50,10 @@ namespace Discord.Gateway
         #endregion
 
         #region  ICustomSticker
-        ulong? ICustomSticker.AuthorId
-            => AuthorId;
 
-        IGuild ICustomSticker.Guild
-            => Guild;
+        IEntitySource<IGuild, ulong> ICustomSticker.Guild => Guild;
+
+        IEntitySource<IGuildUser, ulong>? ICustomSticker.Author => Author;
         #endregion
     }
 }

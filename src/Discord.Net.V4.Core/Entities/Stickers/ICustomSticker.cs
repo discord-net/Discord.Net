@@ -6,12 +6,9 @@ namespace Discord;
 public interface ICustomSticker : ISticker
 {
     /// <summary>
-    ///     Gets the users id who uploaded the sticker.
+    ///     Gets the user that uploaded the guild sticker.
     /// </summary>
-    /// <remarks>
-    ///     In order to get the author id, the bot needs the MANAGE_EMOJIS_AND_STICKERS permission.
-    /// </remarks>
-    ulong? AuthorId { get; }
+    IEntitySource<IGuildUser, ulong>? Author { get; }
 
     /// <summary>
     ///     Gets the guild that this custom sticker is in.

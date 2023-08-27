@@ -30,8 +30,6 @@ namespace Discord.Gateway.State
         public delegate ValueTask<TEntity> EntityFactory(TFactoryArgs? args, Optional<TId> parent, TModel model, CancellationToken token);
         public delegate ValueTask<IEntityStore<TId>> StoreFactory(Optional<TId> parent, CancellationToken token);
 
-        private readonly ConcurrentDictionary<TId, EntityReference> _referenceCache;
-
         private readonly StoreFactory _getStore;
         private readonly StateController _controller;
         private readonly EntityFactory _factory;
@@ -46,7 +44,6 @@ namespace Discord.Gateway.State
             CreateEntityFactoryArguments? argsFactory = null)
         {
             _cleanupSemaphore = new(1, 1);
-            _referenceCache = new();
             _getStore = getStore;
             _controller = controller;
             _factory = factory;
@@ -58,7 +55,7 @@ namespace Discord.Gateway.State
 
         public bool TryGetReferenced(TId id, [NotNullWhen(true)] out TEntity? entity)
         {
-            if(_referenceCache.TryGetValue(id, out var entityRef))
+            if(_controller.TryGetReference(id, out var entityRef))
             {
                 if(entityRef.Reference.IsAlive && entityRef.Reference.Target is not null)
                 {
@@ -71,29 +68,9 @@ namespace Discord.Gateway.State
             return false;
         }
 
-        private async Task<TEntity?> TryGetInScopeAsync(TId id, CancellationToken token)
-        {
-            // wait for any cleanup of the reference cache
-            await _cleanupSemaphore.WaitAsync(token);
-
-            try
-            {
-                if(_referenceCache.TryGetValue(id, out var entityReference) && entityReference.Reference.IsAlive && entityReference.Reference.Target is TEntity entity)
-                {
-                    return entity;
-                }
-
-                return null;
-            }
-            finally
-            {
-                _cleanupSemaphore.Release();
-            }
-        }
-
         #region CreateAsync
         public async ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(TModel model, CancellationToken token = default)
-            => await CreateAsync(model, await _argsFactory(model.Id, Optional<TId>.Unspecified, token), Optional<TId>.Unspecified);
+            => await CreateAsync(model, await _argsFactory(model.Id, Optional<TId>.Unspecified, token), Optional<TId>.Unspecified, token);
 
         public async ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(TModel model, Optional<TId> parent, CancellationToken token = default)
             => await CreateAsync(model, await _argsFactory(model.Id, parent, token), parent, token);
@@ -106,12 +83,10 @@ namespace Discord.Gateway.State
             var store = await _getStore(parent, token);
 
             // if we have the entity in scope already, get it, create a new handle, and update the entity
-            var existing = await TryGetInScopeAsync(model.Id, token);
-
-            if(existing is not null)
+            if(TryGetReferenced(model.Id, out var existing))
             {
                 var handle = _controller.AllocateHandle(store, existing);
-                existing.Update(model);
+                _controller.UpdateActiveEntities<TId, TModel>(CacheOperation.Update, model);
                 return handle;
             }
 
@@ -134,9 +109,7 @@ namespace Discord.Gateway.State
         {
             var store = await _getStore(parent, token);
 
-            var existing = await TryGetInScopeAsync(id, token);
-
-            if(existing is not null)
+            if(TryGetReferenced(id, out var existing))
             {
                 return _controller.AllocateHandle(store, existing);
             }
@@ -200,7 +173,13 @@ namespace Discord.Gateway.State
         private async ValueTask<IEntityHandle<TId, TEntity>> CreateAndAllocateHandle(IEntityStore<TId> store, Optional<TId> parent, TFactoryArgs? args, TModel model, CancellationToken token = default)
         {
             var handle = _controller.AllocateHandle(store, await _factory(args, parent, model, token));
-            _ = _referenceCache.GetOrAdd(model.Id, CreateTrackedReference, handle);
+
+            _controller.AddOrUpdateReference(
+                model.Id,
+                () => CreateTrackedReference(model.Id, handle),
+                old => old.Handles.Add(handle.HandleId)
+            );
+
             return handle;
         }
 
@@ -208,37 +187,11 @@ namespace Discord.Gateway.State
         {
             var entity = handle.Entity ?? throw new NullReferenceException("Entity was null from a fresh handle");
 
-            var reference = new EntityReference(entity);
+            var reference = new EntityReference(entity, this);
 
             reference.RegisterHandle(handle);
 
             return reference;
-        }
-
-        public async Task CleanAsync(CancellationToken token)
-        {
-            await _cleanupSemaphore.WaitAsync(token);
-
-            try
-            {
-                foreach (var entity in _referenceCache.ToArray())
-                {
-                    if (!entity.Value.Reference.IsAlive)
-                    {
-                        // cleanup any handles
-                        if (entity.Value.HandleReferenceCount > 0)
-                        {
-                            await _controller.FreeHandles(entity.Value.Handles);
-                        }
-
-                        _referenceCache.Remove(entity.Key, out _);
-                    }
-                }
-            }
-            finally
-            {
-                _cleanupSemaphore.Release();
-            }
         }
     }
 
@@ -257,6 +210,5 @@ namespace Discord.Gateway.State
 
     internal interface IEntityBroker
     {
-        Task CleanAsync(CancellationToken token);
     }
 }
