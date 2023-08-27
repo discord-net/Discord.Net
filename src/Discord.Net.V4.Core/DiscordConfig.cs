@@ -140,6 +140,8 @@ public class DiscordConfig
     /// </summary>
     public const int MaxEmbedsPerMessage = 10;
 
+    public required DiscordToken Token { get; set; }
+
     /// <summary>
     ///     Gets or sets how a request should act in the case of an error, by default.
     /// </summary>
@@ -154,7 +156,7 @@ public class DiscordConfig
     /// <remarks>
     ///     This property is mutually exclusive with <see cref="RequestOptions.RatelimitCallback"/>.
     /// </remarks>
-    public Func<IRateLimitInfo, Task> DefaultRatelimitCallback { get; set; }
+    public Func<IRateLimitInfo, Task>? DefaultRatelimitCallback { get; set; }
 
     /// <summary>
     ///     Gets or sets the minimum log level severity that will be sent to the Log event.
