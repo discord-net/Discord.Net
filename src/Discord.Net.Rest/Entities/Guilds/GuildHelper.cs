@@ -1,11 +1,13 @@
 using Discord.API;
 using Discord.API.Rest;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 using ImageModel = Discord.API.Image;
 using Model = Discord.API.Guild;
 using RoleModel = Discord.API.Role;
@@ -16,7 +18,7 @@ namespace Discord.Rest
     internal static class GuildHelper
     {
         #region General
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null" />.</exception>
         public static async Task<Model> ModifyAsync(IGuild guild, BaseDiscordClient client,
             Action<GuildProperties> func, RequestOptions options)
         {
@@ -90,7 +92,7 @@ namespace Discord.Rest
 
             return await client.ApiClient.ModifyGuildAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null" />.</exception>
         public static async Task<WidgetModel> ModifyWidgetAsync(IGuild guild, BaseDiscordClient client,
             Action<GuildWidgetProperties> func, RequestOptions options)
         {
@@ -230,7 +232,7 @@ namespace Discord.Rest
             var models = await client.ApiClient.GetGuildChannelsAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestGuildChannel.Create(client, guild, x)).ToImmutableArray();
         }
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestTextChannel> CreateTextChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<TextChannelProperties> func = null)
         {
@@ -261,7 +263,7 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
         }
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestVoiceChannel> CreateVoiceChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<VoiceChannelProperties> func = null)
         {
@@ -320,7 +322,7 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestStageChannel.Create(client, guild, model);
         }
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<GuildChannelProperties> func = null)
         {
@@ -348,7 +350,7 @@ namespace Discord.Rest
             return RestCategoryChannel.Create(client, guild, model);
         }
 
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestForumChannel> CreateForumChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<ForumChannelProperties> func = null)
         {
@@ -376,7 +378,7 @@ namespace Discord.Rest
                 AvailableTags = props.Tags.GetValueOrDefault(Array.Empty<ForumTagProperties>()).Select(
                     x => new ModifyForumTagParams
                     {
-                        Id = x.Id,
+                        Id = x.Id ?? Optional<ulong>.Unspecified,
                         Name = x.Name,
                         EmojiId = x.Emoji is Emote emote
                             ? emote.Id
@@ -466,7 +468,7 @@ namespace Discord.Rest
         #endregion
 
         #region Roles
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
             string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options)
         {
@@ -685,7 +687,7 @@ namespace Discord.Rest
             var emote = await client.ApiClient.CreateGuildEmoteAsync(guild.Id, apiargs, options).ConfigureAwait(false);
             return emote.ToEntity();
         }
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null" />.</exception>
         public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func,
             RequestOptions options)
         {
@@ -757,7 +759,7 @@ namespace Discord.Rest
                 Preconditions.AtLeast(description.Length, 2, nameof(description));
                 Preconditions.AtMost(description.Length, 100, nameof(description));
             }
-            
+
             var tagString = string.Join(", ", tags);
 
             Preconditions.AtLeast(tagString.Length, 1, nameof(tags));
@@ -1125,7 +1127,7 @@ namespace Discord.Rest
             }
 
             if (args.TriggerType.Value is AutoModTriggerType.Keyword)
-                Preconditions.AtLeast(args.KeywordFilter.GetValueOrDefault(Array.Empty<string>()).Length + args.RegexPatterns.GetValueOrDefault(Array.Empty<string>()).Length, 1, "KeywordFilter & RegexPatterns","Auto moderation rule must have at least 1 keyword or regex pattern");
+                Preconditions.AtLeast(args.KeywordFilter.GetValueOrDefault(Array.Empty<string>()).Length + args.RegexPatterns.GetValueOrDefault(Array.Empty<string>()).Length, 1, "KeywordFilter & RegexPatterns", "Auto moderation rule must have at least 1 keyword or regex pattern");
 
             if (args.AllowList.IsSpecified)
             {
@@ -1243,13 +1245,13 @@ namespace Discord.Rest
                                   || args.MentionLimit.IsSpecified
                                   || args.RegexPatterns.IsSpecified
                                   || args.AllowList.IsSpecified ? new API.TriggerMetadata
-                {
-                    KeywordFilter = args.KeywordFilter.IsSpecified ? args.KeywordFilter : rule.KeywordFilter.ToArray(),
-                    RegexPatterns = args.RegexPatterns.IsSpecified ? args.RegexPatterns : rule.RegexPatterns.ToArray(),
-                    AllowList = args.AllowList.IsSpecified ? args.AllowList : rule.AllowList.ToArray(),
-                    MentionLimit = args.MentionLimit.IsSpecified ? args.MentionLimit : rule.MentionTotalLimit ?? Optional<int>.Unspecified,
-                    Presets = args.Presets.IsSpecified ? args.Presets : rule.Presets.ToArray(),
-                } : Optional<API.TriggerMetadata>.Unspecified
+                                  {
+                                      KeywordFilter = args.KeywordFilter.IsSpecified ? args.KeywordFilter : rule.KeywordFilter.ToArray(),
+                                      RegexPatterns = args.RegexPatterns.IsSpecified ? args.RegexPatterns : rule.RegexPatterns.ToArray(),
+                                      AllowList = args.AllowList.IsSpecified ? args.AllowList : rule.AllowList.ToArray(),
+                                      MentionLimit = args.MentionLimit.IsSpecified ? args.MentionLimit : rule.MentionTotalLimit ?? Optional<int>.Unspecified,
+                                      Presets = args.Presets.IsSpecified ? args.Presets : rule.Presets.ToArray(),
+                                  } : Optional<API.TriggerMetadata>.Unspecified
             };
 
             return client.ApiClient.ModifyGuildAutoModRuleAsync(rule.GuildId, rule.Id, apiArgs, options);
@@ -1263,6 +1265,46 @@ namespace Discord.Rest
 
         public static async Task<GuildOnboarding> GetGuildOnboardingAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
             => await client.ApiClient.GetGuildOnboardingAsync(guild.Id, options);
+
+        public static async Task<GuildOnboarding> ModifyGuildOnboardingAsync(IGuild guild, Action<GuildOnboardingProperties> func, BaseDiscordClient client, RequestOptions options)
+        {
+            var props = new GuildOnboardingProperties();
+            func(props);
+
+            var args = new ModifyGuildOnboardingParams
+            {
+                DefaultChannelIds = props.ChannelIds.IsSpecified
+                    ? props.ChannelIds.Value.ToArray()
+                    : Optional<ulong[]>.Unspecified,
+                Enabled = props.IsEnabled,
+                Mode = props.Mode,
+                Prompts = props.Prompts.IsSpecified ? props.Prompts.Value?
+                    .Select(prompt => new GuildOnboardingPromptParams
+                    {
+                        Id = prompt.Id ?? 0,
+                        Type = prompt.Type,
+                        IsInOnboarding = prompt.IsInOnboarding,
+                        IsRequired = prompt.IsRequired,
+                        IsSingleSelect = prompt.IsSingleSelect,
+                        Title = prompt.Title,
+                        Options = prompt.Options?
+                            .Select(option => new GuildOnboardingPromptOptionParams
+                            {
+                                Title = option.Title,
+                                ChannelIds = option.ChannelIds?.ToArray(),
+                                RoleIds = option.RoleIds?.ToArray(),
+                                Description = option.Description,
+                                EmojiName = option.Emoji.GetValueOrDefault(null)?.Name,
+                                EmojiId = option.Emoji.GetValueOrDefault(null) is Emote emote ? emote.Id : null,
+                                EmojiAnimated = option.Emoji.GetValueOrDefault(null) is Emote emt ? emt.Animated : null,
+                                Id = option.Id ?? Optional<ulong>.Unspecified,
+                            }).ToArray(),
+                    }).ToArray()
+                : Optional<GuildOnboardingPromptParams[]>.Unspecified,
+            };
+
+            return await client.ApiClient.ModifyGuildOnboardingAsync(guild.Id, args, options);
+        }
 
         #endregion
     }

@@ -72,6 +72,7 @@ namespace Discord
             string extension = FormatToExtension(format, bannerId);
             return $"{DiscordConfig.CDNUrl}banners/{userId}/{bannerId}.{extension}?size={size}";
         }
+
         /// <summary>
         ///     Returns the default user avatar URL.
         /// </summary>
@@ -83,6 +84,19 @@ namespace Discord
         {
             return $"{DiscordConfig.CDNUrl}embed/avatars/{discriminator % 5}.png";
         }
+
+        /// <summary>
+        ///     Returns the default user avatar URL.
+        /// </summary>
+        /// <param name="userId">The Id of a user.</param>
+        /// <returns>
+        ///     A URL pointing to the user's default avatar when one isn't set.
+        /// </returns>
+        public static string GetDefaultUserAvatarUrl(ulong userId)
+        {
+            return $"{DiscordConfig.CDNUrl}embed/avatars/{(userId >> 22) % 6}.png";
+        }
+
         /// <summary>
         ///     Returns an icon URL.
         /// </summary>

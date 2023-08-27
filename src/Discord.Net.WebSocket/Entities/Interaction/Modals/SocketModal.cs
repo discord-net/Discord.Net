@@ -376,6 +376,10 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
+        /// <remarks>     
+        ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/> if the modal was created
+        ///     in a response to a message component interaction, <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/> otherwise.
+        /// </remarks>
         public override async Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
         {
             if (!InteractionHelper.CanSendResponse(this))
@@ -383,7 +387,9 @@ namespace Discord.WebSocket
 
             var response = new API.InteractionResponse
             {
-                Type = InteractionResponseType.DeferredUpdateMessage,
+                Type = Message is not null
+                    ? InteractionResponseType.DeferredUpdateMessage
+                    : InteractionResponseType.DeferredChannelMessageWithSource,
                 Data = ephemeral ? new API.InteractionCallbackData { Flags = MessageFlags.Ephemeral } : Optional<API.InteractionCallbackData>.Unspecified
             };
 
@@ -401,6 +407,30 @@ namespace Discord.WebSocket
             {
                 HasResponded = true;
             }
+        }
+
+        /// <inheritdoc/>
+        public async Task DeferLoadingAsync(bool ephemeral = false, RequestOptions options = null)
+        {
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot defer an interaction after {InteractionHelper.ResponseTimeLimit} seconds of no response/acknowledgement");
+
+            var response = new API.InteractionResponse
+            {
+                Type = InteractionResponseType.DeferredChannelMessageWithSource,
+                Data = ephemeral ? new API.InteractionCallbackData { Flags = MessageFlags.Ephemeral } : Optional<API.InteractionCallbackData>.Unspecified
+            };
+
+            lock (_lock)
+            {
+                if (HasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond or defer twice to the same interaction");
+                }
+            }
+
+            await Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options).ConfigureAwait(false);
+            HasResponded = true;
         }
 
         /// <inheritdoc/>

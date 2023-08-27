@@ -34,16 +34,19 @@ namespace Discord.Commands
         /// <param name="embed">An embed to be displayed alongside the <paramref name="message"/>.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the <paramref name="message"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
         /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
-        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null)
+        /// <param name="flags">Message flags combined as a bitfield.</param>
+        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null,
+            AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
+            Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
         {
-            return await Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds).ConfigureAwait(false);
+            return await Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags).ConfigureAwait(false);
         }
         /// <summary>
         ///     The method to execute asynchronously before executing the command.

@@ -45,14 +45,14 @@ namespace Discord
         ///     Gets the height of this attachment.
         /// </summary>
         /// <returns>
-        ///     The height of this attachment if it is a picture; otherwise <c>null</c>.
+        ///     The height of this attachment if it is a picture; otherwise <see langword="null" />.
         /// </returns>
         int? Height { get; }
         /// <summary>
         ///     Gets the width of this attachment.
         /// </summary>
         /// <returns>
-        ///     The width of this attachment if it is a picture; otherwise <c>null</c>.
+        ///     The width of this attachment if it is a picture; otherwise <see langword="null" />.
         /// </returns>
         int? Width { get; }
         /// <summary>
@@ -80,5 +80,10 @@ namespace Discord
         ///     Gets the base64 encoded bytearray representing a sampled waveform. <see langword="null"/> if the attachment is not a voice message.
         /// </summary>
         public string Waveform { get; }
+
+        /// <summary>
+        ///     Gets flags related to this to this attachment.
+        /// </summary>
+        public AttachmentFlags Flags { get; }
     }
 }

@@ -74,7 +74,7 @@ namespace Discord
         /// </summary>
         /// <param name="role">The role to get the overwrite from.</param>
         /// <returns>
-        ///     An overwrite object for the targeted role; <c>null</c> if none is set.
+        ///     An overwrite object for the targeted role; <see langword="null" /> if none is set.
         /// </returns>
         OverwritePermissions? GetPermissionOverwrite(IRole role);
         /// <summary>
@@ -82,7 +82,7 @@ namespace Discord
         /// </summary>
         /// <param name="user">The user to get the overwrite from.</param>
         /// <returns>
-        ///     An overwrite object for the targeted user; <c>null</c> if none is set.
+        ///     An overwrite object for the targeted user; <see langword="null" /> if none is set.
         /// </returns>
         OverwritePermissions? GetPermissionOverwrite(IUser user);
         /// <summary>
@@ -163,7 +163,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task representing the asynchronous get operation. The task result contains a guild user object that
-        ///     represents the user; <c>null</c> if none is found.
+        ///     represents the user; <see langword="null" /> if none is found.
         /// </returns>
         new Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
     }

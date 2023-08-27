@@ -31,7 +31,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>

@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <VersionPrefix>3.10.0</VersionPrefix>
+        <VersionPrefix>3.12.0</VersionPrefix>
         <LangVersion>latest</LangVersion>
         <Authors>Discord.Net Contributors</Authors>
         <PackageTags>discord;discordapp</PackageTags>
@@ -16,7 +16,7 @@
     </PropertyGroup>
     <PropertyGroup Condition=" '$(BuildNumber)' != '' And $(IsTagBuild) != 'true' ">
         <VersionSuffix Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
-        <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">build-$(BuildNumber)</VersionSuffix>
+        <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">$(BuildNumber)</VersionSuffix>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <NoWarn>$(NoWarn);CS1573;CS1591</NoWarn>

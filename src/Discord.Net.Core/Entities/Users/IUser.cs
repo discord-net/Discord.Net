@@ -16,7 +16,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This property retrieves a URL for this user's avatar. In event that the user does not have a valid avatar
-        ///     (i.e. their avatar identifier is not set), this method will return <c>null</c>. If you wish to
+        ///     (i.e. their avatar identifier is not set), this method will return <see langword="null" />. If you wish to
         ///     retrieve the default avatar for this user, consider using <see cref="IUser.GetDefaultAvatarUrl"/> (see
         ///     example).
         /// </remarks>
@@ -31,7 +31,7 @@ namespace Discord
         /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
         /// </param>
         /// <returns>
-        ///     A string representing the user's avatar URL; <c>null</c> if the user does not have an avatar in place.
+        ///     A string representing the user's avatar URL; <see langword="null" /> if the user does not have an avatar in place.
         /// </returns>
         string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
         /// <summary>
@@ -47,11 +47,11 @@ namespace Discord
         /// </returns>
         string GetDefaultAvatarUrl();
         /// <summary>
-        ///     Gets the per-username unique ID for this user.
+        ///     Gets the per-username unique ID for this user. This will return "0000" for users who have migrated to new username system.
         /// </summary>
         string Discriminator { get; }
         /// <summary>
-        ///     Gets the per-username unique ID for this user.
+        ///     Gets the per-username unique ID for this user. This will return 0 for users who have migrated to new username system.
         /// </summary>
         ushort DiscriminatorValue { get; }
         /// <summary>
@@ -62,14 +62,14 @@ namespace Discord
         ///     (indicated by the blue BOT tag within the official chat client).
         /// </remarks>
         /// <returns>
-        ///     <c>true</c> if the user is a bot application; otherwise <c>false</c>.
+        ///     <see langword="true" /> if the user is a bot application; otherwise <see langword="false" />.
         /// </returns>
         bool IsBot { get; }
         /// <summary>
         ///     Gets a value that indicates whether this user is a webhook user.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the user is a webhook; otherwise <c>false</c>.
+        ///     <see langword="true" /> if the user is a webhook; otherwise <see langword="false" />.
         /// </returns>
         bool IsWebhook { get; }
         /// <summary>
@@ -86,6 +86,14 @@ namespace Discord
         ///     The value of public flags for this user.
         /// </returns>
         UserProperties? PublicFlags { get; }
+
+        /// <summary>
+        ///     Gets the user's display name, if it is set. For bots, this will get the application name.
+        /// </summary>
+        /// <remarks>
+        ///     This property will be <see langword="null"/> if user has no display name set.
+        /// </remarks>
+        string GlobalName { get; }
 
         /// <summary>
         ///     Creates the direct message channel of this user.

@@ -250,7 +250,7 @@ namespace Discord.Interactions
         ///     Create and loads a <see cref="ModuleInfo"/> using a builder factory.
         /// </summary>
         /// <param name="name">Name of the module.</param>
-        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <c>null</c>.</param>
+        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <see langword="null" />.</param>
         /// <param name="buildFunc">Module builder factory.</param>
         /// <returns>
         ///     A task representing the operation for adding modules. The task result contains the built module instance.
@@ -280,7 +280,7 @@ namespace Discord.Interactions
         ///     Discover and load command modules from an <see cref="Assembly"/>.
         /// </summary>
         /// <param name="assembly"><see cref="Assembly"/> the command modules are defined in.</param>
-        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <c>null</c>.</param>
+        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <see langword="null" />.</param>
         /// <returns>
         ///     A task representing the operation for adding modules. The task result contains a collection of the modules added.
         /// </returns>
@@ -312,7 +312,7 @@ namespace Discord.Interactions
         ///     Add a command module from a <see cref="Type"/>.
         /// </summary>
         /// <typeparam name="T">Type of the module.</typeparam>
-        /// <param name="services">The <see cref="IServiceProvider" /> for your dependency injection solution if using one; otherwise, pass <c>null</c> .</param>
+        /// <param name="services">The <see cref="IServiceProvider" /> for your dependency injection solution if using one; otherwise, pass <see langword="null" /> .</param>
         /// <returns>
         ///     A task representing the operation for adding the module. The task result contains the built module.
         /// </returns>
@@ -329,7 +329,7 @@ namespace Discord.Interactions
         ///     Add a command module from a <see cref="Type"/>.
         /// </summary>
         /// <param name="type">Type of the module.</param>
-        /// <param name="services">The <see cref="IServiceProvider" /> for your dependency injection solution if using one; otherwise, pass <c>null</c> .</param>
+        /// <param name="services">The <see cref="IServiceProvider" /> for your dependency injection solution if using one; otherwise, pass <see langword="null" /> .</param>
         /// <returns>
         ///     A task representing the operation for adding the module. The task result contains the built module.
         /// </returns>

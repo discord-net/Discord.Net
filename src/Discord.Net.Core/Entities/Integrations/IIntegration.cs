@@ -33,7 +33,7 @@ namespace Discord
         ///     Gets a value that indicates whether this integration is enabled or not.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this integration is enabled; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this integration is enabled; otherwise <see langword="false" />.
         /// </returns>
         bool IsEnabled { get; }
         /// <summary>
@@ -44,7 +44,7 @@ namespace Discord
         ///     disabled will not. A user must manually choose when sync the integration if syncing is disabled.
         /// </remarks>
         /// <returns>
-        ///      <c>true</c> if this integration is syncing; otherwise <c>false</c>.
+        ///      <see langword="true" /> if this integration is syncing; otherwise <see langword="false" />.
         /// </returns>
         bool? IsSyncing { get; }
         /// <summary>

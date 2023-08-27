@@ -37,7 +37,7 @@ public class ThreadUpdateAuditLogData : IAuditLogData
     ///     Gets the thread that was created if it still exists.
     /// </summary>
     /// <returns>
-    ///     A thread object representing the thread that was created if it still exists, otherwise returns <c>null</c>.
+    ///     A thread object representing the thread that was created if it still exists, otherwise returns <see langword="null" />.
     /// </returns>
     public IThreadChannel Thread { get; }
 

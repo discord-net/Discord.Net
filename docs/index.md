@@ -62,7 +62,7 @@ feature-rich structure to register & handle interactions like application comman
 #### Slash Commands
 
 Slash commands are purposed to take over the normal prefixed commands in Discord and comes with good functionality to serve as a replacement.
-Being interactions, they are handled as SocketInteractions. Creating and receiving slashcommands is covered below.
+Being interactions, they are handled as SocketInteractions. Creating and receiving slash commands is covered below.
 
 - Find out more about slash commands in the
   [Slash Command Guides](xref:Guides.SlashCommands.Intro)

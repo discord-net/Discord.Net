@@ -13,7 +13,7 @@ namespace Discord
         ///     Gets or sets the topic of the channel.
         /// </summary>
         /// <remarks>
-        ///     Setting this value to any string other than <c>null</c> or <see cref="string.Empty"/> will set the
+        ///     Setting this value to any string other than <see langword="null" /> or <see cref="string.Empty"/> will set the
         ///     channel topic or description to the desired value.
         /// </remarks>
         public Optional<string> Topic { get; set; }
@@ -21,8 +21,8 @@ namespace Discord
         ///     Gets or sets whether this channel should be flagged as NSFW.
         /// </summary>
         /// <remarks>
-        ///     Setting this value to <c>true</c> will mark the channel as NSFW (Not Safe For Work) and will prompt the
-        ///     user about its possibly mature nature before they may view the channel; setting this value to <c>false</c> will
+        ///     Setting this value to <see langword="true" /> will mark the channel as NSFW (Not Safe For Work) and will prompt the
+        ///     user about its possibly mature nature before they may view the channel; setting this value to <see langword="false" /> will
         ///     remove the NSFW indicator.
         /// </remarks>
         public Optional<bool> IsNsfw { get; set; }

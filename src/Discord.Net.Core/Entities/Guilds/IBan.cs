@@ -16,7 +16,7 @@ namespace Discord
         ///     Gets the reason why the user is banned if specified.
         /// </summary>
         /// <returns>
-        ///     A string containing the reason behind the ban; <c>null</c> if none is specified.
+        ///     A string containing the reason behind the ban; <see langword="null" /> if none is specified.
         /// </returns>
         string Reason { get; }
     }

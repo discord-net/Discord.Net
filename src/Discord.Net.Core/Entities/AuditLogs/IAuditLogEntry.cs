@@ -23,7 +23,7 @@ namespace Discord
         ///     Gets the data for this entry.
         /// </summary>
         /// <returns>
-        ///     An <see cref="IAuditLogData" /> for this audit log entry; <c>null</c> if no data is available.
+        ///     An <see cref="IAuditLogData" /> for this audit log entry; <see langword="null" /> if no data is available.
         /// </returns>
         IAuditLogData Data { get; }
 
@@ -39,7 +39,7 @@ namespace Discord
         ///     Gets the reason behind the change.
         /// </summary>
         /// <returns>
-        ///     A string containing the reason for the change; <c>null</c> if none is provided.
+        ///     A string containing the reason for the change; <see langword="null" /> if none is provided.
         /// </returns>
         string Reason { get; }
     }

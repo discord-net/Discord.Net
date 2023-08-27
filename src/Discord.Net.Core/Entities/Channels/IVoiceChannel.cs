@@ -22,7 +22,7 @@ namespace Discord
         /// </summary>
         /// <returns>
         ///     An <see cref="int"/> representing the maximum number of users that are allowed to be connected to this
-        ///     channel at once; <c>null</c> if a limit is not set.
+        ///     channel at once; <see langword="null" /> if a limit is not set.
         /// </returns>
         int? UserLimit { get; }
 

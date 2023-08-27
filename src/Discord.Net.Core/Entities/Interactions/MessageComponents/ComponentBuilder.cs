@@ -82,6 +82,39 @@ namespace Discord
         }
 
         /// <summary>
+        ///     Removes all components of the given type from the <see cref="ComponentBuilder"/>.
+        /// </summary>
+        /// <param name="t">The <see cref="ComponentType"/> to remove.</param>
+        /// <returns>The current builder.</returns>
+        public ComponentBuilder RemoveComponentsOfType(ComponentType t)
+        {
+            this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c.Type == t));
+            return this;
+        }
+
+        /// <summary>
+        ///     Removes a component from the <see cref="ComponentBuilder"/>.
+        /// </summary>
+        /// <param name="customId">The custom id of the component.</param>
+        /// <returns>The current builder.</returns>
+        public ComponentBuilder RemoveComponent(string customId)
+        {
+            this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c.CustomId == customId));
+            return this;
+        }
+
+        /// <summary>
+        ///     Removes a Link Button from the <see cref="ComponentBuilder"/> based on its URL.
+        /// </summary>
+        /// <param name="url">The URL of the Link Button.</param>
+        /// <returns>The current builder.</returns>
+        public ComponentBuilder RemoveButtonByURL(string url)
+        {
+            this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c is ButtonComponent b && b.Url == url));
+            return this;
+        }
+
+        /// <summary>
         ///     Adds a <see cref="SelectMenuBuilder"/> to the <see cref="ComponentBuilder"/> at the specific row.
         ///     If the row cannot accept the component then it will add it to a row that can.
         /// </summary>
@@ -282,6 +315,11 @@ namespace Discord
         {
             if (_actionRows?.SelectMany(x => x.Components)?.Any(x => x.Type == ComponentType.TextInput) ?? false)
                 throw new ArgumentException("TextInputComponents are not allowed in messages.", nameof(ActionRows));
+
+            if (_actionRows?.Count > 0)
+                for (int i = 0; i < _actionRows?.Count; i++)
+                    if (_actionRows[i]?.Components?.Count == 0)
+                        _actionRows.RemoveAt(i);
 
             return _actionRows != null
                 ? new MessageComponent(_actionRows.Select(x => x.Build()).ToList())

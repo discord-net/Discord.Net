@@ -29,8 +29,10 @@ namespace Discord.WebSocket
         ///     Gets the guild the user is in.
         /// </summary>
         public SocketGuild Guild { get; }
-        /// <inheritdoc />
-        public string DisplayName => Nickname ?? Username;
+
+        /// <inheritdoc cref="IGuildUser.DisplayName"/>
+        public string DisplayName => Nickname ?? GlobalName ?? Username;
+
         /// <inheritdoc />
         public string Nickname { get; private set; }
         /// <inheritdoc/>
@@ -45,6 +47,8 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
         /// <inheritdoc />
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
+        /// <inheritdoc />
+        public override string GlobalName { get { return GlobalUser.GlobalName; } internal set { GlobalUser.GlobalName = value; } }
 
         /// <inheritdoc />
         public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild, this));
@@ -82,7 +86,7 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<SocketRole> Roles
             => _roleIds.Select(id => Guild.GetRole(id)).Where(x => x != null).ToReadOnlyCollection(() => _roleIds.Length);
         /// <summary>
-        ///     Returns the voice channel the user is in, or <c>null</c> if none.
+        ///     Returns the voice channel the user is in, or <see langword="null" /> if none.
         /// </summary>
         public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
         /// <inheritdoc />
@@ -91,7 +95,7 @@ namespace Discord.WebSocket
         ///     Gets the voice connection status of the user if any.
         /// </summary>
         /// <returns>
-        ///     A <see cref="SocketVoiceState" /> representing the user's voice status; <c>null</c> if the user is not
+        ///     A <see cref="SocketVoiceState" /> representing the user's voice status; <see langword="null" /> if the user is not
         ///     connected to a voice channel.
         /// </returns>
         public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
@@ -265,7 +269,9 @@ namespace Discord.WebSocket
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, Guild.Id, GuildAvatarId, size, format);
 
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
+        private string DebuggerDisplay => DiscriminatorValue != 0
+            ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)"
+            : $"{Username} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
 
         internal new SocketGuildUser Clone()
         {
