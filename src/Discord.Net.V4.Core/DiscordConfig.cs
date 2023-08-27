@@ -140,7 +140,10 @@ public class DiscordConfig
     /// </summary>
     public const int MaxEmbedsPerMessage = 10;
 
-    public required DiscordToken Token { get; set; }
+    /// <summary>
+    ///     The token used to authenticate with the Discord API.
+    /// </summary>
+    public readonly DiscordToken Token;
 
     /// <summary>
     ///     Gets or sets how a request should act in the case of an error, by default.
@@ -232,4 +235,9 @@ public class DiscordConfig
     ///     Returns the max length of an application description.
     /// </summary>
     public const int MaxApplicationDescriptionLength = 400;
+
+    public DiscordConfig(DiscordToken token)
+    {
+        Token = token;
+    }
 }

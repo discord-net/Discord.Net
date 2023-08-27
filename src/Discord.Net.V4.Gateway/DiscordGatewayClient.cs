@@ -6,6 +6,7 @@ using Discord.Gateway.State;
 using Discord.Rest;
 using System;
 using System.Buffers;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,8 @@ namespace Discord.Gateway
     {
         public bool IsConnected { get; private set; }
 
+        public TimeSpan Ping { get; private set; }
+
         internal StateController State { get; }
 
         internal DiscordGatewayConfig Config { get; }
@@ -27,6 +30,10 @@ namespace Discord.Gateway
         internal readonly ICacheProvider CacheProvider;
         internal readonly IGatewayConnection Connection;
         internal readonly IGatewayEncoding Encoding;
+
+        private readonly ConcurrentQueue<DateTimeOffset> _heartbeats;
+
+        private readonly DiscordToken _token;
 
         private readonly int _maxClientMessageTimeout;
 
@@ -49,8 +56,9 @@ namespace Discord.Gateway
 
         public DiscordGatewayClient(DiscordGatewayConfig config)
         {
+            _heartbeats = new();
             _gatewayUrl = config.CustomGatewayUrl;
-
+            _token = config.Token;
             _maxClientMessageTimeout = config.MaxClientMessageTimeout;
             _connectionTaskSource = new();
             _connectionLifecycleTokenSource = new();
@@ -94,7 +102,10 @@ namespace Discord.Gateway
                     _heartbeatInterval = helloPayload.HeartbeatInterval;
                     break;
                 case GatewayOpCode.HeartbeatAck:
-                    // TODO: track ack's and look for zombified connections
+                    var time = DateTimeOffset.UtcNow;
+
+                    if(_heartbeats.TryDequeue(out var sentTime))
+                        Ping = time - sentTime;
                     break;
 
                 case GatewayOpCode.GuildSync:
@@ -179,11 +190,23 @@ namespace Discord.Gateway
 
 
         #region Send/Recieve
-        private Task SendHeartbeatAsync(CancellationToken token)
-            => SendGatewayMessageAsync(GatewayOpCode.Heartbeat, _sequence, token);
+        private async Task SendHeartbeatAsync(CancellationToken token)
+        {
+            await SendGatewayMessageAsync(GatewayOpCode.Heartbeat, _sequence, token);
+
+            _heartbeats.Enqueue(DateTimeOffset.UtcNow);
+
+            if(_heartbeats.Count > Config.MaxUnacknowledgedHeartbeats)
+            {
+                // zombified connection
+            }
+        }
 
         private Task SendIdentityAsync(IdentityPayload payload, CancellationToken token)
             => SendGatewayMessageAsync(GatewayOpCode.Identify, payload, token);
+
+        private Task SendResumeAsync(ResumePayload payload, CancellationToken token)
+            => SendGatewayMessageAsync(GatewayOpCode.Resume, payload, token);
 
         internal async Task SendGatewayMessageAsync(GatewayOpCode code, object? payload, CancellationToken token)
         {
@@ -244,8 +267,22 @@ namespace Discord.Gateway
                 if(_sessionId is null)
                 {
                     await SendIdentityAsync(new IdentityPayload(
-                        
-                        ));
+                        _token.Value,
+                        new IdentityConnectionProperties(
+                            Environment.OSVersion.Platform.ToString(),
+                            "Discord.Net V4",
+                            "Discord.Net V4"
+                        ),
+                        (int)Config.Intents
+                    ), token);
+                }
+                else
+                {
+                    await SendResumeAsync(new ResumePayload(
+                        _token.Value,
+                        _sessionId,
+                        _sequence ?? 0
+                    ), token);
                 }
             }
             catch (Exception x)

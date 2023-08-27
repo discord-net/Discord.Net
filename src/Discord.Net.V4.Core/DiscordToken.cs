@@ -8,7 +8,7 @@ namespace Discord
     /// </summary>
     /// <param name="Token">The authentication token value.</param>
     /// <param name="Type">The type of the token.</param>
-    public readonly record struct DiscordToken(string Token, TokenType Type)
+    public readonly record struct DiscordToken(string Value, TokenType Type)
     {
         public static implicit operator DiscordToken(string token)
         {

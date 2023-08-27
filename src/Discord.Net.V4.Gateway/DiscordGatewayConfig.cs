@@ -25,7 +25,8 @@ namespace Discord.Gateway
 
         public int MaxClientMessageTimeout { get; set; } = 120000;
 
-        public DiscordGatewayConfig()
+        public DiscordGatewayConfig(DiscordToken token)
+            : base(token)
         {
             Encoding = new ETFEncoding(this);
         }
