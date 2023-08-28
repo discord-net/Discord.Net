@@ -1,0 +1,1 @@
+global using GuildCreatedEvent = System.Func<Discord.Gateway.GatewayGuild, System.Threading.Tasks.ValueTask>;

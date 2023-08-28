@@ -170,7 +170,7 @@ namespace Discord.Rest
             SplashId = model.Splash;
             DiscoverySplashId = model.DiscoverySplash;
             VerificationLevel = model.VerificationLevel;
-            MfaLevel = model.MfaLevel;
+            MfaLevel = model.MFALevel;
             DefaultMessageNotifications = model.DefaultMessageNotifications;
             ExplicitContentFilter = model.ExplicitContentFilter;
             ApplicationId = model.ApplicationId;

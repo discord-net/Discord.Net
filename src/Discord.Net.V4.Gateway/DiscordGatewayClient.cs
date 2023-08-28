@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public class DiscordGatewayClient : IGatewayClient
+    public sealed partial class DiscordGatewayClient : IGatewayClient
     {
         public bool IsConnected { get; private set; }
 

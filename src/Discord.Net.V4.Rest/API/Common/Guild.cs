@@ -1,8 +1,9 @@
+using Discord.Models;
 using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class Guild
+internal class Guild : IGuildModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -59,7 +60,7 @@ internal class Guild
     public GuildFeatures Features { get; set; }
 
     [JsonPropertyName("mfa_level")]
-    public MfaLevel MfaLevel { get; set; }
+    public MfaLevel MFALevel { get; set; }
 
     [JsonPropertyName("application_id")]
     public ulong? ApplicationId { get; set; }
@@ -127,4 +128,37 @@ internal class Guild
 
     [JsonPropertyName("safety_alerts_channel_id")]
     public Optional<ulong?> SafetyAlertsChannelId { get; set; }
+
+
+    int IGuildModel.AFKTimeout => (int)AFKTimeout;
+
+    bool IGuildModel.WidgetEnabled => WidgetEnabled.GetValueOrDefault();
+
+    ulong? IGuildModel.WidgetChannelId => WidgetChannelId.GetValueOrDefault();
+
+    GuildFeature IGuildModel.Features => Features.Value;
+
+    string[] IGuildModel.ExperimentalFeatures => Features.Experimental.ToArray();
+
+    MfaLevel IGuildModel.MFALevel => MFALevel;
+
+    int? IGuildModel.MaxPresense => MaxPresences.GetValueOrDefault();
+
+    int? IGuildModel.MaxMembers => MaxMembers.ToNullable();
+
+    string? IGuildModel.Vanity => VanityUrlCode;
+
+    int? IGuildModel.PremiumSubscriptionCount => PremiumSubscriptionCount.ToNullable();
+
+    int? IGuildModel.MaxVideoChannelUsers => MaxVideoChannelUsers.ToNullable();
+
+    int? IGuildModel.MaxStageVideoChannelUsers => MaxStageVideoChannelUsers.ToNullable();
+
+    int? IGuildModel.ApproximateMemberCount => ApproximateMemberCount.ToNullable();
+
+    IWelcomeScreenModel? IGuildModel.WelcomeScreen => WelcomeScreen.GetValueOrDefault();
+
+    bool? IGuildModel.PremiumProgressBarEnabled => IsBoostProgressBarEnabled.ToNullable();
+
+    ulong? IGuildModel.SafetyAlertsChannelId => SafetyAlertsChannelId.GetValueOrDefault();
 }

@@ -11,7 +11,7 @@ public readonly struct Optional<T>
     ///     Gets the value for this parameter.
     /// </summary>
     /// <exception cref="InvalidOperationException" accessor="get">This property has no value set.</exception>
-    public T Value { get; }
+    public T? Value { get; }
 
     /// <summary>
     ///     Returns true if this value has been specified.
@@ -21,14 +21,14 @@ public readonly struct Optional<T>
     /// <summary>
     ///     Creates a new Parameter with the provided value.
     /// </summary>
-    public Optional(T value)
+    public Optional(T? value)
     {
         Value = value;
         IsSpecified = true;
     }
 
-    public T GetValueOrDefault() => Value!;
-    public T GetValueOrDefault(T defaultValue) => IsSpecified ? Value : defaultValue;
+    public T? GetValueOrDefault() => Value;
+    public T? GetValueOrDefault(T defaultValue) => IsSpecified ? Value : defaultValue;
 
     public override int GetHashCode() => IsSpecified ? Value?.GetHashCode() ?? 0 : 0;
 
@@ -36,7 +36,7 @@ public readonly struct Optional<T>
     private string DebuggerDisplay => IsSpecified ? Value?.ToString() ?? "<null>" : "<unspecified>";
 
     public static implicit operator Optional<T>(T value) => new(value);
-    public static explicit operator T(Optional<T> value) => value.Value;
+    public static explicit operator T?(Optional<T> value) => value.Value;
 }
 
 public static class Optional

@@ -1,8 +1,9 @@
+using Discord.Models;
 using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class WelcomeScreenChannel
+internal class WelcomeScreenChannel : IWelcomeScreenChannelModel
 {
     [JsonPropertyName("channel_id")]
     public ulong ChannelId { get; set; }

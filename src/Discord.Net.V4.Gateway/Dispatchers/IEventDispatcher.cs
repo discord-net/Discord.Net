@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public interface IEventDispatcher<T>
-        where T : Delegate
+    public interface IEventDispatcher
     {
-        Task DispatchAsync(T func, params IEntityHandle[] entities);
+        ValueTask DispatchAsync<T>(T[] funcs, object[] args)
+            where T : Delegate;
     }
 }

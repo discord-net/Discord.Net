@@ -4,18 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.Gateway.Dispatchers
+namespace Discord.Gateway
 {
-    internal class LegacyEventDispatcher<T> : IEventDispatcher<T>
-        where T : Delegate
+    internal class LegacyEventDispatcher : IEventDispatcher
     {
-        public async Task DispatchAsync(T func, params IEntityHandle[] entities)
-        {
-            var result = func.DynamicInvoke(entities);
+        public async ValueTask DispatchAsync<T>(T[] funcs, object[] args)
+            where T : Delegate
 
-            if(result is Task task)
+        {
+            foreach(var func in funcs)
             {
-                await task;
+                var result = func.DynamicInvoke(args);
+
+                if (result is Task task)
+                {
+                    await task;
+                }
+                else if (result is ValueTask vt)
+                {
+                    await vt;
+                }
             }
         }
     }
