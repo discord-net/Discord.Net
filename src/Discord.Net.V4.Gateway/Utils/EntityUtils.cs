@@ -1,12 +1,82 @@
+using Discord.API;
 using Discord.Gateway.Cache;
 using Discord.Gateway.State;
 using System;
-using static Discord.Gateway.EntityBrokerExtensions;
 
 namespace Discord.Gateway
 {
     internal static class EntityUtils
     {
+        public static Cacheable<TId, TEntity, TRest, TCommon>? UpdateCacheableFrom<TId, TEntity, TRest, TCommon>(
+            DiscordGatewayClient client,
+            Cacheable<TId, TEntity, TRest, TCommon>? existing,
+            IEntityBroker<TId, TEntity> broker,
+            TId modelId,
+            Optional<TId> parentId,
+            CacheOperation operation,
+            bool isOwned)
+            where TId : struct, IEquatable<TId>
+            where TEntity : GatewayCacheableEntity<TId>, TCommon
+            where TRest : class, IEntity<TId>, TCommon // TODO: RestEntity<TId>
+            where TCommon : class, IEntity<TId>
+        {
+            if (existing is not null && operation is CacheOperation.Update && !isOwned)
+            {
+                return null;
+            }
+
+            // the model isn't for us
+            if (!isOwned)
+                return existing;
+
+            // if our instance cacheable is null and the models channel id points to us.
+            if (existing is null && operation is CacheOperation.Create or CacheOperation.Update)
+            {
+                return new Cacheable<TId, TEntity, TRest, TCommon>(modelId, parentId, client, broker.ProvideSpecific(modelId, parentId));
+            }
+            // if the operation was a delete and we still hold the instance
+            else if (operation is CacheOperation.Delete && existing is not null)
+            {
+                return null;
+            }
+
+            return existing;
+        }
+
+        public static Cacheable<TId, TEntity>? UpdateCacheableFrom<TId, TEntity>(
+            TEntity entity,
+            Cacheable<TId, TEntity>? existing,
+            IEntityBroker<TId, TEntity> broker,
+            TId modelId,
+            Optional<TId> parentId,
+            CacheOperation operation,
+            bool isOwned)
+            where TId : struct, IEquatable<TId>
+            where TEntity : GatewayCacheableEntity<TId>
+        {
+            if (existing is not null && operation is CacheOperation.Update && !isOwned)
+            {
+                return null;
+            }
+
+            // the model isn't for us
+            if (!isOwned)
+                return existing;
+
+            // if our instance cacheable is null and the models channel id points to us.
+            if (existing is null && operation is CacheOperation.Create or CacheOperation.Update)
+            {
+                return new Cacheable<TId, TEntity>(modelId, parentId, entity.Discord, broker.ProvideSpecific(modelId, parentId));
+            }
+            // if the operation was a delete and we still hold the instance
+            else if (operation is CacheOperation.Delete && existing is not null)
+            {
+                return null;
+            }
+
+            return existing;
+        }
+
         public static Cacheable<TId, TEntity, TRest, TCommon>? UpdateCacheableFrom<TId, TEntity, TRest, TCommon>(
             DiscordGatewayClient client,
             Cacheable<TId, TEntity, TRest, TCommon>? existing,

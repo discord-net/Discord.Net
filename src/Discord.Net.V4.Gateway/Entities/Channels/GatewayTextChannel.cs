@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Gateway
 {
-    public class GatewayTextChannel : SocketGuildChannel, ITextChannel, ISocketNestedChannel
+    public class GatewayTextChannel : GatewayGuildChannel, ITextChannel, IGatewayNestedChannel
     {
         public bool IsNsfw
             => _source.IsNsfw;

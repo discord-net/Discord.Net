@@ -2,14 +2,15 @@ using UserBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.Gat
 using MemberBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayGuildUser, Discord.Models.IMemberModel, Discord.Models.IUserModel>;
 using PresenseBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayPresense, Discord.Models.IPresenseModel>;
 using GuildBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayGuild, Discord.Models.IGuildModel>;
-using ChannelBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.SocketChannel, Discord.Models.IChannelModel>;
-using GuildChannelBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.SocketGuildChannel, Discord.Models.IGuildChannelModel>;
+using ChannelBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayChannel, Discord.Models.IChannelModel>;
+using GuildChannelBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayGuildChannel, Discord.Models.IGuildChannelModel>;
 using CustomStickerBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayCustomSticker, Discord.Models.IStickerModel>;
 using GuildRoleBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayRole, Discord.Models.IRoleModel>;
 using GuildEmoteBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayGuildEmote, Discord.Models.IGuildEmoteModel>;
 using GuildEventBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayGuildEvent, Discord.Models.IGuildEventModel>;
 using GuildStageInstanceBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayStageInstance, Discord.Models.IStageInstanceModel>;
 using MessageBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayMessage, Discord.Models.IMessageModel>;
+using CategoryChannelBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayCategoryChannel, Discord.Models.IGuildChannelModel>;
 using Discord.Gateway.Cache;
 
 namespace Discord.Gateway.State;
@@ -88,7 +89,7 @@ internal partial class StateController
                 ConstructGuildChannelAsync
             );
     private GuildChannelBroker? _guildChannels;
-    private ValueTask<SocketGuildChannel> ConstructGuildChannelAsync(object? args, Optional<ulong> guildId, IGuildChannelModel model, CancellationToken token)
+    private ValueTask<GatewayGuildChannel> ConstructGuildChannelAsync(object? args, Optional<ulong> guildId, IGuildChannelModel model, CancellationToken token)
     {
         // TODO: switch model.Type;
     }
@@ -160,7 +161,6 @@ internal partial class StateController
     private ValueTask<GatewayStageInstance> ConstructStageInstanceEventAsync(object? args, Optional<ulong> guildId, IStageInstanceModel model, CancellationToken token)
         => ValueTask.FromResult(new GatewayStageInstance(_client, model));
 
-
     #endregion
 
     #region Channels
@@ -173,13 +173,29 @@ internal partial class StateController
 
     private ChannelBroker? _channels;
 
-    private ValueTask<SocketChannel> ConstructChannelAsync(object? args, Optional<ulong> parent, IChannelModel model, CancellationToken token)
+    private ValueTask<GatewayChannel> ConstructChannelAsync(object? args, Optional<ulong> parent, IChannelModel model, CancellationToken token)
     {
         // TODO: construct sub-channel type
         return default;
     }
+
+    public CategoryChannelBroker CategoryChannels
+        => _categoryChannels ??= new CategoryChannelBroker(
+            this,
+            (parentId, token) => GetSubStoreAsync(parentId.Value, StoreType.GuildCategory, token),
+            ConstructCategoryChannelAsync
+        );
+    private CategoryChannelBroker? _categoryChannels;
+    private ValueTask<GatewayCategoryChannel> ConstructCategoryChannelAsync(object? args, Optional<ulong> parent, IGuildChannelModel model, CancellationToken token)
+    {
+        return ValueTask.FromResult(
+            new GatewayCategoryChannel(_client, parent.Value, model)
+        );
+    }
+
     #endregion
 
+    #region Messages
     public MessageBroker Messages
         => _messages ??= new MessageBroker(
                 this,
@@ -189,10 +205,8 @@ internal partial class StateController
     private MessageBroker? _messages;
     private ValueTask<GatewayMessage> ConstructMessageAsync(object? args, Optional<ulong> parent, IMessageModel model, CancellationToken token)
     {
-        return ValueTask.FromResult(new GatewayMessage())
+        // TODO: different message entities.
+        return ValueTask.FromResult(new GatewayMessage(_client, model));
     }
-
-    #region Messages
-
     #endregion
 }

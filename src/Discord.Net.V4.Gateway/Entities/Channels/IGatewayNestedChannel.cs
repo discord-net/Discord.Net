@@ -1,6 +1,6 @@
 namespace Discord.Gateway
 {
-    public interface ISocketNestedChannel
+    public interface IGatewayNestedChannel
     {
         GuildChannelCacheable? Category { get; }
     }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public abstract class SocketChannel : GatewayCacheableEntity<ulong, IChannelModel>, IChannel
+    public abstract class GatewayChannel : GatewayCacheableEntity<ulong, IChannelModel>, IChannel
     {
         public string Name
             => Model.Name;
@@ -15,11 +15,9 @@ namespace Discord.Gateway
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(Id);
 
-        internal SocketChannel(DiscordGatewayClient discord, IChannelModel model)
+        internal GatewayChannel(DiscordGatewayClient discord, IChannelModel model)
             : base(discord, model.Id)
-        {
-
-        }
+        { }
 
         public Task<IUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();

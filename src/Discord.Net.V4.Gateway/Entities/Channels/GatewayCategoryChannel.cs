@@ -1,21 +1,28 @@
 using Discord.Gateway.Cache;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public sealed class SocketCategoryChannel : SocketGuildChannel, ICategoryChannel
+    public sealed class GatewayCategoryChannel : GatewayGuildChannel, ICategoryChannel
     {
         protected override IGuildChannelModel Model
             => _source;
 
         private IGuildChannelModel _source;
 
-        public SocketCategoryChannel(DiscordGatewayClient discord, ulong guildId, IGuildChannelModel model)
+        public GatewayCategoryChannel(DiscordGatewayClient discord, ulong guildId, IGuildChannelModel model)
             : base(discord, guildId, model)
+        {
+            Update(model);
+        }
+
+        [MemberNotNull(nameof(_source))]
+        internal void Update(IGuildChannelModel model)
         {
             _source = model;
         }
@@ -23,7 +30,7 @@ namespace Discord.Gateway
         internal override void Update(IChannelModel model)
         {
             if (model is IGuildChannelModel gcmodel)
-                _source = gcmodel;
+                Update(gcmodel);
         }
 
         internal override object Clone() => throw new NotImplementedException();

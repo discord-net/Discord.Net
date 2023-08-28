@@ -6,7 +6,7 @@ namespace Discord.Gateway
     /// <summary>
     ///     Represents a generic WebSocket-based channel that can send and receive messages.
     /// </summary>
-    public interface ISocketMessageChannel : IMessageChannel, ICacheableEntity<ulong, IChannelModel>
+    public interface IGatewayMessageChannel : IMessageChannel, ICacheableEntity<ulong, IChannelModel>
     {
         /// <summary>
         ///     Gets all messages in this channel's cache.

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public abstract class SocketGuildChannel : SocketChannel, ICacheableEntity<ulong, IGuildChannelModel>, IGuildChannel
+    public abstract class GatewayGuildChannel : GatewayChannel, ICacheableEntity<ulong, IGuildChannelModel>, IGuildChannel
     {
         public int Position
             => Model.Position;
@@ -22,7 +22,7 @@ namespace Discord.Gateway
         protected abstract override IGuildChannelModel Model { get; }
 
 
-        internal SocketGuildChannel(DiscordGatewayClient discord, ulong guildId, IGuildChannelModel model)
+        internal GatewayGuildChannel(DiscordGatewayClient discord, ulong guildId, IGuildChannelModel model)
             : base(discord, model)
         {
             Guild = new(guildId, discord, discord.State.Guilds.ProvideSpecific(guildId));
@@ -30,9 +30,6 @@ namespace Discord.Gateway
 
         IGuildChannelModel ICacheableEntity<ulong, IGuildChannelModel>.GetModel()
             => Model;
-
-        void ICacheableEntity<ulong, IGuildChannelModel>.Update(IGuildChannelModel model)
-            => Update(model);
 
         public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
         public OverwritePermissions? GetPermissionOverwrite(IRole role) => throw new NotImplementedException();

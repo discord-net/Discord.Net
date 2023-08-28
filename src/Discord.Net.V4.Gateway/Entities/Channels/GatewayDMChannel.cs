@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    internal sealed class SocketDMChannel : SocketChannel, ISocketMessageChannel, IDMChannel
+    internal sealed class GatewayDMChannel : GatewayChannel, IGatewayMessageChannel, IDMChannel
     {
         public UserCacheable Recipient { get; }
 
@@ -19,7 +19,7 @@ namespace Discord.Gateway
 
         private IDMChannelModel _source;
 
-        public SocketDMChannel(DiscordGatewayClient discord, IDMChannelModel model)
+        public GatewayDMChannel(DiscordGatewayClient discord, IDMChannelModel model)
             : base(discord, model)
         {
             _source = model;
@@ -30,7 +30,7 @@ namespace Discord.Gateway
                 discord.State.Users.ProvideSpecific(model.RecipientId)
             );
 
-            CachedMessages = new(Id, discord.State.);
+            CachedMessages = new(Id, discord.State.Messages, messageId => new MessageCacheable(messageId, Discord, Discord.State.Messages.ProvideSpecific(messageId)));
         }
 
 

@@ -1,10 +1,11 @@
 using Discord.Gateway.Cache;
 using System;
+
 namespace Discord.Gateway
 {
-    public sealed class SocketNewsChannel : GatewayTextChannel, INewsChannel
+    public sealed class GatewayNewsChannel : GatewayTextChannel, INewsChannel
     {
-        public SocketNewsChannel(DiscordGatewayClient discord, ulong guildId, IGuildTextChannelModel model)
+        public GatewayNewsChannel(DiscordGatewayClient discord, ulong guildId, IGuildTextChannelModel model)
             : base(discord, guildId, model)
         {
         }
@@ -17,6 +18,8 @@ namespace Discord.Gateway
         /// </remarks>
         public override int SlowModeInterval
             => throw new NotSupportedException("News channels do not support Slow Mode.");
+
+        public Task<ulong> FollowAnnouncementChannelAsync(ulong channelId, RequestOptions options) => throw new NotImplementedException();
     }
 }
 

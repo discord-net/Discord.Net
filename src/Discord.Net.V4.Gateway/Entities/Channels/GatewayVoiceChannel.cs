@@ -4,7 +4,7 @@ using System;
 
 namespace Discord.Gateway
 {
-    public class GatewayVoiceChannel : GatewayTextChannel, IVoiceChannel, ISocketNestedChannel
+    public class GatewayVoiceChannel : GatewayTextChannel, IVoiceChannel, IGatewayNestedChannel
     {
         public int Bitrate
             => _source.Bitrate;

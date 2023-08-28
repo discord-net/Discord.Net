@@ -151,7 +151,10 @@ namespace Discord.Gateway.State
             if(!_handles.TryAdd(handle.HandleId, handle))
             {
                 // TODO: should be fatal
+                _client.Logger.LogWarning("Failed to store handle of entity {Id}", entity.Id);
             }
+
+            _client.Logger.LogDebug("Handle {} created for entity {}", handle.HandleId, handle.EntityId);
 
             return handle;
         }

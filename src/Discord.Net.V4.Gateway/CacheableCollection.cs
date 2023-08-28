@@ -5,10 +5,11 @@ using System.Collections.Immutable;
 
 namespace Discord.Gateway
 {
-    public sealed class CacheableCollection<TCacheable, TId, TGateway> : IEntityEnumerableSource<TGateway, TId>
-        where TCacheable : Cacheable<TId, TGateway>, IEntitySource<TGateway, TId>
-        where TGateway : GatewayCacheableEntity<TId>
+    public sealed class CacheableCollection<TCacheable, TId, TGateway, TCommon> : IEntityEnumerableSource<TCommon, TId>
+        where TCacheable : Cacheable<TId, TGateway>, IEntitySource<TCommon, TId>
+        where TGateway : GatewayCacheableEntity<TId>, TCommon
         where TId : IEquatable<TId>
+        where TCommon : class, IEntity<TId>
     {
         public async ValueTask<IReadOnlyCollection<TId>> GetIdsAsync(CancellationToken token = default)
             => (await (await _idsFactory(_parent, token)).ToArrayAsync(token)).ToImmutableArray();
@@ -139,7 +140,7 @@ namespace Discord.Gateway
             _broker = broker;
         }
 
-        public async ValueTask<IReadOnlyCollection<TGateway>> FlattenAsync(RequestOptions? options = null, CancellationToken token = default)
+        public async ValueTask<IReadOnlyCollection<TCommon>> FlattenAsync(RequestOptions? options = null, CancellationToken token = default)
         {
             // if we can use the `GetAllAsync()` method
             if(_broker is not null)
@@ -161,7 +162,10 @@ namespace Discord.Gateway
             return new Enumerator(_parent, _idsFactory, _factory, _cleanupTask, token);
         }
 
-        IAsyncEnumerator<IEntitySource<TGateway, TId>> IAsyncEnumerable<IEntitySource<TGateway, TId>>.GetAsyncEnumerator(CancellationToken cancellationToken)
+        async ValueTask<IReadOnlyCollection<TCommon>> IEntityEnumerableSource<TCommon, TId>.FlattenAsync(RequestOptions? option, CancellationToken token)
+            => await FlattenAsync(option, token);
+
+        IAsyncEnumerator<IEntitySource<TCommon, TId>> IAsyncEnumerable<IEntitySource<TCommon, TId>>.GetAsyncEnumerator(CancellationToken cancellationToken)
             => GetAsyncEnumerator(cancellationToken);
     }
 }

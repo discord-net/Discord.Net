@@ -103,7 +103,7 @@ namespace Discord.Gateway
                 discord,
                 discord.State.Channels
                     .ProvideSpecific(model.ChannelId)
-                    .Transform(channel => channel is ISocketMessageChannel mc
+                    .Transform(channel => channel is IGatewayMessageChannel mc
                         ? mc
                         : throw new InvalidCastException($"Expected ISocketMessageChannel, got {channel.GetType().Name}")
                     )

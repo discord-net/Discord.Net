@@ -273,15 +273,6 @@ namespace Discord.Gateway
         public Task<IReadOnlyCollection<IGuildUser>> SearchUsersAsync(string query, int limit = 1000, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         #endregion
 
-        #region IGuild
-        IRole? IGuild.EveryoneRole => EveryoneRole.Value;
-
-        IReadOnlyCollection<GuildEmote> IGuild.Emotes => null!; // TODO
-
-        IReadOnlyCollection<ICustomSticker> IGuild.Stickers => null!; // TODO: sync lookup? IDs are not ensured to be in memory.
-
-        IReadOnlyCollection<IRole> IGuild.Roles => null!; // TODO
-        #endregion
 
     }
 }

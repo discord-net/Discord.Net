@@ -15,27 +15,15 @@ namespace Discord.Gateway
 
         internal void Update(IStageInstanceModel model, CacheOperation operation)
         {
-            // new model channel id isn't ours
-            if (Instance is not null && operation is CacheOperation.Update && model.ChannelId != Id)
-            {
-                Instance = null;
-                return;
-            }
-
-            // the model isn't for us
-            if (model.ChannelId != Id)
-                return;
-
-            // if our instance cacheable is null and the models channel id points to us.
-            if (Instance is null && operation is CacheOperation.Create or CacheOperation.Update)
-            {
-                Instance = new GuildStageInstanceCacheable(model.Id, Guild.Id, Discord, Discord.State.StageInstances.ProvideSpecific(model.Id, Guild.Id));
-            }
-            // if the operation was a delete and we still hold the instance
-            else if (operation is CacheOperation.Delete && Instance is not null)
-            {
-                Instance = null;
-            }
+            Instance = EntityUtils.UpdateCacheableFrom(
+                Discord,
+                Instance,
+                Discord.State.StageInstances,
+                model.ChannelId,
+                Guild.Id,
+                operation,
+                model.ChannelId == Id
+            );
         }
 
         public Task BecomeSpeakerAsync(RequestOptions? options = null) => throw new NotImplementedException();
@@ -50,7 +38,7 @@ namespace Discord.Gateway
         void ICacheUpdatable<ulong, IStageInstanceModel>.Update(IStageInstanceModel model, CacheOperation operation)
             => Update(model, operation);
 
-        IEntitySource<IStageInstance, ulong>? IStageChannel.StageInstance => throw new NotImplementedException();
+        IEntitySource<IStageInstance, ulong>? IStageChannel.StageInstance => Instance;
     }
 }
 
