@@ -121,6 +121,10 @@ namespace Discord.WebSocket
                 ? CDN.GetDefaultUserAvatarUrl(DiscriminatorValue)
                 : CDN.GetDefaultUserAvatarUrl(Id);
 
+        /// <inheritdoc />
+        public virtual string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
+
         /// <summary>
         ///     Gets the full name of the user (e.g. Example#0001).
         /// </summary>

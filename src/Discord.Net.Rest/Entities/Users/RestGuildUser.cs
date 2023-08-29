@@ -195,14 +195,12 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc />
-        public string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => GuildAvatarId is not null
-                ? GetGuildAvatarUrl(format, size)
-                : GetAvatarUrl(format, size);
-
-        /// <inheritdoc />
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, GuildId, GuildAvatarId, size, format);
+
+        /// <inheritdoc />
+        public override string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetGuildAvatarUrl(format, size) ?? base.GetDisplayAvatarUrl(format, size);
         #endregion
 
         #region IGuildUser

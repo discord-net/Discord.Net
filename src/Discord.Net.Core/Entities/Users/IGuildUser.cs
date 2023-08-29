@@ -149,19 +149,6 @@ namespace Discord
         /// </returns>
         string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
         /// <summary>
-        ///     Gets the display avatar URL for this user.
-        /// </summary>
-        /// <remarks>
-        ///     This property retrieves an URL for this guild user's displayed avatar.
-        ///     If the user does not have a guild avatar, this will be the user's regular avatar.
-        /// </remarks>
-        /// <param name="format">The format to return.</param>
-        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
-        /// <returns>
-        ///     A string representing the URL of the displayed avatar for this user. <see langword="null"/> if the user does not have an avatar in place.
-        /// </returns>
-        string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
-        /// <summary>
         ///     Kicks this user from this guild.
         /// </summary>
         /// <param name="reason">The reason for the kick which will be recorded in the audit log.</param>

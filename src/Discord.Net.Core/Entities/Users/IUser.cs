@@ -47,6 +47,18 @@ namespace Discord
         /// </returns>
         string GetDefaultAvatarUrl();
         /// <summary>
+        ///     Gets the display avatar URL for this user.
+        /// </summary>
+        /// <remarks>
+        ///     This method will return <see cref="GetDefaultAvatarUrl" /> if the user has no avatar set.
+        /// </remarks>
+        /// <param name="format">The format of the image.</param>
+        /// <param name="size">The size of the image that matches any power of two, ranging from 16 to 2048.</param>
+        /// <returns>
+        ///     A string representing the user's display avatar URL.
+        /// </returns>
+        string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+        /// <summary>
         ///     Gets the per-username unique ID for this user. This will return "0000" for users who have migrated to new username system.
         /// </summary>
         string Discriminator { get; }
