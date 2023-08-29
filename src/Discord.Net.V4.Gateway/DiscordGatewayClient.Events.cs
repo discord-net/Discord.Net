@@ -7,41 +7,60 @@ namespace Discord.Gateway
     {
         public event GuildCreatedEvent GuildCreated
         {
-            add => AddEvent(EventNames.GuildCreate, value);
-            remove => RemoveEvent(EventNames.GuildCreate, value);
+            add => AddEvent(value);
+            remove => RemoveEvent(value);
         }
 
+        private readonly struct QueuedEvent
+        {
+            public readonly Type EventType;
+            public readonly EventHandler.Handle[] Handles;
 
-        private readonly ConcurrentDictionary<string, HashSet<Delegate>> _events
+            public QueuedEvent(Type type, EventHandler.Handle[] handles)
+            {
+                EventType = type;
+                Handles = handles;
+            }
+        }
+
+        private readonly ConcurrentDictionary<Type, HashSet<EventHandler>> _events
             = new();
 
-        internal ValueTask DispatchEvent<TArg>(string name, Func<TArg, ValueTask> _, TArg arg)
-        {
+        private readonly ConcurrentQueue<QueuedEvent> _eventQueue = new();
 
+        internal void QueueEvent<T>(params object?[] args)
+        {
+            if (!_events.TryGetValue(typeof(T), out var handlers) || handlers.Count == 0)
+                return;
+
+            var handles = handlers.Select(x => x.CreateHandle(in args))
+                .ToArray();
+
+            _eventQueue.Enqueue(new QueuedEvent(typeof(T), handles));
         }
 
-        private void AddEvent<T>(string name, T handler)
+        private void AddEvent<T>(T handler)
             where T : Delegate
         {
             _events.AddOrUpdate(
-                name,
-                (_, value) => new HashSet<Delegate>() { value },
+                typeof(T),
+                (_, value) => new HashSet<EventHandler>() { new(handler) },
                 (_, existing, value) =>
                 {
-                    existing.Add(value);
+                    existing.Add(new(handler));
                     return existing;
                 },
                 handler
             );
         }
 
-        private void RemoveEvent<T>(string name, T handler)
+        private void RemoveEvent<T>(T handler)
             where T : Delegate
         {
-            if (!_events.TryGetValue(name, out var handlers))
+            if (!_events.TryGetValue(typeof(T), out var handlers))
                 return;
 
-            handlers.Remove(handler);
+            handlers.RemoveWhere(x => x.HasDelegate(handler));
         }
     }
 }

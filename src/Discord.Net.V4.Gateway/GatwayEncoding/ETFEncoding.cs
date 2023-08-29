@@ -11,7 +11,7 @@ namespace Discord.Gateway
             _config = config;
         }
 
-        public T Decode<T>(Stream data)
+        public T? Decode<T>(Stream data)
             => ETF.DecodeObject<T>(data);
 
         public ReadOnlyMemory<byte> Encode<T>(T value)

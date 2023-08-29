@@ -26,15 +26,14 @@ namespace Discord.Gateway.EventProcessors
 
                     var handle = await client.State.Guilds.CreateAsync(extendedGuild, token);
 
-                    client.QueueEventDispatch<GuildCreatedEvent>(new IEntityHandle[] { handle }, handle.Entity!);
-
+                    client.QueueEvent<GuildCreatedEvent>(handle.Entity);
                     break;
             }
         }
 
         private ValueTask ProcessUnavailableGuildAsync(DiscordGatewayClient client, ExtendedGuild guild)
         {
-
+            
         }
     }
 }

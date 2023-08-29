@@ -8,22 +8,11 @@ namespace Discord.Gateway
 {
     internal class LegacyEventDispatcher : IEventDispatcher
     {
-        public async ValueTask DispatchAsync<T>(T[] funcs, object[] args)
-            where T : Delegate
-
+        public async ValueTask DispatchAsync(Type eventType, EventHandler.Handle[] handles)
         {
-            foreach(var func in funcs)
+            foreach(var handle in handles)
             {
-                var result = func.DynamicInvoke(args);
-
-                if (result is Task task)
-                {
-                    await task;
-                }
-                else if (result is ValueTask vt)
-                {
-                    await vt;
-                }
+                await handle.RunAsync();
             }
         }
     }

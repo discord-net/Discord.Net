@@ -39,7 +39,7 @@ public partial class DiscordRestApiClient : IRestApiProvider
     internal bool UseSystemClock { get; set; }
     internal Func<IRateLimitInfo, Task>? DefaultRatelimitCallback { get; set; }
 
-    private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new ();
+    private readonly AsyncDelegate<Func<string, string, double, Task>> _sentRequestEvent = new ();
 
 
     public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry,

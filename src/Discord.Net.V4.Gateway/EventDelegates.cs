@@ -1,1 +1,3 @@
-global using GuildCreatedEvent = System.Func<Discord.Gateway.GatewayGuild, System.Threading.Tasks.ValueTask>;
+namespace Discord.Gateway;
+
+public delegate ValueTask GuildCreatedEvent(GatewayGuild guild);

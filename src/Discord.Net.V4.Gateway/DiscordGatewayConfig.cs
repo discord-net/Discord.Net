@@ -20,7 +20,7 @@ namespace Discord.Gateway
 
         public ICacheProvider CacheProvider { get; set; } = new ConcurrentCacheProvider();
         public GatewayConnectionFactory GatewayConnection { get; set; } = WebSocketGatewayConnection.Factory;
-        public IGatewayEncoding Encoding { get; set; }
+        public IGatewayEncoding Encoding { get; set; } = new JsonEncoding();
         public ArrayPool<byte> BufferPool { get; set; } = ArrayPool<byte>.Shared;
 
         public int MaxClientMessageTimeout { get; set; } = 120000;
@@ -28,9 +28,7 @@ namespace Discord.Gateway
 
         public DiscordGatewayConfig(DiscordToken token)
             : base(token)
-        {
-            Encoding = new ETFEncoding(this);
-        }
+        { }
     }
 }
 
