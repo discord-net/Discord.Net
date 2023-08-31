@@ -668,13 +668,11 @@ namespace Discord.API
 
             if (limit.HasValue)
             {
-                string beforeEncoded = WebUtility.UrlEncode(before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O"));
-                query = $"?before={beforeEncoded}&limit={limit.Value}";
+                query = $"?before={SnowflakeUtils.ToSnowflake(before.GetValueOrDefault(DateTimeOffset.UtcNow))}&limit={limit.Value}";
             }
             else if (before.HasValue)
             {
-                string beforeEncoded = WebUtility.UrlEncode(before.Value.ToString("O"));
-                query = $"?before={beforeEncoded}";
+                query = $"?before={before.Value.ToString("O")}";
             }
 
             return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/users/@me/threads/archived/private{query}", bucket, options: options);
