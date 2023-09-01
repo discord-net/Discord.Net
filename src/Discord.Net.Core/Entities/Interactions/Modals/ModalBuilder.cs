@@ -127,7 +127,7 @@ namespace Discord
         /// <param name="updateTextInput">An action that configures the updated text input.</param>
         /// <returns>The current builder.</returns>
         /// <exception cref="ArgumentException">
-        ///     Thrown when the <typeparamref name="TMessageComponent"/> to be updated was not found.
+        ///     Thrown when the <see cref="TextInputComponent"/> to be updated was not found.
         /// </exception>
         public ModalBuilder UpdateTextInput(string customId, Action<TextInputBuilder> updateTextInput)
         {
