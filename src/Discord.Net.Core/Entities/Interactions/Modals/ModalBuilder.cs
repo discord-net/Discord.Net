@@ -122,6 +122,49 @@ namespace Discord
             => Components.ActionRows?.SelectMany(r => r.Components.OfType<TMessageComponent>()).FirstOrDefault(c => c?.CustomId == customId)
                 ?? throw new ArgumentException($"There is no component of type {typeof(TMessageComponent).Name} with the specified custom ID in this modal builder.", nameof(customId));
 
+        /// <summary>
+        ///     Updates a <see cref="TextInputComponent"/> by the specified <paramref name="customId"/>.
+        /// </summary>
+        /// <param name="customId">The <see cref="TextInputComponent.CustomId"/> of the input to update.</param>
+        /// <param name="updateTextInput">An action that configures the updated text input.</param>
+        /// <returns>The current builder.</returns>
+        public ModalBuilder UpdateTextInput(string customId, Action<TextInputBuilder> updateTextInput)
+        {
+            var component = GetComponent<TextInputComponent>(customId);
+            var row = Components.ActionRows.First(r => r.Components.Contains(component));
+
+            var builder = new TextInputBuilder
+            {
+                Label = component.Label,
+                CustomId = component.CustomId,
+                Style = component.Style,
+                Placeholder = component.Placeholder,
+                MinLength = component.MinLength,
+                MaxLength = component.MaxLength,
+                Required = component.Required,
+                Value = component.Value
+            };
+
+            updateTextInput(builder);
+
+            row.Components.Remove(component);
+            row.AddComponent(builder.Build());
+
+            return this;
+        }
+        
+        /// <summary>
+        /// Updates the value of a <see cref="TextInputComponent"/> by the specified <paramref name="customId"/>.
+        /// </summary>
+        /// <param name="customId">The <see cref="TextInputComponent.CustomId"/> of the input to update.</param>
+        /// <param name="value">The new value to put.</param>
+        /// <returns>The current builder.</returns>
+        public ModalBuilder UpdateTextInput(string customId, object value)
+        {
+            UpdateTextInput(customId, x => x.Value = value.ToString());
+            return this;
+        }
+
 
         /// <summary>
         ///     Builds this builder into a <see cref="Modal"/>.
