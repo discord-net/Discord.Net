@@ -76,10 +76,11 @@ namespace Discord
         ///     Adds a component to the current builder.
         /// </summary>
         /// <param name="component">The component to add.</param>
+        /// <param name="row">The row to add the text input.</param>
         /// <returns>The current builder.</returns>
-        public ModalBuilder AddTextInput(TextInputBuilder component)
+        public ModalBuilder AddTextInput(TextInputBuilder component, int row = 0)
         {
-            Components.WithTextInput(component);
+            Components.WithTextInput(component, row);
             return this;
         }
 
