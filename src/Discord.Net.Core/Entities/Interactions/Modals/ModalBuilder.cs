@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a builder for creating a <see cref="Modal"/>.
+    /// </summary>
     public class ModalBuilder
     {
         /// <summary>
@@ -37,7 +40,7 @@ namespace Discord
         public ModalBuilder() { }
 
         /// <summary>
-        ///     Creates a new instance of a <see cref="ModalBuilder"/>
+        ///     Creates a new instance of the <see cref="ModalBuilder"/>.
         /// </summary>
         /// <param name="title">The modal's title.</param>
         /// <param name="customId">The modal's customId.</param>
@@ -192,17 +195,17 @@ namespace Discord
         ///     Builds this builder into a <see cref="Modal"/>.
         /// </summary>
         /// <returns>A <see cref="Modal"/> with the same values as this builder.</returns>
-        /// <exception cref="ArgumentException">Only TextInputComponents are allowed.</exception>
-        /// <exception cref="ArgumentException">Modals must have a custom id.</exception>
+        /// <exception cref="ArgumentException">Modals must have a custom ID.</exception>
         /// <exception cref="ArgumentException">Modals must have a title.</exception>
+        /// <exception cref="ArgumentException">Only components of type <see cref="TextInputComponent"/> are allowed.</exception>
         public Modal Build()
         {
             if (string.IsNullOrEmpty(CustomId))
-                throw new ArgumentException("Modals must have a custom id.", nameof(CustomId));
+                throw new ArgumentException("Modals must have a custom ID.", nameof(CustomId));
             if (string.IsNullOrWhiteSpace(Title))
                 throw new ArgumentException("Modals must have a title.", nameof(Title));
-            if (Components.ActionRows?.SelectMany(x => x.Components).Any(x => x.Type != ComponentType.TextInput) ?? false)
-                throw new ArgumentException($"Only TextInputComponents are allowed.", nameof(Components));
+            if (Components.ActionRows?.SelectMany(r => r.Components).Any(c => c.Type != ComponentType.TextInput) ?? false)
+                throw new ArgumentException($"Only components of type {nameof(TextInputComponent)} are allowed.", nameof(Components));
 
             return new(Title, CustomId, Components.Build());
         }
