@@ -172,7 +172,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ModalBuilder RemoveComponent(string customId)
         {
-            Components.ActionRows.ForEach(r => r.Components.RemoveAll(c => c.CustomId == customId));
+            Components.ActionRows?.ForEach(r => r.Components.RemoveAll(c => c.CustomId == customId));
             return this;
         }
 
@@ -183,7 +183,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ModalBuilder RemoveComponentsOfType(ComponentType type)
         {
-            Components.ActionRows.ForEach(r => r.Components.RemoveAll(c => c.Type == type));
+            Components.ActionRows?.ForEach(r => r.Components.RemoveAll(c => c.Type == type));
             return this;
         }
 
