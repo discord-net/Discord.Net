@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -11,33 +9,7 @@ namespace Discord
     /// </summary>
     public class ModalBuilder
     {
-        /// <summary>
-        ///     Gets or sets the components of the current modal.
-        /// </summary>
-        public ModalComponentBuilder Components { get; set; } = new();
-
-        /// <summary>
-        ///     Gets or sets the title of the current modal.
-        /// </summary>
-        public string Title { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the custom id of the current modal.
-        /// </summary>
-        public string CustomId
-        {
-            get => _customId;
-            set => _customId = value?.Length switch
-            {
-                > ComponentBuilder.MaxCustomIdLength => throw new ArgumentOutOfRangeException(nameof(value), $"Custom Id length must be less or equal to {ComponentBuilder.MaxCustomIdLength}."),
-                0 => throw new ArgumentOutOfRangeException(nameof(value), "Custom Id length must be at least 1."),
-                _ => value
-            };
-        }
-
         private string _customId;
-
-        public ModalBuilder() { }
 
         /// <summary>
         ///     Creates a new instance of the <see cref="ModalBuilder"/>.
