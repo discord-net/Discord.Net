@@ -11,6 +11,8 @@ namespace Discord
     {
         private string _customId;
 
+        public ModalBuilder() { }
+
         /// <summary>
         ///     Creates a new instance of the <see cref="ModalBuilder"/>.
         /// </summary>
