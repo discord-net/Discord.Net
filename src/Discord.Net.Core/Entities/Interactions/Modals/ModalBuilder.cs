@@ -109,6 +109,21 @@ namespace Discord
         }
 
         /// <summary>
+        ///     Gets a <see cref="TMessageComponent"/> by the specified <paramref name="customId"/>.
+        /// </summary>
+        /// <typeparam name="TMessageComponent">The type of the component to get.</typeparam>
+        /// <param name="customId">The <see cref="IMessageComponent.CustomId"/> of the component to get.</param>
+        /// <returns>The component of type <typeparamref name="TMessageComponent"/> that was found.</returns>
+        /// <exception cref="ArgumentException">
+        ///     Thrown when the <typeparamref name="TMessageComponent"/> to be updated was not found.
+        /// </exception>
+        public TMessageComponent GetComponent<TMessageComponent>(string customId) 
+            where TMessageComponent : class, IMessageComponent 
+            => Components.ActionRows?.SelectMany(r => r.Components.OfType<TMessageComponent>()).FirstOrDefault(c => c?.CustomId == customId)
+                ?? throw new ArgumentException($"There is no component of type {typeof(TMessageComponent).Name} with the specified custom ID in this modal builder.", nameof(customId));
+
+
+        /// <summary>
         ///     Builds this builder into a <see cref="Modal"/>.
         /// </summary>
         /// <returns>A <see cref="Modal"/> with the same values as this builder.</returns>
