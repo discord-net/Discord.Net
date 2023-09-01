@@ -54,6 +54,30 @@ namespace Discord
         }
 
         /// <summary>
+        ///     Gets or sets the title of the current modal.
+        /// </summary>
+        public string Title { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the custom ID of the current modal.
+        /// </summary>
+        public string CustomId
+        {
+            get => _customId;
+            set => _customId = value?.Length switch
+            {
+                ComponentBuilder.MaxCustomIdLength => throw new ArgumentOutOfRangeException(nameof(value), $"Custom ID length must be less or equal to {ComponentBuilder.MaxCustomIdLength}."),
+                0 => throw new ArgumentOutOfRangeException(nameof(value), "Custom ID length must be at least 1."),
+                _ => value
+            };
+        }
+
+        /// <summary>
+        ///     Gets or sets the components of the current modal.
+        /// </summary>
+        public ModalComponentBuilder Components { get; set; } = new();
+
+        /// <summary>
         ///     Sets the title of the current modal.
         /// </summary>
         /// <param name="title">The value to set the title to.</param>
