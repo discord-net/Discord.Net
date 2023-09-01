@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -111,7 +109,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Gets a <see cref="TMessageComponent"/> by the specified <paramref name="customId"/>.
+        ///     Gets a <typeparamref name="TMessageComponent"/> by the specified <paramref name="customId"/>.
         /// </summary>
         /// <typeparam name="TMessageComponent">The type of the component to get.</typeparam>
         /// <param name="customId">The <see cref="IMessageComponent.CustomId"/> of the component to get.</param>
@@ -170,7 +168,7 @@ namespace Discord
         /// <summary>
         ///     Removes a component from this builder by the specified <paramref name="customId"/>.
         /// </summary>
-        /// <param name="customId">The <see cref="MessageComponent.CustomId"/> of the component to remove.</param>
+        /// <param name="customId">The <see cref="IMessageComponent.CustomId"/> of the component to remove.</param>
         /// <returns>The current builder.</returns>
         public ModalBuilder RemoveComponent(string customId)
         {
