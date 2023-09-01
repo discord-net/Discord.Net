@@ -165,6 +165,27 @@ namespace Discord
             return this;
         }
 
+        /// <summary>
+        ///     Removes a component from this builder by the specified <paramref name="customId"/>.
+        /// </summary>
+        /// <param name="customId">The <see cref="MessageComponent.CustomId"/> of the component to remove.</param>
+        /// <returns>The current builder.</returns>
+        public ModalBuilder RemoveComponent(string customId)
+        {
+            Components.ActionRows.ForEach(r => r.Components.RemoveAll(c => c.CustomId == customId));
+            return this;
+        }
+
+        /// <summary>
+        ///     Removes all components of the given <paramref name="type"/> from this builder.
+        /// </summary>
+        /// <param name="type">The <see cref="ComponentType"/> to remove.</param>
+        /// <returns>The current builder.</returns>
+        public ModalBuilder RemoveComponentsOfType(ComponentType type)
+        {
+            Components.ActionRows.ForEach(r => r.Components.RemoveAll(c => c.Type == type));
+            return this;
+        }
 
         /// <summary>
         ///     Builds this builder into a <see cref="Modal"/>.
