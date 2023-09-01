@@ -40,7 +40,7 @@ namespace Discord
             get => _customId;
             set => _customId = value?.Length switch
             {
-                ComponentBuilder.MaxCustomIdLength => throw new ArgumentOutOfRangeException(nameof(value), $"Custom ID length must be less or equal to {ComponentBuilder.MaxCustomIdLength}."),
+                > ComponentBuilder.MaxCustomIdLength => throw new ArgumentOutOfRangeException(nameof(value), $"Custom ID length must be less or equal to {ComponentBuilder.MaxCustomIdLength}."),
                 0 => throw new ArgumentOutOfRangeException(nameof(value), "Custom ID length must be at least 1."),
                 _ => value
             };
