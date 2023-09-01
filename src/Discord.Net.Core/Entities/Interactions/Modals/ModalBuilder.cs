@@ -116,13 +116,9 @@ namespace Discord
         /// <typeparam name="TMessageComponent">The type of the component to get.</typeparam>
         /// <param name="customId">The <see cref="IMessageComponent.CustomId"/> of the component to get.</param>
         /// <returns>The component of type <typeparamref name="TMessageComponent"/> that was found.</returns>
-        /// <exception cref="ArgumentException">
-        ///     Thrown when the <typeparamref name="TMessageComponent"/> to be updated was not found.
-        /// </exception>
         public TMessageComponent GetComponent<TMessageComponent>(string customId) 
-            where TMessageComponent : class, IMessageComponent 
-            => Components.ActionRows?.SelectMany(r => r.Components.OfType<TMessageComponent>()).FirstOrDefault(c => c?.CustomId == customId)
-                ?? throw new ArgumentException($"There is no component of type {typeof(TMessageComponent).Name} with the specified custom ID in this modal builder.", nameof(customId));
+            where TMessageComponent : class, IMessageComponent
+            => Components.ActionRows?.SelectMany(r => r.Components.OfType<TMessageComponent>()).FirstOrDefault(c => c?.CustomId == customId);
 
         /// <summary>
         ///     Updates a <see cref="TextInputComponent"/> by the specified <paramref name="customId"/>.
@@ -130,9 +126,12 @@ namespace Discord
         /// <param name="customId">The <see cref="TextInputComponent.CustomId"/> of the input to update.</param>
         /// <param name="updateTextInput">An action that configures the updated text input.</param>
         /// <returns>The current builder.</returns>
+        /// <exception cref="ArgumentException">
+        ///     Thrown when the <typeparamref name="TMessageComponent"/> to be updated was not found.
+        /// </exception>
         public ModalBuilder UpdateTextInput(string customId, Action<TextInputBuilder> updateTextInput)
         {
-            var component = GetComponent<TextInputComponent>(customId);
+            var component = GetComponent<TextInputComponent>(customId) ?? throw new ArgumentException($"There is no component of type {nameof(TextInputComponent)} with the specified custom ID in this modal builder.", nameof(customId));
             var row = Components.ActionRows.First(r => r.Components.Contains(component));
 
             var builder = new TextInputBuilder
