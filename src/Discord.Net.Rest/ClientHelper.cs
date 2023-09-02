@@ -121,6 +121,14 @@ namespace Discord.Rest
                 return RestGuildWidget.Create(model);
             return null;
         }
+
+        public static async ValueTask<IEnumerable<RestUserGuild>> GetAllGuildsAsync(
+            BaseDiscordClient client, RequestOptions options)
+        {
+            var models = await client.ApiClient.GetAllMyGuildsAsync(options).ConfigureAwait(false);
+            return models.Select(x => RestUserGuild.Create(client, x));
+        }
+
         public static IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(BaseDiscordClient client,
             ulong? fromGuildId, int? limit, RequestOptions options)
         {

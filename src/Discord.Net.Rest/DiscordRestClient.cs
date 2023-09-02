@@ -209,6 +209,8 @@ namespace Discord.Rest
             => ClientHelper.GetGuildAsync(this, id, withCounts, options);
         public Task<RestGuildWidget?> GetGuildWidgetAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildWidgetAsync(this, id, options);
+        public ValueTask<IEnumerable<RestUserGuild>> GetAllGuildsAsync(RequestOptions options = null)
+            => ClientHelper.GetAllGuildsAsync(this, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(RequestOptions options = null)
             => ClientHelper.GetGuildSummariesAsync(this, null, null, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(ulong fromGuildId, int limit, RequestOptions options = null)
