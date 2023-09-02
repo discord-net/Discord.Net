@@ -618,11 +618,13 @@ namespace Discord.API
 
             if (limit.HasValue)
             {
-                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O")}&limit={limit.Value}";
+                string beforeEncoded = WebUtility.UrlEncode(before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O"));
+                query = $"?before={beforeEncoded}&limit={limit.Value}";
             }
             else if (before.HasValue)
             {
-                query = $"?before={before.Value.ToString("O")}";
+                string beforeEncoded = WebUtility.UrlEncode(before.Value.ToString("O"));
+                query = $"?before={beforeEncoded}";
             }
 
             return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/public{query}", bucket, options: options);
@@ -641,11 +643,13 @@ namespace Discord.API
 
             if (limit.HasValue)
             {
-                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O")}&limit={limit.Value}";
+                string beforeEncoded = WebUtility.UrlEncode(before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O"));
+                query = $"?before={beforeEncoded}&limit={limit.Value}";
             }
             else if (before.HasValue)
             {
-                query = $"?before={before.Value.ToString("O")}";
+                string beforeEncoded = WebUtility.UrlEncode(before.Value.ToString("O"));
+                query = $"?before={beforeEncoded}";
             }
 
             return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/private{query}", bucket, options: options);
