@@ -172,7 +172,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ModalBuilder UpdateTextInput(string customId, object value)
         {
-            UpdateTextInput(customId, x => x.Value = value.ToString());
+            UpdateTextInput(customId, x => x.Value = value?.ToString());
             return this;
         }
 
