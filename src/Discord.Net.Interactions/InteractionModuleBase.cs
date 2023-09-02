@@ -1,4 +1,3 @@
-using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -122,8 +121,6 @@ namespace Discord.Interactions
         /// <inheritdoc cref="IDiscordInteractionExtentions.RespondWithModalAsync{T}(IDiscordInteraction, string, RequestOptions, Action{ModalBuilder})"/>
         protected virtual async Task RespondWithModalAsync<TModal>(string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null) where TModal : class, IModal
             => await Context.Interaction.RespondWithModalAsync<TModal>(customId, options, modifyModal);
-
-        //IInteractionModuleBase
 
         /// <inheritdoc/>
         void IInteractionModuleBase.SetContext(IInteractionContext context) => SetContext(context);
