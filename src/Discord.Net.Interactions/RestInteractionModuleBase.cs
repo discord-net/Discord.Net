@@ -58,7 +58,20 @@ namespace Discord.Interactions
         protected override async Task RespondWithModalAsync(Modal modal, RequestOptions options = null)
             => await HandleInteractionAsync(x => x.RespondWithModal(modal, options));
 
-            var payload = restInteraction.RespondWithModal(modal, options);
+        /// <summary>
+        ///     Responds to the interaction with a modal.
+        /// </summary>
+        /// <typeparam name="TModal">The type of the modal.</typeparam>
+        /// <param name="customId">The custom ID of the modal.</param>
+        /// <param name="modal">The modal to respond with.</param>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
+        /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
+        /// <returns>
+        ///     A Task representing the operation of creating the interaction response.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">Thrown if the interaction isn't a type of <see cref="RestInteraction"/>.</exception>
+        protected override async Task RespondWithModalAsync<TModal>(string customId, TModal modal, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+            => await HandleInteractionAsync(x => x.RespondWithModal(customId, modal, options, modifyModal));
 
         /// <summary>
         ///     Responds to the interaction with a modal.
@@ -71,7 +84,7 @@ namespace Discord.Interactions
         ///     A Task representing the operation of creating the interaction response.
         /// </returns>
         /// <exception cref="InvalidOperationException">Thrown if the interaction isn't a type of <see cref="RestInteraction"/>.</exception>
-        protected override async Task RespondWithModalAsync<TModal>(string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+        protected override async Task RespondWithModalAsync<TModal>(string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null) 
             => await HandleInteractionAsync(x => x.RespondWithModal<TModal>(customId, options, modifyModal));
 
         private async Task HandleInteractionAsync(Func<RestInteraction, string> action)
