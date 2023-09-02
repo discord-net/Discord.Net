@@ -116,7 +116,7 @@ namespace Discord
         /// <typeparam name="TMessageComponent">The type of the component to get.</typeparam>
         /// <param name="customId">The <see cref="IMessageComponent.CustomId"/> of the component to get.</param>
         /// <returns>
-        ///     The component of type <typeparamref name="TMessageComponent"/> that was found, <see langword="null"> otherwise.
+        ///     The component of type <typeparamref name="TMessageComponent"/> that was found, <see langword="null"/> otherwise.
         /// </returns>
         public TMessageComponent GetComponent<TMessageComponent>(string customId)
             where TMessageComponent : class, IMessageComponent
