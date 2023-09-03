@@ -2,5 +2,5 @@ namespace Discord;
 
 public interface IDeletable
 {
-    ValueTask DeleteAsync(RequestOptions? options = null, CancellationToken token = default);
+    Task DeleteAsync(RequestOptions? options = null, CancellationToken token = default);
 }

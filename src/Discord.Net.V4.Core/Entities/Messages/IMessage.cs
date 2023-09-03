@@ -1,5 +1,3 @@
-using System.Net.Mail;
-
 namespace Discord;
 
 public interface IMessage : ISnowflakeEntity, IDeletable
