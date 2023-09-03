@@ -1,4 +1,5 @@
 using Discord.API.Rest;
+using Discord.EntityProperties.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;

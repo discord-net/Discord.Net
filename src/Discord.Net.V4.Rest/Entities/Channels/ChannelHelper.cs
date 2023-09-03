@@ -1,4 +1,5 @@
 using Discord.API.Rest;
+using Discord.Entities.Messages.Embeds;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;

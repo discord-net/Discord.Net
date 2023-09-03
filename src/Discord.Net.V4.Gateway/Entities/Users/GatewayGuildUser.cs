@@ -1,4 +1,5 @@
 using Discord.API;
+using Discord.EntityProperties.Users;
 using Discord.Gateway.Cache;
 using System;
 using System.Collections.Generic;

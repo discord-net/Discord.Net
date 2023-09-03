@@ -1,3 +1,4 @@
+using Discord.Entities.Messages.Embeds;
 using Discord.Gateway.Cache;
 using System;
 using System.Collections.Generic;

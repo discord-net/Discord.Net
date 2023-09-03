@@ -1,3 +1,4 @@
+using Discord.Entities.Messages.Embeds;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;

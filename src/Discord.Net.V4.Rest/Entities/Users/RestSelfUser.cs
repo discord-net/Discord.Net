@@ -1,3 +1,4 @@
+using Discord.EntityProperties.Users;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;

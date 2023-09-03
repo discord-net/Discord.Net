@@ -1,3 +1,4 @@
+using Discord.Entities.Messages.Embeds;
 using Discord.Net;
 using Newtonsoft.Json;
 using System;
