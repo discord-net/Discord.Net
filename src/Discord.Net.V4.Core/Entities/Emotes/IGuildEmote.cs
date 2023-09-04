@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord;
 
 /// <summary>
 ///     An image-based emote that is attached to a guild.
 /// </summary>
-internal interface IGuildEmote : IEmote, ISnowflakeEntity, IModifyable<EmoteProperties>
+public interface IGuildEmote : IEmote, ISnowflakeEntity, IModifyable<EmoteProperties>
 {
     /// <summary>
     ///     Gets whether this emoji is managed by an integration.

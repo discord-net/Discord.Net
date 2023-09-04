@@ -1,5 +1,5 @@
 namespace Discord;
 
-public interface IGatewayClient
+public interface IGatewayClient : IDiscordClient
 {
 }

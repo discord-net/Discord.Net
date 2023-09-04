@@ -36,32 +36,7 @@ public sealed class GuildUserProperties
     /// <summary>
     ///     Gets or sets the roles the user should have.
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         To add a role to a user:
-    ///         <see cref="IGuildUser.AddRolesAsync(IEnumerable{IRole},RequestOptions)" />
-    ///     </para>
-    ///     <para>
-    ///         To remove a role from a user:
-    ///         <see cref="IGuildUser.RemoveRolesAsync(IEnumerable{IRole},RequestOptions)" />
-    ///     </para>
-    /// </remarks>
-    public Optional<IEnumerable<IRole>> Roles { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the roles the user should have.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         To add a role to a user:
-    ///         <see cref="IGuildUser.AddRolesAsync(IEnumerable{IRole},RequestOptions)" />
-    ///     </para>
-    ///     <para>
-    ///         To remove a role from a user:
-    ///         <see cref="IGuildUser.RemoveRolesAsync(IEnumerable{IRole},RequestOptions)" />
-    ///     </para>
-    /// </remarks>
-    public Optional<IEnumerable<ulong>> RoleIds { get; set; }
+    public Optional<IEnumerable<EntityOrId<ulong, IRole>>> Roles { get; set; }
 
     /// <summary>
     ///     Moves a user to a voice channel. If <see langword="null" />, this user will be disconnected from their current voice channel.
@@ -70,15 +45,7 @@ public sealed class GuildUserProperties
     ///     This user MUST already be in a <see cref="IVoiceChannel"/> for this to work.
     ///     When set, this property takes precedence over <see cref="ChannelId"/>.
     /// </remarks>
-    public Optional<IVoiceChannel> Channel { get; set; }
-
-    /// <summary>
-    ///     Moves a user to a voice channel. Set <see cref="Channel"/> to <see langword="null" /> to disconnect this user from their current voice channel.
-    /// </summary>
-    /// <remarks>
-    ///     This user MUST already be in a <see cref="IVoiceChannel"/> for this to work.
-    /// </remarks>
-    public Optional<ulong?> ChannelId { get; set; }
+    public Optional<EntityOrId<ulong, IVoiceChannel>> Channel { get; set; }
 
     /// <summary>
     ///     Sets a timestamp how long a user should be timed out for.

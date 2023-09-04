@@ -19,7 +19,7 @@ public interface IGuildModel : IEntityModel<ulong>
     MfaLevel MFALevel { get; }
     ulong? ApplicationId { get; }
     ulong? SystemChannelId { get; }
-    SystemChannelMessageDeny SystemChannelFlags { get; }
+    SystemChannelFlags SystemChannelFlags { get; }
     ulong? RulesChannelId { get; }
     int? MaxPresense { get; }
     int? MaxMembers { get; }

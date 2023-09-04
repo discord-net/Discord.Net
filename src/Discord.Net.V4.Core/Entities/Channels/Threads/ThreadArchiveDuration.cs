@@ -1,4 +1,4 @@
-namespace Discord.Entities.Channels.Threads;
+namespace Discord;
 
 /// <summary>
 ///     Represents the thread auto archive duration.

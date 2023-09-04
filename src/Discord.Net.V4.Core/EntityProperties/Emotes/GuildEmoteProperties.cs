@@ -15,10 +15,5 @@ public class EmoteProperties
     /// <summary>
     ///     Gets or sets the roles that can access this <see cref="Emote"/>.
     /// </summary>
-    public Optional<IEnumerable<IRole>> Roles { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the roles that can access this <see cref="Emote"/>.
-    /// </summary>
-    public Optional<IEnumerable<ulong>> RoleIds { get; set; }
+    public Optional<IEnumerable<EntityOrId<ulong, IRole>>> Roles { get; set; }
 }

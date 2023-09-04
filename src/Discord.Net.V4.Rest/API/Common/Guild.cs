@@ -70,7 +70,7 @@ internal class Guild : IGuildModel
 
     // this value is inverted, flags set will turn OFF features
     [JsonPropertyName("system_channel_flags")]
-    public SystemChannelMessageDeny SystemChannelFlags { get; set; }
+    public SystemChannelFlags SystemChannelFlags { get; set; }
 
     [JsonPropertyName("rules_channel_id")]
     public ulong? RulesChannelId { get; set; }

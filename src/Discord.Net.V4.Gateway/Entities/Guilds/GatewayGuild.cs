@@ -107,7 +107,7 @@ namespace Discord.Gateway
         public string? VanityURLCode
             => _source.Vanity;
 
-        public SystemChannelMessageDeny SystemChannelFlags
+        public SystemChannelFlags SystemChannelFlags
             => _source.SystemChannelFlags;
 
         public string? Description

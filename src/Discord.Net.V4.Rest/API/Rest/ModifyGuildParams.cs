@@ -44,7 +44,7 @@ internal class ModifyGuildParams
     public Optional<ulong?> SystemChannelId { get; set; }
 
     [JsonPropertyName("system_channel_flags")]
-    public Optional<SystemChannelMessageDeny> SystemChannelFlags { get; set; }
+    public Optional<SystemChannelFlags> SystemChannelFlags { get; set; }
 
     [JsonPropertyName("rules_channel_id")]
     public Optional<ulong> RulesChannelId { get; set; }

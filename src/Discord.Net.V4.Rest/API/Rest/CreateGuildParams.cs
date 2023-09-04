@@ -38,5 +38,5 @@ internal class CreateGuildParams
     public Optional<ulong> SystemChannelId { get; set; }
 
     [JsonPropertyName("system_channel_flags")]
-    public Optional<SystemChannelMessageDeny> Icon { get; set; }
+    public Optional<SystemChannelFlags> Icon { get; set; }
 }

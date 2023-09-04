@@ -90,7 +90,7 @@ public struct GuildInfo
     /// <remarks>
     ///     <see langword="null" /> if the value was not updated in this entry.
     /// </remarks>
-    public SystemChannelMessageDeny? SystemChannelFlags { get; }
+    public SystemChannelFlags? SystemChannelFlags { get; }
 
     /// <inheritdoc cref="IGuild.Description"/>
     /// <remarks>

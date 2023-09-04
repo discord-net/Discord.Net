@@ -15,7 +15,7 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the team's icon.
         /// </returns>
-        public static string? GetTeamIconUrl(ulong teamId, string iconId)
+        public static string? GetTeamIconUrl(ulong teamId, string? iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}team-icons/{teamId}/{iconId}.jpg" : null;
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the application's icon.
         /// </returns>
-        public static string? GetApplicationIconUrl(ulong appId, string iconId)
+        public static string? GetApplicationIconUrl(ulong appId, string? iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}app-icons/{appId}/{iconId}.jpg" : null;
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the user's avatar in the specified size.
         /// </returns>
-        public static string? GetUserAvatarUrl(ulong userId, string avatarId, ushort size, ImageFormat format)
+        public static string? GetUserAvatarUrl(ulong userId, string? avatarId, ushort size, ImageFormat format)
         {
             if (avatarId == null)
                 return null;
@@ -47,7 +47,7 @@ namespace Discord
             return $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}.{extension}?size={size}";
         }
 
-        public static string? GetGuildUserAvatarUrl(ulong userId, ulong guildId, string avatarId, ushort size, ImageFormat format)
+        public static string? GetGuildUserAvatarUrl(ulong userId, ulong guildId, string? avatarId, ushort size, ImageFormat format)
         {
             if (avatarId == null)
                 return null;
@@ -65,7 +65,7 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the user's banner in the specified size.
         /// </returns>
-        public static string? GetUserBannerUrl(ulong userId, string bannerId, ushort size, ImageFormat format)
+        public static string? GetUserBannerUrl(ulong userId, string? bannerId, ushort size, ImageFormat format)
         {
             if (bannerId == null)
                 return null;
@@ -105,7 +105,7 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the guild's icon.
         /// </returns>
-        public static string? GetGuildIconUrl(ulong guildId, string iconId)
+        public static string? GetGuildIconUrl(ulong guildId, string? iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg" : null;
         /// <summary>
         ///     Returns a guild role's icon URL.
@@ -115,7 +115,7 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the guild role's icon.
         /// </returns>
-        public static string? GetGuildRoleIconUrl(ulong roleId, string roleHash)
+        public static string? GetGuildRoleIconUrl(ulong roleId, string? roleHash)
             => roleHash != null ? $"{DiscordConfig.CDNUrl}role-icons/{roleId}/{roleHash}.png" : null;
         /// <summary>
         ///     Returns a guild splash URL.
@@ -125,7 +125,7 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the guild's splash.
         /// </returns>
-        public static string GetGuildSplashUrl(ulong guildId, string splashId)
+        public static string? GetGuildSplashUrl(ulong guildId, string? splashId)
             => splashId != null ? $"{DiscordConfig.CDNUrl}splashes/{guildId}/{splashId}.jpg" : null;
         /// <summary>
         ///     Returns a guild discovery splash URL.
@@ -135,7 +135,7 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the guild's discovery splash.
         /// </returns>
-        public static string? GetGuildDiscoverySplashUrl(ulong guildId, string discoverySplashId)
+        public static string? GetGuildDiscoverySplashUrl(ulong guildId, string? discoverySplashId)
             => discoverySplashId != null ? $"{DiscordConfig.CDNUrl}discovery-splashes/{guildId}/{discoverySplashId}.jpg" : null;
         /// <summary>
         ///     Returns a channel icon URL.
@@ -145,7 +145,7 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the channel's icon.
         /// </returns>
-        public static string? GetChannelIconUrl(ulong channelId, string iconId)
+        public static string? GetChannelIconUrl(ulong channelId, string? iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}channel-icons/{channelId}/{iconId}.jpg" : null;
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the guild's banner image.
         /// </returns>
-        public static string? GetGuildBannerUrl(ulong guildId, string bannerId, ImageFormat format, ushort? size = null)
+        public static string? GetGuildBannerUrl(ulong guildId, string? bannerId, ImageFormat format, ushort? size = null)
         {
             if (string.IsNullOrEmpty(bannerId))
                 return null;

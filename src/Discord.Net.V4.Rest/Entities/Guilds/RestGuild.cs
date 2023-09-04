@@ -70,7 +70,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string VanityURLCode { get; private set; }
         /// <inheritdoc />
-        public SystemChannelMessageDeny SystemChannelFlags { get; private set; }
+        public SystemChannelFlags SystemChannelFlags { get; private set; }
         /// <inheritdoc />
         public string Description { get; private set; }
         /// <inheritdoc />

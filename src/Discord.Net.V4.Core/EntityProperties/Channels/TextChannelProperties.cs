@@ -1,7 +1,3 @@
-using Discord.Entities.Channels.Threads;
-using System;
-using System.Collections.Generic;
-
 namespace Discord;
 
 /// <summary>
