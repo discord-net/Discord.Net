@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class InviteVanity
+public class InviteVanity
 {
     [JsonPropertyName("code")]
     public string Code { get; set; }

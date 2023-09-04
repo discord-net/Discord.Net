@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class ActivityTimestamps
+public class ActivityTimestamps
 {
     [JsonPropertyName("start")]
     public Optional<long> Start { get; set; }

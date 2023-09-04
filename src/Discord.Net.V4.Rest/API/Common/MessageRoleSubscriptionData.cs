@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class MessageRoleSubscriptionData
+public class MessageRoleSubscriptionData
 {
     [JsonPropertyName("role_subscription_listing_id")]
     public ulong SubscriptionListingId { get; set; }

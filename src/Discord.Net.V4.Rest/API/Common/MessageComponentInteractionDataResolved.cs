@@ -1,7 +1,8 @@
 using System.Text.Json.Serialization;
+
 namespace Discord.API;
 
-internal class MessageComponentInteractionDataResolved
+public class MessageComponentInteractionDataResolved
 {
     [JsonPropertyName("users")]
     public Optional<Dictionary<string, User>> Users { get; set; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class AutocompleteInteractionData : IDiscordInteractionData
+public class AutocompleteInteractionData : IDiscordInteractionData
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }

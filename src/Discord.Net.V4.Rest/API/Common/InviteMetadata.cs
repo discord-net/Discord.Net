@@ -1,7 +1,8 @@
 using System.Text.Json.Serialization;
+
 namespace Discord.API;
 
-internal class InviteMetadata : Invite
+public class InviteMetadata : Invite
 {
     [JsonPropertyName("uses")]
     public int Uses { get; set; }

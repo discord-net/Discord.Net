@@ -21,15 +21,6 @@ public class Routes
     public static string GetUrlEncodedQueryParam(string key, object value)
         => $"{key}={WebUtility.UrlEncode(value.ToString())}";
 
-
-    public string GetEncodedQueryParams(params object[] args)
-    {
-        if (args.Length == 0)
-            return string.Empty;
-
-        return $"?{string.Join("&" , args.Select(x => WebUtility.UrlEncode(x.ToString())))}";
-    }
-
     #region User
 
     public static string GetUser(ulong userId)

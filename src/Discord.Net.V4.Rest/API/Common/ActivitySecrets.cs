@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class ActivitySecrets
+public class ActivitySecrets
 {
     [JsonPropertyName("match")]
     public Optional<string> Match { get; set; }

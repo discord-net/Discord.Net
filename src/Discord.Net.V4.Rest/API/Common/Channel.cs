@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class Channel
+public class Channel
 {
     //Shared
     [JsonPropertyName("id")]

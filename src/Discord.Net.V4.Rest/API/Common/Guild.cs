@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class Guild : IGuildModel
+public class Guild : IGuildModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class Presence
+public class Presence
 {
     [JsonPropertyName("user")]
     public User User { get; set; }

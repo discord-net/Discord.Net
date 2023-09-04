@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Discord.API;
 
 [JsonConverter(typeof(Net.Converters.InteractionConverter))]
-internal class Interaction
+public class Interaction
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }

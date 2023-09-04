@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class EmbedProvider
+public class EmbedProvider
 {
     [JsonPropertyName("name")]
     public Optional<string> Name { get; set; }

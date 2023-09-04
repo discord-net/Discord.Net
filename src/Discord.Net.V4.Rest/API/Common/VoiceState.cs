@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class VoiceState
+public class VoiceState
 {
     [JsonPropertyName("guild_id")]
     public Optional<ulong> GuildId { get; set; }

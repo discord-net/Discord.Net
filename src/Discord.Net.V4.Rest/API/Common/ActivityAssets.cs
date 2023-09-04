@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class ActivityAssets
+public class ActivityAssets
 {
     [JsonPropertyName("small_text")]
     public Optional<string> SmallText { get; set; }

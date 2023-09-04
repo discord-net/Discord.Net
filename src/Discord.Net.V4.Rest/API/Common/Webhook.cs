@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class Webhook
+public class Webhook
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }

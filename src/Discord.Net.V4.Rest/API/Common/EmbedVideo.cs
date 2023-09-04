@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class EmbedVideo
+public class EmbedVideo
 {
     [JsonPropertyName("url")]
     public Optional<string> Url { get; set; }

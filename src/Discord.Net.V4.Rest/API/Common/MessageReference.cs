@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class MessageReference
+public class MessageReference
 {
     [JsonPropertyName("message_id")]
     public Optional<ulong> MessageId { get; set; }

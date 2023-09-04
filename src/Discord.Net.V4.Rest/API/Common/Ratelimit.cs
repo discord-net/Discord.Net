@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class Ratelimit
+public class Ratelimit
 {
     [JsonPropertyName("global")]
     public bool Global { get; set; }

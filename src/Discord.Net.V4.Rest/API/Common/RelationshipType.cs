@@ -1,6 +1,6 @@
 namespace Discord.API;
 
-internal enum RelationshipType
+public enum RelationshipType
 {
     Friend = 1,
     Blocked = 2,

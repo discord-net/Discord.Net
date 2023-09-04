@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class Team
+public class Team
 {
     [JsonPropertyName("icon")]
     public string? Icon { get; set; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class Reaction
+public class Reaction
 {
     [JsonPropertyName("count")]
     public int Count { get; set; }

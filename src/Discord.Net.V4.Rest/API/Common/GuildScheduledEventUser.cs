@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class GuildScheduledEventUser
+public class GuildScheduledEventUser
 {
     [JsonPropertyName("guild_scheduled_event_id")]
     public ulong GuildScheduledEventId { get; set; }

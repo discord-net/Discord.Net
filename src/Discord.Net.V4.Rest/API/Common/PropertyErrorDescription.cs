@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class ErrorDetails
+public class ErrorDetails
 {
     [JsonPropertyName("name")]
     public Optional<string> Name { get; set; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class AllowedMentions
+public class AllowedMentions
 {
     [JsonPropertyName("parse")]
     public Optional<string[]> Parse { get; set; }

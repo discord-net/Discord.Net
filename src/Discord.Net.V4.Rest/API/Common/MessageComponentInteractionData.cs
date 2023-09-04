@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class MessageComponentInteractionData : IDiscordInteractionData
+public class MessageComponentInteractionData : IDiscordInteractionData
 {
     [JsonPropertyName("custom_id")]
     public string CustomId { get; set; }

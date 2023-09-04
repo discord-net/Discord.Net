@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class AuditLogOptions
+public class AuditLogOptions
 {
     [JsonPropertyName("count")]
     public Optional<int> Count { get; set; }

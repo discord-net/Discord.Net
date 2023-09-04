@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class SelectMenuComponent : IMessageComponent
+public class SelectMenuComponent : IMessageComponent
 {
     [JsonPropertyName("type")]
     public ComponentType Type { get; set; }

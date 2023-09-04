@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class ActivityButton
+public class ActivityButton
 {
     [JsonPropertyName("label")]
     public string Label { get; set; }

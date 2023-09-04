@@ -1,9 +1,8 @@
-using Discord.Entities.Channels.Threads;
 using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class ThreadMetadata
+public class ThreadMetadata
 {
     [JsonPropertyName("archived")]
     public bool Archived { get; set; }

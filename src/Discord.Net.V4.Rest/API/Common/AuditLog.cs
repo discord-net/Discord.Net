@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-internal class AuditLog
+public class AuditLog
 {
     [JsonPropertyName("application_commands")]
     public ApplicationCommand[] Commands { get; set; }
