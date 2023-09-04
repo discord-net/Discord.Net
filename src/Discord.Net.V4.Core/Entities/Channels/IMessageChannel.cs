@@ -6,6 +6,36 @@ namespace Discord;
 public interface IMessageChannel : IChannel
 {
     /// <summary>
+    ///     Deletes a message.
+    /// </summary>
+    /// <param name="messageId">The snowflake identifier of the message that would be removed.</param>
+    /// <param name="options">The options to be used when sending the request.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <returns>
+    ///     A task that represents the asynchronous removal operation.
+    /// </returns>
+    /// <exception cref="MissingPermissionException">The current user doesn't have permission to delete the message.</exception>
+    Task DeleteMessageAsync(ulong messageId, RequestOptions? options = null, CancellationToken token = default);
+
+    /// <summary>
+    ///     Bulk-deletes multiple messages.
+    /// </summary>
+    /// <remarks>
+    ///     This method attempts to remove the messages specified in bulk.
+    ///     <note type="important">
+    ///         Due to the limitation set by Discord, this method can only remove messages that are posted within 14 days!
+    ///     </note>
+    /// </remarks>
+    /// <param name="messageIds">The snowflake identifier of the messages to be bulk-deleted.</param>
+    /// <param name="options">The options to be used when sending the request.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <returns>
+    ///     A task that represents the asynchronous bulk-removal operation.
+    /// </returns>
+    /// <exception cref="MissingPermissionException">The current user doesn't have permission to delete the message.</exception>
+    Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions? options = null, CancellationToken token = default);
+
+    /// <summary>
     ///     Sends a message to this message channel.
     /// </summary>
     /// <param name="message">The message to send.</param>
@@ -116,6 +146,7 @@ public interface IMessageChannel : IChannel
     ///     A task that represents the asynchronous operation that triggers the broadcast.
     /// </returns>
     Task TriggerTypingAsync(RequestOptions? options = null, CancellationToken token = default);
+
     /// <summary>
     ///     Continuously broadcasts the "user is typing" message to all users in this channel until the returned
     ///     object is disposed.

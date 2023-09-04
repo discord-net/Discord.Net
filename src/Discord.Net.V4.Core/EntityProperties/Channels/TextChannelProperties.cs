@@ -1,3 +1,4 @@
+using Discord.Entities.Channels.Threads;
 using System;
 using System.Collections.Generic;
 
@@ -6,7 +7,6 @@ namespace Discord;
 /// <summary>
 ///     Provides properties that are used to modify an <see cref="ITextChannel"/> with the specified changes.
 /// </summary>
-/// <seealso cref="ITextChannel.ModifyAsync(System.Action{TextChannelProperties}, RequestOptions)"/>
 public class TextChannelProperties : GuildChannelProperties
 {
     /// <summary>

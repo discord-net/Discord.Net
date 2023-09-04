@@ -1,3 +1,4 @@
+using Discord.Entities.Channels.Threads;
 using System.Text.Json.Serialization;
 
 namespace Discord.API.Rest;

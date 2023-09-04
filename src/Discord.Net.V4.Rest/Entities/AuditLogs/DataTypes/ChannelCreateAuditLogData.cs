@@ -1,5 +1,5 @@
 using Discord.API.AuditLogs;
-
+using Discord.Entities.Channels.Threads;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -147,7 +147,7 @@ public class ChannelCreateAuditLogData : IAuditLogData
     /// <summary>
     ///     Gets tags available in the created forum channel.
     /// </summary>
-    public IReadOnlyCollection<ForumTag> AvailableTags { get; }
+    public IReadOnlyCollection<IForumTag> AvailableTags { get; }
 
     /// <summary>
     ///     Gets the default reaction added to posts in the created forum channel.

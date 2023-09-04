@@ -1,3 +1,5 @@
+using Discord.Entities.Channels.Threads;
+
 namespace Discord.Models;
 
 public interface IThreadChannelModel : IGuildTextChannelModel

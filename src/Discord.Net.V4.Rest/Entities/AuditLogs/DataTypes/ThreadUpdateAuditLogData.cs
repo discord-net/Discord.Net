@@ -1,5 +1,5 @@
 using Discord.API.AuditLogs;
-
+using Discord.Entities.Channels.Threads;
 using System.Linq;
 using EntryModel = Discord.API.AuditLogEntry;
 using Model = Discord.API.AuditLog;

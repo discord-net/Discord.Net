@@ -1,3 +1,5 @@
+using Discord.Entities.Channels.Threads;
+
 namespace Discord;
 
 /// <summary>
@@ -51,22 +53,6 @@ public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel, I
     ThreadArchiveDuration DefaultArchiveDuration { get; }
 
     /// <summary>
-    ///     Bulk-deletes multiple messages.
-    /// </summary>
-    /// <remarks>
-    ///     This method attempts to remove the messages specified in bulk.
-    ///     <note type="important">
-    ///         Due to the limitation set by Discord, this method can only remove messages that are posted within 14 days!
-    ///     </note>
-    /// </remarks>
-    /// <param name="messageIds">The snowflake identifier of the messages to be bulk-deleted.</param>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <returns>
-    ///     A task that represents the asynchronous bulk-removal operation.
-    /// </returns>
-    Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions? options = null);
-
-    /// <summary>
     ///     Creates a thread within this <see cref="ITextChannel"/>.
     /// </summary>
     /// <remarks>
@@ -95,19 +81,21 @@ public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel, I
     /// <param name="invitable">Whether non-moderators can add other non-moderators to a thread; only available when creating a private thread</param>
     /// <param name="slowmode">The amount of seconds a user has to wait before sending another message (0-21600)</param>
     /// <param name="options">The options to be used when sending the request.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents the asynchronous create operation. The task result contains a <see cref="IThreadChannel"/>
     /// </returns>
     Task<IThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay,
-        IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null);
+        ulong? messageId = null, bool? invitable = null, int? slowmode = null, RequestOptions? options = null, CancellationToken token = default);
 
     /// <summary>
     ///     Gets a collection of active threads within this channel.
     /// </summary>
     /// <param name="options">The options to be used when sending the request.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
     ///     a collection of active threads.
     /// </returns>
-    Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null);
+    Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions? options = null, CancellationToken token = default);
 }

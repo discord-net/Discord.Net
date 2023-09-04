@@ -1,4 +1,5 @@
 using Discord.API.AuditLogs;
+using Discord.Entities.Channels.Threads;
 using System;
 using System.Collections.Generic;
 

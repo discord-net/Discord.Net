@@ -1,5 +1,5 @@
 using Discord.API.AuditLogs;
-
+using Discord.Entities.Channels.Threads;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -159,7 +159,7 @@ public class ChannelDeleteAuditLogData : IAuditLogData
     /// <remarks>
     ///     <see langword="null" /> if the value was not specified in this entry..
     /// </remarks>
-    public IReadOnlyCollection<ForumTag> ForumTags { get; }
+    public IReadOnlyCollection<IForumTag> ForumTags { get; }
 
     /// <inheritdoc cref="ITextChannel.Topic"/>
     /// <remarks>

@@ -2,7 +2,7 @@ using System;
 
 namespace Discord;
 
-public interface IGuildChannel : IChannel, IDeletable
+public interface IGuildChannel : IChannel, IDeletable, IModifyable<GuildChannelProperties>
 {
     /// <summary>
     ///     Gets the position of this channel.
@@ -44,4 +44,27 @@ public interface IGuildChannel : IChannel, IDeletable
     ///     Gets a collection of users that are able to view the channel or are currently in this channel.
     /// </summary>
     new IEntityEnumerableSource<ulong, IGuildUser> Users { get; }
+
+    /// <summary>
+    ///     Adds or updates the permission overwrite.
+    /// </summary>
+    /// <param name="overwrite">The overwrite to add.</param>
+    /// <param name="options">The options to be used when sending the request.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <returns>
+    ///     A task representing the asynchronous permission operation for adding the specified permissions to the
+    ///     channel.
+    /// </returns>
+    Task AddPermissionOverwriteAsync(Overwrite overwrite, RequestOptions? options = null, CancellationToken token = default);
+
+    /// <summary>
+    ///     Removes the permission overwrite for the given entity, if one exists.
+    /// </summary>
+    /// <param name="targetId">The target ID of the overwrite to remove.</param>
+    /// <param name="options">The options to be used when sending the request.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <returns>
+    ///     A task representing the asynchronous operation for removing the specified permissions from the channel.
+    /// </returns>
+    Task RemovePermissionOverwriteAsync(ulong targetId, RequestOptions? options = null, CancellationToken token = default);
 }

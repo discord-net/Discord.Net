@@ -1,4 +1,5 @@
 using Discord.Audio;
+using Discord.Entities.Channels.Threads;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -1,3 +1,4 @@
+using Discord.Entities.Channels.Threads;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -104,7 +105,7 @@ namespace Discord.Rest
         /// <remarks>
         ///     <see langword="null" /> if the value was not updated in this entry.
         /// </remarks>
-        public IReadOnlyCollection<ForumTag> ForumTags { get; }
+        public IReadOnlyCollection<IForumTag> ForumTags { get; }
 
         /// <inheritdoc cref="IForumChannel.DefaultReactionEmoji"/>
         /// <remarks>
