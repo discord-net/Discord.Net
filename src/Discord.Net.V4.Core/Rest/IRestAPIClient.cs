@@ -8,5 +8,7 @@ public interface IRestApiClient
 
     Task<T> PostAsync<T>(string route, object payload, BucketInfo bucket, RequestOptions options, CancellationToken token);
 
+    Task<T> PatchAsync<T>(string route, object payload, BucketInfo bucket, RequestOptions options, CancellationToken token);
+
     Task<T> PutAsync<T>(string route, object payload, BucketInfo bucket, RequestOptions options, CancellationToken token);
 }
