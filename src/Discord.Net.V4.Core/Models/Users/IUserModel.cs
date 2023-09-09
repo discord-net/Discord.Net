@@ -12,7 +12,7 @@ public interface IUserModel : IEntityModel<ulong>
     string? Locale { get; }
     bool? Verified { get; }
     string? Email { get; }
-    UserProperties? Flags { get; }
+    UserFlags? Flags { get; }
     PremiumType? Premium { get; }
-    UserProperties? PublicFlags { get; }
+    UserFlags? PublicFlags { get; }
 }

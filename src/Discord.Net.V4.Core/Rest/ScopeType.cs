@@ -1,6 +1,6 @@
 namespace Discord;
 
-internal enum ScopeType : byte
+public enum ScopeType : byte
 {
     Guild,
     Channel,

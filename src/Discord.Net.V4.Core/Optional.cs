@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
@@ -33,6 +34,10 @@ public readonly struct Optional<T>
     public T? GetValueOrDefault() => _value;
     public T? GetValueOrDefault(T? defaultValue) => IsSpecified ? _value : defaultValue;
 
+    [return: NotNullIfNotNull(nameof(other))]
+    public T? Or(T? other)
+        => IsSpecified ? _value ?? other : other;
+
     public override bool Equals(object? other)
     {
         if(other is Optional<T> otherOptional)
@@ -56,6 +61,9 @@ public readonly struct Optional<T>
 
     public static implicit operator Optional<T>(T? value) => new(value);
     public static explicit operator T?(Optional<T> value) => value.Value;
+
+    [return: NotNullIfNotNull(nameof(other))]
+    public static T? operator ^(Optional<T> value, T? other) => value.Or(other);
 
     public static bool operator ==(Optional<T> left, Optional<T> right)
     {
