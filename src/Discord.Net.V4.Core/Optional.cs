@@ -8,11 +8,11 @@ namespace Discord;
 public readonly struct Optional<T>
 {
     public static Optional<T> Unspecified => default;
-    private readonly T? _value;
+    private readonly T _value;
 
     /// <summary> Gets the value for this parameter. </summary>
     /// <exception cref="InvalidOperationException" accessor="get">This property has no value set.</exception>
-    public T? Value
+    public T Value
     {
         get
         {
@@ -25,17 +25,19 @@ public readonly struct Optional<T>
     public bool IsSpecified { get; }
 
     /// <summary> Creates a new Parameter with the provided value. </summary>
-    public Optional(T? value)
+    public Optional(T value)
     {
         _value = value;
         IsSpecified = true;
     }
 
-    public T? GetValueOrDefault() => _value;
-    public T? GetValueOrDefault(T? defaultValue) => IsSpecified ? _value : defaultValue;
+    public T GetValueOrDefault() => _value;
 
-    [return: NotNullIfNotNull(nameof(other))]
-    public T? Or(T? other)
+    [return: NotNullIfNotNull(nameof(defaultValue)), MaybeNull]
+    public T GetValueOrDefault([AllowNull] T defaultValue) => IsSpecified ? _value : defaultValue;
+
+    [return: NotNullIfNotNull(nameof(other)), MaybeNull]
+    public T Or([AllowNull] T other)
         => IsSpecified ? _value ?? other : other;
 
     public override bool Equals(object? other)
@@ -59,11 +61,11 @@ public readonly struct Optional<T>
     public override string? ToString() => IsSpecified ? _value?.ToString() : null;
     private string DebuggerDisplay => IsSpecified ? _value?.ToString() ?? "<null>" : "<unspecified>";
 
-    public static implicit operator Optional<T>(T? value) => new(value);
-    public static explicit operator T?(Optional<T> value) => value.Value;
+    public static implicit operator Optional<T>(T value) => new(value);
+    public static explicit operator T(Optional<T> value) => value.Value;
 
-    [return: NotNullIfNotNull(nameof(other))]
-    public static T? operator ^(Optional<T> value, T? other) => value.Or(other);
+    [return: NotNullIfNotNull(nameof(other)), MaybeNull]
+    public static T operator ^(Optional<T> value, [AllowNull] T other) => value.Or(other);
 
     public static bool operator ==(Optional<T> left, Optional<T> right)
     {
@@ -78,7 +80,7 @@ public readonly struct Optional<T>
 public static class Optional
 {
     public static Optional<T> Create<T>() => Optional<T>.Unspecified;
-    public static Optional<T> Create<T>(T? value) => new(value);
+    public static Optional<T> Create<T>(T value) => new(value);
 
     public static T? ToNullable<T>(this Optional<T> val)
         where T : struct

@@ -14,5 +14,6 @@ public interface IForumTagModel
 {
     ulong Id { get; }
     string Name { get; }
-    IEmojiModel? Emote { get; }
+    string? EmojiName { get; }
+    ulong? EmojiId { get; }
 }

@@ -127,14 +127,14 @@ namespace Discord.Rest
             => (await GetThreadUsersAsync(options: options).FlattenAsync()).ToImmutableArray();
 
         /// <inheritdoc/>
-        public override async Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
+        public override async Task ModifyAsync(Action<ModifyTextChannelProperties> func, RequestOptions options = null)
         {
             var model = await ThreadHelper.ModifyAsync(this, Discord, func, options);
             Update(model);
         }
 
         /// <inheritdoc/>
-        public async Task ModifyAsync(Action<ThreadChannelProperties> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<ModifyThreadChannelProperties> func, RequestOptions options = null)
         {
             var model = await ThreadHelper.ModifyAsync(this, Discord, func, options);
             Update(model);

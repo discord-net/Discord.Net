@@ -37,8 +37,8 @@ namespace Discord.Gateway
 
         public Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false) => throw new NotImplementedException();
         public Task DisconnectAsync() => throw new NotImplementedException();
-        public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
-        public Task ModifyAsync(Action<AudioChannelProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task ModifyAsync(Action<ModifyVoiceChannelProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task ModifyAsync(Action<ModifyAudioChannelProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
     }
 }
 

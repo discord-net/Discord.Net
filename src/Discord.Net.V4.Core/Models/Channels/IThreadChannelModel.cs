@@ -12,5 +12,5 @@ public interface IThreadChannelModel : IGuildTextChannelModel
     int MemberCount { get; }
     int MessageCount { get; }
     bool IsInvitable { get; }
-    DateTimeOffset CreatedAt { get; }
+    DateTimeOffset? CreatedAt { get; }
 }

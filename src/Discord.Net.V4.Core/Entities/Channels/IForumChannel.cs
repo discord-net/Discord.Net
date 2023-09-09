@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a forum channel in a guild that can create posts.
 /// </summary>
-public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyable<ForumChannelProperties>
+public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyable<ModifyForumChannelProperties>
 {
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.

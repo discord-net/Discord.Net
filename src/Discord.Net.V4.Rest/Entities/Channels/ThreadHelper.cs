@@ -40,10 +40,10 @@ namespace Discord.Rest
         }
 
         public static async Task<Model> ModifyAsync(IThreadChannel channel, BaseDiscordClient client,
-            Action<ThreadChannelProperties> func,
+            Action<ModifyThreadChannelProperties> func,
             RequestOptions options)
         {
-            var args = new ThreadChannelProperties();
+            var args = new ModifyThreadChannelProperties();
             func(args);
 
             Preconditions.AtMost(args.AppliedTags.IsSpecified ? args.AppliedTags.Value.Count() : 0, 5, nameof(args.AppliedTags), "Forum post can have max 5 applied tags.");

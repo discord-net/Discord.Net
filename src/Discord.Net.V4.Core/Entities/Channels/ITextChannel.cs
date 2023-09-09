@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a generic channel in a guild that can send and receive messages.
 /// </summary>
-public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel, IIntegrationChannel, IModifyable<TextChannelProperties>
+public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel, IIntegrationChannel, IModifyable<ModifyTextChannelProperties>
 {
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.

@@ -96,7 +96,7 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc/>
-        public async Task ModifyAsync(Action<ForumChannelProperties> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<ModifyForumChannelProperties> func, RequestOptions options = null)
         {
             var model = await ForumHelper.ModifyAsync(this, Discord, func, options);
             Update(model);

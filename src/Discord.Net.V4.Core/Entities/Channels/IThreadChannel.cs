@@ -9,7 +9,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a thread channel inside of a guild.
 /// </summary>
-public interface IThreadChannel : ITextChannel, IModifyable<ThreadChannelProperties>
+public interface IThreadChannel : ITextChannel, IModifyable<ModifyThreadChannelProperties>
 {
     /// <summary>
     ///     Gets the type of the current thread channel.

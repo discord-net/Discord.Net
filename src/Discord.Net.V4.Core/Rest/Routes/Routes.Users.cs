@@ -21,5 +21,17 @@ public static partial class Routes
             $"users/@me/guilds{RouteUtils.GetUrlEncodedQueryParams(("before", before), ("after", after), ("limit", limit), ("with_counts", withCounts))}"
         );
 
-    public static APIRoute<>
+    public static APIRoute<GuildMember> GetCurrentUserGuildMember(ulong guildId)
+        => new(nameof(GetCurrentUserGuildMember), RequestMethod.Get, $"users/@me/guilds/{guildId}/member", (ScopeType.Guild, guildId));
+
+    public static APIRoute LeaveGuild(ulong guildId)
+        => new(nameof(LeaveGuild), RequestMethod.Delete, $"users/@me/guilds/{guildId}", (ScopeType.Guild, guildId));
+
+    public static APIBodyRoute<CreateDMProperties, Channel> CreateDM(CreateDMProperties body)
+        => new(nameof(CreateDM), RequestMethod.Post, "users/@me/channels", body);
+
+    public static APIBodyRoute<CreateGroupDMProperties, Channel> CreateGroupDM(CreateGroupDMProperties body)
+        => new(nameof(CreateGroupDM), RequestMethod.Post, "users/@me/channels", body);
+
+    public static readonly APIRoute<Connection>
 }

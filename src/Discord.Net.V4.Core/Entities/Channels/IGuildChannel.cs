@@ -2,7 +2,7 @@ using System;
 
 namespace Discord;
 
-public interface IGuildChannel : IChannel, IDeletable, IModifyable<GuildChannelProperties>
+public interface IGuildChannel : IChannel, IDeletable, IModifyable<ModifyGuildChannelProperties>
 {
     /// <summary>
     ///     Gets the position of this channel.

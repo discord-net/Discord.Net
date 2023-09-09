@@ -62,7 +62,7 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc />
-        public virtual async Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
+        public virtual async Task ModifyAsync(Action<ModifyTextChannelProperties> func, RequestOptions options = null)
         {
             var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);

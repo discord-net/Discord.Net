@@ -232,12 +232,12 @@ namespace Discord.Rest
         }
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestTextChannel> CreateTextChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name, RequestOptions options, Action<TextChannelProperties> func = null)
+            string name, RequestOptions options, Action<ModifyTextChannelProperties> func = null)
         {
             if (name == null)
                 throw new ArgumentNullException(paramName: nameof(name));
 
-            var props = new TextChannelProperties();
+            var props = new ModifyTextChannelProperties();
             func?.Invoke(props);
 
             var args = new CreateGuildChannelParams(name, ChannelType.Text)
@@ -263,12 +263,12 @@ namespace Discord.Rest
         }
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestVoiceChannel> CreateVoiceChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name, RequestOptions options, Action<VoiceChannelProperties> func = null)
+            string name, RequestOptions options, Action<ModifyVoiceChannelProperties> func = null)
         {
             if (name == null)
                 throw new ArgumentNullException(paramName: nameof(name));
 
-            var props = new VoiceChannelProperties();
+            var props = new ModifyVoiceChannelProperties();
             func?.Invoke(props);
 
             var args = new CreateGuildChannelParams(name, ChannelType.Voice)
@@ -293,12 +293,12 @@ namespace Discord.Rest
             return RestVoiceChannel.Create(client, guild, model);
         }
         public static async Task<RestStageChannel> CreateStageChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name, RequestOptions options, Action<VoiceChannelProperties> func = null)
+            string name, RequestOptions options, Action<ModifyVoiceChannelProperties> func = null)
         {
             if (name == null)
                 throw new ArgumentNullException(paramName: nameof(name));
 
-            var props = new VoiceChannelProperties();
+            var props = new ModifyVoiceChannelProperties();
             func?.Invoke(props);
 
             var args = new CreateGuildChannelParams(name, ChannelType.Stage)
@@ -322,12 +322,12 @@ namespace Discord.Rest
         }
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name, RequestOptions options, Action<GuildChannelProperties> func = null)
+            string name, RequestOptions options, Action<ModifyGuildChannelProperties> func = null)
         {
             if (name == null)
                 throw new ArgumentNullException(paramName: nameof(name));
 
-            var props = new GuildChannelProperties();
+            var props = new ModifyGuildChannelProperties();
             func?.Invoke(props);
 
             var args = new CreateGuildChannelParams(name, ChannelType.Category)
@@ -350,12 +350,12 @@ namespace Discord.Rest
 
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestForumChannel> CreateForumChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name, RequestOptions options, Action<ForumChannelProperties> func = null)
+            string name, RequestOptions options, Action<ModifyForumChannelProperties> func = null)
         {
             if (name == null)
                 throw new ArgumentNullException(paramName: nameof(name));
 
-            var props = new ForumChannelProperties();
+            var props = new ModifyForumChannelProperties();
             func?.Invoke(props);
 
             Preconditions.AtMost(props.Tags.IsSpecified ? props.Tags.Value.Count() : 0, 5, nameof(props.Tags), "Forum channel can have max 20 tags.");

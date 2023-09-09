@@ -9,10 +9,10 @@ namespace Discord.Rest;
 internal static class ForumHelper
 {
     public static async Task<Model> ModifyAsync(IForumChannel channel, BaseDiscordClient client,
-        Action<ForumChannelProperties> func,
+        Action<ModifyForumChannelProperties> func,
         RequestOptions options)
     {
-        var args = new ForumChannelProperties();
+        var args = new ModifyForumChannelProperties();
         func(args);
 
         Preconditions.AtMost(args.Tags.IsSpecified ? args.Tags.Value.Count() : 0, 5, nameof(args.Tags), "Forum channel can have max 20 tags.");

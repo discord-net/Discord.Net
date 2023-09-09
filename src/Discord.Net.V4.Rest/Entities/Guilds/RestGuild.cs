@@ -679,7 +679,7 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     text channel.
         /// </returns>
-        public Task<RestTextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null)
+        public Task<RestTextChannel> CreateTextChannelAsync(string name, Action<ModifyTextChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateTextChannelAsync(this, Discord, name, options, func);
         /// <summary>
         ///     Creates a voice channel with the provided name.
@@ -691,7 +691,7 @@ namespace Discord.Rest
         /// <returns>
         ///     The created voice channel.
         /// </returns>
-        public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null)
+        public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, Action<ModifyVoiceChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options, func);
         /// <summary>
         ///     Creates a new stage channel in this guild.
@@ -703,7 +703,7 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     stage channel.
         /// </returns>
-        public Task<RestStageChannel> CreateStageChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null)
+        public Task<RestStageChannel> CreateStageChannelAsync(string name, Action<ModifyVoiceChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateStageChannelAsync(this, Discord, name, options, func);
         /// <summary>
         ///     Creates a category channel with the provided name.
@@ -715,7 +715,7 @@ namespace Discord.Rest
         /// <returns>
         ///     The created category channel.
         /// </returns>
-        public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null)
+        public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, Action<ModifyGuildChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options, func);
 
         /// <summary>
@@ -728,7 +728,7 @@ namespace Discord.Rest
         /// <returns>
         ///     The created category channel.
         /// </returns>
-        public Task<RestForumChannel> CreateForumChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null)
+        public Task<RestForumChannel> CreateForumChannelAsync(string name, Action<ModifyForumChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateForumChannelAsync(this, Discord, name, options, func);
 
         /// <summary>
@@ -1421,19 +1421,19 @@ namespace Discord.Rest
                 return null;
         }
         /// <inheritdoc />
-        async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, Action<TextChannelProperties> func, RequestOptions options)
+        async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, Action<ModifyTextChannelProperties> func, RequestOptions options)
             => await CreateTextChannelAsync(name, func, options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func, RequestOptions options)
+        async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, Action<ModifyVoiceChannelProperties> func, RequestOptions options)
             => await CreateVoiceChannelAsync(name, func, options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IStageChannel> IGuild.CreateStageChannelAsync(string name, Action<VoiceChannelProperties> func, RequestOptions options)
+        async Task<IStageChannel> IGuild.CreateStageChannelAsync(string name, Action<ModifyVoiceChannelProperties> func, RequestOptions options)
             => await CreateStageChannelAsync(name, func, options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<ICategoryChannel> IGuild.CreateCategoryAsync(string name, Action<GuildChannelProperties> func, RequestOptions options)
+        async Task<ICategoryChannel> IGuild.CreateCategoryAsync(string name, Action<ModifyGuildChannelProperties> func, RequestOptions options)
             => await CreateCategoryChannelAsync(name, func, options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IForumChannel> IGuild.CreateForumChannelAsync(string name, Action<ForumChannelProperties> func, RequestOptions options)
+        async Task<IForumChannel> IGuild.CreateForumChannelAsync(string name, Action<ModifyForumChannelProperties> func, RequestOptions options)
             => await CreateForumChannelAsync(name, func, options).ConfigureAwait(false);
 
         /// <inheritdoc />

@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Represent a permission overwrite object.
 /// </summary>
-public readonly struct Overwrite
+public readonly struct Overwrite 
 {
     /// <summary>
     ///     The unique identifier for the object this overwrite is targeting.

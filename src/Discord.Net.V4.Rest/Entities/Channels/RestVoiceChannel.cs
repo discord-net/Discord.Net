@@ -59,7 +59,7 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc />
-        public async Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<ModifyVoiceChannelProperties> func, RequestOptions options = null)
         {
             var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
@@ -88,7 +88,7 @@ namespace Discord.Rest
         /// <exception cref="NotSupportedException">Connecting to a REST-based channel is not supported.</exception>
         Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
-        Task IAudioChannel.ModifyAsync(Action<AudioChannelProperties> func, RequestOptions options) { throw new NotSupportedException(); }
+        Task IAudioChannel.ModifyAsync(Action<ModifyAudioChannelProperties> func, RequestOptions options) { throw new NotSupportedException(); }
         #endregion
 
         #region IGuildChannel

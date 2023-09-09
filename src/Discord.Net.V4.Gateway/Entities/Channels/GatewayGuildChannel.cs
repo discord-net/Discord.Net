@@ -31,7 +31,7 @@ namespace Discord.Gateway
         IGuildChannelModel ICacheableEntity<ulong, IGuildChannelModel>.GetModel()
             => Model;
 
-        public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task ModifyAsync(Action<ModifyGuildChannelProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
         public OverwritePermissions? GetPermissionOverwrite(IRole role) => throw new NotImplementedException();
         public OverwritePermissions? GetPermissionOverwrite(IUser user) => throw new NotImplementedException();
         public Task RemovePermissionOverwriteAsync(IRole role, RequestOptions? options = null) => throw new NotImplementedException();
