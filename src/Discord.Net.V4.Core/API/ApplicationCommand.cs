@@ -17,38 +17,28 @@ public sealed class ApplicationCommand
     public Optional<ulong> GuildId { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
-
-    [JsonPropertyName("description")]
-    public string Description { get; set; }
-
-    [JsonPropertyName("options")]
-    public Optional<ApplicationCommandOption[]> Options { get; set; }
-
-    [JsonPropertyName("default_permission")]
-    public Optional<bool> DefaultPermissions { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("name_localizations")]
     public Optional<Dictionary<string, string>> NameLocalizations { get; set; }
 
+    [JsonPropertyName("description")]
+    public required string Description { get; set; }
+
     [JsonPropertyName("description_localizations")]
     public Optional<Dictionary<string, string>> DescriptionLocalizations { get; set; }
 
-    [JsonPropertyName("name_localized")]
-    public Optional<string> NameLocalized { get; set; }
+    [JsonPropertyName("options")]
+    public Optional<ApplicationCommandOption[]> Options { get; set; }
 
-    [JsonPropertyName("description_localized")]
-    public Optional<string> DescriptionLocalized { get; set; }
+    [JsonPropertyName("default_member_permissions")]
+    public GuildPermission? DefaultMemberPermission { get; set; }
 
-    // V2 Permissions
     [JsonPropertyName("dm_permission")]
     public Optional<bool> DmPermission { get; set; }
 
-    [JsonPropertyName("default_member_permissions")]
-    public Optional<GuildPermission?> DefaultMemberPermission { get; set; }
-
     [JsonPropertyName("nsfw")]
-    public Optional<bool> Nsfw { get; set; }
+    public Optional<bool> IsNsfw { get; set; }
 
     [JsonPropertyName("version")]
     public ulong Version { get; set; }

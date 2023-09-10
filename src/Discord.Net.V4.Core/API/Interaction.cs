@@ -2,8 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-[JsonConverter(typeof(Net.Converters.InteractionConverter))]
-public class Interaction
+public sealed class Interaction
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -20,11 +19,11 @@ public class Interaction
     [JsonPropertyName("guild_id")]
     public Optional<ulong> GuildId { get; set; }
 
-    [JsonPropertyName("channel_id")]
-    public Optional<ulong> ChannelId { get; set; }
-
     [JsonPropertyName("channel")]
     public Optional<Channel> Channel { get; set; }
+
+    [JsonPropertyName("channel_id")]
+    public Optional<ulong> ChannelId { get; set; }
 
     [JsonPropertyName("member")]
     public Optional<GuildMember> Member { get; set; }
@@ -33,13 +32,16 @@ public class Interaction
     public Optional<User> User { get; set; }
 
     [JsonPropertyName("token")]
-    public string Token { get; set; }
+    public required string Token { get; set; }
 
     [JsonPropertyName("version")]
     public int Version { get; set; }
 
     [JsonPropertyName("message")]
     public Optional<Message> Message { get; set; }
+
+    [JsonPropertyName("app_permissions")]
+    public Optional<ChannelPermission> AppPermission { get; set; }
 
     [JsonPropertyName("locale")]
     public Optional<string> UserLocale { get; set; }

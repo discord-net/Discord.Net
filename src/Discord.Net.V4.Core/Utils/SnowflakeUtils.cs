@@ -19,7 +19,7 @@ public static class SnowflakeUtils
     /// </summary>
     /// <param name="value">The time to be used in the new snowflake.</param>
     /// <returns>
-    ///     A <see cref="UInt64" /> representing the newly generated snowflake identifier.
+    ///     A <see cref="ulong" /> representing the newly generated snowflake identifier.
     /// </returns>
     public static ulong ToSnowflake(DateTimeOffset value)
         => ((ulong)value.ToUnixTimeMilliseconds() - 1420070400000UL) << 22;

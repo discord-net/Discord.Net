@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class ApplicationCommandInteractionDataResolved
+public sealed class ApplicationCommandInteractionDataResolved
 {
     [JsonPropertyName("users")]
     public Optional<Dictionary<string, User>> Users { get; set; }
@@ -10,11 +10,11 @@ public class ApplicationCommandInteractionDataResolved
     [JsonPropertyName("members")]
     public Optional<Dictionary<string, GuildMember>> Members { get; set; }
 
-    [JsonPropertyName("channels")]
-    public Optional<Dictionary<string, Channel>> Channels { get; set; }
-
     [JsonPropertyName("roles")]
     public Optional<Dictionary<string, Role>> Roles { get; set; }
+
+    [JsonPropertyName("channels")]
+    public Optional<Dictionary<string, Channel>> Channels { get; set; }
 
     [JsonPropertyName("messages")]
     public Optional<Dictionary<string, Message>> Messages { get; set; }

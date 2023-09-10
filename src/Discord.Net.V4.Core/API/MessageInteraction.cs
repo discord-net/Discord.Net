@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class MessageInteraction
+public sealed class MessageInteraction
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -11,10 +11,10 @@ public class MessageInteraction
     public InteractionType Type { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("user")]
-    public User User { get; set; }
+    public required User User { get; set; }
 
     [JsonPropertyName("member")]
     public Optional<GuildMember> Member { get; set; }

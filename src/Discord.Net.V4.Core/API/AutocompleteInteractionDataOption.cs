@@ -2,13 +2,13 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class AutocompleteInteractionDataOption
+public sealed class AutocompleteInteractionDataOption
 {
     [JsonPropertyName("type")]
     public ApplicationCommandOptionType Type { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("options")]
     public Optional<AutocompleteInteractionDataOption[]> Options { get; set; }
@@ -17,5 +17,5 @@ public class AutocompleteInteractionDataOption
     public Optional<object> Value { get; set; }
 
     [JsonPropertyName("focused")]
-    public Optional<bool> Focused { get; set; }
+    public Optional<bool> IsFocused { get; set; }
 }
