@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class IntegrationAccount
+public sealed class IntegrationAccount
 {
     [JsonPropertyName("id")]
     public string Id { get; set; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class InstallParams
+public sealed class InstallParams
 {
     [JsonPropertyName("scopes")]
     public string[] Scopes { get; set; }

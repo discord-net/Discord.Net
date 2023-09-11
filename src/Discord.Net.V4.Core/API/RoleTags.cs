@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class RoleTags
+public sealed class RoleTags
 {
     [JsonPropertyName("bot_id")]
     public Optional<ulong> BotId { get; set; }

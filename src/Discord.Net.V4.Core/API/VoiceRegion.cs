@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class VoiceRegion
+public sealed class VoiceRegion
 {
     [JsonPropertyName("id")]
     public string Id { get; set; }

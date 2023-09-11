@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class MessageActivity
+public sealed class MessageActivity
 {
     [JsonPropertyName("type")]
     public MessageActivityType Type { get; set; }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class WelcomeScreen : IWelcomeScreenModel
+public sealed class WelcomeScreen : IWelcomeScreenModel
 {
     [JsonPropertyName("description")]
     public string? Description { get; set; }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class WelcomeScreenChannel : IWelcomeScreenChannelModel
+public sealed class WelcomeScreenChannel : IWelcomeScreenChannelModel
 {
     [JsonPropertyName("channel_id")]
     public ulong ChannelId { get; set; }

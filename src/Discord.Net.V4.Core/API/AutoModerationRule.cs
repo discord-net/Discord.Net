@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class AutoModerationRule
+public sealed class AutoModerationRule
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }

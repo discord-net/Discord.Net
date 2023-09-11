@@ -1,10 +1,8 @@
 using System.Text.Json.Serialization;
-using Discord.Rest.Converters;
 
 namespace Discord.API;
 
-[JsonConverter(typeof(DiscordErrorConverter))]
-public class DiscordError
+public sealed class DiscordError
 {
     [JsonPropertyName("message")]
     public string Message { get; set; }

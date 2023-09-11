@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class ForumThreadMessage
+public sealed class ForumThreadMessage
 {
     [JsonPropertyName("content")]
     public Optional<string> Content { get; set; }

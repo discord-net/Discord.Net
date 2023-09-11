@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class TeamMember
+public sealed class TeamMember
 {
     [JsonPropertyName("membership_state")]
     public MembershipState MembershipState { get; set; }

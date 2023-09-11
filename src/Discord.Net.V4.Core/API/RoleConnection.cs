@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class RoleConnection
+public sealed class RoleConnection
 {
     [JsonPropertyName("platform_name")]
     public Optional<string> PlatformName { get; set; }

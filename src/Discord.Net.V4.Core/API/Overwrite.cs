@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class Overwrite
+public sealed class Overwrite
 {
     [JsonPropertyName("id")]
     public ulong TargetId { get; set; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class ThreadMetadata
+public sealed class ThreadMetadata
 {
     [JsonPropertyName("archived")]
     public bool Archived { get; set; }

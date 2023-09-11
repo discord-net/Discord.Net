@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class AutoModerationAction
+public sealed class AutoModerationAction
 {
     [JsonPropertyName("type")]
     public AutoModActionType Type { get; set; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class InteractionResponse
+public sealed class InteractionResponse
 {
     [JsonPropertyName("type")]
     public InteractionResponseType Type { get; set; }

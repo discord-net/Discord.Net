@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class DefaultReaction
+public sealed class DefaultReaction
 {
     [JsonPropertyName("emoji_id")]
     public ulong? Id { get; set; }

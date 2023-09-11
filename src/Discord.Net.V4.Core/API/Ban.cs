@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class Ban
+public sealed class Ban
 {
     [JsonPropertyName("reason")]
     public string? Reason { get; set; }

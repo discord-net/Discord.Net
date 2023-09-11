@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class TriggerMetadata
+public sealed class TriggerMetadata
 {
     [JsonPropertyName("keyword_filter")]
     public Optional<string[]> KeywordFilter { get; set; }

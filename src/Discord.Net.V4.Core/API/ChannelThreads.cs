@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class ChannelThreads
+public sealed class ChannelThreads
 {
     [JsonPropertyName("threads")]
     public Channel[] Threads { get; set; }

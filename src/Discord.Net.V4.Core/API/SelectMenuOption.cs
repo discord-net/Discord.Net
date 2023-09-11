@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class SelectMenuOption
+public sealed class SelectMenuOption
 {
     [JsonPropertyName("label")]
     public string Label { get; set; }

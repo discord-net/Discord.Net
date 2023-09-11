@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class InteractionCallbackData
+public sealed class InteractionCallbackData
 {
     [JsonPropertyName("tts")]
     public Optional<bool> TTS { get; set; }

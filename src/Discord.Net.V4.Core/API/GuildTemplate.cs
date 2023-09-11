@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class GuildTemplate
+public sealed class GuildTemplate
 {
     [JsonPropertyName("code")]
     public string Code { get; set; }

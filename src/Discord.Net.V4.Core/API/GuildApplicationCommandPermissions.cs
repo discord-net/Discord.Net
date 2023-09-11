@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class GuildApplicationCommandPermission
+public sealed class GuildApplicationCommandPermission
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class StickerItem
+public sealed class StickerItem
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }

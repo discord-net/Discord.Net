@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class ModalInteractionData : IDiscordInteractionData
+public sealed class ModalInteractionData
 {
     [JsonPropertyName("custom_id")]
     public string CustomId { get; set; }

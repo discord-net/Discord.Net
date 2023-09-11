@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class GuildScheduledEventEntityMetadata
+public sealed class GuildScheduledEventEntityMetadata
 {
     [JsonPropertyName("location")]
     public Optional<string> Location { get; set; }

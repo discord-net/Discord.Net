@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class GuildWidgetSettings
+public sealed class GuildWidgetSettings
 {
     [JsonPropertyName("enabled")]
     public bool IsEnabled { get; set; }

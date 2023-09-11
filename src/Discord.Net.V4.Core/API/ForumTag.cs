@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class ForumTag
+public sealed class ForumTag
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }

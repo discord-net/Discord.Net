@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class TextInputComponent : IMessageComponent
+public sealed class TextInputComponent
 {
     [JsonPropertyName("type")]
     public ComponentType Type { get; set; }

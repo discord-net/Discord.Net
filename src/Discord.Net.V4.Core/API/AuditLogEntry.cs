@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class AuditLogEntry
+public sealed class AuditLogEntry
 {
     [JsonPropertyName("target_id")]
     public ulong? TargetId { get; set; }

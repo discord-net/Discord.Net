@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class RoleConnectionMetadata
+public sealed class RoleConnectionMetadata
 {
     [JsonPropertyName("type")]
     public RoleConnectionMetadataType Type { get; set; }

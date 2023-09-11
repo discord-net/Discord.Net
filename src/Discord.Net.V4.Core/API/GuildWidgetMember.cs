@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public class GuildWidgetMember
+public sealed class GuildWidgetMember
 {
     [JsonPropertyName("id")]
     public int Position { get; set; }
