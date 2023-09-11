@@ -1,4 +1,4 @@
-namespace Discord.API;
+namespace Discord.Rest;
 
 public enum RequestMethod
 {

@@ -99,7 +99,7 @@ namespace Discord.Gateway
         public int CompareTo(IRole? other) => throw new NotImplementedException();
         public Task DeleteAsync(RequestOptions? options = null) => throw new NotImplementedException();
         public string GetIconUrl() => throw new NotImplementedException();
-        public Task ModifyAsync(Action<RoleProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task ModifyAsync(Action<ModifyRoleProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
 
         IEntitySource<IGuild, ulong> IRole.Guild => Guild;
     }

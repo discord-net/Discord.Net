@@ -45,7 +45,7 @@ public interface IMessageChannel : IChannel
     ///     A task that represents an asynchronous send operation for delivering the message. The task result
     ///     contains the sent message.
     /// </returns>
-    Task SendMessageAsync(MessageCreateProperties message, RequestOptions? options = null, CancellationToken token = default);
+    Task SendMessageAsync(CreateMessageProperties message, RequestOptions? options = null, CancellationToken token = default);
 
     /// <summary>
     ///     Gets a message from this message channel.

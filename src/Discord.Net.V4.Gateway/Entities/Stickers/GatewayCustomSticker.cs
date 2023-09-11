@@ -39,7 +39,7 @@ namespace Discord.Gateway
         }
 
         /// <inheritdoc/>
-        public Task ModifyAsync(Action<StickerProperties> func, RequestOptions? options = null)
+        public Task ModifyAsync(Action<ModifyStickerProperties> func, RequestOptions? options = null)
             => throw new NotImplementedException();
 
         /// <inheritdoc/>

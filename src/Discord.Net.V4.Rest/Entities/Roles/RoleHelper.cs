@@ -14,9 +14,9 @@ namespace Discord.Rest
             await client.ApiClient.DeleteGuildRoleAsync(role.Guild.Id, role.Id, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(IRole role, BaseDiscordClient client,
-            Action<RoleProperties> func, RequestOptions options)
+            Action<ModifyRoleProperties> func, RequestOptions options)
         {
-            var args = new RoleProperties();
+            var args = new ModifyRoleProperties();
             func(args);
 
             if (args.Icon.IsSpecified || args.Emoji.IsSpecified)

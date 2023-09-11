@@ -1,6 +1,6 @@
 namespace Discord;
 
-public interface IRole : ISnowflakeEntity, IDeletable, IMentionable, IComparable<IRole>, IModifyable<RoleProperties>
+public interface IRole : ISnowflakeEntity, IDeletable, IMentionable, IComparable<IRole>, IModifyable<ModifyRoleProperties>
 {
     IEntitySource<ulong, IGuild> Guild { get; }
 

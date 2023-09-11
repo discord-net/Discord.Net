@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a live stage instance within a stage channel.
 /// </summary>
-public interface IStageInstance : ISnowflakeEntity, IDeletable, IModifyable<StageInstanceProperties>
+public interface IStageInstance : ISnowflakeEntity, IDeletable, IModifyable<ModifyStageInstanceProperties>
 {
     /// <summary>
     ///     Gets the guild associated with the stage instance.

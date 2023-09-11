@@ -11,10 +11,10 @@ namespace Discord.Rest
 {
     internal static class UserHelper
     {
-        public static async Task<Model> ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<SelfUserProperties> func,
+        public static async Task<Model> ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<ModifySelfUserProperties> func,
             RequestOptions options)
         {
-            var args = new SelfUserProperties();
+            var args = new ModifySelfUserProperties();
             func(args);
             var apiArgs = new API.Rest.ModifyCurrentUserParams
             {
@@ -27,10 +27,10 @@ namespace Discord.Rest
 
             return await client.ApiClient.ModifySelfAsync(apiArgs, options).ConfigureAwait(false);
         }
-        public static async Task<GuildUserProperties> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<GuildUserProperties> func,
+        public static async Task<ModifyGuildUserProperties> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<ModifyGuildUserProperties> func,
             RequestOptions options)
         {
-            var args = new GuildUserProperties();
+            var args = new ModifyGuildUserProperties();
             func(args);
 
             if (args.TimedOutUntil.IsSpecified && args.TimedOutUntil.Value.Value.Offset > (new TimeSpan(28, 0, 0, 0)))

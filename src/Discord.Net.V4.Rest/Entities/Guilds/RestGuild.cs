@@ -268,7 +268,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null" />.</exception>
-        public async Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<ModifyGuildProperties> func, RequestOptions options = null)
         {
             var model = await GuildHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);

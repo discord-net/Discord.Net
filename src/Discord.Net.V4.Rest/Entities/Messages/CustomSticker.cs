@@ -61,7 +61,7 @@ namespace Discord.Rest
             => GuildHelper.DeleteStickerAsync(Discord, GuildId, this, options);
 
         /// <inheritdoc/>
-        public async Task ModifyAsync(Action<StickerProperties> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<ModifyStickerProperties> func, RequestOptions options = null)
         {
             var model = await GuildHelper.ModifyStickerAsync(Discord, GuildId, this, func, options);
             Update(model);

@@ -137,7 +137,7 @@ namespace Discord.Rest
             Update(model);
         }
         /// <inheritdoc />
-        public async Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<ModifyGuildUserProperties> func, RequestOptions options = null)
         {
             var args = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             if (args.Deaf.IsSpecified)

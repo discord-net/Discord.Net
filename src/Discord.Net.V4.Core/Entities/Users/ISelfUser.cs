@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     Represents the logged-in Discord user.
 /// </summary>
-public interface ISelfUser : IUser, IModifyable<SelfUserProperties>
+public interface ISelfUser : IUser, IModifyable<ModifySelfUserProperties>
 {
     /// <summary>
     ///     Gets the email associated with this user.

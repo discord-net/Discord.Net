@@ -261,7 +261,7 @@ namespace Discord.Gateway
         public Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IGuildChannel> GetWidgetChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public Task LeaveAsync(RequestOptions? options = null) => throw new NotImplementedException();
-        public Task ModifyAsync(Action<GuildProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task ModifyAsync(Action<ModifyGuildProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
         public Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
         public Task MoveAsync(IGuildUser user, IVoiceChannel targetChannel) => throw new NotImplementedException();

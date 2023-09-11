@@ -53,9 +53,9 @@ public class RestStageInstance : RestEntity<ulong>, IStageInstance
     public ulong? ScheduledEventId { get; internal set; }
 
     /// <inheritdoc />
-    public async Task ModifyAsync(Action<StageInstanceProperties> func, RequestOptions options = null)
+    public async Task ModifyAsync(Action<ModifyStageInstanceProperties> func, RequestOptions options = null)
     {
-        var args = new StageInstanceProperties();
+        var args = new ModifyStageInstanceProperties();
         func(args);
 
         var model = await Discord.ApiClient.ModifyStageInstanceAsync(ChannelId, new ModifyStageInstanceParams()

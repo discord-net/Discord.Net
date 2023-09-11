@@ -82,7 +82,7 @@ namespace Discord.Rest
             throw new NotSupportedException("Webhook users cannot be kicked.");
 
         /// <inheritdoc />
-        Task IGuildUser.ModifyAsync(Action<GuildUserProperties> func, RequestOptions options) =>
+        Task IGuildUser.ModifyAsync(Action<ModifyGuildUserProperties> func, RequestOptions options) =>
             throw new NotSupportedException("Webhook users cannot be modified.");
         /// <inheritdoc />
         Task IGuildUser.AddRoleAsync(ulong role, RequestOptions options) =>

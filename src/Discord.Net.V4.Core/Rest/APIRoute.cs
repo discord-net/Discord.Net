@@ -1,4 +1,4 @@
-namespace Discord.API;
+namespace Discord.Rest;
 
 public readonly struct APIRoute
 {
@@ -23,14 +23,16 @@ public readonly struct APIBodyRoute<TRequestBody>
     public readonly string Route;
     public readonly ValueTuple<ScopeType, ulong>? Bucket;
     public readonly TRequestBody Body;
+    public readonly ContentType ContentType;
 
-    public APIBodyRoute(string name, RequestMethod method, string route, TRequestBody body, ValueTuple<ScopeType, ulong>? bucket = null)
+    public APIBodyRoute(string name, RequestMethod method, string route, TRequestBody body, ContentType contentType = ContentType.JsonBody, ValueTuple<ScopeType, ulong>? bucket = null)
     {
         Name = name;
         Method = method;
         Route = route;
         Body = body;
         Bucket = bucket;
+        ContentType = contentType;
     }
 }
 
@@ -41,14 +43,16 @@ public readonly struct APIBodyRoute<TRequestBody, TResponseBody>
     public readonly string Route;
     public readonly ValueTuple<ScopeType, ulong>? Bucket;
     public readonly TRequestBody Body;
+    public readonly ContentType ContentType;
 
-    public APIBodyRoute(string name, RequestMethod method, string route, TRequestBody body, ValueTuple<ScopeType, ulong>? bucket = null)
+    public APIBodyRoute(string name, RequestMethod method, string route, TRequestBody body, ContentType contentType = ContentType.JsonBody, ValueTuple<ScopeType, ulong>? bucket = null)
     {
         Name = name;
         Method = method;
         Route = route;
         Body = body;
         Bucket = bucket;
+        ContentType = contentType;
     }
 }
 

@@ -4,7 +4,7 @@ namespace Discord;
 ///     Properties that are used to modify the <see cref="ISelfUser" /> with the specified changes.
 /// </summary>
 /// <seealso cref="ISelfUser.ModifyAsync" />
-public sealed class SelfUserProperties
+public sealed class ModifySelfUserProperties
 {
     /// <summary>
     ///     Gets or sets the username.

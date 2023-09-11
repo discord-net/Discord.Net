@@ -82,7 +82,7 @@ public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyabl
     ///     A task that represents the asynchronous creation operation.
     /// </returns>
     Task<IThreadChannel> CreatePostAsync(
-        string title, MessageCreateProperties message,
+        string title, CreateMessageProperties message,
         ThreadArchiveDuration archiveDuration = ThreadArchiveDuration.OneDay,
         int? slowmode = null, RequestOptions? options = null,
         CancellationToken token = default);

@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a class used to modify stickers.
 /// </summary>
-public class StickerProperties
+public class ModifyStickerProperties
 {
     /// <summary>
     ///     Gets or sets the name of the sticker.

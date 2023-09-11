@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Represents properties to use when modifying a stage instance.
 /// </summary>
-public class StageInstanceProperties
+public class ModifyStageInstanceProperties
 {
     /// <summary>
     ///     Gets or sets the topic of the stage.

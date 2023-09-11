@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace Discord;
 
-public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<GuildProperties>
+public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<ModifyGuildProperties>
 {
     /// <summary>
     ///     Gets the name of this guild.

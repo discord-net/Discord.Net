@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a custom sticker within a guild.
 /// </summary>
-public interface IGuildSticker : ISticker, IModifyable<StickerProperties>, IDeletable
+public interface IGuildSticker : ISticker, IModifyable<ModifyStickerProperties>, IDeletable
 {
     /// <summary>
     ///     Gets the user that uploaded the guild sticker.

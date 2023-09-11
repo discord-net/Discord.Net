@@ -6,7 +6,7 @@ namespace Discord;
 ///     Provides properties that are used to modify an <see cref="IGuild" /> with the specified changes.
 /// </summary>
 /// <see cref="IGuild.ModifyAsync"/>
-public class GuildProperties
+public class ModifyGuildProperties
 {
     /// <summary>
     ///     Gets or sets the name of the guild. Must be within 100 characters.

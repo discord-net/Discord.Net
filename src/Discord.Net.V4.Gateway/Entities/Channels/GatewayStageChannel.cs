@@ -27,7 +27,7 @@ namespace Discord.Gateway
         }
 
         public Task BecomeSpeakerAsync(RequestOptions? options = null) => throw new NotImplementedException();
-        public Task ModifyInstanceAsync(Action<StageInstanceProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task ModifyInstanceAsync(Action<ModifyStageInstanceProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
         public Task MoveToSpeakerAsync(IGuildUser user, RequestOptions? options = null) => throw new NotImplementedException();
         public Task RemoveFromSpeakerAsync(IGuildUser user, RequestOptions? options = null) => throw new NotImplementedException();
         public Task RequestToSpeakAsync(RequestOptions? options = null) => throw new NotImplementedException();

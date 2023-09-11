@@ -3,7 +3,7 @@ using Discord.Models;
 
 namespace Discord;
 
-public interface IGuildUser : IUser, IModifyable<GuildUserProperties>
+public interface IGuildUser : IUser, IModifyable<ModifyGuildUserProperties>
 {
     /// <summary>
     ///     Gets when this user joined the guild.

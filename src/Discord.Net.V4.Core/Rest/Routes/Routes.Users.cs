@@ -1,7 +1,7 @@
 using Discord.API;
 using Discord.Utils;
 
-namespace Discord;
+namespace Discord.Rest;
 
 public static partial class Routes
 {
@@ -11,7 +11,7 @@ public static partial class Routes
     public static readonly APIRoute<User> CurrentUser
         = new(nameof(CurrentUser), RequestMethod.Get, "users/@me");
 
-    public static APIBodyRoute<SelfUserProperties, User> ModifyCurrentUser(SelfUserProperties properties)
+    public static APIBodyRoute<ModifySelfUserProperties, User> ModifyCurrentUser(ModifySelfUserProperties properties)
         => new(nameof(ModifyCurrentUser), RequestMethod.Patch, "users/@me", properties);
 
     public static APIRoute<PartialGuild> GetCurrentUserGuilds(ulong? before, ulong? after, int? limit, bool? withCounts)
@@ -33,5 +33,12 @@ public static partial class Routes
     public static APIBodyRoute<CreateGroupDMProperties, Channel> CreateGroupDM(CreateGroupDMProperties body)
         => new(nameof(CreateGroupDM), RequestMethod.Post, "users/@me/channels", body);
 
-    public static readonly APIRoute<Connection>
+    public static readonly APIRoute<Connection> GetUserConnections
+        = new(nameof(GetUserConnections), RequestMethod.Get, "users/@me/connections");
+
+    public static APIRoute<ApplicationRoleConnection> GetUserApplicationRoleConnection(ulong applicationId)
+        => new(nameof(GetUserApplicationRoleConnection), RequestMethod.Get, $"/users/@me/applications/{applicationId}/role-connection");
+
+    public static APIBodyRoute<ModifyUserApplicationRoleConnection, ApplicationRoleConnection> UpdateUserApplicationRoleConnection(ulong applicationId, ModifyUserApplicationRoleConnection body)
+        => new(nameof(UpdateUserApplicationRoleConnection), RequestMethod.Put, $"/users/@me/applications/{applicationId}/role-connection", body);
 }

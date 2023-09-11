@@ -16,7 +16,7 @@ namespace Discord;
 ///     </code>
 /// </example>
 /// <seealso cref="IRole.ModifyAsync" />
-public class RoleProperties
+public class ModifyRoleProperties
 {
     /// <summary>
     ///     Gets or sets the name of the role.

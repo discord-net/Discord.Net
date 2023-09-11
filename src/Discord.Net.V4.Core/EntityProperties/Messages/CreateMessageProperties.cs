@@ -1,6 +1,6 @@
 namespace Discord;
 
-public sealed record MessageCreateProperties(
+public sealed record CreateMessageProperties(
     Optional<string?> Content = default,
     Optional<bool> IsTTS = default,
     Optional<IEnumerable<Embed>> Embeds = default,

@@ -100,9 +100,9 @@ namespace Discord.Rest
         }
 
         public static async Task<StageInstance> ModifyAsync(IStageChannel channel, BaseDiscordClient client,
-            Action<StageInstanceProperties> func, RequestOptions options = null)
+            Action<ModifyStageInstanceProperties> func, RequestOptions options = null)
         {
-            var args = new StageInstanceProperties();
+            var args = new ModifyStageInstanceProperties();
             func(args);
 
             var apiArgs = new ModifyStageInstanceParams()

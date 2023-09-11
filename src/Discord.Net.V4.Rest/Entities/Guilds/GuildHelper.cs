@@ -18,12 +18,12 @@ namespace Discord.Rest
         #region General
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null" />.</exception>
         public static async Task<Model> ModifyAsync(IGuild guild, BaseDiscordClient client,
-            Action<GuildProperties> func, RequestOptions options)
+            Action<ModifyGuildProperties> func, RequestOptions options)
         {
             if (func == null)
                 throw new ArgumentNullException(nameof(func));
 
-            var args = new GuildProperties();
+            var args = new ModifyGuildProperties();
             func(args);
 
             var apiArgs = new API.Rest.ModifyGuildParams
@@ -775,13 +775,13 @@ namespace Discord.Rest
             return await client.ApiClient.CreateGuildStickerAsync(apiArgs, guild.Id, options).ConfigureAwait(false);
         }
 
-        public static async Task<API.Sticker> ModifyStickerAsync(BaseDiscordClient client, ulong guildId, ISticker sticker, Action<StickerProperties> func,
+        public static async Task<API.Sticker> ModifyStickerAsync(BaseDiscordClient client, ulong guildId, ISticker sticker, Action<ModifyStickerProperties> func,
             RequestOptions options = null)
         {
             if (func == null)
                 throw new ArgumentNullException(paramName: nameof(func));
 
-            var props = new StickerProperties();
+            var props = new ModifyStickerProperties();
             func(props);
 
             var apiArgs = new ModifyGuildStickerParams()

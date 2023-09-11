@@ -94,7 +94,7 @@ namespace Discord.Gateway
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128) => throw new NotImplementedException();
         public ChannelPermissions GetPermissions(IGuildChannel channel) => throw new NotImplementedException();
         public Task KickAsync(string? reason = null, RequestOptions? options = null) => throw new NotImplementedException();
-        public Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task ModifyAsync(Action<ModifyGuildUserProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
         public Task RemoveRoleAsync(ulong roleId, RequestOptions? options = null) => throw new NotImplementedException();
         public Task RemoveRoleAsync(IRole role, RequestOptions? options = null) => throw new NotImplementedException();
         public Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions? options = null) => throw new NotImplementedException();

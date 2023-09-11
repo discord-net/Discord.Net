@@ -6,7 +6,7 @@ namespace Discord;
 ///     Properties that are used to modify an <see cref="IGuildUser" /> with the following parameters.
 /// </summary>
 /// <seealso cref="IGuildUser.ModifyAsync" />
-public sealed class GuildUserProperties
+public sealed class ModifyGuildUserProperties
 {
     /// <summary>
     ///     Gets or sets whether the user should be muted in a voice channel.

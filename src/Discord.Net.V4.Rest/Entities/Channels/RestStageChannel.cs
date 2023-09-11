@@ -54,7 +54,7 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc/>
-        public async Task ModifyInstanceAsync(Action<StageInstanceProperties> func, RequestOptions options = null)
+        public async Task ModifyInstanceAsync(Action<ModifyStageInstanceProperties> func, RequestOptions options = null)
         {
             var model = await ChannelHelper.ModifyAsync(this, Discord, func, options);
 

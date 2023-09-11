@@ -43,7 +43,7 @@ namespace Discord.Gateway
             _source = model;
         }
 
-        public Task ModifyAsync(Action<StageInstanceProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task ModifyAsync(Action<ModifyStageInstanceProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
         public Task StopAsync(RequestOptions? options = null) => throw new NotImplementedException();
         internal override object Clone() => throw new NotImplementedException();
         internal override void DisposeClone() => throw new NotImplementedException();
