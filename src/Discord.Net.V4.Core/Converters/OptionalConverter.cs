@@ -6,8 +6,11 @@ namespace Discord.Rest.Converters;
 
 public class OptionalConverter : JsonConverterFactory
 {
-    public override bool CanConvert(Type typeToConvert) => typeToConvert.IsGenericType
-                                                           && typeToConvert.GetGenericTypeDefinition() == typeof(Optional<>);
+    public static readonly OptionalConverter Instance = new();
+
+    public override bool CanConvert(Type typeToConvert)
+        => typeToConvert.IsGenericType &&
+        typeToConvert.GetGenericTypeDefinition() == typeof(Optional<>);
 
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {

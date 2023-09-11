@@ -5,6 +5,8 @@ namespace Discord.Rest.Converters;
 
 public class UserStatusConverter : JsonConverter<UserStatus>
 {
+    public static readonly UserStatusConverter Instance = new();
+
     public override UserStatus Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var typeString = reader.GetString();

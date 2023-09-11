@@ -1,3 +1,11 @@
+
+/* Unmerged change from project 'Discord.Net.V4.Core (net7.0)'
+Before:
+using System.Text.Json.Serialization;
+After:
+using Discord.API.Activity;
+using System.Text.Json.Serialization;
+*/
 using System.Text.Json.Serialization;
 
 namespace Discord.API;

@@ -5,6 +5,8 @@ namespace Discord.Rest.Converters;
 
 public class EmbedTypeConverter : JsonConverter<EmbedType>
 {
+    public static readonly EmbedTypeConverter Instance = new();
+
     public override EmbedType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var typeString = reader.GetString();
