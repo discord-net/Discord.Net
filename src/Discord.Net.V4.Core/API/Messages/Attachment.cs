@@ -8,7 +8,7 @@ public sealed class Attachment
     public ulong Id { get; set; }
 
     [JsonPropertyName("filename")]
-    public string Filename { get; set; }
+    public required string Filename { get; set; }
 
     [JsonPropertyName("description")]
     public Optional<string> Description { get; set; }
@@ -20,10 +20,10 @@ public sealed class Attachment
     public int Size { get; set; }
 
     [JsonPropertyName("url")]
-    public string Url { get; set; }
+    public required string Url { get; set; }
 
     [JsonPropertyName("proxy_url")]
-    public string ProxyUrl { get; set; }
+    public required string ProxyUrl { get; set; }
 
     [JsonPropertyName("height")]
     public Optional<int?> Height { get; set; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public sealed class ButtonComponent : IMessageComponent
+public sealed class ButtonComponent
 {
     [JsonPropertyName("type")]
     public ComponentType Type { get; set; }
@@ -23,40 +23,5 @@ public sealed class ButtonComponent : IMessageComponent
     public Optional<string> Url { get; set; }
 
     [JsonPropertyName("disabled")]
-    public Optional<bool> Disabled { get; set; }
-
-    public ButtonComponent() { }
-
-    public ButtonComponent(Discord.ButtonComponent c)
-    {
-        Type = c.Type;
-        Style = c.Style;
-        Label = c.Label ?? Optional<string>.Unspecified;
-        CustomId = c.CustomId ?? Optional<string>.Unspecified;
-        Url = c.Url ?? Optional<string>.Unspecified;
-        Disabled = c.IsDisabled;
-
-        if (c.Emote is not null)
-        {
-            if (c.Emote is Emote e)
-            {
-                Emote = new Emoji
-                {
-                    Name = e.Name,
-                    Animated = e.Animated,
-                    Id = e.Id
-                };
-            }
-            else
-            {
-                Emote = new Emoji
-                {
-                    Name = c.Emote.Name
-                };
-            }
-        }
-    }
-
-    [JsonIgnore]
-    string IMessageComponent.CustomId => CustomId.GetValueOrDefault();
+    public Optional<bool> IsDisabled { get; set; }
 }

@@ -5,7 +5,7 @@ namespace Discord.API;
 public sealed class EmbedAuthor
 {
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("url")]
     public Optional<string> Url { get; set; }

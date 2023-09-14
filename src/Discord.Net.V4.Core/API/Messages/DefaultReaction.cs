@@ -8,5 +8,5 @@ public sealed class DefaultReaction
     public ulong? Id { get; set; }
 
     [JsonPropertyName("emoji_name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }

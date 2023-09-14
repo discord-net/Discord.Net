@@ -5,10 +5,10 @@ namespace Discord.API;
 public sealed class EmbedField
 {
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("value")]
-    public string Value { get; set; }
+    public required string Value { get; set; }
 
     [JsonPropertyName("inline")]
     public Optional<bool> Inline { get; set; }

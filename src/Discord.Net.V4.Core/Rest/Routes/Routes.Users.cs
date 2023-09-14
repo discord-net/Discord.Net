@@ -33,7 +33,7 @@ public static partial class Routes
     public static APIBodyRoute<CreateGroupDMProperties, Channel> CreateGroupDM(CreateGroupDMProperties body)
         => new(nameof(CreateGroupDM), RequestMethod.Post, "users/@me/channels", body);
 
-    public static readonly APIRoute<Connection> GetUserConnections
+    public static readonly APIRoute<UserConnection> GetUserConnections
         = new(nameof(GetUserConnections), RequestMethod.Get, "users/@me/connections");
 
     public static APIRoute<ApplicationRoleConnection> GetUserApplicationRoleConnection(ulong applicationId)

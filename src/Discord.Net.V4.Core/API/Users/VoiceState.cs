@@ -18,7 +18,7 @@ public sealed class VoiceState
     public Optional<GuildMember> Member { get; set; }
 
     [JsonPropertyName("session_id")]
-    public string SessionId { get; set; }
+    public required string SessionId { get; set; }
 
     [JsonPropertyName("deaf")]
     public bool Deaf { get; set; }

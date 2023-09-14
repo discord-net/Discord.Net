@@ -8,10 +8,10 @@ public sealed class User
     public ulong Id { get; set; }
 
     [JsonPropertyName("username")]
-    public string Username { get; set; }
+    public required string Username { get; set; }
 
     [JsonPropertyName("discriminator")]
-    public string Discriminator { get; set; }
+    public required string Discriminator { get; set; }
 
     [JsonPropertyName("global_name")]
     public string? GlobalName { get; set; }
@@ -44,13 +44,13 @@ public sealed class User
     public Optional<string?> Email { get; set; }
 
     [JsonPropertyName("flags")]
-    public Optional<UserProperties> Flags { get; set; }
+    public Optional<UserFlags> Flags { get; set; }
 
     [JsonPropertyName("premium_type")]
     public Optional<PremiumType> Premium { get; set; }
 
     [JsonPropertyName("public_flags")]
-    public Optional<UserProperties> PublicFlags { get; set; }
+    public Optional<UserFlags> PublicFlags { get; set; }
 
     [JsonPropertyName("avatar_decoration")]
     public Optional<string?> AvatarDecoration { get; set; }

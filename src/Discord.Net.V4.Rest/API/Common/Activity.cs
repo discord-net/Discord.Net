@@ -44,7 +44,7 @@ public class Activity
     public Optional<bool> Instance { get; set; }
 
     [JsonPropertyName("Flags")]
-    public Optional<ActivityProperties> Flags { get; set; }
+    public Optional<ActivityFlags> Flags { get; set; }
 
     [JsonPropertyName("buttons")]
     public Optional<ActivityButton[]> Buttons { get; set; }

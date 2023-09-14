@@ -5,7 +5,7 @@ namespace Discord.API;
 public sealed class EmbedThumbnail
 {
     [JsonPropertyName("url")]
-    public string Url { get; set; }
+    public required string Url { get; set; }
 
     [JsonPropertyName("proxy_url")]
     public Optional<string> ProxyUrl { get; set; }

@@ -8,10 +8,10 @@ public sealed class UserGuild
     public ulong Id { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("icon")]
-    public string Icon { get; set; }
+    public string? Icon { get; set; }
 
     [JsonPropertyName("owner")]
     public bool IsOwner { get; set; }

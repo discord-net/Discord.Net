@@ -8,8 +8,17 @@ public sealed class Reaction
     public int Count { get; set; }
 
     [JsonPropertyName("me")]
-    public bool Me { get; set; }
+    public bool IsMe { get; set; }
+
+    [JsonPropertyName("me_burst")]
+    public bool IsMeBurst { get; set; }
 
     [JsonPropertyName("emoji")]
-    public Emoji Emoji { get; set; }
+    public required Emoji Emoji { get; set; }
+
+    [JsonPropertyName("count_details")]
+    public required ReactionCountDetails CountDetails { get; set; }
+
+    [JsonPropertyName("burst_colors")]
+    public required Color[] Colors { get; set; }
 }

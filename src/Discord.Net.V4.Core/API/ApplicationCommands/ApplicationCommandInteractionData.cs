@@ -14,7 +14,7 @@ public sealed class ApplicationCommandInteractionData : IDiscordInteractionData
     public ApplicationCommandType Type { get; set; }
 
     [JsonPropertyName("resolved")]
-    public Optional<ApplicationCommandInteractionDataResolved> Resolved { get; set; }
+    public Optional<InteractionDataResolved> Resolved { get; set; }
 
     [JsonPropertyName("options")]
     public Optional<ApplicationCommandInteractionDataOption[]> Options { get; set; }

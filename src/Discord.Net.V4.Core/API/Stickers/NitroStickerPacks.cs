@@ -5,5 +5,5 @@ namespace Discord.API;
 public sealed class NitroStickerPacks
 {
     [JsonPropertyName("sticker_packs")]
-    public List<StickerPack> StickerPacks { get; set; }
+    public required StickerPack[] StickerPacks { get; set; }
 }

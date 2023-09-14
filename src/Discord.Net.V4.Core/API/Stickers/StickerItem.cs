@@ -8,7 +8,7 @@ public sealed class StickerItem
     public ulong Id { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("format_type")]
     public StickerFormatType FormatType { get; set; }

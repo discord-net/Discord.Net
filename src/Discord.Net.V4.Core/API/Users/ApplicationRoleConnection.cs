@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 namespace Discord.API;
 
 public sealed class ApplicationRoleConnection
-
 {
     [JsonPropertyName("platform_name")]
     public Optional<string> PlatformName { get; set; }

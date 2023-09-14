@@ -11,13 +11,13 @@ public sealed class Sticker
     public Optional<ulong> PackId { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("description")]
     public string? Description { get; set; }
 
     [JsonPropertyName("tags")]
-    public string Tags { get; set; }
+    public required string Tags { get; set; }
 
     [JsonPropertyName("type")]
     public StickerType Type { get; set; }

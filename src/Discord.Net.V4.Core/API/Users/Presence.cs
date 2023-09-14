@@ -5,7 +5,7 @@ namespace Discord.API;
 public sealed class Presence
 {
     [JsonPropertyName("user")]
-    public User User { get; set; }
+    public required User User { get; set; }
 
     [JsonPropertyName("guild_id")]
     public Optional<ulong> GuildId { get; set; }

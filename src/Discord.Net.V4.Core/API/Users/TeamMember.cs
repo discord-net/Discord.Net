@@ -5,14 +5,14 @@ namespace Discord.API;
 public sealed class TeamMember
 {
     [JsonPropertyName("membership_state")]
-    public MembershipState MembershipState { get; set; }
+    public required MembershipState MembershipState { get; set; }
 
     [JsonPropertyName("permissions")]
-    public string[] Permissions { get; set; }
+    public required string[] Permissions { get; set; }
 
     [JsonPropertyName("team_id")]
-    public ulong TeamId { get; set; }
+    public required ulong TeamId { get; set; }
 
     [JsonPropertyName("user")]
-    public User User { get; set; }
+    public required User User { get; set; }
 }

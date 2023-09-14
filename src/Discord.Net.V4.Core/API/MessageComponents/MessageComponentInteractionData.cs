@@ -5,7 +5,7 @@ namespace Discord.API;
 public sealed class MessageComponentInteractionData : IDiscordInteractionData
 {
     [JsonPropertyName("custom_id")]
-    public string CustomId { get; set; }
+    public required string CustomId { get; set; }
 
     [JsonPropertyName("component_type")]
     public ComponentType ComponentType { get; set; }

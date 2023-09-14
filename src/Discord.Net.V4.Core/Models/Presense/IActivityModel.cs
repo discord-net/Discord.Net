@@ -8,7 +8,7 @@ public interface IActivityModel
     ActivityType Type { get; }
     string Details { get; }
     string State { get; }
-    ActivityProperties Flags { get; }
+    ActivityFlags Flags { get; }
     DateTimeOffset CreatedAt { get; }
     IEmojiModel Emoji { get; }
     ulong? ApplicationId { get; }

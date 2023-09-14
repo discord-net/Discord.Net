@@ -14,5 +14,5 @@ public sealed class MessageMentionedChannel
     public ChannelType ChannelType { get; set; }
 
     [JsonPropertyName("name")]
-    public string ChannelName { get; set; }
+    public required string ChannelName { get; set; }
 }

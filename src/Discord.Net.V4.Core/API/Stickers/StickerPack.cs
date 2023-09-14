@@ -8,10 +8,10 @@ public sealed class StickerPack
     public ulong Id { get; set; }
 
     [JsonPropertyName("stickers")]
-    public Sticker[] Stickers { get; set; }
+    public required Sticker[] Stickers { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("sku_id")]
     public ulong SkuId { get; set; }
@@ -20,7 +20,7 @@ public sealed class StickerPack
     public Optional<ulong> CoverStickerId { get; set; }
 
     [JsonPropertyName("description")]
-    public string Description { get; set; }
+    public required string Description { get; set; }
 
     [JsonPropertyName("banner_asset_id")]
     public Optional<ulong> BannerAssetId { get; set; }

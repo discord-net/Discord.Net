@@ -8,7 +8,7 @@ public sealed class MessageRoleSubscriptionData
     public ulong SubscriptionListingId { get; set; }
 
     [JsonPropertyName("tier_name")]
-    public string TierName { get; set; }
+    public required string TierName { get; set; }
 
     [JsonPropertyName("total_months_subscribed")]
     public int MonthsSubscribed { get; set; }

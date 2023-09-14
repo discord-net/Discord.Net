@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public sealed class ApplicationCommandInteractionDataResolved
+public sealed class InteractionDataResolved
 {
     [JsonPropertyName("users")]
     public Optional<Dictionary<string, User>> Users { get; set; }

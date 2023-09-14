@@ -29,16 +29,16 @@ public sealed class Message
     public bool MentionEveryone { get; set; }
 
     [JsonPropertyName("mentions")]
-    public User[] UserMentions { get; set; }
+    public required User[] UserMentions { get; set; }
 
     [JsonPropertyName("mention_roles")]
-    public ulong[] RoleMentions { get; set; }
+    public required ulong[] RoleMentions { get; set; }
 
     [JsonPropertyName("mention_channels")]
     public Optional<MessageMentionedChannel[]> ChannelMentions { get; set; }
 
     [JsonPropertyName("embeds")]
-    public Embed[] Embeds { get; set; }
+    public required Embed[] Embeds { get; set; }
 
     [JsonPropertyName("reactions")]
     public Optional<Reaction[]> Reactions { get; set; }

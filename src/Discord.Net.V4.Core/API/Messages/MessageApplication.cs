@@ -8,14 +8,14 @@ public sealed class MessageApplication
     public ulong Id { get; set; }
 
     [JsonPropertyName("cover_image")]
-    public string CoverImage { get; set; }
+    public required string CoverImage { get; set; }
 
     [JsonPropertyName("description")]
-    public string Description { get; set; }
+    public required string Description { get; set; }
 
     [JsonPropertyName("icon")]
-    public string Icon { get; set; }
+    public required string Icon { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }

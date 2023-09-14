@@ -5,7 +5,7 @@ namespace Discord.API;
 public sealed class EmbedFooter
 {
     [JsonPropertyName("text")]
-    public string Text { get; set; }
+    public required string Text { get; set; }
 
     [JsonPropertyName("icon_url")]
     public Optional<string> IconUrl { get; set; }
