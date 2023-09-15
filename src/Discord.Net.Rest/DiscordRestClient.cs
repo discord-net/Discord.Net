@@ -371,6 +371,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
             => await ClientHelper.GetGlobalApplicationCommandAsync(this, id, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IApplicationCommand> IDiscordClient.CreateGlobalApplicationCommand(ApplicationCommandProperties properties, RequestOptions options)
+            => await CreateGlobalCommand(properties, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties, RequestOptions options)
+            => await BulkOverwriteGlobalCommands(properties, options).ConfigureAwait(false);
         #endregion
     }
 }
