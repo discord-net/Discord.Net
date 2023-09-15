@@ -1,17 +1,17 @@
-using Discord.Rest.Converters;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Discord.Converters;
 
-internal sealed class DiscordConverterFactory : JsonConverterFactory
+public sealed class DiscordConverterFactory : JsonConverterFactory
 {
     private static readonly JsonConverter[] _converters = new JsonConverter[]
     {
         EmbedTypeConverter.Instance,
         OptionalConverter.Instance,
         UInt64Converter.Instance,
-        UserStatusConverter.Instance
+        UserStatusConverter.Instance,
+        ColorConverter.Instance,
     };
 
     public override bool CanConvert(Type typeToConvert)

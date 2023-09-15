@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using System.Text.Json;
 
-namespace Discord.Rest.Converters;
+namespace Discord.Converters;
 
 public class UserStatusConverter : JsonConverter<UserStatus>
 {

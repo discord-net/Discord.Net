@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Discord.Rest.Converters;
+namespace Discord.Converters;
 
 public class UInt64Converter : JsonConverter<ulong>
 {

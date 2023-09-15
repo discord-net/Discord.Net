@@ -14,8 +14,4 @@
     <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="API\Activity\" />
-  </ItemGroup>
-
 </Project>
