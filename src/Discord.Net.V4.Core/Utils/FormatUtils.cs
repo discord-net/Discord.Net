@@ -1,10 +1,10 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Discord;
+namespace Discord.Utils;
 
 /// <summary> A helper class for formatting characters. </summary>
-public static class Format
+public static class FormatUtils
 {
     // Characters which need escaping
     private static readonly string[] SensitiveCharacters = {

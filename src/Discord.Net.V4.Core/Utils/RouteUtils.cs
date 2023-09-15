@@ -1,26 +1,21 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Discord.Utils
+namespace Discord.Utils;
+
+internal class RouteUtils
 {
-    internal class RouteUtils
+    public static string GetUrlEncodedQueryParams(params (string, object?)[] args)
     {
-        public static string GetUrlEncodedQueryParams(params (string, object?)[] args)
-        {
-            if (args.All(x => x.Item2 is null))
-                return string.Empty;
+        if (args.All(x => x.Item2 is null))
+            return string.Empty;
 
-            var paramsString = string.Join("&", args.Where(x => x.Item2 is not null)
-                .Select(x => GetUrlEncodedQueryParam(x.Item1, x.Item2!)));
+        var paramsString = string.Join("&", args.Where(x => x.Item2 is not null)
+            .Select(x => GetUrlEncodedQueryParam(x.Item1, x.Item2!)));
 
-            return $"?{paramsString}";
-        }
-
-        public static string GetUrlEncodedQueryParam(string key, object value)
-            => $"{key}={WebUtility.UrlEncode(value.ToString())}";
+        return $"?{paramsString}";
     }
+
+    public static string GetUrlEncodedQueryParam(string key, object value)
+        => $"{key}={WebUtility.UrlEncode(value.ToString())}";
 }

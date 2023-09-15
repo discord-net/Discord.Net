@@ -1,5 +1,3 @@
-using System;
-
 namespace Discord.Utils;
 
 internal static class UrlValidation

@@ -1,5 +1,3 @@
-using Discord.Net;
-
 namespace Discord;
 
 /// <summary>
