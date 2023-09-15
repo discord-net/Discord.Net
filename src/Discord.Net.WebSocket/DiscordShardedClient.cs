@@ -529,12 +529,12 @@ namespace Discord.WebSocket
             foreach (var shard in _shards)
             {
                 entity = shard.State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(shard, model));
+
+                //Update it in case it was cached
+                entity.Update(model);
             }
 
             System.Diagnostics.Debug.Assert(entity != null, "There should be at least one shard to get the entity");
-
-            //Update it in case it was cached
-            entity.Update(model);
 
             return entity;
         }
