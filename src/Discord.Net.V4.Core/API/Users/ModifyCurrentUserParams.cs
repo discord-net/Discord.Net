@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Discord.API.Rest;
+namespace Discord.API;
 
-internal class ModifyCurrentUserParams
+public sealed class ModifyCurrentUserParams
 {
     [JsonPropertyName("username")]
     public Optional<string> Username { get; set; }

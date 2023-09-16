@@ -4,5 +4,6 @@ public enum ScopeType : byte
 {
     Guild,
     Channel,
-    Webhook
+    Webhook,
+    Interaction
 }

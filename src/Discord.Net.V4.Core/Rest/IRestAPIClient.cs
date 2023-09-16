@@ -1,4 +1,4 @@
-using Discord.API;
+using Discord;
 
 namespace Discord;
 

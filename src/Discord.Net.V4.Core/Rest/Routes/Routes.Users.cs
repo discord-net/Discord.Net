@@ -5,14 +5,14 @@ namespace Discord.Rest;
 
 public static partial class Routes
 {
+    public static readonly APIRoute<User> GetCurrentUser
+        = new(nameof(GetCurrentUser), RequestMethod.Get, "users/@me");
+
     public static APIRoute<User> GetUser(ulong userId)
         => new(nameof(GetUser), RequestMethod.Get, $"users/{userId}");
 
-    public static readonly APIRoute<User> CurrentUser
-        = new(nameof(CurrentUser), RequestMethod.Get, "users/@me");
-
-    public static APIBodyRoute<ModifySelfUserProperties, User> ModifyCurrentUser(ModifySelfUserProperties properties)
-        => new(nameof(ModifyCurrentUser), RequestMethod.Patch, "users/@me", properties);
+    public static APIBodyRoute<ModifyCurrentUserParams, User> ModifyCurrentUser(ModifyCurrentUserParams body)
+        => new(nameof(ModifyCurrentUser), RequestMethod.Patch, "users/@me", body);
 
     public static APIRoute<PartialGuild> GetCurrentUserGuilds(ulong? before, ulong? after, int? limit, bool? withCounts)
         => new(
@@ -27,10 +27,10 @@ public static partial class Routes
     public static APIRoute LeaveGuild(ulong guildId)
         => new(nameof(LeaveGuild), RequestMethod.Delete, $"users/@me/guilds/{guildId}", (ScopeType.Guild, guildId));
 
-    public static APIBodyRoute<CreateDMProperties, Channel> CreateDM(CreateDMProperties body)
+    public static APIBodyRoute<CreateDMChannelParams, Channel> CreateDM(CreateDMChannelParams body)
         => new(nameof(CreateDM), RequestMethod.Post, "users/@me/channels", body);
 
-    public static APIBodyRoute<CreateGroupDMProperties, Channel> CreateGroupDM(CreateGroupDMProperties body)
+    public static APIBodyRoute<CreateGroupDMChannelParams, Channel> CreateGroupDM(CreateGroupDMChannelParams body)
         => new(nameof(CreateGroupDM), RequestMethod.Post, "users/@me/channels", body);
 
     public static readonly APIRoute<UserConnection> GetUserConnections
@@ -39,6 +39,6 @@ public static partial class Routes
     public static APIRoute<ApplicationRoleConnection> GetUserApplicationRoleConnection(ulong applicationId)
         => new(nameof(GetUserApplicationRoleConnection), RequestMethod.Get, $"/users/@me/applications/{applicationId}/role-connection");
 
-    public static APIBodyRoute<ModifyUserApplicationRoleConnection, ApplicationRoleConnection> UpdateUserApplicationRoleConnection(ulong applicationId, ModifyUserApplicationRoleConnection body)
+    public static APIBodyRoute<ModifyUserRoleConnectionParams, ApplicationRoleConnection> UpdateUserApplicationRoleConnection(ulong applicationId, ModifyUserRoleConnectionParams body)
         => new(nameof(UpdateUserApplicationRoleConnection), RequestMethod.Put, $"/users/@me/applications/{applicationId}/role-connection", body);
 }

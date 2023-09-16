@@ -10,6 +10,7 @@ public sealed class ModifySelfUserProperties
     ///     Gets or sets the username.
     /// </summary>
     public Optional<string> Username { get; set; }
+
     /// <summary>
     ///     Gets or sets the avatar.
     /// </summary>

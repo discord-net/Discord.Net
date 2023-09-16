@@ -1,4 +1,4 @@
-namespace Discord.Rest;
+namespace Discord;
 
 public readonly struct APIRoute
 {
