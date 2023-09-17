@@ -1,4 +1,5 @@
 using Discord.Audio;
+using Discord.Entities.Messages.AllowedMentions;
 using Discord.Entities.Messages.Embeds;
 using Discord.Gateway.Cache;
 using Discord.Rest;

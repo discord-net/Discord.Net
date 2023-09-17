@@ -14,22 +14,22 @@ public enum ActivityType
     ///     The user is streaming online.
     /// </summary>
     Streaming = 1,
-
+    
     /// <summary>
     ///     The user is listening to a song.
     /// </summary>
     Listening = 2,
-
+    
     /// <summary>
     ///     The user is watching some form of media.
     /// </summary>
     Watching = 3,
-
+    
     /// <summary>
     ///     The user has set a custom status.
     /// </summary>
     CustomStatus = 4,
-
+    
     /// <summary>
     ///     The user is competing in a game.
     /// </summary>

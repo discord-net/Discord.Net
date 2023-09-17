@@ -1,6 +1,4 @@
-using Discord;
-
-namespace Discord;
+namespace Discord.Rest;
 
 public interface IRestApiClient
 {

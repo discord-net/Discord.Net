@@ -20,5 +20,5 @@ public class ModifyStickerProperties
     /// <summary>
     ///     Gets or sets the tags of the sticker.
     /// </summary>
-    public Optional<IEnumerable<string>> Tags { get; set; }
+    public Optional<CSVString> Tags { get; set; }
 }

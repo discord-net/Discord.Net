@@ -5,52 +5,53 @@ namespace Discord;
 ///     These describe what the activity payload includes.
 /// </summary>
 [Flags]
-public enum ActivityFlags
+public enum ActivityFlags : ushort
 {
     /// <summary>
     ///     Indicates that no actions on this activity can be taken.
     /// </summary>
     None = 0,
-
-    Instance = 1,
-
+    
+    // no clue what the hell this is?
+    Instance = 1 << 0,
+    
     /// <summary>
     ///     Indicates that this activity can be joined.
     /// </summary>
-    Join = 0b10,
-
+    Join = 1 << 1,
+    
     /// <summary>
     ///     Indicates that this activity can be spectated.
     /// </summary>
-    Spectate = 0b100,
-
+    Spectate = 1 << 2,
+    
     /// <summary>
     ///     Indicates that a user may request to join an activity.
     /// </summary>
-    JoinRequest = 0b1000,
-
+    JoinRequest = 1 << 3,
+    
     /// <summary>
     ///     Indicates that a user can listen along in Spotify.
     /// </summary>
-    Sync = 0b10000,
-
+    Sync = 1 << 4,
+    
     /// <summary>
     ///     Indicates that a user can play this song.
     /// </summary>
-    Play = 0b100000,
-
+    Play = 1 << 5,
+    
     /// <summary>
     ///     Indicates that a user is playing an activity in a voice channel with friends.
     /// </summary>
-    PartyPrivacyFriends = 0b1000000,
-
+    PartyPrivacyFriends = 1 << 6,
+    
     /// <summary>
     ///     Indicates that a user is playing an activity in a voice channel.
     /// </summary>
-    PartyPrivacyVoiceChannel = 0b10000000,
-
+    PartyPrivacyVoiceChannel = 1 << 7,
+    
     /// <summary>
-    ///     Indicates that a user is playing an activity in a voice channel.
+    ///     Indicates that a user is playing an embedded activity.
     /// </summary>
-    Embedded = 0b10000000
+    Embedded = 1 << 8
 }

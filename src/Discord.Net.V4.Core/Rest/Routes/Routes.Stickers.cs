@@ -20,5 +20,9 @@ public static partial class Routes
     public static APIBodyRoute<CreateStickerProperties, Sticker> CreateGuildSticker(ulong guildId, CreateStickerProperties body)
         => new(nameof(CreateGuildSticker), RequestMethod.Post, $"guilds/{guildId}/stickers", body, ContentType.MultipartForm, (ScopeType.Guild, guildId));
 
-    public static 
+    public static APIBodyRoute<ModifyStickerProperties, Sticker> ModifyGuildSticker(ulong guildId, ModifyStickerProperties body)
+        => new(nameof(ModifyGuildSticker), RequestMethod.Patch, $"guilds/{guildId}/stickers", body, bucket: (ScopeType.Guild, guildId));
+
+    public static APIRoute DeleteGuildSticker(ulong guildId, ulong stickerId)
+        => new(nameof(DeleteGuildSticker), RequestMethod.Delete, $"guilds/{guildId}/stickers/{stickerId}", (ScopeType.Guild, guildId));
 }

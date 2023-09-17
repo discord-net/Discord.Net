@@ -1,4 +1,5 @@
 using Discord.Entities.Channels.Threads;
+using Discord.Entities.Messages.AllowedMentions;
 using Discord.Entities.Messages.Embeds;
 using System;
 using System.Collections.Generic;

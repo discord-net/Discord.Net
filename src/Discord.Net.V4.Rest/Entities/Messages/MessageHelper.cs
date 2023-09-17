@@ -1,5 +1,6 @@
 using Discord.API;
 using Discord.API.Rest;
+using Discord.Entities.Messages.AllowedMentions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;

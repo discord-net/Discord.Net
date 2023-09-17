@@ -6,13 +6,14 @@ public sealed record CreateMessageProperties(
     Optional<IEnumerable<Embed>> Embeds = default,
     Optional<AllowedMentions> AllowedMentions = default,
     Optional<MessageReference> Reference = default,
-    // TODO: MessageComponent
-    // TODO: Stickers
-    // TODO: Attachments
+    Optional<IEnumerable<IMessageComponent>> Components = default,
+    Optional<IEnumerable<ulong>> Stickers = default,
+    Optional<IEnumerable<FileAttachment>> Attachments = default,
     Optional<MessageFlags> Flags = default)
 {
     internal bool IsValid()
     {
         // TODO: Validate
+        return true;
     }
 }
