@@ -18,14 +18,17 @@ public enum AllowedMentionTypes : byte
     ///     </note>
     /// </remarks>
     None = 0,
+
     /// <summary>
     ///     Controls role mentions.
     /// </summary>
     Roles = 1 << 0,
+
     /// <summary>
     ///     Controls user mentions.
     /// </summary>
     Users = 1 << 1,
+    
     /// <summary>
     ///     Controls <code>@everyone</code> and <code>@here</code> mentions.
     /// </summary>
