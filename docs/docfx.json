@@ -9,9 +9,7 @@
       ],
       "dest": "api",
       "filter": "filterConfig.yml",
-      "properties": {
-        "TargetFramework": "net5.0"
-      }
+      "allowCompilationErrors": true
     }
   ],
   "build": {
@@ -45,18 +43,12 @@
         ]
       }
     ],
-    "dest": "_site",
+    "output": "_site",
     "template": [
       "default",
-      "_template/light-dark-theme",
-      "_template/last-modified",
-      "_template/description-generator"
+      "modern"
     ],
-    "postProcessors": [
-      "ExtractSearchIndex",
-      "LastModifiedPostProcessor",
-      "DescriptionPostProcessor"
-    ],
+    "postProcessors": [],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
       "_appTitle": "Discord.Net Documentation",
