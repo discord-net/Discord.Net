@@ -5,7 +5,7 @@ title: Home
 
 # Discord.NET Documentation
 
-<div class="big-logo logo-switcher"></div>
+![logo](marketing/logo/SVG/Combinationmark%20White%20Border.svg)
 
 [![GitHub](https://img.shields.io/github/last-commit/discord-net/Discord.Net?style=plastic)](https://github.com/discord-net/Discord.Net)
 [![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net)
