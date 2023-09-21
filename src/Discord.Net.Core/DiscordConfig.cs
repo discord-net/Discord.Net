@@ -237,5 +237,10 @@ namespace Discord
         ///     Returns the max amount of tags applied to an application.
         /// </summary>
         public const int MaxApplicationTagCount = 5;
+
+        /// <summary>
+        ///     Returns the maximum length of a voice channel status.
+        /// </summary>
+        public const int MaxVoiceChannelStatusLength = 500;
     }
 }

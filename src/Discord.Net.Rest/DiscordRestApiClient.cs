@@ -466,6 +466,17 @@ namespace Discord.API
                     break;
             }
         }
+
+        public async Task ModifyVoiceChannelStatusAsync(ulong channelId, string status, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            var payload = new ModifyVoiceStatusParams { Status = status };
+            var ids = new BucketIds();
+
+            await SendJsonAsync("PUT", () => $"channels/{channelId}/voice-status", payload, ids, options: options);
+        }
+
         #endregion
 
         #region Threads
@@ -2254,7 +2265,7 @@ namespace Discord.API
             return await SendAsync<GuildOnboarding>("GET", () => $"guilds/{guildId}/onboarding", new BucketIds(guildId: guildId), options: options);
         }
 
-        public async Task<GuildOnboarding> ModifyGuildOnboardingAsync(ulong guildId, ModifyGuildOnboardingParams args,  RequestOptions options)
+        public async Task<GuildOnboarding> ModifyGuildOnboardingAsync(ulong guildId, ModifyGuildOnboardingParams args, RequestOptions options)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 

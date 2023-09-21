@@ -8,9 +8,9 @@ namespace Discord.WebSocket;
 /// <summary>
 ///     Contains a piece of audit log data related to a webhook deletion.
 /// </summary>
-public class SocketWebhookDeleteAuditLogData : ISocketAuditLogData
+public class SocketWebhookDeletedAuditLogData : ISocketAuditLogData
 {
-    private SocketWebhookDeleteAuditLogData(ulong id, Model model)
+    private SocketWebhookDeletedAuditLogData(ulong id, Model model)
     {
         WebhookId = id;
         ChannelId = model.ChannelId!.Value;
@@ -19,13 +19,13 @@ public class SocketWebhookDeleteAuditLogData : ISocketAuditLogData
         Avatar = model.AvatarHash;
     }
 
-    internal static SocketWebhookDeleteAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
+    internal static SocketWebhookDeletedAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
     {
         var changes = entry.Changes;
 
         var (data, _) = AuditLogHelper.CreateAuditLogEntityInfo<Model>(changes, discord);
 
-        return new SocketWebhookDeleteAuditLogData(entry.TargetId!.Value,data);
+        return new SocketWebhookDeletedAuditLogData(entry.TargetId!.Value,data);
     }
 
     /// <summary>

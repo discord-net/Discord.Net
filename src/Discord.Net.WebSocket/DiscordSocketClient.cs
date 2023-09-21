@@ -2304,6 +2304,22 @@ namespace Discord.WebSocket
 
                                 }
                                 break;
+
+                            case "VOICE_CHANNEL_STATUS_UPDATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_CHANNEL_STATUS_UPDATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<VoiceChannelStatusUpdateEvent>(_serializer);
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    var channel = State.GetChannel(data.Id) as SocketVoiceChannel;
+                                    var before = channel?.Clone();
+
+                                    channel.UpdateVoiceStatus(data.Status);
+
+                                    await TimedInvokeAsync(_voiceChannelStatusUpdated, nameof(VoiceChannelStatusUpdated), before, channel);
+                                }
+                                break;
                             #endregion
 
                             #region Invites
@@ -2903,20 +2919,20 @@ namespace Discord.WebSocket
                             #region Audit Logs
 
                             case "GUILD_AUDIT_LOG_ENTRY_CREATE":
-                            {
-                                var data = (payload as JToken).ToObject<AuditLogCreatedEvent>(_serializer);
-                                type = "GUILD_AUDIT_LOG_ENTRY_CREATE";
-                                await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AUDIT_LOG_ENTRY_CREATE)").ConfigureAwait(false);
+                                {
+                                    var data = (payload as JToken).ToObject<AuditLogCreatedEvent>(_serializer);
+                                    type = "GUILD_AUDIT_LOG_ENTRY_CREATE";
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AUDIT_LOG_ENTRY_CREATE)").ConfigureAwait(false);
 
-                                var guild = State.GetGuild(data.GuildId);
-                                var auditLog = SocketAuditLogEntry.Create(this, data);
-                                guild.AddAuditLog(auditLog);
+                                    var guild = State.GetGuild(data.GuildId);
+                                    var auditLog = SocketAuditLogEntry.Create(this, data);
+                                    guild.AddAuditLog(auditLog);
 
-                                await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
-                            }
-                            break;
+                                    await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
+                                }
+                                break;
                             #endregion
-                            
+
                             #region Auto Moderation
 
                             case "AUTO_MODERATION_RULE_CREATE":
