@@ -1,3 +1,5 @@
+using Discord.Rest;
+
 namespace Discord;
 
 /// <summary>
@@ -19,4 +21,6 @@ public interface IDiscordClient : IDisposable, IAsyncDisposable
     ///     Gets the token type of the logged-in user.
     /// </summary>
     TokenType TokenType { get; }
+
+    IRestApiClient RestApiClient { get; }
 }

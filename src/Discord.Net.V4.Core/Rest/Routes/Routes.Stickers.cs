@@ -1,7 +1,6 @@
 using Discord.API;
-using Discord.Rest;
 
-namespace Discord;
+namespace Discord.Rest;
 
 public static partial class Routes
 {

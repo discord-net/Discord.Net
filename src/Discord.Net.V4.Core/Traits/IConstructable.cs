@@ -3,14 +3,13 @@ using System.Runtime.Versioning;
 
 namespace Discord;
 
-[RequiresPreviewFeatures]
-public interface IConstructableEntity<TModel>
+public interface IConstructable<TModel>
     where TModel : IEntityModel
 {
     internal static abstract T Construct<T>(TModel model);
     
     static T Create<T>(TModel model)
-        where T : IConstructableEntity<TModel>
+        where T : IConstructable<TModel>
     {
         return T.Construct<T>(model);
     }

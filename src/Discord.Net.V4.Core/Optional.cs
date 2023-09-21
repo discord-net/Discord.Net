@@ -31,7 +31,8 @@ public readonly struct Optional<T>
         IsSpecified = true;
     }
 
-    public T GetValueOrDefault() => _value;
+    [return: MaybeNull]
+    public T? GetValueOrDefault() => _value;
 
     [return: NotNullIfNotNull(nameof(defaultValue)), MaybeNull]
     public T GetValueOrDefault([AllowNull] T defaultValue) => IsSpecified ? _value : defaultValue;

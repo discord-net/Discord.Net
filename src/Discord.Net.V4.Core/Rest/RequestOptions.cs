@@ -3,13 +3,8 @@ namespace Discord;
 /// <summary>
 ///     Represents options that should be used when sending a request.
 /// </summary>
-public class RequestOptions
+public readonly struct RequestOptions
 {
-    /// <summary>
-    ///     Creates a new <see cref="RequestOptions" /> class with its default settings.
-    /// </summary>
-    public static RequestOptions Default => new();
-
     /// <summary>
     ///     Gets or sets the maximum time to wait for this request to complete.
     /// </summary>
@@ -21,23 +16,12 @@ public class RequestOptions
     /// <returns>
     ///     A <see cref="int"/> in milliseconds for when the request times out.
     /// </returns>
-    public int? Timeout { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the cancellation token for this request.
-    /// </summary>
-    /// <returns>
-    ///     A <see cref="CancellationToken"/> for this request.
-    /// </returns>
-    [Obsolete("Please use the cancellation token method parameter instead")]
-    public CancellationToken CancelToken { get; set; } = CancellationToken.None;
+    public readonly int? Timeout;
 
     /// <summary>
     ///     Gets or sets the retry behavior when the request fails.
     /// </summary>
-    public RetryMode? RetryMode { get; set; }
-
-    public bool HeaderOnly { get; internal set; }
+    public readonly RetryMode? RetryMode;
 
     /// <summary>
     ///     Gets or sets the reason for this action in the guild's audit log.
@@ -46,7 +30,7 @@ public class RequestOptions
     ///     Gets or sets the reason that will be written to the guild's audit log if applicable. This may not apply
     ///     to all actions.
     /// </remarks>
-    public string? AuditLogReason { get; set; }
+    public readonly string? AuditLogReason;
 
     /// <summary>
     ///		Gets or sets whether or not this request should use the system
@@ -58,41 +42,8 @@ public class RequestOptions
     ///		when millisecond precision is especially important, and the
     ///		hosting system is known to have a desynced clock.
     /// </remarks>
-    public bool? UseSystemClock { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the callback to execute regarding ratelimits for this request.
-    /// </summary>
-    public Func<IRateLimitInfo, Task>? RatelimitCallback { get; set; }
-
-    internal bool IgnoreState { get; set; }
-
-    internal BucketId? BucketId { get; set; }
-
-    internal bool IsClientBucket { get; set; }
-
-    internal bool IsReactionBucket { get; set; }
-
-    internal bool IsGatewayBucket { get; set; }
-
-    internal IDictionary<string, IEnumerable<string>> RequestHeaders { get; }
-
-    internal static RequestOptions CreateOrClone(RequestOptions? options)
-        => options == null
-            ? new RequestOptions()
-            : options.Clone();
-
-    internal void ExecuteRatelimitCallback(IRateLimitInfo info)
-    {
-        if (RatelimitCallback != null)
-        {
-            _ = Task.Run(async () =>
-            {
-                await RatelimitCallback(info);
-            });
-        }
-    }
-
+    public readonly bool? UseSystemClock;
+    
     /// <summary>
     ///     Initializes a new <see cref="RequestOptions" /> class with the default request timeout set in
     ///     <see cref="DiscordConfig"/>.
@@ -100,7 +51,6 @@ public class RequestOptions
     public RequestOptions()
     {
         Timeout = DiscordConfig.DefaultRequestTimeout;
-        RequestHeaders = new Dictionary<string, IEnumerable<string>>();
     }
 
     public RequestOptions Clone() => (RequestOptions)MemberwiseClone();

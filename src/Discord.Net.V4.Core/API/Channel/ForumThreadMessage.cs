@@ -17,7 +17,7 @@ public sealed class ForumThreadMessage
     public Optional<AllowedMentions> AllowedMentions { get; set; }
 
     [JsonPropertyName("components")]
-    public Optional<API.ActionRowComponent[]> Components { get; set; }
+    public Optional<ActionRowComponent[]> Components { get; set; }
 
     [JsonPropertyName("sticker_ids")]
     public Optional<ulong[]> Stickers { get; set; }

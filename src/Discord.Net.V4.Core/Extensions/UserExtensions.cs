@@ -1,3 +1,5 @@
+using Discord.Utils;
+
 namespace Discord;
 
 public static class UserExtensions

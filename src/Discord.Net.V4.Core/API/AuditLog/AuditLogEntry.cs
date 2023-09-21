@@ -20,7 +20,7 @@ public sealed class AuditLogEntry
     public ActionType Action { get; set; }
 
     [JsonPropertyName("options")]
-    public AuditLogOptions Options { get; set; }
+    public Optional<AuditLogOptions> Options { get; set; }
 
     [JsonPropertyName("reason")]
     public Optional<string> Reason { get; set; }

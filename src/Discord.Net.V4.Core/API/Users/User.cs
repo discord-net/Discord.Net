@@ -1,8 +1,9 @@
+using Discord.Models;
 using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public sealed class User
+public sealed class User : IUserModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -54,4 +55,22 @@ public sealed class User
 
     [JsonPropertyName("avatar_decoration")]
     public Optional<string?> AvatarDecoration { get; set; }
+
+    bool? IUserModel.IsBot => IsBot.ToNullable();
+
+    bool? IUserModel.IsSystem => IsSystem.ToNullable();
+
+    bool? IUserModel.MFAEnabled => MFAEnabled.ToNullable();
+
+    string? IUserModel.Locale => Locale.GetValueOrDefault();
+
+    bool? IUserModel.Verified => IsVerified.GetValueOrDefault();
+
+    string? IUserModel.Email => Email.GetValueOrDefault();
+
+    UserFlags? IUserModel.Flags => Flags.ToNullable();
+
+    PremiumType? IUserModel.Premium => Premium.ToNullable();
+
+    UserFlags? IUserModel.PublicFlags => PublicFlags.ToNullable();
 }
