@@ -48,7 +48,9 @@
       "default",
       "modern"
     ],
-    "postProcessors": [],
+    "postProcessors": [
+	  "ExtractSearchIndex"
+	],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
       "_appTitle": "Discord.Net Documentation",
