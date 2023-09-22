@@ -47,12 +47,11 @@
     "template": [
       "default",
       "modern",
-	  "_template/material",
-	  "_template/overrides"
+	    "_template/material"
     ],
     "postProcessors": [
-	  "ExtractSearchIndex"
-	],
+	    "ExtractSearchIndex"
+	  ],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
       "_appTitle": "Discord.Net Documentation",
