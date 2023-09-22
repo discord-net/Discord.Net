@@ -4,12 +4,12 @@
       "src": [
         {
           "src": "../src",
-          "files": ["**.csproj"]
+          "files": ["**/*.csproj"],
+          "exclude": ["Discord.Net.DebugTools/*.csproj"]
         }
       ],
       "dest": "api",
-      "filter": "filterConfig.yml",
-      "allowCompilationErrors": true
+      "filter": "filterConfig.yml"
     }
   ],
   "build": {
