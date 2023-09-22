@@ -1,0 +1,11 @@
+dl.typelist.derived > dd > div:not(:last-child)::after {
+    content: none !important;
+}
+
+dl.typelist.derived > dd > div {
+    display: block !important;
+}
+
+.navbar-brand > img {
+    border-radius: 0;
+}

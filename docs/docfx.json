@@ -46,7 +46,9 @@
     "output": "_site",
     "template": [
       "default",
-      "modern"
+      "modern",
+	  "_template/material",
+	  "_template/overrides"
     ],
     "postProcessors": [
 	  "ExtractSearchIndex"
