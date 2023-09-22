@@ -73,6 +73,7 @@ img {
 
 /** NAVBAR **/
 .navbar-brand > img {
+  border-radius: 0;
   box-shadow: none;
   color: var(--bs-nav-link-color);
 }
@@ -179,4 +180,13 @@ code {
   border-radius: var(--bs-border-radius);
   margin: 4px 2px;
   box-shadow: var(--card-box-shadow);
+}
+
+/* MAKES DERIVED LIST READABLE */
+dl.typelist.derived > dd > div:not(:last-child)::after {
+  content: none !important;
+}
+
+dl.typelist.derived > dd > div {
+  display: block !important;
 }
