@@ -1,10 +1,12 @@
+using Discord.API;
+
 namespace Discord;
 
 /// <summary>
 ///     Properties that are used to modify the <see cref="ISelfUser" /> with the specified changes.
 /// </summary>
 /// <seealso cref="ISelfUser.ModifyAsync" />
-public sealed class ModifySelfUserProperties
+public sealed class ModifySelfUserProperties : IEntityProperties<ModifyCurrentUserParams>
 {
     /// <summary>
     ///     Gets or sets the username.
@@ -15,4 +17,13 @@ public sealed class ModifySelfUserProperties
     ///     Gets or sets the avatar.
     /// </summary>
     public Optional<Image?> Avatar { get; set; }
+
+    public ModifyCurrentUserParams ToApiModel()
+    {
+        return new ModifyCurrentUserParams()
+        {
+            Avatar = Avatar,
+            Username = Username
+        };
+    }
 }

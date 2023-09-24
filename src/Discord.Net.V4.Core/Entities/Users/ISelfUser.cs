@@ -1,5 +1,3 @@
-using Discord.EntityProperties.Users;
-
 namespace Discord;
 
 /// <summary>

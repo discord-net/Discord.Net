@@ -5,13 +5,22 @@ namespace Discord;
 
 public static partial class DiscordClienExtensions
 {
-    public static async Task<T?> GetUserAsync<T>(this IDiscordClient client, ulong id, RequestOptions? options = null, CancellationToken token = default)
+    public static Task<T?> FetchUserAsync<T>(
+        this IEntityProvider<T, IUser, IUserModel> provider,
+        ulong id, RequestOptions? options = null, CancellationToken token = default)
         where T : class, IUser, IConstructable<IUserModel>
+        => provider.ExecuteAndConstructAsync(Routes.GetUser(id), options, token);
+
+    public static Task<T> FetchCurrentUserAsync<T>(this IEntityProvider<T, ISelfUser, IUserModel> provider, RequestOptions? options = null, CancellationToken token = default)
+        where T : class, ISelfUser, IConstructable<IUserModel>
+        => provider.ExecuteAndConstructAsync(Routes.GetCurrentUser, options, token)!;
+
+    public static Task<T?> ModifyCurrentUserAsync<T>(
+        this IEntityProvider<T, ISelfUser, IUserModel> provider,
+        PropertiesOrModel<ModifySelfUserProperties, API.ModifyCurrentUserParams> properties,
+        RequestOptions? options = null, CancellationToken token = default)
+        where T : class, ISelfUser, IModifyable<ModifySelfUserProperties>, IConstructable<IUserModel>
     {
-        var userModel = await client.RestApiClient.ExecuteAsync(Routes.GetUser(id), options ?? default, token);
-        
-        return userModel is not null
-            ? T.Construct<T>(userModel)
-            : null;
+        return provider.ExecuteAndConstructAsync(Routes.ModifyCurrentUser(properties.Model), options, token);
     }
 }

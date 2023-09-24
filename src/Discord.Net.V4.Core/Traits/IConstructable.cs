@@ -4,7 +4,7 @@ using System.Runtime.Versioning;
 namespace Discord;
 
 public interface IConstructable<TModel>
-    where TModel : IEntityModel
+    where TModel : IEntityModel?
 {
     internal static abstract T Construct<T>(TModel model);
     
