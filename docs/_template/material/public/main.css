@@ -183,10 +183,10 @@ code {
 }
 
 /* MAKES DERIVED LIST READABLE */
-dl.typelist.derived > dd > div:not(:last-child)::after {
+:is(dl.typelist.derived, dl.typelist.extensionMethods) > dd > div::after {
   content: none !important;
 }
 
-dl.typelist.derived > dd > div {
+:is(dl.typelist.derived, dl.typelist.extensionMethods) > dd > div {
   display: block !important;
 }
