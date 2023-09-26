@@ -60,6 +60,6 @@
       "_appLogoPath": "marketing/logo/SVG/Logomark Purple.svg",
       "_appFaviconPath": "favicon.ico"
     },
-    "xrefService": ["https://xref.docs.microsoft.com/query?uid={uid}"]
+    "xrefService": ["https://learn.microsoft.com/api/xref/query?uid={uid}"]
   }
 }
