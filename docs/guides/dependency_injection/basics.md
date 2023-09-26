@@ -66,4 +66,4 @@ Through the provider, we can ask for the DiscordSocketClient we registered earli
 
 You can not only directly access the provider from a field or property, but you can also pass around instances to classes registered in the provider.
 There are multiple ways to do this. Please refer to the
-[Injection Documentation](Guides.DI.Injection) for further information.
+[Injection Documentation](xref:Guides.DI.Injection) for further information.
