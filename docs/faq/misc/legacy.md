@@ -23,7 +23,7 @@ The entity can be retrieved from cache by calling `GetOrDownloadAsync()` on the 
 > [!NOTE]
 > GetOrDownloadAsync will download the entity if its not available directly from the cache.
 
-[Cacheable]: xref:Discord.Cacheable
+[Cacheable]: xref:Discord.Cacheable`2
 
 ## X, Y, Z does not work! It doesn't return a valid value anymore.
 
