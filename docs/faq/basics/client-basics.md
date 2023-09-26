@@ -145,4 +145,3 @@ you can do so by specifying the [ShardId] for the [DiscordSocketConfig] and pass
 [ShardDisconnected]: xref:Discord.WebSocket.DiscordShardedClient.ShardDisconnected
 [ShardReady]: xref:Discord.WebSocket.DiscordShardedClient.ShardReady
 [ShardLatencyUpdated]: xref:Discord.WebSocket.DiscordShardedClient.ShardLatencyUpdated
-[ShardId]: xref:Discord.WebSocket.DiscordSocketConfig.ShardId
