@@ -32,7 +32,7 @@ public struct SKU : ISnowflakeEntity
 
     internal SKU(ulong id, SKUType type, ulong applicationId, string name, string slug)
     {
-        Id = Id;
+        Id = id;
         Type = type;
         ApplicationId = applicationId;
         Name = name;
