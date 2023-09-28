@@ -428,6 +428,20 @@ namespace Discord.WebSocket
         public override SocketUser GetUser(string username, string discriminator = null)
             => State.Users.FirstOrDefault(x => (discriminator is null || x.Discriminator == discriminator) && x.Username == username);
 
+        public Task<RestEntitlement> CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options = null)
+            => ClientHelper.CreateTestEntitlementAsync(this, skuId, ownerId, ownerType, options);
+
+        public Task DeleteTestEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => ApiClient.DeleteEntitlementAsync(entitlementId, options);
+
+        public IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> ListEntitlementsAsync(BaseDiscordClient client, int? limit = 100,
+            ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
+            ulong[] skuIds = null, RequestOptions options = null)
+            => ClientHelper.ListEntitlementsAsync(this, limit, afterId, beforeId, excludeEnded, guildId, userId, skuIds, options);
+
+        public Task<IReadOnlyCollection<SKU>> ListSKUsAsync(RequestOptions options = null)
+            => ClientHelper.ListSKUsAsync(this, options);
+
         /// <summary>
         ///     Gets a global application command.
         /// </summary>
@@ -3380,10 +3394,9 @@ namespace Discord.WebSocket
         internal int GetAudioId() => _nextAudioId++;
 
         #region IDiscordClient
-        /// <inheritdoc />
-        async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
-            => await GetApplicationInfoAsync().ConfigureAwait(false);
 
+        async Task<IEntitlement> IDiscordClient.CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options)
+            => await CreateTestEntitlementAsync(skuId, ownerId, ownerType, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => mode == CacheMode.AllowDownload ? await GetChannelAsync(id, options).ConfigureAwait(false) : GetChannel(id);

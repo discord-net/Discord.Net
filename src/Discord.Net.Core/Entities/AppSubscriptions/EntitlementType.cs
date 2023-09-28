@@ -1,6 +1,6 @@
 namespace Discord;
 
-public enum EntitlementTypes
+public enum EntitlementType
 {
     /// <summary>
     ///     The entitlement was purchased as an app subscription.

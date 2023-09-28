@@ -10,5 +10,5 @@ public enum SKUType
     /// <summary>
     ///     System-generated group for each <see cref="SKUType.Subscription"/> SKU created.
     /// </summary>
-    SubscriptonGroup = 6,
+    SubscriptionGroup = 6,
 }

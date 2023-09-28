@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -258,6 +259,18 @@ namespace Discord.Rest
         /// <inheritdoc />
         Task IDiscordClient.StopAsync()
             => Task.Delay(0);
+
+        Task<IEntitlement> IDiscordClient.CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options)
+            => Task.FromResult<IEntitlement>(null);
+
+        Task IDiscordClient.DeleteTestEntitlementAsync(ulong entitlementId, RequestOptions options)
+            => Task.CompletedTask;
+
+        IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> IDiscordClient.ListEntitlementsAsync(int? limit, ulong? afterId, ulong? beforeId,
+            bool excludeEnded, ulong? guildId, ulong? userId, ulong[] skuIds, RequestOptions options) => AsyncEnumerable.Empty<IReadOnlyCollection<IEntitlement>>();
+
+        Task<IReadOnlyCollection<SKU>> IDiscordClient.ListSKUsAsync(RequestOptions options) => Task.FromResult<IReadOnlyCollection<SKU>>(Array.Empty<SKU>());
+
         #endregion
     }
 }
