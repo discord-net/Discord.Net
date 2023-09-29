@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
+
 using EventUserModel = Discord.API.GuildScheduledEventUser;
 using Model = Discord.API.User;
 
@@ -49,6 +50,23 @@ namespace Discord.Rest
         public virtual IReadOnlyCollection<IActivity> Activities => ImmutableList<IActivity>.Empty;
         /// <inheritdoc />
         public virtual bool IsWebhook => false;
+
+        /// <summary>
+        ///     Gets the hash of the avatar decoration.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no avatar decoration set.
+        /// </remarks>
+        public string AvatarDecorationHash { get; private set; }
+
+        /// <summary>
+        ///     Gets the id of the avatar decoration's SKU.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no avatar decoration set.
+        /// </remarks>
+        public ulong AvatarDecorationSkuId { get; private set; }
+
 
         internal RestUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -96,6 +114,11 @@ namespace Discord.Rest
                 PublicFlags = model.PublicFlags.Value;
             if (model.GlobalName.IsSpecified)
                 GlobalName = model.GlobalName.Value;
+            if (model.AvatarDecoration.IsSpecified)
+            {
+                AvatarDecorationHash = model.AvatarDecoration.Value.Asset;
+                AvatarDecorationSkuId = model.AvatarDecoration.Value.SkuId;
+            }
         }
 
         /// <inheritdoc />
@@ -128,6 +151,17 @@ namespace Discord.Rest
             => DiscriminatorValue != 0
                 ? CDN.GetDefaultUserAvatarUrl(DiscriminatorValue)
                 : CDN.GetDefaultUserAvatarUrl(Id);
+
+        /// <summary>
+        ///     Gets the URL for user's avatar decoration.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no avatar decoration set.
+        /// </remarks>
+        public string GetAvatarDecorationUrl()
+            => AvatarDecorationHash is not null
+                ? CDN.GetAvatarDecorationUrl(AvatarDecorationHash)
+                : null;
 
         /// <summary>
         ///     Gets the Username#Discriminator of the user.
