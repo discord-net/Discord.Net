@@ -10,6 +10,6 @@ internal class CreateEntitlementParams
     [JsonProperty("owner_id")]
     public ulong OwnerId { get; set; }
 
-    [JsonProperty("type")]
+    [JsonProperty("owner_type")]
     public SubscriptionOwnerType Type { get; set; }
 }
