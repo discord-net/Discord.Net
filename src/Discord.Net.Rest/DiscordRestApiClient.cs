@@ -2701,7 +2701,7 @@ namespace Discord.API
 
         public async Task<Entitlement[]> ListEntitlementAsync(ListEntitlementsParams args, RequestOptions options = null)
         {
-            var query = $"limit={args.Limit.GetValueOrDefault(100)}";
+            var query = $"?limit={args.Limit.GetValueOrDefault(100)}";
 
             if (args.UserId.IsSpecified)
             {
