@@ -65,7 +65,7 @@ namespace Discord.Rest
         /// <remarks>
         ///     <see langword="null"/> if the user has no avatar decoration set.
         /// </remarks>
-        public ulong AvatarDecorationSkuId { get; private set; }
+        public ulong? AvatarDecorationSkuId { get; private set; }
 
 
         internal RestUser(BaseDiscordClient discord, ulong id)
@@ -116,8 +116,8 @@ namespace Discord.Rest
                 GlobalName = model.GlobalName.Value;
             if (model.AvatarDecoration.IsSpecified)
             {
-                AvatarDecorationHash = model.AvatarDecoration.Value.Asset;
-                AvatarDecorationSkuId = model.AvatarDecoration.Value.SkuId;
+                AvatarDecorationHash = model.AvatarDecoration.Value?.Asset;
+                AvatarDecorationSkuId = model.AvatarDecoration.Value?.SkuId;
             }
         }
 
