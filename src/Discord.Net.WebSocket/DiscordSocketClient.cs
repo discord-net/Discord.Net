@@ -428,19 +428,34 @@ namespace Discord.WebSocket
         public override SocketUser GetUser(string username, string discriminator = null)
             => State.Users.FirstOrDefault(x => (discriminator is null || x.Discriminator == discriminator) && x.Username == username);
 
+        /// <inheritdoc cref="IDiscordClient.CreateTestEntitlementAsync"/>
         public Task<RestEntitlement> CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options = null)
             => ClientHelper.CreateTestEntitlementAsync(this, skuId, ownerId, ownerType, options);
 
+        /// <inheritdoc />
         public Task DeleteTestEntitlementAsync(ulong entitlementId, RequestOptions options = null)
             => ApiClient.DeleteEntitlementAsync(entitlementId, options);
 
+        /// <inheritdoc cref="IDiscordClient.ListEntitlementsAsync"/>
         public IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> ListEntitlementsAsync(BaseDiscordClient client, int? limit = 100,
             ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
             ulong[] skuIds = null, RequestOptions options = null)
             => ClientHelper.ListEntitlementsAsync(this, limit, afterId, beforeId, excludeEnded, guildId, userId, skuIds, options);
 
+        /// <inheritdoc />
         public Task<IReadOnlyCollection<SKU>> ListSKUsAsync(RequestOptions options = null)
             => ClientHelper.ListSKUsAsync(this, options);
+
+        /// <summary>
+        ///     Gets entitlements from cache.
+        /// </summary>
+        public IReadOnlyCollection<SocketEntitlement> Entitlements => State.Entitlements;
+
+        /// <summary>
+        ///     Gets an entitlement from cache. <see langword="null"/> if not found.
+        /// </summary>
+        public SocketEntitlement GetEntitlement(ulong id)
+            => State.GetEntitlement(id);
 
         /// <summary>
         ///     Gets a global application command.
@@ -2917,20 +2932,20 @@ namespace Discord.WebSocket
                             #region Audit Logs
 
                             case "GUILD_AUDIT_LOG_ENTRY_CREATE":
-                            {
-                                var data = (payload as JToken).ToObject<AuditLogCreatedEvent>(_serializer);
-                                type = "GUILD_AUDIT_LOG_ENTRY_CREATE";
-                                await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AUDIT_LOG_ENTRY_CREATE)").ConfigureAwait(false);
+                                {
+                                    var data = (payload as JToken).ToObject<AuditLogCreatedEvent>(_serializer);
+                                    type = "GUILD_AUDIT_LOG_ENTRY_CREATE";
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AUDIT_LOG_ENTRY_CREATE)").ConfigureAwait(false);
 
-                                var guild = State.GetGuild(data.GuildId);
-                                var auditLog = SocketAuditLogEntry.Create(this, data);
-                                guild.AddAuditLog(auditLog);
+                                    var guild = State.GetGuild(data.GuildId);
+                                    var auditLog = SocketAuditLogEntry.Create(this, data);
+                                    guild.AddAuditLog(auditLog);
 
-                                await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
-                            }
-                            break;
+                                    await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
+                                }
+                                break;
                             #endregion
-                            
+
                             #region Auto Moderation
 
                             case "AUTO_MODERATION_RULE_CREATE":
@@ -3061,6 +3076,42 @@ namespace Discord.WebSocket
 
                                     await TimedInvokeAsync(_autoModActionExecuted, nameof(AutoModActionExecuted), guild, action, eventData);
                                 }
+                                break;
+
+                            #endregion
+
+                            #region App Subscriptions
+
+                            case "ENTITLEMENT_CREATE":
+                                {
+                                    var data = (payload as JToken).ToObject<Entitlement>(_serializer);
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (ENTITLEMENT_CREATE)").ConfigureAwait(false);
+
+                                    var entitlement = SocketEntitlement.Create(this, data);
+                                    State.AddEntitlement(data.Id, entitlement);
+
+                                    await TimedInvokeAsync(_entitlementCreated, nameof(EntitlementCreated), entitlement);
+                                }
+                                break;
+
+                            case "ENTITLEMENT_UPDATE":
+                            {
+                                //var data = (payload as JToken).ToObject<Entitlement>(_serializer);
+                                await _gatewayLogger.DebugAsync("Received Dispatch (ENTITLEMENT_UPDATE)").ConfigureAwait(false);
+
+
+                                //await TimedInvokeAsync(_entitlementUpdated, nameof(EntitlementCreated), );
+                            }
+                                break;
+
+                            case "ENTITLEMENT_DELETE":
+                            {
+                                //var data = (payload as JToken).ToObject<Entitlement>(_serializer);
+                                await _gatewayLogger.DebugAsync("Received Dispatch (ENTITLEMENT_DELETE)").ConfigureAwait(false);
+
+                                
+                                //await TimedInvokeAsync(_entitlementDeleted, nameof(EntitlementCreated),);
+                            }
                                 break;
 
                             #endregion

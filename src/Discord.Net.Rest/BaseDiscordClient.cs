@@ -260,15 +260,27 @@ namespace Discord.Rest
         Task IDiscordClient.StopAsync()
             => Task.Delay(0);
 
+        /// <summary>
+        ///     Creates a test entitlement to a given SKU for a given guild or user.
+        /// </summary>
         Task<IEntitlement> IDiscordClient.CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options)
             => Task.FromResult<IEntitlement>(null);
 
+        /// <summary>
+        ///     Deletes a currently-active test entitlement.
+        /// </summary>
         Task IDiscordClient.DeleteTestEntitlementAsync(ulong entitlementId, RequestOptions options)
             => Task.CompletedTask;
 
+        /// <summary>
+        ///     Returns all entitlements for a given app.
+        /// </summary>
         IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> IDiscordClient.ListEntitlementsAsync(int? limit, ulong? afterId, ulong? beforeId,
             bool excludeEnded, ulong? guildId, ulong? userId, ulong[] skuIds, RequestOptions options) => AsyncEnumerable.Empty<IReadOnlyCollection<IEntitlement>>();
 
+        /// <summary>
+        ///     Gets all SKUs for a given application.
+        /// </summary>
         Task<IReadOnlyCollection<SKU>> IDiscordClient.ListSKUsAsync(RequestOptions options) => Task.FromResult<IReadOnlyCollection<SKU>>(Array.Empty<SKU>());
 
         #endregion
