@@ -51,20 +51,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public virtual bool IsWebhook => false;
 
-        /// <summary>
-        ///     Gets the hash of the avatar decoration.
-        /// </summary>
-        /// <remarks>
-        ///     <see langword="null"/> if the user has no avatar decoration set.
-        /// </remarks>
+        /// <inheritdoc />
         public string AvatarDecorationHash { get; private set; }
 
-        /// <summary>
-        ///     Gets the id of the avatar decoration's SKU.
-        /// </summary>
-        /// <remarks>
-        ///     <see langword="null"/> if the user has no avatar decoration set.
-        /// </remarks>
+        /// <inheritdoc />
         public ulong? AvatarDecorationSkuId { get; private set; }
 
 
@@ -114,7 +104,7 @@ namespace Discord.Rest
                 PublicFlags = model.PublicFlags.Value;
             if (model.GlobalName.IsSpecified)
                 GlobalName = model.GlobalName.Value;
-            if (model.AvatarDecoration.IsSpecified)
+            if (model.AvatarDecoration is { IsSpecified: true, Value: not null })
             {
                 AvatarDecorationHash = model.AvatarDecoration.Value?.Asset;
                 AvatarDecorationSkuId = model.AvatarDecoration.Value?.SkuId;
@@ -152,12 +142,7 @@ namespace Discord.Rest
                 ? CDN.GetDefaultUserAvatarUrl(DiscriminatorValue)
                 : CDN.GetDefaultUserAvatarUrl(Id);
 
-        /// <summary>
-        ///     Gets the URL for user's avatar decoration.
-        /// </summary>
-        /// <remarks>
-        ///     <see langword="null"/> if the user has no avatar decoration set.
-        /// </remarks>
+        /// <inheritdoc />
         public string GetAvatarDecorationUrl()
             => AvatarDecorationHash is not null
                 ? CDN.GetAvatarDecorationUrl(AvatarDecorationHash)
