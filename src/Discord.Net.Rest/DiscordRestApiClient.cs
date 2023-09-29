@@ -1650,6 +1650,16 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<GetGuildPruneCountResponse>("GET", () => $"guilds/{guildId}/prune?days={args.Days}{endpointRoleIds}", ids, options: options).ConfigureAwait(false);
         }
+
+        public async Task<GuildIncidentsData> ModifyGuildIncidentActionsAsync(ulong guildId, ModifyGuildIncidentsDataParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            var ids = new BucketIds(guildId: guildId);
+
+            return await SendJsonAsync<GuildIncidentsData>("PUT", () => $"guilds/{guildId}/incident-actions", args, ids, options: options).ConfigureAwait(false);
+        }
+
         #endregion
 
         #region Guild Bans

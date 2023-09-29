@@ -377,6 +377,11 @@ namespace Discord
         ulong MaxUploadLimit { get; }
 
         /// <summary>
+        ///     Gets the incidents data for this guild.
+        /// </summary>
+        GuildIncidentsData IncidentsData { get; }
+
+        /// <summary>
         ///     Modifies this guild.
         /// </summary>
         /// <param name="func">The delegate containing the properties to modify the guild with.</param>
@@ -1325,5 +1330,13 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="IGuildOnboarding"/>.
         /// </returns>
         Task<IGuildOnboarding> ModifyOnboardingAsync(Action<GuildOnboardingProperties> props, RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies the incident actions of the guild.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="IncidentsData"/>.
+        /// </returns>
+        Task<GuildIncidentsData> ModifyIncidentActionsAsync(Action<GuildIncidentsDataProperties> props, RequestOptions options = null);
     }
 }
