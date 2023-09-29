@@ -76,6 +76,8 @@ public class SocketEntitlement : SocketEntity<ulong>, IEntitlement
             : null;
     }
 
+    internal SocketEntitlement Clone() => MemberwiseClone() as SocketEntitlement;
+
     #region IEntitlement
 
     /// <inheritdoc/>

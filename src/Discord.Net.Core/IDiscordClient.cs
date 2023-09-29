@@ -341,13 +341,13 @@ namespace Discord
         /// <summary>
         ///     Returns all entitlements for a given app, active and expired.
         /// </summary>
-        IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> ListEntitlementsAsync(int? limit = 100,
+        IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> GetEntitlementsAsync(int? limit = 100,
             ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
             ulong[] skuIds = null, RequestOptions options = null);
 
         /// <summary>
         ///     Returns all SKUs for a given application. 
         /// </summary>
-        Task<IReadOnlyCollection<SKU>> ListSKUsAsync(RequestOptions options = null);
+        Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null);
     }
 }
