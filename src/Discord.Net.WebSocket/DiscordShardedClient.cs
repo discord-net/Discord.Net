@@ -518,6 +518,8 @@ namespace Discord.WebSocket
 
             client.WebhooksUpdated += (arg1, arg2) => _webhooksUpdated.InvokeAsync(arg1, arg2);
             client.AuditLogCreated += (arg1, arg2) => _auditLogCreated.InvokeAsync(arg1, arg2);
+
+            client.VoiceChannelStatusUpdated += (arg1, arg2) => _voiceChannelStatusUpdated.InvokeAsync(arg1, arg2);
         }
 
         public async Task<SocketApplicationCommand> CreateGlobalApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
