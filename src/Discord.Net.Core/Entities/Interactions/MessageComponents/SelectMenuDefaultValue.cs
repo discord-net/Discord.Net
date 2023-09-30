@@ -3,10 +3,16 @@ namespace Discord;
 /// <summary>
 ///     Represents a default value of an auto-populated select menu.
 /// </summary>
-public struct SelectMenuDefaultValue
+public readonly struct SelectMenuDefaultValue
 {
+    /// <summary>
+    ///     Gets the id of entity this default value refers to.
+    /// </summary>
     public ulong Id { get; }
 
+    /// <summary>
+    ///     Gets the type of this default value.
+    /// </summary>
     public SelectDefaultValueType Type { get; }
 
     /// <summary>
@@ -23,18 +29,18 @@ public struct SelectMenuDefaultValue
     /// <summary>
     ///     Creates a new default value from a <see cref="IChannel"/>.
     /// </summary>
-    public SelectMenuDefaultValue FromChannel(IChannel channel)
+    public static SelectMenuDefaultValue FromChannel(IChannel channel)
         => new(channel.Id, SelectDefaultValueType.Channel);
 
     /// <summary>
     ///     Creates a new default value from a <see cref="IRole"/>.
     /// </summary>
-    public SelectMenuDefaultValue FromRole(IRole role)
+    public static SelectMenuDefaultValue FromRole(IRole role)
         => new(role.Id, SelectDefaultValueType.Role);
 
     /// <summary>
     ///     Creates a new default value from a <see cref="IUser"/>.
     /// </summary>
-    public SelectMenuDefaultValue FromUser(IUser user)
+    public static SelectMenuDefaultValue FromUser(IUser user)
         => new(user.Id, SelectDefaultValueType.User);
 }
