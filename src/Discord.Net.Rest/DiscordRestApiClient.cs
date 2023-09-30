@@ -2743,13 +2743,13 @@ namespace Discord.API
 
         #region App Monetization
 
-        public async Task<Entitlement> CreateEntitlementAsync(CreateEntitlementParams args, RequestOptions options = null)
-            => await SendJsonAsync<Entitlement>("POST", () => $"applications/{CurrentApplicationId}/entitlements", args, new BucketIds(), options: options).ConfigureAwait(false);
+        public Task<Entitlement> CreateEntitlementAsync(CreateEntitlementParams args, RequestOptions options = null)
+            => SendJsonAsync<Entitlement>("POST", () => $"applications/{CurrentApplicationId}/entitlements", args, new BucketIds(), options: options);
 
-        public async Task DeleteEntitlementAsync(ulong entitlementId, RequestOptions options = null)
-            => await SendAsync("DELETE", () => $"applications/{CurrentApplicationId}/entitlements/{entitlementId}", new BucketIds(), options: options).ConfigureAwait(false);
+        public Task DeleteEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => SendAsync("DELETE", () => $"applications/{CurrentApplicationId}/entitlements/{entitlementId}", new BucketIds(), options: options);
 
-        public async Task<Entitlement[]> ListEntitlementAsync(ListEntitlementsParams args, RequestOptions options = null)
+        public Task<Entitlement[]> ListEntitlementAsync(ListEntitlementsParams args, RequestOptions options = null)
         {
             var query = $"?limit={args.Limit.GetValueOrDefault(100)}";
 
@@ -2783,11 +2783,11 @@ namespace Discord.API
                 query += $"&exclude_ended={args.ExcludeEnded.Value}";
             }
 
-            return await SendAsync<Entitlement[]>("GET", () => $"applications/{CurrentApplicationId}/entitlements{query}", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<Entitlement[]>("GET", () => $"applications/{CurrentApplicationId}/entitlements{query}", new BucketIds(), options: options);
         }
 
-        public async Task<SKU[]> ListSKUsAsync(RequestOptions options = null)
-            => await SendAsync<SKU[]>("GET", () => $"applications/{CurrentApplicationId}/skus", new BucketIds(), options: options).ConfigureAwait(false);
+        public Task<SKU[]> ListSKUsAsync(RequestOptions options = null)
+            => SendAsync<SKU[]>("GET", () => $"applications/{CurrentApplicationId}/skus", new BucketIds(), options: options);
 
         #endregion
     }

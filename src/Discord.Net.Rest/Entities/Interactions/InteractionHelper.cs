@@ -522,10 +522,10 @@ namespace Discord.Rest
             return client.ApiClient.CreateInteractionResponseAsync(apiArgs, interactionId, interactionToken, options);
         }
 
-        public static async Task RespondWithPremiumRequiredAsync(BaseDiscordClient client, ulong interactionId,
+        public static Task RespondWithPremiumRequiredAsync(BaseDiscordClient client, ulong interactionId,
             string interactionToken, RequestOptions options = null)
         {
-            await client.ApiClient.CreateInteractionResponseAsync(new InteractionResponse
+            return client.ApiClient.CreateInteractionResponseAsync(new InteractionResponse
             {
                 Type = InteractionResponseType.PremiumRequired,
                 Data = Optional<InteractionCallbackData>.Unspecified
