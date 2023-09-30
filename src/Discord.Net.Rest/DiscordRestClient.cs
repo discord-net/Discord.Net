@@ -278,9 +278,30 @@ namespace Discord.Rest
         public Task<RoleConnection> ModifyUserApplicationRoleConnectionAsync(ulong applicationId, RoleConnectionProperties roleConnection, RequestOptions options = null)
             => ClientHelper.ModifyUserRoleConnectionAsync(applicationId, roleConnection, this, options);
 
+        /// <inheritdoc cref="IDiscordClient.CreateTestEntitlementAsync" />
+        public Task<RestEntitlement> CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options = null)
+            => ClientHelper.CreateTestEntitlementAsync(this, skuId, ownerId, ownerType, options);
+
+        /// <inheritdoc />
+        public Task DeleteTestEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => ApiClient.DeleteEntitlementAsync(entitlementId, options);
+
+        /// <inheritdoc cref="IDiscordClient.GetEntitlementsAsync" />
+        public IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> GetEntitlementsAsync(int? limit = 100,
+            ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
+            ulong[] skuIds = null, RequestOptions options = null)
+            => ClientHelper.ListEntitlementsAsync(this, limit, afterId, beforeId, excludeEnded, guildId, userId, skuIds, options);
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null)
+            => ClientHelper.ListSKUsAsync(this, options);
+
         #endregion
 
         #region IDiscordClient
+        async Task<IEntitlement> IDiscordClient.CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options)
+            => await CreateTestEntitlementAsync(skuId, ownerId, ownerType, options).ConfigureAwait(false);
+
         /// <inheritdoc />
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync(options).ConfigureAwait(false);

@@ -7,6 +7,7 @@ using Discord.Net.Rest;
 using Newtonsoft.Json;
 
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -2254,7 +2255,7 @@ namespace Discord.API
             return await SendAsync<GuildOnboarding>("GET", () => $"guilds/{guildId}/onboarding", new BucketIds(guildId: guildId), options: options);
         }
 
-        public async Task<GuildOnboarding> ModifyGuildOnboardingAsync(ulong guildId, ModifyGuildOnboardingParams args,  RequestOptions options)
+        public async Task<GuildOnboarding> ModifyGuildOnboardingAsync(ulong guildId, ModifyGuildOnboardingParams args, RequestOptions options)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
@@ -2687,6 +2688,56 @@ namespace Discord.API
 
         public async Task<RoleConnection> ModifyUserApplicationRoleConnectionAsync(ulong applicationId, RoleConnection connection, RequestOptions options = null)
         => await SendJsonAsync<RoleConnection>("PUT", () => $"users/@me/applications/{applicationId}/role-connection", connection, new BucketIds(), options: options);
+
+        #endregion
+
+        #region App Monetization
+
+        public async Task<Entitlement> CreateEntitlementAsync(CreateEntitlementParams args, RequestOptions options = null)
+            => await SendJsonAsync<Entitlement>("POST", () => $"applications/{CurrentApplicationId}/entitlements", args, new BucketIds(), options: options).ConfigureAwait(false);
+
+        public async Task DeleteEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => await SendAsync("DELETE", () => $"applications/{CurrentApplicationId}/entitlements/{entitlementId}", new BucketIds(), options: options).ConfigureAwait(false);
+
+        public async Task<Entitlement[]> ListEntitlementAsync(ListEntitlementsParams args, RequestOptions options = null)
+        {
+            var query = $"?limit={args.Limit.GetValueOrDefault(100)}";
+
+            if (args.UserId.IsSpecified)
+            {
+                query += $"&user_id={args.UserId.Value}";
+            }
+
+            if (args.SkuIds.IsSpecified)
+            {
+                query += $"&sku_ids={WebUtility.UrlEncode(string.Join(",", args.SkuIds.Value))}";
+            }
+
+            if (args.BeforeId.IsSpecified)
+            {
+                query += $"&before={args.BeforeId.Value}";
+            }
+
+            if (args.AfterId.IsSpecified)
+            {
+                query += $"&after={args.AfterId.Value}";
+            }
+
+            if (args.GuildId.IsSpecified)
+            {
+                query += $"&guild_id={args.GuildId.Value}";
+            }
+
+            if (args.ExcludeEnded.IsSpecified)
+            {
+                query += $"&exclude_ended={args.ExcludeEnded.Value}";
+            }
+
+            return await SendAsync<Entitlement[]>("GET", () => $"applications/{CurrentApplicationId}/entitlements{query}", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
+        public async Task<SKU[]> ListSKUsAsync(RequestOptions options = null)
+            => await SendAsync<SKU[]>("GET", () => $"applications/{CurrentApplicationId}/skus", new BucketIds(), options: options).ConfigureAwait(false);
 
         #endregion
     }

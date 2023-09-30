@@ -46,5 +46,8 @@ namespace Discord.API
 
         [JsonProperty("guild_locale")]
         public Optional<string> GuildLocale { get; set; }
+
+        [JsonProperty("entitlements")]
+        public Entitlement[] Entitlements { get; set; }
     }
 }
