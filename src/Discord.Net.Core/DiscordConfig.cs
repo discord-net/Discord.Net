@@ -237,5 +237,10 @@ namespace Discord
         ///     Returns the max amount of tags applied to an application.
         /// </summary>
         public const int MaxApplicationTagCount = 5;
+
+        /// <summary>
+        ///     Returns the maximum number of entitlements that can be gotten per-batch.
+        /// </summary>
+        public const int MaxEntitlementsPerBatch = 100;
     }
 }

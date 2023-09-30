@@ -286,7 +286,9 @@ namespace Discord.WebSocket
             }
             else
             {
-                var response = new API.Rest.UploadInteractionFileParams(args.Attachments.Value.ToArray())
+                var attachments = args.Attachments.Value?.ToArray() ?? Array.Empty<FileAttachment>();
+
+                var response = new API.Rest.UploadInteractionFileParams(attachments)
                 {
                     Type = InteractionResponseType.UpdateMessage,
                     Content = args.Content,

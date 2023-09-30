@@ -380,5 +380,65 @@ namespace Discord.Rest
 
 
         #endregion
+
+        #region App Subscriptions
+
+        public static async Task<RestEntitlement> CreateTestEntitlementAsync(BaseDiscordClient client, ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType,
+            RequestOptions options = null)
+        {
+            var model = await client.ApiClient.CreateEntitlementAsync(new CreateEntitlementParams
+            {
+                Type = ownerType,
+                OwnerId = ownerId,
+                SkuId = skuId
+            }, options);
+
+            return RestEntitlement.Create(client, model);
+        }
+
+        public static IAsyncEnumerable<IReadOnlyCollection<RestEntitlement>> ListEntitlementsAsync(BaseDiscordClient client, int? limit = 100,
+            ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
+             ulong[] skuIds = null, RequestOptions options = null)
+        {
+            return new PagedAsyncEnumerable<RestEntitlement>(
+                DiscordConfig.MaxEntitlementsPerBatch,
+                async (info, ct) =>
+                {
+                    var args = new ListEntitlementsParams()
+                    {
+                        Limit = info.PageSize,
+                        BeforeId = beforeId ?? Optional<ulong>.Unspecified,
+                        ExcludeEnded = excludeEnded,
+                        GuildId = guildId ?? Optional<ulong>.Unspecified,
+                        UserId = userId ?? Optional<ulong>.Unspecified,
+                        SkuIds = skuIds ?? Optional<ulong[]>.Unspecified,
+                    };
+                    if (info.Position != null)
+                        args.AfterId = info.Position.Value;
+                    var models = await client.ApiClient.ListEntitlementAsync(args, options).ConfigureAwait(false);
+                    return models
+                        .Select(x => RestEntitlement.Create(client, x))
+                        .ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxEntitlementsPerBatch)
+                        return false;
+                    info.Position = lastPage.Max(x => x.Id);
+                    return true;
+                },
+                start: afterId,
+                count: limit
+            );
+        }
+
+        public static async Task<IReadOnlyCollection<SKU>> ListSKUsAsync(BaseDiscordClient client, RequestOptions options = null)
+        {
+            var models = await client.ApiClient.ListSKUsAsync(options).ConfigureAwait(false);
+
+            return models.Select(x => new SKU(x.Id, x.Type, x.ApplicationId, x.Name, x.Slug)).ToImmutableArray();
+        }
+
+        #endregion
     }
 }

@@ -124,6 +124,10 @@ namespace Discord.Interactions
         protected virtual Task RespondWithModalAsync<TModal>(string customId, RequestOptions options = null) where TModal : class, IModal
             => Context.Interaction.RespondWithModalAsync<TModal>(customId, options);
 
+        /// <inheritdoc cref="IDiscordInteraction.RespondWithPremiumRequiredAsync(RequestOptions)"/>
+        protected virtual Task RespondWithPremiumRequiredAsync(RequestOptions options = null)
+            => Context.Interaction.RespondWithPremiumRequiredAsync(options);
+
         //IInteractionModuleBase
 
         /// <inheritdoc/>

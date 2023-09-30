@@ -1,4 +1,5 @@
 using Discord.Rest;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -907,7 +908,7 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<SocketAuditLogEntry, SocketGuild, Task>> _auditLogCreated = new();
 
         #endregion
-        
+
         #region AutoModeration
 
         /// <summary>
@@ -918,7 +919,7 @@ namespace Discord.WebSocket
             add => _autoModRuleCreated.Add(value);
             remove => _autoModRuleCreated.Remove(value);
         }
-        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleCreated = new ();
+        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleCreated = new();
 
         /// <summary>
         ///     Fired when an auto moderation rule is modified.
@@ -928,7 +929,7 @@ namespace Discord.WebSocket
             add => _autoModRuleUpdated.Add(value);
             remove => _autoModRuleUpdated.Remove(value);
         }
-        internal readonly AsyncEvent<Func<Cacheable<SocketAutoModRule, ulong>, SocketAutoModRule, Task>> _autoModRuleUpdated = new ();
+        internal readonly AsyncEvent<Func<Cacheable<SocketAutoModRule, ulong>, SocketAutoModRule, Task>> _autoModRuleUpdated = new();
 
         /// <summary>
         ///     Fired when an auto moderation rule is deleted.
@@ -938,7 +939,7 @@ namespace Discord.WebSocket
             add => _autoModRuleDeleted.Add(value);
             remove => _autoModRuleDeleted.Remove(value);
         }
-        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleDeleted = new ();
+        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleDeleted = new();
 
         /// <summary>
         ///     Fired when an auto moderation rule is triggered by a user.
@@ -948,8 +949,48 @@ namespace Discord.WebSocket
             add => _autoModActionExecuted.Add(value);
             remove => _autoModActionExecuted.Remove(value);
         }
-        internal readonly AsyncEvent<Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task>> _autoModActionExecuted = new ();
-        
+        internal readonly AsyncEvent<Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task>> _autoModActionExecuted = new();
+
+        #endregion
+
+        #region App Subscriptions
+
+        /// <summary>
+        ///     Fired when a user subscribes to a SKU.
+        /// </summary>
+        public event Func<SocketEntitlement, Task> EntitlementCreated
+        {
+            add { _entitlementCreated.Add(value); }
+            remove { _entitlementCreated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<SocketEntitlement, Task>> _entitlementCreated = new();
+
+
+        /// <summary>
+        ///     Fired when a subscription to a SKU is updated.
+        /// </summary>
+        public event Func<Cacheable<SocketEntitlement, ulong>, SocketEntitlement, Task> EntitlementUpdated
+        {
+            add { _entitlementUpdated.Add(value); }
+            remove { _entitlementUpdated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<SocketEntitlement, ulong>, SocketEntitlement, Task>> _entitlementUpdated = new();
+
+
+        /// <summary>
+        ///     Fired when a user's entitlement is deleted.
+        /// </summary>
+        public event Func<Cacheable<SocketEntitlement, ulong>, Task> EntitlementDeleted
+        {
+            add { _entitlementDeleted.Add(value); }
+            remove { _entitlementDeleted.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<SocketEntitlement, ulong>, Task>> _entitlementDeleted = new();
+
+
         #endregion
     }
 }
