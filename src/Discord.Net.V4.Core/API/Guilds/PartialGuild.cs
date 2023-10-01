@@ -8,7 +8,7 @@ public sealed class PartialGuild
     public ulong Id { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("splash")]
     public Optional<string?> Splash { get; set; }

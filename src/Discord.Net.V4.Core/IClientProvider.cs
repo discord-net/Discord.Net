@@ -1,7 +1,6 @@
-
 namespace Discord;
 
-public interface IClientSource
+public interface IClientProvider
 {
     IDiscordClient Client { get; }
 }

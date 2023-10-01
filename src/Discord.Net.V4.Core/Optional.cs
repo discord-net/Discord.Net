@@ -68,6 +68,8 @@ public readonly struct Optional<T>
     [return: NotNullIfNotNull(nameof(other)), MaybeNull]
     public static T operator ^(Optional<T> value, [AllowNull] T other) => value.Or(other);
 
+    public static T? operator ~(Optional<T> value) => value.GetValueOrDefault();
+
     public static bool operator ==(Optional<T> left, Optional<T> right)
     {
         return left.Equals(right);

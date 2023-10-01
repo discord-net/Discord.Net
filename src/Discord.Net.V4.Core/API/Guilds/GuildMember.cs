@@ -1,8 +1,9 @@
+using Discord.Models;
 using System.Text.Json.Serialization;
 
 namespace Discord.API;
 
-public sealed class GuildMember
+public sealed class GuildMember : IMemberModel
 {
     [JsonPropertyName("user")]
     public Optional<User> User { get; set; }
@@ -12,7 +13,6 @@ public sealed class GuildMember
 
     [JsonPropertyName("avatar")]
     public Optional<string?> Avatar { get; set; }
-
     [JsonPropertyName("roles")]
     public Optional<ulong[]> RoleIds { get; set; }
 
@@ -41,4 +41,17 @@ public sealed class GuildMember
     [JsonPropertyName("communication_disabled_until")]
     public Optional<DateTimeOffset?> TimedOutUntil { get; set; }
 
+    ulong IEntityModel<ulong>.Id => User.Value.Id;
+    string? IMemberModel.GuildAvatar => ~Avatar;
+
+    ulong[] IMemberModel.RoleIds => RoleIds ^ Array.Empty<ulong>();
+
+    DateTimeOffset? IMemberModel.JoinedAt => JoinedAt.ToNullable();
+
+    DateTimeOffset? IMemberModel.PremiumSince => ~PremiumSince;
+
+    bool? IMemberModel.IsPending => Pending.ToNullable();
+
+    string? IMemberModel.Nickname => ~Nick;
+    DateTimeOffset? IMemberModel.CommunicationsDisabledUntil => ~TimedOutUntil;
 }
