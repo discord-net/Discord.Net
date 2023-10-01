@@ -92,6 +92,11 @@ namespace Discord
         ulong ApplicationId { get; }
 
         /// <summary>
+        ///     Gets entitlements for the invoking user.
+        /// </summary>
+        IReadOnlyCollection<IEntitlement> Entitlements { get; }
+
+        /// <summary>
         ///     Responds to an Interaction with type <see cref="InteractionResponseType.ChannelMessageWithSource"/>.
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
@@ -368,5 +373,12 @@ namespace Discord
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
         Task RespondWithModalAsync(Modal modal, RequestOptions options = null);
+
+        /// <summary>
+        ///     Responds to the interaction with an ephemeral message the invoking user,
+        ///     instructing them that whatever they tried to do requires the premium benefits of your app.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
+        Task RespondWithPremiumRequiredAsync(RequestOptions options = null);
     }
 }

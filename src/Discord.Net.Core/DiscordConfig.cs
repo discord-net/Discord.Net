@@ -242,5 +242,10 @@ namespace Discord
         ///     Returns the maximum length of a voice channel status.
         /// </summary>
         public const int MaxVoiceChannelStatusLength = 500;
+      
+        /// <summary>
+        ///     Returns the maximum number of entitlements that can be gotten per-batch.
+        /// </summary>
+        public const int MaxEntitlementsPerBatch = 100;
     }
 }
