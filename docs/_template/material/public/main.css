@@ -190,3 +190,8 @@ code {
 :is(dl.typelist.derived, dl.typelist.extensionMethods) > dd > div {
   display: block !important;
 }
+
+/* MAKES "IN THIS ARTICLE" MORE READABLE */
+.affix h5, .affix .h5 {
+    font-weight: normal !important;
+}
