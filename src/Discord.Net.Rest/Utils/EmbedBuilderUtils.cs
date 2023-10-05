@@ -7,8 +7,15 @@ namespace Discord.Rest;
 
 public static class EmbedBuilderUtils
 {
-    private static JsonSerializerSettings _settings = new () { ContractResolver = new DiscordContractResolver() };
-
+    private static Lazy<JsonSerializerSettings> _settings = new(() =>
+    {
+        var serializer = new JsonSerializerSettings()
+        {
+            ContractResolver = new DiscordContractResolver()
+        };
+        return serializer;
+    });
+    
     /// <summary>
     ///     Parses a string into an <see cref="EmbedBuilder"/>.
     /// </summary>
@@ -19,7 +26,7 @@ public static class EmbedBuilderUtils
     {
         try
         {
-            var model = JsonConvert.DeserializeObject<API.Embed>(json, _settings);
+            var model = JsonConvert.DeserializeObject<API.Embed>(json, _settings.Value);
 
             var embed = model?.ToEntity();
 
@@ -45,7 +52,7 @@ public static class EmbedBuilderUtils
         builder = new EmbedBuilder();
         try
         {
-            var model = JsonConvert.DeserializeObject<API.Embed>(json, _settings);
+            var model = JsonConvert.DeserializeObject<API.Embed>(json, _settings.Value);
 
             var embed = model?.ToEntity();
 
