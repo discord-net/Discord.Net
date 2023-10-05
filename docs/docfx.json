@@ -39,7 +39,8 @@
           "langwordMapping.yml",
           "marketing/logo/**.svg",
           "marketing/logo/**.png",
-          "favicon.ico"
+          "favicon.ico",
+          "../src/Discord.Net.Examples/**.cs"
         ]
       }
     ],

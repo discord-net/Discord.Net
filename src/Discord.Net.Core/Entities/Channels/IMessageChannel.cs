@@ -17,7 +17,7 @@ namespace Discord
         ///     <para>The following example sends a message with the current system time in RFC 1123 format to the channel and
         ///     deletes itself after 5 seconds.</para>
         ///     <code language="cs" region="SendMessageAsync"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Channels/IMessageChannel.Examples.cs" />
         /// </example>
         /// <param name="text">The message to be sent.</param>
         /// <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
@@ -42,14 +42,14 @@ namespace Discord
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <example>
-        ///     <para>The following example uploads a local file called <c>wumpus.txt</c> along with the text 
+        ///     <para>The following example uploads a local file called <c>wumpus.txt</c> along with the text
         ///     <c>good discord boi</c> to the channel.</para>
         ///     <code language="cs" region="SendFileAsync.FilePath"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Channels/IMessageChannel.Examples.cs" />
         ///     <para>The following example uploads a local image called <c>b1nzy.jpg</c> embedded inside a rich embed to the
         ///     channel.</para>
         ///     <code language="cs" region="SendFileAsync.FilePath.EmbeddedImage"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Channels/IMessageChannel.Examples.cs" />
         /// </example>
         /// <remarks>
         ///     This method sends a file as if you are uploading an attachment directly from your Discord client.
@@ -86,7 +86,7 @@ namespace Discord
         ///     <para>The following example uploads a streamed image that will be called <c>b1nzy.jpg</c> embedded inside a
         ///     rich embed to the channel.</para>
         ///     <code language="cs" region="SendFileAsync.FileStream.EmbeddedImage"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Channels/IMessageChannel.Examples.cs" />
         /// </example>
         /// <remarks>
         ///     This method sends a file as if you are uploading an attachment directly from your Discord client.
@@ -195,7 +195,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>
@@ -204,17 +204,17 @@ namespace Discord
         ///         rate limit, causing your bot to freeze!
         ///     </note>
         ///     This method will attempt to fetch the number of messages specified under <paramref name="limit"/>. The
-        ///     library will attempt to split up the requests according to your <paramref name="limit"/> and 
+        ///     library will attempt to split up the requests according to your <paramref name="limit"/> and
         ///     <see cref="DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
         ///     and the <see cref="Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
         ///     be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
         ///     of flattening.
         /// </remarks>
         /// <example>
-        ///     <para>The following example downloads 300 messages and gets messages that belong to the user 
+        ///     <para>The following example downloads 300 messages and gets messages that belong to the user
         ///     <c>53905483156684800</c>.</para>
         ///     <code language="cs" region="GetMessagesAsync.FromLimit.Standard"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Channels/IMessageChannel.Examples.cs" />
         /// </example>
         /// <param name="limit">The numbers of message to be gotten from.</param>
         /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from
@@ -230,7 +230,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>
@@ -240,7 +240,7 @@ namespace Discord
         ///     </note>
         ///     This method will attempt to fetch the number of messages specified under <paramref name="limit"/> around
         ///     the message <paramref name="fromMessageId"/> depending on the <paramref name="dir"/>. The library will
-        ///     attempt to split up the requests according to your <paramref name="limit"/> and 
+        ///     attempt to split up the requests according to your <paramref name="limit"/> and
         ///     <see cref="DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
         ///     and the <see cref="Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
         ///     be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
@@ -249,11 +249,11 @@ namespace Discord
         /// <example>
         ///     <para>The following example gets 5 message prior to the message identifier <c>442012544660537354</c>.</para>
         ///     <code language="cs" region="GetMessagesAsync.FromId.FromMessage"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
-        ///     <para>The following example attempts to retrieve <c>messageCount</c> number of messages from the 
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Channels/IMessageChannel.Examples.cs" />
+        ///     <para>The following example attempts to retrieve <c>messageCount</c> number of messages from the
         ///     beginning of the channel and prints them to the console.</para>
         ///     <code language="cs" region="GetMessagesAsync.FromId.BeginningMessages"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Channels/IMessageChannel.Examples.cs" />
         /// </example>
         /// <param name="fromMessageId">The ID of the starting message to get the messages from.</param>
         /// <param name="dir">The direction of the messages to be gotten from.</param>
@@ -271,7 +271,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>
@@ -281,7 +281,7 @@ namespace Discord
         ///     </note>
         ///     This method will attempt to fetch the number of messages specified under <paramref name="limit"/> around
         ///     the message <paramref name="fromMessage"/> depending on the <paramref name="dir"/>. The library will
-        ///     attempt to split up the requests according to your <paramref name="limit"/> and 
+        ///     attempt to split up the requests according to your <paramref name="limit"/> and
         ///     <see cref="DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
         ///     and the <see cref="Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
         ///     be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
@@ -290,7 +290,7 @@ namespace Discord
         /// <example>
         ///     <para>The following example gets 5 message prior to a specific message, <c>oldMessage</c>.</para>
         ///     <code language="cs" region="GetMessagesAsync.FromMessage"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Channels/IMessageChannel.Examples.cs" />
         /// </example>
         /// <param name="fromMessage">The starting message to get the messages from.</param>
         /// <param name="dir">The direction of the messages to be gotten from.</param>
@@ -360,7 +360,7 @@ namespace Discord
         /// <example>
         ///     <para>The following example keeps the client in the typing state until <c>LongRunningAsync</c> has finished.</para>
         ///     <code language="cs" region="EnterTypingState"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Channels/IMessageChannel.Examples.cs" />
         /// </example>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
