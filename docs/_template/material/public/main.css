@@ -60,7 +60,8 @@ article h4 {
   margin-bottom: 15px;
 }
 
-article h4 {
+/* MAKES PROPERTIES BE SEPARATED CLEARLY */
+article h3 {
   padding-bottom: 8px;
   border-bottom: 2px solid #ddd;
 }
