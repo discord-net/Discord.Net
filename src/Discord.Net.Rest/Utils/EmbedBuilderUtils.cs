@@ -5,7 +5,7 @@ using System;
 
 namespace Discord.Rest;
 
-public static class EmbedUtils
+public static class EmbedBuilderUtils
 {
     private static JsonSerializerSettings _settings = new () { ContractResolver = new DiscordContractResolver() };
 
