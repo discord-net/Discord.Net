@@ -25,7 +25,7 @@ namespace Discord
         ///         >The following example attempts to retrieve the user's current avatar and send it to a channel; if one is
         ///         not set, a default avatar for this user will be returned instead.</para>
         ///     <code language="cs" region="GetAvatarUrl"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Users\IUser.Examples.cs"/>
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Users/IUser.Examples.cs"/>
         /// </example>
         /// <param name="format">The format to return.</param>
         /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.

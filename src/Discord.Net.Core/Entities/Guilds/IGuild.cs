@@ -734,7 +734,7 @@ namespace Discord
         /// <example>
         ///     <para>The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.</para>
         ///     <code language="cs" region="CreateTextChannelAsync"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Guilds\IGuild.Examples.cs"/>
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Guilds/IGuild.Examples.cs"/>
         /// </example>
         /// <param name="name">The new name for the text channel.</param>
         /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
