@@ -16,7 +16,6 @@ namespace Discord.Rest
             {
                 ContractResolver = new DiscordContractResolver()
             };
-            serializer.Converters.Add(new EmbedTypeConverter());
             return serializer;
         });
 
