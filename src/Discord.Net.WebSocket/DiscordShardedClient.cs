@@ -518,7 +518,54 @@ namespace Discord.WebSocket
 
             client.WebhooksUpdated += (arg1, arg2) => _webhooksUpdated.InvokeAsync(arg1, arg2);
             client.AuditLogCreated += (arg1, arg2) => _auditLogCreated.InvokeAsync(arg1, arg2);
+
+            client.EntitlementCreated += (arg1) => _entitlementCreated.InvokeAsync(arg1);
+            client.EntitlementUpdated += (arg1, arg2) => _entitlementUpdated.InvokeAsync(arg1, arg2);
+            client.EntitlementDeleted += (arg1) => _entitlementDeleted.InvokeAsync(arg1);
         }
+
+        public async Task<SocketApplicationCommand> CreateGlobalApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
+        {
+            var model = await InteractionHelper.CreateGlobalCommandAsync(this, properties, options).ConfigureAwait(false);
+
+            SocketApplicationCommand entity = null;
+
+            foreach (var shard in _shards)
+            {
+                entity = shard.State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(shard, model));
+
+                //Update it in case it was cached
+                entity.Update(model);
+            }
+
+            System.Diagnostics.Debug.Assert(entity != null, "There should be at least one shard to get the entity");
+
+            return entity;
+        }
+
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> BulkOverwriteGlobalApplicationCommandsAsync(
+            ApplicationCommandProperties[] properties, RequestOptions options = null)
+        {
+            var models = await InteractionHelper.BulkOverwriteGlobalCommandsAsync(this, properties, options);
+
+            IEnumerable<SocketApplicationCommand> entities = null;
+
+            foreach (var shard in _shards)
+            {
+                entities = models.Select(x => SocketApplicationCommand.Create(shard, x));
+                //Purge our previous commands
+                shard.State.PurgeCommands(x => x.IsGlobalCommand);
+
+                foreach (var entity in entities)
+                {
+                    shard.State.AddCommand(entity);
+                }
+            }
+
+            System.Diagnostics.Debug.Assert(entities != null, "There should be at least one shard to get the entities");
+            return entities.ToImmutableArray();
+        }
+
         #endregion
 
         #region IDiscordClient
@@ -578,6 +625,12 @@ namespace Discord.WebSocket
         {
             return await GetVoiceRegionAsync(id).ConfigureAwait(false);
         }
+        /// <inheritdoc />
+        async Task<IApplicationCommand> IDiscordClient.CreateGlobalApplicationCommand(ApplicationCommandProperties properties, RequestOptions options)
+            => await CreateGlobalApplicationCommandAsync(properties, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties, RequestOptions options)
+            => await BulkOverwriteGlobalApplicationCommandsAsync(properties, options);
         #endregion
 
         #region Dispose

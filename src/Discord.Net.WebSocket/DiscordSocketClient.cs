@@ -428,6 +428,35 @@ namespace Discord.WebSocket
         public override SocketUser GetUser(string username, string discriminator = null)
             => State.Users.FirstOrDefault(x => (discriminator is null || x.Discriminator == discriminator) && x.Username == username);
 
+        /// <inheritdoc cref="IDiscordClient.CreateTestEntitlementAsync"/>
+        public Task<RestEntitlement> CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options = null)
+            => ClientHelper.CreateTestEntitlementAsync(this, skuId, ownerId, ownerType, options);
+
+        /// <inheritdoc />
+        public Task DeleteTestEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => ApiClient.DeleteEntitlementAsync(entitlementId, options);
+
+        /// <inheritdoc cref="IDiscordClient.GetEntitlementsAsync"/>
+        public IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> GetEntitlementsAsync(BaseDiscordClient client, int? limit = 100,
+            ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
+            ulong[] skuIds = null, RequestOptions options = null)
+            => ClientHelper.ListEntitlementsAsync(this, limit, afterId, beforeId, excludeEnded, guildId, userId, skuIds, options);
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null)
+            => ClientHelper.ListSKUsAsync(this, options);
+
+        /// <summary>
+        ///     Gets entitlements from cache.
+        /// </summary>
+        public IReadOnlyCollection<SocketEntitlement> Entitlements => State.Entitlements;
+
+        /// <summary>
+        ///     Gets an entitlement from cache. <see langword="null"/> if not found.
+        /// </summary>
+        public SocketEntitlement GetEntitlement(ulong id)
+            => State.GetEntitlement(id);
+
         /// <summary>
         ///     Gets a global application command.
         /// </summary>
@@ -2903,20 +2932,20 @@ namespace Discord.WebSocket
                             #region Audit Logs
 
                             case "GUILD_AUDIT_LOG_ENTRY_CREATE":
-                            {
-                                var data = (payload as JToken).ToObject<AuditLogCreatedEvent>(_serializer);
-                                type = "GUILD_AUDIT_LOG_ENTRY_CREATE";
-                                await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AUDIT_LOG_ENTRY_CREATE)").ConfigureAwait(false);
+                                {
+                                    var data = (payload as JToken).ToObject<AuditLogCreatedEvent>(_serializer);
+                                    type = "GUILD_AUDIT_LOG_ENTRY_CREATE";
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AUDIT_LOG_ENTRY_CREATE)").ConfigureAwait(false);
 
-                                var guild = State.GetGuild(data.GuildId);
-                                var auditLog = SocketAuditLogEntry.Create(this, data);
-                                guild.AddAuditLog(auditLog);
+                                    var guild = State.GetGuild(data.GuildId);
+                                    var auditLog = SocketAuditLogEntry.Create(this, data);
+                                    guild.AddAuditLog(auditLog);
 
-                                await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
-                            }
-                            break;
+                                    await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
+                                }
+                                break;
                             #endregion
-                            
+
                             #region Auto Moderation
 
                             case "AUTO_MODERATION_RULE_CREATE":
@@ -3046,6 +3075,65 @@ namespace Discord.WebSocket
                                             : null);
 
                                     await TimedInvokeAsync(_autoModActionExecuted, nameof(AutoModActionExecuted), guild, action, eventData);
+                                }
+                                break;
+
+                            #endregion
+
+                            #region App Subscriptions
+
+                            case "ENTITLEMENT_CREATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (ENTITLEMENT_CREATE)").ConfigureAwait(false);
+                                    var data = (payload as JToken).ToObject<Entitlement>(_serializer);
+
+                                    var entitlement = SocketEntitlement.Create(this, data);
+                                    State.AddEntitlement(data.Id, entitlement);
+
+                                    await TimedInvokeAsync(_entitlementCreated, nameof(EntitlementCreated), entitlement);
+                                }
+                                break;
+
+                            case "ENTITLEMENT_UPDATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (ENTITLEMENT_UPDATE)").ConfigureAwait(false);
+                                    var data = (payload as JToken).ToObject<Entitlement>(_serializer);
+
+                                    var entitlement = State.GetEntitlement(data.Id);
+
+                                    var cacheableBefore = new Cacheable<SocketEntitlement, ulong>(entitlement?.Clone(), data.Id,
+                                        entitlement is not null, () => null);
+
+                                    if (entitlement is null)
+                                    {
+                                        entitlement = SocketEntitlement.Create(this, data);
+                                        State.AddEntitlement(data.Id, entitlement);
+                                    }
+                                    else
+                                    {
+                                        entitlement.Update(data);
+                                    }
+
+                                    await TimedInvokeAsync(_entitlementUpdated, nameof(EntitlementUpdated), cacheableBefore, entitlement);
+                                }
+                                break;
+
+                            case "ENTITLEMENT_DELETE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (ENTITLEMENT_DELETE)").ConfigureAwait(false);
+                                    var data = (payload as JToken).ToObject<Entitlement>(_serializer);
+
+                                    var entitlement = State.RemoveEntitlement(data.Id);
+
+                                    if (entitlement is null)
+                                        entitlement = SocketEntitlement.Create(this, data);
+                                    else
+                                        entitlement.Update(data);
+
+                                    var cacheableEntitlement = new Cacheable<SocketEntitlement, ulong>(entitlement, data.Id,
+                                        entitlement is not null, () => null);
+
+                                    await TimedInvokeAsync(_entitlementDeleted, nameof(EntitlementDeleted), cacheableEntitlement);
                                 }
                                 break;
 
@@ -3380,10 +3468,9 @@ namespace Discord.WebSocket
         internal int GetAudioId() => _nextAudioId++;
 
         #region IDiscordClient
-        /// <inheritdoc />
-        async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
-            => await GetApplicationInfoAsync().ConfigureAwait(false);
 
+        async Task<IEntitlement> IDiscordClient.CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options)
+            => await CreateTestEntitlementAsync(skuId, ownerId, ownerType, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => mode == CacheMode.AllowDownload ? await GetChannelAsync(id, options).ConfigureAwait(false) : GetChannel(id);
@@ -3442,6 +3529,12 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(bool withLocalizations, string locale, RequestOptions options)
             => await GetGlobalApplicationCommandsAsync(withLocalizations, locale, options);
+        /// <inheritdoc />
+        async Task<IApplicationCommand> IDiscordClient.CreateGlobalApplicationCommand(ApplicationCommandProperties properties, RequestOptions options)
+            => await CreateGlobalApplicationCommandAsync(properties, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties, RequestOptions options)
+            => await BulkOverwriteGlobalApplicationCommandsAsync(properties, options);
 
         /// <inheritdoc />
         async Task IDiscordClient.StartAsync()

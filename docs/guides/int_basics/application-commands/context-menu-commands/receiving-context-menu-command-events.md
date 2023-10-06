@@ -18,12 +18,12 @@ client.UserCommandExecuted += UserCommandHandler;
 
 public async Task MessageCommandHandler(SocketMessageCommand arg)
 {
-    Console.Writeline("Message command received!");
+    Console.WriteLine("Message command received!");
 }
 
 public async Task UserCommandHandler(SocketUserCommand arg)
 {
-    Console.Writeline("User command received!");
+    Console.WriteLine("User command received!");
 }
 ```
 
