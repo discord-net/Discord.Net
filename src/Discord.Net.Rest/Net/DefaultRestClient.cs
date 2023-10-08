@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,18 +30,28 @@ namespace Discord.Net.Rest
             _baseUrl = baseUrl;
 
 #pragma warning disable IDISP014
-            _client = new HttpClient(new HttpClientHandler
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                _client = new HttpClient(new HttpClientHandler
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+                    UseCookies = false,
+                });
+            else
             {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-                UseCookies = false,
-                UseProxy = useProxy,
-            });
+                _client = new HttpClient(new HttpClientHandler
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+                    UseCookies = false,
+                    UseProxy = useProxy,
+                });
+            }
 #pragma warning restore IDISP014
             SetHeader("accept-encoding", "gzip, deflate");
 
             _cancelToken = CancellationToken.None;
             _errorDeserializer = new JsonSerializer();
         }
+
         private void Dispose(bool disposing)
         {
             if (!_isDisposed)
