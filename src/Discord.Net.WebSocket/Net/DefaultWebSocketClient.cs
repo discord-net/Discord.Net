@@ -82,7 +82,10 @@ namespace Discord.Net.WebSockets
 
             _client?.Dispose();
             _client = new ClientWebSocket();
-            _client.Options.Proxy = _proxy;
+
+            if (_proxy is not null)
+                _client.Options.Proxy = _proxy;
+
             _client.Options.KeepAliveInterval = TimeSpan.Zero;
             foreach (var header in _headers)
             {
