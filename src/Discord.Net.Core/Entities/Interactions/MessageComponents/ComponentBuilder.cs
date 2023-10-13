@@ -1406,7 +1406,7 @@ namespace Discord
         /// <exception cref="ArgumentOutOfRangeException">
         ///     <see cref="Value"/>.Length is greater than <see cref="LargestMaxLength"/> or <see cref="MaxLength"/>.
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
+        /// <exception cref="ArgumentException">
         ///     <see cref="Style"/> is <see cref="TextInputStyle.Short"/> and <see cref="Value"/> contains a new line character.
         /// </exception>
         public string Value
@@ -1419,7 +1419,7 @@ namespace Discord
                 if (value?.Length < (MinLength ?? 0))
                     throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be shorter than {MinLength}");
                 if (Style == TextInputStyle.Short && value?.Contains('\n') == true)
-                    throw new ArgumentOutOfRangeException(nameof(value), $"Value must not contain new line characters when style is {TextInputStyle.Short}.");
+                    throw new ArgumentException(nameof(value), $"Value must not contain new line characters when style is {TextInputStyle.Short}.");
 
                 _value = value;
             }
