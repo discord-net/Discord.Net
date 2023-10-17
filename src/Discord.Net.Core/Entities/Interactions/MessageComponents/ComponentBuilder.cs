@@ -1418,8 +1418,6 @@ namespace Discord
                     throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be longer than {MaxLength ?? LargestMaxLength}.");
                 if (value?.Length < (MinLength ?? 0))
                     throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be shorter than {MinLength}");
-                if (Style == TextInputStyle.Short && value?.Contains('\n') == true)
-                    throw new ArgumentException(nameof(value), $"Value must not contain new line characters when style is {TextInputStyle.Short}.");
 
                 _value = value;
             }
@@ -1556,6 +1554,9 @@ namespace Discord
                 throw new ArgumentException("TextInputComponents must have a custom id.", nameof(CustomId));
             if (string.IsNullOrWhiteSpace(Label))
                 throw new ArgumentException("TextInputComponents must have a label.", nameof(Label));
+            if (Style == TextInputStyle.Short && Value?.Contains('\n') == true)
+                throw new ArgumentException(nameof(Value), $"Value must not contain new line characters when style is {TextInputStyle.Short}.");
+
             return new TextInputComponent(CustomId, Label, Placeholder, MinLength, MaxLength, Style, Required, Value);
         }
     }
