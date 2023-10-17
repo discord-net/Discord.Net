@@ -84,23 +84,8 @@ namespace Discord.Interactions
 
         private static Task SendModalResponseAsync(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
         {
-            var builder = new ModalBuilder(modalInfo.Title, customId);
-
-            foreach (var input in modalInfo.Components)
-                switch (input)
-                {
-                    case TextInputComponentInfo textComponent:
-                        builder.AddTextInput(textComponent.Label, textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
-                            textComponent.MaxLength, textComponent.IsRequired, textComponent.InitialValue);
-                        break;
-                    default:
-                        throw new InvalidOperationException($"{input.GetType().FullName} isn't a valid component info class");
-                }
-
-            if (modifyModal is not null)
-                modifyModal(builder);
-
-            return interaction.RespondWithModalAsync(builder.Build(), options);
+            var modal = modalInfo.ToModal(customId, modifyModal);
+            return interaction.RespondWithModalAsync(modal, options);
         }
     }
 }

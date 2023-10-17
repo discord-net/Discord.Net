@@ -1406,6 +1406,9 @@ namespace Discord
         /// <exception cref="ArgumentOutOfRangeException">
         ///     <see cref="Value"/>.Length is greater than <see cref="LargestMaxLength"/> or <see cref="MaxLength"/>.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     <see cref="Style"/> is <see cref="TextInputStyle.Short"/> and <see cref="Value"/> contains a new line character.
+        /// </exception>
         public string Value
         {
             get => _value;
@@ -1415,6 +1418,7 @@ namespace Discord
                     throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be longer than {MaxLength ?? LargestMaxLength}.");
                 if (value?.Length < (MinLength ?? 0))
                     throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be shorter than {MinLength}");
+
                 _value = value;
             }
         }
@@ -1550,6 +1554,9 @@ namespace Discord
                 throw new ArgumentException("TextInputComponents must have a custom id.", nameof(CustomId));
             if (string.IsNullOrWhiteSpace(Label))
                 throw new ArgumentException("TextInputComponents must have a label.", nameof(Label));
+            if (Style == TextInputStyle.Short && Value?.Contains('\n') == true)
+                throw new ArgumentException($"Value must not contain new line characters when style is {TextInputStyle.Short}.", nameof(Value));
+
             return new TextInputComponent(CustomId, Label, Placeholder, MinLength, MaxLength, Style, Required, Value);
         }
     }
