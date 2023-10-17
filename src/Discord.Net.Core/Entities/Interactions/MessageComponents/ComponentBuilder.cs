@@ -1555,7 +1555,7 @@ namespace Discord
             if (string.IsNullOrWhiteSpace(Label))
                 throw new ArgumentException("TextInputComponents must have a label.", nameof(Label));
             if (Style == TextInputStyle.Short && Value?.Contains('\n') == true)
-                throw new ArgumentException(nameof(Value), $"Value must not contain new line characters when style is {TextInputStyle.Short}.");
+                throw new ArgumentException($"Value must not contain new line characters when style is {TextInputStyle.Short}.", nameof(Value));
 
             return new TextInputComponent(CustomId, Label, Placeholder, MinLength, MaxLength, Style, Required, Value);
         }
