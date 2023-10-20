@@ -1167,7 +1167,7 @@ namespace Discord.Rest
             if (args.ExemptChannels.IsSpecified)
                 Preconditions.AtMost(args.ExemptChannels.Value.Length, AutoModRuleProperties.MaxExemptChannels, nameof(args.ExemptChannels), $"Exempt channels count must be less than or equal to {AutoModRuleProperties.MaxExemptChannels}.");
 
-            if (!args.Actions.IsSpecified || args.Actions.Value.Length == 0)
+            if (!args.Actions.IsSpecified && args.Actions.Value.Length == 0)
             {
                 throw new ArgumentException(message: $"At least 1 action must be set for an auto moderation rule.", paramName: nameof(args.Actions));
             }
