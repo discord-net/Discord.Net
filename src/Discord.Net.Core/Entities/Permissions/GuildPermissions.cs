@@ -111,7 +111,9 @@ namespace Discord
         /// <summary> If <see langword="true"/>, a user can send voice messages in this guild.</summary>
         public bool SendVoiceMessages => Permissions.GetValue(RawValue, GuildPermission.SendVoiceMessages);
         /// <summary> If <see langword="true"/>, a user can use the Clyde AI bot in this guild.</summary>
-        public bool UseClydeAI => Permissions.GetValue(RawValue, ChannelPermission.UseClydeAI);
+        public bool UseClydeAI => Permissions.GetValue(RawValue, GuildPermission.UseClydeAI);
+        /// <summary> If <see langword="true"/>, a user can create guild expressions in this guild.</summary>
+        public bool CreateGuildExpressions => Permissions.GetValue(RawValue, GuildPermission.CreateGuildExpressions);
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value. </summary>
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
@@ -164,7 +166,8 @@ namespace Discord
             bool? useSoundboard = null,
             bool? viewMonetizationAnalytics = null,
             bool? sendVoiceMessages = null,
-            bool? useClydeAI = null)
+            bool? useClydeAI = null,
+            bool? createGuildExpressions = null)
         {
             ulong value = initialValue;
 
@@ -213,6 +216,7 @@ namespace Discord
             Permissions.SetValue(ref value, viewMonetizationAnalytics, GuildPermission.ViewMonetizationAnalytics);
             Permissions.SetValue(ref value, sendVoiceMessages, GuildPermission.SendVoiceMessages);
             Permissions.SetValue(ref value, useClydeAI, GuildPermission.UseClydeAI);
+            Permissions.SetValue(ref value, createGuildExpressions, GuildPermission.CreateGuildExpressions);
 
             RawValue = value;
         }
@@ -263,7 +267,8 @@ namespace Discord
             bool useSoundboard = false,
             bool viewMonetizationAnalytics = false,
             bool sendVoiceMessages = false,
-            bool useClydeAI = false)
+            bool useClydeAI = false,
+            bool createGuildExpressions = false)
             : this(0,
                 createInstantInvite: createInstantInvite,
                 manageRoles: manageRoles,
@@ -309,7 +314,8 @@ namespace Discord
                 useSoundboard: useSoundboard,
                 viewMonetizationAnalytics: viewMonetizationAnalytics,
                 sendVoiceMessages: sendVoiceMessages,
-                useClydeAI: useClydeAI)
+                useClydeAI: useClydeAI,
+                createGuildExpressions: createGuildExpressions)
         { }
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> from this one, changing the provided non-null permissions. </summary>
@@ -358,13 +364,14 @@ namespace Discord
             bool? useSoundboard = null,
             bool? viewMonetizationAnalytics = null,
             bool? sendVoiceMessages = null,
-            bool? useClydeAI = null)
+            bool? useClydeAI = null,
+            bool? createGuildExpressions = null)
             => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
                 viewAuditLog, viewGuildInsights, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojisAndStickers,
                 useApplicationCommands, requestToSpeak, manageEvents, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
-                startEmbeddedActivities, moderateMembers, useSoundboard, viewMonetizationAnalytics, sendVoiceMessages, useClydeAI);
+                startEmbeddedActivities, moderateMembers, useSoundboard, viewMonetizationAnalytics, sendVoiceMessages, useClydeAI, createGuildExpressions);
 
         /// <summary>
         ///     Returns a value that indicates if a specific <see cref="GuildPermission"/> is enabled
