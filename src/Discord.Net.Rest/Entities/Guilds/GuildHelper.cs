@@ -1106,7 +1106,7 @@ namespace Discord.Rest
 
             if (args.RegexPatterns.IsSpecified)
             {
-                if (args.TriggerType.Value is not AutoModTriggerType.Keyword)
+                if (args.TriggerType.Value is not AutoModTriggerType.Keyword and not AutoModTriggerType.MemberProfile)
                     throw new ArgumentException(message: $"Regex patterns can only be used with 'Keyword' trigger type.", paramName: nameof(args.RegexPatterns));
 
                 Preconditions.AtMost(args.RegexPatterns.Value.Length, AutoModRuleProperties.MaxRegexPatternCount, nameof(args.RegexPatterns), $"Regex pattern count must be less than or equal to {AutoModRuleProperties.MaxRegexPatternCount}.");
@@ -1117,7 +1117,7 @@ namespace Discord.Rest
 
             if (args.KeywordFilter.IsSpecified)
             {
-                if (args.TriggerType.Value != AutoModTriggerType.Keyword)
+                if (args.TriggerType.Value is not AutoModTriggerType.Keyword and not AutoModTriggerType.MemberProfile)
                     throw new ArgumentException(message: $"Keyword filter can only be used with 'Keyword' trigger type.", paramName: nameof(args.KeywordFilter));
 
                 Preconditions.AtMost(args.KeywordFilter.Value.Length, AutoModRuleProperties.MaxKeywordCount, nameof(args.KeywordFilter), $"Keyword count must be less than or equal to {AutoModRuleProperties.MaxKeywordCount}");
@@ -1131,7 +1131,7 @@ namespace Discord.Rest
 
             if (args.AllowList.IsSpecified)
             {
-                if (args.TriggerType.Value is not AutoModTriggerType.Keyword or AutoModTriggerType.KeywordPreset)
+                if (args.TriggerType.Value is not AutoModTriggerType.Keyword and not AutoModTriggerType.KeywordPreset and not AutoModTriggerType.MemberProfile)
                     throw new ArgumentException(message: $"Allow list can only be used with 'Keyword' or 'KeywordPreset' trigger type.", paramName: nameof(args.AllowList));
 
                 if (args.TriggerType.Value is AutoModTriggerType.Keyword)
@@ -1167,7 +1167,7 @@ namespace Discord.Rest
             if (args.ExemptChannels.IsSpecified)
                 Preconditions.AtMost(args.ExemptChannels.Value.Length, AutoModRuleProperties.MaxExemptChannels, nameof(args.ExemptChannels), $"Exempt channels count must be less than or equal to {AutoModRuleProperties.MaxExemptChannels}.");
 
-            if (!args.Actions.IsSpecified && args.Actions.Value.Length == 0)
+            if (!args.Actions.IsSpecified || args.Actions.Value.Length == 0)
             {
                 throw new ArgumentException(message: $"At least 1 action must be set for an auto moderation rule.", paramName: nameof(args.Actions));
             }
