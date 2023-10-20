@@ -182,5 +182,10 @@ namespace Discord
         ///     Allows sending voice messages.
         /// </summary>
         SendVoiceMessages = 1L << 46,
+
+        /// <summary>
+        ///     Allows members to interact with the Clyde AI bot.
+        /// </summary>
+        UseClydeAI = 1L << 47,
     }
 }

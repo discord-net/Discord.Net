@@ -18,17 +18,17 @@ namespace Discord
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for text channels.
         /// </summary>
-        public static readonly ChannelPermissions Text = new(0b10001_001111_110010_110011_111101_111111_111101_010001);
+        public static readonly ChannelPermissions Text = new(0b110001_001111_110010_110011_111101_111111_111101_010001);
 
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for voice channels.
         /// </summary>
-        public static readonly ChannelPermissions Voice = new(0b10001_001010_001010_110011_111101_111111_111101_010001); 
+        public static readonly ChannelPermissions Voice = new(0b110001_001010_001010_110011_111101_111111_111101_010001); 
 
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for stage channels.
         /// </summary>
-        public static readonly ChannelPermissions Stage = new(0b10000_000010_001110_010001_010101_111111_111001_010001);
+        public static readonly ChannelPermissions Stage = new(0b110000_000010_001110_010001_010101_111111_111001_010001);
 
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for category channels.
@@ -48,7 +48,7 @@ namespace Discord
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for forum channels.
         /// </summary>
-        public static readonly ChannelPermissions Forum = new(0b01_001110_010010_110011_111101_111111_111101_010001);
+        public static readonly ChannelPermissions Forum = new(0b000001_001110_010010_110011_111101_111111_111101_010001);
 
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for a given channel type.
@@ -142,6 +142,8 @@ namespace Discord
         public bool CreateEvents => Permissions.GetValue(RawValue, ChannelPermission.CreateEvents);
         /// <summary> If <see langword="true"/>, a user can send voice messages in this channel.</summary>
         public bool SendVoiceMessages => Permissions.GetValue(RawValue, ChannelPermission.SendVoiceMessages);
+        /// <summary> If <see langword="true"/>, a user can use the Clyde AI bot in this channel.</summary>
+        public bool UseClydeAI => Permissions.GetValue(RawValue, ChannelPermission.UseClydeAI);
 
         /// <summary> Creates a new <see cref="ChannelPermissions"/> with the provided packed value.</summary>
         public ChannelPermissions(ulong rawValue) { RawValue = rawValue; }
@@ -179,7 +181,8 @@ namespace Discord
             bool? startEmbeddedActivities = null,
             bool? useSoundboard = null,
             bool? createEvents = null,
-            bool? sendVoiceMessages = null)
+            bool? sendVoiceMessages = null,
+            bool? useClydeAI = null)
         {
             ulong value = initialValue;
 
@@ -216,6 +219,7 @@ namespace Discord
             Permissions.SetValue(ref value, useSoundboard, ChannelPermission.UseSoundboard);
             Permissions.SetValue(ref value, createEvents, ChannelPermission.CreateEvents);
             Permissions.SetValue(ref value, sendVoiceMessages, ChannelPermission.SendVoiceMessages);
+            Permissions.SetValue(ref value, useClydeAI, ChannelPermission.UseClydeAI);
 
             RawValue = value;
         }
@@ -254,12 +258,13 @@ namespace Discord
             bool startEmbeddedActivities = false,
             bool useSoundboard = false,
             bool createEvents = false,
-            bool sendVoiceMessages = false)
+            bool sendVoiceMessages = false,
+            bool useClydeAI = false)
             : this(0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect,
                 speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, prioritySpeaker, stream, manageRoles, manageWebhooks,
                 useApplicationCommands, requestToSpeak, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
-                startEmbeddedActivities, useSoundboard, createEvents, sendVoiceMessages)
+                startEmbeddedActivities, useSoundboard, createEvents, sendVoiceMessages, useClydeAI)
         { }
 
         /// <summary> Creates a new <see cref="ChannelPermissions"/> from this one, changing the provided non-null permissions.</summary>
@@ -296,7 +301,8 @@ namespace Discord
             bool? startEmbeddedActivities = null,
             bool? useSoundboard = null,
             bool? createEvents = null,
-            bool? sendVoiceMessages = null)
+            bool? sendVoiceMessages = null,
+            bool? useClydeAI = null)
             => new ChannelPermissions(RawValue,
                 createInstantInvite,
                 manageChannel,
@@ -330,7 +336,8 @@ namespace Discord
                 startEmbeddedActivities,
                 useSoundboard,
                 createEvents,
-                sendVoiceMessages);
+                sendVoiceMessages,
+                useClydeAI);
 
         public bool Has(ChannelPermission permission) => Permissions.GetValue(RawValue, permission);
 
