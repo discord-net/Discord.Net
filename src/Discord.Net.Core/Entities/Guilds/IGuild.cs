@@ -377,6 +377,11 @@ namespace Discord
         ulong MaxUploadLimit { get; }
 
         /// <summary>
+        ///     Get the inventory settings on the guild. <see langword="null"/> if not available in the guild.
+        /// </summary>
+        GuildInventorySettings? InventorySettings { get; }
+
+        /// <summary>
         ///     Modifies this guild.
         /// </summary>
         /// <param name="func">The delegate containing the properties to modify the guild with.</param>

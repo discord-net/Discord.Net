@@ -116,6 +116,9 @@ namespace Discord.Rest
         public GuildFeatures Features { get; private set; }
 
         /// <inheritdoc />
+        public GuildInventorySettings? InventorySettings { get; private set; }
+
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
         /// <inheritdoc />
@@ -197,6 +200,8 @@ namespace Discord.Rest
                 ApproximatePresenceCount = model.ApproximatePresenceCount.Value;
             if (model.IsBoostProgressBarEnabled.IsSpecified)
                 IsBoostProgressBarEnabled = model.IsBoostProgressBarEnabled.Value;
+            if (model.InventorySettings.IsSpecified)
+                InventorySettings = model.InventorySettings.Value is null ? null : new (model.InventorySettings.Value.IsEmojiPackCollectible.GetValueOrDefault(false));
 
             if (model.Emojis != null)
             {
