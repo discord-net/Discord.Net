@@ -1107,7 +1107,7 @@ namespace Discord.Rest
             if (args.RegexPatterns.IsSpecified)
             {
                 if (args.TriggerType.Value is not AutoModTriggerType.Keyword and not AutoModTriggerType.MemberProfile)
-                    throw new ArgumentException(message: $"Regex patterns can only be used with 'Keyword' trigger type.", paramName: nameof(args.RegexPatterns));
+                    throw new ArgumentException(message: $"Regex patterns can only be used with 'Keyword' or 'MemberProfile' trigger type.", paramName: nameof(args.RegexPatterns));
 
                 Preconditions.AtMost(args.RegexPatterns.Value.Length, AutoModRuleProperties.MaxRegexPatternCount, nameof(args.RegexPatterns), $"Regex pattern count must be less than or equal to {AutoModRuleProperties.MaxRegexPatternCount}.");
 
@@ -1118,7 +1118,7 @@ namespace Discord.Rest
             if (args.KeywordFilter.IsSpecified)
             {
                 if (args.TriggerType.Value is not AutoModTriggerType.Keyword and not AutoModTriggerType.MemberProfile)
-                    throw new ArgumentException(message: $"Keyword filter can only be used with 'Keyword' trigger type.", paramName: nameof(args.KeywordFilter));
+                    throw new ArgumentException(message: $"Keyword filter can only be used with 'Keyword' or 'MemberProfile' trigger type.", paramName: nameof(args.KeywordFilter));
 
                 Preconditions.AtMost(args.KeywordFilter.Value.Length, AutoModRuleProperties.MaxKeywordCount, nameof(args.KeywordFilter), $"Keyword count must be less than or equal to {AutoModRuleProperties.MaxKeywordCount}");
 
@@ -1132,7 +1132,7 @@ namespace Discord.Rest
             if (args.AllowList.IsSpecified)
             {
                 if (args.TriggerType.Value is not AutoModTriggerType.Keyword and not AutoModTriggerType.KeywordPreset and not AutoModTriggerType.MemberProfile)
-                    throw new ArgumentException(message: $"Allow list can only be used with 'Keyword' or 'KeywordPreset' trigger type.", paramName: nameof(args.AllowList));
+                    throw new ArgumentException(message: $"Allow list can only be used with 'Keyword', 'KeywordPreset' or 'MemberProfile' trigger type.", paramName: nameof(args.AllowList));
 
                 if (args.TriggerType.Value is AutoModTriggerType.Keyword)
                     Preconditions.AtMost(args.AllowList.Value.Length, AutoModRuleProperties.MaxAllowListCountKeyword, nameof(args.AllowList), $"Allow list entry count must be less than or equal to {AutoModRuleProperties.MaxAllowListCountKeyword}.");
