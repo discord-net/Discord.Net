@@ -2342,11 +2342,13 @@ namespace Discord.WebSocket
                                     var guild = State.GetGuild(data.GuildId);
 
                                     var channel = State.GetChannel(data.Id) as SocketVoiceChannel;
-                                    var before = channel?.Clone();
+                                    var channelCacheable = new Cacheable<SocketVoiceChannel, ulong>(channel, data.Id, channel is not null, () => null);
 
-                                    channel.UpdateVoiceStatus(data.Status);
+                                    var before = (string)channel?.Status?.Clone();
+                                    var after = data.Status;
+                                    channel?.UpdateVoiceStatus(data.Status);
 
-                                    await TimedInvokeAsync(_voiceChannelStatusUpdated, nameof(VoiceChannelStatusUpdated), before, channel);
+                                    await TimedInvokeAsync(_voiceChannelStatusUpdated, nameof(VoiceChannelStatusUpdated), channelCacheable, before, after);
                                 }
                                 break;
                             #endregion

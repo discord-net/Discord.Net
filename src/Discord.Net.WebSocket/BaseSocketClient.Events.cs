@@ -83,13 +83,13 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     The previous state of the channel is passed into the first parameter; the updated channel is passed into the second one.
         /// </remarks>
-        public event Func<SocketVoiceChannel, SocketVoiceChannel, Task> VoiceChannelStatusUpdated
+        public event Func<Cacheable<SocketVoiceChannel, ulong>, string, string, Task> VoiceChannelStatusUpdated
         {
             add { _voiceChannelStatusUpdated.Add(value); }
             remove { _voiceChannelStatusUpdated.Remove(value); }
         }
 
-        internal readonly AsyncEvent<Func<SocketVoiceChannel, SocketVoiceChannel, Task>> _voiceChannelStatusUpdated = new();
+        internal readonly AsyncEvent<Func<Cacheable<SocketVoiceChannel, ulong>, string, string, Task>> _voiceChannelStatusUpdated = new();
 
 
         #endregion
