@@ -196,3 +196,17 @@ code {
 .affix h5, .affix .h5 {
     font-weight: normal !important;
 }
+
+/* MAKES INDEX LOGO VISIBLE ON DIFFERENT THEMES */
+article[data-uid="Root.Landing"] img[alt="logo"] {
+    height: 100pt !important;
+    box-shadow: none;
+}
+
+[data-bs-theme="light"] article[data-uid="Root.Landing"] img[alt="logo"] {
+    content: url('/marketing/logo/SVG/Combinationmark.svg') !important;
+}
+
+[data-bs-theme="dark"] article[data-uid="Root.Landing"] img[alt="logo"] {
+    content: url('/marketing/logo/SVG/Combinationmark White.svg') !important;
+}
