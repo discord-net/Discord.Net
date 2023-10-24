@@ -48,10 +48,12 @@
     "template": [
       "default",
       "modern",
-      "_template/material"
+      "_template/material",
+      "_template/description-generator"
     ],
     "postProcessors": [
-      "ExtractSearchIndex"
+      "ExtractSearchIndex",
+      "DescriptionPostProcessor"	  
     ],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
