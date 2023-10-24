@@ -210,3 +210,9 @@ article[data-uid="Root.Landing"] img[alt="logo"] {
 [data-bs-theme="dark"] article[data-uid="Root.Landing"] img[alt="logo"] {
     content: url('/marketing/logo/SVG/Combinationmark White.svg') !important;
 }
+
+/* MAKES SIDEBAR LINKS A BIT MORE DISTINGUISHABLE */
+.affix ul li a {
+  display: block !important;
+  margin-left: 8px !important;
+}
