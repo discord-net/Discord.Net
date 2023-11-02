@@ -147,6 +147,24 @@ namespace Discord.Rest
             var mebibyte = Math.Pow(2, 20);
             return (ulong)(tierFactor * mebibyte);
         }
+
+        public static async Task<GuildIncidentsData> ModifyGuildIncidentActionsAsync(IGuild guild, BaseDiscordClient client, Action<GuildIncidentsDataProperties> func, RequestOptions options = null)
+        {
+            var props = new GuildIncidentsDataProperties();
+            func(props);
+
+            var args = props.DmsDisabledUntil.IsSpecified || props.InvitesDisabledUntil.IsSpecified
+                ? new ModifyGuildIncidentsDataParams { DmsDisabledUntil = props.DmsDisabledUntil, InvitesDisabledUntil = props.InvitesDisabledUntil }
+                : null;
+
+            var model = await client.ApiClient.ModifyGuildIncidentActionsAsync(guild.Id, args, options);
+
+            return new GuildIncidentsData
+            {
+                DmsDisabledUntil = model.DmsDisabledUntil,
+                InvitesDisabledUntil = model.InvitesDisabledUntil
+            };
+        }
         #endregion
 
         #region Bans
