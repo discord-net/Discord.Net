@@ -865,25 +865,6 @@ namespace Discord.Rest
             => GuildHelper.GetUserAsync(this, Discord, OwnerId, options);
 
         /// <inheritdoc />
-        /// <summary>
-        ///     Prunes inactive users.
-        /// </summary>
-        /// <remarks>
-        ///     <para>
-        ///         This method removes all users that have not logged on in the provided number of <paramref name="days"/>.
-        ///     </para>
-        ///     <para>
-        ///         If <paramref name="simulate" /> is <see langword="true" />, this method will only return the number of users that
-        ///         would be removed without kicking the users.
-        ///     </para>
-        /// </remarks>
-        /// <param name="days">The number of days required for the users to be kicked.</param>
-        /// <param name="simulate">Whether this prune action is a simulation.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous prune operation. The task result contains the number of users to
-        ///     be or has been removed from this guild.
-        /// </returns>
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options, includeRoleIds);
 
