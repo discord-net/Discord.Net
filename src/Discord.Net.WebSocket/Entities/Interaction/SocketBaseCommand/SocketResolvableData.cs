@@ -130,7 +130,7 @@ namespace Discord.WebSocket
             {
                 foreach (var attachment in resolved.Attachments.Value)
                 {
-                    var discordAttachment = Attachment.Create(attachment.Value);
+                    var discordAttachment = Attachment.Create(attachment.Value, discord);
 
                     Attachments.Add(ulong.Parse(attachment.Key), discordAttachment);
                 }

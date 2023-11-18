@@ -94,9 +94,7 @@ namespace Discord
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        public static async Task<IUserMessage> ReplyAsync(this IUserMessage msg, string text = null, bool isTTS = false, Embed embed = null, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
-        {
-            return await msg.Channel.SendMessageAsync(text, isTTS, embed, options, allowedMentions, new MessageReference(messageId: msg.Id), components, stickers, embeds, flags).ConfigureAwait(false);
-        }
+        public static Task<IUserMessage> ReplyAsync(this IUserMessage msg, string text = null, bool isTTS = false, Embed embed = null, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+            => msg.Channel.SendMessageAsync(text, isTTS, embed, options, allowedMentions, new MessageReference(messageId: msg.Id), components, stickers, embeds, flags);
     }
 }

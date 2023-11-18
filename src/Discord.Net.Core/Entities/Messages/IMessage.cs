@@ -323,9 +323,11 @@ namespace Discord
         /// <param name="emoji">The emoji that represents the reaction that you wish to get.</param>
         /// <param name="limit">The number of users to request.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="type">The type of the reaction you wish to get users for.</param>
         /// <returns>
         ///      Paged collection of users.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null,
+            ReactionType type = ReactionType.Normal);
     }
 }

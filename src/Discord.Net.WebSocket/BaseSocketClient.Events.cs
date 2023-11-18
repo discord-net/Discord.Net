@@ -76,6 +76,22 @@ namespace Discord.WebSocket
             remove { _channelUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketChannel, SocketChannel, Task>> _channelUpdatedEvent = new AsyncEvent<Func<SocketChannel, SocketChannel, Task>>();
+
+        /// <summary>
+        ///     Fired when status of a voice channel is updated.
+        /// </summary>
+        /// <remarks>
+        ///     The previous state of the channel is passed into the first parameter; the updated channel is passed into the second one.
+        /// </remarks>
+        public event Func<Cacheable<SocketVoiceChannel, ulong>, string, string, Task> VoiceChannelStatusUpdated
+        {
+            add { _voiceChannelStatusUpdated.Add(value); }
+            remove { _voiceChannelStatusUpdated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<SocketVoiceChannel, ulong>, string, string, Task>> _voiceChannelStatusUpdated = new();
+
+
         #endregion
 
         #region Messages

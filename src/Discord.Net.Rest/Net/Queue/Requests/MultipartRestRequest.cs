@@ -14,9 +14,7 @@ namespace Discord.Net.Queue
             MultipartParams = multipartParams;
         }
 
-        public override async Task<RestResponse> SendAsync()
-        {
-            return await Client.SendAsync(Method, Endpoint, MultipartParams, Options.CancelToken, Options.HeaderOnly, Options.AuditLogReason).ConfigureAwait(false);
-        }
+        public override Task<RestResponse> SendAsync()
+            => Client.SendAsync(Method, Endpoint, MultipartParams, Options.CancelToken, Options.HeaderOnly, Options.AuditLogReason);
     }
 }
