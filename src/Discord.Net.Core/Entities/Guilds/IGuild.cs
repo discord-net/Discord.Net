@@ -875,11 +875,13 @@ namespace Discord
         /// <param name="isHoisted">Whether the role is separated from others on the sidebar.</param>
         /// <param name="isMentionable">Whether the role can be mentioned.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="icon">The icon for the role.</param>
+        /// <param name="emoji">The unicode emoji to be used as an icon for the role.</param>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null);
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null);
 
         /// <summary>
         ///     Adds a user to this guild.
