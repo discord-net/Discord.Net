@@ -105,6 +105,7 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(sendVoiceMessages: true), GuildPermission.SendVoiceMessages);
             AssertFlag(() => new GuildPermissions(useClydeAI: true), GuildPermission.UseClydeAI);
             AssertFlag(() => new GuildPermissions(createGuildExpressions: true), GuildPermission.CreateGuildExpressions);
+            AssertFlag(() => new GuildPermissions(setVoiceChannelStatus: true), GuildPermission.SetVoiceChannelStatus);
         }
 
         /// <summary>
@@ -188,6 +189,7 @@ namespace Discord
             AssertUtil(GuildPermission.SendVoiceMessages, x => x.SendVoiceMessages, (p, enable) => p.Modify(sendVoiceMessages: enable));
             AssertUtil(GuildPermission.UseClydeAI, x => x.UseClydeAI, (p, enable) => p.Modify(useClydeAI: enable));
             AssertUtil(GuildPermission.CreateGuildExpressions, x => x.CreateGuildExpressions, (p, enable) => p.Modify(createGuildExpressions: enable));
+            AssertUtil(GuildPermission.SetVoiceChannelStatus, x => x.SetVoiceChannelStatus, (p, enable) => p.Modify(setVoiceChannelStatus: enable));
         }
     }
 }

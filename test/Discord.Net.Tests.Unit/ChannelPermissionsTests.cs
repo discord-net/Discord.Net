@@ -94,6 +94,7 @@ namespace Discord
             AssertFlag(() => new ChannelPermissions(createEvents: true), ChannelPermission.CreateEvents);
             AssertFlag(() => new ChannelPermissions(sendVoiceMessages: true), ChannelPermission.SendVoiceMessages);
             AssertFlag(() => new ChannelPermissions(useClydeAI: true), ChannelPermission.UseClydeAI);
+            AssertFlag(() => new ChannelPermissions(setVoiceChannelStatus: true), ChannelPermission.SetVoiceChannelStatus);
         }
 
         /// <summary>
@@ -160,6 +161,7 @@ namespace Discord
             AssertUtil(ChannelPermission.Stream, x => x.Stream, (p, enable) => p.Modify(stream: enable));
             AssertUtil(ChannelPermission.SendVoiceMessages, x => x.SendVoiceMessages, (p, enable) => p.Modify(sendVoiceMessages: enable));
             AssertUtil(ChannelPermission.UseClydeAI, x => x.UseClydeAI, (p, enable) => p.Modify(useClydeAI: enable));
+            AssertUtil(ChannelPermission.SetVoiceChannelStatus, x => x.SetVoiceChannelStatus, (p, enable) => p.Modify(setVoiceChannelStatus: enable));
         }
 
         /// <summary>

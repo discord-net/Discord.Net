@@ -137,6 +137,9 @@ namespace Discord.WebSocket
                 : CDN.GetDefaultUserAvatarUrl(Id);
 
         /// <inheritdoc />
+        public virtual string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
+
         public string GetAvatarDecorationUrl()
             => AvatarDecorationHash is not null
                 ? CDN.GetAvatarDecorationUrl(AvatarDecorationHash)

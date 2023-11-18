@@ -2333,6 +2333,24 @@ namespace Discord.WebSocket
 
                                 }
                                 break;
+
+                            case "VOICE_CHANNEL_STATUS_UPDATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_CHANNEL_STATUS_UPDATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<VoiceChannelStatusUpdateEvent>(_serializer);
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    var channel = State.GetChannel(data.Id) as SocketVoiceChannel;
+                                    var channelCacheable = new Cacheable<SocketVoiceChannel, ulong>(channel, data.Id, channel is not null, () => null);
+
+                                    var before = (string)channel?.Status?.Clone();
+                                    var after = data.Status;
+                                    channel?.UpdateVoiceStatus(data.Status);
+
+                                    await TimedInvokeAsync(_voiceChannelStatusUpdated, nameof(VoiceChannelStatusUpdated), channelCacheable, before, after);
+                                }
+                                break;
                             #endregion
 
                             #region Invites
@@ -3182,6 +3200,8 @@ namespace Discord.WebSocket
 
         private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken)
         {
+            int delayInterval = (int)(intervalMillis * DiscordConfig.HeartbeatIntervalFactor);
+
             try
             {
                 await _gatewayLogger.DebugAsync("Heartbeat Started").ConfigureAwait(false);
@@ -3209,7 +3229,8 @@ namespace Discord.WebSocket
                         await _gatewayLogger.WarningAsync("Heartbeat Errored", ex).ConfigureAwait(false);
                     }
 
-                    await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
+                    int delay = Math.Max(0, delayInterval - Latency);
+                    await Task.Delay(delay, cancelToken).ConfigureAwait(false);
                 }
                 await _gatewayLogger.DebugAsync("Heartbeat Stopped").ConfigureAwait(false);
             }

@@ -392,7 +392,7 @@ namespace Discord.Interactions
             if (!deleteMissing)
             {
 
-                var existing = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
+                var existing = await RestClient.GetGuildApplicationCommands(guildId, true).ConfigureAwait(false);
                 var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
                 props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
             }
@@ -416,7 +416,7 @@ namespace Discord.Interactions
 
             if (!deleteMissing)
             {
-                var existing = await RestClient.GetGlobalApplicationCommands().ConfigureAwait(false);
+                var existing = await RestClient.GetGlobalApplicationCommands(true).ConfigureAwait(false);
                 var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
                 props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
             }
@@ -481,7 +481,7 @@ namespace Discord.Interactions
 
             if (!deleteMissing)
             {
-                var existing = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
+                var existing = await RestClient.GetGuildApplicationCommands(guildId, true).ConfigureAwait(false);
                 var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
                 props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
             }
@@ -523,7 +523,7 @@ namespace Discord.Interactions
 
             if (!deleteMissing)
             {
-                var existing = await RestClient.GetGuildApplicationCommands(guildId).ConfigureAwait(false);
+                var existing = await RestClient.GetGuildApplicationCommands(guildId, true).ConfigureAwait(false);
                 var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
                 props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
             }
@@ -547,7 +547,7 @@ namespace Discord.Interactions
 
             if (!deleteMissing)
             {
-                var existing = await RestClient.GetGlobalApplicationCommands().ConfigureAwait(false);
+                var existing = await RestClient.GetGlobalApplicationCommands(true).ConfigureAwait(false);
                 var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
                 props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
             }
@@ -590,7 +590,7 @@ namespace Discord.Interactions
 
             if (!deleteMissing)
             {
-                var existing = await RestClient.GetGlobalApplicationCommands().ConfigureAwait(false);
+                var existing = await RestClient.GetGlobalApplicationCommands(true).ConfigureAwait(false);
                 var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
                 props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
             }

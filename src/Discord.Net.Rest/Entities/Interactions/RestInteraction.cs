@@ -201,7 +201,9 @@ namespace Discord.Rest
                                 ChannelType.Stage or
                                 ChannelType.NewsThread or
                                 ChannelType.PrivateThread or
-                                ChannelType.PublicThread
+                                ChannelType.PublicThread or
+                                ChannelType.Media or
+                                ChannelType.Forum
                                     => RestGuildChannel.Create(discord, Guild, model.Channel.Value) as IRestMessageChannel,
                                 ChannelType.DM => RestDMChannel.Create(discord, model.Channel.Value),
                                 ChannelType.Group => RestGroupChannel.Create(discord, model.Channel.Value),

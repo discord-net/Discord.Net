@@ -739,6 +739,52 @@ namespace Discord
         Task<IReadOnlyCollection<IThreadChannel>> GetThreadChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         /// <summary>
+        ///     Gets a forum channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the stage channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the stage channel associated
+        ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<IForumChannel> GetForumChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of all forum channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     forum channels found within this guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IForumChannel>> GetForumChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a forum channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the stage channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the stage channel associated
+        ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<IMediaChannel> GetMediaChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of all forum channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     media channels found within this guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IMediaChannel>> GetMediaChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
         ///     Creates a new text channel in this guild.
         /// </summary>
         /// <example>
@@ -799,6 +845,18 @@ namespace Discord
         ///     forum channel.
         /// </returns>
         Task<IForumChannel> CreateForumChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new media channel in this guild.
+        /// </summary>
+        /// <param name="name">The new name for the media channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     forum channel.
+        /// </returns>
+        Task<IMediaChannel> CreateMediaChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null);
 
         /// <summary>
         ///     Gets a collection of all the voice regions this guild can access.

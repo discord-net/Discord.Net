@@ -69,6 +69,12 @@ namespace Discord.Interactions
                 _ when typeof(ITextChannel).IsAssignableFrom(type)
                     => new List<ChannelType> { ChannelType.Text },
 
+                _ when typeof(IMediaChannel).IsAssignableFrom(type)
+                    => new List<ChannelType> { ChannelType.Media },
+
+                _ when typeof(IForumChannel).IsAssignableFrom(type)
+                    => new List<ChannelType> { ChannelType.Forum },
+
                 _ => null
             };
         }

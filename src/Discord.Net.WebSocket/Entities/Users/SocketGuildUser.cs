@@ -260,14 +260,12 @@ namespace Discord.WebSocket
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
 
         /// <inheritdoc />
-        public string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => GuildAvatarId is not null
-                ? GetGuildAvatarUrl(format, size)
-                : GetAvatarUrl(format, size);
-
-        /// <inheritdoc />
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, Guild.Id, GuildAvatarId, size, format);
+
+        /// <inheritdoc />
+        public override string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetGuildAvatarUrl(format, size) ?? base.GetDisplayAvatarUrl(format, size);
 
         private string DebuggerDisplay => DiscriminatorValue != 0
             ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)"
