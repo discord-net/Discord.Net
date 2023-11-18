@@ -108,8 +108,12 @@ namespace Discord
         public bool UseSoundboard => Permissions.GetValue(RawValue, GuildPermission.UseSoundboard);
         /// <summary> If <see langword="true"/>, a user can view monetization analytics in this guild.</summary>
         public bool ViewMonetizationAnalytics => Permissions.GetValue(RawValue, GuildPermission.ViewMonetizationAnalytics);
-        /// <summary> If <see langword="true"/>, a user can send voice messages in this channel.</summary>
+        /// <summary> If <see langword="true"/>, a user can send voice messages in this guild.</summary>
         public bool SendVoiceMessages => Permissions.GetValue(RawValue, GuildPermission.SendVoiceMessages);
+        /// <summary> If <see langword="true"/>, a user can use the Clyde AI bot in this guild.</summary>
+        public bool UseClydeAI => Permissions.GetValue(RawValue, GuildPermission.UseClydeAI);
+        /// <summary> If <see langword="true"/>, a user can create guild expressions in this guild.</summary>
+        public bool CreateGuildExpressions => Permissions.GetValue(RawValue, GuildPermission.CreateGuildExpressions);
         /// <summary> If <see langword="true"/>, a user can set the status of a voice channel.</summary>
         public bool SetVoiceChannelStatus => Permissions.GetValue(RawValue, GuildPermission.SetVoiceChannelStatus);
 
@@ -164,6 +168,8 @@ namespace Discord
             bool? useSoundboard = null,
             bool? viewMonetizationAnalytics = null,
             bool? sendVoiceMessages = null,
+            bool? useClydeAI = null,
+            bool? createGuildExpressions = null,
             bool? setVoiceChannelStatus = null)
         {
             ulong value = initialValue;
@@ -212,6 +218,8 @@ namespace Discord
             Permissions.SetValue(ref value, useSoundboard, GuildPermission.UseSoundboard);
             Permissions.SetValue(ref value, viewMonetizationAnalytics, GuildPermission.ViewMonetizationAnalytics);
             Permissions.SetValue(ref value, sendVoiceMessages, GuildPermission.SendVoiceMessages);
+            Permissions.SetValue(ref value, useClydeAI, GuildPermission.UseClydeAI);
+            Permissions.SetValue(ref value, createGuildExpressions, GuildPermission.CreateGuildExpressions);
             Permissions.SetValue(ref value, setVoiceChannelStatus, GuildPermission.SetVoiceChannelStatus);
 
             RawValue = value;
@@ -263,6 +271,8 @@ namespace Discord
             bool useSoundboard = false,
             bool viewMonetizationAnalytics = false,
             bool sendVoiceMessages = false,
+            bool useClydeAI = false,
+            bool createGuildExpressions = false,
             bool setVoiceChannelStatus = false)
             : this(0,
                 createInstantInvite: createInstantInvite,
@@ -309,6 +319,8 @@ namespace Discord
                 useSoundboard: useSoundboard,
                 viewMonetizationAnalytics: viewMonetizationAnalytics,
                 sendVoiceMessages: sendVoiceMessages,
+                useClydeAI: useClydeAI,
+                createGuildExpressions: createGuildExpressions,
                 setVoiceChannelStatus: setVoiceChannelStatus)
         { }
 
@@ -358,13 +370,15 @@ namespace Discord
             bool? useSoundboard = null,
             bool? viewMonetizationAnalytics = null,
             bool? sendVoiceMessages = null,
+            bool? useClydeAI = null,
+            bool? createGuildExpressions = null,
             bool? setVoiceChannelStatus = null)
             => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
                 viewAuditLog, viewGuildInsights, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojisAndStickers,
                 useApplicationCommands, requestToSpeak, manageEvents, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
-                startEmbeddedActivities, moderateMembers, useSoundboard, viewMonetizationAnalytics, sendVoiceMessages, setVoiceChannelStatus);
+                startEmbeddedActivities, moderateMembers, useSoundboard, viewMonetizationAnalytics, sendVoiceMessages, useClydeAI, createGuildExpressions, setVoiceChannelStatus);
 
         /// <summary>
         ///     Returns a value that indicates if a specific <see cref="GuildPermission"/> is enabled

@@ -147,6 +147,9 @@ namespace Discord.WebSocket
         public GuildIncidentsData IncidentsData { get; private set; }
 
         /// <inheritdoc />
+        public GuildInventorySettings? InventorySettings { get; private set; }
+
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
@@ -571,6 +574,9 @@ namespace Discord.WebSocket
             PreferredCulture = PreferredLocale == null ? null : new CultureInfo(PreferredLocale);
             if (model.IsBoostProgressBarEnabled.IsSpecified)
                 IsBoostProgressBarEnabled = model.IsBoostProgressBarEnabled.Value;
+            if (model.InventorySettings.IsSpecified)
+                InventorySettings = model.InventorySettings.Value is null ? null : new(model.InventorySettings.Value.IsEmojiPackCollectible.GetValueOrDefault(false));
+
             IncidentsData = model.IncidentsData is not null
                 ? new GuildIncidentsData { DmsDisabledUntil = model.IncidentsData.DmsDisabledUntil, InvitesDisabledUntil = model.IncidentsData.InvitesDisabledUntil }
                 : new GuildIncidentsData();

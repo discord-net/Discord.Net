@@ -377,6 +377,11 @@ namespace Discord
         ulong MaxUploadLimit { get; }
 
         /// <summary>
+        ///     Get the inventory settings on the guild. <see langword="null"/> if not available in the guild.
+        /// </summary>
+        GuildInventorySettings? InventorySettings { get; }
+
+        /// <summary>
         ///     Gets the incidents data for this guild.
         /// </summary>
         GuildIncidentsData IncidentsData { get; }

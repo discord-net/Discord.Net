@@ -264,10 +264,20 @@ namespace Discord
         UseSoundboard = 1L << 42,
 
         /// <summary>
+        ///     Allows for creating emojis, stickers, and soundboard sounds, and editing and deleting those created by the current user.
+        /// </summary>
+        CreateGuildExpressions = 1L << 43,
+
+        /// <summary>
         ///     Allows sending voice messages.
         /// </summary>
         SendVoiceMessages = 1L << 46,
 
+        /// <summary>
+        ///     Allows members to interact with the Clyde AI bot.
+        /// </summary>
+        UseClydeAI = 1L << 47,
+        
         /// <summary>
         ///     Allows setting voice channel status.
         /// </summary>
