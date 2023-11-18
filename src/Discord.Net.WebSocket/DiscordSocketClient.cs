@@ -3200,6 +3200,8 @@ namespace Discord.WebSocket
 
         private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken)
         {
+            int delayInterval = (int)(intervalMillis * DiscordConfig.HeartbeatIntervalFactor);
+
             try
             {
                 await _gatewayLogger.DebugAsync("Heartbeat Started").ConfigureAwait(false);
@@ -3227,7 +3229,8 @@ namespace Discord.WebSocket
                         await _gatewayLogger.WarningAsync("Heartbeat Errored", ex).ConfigureAwait(false);
                     }
 
-                    await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
+                    int delay = Math.Max(0, delayInterval - Latency);
+                    await Task.Delay(delay, cancelToken).ConfigureAwait(false);
                 }
                 await _gatewayLogger.DebugAsync("Heartbeat Stopped").ConfigureAwait(false);
             }
