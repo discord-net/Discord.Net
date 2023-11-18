@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System;
 
 namespace Discord.API;
 
@@ -42,4 +43,13 @@ internal class Attachment
 
     [JsonProperty("flags")]
     public Optional<AttachmentFlags> Flags { get; set; }
+
+    [JsonProperty("title")]
+    public Optional<string> Title { get; set; }
+
+    [JsonProperty("clip_created_at")]
+    public Optional<DateTimeOffset> ClipCreatedAt { get; set; }
+
+    [JsonProperty("clip_participants")]
+    public Optional<User[]> ClipParticipants { get; set; }
 }
