@@ -168,7 +168,7 @@ namespace Discord
             bool? useSoundboard = null,
             bool? viewMonetizationAnalytics = null,
             bool? sendVoiceMessages = null,
-            bool? useClydeAI = null.
+            bool? useClydeAI = null,
             bool? createGuildExpressions = null,
             bool? setVoiceChannelStatus = null)
         {
