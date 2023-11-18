@@ -141,8 +141,7 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="func">A delegate containing the properties to modify the message with.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
-        /// <returns>A string that contains json to write back to the incoming http request.</returns>
-        public string Update(Action<MessageProperties> func, RequestOptions options = null)
+        public async Task UpdateAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
             var args = new MessageProperties();
             func(args);
@@ -162,12 +161,6 @@ namespace Discord.Rest
 
             var embed = args.Embed;
             var embeds = args.Embeds;
-
-            bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(Message.Content);
-            bool hasEmbeds = embed.IsSpecified && embed.Value != null || embeds.IsSpecified && embeds.Value?.Length > 0 || Message.Embeds.Any();
-
-            if (!hasText && !hasEmbeds)
-                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
             var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
 
@@ -200,20 +193,43 @@ namespace Discord.Rest
                 }
             }
 
-            var response = new API.InteractionResponse
+            if (!args.Attachments.IsSpecified)
             {
-                Type = InteractionResponseType.UpdateMessage,
-                Data = new API.InteractionCallbackData
+                var response = new API.InteractionResponse
                 {
+                    Type = InteractionResponseType.UpdateMessage,
+                    Data = new API.InteractionCallbackData
+                    {
+                        Content = args.Content,
+                        AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
+                        Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
+                        Components = args.Components.IsSpecified
+                            ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
+                            : Optional<API.ActionRowComponent[]>.Unspecified,
+                        Flags = args.Flags.IsSpecified ? args.Flags.Value ?? Optional<MessageFlags>.Unspecified : Optional<MessageFlags>.Unspecified
+                    }
+                };
+
+                await InteractionHelper.SendInteractionResponseAsync(Discord, response, this, Channel, options).ConfigureAwait(false);
+            }
+            else
+            {
+                var attachments = args.Attachments.Value?.ToArray() ?? Array.Empty<FileAttachment>();
+
+                var response = new API.Rest.UploadInteractionFileParams(attachments)
+                {
+                    Type = InteractionResponseType.UpdateMessage,
                     Content = args.Content,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
-                    Components = args.Components.IsSpecified
+                    MessageComponents = args.Components.IsSpecified
                         ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
                         : Optional<API.ActionRowComponent[]>.Unspecified,
                     Flags = args.Flags.IsSpecified ? args.Flags.Value ?? Optional<MessageFlags>.Unspecified : Optional<MessageFlags>.Unspecified
-                }
-            };
+                };
+
+                await InteractionHelper.SendInteractionResponseAsync(Discord, response, this, Channel, options).ConfigureAwait(false);
+            }
 
             lock (_lock)
             {
@@ -221,11 +237,9 @@ namespace Discord.Rest
                 {
                     throw new InvalidOperationException("Cannot respond, update, or defer twice to the same interaction");
                 }
-
-                HasResponded = true;
             }
 
-            return SerializePayload(response);
+            HasResponded = true;
         }
 
         /// <inheritdoc/>
@@ -493,7 +507,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         Task IComponentInteraction.UpdateAsync(Action<MessageProperties> func, RequestOptions options)
-            => Task.FromResult(Update(func, options));
+            => UpdateAsync(func, options);
 
         /// <inheritdoc />
         Task IComponentInteraction.DeferLoadingAsync(bool ephemeral, RequestOptions options)

@@ -257,5 +257,15 @@ namespace Discord
                 _ => throw new ArgumentException(nameof(format)),
             };
         }
+
+        /// <summary>
+        ///     Gets an avatar decoration url based off the hash.
+        /// </summary>
+        /// <param name="avatarDecorationHash">The hash of the avatar decoraition.</param>
+        /// <returns>
+        ///     A URL to the avatar decoration.
+        /// </returns>
+        public static string GetAvatarDecorationUrl(string avatarDecorationHash)
+            => $"{DiscordConfig.CDNUrl}avatar-decoration-presets/{avatarDecorationHash}.png";
     }
 }

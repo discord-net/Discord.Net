@@ -246,5 +246,15 @@ namespace Discord
         ///     This factor is used to reduce the interval and ensure that Discord will get the heartbeat within the estimated interval.
         /// </remarks>
         internal const double HeartbeatIntervalFactor = 0.9;
+
+        /// <summary>
+        ///     Returns the maximum length of a voice channel status.
+        /// </summary>
+        public const int MaxVoiceChannelStatusLength = 500;
+      
+        /// <summary>
+        ///     Returns the maximum number of entitlements that can be gotten per-batch.
+        /// </summary>
+        public const int MaxEntitlementsPerBatch = 100;
     }
 }

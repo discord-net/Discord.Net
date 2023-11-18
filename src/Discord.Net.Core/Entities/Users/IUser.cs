@@ -96,6 +96,22 @@ namespace Discord
         string GlobalName { get; }
 
         /// <summary>
+        ///     Gets the hash of the avatar decoration.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no avatar decoration set.
+        /// </remarks>
+        string AvatarDecorationHash { get; }
+
+        /// <summary>
+        ///     Gets the id of the avatar decoration's SKU.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no avatar decoration set.
+        /// </remarks>
+        ulong? AvatarDecorationSkuId { get; }
+
+        /// <summary>
         ///     Creates the direct message channel of this user.
         /// </summary>
         /// <remarks>
@@ -120,5 +136,14 @@ namespace Discord
         ///     contains the DM channel associated with this user.
         /// </returns>
         Task<IDMChannel> CreateDMChannelAsync(RequestOptions options = null);
+
+
+        /// <summary>
+        ///     Gets the URL for user's avatar decoration.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no avatar decoration set.
+        /// </remarks>
+        string GetAvatarDecorationUrl();
     }
 }
