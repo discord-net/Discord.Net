@@ -25,8 +25,8 @@ namespace Discord.Interactions
         ///     A Task representing the operation of creating the interaction response.
         /// </returns>
         /// <exception cref="InvalidOperationException">Thrown if the interaction isn't a type of <see cref="RestInteraction"/>.</exception>
-        protected override async Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
-            => await HandleInteractionAsync(x => x.Defer(ephemeral, options));
+        protected override Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
+            => HandleInteractionAsync(x => x.Defer(ephemeral, options));
 
         /// <summary>
         ///     Respond to a Rest based Discord Interaction using the <see cref="InteractionServiceConfig.RestResponseCallback"/> delegate.
@@ -43,8 +43,8 @@ namespace Discord.Interactions
         ///     A Task representing the operation of creating the interaction response.
         /// </returns>
         /// <exception cref="InvalidOperationException">Thrown if the interaction isn't a type of <see cref="RestInteraction"/>.</exception>
-        protected override async Task RespondAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, Embed embed = null)
-            => await HandleInteractionAsync(x => x.Respond(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options));
+        protected override Task RespondAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, Embed embed = null)
+            => HandleInteractionAsync(x => x.Respond(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options));
 
         /// <summary>
         ///     Responds to the interaction with a modal.
@@ -55,8 +55,8 @@ namespace Discord.Interactions
         ///     A Task representing the operation of creating the interaction response.
         /// </returns>
         /// <exception cref="InvalidOperationException">Thrown if the interaction isn't a type of <see cref="RestInteraction"/>.</exception>
-        protected override async Task RespondWithModalAsync(Modal modal, RequestOptions options = null)
-            => await HandleInteractionAsync(x => x.RespondWithModal(modal, options));
+        protected override Task RespondWithModalAsync(Modal modal, RequestOptions options = null)
+            => HandleInteractionAsync(x => x.RespondWithModal(modal, options));
 
         /// <summary>
         ///     Responds to the interaction with a modal.
@@ -84,10 +84,10 @@ namespace Discord.Interactions
         ///     A Task representing the operation of creating the interaction response.
         /// </returns>
         /// <exception cref="InvalidOperationException">Thrown if the interaction isn't a type of <see cref="RestInteraction"/>.</exception>
-        protected override async Task RespondWithModalAsync<TModal>(string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null) 
-            => await HandleInteractionAsync(x => x.RespondWithModal<TModal>(customId, options, modifyModal));
+        protected override Task RespondWithModalAsync<TModal>(string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null) 
+            => HandleInteractionAsync(x => x.RespondWithModal<TModal>(customId, options, modifyModal));
 
-        private async Task HandleInteractionAsync(Func<RestInteraction, string> action)
+        private Task HandleInteractionAsync(Func<RestInteraction, string> action)
         {
             if (Context.Interaction is not RestInteraction restInteraction)
                 throw new InvalidOperationException($"Interaction must be a type of {nameof(RestInteraction)} in order to execute this method.");
@@ -95,9 +95,9 @@ namespace Discord.Interactions
             var payload = action(restInteraction);
 
             if (Context is IRestInteractionContext restContext && restContext.InteractionResponseCallback != null)
-                await restContext.InteractionResponseCallback.Invoke(payload).ConfigureAwait(false);
+                return restContext.InteractionResponseCallback.Invoke(payload);
             else
-                await InteractionService._restResponseCallback(Context, payload).ConfigureAwait(false);
+                return InteractionService._restResponseCallback(Context, payload);
         }
     }
 }

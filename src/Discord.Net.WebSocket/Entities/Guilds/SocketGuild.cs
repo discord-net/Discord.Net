@@ -1307,10 +1307,9 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public async Task DownloadUsersAsync()
-        {
-            await Discord.DownloadUsersAsync(new[] { this }).ConfigureAwait(false);
-        }
+        public Task DownloadUsersAsync()
+            => Discord.DownloadUsersAsync(new[] { this });
+
         internal void CompleteDownloadUsers()
         {
             _downloaderPromise.TrySetResultAsync(true);
@@ -1545,7 +1544,8 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="user">The user to disconnect.</param>
         /// <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
-        async Task IGuild.DisconnectAsync(IGuildUser user) => await user.ModifyAsync(x => x.Channel = null);
+        Task IGuild.DisconnectAsync(IGuildUser user)
+            => user.ModifyAsync(x => x.Channel = null);
         #endregion
 
         #region Stickers
@@ -1850,7 +1850,7 @@ namespace Discord.WebSocket
             }
         }
 
-        private async Task ModifyAudioInternalAsync(ulong channelId, Action<AudioChannelProperties> func, RequestOptions options)
+        private Task ModifyAudioInternalAsync(ulong channelId, Action<AudioChannelProperties> func, RequestOptions options)
         {
             if (_voiceStateUpdateParams == null || _voiceStateUpdateParams.ChannelId != channelId)
                 throw new InvalidOperationException("Cannot modify properties of not connected audio channel");
@@ -1863,7 +1863,7 @@ namespace Discord.WebSocket
             if (props.SelfMute.IsSpecified)
                 _voiceStateUpdateParams.SelfMute = props.SelfMute.Value;
 
-            await Discord.ApiClient.SendVoiceStateUpdateAsync(_voiceStateUpdateParams, options).ConfigureAwait(false);
+            return Discord.ApiClient.SendVoiceStateUpdateAsync(_voiceStateUpdateParams, options);
         }
 
         internal async Task FinishConnectAudio(string url, string token)

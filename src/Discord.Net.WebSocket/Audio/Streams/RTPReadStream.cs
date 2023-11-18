@@ -23,7 +23,7 @@ namespace Discord.Audio.Streams
 
         /// <exception cref="OperationCanceledException">The token has had cancellation requested.</exception>
         /// <exception cref="ObjectDisposedException">The associated <see cref="T:System.Threading.CancellationTokenSource" /> has been disposed.</exception>
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             cancelToken.ThrowIfCancellationRequested();
 
@@ -38,7 +38,7 @@ namespace Discord.Audio.Streams
                 (buffer[offset + 7] << 0));
 
             _next.WriteHeader(seq, timestamp, false);
-            await _next.WriteAsync(buffer, offset + headerSize, count - headerSize, cancelToken).ConfigureAwait(false);
+            return _next.WriteAsync(buffer, offset + headerSize, count - headerSize, cancelToken);
         }
 
         public static bool TryReadSsrc(byte[] buffer, int offset, out uint ssrc)

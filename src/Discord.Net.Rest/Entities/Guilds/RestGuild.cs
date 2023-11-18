@@ -296,10 +296,10 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="args" /> is <see langword="null"/>.</exception>
-        public async Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null)
+        public Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null)
         {
             var arr = args.ToArray();
-            await GuildHelper.ReorderChannelsAsync(this, Discord, arr, options).ConfigureAwait(false);
+            return GuildHelper.ReorderChannelsAsync(this, Discord, arr, options);
         }
         /// <inheritdoc />
         public async Task ReorderRolesAsync(IEnumerable<ReorderRoleProperties> args, RequestOptions options = null)
@@ -670,12 +670,12 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous get operation. The task result contains the widget channel set
         ///     within the server's widget settings; <see langword="null"/> if none is set.
         /// </returns>
-        public async Task<RestGuildChannel> GetWidgetChannelAsync(RequestOptions options = null)
+        public Task<RestGuildChannel> GetWidgetChannelAsync(RequestOptions options = null)
         {
             var widgetChannelId = WidgetChannelId;
             if (widgetChannelId.HasValue)
-                return await GuildHelper.GetChannelAsync(this, Discord, widgetChannelId.Value, options).ConfigureAwait(false);
-            return null;
+                return GuildHelper.GetChannelAsync(this, Discord, widgetChannelId.Value, options);
+            return Task.FromResult<RestGuildChannel>(null);
         }
 
         /// <summary>
@@ -1053,8 +1053,9 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of application commands found within the guild.
         /// </returns>
-        public async Task<IReadOnlyCollection<RestGuildCommand>> GetApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null)
-            => await ClientHelper.GetGuildApplicationCommandsAsync(Discord, Id, withLocalizations, locale, options).ConfigureAwait(false);
+        public Task<IReadOnlyCollection<RestGuildCommand>> GetApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null)
+            => ClientHelper.GetGuildApplicationCommandsAsync(Discord, Id, withLocalizations, locale, options);
+
         /// <summary>
         ///     Gets an application command within this guild with the specified id.
         /// </summary>
@@ -1064,8 +1065,9 @@ namespace Discord.Rest
         ///     A ValueTask that represents the asynchronous get operation. The task result contains a <see cref="IApplicationCommand"/>
         ///     if found, otherwise <see langword="null"/>.
         /// </returns>
-        public async Task<RestGuildCommand> GetApplicationCommandAsync(ulong id, RequestOptions options = null)
-            => await ClientHelper.GetGuildApplicationCommandAsync(Discord, id, Id, options);
+        public Task<RestGuildCommand> GetApplicationCommandAsync(ulong id, RequestOptions options = null)
+            => ClientHelper.GetGuildApplicationCommandAsync(Discord, id, Id, options);
+
         /// <summary>
         ///     Creates an application command within this guild.
         /// </summary>
@@ -1168,6 +1170,7 @@ namespace Discord.Rest
             using var fs = File.OpenRead(path);
             return await CreateStickerAsync(name, fs, Path.GetFileName(fs.Name), tags,  description,options);
         }
+
         /// <summary>
         ///     Creates a new sticker in this guild
         /// </summary>
@@ -1587,8 +1590,8 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)
             => await GetIntegrationsAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task IGuild.DeleteIntegrationAsync(ulong id, RequestOptions options)
-            => await DeleteIntegrationAsync(id, options).ConfigureAwait(false);
+        Task IGuild.DeleteIntegrationAsync(ulong id, RequestOptions options)
+            => DeleteIntegrationAsync(id, options);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuild.GetInvitesAsync(RequestOptions options)
@@ -1616,7 +1619,8 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="user">The user to disconnect.</param>
         /// <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
-        async Task IGuild.DisconnectAsync(IGuildUser user) => await user.ModifyAsync(x => x.Channel = null);
+        Task IGuild.DisconnectAsync(IGuildUser user)
+            => user.ModifyAsync(x => x.Channel = null);
 
         /// <inheritdoc />
         async Task<IGuildUser> IGuild.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

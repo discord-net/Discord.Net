@@ -95,13 +95,13 @@ namespace Discord.Audio
             UdpLatencyUpdated += async (old, val) => await _audioLogger.DebugAsync($"UDP Latency = {val} ms").ConfigureAwait(false);
         }
 
-        internal async Task StartAsync(string url, ulong userId, string sessionId, string token)
+        internal Task StartAsync(string url, ulong userId, string sessionId, string token)
         {
             _url = url;
             _userId = userId;
             _sessionId = sessionId;
             _token = token;
-            await _connection.StartAsync().ConfigureAwait(false);
+            return _connection.StartAsync();
         }
 
         public IReadOnlyDictionary<ulong, AudioInStream> GetStreams()
@@ -109,10 +109,8 @@ namespace Discord.Audio
             return _streams.ToDictionary(pair => pair.Key, pair => pair.Value.Reader);
         }
 
-        public async Task StopAsync()
-        {
-            await _connection.StopAsync().ConfigureAwait(false);
-        }
+        public Task StopAsync()
+            => _connection.StopAsync();
 
         private async Task OnConnectingAsync()
         {
