@@ -84,7 +84,7 @@ namespace Discord.WebSocket
                 {
                     var attachments = ImmutableArray.CreateBuilder<Attachment>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        attachments.Add(Attachment.Create(value[i]));
+                        attachments.Add(Attachment.Create(value[i], Discord));
                     _attachments = attachments.ToImmutable();
                 }
                 else
