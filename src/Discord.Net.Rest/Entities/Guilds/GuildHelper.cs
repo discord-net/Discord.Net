@@ -457,7 +457,7 @@ namespace Discord.Rest
                 AvailableTags = props.Tags.GetValueOrDefault(Array.Empty<ForumTagProperties>()).Select(
                     x => new ModifyForumTagParams
                     {
-                        Id = x.Id,
+                        Id = x.Id ?? Optional<ulong>.Unspecified,
                         Name = x.Name,
                         EmojiId = x.Emoji is Emote emote
                             ? emote.Id
