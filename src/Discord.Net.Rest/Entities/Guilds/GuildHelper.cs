@@ -4,6 +4,7 @@ using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -146,6 +147,24 @@ namespace Discord.Rest
 
             var mebibyte = Math.Pow(2, 20);
             return (ulong)(tierFactor * mebibyte);
+        }
+
+        public static async Task<GuildIncidentsData> ModifyGuildIncidentActionsAsync(IGuild guild, BaseDiscordClient client, Action<GuildIncidentsDataProperties> func, RequestOptions options = null)
+        {
+            var props = new GuildIncidentsDataProperties();
+            func(props);
+
+            var args = props.DmsDisabledUntil.IsSpecified || props.InvitesDisabledUntil.IsSpecified
+                ? new ModifyGuildIncidentsDataParams { DmsDisabledUntil = props.DmsDisabledUntil, InvitesDisabledUntil = props.InvitesDisabledUntil }
+                : null;
+
+            var model = await client.ApiClient.ModifyGuildIncidentActionsAsync(guild.Id, args, options);
+
+            return new GuildIncidentsData
+            {
+                DmsDisabledUntil = model.DmsDisabledUntil,
+                InvitesDisabledUntil = model.InvitesDisabledUntil
+            };
         }
         #endregion
 
@@ -407,6 +426,66 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestForumChannel.Create(client, guild, model);
         }
+
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
+        public static async Task<RestMediaChannel> CreateMediaChannelAsync(IGuild guild, BaseDiscordClient client,
+            string name, RequestOptions options, Action<ForumChannelProperties> func = null)
+        {
+            if (name == null)
+                throw new ArgumentNullException(paramName: nameof(name));
+
+            var props = new ForumChannelProperties();
+            func?.Invoke(props);
+
+            Preconditions.AtMost(props.Tags.IsSpecified ? props.Tags.Value.Count() : 0, 20, nameof(props.Tags), "Media channel can have max 20 tags.");
+
+            var args = new CreateGuildChannelParams(name, ChannelType.Media)
+            {
+                Position = props.Position,
+                Overwrites = props.PermissionOverwrites.IsSpecified
+                    ? props.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
+                SlowModeInterval = props.ThreadCreationInterval,
+                AvailableTags = props.Tags.GetValueOrDefault(Array.Empty<ForumTagProperties>()).Select(
+                    x => new ModifyForumTagParams
+                    {
+                        Id = x.Id ?? Optional<ulong>.Unspecified,
+                        Name = x.Name,
+                        EmojiId = x.Emoji is Emote emote
+                            ? emote.Id
+                            : Optional<ulong?>.Unspecified,
+                        EmojiName = x.Emoji is Emoji emoji
+                            ? emoji.Name
+                            : Optional<string>.Unspecified,
+                        Moderated = x.IsModerated
+                    }).ToArray(),
+                DefaultReactionEmoji = props.DefaultReactionEmoji.IsSpecified
+                    ? new API.ModifyForumReactionEmojiParams
+                    {
+                        EmojiId = props.DefaultReactionEmoji.Value is Emote emote ?
+                            emote.Id : Optional<ulong?>.Unspecified,
+                        EmojiName = props.DefaultReactionEmoji.Value is Emoji emoji ?
+                            emoji.Name : Optional<string>.Unspecified
+                    }
+                    : Optional<ModifyForumReactionEmojiParams>.Unspecified,
+                ThreadRateLimitPerUser = props.DefaultSlowModeInterval,
+                CategoryId = props.CategoryId,
+                IsNsfw = props.IsNsfw,
+                Topic = props.Topic,
+                DefaultAutoArchiveDuration = props.AutoArchiveDuration,
+                DefaultSortOrder = props.DefaultSortOrder.GetValueOrDefault(ForumSortOrder.LatestActivity),
+            };
+
+            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
+            return RestMediaChannel.Create(client, guild, model);
+        }
+
         #endregion
 
         #region Voice Regions
@@ -468,18 +547,30 @@ namespace Discord.Rest
         #region Roles
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
-            string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options)
+            string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options, Image? icon, Emoji emoji)
         {
             if (name == null)
                 throw new ArgumentNullException(paramName: nameof(name));
 
+            if (icon is not null || emoji is not null)
+            {
+                guild.Features.EnsureFeature(GuildFeature.RoleIcons);
+
+                if (icon is not null && emoji is not null)
+                {
+                    throw new ArgumentException("Emoji and Icon properties cannot be present on a role at the same time.");
+                }
+            }
+
             var createGuildRoleParams = new API.Rest.ModifyGuildRoleParams
             {
-                Color = color?.RawValue ?? Optional.Create<uint>(),
+                Color = color?.RawValue ?? Optional.Create<uint>(), 
                 Hoist = isHoisted,
                 Mentionable = isMentionable,
                 Name = name,
-                Permissions = permissions?.RawValue.ToString() ?? Optional.Create<string>()
+                Permissions = permissions?.RawValue.ToString() ?? Optional.Create<string>(),
+                Icon = icon?.ToModel(),
+                Emoji = emoji?.Name
             };
 
             var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, createGuildRoleParams, options).ConfigureAwait(false);
@@ -1100,8 +1191,8 @@ namespace Discord.Rest
 
             if (args.RegexPatterns.IsSpecified)
             {
-                if (args.TriggerType.Value is not AutoModTriggerType.Keyword)
-                    throw new ArgumentException(message: $"Regex patterns can only be used with 'Keyword' trigger type.", paramName: nameof(args.RegexPatterns));
+                if (args.TriggerType.Value is not AutoModTriggerType.Keyword and not AutoModTriggerType.MemberProfile)
+                    throw new ArgumentException(message: $"Regex patterns can only be used with 'Keyword' or 'MemberProfile' trigger type.", paramName: nameof(args.RegexPatterns));
 
                 Preconditions.AtMost(args.RegexPatterns.Value.Length, AutoModRuleProperties.MaxRegexPatternCount, nameof(args.RegexPatterns), $"Regex pattern count must be less than or equal to {AutoModRuleProperties.MaxRegexPatternCount}.");
 
@@ -1111,8 +1202,8 @@ namespace Discord.Rest
 
             if (args.KeywordFilter.IsSpecified)
             {
-                if (args.TriggerType.Value != AutoModTriggerType.Keyword)
-                    throw new ArgumentException(message: $"Keyword filter can only be used with 'Keyword' trigger type.", paramName: nameof(args.KeywordFilter));
+                if (args.TriggerType.Value is not AutoModTriggerType.Keyword and not AutoModTriggerType.MemberProfile)
+                    throw new ArgumentException(message: $"Keyword filter can only be used with 'Keyword' or 'MemberProfile' trigger type.", paramName: nameof(args.KeywordFilter));
 
                 Preconditions.AtMost(args.KeywordFilter.Value.Length, AutoModRuleProperties.MaxKeywordCount, nameof(args.KeywordFilter), $"Keyword count must be less than or equal to {AutoModRuleProperties.MaxKeywordCount}");
 
@@ -1125,8 +1216,8 @@ namespace Discord.Rest
 
             if (args.AllowList.IsSpecified)
             {
-                if (args.TriggerType.Value is not AutoModTriggerType.Keyword or AutoModTriggerType.KeywordPreset)
-                    throw new ArgumentException(message: $"Allow list can only be used with 'Keyword' or 'KeywordPreset' trigger type.", paramName: nameof(args.AllowList));
+                if (args.TriggerType.Value is not AutoModTriggerType.Keyword and not AutoModTriggerType.KeywordPreset and not AutoModTriggerType.MemberProfile)
+                    throw new ArgumentException(message: $"Allow list can only be used with 'Keyword', 'KeywordPreset' or 'MemberProfile' trigger type.", paramName: nameof(args.AllowList));
 
                 if (args.TriggerType.Value is AutoModTriggerType.Keyword)
                     Preconditions.AtMost(args.AllowList.Value.Length, AutoModRuleProperties.MaxAllowListCountKeyword, nameof(args.AllowList), $"Allow list entry count must be less than or equal to {AutoModRuleProperties.MaxAllowListCountKeyword}.");
@@ -1161,7 +1252,7 @@ namespace Discord.Rest
             if (args.ExemptChannels.IsSpecified)
                 Preconditions.AtMost(args.ExemptChannels.Value.Length, AutoModRuleProperties.MaxExemptChannels, nameof(args.ExemptChannels), $"Exempt channels count must be less than or equal to {AutoModRuleProperties.MaxExemptChannels}.");
 
-            if (!args.Actions.IsSpecified && args.Actions.Value.Length == 0)
+            if (!args.Actions.IsSpecified || args.Actions.Value.Length == 0)
             {
                 throw new ArgumentException(message: $"At least 1 action must be set for an auto moderation rule.", paramName: nameof(args.Actions));
             }

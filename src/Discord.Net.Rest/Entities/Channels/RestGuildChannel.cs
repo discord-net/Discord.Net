@@ -42,6 +42,7 @@ namespace Discord.Rest
                 ChannelType.Text => RestTextChannel.Create(discord, guild, model),
                 ChannelType.Voice => RestVoiceChannel.Create(discord, guild, model),
                 ChannelType.Stage => RestStageChannel.Create(discord, guild, model),
+                ChannelType.Media => RestMediaChannel.Create(discord, guild, model),
                 ChannelType.Forum => RestForumChannel.Create(discord, guild, model),
                 ChannelType.Category => RestCategoryChannel.Create(discord, guild, model),
                 ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.NewsThread => RestThreadChannel.Create(discord, guild, model),

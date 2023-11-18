@@ -145,7 +145,7 @@ namespace Discord.Rest
             => client.ApiClient.RemoveAllReactionsForEmoteAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name), options);
 
         public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
-            int? limit, BaseDiscordClient client, RequestOptions options)
+            int? limit, BaseDiscordClient client, ReactionType reactionType, RequestOptions options)
         {
             Preconditions.NotNull(emote, nameof(emote));
             var emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name));
@@ -162,7 +162,7 @@ namespace Discord.Rest
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
 
-                    var models = await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false);
+                    var models = await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, reactionType, options).ConfigureAwait(false);
                     return models.Select(x => RestUser.Create(client, x)).ToImmutableArray();
                 },
                 nextPage: (info, lastPage) =>

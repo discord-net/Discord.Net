@@ -65,6 +65,42 @@ namespace Discord.Rest
         public ApplicationInstallParams InstallParams { get; private set; }
 
         /// <inheritdoc />
+        public ApplicationDiscoverabilityState DiscoverabilityState { get; private set; }
+
+        /// <inheritdoc />
+        public DiscoveryEligibilityFlags DiscoveryEligibilityFlags { get; private set; }
+
+        /// <inheritdoc />
+        public ApplicationExplicitContentFilterLevel ExplicitContentFilterLevel { get; private set; }
+
+        /// <inheritdoc />
+        public bool IsHook { get; private set; }
+
+        /// <inheritdoc />
+        public IReadOnlyCollection<string> InteractionEventTypes { get; private set; }
+
+        /// <inheritdoc />
+        public ApplicationInteractionsVersion InteractionsVersion { get; private set; }
+
+        /// <inheritdoc />
+        public bool IsMonetized { get; private set; }
+
+        /// <inheritdoc />
+        public ApplicationMonetizationEligibilityFlags MonetizationEligibilityFlags { get; private set; }
+
+        /// <inheritdoc />
+        public ApplicationMonetizationState MonetizationState { get; private set; }
+
+        /// <inheritdoc />
+        public ApplicationRpcState RpcState { get; private set; }
+
+        /// <inheritdoc />
+        public ApplicationStoreState StoreState { get; private set; }
+
+        /// <inheritdoc />
+        public ApplicationVerificationState VerificationState { get; private set; }
+
+        /// <inheritdoc />
         public IReadOnlyCollection<string> Tags { get; private set; }
 
         internal RestApplication(BaseDiscordClient discord, ulong id)
@@ -113,6 +149,22 @@ namespace Discord.Rest
                 RedirectUris = model.RedirectUris.Value.ToImmutableArray();
 
             ApproximateGuildCount = model.ApproximateGuildCount.IsSpecified ? model.ApproximateGuildCount.Value : null;
+
+            DiscoverabilityState = model.DiscoverabilityState.GetValueOrDefault(ApplicationDiscoverabilityState.None);
+            DiscoveryEligibilityFlags = model.DiscoveryEligibilityFlags.GetValueOrDefault(DiscoveryEligibilityFlags.None);
+            ExplicitContentFilterLevel = model.ExplicitContentFilter.GetValueOrDefault(ApplicationExplicitContentFilterLevel.Disabled);
+            IsHook = model.IsHook;
+
+            InteractionEventTypes = model.InteractionsEventTypes.GetValueOrDefault(Array.Empty<string>()).ToImmutableArray();
+            InteractionsVersion = model.InteractionsVersion.GetValueOrDefault(ApplicationInteractionsVersion.Version1);
+
+            IsMonetized = model.IsMonetized;
+            MonetizationEligibilityFlags = model.MonetizationEligibilityFlags.GetValueOrDefault(ApplicationMonetizationEligibilityFlags.None);
+            MonetizationState = model.MonetizationState.GetValueOrDefault(ApplicationMonetizationState.None);
+
+            RpcState = model.RpcState.GetValueOrDefault(ApplicationRpcState.Disabled);
+            StoreState = model.StoreState.GetValueOrDefault(ApplicationStoreState.None);
+            VerificationState = model.VerificationState.GetValueOrDefault(ApplicationVerificationState.Ineligible);
         }
 
         /// <exception cref="InvalidOperationException">Unable to update this object from a different application token.</exception>

@@ -465,6 +465,17 @@ namespace Discord.API
                     return SendJsonAsync("PATCH", () => $"guilds/{guildId}/channels", channels, ids, options: options);
             }
         }
+
+        public async Task ModifyVoiceChannelStatusAsync(ulong channelId, string status, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            var payload = new ModifyVoiceStatusParams { Status = status };
+            var ids = new BucketIds();
+
+            await SendJsonAsync("PUT", () => $"channels/{channelId}/voice-status", payload, ids, options: options);
+        }
+
         #endregion
 
         #region Threads
@@ -1138,7 +1149,7 @@ namespace Discord.API
             return SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}", ids, options: options);
         }
 
-        public Task<IReadOnlyCollection<User>> GetReactionUsersAsync(ulong channelId, ulong messageId, string emoji, GetReactionUsersParams args, RequestOptions options = null)
+        public Task<IReadOnlyCollection<User>> GetReactionUsersAsync(ulong channelId, ulong messageId, string emoji, GetReactionUsersParams args, ReactionType reactionType, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
@@ -1153,8 +1164,8 @@ namespace Discord.API
             ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
 
             var ids = new BucketIds(channelId: channelId);
-            Expression<Func<string>> endpoint = () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}?limit={limit}&after={afterUserId}";
-            return SendAsync<IReadOnlyCollection<User>>("GET", endpoint, ids, options: options);
+            Expression<Func<string>> endpoint = () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}?limit={limit}&after={afterUserId}&type={(int)reactionType}";
+            return SendAsync<IReadOnlyCollection<User>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
 
         public Task AckMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
@@ -1677,6 +1688,16 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return SendAsync<GetGuildPruneCountResponse>("GET", () => $"guilds/{guildId}/prune?days={args.Days}{endpointRoleIds}", ids, options: options);
         }
+
+        public async Task<GuildIncidentsData> ModifyGuildIncidentActionsAsync(ulong guildId, ModifyGuildIncidentsDataParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            var ids = new BucketIds(guildId: guildId);
+
+            return await SendJsonAsync<GuildIncidentsData>("PUT", () => $"guilds/{guildId}/incident-actions", args, ids, options: options).ConfigureAwait(false);
+        }
+
         #endregion
 
         #region Guild Bans

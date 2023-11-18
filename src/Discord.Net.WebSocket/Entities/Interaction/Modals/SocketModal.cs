@@ -221,12 +221,6 @@ namespace Discord.WebSocket
             var embed = args.Embed;
             var embeds = args.Embeds;
 
-            bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : false;
-            bool hasEmbeds = embed.IsSpecified && embed.Value != null || embeds.IsSpecified && embeds.Value?.Length > 0;
-
-            if (!hasText && !hasEmbeds)
-                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
-
             var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
 
             if (embed.IsSpecified && embed.Value != null)

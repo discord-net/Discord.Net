@@ -249,6 +249,16 @@ namespace Discord
         /// <summary>
         ///     Guild Onboarding was updated.
         /// </summary>
-        OnboardingUpdated = 167
+        OnboardingUpdated = 167,
+
+        /// <summary>
+        ///     A voice channel status was updated by a user.
+        /// </summary>
+        VoiceChannelStatusUpdated = 192,
+
+        /// <summary>
+        ///     A voice channel status was deleted by a user.
+        /// </summary>
+        VoiceChannelStatusDeleted = 193
     }
 }
