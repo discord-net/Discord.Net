@@ -47,5 +47,10 @@ namespace Discord
         ///     Respond by showing the user a modal.
         /// </summary>
         Modal = 9,
+
+        /// <summary>
+        ///     Respond to an interaction with an upgrade button, only available for apps with monetization enabled.
+        /// </summary>
+        PremiumRequired = 10
     }
 }

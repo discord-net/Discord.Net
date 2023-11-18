@@ -7,6 +7,7 @@ using Discord.Net.Rest;
 using Newtonsoft.Json;
 
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -466,6 +467,17 @@ namespace Discord.API
                     break;
             }
         }
+
+        public async Task ModifyVoiceChannelStatusAsync(ulong channelId, string status, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            var payload = new ModifyVoiceStatusParams { Status = status };
+            var ids = new BucketIds();
+
+            await SendJsonAsync("PUT", () => $"channels/{channelId}/voice-status", payload, ids, options: options);
+        }
+
         #endregion
 
         #region Threads
@@ -618,11 +630,13 @@ namespace Discord.API
 
             if (limit.HasValue)
             {
-                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O")}&limit={limit.Value}";
+                string beforeEncoded = WebUtility.UrlEncode(before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O"));
+                query = $"?before={beforeEncoded}&limit={limit.Value}";
             }
             else if (before.HasValue)
             {
-                query = $"?before={before.Value.ToString("O")}";
+                string beforeEncoded = WebUtility.UrlEncode(before.Value.ToString("O"));
+                query = $"?before={beforeEncoded}";
             }
 
             return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/public{query}", bucket, options: options);
@@ -641,11 +655,13 @@ namespace Discord.API
 
             if (limit.HasValue)
             {
-                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O")}&limit={limit.Value}";
+                string beforeEncoded = WebUtility.UrlEncode(before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O"));
+                query = $"?before={beforeEncoded}&limit={limit.Value}";
             }
             else if (before.HasValue)
             {
-                query = $"?before={before.Value.ToString("O")}";
+                string beforeEncoded = WebUtility.UrlEncode(before.Value.ToString("O"));
+                query = $"?before={beforeEncoded}";
             }
 
             return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/private{query}", bucket, options: options);
@@ -1646,6 +1662,16 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<GetGuildPruneCountResponse>("GET", () => $"guilds/{guildId}/prune?days={args.Days}{endpointRoleIds}", ids, options: options).ConfigureAwait(false);
         }
+
+        public async Task<GuildIncidentsData> ModifyGuildIncidentActionsAsync(ulong guildId, ModifyGuildIncidentsDataParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            var ids = new BucketIds(guildId: guildId);
+
+            return await SendJsonAsync<GuildIncidentsData>("PUT", () => $"guilds/{guildId}/incident-actions", args, ids, options: options).ConfigureAwait(false);
+        }
+
         #endregion
 
         #region Guild Bans
@@ -2250,7 +2276,7 @@ namespace Discord.API
             return await SendAsync<GuildOnboarding>("GET", () => $"guilds/{guildId}/onboarding", new BucketIds(guildId: guildId), options: options);
         }
 
-        public async Task<GuildOnboarding> ModifyGuildOnboardingAsync(ulong guildId, ModifyGuildOnboardingParams args,  RequestOptions options)
+        public async Task<GuildOnboarding> ModifyGuildOnboardingAsync(ulong guildId, ModifyGuildOnboardingParams args, RequestOptions options)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
@@ -2683,6 +2709,56 @@ namespace Discord.API
 
         public async Task<RoleConnection> ModifyUserApplicationRoleConnectionAsync(ulong applicationId, RoleConnection connection, RequestOptions options = null)
         => await SendJsonAsync<RoleConnection>("PUT", () => $"users/@me/applications/{applicationId}/role-connection", connection, new BucketIds(), options: options);
+
+        #endregion
+
+        #region App Monetization
+
+        public async Task<Entitlement> CreateEntitlementAsync(CreateEntitlementParams args, RequestOptions options = null)
+            => await SendJsonAsync<Entitlement>("POST", () => $"applications/{CurrentApplicationId}/entitlements", args, new BucketIds(), options: options).ConfigureAwait(false);
+
+        public async Task DeleteEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => await SendAsync("DELETE", () => $"applications/{CurrentApplicationId}/entitlements/{entitlementId}", new BucketIds(), options: options).ConfigureAwait(false);
+
+        public async Task<Entitlement[]> ListEntitlementAsync(ListEntitlementsParams args, RequestOptions options = null)
+        {
+            var query = $"?limit={args.Limit.GetValueOrDefault(100)}";
+
+            if (args.UserId.IsSpecified)
+            {
+                query += $"&user_id={args.UserId.Value}";
+            }
+
+            if (args.SkuIds.IsSpecified)
+            {
+                query += $"&sku_ids={WebUtility.UrlEncode(string.Join(",", args.SkuIds.Value))}";
+            }
+
+            if (args.BeforeId.IsSpecified)
+            {
+                query += $"&before={args.BeforeId.Value}";
+            }
+
+            if (args.AfterId.IsSpecified)
+            {
+                query += $"&after={args.AfterId.Value}";
+            }
+
+            if (args.GuildId.IsSpecified)
+            {
+                query += $"&guild_id={args.GuildId.Value}";
+            }
+
+            if (args.ExcludeEnded.IsSpecified)
+            {
+                query += $"&exclude_ended={args.ExcludeEnded.Value}";
+            }
+
+            return await SendAsync<Entitlement[]>("GET", () => $"applications/{CurrentApplicationId}/entitlements{query}", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
+        public async Task<SKU[]> ListSKUsAsync(RequestOptions options = null)
+            => await SendAsync<SKU[]>("GET", () => $"applications/{CurrentApplicationId}/skus", new BucketIds(), options: options).ConfigureAwait(false);
 
         #endregion
     }

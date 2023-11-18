@@ -49,6 +49,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public IUserMessage ReferencedMessage => _referencedMessage;
 
+        /// <inheritdoc />
+        public MessageResolvedData ResolvedData { get; internal set; }
+
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
             : base(discord, id, channel, author, source)
         {
@@ -171,6 +174,34 @@ namespace Discord.WebSocket
                 }
                 else
                     _stickers = ImmutableArray.Create<SocketSticker>();
+            }
+
+            if (model.Resolved.IsSpecified)
+            {
+                var users = model.Resolved.Value.Users.IsSpecified
+                    ? model.Resolved.Value.Users.Value.Select(x => RestUser.Create(Discord, x.Value)).ToImmutableArray()
+                    : ImmutableArray<RestUser>.Empty;
+
+                var members = model.Resolved.Value.Members.IsSpecified
+                    ? model.Resolved.Value.Members.Value.Select(x =>
+                    {
+                        x.Value.User = model.Resolved.Value.Users.Value.TryGetValue(x.Key, out var user)
+                            ? user
+                            : null;
+
+                        return RestGuildUser.Create(Discord, guild, x.Value);
+                    }).ToImmutableArray()
+                    : ImmutableArray<RestGuildUser>.Empty;
+
+                var roles = model.Resolved.Value.Roles.IsSpecified
+                    ? model.Resolved.Value.Roles.Value.Select(x => RestRole.Create(Discord, guild, x.Value)).ToImmutableArray()
+                    : ImmutableArray<RestRole>.Empty;
+
+                var channels = model.Resolved.Value.Channels.IsSpecified
+                    ? model.Resolved.Value.Channels.Value.Select(x => RestChannel.Create(Discord, x.Value, guild)).ToImmutableArray()
+                    : ImmutableArray<RestChannel>.Empty;
+
+                ResolvedData = new MessageResolvedData(users, members, roles, channels);
             }
         }
 

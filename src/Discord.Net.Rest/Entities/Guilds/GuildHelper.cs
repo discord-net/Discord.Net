@@ -4,6 +4,7 @@ using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -146,6 +147,24 @@ namespace Discord.Rest
 
             var mebibyte = Math.Pow(2, 20);
             return (ulong)(tierFactor * mebibyte);
+        }
+
+        public static async Task<GuildIncidentsData> ModifyGuildIncidentActionsAsync(IGuild guild, BaseDiscordClient client, Action<GuildIncidentsDataProperties> func, RequestOptions options = null)
+        {
+            var props = new GuildIncidentsDataProperties();
+            func(props);
+
+            var args = props.DmsDisabledUntil.IsSpecified || props.InvitesDisabledUntil.IsSpecified
+                ? new ModifyGuildIncidentsDataParams { DmsDisabledUntil = props.DmsDisabledUntil, InvitesDisabledUntil = props.InvitesDisabledUntil }
+                : null;
+
+            var model = await client.ApiClient.ModifyGuildIncidentActionsAsync(guild.Id, args, options);
+
+            return new GuildIncidentsData
+            {
+                DmsDisabledUntil = model.DmsDisabledUntil,
+                InvitesDisabledUntil = model.InvitesDisabledUntil
+            };
         }
         #endregion
 
@@ -470,18 +489,30 @@ namespace Discord.Rest
         #region Roles
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
-            string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options)
+            string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options, Image? icon, Emoji emoji)
         {
             if (name == null)
                 throw new ArgumentNullException(paramName: nameof(name));
 
+            if (icon is not null || emoji is not null)
+            {
+                guild.Features.EnsureFeature(GuildFeature.RoleIcons);
+
+                if (icon is not null && emoji is not null)
+                {
+                    throw new ArgumentException("Emoji and Icon properties cannot be present on a role at the same time.");
+                }
+            }
+
             var createGuildRoleParams = new API.Rest.ModifyGuildRoleParams
             {
-                Color = color?.RawValue ?? Optional.Create<uint>(),
+                Color = color?.RawValue ?? Optional.Create<uint>(), 
                 Hoist = isHoisted,
                 Mentionable = isMentionable,
                 Name = name,
-                Permissions = permissions?.RawValue.ToString() ?? Optional.Create<string>()
+                Permissions = permissions?.RawValue.ToString() ?? Optional.Create<string>(),
+                Icon = icon?.ToModel(),
+                Emoji = emoji?.Name
             };
 
             var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, createGuildRoleParams, options).ConfigureAwait(false);

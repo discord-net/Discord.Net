@@ -143,6 +143,8 @@ namespace Discord.WebSocket
         public bool IsBoostProgressBarEnabled { get; private set; }
         /// <inheritdoc />
         public GuildFeatures Features { get; private set; }
+        /// <inheritdoc/>
+        public GuildIncidentsData IncidentsData { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -560,6 +562,9 @@ namespace Discord.WebSocket
             PreferredCulture = PreferredLocale == null ? null : new CultureInfo(PreferredLocale);
             if (model.IsBoostProgressBarEnabled.IsSpecified)
                 IsBoostProgressBarEnabled = model.IsBoostProgressBarEnabled.Value;
+            IncidentsData = model.IncidentsData is not null
+                ? new GuildIncidentsData { DmsDisabledUntil = model.IncidentsData.DmsDisabledUntil, InvitesDisabledUntil = model.IncidentsData.InvitesDisabledUntil }
+                : new GuildIncidentsData();
             if (model.Emojis != null)
             {
                 var emojis = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
@@ -656,6 +661,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task LeaveAsync(RequestOptions options = null)
             => GuildHelper.LeaveAsync(this, Discord, options);
+
+        /// <inheritdoc />
+        public Task<GuildIncidentsData> ModifyIncidentActionsAsync(Action<GuildIncidentsDataProperties> props, RequestOptions options = null)
+            => GuildHelper.ModifyGuildIncidentActionsAsync(this, Discord, props, options);
+
         #endregion
 
         #region Bans
@@ -1074,14 +1084,16 @@ namespace Discord.WebSocket
         /// <param name="isHoisted">Whether the role is separated from others on the sidebar.</param>
         /// <param name="isMentionable">Whether the role can be mentioned.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="icon">The icon for the role.</param>
+        /// <param name="emoji">The unicode emoji to be used as an icon for the role.</param>
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null"/>.</exception>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
         public Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
-            bool isHoisted = false, bool isMentionable = false, RequestOptions options = null)
-            => GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, isMentionable, options);
+            bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null)
+            => GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, isMentionable, options, icon, emoji);
         internal SocketRole AddRole(RoleModel model)
         {
             var role = SocketRole.Create(this, Discord.State, model);
@@ -2104,8 +2116,8 @@ namespace Discord.WebSocket
         async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
             => await CreateRoleAsync(name, permissions, color, isHoisted, false, options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options)
-            => await CreateRoleAsync(name, permissions, color, isHoisted, isMentionable, options).ConfigureAwait(false);
+        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options, Image? icon, Emoji emoji)
+            => await CreateRoleAsync(name, permissions, color, isHoisted, isMentionable, options, icon, emoji).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
