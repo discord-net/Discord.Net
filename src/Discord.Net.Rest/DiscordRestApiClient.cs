@@ -467,6 +467,17 @@ namespace Discord.API
                     break;
             }
         }
+
+        public async Task ModifyVoiceChannelStatusAsync(ulong channelId, string status, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            var payload = new ModifyVoiceStatusParams { Status = status };
+            var ids = new BucketIds();
+
+            await SendJsonAsync("PUT", () => $"channels/{channelId}/voice-status", payload, ids, options: options);
+        }
+
         #endregion
 
         #region Threads

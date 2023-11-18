@@ -150,5 +150,13 @@ namespace Discord.Rest
 
             return Discord.ApiClient.ModifyUserVoiceState(Guild.Id, user.Id, args);
         }
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Setting voice channel status is not supported in stage channels.
+        /// </remarks>
+        /// <exception cref="NotSupportedException">Setting voice channel status is not supported in stage channels.</exception>
+        public override Task SetStatusAsync(string status, RequestOptions options = null)
+            => throw new NotSupportedException("Setting voice channel status is not supported in stage channels.");
     }
 }
