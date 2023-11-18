@@ -94,5 +94,8 @@ namespace Discord.API
 
         [JsonProperty("inventory_settings")]
         public Optional<GuildInventorySettings> InventorySettings { get; set; }
+
+        [JsonProperty("incidents_data")]
+        public GuildIncidentsData IncidentsData { get; set; }
     }
 }
