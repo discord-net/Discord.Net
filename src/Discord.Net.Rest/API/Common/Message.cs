@@ -67,5 +67,8 @@ namespace Discord.API
 
         [JsonProperty("thread")]
         public Optional<Channel> Thread { get; set; }
+
+        [JsonProperty("resolved")]
+        public Optional<MessageComponentInteractionDataResolved> Resolved { get; set; }
     }
 }
