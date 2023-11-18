@@ -224,16 +224,6 @@ namespace Discord.WebSocket
             var embed = args.Embed;
             var embeds = args.Embeds;
 
-            bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(Message.Content);
-            bool hasEmbeds = embed.IsSpecified && embed.Value != null || embeds.IsSpecified && embeds.Value?.Length > 0 || Message.Embeds.Any();
-            bool hasComponents = args.Components.IsSpecified && args.Components.Value != null;
-            bool hasAttachments = args.Attachments.IsSpecified;
-            bool hasFlags = args.Flags.IsSpecified;
-
-            // No content needed if modifying flags
-            if ((!hasComponents && !hasText && !hasEmbeds && !hasAttachments) && !hasFlags)
-                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
-
             var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
 
             if (embed.IsSpecified && embed.Value != null)
@@ -286,7 +276,9 @@ namespace Discord.WebSocket
             }
             else
             {
-                var response = new API.Rest.UploadInteractionFileParams(args.Attachments.Value.ToArray())
+                var attachments = args.Attachments.Value?.ToArray() ?? Array.Empty<FileAttachment>();
+
+                var response = new API.Rest.UploadInteractionFileParams(attachments)
                 {
                     Type = InteractionResponseType.UpdateMessage,
                     Content = args.Content,

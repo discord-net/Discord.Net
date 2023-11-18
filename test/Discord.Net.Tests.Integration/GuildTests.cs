@@ -18,6 +18,7 @@ namespace Discord
         {
             client = guildFixture.Client;
             guild = guildFixture.Guild;
+            this.output = output;
             output.WriteLine($"RestGuildFixture using guild: {guild.Id}");
             guildFixture.Client.Log += LogAsync;
         }

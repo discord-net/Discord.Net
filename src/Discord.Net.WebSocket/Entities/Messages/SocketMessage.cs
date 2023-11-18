@@ -237,7 +237,10 @@ namespace Discord.WebSocket
                                     parsed.MaxValues,
                                     parsed.Disabled,
                                     parsed.Type,
-                                    parsed.ChannelTypes.GetValueOrDefault()
+                                    parsed.ChannelTypes.GetValueOrDefault(),
+                                    parsed.DefaultValues.IsSpecified
+                                        ? parsed.DefaultValues.Value.Select(x => new SelectMenuDefaultValue(x.Id, x.Type))
+                                        : Array.Empty<SelectMenuDefaultValue>()
                                     );
                             }
                         default:

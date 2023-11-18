@@ -1,4 +1,3 @@
-using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -117,11 +116,20 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc cref="IDiscordInteraction.RespondWithModalAsync(Modal, RequestOptions)"/>
-        protected virtual async Task RespondWithModalAsync(Modal modal, RequestOptions options = null) => await Context.Interaction.RespondWithModalAsync(modal);
+        protected virtual async Task RespondWithModalAsync(Modal modal, RequestOptions options = null) 
+            => await Context.Interaction.RespondWithModalAsync(modal, options);
+
+        /// <inheritdoc cref="IDiscordInteractionExtentions.RespondWithModalAsync{T}(IDiscordInteraction, string, T, RequestOptions, Action{ModalBuilder})"/>
+        protected virtual async Task RespondWithModalAsync<TModal>(string customId, TModal modal, RequestOptions options = null, Action<ModalBuilder> modifyModal = null) where TModal : class, IModal
+            => await Context.Interaction.RespondWithModalAsync(customId, modal, options, modifyModal);
 
         /// <inheritdoc cref="IDiscordInteractionExtentions.RespondWithModalAsync{T}(IDiscordInteraction, string, RequestOptions, Action{ModalBuilder})"/>
-        protected virtual async Task RespondWithModalAsync<TModal>(string customId, RequestOptions options = null) where TModal : class, IModal
-            => await Context.Interaction.RespondWithModalAsync<TModal>(customId, options);
+        protected virtual async Task RespondWithModalAsync<TModal>(string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null) where TModal : class, IModal
+            => await Context.Interaction.RespondWithModalAsync<TModal>(customId, options, modifyModal);
+
+        /// <inheritdoc cref="IDiscordInteraction.RespondWithPremiumRequiredAsync(RequestOptions)"/>
+        protected virtual Task RespondWithPremiumRequiredAsync(RequestOptions options = null)
+            => Context.Interaction.RespondWithPremiumRequiredAsync(options);
 
         //IInteractionModuleBase
 

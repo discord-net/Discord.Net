@@ -182,5 +182,10 @@ namespace Discord
         ///     Allows sending voice messages.
         /// </summary>
         SendVoiceMessages = 1L << 46,
+
+        /// <summary>
+        ///     Allows setting voice channel status.
+        /// </summary>
+        SetVoiceChannelStatus = 1L << 48,
     }
 }
