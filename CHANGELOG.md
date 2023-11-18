@@ -1,5 +1,41 @@
 # Changelog
 
+## [3.13.0] - 2023-11-18
+
+### Added
+- #2707 Added Super reactions support (9fd5c6c)
+- #2725 Added Media channel support (e3cd340)
+- #2753 Added additional Update/Modify Async Attachment's (ae275ab)
+- #2769 Added missing parameters to `RespondWithModalAsync` methods and implement missing overloads (4e78aec)
+- #2773 Added useful utility methods to `ModalBuilder` (8591de7)
+- #2776 Added Select menu default values (ac274d4)
+- #2777 Added Voice channel status support (8060dcf)
+- #2781 Added premium subscriptions support (7723f61)
+- #2782 Added Avatar decorations support (f64d9d6)
+- #2784 Added App subscriptions additional support (a9a8da4)
+- #2783 Added Guild incident actions (9b36df3)
+- #2787 Added Embed `ToJsonString` & `(Try)Parse` (7b5c40a)
+- #2791 Added Automod member profile moderation, new application fields, use clyde ai & guild invenory settings (699554a)
+- #2792 Added create roles with icons (b45b774)
+- #2796 Added clips support (poggers) (89bebc3)
+
+### Fixed
+- #2758 Fixed Slash Command Localizations lost after AddCommandsToGuildAsync and deleteMissing = false (8d5022a)
+- #2759 Fixed missing null checks in `RoleConnectionProperties` (ab3b30d)
+- #2766 Fixed UpdateAsync Remove Attachment Bug (a668757)
+- #2763 Fixed SocketKickAuditLogData User never having value (5cfec05)
+- #2770 Fixed URL encode timestamps sent as query parameters (589c58a)
+- #2774 Fixed some IDiscordClient methods are not properly implemented in clients (8baf913)
+- #2789 Fixed multiline values in short TextInputs (33e8340)
+
+
+### Misc
+- #2739 Remove some unnecessary async/await (86655a8)
+- #2754 Replace Moq with NSubstitute for Mocking in GuildHelperTests (b988a18)
+- #2765 Use Discord heartbeat interval in audio. (9cedfbc)
+- #2771 Extract `GetDisplayAvatarUrl` in `IUser` (b1787d8)
+
+
 ## [3.12.0] - 2023-08-10
 
 ### Added
