@@ -236,6 +236,6 @@ namespace Discord.Rest
                 cachedAuthor ?? (model.User.IsSpecified
                     ? RestUser.Create(discord, model.User.Value)
                     : null),
-                model.IsAvailable.GetValueOrDefault(true));
+                model.IsAvailable.GetValueOrDefault(false));
     }
 }

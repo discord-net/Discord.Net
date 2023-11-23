@@ -522,9 +522,9 @@ namespace Discord.WebSocket
             client.EntitlementUpdated += (arg1, arg2) => _entitlementUpdated.InvokeAsync(arg1, arg2);
             client.EntitlementDeleted += (arg1) => _entitlementDeleted.InvokeAsync(arg1);
 
-            client.SoundboardSoundCreated += (arg1) => _soundboardSoundCreated.InvokeAsync(arg1);
-            client.SoundboardSoundUpdated += (arg1) => _soundboardSoundUpdated.InvokeAsync(arg1);
-            client.SoundboardSoundDeleted += (arg1) => _soundboardSoundDeleted.InvokeAsync(arg1);
+            client.SoundboardSoundCreated += (arg1, arg2) => _soundboardSoundCreated.InvokeAsync(arg1, arg2);
+            client.SoundboardSoundUpdated += (arg1, arg2, arg3) => _soundboardSoundUpdated.InvokeAsync(arg1, arg2, arg3);
+            client.SoundboardSoundDeleted += (arg1, arg2) => _soundboardSoundDeleted.InvokeAsync(arg1, arg2);
         }
 
         public async Task<SocketApplicationCommand> CreateGlobalApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)

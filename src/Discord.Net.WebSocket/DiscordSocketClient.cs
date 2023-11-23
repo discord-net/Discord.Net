@@ -3176,19 +3176,44 @@ namespace Discord.WebSocket
 
                             case "GUILD_SOUNDBOARD_SOUND_CREATE":
                                 {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_SOUNDBOARD_SOUND_CREATE)").ConfigureAwait(false);
+                                    var data = (payload as JToken).ToObject<API.SoundboardSound>(_serializer);
 
+                                    var guild = GetGuild(data.GuildId.Value);
+
+                                    var sound = guild.AddOrUpdateSoundboardSound(data);
+
+                                    await TimedInvokeAsync(_soundboardSoundCreated, nameof(SoundboardSoundCreated), guild, sound);
                                 }
                                 break;
 
                             case "GUILD_SOUNDBOARD_SOUND_UPDATE":
                                 {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_SOUNDBOARD_SOUND_UPDATE)").ConfigureAwait(false);
+                                    var data = (payload as JToken).ToObject<API.SoundboardSound>(_serializer);
 
+                                    var guild = GetGuild(data.GuildId.Value);
+
+                                    var before = guild.GetSoundboardSound(data.SoundId)?.Clone();
+                                    var beforeCacheable = new Cacheable<SoundboardSound, ulong>(before, data.SoundId, before is not null, () => null);
+
+                                    var after = guild.AddOrUpdateSoundboardSound(data);
+
+                                    await TimedInvokeAsync(_soundboardSoundUpdated, nameof(SoundboardSoundUpdated), guild, beforeCacheable, after);
                                 }
                                 break;
 
-                            case "GUILD_SOUNDBOARD_SOUND_DELETE ":
+                            case "GUILD_SOUNDBOARD_SOUND_DELETE":
                                 {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_SOUNDBOARD_SOUND_DELETE)").ConfigureAwait(false);
+                                    var data = (payload as JToken).ToObject<SoundboardSoundDeletedEvent>(_serializer);
 
+                                    var guild = GetGuild(data.GuildId);
+
+                                    var sound = guild.RemoveSoundboardSound(data.SoundId);
+                                    var soundCacheable = new Cacheable<SoundboardSound, ulong>(sound, data.SoundId, sound is not null, () => null);
+
+                                    await TimedInvokeAsync(_soundboardSoundDeleted, nameof(SoundboardSoundDeleted), guild, soundCacheable);
                                 }
                                 break;
 

@@ -26,6 +26,7 @@ using RoleModel = Discord.API.Role;
 using StickerModel = Discord.API.Sticker;
 using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
+using SoundboardSoundModel = Discord.API.SoundboardSound;
 
 namespace Discord.WebSocket
 {
@@ -2027,6 +2028,45 @@ namespace Discord.WebSocket
             var model = await GuildHelper.ModifyGuildOnboardingAsync(this, props, Discord, options);
 
             return new SocketGuildOnboarding(Discord, model, this);
+        }
+
+        #endregion
+
+        #region Soundboard
+
+        /// <summary>
+        ///     Gets a soundboard cached sound from this guild.
+        /// </summary>
+        public SoundboardSound GetSoundboardSound(ulong id)
+            => _soundboardSounds.TryGetValue(id, out var sound) ? sound : null;
+
+        internal SoundboardSound RemoveSoundboardSound(ulong id)
+            => _soundboardSounds.TryRemove(id, out var value) ? value : null;
+
+        internal SoundboardSound AddOrUpdateSoundboardSound(SoundboardSoundModel model)
+        {
+            if (_soundboardSounds.TryGetValue(model.SoundId, out var value))
+            {
+                value.Volume = model.Volume;
+                value.Name = model.Name;
+                value.IsAvailable = model.IsAvailable.GetValueOrDefault(false);
+                value.Author = (IUser)GetUser(model.UserId) ?? (model.User.IsSpecified
+                    ? RestUser.Create(Discord, model.User.Value)
+                    : null);
+
+                if (model.EmojiId is { IsSpecified: true, Value: not null })
+                    value.Emoji = new Emote(model.EmojiId.Value.Value, model.EmojiName.GetValueOrDefault(null), false);
+                else if (!string.IsNullOrWhiteSpace(model.EmojiName.GetValueOrDefault(null)))
+                    value.Emoji = new Emoji(model.EmojiName.GetValueOrDefault(null));
+                else
+                    value.Emoji = null;
+            }
+            else
+            {
+                value = model.ToEntity(GetUser(model.UserId), Discord);
+                _soundboardSounds[model.SoundId] = value;
+            }
+            return value;
         }
 
         #endregion

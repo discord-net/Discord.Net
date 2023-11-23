@@ -15,7 +15,7 @@ public class SoundboardSound : ISnowflakeEntity
     /// <summary>
     ///     Gets the Id of the sound.
     /// </summary>
-    public ulong SoundId { get; }
+    public ulong SoundId { get; internal set; }
 
     /// <inheritdoc />
     /// <remarks>
@@ -26,17 +26,17 @@ public class SoundboardSound : ISnowflakeEntity
     /// <summary>
     ///     Gets the name of the sound.
     /// </summary>
-    public string Name { get; }
+    public string Name { get; internal set; }
 
     /// <summary>
     ///     Gets the Id of the author of the sound.
     /// </summary>
-    public ulong AuthorId { get; }
+    public ulong AuthorId { get; internal set; }
 
     /// <summary>
     ///     Gets the author of the sound.
     /// </summary>
-    public IUser Author { get; }
+    public IUser Author { get; internal set; }
 
     /// <summary>
     ///     Gets the icon of the sound.
@@ -44,32 +44,32 @@ public class SoundboardSound : ISnowflakeEntity
     /// <remarks>
     ///     Custom emojis will only have Id property filled due to limited data returned by discord.
     /// </remarks>
-    public IEmote Emoji { get; }
+    public IEmote Emoji { get; internal set; }
 
     /// <summary>
     ///     Gets the volume of the sound.
     /// </summary>
-    public double Volume { get; }
+    public double Volume { get; internal set; }
 
     /// <summary>
     ///     Gets whether the sound is available or not.
     /// </summary>
-    public bool? Available { get; }
+    public bool? IsAvailable { get; internal set; }
 
     /// <summary>
     ///     Gets the Id of the guild this sound belongs to. <see langword="null"/> if not available.
     /// </summary>
-    public ulong? GuildId { get; }
+    public ulong? GuildId { get; internal set; }
 
     internal SoundboardSound(ulong soundId, string name, ulong authorId, double volume, ulong? guildId = null,
-        string emojiName = null, ulong? emojiId = null, IUser author = null, bool? available = null)
+        string emojiName = null, ulong? emojiId = null, IUser author = null, bool? isAvailable = null)
     {
         GuildId = guildId;
         SoundId = soundId; 
         Name = name;
         AuthorId = authorId;
         Author = author;
-        Available = available;
+        IsAvailable = isAvailable;
         Volume = volume;
 
         if (emojiId is not null)
@@ -81,6 +81,8 @@ public class SoundboardSound : ISnowflakeEntity
     }
 
     private string DebuggerDisplay => $"{Name} ({SoundId})";
+
+    internal SoundboardSound Clone() => (SoundboardSound)MemberwiseClone();
 
     /// <summary>
     ///     Gets the url for the sound.
