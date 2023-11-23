@@ -440,5 +440,16 @@ namespace Discord.Rest
         }
 
         #endregion
+
+        #region Soundboard
+
+        public static async Task<IReadOnlyCollection<SoundboardSound>> GetDefaultSoundboardSoundsAsync(BaseDiscordClient client, RequestOptions options = null)
+        {
+            var models = await client.ApiClient.GetDefaultSoundboardSoundsAsync(options).ConfigureAwait(false);
+
+            return models.Select(x => x.ToEntity(discord: client)).ToImmutableArray();
+        }
+
+        #endregion
     }
 }

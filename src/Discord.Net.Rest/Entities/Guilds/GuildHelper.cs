@@ -1408,15 +1408,7 @@ namespace Discord.Rest
 
             var model = await client.ApiClient.CreateSoundboardSoundAsync(guild.Id, args, options);
 
-            return new SoundboardSound(model.Id,
-                model.Name,
-                model.UserId,
-                model.Volume,
-                model.OverridePath,
-                model.Name,
-                model.EmojiId.GetValueOrDefault(null),
-                model.User.IsSpecified ? RestUser.Create(client, model.User.Value) : null,
-                model.Available.IsSpecified ? model.Available.Value : null);
+            return model.ToEntity(discord: client);
         }
 
         #endregion

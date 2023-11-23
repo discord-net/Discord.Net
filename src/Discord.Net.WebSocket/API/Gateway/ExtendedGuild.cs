@@ -31,5 +31,8 @@ namespace Discord.API.Gateway
 
         [JsonProperty("guild_scheduled_events")]
         public GuildScheduledEvent[] GuildScheduledEvents { get; set; }
+
+        [JsonProperty("soundboard_sounds")]
+        public SoundboardSound[] SoundboardSounds { get; set; } 
     }
 }

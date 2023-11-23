@@ -37,17 +37,7 @@ namespace Discord
         ///     A URL pointing to the soundboard sound.
         /// </returns>
         public static string GetSoundboardSoundUrl(ulong soundId)
-            => $"{DiscordConfig.CDNUrl}soundboard-sounds/{soundId}";
-
-        /// <summary>
-        ///     Returns a soundboard default sound URL.
-        /// </summary>
-        /// <param name="soundName">The name of the sound.</param>
-        /// <returns>
-        ///     A URL pointing to the soundboard default sound.
-        /// </returns>
-        public static string GetSoundboardDefaultSoundUrl(string soundName)
-            => soundName != null ? $"{DiscordConfig.CDNUrl}soundboard-default-sounds/{soundName}" : null;
+            => $"{DiscordConfig.CDNUrl}soundboard-sounds/{soundId}.mp3";
 
         /// <summary>
         ///     Returns a user avatar URL.

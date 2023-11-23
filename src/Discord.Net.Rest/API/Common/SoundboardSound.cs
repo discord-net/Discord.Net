@@ -4,8 +4,8 @@ namespace Discord.API;
 
 internal class SoundboardSound
 {
-    [JsonProperty("id")]
-    public ulong Id { get; set; }
+    [JsonProperty("sound_id")]
+    public ulong SoundId { get; set; }
 
     [JsonProperty("name")]
     public string Name { get; set; }
@@ -19,8 +19,8 @@ internal class SoundboardSound
     [JsonProperty("emoji_name")]
     public Optional<string> EmojiName { get; set; }
 
-    [JsonProperty("override_path")]
-    public string OverridePath { get; set; }
+    [JsonProperty("guild_id")]
+    public Optional<ulong> GuildId { get; set; }
 
     [JsonProperty("user_id")]
     public ulong UserId { get; set; }
@@ -29,5 +29,5 @@ internal class SoundboardSound
     public Optional<User> User { get; set; }
 
     [JsonProperty("available")]
-    public Optional<bool> Available { get; set; }
+    public Optional<bool> IsAvailable { get; set; }
 }

@@ -2814,7 +2814,7 @@ namespace Discord.API
 
         #region Soundboard
 
-        public async Task<SoundboardSound> CreateSoundboardSoundAsync(ulong guildId, CreateSoundboardSoundParams args, RequestOptions options = null)
+        public Task<SoundboardSound> CreateSoundboardSoundAsync(ulong guildId, CreateSoundboardSoundParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -2822,7 +2822,14 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             var ids = new BucketIds(guildId: guildId);
 
-            return await SendJsonAsync<SoundboardSound>("POST", () => $"guilds/{guildId}/soundboard-sounds", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<SoundboardSound>("POST", () => $"guilds/{guildId}/soundboard-sounds", args, ids, options: options);
+        }
+
+        public Task<SoundboardSound[]> GetDefaultSoundboardSoundsAsync(RequestOptions options = null)
+        {
+            var ids = new BucketIds();
+
+            return SendAsync<SoundboardSound[]>("GET", () => "soundboard-default-sounds", ids: ids, options: options);
         }
 
         #endregion

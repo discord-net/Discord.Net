@@ -447,6 +447,10 @@ namespace Discord.WebSocket
         public Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null)
             => ClientHelper.ListSKUsAsync(this, options);
 
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<SoundboardSound>> GetDefaultSoundboardSoundsAsync(RequestOptions options = null)
+            => ClientHelper.GetDefaultSoundboardSoundsAsync(this, options);
+
         /// <summary>
         ///     Gets entitlements from cache.
         /// </summary>
