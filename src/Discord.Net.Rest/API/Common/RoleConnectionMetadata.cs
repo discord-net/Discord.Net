@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Discord.API;
 
-public class RoleConnectionMetadata
+internal class RoleConnectionMetadata
 {
     [JsonProperty("type")]
     public RoleConnectionMetadataType Type { get; set; }

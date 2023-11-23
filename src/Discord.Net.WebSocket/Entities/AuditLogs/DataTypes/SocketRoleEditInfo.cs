@@ -30,7 +30,7 @@ public struct SocketRoleEditInfo
     ///     Gets the color of this role.
     /// </summary>
     /// <returns>
-    ///     A color object representing the color assigned to this role; <c>null</c> if this role does not have a
+    ///     A color object representing the color assigned to this role; <see langword="null" /> if this role does not have a
     ///     color.
     /// </returns>
     public Color? Color { get; }
@@ -39,8 +39,8 @@ public struct SocketRoleEditInfo
     ///     Gets a value that indicates whether this role is mentionable.
     /// </summary>
     /// <returns>
-    ///     <c>true</c> if other members can mention this role in a text channel; otherwise <c>false</c>;
-    ///     <c>null</c> if this is not mentioned in this entry.
+    ///     <see langword="true" /> if other members can mention this role in a text channel; otherwise <see langword="false" />;
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public bool? Mentionable { get; }
 
@@ -49,8 +49,8 @@ public struct SocketRoleEditInfo
     ///     section on the user list).
     /// </summary>
     /// <returns>
-    ///     <c>true</c> if this role's members will appear in a separate section in the user list; otherwise
-    ///     <c>false</c>; <c>null</c> if this is not mentioned in this entry.
+    ///     <see langword="true" /> if this role's members will appear in a separate section in the user list; otherwise
+    ///     <see langword="false" />; <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public bool? Hoist { get; }
 
@@ -66,7 +66,7 @@ public struct SocketRoleEditInfo
     ///     Gets the permissions assigned to this role.
     /// </summary>
     /// <returns>
-    ///     A guild permissions object representing the permissions that have been assigned to this role; <c>null</c>
+    ///     A guild permissions object representing the permissions that have been assigned to this role; <see langword="null" />
     ///     if no permissions have been assigned.
     /// </returns>
     public GuildPermissions? Permissions { get; }

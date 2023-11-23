@@ -27,7 +27,7 @@ namespace Discord
 
         /// <summary> Fills the embed author field with the provided user's full username and avatar URL. </summary>
         public static EmbedBuilder WithAuthor(this EmbedBuilder builder, IUser user) =>
-            builder.WithAuthor($"{user.Username}#{user.Discriminator}", user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+            builder.WithAuthor(user.DiscriminatorValue != 0 ? $"{user.Username}#{user.Discriminator}" : user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
 
         /// <summary> Converts a <see cref="EmbedType.Rich"/> <see cref="IEmbed"/> object to a <see cref="EmbedBuilder"/>. </summary>
         /// <exception cref="InvalidOperationException">The embed type is not <see cref="EmbedType.Rich"/>.</exception>

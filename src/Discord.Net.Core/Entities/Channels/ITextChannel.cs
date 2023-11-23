@@ -14,7 +14,7 @@ namespace Discord
         ///     Gets a value that indicates whether the channel is NSFW.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the channel has the NSFW flag enabled; otherwise <c>false</c>.
+        ///     <see langword="true" /> if the channel has the NSFW flag enabled; otherwise <see langword="false" />.
         /// </returns>
         bool IsNsfw { get; }
 
@@ -22,7 +22,7 @@ namespace Discord
         ///     Gets the current topic for this text channel.
         /// </summary>
         /// <returns>
-        ///     A string representing the topic set in the channel; <c>null</c> if none is set.
+        ///     A string representing the topic set in the channel; <see langword="null" /> if none is set.
         /// </returns>
         string Topic { get; }
 

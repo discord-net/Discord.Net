@@ -9,6 +9,11 @@ namespace Discord
     public interface IUserMessage : IMessage
     {
         /// <summary>
+        ///     Gets the resolved data if the message has components. <see langword="null"/> otherwise.
+        /// </summary>
+        MessageResolvedData ResolvedData { get; }
+
+        /// <summary>
         ///     Gets the referenced message if it is a crosspost, channel follow add, pin, or reply message.
         /// </summary>
         /// <returns>

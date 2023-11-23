@@ -41,56 +41,56 @@ namespace Discord
         /// </summary>
         /// <returns>
         ///     A <see cref="DateTimeOffset"/> based on the timestamp present at the bottom left of the embed, or 
-        ///     <c>null</c> if none is set.
+        ///     <see langword="null" /> if none is set.
         /// </returns>
         DateTimeOffset? Timestamp { get; }
         /// <summary>
         ///     Gets the color of this embed.
         /// </summary>
         /// <returns>
-        ///     The color of the embed present on the side of the embed, or <c>null</c> if none is set.
+        ///     The color of the embed present on the side of the embed, or <see langword="null" /> if none is set.
         /// </returns>
         Color? Color { get; }
         /// <summary>
         ///     Gets the image of this embed.
         /// </summary>
         /// <returns>
-        ///     The image of the embed, or <c>null</c> if none is set.
+        ///     The image of the embed, or <see langword="null" /> if none is set.
         /// </returns>
         EmbedImage? Image { get; }
         /// <summary>
         ///     Gets the video of this embed.
         /// </summary>
         /// <returns>
-        ///     The video of the embed, or <c>null</c> if none is set.
+        ///     The video of the embed, or <see langword="null" /> if none is set.
         /// </returns>
         EmbedVideo? Video { get; }
         /// <summary>
         ///     Gets the author field of this embed.
         /// </summary>
         /// <returns>
-        ///     The author field of the embed, or <c>null</c> if none is set.
+        ///     The author field of the embed, or <see langword="null" /> if none is set.
         /// </returns>
         EmbedAuthor? Author { get; }
         /// <summary>
         ///     Gets the footer field of this embed.
         /// </summary>
         /// <returns>
-        ///     The author field of the embed, or <c>null</c> if none is set.
+        ///     The author field of the embed, or <see langword="null" /> if none is set.
         /// </returns>
         EmbedFooter? Footer { get; }
         /// <summary>
         ///     Gets the provider of this embed.
         /// </summary>
         /// <returns>
-        ///     The source of the embed, or <c>null</c> if none is set.
+        ///     The source of the embed, or <see langword="null" /> if none is set.
         /// </returns>
         EmbedProvider? Provider { get; }
         /// <summary>
         ///     Gets the thumbnail featured in this embed.
         /// </summary>
         /// <returns>
-        ///     The thumbnail featured in the embed, or <c>null</c> if none is set.
+        ///     The thumbnail featured in the embed, or <see langword="null" /> if none is set.
         /// </returns>
         EmbedThumbnail? Thumbnail { get; }
         /// <summary>

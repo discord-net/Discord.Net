@@ -103,6 +103,9 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(viewMonetizationAnalytics: true), GuildPermission.ViewMonetizationAnalytics);
             AssertFlag(() => new GuildPermissions(useSoundboard: true), GuildPermission.UseSoundboard);
             AssertFlag(() => new GuildPermissions(sendVoiceMessages: true), GuildPermission.SendVoiceMessages);
+            AssertFlag(() => new GuildPermissions(useClydeAI: true), GuildPermission.UseClydeAI);
+            AssertFlag(() => new GuildPermissions(createGuildExpressions: true), GuildPermission.CreateGuildExpressions);
+            AssertFlag(() => new GuildPermissions(setVoiceChannelStatus: true), GuildPermission.SetVoiceChannelStatus);
             AssertFlag(() => new GuildPermissions(useExternalSounds: true), GuildPermission.UseExternalSounds);
         }
 
@@ -185,6 +188,9 @@ namespace Discord
             AssertUtil(GuildPermission.ViewMonetizationAnalytics, x => x.ViewMonetizationAnalytics, (p, enable) => p.Modify(viewMonetizationAnalytics: enable));
             AssertUtil(GuildPermission.UseSoundboard, x => x.UseSoundboard, (p, enable) => p.Modify(useSoundboard: enable));
             AssertUtil(GuildPermission.SendVoiceMessages, x => x.SendVoiceMessages, (p, enable) => p.Modify(sendVoiceMessages: enable));
+            AssertUtil(GuildPermission.UseClydeAI, x => x.UseClydeAI, (p, enable) => p.Modify(useClydeAI: enable));
+            AssertUtil(GuildPermission.CreateGuildExpressions, x => x.CreateGuildExpressions, (p, enable) => p.Modify(createGuildExpressions: enable));
+            AssertUtil(GuildPermission.SetVoiceChannelStatus, x => x.SetVoiceChannelStatus, (p, enable) => p.Modify(setVoiceChannelStatus: enable));
             AssertUtil(GuildPermission.UseExternalSounds, x => x.UseExternalSounds, (p, enable) => p.Modify(useExternalSounds: enable));
         }
     }

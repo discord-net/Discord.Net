@@ -86,6 +86,9 @@ internal static class AuditLogHelper
             [ActionType.OnboardingQuestionCreated] = OnboardingPromptCreatedAuditLogData.Create,
             [ActionType.OnboardingQuestionUpdated] = OnboardingPromptUpdatedAuditLogData.Create,
             [ActionType.OnboardingUpdated] = OnboardingUpdatedAuditLogData.Create,
+
+            [ActionType.VoiceChannelStatusUpdated] = VoiceChannelStatusUpdateAuditLogData.Create,
+            [ActionType.VoiceChannelStatusDeleted] = VoiceChannelStatusDeletedAuditLogData.Create
         };
 
     public static IAuditLogData CreateData(BaseDiscordClient discord, EntryModel entry, Model log = null)

@@ -102,7 +102,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     This method gets the user present in the WebSocket cache with the given condition.
         ///     <note type="warning">
-        ///         Sometimes a user may return <c>null</c> due to Discord not sending offline users in large guilds
+        ///         Sometimes a user may return <see langword="null" /> due to Discord not sending offline users in large guilds
         ///         (i.e. guild with 100+ members) actively. To download users on startup and to see more information
         ///         about this subject, see <see cref="Discord.WebSocket.DiscordSocketConfig.AlwaysDownloadUsers" />.
         ///     </note>
@@ -114,7 +114,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     A generic WebSocket-based user; <c>null</c> when the user cannot be found.
+        ///     A generic WebSocket-based user; <see langword="null" /> when the user cannot be found.
         /// </returns>
         public abstract SocketUser GetUser(ulong id);
 
@@ -124,7 +124,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     This method gets the user present in the WebSocket cache with the given condition.
         ///     <note type="warning">
-        ///         Sometimes a user may return <c>null</c> due to Discord not sending offline users in large guilds
+        ///         Sometimes a user may return <see langword="null" /> due to Discord not sending offline users in large guilds
         ///         (i.e. guild with 100+ members) actively. To download users on startup and to see more information
         ///         about this subject, see <see cref="Discord.WebSocket.DiscordSocketConfig.AlwaysDownloadUsers" />.
         ///     </note>
@@ -138,16 +138,16 @@ namespace Discord.WebSocket
         /// <param name="username">The name of the user.</param>
         /// <param name="discriminator">The discriminator value of the user.</param>
         /// <returns>
-        ///     A generic WebSocket-based user; <c>null</c> when the user cannot be found.
+        ///     A generic WebSocket-based user; <see langword="null" /> when the user cannot be found.
         /// </returns>
-        public abstract SocketUser GetUser(string username, string discriminator);
+        public abstract SocketUser GetUser(string username, string discriminator = null);
         /// <summary>
         ///     Gets a channel.
         /// </summary>
         /// <param name="id">The snowflake identifier of the channel (e.g. `381889909113225237`).</param>
         /// <returns>
         ///     A generic WebSocket-based channel object (voice, text, category, etc.) associated with the identifier;
-        ///     <c>null</c> when the channel cannot be found.
+        ///     <see langword="null" /> when the channel cannot be found.
         /// </returns>
         public abstract SocketChannel GetChannel(ulong id);
         /// <summary>
@@ -155,7 +155,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="id">The guild snowflake identifier.</param>
         /// <returns>
-        ///     A WebSocket-based guild associated with the snowflake identifier; <c>null</c> when the guild cannot be
+        ///     A WebSocket-based guild associated with the snowflake identifier; <see langword="null" /> when the guild cannot be
         ///     found.
         /// </returns>
         public abstract SocketGuild GetGuild(ulong id);
@@ -173,7 +173,7 @@ namespace Discord.WebSocket
         /// <param name="id">The identifier of the voice region (e.g. <c>eu-central</c> ).</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that contains a REST-based voice region associated with the identifier; <c>null</c> if the
+        ///     A task that contains a REST-based voice region associated with the identifier; <see langword="null" /> if the
         ///     voice region is not found.
         /// </returns>
         public abstract ValueTask<RestVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null);
@@ -227,6 +227,16 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous set operation.
         /// </returns>
         public abstract Task SetActivityAsync(IActivity activity);
+
+        /// <summary>
+        ///     Sets the custom status of the logged-in user.
+        /// </summary>
+        /// <param name="status">The string that will be displayed as status.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous set operation.
+        /// </returns>
+        public abstract Task SetCustomStatusAsync(string status);
+
         /// <summary>
         ///     Attempts to download users into the user cache for the selected guilds.
         /// </summary>

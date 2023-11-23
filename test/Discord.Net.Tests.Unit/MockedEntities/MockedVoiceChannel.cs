@@ -75,6 +75,8 @@ namespace Discord
         public Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null) => throw new NotImplementedException();
         public IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null) => throw new NotImplementedException();
         public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null) => throw new NotImplementedException();
+        public Task SetStatusAsync(string status, RequestOptions options = null) => throw new NotImplementedException();
+
         public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null) => throw new NotImplementedException();
         public Task ModifyAsync(Action<AudioChannelProperties> func, RequestOptions options = null) => throw new NotImplementedException();
         public Task<IUserMessage> ModifyMessageAsync(ulong messageId, Action<MessageProperties> func, RequestOptions options = null) => throw new NotImplementedException();

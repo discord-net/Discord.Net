@@ -90,7 +90,7 @@ public class SocketChannelCreateAuditLogData : ISocketAuditLogData
     /// <returns>
     ///     An <see cref="int"/> representing the time in seconds required before the user can send another
     ///     message; <c>0</c> if disabled.
-    ///     <c>null</c> if this is not mentioned in this entry.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public int? SlowModeInterval { get; }
 
@@ -98,8 +98,8 @@ public class SocketChannelCreateAuditLogData : ISocketAuditLogData
     ///     Gets the value that indicates whether the created channel is NSFW.
     /// </summary>
     /// <returns>
-    ///     <c>true</c> if the created channel has the NSFW flag enabled; otherwise <c>false</c>.
-    ///     <c>null</c> if this is not mentioned in this entry.
+    ///     <see langword="true" /> if the created channel has the NSFW flag enabled; otherwise <see langword="false" />.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public bool? IsNsfw { get; }
 
@@ -109,7 +109,7 @@ public class SocketChannelCreateAuditLogData : ISocketAuditLogData
     /// <returns>
     ///     An <see cref="int"/> representing the bit-rate (bps) that the created voice channel defines and requests the
     ///     client(s) to use.
-    ///     <c>null</c> if this is not mentioned in this entry.
+    ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public int? Bitrate { get; }
 

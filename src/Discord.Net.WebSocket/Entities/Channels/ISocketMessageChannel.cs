@@ -54,7 +54,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <note type="warning">
         ///         This method requires the use of cache, which is not enabled by default; if caching is not enabled,
-        ///         this method will always return <c>null</c>. Please refer to
+        ///         this method will always return <see langword="null" />. Please refer to
         ///         <see cref="Discord.WebSocket.DiscordSocketConfig.MessageCacheSize" /> for more details.
         ///     </note>
         ///     <para>
@@ -64,7 +64,7 @@ namespace Discord.WebSocket
         /// </remarks>
         /// <param name="id">The snowflake identifier of the message.</param>
         /// <returns>
-        ///     A WebSocket-based message object; <c>null</c> if it does not exist in the cache or if caching is not
+        ///     A WebSocket-based message object; <see langword="null" /> if it does not exist in the cache or if caching is not
         ///     enabled.
         /// </returns>
         SocketMessage GetCachedMessage(ulong id);

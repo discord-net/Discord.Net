@@ -115,7 +115,7 @@ namespace Discord
         ///     This boolean is used to determine if the guild is currently connected to the WebSocket and is ready to be used/accessed.
         /// </remarks>
         /// <returns>
-        ///     <c>true</c> if this guild is currently connected and ready to be used; otherwise <see langword="false"/>.
+        ///     <see langword="true" /> if this guild is currently connected and ready to be used; otherwise <see langword="false"/>.
         /// </returns>
         bool Available { get; }
 
@@ -375,6 +375,16 @@ namespace Discord
         ///     Gets the upload limit in bytes for this guild. This number is dependent on the guild's boost status.
         /// </summary>
         ulong MaxUploadLimit { get; }
+
+        /// <summary>
+        ///     Get the inventory settings on the guild. <see langword="null"/> if not available in the guild.
+        /// </summary>
+        GuildInventorySettings? InventorySettings { get; }
+
+        /// <summary>
+        ///     Gets the incidents data for this guild.
+        /// </summary>
+        GuildIncidentsData IncidentsData { get; }
 
         /// <summary>
         ///     Modifies this guild.
@@ -729,6 +739,52 @@ namespace Discord
         Task<IReadOnlyCollection<IThreadChannel>> GetThreadChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         /// <summary>
+        ///     Gets a forum channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the stage channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the stage channel associated
+        ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<IForumChannel> GetForumChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of all forum channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     forum channels found within this guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IForumChannel>> GetForumChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a forum channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the stage channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the stage channel associated
+        ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<IMediaChannel> GetMediaChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of all forum channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     media channels found within this guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IMediaChannel>> GetMediaChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
         ///     Creates a new text channel in this guild.
         /// </summary>
         /// <example>
@@ -789,6 +845,18 @@ namespace Discord
         ///     forum channel.
         /// </returns>
         Task<IForumChannel> CreateForumChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new media channel in this guild.
+        /// </summary>
+        /// <param name="name">The new name for the media channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     forum channel.
+        /// </returns>
+        Task<IMediaChannel> CreateMediaChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null);
 
         /// <summary>
         ///     Gets a collection of all the voice regions this guild can access.
@@ -870,11 +938,13 @@ namespace Discord
         /// <param name="isHoisted">Whether the role is separated from others on the sidebar.</param>
         /// <param name="isMentionable">Whether the role can be mentioned.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="icon">The icon for the role.</param>
+        /// <param name="emoji">The unicode emoji to be used as an icon for the role.</param>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null);
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null);
 
         /// <summary>
         ///     Adds a user to this guild.
@@ -966,7 +1036,7 @@ namespace Discord
         ///         This method removes all users that have not logged on in the provided number of <paramref name="days"/>.
         ///     </para>
         ///     <para>
-        ///         If <paramref name="simulate" /> is <c>true</c>, this method will only return the number of users that
+        ///         If <paramref name="simulate" /> is <see langword="true" />, this method will only return the number of users that
         ///         would be removed without kicking the users.
         ///     </para>
         /// </remarks>
@@ -1317,5 +1387,21 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the created <see cref="IGuildOnboarding"/>.
         /// </returns>
         Task<IGuildOnboarding> GetOnboardingAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies the onboarding object configured for the guild.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="IGuildOnboarding"/>.
+        /// </returns>
+        Task<IGuildOnboarding> ModifyOnboardingAsync(Action<GuildOnboardingProperties> props, RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies the incident actions of the guild.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="IncidentsData"/>.
+        /// </returns>
+        Task<GuildIncidentsData> ModifyIncidentActionsAsync(Action<GuildIncidentsDataProperties> props, RequestOptions options = null);
     }
 }

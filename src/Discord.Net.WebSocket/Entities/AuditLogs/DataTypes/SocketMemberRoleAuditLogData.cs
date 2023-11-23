@@ -22,7 +22,7 @@ public class SocketMemberRoleAuditLogData : ISocketAuditLogData
 
         var roleInfos = changes.SelectMany(x => x.NewValue.ToObject<API.Role[]>(discord.ApiClient.Serializer),
                 (model, role) => new { model.ChangedProperty, Role = role })
-            .Select(x => new SocketMemberRoleEditInfo(x.Role.Name, x.Role.Id, x.ChangedProperty == "$add"))
+            .Select(x => new SocketMemberRoleEditInfo(x.Role.Name, x.Role.Id, x.ChangedProperty == "$add", x.ChangedProperty == "$remove"))
             .ToList();
 
         var cachedUser = discord.GetUser(entry.TargetId!.Value);
