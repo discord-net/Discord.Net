@@ -564,7 +564,7 @@ namespace Discord.Rest
 
             var createGuildRoleParams = new API.Rest.ModifyGuildRoleParams
             {
-                Color = color?.RawValue ?? Optional.Create<uint>(), 
+                Color = color?.RawValue ?? Optional.Create<uint>(),
                 Hoist = isHoisted,
                 Mentionable = isMentionable,
                 Name = name,
@@ -696,6 +696,38 @@ namespace Discord.Rest
             var models = await client.ApiClient.SearchGuildMembersAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
             return models.Select(x => RestGuildUser.Create(client, guild, x)).ToImmutableArray();
         }
+
+        public static async Task<MemberSearchResult> SearchUsersAsyncV2(IGuild guild, BaseDiscordClient client, int limit, MemberSearchParamsV2 args,
+            RequestOptions options)
+        {
+            var apiArgs = new SearchGuildMembersParamsV2
+            {
+                Limit = limit,
+                After = args is null
+                    ? null
+                    : new ()
+                    {
+                        UserId = args.After.UserId,
+                        GuildJoinedAt = args.After.GuildJoinedAt
+                    }
+            };
+
+            var model = await client.ApiClient.SearchGuildMembersAsyncV2(guild.Id, apiArgs, options);
+
+            return new MemberSearchResult(
+                model.GuildId,
+                model.Members.Select(x =>
+                    new MemberSearchData(
+                        RestGuildUser.Create(client, guild, x.Member),
+                        x.InviteCode,
+                        x.JoinSourceType,
+                        x.InviterId)
+                ).ToImmutableArray(),
+                model.PageResultCount,
+                model.TotalResultCount
+                );
+        }
+
         #endregion
 
         #region Audit logs
