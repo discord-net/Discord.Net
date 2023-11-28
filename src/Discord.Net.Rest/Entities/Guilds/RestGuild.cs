@@ -998,7 +998,7 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestGuildUser>> SearchUsersAsync(string query, int limit = DiscordConfig.MaxUsersPerBatch, RequestOptions options = null)
             => GuildHelper.SearchUsersAsync(this, Discord, query, limit, options);
 
-        public Task<MemberSearchResult> SearchUsersAsyncV2(int limit = DiscordConfig.MaxUsersPerBatch, MemberSearchParamsV2 args = null, RequestOptions options = null)
+        public Task<MemberSearchResult> SearchUsersAsyncV2(int limit = DiscordConfig.MaxUsersPerBatch, MemberSearchPropertiesV2 args = null, RequestOptions options = null)
             => GuildHelper.SearchUsersAsyncV2(this, Discord, limit, args, options);
         #endregion
 

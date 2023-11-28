@@ -11,7 +11,7 @@ internal class GuildSearchMemberData
     public string InviteCode { get; set; }
 
     [JsonProperty("join_source_type")]
-    public InviteSourceType JoinSourceType { get; set; }
+    public JoinSourceType JoinSourceType { get; set; }
 
     [JsonProperty("inviter_id")]
     public ulong? InviterId { get; set; }

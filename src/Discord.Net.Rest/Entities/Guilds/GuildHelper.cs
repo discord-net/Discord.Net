@@ -697,7 +697,7 @@ namespace Discord.Rest
             return models.Select(x => RestGuildUser.Create(client, guild, x)).ToImmutableArray();
         }
 
-        public static async Task<MemberSearchResult> SearchUsersAsyncV2(IGuild guild, BaseDiscordClient client, int limit, MemberSearchParamsV2 args,
+        public static async Task<MemberSearchResult> SearchUsersAsyncV2(IGuild guild, BaseDiscordClient client, int limit, MemberSearchPropertiesV2 args,
             RequestOptions options)
         {
             var apiArgs = new SearchGuildMembersParamsV2

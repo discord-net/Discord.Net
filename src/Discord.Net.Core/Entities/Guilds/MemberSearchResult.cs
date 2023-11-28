@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Discord.Rest;
+namespace Discord;
 
 public struct MemberSearchResult
 {
@@ -25,7 +25,7 @@ public struct MemberSearchResult
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 public readonly struct MemberSearchData
 {
-    public RestGuildUser User { get; }
+    public IGuildUser User { get; }
 
     public string SourceInviteCode { get; }
 
@@ -33,7 +33,7 @@ public readonly struct MemberSearchData
 
     public ulong? InviterId { get; }
 
-    public MemberSearchData(RestGuildUser user, string sourceInviteCode, JoinSourceType joinSourceType, ulong? inviterId)
+    public MemberSearchData(IGuildUser user, string sourceInviteCode, JoinSourceType joinSourceType, ulong? inviterId)
     {
         User = user;
         SourceInviteCode = sourceInviteCode;
@@ -41,5 +41,5 @@ public readonly struct MemberSearchData
         InviterId = inviterId;
     }
 
-    private string DebuggerDisplay => $"{User.DisplayName} ({User.Id})";
+    private string DebuggerDisplay => $"{User.Username} ({User.Id})";
 }
