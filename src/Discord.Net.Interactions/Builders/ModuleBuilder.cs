@@ -114,6 +114,16 @@ namespace Discord.Interactions.Builders
         /// </summary>
         public IReadOnlyList<ModalCommandBuilder> ModalCommands => _modalCommands;
 
+        /// <summary>
+        ///     Gets the install method for this command.
+        /// </summary>
+        public HashSet<ApplicationIntegrationType> IntegrationTypes { get; set; } = null;
+
+        /// <summary>
+        ///     Gets the context types this command can be executed in.
+        /// </summary>
+        public HashSet<ApplicationCommandContextType> ContextTypes { get; set; } = null;
+
         internal TypeInfo TypeInfo { get; set; }
 
         internal ModuleBuilder(InteractionService interactionService, ModuleBuilder parent = null)
@@ -420,6 +430,28 @@ namespace Discord.Interactions.Builders
             var subModule = new ModuleBuilder(InteractionService, this);
             configure(subModule);
             _subModules.Add(subModule);
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets <see cref="IntegrationTypes"/>.
+        /// </summary>
+        /// <param name="integrationTypes">Install types for this command.</param>
+        /// <returns>The builder instance.</returns>
+        public ModuleBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
+        {
+            IntegrationTypes = new HashSet<ApplicationIntegrationType>(integrationTypes);
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets <see cref="ContextTypes"/>.
+        /// </summary>
+        /// <param name="contextTypes">Context types the command can be executed in.</param>
+        /// <returns>The builder instance.</returns>
+        public ModuleBuilder WithContextTypes(params ApplicationCommandContextType[] contextTypes)
+        {
+            ContextTypes = new HashSet<ApplicationCommandContextType>(contextTypes);
             return this;
         }
 

@@ -89,7 +89,7 @@ namespace Discord
         IReadOnlyCollection<ApplicationCommandContextType> ContextTypes { get; }
 
         /// <summary>
-        ///     Gets the install method fo the command. <see langword="null" /> if not specified.
+        ///     Gets the install method for the command. <see langword="null" /> if not specified.
         /// </summary>
         IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
 

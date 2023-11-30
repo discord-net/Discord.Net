@@ -56,6 +56,16 @@ namespace Discord
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; set; }
 
+        /// <summary>
+        ///     Gets the install method for this command.
+        /// </summary>
+        public HashSet<ApplicationIntegrationType> IntegrationTypes { get; set; } = null;
+
+        /// <summary>
+        ///     Gets the context types this command can be executed in.
+        /// </summary>
+        public HashSet<ApplicationCommandContextType> ContextTypes { get; set; } = null;
+
         private string _name;
         private Dictionary<string, string> _nameLocalizations;
 
@@ -73,6 +83,8 @@ namespace Discord
                 DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified,
                 NameLocalizations = NameLocalizations,
                 IsNsfw = IsNsfw,
+                ContextTypes = ContextTypes,
+                IntegrationTypes = IntegrationTypes
             };
 
             return props;

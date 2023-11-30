@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -104,6 +105,12 @@ namespace Discord.Interactions.Builders
                     case NsfwCommandAttribute nsfwCommand:
                         builder.SetNsfw(nsfwCommand.IsNsfw);
                         break;
+                    case ContextTypeAttribute contextType:
+                        builder.WithContextTypes(contextType.ContextTypes.ToArray());
+                        break;
+                    case IntegrationTypeAttribute integrationType:
+                        builder.WithIntegrationTypes(integrationType.IntegrationTypes.ToArray());
+                        break;
                     default:
                         builder.AddAttributes(attribute);
                         break;
@@ -198,6 +205,12 @@ namespace Discord.Interactions.Builders
                     case NsfwCommandAttribute nsfwCommand:
                         builder.SetNsfw(nsfwCommand.IsNsfw);
                         break;
+                    case ContextTypeAttribute contextType:
+                        builder.WithContextTypes(contextType.ContextTypes.ToArray());
+                        break;
+                    case IntegrationTypeAttribute integrationType:
+                        builder.WithIntegrationTypes(integrationType.IntegrationTypes.ToArray());
+                        break;
                     default:
                         builder.WithAttributes(attribute);
                         break;
@@ -252,6 +265,12 @@ namespace Discord.Interactions.Builders
                         break;
                     case NsfwCommandAttribute nsfwCommand:
                         builder.SetNsfw(nsfwCommand.IsNsfw);
+                        break;
+                    case ContextTypeAttribute contextType:
+                        builder.WithContextTypes(contextType.ContextTypes.ToArray());
+                        break;
+                    case IntegrationTypeAttribute integrationType:
+                        builder.WithIntegrationTypes(integrationType.IntegrationTypes.ToArray());
                         break;
                     default:
                         builder.WithAttributes(attribute);

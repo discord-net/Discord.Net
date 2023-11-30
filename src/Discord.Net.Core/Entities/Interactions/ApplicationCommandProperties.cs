@@ -94,12 +94,12 @@ namespace Discord
         public Optional<GuildPermission> DefaultMemberPermissions { get; set; }
 
         /// <summary>
-        ///     
+        ///     Gets or sets the install method for this command.
         /// </summary>
         public Optional<HashSet<ApplicationIntegrationType>> IntegrationTypes { get; set; }
 
         /// <summary>
-        ///     
+        ///     Gets or sets context types this command can be executed in.
         /// </summary>
         public Optional<HashSet<ApplicationCommandContextType>> ContextTypes { get; set; }
 

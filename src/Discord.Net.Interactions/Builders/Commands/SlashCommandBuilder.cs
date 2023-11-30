@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Discord.Interactions.Builders
 {
@@ -34,6 +35,16 @@ namespace Discord.Interactions.Builders
         ///     Gets the default permissions needed for executing this command.
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; set; } = null;
+
+        /// <summary>
+        ///     Gets the install method for this command.
+        /// </summary>
+        public HashSet<ApplicationIntegrationType> IntegrationTypes { get; set; } = null;
+
+        /// <summary>
+        ///     Gets the context types this command can be executed in.
+        /// </summary>
+        public HashSet<ApplicationCommandContextType> ContextTypes { get; set; } = null; 
 
         internal SlashCommandBuilder(ModuleBuilder module) : base(module) { }
 
@@ -123,6 +134,28 @@ namespace Discord.Interactions.Builders
         public SlashCommandBuilder WithDefaultMemberPermissions(GuildPermission permissions)
         {
             DefaultMemberPermissions = permissions;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets <see cref="IntegrationTypes"/>.
+        /// </summary>
+        /// <param name="integrationTypes">Install types for this command.</param>
+        /// <returns>The builder instance.</returns>
+        public SlashCommandBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
+        {
+            IntegrationTypes = new HashSet<ApplicationIntegrationType>(integrationTypes);
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets <see cref="ContextTypes"/>.
+        /// </summary>
+        /// <param name="contextTypes">Context types the command can be executed in.</param>
+        /// <returns>The builder instance.</returns>
+        public SlashCommandBuilder WithContextTypes(params ApplicationCommandContextType[] contextTypes)
+        {
+            ContextTypes = new HashSet<ApplicationCommandContextType>(contextTypes);
             return this;
         }
 

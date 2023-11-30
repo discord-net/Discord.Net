@@ -27,6 +27,12 @@ namespace Discord.Interactions
         public GuildPermission? DefaultMemberPermissions { get; }
 
         /// <inheritdoc/>
+        public IReadOnlyCollection<ApplicationCommandContextType> ContextTypes { get; }
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
+
+        /// <inheritdoc/>
         public override IReadOnlyList<CommandParameterInfo> Parameters { get; }
 
         /// <inheritdoc/>
@@ -44,6 +50,8 @@ namespace Discord.Interactions
             IsEnabledInDm = builder.IsEnabledInDm;
             DefaultMemberPermissions = builder.DefaultMemberPermissions;
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
+            ContextTypes = builder.ContextTypes?.ToImmutableArray();
+            IntegrationTypes = builder.IntegrationTypes?.ToImmutableArray();
         }
 
         internal static ContextCommandInfo Create(Builders.ContextCommandBuilder builder, ModuleInfo module, InteractionService commandService)
