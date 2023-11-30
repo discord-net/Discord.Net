@@ -46,7 +46,11 @@ namespace Discord.Interactions.Builders
         /// </summary>
         public HashSet<ApplicationCommandContextType> ContextTypes { get; set; } = null;
 
-        internal ContextCommandBuilder(ModuleBuilder module) : base(module) { }
+        internal ContextCommandBuilder(ModuleBuilder module) : base(module)
+        {
+            IntegrationTypes = module.IntegrationTypes;
+            ContextTypes = module.ContextTypes;
+        }
 
         /// <summary>
         ///     Initializes a new <see cref="ContextCommandBuilder"/>.

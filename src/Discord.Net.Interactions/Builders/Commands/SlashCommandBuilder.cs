@@ -44,9 +44,13 @@ namespace Discord.Interactions.Builders
         /// <summary>
         ///     Gets the context types this command can be executed in.
         /// </summary>
-        public HashSet<ApplicationCommandContextType> ContextTypes { get; set; } = null; 
+        public HashSet<ApplicationCommandContextType> ContextTypes { get; set; } = null;
 
-        internal SlashCommandBuilder(ModuleBuilder module) : base(module) { }
+        internal SlashCommandBuilder(ModuleBuilder module) : base(module)
+        {
+            IntegrationTypes = module.IntegrationTypes;
+            ContextTypes = module.ContextTypes;
+        }
 
         /// <summary>
         ///     Initializes a new <see cref="SlashCommandBuilder"/>.

@@ -106,10 +106,10 @@ namespace Discord.Interactions.Builders
                         builder.SetNsfw(nsfwCommand.IsNsfw);
                         break;
                     case ContextTypeAttribute contextType:
-                        builder.WithContextTypes(contextType.ContextTypes.ToArray());
+                        builder.WithContextTypes(contextType.ContextTypes?.ToArray());
                         break;
                     case IntegrationTypeAttribute integrationType:
-                        builder.WithIntegrationTypes(integrationType.IntegrationTypes.ToArray());
+                        builder.WithIntegrationTypes(integrationType.IntegrationTypes?.ToArray());
                         break;
                     default:
                         builder.AddAttributes(attribute);
