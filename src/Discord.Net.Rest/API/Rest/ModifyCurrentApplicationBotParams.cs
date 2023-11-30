@@ -30,4 +30,7 @@ internal class ModifyCurrentApplicationBotParams
 
     [JsonProperty("tags")]
     public Optional<string[]> Tags { get; set; }
-}
+
+    [JsonProperty("integration_types")]
+    public Optional<ApplicationIntegrationType[]> IntegrationTypes { get; set; }
+} 

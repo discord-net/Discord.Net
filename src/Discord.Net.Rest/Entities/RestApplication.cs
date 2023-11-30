@@ -103,6 +103,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public IReadOnlyCollection<string> Tags { get; private set; }
 
+        /// <inheritdoc />
+        public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; private set; }
+
         internal RestApplication(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
@@ -165,6 +168,8 @@ namespace Discord.Rest
             RpcState = model.RpcState.GetValueOrDefault(ApplicationRpcState.Disabled);
             StoreState = model.StoreState.GetValueOrDefault(ApplicationStoreState.None);
             VerificationState = model.VerificationState.GetValueOrDefault(ApplicationVerificationState.Ineligible);
+
+            IntegrationTypes = model.IntegrationTypes.GetValueOrDefault([ApplicationIntegrationType.GuildInstall]).ToImmutableArray();
         }
 
         /// <exception cref="InvalidOperationException">Unable to update this object from a different application token.</exception>

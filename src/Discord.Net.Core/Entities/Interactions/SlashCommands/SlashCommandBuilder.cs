@@ -63,7 +63,7 @@ namespace Discord
                 Preconditions.AtMost(value?.Count ?? 0, MaxOptionsCount, nameof(value));
                 _options = value;
             }
-        }
+        }   
 
         /// <summary>
         ///     Gets the localization dictionary for the name field of this command.
@@ -74,6 +74,30 @@ namespace Discord
         ///     Gets the localization dictionary for the description field of this command.
         /// </summary>
         public IReadOnlyDictionary<string, string> DescriptionLocalizations => _descriptionLocalizations;
+
+        /// <summary>
+        ///     
+        /// </summary>
+        public HashSet<ApplicationCommandContextType> ContextTypes
+        {
+            get => _contextTypes;
+            set
+            {
+                _contextTypes = value;
+            }
+        }
+
+        /// <summary>
+        ///     
+        /// </summary>
+        public HashSet<ApplicationIntegrationType> IntegrationTypes
+        {
+            get => _integrationTypes;
+            set
+            {
+                _integrationTypes = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets whether the command is enabled by default when the app is added to a guild
@@ -100,6 +124,8 @@ namespace Discord
         private Dictionary<string, string> _nameLocalizations;
         private Dictionary<string, string> _descriptionLocalizations;
         private List<SlashCommandOptionBuilder> _options;
+        private HashSet<ApplicationIntegrationType> _integrationTypes;
+        private HashSet<ApplicationCommandContextType> _contextTypes;
 
         /// <summary>
         ///     Build the current builder into a <see cref="SlashCommandProperties"/> class.
@@ -117,6 +143,8 @@ namespace Discord
                 IsDMEnabled = IsDMEnabled,
                 DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified,
                 IsNsfw = IsNsfw,
+                ContextTypes = ContextTypes,
+                IntegrationTypes = IntegrationTypes
             };
 
             if (Options != null && Options.Any())
@@ -196,6 +224,28 @@ namespace Discord
         public SlashCommandBuilder WithDefaultMemberPermissions(GuildPermission? permissions)
         {
             DefaultMemberPermissions = permissions;
+            return this;
+        }
+
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="contextTypes"></param>
+        /// <returns></returns>
+        public SlashCommandBuilder WithContextTypes(params ApplicationCommandContextType[] contextTypes)
+        {
+            ContextTypes = new HashSet<ApplicationCommandContextType>(contextTypes);
+            return this;
+        }
+
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="integrationTypes"></param>
+        /// <returns></returns>
+        public SlashCommandBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
+        {
+            IntegrationTypes = new HashSet<ApplicationIntegrationType>(integrationTypes);
             return this;
         }
 

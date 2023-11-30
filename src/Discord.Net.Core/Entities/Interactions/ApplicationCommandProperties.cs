@@ -93,6 +93,16 @@ namespace Discord
         /// </summary>
         public Optional<GuildPermission> DefaultMemberPermissions { get; set; }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        public Optional<HashSet<ApplicationIntegrationType>> IntegrationTypes { get; set; }
+
+        /// <summary>
+        ///     
+        /// </summary>
+        public Optional<HashSet<ApplicationCommandContextType>> ContextTypes { get; set; }
+
         internal ApplicationCommandProperties() { }
     }
 }

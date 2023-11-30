@@ -54,4 +54,9 @@ public class ModifyApplicationProperties
     /// </remarks>
     public Optional<ApplicationFlags> Flags { get; set; }
 
+    /// <summary>
+    ///     Gets or sets application integration types of the application.
+    /// </summary>
+    public Optional<ApplicationIntegrationType[]> IntegrationTypes { get; set; }
+
 }
