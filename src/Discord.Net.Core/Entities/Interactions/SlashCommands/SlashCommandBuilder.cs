@@ -232,24 +232,28 @@ namespace Discord
         }
 
         /// <summary>
-        ///     
+        ///     Sets the install method for this command.
         /// </summary>
-        /// <param name="contextTypes"></param>
-        /// <returns></returns>
-        public SlashCommandBuilder WithContextTypes(params ApplicationCommandContextType[] contextTypes)
+        /// <param name="integrationTypes">Install types for this command.</param>
+        /// <returns>The builder instance.</returns>
+        public SlashCommandBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
         {
-            ContextTypes = new HashSet<ApplicationCommandContextType>(contextTypes);
+            IntegrationTypes = integrationTypes is not null
+                ? new HashSet<ApplicationIntegrationType>(integrationTypes)
+                : null;
             return this;
         }
 
         /// <summary>
-        ///     
+        ///     Sets context types this command can be executed in.
         /// </summary>
-        /// <param name="integrationTypes"></param>
-        /// <returns></returns>
-        public SlashCommandBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
+        /// <param name="contextTypes">Context types the command can be executed in.</param>
+        /// <returns>The builder instance.</returns>
+        public SlashCommandBuilder WithContextTypes(params ApplicationCommandContextType[] contextTypes)
         {
-            IntegrationTypes = new HashSet<ApplicationIntegrationType>(integrationTypes);
+            ContextTypes = contextTypes is not null
+                ? new HashSet<ApplicationCommandContextType>(contextTypes)
+                : null;
             return this;
         }
 

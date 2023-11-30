@@ -197,5 +197,31 @@ namespace Discord
             DefaultMemberPermissions = permissions;
             return this;
         }
+
+        /// <summary>
+        ///     Sets the install method for this command.
+        /// </summary>
+        /// <param name="integrationTypes">Install types for this command.</param>
+        /// <returns>The builder instance.</returns>
+        public UserCommandBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
+        {
+            IntegrationTypes = integrationTypes is not null
+                ? new HashSet<ApplicationIntegrationType>(integrationTypes)
+                : null;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets context types this command can be executed in.
+        /// </summary>
+        /// <param name="contextTypes">Context types the command can be executed in.</param>
+        /// <returns>The builder instance.</returns>
+        public UserCommandBuilder WithContextTypes(params ApplicationCommandContextType[] contextTypes)
+        {
+            ContextTypes = contextTypes is not null
+                ? new HashSet<ApplicationCommandContextType>(contextTypes)
+                : null;
+            return this;
+        }
     }
 }

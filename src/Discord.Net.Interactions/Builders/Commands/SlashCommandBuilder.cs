@@ -148,7 +148,9 @@ namespace Discord.Interactions.Builders
         /// <returns>The builder instance.</returns>
         public SlashCommandBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
         {
-            IntegrationTypes = new HashSet<ApplicationIntegrationType>(integrationTypes);
+            IntegrationTypes = integrationTypes is not null
+                ? new HashSet<ApplicationIntegrationType>(integrationTypes)
+                : null;
             return this;
         }
 
@@ -159,7 +161,9 @@ namespace Discord.Interactions.Builders
         /// <returns>The builder instance.</returns>
         public SlashCommandBuilder WithContextTypes(params ApplicationCommandContextType[] contextTypes)
         {
-            ContextTypes = new HashSet<ApplicationCommandContextType>(contextTypes);
+            ContextTypes = contextTypes is not null
+                ? new HashSet<ApplicationCommandContextType>(contextTypes)
+                : null;
             return this;
         }
 
