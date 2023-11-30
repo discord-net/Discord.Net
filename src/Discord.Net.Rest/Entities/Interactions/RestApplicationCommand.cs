@@ -112,8 +112,8 @@ namespace Discord.Rest
             DefaultMemberPermissions = new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(0).GetValueOrDefault(0));
             IsNsfw = model.Nsfw.GetValueOrDefault(false).GetValueOrDefault(false);
 
-            IntegrationTypes = model.IntegrationTypes.GetValueOrDefault([ApplicationIntegrationType.GuildInstall]).ToImmutableArray();
-            ContextTypes = model.ContextTypes.GetValueOrDefault([ApplicationCommandContextType.Guild, ApplicationCommandContextType.BotDm]);
+            IntegrationTypes = model.IntegrationTypes.GetValueOrDefault(null)?.ToImmutableArray();
+            ContextTypes = model.ContextTypes.GetValueOrDefault(null)?.ToImmutableArray();
         }
 
         /// <inheritdoc/>
