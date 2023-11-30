@@ -93,6 +93,9 @@ namespace Discord.Rest
         /// <inheritdoc cref="IDiscordInteraction.Entitlements" />
         public IReadOnlyCollection<RestEntitlement> Entitlements { get; private set; }
 
+        /// <inheritdoc/>
+        public Dictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; private set; }
+
         internal RestInteraction(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
@@ -232,6 +235,8 @@ namespace Discord.Rest
                 : null;
 
             Entitlements = model.Entitlements.Select(x => RestEntitlement.Create(discord, x)).ToImmutableArray();
+
+            IntegrationOwners = model.IntegrationOwners;
         }
 
         internal string SerializePayload(object payload)

@@ -67,6 +67,12 @@ namespace Discord.Rest
         /// </remarks>
         public string DescriptionLocalized { get; private set; }
 
+        /// <inheritdoc />
+        public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; private set; }
+
+        /// <inheritdoc />
+        public IReadOnlyCollection<ApplicationCommandContextType> ContextTypes { get; private set; }
+
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(Id);
@@ -105,6 +111,9 @@ namespace Discord.Rest
             IsEnabledInDm = model.DmPermission.GetValueOrDefault(true).GetValueOrDefault(true);
             DefaultMemberPermissions = new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(0).GetValueOrDefault(0));
             IsNsfw = model.Nsfw.GetValueOrDefault(false).GetValueOrDefault(false);
+
+            IntegrationTypes = model.IntegrationTypes.GetValueOrDefault([ApplicationIntegrationType.GuildInstall]).ToImmutableArray();
+            ContextTypes = model.ContextTypes.GetValueOrDefault([ApplicationCommandContextType.Guild, ApplicationCommandContextType.BotDm]);
         }
 
         /// <inheritdoc/>

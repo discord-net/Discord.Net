@@ -133,6 +133,10 @@ namespace Discord
         /// <returns>A <see cref="SlashCommandProperties"/> that can be used to create slash commands.</returns>
         public SlashCommandProperties Build()
         {
+            // doing ?? 1 for now until we know default values (if these become non-optional)
+            Preconditions.AtLeast(_contextTypes?.Count ?? 1, 1, nameof(ContextTypes), "At least 1 context type must be specified");
+            Preconditions.AtLeast(_integrationTypes?.Count ?? 1, 1, nameof(IntegrationTypes), "At least 1 integration type must be specified");
+
             var props = new SlashCommandProperties
             {
                 Name = Name,
@@ -143,8 +147,8 @@ namespace Discord
                 IsDMEnabled = IsDMEnabled,
                 DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified,
                 IsNsfw = IsNsfw,
-                ContextTypes = ContextTypes,
-                IntegrationTypes = IntegrationTypes
+                ContextTypes = _contextTypes ?? Optional<HashSet<ApplicationCommandContextType>>.Unspecified,
+                IntegrationTypes = _integrationTypes ?? Optional<HashSet<ApplicationIntegrationType>>.Unspecified
             };
 
             if (Options != null && Options.Any())

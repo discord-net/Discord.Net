@@ -76,6 +76,9 @@ namespace Discord.WebSocket
         /// <inheritdoc cref="IDiscordInteraction.Entitlements" />
         public IReadOnlyCollection<RestEntitlement> Entitlements { get; private set; }
 
+        /// <inheritdoc/>
+        public Dictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; private set; }
+
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel, SocketUser user)
             : base(client, id)
         {
@@ -149,6 +152,8 @@ namespace Discord.WebSocket
                 : null;
 
             Entitlements = model.Entitlements.Select(x => RestEntitlement.Create(Discord, x)).ToImmutableArray();
+
+            IntegrationOwners = model.IntegrationOwners;
         }
 
         /// <summary>

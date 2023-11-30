@@ -52,9 +52,9 @@ namespace Discord.API
         public Optional<bool?> Nsfw { get; set; }
 
         [JsonProperty("contexts")]
-        public Optional<HashSet<ApplicationCommandContextType>> ContextTypes { get; set; }
+        public Optional<ApplicationCommandContextType[]> ContextTypes { get; set; }
 
         [JsonProperty("integration_types")]
-        public Optional<HashSet<ApplicationIntegrationType>> IntegrationTypes { get; set; }
+        public Optional<ApplicationIntegrationType[]> IntegrationTypes { get; set; }
     }
 }

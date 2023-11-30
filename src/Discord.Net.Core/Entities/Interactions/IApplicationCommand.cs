@@ -84,6 +84,16 @@ namespace Discord
         string DescriptionLocalized { get; }
 
         /// <summary>
+        ///     
+        /// </summary>
+        IReadOnlyCollection<ApplicationCommandContextType> ContextTypes { get; }
+
+        /// <summary>
+        ///     
+        /// </summary>
+        IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
+
+        /// <summary>
         ///     Modifies the current application command.
         /// </summary>
         /// <param name="func">The new properties to use when modifying the command.</param>

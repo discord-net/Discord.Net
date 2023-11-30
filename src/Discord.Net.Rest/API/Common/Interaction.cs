@@ -1,5 +1,7 @@
 using Newtonsoft.Json;
 
+using System.Collections.Generic;
+
 namespace Discord.API
 {
     [JsonConverter(typeof(Net.Converters.InteractionConverter))]
@@ -49,5 +51,8 @@ namespace Discord.API
 
         [JsonProperty("entitlements")]
         public Entitlement[] Entitlements { get; set; }
+
+        [JsonProperty("authorizing_integration_owners")]
+        public Dictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; set; }
     }
 }
