@@ -2035,7 +2035,7 @@ namespace Discord.WebSocket
         #region Soundboard
 
         /// <summary>
-        ///     Gets a soundboard cached sound from this guild.
+        ///     Gets a cached soundboard sound from this guild.
         /// </summary>
         public SoundboardSound GetSoundboardSound(ulong id)
             => _soundboardSounds.TryGetValue(id, out var sound) ? sound : null;
