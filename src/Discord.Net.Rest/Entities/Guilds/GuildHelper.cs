@@ -711,7 +711,6 @@ namespace Discord.Rest
                         GuildJoinedAt = args.After.GuildJoinedAt
                     }
             };
-
             var model = await client.ApiClient.SearchGuildMembersAsyncV2(guild.Id, apiArgs, options);
 
             return new MemberSearchResult(
