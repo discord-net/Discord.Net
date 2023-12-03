@@ -141,6 +141,26 @@ namespace Discord
         /// <summary>
         ///     The message for a guild application premium subscription.
         /// </summary>
-        GuildApplicationPremiumSubscription = 32
+        GuildApplicationPremiumSubscription = 32,
+
+        /// <summary>
+        ///     The message for incident alert mode enabled.
+        /// </summary>
+        IncidentAlertModeEnabled = 36,
+
+        /// <summary>
+        ///     The message for incident alert mode disabled.
+        /// </summary>
+        IncidentAlertModeDisabled = 37,
+
+        /// <summary>
+        ///     The message for incident report raid.
+        /// </summary>
+        IncidentReportRaid = 38,
+
+        /// <summary>
+        ///     The message for incident report false alarm.
+        /// </summary>
+        IncidentReportFalseAlarm = 39
     }
 }
