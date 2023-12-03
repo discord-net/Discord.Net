@@ -105,7 +105,7 @@ namespace Discord.Interactions.Builders
                     case NsfwCommandAttribute nsfwCommand:
                         builder.SetNsfw(nsfwCommand.IsNsfw);
                         break;
-                    case ContextTypeAttribute contextType:
+                    case CommandContextTypeAttribute contextType:
                         builder.WithContextTypes(contextType.ContextTypes?.ToArray());
                         break;
                     case IntegrationTypeAttribute integrationType:
@@ -205,7 +205,7 @@ namespace Discord.Interactions.Builders
                     case NsfwCommandAttribute nsfwCommand:
                         builder.SetNsfw(nsfwCommand.IsNsfw);
                         break;
-                    case ContextTypeAttribute contextType:
+                    case CommandContextTypeAttribute contextType:
                         builder.WithContextTypes(contextType.ContextTypes.ToArray());
                         break;
                     case IntegrationTypeAttribute integrationType:
@@ -266,7 +266,7 @@ namespace Discord.Interactions.Builders
                     case NsfwCommandAttribute nsfwCommand:
                         builder.SetNsfw(nsfwCommand.IsNsfw);
                         break;
-                    case ContextTypeAttribute contextType:
+                    case CommandContextTypeAttribute contextType:
                         builder.WithContextTypes(contextType.ContextTypes.ToArray());
                         break;
                     case IntegrationTypeAttribute integrationType:

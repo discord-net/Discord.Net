@@ -9,11 +9,11 @@ namespace Discord.Interactions;
 ///     Specifies context types this command can be executed in.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public class ContextTypeAttribute : Attribute
+public class CommandContextTypeAttribute : Attribute
 {
     public IReadOnlyCollection<ApplicationCommandContextType> ContextTypes { get; }
 
-    public ContextTypeAttribute(params ApplicationCommandContextType[] contextTypes)
+    public CommandContextTypeAttribute(params ApplicationCommandContextType[] contextTypes)
     {
         ContextTypes = contextTypes?.Distinct().ToImmutableArray()
                        ?? throw new ArgumentNullException(nameof(contextTypes));
