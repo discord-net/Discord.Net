@@ -63,7 +63,7 @@ namespace Discord
                 Preconditions.AtMost(value?.Count ?? 0, MaxOptionsCount, nameof(value));
                 _options = value;
             }
-        }   
+        }
 
         /// <summary>
         ///     Gets the localization dictionary for the name field of this command.
