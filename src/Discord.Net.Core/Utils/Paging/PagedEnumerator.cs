@@ -26,7 +26,7 @@ namespace Discord
         }
 
         public IAsyncEnumerator<IReadOnlyCollection<T>> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken()) => new Enumerator(this, cancellationToken);
-        internal class Enumerator : IAsyncEnumerator<IReadOnlyCollection<T>>
+        internal sealed class Enumerator : IAsyncEnumerator<IReadOnlyCollection<T>>
         {
             private readonly PagedAsyncEnumerable<T> _source;
             private readonly CancellationToken _token;
@@ -74,12 +74,6 @@ namespace Discord
             }
 
             public ValueTask DisposeAsync()
-            {
-                Current = null;
-                return default;
-            }
-
-            protected virtual ValueTask DisposeAsyncCore()
             {
                 Current = null;
                 return default;
