@@ -78,6 +78,12 @@ namespace Discord
                 Current = null;
                 return default;
             }
+
+            protected virtual ValueTask DisposeAsyncCore()
+            {
+                Current = null;
+                return default;
+            }
         }
     }
 }
