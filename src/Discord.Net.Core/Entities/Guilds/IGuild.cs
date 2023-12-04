@@ -279,7 +279,7 @@ namespace Discord
         ///     This is the number of users who have boosted this guild.
         /// </remarks>
         /// <returns>
-        ///     The number of premium subscribers of this guild; <see langword="null" /> if not available.
+        ///     The number of premium subscribers of this guild;
         /// </returns>
         int PremiumSubscriptionCount { get; }
         /// <summary>
