@@ -92,7 +92,7 @@ namespace Discord.Rest
                 Creator = RestUser.Create(Discord, model.Creator.Value);
             }
 
-            CreatorId = model.CreatorId.ToNullable() ?? 0; // should be changed?
+            CreatorId = model.CreatorId.GetValueOrDefault(null) ?? 0; // should be changed?
             ChannelId = model.ChannelId.IsSpecified ? model.ChannelId.Value : null;
             Name = model.Name;
             Description = model.Description.GetValueOrDefault();

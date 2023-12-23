@@ -87,7 +87,7 @@ namespace Discord.WebSocket
 
             if (model.CreatorId.IsSpecified)
             {
-                var guildUser = Guild.GetUser(model.CreatorId.Value);
+                var guildUser = Guild.GetUser(model.CreatorId.GetValueOrDefault(0) ?? 0);
 
                 if (guildUser != null)
                 {
@@ -96,7 +96,7 @@ namespace Discord.WebSocket
 
                     Creator = guildUser;
                 }
-                else if (guildUser == null && model.Creator.IsSpecified)
+                else if (model.Creator.IsSpecified)
                 {
                     guildUser = SocketGuildUser.Create(Guild, Discord.State, model.Creator.Value);
                     Creator = guildUser;
