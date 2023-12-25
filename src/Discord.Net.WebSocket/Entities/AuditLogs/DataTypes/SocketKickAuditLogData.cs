@@ -9,9 +9,10 @@ namespace Discord.WebSocket;
 /// </summary>
 public class SocketKickAuditLogData : ISocketAuditLogData
 {
-    private SocketKickAuditLogData(Cacheable<SocketUser, RestUser, IUser, ulong> user)
+    private SocketKickAuditLogData(Cacheable<SocketUser, RestUser, IUser, ulong> user, string integrationType)
     {
         Target = user;
+        IntegrationType = integrationType;
     }
 
     internal static SocketKickAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
@@ -26,7 +27,7 @@ public class SocketKickAuditLogData : ISocketAuditLogData
                 var user = await discord.ApiClient.GetUserAsync(entry.TargetId!.Value);
                 return user is not null ? RestUser.Create(discord, user) : null;
             });
-        return new SocketKickAuditLogData(cacheableUser);
+        return new SocketKickAuditLogData(cacheableUser, entry.Options.IntegrationType);
     }
 
     /// <summary>
@@ -40,4 +41,9 @@ public class SocketKickAuditLogData : ISocketAuditLogData
     ///     A cacheable user object representing the kicked user.
     /// </returns>
     public Cacheable<SocketUser, RestUser, IUser, ulong> Target { get; }
+
+    /// <summary>
+    ///     Gets the type of integration which performed the action. <see langword="null"/> if the action was performed by a user.
+    /// </summary>
+    public string IntegrationType { get; }
 }

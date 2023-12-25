@@ -9,15 +9,16 @@ namespace Discord.Rest;
 /// </summary>
 public class KickAuditLogData : IAuditLogData
 {
-    private KickAuditLogData(RestUser user)
+    private KickAuditLogData(RestUser user, string integrationType)
     {
         Target = user;
+        IntegrationType = integrationType;
     }
 
     internal static KickAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
     {
         var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-        return new KickAuditLogData((userInfo != null) ? RestUser.Create(discord, userInfo) : null);
+        return new KickAuditLogData((userInfo != null) ? RestUser.Create(discord, userInfo) : null, entry.Options.IntegrationType);
     }
 
     /// <summary>
@@ -30,4 +31,9 @@ public class KickAuditLogData : IAuditLogData
     ///     A user object representing the kicked user.
     /// </returns>
     public IUser Target { get; }
+    
+    /// <summary>
+    ///     Gets the type of integration which performed the action. <see langword="null"/> if the action was performed by a user.
+    /// </summary>
+    public string IntegrationType { get; }
 }
