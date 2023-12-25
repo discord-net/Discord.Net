@@ -39,9 +39,6 @@ namespace Discord.Interactions
     /// </summary>
     /// <typeparam name="T">Type of the <see cref="AutocompleteHandler"/> that will be used to handle Autocomplete interactions targeting the parameter.</typeparam>
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
-    public class AutocompleteAttribute<T> : AutocompleteAttribute
-        where T: class, IAutocompleteHandler
-    {
-        public AutocompleteAttribute() : base(typeof(T)) { }
-    }
+    public class AutocompleteAttribute<T>() : AutocompleteAttribute(typeof(T))
+        where T : class, IAutocompleteHandler;
 }
