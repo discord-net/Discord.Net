@@ -39,4 +39,7 @@ internal class AuditLogOptions
 
     [JsonProperty("status")]
     public string Status { get; set; }
+
+    [JsonProperty("integration_type")]
+    public string IntegrationType { get; set; }
 }
