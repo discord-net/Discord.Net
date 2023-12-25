@@ -9,13 +9,11 @@ namespace Discord.WebSocket;
 /// </summary>
 public class SocketMemberUpdateAuditLogData : ISocketAuditLogData
 {
-    private SocketMemberUpdateAuditLogData(Cacheable<SocketUser, RestUser, IUser, ulong> target, MemberInfo before, MemberInfo after,
-        string integrationType)
+    private SocketMemberUpdateAuditLogData(Cacheable<SocketUser, RestUser, IUser, ulong> target, MemberInfo before, MemberInfo after)
     {
         Target = target;
         Before = before;
         After = after;
-        IntegrationType = integrationType;
     }
 
     internal static SocketMemberUpdateAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
@@ -35,8 +33,7 @@ public class SocketMemberUpdateAuditLogData : ISocketAuditLogData
                 return user is not null ? RestUser.Create(discord, user) : null;
             });
 
-        return new SocketMemberUpdateAuditLogData(cacheableUser, new MemberInfo(before), new MemberInfo(after),
-            entry.Options?.IntegrationType);
+        return new SocketMemberUpdateAuditLogData(cacheableUser, new MemberInfo(before), new MemberInfo(after));
     }
 
     /// <summary>
@@ -65,9 +62,4 @@ public class SocketMemberUpdateAuditLogData : ISocketAuditLogData
     ///     An information object containing the member information after the changes were made.
     /// </returns>
     public MemberInfo After { get; }
-
-    /// <summary>
-    ///     Gets the type of integration which performed the action. <see langword="null"/> if the action was performed by a user.
-    /// </summary>
-    public string IntegrationType { get; }
 }

@@ -10,12 +10,11 @@ namespace Discord.Rest;
 /// </summary>
 public class MemberUpdateAuditLogData : IAuditLogData
 {
-    private MemberUpdateAuditLogData(IUser target, MemberInfo before, MemberInfo after, string integrationType)
+    private MemberUpdateAuditLogData(IUser target, MemberInfo before, MemberInfo after)
     {
         Target = target;
         Before = before;
         After = after;
-        IntegrationType = integrationType;
     }
 
     internal static MemberUpdateAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
@@ -27,7 +26,7 @@ public class MemberUpdateAuditLogData : IAuditLogData
         var targetInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
         RestUser user = (targetInfo != null) ? RestUser.Create(discord, targetInfo) : null;
 
-        return new MemberUpdateAuditLogData(user, new MemberInfo(before), new MemberInfo(after), entry.Options?.IntegrationType);
+        return new MemberUpdateAuditLogData(user, new MemberInfo(before), new MemberInfo(after));
     }
 
     /// <summary>
@@ -54,9 +53,4 @@ public class MemberUpdateAuditLogData : IAuditLogData
     ///     An information object containing the member information after the changes were made.
     /// </returns>
     public MemberInfo After { get; }
-
-    /// <summary>
-    ///     Gets the type of integration which performed the action. <see langword="null"/> if the action was performed by a user.
-    /// </summary>
-    public string IntegrationType { get; }
 }
