@@ -36,7 +36,7 @@ public class SocketMemberUpdateAuditLogData : ISocketAuditLogData
             });
 
         return new SocketMemberUpdateAuditLogData(cacheableUser, new MemberInfo(before), new MemberInfo(after),
-            entry.Options.IntegrationType);
+            entry.Options?.IntegrationType);
     }
 
     /// <summary>

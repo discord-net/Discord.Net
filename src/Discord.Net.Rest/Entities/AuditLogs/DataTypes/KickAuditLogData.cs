@@ -18,7 +18,7 @@ public class KickAuditLogData : IAuditLogData
     internal static KickAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log = null)
     {
         var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-        return new KickAuditLogData((userInfo != null) ? RestUser.Create(discord, userInfo) : null, entry.Options.IntegrationType);
+        return new KickAuditLogData((userInfo != null) ? RestUser.Create(discord, userInfo) : null, entry.Options?.IntegrationType);
     }
 
     /// <summary>

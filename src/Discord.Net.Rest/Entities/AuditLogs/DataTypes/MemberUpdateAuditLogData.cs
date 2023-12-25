@@ -27,7 +27,7 @@ public class MemberUpdateAuditLogData : IAuditLogData
         var targetInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
         RestUser user = (targetInfo != null) ? RestUser.Create(discord, targetInfo) : null;
 
-        return new MemberUpdateAuditLogData(user, new MemberInfo(before), new MemberInfo(after), entry.Options.IntegrationType);
+        return new MemberUpdateAuditLogData(user, new MemberInfo(before), new MemberInfo(after), entry.Options?.IntegrationType);
     }
 
     /// <summary>

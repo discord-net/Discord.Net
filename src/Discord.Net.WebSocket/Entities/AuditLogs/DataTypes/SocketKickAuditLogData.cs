@@ -27,7 +27,7 @@ public class SocketKickAuditLogData : ISocketAuditLogData
                 var user = await discord.ApiClient.GetUserAsync(entry.TargetId!.Value);
                 return user is not null ? RestUser.Create(discord, user) : null;
             });
-        return new SocketKickAuditLogData(cacheableUser, entry.Options.IntegrationType);
+        return new SocketKickAuditLogData(cacheableUser, entry.Options?.IntegrationType);
     }
 
     /// <summary>
