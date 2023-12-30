@@ -5,7 +5,7 @@ namespace Discord.API;
 public class Invite
 {
     [JsonPropertyName("code")]
-    public string Code { get; set; }
+    public required string Code { get; set; }
 
     [JsonPropertyName("guild")]
     public Optional<PartialGuild> Guild { get; set; }

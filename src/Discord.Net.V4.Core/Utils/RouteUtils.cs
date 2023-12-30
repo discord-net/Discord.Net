@@ -16,6 +16,6 @@ internal class RouteUtils
         return $"?{paramsString}";
     }
 
-    public static string GetUrlEncodedQueryParam(string key, object value)
+    private static string GetUrlEncodedQueryParam(string key, object value)
         => $"{key}={WebUtility.UrlEncode(value.ToString())}";
 }

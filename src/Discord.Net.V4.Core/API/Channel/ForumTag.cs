@@ -8,7 +8,7 @@ public sealed class ForumTag
     public ulong Id { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("moderated")]
     public bool Moderated { get; set; }

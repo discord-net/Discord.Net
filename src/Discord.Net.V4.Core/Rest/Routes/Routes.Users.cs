@@ -27,11 +27,11 @@ public static partial class Routes
     public static ApiRoute LeaveGuild(ulong guildId)
         => new(nameof(LeaveGuild), RequestMethod.Delete, $"users/@me/guilds/{guildId}", (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<CreateDMChannelParams, Channel> CreateDM(CreateDMChannelParams body)
-        => new(nameof(CreateDM), RequestMethod.Post, "users/@me/channels", body);
+    public static ApiBodyRoute<CreateDMChannelParams, Channel> CreateDm(CreateDMChannelParams body)
+        => new(nameof(CreateDm), RequestMethod.Post, "users/@me/channels", body);
 
-    public static ApiBodyRoute<CreateGroupDMChannelParams, Channel> CreateGroupDM(CreateGroupDMChannelParams body)
-        => new(nameof(CreateGroupDM), RequestMethod.Post, "users/@me/channels", body);
+    public static ApiBodyRoute<CreateGroupDMChannelParams, Channel> CreateGroupDm(CreateGroupDMChannelParams body)
+        => new(nameof(CreateGroupDm), RequestMethod.Post, "users/@me/channels", body);
 
     public static readonly ApiRoute<UserConnection> GetUserConnections
         = new(nameof(GetUserConnections), RequestMethod.Get, "users/@me/connections");
