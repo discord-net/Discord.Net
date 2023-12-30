@@ -1,73 +1,61 @@
 namespace Discord;
 
-public readonly struct APIRoute
+public sealed class ApiRoute(string name, RequestMethod method, string route, BucketInfo? bucket = null)
+    : IApiRoute
 {
-    public readonly string Name;
-    public readonly RequestMethod Method;
-    public readonly string Route;
-    public readonly ValueTuple<ScopeType, ulong>? Bucket;
-
-    public APIRoute(string name, RequestMethod method, string route, ValueTuple<ScopeType, ulong>? bucket = null)
-    {
-        Name = name;
-        Method = method;
-        Route = route;
-        Bucket = bucket;
-    }
+    public string Name { get; } = name;
+    public RequestMethod Method { get; } = method;
+    public string Endpoint { get; } = route;
+    public BucketInfo? Bucket { get; } = bucket;
 }
 
-public readonly struct APIBodyRoute<TRequestBody>
+public sealed class ApiBodyRoute<TRequestBody>(
+    string name,
+    RequestMethod method,
+    string route,
+    TRequestBody body,
+    ContentType contentType = ContentType.JsonBody,
+    BucketInfo? bucket = null)
+    : IApiRoute
 {
-    public readonly string Name;
-    public readonly RequestMethod Method;
-    public readonly string Route;
-    public readonly ValueTuple<ScopeType, ulong>? Bucket;
-    public readonly TRequestBody Body;
-    public readonly ContentType ContentType;
-
-    public APIBodyRoute(string name, RequestMethod method, string route, TRequestBody body, ContentType contentType = ContentType.JsonBody, ValueTuple<ScopeType, ulong>? bucket = null)
-    {
-        Name = name;
-        Method = method;
-        Route = route;
-        Body = body;
-        Bucket = bucket;
-        ContentType = contentType;
-    }
+    public string Name { get; } = name;
+    public RequestMethod Method { get; } = method;
+    public string Endpoint { get; } = route;
+    public BucketInfo? Bucket { get; } = bucket;
+    public TRequestBody Body { get; } = body;
+    public ContentType ContentType { get; } = contentType;
 }
 
-public readonly struct APIBodyRoute<TRequestBody, TResponseBody>
+public sealed class ApiBodyRoute<TRequestBody, TResponseBody>(
+    string name,
+    RequestMethod method,
+    string route,
+    TRequestBody body,
+    ContentType contentType = ContentType.JsonBody,
+    BucketInfo? bucket = null)
+    : IApiRoute
 {
-    public readonly string Name;
-    public readonly RequestMethod Method;
-    public readonly string Route;
-    public readonly ValueTuple<ScopeType, ulong>? Bucket;
-    public readonly TRequestBody Body;
-    public readonly ContentType ContentType;
-
-    public APIBodyRoute(string name, RequestMethod method, string route, TRequestBody body, ContentType contentType = ContentType.JsonBody, ValueTuple<ScopeType, ulong>? bucket = null)
-    {
-        Name = name;
-        Method = method;
-        Route = route;
-        Body = body;
-        Bucket = bucket;
-        ContentType = contentType;
-    }
+    public string Name { get; } = name;
+    public RequestMethod Method { get; } = method;
+    public string Endpoint { get; } = route;
+    public BucketInfo? Bucket { get; } = bucket;
+    public TRequestBody Body { get; } = body;
+    public ContentType ContentType { get; } = contentType;
 }
 
-public readonly struct APIRoute<TResponse>
+public sealed class ApiRoute<TResponse>(string name, RequestMethod method, string route, BucketInfo? bucket = null)
+    : IApiRoute
 {
-    public readonly string Name;
-    public readonly RequestMethod Method;
-    public readonly string Route;
-    public readonly ValueTuple<ScopeType, ulong>? Bucket;
+    public string Name { get; } = name;
+    public RequestMethod Method { get; } = method;
+    public string Endpoint { get; } = route;
+    public BucketInfo? Bucket { get; } = bucket;
+}
 
-    public APIRoute(string name, RequestMethod method, string route, ValueTuple<ScopeType, ulong>? bucket = null)
-    {
-        Name = name;
-        Method = method;
-        Route = route;
-        Bucket = bucket;
-    }
+public interface IApiRoute
+{
+    string Name { get; }
+    RequestMethod Method { get; }
+    string Endpoint { get; }
+    BucketInfo? Bucket { get; }
 }

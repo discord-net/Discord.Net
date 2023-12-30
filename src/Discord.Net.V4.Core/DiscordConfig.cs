@@ -1,4 +1,6 @@
+using Discord.Converters;
 using System.Reflection;
+using System.Text.Json;
 
 namespace Discord;
 
@@ -44,27 +46,6 @@ public class DiscordConfig
     ///     The user agent used in each Discord.Net request.
     /// </returns>
     public static string UserAgent { get; } = $"DiscordBot (https://github.com/discord-net/Discord.Net, v{Version})";
-    /// <summary>
-    ///     Returns the base Discord API URL.
-    /// </summary>
-    /// <returns>
-    ///     The Discord API URL using <see cref="APIVersion"/>.
-    /// </returns>
-    public static readonly string APIUrl = $"https://discord.com/api/v{APIVersion}/";
-    /// <summary>
-    ///     Returns the base Discord CDN URL.
-    /// </summary>
-    /// <returns>
-    ///     The base Discord Content Delivery Network (CDN) URL.
-    /// </returns>
-    public const string CDNUrl = "https://cdn.discordapp.com/";
-    /// <summary>
-    ///     Returns the base Discord invite URL.
-    /// </summary>
-    /// <returns>
-    ///     The base Discord invite URL.
-    /// </returns>
-    public const string InviteUrl = "https://discord.gg/";
 
     /// <summary>
     ///     Returns the default timeout for requests.
@@ -144,6 +125,33 @@ public class DiscordConfig
     ///     The token used to authenticate with the Discord API.
     /// </summary>
     public readonly DiscordToken Token;
+
+    /// <summary>
+    ///     Returns the base Discord API URL.
+    /// </summary>
+    /// <returns>
+    ///     The Discord API URL using <see cref="APIVersion"/>.
+    /// </returns>
+    public string APIUrl { get; set; }= $"https://discord.com/api/v{APIVersion}/";
+    /// <summary>
+    ///     Returns the base Discord CDN URL.
+    /// </summary>
+    /// <returns>
+    ///     The base Discord Content Delivery Network (CDN) URL.
+    /// </returns>
+    public string CDNUrl { get; set; } = "https://cdn.discordapp.com/";
+    /// <summary>
+    ///     Returns the base Discord invite URL.
+    /// </summary>
+    /// <returns>
+    ///     The base Discord invite URL.
+    /// </returns>
+    public string InviteUrl { get; set; }= "https://discord.gg/";
+
+    public JsonSerializerOptions JsonSerializerOptions { get; set; } = new JsonSerializerOptions()
+    {
+        Converters = { DiscordConverterFactory.Instance }
+    };
 
     /// <summary>
     ///     Gets or sets how a request should act in the case of an error, by default.

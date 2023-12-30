@@ -16,7 +16,7 @@ public readonly struct RequestOptions
     /// <returns>
     ///     A <see cref="int"/> in milliseconds for when the request times out.
     /// </returns>
-    public readonly int? Timeout;
+    public readonly int Timeout;
 
     /// <summary>
     ///     Gets or sets the retry behavior when the request fails.
@@ -43,7 +43,7 @@ public readonly struct RequestOptions
     ///		hosting system is known to have a desynced clock.
     /// </remarks>
     public readonly bool? UseSystemClock;
-    
+
     /// <summary>
     ///     Initializes a new <see cref="RequestOptions" /> class with the default request timeout set in
     ///     <see cref="DiscordConfig"/>.

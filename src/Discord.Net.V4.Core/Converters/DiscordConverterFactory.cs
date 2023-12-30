@@ -5,14 +5,16 @@ namespace Discord.Converters;
 
 public sealed class DiscordConverterFactory : JsonConverterFactory
 {
-    private static readonly JsonConverter[] _converters = new JsonConverter[]
-    {
+    public static readonly DiscordConverterFactory Instance = new();
+
+    private static readonly JsonConverter[] _converters =
+    [
         EmbedTypeConverter.Instance,
         OptionalConverter.Instance,
         UInt64Converter.Instance,
         UserStatusConverter.Instance,
-        ColorConverter.Instance,
-    };
+        ColorConverter.Instance
+    ];
 
     public override bool CanConvert(Type typeToConvert)
         => _converters.Any(x => x.CanConvert(typeToConvert));

@@ -4,7 +4,7 @@ namespace Discord;
 ///     Represents an authentication token used to authenticate with the
 ///     Discord API.
 /// </summary>
-/// <param name="Token">The authentication token value.</param>
+/// <param name="Value">The authentication token value.</param>
 /// <param name="Type">The type of the token.</param>
 public readonly record struct DiscordToken(string Value, TokenType Type)
 {

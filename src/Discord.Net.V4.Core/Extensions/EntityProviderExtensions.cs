@@ -6,7 +6,7 @@ internal static class EntityProviderExtensions
 {
     public static async Task<TResult?> ExecuteAndConstructAsync<TResult, TCoreEntity, TModel, TAPI, TBody>(
         this IEntityProvider<TResult, TCoreEntity, TModel> provider,
-        APIBodyRoute<TBody, TAPI> route, RequestOptions? options, CancellationToken token)
+        ApiBodyRoute<TBody, TAPI> route, RequestOptions? options, CancellationToken token)
         where TResult : class, TCoreEntity, IConstructable<TModel>
         where TCoreEntity : IEntity
         where TModel : IEntityModel
@@ -21,7 +21,7 @@ internal static class EntityProviderExtensions
 
     public static async Task<TResult?> ExecuteAndConstructAsync<TResult, TCoreEntity, TModel, TAPI>(
         this IEntityProvider<TResult, TCoreEntity, TModel> provider,
-        APIRoute<TAPI> route, RequestOptions? options, CancellationToken token = default)
+        ApiRoute<TAPI> route, RequestOptions? options, CancellationToken token = default)
         where TResult : class, TCoreEntity, IConstructable<TModel>
         where TCoreEntity : IEntity
         where TModel : IEntityModel
