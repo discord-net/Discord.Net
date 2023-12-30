@@ -26,6 +26,4 @@ internal sealed class RatelimitContract(RateLimiter limiter, Bucket bucket, Acti
         IsActive = false;
         onResolve(this);
     }
-
-
 }

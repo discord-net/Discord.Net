@@ -8,7 +8,7 @@ public sealed class Ratelimit
     public bool Global { get; set; }
 
     [JsonPropertyName("message")]
-    public string Message { get; set; }
+    public required string Message { get; set; }
 
     [JsonPropertyName("retry_after")]
     public double RetryAfter { get; set; }

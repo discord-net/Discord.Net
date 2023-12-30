@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace Discord.Rest;
@@ -10,10 +11,12 @@ public sealed class DiscordRestClient : IDiscordClient
 
     internal readonly DiscordConfig Config;
 
-    public DiscordRestClient(DiscordConfig config)
+    internal readonly ILogger Logger;
+
+    public DiscordRestClient(DiscordConfig config, ILogger logger)
     {
         Config = config;
-
+        Logger = logger;
         RestApiClient = new ApiClient(this, config.Token);
         RateLimiter = new RateLimiter();
     }

@@ -1,3 +1,5 @@
+using Discord.API;
+using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Net;
 using System.Net.Http.Json;
@@ -30,6 +32,7 @@ public sealed class ApiClient : IRestApiClient, IDisposable
                 ToHttpMethod(route.Method),
                 route.Endpoint
             ),
+            options,
             token
         );
 
@@ -42,6 +45,7 @@ public sealed class ApiClient : IRestApiClient, IDisposable
                 ToHttpMethod(route.Method),
                 route.Endpoint
             ),
+            options,
             token
          );
 
@@ -59,7 +63,7 @@ public sealed class ApiClient : IRestApiClient, IDisposable
             route.Endpoint
         ) { Content = EncodeBodyContent(route.Body, route.ContentType) };
 
-        return SendAsync(route, request, token);
+        return SendAsync(route, request, options, token);
     }
 
     public async Task<U?> ExecuteAsync<T, U>(ApiBodyRoute<T, U> route, RequestOptions options, CancellationToken token)
@@ -71,7 +75,7 @@ public sealed class ApiClient : IRestApiClient, IDisposable
             route.Endpoint
         ) { Content = EncodeBodyContent(route.Body, route.ContentType) };
 
-        var result = await SendAsync(route, request, token);
+        var result = await SendAsync(route, request, options, token);
 
         if (result is null)
             return null;
@@ -80,7 +84,7 @@ public sealed class ApiClient : IRestApiClient, IDisposable
     }
 
     private async Task<Stream?> SendAsync(
-        IApiRoute route,
+        ApiRoute route,
         HttpRequestMessage request,
         RequestOptions options,
         CancellationToken token = default)
@@ -88,7 +92,9 @@ public sealed class ApiClient : IRestApiClient, IDisposable
         if(options.AuditLogReason is not null)
             request.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(options.AuditLogReason));
 
+        _restClient.Logger.LogDebug("Acquiring a bucket ratelimit contract for {}", route);
         var contract = await _restClient.RateLimiter.AcquireContractAsync(route, token);
+        _restClient.Logger.LogDebug("Entered bucket contract");
 
         try
         {
@@ -97,22 +103,32 @@ public sealed class ApiClient : IRestApiClient, IDisposable
                 CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token, token);
 
             // no going back now :D
+            _restClient.Logger.LogDebug("Entering critical phase");
             using var phase = await contract.EnterSuperCriticalPhaseDodalooAsync(token);
+            _restClient.Logger.LogDebug("Preforming request");
 
             var response = await _httpClient.SendAsync(request, requestTokenSource.Token);
 
-            ProcessRateLimits(response, contract);
+            _restClient.Logger.LogDebug("{} -> {}", route, response.StatusCode);
 
-            if (response.StatusCode is >= (HttpStatusCode)200 and < (HttpStatusCode)300)
+            await ProcessRateLimitsAsync(response, contract, token);
+
+            switch (response.StatusCode)
             {
-                return await response.Content.ReadAsStreamAsync(token);
+                case >= (HttpStatusCode)200 and < (HttpStatusCode)300:
+                    return await response.Content.ReadAsStreamAsync(token);
+                case HttpStatusCode.TooManyRequests:
+                    contract.Cancel();
+                    // retry the request
+                    return await SendAsync(route, request, options, token);
+                case HttpStatusCode.BadGateway when (_restClient.Config.DefaultRetryMode & RetryMode.Retry502) != 0:
+                    // TODO: configure retry
+                    await Task.Delay(1000, token);
+                    return await SendAsync(route, request, options, token);
+                default:
+                    throw new HttpRequestException($"Got unsuccessful status code {response.StatusCode}", null,
+                        statusCode: response.StatusCode);
             }
-
-            if (response.StatusCode == HttpStatusCode.TooManyRequests)
-                contract.Cancel();
-            else
-                throw new HttpRequestException($"Got unsuccessful status code {response.StatusCode}", null,
-                    statusCode: response.StatusCode);
         }
         catch
         {
@@ -121,12 +137,12 @@ public sealed class ApiClient : IRestApiClient, IDisposable
         }
     }
 
-    private void ProcessRateLimits(HttpResponseMessage response, RatelimitContract contract)
+    private ValueTask ProcessRateLimitsAsync(HttpResponseMessage response, RatelimitContract contract,
+        CancellationToken token)
     {
         if (response.StatusCode is HttpStatusCode.TooManyRequests)
         {
-            ProcessGlobalRateLimit(response, contract);
-            return;
+            return new ValueTask(ProcessGlobalRateLimitAsync(response, token));
         }
 
         if (
@@ -136,7 +152,7 @@ public sealed class ApiClient : IRestApiClient, IDisposable
             response.Headers.Date is null)
         {
             // TODO: do we throw or ignore?
-            return;
+            return ValueTask.CompletedTask;
         }
 
         // TODO: configure how we calculate the reset time
@@ -152,12 +168,26 @@ public sealed class ApiClient : IRestApiClient, IDisposable
             uint.Parse(response.Headers.GetValues("X-RateLimit-Remaining").First()),
             resetAt
         ));
+
+        return ValueTask.CompletedTask;
     }
 
-    private void ProcessGlobalRateLimit(HttpResponseMessage message, RatelimitContract contract)
+    private async Task ProcessGlobalRateLimitAsync(HttpResponseMessage message,
+        CancellationToken token)
     {
+        var payload = await ReadRateLimitPayloadAsync(message, token);
 
+        var retryIn = payload?.RetryAfter ?? (message.Headers.TryGetValues("X-Ratelimit-Reset-After", out var r)
+            ? double.Parse(r.First())
+            : throw new InvalidOperationException("No reset information provided for ratelimit"));
+
+        var retryAt = (message.Headers.Date ?? DateTimeOffset.UtcNow).AddSeconds(retryIn);
+
+        _restClient.RateLimiter.TriggerGlobalLimit(retryAt);
     }
+
+    private Task<Ratelimit?> ReadRateLimitPayloadAsync(HttpResponseMessage message, CancellationToken token)
+        => message.Content.ReadFromJsonAsync<Ratelimit?>(_restClient.Config.JsonSerializerOptions, token);
 
     private HttpContent EncodeBodyContent<T>(T body, ContentType contentType)
     {
