@@ -223,7 +223,7 @@ namespace Discord
             => $"{DiscordConfig.CDNUrl}stickers/{stickerId}.{FormatToExtension(format)}";
 
         /// <summary>
-        ///     Returns an events cover image url. <see langword="null"/> if the <see cref="assetId"/> is <see langword="null"/>.
+        ///     Returns an events cover image url. <see langword="null"/> if the assetId <see langword="null"/>.
         /// </summary>
         /// <param name="guildId">The guild id that the event is in.</param>
         /// <param name="eventId">The id of the event.</param>
