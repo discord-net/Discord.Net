@@ -5,9 +5,11 @@ namespace Discord.Rest;
 
 public sealed class DiscordRestClient : IDiscordClient
 {
-    public IEntitySource<ulong, ISelfUser> CurrentUser { get; }
+    public RestSelfUserSource CurrentUser { get; }
     public ApiClient RestApiClient { get; }
     internal RateLimiter RateLimiter { get; }
+
+    internal RequestOptions DefaultRequestOptions { get; }
 
     internal readonly DiscordConfig Config;
 
@@ -19,6 +21,20 @@ public sealed class DiscordRestClient : IDiscordClient
         Logger = logger;
         RestApiClient = new ApiClient(this, config.Token);
         RateLimiter = new RateLimiter();
+        DefaultRequestOptions = new RequestOptions(
+            timeout: DiscordConfig.DefaultRequestTimeout,
+            retryMode: Config.DefaultRetryMode,
+            useSystemClock: false
+        );
+
+        // load the ID from the token
+
+        CurrentUser = RestSelfUserSource.Create(
+            this,
+            TokenUtils.GetUserIdFromToken(config.Token.Value),
+            Routes.GetCurrentUser,
+            RestSelfUser.Create
+        );
     }
 
     public void Dispose() => throw new NotImplementedException();
@@ -26,4 +42,5 @@ public sealed class DiscordRestClient : IDiscordClient
     public ValueTask DisposeAsync() => throw new NotImplementedException();
 
     IRestApiClient IDiscordClient.RestApiClient => RestApiClient;
+    IEntitySource<ulong, ISelfUser> IDiscordClient.CurrentUser => CurrentUser;
 }

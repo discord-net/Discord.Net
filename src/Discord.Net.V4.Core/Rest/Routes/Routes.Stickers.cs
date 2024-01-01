@@ -22,6 +22,6 @@ public static partial class Routes
     public static ApiBodyRoute<ModifyStickerProperties, Sticker> ModifyGuildSticker(ulong guildId, ModifyStickerProperties body)
         => new(nameof(ModifyGuildSticker), RequestMethod.Patch, $"guilds/{guildId}/stickers", body, bucket: (ScopeType.Guild, guildId));
 
-    public static ApiRoute DeleteGuildSticker(ulong guildId, ulong stickerId)
+    public static BasicApiRoute DeleteGuildSticker(ulong guildId, ulong stickerId)
         => new(nameof(DeleteGuildSticker), RequestMethod.Delete, $"guilds/{guildId}/stickers/{stickerId}", (ScopeType.Guild, guildId));
 }

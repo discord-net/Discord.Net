@@ -25,7 +25,7 @@ public sealed class ApiClient : IRestApiClient, IDisposable
         };
     }
 
-    public Task ExecuteAsync(ApiRoute route, RequestOptions options, CancellationToken token)
+    public Task ExecuteAsync(BasicApiRoute route, RequestOptions options, CancellationToken token)
         => SendAsync(
             route,
             new HttpRequestMessage(
@@ -241,5 +241,6 @@ public sealed class ApiClient : IRestApiClient, IDisposable
 
     public void Dispose()
     {
+        _httpClient.Dispose();
     }
 }

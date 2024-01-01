@@ -25,6 +25,8 @@ public sealed class ApiBodyRoute<TRequestBody, TResponseBody>(
     ContentType contentType = ContentType.JsonBody,
     BucketInfo? bucket = null)
     : ApiRoute(name, method, endpoint, bucket)
+    where TRequestBody : class
+    where TResponseBody : class
 {
     public TRequestBody Body { get; } = body;
     public ContentType ContentType { get; } = contentType;

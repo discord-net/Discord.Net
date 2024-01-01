@@ -2,7 +2,7 @@ namespace Discord.Rest;
 
 public interface IRestApiClient
 {
-    Task ExecuteAsync(ApiRoute route, RequestOptions options, CancellationToken token);
+    Task ExecuteAsync(BasicApiRoute route, RequestOptions options, CancellationToken token);
 
     Task<T?> ExecuteAsync<T>(ApiRoute<T> route, RequestOptions options, CancellationToken token)
         where T : class;

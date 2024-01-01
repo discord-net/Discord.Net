@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Represents options that should be used when sending a request.
 /// </summary>
-public readonly struct RequestOptions
+public sealed record RequestOptions
 {
     /// <summary>
     ///     Gets or sets the maximum time to wait for this request to complete.
@@ -16,12 +16,12 @@ public readonly struct RequestOptions
     /// <returns>
     ///     A <see cref="int"/> in milliseconds for when the request times out.
     /// </returns>
-    public readonly int Timeout;
+    public int Timeout { get; set; }
 
     /// <summary>
     ///     Gets or sets the retry behavior when the request fails.
     /// </summary>
-    public readonly RetryMode? RetryMode;
+    public RetryMode? RetryMode { get; set; }
 
     /// <summary>
     ///     Gets or sets the reason for this action in the guild's audit log.
@@ -30,7 +30,7 @@ public readonly struct RequestOptions
     ///     Gets or sets the reason that will be written to the guild's audit log if applicable. This may not apply
     ///     to all actions.
     /// </remarks>
-    public readonly string? AuditLogReason;
+    public string? AuditLogReason { get; set; }
 
     /// <summary>
     ///		Gets or sets whether or not this request should use the system
@@ -42,16 +42,18 @@ public readonly struct RequestOptions
     ///		when millisecond precision is especially important, and the
     ///		hosting system is known to have a desynced clock.
     /// </remarks>
-    public readonly bool? UseSystemClock;
+    public bool? UseSystemClock { get; set; }
 
     /// <summary>
     ///     Initializes a new <see cref="RequestOptions" /> class with the default request timeout set in
     ///     <see cref="DiscordConfig"/>.
     /// </summary>
-    public RequestOptions()
+    public RequestOptions(int? timeout = null, bool? useSystemClock = null, string? auditLogReason = null,
+        RetryMode? retryMode = null)
     {
+        UseSystemClock = useSystemClock;
+        AuditLogReason = auditLogReason;
+        RetryMode = retryMode;
         Timeout = DiscordConfig.DefaultRequestTimeout;
     }
-
-    public RequestOptions Clone() => (RequestOptions)MemberwiseClone();
 }

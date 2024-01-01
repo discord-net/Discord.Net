@@ -24,7 +24,7 @@ public static partial class Routes
     public static ApiRoute<GuildMember> GetCurrentUserGuildMember(ulong guildId)
         => new(nameof(GetCurrentUserGuildMember), RequestMethod.Get, $"users/@me/guilds/{guildId}/member", (ScopeType.Guild, guildId));
 
-    public static ApiRoute LeaveGuild(ulong guildId)
+    public static BasicApiRoute LeaveGuild(ulong guildId)
         => new(nameof(LeaveGuild), RequestMethod.Delete, $"users/@me/guilds/{guildId}", (ScopeType.Guild, guildId));
 
     public static ApiBodyRoute<CreateDMChannelParams, Channel> CreateDm(CreateDMChannelParams body)

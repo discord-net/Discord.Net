@@ -17,7 +17,7 @@ public static partial class Routes
             ContentType.JsonBody,
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute DeleteChannel(ulong channelId)
+    public static BasicApiRoute DeleteChannel(ulong channelId)
         => new(nameof(DeleteChannel),
             RequestMethod.Delete,
             $"/channels/{channelId}",
@@ -53,19 +53,19 @@ public static partial class Routes
             $"/channels/{channelId}/messages/{messageId}/crosspost",
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute CreateReaction(ulong channelId, ulong messageId, string emoji)
+    public static BasicApiRoute CreateReaction(ulong channelId, ulong messageId, string emoji)
         => new(nameof(CreateReaction),
             RequestMethod.Put,
             $"/channels/{channelId}/messages/{messageId}/reactions/{WebUtility.UrlEncode(emoji)}/@me",
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute DeleteReaction(ulong channelId, ulong messageId, string emoji)
+    public static BasicApiRoute DeleteReaction(ulong channelId, ulong messageId, string emoji)
         => new(nameof(DeleteReaction),
             RequestMethod.Delete,
             $"/channels/{channelId}/messages/{messageId}/reactions/{WebUtility.UrlEncode(emoji)}/@me",
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute DeleteUserReaction(ulong channelId, ulong messageId, string emoji, ulong userId)
+    public static BasicApiRoute DeleteUserReaction(ulong channelId, ulong messageId, string emoji, ulong userId)
         => new(nameof(DeleteUserReaction),
             RequestMethod.Delete,
             $"/channels/{channelId}/messages/{messageId}/reactions/{WebUtility.UrlEncode(emoji)}/{userId}",
@@ -77,13 +77,13 @@ public static partial class Routes
             $"/channels/{channelId}/messages/{messageId}/reactions/{WebUtility.UrlEncode(emoji)}{RouteUtils.GetUrlEncodedQueryParams(("after", afterId), ("limit", limit), ("type", type))}",
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute DeleteAllReactions(ulong channelId, ulong messageId)
+    public static BasicApiRoute DeleteAllReactions(ulong channelId, ulong messageId)
         => new(nameof(DeleteAllReactions),
             RequestMethod.Delete,
             $"/channels/{channelId}/messages/{messageId}/reactions",
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute DeleteAllReactionsForEmoji(ulong channelId, ulong messageId, string emoji)
+    public static BasicApiRoute DeleteAllReactionsForEmoji(ulong channelId, ulong messageId, string emoji)
         => new(nameof(DeleteAllReactionsForEmoji),
             RequestMethod.Delete,
             $"/channels/{channelId}/messages/{messageId}/reactions/{WebUtility.UrlEncode(emoji)}",
@@ -97,7 +97,7 @@ public static partial class Routes
             ContentType.JsonBody,
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute DeleteMessage(ulong channelId, ulong messageId)
+    public static BasicApiRoute DeleteMessage(ulong channelId, ulong messageId)
         => new(nameof(DeleteMessage),
             RequestMethod.Delete,
             $"/channels/{channelId}/messages/{messageId}",
@@ -133,7 +133,7 @@ public static partial class Routes
             ContentType.JsonBody,
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute DeleteChannelPermissions(ulong channelId, ulong overwriteId)
+    public static BasicApiRoute DeleteChannelPermissions(ulong channelId, ulong overwriteId)
     => new(nameof(DeleteChannelPermissions),
         RequestMethod.Delete,
         $"/channels/{channelId}/permissions/{overwriteId}",
@@ -146,31 +146,31 @@ public static partial class Routes
             body,
             ContentType.JsonBody,
             (ScopeType.Channel, channelId));
-    
-    public static ApiRoute TriggerTyping(ulong channelId)
+
+    public static BasicApiRoute TriggerTyping(ulong channelId)
         => new(nameof(TriggerTyping),
             RequestMethod.Post,
             $"/channels/{channelId}/typing",
             (ScopeType.Channel, channelId));
-    
+
     public static ApiRoute<Message[]> GetPinnedMessages(ulong channelId)
         => new(nameof(GetPinnedMessages),
             RequestMethod.Get,
             $"/channels/{channelId}/pins",
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute PinMessage(ulong channelId, ulong messageId)
+    public static BasicApiRoute PinMessage(ulong channelId, ulong messageId)
         => new(nameof(PinMessage),
             RequestMethod.Put,
             $"/channels/{channelId}/pins/{messageId}",
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute UnpinMessage(ulong channelId, ulong messageId)
+    public static BasicApiRoute UnpinMessage(ulong channelId, ulong messageId)
         => new(nameof(UnpinMessage),
             RequestMethod.Delete,
             $"/channels/{channelId}/pins/{messageId}",
             (ScopeType.Channel, channelId));
-    
+
     public static ApiBodyRoute<GroupDmAddRecipientParams> GroupDmAddRecipient(GroupDmAddRecipientParams body, ulong channelId, ulong userId)
         => new(nameof(GroupDmAddRecipient),
             RequestMethod.Put,
@@ -178,7 +178,7 @@ public static partial class Routes
             body,
             ContentType.JsonBody,
             (ScopeType.Channel, channelId));
-    
+
     public static ApiBodyRoute<StartThreadFromMessageParams, Channel> StartThreadFromMessage(StartThreadFromMessageParams body, ulong channelId, ulong messageId)
         => new(nameof(StartThreadFromMessage),
             RequestMethod.Post,
@@ -207,30 +207,30 @@ public static partial class Routes
             ContentType.JsonBody,
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute JoinThread(ulong channelId)
+    public static BasicApiRoute JoinThread(ulong channelId)
         => new(nameof(JoinThread),
             RequestMethod.Put,
             $"/channels/{channelId}/thread-members/@me",
             (ScopeType.Channel, channelId));
-    
-    public static ApiRoute AddThreadMember(ulong channelId, ulong userId)
+
+    public static BasicApiRoute AddThreadMember(ulong channelId, ulong userId)
         => new(nameof(AddThreadMember),
             RequestMethod.Put,
             $"/channels/{channelId}/thread-members/{userId}",
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute LeaveThread(ulong channelId)
+    public static BasicApiRoute LeaveThread(ulong channelId)
         => new(nameof(LeaveThread),
             RequestMethod.Delete,
             $"/channels/{channelId}/thread-members/@me",
             (ScopeType.Channel, channelId));
 
-    public static ApiRoute RemoveThreadMember(ulong channelId, ulong userId)
+    public static BasicApiRoute RemoveThreadMember(ulong channelId, ulong userId)
         => new(nameof(RemoveThreadMember),
             RequestMethod.Delete,
             $"/channels/{channelId}/thread-members/{userId}",
             (ScopeType.Channel, channelId));
-    
+
     public static ApiRoute<ThreadMember> GetThreadMember(ulong channelId, ulong userId, bool? withMember = default)
         => new(nameof(GetThreadMember),
             RequestMethod.Get,

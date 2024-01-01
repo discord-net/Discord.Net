@@ -121,6 +121,14 @@ public static class TokenUtils
         return DecodeBase64UserId(segments[0]).HasValue;
     }
 
+    internal static ulong GetUserIdFromToken(string token)
+    {
+        if (!CheckBotTokenValidity(token))
+            throw new ArgumentException("Token isn't valid");
+
+        return DecodeBase64UserId(token.Split('.')[0])!.Value;
+    }
+
     /// <summary>
     ///     The set of all characters that are not allowed inside of a token.
     /// </summary>
