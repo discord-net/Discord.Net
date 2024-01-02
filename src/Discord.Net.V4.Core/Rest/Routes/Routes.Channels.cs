@@ -7,9 +7,12 @@ namespace Discord.Rest;
 public static partial class Routes
 {
     public static ApiRoute<Channel> GetChannel(ulong channelId)
-        => new(nameof(GetChannel), RequestMethod.Get, $"/channels/{channelId}", (ScopeType.Channel, channelId));
+        => new(nameof(GetChannel),
+            RequestMethod.Get,
+            $"/channels/{channelId}",
+            (ScopeType.Channel, channelId));
 
-    public static ApiBodyRoute<ModifyChannelParams, Channel> ModifyChannel(ModifyChannelParams body, ulong channelId)
+    public static ApiBodyRoute<ModifyChannelParams, Channel> ModifyChannel(ulong channelId, ModifyChannelParams body)
         => new(nameof(ModifyChannel),
             RequestMethod.Patch,
             $"/channels/{channelId}",
@@ -35,7 +38,7 @@ public static partial class Routes
             $"/channels/{channelId}/messages/{messageId}",
             (ScopeType.Channel, channelId));
 
-    public static ApiBodyRoute<CreateMessageParams, Message> CreateMessage(CreateMessageParams body, ulong channelId)
+    public static ApiBodyRoute<CreateMessageParams, Message> CreateMessage(ulong channelId, CreateMessageParams body)
         => new(nameof(CreateMessage),
             RequestMethod.Post,
             $"/channels/{channelId}",
@@ -89,7 +92,7 @@ public static partial class Routes
             $"/channels/{channelId}/messages/{messageId}/reactions/{WebUtility.UrlEncode(emoji)}",
             (ScopeType.Channel, channelId));
 
-    public static ApiBodyRoute<ModifyMessageParams, Message> ModifyMessage(ModifyMessageParams body, ulong channelId, ulong messageId)
+    public static ApiBodyRoute<ModifyMessageParams, Message> ModifyMessage(ulong channelId, ulong messageId, ModifyMessageParams body)
         => new(nameof(ModifyMessage),
             RequestMethod.Patch,
             $"/channels/{channelId}/messages/{messageId}",
@@ -111,7 +114,7 @@ public static partial class Routes
             ContentType.JsonBody,
             (ScopeType.Channel, channelId));
 
-    public static ApiBodyRoute<ModifyChannelPermissionsParams> ModifyChannelPermissions(ModifyChannelPermissionsParams body, ulong channelId, ulong overwriteId)
+    public static ApiBodyRoute<ModifyChannelPermissionsParams> ModifyChannelPermissions(ulong channelId, ulong overwriteId, ModifyChannelPermissionsParams body)
         => new(nameof(ModifyChannelPermissions),
             RequestMethod.Put,
             $"/channels/{channelId}/permissions/{overwriteId}",
@@ -125,7 +128,7 @@ public static partial class Routes
             $"/channels/{channelId}/invites",
             (ScopeType.Channel, channelId));
 
-    public static ApiBodyRoute<CreateChannelInviteParams, Invite> CreateChannelInvite(CreateChannelInviteParams body, ulong channelId)
+    public static ApiBodyRoute<CreateChannelInviteParams, Invite> CreateChannelInvite(ulong channelId, CreateChannelInviteParams body)
         => new(nameof(CreateChannelInvite),
             RequestMethod.Post,
             $"/channels/{channelId}/invites",
@@ -139,7 +142,7 @@ public static partial class Routes
         $"/channels/{channelId}/permissions/{overwriteId}",
         (ScopeType.Channel, channelId));
 
-    public static ApiBodyRoute<FollowAnnouncementChannelParams, FollowedChannel> FollowAnnouncementChannel(FollowAnnouncementChannelParams body, ulong channelId)
+    public static ApiBodyRoute<FollowAnnouncementChannelParams, FollowedChannel> FollowAnnouncementChannel(ulong channelId, FollowAnnouncementChannelParams body)
         => new(nameof(FollowAnnouncementChannel),
             RequestMethod.Post,
             $"/channels/{channelId}/followers",
@@ -171,7 +174,7 @@ public static partial class Routes
             $"/channels/{channelId}/pins/{messageId}",
             (ScopeType.Channel, channelId));
 
-    public static ApiBodyRoute<GroupDmAddRecipientParams> GroupDmAddRecipient(GroupDmAddRecipientParams body, ulong channelId, ulong userId)
+    public static ApiBodyRoute<GroupDmAddRecipientParams> GroupDmAddRecipient(ulong channelId, ulong userId, GroupDmAddRecipientParams body)
         => new(nameof(GroupDmAddRecipient),
             RequestMethod.Put,
             $"/channels/{channelId}/recipients/{userId}",
@@ -179,7 +182,7 @@ public static partial class Routes
             ContentType.JsonBody,
             (ScopeType.Channel, channelId));
 
-    public static ApiBodyRoute<StartThreadFromMessageParams, Channel> StartThreadFromMessage(StartThreadFromMessageParams body, ulong channelId, ulong messageId)
+    public static ApiBodyRoute<StartThreadFromMessageParams, Channel> StartThreadFromMessage(ulong channelId, ulong messageId, StartThreadFromMessageParams body)
         => new(nameof(StartThreadFromMessage),
             RequestMethod.Post,
             $"/channels/{channelId}/messages/{messageId}/threads",
@@ -187,10 +190,7 @@ public static partial class Routes
             ContentType.JsonBody,
             (ScopeType.Channel, channelId));
 
-    public static string StartThreadWithoutMessage(ulong channelId)
-        => $"/channels/{channelId}/threads";
-
-    public static ApiBodyRoute<StartThreadParams, Channel> StartThreadWithoutMessage(StartThreadParams body, ulong channelId)
+    public static ApiBodyRoute<StartThreadParams, Channel> StartThreadWithoutMessage(ulong channelId, StartThreadParams body)
         => new(nameof(StartThreadWithoutMessage),
             RequestMethod.Post,
             $"/channels/{channelId}/threads",
@@ -199,7 +199,7 @@ public static partial class Routes
             (ScopeType.Channel, channelId));
 
     //TODO: add support for files
-    public static ApiBodyRoute<StartThreadInForumParams, Channel> StartThreadInForum(StartThreadInForumParams body, ulong channelId)
+    public static ApiBodyRoute<StartThreadInForumParams, Channel> StartThreadInForum(ulong channelId, StartThreadInForumParams body)
         => new(nameof(StartThreadInForum),
             RequestMethod.Post,
             $"/channels/{channelId}/threads",
@@ -237,21 +237,28 @@ public static partial class Routes
             $"/channels/{channelId}/thread-members/{userId}{RouteUtils.GetUrlEncodedQueryParams(("with_member", withMember))}",
             (ScopeType.Channel, channelId));
 
-    public static string ListThreadMembers(ulong channelId, bool? withMember = default, ulong? afterId = default, int? limit = default)
-        => $"/channels/{channelId}/thread-members{RouteUtils.GetUrlEncodedQueryParams(("with_member", withMember),
-            ("after", afterId),
-            ("limit", limit))}";
+    public static ApiRoute<ThreadMember[]> ListThreadMembers(ulong channelId, bool? withMember = default, ulong? afterId = default, int? limit = default)
+        => new(nameof(ListThreadMembers),
+            RequestMethod.Get,
+            $"/channels/{channelId}/thread-members{RouteUtils.GetUrlEncodedQueryParams(("with_member", withMember), ("after", afterId), ("limit", limit))}",
+            (ScopeType.Channel, channelId));
 
-    public static string ListPublicArchivedThreads(ulong channelId, DateTimeOffset? before = default, int? limit = default)
-        => $"/channels/{channelId}/threads/archived/public{RouteUtils.GetUrlEncodedQueryParams(("before", before),
-            ("limit", limit))}";
+    public static ApiRoute<ChannelThreads> ListPublicArchivedThreads(ulong channelId, DateTimeOffset? beforeId = default, int? limit = default)
+        => new(nameof(ListPublicArchivedThreads),
+            RequestMethod.Get,
+            $"/channels/{channelId}/threads/archived/public{RouteUtils.GetUrlEncodedQueryParams(("before", beforeId), ("limit", limit))}",
+            (ScopeType.Channel, channelId));
 
-    public static string ListPrivateArchivedThreads(ulong channelId, DateTimeOffset? before = default, int? limit = default)
-        => $"/channels/{channelId}/threads/archived/private{RouteUtils.GetUrlEncodedQueryParams(("before", before),
-            ("limit", limit))}";
+    public static ApiRoute<ChannelThreads> ListPrivateArchivedThreads(ulong channelId, DateTimeOffset? beforeId = default, int? limit = default)
+        => new(nameof(ListPrivateArchivedThreads),
+            RequestMethod.Get,
+            $"/channels/{channelId}/threads/archived/private{RouteUtils.GetUrlEncodedQueryParams(("before", beforeId), ("limit", limit))}",
+            (ScopeType.Channel, channelId));
 
-    public static string ListPrivateArchivedThreads(ulong channelId, ulong? beforeId = default, int? limit = default)
-        => $"/channels/{channelId}/users/@me/threads/archived/private{RouteUtils.GetUrlEncodedQueryParams(("before", beforeId),
-            ("limit", limit))}";
+    public static ApiRoute<ChannelThreads> ListJoinedPrivateArchivedThreads(ulong channelId, DateTimeOffset? beforeId = default, int? limit = default)
+        => new(nameof(ListJoinedPrivateArchivedThreads),
+            RequestMethod.Get,
+            $"/channels/{channelId}/users/@me/threads/archived/private{RouteUtils.GetUrlEncodedQueryParams(("before", beforeId), ("limit", limit))}",
+            (ScopeType.Channel, channelId));
 
 }

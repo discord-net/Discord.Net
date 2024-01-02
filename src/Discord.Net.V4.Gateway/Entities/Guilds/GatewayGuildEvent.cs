@@ -31,7 +31,7 @@ namespace Discord.Gateway
         public GuildScheduledEventStatus Status
             => _source.Status;
 
-        public GuildScheduledEventType Type
+        public GuildScheduledEntityType Type
             => _source.Type;
 
         public ulong? EntityId

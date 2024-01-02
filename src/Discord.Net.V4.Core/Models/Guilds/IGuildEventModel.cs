@@ -11,7 +11,7 @@ namespace Discord.Models
         DateTimeOffset? EndTime { get; }
         GuildScheduledEventPrivacyLevel PrivacyLevel { get; }
         GuildScheduledEventStatus Status { get; }
-        GuildScheduledEventType Type { get; }
+        GuildScheduledEntityType Type { get; }
         ulong? EntityId { get; }
         int? UserCount { get; }
         string? Image { get; }

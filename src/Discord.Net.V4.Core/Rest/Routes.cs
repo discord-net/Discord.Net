@@ -1,48 +1,4 @@
-//using System.Net;
-
-//namespace Discord;
-
-///// <summary>
-/////     Generates route strings for Discord API endpoints.
-///// </summary>
-//public class Routes
-//{
-//    //public static string GetUrlEncodedQueryParams(params (string, object?)[] args)
-//    //{
-//    //    if (args.All(x => x.Item2 is null))
-//    //        return string.Empty;
-
-//    //    var paramsString = string.Join("&", args.Where(x => x.Item2 is not null)
-//    //        .Select(x => GetUrlEncodedQueryParam(x.Item1, x.Item2!)));
-
-//    //    return $"?{paramsString}";
-//    //}
-
-//    //public static string GetUrlEncodedQueryParam(string key, object value)
-//    //    => $"{key}={WebUtility.UrlEncode(value.ToString())}";
-
-//    //public static string GetCommaDelimitedSnowflakeArray(ulong[] ids)
-//    //    => ids.Length > 0
-//    //        ? string.Join(',', ids)
-//    //        : string.Empty;
-
-
-
-//    //#region Channel
-
-//    //#endregion
-
-//    //#region Emoji
-
-//    //public static string GuildEmojis(ulong guildId)
-//    //    => $"guilds/{guildId}/emojis";
-
-//    //public static string Emoji(ulong guildId, ulong emojiId)
-//    //    => $"guilds/{guildId}/emojis/{emojiId}";
-
-//    //#endregion
-
-//    //#region Guild
+#region Guild
 
 //    //public static string Guilds
 //    //    => "guilds";
@@ -140,44 +96,9 @@
 //    //public static string ModifyUserVoiceState(ulong guildId, ulong userId)
 //    //        => $"guilds/{guildId}/voice-states/{userId}";
 
-//    //#endregion
+#endregion
 
-//    //#region Guild Scheduled Events
-
-//    //public static string ListGuildScheduledEvents(ulong guildId, bool? withUserCount = default)
-//    //    => $"guilds/{guildId}/scheduled-events{GetUrlEncodedQueryParams(("with_user_count", withUserCount))}";
-
-//    //public static string CreateGuildScheduledEvent(ulong guildId)
-//    //    => $"guilds/{guildId}/scheduled-events";
-
-//    //public static string GetGuildScheduledEvent(ulong guildId, ulong eventId, bool? withUserCount = default)
-//    //    => $"guilds/{guildId}/scheduled-events/{eventId}{GetUrlEncodedQueryParams(("with_user_count", withUserCount))}";
-
-//    //public static string UpdateGuildScheduledEvent(ulong guildId, ulong eventId)
-//    //    => $"guilds/{guildId}/scheduled-events/{eventId}";
-
-//    //public static string GetGuildScheduledEventUsers(ulong guildId, ulong eventId, int? limit = default, bool? withMember = default, ulong? beforeId = default, ulong? afterId = default)
-//    //    => $"guilds/{guildId}/scheduled-events/{eventId}/users{GetUrlEncodedQueryParams(("limit", limit),
-//    //        ("with_member", withMember),
-//    //        ("before", beforeId),
-//    //        ("after", afterId))}";
-
-//    //#endregion
-
-//    //#region Guild Template
-
-//    //public static string GuildTemplate(string templateCode)
-//    //    => $"guilds/templates/{templateCode}";
-
-//    //public static string GuildTemplates(ulong guildId)
-//    //    => $"guilds/{guildId}/templates";
-
-//    //public static string UpdateGuildTemplate(ulong guildId, string templateCode)
-//    //    => $"guilds/{guildId}/templates/{templateCode}";
-
-//    //#endregion
-
-//    //#region Invite
+#region Invite
 
 //    //public static string GetInvite(string code, bool? withCounts = default, bool? withExpiration = default, ulong? eventId = default)
 //    //    => $"invites/{code}{GetUrlEncodedQueryParams(("with_counts", withCounts),
@@ -213,47 +134,9 @@
 //    //public static string GuildSticker(ulong guildId, ulong stickerId)
 //    //    => $"guilds/{guildId}/stickers/{stickerId}";
 
-//    //#endregion
+#endregion
 
-//    //#region User
-
-//    //public static string GetUser(ulong userId)
-//    //    => $"users/{userId}";
-
-//    //public static string CurrentUser
-//    //    => $"users/@me";
-
-//    //public static string GetCurrentUserGuilds(ulong? before = default, ulong? after = default, int? limit = default, bool? withCounts = default)
-//    //    => $"users/@me/guilds{GetUrlEncodedQueryParams(("before", before),
-//    //        ("after", after),
-//    //        ("limit", limit),
-//    //        ("with_counts", withCounts))}";
-
-//    //public static string GetCurrentUserGuildMember(ulong guildId)
-//    //    => $"users/@me/guilds/{guildId}/member";
-
-//    //public static string LeaveGuild(ulong guildId)
-//    //    => $"users/@me/guilds/{guildId}";
-
-//    //public static string CreateDm
-//    //    => "users/@me/channels";
-
-//    //public static string GetUserConnections
-//    //    => "users/@me/connections";
-
-//    //public static string ApplicationRoleConnection(ulong applicationId)
-//    //    => $"users/@me/applications/{applicationId}/role-connection";
-
-//    //#endregion
-
-//    //#region Voice
-
-//    //public static string ListVoiceRegions
-//    //    => $"voice/regions";
-
-//    //#endregion
-
-//    //#region Webhook
+#region Webhook
 
 //    //public static string ChannelWebhook(ulong channelId)
 //    //    => $"channels/{channelId}/webhooks";
@@ -278,6 +161,4 @@
 
 //    //public static string WebhookMessage(ulong webhookId, string webhookToken, ulong messageId, ulong? threadId = default)
 //    //    => $"webhooks/{webhookId}/{webhookToken}/messages/{messageId}{GetUrlEncodedQueryParams(("thread_id", threadId))}";
-
-//    //#endregion
-//}
+#endregion

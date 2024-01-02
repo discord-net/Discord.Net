@@ -35,7 +35,7 @@ public sealed class GuildScheduledEvent
     public GuildScheduledEventStatus Status { get; set; }
 
     [JsonPropertyName("entity_type")]
-    public GuildScheduledEventType EntityType { get; set; }
+    public GuildScheduledEntityType EntityType { get; set; }
 
     [JsonPropertyName("entity_id")]
     public ulong? EntityId { get; set; }
