@@ -110,7 +110,7 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public string GetCoverImageUrl(ImageFormat format = ImageFormat.Auto, ushort size = 1024)
-            => CDN.GetEventCoverImageUrl(Guild.Id, Id, CoverImageId, format, size);
+            => CDN.GetEventCoverImageUrl(GuildId, Id, CoverImageId, format, size);
 
         /// <inheritdoc/>
         public Task StartAsync(RequestOptions options = null)
