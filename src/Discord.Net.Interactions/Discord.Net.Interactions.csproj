@@ -3,12 +3,14 @@
   <Import Project="../../StyleAnalyzer.targets" />
   <PropertyGroup>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net6.0;net5.0;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <LangVersion>preview</LangVersion>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net6.0;net5.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <RootNamespace>Discord.Interactions</RootNamespace>
     <AssemblyName>Discord.Net.Interactions</AssemblyName>
     <Description>A Discord.Net extension adding support for Application Commands.</Description>
     <WarningLevel>5</WarningLevel>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
   </PropertyGroup>
   
   <ItemGroup>
