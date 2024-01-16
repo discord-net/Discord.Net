@@ -56,10 +56,20 @@ namespace Discord.Commands
         {
             Text = text;
         }
+
         public CommandAttribute(string text, bool ignoreExtraArgs)
         {
             Text = text;
             IgnoreExtraArgs = ignoreExtraArgs;
+        }
+
+        public CommandAttribute(string text, bool ignoreExtraArgs, string summary = default, string[] aliases = default, string remarks = default)
+        {
+            Text = text;
+            IgnoreExtraArgs = ignoreExtraArgs;
+            Summary = summary;
+            Aliases = aliases;
+            Remarks = remarks;
         }
     }
 }
