@@ -1,5 +1,7 @@
-using System;
+using Discord.API;
 using Discord.API.Rest;
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -15,6 +17,49 @@ namespace Discord.Rest
         {
             var model = await client.ApiClient.GetMyApplicationAsync(options).ConfigureAwait(false);
             return RestApplication.Create(client, model);
+        }
+
+        public static async Task<RestApplication> GetCurrentBotApplicationAsync(BaseDiscordClient client, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetCurrentBotApplicationAsync(options).ConfigureAwait(false);
+            return RestApplication.Create(client, model);
+        }
+
+        public static Task<API.Application> ModifyCurrentBotApplicationAsync(BaseDiscordClient client, Action<ModifyApplicationProperties> func, RequestOptions options)
+        {
+            var args = new ModifyApplicationProperties();
+            func(args);
+
+            if (args.Tags.IsSpecified)
+            {
+                Preconditions.AtMost(args.Tags.Value.Length, DiscordConfig.MaxApplicationTagCount, nameof(args.Tags), $"An application can have a maximum of {DiscordConfig.MaxApplicationTagCount} applied.");
+                foreach (var tag in args.Tags.Value)
+                    Preconditions.AtMost(tag.Length, DiscordConfig.MaxApplicationTagLength, nameof(args.Tags), $"An application tag must have length less or equal to {DiscordConfig.MaxApplicationTagLength}");
+            }
+
+            if (args.Description.IsSpecified)
+                Preconditions.AtMost(args.Description.Value.Length, DiscordConfig.MaxApplicationDescriptionLength, nameof(args.Description), $"An application description tag mus have length less or equal to {DiscordConfig.MaxApplicationDescriptionLength}");
+
+            return client.ApiClient.ModifyCurrentBotApplicationAsync(new()
+            {
+                Description = args.Description,
+                Tags = args.Tags,
+                Icon = args.Icon.IsSpecified ? args.Icon.Value?.ToModel() : Optional<API.Image?>.Unspecified,
+                InteractionsEndpointUrl = args.InteractionsEndpointUrl,
+                RoleConnectionsEndpointUrl = args.RoleConnectionsEndpointUrl,
+                Flags = args.Flags,
+                CoverImage = args.CoverImage.IsSpecified ? args.CoverImage.Value?.ToModel() : Optional<API.Image?>.Unspecified,
+                CustomInstallUrl = args.CustomInstallUrl,
+                InstallParams = args.InstallParams.IsSpecified
+                    ? args.InstallParams.Value is null
+                        ? null
+                        : new InstallParams
+                        {
+                            Permission = (ulong)args.InstallParams.Value.Permission,
+                            Scopes = args.InstallParams.Value.Scopes.ToArray()
+                        }
+                    : Optional<InstallParams>.Unspecified,
+            }, options);
         }
 
         public static async Task<RestChannel> GetChannelAsync(BaseDiscordClient client,
@@ -52,10 +97,9 @@ namespace Discord.Rest
             return models.Select(model => RestConnection.Create(client, model)).ToImmutableArray();
         }
 
-        public static async Task<RestInviteMetadata> GetInviteAsync(BaseDiscordClient client,
-            string inviteId, RequestOptions options)
+        public static async Task<RestInviteMetadata> GetInviteAsync(BaseDiscordClient client, string inviteId, RequestOptions options, ulong? scheduledEventId = null)
         {
-            var model = await client.ApiClient.GetInviteAsync(inviteId, options).ConfigureAwait(false);
+            var model = await client.ApiClient.GetInviteAsync(inviteId, options, scheduledEventId).ConfigureAwait(false);
             if (model != null)
                 return RestInviteMetadata.Create(client, null, null, model);
             return null;
@@ -263,6 +307,138 @@ namespace Discord.Rest
 
         public static Task RemoveRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
             => client.ApiClient.RemoveRoleAsync(guildId, userId, roleId, options);
+        #endregion
+
+        #region Role Connection Metadata
+
+        public static async Task<IReadOnlyCollection<RoleConnectionMetadata>> GetRoleConnectionMetadataRecordsAsync(BaseDiscordClient client, RequestOptions options = null)
+            => (await client.ApiClient.GetApplicationRoleConnectionMetadataRecordsAsync(options))
+                .Select(model
+                    => new RoleConnectionMetadata(
+                        model.Type,
+                        model.Key,
+                        model.Name,
+                        model.Description,
+                        model.NameLocalizations.IsSpecified
+                            ? model.NameLocalizations.Value?.ToImmutableDictionary()
+                            : null,
+                        model.DescriptionLocalizations.IsSpecified
+                            ? model.DescriptionLocalizations.Value?.ToImmutableDictionary()
+                            : null))
+                .ToImmutableArray();
+
+        public static async Task<IReadOnlyCollection<RoleConnectionMetadata>> ModifyRoleConnectionMetadataRecordsAsync(ICollection<RoleConnectionMetadataProperties> metadata, BaseDiscordClient client, RequestOptions options = null)
+            => (await client.ApiClient.UpdateApplicationRoleConnectionMetadataRecordsAsync(metadata
+                .Select(x => new API.RoleConnectionMetadata
+                {
+                    Name = x.Name,
+                    Description = x.Description,
+                    Key = x.Key,
+                    Type = x.Type,
+                    NameLocalizations = x.NameLocalizations?.ToDictionary(),
+                    DescriptionLocalizations = x.DescriptionLocalizations?.ToDictionary()
+                }).ToArray()))
+                .Select(model
+                    => new RoleConnectionMetadata(
+                        model.Type,
+                        model.Key,
+                        model.Name,
+                        model.Description,
+                        model.NameLocalizations.IsSpecified
+                            ? model.NameLocalizations.Value?.ToImmutableDictionary()
+                            : null,
+                        model.DescriptionLocalizations.IsSpecified
+                            ? model.DescriptionLocalizations.Value?.ToImmutableDictionary()
+                            : null))
+                .ToImmutableArray();
+
+        public static async Task<RoleConnection> GetUserRoleConnectionAsync(ulong applicationId, BaseDiscordClient client, RequestOptions options = null)
+        {
+            var roleConnection = await client.ApiClient.GetUserApplicationRoleConnectionAsync(applicationId, options);
+
+            return new RoleConnection(roleConnection.PlatformName.GetValueOrDefault(null),
+                roleConnection.PlatformUsername.GetValueOrDefault(null),
+                roleConnection.Metadata.GetValueOrDefault());
+        }
+
+        public static async Task<RoleConnection> ModifyUserRoleConnectionAsync(ulong applicationId, RoleConnectionProperties roleConnection, BaseDiscordClient client, RequestOptions options = null)
+        {
+            var updatedConnection = await client.ApiClient.ModifyUserApplicationRoleConnectionAsync(applicationId,
+                new API.RoleConnection
+                {
+                    PlatformName = roleConnection.PlatformName,
+                    PlatformUsername = roleConnection.PlatformUsername,
+                    Metadata = roleConnection.Metadata
+                }, options);
+
+            return new RoleConnection(
+                updatedConnection.PlatformName.GetValueOrDefault(null),
+                updatedConnection.PlatformUsername.GetValueOrDefault(null),
+                updatedConnection.Metadata.GetValueOrDefault()?.ToImmutableDictionary()
+                );
+        }
+
+
+        #endregion
+
+        #region App Subscriptions
+
+        public static async Task<RestEntitlement> CreateTestEntitlementAsync(BaseDiscordClient client, ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType,
+            RequestOptions options = null)
+        {
+            var model = await client.ApiClient.CreateEntitlementAsync(new CreateEntitlementParams
+            {
+                Type = ownerType,
+                OwnerId = ownerId,
+                SkuId = skuId
+            }, options);
+
+            return RestEntitlement.Create(client, model);
+        }
+
+        public static IAsyncEnumerable<IReadOnlyCollection<RestEntitlement>> ListEntitlementsAsync(BaseDiscordClient client, int? limit = 100,
+            ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
+             ulong[] skuIds = null, RequestOptions options = null)
+        {
+            return new PagedAsyncEnumerable<RestEntitlement>(
+                DiscordConfig.MaxEntitlementsPerBatch,
+                async (info, ct) =>
+                {
+                    var args = new ListEntitlementsParams()
+                    {
+                        Limit = info.PageSize,
+                        BeforeId = beforeId ?? Optional<ulong>.Unspecified,
+                        ExcludeEnded = excludeEnded,
+                        GuildId = guildId ?? Optional<ulong>.Unspecified,
+                        UserId = userId ?? Optional<ulong>.Unspecified,
+                        SkuIds = skuIds ?? Optional<ulong[]>.Unspecified,
+                    };
+                    if (info.Position != null)
+                        args.AfterId = info.Position.Value;
+                    var models = await client.ApiClient.ListEntitlementAsync(args, options).ConfigureAwait(false);
+                    return models
+                        .Select(x => RestEntitlement.Create(client, x))
+                        .ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxEntitlementsPerBatch)
+                        return false;
+                    info.Position = lastPage.Max(x => x.Id);
+                    return true;
+                },
+                start: afterId,
+                count: limit
+            );
+        }
+
+        public static async Task<IReadOnlyCollection<SKU>> ListSKUsAsync(BaseDiscordClient client, RequestOptions options = null)
+        {
+            var models = await client.ApiClient.ListSKUsAsync(options).ConfigureAwait(false);
+
+            return models.Select(x => new SKU(x.Id, x.Type, x.ApplicationId, x.Name, x.Slug)).ToImmutableArray();
+        }
+
         #endregion
     }
 }

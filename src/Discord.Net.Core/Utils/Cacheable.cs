@@ -25,12 +25,12 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This value is not guaranteed to be set; in cases where the entity cannot be pulled from cache, it is
-        ///     <c>null</c>.
+        ///     <see langword="null" />.
         /// </remarks>
         public TEntity Value { get; }
         private Func<Task<TEntity>> DownloadFunc { get; }
 
-        internal Cacheable(TEntity value, TId id, bool hasValue , Func<Task<TEntity>> downloadFunc)
+        internal Cacheable(TEntity value, TId id, bool hasValue, Func<Task<TEntity>> downloadFunc)
         {
             Value = value;
             Id = id;
@@ -47,10 +47,8 @@ namespace Discord
         ///     A task that represents the asynchronous download operation. The task result contains the downloaded
         ///     entity.
         /// </returns>
-        public async Task<TEntity> DownloadAsync()
-        {
-            return await DownloadFunc().ConfigureAwait(false);
-        }
+        public Task<TEntity> DownloadAsync()
+            => DownloadFunc();
 
         /// <summary>
         ///     Returns the cached entity if it exists; otherwise downloads it.
@@ -81,7 +79,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This value is not guaranteed to be set; in cases where the entity cannot be pulled from cache, it is
-        ///     <c>null</c>.
+        ///     <see langword="null" />.
         /// </remarks>
         public TCachedEntity Value { get; }
         private Func<Task<TDownloadableEntity>> DownloadFunc { get; }
@@ -103,9 +101,9 @@ namespace Discord
         ///     A task that represents the asynchronous download operation. The task result contains the downloaded
         ///     entity.
         /// </returns>
-        public async Task<TDownloadableEntity> DownloadAsync()
+        public Task<TDownloadableEntity> DownloadAsync()
         {
-            return await DownloadFunc().ConfigureAwait(false);
+            return DownloadFunc();
         }
 
         /// <summary>

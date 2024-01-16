@@ -68,7 +68,7 @@ namespace Discord.Net.Converters
                         Errors = prop.Value.ToObject<Error[]>()
                     });
                 }
-                else if(int.TryParse(prop.Name, out var i)) // array value
+                else if (int.TryParse(prop.Name, out var i)) // array value
                 {
                     var r = prop.Value.CreateReader();
                     errs.AddRange(ReadErrors(r, path + $"[{i}]"));

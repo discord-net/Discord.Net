@@ -43,6 +43,12 @@ namespace Discord.API
         [JsonProperty("rtc_region")]
         public Optional<string> RTCRegion { get; set; }
 
+        [JsonProperty("video_quality_mode")]
+        public Optional<VideoQualityMode> VideoQualityMode { get; set; }
+
+        [JsonProperty("status")]
+        public Optional<string> Status { get; set; }
+
         //PrivateChannel
         [JsonProperty("recipients")]
         public Optional<User[]> Recipients { get; set; }
@@ -69,7 +75,7 @@ namespace Discord.API
 
         //ForumChannel
         [JsonProperty("available_tags")]
-        public Optional<ForumTags[]> ForumTags { get; set; }
+        public Optional<ForumTag[]> ForumTags { get; set; }
 
         [JsonProperty("applied_tags")]
         public Optional<ulong[]> AppliedTags { get; set; }

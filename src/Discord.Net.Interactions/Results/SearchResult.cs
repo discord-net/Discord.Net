@@ -32,7 +32,7 @@ namespace Discord.Interactions
         /// <inheritdoc/>
         public bool IsSuccess => !Error.HasValue;
 
-        private SearchResult (string text, T commandInfo, string[] captureGroups, InteractionCommandError? error, string reason)
+        private SearchResult(string text, T commandInfo, string[] captureGroups, InteractionCommandError? error, string reason)
         {
             Text = text;
             Error = error;
@@ -47,7 +47,7 @@ namespace Discord.Interactions
         /// <returns>
         ///     A <see cref="SearchResult{T}" /> that does not contain any errors.
         /// </returns>
-        public static SearchResult<T> FromSuccess (string text, T commandInfo, string[] wildCardMatch = null) =>
+        public static SearchResult<T> FromSuccess(string text, T commandInfo, string[] wildCardMatch = null) =>
             new SearchResult<T>(text, commandInfo, wildCardMatch, null, null);
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Discord.Interactions
         /// <returns>
         ///     A <see cref="SearchResult{T}" /> that contains a <see cref="InteractionCommandError" /> and reason.
         /// </returns>
-        public static SearchResult<T> FromError (string text, InteractionCommandError error, string reason) =>
+        public static SearchResult<T> FromError(string text, InteractionCommandError error, string reason) =>
             new SearchResult<T>(text, null, null, error, reason);
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Discord.Interactions
         ///     with a <see cref="InteractionCommandError" /> of type <c>Exception</c> as well as the exception message as the
         ///     reason.
         /// </returns>
-        public static SearchResult<T> FromError (Exception ex) =>
+        public static SearchResult<T> FromError(Exception ex) =>
             new SearchResult<T>(null, null, null, InteractionCommandError.Exception, ex.Message);
 
         /// <summary>
@@ -84,10 +84,10 @@ namespace Discord.Interactions
         /// <returns>
         ///     A <see cref="SearchResult{T}"/> that inherits the <see cref="IResult"/> error type and reason.
         /// </returns>
-        public static SearchResult<T> FromError (IResult result) =>
+        public static SearchResult<T> FromError(IResult result) =>
             new SearchResult<T>(null, null, null, result.Error, result.ErrorReason);
 
         /// <inheritdoc/>
-        public override string ToString ( ) => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
+        public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
     }
 }

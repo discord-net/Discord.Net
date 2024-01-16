@@ -50,7 +50,8 @@ namespace Discord.Rest
                 ChannelType.NewsThread or
                 ChannelType.PrivateThread or
                 ChannelType.PublicThread or
-                ChannelType.Forum
+                ChannelType.Forum or
+                ChannelType.Media
                     => RestGuildChannel.Create(discord, guild, model),
                 ChannelType.DM or ChannelType.Group => CreatePrivate(discord, model) as RestChannel,
                 ChannelType.Category => RestCategoryChannel.Create(discord, guild, model),

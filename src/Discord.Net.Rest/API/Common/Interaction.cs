@@ -23,6 +23,9 @@ namespace Discord.API
         [JsonProperty("channel_id")]
         public Optional<ulong> ChannelId { get; set; }
 
+        [JsonProperty("channel")]
+        public Optional<Channel> Channel { get; set; }
+
         [JsonProperty("member")]
         public Optional<GuildMember> Member { get; set; }
 
@@ -43,5 +46,8 @@ namespace Discord.API
 
         [JsonProperty("guild_locale")]
         public Optional<string> GuildLocale { get; set; }
+
+        [JsonProperty("entitlements")]
+        public Entitlement[] Entitlements { get; set; }
     }
 }

@@ -11,19 +11,9 @@ namespace Discord.Rest
 {
     internal static class ThreadHelper
     {
-        public static async Task<Model> CreateThreadAsync(BaseDiscordClient client, ITextChannel channel, string name, ThreadType type = ThreadType.PublicThread,
+        public static Task<Model> CreateThreadAsync(BaseDiscordClient client, ITextChannel channel, string name, ThreadType type = ThreadType.PublicThread,
             ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
         {
-            var features = channel.Guild.Features;
-            if (autoArchiveDuration == ThreadArchiveDuration.OneWeek && !features.HasFeature(GuildFeature.SevenDayThreadArchive))
-                throw new ArgumentException($"The guild {channel.Guild.Name} does not have the SEVEN_DAY_THREAD_ARCHIVE feature!", nameof(autoArchiveDuration));
-
-            if (autoArchiveDuration == ThreadArchiveDuration.ThreeDays && !features.HasFeature(GuildFeature.ThreeDayThreadArchive))
-                throw new ArgumentException($"The guild {channel.Guild.Name} does not have the THREE_DAY_THREAD_ARCHIVE feature!", nameof(autoArchiveDuration));
-
-            if (type == ThreadType.PrivateThread && !features.HasFeature(GuildFeature.PrivateThreads))
-                throw new ArgumentException($"The guild {channel.Guild.Name} does not have the PRIVATE_THREADS feature!", nameof(type));
-
             if (channel is INewsChannel && type != ThreadType.NewsThread)
                 throw new ArgumentException($"{nameof(type)} must be a {ThreadType.NewsThread} in News channels");
 
@@ -36,17 +26,13 @@ namespace Discord.Rest
                 Ratelimit = slowmode.HasValue ? slowmode.Value : Optional<int?>.Unspecified,
             };
 
-            Model model;
-
             if (message != null)
-                model = await client.ApiClient.StartThreadAsync(channel.Id, message.Id, args, options).ConfigureAwait(false);
+                return client.ApiClient.StartThreadAsync(channel.Id, message.Id, args, options);
             else
-                model = await client.ApiClient.StartThreadAsync(channel.Id, args, options).ConfigureAwait(false);
-
-            return model;
+                return client.ApiClient.StartThreadAsync(channel.Id, args, options);
         }
 
-        public static async Task<Model> ModifyAsync(IThreadChannel channel, BaseDiscordClient client,
+        public static Task<Model> ModifyAsync(IThreadChannel channel, BaseDiscordClient client,
             Action<ThreadChannelProperties> func,
             RequestOptions options)
         {
@@ -65,7 +51,7 @@ namespace Discord.Rest
                 AppliedTags = args.AppliedTags,
                 Flags = args.Flags,
             };
-            return await client.ApiClient.ModifyThreadAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyThreadAsync(channel.Id, apiArgs, options);
         }
 
         public static async Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(IGuild guild, ulong channelId, BaseDiscordClient client, RequestOptions options)
@@ -95,11 +81,27 @@ namespace Discord.Rest
             return result.Threads.Select(x => RestThreadChannel.Create(client, channel.Guild, x)).ToImmutableArray();
         }
 
-        public static async Task<RestThreadUser[]> GetUsersAsync(IThreadChannel channel, BaseDiscordClient client, RequestOptions options = null)
+        public static IAsyncEnumerable<IReadOnlyCollection<RestThreadUser>> GetUsersAsync(IThreadChannel channel, BaseDiscordClient client, int limit = DiscordConfig.MaxThreadMembersPerBatch, ulong? afterId = null, RequestOptions options = null)
         {
-            var users = await client.ApiClient.ListThreadMembersAsync(channel.Id, options);
-
-            return users.Select(x => RestThreadUser.Create(client, channel.Guild, x, channel)).ToArray();
+            return new PagedAsyncEnumerable<RestThreadUser>(
+                limit,
+                async (info, ct) =>
+                {
+                    if (info.Position != null)
+                        afterId = info.Position.Value;
+                    var users = await client.ApiClient.ListThreadMembersAsync(channel.Id, afterId, limit, options);
+                    return users.Select(x => RestThreadUser.Create(client, channel.Guild, x, channel)).ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != limit)
+                        return false;
+                    info.Position = lastPage.Max(x => x.Id);
+                    return true;
+                },
+                start: afterId,
+                count: limit
+            );
         }
 
         public static async Task<RestThreadUser> GetUserAsync(ulong userId, IThreadChannel channel, BaseDiscordClient client, RequestOptions options = null)
@@ -209,7 +211,7 @@ namespace Discord.Rest
 
             if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
                 throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
-            
+
             if (channel.Flags.HasFlag(ChannelFlags.RequireTag))
                 throw new ArgumentException($"The channel {channel.Name} requires posts to have at least one tag.");
 
@@ -223,7 +225,8 @@ namespace Discord.Rest
                 MessageComponent = components?.Components?.Any() ?? false ? components.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
                 Slowmode = slowmode,
                 Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified,
-                Title = title
+                Title = title,
+                TagIds = tagIds
             };
 
             var model = await client.ApiClient.CreatePostAsync(channel.Id, args, options);

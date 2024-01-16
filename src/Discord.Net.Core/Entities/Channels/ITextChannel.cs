@@ -8,13 +8,13 @@ namespace Discord
     /// <summary>
     ///     Represents a generic channel in a guild that can send and receive messages.
     /// </summary>
-    public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel
+    public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel, IIntegrationChannel
     {
         /// <summary>
         ///     Gets a value that indicates whether the channel is NSFW.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the channel has the NSFW flag enabled; otherwise <c>false</c>.
+        ///     <see langword="true" /> if the channel has the NSFW flag enabled; otherwise <see langword="false" />.
         /// </returns>
         bool IsNsfw { get; }
 
@@ -22,7 +22,7 @@ namespace Discord
         ///     Gets the current topic for this text channel.
         /// </summary>
         /// <returns>
-        ///     A string representing the topic set in the channel; <c>null</c> if none is set.
+        ///     A string representing the topic set in the channel; <see langword="null" /> if none is set.
         /// </returns>
         string Topic { get; }
 
@@ -34,6 +34,15 @@ namespace Discord
         ///     message; <c>0</c> if disabled.
         /// </returns>
         int SlowModeInterval { get; }
+
+        /// <summary>
+        /// Gets the current default slow-mode delay for threads in this channel.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="int"/> representing the time in seconds required before the user can send another
+        ///     message; <c>0</c> if disabled.
+        /// </returns>
+        int DefaultSlowModeInterval { get; }
 
         /// <summary>
         ///     Gets the default auto-archive duration for client-created threads in this channel.
@@ -94,37 +103,6 @@ namespace Discord
         /// </returns>
         /// <seealso cref="TextChannelProperties"/>
         Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null);
-        
-        /// <summary>
-        ///     Creates a webhook in this text channel.
-        /// </summary>
-        /// <param name="name">The name of the webhook.</param>
-        /// <param name="avatar">The avatar of the webhook.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
-        ///     webhook.
-        /// </returns>
-        Task<IWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null);
-        /// <summary>
-        ///     Gets a webhook available in this text channel.
-        /// </summary>
-        /// <param name="id">The identifier of the webhook.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a webhook associated
-        ///     with the identifier; <c>null</c> if the webhook is not found.
-        /// </returns>
-        Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
-        /// <summary>
-        ///     Gets the webhooks available in this text channel.
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
-        ///     of webhooks that is available in this channel.
-        /// </returns>
-        Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null);
 
         /// <summary>
         ///     Creates a thread within this <see cref="ITextChannel"/>.

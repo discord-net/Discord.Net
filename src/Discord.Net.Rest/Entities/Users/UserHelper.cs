@@ -1,17 +1,16 @@
 using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Model = Discord.API.User;
-using ImageModel = Discord.API.Image;
 using System.Linq;
+using System.Threading.Tasks;
+using ImageModel = Discord.API.Image;
+using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
     internal static class UserHelper
     {
-        public static async Task<Model> ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<SelfUserProperties> func,
-            RequestOptions options)
+        public static Task<Model> ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<SelfUserProperties> func, RequestOptions options)
         {
             var args = new SelfUserProperties();
             func(args);
@@ -24,7 +23,7 @@ namespace Discord.Rest
             if (!apiArgs.Avatar.IsSpecified && user.AvatarId != null)
                 apiArgs.Avatar = new ImageModel(user.AvatarId);
 
-            return await client.ApiClient.ModifySelfAsync(apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifySelfAsync(apiArgs, options);
         }
         public static async Task<GuildUserProperties> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<GuildUserProperties> func,
             RequestOptions options)
@@ -40,7 +39,8 @@ namespace Discord.Rest
                 Deaf = args.Deaf,
                 Mute = args.Mute,
                 Nickname = args.Nickname,
-                TimedOutUntil = args.TimedOutUntil
+                TimedOutUntil = args.TimedOutUntil,
+                Flags = args.Flags
             };
 
             if (args.Channel.IsSpecified)
@@ -65,11 +65,8 @@ namespace Discord.Rest
             return args;
         }
 
-        public static async Task KickAsync(IGuildUser user, BaseDiscordClient client,
-            string reason, RequestOptions options)
-        {
-            await client.ApiClient.RemoveGuildMemberAsync(user.GuildId, user.Id, reason, options).ConfigureAwait(false);
-        }
+        public static Task KickAsync(IGuildUser user, BaseDiscordClient client, string reason, RequestOptions options)
+            => client.ApiClient.RemoveGuildMemberAsync(user.GuildId, user.Id, reason, options);
 
         public static async Task<RestDMChannel> CreateDMChannelAsync(IUser user, BaseDiscordClient client,
             RequestOptions options)
@@ -90,7 +87,7 @@ namespace Discord.Rest
                 await client.ApiClient.RemoveRoleAsync(user.Guild.Id, user.Id, roleId, options).ConfigureAwait(false);
         }
 
-        public static async Task SetTimeoutAsync(IGuildUser user, BaseDiscordClient client, TimeSpan span, RequestOptions options)
+        public static Task SetTimeoutAsync(IGuildUser user, BaseDiscordClient client, TimeSpan span, RequestOptions options)
         {
             if (span.TotalDays > 28) // As its double, an exact value of 28 can be accepted.
                 throw new ArgumentOutOfRangeException(nameof(span), "Offset cannot be more than 28 days from the current date.");
@@ -100,16 +97,16 @@ namespace Discord.Rest
             {
                 TimedOutUntil = DateTimeOffset.UtcNow.Add(span)
             };
-            await client.ApiClient.ModifyGuildMemberAsync(user.Guild.Id, user.Id, apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyGuildMemberAsync(user.Guild.Id, user.Id, apiArgs, options);
         }
 
-        public static async Task RemoveTimeOutAsync(IGuildUser user, BaseDiscordClient client, RequestOptions options)
+        public static Task RemoveTimeOutAsync(IGuildUser user, BaseDiscordClient client, RequestOptions options)
         {
             var apiArgs = new API.Rest.ModifyGuildMemberParams()
             {
                 TimedOutUntil = null
             };
-            await client.ApiClient.ModifyGuildMemberAsync(user.Guild.Id, user.Id, apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyGuildMemberAsync(user.Guild.Id, user.Id, apiArgs, options);
         }
     }
 }

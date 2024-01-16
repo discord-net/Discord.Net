@@ -99,12 +99,68 @@ namespace Discord
         /// </remarks>
         ThreadStarterMessage = 21,
         /// <summary>
-        ///     The message for a invite reminder.
+        ///     The message for an invite reminder.
         /// </summary>
         GuildInviteReminder = 22,
         /// <summary>
         ///     The message for a context menu command.
         /// </summary>
         ContextMenuCommand = 23,
+        /// <summary>
+        ///     The message for an automod action.
+        /// </summary>
+        AutoModerationAction = 24,
+        /// <summary>
+        ///     The message for a role subscription purchase.
+        /// </summary>
+        RoleSubscriptionPurchase = 25,
+        /// <summary>
+        ///     The message for an interaction premium upsell.
+        /// </summary>
+        InteractionPremiumUpsell = 26,
+        /// <summary>
+        ///     The message for a stage start.
+        /// </summary>
+        StageStart = 27,
+        /// <summary>
+        ///     The message for a stage end.
+        /// </summary>
+        StageEnd = 28,
+        /// <summary>
+        ///     The message for a stage speaker.
+        /// </summary>
+        StageSpeaker = 29,
+        /// <summary>
+        ///     The message for a stage raise hand.
+        /// </summary>
+        StageRaiseHand = 30,
+        /// <summary>
+        ///     The message for a stage raise hand.
+        /// </summary>
+        StageTopic = 31,
+        /// <summary>
+        ///     The message for a guild application premium subscription.
+        /// </summary>
+        GuildApplicationPremiumSubscription = 32,
+
+        /// <summary>
+        ///     The message for incident alert mode enabled.
+        /// </summary>
+        IncidentAlertModeEnabled = 36,
+
+        /// <summary>
+        ///     The message for incident alert mode disabled.
+        /// </summary>
+        IncidentAlertModeDisabled = 37,
+
+        /// <summary>
+        ///     The message for incident report raid.
+        /// </summary>
+        IncidentReportRaid = 38,
+
+        /// <summary>
+        ///     The message for incident report false alarm.
+        /// </summary>
+        IncidentReportFalseAlarm = 39
     }
 }

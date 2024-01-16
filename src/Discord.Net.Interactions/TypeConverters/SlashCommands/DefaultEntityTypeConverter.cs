@@ -9,7 +9,7 @@ namespace Discord.Interactions
 {
     internal abstract class DefaultEntityTypeConverter<T> : TypeConverter<T> where T : class
     {
-        public override Task<TypeConverterResult> ReadAsync (IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
+        public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
         {
             var value = option.Value as T;
 
@@ -27,19 +27,19 @@ namespace Discord.Interactions
 
     internal class DefaultRoleConverter<T> : DefaultEntityTypeConverter<T> where T : class, IRole
     {
-        public override ApplicationCommandOptionType GetDiscordType ( ) => ApplicationCommandOptionType.Role;
+        public override ApplicationCommandOptionType GetDiscordType() => ApplicationCommandOptionType.Role;
     }
 
     internal class DefaultUserConverter<T> : DefaultEntityTypeConverter<T> where T : class, IUser
     {
-        public override ApplicationCommandOptionType GetDiscordType ( ) => ApplicationCommandOptionType.User;
+        public override ApplicationCommandOptionType GetDiscordType() => ApplicationCommandOptionType.User;
     }
 
     internal class DefaultChannelConverter<T> : DefaultEntityTypeConverter<T> where T : class, IChannel
     {
         private readonly List<ChannelType> _channelTypes;
 
-        public DefaultChannelConverter ( )
+        public DefaultChannelConverter()
         {
             var type = typeof(T);
 
@@ -69,13 +69,19 @@ namespace Discord.Interactions
                 _ when typeof(ITextChannel).IsAssignableFrom(type)
                     => new List<ChannelType> { ChannelType.Text },
 
+                _ when typeof(IMediaChannel).IsAssignableFrom(type)
+                    => new List<ChannelType> { ChannelType.Media },
+
+                _ when typeof(IForumChannel).IsAssignableFrom(type)
+                    => new List<ChannelType> { ChannelType.Forum },
+
                 _ => null
             };
         }
 
-        public override ApplicationCommandOptionType GetDiscordType ( ) => ApplicationCommandOptionType.Channel;
+        public override ApplicationCommandOptionType GetDiscordType() => ApplicationCommandOptionType.Channel;
 
-        public override void Write (ApplicationCommandOptionProperties properties, IParameterInfo parameter)
+        public override void Write(ApplicationCommandOptionProperties properties, IParameterInfo parameter)
         {
             if (_channelTypes is not null)
                 properties.ChannelTypes = _channelTypes;
@@ -84,6 +90,6 @@ namespace Discord.Interactions
 
     internal class DefaultMentionableConverter<T> : DefaultEntityTypeConverter<T> where T : class, IMentionable
     {
-        public override ApplicationCommandOptionType GetDiscordType ( ) => ApplicationCommandOptionType.Mentionable;
+        public override ApplicationCommandOptionType GetDiscordType() => ApplicationCommandOptionType.Mentionable;
     }
 }

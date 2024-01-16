@@ -77,7 +77,7 @@ namespace Discord.Rest
             {
                 foreach (var role in resolved.Roles.Value)
                 {
-                    var restRole = RestRole.Create(discord, guild, role.Value); 
+                    var restRole = RestRole.Create(discord, guild, role.Value);
 
                     Roles.Add(ulong.Parse(role.Key), restRole);
                 }
@@ -108,12 +108,12 @@ namespace Discord.Rest
                     Messages.Add(message.Id, message);
                 }
             }
-            
+
             if (resolved.Attachments.IsSpecified)
             {
                 foreach (var attachment in resolved.Attachments.Value)
                 {
-                    var discordAttachment = Attachment.Create(attachment.Value);
+                    var discordAttachment = Attachment.Create(attachment.Value, discord);
 
                     Attachments.Add(ulong.Parse(attachment.Key), discordAttachment);
                 }

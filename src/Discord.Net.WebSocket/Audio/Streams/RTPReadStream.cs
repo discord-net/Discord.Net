@@ -23,13 +23,13 @@ namespace Discord.Audio.Streams
 
         /// <exception cref="OperationCanceledException">The token has had cancellation requested.</exception>
         /// <exception cref="ObjectDisposedException">The associated <see cref="T:System.Threading.CancellationTokenSource" /> has been disposed.</exception>
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             cancelToken.ThrowIfCancellationRequested();
 
             int headerSize = GetHeaderSize(buffer, offset);
 
-            ushort seq =  (ushort)((buffer[offset + 2] << 8) |
+            ushort seq = (ushort)((buffer[offset + 2] << 8) |
                 (buffer[offset + 3] << 0));
 
             uint timestamp = (uint)((buffer[offset + 4] << 24) |
@@ -38,7 +38,7 @@ namespace Discord.Audio.Streams
                 (buffer[offset + 7] << 0));
 
             _next.WriteHeader(seq, timestamp, false);
-            await _next.WriteAsync(buffer, offset + headerSize, count - headerSize, cancelToken).ConfigureAwait(false);
+            return _next.WriteAsync(buffer, offset + headerSize, count - headerSize, cancelToken);
         }
 
         public static bool TryReadSsrc(byte[] buffer, int offset, out uint ssrc)
@@ -46,7 +46,7 @@ namespace Discord.Audio.Streams
             ssrc = 0;
             if (buffer.Length - offset < 12)
                 return false;
-                
+
             int version = (buffer[offset + 0] & 0b1100_0000) >> 6;
             if (version != 2)
                 return false;
@@ -71,8 +71,8 @@ namespace Discord.Audio.Streams
                 return 12 + csics * 4;
 
             int extensionOffset = offset + 12 + (csics * 4);
-            int extensionLength = 
-                (buffer[extensionOffset + 2] << 8) | 
+            int extensionLength =
+                (buffer[extensionOffset + 2] << 8) |
                 (buffer[extensionOffset + 3]);
             return extensionOffset + 4 + (extensionLength * 4);
         }

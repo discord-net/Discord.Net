@@ -87,14 +87,17 @@ namespace Discord.Net.Udp
         }
         public async Task StopInternalAsync(bool isDisposing = false)
         {
-            try { _stopCancelTokenSource.Cancel(false); } catch { }
+            try
+            { _stopCancelTokenSource.Cancel(false); }
+            catch { }
 
             if (!isDisposing)
                 await (_task ?? Task.Delay(0)).ConfigureAwait(false);
 
             if (_udp != null)
             {
-                try { _udp.Dispose(); }
+                try
+                { _udp.Dispose(); }
                 catch { }
                 _udp = null;
             }
@@ -113,7 +116,7 @@ namespace Discord.Net.Udp
             _cancelToken = _cancelTokenSource.Token;
         }
 
-        public async Task SendAsync(byte[] data, int index, int count)
+        public Task SendAsync(byte[] data, int index, int count)
         {
             if (index != 0) //Should never happen?
             {
@@ -121,7 +124,7 @@ namespace Discord.Net.Udp
                 Buffer.BlockCopy(data, index, newData, 0, count);
                 data = newData;
             }
-            await _udp.SendAsync(data, count, _destination).ConfigureAwait(false);
+            return _udp.SendAsync(data, count, _destination);
         }
 
         private async Task RunAsync(CancellationToken cancelToken)

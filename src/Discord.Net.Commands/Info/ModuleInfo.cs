@@ -1,8 +1,8 @@
+using Discord.Commands.Builders;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using Discord.Commands.Builders;
+using System.Linq;
 
 namespace Discord.Commands
 {

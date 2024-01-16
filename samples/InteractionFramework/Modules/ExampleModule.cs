@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace InteractionFramework.Modules
 {
-    // Interation modules must be public and inherit from an IInterationModuleBase
+    // Interaction modules must be public and inherit from an IInteractionModuleBase
     public class ExampleModule : InteractionModuleBase<SocketInteractionContext>
     {
         // Dependencies can be accessed through Property injection, public properties with public setters will be set by the service provider
@@ -26,7 +26,7 @@ namespace InteractionFramework.Modules
 
         // [Summary] lets you customize the name and the description of a parameter
         [SlashCommand("echo", "Repeat the input")]
-        public async Task Echo(string echo, [Summary(description: "mention the user")]bool mention = false)
+        public async Task Echo(string echo, [Summary(description: "mention the user")] bool mention = false)
             => await RespondAsync(echo + (mention ? Context.User.Mention : string.Empty));
 
         [SlashCommand("ping", "Pings the bot and returns its latency.")]

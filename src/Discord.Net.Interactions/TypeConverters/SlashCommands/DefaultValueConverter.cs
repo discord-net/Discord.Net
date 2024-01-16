@@ -6,7 +6,7 @@ namespace Discord.Interactions
 {
     internal class DefaultValueConverter<T> : TypeConverter<T> where T : IConvertible
     {
-        public override ApplicationCommandOptionType GetDiscordType ( )
+        public override ApplicationCommandOptionType GetDiscordType()
         {
             switch (Type.GetTypeCode(typeof(T)))
             {
@@ -38,7 +38,7 @@ namespace Discord.Interactions
                     throw new InvalidOperationException($"Parameter Type {typeof(T).FullName} is not supported by Discord.");
             }
         }
-        public override Task<TypeConverterResult> ReadAsync (IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
+        public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
         {
             object value;
 

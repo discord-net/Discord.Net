@@ -72,6 +72,7 @@ namespace Discord
             string extension = FormatToExtension(format, bannerId);
             return $"{DiscordConfig.CDNUrl}banners/{userId}/{bannerId}.{extension}?size={size}";
         }
+
         /// <summary>
         ///     Returns the default user avatar URL.
         /// </summary>
@@ -83,6 +84,19 @@ namespace Discord
         {
             return $"{DiscordConfig.CDNUrl}embed/avatars/{discriminator % 5}.png";
         }
+
+        /// <summary>
+        ///     Returns the default user avatar URL.
+        /// </summary>
+        /// <param name="userId">The Id of a user.</param>
+        /// <returns>
+        ///     A URL pointing to the user's default avatar when one isn't set.
+        /// </returns>
+        public static string GetDefaultUserAvatarUrl(ulong userId)
+        {
+            return $"{DiscordConfig.CDNUrl}embed/avatars/{(userId >> 22) % 6}.png";
+        }
+
         /// <summary>
         ///     Returns an icon URL.
         /// </summary>
@@ -146,10 +160,10 @@ namespace Discord
         /// </returns>
         public static string GetGuildBannerUrl(ulong guildId, string bannerId, ImageFormat format, ushort? size = null)
         {
-	        if (string.IsNullOrEmpty(bannerId))
-		        return null;
-	        string extension = FormatToExtension(format, bannerId);
-	        return $"{DiscordConfig.CDNUrl}banners/{guildId}/{bannerId}.{extension}" + (size.HasValue ? $"?size={size}" : string.Empty);
+            if (string.IsNullOrEmpty(bannerId))
+                return null;
+            string extension = FormatToExtension(format, bannerId);
+            return $"{DiscordConfig.CDNUrl}banners/{guildId}/{bannerId}.{extension}" + (size.HasValue ? $"?size={size}" : string.Empty);
         }
         /// <summary>
         ///     Returns an emoji URL.
@@ -218,7 +232,7 @@ namespace Discord
         /// <param name="size">The size of the image.</param>
         /// <returns></returns>
         public static string GetEventCoverImageUrl(ulong guildId, ulong eventId, string assetId, ImageFormat format = ImageFormat.Auto, ushort size = 1024)
-            => $"{DiscordConfig.CDNUrl}guild-events/{guildId}/{eventId}/{assetId}.{FormatToExtension(format, assetId)}?size={size}";
+            => $"{DiscordConfig.CDNUrl}guild-events/{eventId}/{assetId}.{FormatToExtension(format, assetId)}?size={size}";
 
         private static string FormatToExtension(StickerFormatType format)
         {
@@ -243,5 +257,15 @@ namespace Discord
                 _ => throw new ArgumentException(nameof(format)),
             };
         }
+
+        /// <summary>
+        ///     Gets an avatar decoration url based off the hash.
+        /// </summary>
+        /// <param name="avatarDecorationHash">The hash of the avatar decoraition.</param>
+        /// <returns>
+        ///     A URL to the avatar decoration.
+        /// </returns>
+        public static string GetAvatarDecorationUrl(string avatarDecorationHash)
+            => $"{DiscordConfig.CDNUrl}avatar-decoration-presets/{avatarDecorationHash}.png";
     }
 }

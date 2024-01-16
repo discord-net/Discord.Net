@@ -1,4 +1,4 @@
-﻿namespace Discord.Net.Rest
+namespace Discord.Net.Rest
 {
     public delegate IRestClient RestClientProvider(string baseUrl);
 }

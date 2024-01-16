@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class MessageApplication
+    internal class MessageApplication
     {
         /// <summary>
         ///     Gets the snowflake ID of the application.

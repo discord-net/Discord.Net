@@ -11,15 +11,15 @@ namespace Discord
         ///     Gets a value that indicates whether the invite is a temporary one.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if users accepting this invite will be removed from the guild when they log off; otherwise 
-        ///     <c>false</c>.
+        ///     <see langword="true" /> if users accepting this invite will be removed from the guild when they log off; otherwise 
+        ///     <see langword="false" />.
         /// </returns>
         bool IsTemporary { get; }
         /// <summary>
         ///     Gets the time (in seconds) until the invite expires.
         /// </summary>
         /// <returns>
-        ///     An <see cref="int"/> representing the time in seconds until this invite expires; <c>null</c> if this
+        ///     An <see cref="int"/> representing the time in seconds until this invite expires; <see langword="null" /> if this
         ///     invite never expires.
         /// </returns>
         int? MaxAge { get; }
@@ -28,7 +28,7 @@ namespace Discord
         /// </summary>
         /// <returns>
         ///     An <see cref="int"/> representing the number of uses this invite may be accepted until it is removed
-        ///     from the guild; <c>null</c> if none is set.
+        ///     from the guild; <see langword="null" /> if none is set.
         /// </returns>
         int? MaxUses { get; }
         /// <summary>

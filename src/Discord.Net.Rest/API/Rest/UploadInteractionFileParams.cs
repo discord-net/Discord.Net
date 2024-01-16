@@ -41,7 +41,7 @@ namespace Discord.API.Rest
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
             var d = new Dictionary<string, object>();
-           
+
 
             var payload = new Dictionary<string, object>();
             payload["type"] = Type;

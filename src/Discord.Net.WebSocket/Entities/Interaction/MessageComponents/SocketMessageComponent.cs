@@ -1,12 +1,12 @@
+using Discord.Net.Rest;
+using Discord.Rest;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
 using DataModel = Discord.API.MessageComponentInteractionData;
-using Discord.Rest;
-using System.Collections.Generic;
-using Discord.Net.Rest;
-using System.IO;
+using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {
@@ -19,10 +19,8 @@ namespace Discord.WebSocket
         ///     Gets the data received with this interaction, contains the button that was clicked.
         /// </summary>
         public new SocketMessageComponentData Data { get; }
-
-        /// <summary>
-        ///     Gets the message that contained the trigger for this interaction.
-        /// </summary>
+        
+        /// <inheritdoc cref="IComponentInteraction.Message"/>
         public SocketUserMessage Message { get; private set; }
 
         private object _lock = new object();
@@ -226,16 +224,6 @@ namespace Discord.WebSocket
             var embed = args.Embed;
             var embeds = args.Embeds;
 
-            bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(Message.Content);
-            bool hasEmbeds = embed.IsSpecified && embed.Value != null || embeds.IsSpecified && embeds.Value?.Length > 0 || Message.Embeds.Any();
-            bool hasComponents = args.Components.IsSpecified && args.Components.Value != null;
-            bool hasAttachments = args.Attachments.IsSpecified;
-            bool hasFlags = args.Flags.IsSpecified;
-
-            // No content needed if modifying flags
-            if ((!hasComponents && !hasText && !hasEmbeds && !hasAttachments) && !hasFlags)
-                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
-
             var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
 
             if (embed.IsSpecified && embed.Value != null)
@@ -288,7 +276,9 @@ namespace Discord.WebSocket
             }
             else
             {
-                var response = new API.Rest.UploadInteractionFileParams(args.Attachments.Value.ToArray())
+                var attachments = args.Attachments.Value?.ToArray() ?? Array.Empty<FileAttachment>();
+
+                var response = new API.Rest.UploadInteractionFileParams(attachments)
                 {
                     Type = InteractionResponseType.UpdateMessage,
                     Content = args.Content,
@@ -315,7 +305,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
-        public override async Task<RestFollowupMessage> FollowupAsync(
+        public override Task<RestFollowupMessage> FollowupAsync(
             string text = null,
             Embed[] embeds = null,
             bool isTTS = false,
@@ -348,11 +338,11 @@ namespace Discord.WebSocket
             if (ephemeral)
                 args.Flags = MessageFlags.Ephemeral;
 
-            return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
+            return InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
         }
 
         /// <inheritdoc/>
-        public override async Task<RestFollowupMessage> FollowupWithFilesAsync(
+        public override Task<RestFollowupMessage> FollowupWithFilesAsync(
             IEnumerable<FileAttachment> attachments,
             string text = null,
             Embed[] embeds = null,
@@ -401,7 +391,7 @@ namespace Discord.WebSocket
                 flags |= MessageFlags.Ephemeral;
 
             var args = new API.Rest.UploadWebhookFileParams(attachments.ToArray()) { Flags = flags, Content = text, IsTTS = isTTS, Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified, AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, MessageComponents = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified };
-            return await InteractionHelper.SendFollowupAsync(Discord, args, Token, Channel, options).ConfigureAwait(false);
+            return InteractionHelper.SendFollowupAsync(Discord, args, Token, Channel, options);
         }
 
         /// <inheritdoc/>

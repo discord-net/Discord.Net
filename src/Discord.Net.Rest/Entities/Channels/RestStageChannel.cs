@@ -13,10 +13,12 @@ namespace Discord.Rest
     {
         /// <inheritdoc/>
         /// <remarks>
-        ///     This field is always false for stage channels.
+        ///     This field is always true for stage channels.
         /// </remarks>
+        /// 
+        [Obsolete("This property is no longer used because Discord enabled text-in-voice and text-in-stage for all channels.")]
         public override bool IsTextInVoice
-            => false;
+            => true;
 
         /// <inheritdoc/>
         public StagePrivacyLevel? PrivacyLevel { get; private set; }
@@ -39,7 +41,7 @@ namespace Discord.Rest
         internal void Update(StageInstance model, bool isLive = false)
         {
             IsLive = isLive;
-            if(isLive)
+            if (isLive)
             {
                 PrivacyLevel = model.PrivacyLevel;
                 IsDiscoverableDisabled = model.DiscoverableDisabled;
@@ -148,5 +150,13 @@ namespace Discord.Rest
 
             return Discord.ApiClient.ModifyUserVoiceState(Guild.Id, user.Id, args);
         }
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Setting voice channel status is not supported in stage channels.
+        /// </remarks>
+        /// <exception cref="NotSupportedException">Setting voice channel status is not supported in stage channels.</exception>
+        public override Task SetStatusAsync(string status, RequestOptions options = null)
+            => throw new NotSupportedException("Setting voice channel status is not supported in stage channels.");
     }
 }

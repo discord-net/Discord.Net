@@ -30,7 +30,7 @@ namespace Discord
             Flags = flags;
             Details = details;
         }
-        
+
         /// <summary> Returns the name of the <see cref="Game"/>. </summary>
         public override string ToString() => Name;
         private string DebuggerDisplay => Name;

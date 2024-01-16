@@ -21,7 +21,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     Gets or set the max time, in milliseconds, to wait for this request to complete. If
-        ///     <c>null</c>, a request will not time out. If a rate limit has been triggered for this request's bucket
+        ///     <see langword="null" />, a request will not time out. If a rate limit has been triggered for this request's bucket
         ///     and will not be unpaused in time, this request will fail immediately.
         /// </remarks>
         /// <returns>
@@ -48,17 +48,17 @@ namespace Discord
         ///     to all actions.
         /// </remarks>
         public string AuditLogReason { get; set; }
-		/// <summary>
-		///		Gets or sets whether or not this request should use the system
-		///		clock for rate-limiting. Defaults to <c>true</c>.
-		/// </summary>
-		/// <remarks>
-		///		This property can also be set in <see cref="DiscordConfig"/>.
-		///		On a per-request basis, the system clock should only be disabled
-		///		when millisecond precision is especially important, and the
-		///		hosting system is known to have a desynced clock.
-		/// </remarks>
-		public bool? UseSystemClock { get; set; }
+        /// <summary>
+        ///		Gets or sets whether or not this request should use the system
+        ///		clock for rate-limiting. Defaults to <see langword="true" />.
+        /// </summary>
+        /// <remarks>
+        ///		This property can also be set in <see cref="DiscordConfig"/>.
+        ///		On a per-request basis, the system clock should only be disabled
+        ///		when millisecond precision is especially important, and the
+        ///		hosting system is known to have a desynced clock.
+        /// </remarks>
+        public bool? UseSystemClock { get; set; }
 
         /// <summary>
         ///     Gets or sets the callback to execute regarding ratelimits for this request.

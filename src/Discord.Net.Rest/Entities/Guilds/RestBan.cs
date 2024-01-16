@@ -38,7 +38,7 @@ namespace Discord.Rest
         /// </returns>
         public override string ToString() => User.ToString();
         private string DebuggerDisplay => $"{User}: {Reason}";
-#endregion
+        #endregion
 
         #region IBan
         /// <inheritdoc />

@@ -35,7 +35,7 @@ namespace Discord.Rest
         public RestUser User { get; }
 
         /// <summary>
-        ///     Gets the <see cref="RestInteraction"/> the command was recieved with.
+        ///     Gets the <see cref="RestInteraction"/> the command was received with.
         /// </summary>
         public TInteraction Interaction { get; }
 
@@ -51,7 +51,7 @@ namespace Discord.Rest
         public IReadOnlyCollection<IRouteSegmentMatch> SegmentMatches { get; private set; }
 
         /// <summary>
-        ///     Initializes a new <see cref="RestInteractionContext{TInteraction}"/>. 
+        ///     Initializes a new <see cref="RestInteractionContext{TInteraction}"/>.
         /// </summary>
         /// <param name="client">The underlying client.</param>
         /// <param name="interaction">The underlying interaction.</param>
@@ -65,7 +65,7 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Initializes a new <see cref="RestInteractionContext{TInteraction}"/>. 
+        ///     Initializes a new <see cref="RestInteractionContext{TInteraction}"/>.
         /// </summary>
         /// <param name="client">The underlying client.</param>
         /// <param name="interaction">The underlying interaction.</param>
@@ -83,7 +83,7 @@ namespace Discord.Rest
         /// <inheritdoc/>
         IEnumerable<IRouteSegmentMatch> IRouteMatchContainer.SegmentMatches => SegmentMatches;
 
-        // IInterationContext
+        // IInteractionContext
         /// <inheritdoc/>
         IDiscordClient IInteractionContext.Client => Client;
 

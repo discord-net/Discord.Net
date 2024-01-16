@@ -1,6 +1,6 @@
+using Discord.Commands.Builders;
 using System;
 using System.Threading.Tasks;
-using Discord.Commands.Builders;
 
 namespace Discord.Commands
 {
@@ -34,17 +34,19 @@ namespace Discord.Commands
         /// <param name="embed">An embed to be displayed alongside the <paramref name="message"/>.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the <paramref name="message"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
         /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
-        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null)
-        {
-            return await Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds).ConfigureAwait(false);
-        }
+        /// <param name="flags">Message flags combined as a bitfield.</param>
+        protected virtual Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null,
+            AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
+            Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+            => Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags);
+
         /// <summary>
         ///     The method to execute asynchronously before executing the command.
         /// </summary>

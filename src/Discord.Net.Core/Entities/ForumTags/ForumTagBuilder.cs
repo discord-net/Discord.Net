@@ -110,8 +110,8 @@ public class ForumTagBuilder
     public ForumTagBuilder(string name, ulong? id = null, bool isModerated = false, ulong? emoteId = null)
     {
         Name = name;
-        if(emoteId is not null)
-            Emoji = new Emote(emoteId.Value, null,  false);
+        if (emoteId is not null)
+            Emoji = new Emote(emoteId.Value, null, false);
         IsModerated = isModerated;
         Id = id;
     }
@@ -124,8 +124,8 @@ public class ForumTagBuilder
     public ForumTagProperties Build()
     {
         if (_name is null)
-            throw new ArgumentNullException(nameof(Name), "Name must be set to build the tag");
-        return new ForumTagProperties(_name!, _emoji, _moderated);
+            throw new ArgumentNullException(nameof(Name), "Name must be set to build the tag.");
+        return new ForumTagProperties(_id, _name, _emoji, _moderated);
     }
 
     /// <summary>
@@ -180,12 +180,12 @@ public class ForumTagBuilder
         => builder is not null &&
            Id == builder.Id &&
            Name == builder.Name &&
-           (Emoji is Emoji emoji &&  builder.Emoji is Emoji otherEmoji && emoji.Equals(otherEmoji) ||
+           (Emoji is Emoji emoji && builder.Emoji is Emoji otherEmoji && emoji.Equals(otherEmoji) ||
             Emoji is Emote emote && builder.Emoji is Emote otherEmote && emote.Equals(otherEmote)) &&
            IsModerated == builder.IsModerated;
 
     public static bool operator ==(ForumTagBuilder? left, ForumTagBuilder? right)
-    => left?.Equals(right) ?? right is null ;
+    => left?.Equals(right) ?? right is null;
 
     public static bool operator !=(ForumTagBuilder? left, ForumTagBuilder? right) => !(left == right);
 }

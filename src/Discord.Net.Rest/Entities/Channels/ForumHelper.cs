@@ -8,15 +8,15 @@ namespace Discord.Rest;
 
 internal static class ForumHelper
 {
-    public static async Task<Model> ModifyAsync(IForumChannel channel, BaseDiscordClient client,
+    public static Task<Model> ModifyAsync(IForumChannel channel, BaseDiscordClient client,
         Action<ForumChannelProperties> func,
         RequestOptions options)
     {
         var args = new ForumChannelProperties();
         func(args);
 
-        Preconditions.AtMost(args.Tags.IsSpecified ? args.Tags.Value.Count() : 0, 5, nameof(args.Tags), "Forum channel can have max 20 tags.");
-        
+        Preconditions.AtMost(args.Tags.IsSpecified ? args.Tags.Value.Count() : 0, 20, nameof(args.Tags), "Forum channel can have max 20 tags.");
+
         var apiArgs = new API.Rest.ModifyForumChannelParams()
         {
             Name = args.Name,
@@ -36,6 +36,7 @@ internal static class ForumHelper
             Tags = args.Tags.IsSpecified
                 ? args.Tags.Value.Select(tag => new API.ModifyForumTagParams
                 {
+                    Id = tag.Id ?? Optional<ulong>.Unspecified,
                     Name = tag.Name,
                     EmojiId = tag.Emoji is Emote emote
                         ? emote.Id
@@ -56,9 +57,8 @@ internal static class ForumHelper
                         emoji.Name : Optional<string>.Unspecified
                 }
                 : Optional<ModifyForumReactionEmojiParams>.Unspecified,
-            DefaultSortOrder = args.DefaultSortOrder,
-            DefaultLayout = args.DefaultLayout,
+            DefaultSortOrder = args.DefaultSortOrder
         };
-        return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+        return client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options);
     }
 }

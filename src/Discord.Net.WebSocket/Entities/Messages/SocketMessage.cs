@@ -78,6 +78,15 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public MessageType Type { get; private set; }
 
+        /// <inheritdoc />
+        public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
+
+        /// <inheritdoc cref="IMessage.Thread"/>
+        public SocketThreadChannel Thread { get; private set; }
+
+        /// <inheritdoc />
+        IThreadChannel IMessage.Thread => Thread;
+
         /// <summary>
         ///     Returns all attachments included in this message.
         /// </summary>
@@ -228,7 +237,10 @@ namespace Discord.WebSocket
                                     parsed.MaxValues,
                                     parsed.Disabled,
                                     parsed.Type,
-                                    parsed.ChannelTypes.GetValueOrDefault()
+                                    parsed.ChannelTypes.GetValueOrDefault(),
+                                    parsed.DefaultValues.IsSpecified
+                                        ? parsed.DefaultValues.Value.Select(x => new SelectMenuDefaultValue(x.Id, x.Type))
+                                        : Array.Empty<SelectMenuDefaultValue>()
                                     );
                             }
                         default:
@@ -271,6 +283,21 @@ namespace Discord.WebSocket
 
             if (model.Flags.IsSpecified)
                 Flags = model.Flags.Value;
+
+            if (model.RoleSubscriptionData.IsSpecified)
+            {
+                RoleSubscriptionData = new(
+                    model.RoleSubscriptionData.Value.SubscriptionListingId,
+                    model.RoleSubscriptionData.Value.TierName,
+                    model.RoleSubscriptionData.Value.MonthsSubscribed,
+                    model.RoleSubscriptionData.Value.IsRenewal);
+            }
+
+            if (model.Thread.IsSpecified)
+            {
+                SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
+                Thread = guild?.AddOrUpdateChannel(state, model.Thread.Value) as SocketThreadChannel;
+            }
         }
 
         /// <inheritdoc />
@@ -285,7 +312,7 @@ namespace Discord.WebSocket
         /// </returns>
         public override string ToString() => Content;
         internal SocketMessage Clone() => MemberwiseClone() as SocketMessage;
-#endregion
+        #endregion
 
         #region IMessage
         /// <inheritdoc />
@@ -347,8 +374,8 @@ namespace Discord.WebSocket
         public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsForEmoteAsync(this, emote, Discord, options);
         /// <inheritdoc />
-        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
-            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null, ReactionType type = ReactionType.Normal)
+            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, type, options);
         #endregion
     }
 }

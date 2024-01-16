@@ -1,3 +1,4 @@
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -5,7 +6,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Rest;
 using Model = Discord.API.User;
 using PresenceModel = Discord.API.Presence;
 
@@ -33,6 +33,9 @@ namespace Discord.WebSocket
         internal abstract SocketPresence Presence { get; set; }
 
         /// <inheritdoc />
+        public abstract string GlobalName { get; internal set; }
+
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public string Discriminator => DiscriminatorValue.ToString("D4");
@@ -44,6 +47,13 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<ClientType> ActiveClients => Presence.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
         /// <inheritdoc />
         public IReadOnlyCollection<IActivity> Activities => Presence.Activities ?? ImmutableList<IActivity>.Empty;
+
+        /// <inheritdoc />
+        public string AvatarDecorationHash { get; private set; }
+
+        /// <inheritdoc />
+        public ulong? AvatarDecorationSkuId { get; private set; }
+
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>
@@ -68,10 +78,10 @@ namespace Discord.WebSocket
             }
             if (model.Discriminator.IsSpecified)
             {
-                var newVal = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
+                var newVal = ushort.Parse(model.Discriminator.GetValueOrDefault(null) ?? "0", NumberStyles.None, CultureInfo.InvariantCulture);
                 if (newVal != DiscriminatorValue)
                 {
-                    DiscriminatorValue = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
+                    DiscriminatorValue = ushort.Parse(model.Discriminator.GetValueOrDefault(null) ?? "0", NumberStyles.None, CultureInfo.InvariantCulture);
                     hasChanges = true;
                 }
             }
@@ -90,6 +100,19 @@ namespace Discord.WebSocket
                 PublicFlags = model.PublicFlags.Value;
                 hasChanges = true;
             }
+            if (model.GlobalName.IsSpecified && model.GlobalName.Value != GlobalName)
+            {
+                GlobalName = model.GlobalName.Value;
+                hasChanges = true;
+            }
+            if (model.AvatarDecoration is { IsSpecified: true, Value: not null }
+                && (model.AvatarDecoration.Value.Asset != AvatarDecorationHash || model.AvatarDecoration.Value.SkuId != AvatarDecorationSkuId))
+            {
+                AvatarDecorationHash = model.AvatarDecoration.Value?.Asset;
+                AvatarDecorationSkuId = model.AvatarDecoration.Value?.SkuId;
+                hasChanges = true;
+            }
+
             return hasChanges;
         }
 
@@ -109,7 +132,18 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public string GetDefaultAvatarUrl()
-            => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
+            => DiscriminatorValue != 0
+                ? CDN.GetDefaultUserAvatarUrl(DiscriminatorValue)
+                : CDN.GetDefaultUserAvatarUrl(Id);
+
+        /// <inheritdoc />
+        public virtual string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
+
+        public string GetAvatarDecorationUrl()
+            => AvatarDecorationHash is not null
+                ? CDN.GetAvatarDecorationUrl(AvatarDecorationHash)
+                : null;
 
         /// <summary>
         ///     Gets the full name of the user (e.g. Example#0001).

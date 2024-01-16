@@ -5,7 +5,7 @@ title: Introduction to Guild Events
 
 # Guild Events
 
-Guild events are a way to host events within a guild. They offer alot of features and flexibility.
+Guild events are a way to host events within a guild. They offer a lot of features and flexibility.
 
 ## Getting started with guild events
 
@@ -38,4 +38,10 @@ client.GuildScheduledEventCreated += ...
 
 // Fired when a guild event is updated.
 client.GuildScheduledEventUpdated += ...
+
+// Fired when a guild event has someone mark themselves as interested.
+client.GuildScheduledEventUserAdd += ...
+
+// Fired when a guild event has someone remove their interested status.
+client.GuildScheduledEventUserRemove += ...
 ```

@@ -26,7 +26,7 @@ namespace Discord.Interactions
         bool IgnoreGroupNames { get; }
 
         /// <summary>
-        ///     Gets wheter this command supports wild card patterns.
+        ///     Gets whether this command supports wild card patterns.
         /// </summary>
         bool SupportsWildCards { get; }
 
@@ -75,11 +75,11 @@ namespace Discord.Interactions
         /// <returns>
         ///     A task representing the execution process. The task result contains the execution result.
         /// </returns>
-        Task<IResult> ExecuteAsync (IInteractionContext context, IServiceProvider services);
+        Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services);
 
         /// <summary>
         ///     Check if an execution context meets the command precondition requirements.
         /// </summary>
-        Task<PreconditionResult> CheckPreconditionsAsync (IInteractionContext context, IServiceProvider services);
+        Task<PreconditionResult> CheckPreconditionsAsync(IInteractionContext context, IServiceProvider services);
     }
 }

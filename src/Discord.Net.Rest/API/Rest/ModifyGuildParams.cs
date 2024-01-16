@@ -27,6 +27,8 @@ namespace Discord.API.Rest
         public Optional<Image?> Splash { get; set; }
         [JsonProperty("afk_channel_id")]
         public Optional<ulong?> AfkChannelId { get; set; }
+        [JsonProperty("safety_alerts_channel_id")]
+        public Optional<ulong> SafetyAlertsChannelId { get; set; }
         [JsonProperty("owner_id")]
         public Optional<ulong> OwnerId { get; set; }
         [JsonProperty("explicit_content_filter")]
@@ -34,8 +36,10 @@ namespace Discord.API.Rest
         [JsonProperty("system_channel_flags")]
         public Optional<SystemChannelMessageDeny> SystemChannelFlags { get; set; }
         [JsonProperty("preferred_locale")]
-        public string PreferredLocale { get; set; }
+        public Optional<string> PreferredLocale { get; set; }
         [JsonProperty("premium_progress_bar_enabled")]
         public Optional<bool> IsBoostProgressBarEnabled { get; set; }
+        [JsonProperty("features")]
+        public Optional<GuildFeatures> GuildFeatures { get; set; }
     }
 }

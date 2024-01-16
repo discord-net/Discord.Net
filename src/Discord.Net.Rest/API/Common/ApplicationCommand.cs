@@ -14,6 +14,9 @@ namespace Discord.API
         [JsonProperty("application_id")]
         public ulong ApplicationId { get; set; }
 
+        [JsonProperty("guild_id")]
+        public Optional<ulong> GuildId { get; set; }
+
         [JsonProperty("name")]
         public string Name { get; set; }
 
@@ -37,7 +40,7 @@ namespace Discord.API
 
         [JsonProperty("description_localized")]
         public Optional<string> DescriptionLocalized { get; set; }
-        
+
         // V2 Permissions
         [JsonProperty("dm_permission")]
         public Optional<bool?> DmPermission { get; set; }

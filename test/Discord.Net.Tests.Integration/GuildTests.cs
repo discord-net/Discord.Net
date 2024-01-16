@@ -18,7 +18,7 @@ namespace Discord
         {
             client = guildFixture.Client;
             guild = guildFixture.Guild;
-            output = output;
+            this.output = output;
             output.WriteLine($"RestGuildFixture using guild: {guild.Id}");
             guildFixture.Client.Log += LogAsync;
         }
@@ -76,7 +76,7 @@ namespace Discord
             await guild.ModifyAsync(x => { x.SystemChannel = new Optional<ITextChannel>(systemChannel); });
             Assert.Equal(systemChannel.Id, guild.SystemChannelId);
 
-            await Assert.ThrowsAsync<NullReferenceException>( async () =>
+            await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
                 await guild.ModifyAsync(x => x.SystemChannel = null);
             });
@@ -103,7 +103,7 @@ namespace Discord
             await guild.ModifyAsync(x => x.AfkChannel = new Optional<IVoiceChannel>(afkChannel));
             Assert.Equal(afkChannel.Id, guild.AFKChannelId);
 
-            await Assert.ThrowsAsync<NullReferenceException>( async () =>
+            await Assert.ThrowsAsync<NullReferenceException>(async () =>
             {
                 await guild.ModifyAsync(x => x.AfkChannel = null);
             });

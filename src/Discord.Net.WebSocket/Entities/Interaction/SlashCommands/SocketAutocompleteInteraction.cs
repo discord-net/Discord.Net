@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
 using DataModel = Discord.API.AutocompleteInteractionData;
+using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {
@@ -104,7 +104,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public override Task RespondWithModalAsync(Modal modal, RequestOptions requestOptions = null)
-            => throw new NotSupportedException("Autocomplete interactions cannot have normal responces!");
+            => throw new NotSupportedException("Autocomplete interactions cannot have normal responses!");
 
         //IAutocompleteInteraction
         /// <inheritdoc/>

@@ -1,8 +1,8 @@
+using Discord;
+using Discord.WebSocket;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 
 namespace BasicBot
 {
@@ -90,7 +90,7 @@ namespace BasicBot
 
             if (message.Content == "!ping")
             {
-                // Create a new componentbuilder, in which dropdowns & buttons can be created.
+                // Create a new ComponentBuilder, in which dropdowns & buttons can be created.
                 var cb = new ComponentBuilder()
                     .WithButton("Click me!", "unique-id", ButtonStyle.Primary);
 
@@ -112,7 +112,8 @@ namespace BasicBot
                 if (component.Data.CustomId == "unique-id")
                     await interaction.RespondAsync("Thank you for clicking my button!");
 
-                else Console.WriteLine("An ID has been received that has no handler!");
+                else
+                    Console.WriteLine("An ID has been received that has no handler!");
             }
         }
     }

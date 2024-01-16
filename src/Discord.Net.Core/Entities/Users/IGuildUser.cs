@@ -14,7 +14,7 @@ namespace Discord
         /// </summary>
         /// <returns>
         ///     A <see cref="DateTimeOffset"/> representing the time of which the user has joined the guild; 
-        ///     <c>null</c> when it cannot be obtained.
+        ///     <see langword="null" /> when it cannot be obtained.
         /// </returns>
         DateTimeOffset? JoinedAt { get; }
         /// <summary>
@@ -28,7 +28,7 @@ namespace Discord
         ///     Gets the nickname for this user.
         /// </summary>
         /// <returns>
-        ///     A string representing the nickname of the user; <c>null</c> if none is set.
+        ///     A string representing the nickname of the user; <see langword="null" /> if none is set.
         /// </returns>
         string Nickname { get; }
         /// <summary>
@@ -73,7 +73,7 @@ namespace Discord
         ///     Gets the date and time for when this user's guild boost began.
         /// </summary>
         /// <returns>
-        ///     A <see cref="DateTimeOffset"/> for when the user began boosting this guild; <c>null</c> if they are not boosting the guild.
+        ///     A <see cref="DateTimeOffset"/> for when the user began boosting this guild; <see langword="null" /> if they are not boosting the guild.
         /// </returns>
         DateTimeOffset? PremiumSince { get; }
         /// <summary>
@@ -112,6 +112,11 @@ namespace Discord
         DateTimeOffset? TimedOutUntil { get; }
 
         /// <summary>
+        ///     Gets the public flags for this guild member.
+        /// </summary>
+        GuildUserFlags Flags { get; }
+
+        /// <summary>
         ///     Gets the level permissions granted to this user to a given channel.
         /// </summary>
         /// <example>
@@ -128,34 +133,20 @@ namespace Discord
         ///     specified channel.
         /// </returns>
         ChannelPermissions GetPermissions(IGuildChannel channel);
-
         /// <summary>
-        ///     Gets the guild avatar URL for this user.
+        ///     Gets the guild-specific avatar URL for this user, if it is set.
         /// </summary>
         /// <remarks>
-        ///     This property retrieves a URL for this guild user's guild specific avatar. In event that the user does not have a valid guild avatar
-        ///     (i.e. their avatar identifier is not set), this method will return <see langword="null"/>.
+        ///     <note type="tip">
+        ///         If you wish to retrieve the display avatar for this user, consider using <see cref="IUser.GetDisplayAvatarUrl"/>.
+        ///     </note>
         /// </remarks>
-        /// <param name="format">The format to return.</param>
-        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
-        /// </param>
+        /// <param name="format">The format of the image.</param>
+        /// <param name="size">The size of the image that matches any power of two, ranging from 16 to 2048.</param>
         /// <returns>
-        ///     A string representing the user's avatar URL; <see langword="null"/> if the user does not have an avatar in place.
+        ///     A string representing the user's guild-specific avatar URL; <see langword="null"/> if the user has no guild avatar set.
         /// </returns>
         string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
-        /// <summary>
-        ///     Gets the display avatar URL for this user.
-        /// </summary>
-        /// <remarks>
-        ///     This property retrieves an URL for this guild user's displayed avatar.
-        ///     If the user does not have a guild avatar, this will be the user's regular avatar.
-        /// </remarks>
-        /// <param name="format">The format to return.</param>
-        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
-        /// <returns>
-        ///     A string representing the URL of the displayed avatar for this user. <see langword="null"/> if the user does not have an avatar in place.
-        /// </returns>
-        string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
         /// <summary>
         ///     Kicks this user from this guild.
         /// </summary>

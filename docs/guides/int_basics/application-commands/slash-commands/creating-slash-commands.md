@@ -19,7 +19,7 @@ Guild commands are specific to the guild you specify when making them. Guild com
 
 **Note**: Global commands will take up to 1 hour to create, delete or modify on guilds. If you need to update a command quickly for testing you can create it as a guild command.
 
-If you don't have the code for a bot ready yet please follow [this guide](https://docs.stillu.cc/guides/getting_started/first-bot.html).
+If you don't have the code for a bot ready yet please follow [this guide](https://discordnet.dev/guides/getting_started/first-bot.html).
 
 ## SlashCommandBuilder
 
@@ -85,7 +85,7 @@ public async Task Client_Ready()
     catch(ApplicationCommandException exception)
     {
         // If our command was invalid, we should catch an ApplicationCommandException. This exception contains the path of the error as well as the error message. You can serialize the Error field in the exception to get a visual of where your error is.
-        var json = JsonConvert.SerializeObject(exception.Error, Formatting.Indented);
+        var json = JsonConvert.SerializeObject(exception.Errors, Formatting.Indented);
 
         // You can send this error somewhere or just print it to the console, for this example we're just going to print it.
         Console.WriteLine(json);

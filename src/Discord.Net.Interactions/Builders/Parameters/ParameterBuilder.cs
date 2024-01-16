@@ -40,7 +40,7 @@ namespace Discord.Interactions.Builders
         public IReadOnlyCollection<ParameterPreconditionAttribute> Preconditions => _preconditions;
         protected abstract TBuilder Instance { get; }
 
-        internal ParameterBuilder (ICommandBuilder command)
+        internal ParameterBuilder(ICommandBuilder command)
         {
             _attributes = new List<Attribute>();
             _preconditions = new List<ParameterPreconditionAttribute>();
@@ -48,7 +48,7 @@ namespace Discord.Interactions.Builders
             Command = command;
         }
 
-        protected ParameterBuilder (ICommandBuilder command, string name, Type type) : this(command)
+        protected ParameterBuilder(ICommandBuilder command, string name, Type type) : this(command)
         {
             Name = name;
             SetParameterType(type);
@@ -61,7 +61,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public virtual TBuilder WithName (string name)
+        public virtual TBuilder WithName(string name)
         {
             Name = name;
             return Instance;
@@ -74,7 +74,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public virtual TBuilder SetParameterType (Type type)
+        public virtual TBuilder SetParameterType(Type type)
         {
             ParameterType = type;
             return Instance;
@@ -87,7 +87,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public virtual TBuilder SetRequired (bool isRequired)
+        public virtual TBuilder SetRequired(bool isRequired)
         {
             IsRequired = isRequired;
             return Instance;
@@ -100,7 +100,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public virtual TBuilder SetDefaultValue (object defaultValue)
+        public virtual TBuilder SetDefaultValue(object defaultValue)
         {
             DefaultValue = defaultValue;
             return Instance;
@@ -113,7 +113,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public virtual TBuilder AddAttributes (params Attribute[] attributes)
+        public virtual TBuilder AddAttributes(params Attribute[] attributes)
         {
             _attributes.AddRange(attributes);
             return Instance;
@@ -126,37 +126,37 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public virtual TBuilder AddPreconditions (params ParameterPreconditionAttribute[] attributes)
+        public virtual TBuilder AddPreconditions(params ParameterPreconditionAttribute[] attributes)
         {
             _preconditions.AddRange(attributes);
             return Instance;
         }
 
-        internal abstract TInfo Build (ICommandInfo command);
+        internal abstract TInfo Build(ICommandInfo command);
 
         //IParameterBuilder
         /// <inheritdoc/>
-        IParameterBuilder IParameterBuilder.WithName (string name) =>
+        IParameterBuilder IParameterBuilder.WithName(string name) =>
             WithName(name);
 
         /// <inheritdoc/>
-        IParameterBuilder IParameterBuilder.SetParameterType (Type type) =>
+        IParameterBuilder IParameterBuilder.SetParameterType(Type type) =>
             SetParameterType(type);
 
         /// <inheritdoc/>
-        IParameterBuilder IParameterBuilder.SetRequired (bool isRequired) =>
+        IParameterBuilder IParameterBuilder.SetRequired(bool isRequired) =>
             SetRequired(isRequired);
 
         /// <inheritdoc/>
-        IParameterBuilder IParameterBuilder.SetDefaultValue (object defaultValue) =>
+        IParameterBuilder IParameterBuilder.SetDefaultValue(object defaultValue) =>
             SetDefaultValue(defaultValue);
 
         /// <inheritdoc/>
-        IParameterBuilder IParameterBuilder.AddAttributes (params Attribute[] attributes) =>
+        IParameterBuilder IParameterBuilder.AddAttributes(params Attribute[] attributes) =>
             AddAttributes(attributes);
 
         /// <inheritdoc/>
-        IParameterBuilder IParameterBuilder.AddPreconditions (params ParameterPreconditionAttribute[] preconditions) =>
+        IParameterBuilder IParameterBuilder.AddPreconditions(params ParameterPreconditionAttribute[] preconditions) =>
             AddPreconditions(preconditions);
     }
 }

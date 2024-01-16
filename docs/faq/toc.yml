@@ -16,6 +16,8 @@
       topicUid: FAQ.Interactions.Framework
     - name: Manual handling
       topicUid: FAQ.Interactions.Manual
+    - name: Interaction response schemes
+      topicUid: FAQ.Interactions.RespondingSchemes
 - name: Text Commands
   items: 
     - name: Text Command basics

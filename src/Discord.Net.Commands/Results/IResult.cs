@@ -10,7 +10,7 @@ namespace Discord.Commands
         /// </summary>
         /// <returns>
         ///     A <see cref="CommandError" /> indicating the type of error that may have occurred during the operation; 
-        ///     <c>null</c> if the operation was successful.
+        ///     <see langword="null" /> if the operation was successful.
         /// </returns>
         CommandError? Error { get; }
         /// <summary>
@@ -24,7 +24,7 @@ namespace Discord.Commands
         ///     Indicates whether the operation was successful or not.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the result is positive; otherwise <c>false</c>.
+        ///     <see langword="true" /> if the result is positive; otherwise <see langword="false" />.
         /// </returns>
         bool IsSuccess { get; }
     }

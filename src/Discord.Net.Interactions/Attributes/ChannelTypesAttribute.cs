@@ -19,7 +19,7 @@ namespace Discord.Interactions
         ///     Specify the target channel types for a <see cref="ApplicationCommandOptionType.Channel"/> option.
         /// </summary>
         /// <param name="channelTypes">The allowed channel types for this option.</param>
-        public ChannelTypesAttribute (params ChannelType[] channelTypes)
+        public ChannelTypesAttribute(params ChannelType[] channelTypes)
         {
             if (channelTypes is null)
                 throw new ArgumentNullException(nameof(channelTypes));

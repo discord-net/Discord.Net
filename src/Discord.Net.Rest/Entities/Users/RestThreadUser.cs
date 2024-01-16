@@ -18,6 +18,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public IGuild Guild { get; }
 
+        /// <inheritdoc cref="IThreadUser.GuildUser"/>
+        public RestGuildUser GuildUser { get; private set; }
+
         /// <inheritdoc/>
         public string Mention => MentionUtils.MentionUser(Id);
 
@@ -38,7 +41,12 @@ namespace Discord.Rest
         internal void Update(Model model)
         {
             ThreadJoinedAt = model.JoinTimestamp;
+            if (model.GuildMember.IsSpecified)
+                GuildUser = RestGuildUser.Create(Discord, Guild, model.GuildMember.Value);
         }
+
+        /// <inheritdoc />
+        IGuildUser IThreadUser.GuildUser => GuildUser;
 
         /// <summary>
         ///     Gets the guild user for this thread user.

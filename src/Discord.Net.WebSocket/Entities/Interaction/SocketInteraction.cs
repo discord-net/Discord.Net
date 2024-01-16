@@ -1,11 +1,13 @@
+using Discord.Net;
 using Discord.Rest;
 using System;
-using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
-using DataModel = Discord.API.ApplicationCommandInteractionData;
-using System.IO;
 using System.Collections.Generic;
-using Discord.Net;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using DataModel = Discord.API.ApplicationCommandInteractionData;
+using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {
@@ -71,6 +73,9 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public ulong ApplicationId { get; private set; }
 
+        /// <inheritdoc cref="IDiscordInteraction.Entitlements" />
+        public IReadOnlyCollection<RestEntitlement> Entitlements { get; private set; }
+
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel, SocketUser user)
             : base(client, id)
         {
@@ -116,8 +121,8 @@ namespace Discord.WebSocket
 
         internal virtual void Update(Model model)
         {
-            ChannelId = model.ChannelId.IsSpecified
-                ? model.ChannelId.Value
+            ChannelId = model.Channel.IsSpecified
+                ? model.Channel.Value.Id
                 : null;
 
             GuildId = model.GuildId.IsSpecified
@@ -130,7 +135,7 @@ namespace Discord.WebSocket
             Data = model.Data.IsSpecified
                 ? model.Data.Value
                 : null;
-            
+
             Token = model.Token;
             Version = model.Version;
             Type = model.Type;
@@ -142,6 +147,8 @@ namespace Discord.WebSocket
             GuildLocale = model.GuildLocale.IsSpecified
                 ? model.GuildLocale.Value
                 : null;
+
+            Entitlements = model.Entitlements.Select(x => RestEntitlement.Create(Discord, x)).ToImmutableArray();
         }
 
         /// <summary>
@@ -398,16 +405,21 @@ namespace Discord.WebSocket
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
         public abstract Task RespondWithModalAsync(Modal modal, RequestOptions options = null);
-#endregion
+
+        /// <inheritdoc/>
+        public Task RespondWithPremiumRequiredAsync(RequestOptions options = null)
+            => InteractionHelper.RespondWithPremiumRequiredAsync(Discord, Id, Token, options);
+
+        #endregion
 
         /// <summary>
-        ///     Attepts to get the channel this interaction was executed in.
+        ///     Attempts to get the channel this interaction was executed in.
         /// </summary>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>
         ///     A task that represents the asynchronous operation of fetching the channel.
         /// </returns>
-        public async ValueTask<IMessageChannel> GetChannelAsync(RequestOptions options  = null)
+        public async ValueTask<IMessageChannel> GetChannelAsync(RequestOptions options = null)
         {
             if (Channel != null)
                 return Channel;
@@ -419,10 +431,13 @@ namespace Discord.WebSocket
             {
                 return (IMessageChannel)await Discord.GetChannelAsync(ChannelId.Value, options).ConfigureAwait(false);
             }
-            catch(HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions) { return null; } // bot can't view that channel, return null instead of throwing.
+            catch (HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions) { return null; } // bot can't view that channel, return null instead of throwing.
         }
 
-#region  IDiscordInteraction
+        #region  IDiscordInteraction
+        /// <inheritdoc/>
+        IReadOnlyCollection<IEntitlement> IDiscordInteraction.Entitlements => Entitlements;
+
         /// <inheritdoc/>
         IUser IDiscordInteraction.User => User;
 
@@ -452,6 +467,6 @@ namespace Discord.WebSocket
         async Task<IUserMessage> IDiscordInteraction.FollowupWithFileAsync(FileAttachment attachment, string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options)
             => await FollowupWithFileAsync(attachment, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
 #endif
-#endregion
+        #endregion
     }
 }

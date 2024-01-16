@@ -32,7 +32,7 @@ namespace Discord.API.Rest
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
             var d = new Dictionary<string, object>();
-            
+
             var payload = new Dictionary<string, object>();
             if (Content.IsSpecified)
                 payload["content"] = Content.Value;
@@ -55,7 +55,7 @@ namespace Discord.API.Rest
 
             List<object> attachments = new();
 
-            for(int n = 0; n != Files.Length; n++)
+            for (int n = 0; n != Files.Length; n++)
             {
                 var attachment = Files[n];
 

@@ -13,12 +13,12 @@ namespace Discord.Audio.Streams
         {
             _client = client;
         }
-        
+
         public override void WriteHeader(ushort seq, uint timestamp, bool missed) { } //Ignore
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             cancelToken.ThrowIfCancellationRequested();
-            await _client.SendAsync(buffer, offset, count).ConfigureAwait(false);
+            return _client.SendAsync(buffer, offset, count);
         }
     }
 }

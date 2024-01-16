@@ -1,6 +1,6 @@
-using System;
-using Newtonsoft.Json;
 using Discord.Net.Converters;
+using Newtonsoft.Json;
+using System;
 
 namespace Discord.API
 {

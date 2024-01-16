@@ -64,12 +64,12 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
+        public override Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
         {
             if (context.Interaction is not ISlashCommandInteraction)
-                return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Slash Command Interaction");
+                return Task.FromResult((IResult)ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Slash Command Interaction"));
 
-            return await base.ExecuteAsync(context, services);
+            return base.ExecuteAsync(context, services);
         }
 
         protected override async Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
@@ -86,13 +86,13 @@ namespace Discord.Interactions
 
             var options = GetOptions();
             var args = new object[Parameters.Count];
-            for(var i = 0; i < Parameters.Count; i++)
+            for (var i = 0; i < Parameters.Count; i++)
             {
                 var parameter = Parameters[i];
                 var result = await ParseArgumentAsync(parameter, context, options, services).ConfigureAwait(false);
 
                 if (!result.IsSuccess)
-                    return await InvokeEventAndReturn(context, ParseResult.FromError(result)).ConfigureAwait(false);
+                    return ParseResult.FromError(result);
 
                 if (result is not TypeConverterResult converterResult)
                     return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Complex command parsing failed for an unknown reason.");
@@ -136,10 +136,10 @@ namespace Discord.Interactions
             return readResult;
         }
 
-        protected override Task InvokeModuleEvent (IInteractionContext context, IResult result)
+        protected override Task InvokeModuleEvent(IInteractionContext context, IResult result)
             => CommandService._slashCommandExecutedEvent.InvokeAsync(this, context, result);
 
-        protected override string GetLogString (IInteractionContext context)
+        protected override string GetLogString(IInteractionContext context)
         {
             if (context.Guild != null)
                 return $"Slash Command: \"{base.ToString()}\" for {context.User} in {context.Guild}/{context.Channel}";
@@ -153,7 +153,7 @@ namespace Discord.Interactions
                 if (!parameter.IsComplexParameter)
                     yield return parameter;
                 else
-                    foreach(var complexParameterField in parameter.ComplexParameterFields)
+                    foreach (var complexParameterField in parameter.ComplexParameterFields)
                         yield return complexParameterField;
         }
     }

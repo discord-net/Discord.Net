@@ -64,11 +64,11 @@ namespace InteractionFramework
 
         public static bool IsDebug()
         {
-            #if DEBUG
-                return true;
-            #else
-                return false;
-            #endif
+#if DEBUG
+            return true;
+#else
+            return false;
+#endif
         }
     }
 }

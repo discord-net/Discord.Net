@@ -20,7 +20,7 @@ namespace Discord.Interactions
     /// <returns>
     ///     A task representing the execution operation.
     /// </returns>
-    public delegate Task ExecuteCallback (IInteractionContext context, object[] args, IServiceProvider serviceProvider, ICommandInfo commandInfo);
+    public delegate Task ExecuteCallback(IInteractionContext context, object[] args, IServiceProvider serviceProvider, ICommandInfo commandInfo);
 
     /// <summary>
     ///     The base information class for <see cref="InteractionService"/> commands.
@@ -88,12 +88,12 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
+        public virtual Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
         {
             switch (RunMode)
             {
                 case RunMode.Sync:
-                    return await ExecuteInternalAsync(context, services).ConfigureAwait(false);
+                    return ExecuteInternalAsync(context, services);
                 case RunMode.Async:
                     _ = Task.Run(async () =>
                     {
@@ -104,7 +104,7 @@ namespace Discord.Interactions
                     throw new InvalidOperationException($"RunMode {RunMode} is not supported.");
             }
 
-            return ExecuteResult.FromSuccess();
+            return Task.FromResult((IResult)ExecuteResult.FromSuccess());
         }
 
         protected abstract Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services);
@@ -114,7 +114,7 @@ namespace Discord.Interactions
             await CommandService._cmdLogger.DebugAsync($"Executing {GetLogString(context)}").ConfigureAwait(false);
 
             using var scope = services?.CreateScope();
-            
+
             if (CommandService._autoServiceScopes)
                 services = scope?.ServiceProvider ?? EmptyServiceProvider.Instance;
 
@@ -129,7 +129,7 @@ namespace Discord.Interactions
                 if (!argsResult.IsSuccess)
                     return await InvokeEventAndReturn(context, argsResult).ConfigureAwait(false);
 
-                if(argsResult is not ParseResult parseResult)
+                if (argsResult is not ParseResult parseResult)
                     return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Complex command parsing failed for an unknown reason.");
 
                 var args = parseResult.Args;
