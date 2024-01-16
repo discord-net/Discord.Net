@@ -21,7 +21,7 @@ namespace Discord
         String = 3,
 
         /// <summary>
-        ///     An <see langword="int"/>.
+        ///     An <see langword="long"/>.
         /// </summary>
         Integer = 4,
 

@@ -25,7 +25,8 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get; internal set; }
         /// <inheritdoc />
         public override string AvatarId { get; internal set; }
-
+        /// <inheritdoc />
+        public override string GlobalName { get; internal set; }
 
         /// <inheritdoc />
         public override bool IsBot { get; internal set; }
@@ -49,9 +50,12 @@ namespace Discord.WebSocket
             return entity;
         }
 
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)";
+        private string DebuggerDisplay => DiscriminatorValue != 0
+            ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)"
+            : $"{Username} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)";
+
         internal new SocketWebhookUser Clone() => MemberwiseClone() as SocketWebhookUser;
-#endregion
+        #endregion
 
         #region IGuildUser
         /// <inheritdoc />
@@ -71,8 +75,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         string IGuildUser.GuildAvatarId => null;
         /// <inheritdoc />
-        string IGuildUser.GetDisplayAvatarUrl(ImageFormat format, ushort size) => null;
-        /// <inheritdoc />
         string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => null;
         /// <inheritdoc />
         DateTimeOffset? IGuildUser.PremiumSince => null;
@@ -84,6 +86,8 @@ namespace Discord.WebSocket
         int IGuildUser.Hierarchy => 0;
         /// <inheritdoc />
         GuildPermissions IGuildUser.GuildPermissions => GuildPermissions.Webhook;
+        /// <inheritdoc />
+        GuildUserFlags IGuildUser.Flags => GuildUserFlags.None;
 
         /// <inheritdoc />
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel) => Permissions.ToChannelPerms(channel, GuildPermissions.Webhook.RawValue);

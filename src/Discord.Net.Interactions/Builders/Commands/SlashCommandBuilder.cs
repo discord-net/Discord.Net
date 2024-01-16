@@ -26,11 +26,16 @@ namespace Discord.Interactions.Builders
         public bool IsEnabledInDm { get; set; } = true;
 
         /// <summary>
+        ///     Gets whether this command is age restricted.
+        /// </summary>
+        public bool IsNsfw { get; set; } = false;
+
+        /// <summary>
         ///     Gets the default permissions needed for executing this command.
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; set; } = null;
 
-        internal SlashCommandBuilder (ModuleBuilder module) : base(module) { }
+        internal SlashCommandBuilder(ModuleBuilder module) : base(module) { }
 
         /// <summary>
         ///     Initializes a new <see cref="SlashCommandBuilder"/>.
@@ -38,7 +43,7 @@ namespace Discord.Interactions.Builders
         /// <param name="module">Parent module of this command.</param>
         /// <param name="name">Name of this command.</param>
         /// <param name="callback">Execution callback of this command.</param>
-        public SlashCommandBuilder (ModuleBuilder module, string name, ExecuteCallback callback) : base(module, name, callback) { }
+        public SlashCommandBuilder(ModuleBuilder module, string name, ExecuteCallback callback) : base(module, name, callback) { }
 
         /// <summary>
         ///     Sets <see cref="Description"/>.
@@ -47,7 +52,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public SlashCommandBuilder WithDescription (string description)
+        public SlashCommandBuilder WithDescription(string description)
         {
             Description = description;
             return this;
@@ -61,7 +66,7 @@ namespace Discord.Interactions.Builders
         ///     The builder instance.
         /// </returns>
         [Obsolete($"To be deprecated soon, use {nameof(SetEnabledInDm)} and {nameof(WithDefaultMemberPermissions)} instead.")]
-        public SlashCommandBuilder WithDefaultPermission (bool permission)
+        public SlashCommandBuilder WithDefaultPermission(bool permission)
         {
             DefaultPermission = permission;
             return Instance;
@@ -74,7 +79,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public override SlashCommandBuilder AddParameter (Action<SlashCommandParameterBuilder> configure)
+        public override SlashCommandBuilder AddParameter(Action<SlashCommandParameterBuilder> configure)
         {
             var parameter = new SlashCommandParameterBuilder(this);
             configure(parameter);
@@ -96,6 +101,19 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
+        ///     Sets <see cref="IsNsfw"/>.
+        /// </summary>
+        /// <param name="isNsfw">New value of the <see cref="IsNsfw"/>.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public SlashCommandBuilder SetNsfw(bool isNsfw)
+        {
+            IsNsfw = isNsfw;
+            return this;
+        }
+
+        /// <summary>
         ///     Sets <see cref="DefaultMemberPermissions"/>.
         /// </summary>
         /// <param name="permissions">New value of the <see cref="DefaultMemberPermissions"/>.</param>
@@ -108,7 +126,7 @@ namespace Discord.Interactions.Builders
             return this;
         }
 
-        internal override SlashCommandInfo Build (ModuleInfo module, InteractionService commandService) =>
+        internal override SlashCommandInfo Build(ModuleInfo module, InteractionService commandService) =>
             new SlashCommandInfo(this, module, commandService);
     }
 }

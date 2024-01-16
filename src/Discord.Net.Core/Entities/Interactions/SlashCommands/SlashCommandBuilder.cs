@@ -86,6 +86,11 @@ namespace Discord
         public bool IsDMEnabled { get; set; } = true;
 
         /// <summary>
+        ///     Gets or sets whether or not this command is age restricted.
+        /// </summary>
+        public bool IsNsfw { get; set; } = false;
+
+        /// <summary>
         ///     Gets or sets the default permission required to use this slash command.
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; set; }
@@ -110,7 +115,8 @@ namespace Discord
                 NameLocalizations = _nameLocalizations,
                 DescriptionLocalizations = _descriptionLocalizations,
                 IsDMEnabled = IsDMEnabled,
-                DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified
+                DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified,
+                IsNsfw = IsNsfw,
             };
 
             if (Options != null && Options.Any())
@@ -161,13 +167,24 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Sets whether or not this command can be used in dms
+        ///     Sets whether or not this command can be used in dms.
         /// </summary>
         /// <param name="permission"><see langword="true"/> if the command is available in dms, otherwise <see langword="false"/>.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder WithDMPermission(bool permission)
         {
             IsDMEnabled = permission;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets whether or not this command is age restricted.
+        /// </summary>
+        /// <param name="permission"><see langword="true"/> if the command is age restricted, otherwise <see langword="false"/>.</param>
+        /// <returns>The current builder.</returns>
+        public SlashCommandBuilder WithNsfw(bool permission)
+        {
+            IsNsfw = permission;
             return this;
         }
 
@@ -295,7 +312,7 @@ namespace Discord
 
             foreach (var (locale, name) in nameLocalizations)
             {
-                if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                     throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
                 EnsureValidCommandName(name);
@@ -319,7 +336,7 @@ namespace Discord
 
             foreach (var (locale, description) in descriptionLocalizations)
             {
-                if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                     throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
                 EnsureValidCommandDescription(description);
@@ -338,7 +355,7 @@ namespace Discord
         /// <exception cref="ArgumentException">Thrown if <paramref name="locale"/> is an invalid locale string.</exception>
         public SlashCommandBuilder AddNameLocalization(string locale, string name)
         {
-            if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+            if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                 throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
             EnsureValidCommandName(name);
@@ -358,7 +375,7 @@ namespace Discord
         /// <exception cref="ArgumentException">Thrown if <paramref name="locale"/> is an invalid locale string.</exception>
         public SlashCommandBuilder AddDescriptionLocalization(string locale, string description)
         {
-            if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+            if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                 throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
             EnsureValidCommandDescription(description);
@@ -532,7 +549,7 @@ namespace Discord
             if (isIntType && MaxValue != null && MaxValue % 1 != 0)
                 throw new InvalidOperationException("MaxValue cannot have decimals on Integer command options.");
 
-            if(isStrType && MinLength is not null && MinLength < 0)
+            if (isStrType && MinLength is not null && MinLength < 0)
                 throw new InvalidOperationException("MinLength cannot be smaller than 0.");
 
             if (isStrType && MaxLength is not null && MaxLength < 1)
@@ -610,10 +627,10 @@ namespace Discord
                 ChannelTypes = channelTypes,
             };
 
-            if(nameLocalizations is not null)
+            if (nameLocalizations is not null)
                 option.WithNameLocalizations(nameLocalizations);
 
-            if(descriptionLocalizations is not null)
+            if (descriptionLocalizations is not null)
                 option.WithDescriptionLocalizations(descriptionLocalizations);
 
             return AddOption(option);
@@ -647,7 +664,9 @@ namespace Discord
             if (options == null)
                 throw new ArgumentNullException(nameof(options), "Options cannot be null!");
 
-            if ((Options?.Count ?? 0) + options.Length > SlashCommandBuilder.MaxOptionsCount)
+            Options ??= new List<SlashCommandOptionBuilder>();
+
+            if (Options.Count + options.Length > SlashCommandBuilder.MaxOptionsCount)
                 throw new ArgumentOutOfRangeException(nameof(options), $"There can only be {SlashCommandBuilder.MaxOptionsCount} options per sub command group!");
 
             foreach (var option in options)
@@ -730,7 +749,7 @@ namespace Discord
             Preconditions.AtLeast(name.Length, 1, nameof(name));
             Preconditions.AtMost(name.Length, 100, nameof(name));
 
-            if(value is string str)
+            if (value is string str)
             {
                 Preconditions.AtLeast(str.Length, 1, nameof(value));
                 Preconditions.AtMost(str.Length, 100, nameof(value));
@@ -885,7 +904,7 @@ namespace Discord
 
             foreach (var (locale, name) in nameLocalizations)
             {
-                if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                     throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
                 EnsureValidCommandOptionName(name);
@@ -909,7 +928,7 @@ namespace Discord
 
             foreach (var (locale, description) in descriptionLocalizations)
             {
-                if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                     throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
                 EnsureValidCommandOptionDescription(description);
@@ -928,7 +947,7 @@ namespace Discord
         /// <exception cref="ArgumentException">Thrown if <paramref name="locale"/> is an invalid locale string.</exception>
         public SlashCommandOptionBuilder AddNameLocalization(string locale, string name)
         {
-            if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+            if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                 throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
             EnsureValidCommandOptionName(name);
@@ -948,7 +967,7 @@ namespace Discord
         /// <exception cref="ArgumentException">Thrown if <paramref name="locale"/> is an invalid locale string.</exception>
         public SlashCommandOptionBuilder AddDescriptionLocalization(string locale, string description)
         {
-            if(!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+            if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
                 throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
             EnsureValidCommandOptionDescription(description);

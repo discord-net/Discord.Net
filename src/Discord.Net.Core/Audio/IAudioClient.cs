@@ -13,6 +13,7 @@ namespace Discord.Audio
         event Func<ulong, AudioInStream, Task> StreamCreated;
         event Func<ulong, Task> StreamDestroyed;
         event Func<ulong, bool, Task> SpeakingUpdated;
+        event Func<ulong, Task> ClientDisconnected;
 
         /// <summary> Gets the current connection state of this client. </summary>
         ConnectionState ConnectionState { get; }

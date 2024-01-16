@@ -19,21 +19,34 @@ namespace Discord.WebSocket
         IReadOnlyCollection<SocketMessage> CachedMessages { get; }
 
         /// <inheritdoc cref="IMessageChannel.SendMessageAsync(string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
-        new Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, 
+        new Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null,
             RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null,
             MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
-        
+
         /// <inheritdoc cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
-        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, 
-            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, 
-            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, 
+        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null,
+            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null,
+            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
-            
+
         /// <inheritdoc cref="IMessageChannel.SendFileAsync(Stream, string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
-        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, 
-            Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, 
-            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, 
+        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false,
+            Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null,
+            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
             Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+
+        /// <inheritdoc cref="IMessageChannel.SendFileAsync(FileAttachment, string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
+        new Task<RestUserMessage> SendFileAsync(FileAttachment attachment, string text = null, bool isTTS = false,
+            Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
+            MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
+            Embed[] embeds = null, MessageFlags flags = MessageFlags.None);
+
+        /// <inheritdoc cref="IMessageChannel.SendFilesAsync(IEnumerable{FileAttachment}, string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>
+        new Task<RestUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text = null,
+            bool isTTS = false, Embed embed = null, RequestOptions options = null,
+            AllowedMentions allowedMentions = null, MessageReference messageReference = null,
+            MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null,
+            MessageFlags flags = MessageFlags.None);
 
         /// <summary>
         ///     Gets a cached message from this channel.
@@ -41,7 +54,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <note type="warning">
         ///         This method requires the use of cache, which is not enabled by default; if caching is not enabled,
-        ///         this method will always return <c>null</c>. Please refer to
+        ///         this method will always return <see langword="null" />. Please refer to
         ///         <see cref="Discord.WebSocket.DiscordSocketConfig.MessageCacheSize" /> for more details.
         ///     </note>
         ///     <para>
@@ -51,7 +64,7 @@ namespace Discord.WebSocket
         /// </remarks>
         /// <param name="id">The snowflake identifier of the message.</param>
         /// <returns>
-        ///     A WebSocket-based message object; <c>null</c> if it does not exist in the cache or if caching is not
+        ///     A WebSocket-based message object; <see langword="null" /> if it does not exist in the cache or if caching is not
         ///     enabled.
         /// </returns>
         SocketMessage GetCachedMessage(ulong id);

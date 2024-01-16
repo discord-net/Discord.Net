@@ -40,6 +40,9 @@ namespace Discord.WebSocket
         public bool IsEnabledInDm { get; private set; }
 
         /// <inheritdoc/>
+        public bool IsNsfw { get; private set; }
+
+        /// <inheritdoc/>
         public GuildPermissions DefaultMemberPermissions { get; private set; }
 
         /// <summary>
@@ -130,6 +133,7 @@ namespace Discord.WebSocket
 
             IsEnabledInDm = model.DmPermission.GetValueOrDefault(true).GetValueOrDefault(true);
             DefaultMemberPermissions = new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(0).GetValueOrDefault(0));
+            IsNsfw = model.Nsfw.GetValueOrDefault(false).GetValueOrDefault(false);
         }
 
         /// <inheritdoc/>

@@ -1,6 +1,6 @@
 using System;
-using System.Globalization;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Discord
 {
@@ -44,11 +44,14 @@ namespace Discord
         /// <param name="other">The object to compare with the current object.</param>
         public override bool Equals(object other)
         {
-            if (other == null) return false;
-            if (other == this) return true;
+            if (other == null)
+                return false;
+            if (other == this)
+                return true;
 
             var otherEmote = other as Emote;
-            if (otherEmote == null) return false;
+            if (otherEmote == null)
+                return false;
 
             return Id == otherEmote.Id;
         }

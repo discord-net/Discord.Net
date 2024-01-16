@@ -41,7 +41,7 @@ namespace Discord
         /// <paramref name="path" /> is a zero-length string, contains only white space, or contains one or more invalid
         /// characters as defined by <see cref="Path.GetInvalidPathChars"/>.
         /// </exception>
-        /// <exception cref="System.ArgumentNullException"><paramref name="path" /> is <c>null</c>.</exception>
+        /// <exception cref="System.ArgumentNullException"><paramref name="path" /> is <see langword="null" />.</exception>
         /// <exception cref="PathTooLongException">
         /// The specified path, file name, or both exceed the system-defined maximum length. For example, on
         /// Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260

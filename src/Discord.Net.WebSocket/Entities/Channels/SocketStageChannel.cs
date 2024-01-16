@@ -16,10 +16,11 @@ namespace Discord.WebSocket
     {
         /// <inheritdoc/>
         /// <remarks>
-        ///     This field is always false for stage channels.
+        ///     This field is always true for stage channels.
         /// </remarks>
+        [Obsolete("This property is no longer used because Discord enabled text-in-stage for all channels.")]
         public override bool IsTextInVoice
-            => false;
+            => true;
 
         /// <inheritdoc/>
         public StagePrivacyLevel? PrivacyLevel { get; private set; }
@@ -41,6 +42,12 @@ namespace Discord.WebSocket
         /// </summary>
         public IReadOnlyCollection<SocketGuildUser> Speakers
             => Users.Where(x => !x.IsSuppressed).ToImmutableArray();
+
+        /// <inheritdoc/>
+        /// <remarks>
+        ///     This property is not supported in stage channels and will always return <see cref="string.Empty"/>.
+        /// </remarks>
+        public override string Status => string.Empty;
 
         internal new SocketStageChannel Clone() => MemberwiseClone() as SocketStageChannel;
 
@@ -155,5 +162,13 @@ namespace Discord.WebSocket
 
             return Discord.ApiClient.ModifyUserVoiceState(Guild.Id, user.Id, args);
         }
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Setting voice channel status is not supported in stage channels.
+        /// </remarks>
+        /// <exception cref="NotSupportedException">Setting voice channel status is not supported in stage channels.</exception>
+        public override Task SetStatusAsync(string status, RequestOptions options = null)
+            => throw new NotSupportedException("Setting voice channel status is not supported in stage channels.");
     }
 }

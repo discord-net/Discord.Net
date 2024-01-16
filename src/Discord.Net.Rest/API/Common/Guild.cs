@@ -44,6 +44,8 @@ namespace Discord.API
         public Optional<bool> WidgetEnabled { get; set; }
         [JsonProperty("widget_channel_id")]
         public Optional<ulong?> WidgetChannelId { get; set; }
+        [JsonProperty("safety_alerts_channel_id")]
+        public Optional<ulong?> SafetyAlertsChannelId { get; set; }
         [JsonProperty("system_channel_id")]
         public ulong? SystemChannelId { get; set; }
         [JsonProperty("premium_tier")]
@@ -83,5 +85,17 @@ namespace Discord.API
         public Sticker[] Stickers { get; set; }
         [JsonProperty("premium_progress_bar_enabled")]
         public Optional<bool> IsBoostProgressBarEnabled { get; set; }
+
+        [JsonProperty("welcome_screen")]
+        public Optional<WelcomeScreen> WelcomeScreen { get; set; }
+
+        [JsonProperty("max_stage_video_channel_users")]
+        public Optional<int> MaxStageVideoChannelUsers { get; set; }
+
+        [JsonProperty("inventory_settings")]
+        public Optional<GuildInventorySettings> InventorySettings { get; set; }
+
+        [JsonProperty("incidents_data")]
+        public GuildIncidentsData IncidentsData { get; set; }
     }
 }

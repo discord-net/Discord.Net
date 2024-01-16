@@ -1,15 +1,18 @@
-
 using Discord.API.Rest;
 using Discord.Net;
 using Discord.Net.Converters;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
+
 using Newtonsoft.Json;
+
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -200,7 +203,7 @@ namespace Discord.API
         internal Task SendAsync(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
             => SendAsync(method, GetEndpoint(endpointExpr), GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
-        public async Task SendAsync(string method, string endpoint,
+        public Task SendAsync(string method, string endpoint,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
             options ??= new RequestOptions();
@@ -208,13 +211,13 @@ namespace Discord.API
             options.BucketId = bucketId;
 
             var request = new RestRequest(RestClient, method, endpoint, options);
-            await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
+            return SendInternalAsync(method, endpoint, request);
         }
 
         internal Task SendJsonAsync(string method, Expression<Func<string>> endpointExpr, object payload, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
             => SendJsonAsync(method, GetEndpoint(endpointExpr), payload, GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
-        public async Task SendJsonAsync(string method, string endpoint, object payload,
+        public Task SendJsonAsync(string method, string endpoint, object payload,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
             options ??= new RequestOptions();
@@ -223,13 +226,13 @@ namespace Discord.API
 
             string json = payload != null ? SerializeJson(payload) : null;
             var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
-            await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
+            return SendInternalAsync(method, endpoint, request);
         }
 
         internal Task SendMultipartAsync(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
             => SendMultipartAsync(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
-        public async Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
+        public Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
             options ??= new RequestOptions();
@@ -237,7 +240,7 @@ namespace Discord.API
             options.BucketId = bucketId;
 
             var request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);
-            await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
+            return SendInternalAsync(method, endpoint, request);
         }
 
         internal Task<TResponse> SendAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
@@ -302,23 +305,23 @@ namespace Discord.API
         #endregion
 
         #region Auth
-        public async Task ValidateTokenAsync(RequestOptions options = null)
+        public Task ValidateTokenAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            await SendAsync("GET", () => "auth/login", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync("GET", () => "auth/login", new BucketIds(), options: options);
         }
         #endregion
 
         #region Gateway
-        public async Task<GetGatewayResponse> GetGatewayAsync(RequestOptions options = null)
+        public Task<GetGatewayResponse> GetGatewayAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<GetGatewayResponse>("GET", () => "gateway", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<GetGatewayResponse>("GET", () => "gateway", new BucketIds(), options: options);
         }
-        public async Task<GetBotGatewayResponse> GetBotGatewayAsync(RequestOptions options = null)
+        public Task<GetBotGatewayResponse> GetBotGatewayAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<GetBotGatewayResponse>("GET", () => "gateway/bot", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<GetBotGatewayResponse>("GET", () => "gateway/bot", new BucketIds(), options: options);
         }
         #endregion
 
@@ -352,15 +355,15 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
-        public async Task<IReadOnlyCollection<Channel>> GetGuildChannelsAsync(ulong guildId, RequestOptions options = null)
+        public Task<IReadOnlyCollection<Channel>> GetGuildChannelsAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<Channel>>("GET", () => $"guilds/{guildId}/channels", ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<Channel>>("GET", () => $"guilds/{guildId}/channels", ids, options: options);
         }
-        public async Task<Channel> CreateGuildChannelAsync(ulong guildId, CreateGuildChannelParams args, RequestOptions options = null)
+        public Task<Channel> CreateGuildChannelAsync(ulong guildId, CreateGuildChannelParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -373,16 +376,16 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<Channel>("POST", () => $"guilds/{guildId}/channels", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Channel>("POST", () => $"guilds/{guildId}/channels", args, ids, options: options);
         }
 
-        public async Task<Channel> DeleteChannelAsync(ulong channelId, RequestOptions options = null)
+        public Task<Channel> DeleteChannelAsync(ulong channelId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendAsync<Channel>("DELETE", () => $"channels/{channelId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync<Channel>("DELETE", () => $"channels/{channelId}", ids, options: options);
         }
         /// <exception cref="ArgumentException">
         /// <paramref name="channelId"/> must not be equal to zero.
@@ -394,7 +397,7 @@ namespace Discord.API
         /// -and-
         /// <paramref name="args.Name"/> must not be <see langword="null"/> or empty.
         /// </exception>
-        public async Task<Channel> ModifyGuildChannelAsync(ulong channelId, Rest.ModifyGuildChannelParams args, RequestOptions options = null)
+        public Task<Channel> ModifyGuildChannelAsync(ulong channelId, Rest.ModifyGuildChannelParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
@@ -407,7 +410,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendJsonAsync<Channel>("PATCH", () => $"channels/{channelId}", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Channel>("PATCH", () => $"channels/{channelId}", args, ids, options: options);
         }
 
         public async Task<Channel> ModifyGuildChannelAsync(ulong channelId, Rest.ModifyTextChannelParams args, RequestOptions options = null)
@@ -430,7 +433,7 @@ namespace Discord.API
             return await SendJsonAsync<Channel>("PATCH", () => $"channels/{channelId}", args, ids, options: options).ConfigureAwait(false);
         }
 
-        public async Task<Channel> ModifyGuildChannelAsync(ulong channelId, Rest.ModifyVoiceChannelParams args, RequestOptions options = null)
+        public Task<Channel> ModifyGuildChannelAsync(ulong channelId, Rest.ModifyVoiceChannelParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
@@ -441,10 +444,10 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendJsonAsync<Channel>("PATCH", () => $"channels/{channelId}", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Channel>("PATCH", () => $"channels/{channelId}", args, ids, options: options);
         }
 
-        public async Task ModifyGuildChannelsAsync(ulong guildId, IEnumerable<Rest.ModifyGuildChannelsParams> args, RequestOptions options = null)
+        public Task ModifyGuildChannelsAsync(ulong guildId, IEnumerable<Rest.ModifyGuildChannelsParams> args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -454,47 +457,56 @@ namespace Discord.API
             switch (channels.Length)
             {
                 case 0:
-                    return;
+                    return Task.CompletedTask;
                 case 1:
-                    await ModifyGuildChannelAsync(channels[0].Id, new Rest.ModifyGuildChannelParams { Position = channels[0].Position }).ConfigureAwait(false);
-                    break;
+                    return ModifyGuildChannelAsync(channels[0].Id, new Rest.ModifyGuildChannelParams { Position = channels[0].Position });
                 default:
                     var ids = new BucketIds(guildId: guildId);
-                    await SendJsonAsync("PATCH", () => $"guilds/{guildId}/channels", channels, ids, options: options).ConfigureAwait(false);
-                    break;
+                    return SendJsonAsync("PATCH", () => $"guilds/{guildId}/channels", channels, ids, options: options);
             }
         }
+
+        public async Task ModifyVoiceChannelStatusAsync(ulong channelId, string status, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            var payload = new ModifyVoiceStatusParams { Status = status };
+            var ids = new BucketIds();
+
+            await SendJsonAsync("PUT", () => $"channels/{channelId}/voice-status", payload, ids, options: options);
+        }
+
         #endregion
 
         #region Threads
-        public async Task<Channel> CreatePostAsync(ulong channelId, CreatePostParams args, RequestOptions options = null)
+        public Task<Channel> CreatePostAsync(ulong channelId, CreatePostParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
             var bucket = new BucketIds(channelId: channelId);
 
-            return await SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/threads", args, bucket, options: options);
+            return SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/threads", args, bucket, options: options);
         }
 
-        public async Task<Channel> CreatePostAsync(ulong channelId, CreateMultipartPostAsync args, RequestOptions options = null)
+        public Task<Channel> CreatePostAsync(ulong channelId, CreateMultipartPostAsync args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
             var bucket = new BucketIds(channelId: channelId);
 
-            return await SendMultipartAsync<Channel>("POST", () => $"channels/{channelId}/threads", args.ToDictionary(), bucket, options: options);
+            return SendMultipartAsync<Channel>("POST", () => $"channels/{channelId}/threads", args.ToDictionary(), bucket, options: options);
         }
 
-        public async Task<Channel> ModifyThreadAsync(ulong channelId, ModifyThreadParams args, RequestOptions options = null)
+        public Task<Channel> ModifyThreadAsync(ulong channelId, ModifyThreadParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
             var bucket = new BucketIds(channelId: channelId);
 
-            return await SendJsonAsync<Channel>("PATCH", () => $"channels/{channelId}", args, bucket, options: options);
+            return SendJsonAsync<Channel>("PATCH", () => $"channels/{channelId}", args, bucket, options: options);
         }
 
-        public async Task<Channel> StartThreadAsync(ulong channelId, ulong messageId, StartThreadParams args, RequestOptions options = null)
+        public Task<Channel> StartThreadAsync(ulong channelId, ulong messageId, StartThreadParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
@@ -503,10 +515,10 @@ namespace Discord.API
 
             var bucket = new BucketIds(0, channelId);
 
-            return await SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/messages/{messageId}/threads", args, bucket, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/messages/{messageId}/threads", args, bucket, options: options);
         }
 
-        public async Task<Channel> StartThreadAsync(ulong channelId, StartThreadParams args, RequestOptions options = null)
+        public Task<Channel> StartThreadAsync(ulong channelId, StartThreadParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
@@ -514,10 +526,10 @@ namespace Discord.API
 
             var bucket = new BucketIds(channelId: channelId);
 
-            return await SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/threads", args, bucket, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/threads", args, bucket, options: options);
         }
 
-        public async Task JoinThreadAsync(ulong channelId, RequestOptions options = null)
+        public Task JoinThreadAsync(ulong channelId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
@@ -525,44 +537,22 @@ namespace Discord.API
 
             var bucket = new BucketIds(channelId: channelId);
 
-            await SendAsync("PUT", () => $"channels/{channelId}/thread-members/@me", bucket, options: options).ConfigureAwait(false);
+            return SendAsync("PUT", () => $"channels/{channelId}/thread-members/@me", bucket, options: options);
         }
 
-        public async Task AddThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
-        {
-            Preconditions.NotEqual(channelId, 0, nameof(channelId));
-            Preconditions.NotEqual(userId, 0, nameof(channelId));
-
-            options = RequestOptions.CreateOrClone(options);
-
-            var bucket = new BucketIds(channelId: channelId);
-
-            await SendAsync("PUT", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options).ConfigureAwait(false);
-        }
-
-        public async Task LeaveThreadAsync(ulong channelId, RequestOptions options = null)
-        {
-            Preconditions.NotEqual(channelId, 0, nameof(channelId));
-
-            options = RequestOptions.CreateOrClone(options);
-
-            var bucket = new BucketIds(channelId: channelId);
-
-            await SendAsync("DELETE", () => $"channels/{channelId}/thread-members/@me", bucket, options: options).ConfigureAwait(false);
-        }
-
-        public async Task RemoveThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
+        public Task AddThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(userId, 0, nameof(channelId));
 
             options = RequestOptions.CreateOrClone(options);
+
             var bucket = new BucketIds(channelId: channelId);
 
-            await SendAsync("DELETE", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options).ConfigureAwait(false);
+            return SendAsync("PUT", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options);
         }
 
-        public async Task<ThreadMember[]> ListThreadMembersAsync(ulong channelId, RequestOptions options = null)
+        public Task LeaveThreadAsync(ulong channelId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
@@ -570,10 +560,39 @@ namespace Discord.API
 
             var bucket = new BucketIds(channelId: channelId);
 
-            return await SendAsync<ThreadMember[]>("GET", () => $"channels/{channelId}/thread-members", bucket, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"channels/{channelId}/thread-members/@me", bucket, options: options);
         }
 
-        public async Task<ThreadMember> GetThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
+        public Task RemoveThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(userId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+            var bucket = new BucketIds(channelId: channelId);
+
+            return SendAsync("DELETE", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options);
+        }
+
+        public async Task<ThreadMember[]> ListThreadMembersAsync(ulong channelId, ulong? after = null, int? limit = null, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            var query = "?with_member=true";
+
+            if (limit.HasValue)
+                query += $"&limit={limit}";
+            if (after.HasValue)
+                query += $"&after={after}";
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(channelId: channelId);
+
+            return await SendAsync<ThreadMember[]>("GET", () => $"channels/{channelId}/thread-members{query}", bucket, options: options).ConfigureAwait(false);
+        }
+
+        public Task<ThreadMember> GetThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
@@ -581,11 +600,12 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var bucket = new BucketIds(channelId: channelId);
+            var query = "?with_member=true";
 
-            return await SendAsync<ThreadMember>("GET", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options).ConfigureAwait(false);
+            return SendAsync<ThreadMember>("GET", () => $"channels/{channelId}/thread-members/{userId}{query}", bucket, options: options);
         }
 
-        public async Task<ChannelThreads> GetActiveThreadsAsync(ulong guildId, RequestOptions options = null)
+        public Task<ChannelThreads> GetActiveThreadsAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
@@ -593,10 +613,10 @@ namespace Discord.API
 
             var bucket = new BucketIds(guildId: guildId);
 
-            return await SendAsync<ChannelThreads>("GET", () => $"guilds/{guildId}/threads/active", bucket, options: options);
+            return SendAsync<ChannelThreads>("GET", () => $"guilds/{guildId}/threads/active", bucket, options: options);
         }
 
-        public async Task<ChannelThreads> GetPublicArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null, RequestOptions options = null)
+        public Task<ChannelThreads> GetPublicArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
@@ -608,17 +628,19 @@ namespace Discord.API
 
             if (limit.HasValue)
             {
-                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O")}&limit={limit.Value}";
+                string beforeEncoded = WebUtility.UrlEncode(before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O"));
+                query = $"?before={beforeEncoded}&limit={limit.Value}";
             }
             else if (before.HasValue)
             {
-                query = $"?before={before.Value.ToString("O")}";
+                string beforeEncoded = WebUtility.UrlEncode(before.Value.ToString("O"));
+                query = $"?before={beforeEncoded}";
             }
 
-            return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/public{query}", bucket, options: options);
+            return SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/public{query}", bucket, options: options);
         }
 
-        public async Task<ChannelThreads> GetPrivateArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null,
+        public Task<ChannelThreads> GetPrivateArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null,
             RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
@@ -631,17 +653,19 @@ namespace Discord.API
 
             if (limit.HasValue)
             {
-                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O")}&limit={limit.Value}";
+                string beforeEncoded = WebUtility.UrlEncode(before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O"));
+                query = $"?before={beforeEncoded}&limit={limit.Value}";
             }
             else if (before.HasValue)
             {
-                query = $"?before={before.Value.ToString("O")}";
+                string beforeEncoded = WebUtility.UrlEncode(before.Value.ToString("O"));
+                query = $"?before={beforeEncoded}";
             }
 
-            return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/private{query}", bucket, options: options);
+            return SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/private{query}", bucket, options: options);
         }
 
-        public async Task<ChannelThreads> GetJoinedPrivateArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null,
+        public Task<ChannelThreads> GetJoinedPrivateArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null,
             RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
@@ -661,21 +685,21 @@ namespace Discord.API
                 query = $"?before={before.Value.ToString("O")}";
             }
 
-            return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/users/@me/threads/archived/private{query}", bucket, options: options);
+            return SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/users/@me/threads/archived/private{query}", bucket, options: options);
         }
         #endregion
 
         #region Stage
-        public async Task<StageInstance> CreateStageInstanceAsync(CreateStageInstanceParams args, RequestOptions options = null)
+        public Task<StageInstance> CreateStageInstanceAsync(CreateStageInstanceParams args, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
             var bucket = new BucketIds();
 
-            return await SendJsonAsync<StageInstance>("POST", () => $"stage-instances", args, bucket, options: options).ConfigureAwait(false);
+            return SendJsonAsync<StageInstance>("POST", () => $"stage-instances", args, bucket, options: options);
         }
 
-        public async Task<StageInstance> ModifyStageInstanceAsync(ulong channelId, ModifyStageInstanceParams args, RequestOptions options = null)
+        public Task<StageInstance> ModifyStageInstanceAsync(ulong channelId, ModifyStageInstanceParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
@@ -683,7 +707,7 @@ namespace Discord.API
 
             var bucket = new BucketIds(channelId: channelId);
 
-            return await SendJsonAsync<StageInstance>("PATCH", () => $"stage-instances/{channelId}", args, bucket, options: options).ConfigureAwait(false);
+            return SendJsonAsync<StageInstance>("PATCH", () => $"stage-instances/{channelId}", args, bucket, options: options);
         }
 
         public async Task DeleteStageInstanceAsync(ulong channelId, RequestOptions options = null)
@@ -719,7 +743,7 @@ namespace Discord.API
             }
         }
 
-        public async Task ModifyMyVoiceState(ulong guildId, ModifyVoiceStateParams args, RequestOptions options = null)
+        public Task ModifyMyVoiceState(ulong guildId, ModifyVoiceStateParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
@@ -727,10 +751,10 @@ namespace Discord.API
 
             var bucket = new BucketIds();
 
-            await SendJsonAsync("PATCH", () => $"guilds/{guildId}/voice-states/@me", args, bucket, options: options).ConfigureAwait(false);
+            return SendJsonAsync("PATCH", () => $"guilds/{guildId}/voice-states/@me", args, bucket, options: options);
         }
 
-        public async Task ModifyUserVoiceState(ulong guildId, ulong userId, ModifyVoiceStateParams args, RequestOptions options = null)
+        public Task ModifyUserVoiceState(ulong guildId, ulong userId, ModifyVoiceStateParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
@@ -739,12 +763,12 @@ namespace Discord.API
 
             var bucket = new BucketIds();
 
-            await SendJsonAsync("PATCH", () => $"guilds/{guildId}/voice-states/{userId}", args, bucket, options: options).ConfigureAwait(false);
+            return SendJsonAsync("PATCH", () => $"guilds/{guildId}/voice-states/{userId}", args, bucket, options: options);
         }
         #endregion
 
         #region Roles
-        public async Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+        public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
@@ -753,9 +777,9 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendAsync("PUT", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("PUT", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options);
         }
-        public async Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+        public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
@@ -764,7 +788,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options);
         }
         #endregion
 
@@ -782,7 +806,7 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
-        public async Task<IReadOnlyCollection<Message>> GetChannelMessagesAsync(ulong channelId, GetChannelMessagesParams args, RequestOptions options = null)
+        public Task<IReadOnlyCollection<Message>> GetChannelMessagesAsync(ulong channelId, GetChannelMessagesParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
@@ -804,44 +828,41 @@ namespace Discord.API
                 endpoint = () => $"channels/{channelId}/messages?limit={limit}&{relativeDir}={relativeId}";
             else
                 endpoint = () => $"channels/{channelId}/messages?limit={limit}";
-            return await SendAsync<IReadOnlyCollection<Message>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+
+            return SendAsync<IReadOnlyCollection<Message>>("GET", endpoint, ids, options: options);
         }
+
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public async Task<Message> CreateMessageAsync(ulong channelId, CreateMessageParams args, RequestOptions options = null)
+        public Task<Message> CreateMessageAsync(ulong channelId, CreateMessageParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
-            if ((!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0) && (!args.Stickers.IsSpecified || args.Stickers.Value == null || args.Stickers.Value.Length == 0))
-                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
-            if (args.Content?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+            if (args.Content.IsSpecified && args.Content.Value is not null)
+                Preconditions.AtMost(args.Content.Value.Length, DiscordConfig.MaxMessageSize, nameof(args.Content), $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.");
+
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendJsonAsync<Message>("POST", () => $"channels/{channelId}/messages", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Message>("POST", () => $"channels/{channelId}/messages", args, ids, clientBucket: ClientBucketType.SendEdit, options: options);
         }
-
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">This operation may only be called with a <see cref="TokenType.Webhook"/> token.</exception>
-        public async Task<Message> CreateWebhookMessageAsync(ulong webhookId, CreateWebhookMessageParams args, RequestOptions options = null, ulong? threadId = null)
+        public Task<Message> CreateWebhookMessageAsync(ulong webhookId, CreateWebhookMessageParams args, RequestOptions options = null, ulong? threadId = null)
         {
             if (AuthTokenType != TokenType.Webhook)
                 throw new InvalidOperationException($"This operation may only be called with a {nameof(TokenType.Webhook)} token.");
 
-            Preconditions.NotNull(args, nameof(args));
-            Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
-            if (!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0)
-                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
-
-            if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+            if (args.Embeds.IsSpecified)
+                Preconditions.AtMost(args.Embeds.Value.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(args.Embeds), "A max of 10 Embeds are allowed.");
+            if (args.Content.IsSpecified && args.Content.Value is not null)
+                Preconditions.AtMost(args.Content.Value.Length, DiscordConfig.MaxMessageSize, nameof(args.Content), $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.");
 
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(webhookId: webhookId);
-            return await SendJsonAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?{WebhookQuery(true, threadId)}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?{WebhookQuery(true, threadId)}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -856,17 +877,40 @@ namespace Discord.API
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
 
             if (args.Embeds.IsSpecified)
-                Preconditions.AtMost(args.Embeds.Value.Length, 10, nameof(args.Embeds), "A max of 10 Embeds are allowed.");
-            if (args.Content.IsSpecified && args.Content.Value.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+                Preconditions.AtMost(args.Embeds.Value.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(args.Embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
+            if (args.Content.IsSpecified && args.Content.Value is not null)
+                Preconditions.AtMost(args.Content.Value.Length, DiscordConfig.MaxMessageSize, nameof(args.Content), $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.");
+
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(webhookId: webhookId);
             await SendJsonAsync<Message>("PATCH", () => $"webhooks/{webhookId}/{AuthToken}/messages/{messageId}?{WebhookQuery(false, threadId)}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
 
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">This operation may only be called with a <see cref="TokenType.Webhook"/> token.</exception>
-        public async Task DeleteWebhookMessageAsync(ulong webhookId, ulong messageId, RequestOptions options = null, ulong? threadId = null)
+        public Task ModifyWebhookMessageAsync(ulong webhookId, ulong messageId, UploadWebhookFileParams args, RequestOptions options = null, ulong? threadId = null)
+        {
+            if (AuthTokenType != TokenType.Webhook)
+                throw new InvalidOperationException($"This operation may only be called with a {nameof(TokenType.Webhook)} token.");
+
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+
+            if (args.Embeds.IsSpecified)
+                Preconditions.AtMost(args.Embeds.Value.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(args.Embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
+            if (args.Content.IsSpecified && args.Content.Value is not null)
+                Preconditions.AtMost(args.Content.Value.Length, DiscordConfig.MaxMessageSize, nameof(args.Content), $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.");
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(webhookId: webhookId);
+            return SendMultipartAsync<Message>("PATCH", () => $"webhooks/{webhookId}/{AuthToken}/messages/{messageId}?{WebhookQuery(false, threadId)}", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options);
+        }
+
+        /// <exception cref="InvalidOperationException">This operation may only be called with a <see cref="TokenType.Webhook"/> token.</exception>
+        public Task DeleteWebhookMessageAsync(ulong webhookId, ulong messageId, RequestOptions options = null, ulong? threadId = null)
         {
             if (AuthTokenType != TokenType.Webhook)
                 throw new InvalidOperationException($"This operation may only be called with a {nameof(TokenType.Webhook)} token.");
@@ -877,28 +921,28 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(webhookId: webhookId);
-            await SendAsync("DELETE", () => $"webhooks/{webhookId}/{AuthToken}/messages/{messageId}?{WebhookQuery(false, threadId)}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"webhooks/{webhookId}/{AuthToken}/messages/{messageId}?{WebhookQuery(false, threadId)}", ids, options: options);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public async Task<Message> UploadFileAsync(ulong channelId, UploadFileParams args, RequestOptions options = null)
+        public Task<Message> UploadFileAsync(ulong channelId, UploadFileParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             options = RequestOptions.CreateOrClone(options);
 
-            if (args.Content.GetValueOrDefault(null) == null)
-                args.Content = "";
-            else if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+            if (args.Embeds.IsSpecified)
+                Preconditions.AtMost(args.Embeds.Value.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(args.Embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
+            if (args.Content.IsSpecified && args.Content.Value is not null)
+                Preconditions.AtMost(args.Content.Value.Length, DiscordConfig.MaxMessageSize, nameof(args.Content), $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.");
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendMultipartAsync<Message>("POST", () => $"channels/{channelId}/messages", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return SendMultipartAsync<Message>("POST", () => $"channels/{channelId}/messages", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">This operation may only be called with a <see cref="TokenType.Webhook"/> token.</exception>
-        public async Task<Message> UploadWebhookFileAsync(ulong webhookId, UploadWebhookFileParams args, RequestOptions options = null, ulong? threadId = null)
+        public Task<Message> UploadWebhookFileAsync(ulong webhookId, UploadWebhookFileParams args, RequestOptions options = null, ulong? threadId = null)
         {
             if (AuthTokenType != TokenType.Webhook)
                 throw new InvalidOperationException($"This operation may only be called with a {nameof(TokenType.Webhook)} token.");
@@ -907,29 +951,26 @@ namespace Discord.API
             Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
             options = RequestOptions.CreateOrClone(options);
 
-            if (args.Content.GetValueOrDefault(null) == null)
-                args.Content = "";
-            else if (args.Content.IsSpecified)
-            {
-                if (args.Content.Value == null)
-                    args.Content = "";
-                if (args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                    throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
-            }
+            if (args.Embeds.IsSpecified)
+                Preconditions.AtMost(args.Embeds.Value.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(args.Embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
+            if (args.Content.IsSpecified && args.Content.Value is not null)
+                Preconditions.AtMost(args.Content.Value.Length, DiscordConfig.MaxMessageSize, nameof(args.Content), $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.");
 
             var ids = new BucketIds(webhookId: webhookId);
-            return await SendMultipartAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?{WebhookQuery(true, threadId)}", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return SendMultipartAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?{WebhookQuery(true, threadId)}", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options);
         }
-        public async Task DeleteMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+
+        public Task DeleteMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}", ids, options: options);
         }
-        public async Task DeleteMessagesAsync(ulong channelId, DeleteMessagesParams args, RequestOptions options = null)
+
+        public Task DeleteMessagesAsync(ulong channelId, DeleteMessagesParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
@@ -941,86 +982,97 @@ namespace Discord.API
             switch (args.MessageIds.Length)
             {
                 case 0:
-                    return;
+                    return Task.CompletedTask;
                 case 1:
-                    await DeleteMessageAsync(channelId, args.MessageIds[0]).ConfigureAwait(false);
-                    break;
+                    return DeleteMessageAsync(channelId, args.MessageIds[0]);
                 default:
                     var ids = new BucketIds(channelId: channelId);
-                    await SendJsonAsync("POST", () => $"channels/{channelId}/messages/bulk-delete", args, ids, options: options).ConfigureAwait(false);
-                    break;
+                    return SendJsonAsync("POST", () => $"channels/{channelId}/messages/bulk-delete", args, ids, options: options);
             }
         }
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public async Task<Message> ModifyMessageAsync(ulong channelId, ulong messageId, Rest.ModifyMessageParams args, RequestOptions options = null)
+        public Task<Message> ModifyMessageAsync(ulong channelId, ulong messageId, Rest.ModifyMessageParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             Preconditions.NotNull(args, nameof(args));
-            if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+
+            if (args.Embeds.IsSpecified)
+                Preconditions.AtMost(args.Embeds.Value.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(args.Embeds), "A max of 10 Embeds are allowed.");
+            if (args.Content.IsSpecified && args.Content.Value is not null)
+                Preconditions.AtMost(args.Content.Value.Length, DiscordConfig.MaxMessageSize, nameof(args.Content), $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.");
+
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options);
         }
 
-        public async Task<Message> ModifyMessageAsync(ulong channelId, ulong messageId, Rest.UploadFileParams args, RequestOptions options = null)
+        public Task<Message> ModifyMessageAsync(ulong channelId, ulong messageId, Rest.UploadFileParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             Preconditions.NotNull(args, nameof(args));
-            if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+
+            if (args.Embeds.IsSpecified)
+                Preconditions.AtMost(args.Embeds.Value.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(args.Embeds), "A max of 10 Embeds are allowed.");
+            if (args.Content.IsSpecified && args.Content.Value is not null)
+                Preconditions.AtMost(args.Content.Value.Length, DiscordConfig.MaxMessageSize, nameof(args.Content), $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.");
+
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendMultipartAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return SendMultipartAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options);
         }
         #endregion
 
         #region Stickers, Reactions, Crosspost, and Acks
-        public async Task<Sticker> GetStickerAsync(ulong id, RequestOptions options = null)
+        public Task<Sticker> GetStickerAsync(ulong id, RequestOptions options = null)
         {
             Preconditions.NotEqual(id, 0, nameof(id));
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await NullifyNotFound(SendAsync<Sticker>("GET", () => $"stickers/{id}", new BucketIds(), options: options)).ConfigureAwait(false);
+            return NullifyNotFound(SendAsync<Sticker>("GET", () => $"stickers/{id}", new BucketIds(), options: options));
         }
-        public async Task<Sticker> GetGuildStickerAsync(ulong guildId, ulong id, RequestOptions options = null)
+
+        public Task<Sticker> GetGuildStickerAsync(ulong guildId, ulong id, RequestOptions options = null)
         {
             Preconditions.NotEqual(id, 0, nameof(id));
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await NullifyNotFound(SendAsync<Sticker>("GET", () => $"guilds/{guildId}/stickers/{id}", new BucketIds(guildId), options: options)).ConfigureAwait(false);
+            return NullifyNotFound(SendAsync<Sticker>("GET", () => $"guilds/{guildId}/stickers/{id}", new BucketIds(guildId), options: options));
         }
-        public async Task<Sticker[]> ListGuildStickersAsync(ulong guildId, RequestOptions options = null)
+
+        public Task<Sticker[]> ListGuildStickersAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendAsync<Sticker[]>("GET", () => $"guilds/{guildId}/stickers", new BucketIds(guildId), options: options).ConfigureAwait(false);
+            return SendAsync<Sticker[]>("GET", () => $"guilds/{guildId}/stickers", new BucketIds(guildId), options: options);
         }
-        public async Task<NitroStickerPacks> ListNitroStickerPacksAsync(RequestOptions options = null)
+
+        public Task<NitroStickerPacks> ListNitroStickerPacksAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendAsync<NitroStickerPacks>("GET", () => $"sticker-packs", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<NitroStickerPacks>("GET", () => $"sticker-packs", new BucketIds(), options: options);
         }
-        public async Task<Sticker> CreateGuildStickerAsync(CreateStickerParams args, ulong guildId, RequestOptions options = null)
+
+        public Task<Sticker> CreateGuildStickerAsync(CreateStickerParams args, ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendMultipartAsync<Sticker>("POST", () => $"guilds/{guildId}/stickers", args.ToDictionary(), new BucketIds(guildId), options: options).ConfigureAwait(false);
+            return SendMultipartAsync<Sticker>("POST", () => $"guilds/{guildId}/stickers", args.ToDictionary(), new BucketIds(guildId), options: options);
         }
-        public async Task<Sticker> ModifyStickerAsync(ModifyStickerParams args, ulong guildId, ulong stickerId, RequestOptions options = null)
+
+        public Task<Sticker> ModifyStickerAsync(ModifyStickerParams args, ulong guildId, ulong stickerId, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -1028,19 +1080,20 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<Sticker>("PATCH", () => $"guilds/{guildId}/stickers/{stickerId}", args, new BucketIds(guildId), options: options).ConfigureAwait(false);
+            return SendJsonAsync<Sticker>("PATCH", () => $"guilds/{guildId}/stickers/{stickerId}", args, new BucketIds(guildId), options: options);
         }
-        public async Task DeleteStickerAsync(ulong guildId, ulong stickerId, RequestOptions options = null)
+
+        public Task DeleteStickerAsync(ulong guildId, ulong stickerId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(stickerId, 0, nameof(stickerId));
 
             options = RequestOptions.CreateOrClone(options);
 
-            await SendAsync("DELETE", () => $"guilds/{guildId}/stickers/{stickerId}", new BucketIds(guildId), options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"guilds/{guildId}/stickers/{stickerId}", new BucketIds(guildId), options: options);
         }
 
-        public async Task AddReactionAsync(ulong channelId, ulong messageId, string emoji, RequestOptions options = null)
+        public Task AddReactionAsync(ulong channelId, ulong messageId, string emoji, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
@@ -1053,9 +1106,10 @@ namespace Discord.API
 
             // @me is non-const to fool the ratelimiter, otherwise it will put add/remove in separate buckets
             var me = "@me";
-            await SendAsync("PUT", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}/{me}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("PUT", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}/{me}", ids, options: options);
         }
-        public async Task RemoveReactionAsync(ulong channelId, ulong messageId, ulong userId, string emoji, RequestOptions options = null)
+
+        public Task RemoveReactionAsync(ulong channelId, ulong messageId, ulong userId, string emoji, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
@@ -1067,9 +1121,10 @@ namespace Discord.API
             var ids = new BucketIds(channelId: channelId);
 
             var user = CurrentUserId.HasValue ? (userId == CurrentUserId.Value ? "@me" : userId.ToString()) : userId.ToString();
-            await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}/{user}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}/{user}", ids, options: options);
         }
-        public async Task RemoveAllReactionsAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+
+        public Task RemoveAllReactionsAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
@@ -1078,9 +1133,10 @@ namespace Discord.API
 
             var ids = new BucketIds(channelId: channelId);
 
-            await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions", ids, options: options);
         }
-        public async Task RemoveAllReactionsForEmoteAsync(ulong channelId, ulong messageId, string emoji, RequestOptions options = null)
+
+        public Task RemoveAllReactionsForEmoteAsync(ulong channelId, ulong messageId, string emoji, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
@@ -1090,9 +1146,10 @@ namespace Discord.API
 
             var ids = new BucketIds(channelId: channelId);
 
-            await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}", ids, options: options);
         }
-        public async Task<IReadOnlyCollection<User>> GetReactionUsersAsync(ulong channelId, ulong messageId, string emoji, GetReactionUsersParams args, RequestOptions options = null)
+
+        public Task<IReadOnlyCollection<User>> GetReactionUsersAsync(ulong channelId, ulong messageId, string emoji, GetReactionUsersParams args, ReactionType reactionType, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
@@ -1107,39 +1164,52 @@ namespace Discord.API
             ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
 
             var ids = new BucketIds(channelId: channelId);
-            Expression<Func<string>> endpoint = () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}?limit={limit}&after={afterUserId}";
-            return await SendAsync<IReadOnlyCollection<User>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+            Expression<Func<string>> endpoint = () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}?limit={limit}&after={afterUserId}&type={(int)reactionType}";
+            return SendAsync<IReadOnlyCollection<User>>("GET", endpoint, ids, options: options);
         }
-        public async Task AckMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+
+        public Task AckMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            await SendAsync("POST", () => $"channels/{channelId}/messages/{messageId}/ack", ids, options: options).ConfigureAwait(false);
+            return SendAsync("POST", () => $"channels/{channelId}/messages/{messageId}/ack", ids, options: options);
         }
-        public async Task TriggerTypingIndicatorAsync(ulong channelId, RequestOptions options = null)
+
+        public Task TriggerTypingIndicatorAsync(ulong channelId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            await SendAsync("POST", () => $"channels/{channelId}/typing", ids, options: options).ConfigureAwait(false);
+            return SendAsync("POST", () => $"channels/{channelId}/typing", ids, options: options);
         }
-        public async Task CrosspostAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+
+        public Task CrosspostAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            await SendAsync("POST", () => $"channels/{channelId}/messages/{messageId}/crosspost", ids, options: options).ConfigureAwait(false);
+            return SendAsync("POST", () => $"channels/{channelId}/messages/{messageId}/crosspost", ids, options: options);
+        }
+
+        public Task<FollowedChannel> FollowChannelAsync(ulong newsChannelId, ulong followingChannelId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(newsChannelId, 0, nameof(newsChannelId));
+            Preconditions.NotEqual(followingChannelId, 0, nameof(followingChannelId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(channelId: newsChannelId);
+            return SendJsonAsync<FollowedChannel>("POST", () => $"channels/{newsChannelId}/followers", new { webhook_channel_id = followingChannelId }, ids, options: options);
         }
         #endregion
 
         #region Channel Permissions
-        public async Task ModifyChannelPermissionsAsync(ulong channelId, ulong targetId, ModifyChannelPermissionsParams args, RequestOptions options = null)
+        public Task ModifyChannelPermissionsAsync(ulong channelId, ulong targetId, ModifyChannelPermissionsParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(targetId, 0, nameof(targetId));
@@ -1147,73 +1217,75 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            await SendJsonAsync("PUT", () => $"channels/{channelId}/permissions/{targetId}", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync("PUT", () => $"channels/{channelId}/permissions/{targetId}", args, ids, options: options);
         }
-        public async Task DeleteChannelPermissionAsync(ulong channelId, ulong targetId, RequestOptions options = null)
+
+        public Task DeleteChannelPermissionAsync(ulong channelId, ulong targetId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(targetId, 0, nameof(targetId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            await SendAsync("DELETE", () => $"channels/{channelId}/permissions/{targetId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"channels/{channelId}/permissions/{targetId}", ids, options: options);
         }
         #endregion
 
         #region Channel Pins
-        public async Task AddPinAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+        public Task AddPinAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
             Preconditions.GreaterThan(channelId, 0, nameof(channelId));
             Preconditions.GreaterThan(messageId, 0, nameof(messageId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            await SendAsync("PUT", () => $"channels/{channelId}/pins/{messageId}", ids, options: options).ConfigureAwait(false);
-
+            return SendAsync("PUT", () => $"channels/{channelId}/pins/{messageId}", ids, options: options);
         }
-        public async Task RemovePinAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+
+        public Task RemovePinAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            await SendAsync("DELETE", () => $"channels/{channelId}/pins/{messageId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"channels/{channelId}/pins/{messageId}", ids, options: options);
         }
-        public async Task<IReadOnlyCollection<Message>> GetPinsAsync(ulong channelId, RequestOptions options = null)
+
+        public Task<IReadOnlyCollection<Message>> GetPinsAsync(ulong channelId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendAsync<IReadOnlyCollection<Message>>("GET", () => $"channels/{channelId}/pins", ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<Message>>("GET", () => $"channels/{channelId}/pins", ids, options: options);
         }
         #endregion
 
         #region Channel Recipients
-        public async Task AddGroupRecipientAsync(ulong channelId, ulong userId, RequestOptions options = null)
+        public Task AddGroupRecipientAsync(ulong channelId, ulong userId, RequestOptions options = null)
         {
             Preconditions.GreaterThan(channelId, 0, nameof(channelId));
             Preconditions.GreaterThan(userId, 0, nameof(userId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            await SendAsync("PUT", () => $"channels/{channelId}/recipients/{userId}", ids, options: options).ConfigureAwait(false);
-
+            return SendAsync("PUT", () => $"channels/{channelId}/recipients/{userId}", ids, options: options);
         }
-        public async Task RemoveGroupRecipientAsync(ulong channelId, ulong userId, RequestOptions options = null)
+
+        public Task RemoveGroupRecipientAsync(ulong channelId, ulong userId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            await SendAsync("DELETE", () => $"channels/{channelId}/recipients/{userId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"channels/{channelId}/recipients/{userId}", ids, options: options);
         }
         #endregion
 
         #region Interactions
-        public async Task<ApplicationCommand[]> GetGlobalApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null)
+        public Task<ApplicationCommand[]> GetGlobalApplicationCommandsAsync(bool withLocalizations = false, string locale = null, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
@@ -1225,10 +1297,9 @@ namespace Discord.API
                 options.RequestHeaders["X-Discord-Locale"] = new[] { locale };
             }
 
-            //with_localizations=false doesnt return localized names and descriptions
+            //with_localizations=false doesn't return localized names and descriptions
             var query = withLocalizations ? "?with_localizations=true" : string.Empty;
-            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands{query}",
-                new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/commands{query}", new BucketIds(), options: options);
         }
 
         public async Task<ApplicationCommand> GetGlobalApplicationCommandAsync(ulong id, RequestOptions options = null)
@@ -1244,7 +1315,7 @@ namespace Discord.API
             catch (HttpException x) when (x.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
 
-        public async Task<ApplicationCommand> CreateGlobalApplicationCommandAsync(CreateApplicationCommandParams command, RequestOptions options = null)
+        public Task<ApplicationCommand> CreateGlobalApplicationCommandAsync(CreateApplicationCommandParams command, RequestOptions options = null)
         {
             Preconditions.NotNull(command, nameof(command));
             Preconditions.AtMost(command.Name.Length, 32, nameof(command.Name));
@@ -1259,41 +1330,45 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{CurrentApplicationId}/commands", command, new BucketIds(), options: options).ConfigureAwait(false);
+            return SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{CurrentApplicationId}/commands", command, new BucketIds(), options: options);
         }
-        public async Task<ApplicationCommand> ModifyGlobalApplicationCommandAsync(ModifyApplicationCommandParams command, ulong commandId, RequestOptions options = null)
+
+        public Task<ApplicationCommand> ModifyGlobalApplicationCommandAsync(ModifyApplicationCommandParams command, ulong commandId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{CurrentApplicationId}/commands/{commandId}", command, new BucketIds(), options: options).ConfigureAwait(false);
+            return SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{CurrentApplicationId}/commands/{commandId}", command, new BucketIds(), options: options);
         }
-        public async Task<ApplicationCommand> ModifyGlobalApplicationUserCommandAsync(ModifyApplicationCommandParams command, ulong commandId, RequestOptions options = null)
+
+        public Task<ApplicationCommand> ModifyGlobalApplicationUserCommandAsync(ModifyApplicationCommandParams command, ulong commandId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{CurrentApplicationId}/commands/{commandId}", command, new BucketIds(), options: options).ConfigureAwait(false);
+            return SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{CurrentApplicationId}/commands/{commandId}", command, new BucketIds(), options: options);
         }
-        public async Task<ApplicationCommand> ModifyGlobalApplicationMessageCommandAsync(ModifyApplicationCommandParams command, ulong commandId, RequestOptions options = null)
+
+        public Task<ApplicationCommand> ModifyGlobalApplicationMessageCommandAsync(ModifyApplicationCommandParams command, ulong commandId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{CurrentApplicationId}/commands/{commandId}", command, new BucketIds(), options: options).ConfigureAwait(false);
+            return SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{CurrentApplicationId}/commands/{commandId}", command, new BucketIds(), options: options);
         }
-        public async Task DeleteGlobalApplicationCommandAsync(ulong commandId, RequestOptions options = null)
+
+        public Task DeleteGlobalApplicationCommandAsync(ulong commandId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            await SendAsync("DELETE", () => $"applications/{CurrentApplicationId}/commands/{commandId}", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"applications/{CurrentApplicationId}/commands/{commandId}", new BucketIds(), options: options);
         }
 
-        public async Task<ApplicationCommand[]> BulkOverwriteGlobalApplicationCommandsAsync(CreateApplicationCommandParams[] commands, RequestOptions options = null)
+        public Task<ApplicationCommand[]> BulkOverwriteGlobalApplicationCommandsAsync(CreateApplicationCommandParams[] commands, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{CurrentApplicationId}/commands", commands, new BucketIds(), options: options).ConfigureAwait(false);
+            return SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{CurrentApplicationId}/commands", commands, new BucketIds(), options: options);
         }
 
-        public async Task<ApplicationCommand[]> GetGuildApplicationCommandsAsync(ulong guildId, bool withLocalizations = false, string locale = null, RequestOptions options = null)
+        public Task<ApplicationCommand[]> GetGuildApplicationCommandsAsync(ulong guildId, bool withLocalizations = false, string locale = null, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
@@ -1307,10 +1382,9 @@ namespace Discord.API
                 options.RequestHeaders["X-Discord-Locale"] = new[] { locale };
             }
 
-            //with_localizations=false doesnt return localized names and descriptions
+            //with_localizations=false doesn't return localized names and descriptions
             var query = withLocalizations ? "?with_localizations=true" : string.Empty;
-            return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands{query}",
-                bucket, options: options).ConfigureAwait(false);
+            return SendAsync<ApplicationCommand[]>("GET", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands{query}", bucket, options: options);
         }
 
         public async Task<ApplicationCommand> GetGuildApplicationCommandAsync(ulong guildId, ulong commandId, RequestOptions options = null)
@@ -1326,7 +1400,7 @@ namespace Discord.API
             catch (HttpException x) when (x.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
 
-        public async Task<ApplicationCommand> CreateGuildApplicationCommandAsync(CreateApplicationCommandParams command, ulong guildId, RequestOptions options = null)
+        public Task<ApplicationCommand> CreateGuildApplicationCommandAsync(CreateApplicationCommandParams command, ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotNull(command, nameof(command));
             Preconditions.AtMost(command.Name.Length, 32, nameof(command.Name));
@@ -1343,46 +1417,49 @@ namespace Discord.API
 
             var bucket = new BucketIds(guildId: guildId);
 
-            return await SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands", command, bucket, options: options).ConfigureAwait(false);
+            return SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands", command, bucket, options: options);
         }
-        public async Task<ApplicationCommand> ModifyGuildApplicationCommandAsync(ModifyApplicationCommandParams command, ulong guildId, ulong commandId, RequestOptions options = null)
+
+        public Task<ApplicationCommand> ModifyGuildApplicationCommandAsync(ModifyApplicationCommandParams command, ulong guildId, ulong commandId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
             var bucket = new BucketIds(guildId: guildId);
 
-            return await SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands/{commandId}", command, bucket, options: options).ConfigureAwait(false);
+            return SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands/{commandId}", command, bucket, options: options);
         }
-        public async Task DeleteGuildApplicationCommandAsync(ulong guildId, ulong commandId, RequestOptions options = null)
+
+        public Task DeleteGuildApplicationCommandAsync(ulong guildId, ulong commandId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
             var bucket = new BucketIds(guildId: guildId);
 
-            await SendAsync<ApplicationCommand>("DELETE", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands/{commandId}", bucket, options: options).ConfigureAwait(false);
+            return SendAsync<ApplicationCommand>("DELETE", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands/{commandId}", bucket, options: options);
         }
 
-        public async Task<ApplicationCommand[]> BulkOverwriteGuildApplicationCommandsAsync(ulong guildId, CreateApplicationCommandParams[] commands, RequestOptions options = null)
+        public Task<ApplicationCommand[]> BulkOverwriteGuildApplicationCommandsAsync(ulong guildId, CreateApplicationCommandParams[] commands, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
             var bucket = new BucketIds(guildId: guildId);
 
-            return await SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands", commands, bucket, options: options).ConfigureAwait(false);
+            return SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands", commands, bucket, options: options);
         }
         #endregion
 
         #region Interaction Responses
-        public async Task CreateInteractionResponseAsync(InteractionResponse response, ulong interactionId, string interactionToken, RequestOptions options = null)
+        public Task CreateInteractionResponseAsync(InteractionResponse response, ulong interactionId, string interactionToken, RequestOptions options = null)
         {
             if (response.Data.IsSpecified && response.Data.Value.Content.IsSpecified)
                 Preconditions.AtMost(response.Data.Value.Content.Value?.Length ?? 0, 2000, nameof(response.Data.Value.Content));
 
             options = RequestOptions.CreateOrClone(options);
 
-            await SendJsonAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response, new BucketIds(), options: options);
+            return SendJsonAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response, new BucketIds(), options: options);
         }
-        public async Task CreateInteractionResponseAsync(UploadInteractionFileParams response, ulong interactionId, string interactionToken, RequestOptions options = null)
+
+        public Task CreateInteractionResponseAsync(UploadInteractionFileParams response, ulong interactionId, string interactionToken, RequestOptions options = null)
         {
             if ((!response.Embeds.IsSpecified || response.Embeds.Value == null || response.Embeds.Value.Length == 0) && !response.Files.Any())
                 Preconditions.NotNullOrEmpty(response.Content, nameof(response.Content));
@@ -1393,39 +1470,51 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds();
-            await SendMultipartAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return SendMultipartAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options);
         }
-        public async Task<Message> GetInteractionResponseAsync(string interactionToken, RequestOptions options = null)
+
+        public Task<Message> GetInteractionResponseAsync(string interactionToken, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(interactionToken, nameof(interactionToken));
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await NullifyNotFound(SendAsync<Message>("GET", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", new BucketIds(), options: options)).ConfigureAwait(false);
+            return NullifyNotFound(SendAsync<Message>("GET", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", new BucketIds(), options: options));
         }
-        public async Task<Message> ModifyInteractionResponseAsync(ModifyInteractionResponseParams args, string interactionToken, RequestOptions options = null)
+
+        public Task<Message> ModifyInteractionResponseAsync(ModifyInteractionResponseParams args, string interactionToken, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", args, new BucketIds(), options: options);
+            return SendJsonAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", args, new BucketIds(), options: options);
         }
-        public async Task<Message> ModifyInteractionResponseAsync(UploadWebhookFileParams args, string interactionToken, RequestOptions options = null)
+
+        public Task<Message> ModifyInteractionResponseAsync(UploadWebhookFileParams args, string interactionToken, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendMultipartAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", args.ToDictionary(), new BucketIds(), options: options);
+            return SendMultipartAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", args.ToDictionary(), new BucketIds(), options: options);
         }
-        public async Task DeleteInteractionResponseAsync(string interactionToken, RequestOptions options = null)
+
+        public Task DeleteInteractionResponseAsync(string interactionToken, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            await SendAsync("DELETE", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", new BucketIds(), options: options);
+            return SendAsync("DELETE", () => $"webhooks/{CurrentApplicationId}/{interactionToken}/messages/@original", new BucketIds(), options: options);
         }
 
-        public async Task<Message> CreateInteractionFollowupMessageAsync(CreateWebhookMessageParams args, string token, RequestOptions options = null)
+        public Task<Message> CreateInteractionFollowupMessageAsync(CreateWebhookMessageParams args, string token, RequestOptions options = null)
         {
-            if ((!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0) && !args.File.IsSpecified)
-                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
+            if ((!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0)
+                && (!args.Content.IsSpecified || args.Content.Value is null || string.IsNullOrWhiteSpace(args.Content.Value))
+                && (!args.Components.IsSpecified || args.Components.Value is null || args.Components.Value.Length == 0)
+                && (!args.File.IsSpecified))
+            {
+                throw new ArgumentException("At least one of 'Content', 'Embeds', 'File' or 'Components' must be specified.", nameof(args));
+            }
+
+            if (args.Content.IsSpecified && args.Content.Value is not null && args.Content.Value.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
 
             if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
@@ -1433,26 +1522,30 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             if (!args.File.IsSpecified)
-                return await SendJsonAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args, new BucketIds(), options: options).ConfigureAwait(false);
+                return SendJsonAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args, new BucketIds(), options: options);
             else
-                return await SendMultipartAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args.ToDictionary(), new BucketIds(), options: options).ConfigureAwait(false);
+                return SendMultipartAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args.ToDictionary(), new BucketIds(), options: options);
         }
 
-        public async Task<Message> CreateInteractionFollowupMessageAsync(UploadWebhookFileParams args, string token, RequestOptions options = null)
+        public Task<Message> CreateInteractionFollowupMessageAsync(UploadWebhookFileParams args, string token, RequestOptions options = null)
         {
-            if ((!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0) && !args.Files.Any())
-                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
-
+            if ((!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0)
+                && (!args.Content.IsSpecified || args.Content.Value is null || string.IsNullOrWhiteSpace(args.Content.Value))
+                && (!args.MessageComponents.IsSpecified || args.MessageComponents.Value is null || args.MessageComponents.Value.Length == 0)
+                && (args.Files.Length == 0))
+            {
+                throw new ArgumentException("At least one of 'Content', 'Embeds', 'Files' or 'Components' must be specified.", nameof(args));
+            }
             if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
 
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds();
-            return await SendMultipartAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return SendMultipartAsync<Message>("POST", () => $"webhooks/{CurrentApplicationId}/{token}?wait=true", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options);
         }
 
-        public async Task<Message> ModifyInteractionFollowupMessageAsync(ModifyInteractionResponseParams args, ulong id, string token, RequestOptions options = null)
+        public Task<Message> ModifyInteractionFollowupMessageAsync(ModifyInteractionResponseParams args, ulong id, string token, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(id, 0, nameof(id));
@@ -1462,47 +1555,47 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{token}/messages/{id}", args, new BucketIds(), options: options).ConfigureAwait(false);
+            return SendJsonAsync<Message>("PATCH", () => $"webhooks/{CurrentApplicationId}/{token}/messages/{id}", args, new BucketIds(), options: options);
         }
 
-        public async Task DeleteInteractionFollowupMessageAsync(ulong id, string token, RequestOptions options = null)
+        public Task DeleteInteractionFollowupMessageAsync(ulong id, string token, RequestOptions options = null)
         {
             Preconditions.NotEqual(id, 0, nameof(id));
 
             options = RequestOptions.CreateOrClone(options);
 
-            await SendAsync("DELETE", () => $"webhooks/{CurrentApplicationId}/{token}/messages/{id}", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"webhooks/{CurrentApplicationId}/{token}/messages/{id}", new BucketIds(), options: options);
         }
         #endregion
 
         #region Application Command permissions
-        public async Task<GuildApplicationCommandPermission[]> GetGuildApplicationCommandPermissionsAsync(ulong guildId, RequestOptions options = null)
+        public Task<GuildApplicationCommandPermission[]> GetGuildApplicationCommandPermissionsAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendAsync<GuildApplicationCommandPermission[]>("GET", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands/permissions", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<GuildApplicationCommandPermission[]>("GET", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands/permissions", new BucketIds(), options: options);
         }
 
-        public async Task<GuildApplicationCommandPermission> GetGuildApplicationCommandPermissionAsync(ulong guildId, ulong commandId, RequestOptions options = null)
+        public Task<GuildApplicationCommandPermission> GetGuildApplicationCommandPermissionAsync(ulong guildId, ulong commandId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(commandId, 0, nameof(commandId));
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendAsync<GuildApplicationCommandPermission>("GET", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands/{commandId}/permissions", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<GuildApplicationCommandPermission>("GET", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands/{commandId}/permissions", new BucketIds(), options: options);
         }
 
-        public async Task<GuildApplicationCommandPermission> ModifyApplicationCommandPermissionsAsync(ModifyGuildApplicationCommandPermissionsParams permissions, ulong guildId, ulong commandId, RequestOptions options = null)
+        public Task<GuildApplicationCommandPermission> ModifyApplicationCommandPermissionsAsync(ModifyGuildApplicationCommandPermissionsParams permissions, ulong guildId, ulong commandId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(commandId, 0, nameof(commandId));
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<GuildApplicationCommandPermission>("PUT", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands/{commandId}/permissions", permissions, new BucketIds(), options: options).ConfigureAwait(false);
+            return SendJsonAsync<GuildApplicationCommandPermission>("PUT", () => $"applications/{CurrentApplicationId}/guilds/{guildId}/commands/{commandId}/permissions", permissions, new BucketIds(), options: options);
         }
 
         public async Task<IReadOnlyCollection<GuildApplicationCommandPermission>> BatchModifyApplicationCommandPermissionsAsync(ModifyGuildApplicationCommandPermissions[] permissions, ulong guildId, RequestOptions options = null)
@@ -1529,32 +1622,36 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
-        public async Task<Guild> CreateGuildAsync(CreateGuildParams args, RequestOptions options = null)
+
+        public Task<Guild> CreateGuildAsync(CreateGuildParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
             Preconditions.NotNullOrWhitespace(args.RegionId, nameof(args.RegionId));
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<Guild>("POST", () => "guilds", args, new BucketIds(), options: options).ConfigureAwait(false);
+            return SendJsonAsync<Guild>("POST", () => "guilds", args, new BucketIds(), options: options);
         }
-        public async Task<Guild> DeleteGuildAsync(ulong guildId, RequestOptions options = null)
+
+        public Task<Guild> DeleteGuildAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<Guild>("DELETE", () => $"guilds/{guildId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync<Guild>("DELETE", () => $"guilds/{guildId}", ids, options: options);
         }
-        public async Task<Guild> LeaveGuildAsync(ulong guildId, RequestOptions options = null)
+
+        public Task<Guild> LeaveGuildAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<Guild>("DELETE", () => $"users/@me/guilds/{guildId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync<Guild>("DELETE", () => $"users/@me/guilds/{guildId}", ids, options: options);
         }
-        public async Task<Guild> ModifyGuildAsync(ulong guildId, Rest.ModifyGuildParams args, RequestOptions options = null)
+
+        public Task<Guild> ModifyGuildAsync(ulong guildId, Rest.ModifyGuildParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -1566,9 +1663,10 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<Guild>("PATCH", () => $"guilds/{guildId}", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Guild>("PATCH", () => $"guilds/{guildId}", args, ids, options: options);
         }
-        public async Task<GetGuildPruneCountResponse> BeginGuildPruneAsync(ulong guildId, GuildPruneParams args, RequestOptions options = null)
+
+        public Task<GetGuildPruneCountResponse> BeginGuildPruneAsync(ulong guildId, GuildPruneParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -1576,9 +1674,10 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<GetGuildPruneCountResponse>("POST", () => $"guilds/{guildId}/prune", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<GetGuildPruneCountResponse>("POST", () => $"guilds/{guildId}/prune", args, ids, options: options);
         }
-        public async Task<GetGuildPruneCountResponse> GetGuildPruneCountAsync(ulong guildId, GuildPruneParams args, RequestOptions options = null)
+
+        public Task<GetGuildPruneCountResponse> GetGuildPruneCountAsync(ulong guildId, GuildPruneParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -1587,12 +1686,22 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<GetGuildPruneCountResponse>("GET", () => $"guilds/{guildId}/prune?days={args.Days}{endpointRoleIds}", ids, options: options).ConfigureAwait(false);
+            return SendAsync<GetGuildPruneCountResponse>("GET", () => $"guilds/{guildId}/prune?days={args.Days}{endpointRoleIds}", ids, options: options);
         }
+
+        public async Task<GuildIncidentsData> ModifyGuildIncidentActionsAsync(ulong guildId, ModifyGuildIncidentsDataParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            var ids = new BucketIds(guildId: guildId);
+
+            return await SendJsonAsync<GuildIncidentsData>("PUT", () => $"guilds/{guildId}/incident-actions", args, ids, options: options).ConfigureAwait(false);
+        }
+
         #endregion
 
         #region Guild Bans
-        public async Task<IReadOnlyCollection<Ban>> GetGuildBansAsync(ulong guildId, GetGuildBansParams args, RequestOptions options = null)
+        public Task<IReadOnlyCollection<Ban>> GetGuildBansAsync(ulong guildId, GetGuildBansParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -1614,8 +1723,9 @@ namespace Discord.API
                 endpoint = () => $"guilds/{guildId}/bans?limit={limit}&{relativeDir}={relativeId}";
             else
                 endpoint = () => $"guilds/{guildId}/bans?limit={limit}";
-            return await SendAsync<IReadOnlyCollection<Ban>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<Ban>>("GET", endpoint, ids, options: options);
         }
+
         public async Task<Ban> GetGuildBanAsync(ulong guildId, ulong userId, RequestOptions options)
         {
             Preconditions.NotEqual(userId, 0, nameof(userId));
@@ -1629,13 +1739,14 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
+
         /// <exception cref="ArgumentException">
         /// <paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.
         /// -and-
         /// <paramref name="args.DeleteMessageDays"/> must be between 0 to 7.
         /// </exception>
         /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
-        public async Task CreateGuildBanAsync(ulong guildId, ulong userId, CreateGuildBanParams args, RequestOptions options = null)
+        public Task CreateGuildBanAsync(ulong guildId, ulong userId, CreateGuildBanParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
@@ -1645,18 +1756,20 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            string reason = string.IsNullOrWhiteSpace(args.Reason) ? "" : $"&reason={Uri.EscapeDataString(args.Reason)}";
-            await SendAsync("PUT", () => $"guilds/{guildId}/bans/{userId}?delete_message_days={args.DeleteMessageDays}{reason}", ids, options: options).ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(args.Reason))
+                options.AuditLogReason = args.Reason;
+            return SendAsync("PUT", () => $"guilds/{guildId}/bans/{userId}?delete_message_days={args.DeleteMessageDays}", ids, options: options);
         }
+
         /// <exception cref="ArgumentException"><paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.</exception>
-        public async Task RemoveGuildBanAsync(ulong guildId, ulong userId, RequestOptions options = null)
+        public Task RemoveGuildBanAsync(ulong guildId, ulong userId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendAsync("DELETE", () => $"guilds/{guildId}/bans/{userId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"guilds/{guildId}/bans/{userId}", ids, options: options);
         }
         #endregion
 
@@ -1674,44 +1787,46 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
+
         /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
-        public async Task<GuildWidget> ModifyGuildWidgetAsync(ulong guildId, Rest.ModifyGuildWidgetParams args, RequestOptions options = null)
+        public Task<GuildWidget> ModifyGuildWidgetAsync(ulong guildId, Rest.ModifyGuildWidgetParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<GuildWidget>("PATCH", () => $"guilds/{guildId}/widget", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<GuildWidget>("PATCH", () => $"guilds/{guildId}/widget", args, ids, options: options);
         }
         #endregion
 
         #region Guild Integrations
         /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
-        public async Task<IReadOnlyCollection<Integration>> GetIntegrationsAsync(ulong guildId, RequestOptions options = null)
+        public Task<IReadOnlyCollection<Integration>> GetIntegrationsAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<Integration>>("GET", () => $"guilds/{guildId}/integrations", ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<Integration>>("GET", () => $"guilds/{guildId}/integrations", ids, options: options);
         }
-        public async Task DeleteIntegrationAsync(ulong guildId, ulong integrationId, RequestOptions options = null)
+
+        public Task DeleteIntegrationAsync(ulong guildId, ulong integrationId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(integrationId, 0, nameof(integrationId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendAsync("DELETE", () => $"guilds/{guildId}/integrations/{integrationId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"guilds/{guildId}/integrations/{integrationId}", ids, options: options);
         }
         #endregion
 
         #region Guild Invites
         /// <exception cref="ArgumentException"><paramref name="inviteId"/> cannot be blank.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="inviteId"/> must not be <see langword="null"/>.</exception>
-        public async Task<InviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null)
+        public async Task<InviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null, ulong? scheduledEventId = null)
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
             options = RequestOptions.CreateOrClone(options);
@@ -1724,39 +1839,47 @@ namespace Discord.API
             if (index >= 0)
                 inviteId = inviteId.Substring(index + 1);
 
+            var scheduledEventQuery = scheduledEventId is not null
+                ? $"&guild_scheduled_event_id={scheduledEventId}"
+                : string.Empty;
+
             try
             {
-                return await SendAsync<InviteMetadata>("GET", () => $"invites/{inviteId}?with_counts=true", new BucketIds(), options: options).ConfigureAwait(false);
+                return await SendAsync<InviteMetadata>("GET", () => $"invites/{inviteId}?with_counts=true&with_expiration=true{scheduledEventQuery}", new BucketIds(), options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
+
         /// <exception cref="ArgumentException"><paramref name="guildId"/> may not be equal to zero.</exception>
-        public async Task<InviteVanity> GetVanityInviteAsync(ulong guildId, RequestOptions options = null)
+        public Task<InviteVanity> GetVanityInviteAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<InviteVanity>("GET", () => $"guilds/{guildId}/vanity-url", ids, options: options).ConfigureAwait(false);
+            return SendAsync<InviteVanity>("GET", () => $"guilds/{guildId}/vanity-url", ids, options: options);
         }
+
         /// <exception cref="ArgumentException"><paramref name="guildId"/> may not be equal to zero.</exception>
-        public async Task<IReadOnlyCollection<InviteMetadata>> GetGuildInvitesAsync(ulong guildId, RequestOptions options = null)
+        public Task<IReadOnlyCollection<InviteMetadata>> GetGuildInvitesAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<InviteMetadata>>("GET", () => $"guilds/{guildId}/invites", ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<InviteMetadata>>("GET", () => $"guilds/{guildId}/invites", ids, options: options);
         }
+
         /// <exception cref="ArgumentException"><paramref name="channelId"/> may not be equal to zero.</exception>
-        public async Task<IReadOnlyCollection<InviteMetadata>> GetChannelInvitesAsync(ulong channelId, RequestOptions options = null)
+        public Task<IReadOnlyCollection<InviteMetadata>> GetChannelInvitesAsync(ulong channelId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendAsync<IReadOnlyCollection<InviteMetadata>>("GET", () => $"channels/{channelId}/invites", ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<InviteMetadata>>("GET", () => $"channels/{channelId}/invites", ids, options: options);
         }
+
         /// <exception cref="ArgumentException">
         /// <paramref name="channelId"/> may not be equal to zero.
         /// -and-
@@ -1765,7 +1888,7 @@ namespace Discord.API
         /// <paramref name="args.MaxAge"/> must be lesser than 86400.
         /// </exception>
         /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
-        public async Task<InviteMetadata> CreateChannelInviteAsync(ulong channelId, CreateChannelInviteParams args, RequestOptions options = null)
+        public Task<InviteMetadata> CreateChannelInviteAsync(ulong channelId, CreateChannelInviteParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
@@ -1784,19 +1907,20 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendJsonAsync<InviteMetadata>("POST", () => $"channels/{channelId}/invites", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<InviteMetadata>("POST", () => $"channels/{channelId}/invites", args, ids, options: options);
         }
-        public async Task<Invite> DeleteInviteAsync(string inviteId, RequestOptions options = null)
+
+        public Task<Invite> DeleteInviteAsync(string inviteId, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendAsync<Invite>("DELETE", () => $"invites/{inviteId}", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<Invite>("DELETE", () => $"invites/{inviteId}", new BucketIds(), options: options);
         }
         #endregion
 
         #region Guild Members
-        public async Task<GuildMember> AddGuildMemberAsync(ulong guildId, ulong userId, AddGuildMemberParams args, RequestOptions options = null)
+        public Task<GuildMember> AddGuildMemberAsync(ulong guildId, ulong userId, AddGuildMemberParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
@@ -1812,9 +1936,9 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-
-            return await SendJsonAsync<GuildMember>("PUT", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options);
+            return SendJsonAsync<GuildMember>("PUT", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options);
         }
+
         public async Task<GuildMember> GetGuildMemberAsync(ulong guildId, ulong userId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -1828,7 +1952,8 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
-        public async Task<IReadOnlyCollection<GuildMember>> GetGuildMembersAsync(ulong guildId, GetGuildMembersParams args, RequestOptions options = null)
+
+        public Task<IReadOnlyCollection<GuildMember>> GetGuildMembersAsync(ulong guildId, GetGuildMembersParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -1842,18 +1967,21 @@ namespace Discord.API
 
             var ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint = () => $"guilds/{guildId}/members?limit={limit}&after={afterUserId}";
-            return await SendAsync<IReadOnlyCollection<GuildMember>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<GuildMember>>("GET", endpoint, ids, options: options);
         }
-        public async Task RemoveGuildMemberAsync(ulong guildId, ulong userId, string reason, RequestOptions options = null)
+
+        public Task RemoveGuildMemberAsync(ulong guildId, ulong userId, string reason, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            reason = string.IsNullOrWhiteSpace(reason) ? "" : $"?reason={Uri.EscapeDataString(reason)}";
-            await SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}{reason}", ids, options: options).ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(reason))
+                options.AuditLogReason = reason;
+            return SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}", ids, options: options);
         }
+
         public async Task ModifyGuildMemberAsync(ulong guildId, ulong userId, Rest.ModifyGuildMemberParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -1863,8 +1991,6 @@ namespace Discord.API
 
             bool isCurrentUser = userId == CurrentUserId;
 
-            if (args.RoleIds.IsSpecified)
-                Preconditions.NotEveryoneRole(args.RoleIds.Value, guildId, nameof(args.RoleIds));
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
                 var nickArgs = new Rest.ModifyCurrentUserNickParams(args.Nickname.Value ?? "");
@@ -1877,7 +2003,8 @@ namespace Discord.API
                 await SendJsonAsync("PATCH", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options).ConfigureAwait(false);
             }
         }
-        public async Task<IReadOnlyCollection<GuildMember>> SearchGuildMembersAsync(ulong guildId, SearchGuildMembersParams args, RequestOptions options = null)
+
+        public Task<IReadOnlyCollection<GuildMember>> SearchGuildMembersAsync(ulong guildId, SearchGuildMembersParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -1891,19 +2018,20 @@ namespace Discord.API
 
             var ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint = () => $"guilds/{guildId}/members/search?limit={limit}&query={query}";
-            return await SendAsync<IReadOnlyCollection<GuildMember>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<GuildMember>>("GET", endpoint, ids, options: options);
         }
         #endregion
 
         #region Guild Roles
-        public async Task<IReadOnlyCollection<Role>> GetGuildRolesAsync(ulong guildId, RequestOptions options = null)
+        public Task<IReadOnlyCollection<Role>> GetGuildRolesAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<Role>>("GET", () => $"guilds/{guildId}/roles", ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<Role>>("GET", () => $"guilds/{guildId}/roles", ids, options: options);
         }
+
         public async Task<Role> CreateGuildRoleAsync(ulong guildId, Rest.ModifyGuildRoleParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -1912,16 +2040,18 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<Role>("POST", () => $"guilds/{guildId}/roles", args, ids, options: options).ConfigureAwait(false);
         }
-        public async Task DeleteGuildRoleAsync(ulong guildId, ulong roleId, RequestOptions options = null)
+
+        public Task DeleteGuildRoleAsync(ulong guildId, ulong roleId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(roleId, 0, nameof(roleId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendAsync("DELETE", () => $"guilds/{guildId}/roles/{roleId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"guilds/{guildId}/roles/{roleId}", ids, options: options);
         }
-        public async Task<Role> ModifyGuildRoleAsync(ulong guildId, ulong roleId, Rest.ModifyGuildRoleParams args, RequestOptions options = null)
+
+        public Task<Role> ModifyGuildRoleAsync(ulong guildId, ulong roleId, Rest.ModifyGuildRoleParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(roleId, 0, nameof(roleId));
@@ -1931,40 +2061,41 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<Role>("PATCH", () => $"guilds/{guildId}/roles/{roleId}", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Role>("PATCH", () => $"guilds/{guildId}/roles/{roleId}", args, ids, options: options);
         }
-        public async Task<IReadOnlyCollection<Role>> ModifyGuildRolesAsync(ulong guildId, IEnumerable<Rest.ModifyGuildRolesParams> args, RequestOptions options = null)
+
+        public Task<IReadOnlyCollection<Role>> ModifyGuildRolesAsync(ulong guildId, IEnumerable<Rest.ModifyGuildRolesParams> args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<IReadOnlyCollection<Role>>("PATCH", () => $"guilds/{guildId}/roles", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<IReadOnlyCollection<Role>>("PATCH", () => $"guilds/{guildId}/roles", args, ids, options: options);
         }
         #endregion
 
         #region Guild emoji
-        public async Task<IReadOnlyCollection<Emoji>> GetGuildEmotesAsync(ulong guildId, RequestOptions options = null)
+        public Task<IReadOnlyCollection<Emoji>> GetGuildEmotesAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<Emoji>>("GET", () => $"guilds/{guildId}/emojis", ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<Emoji>>("GET", () => $"guilds/{guildId}/emojis", ids, options: options);
         }
 
-        public async Task<Emoji> GetGuildEmoteAsync(ulong guildId, ulong emoteId, RequestOptions options = null)
+        public Task<Emoji> GetGuildEmoteAsync(ulong guildId, ulong emoteId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(emoteId, 0, nameof(emoteId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<Emoji>("GET", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync<Emoji>("GET", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options);
         }
 
-        public async Task<Emoji> CreateGuildEmoteAsync(ulong guildId, Rest.CreateGuildEmoteParams args, RequestOptions options = null)
+        public Task<Emoji> CreateGuildEmoteAsync(ulong guildId, Rest.CreateGuildEmoteParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -1973,10 +2104,10 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<Emoji>("POST", () => $"guilds/{guildId}/emojis", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Emoji>("POST", () => $"guilds/{guildId}/emojis", args, ids, options: options);
         }
 
-        public async Task<Emoji> ModifyGuildEmoteAsync(ulong guildId, ulong emoteId, ModifyGuildEmoteParams args, RequestOptions options = null)
+        public Task<Emoji> ModifyGuildEmoteAsync(ulong guildId, ulong emoteId, ModifyGuildEmoteParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(emoteId, 0, nameof(emoteId));
@@ -1984,43 +2115,42 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<Emoji>("PATCH", () => $"guilds/{guildId}/emojis/{emoteId}", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Emoji>("PATCH", () => $"guilds/{guildId}/emojis/{emoteId}", args, ids, options: options);
         }
 
-        public async Task DeleteGuildEmoteAsync(ulong guildId, ulong emoteId, RequestOptions options = null)
+        public Task DeleteGuildEmoteAsync(ulong guildId, ulong emoteId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(emoteId, 0, nameof(emoteId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendAsync("DELETE", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options);
         }
         #endregion
 
         #region Guild Events
 
-        public async Task<GuildScheduledEvent[]> ListGuildScheduledEventsAsync(ulong guildId, RequestOptions options = null)
+        public Task<GuildScheduledEvent[]> ListGuildScheduledEventsAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<GuildScheduledEvent[]>("GET", () => $"guilds/{guildId}/scheduled-events?with_user_count=true", ids, options: options).ConfigureAwait(false);
+            return SendAsync<GuildScheduledEvent[]>("GET", () => $"guilds/{guildId}/scheduled-events?with_user_count=true", ids, options: options);
         }
 
-        public async Task<GuildScheduledEvent> GetGuildScheduledEventAsync(ulong eventId, ulong guildId, RequestOptions options = null)
+        public Task<GuildScheduledEvent> GetGuildScheduledEventAsync(ulong eventId, ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(eventId, 0, nameof(eventId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-
-            return await NullifyNotFound<GuildScheduledEvent>(SendAsync<GuildScheduledEvent>("GET", () => $"guilds/{guildId}/scheduled-events/{eventId}?with_user_count=true", ids, options: options)).ConfigureAwait(false);
+            return NullifyNotFound<GuildScheduledEvent>(SendAsync<GuildScheduledEvent>("GET", () => $"guilds/{guildId}/scheduled-events/{eventId}?with_user_count=true", ids, options: options));
         }
 
-        public async Task<GuildScheduledEvent> CreateGuildScheduledEventAsync(CreateGuildScheduledEventParams args, ulong guildId, RequestOptions options = null)
+        public Task<GuildScheduledEvent> CreateGuildScheduledEventAsync(CreateGuildScheduledEventParams args, ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -2028,11 +2158,10 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-
-            return await SendJsonAsync<GuildScheduledEvent>("POST", () => $"guilds/{guildId}/scheduled-events", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<GuildScheduledEvent>("POST", () => $"guilds/{guildId}/scheduled-events", args, ids, options: options);
         }
 
-        public async Task<GuildScheduledEvent> ModifyGuildScheduledEventAsync(ModifyGuildScheduledEventParams args, ulong eventId, ulong guildId, RequestOptions options = null)
+        public Task<GuildScheduledEvent> ModifyGuildScheduledEventAsync(ModifyGuildScheduledEventParams args, ulong eventId, ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(eventId, 0, nameof(eventId));
@@ -2041,11 +2170,10 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-
-            return await SendJsonAsync<GuildScheduledEvent>("PATCH", () => $"guilds/{guildId}/scheduled-events/{eventId}", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<GuildScheduledEvent>("PATCH", () => $"guilds/{guildId}/scheduled-events/{eventId}", args, ids, options: options);
         }
 
-        public async Task DeleteGuildScheduledEventAsync(ulong eventId, ulong guildId, RequestOptions options = null)
+        public Task DeleteGuildScheduledEventAsync(ulong eventId, ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(eventId, 0, nameof(eventId));
@@ -2053,11 +2181,10 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-
-            await SendAsync("DELETE", () => $"guilds/{guildId}/scheduled-events/{eventId}", ids, options: options).ConfigureAwait(false);
+            return SendAsync("DELETE", () => $"guilds/{guildId}/scheduled-events/{eventId}", ids, options: options);
         }
 
-        public async Task<GuildScheduledEventUser[]> GetGuildScheduledEventUsersAsync(ulong eventId, ulong guildId, int limit = 100, RequestOptions options = null)
+        public Task<GuildScheduledEventUser[]> GetGuildScheduledEventUsersAsync(ulong eventId, ulong guildId, int limit = 100, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(eventId, 0, nameof(eventId));
@@ -2065,11 +2192,10 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-
-            return await SendAsync<GuildScheduledEventUser[]>("GET", () => $"guilds/{guildId}/scheduled-events/{eventId}/users?limit={limit}&with_member=true", ids, options: options).ConfigureAwait(false);
+            return SendAsync<GuildScheduledEventUser[]>("GET", () => $"guilds/{guildId}/scheduled-events/{eventId}/users?limit={limit}&with_member=true", ids, options: options);
         }
 
-        public async Task<GuildScheduledEventUser[]> GetGuildScheduledEventUsersAsync(ulong eventId, ulong guildId, GetEventUsersParams args, RequestOptions options = null)
+        public Task<GuildScheduledEventUser[]> GetGuildScheduledEventUsersAsync(ulong eventId, ulong guildId, GetEventUsersParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(eventId, 0, nameof(eventId));
             Preconditions.NotNull(args, nameof(args));
@@ -2092,7 +2218,110 @@ namespace Discord.API
             else
                 endpoint = () => $"guilds/{guildId}/scheduled-events/{eventId}/users?with_member=true&limit={limit}";
 
-            return await SendAsync<GuildScheduledEventUser[]>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+            return SendAsync<GuildScheduledEventUser[]>("GET", endpoint, ids, options: options);
+        }
+
+        #endregion
+
+        #region Guild AutoMod
+
+        public Task<AutoModerationRule[]> GetGuildAutoModRulesAsync(ulong guildId, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return SendAsync<AutoModerationRule[]>("GET", () => $"guilds/{guildId}/auto-moderation/rules", new BucketIds(guildId: guildId), options: options);
+        }
+
+        public Task<AutoModerationRule> GetGuildAutoModRuleAsync(ulong guildId, ulong ruleId, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(ruleId, 0, nameof(ruleId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return SendAsync<AutoModerationRule>("GET", () => $"guilds/{guildId}/auto-moderation/rules/{ruleId}", new BucketIds(guildId), options: options);
+        }
+
+        public Task<AutoModerationRule> CreateGuildAutoModRuleAsync(ulong guildId, CreateAutoModRuleParams args, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return SendJsonAsync<AutoModerationRule>("POST", () => $"guilds/{guildId}/auto-moderation/rules", args, new BucketIds(guildId: guildId), options: options);
+        }
+
+        public Task<AutoModerationRule> ModifyGuildAutoModRuleAsync(ulong guildId, ulong ruleId, ModifyAutoModRuleParams args, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(ruleId, 0, nameof(ruleId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return SendJsonAsync<AutoModerationRule>("PATCH", () => $"guilds/{guildId}/auto-moderation/rules/{ruleId}", args, new BucketIds(guildId: guildId), options: options);
+        }
+
+        public Task DeleteGuildAutoModRuleAsync(ulong guildId, ulong ruleId, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(ruleId, 0, nameof(ruleId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return SendAsync("DELETE", () => $"guilds/{guildId}/auto-moderation/rules/{ruleId}", new BucketIds(guildId: guildId), options: options);
+        }
+
+        #endregion
+
+        #region Guild Welcome Screen
+
+        public async Task<WelcomeScreen> GetGuildWelcomeScreenAsync(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+
+            try
+            {
+                var ids = new BucketIds(guildId: guildId);
+                return await SendAsync<WelcomeScreen>("GET", () => $"guilds/{guildId}/welcome-screen", ids, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
+        }
+
+        public Task<WelcomeScreen> ModifyGuildWelcomeScreenAsync(ModifyGuildWelcomeScreenParams args, ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(guildId: guildId);
+
+            return SendJsonAsync<WelcomeScreen>("PATCH", () => $"guilds/{guildId}/welcome-screen", args, ids, options: options);
+        }
+
+        #endregion
+
+        #region Guild Onboarding
+
+        public Task<GuildOnboarding> GetGuildOnboardingAsync(ulong guildId, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return SendAsync<GuildOnboarding>("GET", () => $"guilds/{guildId}/onboarding", new BucketIds(guildId: guildId), options: options);
+        }
+
+        public Task<GuildOnboarding> ModifyGuildOnboardingAsync(ulong guildId, ModifyGuildOnboardingParams args, RequestOptions options)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return SendJsonAsync<GuildOnboarding>("PUT", () => $"guilds/{guildId}/onboarding", args, new BucketIds(guildId: guildId), options: options);
         }
 
         #endregion
@@ -2112,22 +2341,25 @@ namespace Discord.API
         #endregion
 
         #region Current User/DMs
-        public async Task<User> GetMyUserAsync(RequestOptions options = null)
+        public Task<User> GetMyUserAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<User>("GET", () => "users/@me", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<User>("GET", () => "users/@me", new BucketIds(), options: options);
         }
-        public async Task<IReadOnlyCollection<Connection>> GetMyConnectionsAsync(RequestOptions options = null)
+
+        public Task<IReadOnlyCollection<Connection>> GetMyConnectionsAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<IReadOnlyCollection<Connection>>("GET", () => "users/@me/connections", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<Connection>>("GET", () => "users/@me/connections", new BucketIds(), options: options);
         }
-        public async Task<IReadOnlyCollection<Channel>> GetMyPrivateChannelsAsync(RequestOptions options = null)
+
+        public Task<IReadOnlyCollection<Channel>> GetMyPrivateChannelsAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<IReadOnlyCollection<Channel>>("GET", () => "users/@me/channels", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<Channel>>("GET", () => "users/@me/channels", new BucketIds(), options: options);
         }
-        public async Task<IReadOnlyCollection<UserGuild>> GetMyGuildsAsync(GetGuildSummariesParams args, RequestOptions options = null)
+
+        public Task<IReadOnlyCollection<UserGuild>> GetMyGuildsAsync(GetGuildSummariesParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.GreaterThan(args.Limit, 0, nameof(args.Limit));
@@ -2138,58 +2370,85 @@ namespace Discord.API
             int limit = args.Limit.GetValueOrDefault(int.MaxValue);
             ulong afterGuildId = args.AfterGuildId.GetValueOrDefault(0);
 
-            return await SendAsync<IReadOnlyCollection<UserGuild>>("GET", () => $"users/@me/guilds?limit={limit}&after={afterGuildId}", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<UserGuild>>("GET", () => $"users/@me/guilds?limit={limit}&after={afterGuildId}&with_counts=true", new BucketIds(), options: options);
         }
-        public async Task<Application> GetMyApplicationAsync(RequestOptions options = null)
+
+        public Task<Application> GetMyApplicationAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<Application>("GET", () => "oauth2/applications/@me", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<Application>("GET", () => "oauth2/applications/@me", new BucketIds(), options: options);
         }
-        public async Task<User> ModifySelfAsync(Rest.ModifyCurrentUserParams args, RequestOptions options = null)
+
+        public Task<Application> GetCurrentBotApplicationAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return SendAsync<Application>("GET", () => "applications/@me", new BucketIds(), options: options);
+        }
+
+        public Task<Application> ModifyCurrentBotApplicationAsync(ModifyCurrentApplicationBotParams args, RequestOptions options = null)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            options = RequestOptions.CreateOrClone(options);
+
+            return SendJsonAsync<Application>("PATCH", () => "applications/@me", args, new BucketIds(), options: options);
+        }
+
+        public Task<User> ModifySelfAsync(Rest.ModifyCurrentUserParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotNullOrEmpty(args.Username, nameof(args.Username));
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<User>("PATCH", () => "users/@me", args, new BucketIds(), options: options).ConfigureAwait(false);
+            return SendJsonAsync<User>("PATCH", () => "users/@me", args, new BucketIds(), options: options);
         }
-        public async Task ModifyMyNickAsync(ulong guildId, Rest.ModifyCurrentUserNickParams args, RequestOptions options = null)
+
+        public Task ModifyMyNickAsync(ulong guildId, Rest.ModifyCurrentUserNickParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotNull(args.Nickname, nameof(args.Nickname));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendJsonAsync("PATCH", () => $"guilds/{guildId}/members/@me/nick", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync("PATCH", () => $"guilds/{guildId}/members/@me/nick", args, ids, options: options);
         }
-        public async Task<Channel> CreateDMChannelAsync(CreateDMChannelParams args, RequestOptions options = null)
+
+        public Task<Channel> CreateDMChannelAsync(CreateDMChannelParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.GreaterThan(args.RecipientId, 0, nameof(args.RecipientId));
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<Channel>("POST", () => "users/@me/channels", args, new BucketIds(), options: options).ConfigureAwait(false);
+            return SendJsonAsync<Channel>("POST", () => "users/@me/channels", args, new BucketIds(), options: options);
+        }
+
+        public Task<GuildMember> GetCurrentUserGuildMember(ulong guildId, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds();
+            return SendAsync<GuildMember>("GET", () => $"users/@me/guilds/{guildId}/member", ids, options: options);
         }
         #endregion
 
         #region Voice Regions
-        public async Task<IReadOnlyCollection<VoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
+        public Task<IReadOnlyCollection<VoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<IReadOnlyCollection<VoiceRegion>>("GET", () => "voice/regions", new BucketIds(), options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<VoiceRegion>>("GET", () => "voice/regions", new BucketIds(), options: options);
         }
-        public async Task<IReadOnlyCollection<VoiceRegion>> GetGuildVoiceRegionsAsync(ulong guildId, RequestOptions options = null)
+
+        public Task<IReadOnlyCollection<VoiceRegion>> GetGuildVoiceRegionsAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<VoiceRegion>>("GET", () => $"guilds/{guildId}/regions", ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<VoiceRegion>>("GET", () => $"guilds/{guildId}/regions", ids, options: options);
         }
         #endregion
 
         #region Audit logs
-        public async Task<AuditLog> GetAuditLogsAsync(ulong guildId, GetAuditLogsParams args, RequestOptions options = null)
+        public Task<AuditLog> GetAuditLogsAsync(ulong guildId, GetAuditLogsParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -2216,15 +2475,20 @@ namespace Discord.API
                 queryArgs.Append("&action_type=")
                     .Append(args.ActionType.Value);
             }
+            if (args.AfterEntryId.IsSpecified)
+            {
+                queryArgs.Append("&after=")
+                    .Append(args.AfterEntryId);
+            }
 
-            // Still use string interp for the query w/o params, as this is necessary for CreateBucketId
+            // Still use string interpolation for the query w/o params, as this is necessary for CreateBucketId
             endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}{queryArgs.ToString()}";
-            return await SendAsync<AuditLog>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+            return SendAsync<AuditLog>("GET", endpoint, ids, options: options);
         }
         #endregion
 
         #region Webhooks
-        public async Task<Webhook> CreateWebhookAsync(ulong channelId, CreateWebhookParams args, RequestOptions options = null)
+        public Task<Webhook> CreateWebhookAsync(ulong channelId, CreateWebhookParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
@@ -2232,8 +2496,9 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             var ids = new BucketIds(channelId: channelId);
 
-            return await SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/webhooks", args, ids, options: options).ConfigureAwait(false);
+            return SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/webhooks", args, ids, options: options);
         }
+
         public async Task<Webhook> GetWebhookAsync(ulong webhookId, RequestOptions options = null)
         {
             Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
@@ -2248,7 +2513,8 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
-        public async Task<Webhook> ModifyWebhookAsync(ulong webhookId, ModifyWebhookParams args, RequestOptions options = null)
+
+        public Task<Webhook> ModifyWebhookAsync(ulong webhookId, ModifyWebhookParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
             Preconditions.NotNull(args, nameof(args));
@@ -2256,35 +2522,38 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             if (AuthTokenType == TokenType.Webhook)
-                return await SendJsonAsync<Webhook>("PATCH", () => $"webhooks/{webhookId}/{AuthToken}", args, new BucketIds(), options: options).ConfigureAwait(false);
+                return SendJsonAsync<Webhook>("PATCH", () => $"webhooks/{webhookId}/{AuthToken}", args, new BucketIds(), options: options);
             else
-                return await SendJsonAsync<Webhook>("PATCH", () => $"webhooks/{webhookId}", args, new BucketIds(), options: options).ConfigureAwait(false);
+                return SendJsonAsync<Webhook>("PATCH", () => $"webhooks/{webhookId}", args, new BucketIds(), options: options);
         }
-        public async Task DeleteWebhookAsync(ulong webhookId, RequestOptions options = null)
+
+        public Task DeleteWebhookAsync(ulong webhookId, RequestOptions options = null)
         {
             Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
             options = RequestOptions.CreateOrClone(options);
 
             if (AuthTokenType == TokenType.Webhook)
-                await SendAsync("DELETE", () => $"webhooks/{webhookId}/{AuthToken}", new BucketIds(), options: options).ConfigureAwait(false);
+                return SendAsync("DELETE", () => $"webhooks/{webhookId}/{AuthToken}", new BucketIds(), options: options);
             else
-                await SendAsync("DELETE", () => $"webhooks/{webhookId}", new BucketIds(), options: options).ConfigureAwait(false);
+                return SendAsync("DELETE", () => $"webhooks/{webhookId}", new BucketIds(), options: options);
         }
-        public async Task<IReadOnlyCollection<Webhook>> GetGuildWebhooksAsync(ulong guildId, RequestOptions options = null)
+
+        public Task<IReadOnlyCollection<Webhook>> GetGuildWebhooksAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<Webhook>>("GET", () => $"guilds/{guildId}/webhooks", ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<Webhook>>("GET", () => $"guilds/{guildId}/webhooks", ids, options: options);
         }
-        public async Task<IReadOnlyCollection<Webhook>> GetChannelWebhooksAsync(ulong channelId, RequestOptions options = null)
+
+        public Task<IReadOnlyCollection<Webhook>> GetChannelWebhooksAsync(ulong channelId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendAsync<IReadOnlyCollection<Webhook>>("GET", () => $"channels/{channelId}/webhooks", ids, options: options).ConfigureAwait(false);
+            return SendAsync<IReadOnlyCollection<Webhook>>("GET", () => $"channels/{channelId}/webhooks", ids, options: options);
         }
         #endregion
 
@@ -2474,6 +2743,72 @@ namespace Discord.API
 
             return $"{string.Join("&", querys)}";
         }
+
+        #endregion
+
+        #region Application Role Connections Metadata
+
+        public Task<RoleConnectionMetadata[]> GetApplicationRoleConnectionMetadataRecordsAsync(RequestOptions options = null)
+            => SendAsync<RoleConnectionMetadata[]>("GET", () => $"applications/{CurrentApplicationId}/role-connections/metadata", new BucketIds(), options: options);
+
+        public Task<RoleConnectionMetadata[]> UpdateApplicationRoleConnectionMetadataRecordsAsync(RoleConnectionMetadata[] roleConnections, RequestOptions options = null)
+            => SendJsonAsync<RoleConnectionMetadata[]>("PUT", () => $"applications/{CurrentApplicationId}/role-connections/metadata", roleConnections, new BucketIds(), options: options);
+
+        public Task<RoleConnection> GetUserApplicationRoleConnectionAsync(ulong applicationId, RequestOptions options = null)
+            => SendAsync<RoleConnection>("GET", () => $"users/@me/applications/{applicationId}/role-connection", new BucketIds(), options: options);
+
+        public Task<RoleConnection> ModifyUserApplicationRoleConnectionAsync(ulong applicationId, RoleConnection connection, RequestOptions options = null)
+            => SendJsonAsync<RoleConnection>("PUT", () => $"users/@me/applications/{applicationId}/role-connection", connection, new BucketIds(), options: options);
+
+        #endregion
+
+        #region App Monetization
+
+        public Task<Entitlement> CreateEntitlementAsync(CreateEntitlementParams args, RequestOptions options = null)
+            => SendJsonAsync<Entitlement>("POST", () => $"applications/{CurrentApplicationId}/entitlements", args, new BucketIds(), options: options);
+
+        public Task DeleteEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => SendAsync("DELETE", () => $"applications/{CurrentApplicationId}/entitlements/{entitlementId}", new BucketIds(), options: options);
+
+        public Task<Entitlement[]> ListEntitlementAsync(ListEntitlementsParams args, RequestOptions options = null)
+        {
+            var query = $"?limit={args.Limit.GetValueOrDefault(100)}";
+
+            if (args.UserId.IsSpecified)
+            {
+                query += $"&user_id={args.UserId.Value}";
+            }
+
+            if (args.SkuIds.IsSpecified)
+            {
+                query += $"&sku_ids={WebUtility.UrlEncode(string.Join(",", args.SkuIds.Value))}";
+            }
+
+            if (args.BeforeId.IsSpecified)
+            {
+                query += $"&before={args.BeforeId.Value}";
+            }
+
+            if (args.AfterId.IsSpecified)
+            {
+                query += $"&after={args.AfterId.Value}";
+            }
+
+            if (args.GuildId.IsSpecified)
+            {
+                query += $"&guild_id={args.GuildId.Value}";
+            }
+
+            if (args.ExcludeEnded.IsSpecified)
+            {
+                query += $"&exclude_ended={args.ExcludeEnded.Value}";
+            }
+
+            return SendAsync<Entitlement[]>("GET", () => $"applications/{CurrentApplicationId}/entitlements{query}", new BucketIds(), options: options);
+        }
+
+        public Task<SKU[]> ListSKUsAsync(RequestOptions options = null)
+            => SendAsync<SKU[]>("GET", () => $"applications/{CurrentApplicationId}/skus", new BucketIds(), options: options);
 
         #endregion
     }

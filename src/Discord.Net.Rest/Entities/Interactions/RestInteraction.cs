@@ -1,12 +1,14 @@
+using Discord.Net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Model = Discord.API.Interaction;
 using DataModel = Discord.API.ApplicationCommandInteractionData;
-using Newtonsoft.Json;
-using Discord.Net;
+using Model = Discord.API.Interaction;
 
 namespace Discord.Rest
 {
@@ -88,6 +90,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public ulong ApplicationId { get; private set; }
 
+        /// <inheritdoc cref="IDiscordInteraction.Entitlements" />
+        public IReadOnlyCollection<RestEntitlement> Entitlements { get; private set; }
+
         internal RestInteraction(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
@@ -98,7 +103,7 @@ namespace Discord.Rest
 
         internal static async Task<RestInteraction> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
-            if(model.Type == InteractionType.Ping)
+            if (model.Type == InteractionType.Ping)
             {
                 return await RestPingInteraction.CreateAsync(client, model, doApiCall);
             }
@@ -135,20 +140,20 @@ namespace Discord.Rest
 
         internal virtual async Task UpdateAsync(DiscordRestClient discord, Model model, bool doApiCall)
         {
-            ChannelId = model.ChannelId.IsSpecified
-                ? model.ChannelId.Value
+            ChannelId = model.Channel.IsSpecified
+                ? model.Channel.Value.Id
                 : null;
 
             GuildId = model.GuildId.IsSpecified
                 ? model.GuildId.Value
                 : null;
-            
+
             IsDMInteraction = GuildId is null;
 
             Data = model.Data.IsSpecified
                 ? model.Data.Value
                 : null;
-            
+
             Token = model.Token;
             Version = model.Version;
             Type = model.Type;
@@ -176,7 +181,7 @@ namespace Discord.Rest
                     User = RestUser.Create(Discord, model.User.Value);
                 }
             }
-            
+
 
             if (Channel is null && ChannelId is not null)
             {
@@ -186,8 +191,25 @@ namespace Discord.Rest
                         Channel = (IRestMessageChannel)await discord.GetChannelAsync(ChannelId.Value);
                     else
                     {
-                        Channel = null;
-
+                        if (model.Channel.IsSpecified)
+                        {
+                            Channel = model.Channel.Value.Type switch
+                            {
+                                ChannelType.News or
+                                ChannelType.Text or
+                                ChannelType.Voice or
+                                ChannelType.Stage or
+                                ChannelType.NewsThread or
+                                ChannelType.PrivateThread or
+                                ChannelType.PublicThread or
+                                ChannelType.Media or
+                                ChannelType.Forum
+                                    => RestGuildChannel.Create(discord, Guild, model.Channel.Value) as IRestMessageChannel,
+                                ChannelType.DM => RestDMChannel.Create(discord, model.Channel.Value),
+                                ChannelType.Group => RestGroupChannel.Create(discord, model.Channel.Value),
+                                _ => null
+                            };
+                        }
                         _getChannel = async (opt, ul) =>
                         {
                             if (Guild is null)
@@ -208,6 +230,8 @@ namespace Discord.Rest
             GuildLocale = model.GuildLocale.IsSpecified
                 ? model.GuildLocale.Value
                 : null;
+
+            Entitlements = model.Entitlements.Select(x => RestEntitlement.Create(discord, x)).ToImmutableArray();
         }
 
         internal string SerializePayload(object payload)
@@ -294,7 +318,7 @@ namespace Discord.Rest
         }
         /// <inheritdoc/>
         public abstract string RespondWithModal(Modal modal, RequestOptions options = null);
-        
+
         /// <inheritdoc/>
         public abstract string Respond(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
 
@@ -398,7 +422,14 @@ namespace Discord.Rest
         public Task DeleteOriginalResponseAsync(RequestOptions options = null)
             => InteractionHelper.DeleteInteractionResponseAsync(Discord, this, options);
 
+        /// <inheritdoc/>
+        public Task RespondWithPremiumRequiredAsync(RequestOptions options = null)
+            => InteractionHelper.RespondWithPremiumRequiredAsync(Discord, Id, Token, options);
+
         #region  IDiscordInteraction
+        /// <inheritdoc/>
+        IReadOnlyCollection<IEntitlement> IDiscordInteraction.Entitlements => Entitlements;
+
         /// <inheritdoc/>
         IUser IDiscordInteraction.User => User;
 

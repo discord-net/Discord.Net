@@ -26,6 +26,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public ulong GuildId => Guild.Id;
 
+        /// <inheritdoc />
+        public ChannelFlags Flags { get; private set; }
+
         internal RestGuildChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, id)
         {
@@ -39,6 +42,7 @@ namespace Discord.Rest
                 ChannelType.Text => RestTextChannel.Create(discord, guild, model),
                 ChannelType.Voice => RestVoiceChannel.Create(discord, guild, model),
                 ChannelType.Stage => RestStageChannel.Create(discord, guild, model),
+                ChannelType.Media => RestMediaChannel.Create(discord, guild, model),
                 ChannelType.Forum => RestForumChannel.Create(discord, guild, model),
                 ChannelType.Category => RestCategoryChannel.Create(discord, guild, model),
                 ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.NewsThread => RestThreadChannel.Create(discord, guild, model),
@@ -62,6 +66,8 @@ namespace Discord.Rest
                     newOverwrites.Add(overwrites[i].ToEntity());
                 _overwrites = newOverwrites.ToImmutable();
             }
+
+            Flags = model.Flags.GetValueOrDefault(ChannelFlags.None);
         }
 
         /// <inheritdoc />
@@ -85,7 +91,7 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="user">The user to get the overwrite from.</param>
         /// <returns>
-        ///     An overwrite object for the targeted user; <c>null</c> if none is set.
+        ///     An overwrite object for the targeted user; <see langword="null" /> if none is set.
         /// </returns>
         public virtual OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
@@ -102,7 +108,7 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="role">The role to get the overwrite from.</param>
         /// <returns>
-        ///     An overwrite object for the targeted role; <c>null</c> if none is set.
+        ///     An overwrite object for the targeted role; <see langword="null" /> if none is set.
         /// </returns>
         public virtual OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
@@ -214,17 +220,17 @@ namespace Discord.Rest
         OverwritePermissions? IGuildChannel.GetPermissionOverwrite(IUser user)
             => GetPermissionOverwrite(user);
         /// <inheritdoc />
-        async Task IGuildChannel.AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options)
-            => await AddPermissionOverwriteAsync(role, permissions, options).ConfigureAwait(false);
+        Task IGuildChannel.AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options)
+            => AddPermissionOverwriteAsync(role, permissions, options);
         /// <inheritdoc />
-        async Task IGuildChannel.AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options)
-            => await AddPermissionOverwriteAsync(user, permissions, options).ConfigureAwait(false);
+        Task IGuildChannel.AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options)
+            => AddPermissionOverwriteAsync(user, permissions, options);
         /// <inheritdoc />
-        async Task IGuildChannel.RemovePermissionOverwriteAsync(IRole role, RequestOptions options)
-            => await RemovePermissionOverwriteAsync(role, options).ConfigureAwait(false);
+        Task IGuildChannel.RemovePermissionOverwriteAsync(IRole role, RequestOptions options)
+            => RemovePermissionOverwriteAsync(role, options);
         /// <inheritdoc />
-        async Task IGuildChannel.RemovePermissionOverwriteAsync(IUser user, RequestOptions options)
-            => await RemovePermissionOverwriteAsync(user, options).ConfigureAwait(false);
+        Task IGuildChannel.RemovePermissionOverwriteAsync(IUser user, RequestOptions options)
+            => RemovePermissionOverwriteAsync(user, options);
 
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)

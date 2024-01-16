@@ -76,7 +76,7 @@ namespace Discord.Commands
         ///     Gets a string that indicates the execution result.
         /// </summary>
         /// <returns>
-        ///     <c>Success</c> if <see cref="IsSuccess"/> is <c>true</c>; otherwise "<see cref="Error"/>: 
+        ///     <c>Success</c> if <see cref="IsSuccess"/> is <see langword="true" />; otherwise "<see cref="Error"/>: 
         ///     <see cref="ErrorReason"/>".
         /// </returns>
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";

@@ -34,7 +34,7 @@ namespace Discord.Logging
             try
             {
                 if (severity <= Level)
-                await _messageEvent.InvokeAsync(new LogMessage(severity, source, message, ex)).ConfigureAwait(false);
+                    await _messageEvent.InvokeAsync(new LogMessage(severity, source, message, ex)).ConfigureAwait(false);
             }
             catch
             {
@@ -97,9 +97,7 @@ namespace Discord.Logging
 
         public Logger CreateLogger(string name) => new Logger(this, name);
 
-        public async Task WriteInitialLog()
-        {
-            await ClientLogger.InfoAsync($"Discord.Net v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion})").ConfigureAwait(false);
-        }
+        public Task WriteInitialLog()
+            => ClientLogger.InfoAsync($"Discord.Net v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion})");
     }
 }

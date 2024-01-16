@@ -14,6 +14,9 @@ namespace Discord.Rest
         public IGuild Guild { get; private set; }
 
         /// <inheritdoc/>
+        public ulong GuildId { get; private set; }
+
+        /// <inheritdoc/>
         public ulong? ChannelId { get; private set; }
 
         /// <inheritdoc/>
@@ -102,6 +105,7 @@ namespace Discord.Rest
             Location = model.EntityMetadata?.Location.GetValueOrDefault();
             UserCount = model.UserCount.ToNullable();
             CoverImageId = model.Image;
+            GuildId = model.GuildId;
         }
 
         /// <inheritdoc/>

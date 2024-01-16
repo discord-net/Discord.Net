@@ -26,7 +26,7 @@ namespace Discord.Audio.Streams
         public override void WriteHeader(ushort seq, uint timestamp, bool missed)
         {
             if (_hasHeader)
-                throw new InvalidOperationException("Header received with no payload.");                
+                throw new InvalidOperationException("Header received with no payload.");
             _hasHeader = true;
 
             _nextMissed = missed;
@@ -34,37 +34,24 @@ namespace Discord.Audio.Streams
         }
 
         /// <exception cref="InvalidOperationException">Received payload without an RTP header.</exception>
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             if (!_hasHeader)
                 throw new InvalidOperationException("Received payload without an RTP header.");
             _hasHeader = false;
 
-            if (!_nextMissed)
-            {
-                count = _decoder.DecodeFrame(buffer, offset, count, _buffer, 0, false);
-                await _next.WriteAsync(_buffer, 0, count, cancelToken).ConfigureAwait(false);
-            }
-            else if (count > 0)
-            {
-                count = _decoder.DecodeFrame(buffer, offset, count, _buffer, 0, true);
-                await _next.WriteAsync(_buffer, 0, count, cancelToken).ConfigureAwait(false);
-            }
-            else
-            {
-                count = _decoder.DecodeFrame(null, 0, 0, _buffer, 0, true);
-                await _next.WriteAsync(_buffer, 0, count, cancelToken).ConfigureAwait(false);
-            }
+            count = !_nextMissed || count > 0
+                ? _decoder.DecodeFrame(buffer, offset, count, _buffer, 0, false)
+                : _decoder.DecodeFrame(null, 0, 0, _buffer, 0, false);
+
+            return _next.WriteAsync(_buffer, 0, count, cancelToken);
         }
 
-        public override async Task FlushAsync(CancellationToken cancelToken)
-        {
-            await _next.FlushAsync(cancelToken).ConfigureAwait(false);
-        }
-        public override async Task ClearAsync(CancellationToken cancelToken)
-        {
-            await _next.ClearAsync(cancelToken).ConfigureAwait(false);
-        }
+        public override Task FlushAsync(CancellationToken cancelToken)
+            => _next.FlushAsync(cancelToken);
+
+        public override Task ClearAsync(CancellationToken cancelToken)
+            => _next.ClearAsync(cancelToken);
 
         protected override void Dispose(bool disposing)
         {

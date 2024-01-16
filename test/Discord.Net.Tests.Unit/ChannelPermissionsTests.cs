@@ -89,10 +89,16 @@ namespace Discord
             AssertFlag(() => new ChannelPermissions(createPrivateThreads: true), ChannelPermission.CreatePrivateThreads);
             AssertFlag(() => new ChannelPermissions(createPublicThreads: true), ChannelPermission.CreatePublicThreads);
             AssertFlag(() => new ChannelPermissions(sendMessagesInThreads: true), ChannelPermission.SendMessagesInThreads);
+            AssertFlag(() => new ChannelPermissions(startEmbeddedActivities: true), ChannelPermission.StartEmbeddedActivities);
+            AssertFlag(() => new ChannelPermissions(useSoundboard: true), ChannelPermission.UseSoundboard);
+            AssertFlag(() => new ChannelPermissions(createEvents: true), ChannelPermission.CreateEvents);
+            AssertFlag(() => new ChannelPermissions(sendVoiceMessages: true), ChannelPermission.SendVoiceMessages);
+            AssertFlag(() => new ChannelPermissions(useClydeAI: true), ChannelPermission.UseClydeAI);
+            AssertFlag(() => new ChannelPermissions(setVoiceChannelStatus: true), ChannelPermission.SetVoiceChannelStatus);
         }
 
         /// <summary>
-        ///     Tests the behavior of <see cref="Discord.ChannelPermissions.Modify(bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?)"/>
+        ///     Tests the behavior of <see cref="Discord.ChannelPermissions.Modify"/>
         ///     with each of the parameters.
         /// </summary>
         [Fact]
@@ -153,6 +159,9 @@ namespace Discord
             AssertUtil(ChannelPermission.ManageWebhooks, x => x.ManageWebhooks, (p, enable) => p.Modify(manageWebhooks: enable));
             AssertUtil(ChannelPermission.PrioritySpeaker, x => x.PrioritySpeaker, (p, enable) => p.Modify(prioritySpeaker: enable));
             AssertUtil(ChannelPermission.Stream, x => x.Stream, (p, enable) => p.Modify(stream: enable));
+            AssertUtil(ChannelPermission.SendVoiceMessages, x => x.SendVoiceMessages, (p, enable) => p.Modify(sendVoiceMessages: enable));
+            AssertUtil(ChannelPermission.UseClydeAI, x => x.UseClydeAI, (p, enable) => p.Modify(useClydeAI: enable));
+            AssertUtil(ChannelPermission.SetVoiceChannelStatus, x => x.SetVoiceChannelStatus, (p, enable) => p.Modify(setVoiceChannelStatus: enable));
         }
 
         /// <summary>

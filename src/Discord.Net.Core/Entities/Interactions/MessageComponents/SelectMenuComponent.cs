@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +10,7 @@ namespace Discord
     public class SelectMenuComponent : IMessageComponent
     {
         /// <inheritdoc/>
-        public ComponentType Type => ComponentType.SelectMenu;
+        public ComponentType Type { get; }
 
         /// <inheritdoc/>
         public string CustomId { get; }
@@ -40,6 +41,16 @@ namespace Discord
         public bool IsDisabled { get; }
 
         /// <summary>
+        ///     Gets the allowed channel types for this modal
+        /// </summary>
+        public IReadOnlyCollection<ChannelType> ChannelTypes { get; }
+
+        /// <summary>
+        ///     Gets default values for auto-populated select menu components.
+        /// </summary>
+        public IReadOnlyCollection<SelectMenuDefaultValue> DefaultValues { get; }
+
+        /// <summary>
         ///     Turns this select menu into a builder.
         /// </summary>
         /// <returns>
@@ -52,9 +63,11 @@ namespace Discord
                 Placeholder,
                 MaxValues,
                 MinValues,
-                IsDisabled);
+                IsDisabled, Type, ChannelTypes.ToList(),
+                DefaultValues.ToList());
 
-        internal SelectMenuComponent(string customId, List<SelectMenuOption> options, string placeholder, int minValues, int maxValues, bool disabled)
+        internal SelectMenuComponent(string customId, List<SelectMenuOption> options, string placeholder, int minValues, int maxValues,
+            bool disabled, ComponentType type, IEnumerable<ChannelType> channelTypes = null, IEnumerable<SelectMenuDefaultValue> defaultValues = null)
         {
             CustomId = customId;
             Options = options;
@@ -62,6 +75,9 @@ namespace Discord
             MinValues = minValues;
             MaxValues = maxValues;
             IsDisabled = disabled;
+            Type = type;
+            ChannelTypes = channelTypes?.ToArray() ?? Array.Empty<ChannelType>();
+            DefaultValues = defaultValues?.ToArray() ?? Array.Empty<SelectMenuDefaultValue>();
         }
     }
 }

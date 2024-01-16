@@ -28,4 +28,4 @@ var guild = client.GetGuild(guildId);
 var guildEvent = await guild.CreateEventAsync("test event", DateTimeOffset.UtcNow.AddDays(1),  GuildScheduledEventType.External, endTime: DateTimeOffset.UtcNow.AddDays(2), location: "Space");
 ```
 
-This code will create an event that lasts a day and starts tomorrow. It will be an external event thats in space.
+This code will create an event that lasts a day and starts tomorrow. It will be an external event that's in space.

@@ -23,7 +23,7 @@ namespace Discord.Interactions
         public string CommandName { get; }
 
         /// <inheritdoc/>
-        public override IReadOnlyCollection<CommandParameterInfo> Parameters { get; }
+        public override IReadOnlyList<CommandParameterInfo> Parameters { get; }
 
         /// <inheritdoc/>
         public override bool SupportsWildCards => false;
@@ -36,13 +36,16 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
+        public override Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
         {
             if (context.Interaction is not IAutocompleteInteraction)
-                return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Autocomplete Interaction");
+                return Task.FromResult((IResult)ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Autocomplete Interaction"));
 
-            return await RunAsync(context, Array.Empty<object>(), services).ConfigureAwait(false);
+            return base.ExecuteAsync(context, services);
         }
+
+        protected override Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
+            => Task.FromResult(ParseResult.FromSuccess(Array.Empty<object>()) as IResult);
 
         /// <inheritdoc/>
         protected override Task InvokeModuleEvent(IInteractionContext context, IResult result) =>
@@ -61,7 +64,7 @@ namespace Discord.Interactions
         {
             var keywords = new List<string>() { ParameterName, CommandName };
 
-            if(!IgnoreGroupNames)
+            if (!IgnoreGroupNames)
             {
                 var currentParent = Module;
 

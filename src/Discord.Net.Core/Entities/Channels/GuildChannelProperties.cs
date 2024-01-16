@@ -36,5 +36,10 @@ namespace Discord
         ///     Gets or sets the permission overwrites for this channel.
         /// </summary>
         public Optional<IEnumerable<Overwrite>> PermissionOverwrites { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the flags of the channel.
+        /// </summary>
+        public Optional<ChannelFlags> Flags { get; set; }
     }
 }

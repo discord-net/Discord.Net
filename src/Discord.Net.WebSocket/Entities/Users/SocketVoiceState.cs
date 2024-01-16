@@ -11,7 +11,7 @@ namespace Discord.WebSocket
     public struct SocketVoiceState : IVoiceState
     {
         /// <summary>
-        ///     Initializes a default <see cref="SocketVoiceState"/> with everything set to <c>null</c> or <c>false</c>.
+        ///     Initializes a default <see cref="SocketVoiceState"/> with everything set to <see langword="null" /> or <see langword="false" />.
         /// </summary>
         public static readonly SocketVoiceState Default = new SocketVoiceState(null, null, null, false, false, false, false, false, false, false);
 
@@ -31,7 +31,7 @@ namespace Discord.WebSocket
         private readonly Flags _voiceStates;
 
         /// <summary>
-        ///     Gets the voice channel that the user is currently in; or <c>null</c> if none.
+        ///     Gets the voice channel that the user is currently in; or <see langword="null" /> if none.
         /// </summary>
         public SocketVoiceChannel VoiceChannel { get; }
         /// <inheritdoc />
@@ -53,7 +53,7 @@ namespace Discord.WebSocket
         public bool IsStreaming => (_voiceStates & Flags.SelfStream) != 0;
         /// <inheritdoc />
         public bool IsVideoing => (_voiceStates & Flags.SelfVideo) != 0;
-        
+
 
         internal SocketVoiceState(SocketVoiceChannel voiceChannel, DateTimeOffset? requestToSpeak, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed, bool isStream, bool isVideo)
         {

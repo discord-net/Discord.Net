@@ -19,8 +19,10 @@ namespace Discord.Rest
         private long? _timedOutTicks;
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
-        /// <inheritdoc />
-        public string DisplayName => Nickname ?? Username;
+
+        /// <inheritdoc cref="IGuildUser.DisplayName"/>
+        public string DisplayName => Nickname ?? GlobalName ?? Username;
+
         /// <inheritdoc />
         public string Nickname { get; private set; }
         /// <inheritdoc/>
@@ -38,6 +40,10 @@ namespace Discord.Rest
         public ulong GuildId { get; }
         /// <inheritdoc />
         public bool? IsPending { get; private set; }
+
+        /// <inheritdoc />
+        public GuildUserFlags Flags { get; private set; }
+
         /// <inheritdoc />
         public int Hierarchy
         {
@@ -114,6 +120,7 @@ namespace Discord.Rest
                 _timedOutTicks = model.TimedOutUntil.Value?.UtcTicks;
             if (model.Pending.IsSpecified)
                 IsPending = model.Pending.Value;
+            Flags = model.Flags;
         }
         private void UpdateRoles(ulong[] roleIds)
         {
@@ -188,15 +195,13 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc />
-        public string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => GuildAvatarId is not null
-                ? GetGuildAvatarUrl(format, size)
-                : GetAvatarUrl(format, size);
-
-        /// <inheritdoc />
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, GuildId, GuildAvatarId, size, format);
-#endregion
+
+        /// <inheritdoc />
+        public override string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetGuildAvatarUrl(format, size) ?? base.GetDisplayAvatarUrl(format, size);
+        #endregion
 
         #region IGuildUser
         /// <inheritdoc />

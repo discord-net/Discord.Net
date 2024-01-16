@@ -15,7 +15,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <remarks>
         ///     <see cref="Preconditions" /> of the same group require only one of the preconditions to pass in order to
-        ///     be successful (A || B). Specifying <see cref="Group" /> = <c>null</c> or not at all will
+        ///     be successful (A || B). Specifying <see cref="Group" /> = <see langword="null" /> or not at all will
         ///     require *all* preconditions to pass, just like normal (A &amp;&amp; B).
         /// </remarks>
         public string Group { get; set; } = null;
@@ -37,6 +37,6 @@ namespace Discord.Interactions
         /// <param name="context">The context of the command.</param>
         /// <param name="commandInfo">The command being executed.</param>
         /// <param name="services">The service collection used for dependency injection.</param>
-        public abstract Task<PreconditionResult> CheckRequirementsAsync (IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services);
+        public abstract Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services);
     }
 }

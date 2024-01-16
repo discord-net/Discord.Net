@@ -12,6 +12,7 @@ namespace Discord.WebSocket
         public override string Username { get; internal set; }
         public override ushort DiscriminatorValue { get; internal set; }
         public override string AvatarId { get; internal set; }
+        public override string GlobalName { get; internal set; }
         internal override SocketPresence Presence { get; set; }
 
         public override bool IsWebhook => false;
@@ -48,7 +49,10 @@ namespace Discord.WebSocket
             }
         }
 
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Global)";
+        private string DebuggerDisplay => DiscriminatorValue != 0
+            ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)"
+            : $"{Username} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
+
         internal new SocketGlobalUser Clone() => MemberwiseClone() as SocketGlobalUser;
     }
 }

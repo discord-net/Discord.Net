@@ -24,7 +24,7 @@ namespace Discord.Interactions
         public bool ThrowOnError { get; set; } = true;
 
         /// <summary>
-        ///     Gets or sets the delimiters that will be used to seperate group names and the method name when a Message Component Interaction is recieved.
+        ///     Gets or sets the delimiters that will be used to separate group names and the method name when a Message Component Interaction is received.
         /// </summary>
         public char[] InteractionCustomIdDelimiters { get; set; }
 
@@ -51,7 +51,7 @@ namespace Discord.Interactions
         public bool EnableAutocompleteHandlers { get; set; } = true;
 
         /// <summary>
-        ///     Gets or sets whether new service scopes should be automatically created when resolving module depedencies on every command execution.
+        ///     Gets or sets whether new service scopes should be automatically created when resolving module dependencies on every command execution.
         /// </summary>
         public bool AutoServiceScopes { get; set; } = true;
 

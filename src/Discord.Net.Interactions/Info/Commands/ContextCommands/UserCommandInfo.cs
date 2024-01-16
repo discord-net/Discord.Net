@@ -12,20 +12,25 @@ namespace Discord.Interactions
             : base(builder, module, commandService) { }
 
         /// <inheritdoc/>
-        public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
+        public override Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
         {
             if (context.Interaction is not IUserCommandInteraction userCommand)
-                return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Message Command Interation");
+                return Task.FromResult((IResult)ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Message Command Interation"));
 
+            return base.ExecuteAsync(context, services);
+        }
+
+        protected override Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)
+        {
             try
             {
-                object[] args = new object[1] { userCommand.Data.User };
+                object[] args = new object[1] { (context.Interaction as IUserCommandInteraction).Data.User };
 
-                return await RunAsync(context, args, services).ConfigureAwait(false);
+                return Task.FromResult(ParseResult.FromSuccess(args) as IResult);
             }
             catch (Exception ex)
             {
-                return ExecuteResult.FromError(ex);
+                return Task.FromResult(ParseResult.FromError(ex) as IResult);
             }
         }
 

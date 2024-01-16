@@ -5,7 +5,7 @@ title: Modifying Guild Events
 
 # Modifying Events
 
-You can modify events using the `ModifyAsync` method to modify the event, heres the properties you can modify:
+You can modify events using the `ModifyAsync` method to modify the event. Here are the properties you can modify:
 
 | Name         | Type                              | Description                                  |
 | ------------ | --------------------------------- | -------------------------------------------- |

@@ -84,6 +84,11 @@ namespace Discord
         public Optional<bool> IsDMEnabled { get; set; }
 
         /// <summary>
+        ///     Gets or sets whether or not this command is age restricted.
+        /// </summary>
+        public Optional<bool> IsNsfw { get; set; }
+
+        /// <summary>
         ///     Gets or sets the default permissions required by a user to execute this application command.
         /// </summary>
         public Optional<GuildPermission> DefaultMemberPermissions { get; set; }

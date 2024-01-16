@@ -14,7 +14,7 @@ namespace Discord.Commands
         /// <param name="c">The char prefix.</param>
         /// <param name="argPos">References where the command starts.</param>
         /// <returns>
-        ///     <c>true</c> if the message begins with the char <paramref name="c"/>; otherwise <c>false</c>.
+        ///     <see langword="true" /> if the message begins with the char <paramref name="c"/>; otherwise <see langword="false" />.
         /// </returns>
         public static bool HasCharPrefix(this IUserMessage msg, char c, ref int argPos)
         {
@@ -45,13 +45,17 @@ namespace Discord.Commands
         public static bool HasMentionPrefix(this IUserMessage msg, IUser user, ref int argPos)
         {
             var text = msg.Content;
-            if (string.IsNullOrEmpty(text) || text.Length <= 3 || text[0] != '<' || text[1] != '@') return false;
+            if (string.IsNullOrEmpty(text) || text.Length <= 3 || text[0] != '<' || text[1] != '@')
+                return false;
 
             int endPos = text.IndexOf('>');
-            if (endPos == -1) return false;
-            if (text.Length < endPos + 2 || text[endPos + 1] != ' ') return false; //Must end in "> "
+            if (endPos == -1)
+                return false;
+            if (text.Length < endPos + 2 || text[endPos + 1] != ' ')
+                return false; //Must end in "> "
 
-            if (!MentionUtils.TryParseUser(text.Substring(0, endPos + 1), out ulong userId)) return false;
+            if (!MentionUtils.TryParseUser(text.Substring(0, endPos + 1), out ulong userId))
+                return false;
             if (userId == user.Id)
             {
                 argPos = endPos + 2;

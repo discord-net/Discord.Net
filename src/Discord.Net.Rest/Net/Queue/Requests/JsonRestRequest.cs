@@ -1,4 +1,4 @@
-﻿using Discord.Net.Rest;
+using Discord.Net.Rest;
 using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
@@ -13,9 +13,7 @@ namespace Discord.Net.Queue
             Json = json;
         }
 
-        public override async Task<RestResponse> SendAsync()
-        {
-            return await Client.SendAsync(Method, Endpoint, Json, Options.CancelToken, Options.HeaderOnly, Options.AuditLogReason).ConfigureAwait(false);
-        }
+        public override Task<RestResponse> SendAsync()
+            => Client.SendAsync(Method, Endpoint, Json, Options.CancelToken, Options.HeaderOnly, Options.AuditLogReason);
     }
 }

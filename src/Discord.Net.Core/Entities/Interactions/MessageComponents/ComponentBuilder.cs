@@ -1,7 +1,8 @@
+using Discord.Utils;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Discord.Utils;
 
 namespace Discord
 {
@@ -82,6 +83,39 @@ namespace Discord
         }
 
         /// <summary>
+        ///     Removes all components of the given type from the <see cref="ComponentBuilder"/>.
+        /// </summary>
+        /// <param name="t">The <see cref="ComponentType"/> to remove.</param>
+        /// <returns>The current builder.</returns>
+        public ComponentBuilder RemoveComponentsOfType(ComponentType t)
+        {
+            this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c.Type == t));
+            return this;
+        }
+
+        /// <summary>
+        ///     Removes a component from the <see cref="ComponentBuilder"/>.
+        /// </summary>
+        /// <param name="customId">The custom id of the component.</param>
+        /// <returns>The current builder.</returns>
+        public ComponentBuilder RemoveComponent(string customId)
+        {
+            this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c.CustomId == customId));
+            return this;
+        }
+
+        /// <summary>
+        ///     Removes a Link Button from the <see cref="ComponentBuilder"/> based on its URL.
+        /// </summary>
+        /// <param name="url">The URL of the Link Button.</param>
+        /// <returns>The current builder.</returns>
+        public ComponentBuilder RemoveButtonByURL(string url)
+        {
+            this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c is ButtonComponent b && b.Url == url));
+            return this;
+        }
+
+        /// <summary>
         ///     Adds a <see cref="SelectMenuBuilder"/> to the <see cref="ComponentBuilder"/> at the specific row.
         ///     If the row cannot accept the component then it will add it to a row that can.
         /// </summary>
@@ -92,9 +126,12 @@ namespace Discord
         /// <param name="maxValues">The max values of the placeholder.</param>
         /// <param name="disabled">Whether or not the menu is disabled.</param>
         /// <param name="row">The row to add the menu to.</param>
+        /// <param name="type">The type of the select menu.</param>
+        /// <param name="channelTypes">Menus valid channel types (only for <see cref="ComponentType.ChannelSelect"/>)</param>
         /// <returns></returns>
-        public ComponentBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options,
-            string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false, int row = 0)
+        public ComponentBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options = null,
+            string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false, int row = 0, ComponentType type = ComponentType.SelectMenu,
+            ChannelType[] channelTypes = null, SelectMenuDefaultValue[] defaultValues = null)
         {
             return WithSelectMenu(new SelectMenuBuilder()
                 .WithCustomId(customId)
@@ -102,7 +139,10 @@ namespace Discord
                 .WithPlaceholder(placeholder)
                 .WithMaxValues(maxValues)
                 .WithMinValues(minValues)
-                .WithDisabled(disabled),
+                .WithDisabled(disabled)
+                .WithType(type)
+                .WithChannelTypes(channelTypes)
+                .WithDefaultValues(defaultValues),
                 row);
         }
 
@@ -118,7 +158,7 @@ namespace Discord
         public ComponentBuilder WithSelectMenu(SelectMenuBuilder menu, int row = 0)
         {
             Preconditions.LessThan(row, MaxActionRowCount, nameof(row));
-            if (menu.Options.Distinct().Count() != menu.Options.Count)
+            if (menu.Options is not null && menu.Options.Distinct().Count() != menu.Options.Count)
                 throw new InvalidOperationException("Please make sure that there is no duplicates values.");
 
             var builtMenu = menu.Build();
@@ -278,9 +318,12 @@ namespace Discord
         {
             if (_actionRows?.SelectMany(x => x.Components)?.Any(x => x.Type == ComponentType.TextInput) ?? false)
                 throw new ArgumentException("TextInputComponents are not allowed in messages.", nameof(ActionRows));
-            if (_actionRows?.SelectMany(x => x.Components)?.Any(x => x.Type == ComponentType.ModalSubmit) ?? false)
-                throw new ArgumentException("ModalSubmit components are not allowed in messages.", nameof(ActionRows));
-            
+
+            if (_actionRows?.Count > 0)
+                for (int i = 0; i < _actionRows?.Count; i++)
+                    if (_actionRows[i]?.Components?.Count == 0)
+                        _actionRows.RemoveAt(i);
+
             return _actionRows != null
                 ? new MessageComponent(_actionRows.Select(x => x.Build()).ToList())
                 : MessageComponent.Empty;
@@ -356,10 +399,13 @@ namespace Discord
         /// <param name="placeholder">The placeholder of the menu.</param>
         /// <param name="minValues">The min values of the placeholder.</param>
         /// <param name="maxValues">The max values of the placeholder.</param>
-        /// <param name="disabled">Whether or not the menu is disabled.</param>
-        /// <returns>The current builder.</returns> 
-        public ActionRowBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options,
-            string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false)
+        /// <param name="disabled">Whether or not the menu is disabled.</param> 
+        /// <param name="type">The type of the select menu.</param>
+        /// <param name="channelTypes">Menus valid channel types (only for <see cref="ComponentType.ChannelSelect"/>)</param>
+        /// <returns>The current builder.</returns>
+        public ActionRowBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options = null,
+            string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false,
+            ComponentType type = ComponentType.SelectMenu, ChannelType[] channelTypes = null)
         {
             return WithSelectMenu(new SelectMenuBuilder()
                 .WithCustomId(customId)
@@ -367,7 +413,9 @@ namespace Discord
                 .WithPlaceholder(placeholder)
                 .WithMaxValues(maxValues)
                 .WithMinValues(minValues)
-                .WithDisabled(disabled));
+                .WithDisabled(disabled)
+                .WithType(type)
+                .WithChannelTypes(channelTypes));
         }
 
         /// <summary>
@@ -378,7 +426,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ActionRowBuilder WithSelectMenu(SelectMenuBuilder menu)
         {
-            if (menu.Options.Distinct().Count() != menu.Options.Count)
+            if (menu.Options is not null && menu.Options.Distinct().Count() != menu.Options.Count)
                 throw new InvalidOperationException("Please make sure that there is no duplicates values.");
 
             var builtMenu = menu.Build();
@@ -431,10 +479,10 @@ namespace Discord
         {
             var builtButton = button.Build();
 
-            if(Components.Count >= 5)
+            if (Components.Count >= 5)
                 throw new InvalidOperationException($"Components count reached {MaxChildCount}");
 
-            if (Components.Any(x => x.Type == ComponentType.SelectMenu))
+            if (Components.Any(x => x.Type.IsSelectType()))
                 throw new InvalidOperationException($"A button cannot be added to a row with a SelectMenu");
 
             AddComponent(builtButton);
@@ -458,11 +506,15 @@ namespace Discord
                 case ComponentType.ActionRow:
                     return false;
                 case ComponentType.Button:
-                    if (Components.Any(x => x.Type == ComponentType.SelectMenu))
+                    if (Components.Any(x => x.Type.IsSelectType()))
                         return false;
                     else
                         return Components.Count < 5;
                 case ComponentType.SelectMenu:
+                case ComponentType.ChannelSelect:
+                case ComponentType.MentionableSelect:
+                case ComponentType.RoleSelect:
+                case ComponentType.UserSelect:
                     return Components.Count == 0;
                 default:
                     return false;
@@ -760,6 +812,18 @@ namespace Discord
         }
 
         /// <summary>
+        ///     Gets or sets the type of the current select menu.
+        /// </summary>
+        /// <exception cref="ArgumentException">Type must be a select menu type.</exception>
+        public ComponentType Type
+        {
+            get => _type;
+            set => _type = value.IsSelectType()
+                ? value
+                : throw new ArgumentException("Type must be a select menu type.", nameof(value));
+        }
+
+        /// <summary>
         ///     Gets or sets the placeholder text of the current select menu.
         /// </summary>
         /// <exception cref="ArgumentException" accessor="set"><see cref="Placeholder"/> length exceeds <see cref="MaxPlaceholderLength"/>.</exception>
@@ -815,8 +879,6 @@ namespace Discord
             {
                 if (value != null)
                     Preconditions.AtMost(value.Count, MaxOptionCount, nameof(Options));
-                else
-                    throw new ArgumentNullException(nameof(value), $"{nameof(Options)} cannot be null.");
 
                 _options = value;
             }
@@ -827,11 +889,30 @@ namespace Discord
         /// </summary>
         public bool IsDisabled { get; set; }
 
+        /// <summary>
+        ///     Gets or sets the menu's channel types (only valid on <see cref="ComponentType.ChannelSelect"/>s).
+        /// </summary>
+        public List<ChannelType> ChannelTypes { get; set; }
+
+        public List<SelectMenuDefaultValue> DefaultValues
+        {
+            get => _defaultValues;
+            set
+            {
+                if (value != null)
+                    Preconditions.AtMost(value.Count, MaxOptionCount, nameof(DefaultValues));
+
+                _defaultValues = value;
+            }
+        }
+
         private List<SelectMenuOptionBuilder> _options = new List<SelectMenuOptionBuilder>();
         private int _minValues = 1;
         private int _maxValues = 1;
         private string _placeholder;
         private string _customId;
+        private ComponentType _type = ComponentType.SelectMenu;
+        private List<SelectMenuDefaultValue> _defaultValues = new();
 
         /// <summary>
         ///     Creates a new instance of a <see cref="SelectMenuBuilder"/>.
@@ -851,6 +932,7 @@ namespace Discord
             Options = selectMenu.Options?
                .Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault))
                .ToList();
+            DefaultValues = selectMenu.DefaultValues?.ToList();
         }
 
         /// <summary>
@@ -862,7 +944,10 @@ namespace Discord
         /// <param name="maxValues">The max values of this select menu.</param>
         /// <param name="minValues">The min values of this select menu.</param>
         /// <param name="isDisabled">Disabled this select menu or not.</param>
-        public SelectMenuBuilder(string customId, List<SelectMenuOptionBuilder> options, string placeholder = null, int maxValues = 1, int minValues = 1, bool isDisabled = false)
+        /// <param name="type">The <see cref="ComponentType"/> of this select menu.</param>
+        /// <param name="channelTypes">The types of channels this menu can select (only valid on <see cref="ComponentType.ChannelSelect"/>s)</param>
+        public SelectMenuBuilder(string customId, List<SelectMenuOptionBuilder> options = null, string placeholder = null, int maxValues = 1, int minValues = 1,
+            bool isDisabled = false, ComponentType type = ComponentType.SelectMenu, List<ChannelType> channelTypes = null, List<SelectMenuDefaultValue> defaultValues = null)
         {
             CustomId = customId;
             Options = options;
@@ -870,6 +955,9 @@ namespace Discord
             IsDisabled = isDisabled;
             MaxValues = maxValues;
             MinValues = minValues;
+            Type = type;
+            ChannelTypes = channelTypes ?? new();
+            DefaultValues = defaultValues ?? new();
         }
 
         /// <summary>
@@ -978,6 +1066,48 @@ namespace Discord
         }
 
         /// <summary>
+        ///     Add one default value to menu options.
+        /// </summary>
+        /// <param name="id">The id of an entity to add.</param>
+        /// <param name="type">The type of an entity to add.</param>
+        /// <exception cref="InvalidOperationException">Default values count reached <see cref="MaxOptionCount"/>.</exception>
+        /// <returns>
+        ///     The current builder.
+        /// </returns>
+        public SelectMenuBuilder AddDefaultValue(ulong id, SelectDefaultValueType type)
+            => AddDefaultValue(new(id, type)); 
+
+        /// <summary>
+        ///     Add one default value to menu options.
+        /// </summary>
+        /// <param name="value">The default value to add.</param>
+        /// <exception cref="InvalidOperationException">Default values count reached <see cref="MaxOptionCount"/>.</exception>
+        /// <returns>
+        ///     The current builder.
+        /// </returns>
+        public SelectMenuBuilder AddDefaultValue(SelectMenuDefaultValue value)
+        {
+            if (DefaultValues.Count >= MaxOptionCount)
+                throw new InvalidOperationException($"Options count reached {MaxOptionCount}.");
+
+            DefaultValues.Add(value);
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the field default values.
+        /// </summary>
+        /// <param name="defaultValues">The value to set the field default values to.</param>
+        /// <returns>
+        ///     The current builder.
+        /// </returns>
+        public SelectMenuBuilder WithDefaultValues(params SelectMenuDefaultValue[] defaultValues)
+        {
+            DefaultValues = defaultValues?.ToList();
+            return this;
+        }
+
+        /// <summary>
         ///     Sets whether the current menu is disabled.
         /// </summary>
         /// <param name="isDisabled">Whether the current menu is disabled or not.</param>
@@ -991,6 +1121,47 @@ namespace Discord
         }
 
         /// <summary>
+        ///     Sets the menu's current type.
+        /// </summary>
+        /// <param name="type">The type of the menu.</param>
+        /// <returns>
+        ///     The current builder.
+        /// </returns>
+        public SelectMenuBuilder WithType(ComponentType type)
+        {
+            Type = type;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the menus valid channel types (only for <see cref="ComponentType.ChannelSelect"/>s).
+        /// </summary>
+        /// <param name="channelTypes">The valid channel types of the menu.</param>
+        /// <returns>
+        ///     The current builder.
+        /// </returns>
+        public SelectMenuBuilder WithChannelTypes(List<ChannelType> channelTypes)
+        {
+            ChannelTypes = channelTypes;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the menus valid channel types (only for <see cref="ComponentType.ChannelSelect"/>s).
+        /// </summary>
+        /// <param name="channelTypes">The valid channel types of the menu.</param>
+        /// <returns>
+        ///     The current builder.
+        /// </returns>
+        public SelectMenuBuilder WithChannelTypes(params ChannelType[] channelTypes)
+        {
+            ChannelTypes = channelTypes is null
+                ? ChannelTypeUtils.AllChannelTypes()
+                : channelTypes.ToList();
+            return this;
+        }
+
+        /// <summary>
         ///     Builds a <see cref="SelectMenuComponent"/>
         /// </summary>
         /// <returns>The newly built <see cref="SelectMenuComponent"/></returns>
@@ -998,7 +1169,7 @@ namespace Discord
         {
             var options = Options?.Select(x => x.Build()).ToList();
 
-            return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, IsDisabled);
+            return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, IsDisabled, Type, ChannelTypes, DefaultValues);
         }
     }
 
@@ -1296,6 +1467,9 @@ namespace Discord
         /// <exception cref="ArgumentOutOfRangeException">
         ///     <see cref="Value"/>.Length is greater than <see cref="LargestMaxLength"/> or <see cref="MaxLength"/>.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     <see cref="Style"/> is <see cref="TextInputStyle.Short"/> and <see cref="Value"/> contains a new line character.
+        /// </exception>
         public string Value
         {
             get => _value;
@@ -1305,6 +1479,7 @@ namespace Discord
                     throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be longer than {MaxLength ?? LargestMaxLength}.");
                 if (value?.Length < (MinLength ?? 0))
                     throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be shorter than {MinLength}");
+
                 _value = value;
             }
         }
@@ -1440,6 +1615,9 @@ namespace Discord
                 throw new ArgumentException("TextInputComponents must have a custom id.", nameof(CustomId));
             if (string.IsNullOrWhiteSpace(Label))
                 throw new ArgumentException("TextInputComponents must have a label.", nameof(Label));
+            if (Style == TextInputStyle.Short && Value?.Contains('\n') == true)
+                throw new ArgumentException($"Value must not contain new line characters when style is {TextInputStyle.Short}.", nameof(Value));
+
             return new TextInputComponent(CustomId, Label, Placeholder, MinLength, MaxLength, Style, Required, Value);
         }
     }

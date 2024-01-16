@@ -25,13 +25,14 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the message.</param>
         /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
-        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> is permitted.</param>
+        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/>
+        /// and <see cref="MessageFlags.SuppressNotification"/> is permitted.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
@@ -66,13 +67,13 @@ namespace Discord
         /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
         /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
-        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> is permitted.</param>
+        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.SuppressNotification"/> is permitted.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
@@ -104,13 +105,13 @@ namespace Discord
         /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
         /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
-        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> is permitted.</param>
+        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.SuppressNotification"/> is permitted.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
@@ -134,13 +135,13 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
         /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
-        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> is permitted.</param>
+        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.SuppressNotification"/> is permitted.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
@@ -164,13 +165,13 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
         /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
-        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> is permitted.</param>
+        /// <param name="flags">A message flag to be applied to the sent message, only <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.SuppressNotification"/> is permitted.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
@@ -185,7 +186,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents an asynchronous get operation for retrieving the message. The task result contains
-        ///     the retrieved message; <c>null</c> if no message is found with the specified identifier.
+        ///     the retrieved message; <see langword="null" /> if no message is found with the specified identifier.
         /// </returns>
         Task<IMessage> GetMessageAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
@@ -222,7 +223,7 @@ namespace Discord
         /// <returns>
         ///     Paged collection of messages.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, 
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch,
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
         ///     Gets a collection of messages in this channel.
@@ -263,7 +264,7 @@ namespace Discord
         /// <returns>
         ///     Paged collection of messages.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, 
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch,
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
         ///     Gets a collection of messages in this channel.
@@ -300,7 +301,7 @@ namespace Discord
         /// <returns>
         ///     Paged collection of messages.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, 
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch,
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
         ///     Gets a collection of pinned messages in this channel.

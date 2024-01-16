@@ -33,14 +33,31 @@ namespace Discord.WebSocket
             }
             else if (dir == Direction.After)
             {
-                limit -= cachedMessages.Count;
-                if (mode == CacheMode.CacheOnly || limit <= 0)
+                if (mode == CacheMode.CacheOnly)
                     return result;
 
+                bool ignoreCache = false;
+
+                // We can find two cases:
+                // 1. fromMessageId is not null and corresponds to a message that is not in the cache,
+                // so we have to make a request and ignore the cache
+                if (fromMessageId.HasValue && messages?.Get(fromMessageId.Value) == null)
+                {
+                    ignoreCache = true;
+                }
+                // 2. fromMessageId is null or already in the cache, so we start from the cache
+                else if (cachedMessages.Count > 0)
+                {
+                    fromMessageId = cachedMessages.Max(x => x.Id);
+                    limit -= cachedMessages.Count;
+
+                    if (limit <= 0)
+                        return result;
+                }
+
                 //Download remaining messages
-                ulong maxId = cachedMessages.Count > 0 ? cachedMessages.Max(x => x.Id) : fromMessageId.Value;
-                var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, maxId, dir, limit, options);
-                if (cachedMessages.Count != 0)
+                var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, fromMessageId, dir, limit, options);
+                if (!ignoreCache && cachedMessages.Count != 0)
                     return result.Concat(downloadedMessages);
                 else
                     return downloadedMessages;
@@ -68,11 +85,20 @@ namespace Discord.WebSocket
         {
             switch (channel)
             {
-                case SocketDMChannel dmChannel: dmChannel.AddMessage(msg); break;
-                case SocketGroupChannel groupChannel: groupChannel.AddMessage(msg); break;
-                case SocketThreadChannel threadChannel: threadChannel.AddMessage(msg); break;
-                case SocketTextChannel textChannel: textChannel.AddMessage(msg); break;
-                default: throw new NotSupportedException($"Unexpected {nameof(ISocketMessageChannel)} type.");
+                case SocketDMChannel dmChannel:
+                    dmChannel.AddMessage(msg);
+                    break;
+                case SocketGroupChannel groupChannel:
+                    groupChannel.AddMessage(msg);
+                    break;
+                case SocketThreadChannel threadChannel:
+                    threadChannel.AddMessage(msg);
+                    break;
+                case SocketTextChannel textChannel:
+                    textChannel.AddMessage(msg);
+                    break;
+                default:
+                    throw new NotSupportedException($"Unexpected {nameof(ISocketMessageChannel)} type.");
             }
         }
         /// <exception cref="NotSupportedException">Unexpected <see cref="ISocketMessageChannel"/> type.</exception>

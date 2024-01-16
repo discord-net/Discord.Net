@@ -17,7 +17,7 @@ namespace Discord.Rest
         internal RestMessageCommand(DiscordRestClient client, Model model)
             : base(client, model)
         {
-            
+
         }
 
         internal new static async Task<RestMessageCommand> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)
@@ -34,7 +34,7 @@ namespace Discord.Rest
             var dataModel = model.Data.IsSpecified
                 ? (DataModel)model.Data.Value
                 : null;
-            
+
             Data = await RestMessageCommandData.CreateAsync(client, dataModel, Guild, Channel, doApiCall).ConfigureAwait(false);
         }
 

@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Respresents a <see cref="IMessageComponent"/> text input.
+    ///     Represents a <see cref="IMessageComponent"/> text input.
     /// </summary>
     public class TextInputComponent : IMessageComponent
     {
@@ -17,7 +17,7 @@ namespace Discord
         public string Label { get; }
 
         /// <summary>
-        ///     Gets the placeholder of the component. 
+        ///     Gets the placeholder of the component.
         /// </summary>
         public string Placeholder { get; }
 
@@ -46,7 +46,7 @@ namespace Discord
         /// </summary>
         public string Value { get; }
 
-        internal TextInputComponent(string customId, string label, string placeholder, int? minLength, int? maxLength, 
+        internal TextInputComponent(string customId, string label, string placeholder, int? minLength, int? maxLength,
             TextInputStyle style, bool? required, string value)
         {
             CustomId = customId;

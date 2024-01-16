@@ -1,8 +1,8 @@
 using Discord.Commands.Builders;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -162,20 +162,20 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null, IServiceProvider services = null)
+        public Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null, IServiceProvider services = null)
         {
             services ??= EmptyServiceProvider.Instance;
 
             if (!searchResult.IsSuccess)
-                return ParseResult.FromError(searchResult);
+                return Task.FromResult(ParseResult.FromError(searchResult));
             if (preconditionResult != null && !preconditionResult.IsSuccess)
-                return ParseResult.FromError(preconditionResult);
+                return Task.FromResult(ParseResult.FromError(preconditionResult));
 
             string input = searchResult.Text.Substring(startIndex);
 
-            return await CommandParser.ParseArgsAsync(this, context, _commandService._ignoreExtraArgs, services, input, 0, _commandService._quotationMarkAliasMap).ConfigureAwait(false);
+            return CommandParser.ParseArgsAsync(this, context, _commandService._ignoreExtraArgs, services, input, 0, _commandService._quotationMarkAliasMap);
         }
-        
+
         public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
         {
             if (!parseResult.IsSuccess)
