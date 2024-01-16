@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Discord.API;
 
-public class RoleConnection
+internal class RoleConnection
 {
     [JsonProperty("platform_name")]
     public Optional<string> PlatformName { get; set; }

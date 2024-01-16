@@ -76,7 +76,7 @@ namespace Discord.Rest
         /// </exception>
         /// <returns>
         ///     A task representing the asynchronous get operation. The task result contains a guild user object that
-        ///     represents the user; <c>null</c> if none is found.
+        ///     represents the user; <see langword="null" /> if none is found.
         /// </returns>
         public Task<RestGuildUser> GetUserAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetUserAsync(this, Guild, Discord, id, options);
@@ -127,7 +127,7 @@ namespace Discord.Rest
         /// invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="filePath" /> is <c>null</c>.
+        /// <paramref name="filePath" /> is <see langword="null" />.
         /// </exception>
         /// <exception cref="PathTooLongException">
         /// The specified path, file name, or both exceed the system-defined maximum length. For example, on
@@ -227,7 +227,7 @@ namespace Discord.Rest
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a webhook associated
-        ///     with the identifier; <c>null</c> if the webhook is not found.
+        ///     with the identifier; <see langword="null" /> if the webhook is not found.
         /// </returns>
         public virtual Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
@@ -280,7 +280,7 @@ namespace Discord.Rest
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the category channel
-        ///     representing the parent of this channel; <c>null</c> if none is set.
+        ///     representing the parent of this channel; <see langword="null" /> if none is set.
         /// </returns>
         public virtual Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
             => ChannelHelper.GetCategoryAsync(this, Discord, options);

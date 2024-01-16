@@ -8,6 +8,14 @@ namespace Discord;
 public interface IForumTag
 {
     /// <summary>
+    ///     Gets the Id of the tag.
+    ///</summary>
+    /// <remarks>
+    ///     This property may be <see langword="null"/> if the object is <see cref="ForumTagProperties"/>.
+    /// </remarks>
+    ulong? Id { get; }
+
+    /// <summary>
     ///     Gets the name of the tag.
     /// </summary>
     string Name { get; }

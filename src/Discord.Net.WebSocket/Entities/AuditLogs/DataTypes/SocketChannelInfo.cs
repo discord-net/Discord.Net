@@ -81,7 +81,7 @@ public struct SocketChannelInfo
     ///     Gets the type of this channel.
     /// </summary>
     /// <returns>
-    ///     The channel type of this channel; <c>null</c> if not applicable.
+    ///     The channel type of this channel; <see langword="null" /> if not applicable.
     /// </returns>
     public ChannelType? ChannelType { get; }
 

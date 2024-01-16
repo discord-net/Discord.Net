@@ -170,7 +170,7 @@ namespace Discord
         ///     Gets or sets whether the initial log entry should be printed.
         /// </summary>
         /// <remarks>
-        ///     If set to <c>true</c>, the library will attempt to print the current version of the library, as well as
+        ///     If set to <see langword="true" />, the library will attempt to print the current version of the library, as well as
         ///     the API version it uses on startup.
         /// </remarks>
         internal bool DisplayInitialLog { get; set; } = true;
@@ -179,7 +179,7 @@ namespace Discord
         /// 	Gets or sets whether or not rate-limits should use the system clock.
         /// </summary>
         /// <remarks>
-        ///		If set to <c>false</c>, we will use the X-RateLimit-Reset-After header
+        ///		If set to <see langword="false" />, we will use the X-RateLimit-Reset-After header
         ///		to determine when a rate-limit expires, rather than comparing the
         ///		X-RateLimit-Reset timestamp to the system time.
         ///
@@ -232,5 +232,29 @@ namespace Discord
         ///     Returns the max length of an application description.
         /// </summary>
         public const int MaxApplicationDescriptionLength = 400;
+
+        /// <summary>
+        ///     Returns the max amount of tags applied to an application.
+        /// </summary>
+        public const int MaxApplicationTagCount = 5;
+
+        /// <summary>
+        ///     Returns the factor to reduce the heartbeat interval.
+        /// </summary>
+        /// <remarks>
+        ///     If a heartbeat takes longer than the interval estimated by Discord, the connection will be closed.
+        ///     This factor is used to reduce the interval and ensure that Discord will get the heartbeat within the estimated interval.
+        /// </remarks>
+        internal const double HeartbeatIntervalFactor = 0.9;
+
+        /// <summary>
+        ///     Returns the maximum length of a voice channel status.
+        /// </summary>
+        public const int MaxVoiceChannelStatusLength = 500;
+      
+        /// <summary>
+        ///     Returns the maximum number of entitlements that can be gotten per-batch.
+        /// </summary>
+        public const int MaxEntitlementsPerBatch = 100;
     }
 }

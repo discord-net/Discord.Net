@@ -11,8 +11,8 @@ namespace Discord
         ///     Gets a value that indicates whether this user is deafened by the guild.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the user is deafened (i.e. not permitted to listen to or speak to others) by the guild;
-        ///     otherwise <c>false</c>.
+        ///     <see langword="true" /> if the user is deafened (i.e. not permitted to listen to or speak to others) by the guild;
+        ///     otherwise <see langword="false" />.
         /// </returns>
         bool IsDeafened { get; }
         /// <summary>
@@ -20,14 +20,14 @@ namespace Discord
         ///     guild.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this user is muted by the guild; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this user is muted by the guild; otherwise <see langword="false" />.
         /// </returns>
         bool IsMuted { get; }
         /// <summary>
         ///     Gets a value that indicates whether this user has marked themselves as deafened.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this user has deafened themselves (i.e. not permitted to listen to or speak to others); otherwise <c>false</c>.
+        ///     <see langword="true" /> if this user has deafened themselves (i.e. not permitted to listen to or speak to others); otherwise <see langword="false" />.
         /// </returns>
         bool IsSelfDeafened { get; }
         /// <summary>
@@ -35,21 +35,21 @@ namespace Discord
         ///     speak via voice).
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this user has muted themselves; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this user has muted themselves; otherwise <see langword="false" />.
         /// </returns>
         bool IsSelfMuted { get; }
         /// <summary>
         ///     Gets a value that indicates whether the user is muted by the current user.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the guild is temporarily blocking audio to/from this user; otherwise <c>false</c>.
+        ///     <see langword="true" /> if the guild is temporarily blocking audio to/from this user; otherwise <see langword="false" />.
         /// </returns>
         bool IsSuppressed { get; }
         /// <summary>
         ///     Gets the voice channel this user is currently in.
         /// </summary>
         /// <returns>
-        ///     A generic voice channel object representing the voice channel that the user is currently in; <c>null</c>
+        ///     A generic voice channel object representing the voice channel that the user is currently in; <see langword="null" />
         ///     if none.
         /// </returns>
         IVoiceChannel VoiceChannel { get; }
@@ -61,14 +61,14 @@ namespace Discord
         ///     Gets a value that indicates if this user is streaming in a voice channel.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the user is streaming; otherwise <c>false</c>.
+        ///     <see langword="true" /> if the user is streaming; otherwise <see langword="false" />.
         /// </returns>
         bool IsStreaming { get; }
         /// <summary>
         ///     Gets a value that indicates if the user is videoing in a voice channel.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the user has their camera turned on; otherwise <c>false</c>.
+        ///     <see langword="true" /> if the user has their camera turned on; otherwise <see langword="false" />.
         /// </returns>
         bool IsVideoing { get; }
         /// <summary>

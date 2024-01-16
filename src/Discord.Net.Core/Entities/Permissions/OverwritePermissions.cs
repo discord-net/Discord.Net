@@ -83,21 +83,21 @@ namespace Discord
         public PermValue ManageRoles => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageRoles);
         /// <summary> If True, a user may edit the webhooks for this channel. </summary>
         public PermValue ManageWebhooks => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageWebhooks);
-        /// <summary> If <c>true</c>, a user may use slash commands in this guild. </summary>
+        /// <summary> If <see langword="true" />, a user may use slash commands in this guild. </summary>
         public PermValue UseApplicationCommands => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseApplicationCommands);
-        /// <summary> If <c>true</c>, a user may request to speak in stage channels. </summary>
+        /// <summary> If <see langword="true" />, a user may request to speak in stage channels. </summary>
         public PermValue RequestToSpeak => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.RequestToSpeak);
-        /// <summary> If <c>true</c>, a user may manage threads in this guild. </summary>
+        /// <summary> If <see langword="true" />, a user may manage threads in this guild. </summary>
         public PermValue ManageThreads => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageThreads);
-        /// <summary> If <c>true</c>, a user may create public threads in this guild. </summary>
+        /// <summary> If <see langword="true" />, a user may create public threads in this guild. </summary>
         public PermValue CreatePublicThreads => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.CreatePublicThreads);
-        /// <summary> If <c>true</c>, a user may create private threads in this guild. </summary>
+        /// <summary> If <see langword="true" />, a user may create private threads in this guild. </summary>
         public PermValue CreatePrivateThreads => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.CreatePrivateThreads);
-        /// <summary> If <c>true</c>, a user may use external stickers in this guild. </summary>
+        /// <summary> If <see langword="true" />, a user may use external stickers in this guild. </summary>
         public PermValue UseExternalStickers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseExternalStickers);
-        /// <summary> If <c>true</c>, a user may send messages in threads in this guild. </summary>
+        /// <summary> If <see langword="true" />, a user may send messages in threads in this guild. </summary>
         public PermValue SendMessagesInThreads => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendMessagesInThreads);
-        /// <summary> If <c>true</c>, a user launch application activities in voice channels in this guild. </summary>
+        /// <summary> If <see langword="true" />, a user launch application activities in voice channels in this guild. </summary>
         public PermValue StartEmbeddedActivities => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.StartEmbeddedActivities);
 
         /// <summary> Creates a new OverwritePermissions with the provided allow and deny packed values. </summary>

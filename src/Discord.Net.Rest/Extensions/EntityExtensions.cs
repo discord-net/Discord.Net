@@ -201,9 +201,10 @@ namespace Discord.Rest
                             Username = command.User.Username,
                             Avatar = command.User.AvatarId,
                             Bot = command.User.IsBot,
-                            Discriminator = command.User.Discriminator,
+                            Discriminator = command.User.Discriminator == "0000" ? Optional<string>.Unspecified : command.User.Discriminator,
                             PublicFlags = command.User.PublicFlags.HasValue ? command.User.PublicFlags.Value : Optional<UserProperties>.Unspecified,
                             Id = command.User.Id,
+                            GlobalName = command.User.GlobalName,
                         }
                     };
                 }

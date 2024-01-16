@@ -108,16 +108,18 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Formats a user's username + discriminator.
+        ///     Formats a user's username and optional discriminator.
         /// </summary>
         /// <param name="doBidirectional">To format the string in bidirectional unicode or not</param>
         /// <param name="user">The user whose username and discriminator to format</param>
-        /// <returns>The username + discriminator</returns>
+        /// <returns>The username + optional discriminator.</returns>
         public static string UsernameAndDiscriminator(IUser user, bool doBidirectional)
         {
-            return doBidirectional
-                ? $"\u2066{user.Username}\u2069#{user.Discriminator}"
-                : $"{user.Username}#{user.Discriminator}";
+            if (user.DiscriminatorValue != 0)
+                return doBidirectional
+                    ? $"\u2066{user.Username}\u2069#{user.Discriminator}"
+                    : $"{user.Username}#{user.Discriminator}";
+            return user.Username;
         }
     }
 }

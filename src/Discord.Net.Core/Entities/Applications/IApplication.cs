@@ -24,7 +24,7 @@ namespace Discord
         /// </summary>
         ApplicationFlags Flags { get; }
         /// <summary>
-        ///     Gets a collection of install parameters for this application.
+        ///     Gets a collection of install parameters for this application; <see langword="null"/> if disabled.
         /// </summary>
         ApplicationInstallParams InstallParams { get; }
         /// <summary>
@@ -54,45 +54,105 @@ namespace Discord
         /// <summary>
         ///     Gets the url of the app's terms of service.
         /// </summary>
-        public string TermsOfService { get; }
+        string TermsOfService { get; }
         /// <summary>
         ///     Gets the the url of the app's privacy policy.
         /// </summary>
-        public string PrivacyPolicy { get; }
+        string PrivacyPolicy { get; }
 
         /// <summary>
         ///     Gets application's default custom authorization url. <see langword="null" /> if disabled.
         /// </summary>
-        public string CustomInstallUrl { get; }
+        string CustomInstallUrl { get; }
 
         /// <summary>
         ///     Gets the application's role connection verification entry point. <see langword="null" /> if not set.
         /// </summary>
-        public string RoleConnectionsVerificationUrl { get; }
+        string RoleConnectionsVerificationUrl { get; }
 
         /// <summary>
         ///     Gets the hex encoded key for verification in interactions.
         /// </summary>
-        public string VerifyKey { get; }
+        string VerifyKey { get; }
 
         /// <summary>
         ///     Gets the partial guild object of the application's developer's support server. <see langword="null" /> if not set.
         /// </summary>
-        public PartialGuild Guild { get; }
+        PartialGuild Guild { get; }
 
         /// <summary>
         ///     Gets the redirect uris configured for the application.
         /// </summary>
-        public IReadOnlyCollection<string> RedirectUris { get;}
+        IReadOnlyCollection<string> RedirectUris { get;}
 
         /// <summary>
         ///      Gets application's interactions endpoint url. <see langword="null" /> if not set.
         /// </summary>
-        public string InteractionsEndpointUrl { get; }
+        string InteractionsEndpointUrl { get; }
 
         /// <summary>
         ///     Gets the approximate count of the guild the application was added to. <see langword="null" /> if not returned.
         /// </summary>
-        public int? ApproximateGuildCount { get; }
+        int? ApproximateGuildCount { get; }
+
+        /// <summary>
+        ///     Gets the application's discoverability state.
+        /// </summary>
+        ApplicationDiscoverabilityState DiscoverabilityState { get; }
+
+        /// <summary>
+        ///     Gets the application's discovery eligibility flags.
+        /// </summary>
+        DiscoveryEligibilityFlags DiscoveryEligibilityFlags { get; }
+
+        /// <summary>
+        ///     Gets the application's explicit content filter level for uploaded media content used in application commands.
+        /// </summary>
+        ApplicationExplicitContentFilterLevel ExplicitContentFilterLevel { get; }
+
+        /// <summary>
+        ///     Gets whether the bot is allowed to hook into the application's game directly.
+        /// </summary>
+        bool IsHook { get; }
+
+        /// <summary>
+        ///     Gets event types to be sent to the interaction endpoint.
+        /// </summary>
+        IReadOnlyCollection<string> InteractionEventTypes { get; }
+
+        /// <summary>
+        ///     Gets the interactions version application uses.
+        /// </summary>
+        ApplicationInteractionsVersion InteractionsVersion { get; }
+
+        /// <summary>
+        ///     Whether the application has premium subscriptions.
+        /// </summary>
+        bool IsMonetized { get; }
+
+        /// <summary>
+        ///     Gets the application's monetization eligibility flags.
+        /// </summary>
+        ApplicationMonetizationEligibilityFlags MonetizationEligibilityFlags { get; }
+
+        /// <summary>
+        ///     Gets the application's monetization state.
+        /// </summary>
+        ApplicationMonetizationState MonetizationState { get; }
+
+        /// <summary>
+        ///     Gets the application's rpc state.
+        /// </summary>
+        ApplicationRpcState RpcState { get; }
+
+        /// <summary>
+        ///     Gets the application's store state.
+        /// </summary>
+        ApplicationStoreState StoreState { get; }
+
+        /// <summary>
+        ///     Gets the application's verification state.
+        /// </summary>
+        ApplicationVerificationState VerificationState { get; }
     }
 }

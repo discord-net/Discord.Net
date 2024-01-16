@@ -16,7 +16,7 @@ namespace Discord
         ///     Gets a value that indicates whether the channel is NSFW.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the channel has the NSFW flag enabled; otherwise <c>false</c>.
+        ///     <see langword="true" /> if the channel has the NSFW flag enabled; otherwise <see langword="false" />.
         /// </returns>
         bool IsNsfw { get; }
 
@@ -24,7 +24,7 @@ namespace Discord
         ///     Gets the current topic for this text channel.
         /// </summary>
         /// <returns>
-        ///     A string representing the topic set in the channel; <c>null</c> if none is set.
+        ///     A string representing the topic set in the channel; <see langword="null" /> if none is set.
         /// </returns>
         string Topic { get; }
 
@@ -103,7 +103,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the message.</param>
@@ -130,7 +130,7 @@ namespace Discord
         /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
@@ -159,7 +159,7 @@ namespace Discord
         /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
@@ -186,7 +186,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
@@ -212,7 +212,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        ///     If <see langword="null" />, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>

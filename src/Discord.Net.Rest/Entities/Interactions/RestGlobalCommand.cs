@@ -20,8 +20,8 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc/>
-        public override async Task DeleteAsync(RequestOptions options = null)
-            => await InteractionHelper.DeleteGlobalCommandAsync(Discord, this).ConfigureAwait(false);
+        public override Task DeleteAsync(RequestOptions options = null)
+            => InteractionHelper.DeleteGlobalCommandAsync(Discord, this);
 
         /// <summary>
         ///     Modifies this <see cref="RestApplicationCommand"/>.

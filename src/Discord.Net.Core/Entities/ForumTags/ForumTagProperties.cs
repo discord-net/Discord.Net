@@ -7,7 +7,7 @@ public class ForumTagProperties : IForumTag
     /// <summary>
     ///     Gets the Id of the tag.
     /// </summary>
-    public ulong Id { get; }
+    public ulong? Id { get; }
 
     /// <inheritdoc/>
     public string Name { get; }
@@ -18,11 +18,12 @@ public class ForumTagProperties : IForumTag
     /// <inheritdoc/>
     public bool IsModerated { get; }
 
-    internal ForumTagProperties(string name, IEmote? emoji = null, bool isMmoderated = false)
+    internal ForumTagProperties(ulong? id, string name, IEmote? emoji = null, bool isModerated = false)
     {
+        Id = id;
         Name = name;
         Emoji = emoji;
-        IsModerated = isMmoderated;
+        IsModerated = isModerated;
     }
 
     public override int GetHashCode() => (Id, Name, Emoji, IsModerated).GetHashCode();

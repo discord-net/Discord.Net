@@ -12,7 +12,7 @@ namespace Discord
         ///     Gets or sets the user's nickname.
         /// </summary>
         /// <remarks>
-        ///     To clear the user's nickname, this value can be set to <c>null</c> or
+        ///     To clear the user's nickname, this value can be set to <see langword="null" /> or
         ///     <see cref="string.Empty"/>.
         /// </remarks>
         public Optional<string> Nickname { get; set; }
@@ -20,14 +20,14 @@ namespace Discord
         ///     Gets or sets whether the user should be muted in a voice channel.
         /// </summary>
         /// <remarks>
-        ///     If this value is set to <c>true</c>, no user will be able to hear this user speak in the guild.
+        ///     If this value is set to <see langword="true" />, no user will be able to hear this user speak in the guild.
         /// </remarks>
         public Optional<bool> Mute { get; set; }
         /// <summary>
         ///     Gets or sets whether the user should be deafened in a voice channel.
         /// </summary>
         /// <remarks>
-        ///     If this value is set to <c>true</c>, this user will not be able to hear anyone speak in the guild.
+        ///     If this value is set to <see langword="true" />, this user will not be able to hear anyone speak in the guild.
         /// </remarks>
         public Optional<bool> Deaf { get; set; }
         /// <summary>
