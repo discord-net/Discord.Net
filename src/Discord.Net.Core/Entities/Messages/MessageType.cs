@@ -164,7 +164,7 @@ namespace Discord
         IncidentReportFalseAlarm = 39,
 
         /// <summary>
-        /// The message is a purchase notification.
+        ///     The message is a purchase notification.
         /// </summary>
         PurchaseNotification = 44
     }
