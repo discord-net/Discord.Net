@@ -161,6 +161,11 @@ namespace Discord
         /// <summary>
         ///     The message for incident report false alarm.
         /// </summary>
-        IncidentReportFalseAlarm = 39
+        IncidentReportFalseAlarm = 39,
+
+        /// <summary>
+        /// The message is a purchase notification.
+        /// </summary>
+        PurchaseNotification = 44
     }
 }
