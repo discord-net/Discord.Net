@@ -10,10 +10,11 @@ namespace Discord.WebSocket;
 /// </summary>
 public class SocketMemberRoleAuditLogData : ISocketAuditLogData
 {
-    private SocketMemberRoleAuditLogData(IReadOnlyCollection<SocketMemberRoleEditInfo> roles, Cacheable<SocketUser, RestUser, IUser, ulong> target)
+    private SocketMemberRoleAuditLogData(IReadOnlyCollection<SocketMemberRoleEditInfo> roles, Cacheable<SocketUser, RestUser, IUser, ulong> target, string integrationType)
     {
         Roles = roles;
         Target = target;
+        IntegrationType = integrationType;
     }
 
     internal static SocketMemberRoleAuditLogData Create(DiscordSocketClient discord, EntryModel entry)
@@ -36,7 +37,7 @@ public class SocketMemberRoleAuditLogData : ISocketAuditLogData
                 return user is not null ? RestUser.Create(discord, user) : null;
             });
 
-        return new SocketMemberRoleAuditLogData(roleInfos.ToReadOnlyCollection(), cacheableUser);
+        return new SocketMemberRoleAuditLogData(roleInfos.ToReadOnlyCollection(), cacheableUser, entry.Options?.IntegrationType);
     }
 
     /// <summary>
@@ -55,4 +56,9 @@ public class SocketMemberRoleAuditLogData : ISocketAuditLogData
     ///     A cacheable user object representing the user that the role changes were performed on.
     /// </returns>
     public Cacheable<SocketUser, RestUser, IUser, ulong> Target { get; }
+
+    /// <summary>
+    ///     Gets the type of integration which performed the action. <see langword="null"/> if the action was performed by a user.
+    /// </summary>
+    public string IntegrationType { get; }
 }

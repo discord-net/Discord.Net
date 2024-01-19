@@ -648,7 +648,6 @@ namespace Discord.WebSocket
             if (ConnectionState == ConnectionState.Connected)
             {
                 EnsureGatewayIntent(GatewayIntents.GuildMembers);
-
                 //Race condition leads to guilds being requested twice, probably okay
                 return ProcessUserDownloadsAsync(guilds.Select(x => GetGuild(x.Id)).Where(x => x != null));
             }
@@ -997,7 +996,14 @@ namespace Discord.WebSocket
                                                 return;
 
                                             if (BaseConfig.AlwaysDownloadUsers)
-                                                _ = DownloadUsersAsync(Guilds.Where(x => x.IsAvailable && !x.HasAllMembers));
+                                                try
+                                                {
+                                                    _ = DownloadUsersAsync(Guilds.Where(x => x.IsAvailable && !x.HasAllMembers));
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    await _gatewayLogger.WarningAsync(ex);
+                                                }
 
                                             await TimedInvokeAsync(_readyEvent, nameof(Ready)).ConfigureAwait(false);
                                             await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
