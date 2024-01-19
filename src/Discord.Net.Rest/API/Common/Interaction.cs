@@ -54,5 +54,8 @@ namespace Discord.API
 
         [JsonProperty("authorizing_integration_owners")]
         public Dictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; set; }
+
+        [JsonProperty("context")]
+        public Optional<ApplicationCommandContextType> ContextType { get; set; }
     }
 }

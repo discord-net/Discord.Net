@@ -90,11 +90,14 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public ulong ApplicationId { get; private set; }
 
+        /// <inheritdoc/>
+        public ApplicationCommandContextType? ContextType { get; private set; }
+
         /// <inheritdoc cref="IDiscordInteraction.Entitlements" />
         public IReadOnlyCollection<RestEntitlement> Entitlements { get; private set; }
 
         /// <inheritdoc/>
-        public Dictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; private set; }
+        public IReadOnlyDictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; private set; }
 
         internal RestInteraction(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -237,6 +240,9 @@ namespace Discord.Rest
             Entitlements = model.Entitlements.Select(x => RestEntitlement.Create(discord, x)).ToImmutableArray();
 
             IntegrationOwners = model.IntegrationOwners;
+            ContextType = model.ContextType.IsSpecified
+                ? model.ContextType.Value
+                : null;
         }
 
         internal string SerializePayload(object payload)

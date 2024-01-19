@@ -97,6 +97,16 @@ namespace Discord
         IReadOnlyCollection<IEntitlement> Entitlements { get; }
 
         /// <summary>
+        ///     Gets which integrations authorized the interaction.
+        /// </summary>
+        IReadOnlyDictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; }
+
+        /// <summary>
+        ///     Gets the context this interaction was created in. <see langword="null"/> if context type is unknown.
+        /// </summary>
+        ApplicationCommandContextType? ContextType { get;  }
+
+        /// <summary>
         ///     Responds to an Interaction with type <see cref="InteractionResponseType.ChannelMessageWithSource"/>.
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>

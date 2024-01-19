@@ -73,11 +73,14 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public ulong ApplicationId { get; private set; }
 
+        /// <inheritdoc/>
+        public ApplicationCommandContextType? ContextType { get; private set; }
+
         /// <inheritdoc cref="IDiscordInteraction.Entitlements" />
         public IReadOnlyCollection<RestEntitlement> Entitlements { get; private set; }
 
         /// <inheritdoc/>
-        public Dictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; private set; }
+        public IReadOnlyDictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; private set; }
 
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel, SocketUser user)
             : base(client, id)
@@ -154,6 +157,9 @@ namespace Discord.WebSocket
             Entitlements = model.Entitlements.Select(x => RestEntitlement.Create(Discord, x)).ToImmutableArray();
 
             IntegrationOwners = model.IntegrationOwners;
+            ContextType = model.ContextType.IsSpecified
+                ? model.ContextType.Value
+                : null;
         }
 
         /// <summary>
