@@ -55,11 +55,18 @@ namespace Discord.Rest
                         ? null
                         : new InstallParams
                         {
-                            Permission = (ulong)args.InstallParams.Value.Permission,
+                            Permission = args.InstallParams.Value.Permission,
                             Scopes = args.InstallParams.Value.Scopes.ToArray()
                         }
                     : Optional<InstallParams>.Unspecified,
-                IntegrationTypes = args.IntegrationTypes
+                IntegrationTypes = args.IntegrationTypes,
+                IntegrationTypesConfig = args.IntegrationTypesConfig.IsSpecified
+                    ? args.IntegrationTypesConfig.Value?.ToDictionary(x => x.Key, x => new InstallParams
+                    {
+                        Permission = x.Value.Permission,
+                        Scopes = x.Value.Scopes.ToArray()
+                    })
+                    : Optional<Dictionary<ApplicationIntegrationType, InstallParams>>.Unspecified
             }, options);
         }
 

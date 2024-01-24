@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Discord.API.Rest;
 
@@ -33,4 +34,7 @@ internal class ModifyCurrentApplicationBotParams
 
     [JsonProperty("integration_types")]
     public Optional<ApplicationIntegrationType[]> IntegrationTypes { get; set; }
+
+    [JsonProperty("integration_types_config")]
+    public Optional<Dictionary<ApplicationIntegrationType, InstallParams>> IntegrationTypesConfig { get; set; }
 } 

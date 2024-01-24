@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Discord;
 
 /// <summary>
@@ -58,5 +60,10 @@ public class ModifyApplicationProperties
     ///     Gets or sets application integration types of the application.
     /// </summary>
     public Optional<ApplicationIntegrationType[]> IntegrationTypes { get; set; }
+
+    /// <summary>
+    ///     Gets or sets application install params configured for integration install types.
+    /// </summary>
+    public Optional<Dictionary<ApplicationIntegrationType, ApplicationInstallParams>> IntegrationTypesConfig { get; set; }
 
 }

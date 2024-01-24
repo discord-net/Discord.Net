@@ -159,5 +159,10 @@ namespace Discord
         ///     Gets integration types configured for the application.
         /// </summary>
         IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
+
+        /// <summary>
+        ///     Gets application install params configured for integration install types.
+        /// </summary>
+        IReadOnlyDictionary<ApplicationIntegrationType, ApplicationInstallParams> IntegrationTypesConfig { get; }
     }
 }
