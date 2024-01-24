@@ -32,9 +32,6 @@ internal class ModifyCurrentApplicationBotParams
     [JsonProperty("tags")]
     public Optional<string[]> Tags { get; set; }
 
-    [JsonProperty("integration_types")]
-    public Optional<ApplicationIntegrationType[]> IntegrationTypes { get; set; }
-
     [JsonProperty("integration_types_config")]
     public Optional<Dictionary<ApplicationIntegrationType, InstallParams>> IntegrationTypesConfig { get; set; }
 } 

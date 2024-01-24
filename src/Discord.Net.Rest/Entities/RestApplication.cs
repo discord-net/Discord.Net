@@ -105,9 +105,6 @@ namespace Discord.Rest
         public IReadOnlyCollection<string> Tags { get; private set; }
 
         /// <inheritdoc />
-        public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; private set; }
-
-        /// <inheritdoc />
         public IReadOnlyDictionary<ApplicationIntegrationType, ApplicationInstallParams> IntegrationTypesConfig { get; private set; }
 
         internal RestApplication(BaseDiscordClient discord, ulong id)
@@ -172,9 +169,7 @@ namespace Discord.Rest
             RpcState = model.RpcState.GetValueOrDefault(ApplicationRpcState.Disabled);
             StoreState = model.StoreState.GetValueOrDefault(ApplicationStoreState.None);
             VerificationState = model.VerificationState.GetValueOrDefault(ApplicationVerificationState.Ineligible);
-
-            IntegrationTypes = model.IntegrationTypes.GetValueOrDefault([ApplicationIntegrationType.GuildInstall]).ToImmutableArray();
-
+            
             var dict = new Dictionary<ApplicationIntegrationType, ApplicationInstallParams>();
             if (model.IntegrationTypesConfig.IsSpecified)
             {

@@ -59,7 +59,6 @@ namespace Discord.Rest
                             Scopes = args.InstallParams.Value.Scopes.ToArray()
                         }
                     : Optional<InstallParams>.Unspecified,
-                IntegrationTypes = args.IntegrationTypes,
                 IntegrationTypesConfig = args.IntegrationTypesConfig.IsSpecified
                     ? args.IntegrationTypesConfig.Value?.ToDictionary(x => x.Key, x => new InstallParams
                     {
