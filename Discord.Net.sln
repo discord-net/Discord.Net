@@ -52,7 +52,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.V4.Rest", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.V4.Core", "src\Discord.Net.V4.Core\Discord.Net.V4.Core.csproj", "{3277421C-AD38-43A7-89EB-D4E1F866004E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.V4.Audio", "Discord.Net.V4.Audio\Discord.Net.V4.Audio.csproj", "{EE97E2F3-8A85-46D4-A5D6-EE985047F9F6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.V4.Audio", "src\Discord.Net.V4.Audio\Discord.Net.V4.Audio.csproj", "{EE97E2F3-8A85-46D4-A5D6-EE985047F9F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
