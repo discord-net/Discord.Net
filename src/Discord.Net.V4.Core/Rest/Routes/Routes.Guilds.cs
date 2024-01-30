@@ -185,7 +185,7 @@ public partial class Routes
     public static ApiBodyRoute<ModifyGuildMfaLevelParams, MfaLevelResponse> ModifyGuildMfaLevel(ulong guildId, ModifyGuildMfaLevelParams body)
         => new(nameof(ModifyGuildMfaLevel),
             RequestMethod.Patch,
-            $"guilds/{guildId}/mfa-level",
+            $"guilds/{guildId}/mfa",
             body,
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
