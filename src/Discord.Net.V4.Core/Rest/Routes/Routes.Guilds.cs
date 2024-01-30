@@ -182,14 +182,13 @@ public partial class Routes
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    // TODO: fix
-    //public static ApiBodyRoute<ModifyGuildMfaLevelParams, MfaLevel> ModifyGuildMfaLevel(ulong guildId, ModifyGuildMfaLevelParams body)
-    //    => new(nameof(ModifyGuildMfaLevel),
-    //        RequestMethod.Patch,
-    //        $"guilds/{guildId}/mfa-level",
-    //        body,
-    //        ContentType.JsonBody,
-    //        (ScopeType.Guild, guildId));
+    public static ApiBodyRoute<ModifyGuildMfaLevelParams, MfaLevelResponse> ModifyGuildMfaLevel(ulong guildId, ModifyGuildMfaLevelParams body)
+        => new(nameof(ModifyGuildMfaLevel),
+            RequestMethod.Patch,
+            $"guilds/{guildId}/mfa-level",
+            body,
+            ContentType.JsonBody,
+            (ScopeType.Guild, guildId));
 
     public static BasicApiRoute DeleteGuildRole(ulong guildId, ulong roleId)
         => new(nameof(DeleteGuildRole),
