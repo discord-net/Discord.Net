@@ -10,6 +10,7 @@ public enum JoinSourceType
 
     ServerDiscovery = 3,
 
+    StudentHub = 4,
 
     InviteCode = 5,
 
