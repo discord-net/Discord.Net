@@ -42,6 +42,13 @@ FAQ. Read it thoroughly because most common questions are already answered there
 If you still have unanswered questions after reading the [FAQ](xref:FAQ.Basics.GetStarted), further support is available on
 [Discord](https://discord.gg/dnet).
 
+## Supporting Discord.Net
+
+Discord.Net is an MIT-licensed open source project with its development made possible entirely by volunteers. 
+If you'd like to support our efforts financially, please consider:
+
+- [Contributing on Open Collective](https://opencollective.com/discordnet).
+
 ## New in V3
 
 #### Interaction Framework

@@ -413,8 +413,9 @@ namespace Discord.Interactions.Builders
                 }
                 catch (Exception ex)
                 {
-                    await commandService._cmdLogger.ErrorAsync(ex).ConfigureAwait(false);
-                    return ExecuteResult.FromError(ex);
+                    var interactionException = new InteractionException(commandInfo, context, ex);
+                    await commandService._cmdLogger.ErrorAsync(interactionException).ConfigureAwait(false);
+                    return ExecuteResult.FromError(interactionException);
                 }
                 finally
                 {

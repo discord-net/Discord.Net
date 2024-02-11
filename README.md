@@ -23,6 +23,13 @@ Discord.Net is an unofficial .NET API Wrapper for the Discord client (https://di
 
 - https://discordnet.dev
 
+## 🩷 Supporting Discord.Net
+
+Discord.Net is an MIT-licensed open source project with its development made possible entirely by volunteers. 
+If you'd like to support our efforts financially, please consider:
+
+- [Contributing on Open Collective](https://opencollective.com/discordnet).
+
 ## 📥 Installation
 
 ### Stable (NuGet)

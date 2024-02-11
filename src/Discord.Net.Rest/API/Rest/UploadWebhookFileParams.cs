@@ -23,6 +23,7 @@ namespace Discord.API.Rest
         public Optional<ActionRowComponent[]> MessageComponents { get; set; }
         public Optional<MessageFlags> Flags { get; set; }
         public Optional<string> ThreadName { get; set; }
+        public Optional<ulong[]> AppliedTags { get; set; }
 
         public UploadWebhookFileParams(params FileAttachment[] files)
         {
@@ -54,6 +55,8 @@ namespace Discord.API.Rest
                 payload["flags"] = Flags.Value;
             if (ThreadName.IsSpecified)
                 payload["thread_name"] = ThreadName.Value;
+            if (AppliedTags.IsSpecified)
+                payload["applied_tags"] = AppliedTags.Value;
 
             List<object> attachments = new();
 
