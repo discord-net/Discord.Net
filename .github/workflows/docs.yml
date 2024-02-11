@@ -26,7 +26,7 @@ jobs:
       run: docfx docs/docfx.json
 
     - name: Create Output Directory
-      run: mkdir output | mkdir output/latest | cp -a docs/_site/. ~/output/latest/.
+      run: mkdir output | mkdir output/latest | cp -a docs/_site/. output/latest/.
         
     - name: Auth DNet bot
       id: bot_auth
