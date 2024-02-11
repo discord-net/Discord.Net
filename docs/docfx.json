@@ -4,14 +4,12 @@
       "src": [
         {
           "src": "../src",
-          "files": ["**.csproj"]
+          "files": ["**/*.csproj"],
+          "exclude": ["Discord.Net.DebugTools/*.csproj"]
         }
       ],
       "dest": "api",
-      "filter": "filterConfig.yml",
-      "properties": {
-        "TargetFramework": "net5.0"
-      }
+      "filter": "filterConfig.yml"
     }
   ],
   "build": {
@@ -41,21 +39,21 @@
           "langwordMapping.yml",
           "marketing/logo/**.svg",
           "marketing/logo/**.png",
-          "favicon.ico"
+          "favicon.ico",
+          "../src/Discord.Net.Examples/**.cs"
         ]
       }
     ],
-    "dest": "_site",
+    "output": "_site",
     "template": [
       "default",
-      "_template/light-dark-theme",
-      "_template/last-modified",
+      "modern",
+      "_template/material",
       "_template/description-generator"
     ],
     "postProcessors": [
       "ExtractSearchIndex",
-      "LastModifiedPostProcessor",
-      "DescriptionPostProcessor"
+      "DescriptionPostProcessor"	  
     ],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
@@ -65,6 +63,6 @@
       "_appLogoPath": "marketing/logo/SVG/Logomark Purple.svg",
       "_appFaviconPath": "favicon.ico"
     },
-    "xrefService": ["https://xref.docs.microsoft.com/query?uid={uid}"]
+    "xrefService": ["https://learn.microsoft.com/api/xref/query?uid={uid}"]
   }
 }
