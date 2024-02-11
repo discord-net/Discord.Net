@@ -21,12 +21,6 @@ jobs:
 
     - name: Setup DocFX
       run: dotnet tool install -g docfx --version 2.71.0
-
-    - name: Build DNet docs
-      run: docfx docs/docfx.json
-
-    - name: Create Output Directory
-      run: mkdir output | mkdir output/latest | cp -a docs/_site/. output/latest/.
         
     - name: Auth DNet bot
       id: bot_auth
@@ -34,6 +28,12 @@ jobs:
       with:
         APP_PEM: ${{ secrets.DNET_BOT_PEM }}
         APP_ID: ${{ secrets.DNET_BOT_ID }}
+
+    - name: Build DNet docs
+      run: docfx docs/docfx.json
+
+    - name: Create Output Directory
+      run: mkdir output | mkdir output/latest | cp -a docs/_site/. output/latest/.
 
     - name: Push to static docs
       uses: cpina/github-action-push-to-another-repository@main
