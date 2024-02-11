@@ -31,8 +31,8 @@ jobs:
       id: bot_auth
       uses: machine-learning-apps/actions-app-token@master
       with:
-        APP_PEM: ${{ secrets.APP_PEM }}
-        APP_ID: ${{ secrets.APP_ID }}
+        APP_PEM: ${{ secrets.DNET_BOT_PEM }}
+        APP_ID: ${{ secrets.DNET_BOT_ID }}
 
     - name: Push to static docs
       uses: cpina/github-action-push-to-another-repository@main
