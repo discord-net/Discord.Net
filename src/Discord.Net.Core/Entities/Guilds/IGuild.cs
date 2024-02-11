@@ -801,6 +801,21 @@ namespace Discord
         /// </returns>
         Task<ITextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null);
         /// <summary>
+        ///     Creates a new announcement channel in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     Announcement channels are only available in Community guilds.
+        /// </remarks>
+        /// <param name="name">The new name for the announcement channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     announcement channel.
+        /// </returns>
+        Task<INewsChannel> CreateNewsChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null);
+
+        /// <summary>
         ///     Creates a new voice channel in this guild.
         /// </summary>
         /// <param name="name">The new name for the voice channel.</param>
