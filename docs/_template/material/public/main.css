@@ -188,12 +188,12 @@ dl.parameters > dt > code {
     padding: 3px;
 }
 
-/* MAKES DERIVED LIST READABLE */
-:is(dl.typelist.derived, dl.typelist.extensionMethods) > dd > div::after {
+/* MAKES INHERITANCE LIST READABLE */
+:is(dl.typelist.inheritedMembers, dl.typelist.extensionMethods) > dd > div::after {
   content: none !important;
 }
 
-:is(dl.typelist.derived, dl.typelist.extensionMethods) > dd > div {
+:is(dl.typelist.inheritedMembers, dl.typelist.extensionMethods) > dd > div {
   display: block !important;
 }
 
@@ -217,7 +217,7 @@ article[data-uid="Root.Landing"] img[alt="logo"] {
 }
 
 /* MAKES SIDEBAR LINKS A BIT MORE DISTINGUISHABLE */
-.affix ul li a {
+.affix ul li a:not(.link-body-emphasis) {
   display: block !important;
   margin-left: 8px !important;
 }
