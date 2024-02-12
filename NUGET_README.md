@@ -5,6 +5,16 @@
 ## 📄 Documentation
 
 - https://discordnet.dev
+- [Sample Projects](https://github.com/discord-net/Discord.Net/tree/dev/samples) in our repository
+
+## Feedback
+
+You report issues with the library by opening an issue in our [GitHub Repository](https://github.com/discord-net/Discord.Net)
+
+If you need help with using Discord.Net check out the following:
+- ask on our [Discord Support Server](https://discord.gg/dnet) 
+- start a thread in [GitHub Discussions](https://github.com/discord-net/Discord.Net/discussions)
+
 ## 📥 Installation
 
 ### Stable (NuGet)
