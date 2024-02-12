@@ -183,6 +183,11 @@ code {
   box-shadow: var(--card-box-shadow);
 }
 
+/* MAKES PARAMETERS MORE SPACIOUS */
+dl.parameters > dt > code {
+    padding: 3px;
+}
+
 /* MAKES DERIVED LIST READABLE */
 :is(dl.typelist.derived, dl.typelist.extensionMethods) > dd > div::after {
   content: none !important;
