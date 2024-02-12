@@ -53,7 +53,7 @@
     ],
     "postProcessors": [
       "ExtractSearchIndex",
-      "DescriptionPostProcessor"	  
+      "DescriptionPostProcessor"
     ],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
@@ -63,6 +63,6 @@
       "_appLogoPath": "marketing/logo/SVG/Logomark Purple.svg",
       "_appFaviconPath": "favicon.ico"
     },
-    "xrefService": ["https://learn.microsoft.com/api/xref/query?uid={uid}"]
+    "xref": ["https://github.com/dotnet/docfx/raw/main/.xrefmap.json"]
   }
 }
