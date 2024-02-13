@@ -67,7 +67,7 @@ jobs:
                 
             - name: Is Tag Build
               if: startsWith(github.ref, 'refs/tags/')
-              run: echo "IsTagBuild=true" >> $GITHUB_ENV
+              run: echo "IsTagBuild=true" >> $env:GITHUB_ENV
 
             - name: Restore
               run: dotnet restore
@@ -117,13 +117,13 @@ jobs:
         
         - name: Is Tag Build
           if: startsWith(github.ref, 'refs/tags/')
-          run: echo "IsTagBuild=true" >> $GITHUB_ENV
+          run: echo "IsTagBuild=true" >> $env:GITHUB_ENV
 
         - name: Update Suffix
           if: env.IsTagBuild != 'true'
           env:
             buildNumber: ${{ github.run_number }} 
-          run: echo "Suffix=${{ env.buildNumber }}" >> $GITHUB_ENV
+          run: echo "Suffix=${{ env.buildNumber }}" >> $env:GITHUB_ENV
           
         - name: setup NuGet
           uses: nuget/setup-nuget@v2
