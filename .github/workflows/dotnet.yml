@@ -51,7 +51,7 @@ jobs:
                 dotnet-version: 8.0.x
                 
             - name: Is Tag Build
-              if: startsWith(github.ref, 'refs/tags/v')
+              if: startsWith(github.ref, 'refs/tags/')
               run: echo "IsTagBuild=true" >> $GITHUB_ENV
 
             - name: Restore
@@ -101,7 +101,7 @@ jobs:
         - uses: actions/checkout@v4
         
         - name: Is Tag Build
-          if: startsWith(github.ref, 'refs/tags/v')
+          if: startsWith(github.ref, 'refs/tags/')
           run: echo "IsTagBuild=true" >> $GITHUB_ENV
 
         - name: Update Suffix
@@ -123,8 +123,8 @@ jobs:
           run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory $(ArtifactStagingDirectory) -Suffix=$Suffix
 
         - name: Push Nightly
-          run: nuget push $(ArtifactStagingDirectory)/*.nupkg -Source ${{ vars.NIGHTLY_FEED }} -ApiKey ${{ secrets.NIGHTLY_API_KEY }}
+          run: nuget push $(ArtifactStagingDirectory)/*.nupkg -Source ${{ vars.NIGHTLY_FEED }} -ApiKey ${{ secrets.NIGHTLY_FEED_API_KEY }}
 
-        - name: Push Release
-          if: env.IsTagBuild == 'true'
-          run: nuget push $(ArtifactStagingDirectory)/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }}
+        #- name: Push Release
+        #  if: env.IsTagBuild == 'true'
+        #  run: nuget push $(ArtifactStagingDirectory)/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }}
