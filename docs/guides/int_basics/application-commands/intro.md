@@ -12,7 +12,7 @@ If you have extra questions that aren't covered here you can come to our
 
 > [!NOTE]
 > This guide shows the manual way of creating and handling application commands. We recommend using the Interaction Framework because it allows you to work with application commands
-> and handle interactions in a much simpler and structurized way. You can find more info in the [InteractionsIntro].
+> and handle interactions in a much simpler and structurized way. You can find more info in the [Interaction Framework Intro] docs.
 
 ## What is an application command?
 
@@ -51,4 +51,4 @@ From there you can then use the link to add your bot to a server.
 > In order for users in your guild to use your slash commands, they need to have
 > the "Use Application Commands" permission on the guild.
 
-[InteractionsIntro]: xref:Guides.IntFw.Intro
+[Interaction Framework Intro]: xref:Guides.IntFw.Intro
