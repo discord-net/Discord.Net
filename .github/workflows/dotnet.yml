@@ -137,7 +137,12 @@ jobs:
             path: ${{ env.ArtifactStagingDirectory }}
         
         - name: Pack Metapackage
+          if: env.IsTagBuild != 'true'
           run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }} -Suffix=${{ env.Suffix }}
+
+        - name: Pack Metapackage
+          if: env.IsTagBuild == 'true'
+          run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }}
 
         - name: Push Nightly
           run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ vars.NIGHTLY_FEED }} -ApiKey ${{ secrets.NIGHTLY_FEED_API_KEY }}
