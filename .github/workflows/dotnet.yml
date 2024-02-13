@@ -120,7 +120,7 @@ jobs:
           run: echo "IsTagBuild=true" >> $GITHUB_ENV
 
         - name: Update Suffix
-          if: env.IsTagBuild == 'true'
+          if: env.IsTagBuild != 'true'
           env:
             buildNumber: ${{ github.run_number }} 
           run: echo "Suffix=${{ env.buildNumber }}" >> $GITHUB_ENV
