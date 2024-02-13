@@ -44,7 +44,7 @@ Ideally, use pattern matching to make sure its the type of interaction you are e
 ## My interaction commands are not showing up?
 
 - Try to check for any errors in the console, there is a good chance something might have been thrown.
-- - Make sure you have setup logging. If you use `InteractionService` hook into [`InteractionService.Log`](https://discordnet.dev/api/Discord.Interactions.InteractionService.html#Discord_Interactions_InteractionService_Log) event
+- - Make sure you have setup logging. If you use `InteractionService` hook into [`InteractionService.Log`]) event
 
 - Register your commands after the Ready event in the client. The client is not configured to register commands before this moment.
 
@@ -65,3 +65,6 @@ Overwriting is only required if you make changes to existing commands, or add ne
 Message and user commands have a limit of 5 per guild, and another 5 globally.
 If you have more than 5 guild-only message commands being registered, no more than 5 will actually show up.
 You can get up to 10 entries to show if you register 5 per guild, and another 5 globally.
+
+
+[`InteractionService.Log`]: xref:Discord.Interactions.InteractionService.Log
