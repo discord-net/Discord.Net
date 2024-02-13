@@ -107,7 +107,7 @@ jobs:
       name: Windows Deploy
       runs-on: windows-latest
       needs: [build-windows, build-linux]
-      if: github.event_name != 'pull_request'
+      #if: github.event_name != 'pull_request'
       env:
         IsTagBuild: false
         ArtifactStagingDirectory: "artifacts"
