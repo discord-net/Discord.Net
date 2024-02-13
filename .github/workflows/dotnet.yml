@@ -138,7 +138,7 @@ jobs:
         
         - name: Pack Metapackage
           if: env.IsTagBuild != 'true'
-          run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }} -Suffix=${{ env.Suffix }}
+          run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }} -Suffix ${{ env.Suffix }}
 
         - name: Pack Metapackage
           if: env.IsTagBuild == 'true'
