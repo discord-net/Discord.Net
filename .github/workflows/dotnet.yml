@@ -49,16 +49,16 @@ jobs:
           IsTagBuild: false
           DOTNET_INSTALL_DIR: 'C:\Program Files\dotnet'
         steps:
-            - name: Cache dotnet
-              id: cache-dotnet
-              uses: actions/cache@v4
-              with:
-                path: ${{ env.DOTNET_INSTALL_DIR }}
-                key: ${{ runner.os }}-dotnet-8
-                restore-keys: ${{ runner.os }}-dotnet-8
+            #- name: Cache dotnet
+            #  id: cache-dotnet
+            #  uses: actions/cache@v4
+            #  with:
+            #    path: ${{ env.DOTNET_INSTALL_DIR }}
+            #    key: ${{ runner.os }}-dotnet-8
+            #    restore-keys: ${{ runner.os }}-dotnet-8
             
             - name: Setup .NET
-              if: ${{ steps.cache-dotnet.outputs.cache-hit != 'true' }}
+            #  if: ${{ steps.cache-dotnet.outputs.cache-hit != 'true' }}
               uses: actions/setup-dotnet@v4
               with:
                 dotnet-version: 8.0.x
