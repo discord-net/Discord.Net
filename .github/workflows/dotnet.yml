@@ -145,7 +145,10 @@ jobs:
           run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }}
 
         - name: Push Nightly
-          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ vars.NIGHTLY_FEED }} -ApiKey ${{ secrets.NIGHTLY_FEED_API_KEY }}
+          env: 
+            FEED: ${{ secrets.NIGHTLY_FEED }}
+            KEY: ${{ secrets.NIGHTLY_FEED_API_KEY }}
+          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source $env:FEED -ApiKey $env:KEY
 
         #- name: Push Release
         #  if: env.IsTagBuild == 'true'
