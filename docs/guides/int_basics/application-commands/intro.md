@@ -8,7 +8,11 @@ title: Introduction to slash commands
 
 This guide will show you how to use application commands.
 If you have extra questions that aren't covered here you can come to our
-[Discord](https://discord.com/invite/dvSfUTet3K) server and ask around there.
+[Discord](https://discord.gg/dnet) server and ask around there.
+
+> [!NOTE]
+> This guide shows the manual way of creating and handling application commands. We recommend using the Interaction Framework because it allows you to work with application commands
+> and handling interactions in a much simpler and structurized way. You can find more info in the [InteractionsIntro].
 
 ## What is an application command?
 
@@ -46,3 +50,5 @@ From there you can then use the link to add your bot to a server.
 > [!NOTE]
 > In order for users in your guild to use your slash commands, they need to have
 > the "Use Application Commands" permission on the guild.
+
+[InteractionsIntro]: xref:Guides.IntFw.Intro
