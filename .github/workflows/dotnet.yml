@@ -12,7 +12,7 @@ jobs:
     build-linux:
         name: Build and Test on Linux
         runs-on: ubuntu-latest
-        env: 
+        env:
           IsTagBuild: false
         steps:
             - uses: actions/checkout@v4    
@@ -74,15 +74,15 @@ jobs:
               env: 
                 buildNumber: ${{ github.run_number }}
               run: |
-                dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" --no-restore --no-build -v minimal -c Release -o "$ArtifactStagingDirectory" /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
-                dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" --no-restore --no-build -v minimal -c Release -o "$ArtifactStagingDirectory" /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
-                dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" --no-restore --no-build -v minimal -c Release -o "$ArtifactStagingDirectory" /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
-                dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" --no-restore --no-build -v minimal -c Release -o "$ArtifactStagingDirectory" /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
-                dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" --no-restore --no-build -v minimal -c Release -o "$ArtifactStagingDirectory" /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
-                dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" --no-restore --no-build -v minimal -c Release -o "$ArtifactStagingDirectory" /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
-                dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" --no-restore --no-build -v minimal -c Release -o "$ArtifactStagingDirectory" /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
-                dotnet pack "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" --no-restore --no-build -v minimal -c Release -o "$ArtifactStagingDirectory" /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
-                dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c Release -o "$ArtifactStagingDirectory" /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
+                dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" --no-restore --no-build -v minimal -c Release -o $ArtifactStagingDirectory /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
+                dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" --no-restore --no-build -v minimal -c Release -o $ArtifactStagingDirectory /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
+                dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" --no-restore --no-build -v minimal -c Release -o $ArtifactStagingDirectory /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
+                dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" --no-restore --no-build -v minimal -c Release -o $ArtifactStagingDirectory /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
+                dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" --no-restore --no-build -v minimal -c Release -o $ArtifactStagingDirectory /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
+                dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" --no-restore --no-build -v minimal -c Release -o $ArtifactStagingDirectory /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
+                dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" --no-restore --no-build -v minimal -c Release -o $ArtifactStagingDirectory /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
+                dotnet pack "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" --no-restore --no-build -v minimal -c Release -o $ArtifactStagingDirectory /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
+                dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c Release -o $ArtifactStagingDirectory /p:BuildNumber=$buildNumber /p:IsTagBuild=$IsTagBuild
             
             - name: Publish Artifacts
               uses: actions/upload-artifact@v4
