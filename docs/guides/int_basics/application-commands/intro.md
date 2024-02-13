@@ -12,7 +12,7 @@ If you have extra questions that aren't covered here you can come to our
 
 > [!NOTE]
 > This guide shows the manual way of creating and handling application commands. We recommend using the Interaction Framework because it allows you to work with application commands
-> and handling interactions in a much simpler and structurized way. You can find more info in the [InteractionsIntro].
+> and handle interactions in a much simpler and structurized way. You can find more info in the [InteractionsIntro].
 
 ## What is an application command?
 
