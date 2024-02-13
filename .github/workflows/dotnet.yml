@@ -47,13 +47,13 @@ jobs:
         env: 
           ArtifactStagingDirectory: "artifacts"
           IsTagBuild: false
-          DotnetInstallDir: '.\.dotnet'
+          DOTNET_INSTALL_DIR: 'C:\Program Files\dotnet'
         steps:
             - name: Cache dotnet
               id: cache-dotnet
               uses: actions/cache@v4
               with:
-                path: ${{ env.DotnetInstallDir }}
+                path: ${{ env.DOTNET_INSTALL_DIR }}
                 key: ${{ runner.os }}-dotnet-8
                 restore-keys: ${{ runner.os }}-dotnet-8
             
@@ -137,7 +137,7 @@ jobs:
             path: ${{ env.ArtifactStagingDirectory }}
         
         - name: Pack Metapackage
-          run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }} -Suffix=$Suffix
+          run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }} -Suffix=${{ env.Suffix }}
 
         - name: Push Nightly
           run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ vars.NIGHTLY_FEED }} -ApiKey ${{ secrets.NIGHTLY_FEED_API_KEY }}
