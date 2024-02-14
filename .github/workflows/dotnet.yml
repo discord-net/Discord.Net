@@ -53,6 +53,12 @@ jobs:
 
             - name: Analyzer Test
               run: dotnet test "test/Discord.Net.Analyzers.Tests/Discord.Net.Analyzers.Tests.csproj" --no-restore --no-build -v minimal -c Release --logger trx
+
+            - name: Publish Test Results
+              uses: EnricoMi/publish-unit-test-result-action@v2
+              if: failure() || success()
+              with:
+                files: ./**/*.trx
             
             - name: Pack
               env: 
