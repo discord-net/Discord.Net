@@ -10,7 +10,7 @@ public class AutoModFlaggedMessageAuditLogData : IAuditLogData
 {
     internal AutoModFlaggedMessageAuditLogData(ulong? channelId, string autoModRuleName, AutoModTriggerType autoModRuleTriggerType)
     {
-        ChannelId = channelId;
+        ChannelId = channelId ?? 0;
         AutoModRuleName = autoModRuleName;
         AutoModRuleTriggerType = autoModRuleTriggerType;
     }
@@ -22,7 +22,7 @@ public class AutoModFlaggedMessageAuditLogData : IAuditLogData
     }
 
     /// <summary>
-    ///     Gets the channel the message was sent in. May be <see langword="null"/> if a user profile was flagged.
+    ///     Gets the channel the message was sent in. Will be 0 if a user profile was flagged.
     /// </summary>
     public ulong? ChannelId { get; set; }
 

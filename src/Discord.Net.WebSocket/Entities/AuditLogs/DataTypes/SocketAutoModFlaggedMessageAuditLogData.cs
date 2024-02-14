@@ -9,7 +9,7 @@ public class SocketAutoModFlaggedMessageAuditLogData : ISocketAuditLogData
 {
     internal SocketAutoModFlaggedMessageAuditLogData(ulong? channelId, string autoModRuleName, AutoModTriggerType autoModRuleTriggerType)
     {
-        ChannelId = channelId;
+        ChannelId = channelId ?? 0;
         AutoModRuleName = autoModRuleName;
         AutoModRuleTriggerType = autoModRuleTriggerType;
     }
@@ -21,9 +21,9 @@ public class SocketAutoModFlaggedMessageAuditLogData : ISocketAuditLogData
     }
 
     /// <summary>
-    ///     Gets the channel the message was sent in. May be <see langword="null"/> if a user profile was flagged.
+    ///     Gets the channel the message was sent in. Will be 0 if a user profile was flagged.
     /// </summary>
-    public ulong? ChannelId { get; set; }
+    public ulong ChannelId { get; set; }
 
     /// <summary>
     ///     Gets the name of the auto moderation rule that got triggered.
