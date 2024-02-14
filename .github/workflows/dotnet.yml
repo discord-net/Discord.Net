@@ -19,66 +19,71 @@ jobs:
           ArtifactStagingDirectory: "artifacts"
           IsTagBuild: false
           DOTNET_INSTALL_DIR: "/usr/share/dotnet"
+          Suffix: ${{ github.run_number }}
         steps:
-            - uses: actions/checkout@v4    
+          - uses: actions/checkout@v4    
 
-            - name: Cache dotnet
-              id: cache-dotnet
-              uses: actions/cache@v4
-              with:
-                path: |
-                  ${{ env.DOTNET_INSTALL_DIR }}
-                  ~/.nuget/packages
-                key: ${{ runner.os }}-dotnet-8
-                restore-keys: ${{ runner.os }}-dotnet-8
-            
-            - name: Setup .NET
-              if: ${{ steps.cache-dotnet.outputs.cache-hit != 'true' }}  
-              uses: actions/setup-dotnet@v4
-              with:
-                dotnet-version: 8.0.x
+          - name: Cache dotnet
+            id: cache-dotnet
+            uses: actions/cache@v4
+            with:
+              path: |
+                ${{ env.DOTNET_INSTALL_DIR }}
+                ~/.nuget/packages
+              key: ${{ runner.os }}-dotnet-8
+              restore-keys: ${{ runner.os }}-dotnet-8
+          
+          - name: Setup .NET
+            if: ${{ steps.cache-dotnet.outputs.cache-hit != 'true' }}  
+            uses: actions/setup-dotnet@v4
+            with:
+              dotnet-version: 8.0.x
 
-            - name: Is Tag Build
-              if: startsWith(github.ref, 'refs/tags/')
-              run: echo "IsTagBuild=true" >> $GITHUB_ENV
+          - name: Is Tag Build
+            if: startsWith(github.ref, 'refs/tags/')
+            run: echo "IsTagBuild=true" >> $GITHUB_ENV
+          
+          - name: Generate Suffix
+            if: env.IsTagBuild != 'true'
+            run: echo "Suffix=$(date +'%Y%m%d')-${{ github.run_number }}" >> $GITHUB_ENV
 
-            - name: Restore
-              run: dotnet restore ./Discord.Net.sln -v minimal
+          - name: Restore
+            run: dotnet restore ./Discord.Net.sln -v minimal
 
-            - name: Build
-              run: dotnet build "Discord.Net.sln" -v minimal -c Release --no-restore /p:BuildNumber=${{ github.run_number }} /p:IsTagBuild=$(IsTagBuild)
+          - name: Build
+            run: dotnet build "Discord.Net.sln" -v minimal -c Release --no-restore /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=$(IsTagBuild)
 
-            - name: Unit Test
-              run: dotnet test "test/Discord.Net.Tests.Unit/Discord.Net.Tests.Unit.csproj" --no-restore --no-build -v minimal -c Release --logger trx
+          - name: Unit Test
+            run: dotnet test "test/Discord.Net.Tests.Unit/Discord.Net.Tests.Unit.csproj" --no-restore --no-build -v minimal -c Release --logger trx
 
-            - name: Analyzer Test
-              run: dotnet test "test/Discord.Net.Analyzers.Tests/Discord.Net.Analyzers.Tests.csproj" --no-restore --no-build -v minimal -c Release --logger trx
+          - name: Analyzer Test
+            run: dotnet test "test/Discord.Net.Analyzers.Tests/Discord.Net.Analyzers.Tests.csproj" --no-restore --no-build -v minimal -c Release --logger trx
 
-            - name: Publish Test Results
-              uses: EnricoMi/publish-unit-test-result-action@v2
-              if: failure() || success()
-              with:
-                files: ./**/*.trx
-            
-            - name: Pack
-              env: 
-                buildNumber: ${{ github.run_number }}
-              run: |
-                dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.buildNumber }} /p:IsTagBuild=${{ env.IsTagBuild }}
-                dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.buildNumber }} /p:IsTagBuild=${{ env.IsTagBuild }}
-                dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.buildNumber }} /p:IsTagBuild=${{ env.IsTagBuild }}
-                dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.buildNumber }} /p:IsTagBuild=${{ env.IsTagBuild }}
-                dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.buildNumber }} /p:IsTagBuild=${{ env.IsTagBuild }}
-                dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.buildNumber }} /p:IsTagBuild=${{ env.IsTagBuild }}
-                dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.buildNumber }} /p:IsTagBuild=${{ env.IsTagBuild }}
-                dotnet pack "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.buildNumber }} /p:IsTagBuild=${{ env.IsTagBuild }}
-                dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.buildNumber }} /p:IsTagBuild=${{ env.IsTagBuild }}
-            
-            - name: Publish Artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                name: discord-net
-                path: ${{ env.ArtifactStagingDirectory }}/*
+          - name: Publish Test Results
+            uses: EnricoMi/publish-unit-test-result-action@v2
+            if: failure() || success()
+            with:
+              files: ./**/*.trx
+          
+          - name: Pack
+            env: 
+              buildNumber: $Suffix
+            run: |
+              dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+          
+          - name: Publish Artifacts
+            uses: actions/upload-artifact@v4
+            with:
+              name: discord-net
+              path: ${{ env.ArtifactStagingDirectory }}/*
     
     deploy:
       name: Deploy
@@ -94,6 +99,9 @@ jobs:
         - name: Is Tag Build
           if: startsWith(github.ref, 'refs/tags/')
           run: echo "IsTagBuild=true" >> $GITHUB_ENV
+
+        - name: Generate Suffix
+          run: echo "Suffix=$(date +'%Y%m%d')-${{ github.run_number }}" >> $GITHUB_ENV
           
         - name: setup NuGet
           uses: nuget/setup-nuget@v2
@@ -108,9 +116,7 @@ jobs:
         
         - name: Pack Metapackage
           if: env.IsTagBuild != 'true'
-          env:
-            buildNumber: ${{ github.run_number }} 
-          run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }} -Suffix ${{ env.buildNumber }}
+          run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }} -Suffix $Suffix
 
         - name: Pack Metapackage
           if: env.IsTagBuild == 'true'
