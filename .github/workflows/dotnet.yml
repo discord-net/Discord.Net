@@ -31,7 +31,7 @@ jobs:
               run: echo "IsTagBuild=true" >> $GITHUB_ENV
 
             - name: Restore
-              run: dotnet restore
+              run: dotnet restore ./Discord.Net.sln
 
             - name: Build
               run: dotnet build "Discord.Net.sln" -v minimal -c Release --no-restore /p:BuildNumber=${{ github.run_number }} /p:IsTagBuild=$(IsTagBuild)
