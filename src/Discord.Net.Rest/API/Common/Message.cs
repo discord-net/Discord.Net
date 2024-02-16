@@ -70,5 +70,8 @@ namespace Discord.API
 
         [JsonProperty("resolved")]
         public Optional<MessageComponentInteractionDataResolved> Resolved { get; set; }
+
+        [JsonProperty("interaction_metadata")]
+        public Optional<MessageInteractionMetadata> InteractionMetadata { get; set; }
     }
 }
