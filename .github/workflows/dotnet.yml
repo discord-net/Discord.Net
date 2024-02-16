@@ -113,6 +113,11 @@ jobs:
         - name: Push Nightly
           run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ vars.NIGHTLY_FEED }} -ApiKey ${{ secrets.NIGHTLY_FEED_API_KEY }}
 
+        - name: Push Nightly to GitHub Pacakges
+          env:
+            REPOSITORY_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ env.REPOSITORY_URL }} -ApiKey ${{ secrets.GITHUB_TOKEN }}
+
         #- name: Push Release
         #  if: env.IsTagBuild == 'true'
         #  run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }}
