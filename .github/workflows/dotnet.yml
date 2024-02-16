@@ -120,6 +120,6 @@ jobs:
             REPOSITORY_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
           run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ env.REPOSITORY_URL }} -ApiKey ${{ secrets.GITHUB_TOKEN }}
 
-        #- name: Push Release
-        #  if: env.IsTagBuild == 'true' && vars.PUSH_NUGET == 'true'
-        #  run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }}
+        - name: Push Release
+          if: env.IsTagBuild == 'true' && vars.PUSH_NUGET == 'true'
+          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }}
