@@ -121,5 +121,5 @@ jobs:
           run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ env.REPOSITORY_URL }} -ApiKey ${{ secrets.GITHUB_TOKEN }}
 
         #- name: Push Release
-        #  if: env.IsTagBuild == 'true' && vars.PushNuGet == 'true'
+        #  if: env.IsTagBuild == 'true' && vars.PUSH_NUGET == 'true'
         #  run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }}
