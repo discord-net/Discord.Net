@@ -203,7 +203,10 @@ namespace Discord.Rest
                                     parsed.MaxValues,
                                     parsed.Disabled,
                                     parsed.Type,
-                                    parsed.ChannelTypes.GetValueOrDefault()
+                                    parsed.ChannelTypes.GetValueOrDefault(),
+                                    parsed.DefaultValues.IsSpecified
+                                        ? parsed.DefaultValues.Value.Select(x => new SelectMenuDefaultValue(x.Id, x.Type))
+                                        : Array.Empty<SelectMenuDefaultValue>()
                                 );
                             }
                         default:
@@ -313,7 +316,14 @@ namespace Discord.Rest
         #endregion
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x => new ReactionMetadata { ReactionCount = x.Count, IsMe = x.Me });
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x => new ReactionMetadata
+        {
+            ReactionCount = x.Count,
+            IsMe = x.Me,
+            BurstColors = x.BurstColors,
+            BurstCount = x.BurstCount,
+            NormalCount = x.NormalCount,
+        });
 
         /// <inheritdoc />
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
@@ -331,7 +341,7 @@ namespace Discord.Rest
         public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsForEmoteAsync(this, emote, Discord, options);
         /// <inheritdoc />
-        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
-            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null, ReactionType type = ReactionType.Normal)
+            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, type, options);
     }
 }

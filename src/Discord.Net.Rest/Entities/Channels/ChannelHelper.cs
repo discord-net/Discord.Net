@@ -13,12 +13,10 @@ namespace Discord.Rest
     internal static class ChannelHelper
     {
         #region General
-        public static async Task DeleteAsync(IChannel channel, BaseDiscordClient client,
-            RequestOptions options)
-        {
-            await client.ApiClient.DeleteChannelAsync(channel.Id, options).ConfigureAwait(false);
-        }
-        public static async Task<Model> ModifyAsync(IGuildChannel channel, BaseDiscordClient client,
+        public static Task DeleteAsync(IChannel channel, BaseDiscordClient client, RequestOptions options)
+            => client.ApiClient.DeleteChannelAsync(channel.Id, options);
+
+        public static Task<Model> ModifyAsync(IGuildChannel channel, BaseDiscordClient client,
             Action<GuildChannelProperties> func,
             RequestOptions options)
         {
@@ -40,9 +38,10 @@ namespace Discord.Rest
                     : Optional.Create<API.Overwrite[]>(),
                 Flags = args.Flags.GetValueOrDefault(),
             };
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options);
         }
-        public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client,
+
+        public static Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client,
             Action<TextChannelProperties> func,
             RequestOptions options)
         {
@@ -67,9 +66,10 @@ namespace Discord.Rest
                     : Optional.Create<API.Overwrite[]>(),
                 DefaultSlowModeInterval = args.DefaultSlowModeInterval
             };
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options);
         }
-        public static async Task<Model> ModifyAsync(IVoiceChannel channel, BaseDiscordClient client,
+
+        public static Task<Model> ModifyAsync(IVoiceChannel channel, BaseDiscordClient client,
             Action<VoiceChannelProperties> func,
             RequestOptions options)
         {
@@ -95,10 +95,10 @@ namespace Discord.Rest
                 SlowModeInterval = args.SlowModeInterval,
                 IsNsfw = args.IsNsfw,
             };
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options);
         }
 
-        public static async Task<StageInstance> ModifyStageAsync(IStageChannel channel, BaseDiscordClient client,
+        public static Task<StageInstance> ModifyAsync(IStageChannel channel, BaseDiscordClient client,
             Action<StageInstanceProperties> func, RequestOptions options = null)
         {
             var args = new StageInstanceProperties();
@@ -110,7 +110,7 @@ namespace Discord.Rest
                 Topic = args.Topic
             };
 
-            return await client.ApiClient.ModifyStageInstanceAsync(channel.Id, apiArgs, options);
+            return client.ApiClient.ModifyStageInstanceAsync(channel.Id, apiArgs, options);
         }
         #endregion
 
@@ -492,28 +492,27 @@ namespace Discord.Rest
         #endregion
 
         #region Permission Overwrites
-        public static async Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
+        public static Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
             IUser user, OverwritePermissions perms, RequestOptions options)
         {
             var args = new ModifyChannelPermissionsParams((int)PermissionTarget.User, perms.AllowValue.ToString(), perms.DenyValue.ToString());
-            await client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, user.Id, args, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, user.Id, args, options);
         }
-        public static async Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
+
+        public static Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
             IRole role, OverwritePermissions perms, RequestOptions options)
         {
             var args = new ModifyChannelPermissionsParams((int)PermissionTarget.Role, perms.AllowValue.ToString(), perms.DenyValue.ToString());
-            await client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, role.Id, args, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, role.Id, args, options);
         }
-        public static async Task RemovePermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
+
+        public static Task RemovePermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
             IUser user, RequestOptions options)
-        {
-            await client.ApiClient.DeleteChannelPermissionAsync(channel.Id, user.Id, options).ConfigureAwait(false);
-        }
-        public static async Task RemovePermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
+            => client.ApiClient.DeleteChannelPermissionAsync(channel.Id, user.Id, options);
+
+        public static Task RemovePermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
             IRole role, RequestOptions options)
-        {
-            await client.ApiClient.DeleteChannelPermissionAsync(channel.Id, role.Id, options).ConfigureAwait(false);
-        }
+            => client.ApiClient.DeleteChannelPermissionAsync(channel.Id, role.Id, options);
         #endregion
 
         #region Users
@@ -564,11 +563,9 @@ namespace Discord.Rest
         #endregion
 
         #region Typing
-        public static async Task TriggerTypingAsync(IMessageChannel channel, BaseDiscordClient client,
-            RequestOptions options = null)
-        {
-            await client.ApiClient.TriggerTypingIndicatorAsync(channel.Id, options).ConfigureAwait(false);
-        }
+        public static Task TriggerTypingAsync(IMessageChannel channel, BaseDiscordClient client, RequestOptions options = null)
+            => client.ApiClient.TriggerTypingIndicatorAsync(channel.Id, options);
+
         public static IDisposable EnterTypingState(IMessageChannel channel, BaseDiscordClient client,
             RequestOptions options)
             => new TypingNotifier(channel, options);
@@ -635,6 +632,17 @@ namespace Discord.Rest
             };
             await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
+        #endregion
+
+        #region Voice
+
+        public static async Task ModifyVoiceChannelStatusAsync(IVoiceChannel channel, string status, BaseDiscordClient client, RequestOptions options)
+        {
+            Preconditions.AtMost(status.Length, DiscordConfig.MaxVoiceChannelStatusLength, $"Voice channel status length must be less than {DiscordConfig.MaxVoiceChannelStatusLength}.");
+
+            await client.ApiClient.ModifyVoiceChannelStatusAsync(channel.Id, status, options).ConfigureAwait(false);
+        }
+
         #endregion
     }
 }

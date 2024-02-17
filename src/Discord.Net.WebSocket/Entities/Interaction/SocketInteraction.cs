@@ -2,7 +2,9 @@ using Discord.Net;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using DataModel = Discord.API.ApplicationCommandInteractionData;
 using Model = Discord.API.Interaction;
@@ -70,6 +72,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public ulong ApplicationId { get; private set; }
+
+        /// <inheritdoc cref="IDiscordInteraction.Entitlements" />
+        public IReadOnlyCollection<RestEntitlement> Entitlements { get; private set; }
 
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel, SocketUser user)
             : base(client, id)
@@ -142,6 +147,8 @@ namespace Discord.WebSocket
             GuildLocale = model.GuildLocale.IsSpecified
                 ? model.GuildLocale.Value
                 : null;
+
+            Entitlements = model.Entitlements.Select(x => RestEntitlement.Create(Discord, x)).ToImmutableArray();
         }
 
         /// <summary>
@@ -398,6 +405,11 @@ namespace Discord.WebSocket
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
         public abstract Task RespondWithModalAsync(Modal modal, RequestOptions options = null);
+
+        /// <inheritdoc/>
+        public Task RespondWithPremiumRequiredAsync(RequestOptions options = null)
+            => InteractionHelper.RespondWithPremiumRequiredAsync(Discord, Id, Token, options);
+
         #endregion
 
         /// <summary>
@@ -423,6 +435,9 @@ namespace Discord.WebSocket
         }
 
         #region  IDiscordInteraction
+        /// <inheritdoc/>
+        IReadOnlyCollection<IEntitlement> IDiscordInteraction.Entitlements => Entitlements;
+
         /// <inheritdoc/>
         IUser IDiscordInteraction.User => User;
 

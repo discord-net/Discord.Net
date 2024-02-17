@@ -47,7 +47,7 @@ body:
     attributes:
       label: Version
       description: What version of Discord.Net are you using?
-      placeholder: ex. 3.1.0
+      placeholder: ex. 3.12.0
     validations:
       required: true
   - type: input
@@ -62,7 +62,9 @@ body:
     id: logs
     attributes: 
       label: Logs
-      description: Add applicable logs and/or a stack trace here.
+      description: Add applicable logs and/or a stack trace here. See this [docs page](https://discordnet.dev/guides/concepts/logging.html) 
+                    to make sure you have properly setup logging.
+      render: shell
     validations:
       required: true
   - type: textarea
@@ -82,5 +84,16 @@ body:
       label: Packages
       description: Please list all 3rd party packages in use if applicable, including their versions.
       placeholder: Discord.Addons.Hosting V5.1.0, Discord.InteractivityAddon V2.4.0, etc.
+    validations:
+      required: true      
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please list your OS name and version, .NET runtime or SDK you're using, host architecture
+      placeholder: |
+        - **OS**: Windows 11 23H2 25915
+        - **Architecture**: x64
+        - **SDK**: .NET sdk 7.0.100
     validations:
       required: true
