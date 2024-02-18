@@ -203,21 +203,10 @@ namespace Discord.WebSocket
         }
         /// <inheritdoc/>
         public int MaxBitrate
-        {
-            get
-            {
-                return PremiumTier switch
-                {
-                    PremiumTier.Tier1 => 128000,
-                    PremiumTier.Tier2 => 256000,
-                    PremiumTier.Tier3 => 384000,
-                    _ => 96000,
-                };
-            }
-        }
+            => GuildHelper.GetMaxBitrate(PremiumTier);
         /// <inheritdoc/>
         public ulong MaxUploadLimit
-            => GuildHelper.GetUploadLimit(this);
+            => GuildHelper.GetUploadLimit(PremiumTier);
         /// <summary>
         ///     Gets the widget channel (i.e. the channel set in the guild's widget settings) in this guild.
         /// </summary>
