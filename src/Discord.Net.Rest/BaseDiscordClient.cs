@@ -178,11 +178,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
             => ClientHelper.GetBotGatewayAsync(this, options);
+
+        /// <inheritdoc />
+        public virtual ConnectionState ConnectionState => ConnectionState.Disconnected;
         #endregion
 
         #region IDiscordClient
-        /// <inheritdoc />
-        ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
         /// <inheritdoc />
         ISelfUser IDiscordClient.CurrentUser => CurrentUser;
 
