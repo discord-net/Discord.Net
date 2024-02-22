@@ -165,7 +165,6 @@ namespace Discord.Rest
 
                 ResolvedData = new MessageResolvedData(users, members, roles, channels);
             }
-
             if (model.InteractionMetadata.IsSpecified)
                 InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata();
         }
