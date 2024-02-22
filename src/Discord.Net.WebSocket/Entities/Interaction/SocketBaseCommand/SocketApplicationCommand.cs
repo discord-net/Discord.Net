@@ -83,7 +83,7 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; private set; }
 
         /// <inheritdoc />
-        public IReadOnlyCollection<ApplicationCommandContextType> ContextTypes { get; private set; }
+        public IReadOnlyCollection<InteractionContextType> ContextTypes { get; private set; }
 
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt

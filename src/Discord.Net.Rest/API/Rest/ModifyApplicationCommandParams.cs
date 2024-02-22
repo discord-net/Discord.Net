@@ -30,7 +30,7 @@ namespace Discord.API.Rest
         public Optional<Dictionary<string, string>> DescriptionLocalizations { get; set; }
 
         [JsonProperty("contexts")]
-        public Optional<HashSet<ApplicationCommandContextType>> ContextTypes { get; set; }
+        public Optional<HashSet<InteractionContextType>> ContextTypes { get; set; }
 
         [JsonProperty("integration_types")]
         public Optional<HashSet<ApplicationIntegrationType>> IntegrationTypes { get; set; }

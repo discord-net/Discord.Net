@@ -101,7 +101,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets context types this command can be executed in.
         /// </summary>
-        public Optional<HashSet<ApplicationCommandContextType>> ContextTypes { get; set; }
+        public Optional<HashSet<InteractionContextType>> ContextTypes { get; set; }
 
         internal ApplicationCommandProperties() { }
     }

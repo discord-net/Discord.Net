@@ -27,7 +27,7 @@ namespace Discord.Interactions
         public GuildPermission? DefaultMemberPermissions { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<ApplicationCommandContextType> ContextTypes { get; }
+        public IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
 
         /// <inheritdoc/>
         public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }

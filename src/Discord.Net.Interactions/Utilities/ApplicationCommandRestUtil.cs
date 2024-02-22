@@ -60,7 +60,7 @@ namespace Discord.Interactions
                     ? new HashSet<ApplicationIntegrationType>(commandInfo.IntegrationTypes)
                     : null,
                 ContextTypes = commandInfo.ContextTypes is not null
-                    ? new HashSet<ApplicationCommandContextType>(commandInfo.ContextTypes)
+                    ? new HashSet<InteractionContextType>(commandInfo.ContextTypes)
                     : null,
             }.WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
             .WithDescriptionLocalizations(localizationManager?.GetAllDescriptions(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
@@ -110,7 +110,7 @@ namespace Discord.Interactions
                         ? new HashSet<ApplicationIntegrationType>(commandInfo.IntegrationTypes)
                         : null,
                     ContextTypes = commandInfo.ContextTypes is not null
-                        ? new HashSet<ApplicationCommandContextType>(commandInfo.ContextTypes)
+                        ? new HashSet<InteractionContextType>(commandInfo.ContextTypes)
                         : null,
                 }
                 .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
@@ -126,7 +126,7 @@ namespace Discord.Interactions
                         ? new HashSet<ApplicationIntegrationType>(commandInfo.IntegrationTypes)
                         : null,
                     ContextTypes = commandInfo.ContextTypes is not null
-                        ? new HashSet<ApplicationCommandContextType>(commandInfo.ContextTypes)
+                        ? new HashSet<InteractionContextType>(commandInfo.ContextTypes)
                         : null,
                 }
                 .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
@@ -189,7 +189,7 @@ namespace Discord.Interactions
                         ? new HashSet<ApplicationIntegrationType>(moduleInfo.IntegrationTypes)
                         : null,
                     ContextTypes = moduleInfo.ContextTypes is not null
-                        ? new HashSet<ApplicationCommandContextType>(moduleInfo.ContextTypes)
+                        ? new HashSet<InteractionContextType>(moduleInfo.ContextTypes)
                         : null,
                 }
                 .WithNameLocalizations(localizationManager?.GetAllNames(modulePath, LocalizationTarget.Group) ?? ImmutableDictionary<string, string>.Empty)
@@ -258,8 +258,8 @@ namespace Discord.Interactions
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     ContextTypes = command.ContextTypes is not null
-                        ? new HashSet<ApplicationCommandContextType>(command.ContextTypes)
-                        : Optional<HashSet<ApplicationCommandContextType>>.Unspecified,
+                        ? new HashSet<InteractionContextType>(command.ContextTypes)
+                        : Optional<HashSet<InteractionContextType>>.Unspecified,
                     IntegrationTypes = command.IntegrationTypes is not null
                         ? new HashSet<ApplicationIntegrationType>(command.IntegrationTypes)
                         : Optional<HashSet<ApplicationIntegrationType>>.Unspecified,
@@ -274,8 +274,8 @@ namespace Discord.Interactions
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     ContextTypes = command.ContextTypes is not null
-                        ? new HashSet<ApplicationCommandContextType>(command.ContextTypes)
-                        : Optional<HashSet<ApplicationCommandContextType>>.Unspecified,
+                        ? new HashSet<InteractionContextType>(command.ContextTypes)
+                        : Optional<HashSet<InteractionContextType>>.Unspecified,
                     IntegrationTypes = command.IntegrationTypes is not null
                         ? new HashSet<ApplicationIntegrationType>(command.IntegrationTypes)
                         : Optional<HashSet<ApplicationIntegrationType>>.Unspecified,
@@ -290,8 +290,8 @@ namespace Discord.Interactions
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     ContextTypes = command.ContextTypes is not null
-                        ? new HashSet<ApplicationCommandContextType>(command.ContextTypes)
-                        : Optional<HashSet<ApplicationCommandContextType>>.Unspecified,
+                        ? new HashSet<InteractionContextType>(command.ContextTypes)
+                        : Optional<HashSet<InteractionContextType>>.Unspecified,
                     IntegrationTypes = command.IntegrationTypes is not null
                         ? new HashSet<ApplicationIntegrationType>(command.IntegrationTypes)
                         : Optional<HashSet<ApplicationIntegrationType>>.Unspecified,

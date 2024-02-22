@@ -78,7 +78,7 @@ namespace Discord
         /// <summary>
         ///     
         /// </summary>
-        public HashSet<ApplicationCommandContextType> ContextTypes
+        public HashSet<InteractionContextType> ContextTypes
         {
             get => _contextTypes;
             set
@@ -125,7 +125,7 @@ namespace Discord
         private Dictionary<string, string> _descriptionLocalizations;
         private List<SlashCommandOptionBuilder> _options;
         private HashSet<ApplicationIntegrationType> _integrationTypes;
-        private HashSet<ApplicationCommandContextType> _contextTypes;
+        private HashSet<InteractionContextType> _contextTypes;
 
         /// <summary>
         ///     Build the current builder into a <see cref="SlashCommandProperties"/> class.
@@ -147,7 +147,7 @@ namespace Discord
                 IsDMEnabled = IsDMEnabled,
                 DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified,
                 IsNsfw = IsNsfw,
-                ContextTypes = _contextTypes ?? Optional<HashSet<ApplicationCommandContextType>>.Unspecified,
+                ContextTypes = _contextTypes ?? Optional<HashSet<InteractionContextType>>.Unspecified,
                 IntegrationTypes = _integrationTypes ?? Optional<HashSet<ApplicationIntegrationType>>.Unspecified
             };
 
@@ -249,10 +249,10 @@ namespace Discord
         /// </summary>
         /// <param name="contextTypes">Context types the command can be executed in.</param>
         /// <returns>The builder instance.</returns>
-        public SlashCommandBuilder WithContextTypes(params ApplicationCommandContextType[] contextTypes)
+        public SlashCommandBuilder WithContextTypes(params InteractionContextType[] contextTypes)
         {
             ContextTypes = contextTypes is not null
-                ? new HashSet<ApplicationCommandContextType>(contextTypes)
+                ? new HashSet<InteractionContextType>(contextTypes)
                 : null;
             return this;
         }

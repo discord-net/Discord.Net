@@ -11,9 +11,9 @@ namespace Discord.Interactions;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class CommandContextTypeAttribute : Attribute
 {
-    public IReadOnlyCollection<ApplicationCommandContextType> ContextTypes { get; }
+    public IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
 
-    public CommandContextTypeAttribute(params ApplicationCommandContextType[] contextTypes)
+    public CommandContextTypeAttribute(params InteractionContextType[] contextTypes)
     {
         ContextTypes = contextTypes?.Distinct().ToImmutableArray()
                        ?? throw new ArgumentNullException(nameof(contextTypes));

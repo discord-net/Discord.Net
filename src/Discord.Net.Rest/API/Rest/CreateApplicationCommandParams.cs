@@ -39,7 +39,7 @@ namespace Discord.API.Rest
         public Optional<bool> Nsfw { get; set; }
 
         [JsonProperty("contexts")]
-        public Optional<HashSet<ApplicationCommandContextType>> ContextTypes { get; set; }
+        public Optional<HashSet<InteractionContextType>> ContextTypes { get; set; }
 
         [JsonProperty("integration_types")]
         public Optional<HashSet<ApplicationIntegrationType>> IntegrationTypes { get; set; }
@@ -48,7 +48,7 @@ namespace Discord.API.Rest
 
         public CreateApplicationCommandParams(string name, string description, ApplicationCommandType type, ApplicationCommandOption[] options = null,
             IDictionary<string, string> nameLocalizations = null, IDictionary<string, string> descriptionLocalizations = null, bool nsfw = false,
-            HashSet<ApplicationCommandContextType> contextTypes = null, HashSet<ApplicationIntegrationType> integrationTypes = null)
+            HashSet<InteractionContextType> contextTypes = null, HashSet<ApplicationIntegrationType> integrationTypes = null)
         {
             Name = name;
             Description = description;
@@ -57,7 +57,7 @@ namespace Discord.API.Rest
             NameLocalizations = nameLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
             DescriptionLocalizations = descriptionLocalizations?.ToDictionary(x => x.Key, x => x.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
             Nsfw = nsfw;
-            ContextTypes = contextTypes ?? Optional.Create<HashSet<ApplicationCommandContextType>>();
+            ContextTypes = contextTypes ?? Optional.Create<HashSet<InteractionContextType>>();
             IntegrationTypes = integrationTypes ?? Optional.Create<HashSet<ApplicationIntegrationType>>();
         }
     }

@@ -1,6 +1,6 @@
 namespace Discord;
 
-public enum ApplicationCommandContextType
+public enum InteractionContextType
 {
     /// <summary>
     ///     The command can be used in guilds.

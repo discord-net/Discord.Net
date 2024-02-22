@@ -74,7 +74,7 @@ namespace Discord.WebSocket
         public ulong ApplicationId { get; private set; }
 
         /// <inheritdoc/>
-        public ApplicationCommandContextType? ContextType { get; private set; }
+        public InteractionContextType? ContextType { get; private set; }
 
         /// <inheritdoc cref="IDiscordInteraction.Entitlements" />
         public IReadOnlyCollection<RestEntitlement> Entitlements { get; private set; }

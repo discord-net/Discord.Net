@@ -86,7 +86,7 @@ namespace Discord
         /// <summary>
         ///     Gets context types the command can be used in. <see langword="null" /> if not specified.
         /// </summary>
-        IReadOnlyCollection<ApplicationCommandContextType> ContextTypes { get; }
+        IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
 
         /// <summary>
         ///     Gets the install method for the command. <see langword="null" /> if not specified.

@@ -44,7 +44,7 @@ namespace Discord.Interactions.Builders
         /// <summary>
         ///     Gets the context types this command can be executed in.
         /// </summary>
-        public HashSet<ApplicationCommandContextType> ContextTypes { get; set; } = null;
+        public HashSet<InteractionContextType> ContextTypes { get; set; } = null;
 
         internal ContextCommandBuilder(ModuleBuilder module) : base(module)
         {
@@ -157,9 +157,9 @@ namespace Discord.Interactions.Builders
         /// </summary>
         /// <param name="contextTypes">Context types the command can be executed in.</param>
         /// <returns>The builder instance.</returns>
-        public ContextCommandBuilder WithContextTypes(params ApplicationCommandContextType[] contextTypes)
+        public ContextCommandBuilder WithContextTypes(params InteractionContextType[] contextTypes)
         {
-            ContextTypes = new HashSet<ApplicationCommandContextType>(contextTypes);
+            ContextTypes = new HashSet<InteractionContextType>(contextTypes);
             return this;
         }
 

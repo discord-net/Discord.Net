@@ -64,7 +64,7 @@ namespace Discord
         /// <summary>
         ///     Gets the context types this command can be executed in.
         /// </summary>
-        public HashSet<ApplicationCommandContextType> ContextTypes { get; set; } = null;
+        public HashSet<InteractionContextType> ContextTypes { get; set; } = null;
 
         private string _name;
         private Dictionary<string, string> _nameLocalizations;
@@ -216,10 +216,10 @@ namespace Discord
         /// </summary>
         /// <param name="contextTypes">Context types the command can be executed in.</param>
         /// <returns>The builder instance.</returns>
-        public UserCommandBuilder WithContextTypes(params ApplicationCommandContextType[] contextTypes)
+        public UserCommandBuilder WithContextTypes(params InteractionContextType[] contextTypes)
         {
             ContextTypes = contextTypes is not null
-                ? new HashSet<ApplicationCommandContextType>(contextTypes)
+                ? new HashSet<InteractionContextType>(contextTypes)
                 : null;
             return this;
         }

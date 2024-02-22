@@ -56,7 +56,7 @@ internal class Interaction
     public Dictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; set; }
 
     [JsonProperty("context")]
-    public Optional<ApplicationCommandContextType> ContextType { get; set; }
+    public Optional<InteractionContextType> ContextType { get; set; }
 
     [JsonProperty("app_permissions")]
     public Optional<GuildPermissions> ApplicationPermissions { get; set; }

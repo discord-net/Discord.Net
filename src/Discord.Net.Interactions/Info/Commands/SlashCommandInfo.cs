@@ -47,7 +47,7 @@ namespace Discord.Interactions
         public IReadOnlyList<SlashCommandParameterInfo> FlattenedParameters { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<ApplicationCommandContextType> ContextTypes { get; }
+        public IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
 
         /// <inheritdoc/>
         public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }

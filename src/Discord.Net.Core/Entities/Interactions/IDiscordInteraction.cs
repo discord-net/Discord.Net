@@ -104,7 +104,7 @@ namespace Discord
         /// <summary>
         ///     Gets the context this interaction was created in. <see langword="null"/> if context type is unknown.
         /// </summary>
-        ApplicationCommandContextType? ContextType { get;  }
+        InteractionContextType? ContextType { get;  }
 
         /// <summary>
         ///     Responds to an Interaction with type <see cref="InteractionResponseType.ChannelMessageWithSource"/>.

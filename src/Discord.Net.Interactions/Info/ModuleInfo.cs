@@ -120,7 +120,7 @@ namespace Discord.Interactions
         /// <summary>
         ///     Gets context types commands in this module can be executed in.
         /// </summary>
-        public IReadOnlyCollection<ApplicationCommandContextType> ContextTypes { get; }
+        public IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
 
         /// <summary>
         ///     Gets the install method for commands in this module.
