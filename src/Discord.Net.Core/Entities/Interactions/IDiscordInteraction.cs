@@ -107,6 +107,11 @@ namespace Discord
         InteractionContextType? ContextType { get;  }
 
         /// <summary>
+        ///     Gets the permissions the app or bot has within the channel the interaction was sent from.
+        /// </summary>
+        GuildPermissions Permissions { get; }
+
+        /// <summary>
         ///     Responds to an Interaction with type <see cref="InteractionResponseType.ChannelMessageWithSource"/>.
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>

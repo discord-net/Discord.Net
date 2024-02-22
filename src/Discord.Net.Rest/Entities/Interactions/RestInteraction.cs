@@ -93,6 +93,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public InteractionContextType? ContextType { get; private set; }
 
+        /// <inheritdoc/>
+        public GuildPermissions Permissions  { get; private set; }
+
         /// <inheritdoc cref="IDiscordInteraction.Entitlements" />
         public IReadOnlyCollection<RestEntitlement> Entitlements { get; private set; }
 
@@ -243,6 +246,8 @@ namespace Discord.Rest
             ContextType = model.ContextType.IsSpecified
                 ? model.ContextType.Value
                 : null;
+
+            Permissions = new GuildPermissions((ulong)model.ApplicationPermissions);
         }
 
         internal string SerializePayload(object payload)
