@@ -760,6 +760,11 @@ namespace Discord.Rest
         /// </returns>
         public Task<RestTextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateTextChannelAsync(this, Discord, name, options, func);
+
+        /// <inheritdoc cref="IGuild.CreateNewsChannelAsync"/>
+        public Task<RestNewsChannel> CreateNewsChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null)
+            => GuildHelper.CreateNewsChannelAsync(this, Discord, name, options, func);
+
         /// <summary>
         ///     Creates a voice channel with the provided name.
         /// </summary>
@@ -959,25 +964,6 @@ namespace Discord.Rest
             => GuildHelper.GetUserAsync(this, Discord, OwnerId, options);
 
         /// <inheritdoc />
-        /// <summary>
-        ///     Prunes inactive users.
-        /// </summary>
-        /// <remarks>
-        ///     <para>
-        ///         This method removes all users that have not logged on in the provided number of <paramref name="days"/>.
-        ///     </para>
-        ///     <para>
-        ///         If <paramref name="simulate" /> is <see langword="true" />, this method will only return the number of users that
-        ///         would be removed without kicking the users.
-        ///     </para>
-        /// </remarks>
-        /// <param name="days">The number of days required for the users to be kicked.</param>
-        /// <param name="simulate">Whether this prune action is a simulation.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous prune operation. The task result contains the number of users to
-        ///     be or has been removed from this guild.
-        /// </returns>
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options, includeRoleIds);
 
@@ -1565,6 +1551,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, Action<TextChannelProperties> func, RequestOptions options)
             => await CreateTextChannelAsync(name, func, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<INewsChannel> IGuild.CreateNewsChannelAsync(string name, Action<TextChannelProperties> func, RequestOptions options)
+            => await CreateNewsChannelAsync(name, func, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func, RequestOptions options)
             => await CreateVoiceChannelAsync(name, func, options).ConfigureAwait(false);
