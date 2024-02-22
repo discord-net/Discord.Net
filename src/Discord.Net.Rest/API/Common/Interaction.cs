@@ -59,5 +59,5 @@ internal class Interaction
     public Optional<InteractionContextType> ContextType { get; set; }
 
     [JsonProperty("app_permissions")]
-    public Optional<GuildPermissions> ApplicationPermissions { get; set; }
+    public Optional<GuildPermission> ApplicationPermissions { get; set; }
 }
