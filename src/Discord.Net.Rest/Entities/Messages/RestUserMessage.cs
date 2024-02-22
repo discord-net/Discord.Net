@@ -167,9 +167,7 @@ namespace Discord.Rest
             }
 
             if (model.InteractionMetadata.IsSpecified)
-            {
                 InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata();
-            }
         }
 
         /// <inheritdoc />

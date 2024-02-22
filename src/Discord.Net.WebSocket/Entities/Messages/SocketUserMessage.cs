@@ -208,9 +208,7 @@ namespace Discord.WebSocket
             }
 
             if (model.InteractionMetadata.IsSpecified)
-            {
                 InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata();
-            }
         }
 
         /// <inheritdoc />
