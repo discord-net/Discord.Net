@@ -721,7 +721,12 @@ namespace Discord.WebSocket
             if (!string.IsNullOrEmpty(streamUrl))
                 Activity = new StreamingGame(name, streamUrl);
             else if (!string.IsNullOrEmpty(name))
-                Activity = new Game(name, type);
+            {
+                if (type is ActivityType.CustomStatus)
+                    Activity = new CustomStatusGame(name);
+                else
+                    Activity = new Game(name, type);
+            }
             else
                 Activity = null;
             return SendStatusAsync();
