@@ -119,12 +119,12 @@ jobs:
 
         - name: Push Nightly
           if: vars.PUSH_NIGHTLY == 'true'
-          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ vars.NIGHTLY_FEED }}
+          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source ${{ vars.NIGHTLY_FEED }}
 
         - name: Push Nightly to GitHub Pacakges
           if: vars.PUSH_NIGHTLY == 'true'            
-          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ env.REPOSITORY_URL }}
+          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source ${{ env.REPOSITORY_URL }}
 
         - name: Push Release
           if: env.IsTagBuild == 'true' && vars.PUSH_NUGET == 'true'
-          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source https://api.nuget.org/v3/index.json
+          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source https://api.nuget.org/v3/index.json
