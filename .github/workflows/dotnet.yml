@@ -81,6 +81,7 @@ jobs:
       env:
         IsTagBuild: false
         ArtifactStagingDirectory: "artifacts"
+        REPOSITORY_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
       steps:
         - uses: actions/checkout@v4
         
@@ -110,16 +111,20 @@ jobs:
           if: env.IsTagBuild == 'true'
           run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }}
 
+        - name: Set API Keys
+          run: |
+            nuget setApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
+            nuget setApiKey ${{ secrets.NIGHTLY_FEED_API_KEY }} -Source ${{ vars.NIGHTLY_FEED }}
+            nuget setApiKey ${{ secrets.GITHUB_TOKEN }} -Source ${{ env.REPOSITORY_URL }
+
         - name: Push Nightly
           if: vars.PUSH_NIGHTLY == 'true'
-          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ vars.NIGHTLY_FEED }} -ApiKey ${{ secrets.NIGHTLY_FEED_API_KEY }}
+          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ vars.NIGHTLY_FEED }}
 
         - name: Push Nightly to GitHub Pacakges
-          if: vars.PUSH_NIGHTLY == 'true'
-          env:
-            REPOSITORY_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ env.REPOSITORY_URL }} -ApiKey ${{ secrets.GITHUB_TOKEN }}
+          if: vars.PUSH_NIGHTLY == 'true'            
+          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source ${{ env.REPOSITORY_URL }}
 
         - name: Push Release
           if: env.IsTagBuild == 'true' && vars.PUSH_NUGET == 'true'
-          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }}
+          run: nuget push ${{ env.ArtifactStagingDirectory }}/*.nupkg -Source https://api.nuget.org/v3/index.json
