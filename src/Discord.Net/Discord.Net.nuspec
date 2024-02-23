@@ -12,6 +12,7 @@
     <license type="expression">MIT</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <icon>PackageLogo.png</icon>
+    <readme>NUGET_README.md</readme>
     <dependencies>
         <group targetFramework="net6.0">
             <dependency id="Discord.Net.Core" version="3.13.1$suffix$" />
@@ -56,6 +57,7 @@
     </dependencies>
   </metadata>
   <files>
+    <file src="../../NUGET_README.md" />
     <file src="../../docs/marketing/logo/PackageLogo.png" />
   </files>
 </package>

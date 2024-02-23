@@ -49,7 +49,9 @@ namespace Discord.Interactions
         internal SlashCommandInfo(Builders.SlashCommandBuilder builder, ModuleInfo module, InteractionService commandService) : base(builder, module, commandService)
         {
             Description = builder.Description;
+#pragma warning disable CS0618 // Type or member is obsolete
             DefaultPermission = builder.DefaultPermission;
+#pragma warning restore CS0618 // Type or member is obsolete
             IsEnabledInDm = builder.IsEnabledInDm;
             IsNsfw = builder.IsNsfw;
             DefaultMemberPermissions = builder.DefaultMemberPermissions;

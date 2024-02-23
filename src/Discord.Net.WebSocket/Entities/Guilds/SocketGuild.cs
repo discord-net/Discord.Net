@@ -203,21 +203,10 @@ namespace Discord.WebSocket
         }
         /// <inheritdoc/>
         public int MaxBitrate
-        {
-            get
-            {
-                return PremiumTier switch
-                {
-                    PremiumTier.Tier1 => 128000,
-                    PremiumTier.Tier2 => 256000,
-                    PremiumTier.Tier3 => 384000,
-                    _ => 96000,
-                };
-            }
-        }
+            => GuildHelper.GetMaxBitrate(PremiumTier);
         /// <inheritdoc/>
         public ulong MaxUploadLimit
-            => GuildHelper.GetUploadLimit(this);
+            => GuildHelper.GetUploadLimit(PremiumTier);
         /// <summary>
         ///     Gets the widget channel (i.e. the channel set in the guild's widget settings) in this guild.
         /// </summary>
@@ -1755,11 +1744,9 @@ namespace Discord.WebSocket
 
                 if (external)
                 {
-#pragma warning disable IDISP001
-                    var _ = promise.TrySetResultAsync(null);
+                    _ = promise.TrySetResultAsync(null);
                     await Discord.ApiClient.SendVoiceStateUpdateAsync(_voiceStateUpdateParams).ConfigureAwait(false);
                     return null;
-#pragma warning restore IDISP001
                 }
 
                 if (_audioClient == null)
@@ -1777,19 +1764,15 @@ namespace Discord.WebSocket
                                 await promise.TrySetExceptionAsync(ex);
                             else
                                 await promise.TrySetCanceledAsync();
-                            return;
                         }
                     };
                     audioClient.Connected += () =>
                     {
-#pragma warning disable IDISP001
-                        var _ = promise.TrySetResultAsync(_audioClient);
-#pragma warning restore IDISP001
+                        _ = promise.TrySetResultAsync(_audioClient);
                         return Task.Delay(0);
                     };
-#pragma warning disable IDISP003
+
                     _audioClient = audioClient;
-#pragma warning restore IDISP003
                 }
 
                 await Discord.ApiClient.SendVoiceStateUpdateAsync(_voiceStateUpdateParams).ConfigureAwait(false);
