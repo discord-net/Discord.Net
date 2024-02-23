@@ -113,7 +113,7 @@ jobs:
 
         - name: Set API Keys
           run: |
-            nuget setApiKey ${{ secrets.NUGET_API_KEY }}
+            nuget setApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
             nuget setApiKey ${{ secrets.NIGHTLY_FEED_API_KEY }} -Source ${{ vars.NIGHTLY_FEED }}
             nuget setApiKey ${{ secrets.GITHUB_TOKEN }} -Source ${{ env.REPOSITORY_URL }
 
