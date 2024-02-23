@@ -163,7 +163,9 @@ namespace Discord.Interactions
                 {
                     Name = moduleInfo.SlashGroupName,
                     Description = moduleInfo.Description,
+#pragma warning disable CS0618 // Type or member is obsolete
                     IsDefaultPermission = moduleInfo.DefaultPermission,
+#pragma warning restore CS0618 // Type or member is obsolete
                     IsDMEnabled = moduleInfo.IsEnabledInDm,
                     IsNsfw = moduleInfo.IsNsfw,
                     DefaultMemberPermissions = moduleInfo.DefaultMemberPermissions

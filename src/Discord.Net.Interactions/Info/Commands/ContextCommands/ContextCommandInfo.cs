@@ -39,7 +39,9 @@ namespace Discord.Interactions
             : base(builder, module, commandService)
         {
             CommandType = builder.CommandType;
+#pragma warning disable CS0618 // Type or member is obsolete
             DefaultPermission = builder.DefaultPermission;
+#pragma warning restore CS0618 // Type or member is obsolete
             IsNsfw = builder.IsNsfw;
             IsEnabledInDm = builder.IsEnabledInDm;
             DefaultMemberPermissions = builder.DefaultMemberPermissions;
