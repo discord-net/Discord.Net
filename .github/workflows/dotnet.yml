@@ -65,7 +65,7 @@ jobs:
               dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
               dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
               dotnet pack "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
-              dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+#              dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
           
           - name: Publish Artifacts
             uses: actions/upload-artifact@v4
