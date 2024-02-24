@@ -80,11 +80,13 @@ namespace Discord.Interactions.Builders
                             builder.Description = group.Description;
                         }
                         break;
+#pragma warning disable CS0618 // Type or member is obsolete
                     case DefaultPermissionAttribute defPermission:
                         {
                             builder.DefaultPermission = defPermission.IsDefaultPermission;
                         }
                         break;
+#pragma warning restore CS0618 // Type or member is obsolete
                     case EnabledInDmAttribute enabledInDm:
                         {
                             builder.IsEnabledInDm = enabledInDm.IsEnabled;
@@ -177,11 +179,13 @@ namespace Discord.Interactions.Builders
                             builder.RunMode = command.RunMode;
                         }
                         break;
+#pragma warning disable CS0618 // Type or member is obsolete
                     case DefaultPermissionAttribute defaultPermission:
                         {
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
                         }
                         break;
+#pragma warning restore CS0618 // Type or member is obsolete
                     case EnabledInDmAttribute enabledInDm:
                         {
                             builder.IsEnabledInDm = enabledInDm.IsEnabled;
@@ -232,11 +236,13 @@ namespace Discord.Interactions.Builders
                             command.CheckMethodDefinition(methodInfo);
                         }
                         break;
+#pragma warning disable CS0618 // Type or member is obsolete
                     case DefaultPermissionAttribute defaultPermission:
                         {
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
                         }
                         break;
+#pragma warning restore CS0618 // Type or member is obsolete
                     case EnabledInDmAttribute enabledInDm:
                         {
                             builder.IsEnabledInDm = enabledInDm.IsEnabled;

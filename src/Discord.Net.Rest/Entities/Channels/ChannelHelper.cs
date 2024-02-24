@@ -49,6 +49,7 @@ namespace Discord.Rest
             func(args);
             var apiArgs = new API.Rest.ModifyTextChannelParams
             {
+                Type = args.ChannelType,
                 Name = args.Name,
                 Position = args.Position,
                 CategoryId = args.CategoryId,
