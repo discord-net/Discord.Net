@@ -925,7 +925,7 @@ namespace Discord
         public SelectMenuBuilder(SelectMenuComponent selectMenu)
         {
             Placeholder = selectMenu.Placeholder;
-            CustomId = selectMenu.Placeholder;
+            CustomId = selectMenu.CustomId;
             MaxValues = selectMenu.MaxValues;
             MinValues = selectMenu.MinValues;
             IsDisabled = selectMenu.IsDisabled;
