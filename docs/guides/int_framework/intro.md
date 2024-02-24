@@ -352,11 +352,6 @@ can be used to register cherry picked modules or commands to global/guild scopes
 > [!NOTE]
 > [DontAutoRegisterAttribute] can be used on module classes to prevent `RegisterCommandsGloballyAsync()` and `RegisterCommandsToGuildAsync()` from registering them to the Discord.
 
-> [!NOTE]
-> In debug environment, since Global commands can take up to 1 hour to register/update,
-> it is advised to register your commands to a test guild for your changes to take effect immediately.
-> You can use preprocessor directives to create a simple logic for registering commands as seen above.
-
 ## Interaction Utility
 
 Interaction Service ships with a static `InteractionUtility`
