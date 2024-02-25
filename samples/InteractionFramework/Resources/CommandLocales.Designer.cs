@@ -1,66 +1,71 @@
-[global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
-[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-[global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-internal class CommandLocales
-{
-
-    private static global::System.Resources.ResourceManager resourceMan;
-
-    private static global::System.Globalization.CultureInfo resourceCulture;
-
-    [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-    internal CommandLocales()
+namespace DiscordNetTestBot.Properties {
+    using System;   
+    
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+    internal class CommandLocales
     {
-    }
-
-    [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-    internal static global::System.Resources.ResourceManager ResourceManager
-    {
-        get
+    
+        private static global::System.Resources.ResourceManager resourceMan;
+    
+        private static global::System.Globalization.CultureInfo resourceCulture;
+    
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        internal CommandLocales()
         {
-            if (object.ReferenceEquals(resourceMan, null))
+        }
+    
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+        internal static global::System.Resources.ResourceManager ResourceManager
+        {
+            get
             {
-                global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CommandLocales", typeof(CommandLocales).Assembly);
-                resourceMan = temp;
+                if (object.ReferenceEquals(resourceMan, null))
+                {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CommandLocales", typeof(CommandLocales).Assembly);
+                    resourceMan = temp;
+                }
+                return resourceMan;
             }
-            return resourceMan;
         }
-    }
-
-    [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-    internal static global::System.Globalization.CultureInfo Culture
-    {
-        get
+    
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+        internal static global::System.Globalization.CultureInfo Culture
         {
-            return resourceCulture;
+            get
+            {
+                return resourceCulture;
+            }
+            set
+            {
+                resourceCulture = value;
+            }
         }
-        set
+    
+        internal static string echo_description
         {
-            resourceCulture = value;
+            get
+            {
+                return ResourceManager.GetString("echo.description", resourceCulture);
+            }
         }
-    }
-
-    internal static string echo_description
-    {
-        get
+    
+        internal static string echo_mention_description
         {
-            return ResourceManager.GetString("echo.description", resourceCulture);
+            get
+            {
+                return ResourceManager.GetString("echo.mention.description", resourceCulture);
+            }
         }
-    }
-
-    internal static string echo_mention_description
-    {
-        get
+    
+        internal static string echo_name
         {
-            return ResourceManager.GetString("echo.mention.description", resourceCulture);
-        }
-    }
-
-    internal static string echo_name
-    {
-        get
-        {
-            return ResourceManager.GetString("echo.name", resourceCulture);
+            get
+            {
+                return ResourceManager.GetString("echo.name", resourceCulture);
+            }
         }
     }
 }
+
