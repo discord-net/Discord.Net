@@ -4,6 +4,8 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Globalization;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,18 +22,24 @@ public class Program
         AlwaysDownloadUsers = true,
     };
 
+    private static readonly InteractionServiceConfig _interactionServiceConfig = new()
+    {
+        LocalizationManager = new ResxLocalizationManager("InteractionFramework.Resources.CommandLocales", Assembly.GetEntryAssembly(),
+            new CultureInfo("en-US"), new CultureInfo("ru"))
+    };
+
     public static async Task Main(string[] args)
     {
         _configuration = new ConfigurationBuilder()
             .AddEnvironmentVariables(prefix: "DC_")
             .AddJsonFile("appsettings.json", optional: true)
             .Build();
-
+        
         _services = new ServiceCollection()
             .AddSingleton(_configuration)
             .AddSingleton(_socketConfig)
             .AddSingleton<DiscordSocketClient>()
-            .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
+            .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(), _interactionServiceConfig))
             .AddSingleton<InteractionHandler>()
             .BuildServiceProvider();
 
