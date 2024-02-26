@@ -69,6 +69,10 @@ namespace Discord.Rest
         public override Task<RestThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
             => throw new InvalidOperationException("Cannot create a thread within a voice channel");
 
+        /// <inheritdoc />
+        public virtual Task SetStatusAsync(string status, RequestOptions options = null)
+            => ChannelHelper.ModifyVoiceChannelStatusAsync(this, status, Discord, options);
+
         #endregion
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
@@ -85,7 +89,7 @@ namespace Discord.Rest
         #region IAudioChannel
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Connecting to a REST-based channel is not supported.</exception>
-        Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
+        Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external, bool disconnect) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
         Task IAudioChannel.ModifyAsync(Action<AudioChannelProperties> func, RequestOptions options) { throw new NotSupportedException(); }
         #endregion

@@ -1,31 +1,31 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Discord
+namespace Discord;
+
+/// <summary>
+///     Represents install parameters for an application.
+/// </summary>
+public class ApplicationInstallParams
 {
     /// <summary>
-    ///     Represents install parameters for an application.
+    ///     Gets the scopes to install this application.
     /// </summary>
-    public class ApplicationInstallParams
+    public IReadOnlyCollection<string> Scopes { get; }
+
+    /// <summary>
+    ///     Gets the default permissions to install this application.
+    /// </summary>
+    public GuildPermission Permission { get; }
+
+    public ApplicationInstallParams(string[] scopes, GuildPermission permission)
     {
-        /// <summary>
-        ///     Gets the scopes to install this application.
-        /// </summary>
-        public IReadOnlyCollection<string> Scopes { get; }
+        Preconditions.NotNull(scopes, nameof(scopes));
 
-        /// <summary>
-        ///     Gets the default permissions to install this application
-        /// </summary>
-        public GuildPermission? Permission { get; }
+        foreach (var s in scopes)
+            Preconditions.NotNull(s, nameof(scopes));
 
-        internal ApplicationInstallParams(string[] scopes, GuildPermission? permission)
-        {
-            Scopes = scopes.ToImmutableArray();
-            Permission = permission;
-        }
+        Scopes = scopes.ToImmutableArray();
+        Permission = permission;
     }
 }

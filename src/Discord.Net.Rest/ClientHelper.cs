@@ -1,4 +1,6 @@
+using Discord.API;
 using Discord.API.Rest;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -23,25 +25,40 @@ namespace Discord.Rest
             return RestApplication.Create(client, model);
         }
 
-        public static async Task<API.Application> ModifyCurrentBotApplicationAsync(BaseDiscordClient client, Action<ModifyApplicationProperties> func, RequestOptions options)
+        public static Task<API.Application> ModifyCurrentBotApplicationAsync(BaseDiscordClient client, Action<ModifyApplicationProperties> func, RequestOptions options)
         {
             var args = new ModifyApplicationProperties();
             func(args);
 
-            if(args.Tags.IsSpecified)
+            if (args.Tags.IsSpecified)
+            {
+                Preconditions.AtMost(args.Tags.Value.Length, DiscordConfig.MaxApplicationTagCount, nameof(args.Tags), $"An application can have a maximum of {DiscordConfig.MaxApplicationTagCount} applied.");
                 foreach (var tag in args.Tags.Value)
                     Preconditions.AtMost(tag.Length, DiscordConfig.MaxApplicationTagLength, nameof(args.Tags), $"An application tag must have length less or equal to {DiscordConfig.MaxApplicationTagLength}");
+            }
 
-            if(args.Description.IsSpecified)
+            if (args.Description.IsSpecified)
                 Preconditions.AtMost(args.Description.Value.Length, DiscordConfig.MaxApplicationDescriptionLength, nameof(args.Description), $"An application description tag mus have length less or equal to {DiscordConfig.MaxApplicationDescriptionLength}");
 
-            return await client.ApiClient.ModifyCurrentBotApplicationAsync(new()
+            return client.ApiClient.ModifyCurrentBotApplicationAsync(new()
             {
                 Description = args.Description,
                 Tags = args.Tags,
                 Icon = args.Icon.IsSpecified ? args.Icon.Value?.ToModel() : Optional<API.Image?>.Unspecified,
                 InteractionsEndpointUrl = args.InteractionsEndpointUrl,
                 RoleConnectionsEndpointUrl = args.RoleConnectionsEndpointUrl,
+                Flags = args.Flags,
+                CoverImage = args.CoverImage.IsSpecified ? args.CoverImage.Value?.ToModel() : Optional<API.Image?>.Unspecified,
+                CustomInstallUrl = args.CustomInstallUrl,
+                InstallParams = args.InstallParams.IsSpecified
+                    ? args.InstallParams.Value is null
+                        ? null
+                        : new InstallParams
+                        {
+                            Permission = (ulong)args.InstallParams.Value.Permission,
+                            Scopes = args.InstallParams.Value.Scopes.ToArray()
+                        }
+                    : Optional<InstallParams>.Unspecified,
             }, options);
         }
 
@@ -361,6 +378,66 @@ namespace Discord.Rest
                 );
         }
 
+
+        #endregion
+
+        #region App Subscriptions
+
+        public static async Task<RestEntitlement> CreateTestEntitlementAsync(BaseDiscordClient client, ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType,
+            RequestOptions options = null)
+        {
+            var model = await client.ApiClient.CreateEntitlementAsync(new CreateEntitlementParams
+            {
+                Type = ownerType,
+                OwnerId = ownerId,
+                SkuId = skuId
+            }, options);
+
+            return RestEntitlement.Create(client, model);
+        }
+
+        public static IAsyncEnumerable<IReadOnlyCollection<RestEntitlement>> ListEntitlementsAsync(BaseDiscordClient client, int? limit = 100,
+            ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
+             ulong[] skuIds = null, RequestOptions options = null)
+        {
+            return new PagedAsyncEnumerable<RestEntitlement>(
+                DiscordConfig.MaxEntitlementsPerBatch,
+                async (info, ct) =>
+                {
+                    var args = new ListEntitlementsParams()
+                    {
+                        Limit = info.PageSize,
+                        BeforeId = beforeId ?? Optional<ulong>.Unspecified,
+                        ExcludeEnded = excludeEnded,
+                        GuildId = guildId ?? Optional<ulong>.Unspecified,
+                        UserId = userId ?? Optional<ulong>.Unspecified,
+                        SkuIds = skuIds ?? Optional<ulong[]>.Unspecified,
+                    };
+                    if (info.Position != null)
+                        args.AfterId = info.Position.Value;
+                    var models = await client.ApiClient.ListEntitlementAsync(args, options).ConfigureAwait(false);
+                    return models
+                        .Select(x => RestEntitlement.Create(client, x))
+                        .ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxEntitlementsPerBatch)
+                        return false;
+                    info.Position = lastPage.Max(x => x.Id);
+                    return true;
+                },
+                start: afterId,
+                count: limit
+            );
+        }
+
+        public static async Task<IReadOnlyCollection<SKU>> ListSKUsAsync(BaseDiscordClient client, RequestOptions options = null)
+        {
+            var models = await client.ApiClient.ListSKUsAsync(options).ConfigureAwait(false);
+
+            return models.Select(x => new SKU(x.Id, x.Type, x.ApplicationId, x.Name, x.Slug)).ToImmutableArray();
+        }
 
         #endregion
     }

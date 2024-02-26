@@ -25,7 +25,8 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get; internal set; }
         /// <inheritdoc />
         public override string AvatarId { get; internal set; }
-
+        /// <inheritdoc />
+        public override string GlobalName { get; internal set; }
 
         /// <inheritdoc />
         public override bool IsBot { get; internal set; }
@@ -73,8 +74,6 @@ namespace Discord.WebSocket
         string IGuildUser.DisplayAvatarId => null;
         /// <inheritdoc />
         string IGuildUser.GuildAvatarId => null;
-        /// <inheritdoc />
-        string IGuildUser.GetDisplayAvatarUrl(ImageFormat format, ushort size) => null;
         /// <inheritdoc />
         string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => null;
         /// <inheritdoc />

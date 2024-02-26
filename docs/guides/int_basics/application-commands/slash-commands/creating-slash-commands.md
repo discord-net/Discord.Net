@@ -17,9 +17,7 @@ Guild commands are specific to the guild you specify when making them. Guild com
 
 **Note**: Apps can have a maximum of 100 global commands, and an additional 100 guild-specific commands per guild.
 
-**Note**: Global commands will take up to 1 hour to create, delete or modify on guilds. If you need to update a command quickly for testing you can create it as a guild command.
-
-If you don't have the code for a bot ready yet please follow [this guide](https://docs.stillu.cc/guides/getting_started/first-bot.html).
+If you don't have the code for a bot ready yet please follow [this guide](https://discordnet.dev/guides/getting_started/first-bot.html).
 
 ## SlashCommandBuilder
 

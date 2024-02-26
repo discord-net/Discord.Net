@@ -1,6 +1,5 @@
 using Discord.Rest;
-using FluentAssertions;
-using Moq;
+using NSubstitute;
 using System;
 using Xunit;
 
@@ -15,11 +14,10 @@ public class GuildHelperTests
     [InlineData(PremiumTier.Tier3, 100)]
     public void GetUploadLimit(PremiumTier tier, ulong factor)
     {
-        var guild = Mock.Of<IGuild>(g => g.PremiumTier == tier);
         var expected = factor * (ulong)Math.Pow(2, 20);
 
-        var actual = GuildHelper.GetUploadLimit(guild);
+        var actual = GuildHelper.GetUploadLimit(tier);
 
-        actual.Should().Be(expected);
+        Assert.Equal(expected, actual);
     }
 }

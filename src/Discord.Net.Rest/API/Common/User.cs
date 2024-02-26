@@ -22,6 +22,9 @@ namespace Discord.API
         [JsonProperty("global_name")]
         public Optional<string> GlobalName { get; set; }
 
+        [JsonProperty("avatar_decoration_data")]
+        public Optional<AvatarDecorationData> AvatarDecoration { get; set; }
+
         //CurrentUser
         [JsonProperty("verified")]
         public Optional<bool> Verified { get; set; }

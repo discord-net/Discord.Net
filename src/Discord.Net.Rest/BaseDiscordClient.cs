@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -177,11 +178,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
             => ClientHelper.GetBotGatewayAsync(this, options);
+
+        /// <inheritdoc />
+        public virtual ConnectionState ConnectionState => ConnectionState.Disconnected;
         #endregion
 
         #region IDiscordClient
-        /// <inheritdoc />
-        ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
         /// <inheritdoc />
         ISelfUser IDiscordClient.CurrentUser => CurrentUser;
 
@@ -258,6 +260,30 @@ namespace Discord.Rest
         /// <inheritdoc />
         Task IDiscordClient.StopAsync()
             => Task.Delay(0);
+
+        /// <summary>
+        ///     Creates a test entitlement to a given SKU for a given guild or user.
+        /// </summary>
+        Task<IEntitlement> IDiscordClient.CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options)
+            => Task.FromResult<IEntitlement>(null);
+
+        /// <summary>
+        ///     Deletes a currently-active test entitlement.
+        /// </summary>
+        Task IDiscordClient.DeleteTestEntitlementAsync(ulong entitlementId, RequestOptions options)
+            => Task.CompletedTask;
+
+        /// <summary>
+        ///     Returns all entitlements for a given app.
+        /// </summary>
+        IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> IDiscordClient.GetEntitlementsAsync(int? limit, ulong? afterId, ulong? beforeId,
+            bool excludeEnded, ulong? guildId, ulong? userId, ulong[] skuIds, RequestOptions options) => AsyncEnumerable.Empty<IReadOnlyCollection<IEntitlement>>();
+
+        /// <summary>
+        ///     Gets all SKUs for a given application.
+        /// </summary>
+        Task<IReadOnlyCollection<SKU>> IDiscordClient.GetSKUsAsync(RequestOptions options) => Task.FromResult<IReadOnlyCollection<SKU>>(Array.Empty<SKU>());
+
         #endregion
     }
 }

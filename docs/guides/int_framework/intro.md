@@ -352,11 +352,6 @@ can be used to register cherry picked modules or commands to global/guild scopes
 > [!NOTE]
 > [DontAutoRegisterAttribute] can be used on module classes to prevent `RegisterCommandsGloballyAsync()` and `RegisterCommandsToGuildAsync()` from registering them to the Discord.
 
-> [!NOTE]
-> In debug environment, since Global commands can take up to 1 hour to register/update,
-> it is advised to register your commands to a test guild for your changes to take effect immediately.
-> You can use preprocessor directives to create a simple logic for registering commands as seen above.
-
 ## Interaction Utility
 
 Interaction Service ships with a static `InteractionUtility`
@@ -389,7 +384,7 @@ Discord Slash Commands support name/description localization. Localization is av
 
 ### JsonLocalizationManager
 
-`JsonLocaliationManager` uses a nested data structure similar to Discord's Application Commands schema. You can get the Json schema [here](https://gist.github.com/Cenngo/d46a881de24823302f66c3c7e2f7b254). `JsonLocalizationManager` accepts a base path and a base file name and automatically discovers every resource file ( \basePath\fileName.locale.json ). A Json resource file should have a structure similar to:
+`JsonLocalizationManager` uses a nested data structure similar to Discord's Application Commands schema. You can get the Json schema [here](https://gist.github.com/Cenngo/d46a881de24823302f66c3c7e2f7b254). `JsonLocalizationManager` accepts a base path and a base file name and automatically discovers every resource file ( \basePath\fileName.locale.json ). A Json resource file should have a structure similar to:
 
 ```json
 {

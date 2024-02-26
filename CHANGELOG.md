@@ -1,5 +1,87 @@
 # Changelog
 
+## [3.13.1] - 2024-02-11
+
+### Added
+- #2804 Add Incident actions message types (178ff58)
+- #2805 Add `AppliedTags` to `DiscordWebhookClient.SendXAsync` (d382e5c)
+- #2700 Optional Aliasses, Summary and Remarks Properties to CommandAttribute (5a8582c)
+- #2584 Log InteractionCommand execution exceptions in Wrapped Exception (0f0f3f7)
+- #2827 `44` (Add message type 44) (541571c)
+- #2837 Allow creating announcement channels (f1777de)
+
+### Fixed
+- #2801 Add null check in `SelectMenuBuilder` (b18cc31)
+- #2813 Incorrect json model for Guild Scheduled Events (de4b6b9)
+- #2800 Warning about missing intents not being logged (8227d70)
+- #2818 `GetEventCoverImageUrl` throwing NRE in case event cover image is null (138e18c)
+
+### Misc
+- #2807 Incorrect xmldoc (d234db7)
+- #2823 Update sample projects & samples in docs (e2e8c0f)
+- #2819 [2024] Very important changes (update licence & docs) (ff9b9b4)
+- #2831 Add checks for whitespace-only strings in button builder (89efe0f)
+- #2835 Additional select menu option validations (4d7e384)
+
+
+## [3.13.0] - 2023-11-18
+
+### Added
+- #2707 Added Super reactions support (9fd5c6c)
+- #2725 Added Media channel support (e3cd340)
+- #2753 Added additional Update/Modify Async Attachment's (ae275ab)
+- #2769 Added missing parameters to `RespondWithModalAsync` methods and implement missing overloads (4e78aec)
+- #2773 Added useful utility methods to `ModalBuilder` (8591de7)
+- #2776 Added Select menu default values (ac274d4)
+- #2777 Added Voice channel status support (8060dcf)
+- #2781 Added premium subscriptions support (7723f61)
+- #2782 Added Avatar decorations support (f64d9d6)
+- #2784 Added App subscriptions additional support (a9a8da4)
+- #2783 Added Guild incident actions (9b36df3)
+- #2787 Added Embed `ToJsonString` & `(Try)Parse` (7b5c40a)
+- #2791 Added Automod member profile moderation, new application fields, use clyde ai & guild invenory settings (699554a)
+- #2792 Added create roles with icons (b45b774)
+- #2796 Added clips support (poggers) (89bebc3)
+
+### Fixed
+- #2758 Fixed Slash Command Localizations lost after AddCommandsToGuildAsync and deleteMissing = false (8d5022a)
+- #2759 Fixed missing null checks in `RoleConnectionProperties` (ab3b30d)
+- #2766 Fixed UpdateAsync Remove Attachment Bug (a668757)
+- #2763 Fixed SocketKickAuditLogData User never having value (5cfec05)
+- #2770 Fixed URL encode timestamps sent as query parameters (589c58a)
+- #2774 Fixed some IDiscordClient methods are not properly implemented in clients (8baf913)
+- #2789 Fixed multiline values in short TextInputs (33e8340)
+
+
+### Misc
+- #2739 Remove some unnecessary async/await (86655a8)
+- #2754 Replace Moq with NSubstitute for Mocking in GuildHelperTests (b988a18)
+- #2765 Use Discord heartbeat interval in audio. (9cedfbc)
+- #2771 Extract `GetDisplayAvatarUrl` in `IUser` (b1787d8)
+
+
+## [3.12.0] - 2023-08-10
+
+### Added
+- #2644 Added `ComponentBuilder` component removal methods. (d5d7378)
+- #2668 Added a method for sending silent audio frames on `OpusEncodeStream`. (59094d2)
+- #2675 Added missing `remove` property to `MemberRoleAudit`. (5fb9152)
+- #2720 Added role & attachment flags (a421715)
+- #2723 Added missing properties to webhook implementation (2b8584d)
+- #2729 Added new onboarding methods/properties (8cd4c1c)
+- #2730 Added new `ModifyCurrentApplication` features (166d40f)
+- #2749 Added support for setting custom status (b2820d5)
+
+### Fixed
+- #2711 Fixed modifying guild resets preferred locale (12c50f2)
+- #2713 Fixed some `ReplyAsync` methods missing `MessageFlags` parameter. (56769cb)
+- #2714 Fixed disconnecting socket client not sending close code. (6bb3777)
+- #2722 Fixed modal's `DeferAsync` implementation (5f580f6)
+- #2726 Fixed global name not being passed to `UserUpdated` event (9dfd4d7)
+- #2742 Fixed `ModifyAsync` attachments #2236 (0c12079)
+- #2745 Fixed `GetMessagesAsync` with `Direction.After` not working as expected (c922497)
+
+
 ## [3.11.0] - 2023-6-27
 
 ### Added

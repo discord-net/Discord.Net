@@ -5,7 +5,7 @@ title: Home
 
 # Discord.NET Documentation
 
-<div class="big-logo logo-switcher"></div>
+![logo](marketing/logo/SVG/Combinationmark%20White%20Border.svg)
 
 [![GitHub](https://img.shields.io/github/last-commit/discord-net/Discord.Net?style=plastic)](https://github.com/discord-net/Discord.Net)
 [![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net)
@@ -31,15 +31,8 @@ objects in the library.
 
 ## Nightlies
 
-Nightlies are builds of Discord.NET that are still in an experimental phase, and have not been released.
-These are not included in the main repository, and are instead taken over by [Discord.NET Labs].
-
-Discord.NET Labs is an experimental fork of Discord.NET that implements the newest discord features
-for testing and development to eventually get merged into Discord.NET.
-
-[Installing Discord.NET Labs](xref:Guides.GettingStarted.Installation.Labs)
-
-[Discord.Net Labs]: https://github.com/Discord-Net-Labs/Discord.Net-Labs
+Nightlies are builds of Discord.NET that are still in an experimental phase, and have not been released.  
+They are available through Discord.NET's [MyGet feed](https://www.myget.org/F/discord-net/api/v3/index.json).
 
 ## Questions?
 
@@ -48,6 +41,13 @@ FAQ. Read it thoroughly because most common questions are already answered there
 
 If you still have unanswered questions after reading the [FAQ](xref:FAQ.Basics.GetStarted), further support is available on
 [Discord](https://discord.gg/dnet).
+
+## Supporting Discord.Net
+
+Discord.Net is an MIT-licensed open source project with its development made possible entirely by volunteers. 
+If you'd like to support our efforts financially, please consider:
+
+- [Contributing on Open Collective](https://opencollective.com/discordnet).
 
 ## New in V3
 
@@ -62,7 +62,7 @@ feature-rich structure to register & handle interactions like application comman
 #### Slash Commands
 
 Slash commands are purposed to take over the normal prefixed commands in Discord and comes with good functionality to serve as a replacement.
-Being interactions, they are handled as SocketInteractions. Creating and receiving slashcommands is covered below.
+Being interactions, they are handled as SocketInteractions. Creating and receiving slash commands is covered below.
 
 - Find out more about slash commands in the
   [Slash Command Guides](xref:Guides.SlashCommands.Intro)

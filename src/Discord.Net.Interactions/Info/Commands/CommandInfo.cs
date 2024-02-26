@@ -88,12 +88,12 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
+        public virtual Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
         {
             switch (RunMode)
             {
                 case RunMode.Sync:
-                    return await ExecuteInternalAsync(context, services).ConfigureAwait(false);
+                    return ExecuteInternalAsync(context, services);
                 case RunMode.Async:
                     _ = Task.Run(async () =>
                     {
@@ -104,7 +104,7 @@ namespace Discord.Interactions
                     throw new InvalidOperationException($"RunMode {RunMode} is not supported.");
             }
 
-            return ExecuteResult.FromSuccess();
+            return Task.FromResult((IResult)ExecuteResult.FromSuccess());
         }
 
         protected abstract Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services);
@@ -165,7 +165,8 @@ namespace Discord.Interactions
                 while (ex is TargetInvocationException)
                     ex = ex.InnerException;
 
-                await Module.CommandService._cmdLogger.ErrorAsync(ex).ConfigureAwait(false);
+                var interactionException = new InteractionException(this, context, ex);
+                await Module.CommandService._cmdLogger.ErrorAsync(interactionException).ConfigureAwait(false);
 
                 var result = ExecuteResult.FromError(ex);
                 await InvokeModuleEvent(context, result).ConfigureAwait(false);

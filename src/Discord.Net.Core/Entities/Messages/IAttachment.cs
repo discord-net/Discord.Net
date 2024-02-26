@@ -1,18 +1,13 @@
+using System;
+using System.Collections.Generic;
+
 namespace Discord
 {
     /// <summary>
     ///     Represents a message attachment found in a <see cref="IUserMessage"/>.
     /// </summary>
-    public interface IAttachment
+    public interface IAttachment : ISnowflakeEntity
     {
-        /// <summary>
-        ///     Gets the ID of this attachment.
-        /// </summary>
-        /// <returns>
-        ///     A snowflake ID associated with this attachment.
-        /// </returns>
-        ulong Id { get; }
-
         /// <summary>
         ///     Gets the filename of this attachment.
         /// </summary>
@@ -80,5 +75,25 @@ namespace Discord
         ///     Gets the base64 encoded bytearray representing a sampled waveform. <see langword="null"/> if the attachment is not a voice message.
         /// </summary>
         public string Waveform { get; }
+
+        /// <summary>
+        ///     Gets flags related to this to this attachment.
+        /// </summary>
+        public AttachmentFlags Flags { get; }
+
+        /// <summary>
+        ///     Gets users who participated in the clip.
+        /// </summary>
+        public IReadOnlyCollection<IUser> ClipParticipants { get; }
+
+        /// <summary>
+        ///     Gets the title of the clip. <see langword="null"/> if the clip has no title set.
+        /// </summary>
+        public string Title { get; }
+
+        /// <summary>
+        ///     Gets the timestamp of the clip. <see langword="null"/> if the attachment is not a clip.
+        /// </summary>
+        public DateTimeOffset? ClipCreatedAt { get; }
     }
 }

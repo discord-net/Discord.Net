@@ -54,7 +54,7 @@ namespace Discord
 
         public Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();
         public Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();
-        public Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false) => throw new NotImplementedException();
+        public Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false, bool disconnect = true) => throw new NotImplementedException();
         public Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null) => throw new NotImplementedException();
         public Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null) => throw new NotImplementedException();
         public Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null) => throw new NotImplementedException();
@@ -76,6 +76,8 @@ namespace Discord
         public Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null) => throw new NotImplementedException();
         public IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null) => throw new NotImplementedException();
         public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null) => throw new NotImplementedException();
+        public Task SetStatusAsync(string status, RequestOptions options = null) => throw new NotImplementedException();
+
         public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null) => throw new NotImplementedException();
         public Task ModifyAsync(Action<AudioChannelProperties> func, RequestOptions options = null) => throw new NotImplementedException();
         public Task<IUserMessage> ModifyMessageAsync(ulong messageId, Action<MessageProperties> func, RequestOptions options = null) => throw new NotImplementedException();

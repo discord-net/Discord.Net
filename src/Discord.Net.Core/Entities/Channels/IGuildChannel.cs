@@ -115,12 +115,12 @@ namespace Discord
         ///     Adds or updates the permission overwrite for the given role.
         /// </summary>
         /// <example>
-        ///     <para>The following example fetches a role via <see cref="IGuild.GetRole"/> and a channel via 
-        ///     <see cref="IGuild.GetChannelAsync"/>. Next, it checks if an overwrite had already been set via 
+        ///     <para>The following example fetches a role via <see cref="IGuild.GetRole"/> and a channel via
+        ///     <see cref="IGuild.GetChannelAsync"/>. Next, it checks if an overwrite had already been set via
         ///     <see cref="GetPermissionOverwrite(Discord.IRole)"/>; if not, it denies the role from sending any
         ///     messages to the channel.</para>
         ///     <code language="cs" region="AddPermissionOverwriteAsyncRole"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IGuildChannel.Examples.cs"/>
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Channels/IGuildChannel.Examples.cs"/>
         /// </example>
         /// <param name="role">The role to add the overwrite to.</param>
         /// <param name="permissions">The overwrite to add to the role.</param>
@@ -134,12 +134,12 @@ namespace Discord
         ///     Adds or updates the permission overwrite for the given user.
         /// </summary>
         /// <example>
-        ///     <para>The following example fetches a user via <see cref="IGuild.GetUserAsync"/> and a channel via 
-        ///     <see cref="IGuild.GetChannelAsync"/>. Next, it checks if an overwrite had already been set via 
+        ///     <para>The following example fetches a user via <see cref="IGuild.GetUserAsync"/> and a channel via
+        ///     <see cref="IGuild.GetChannelAsync"/>. Next, it checks if an overwrite had already been set via
         ///     <see cref="GetPermissionOverwrite(Discord.IUser)"/>; if not, it denies the user from sending any
         ///     messages to the channel.</para>
         ///     <code language="cs" region="AddPermissionOverwriteAsyncUser"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IGuildChannel.Examples.cs"/>
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Channels/IGuildChannel.Examples.cs"/>
         /// </example>
         /// <param name="user">The user to add the overwrite to.</param>
         /// <param name="permissions">The overwrite to add to the user.</param>

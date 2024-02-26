@@ -97,7 +97,7 @@ namespace Discord.Net.Rest
         }
 
         /// <exception cref="InvalidOperationException">Unsupported param type.</exception>
-        public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly, string reason = null,
+        public Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly, string reason = null,
             IEnumerable<KeyValuePair<string, IEnumerable<string>>> requestHeaders = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
@@ -162,7 +162,7 @@ namespace Discord.Net.Rest
             }
 
             restRequest.Content = content;
-            return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
+            return SendInternalAsync(restRequest, cancelToken, headerOnly);
         }
 
         private async Task<RestResponse> SendInternalAsync(HttpRequestMessage request, CancellationToken cancelToken, bool headerOnly)

@@ -4,14 +4,12 @@
       "src": [
         {
           "src": "../src",
-          "files": ["**.csproj"]
+          "files": ["**/*.csproj"],
+          "exclude": ["Discord.Net.DebugTools/*.csproj"]
         }
       ],
       "dest": "api",
-      "filter": "filterConfig.yml",
-      "properties": {
-        "TargetFramework": "net5.0"
-      }
+      "filter": "filterConfig.yml"
     }
   ],
   "build": {
@@ -41,30 +39,30 @@
           "langwordMapping.yml",
           "marketing/logo/**.svg",
           "marketing/logo/**.png",
-          "favicon.ico"
+          "favicon.ico",
+          "../src/Discord.Net.Examples/**.cs"
         ]
       }
     ],
-    "dest": "_site",
+    "output": "_site",
     "template": [
       "default",
-      "_template/light-dark-theme",
-      "_template/last-modified",
+      "modern",
+      "_template/material",
       "_template/description-generator"
     ],
     "postProcessors": [
       "ExtractSearchIndex",
-      "LastModifiedPostProcessor",
       "DescriptionPostProcessor"
     ],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
       "_appTitle": "Discord.Net Documentation",
-      "_appFooter": "Discord.Net (c) 2015-2023 3.11.0",
+      "_appFooter": "Discord.Net © 2015-2024 3.13.1",
       "_enableSearch": true,
       "_appLogoPath": "marketing/logo/SVG/Logomark Purple.svg",
       "_appFaviconPath": "favicon.ico"
     },
-    "xrefService": ["https://xref.docs.microsoft.com/query?uid={uid}"]
+    "xref": ["https://github.com/dotnet/docfx/raw/main/.xrefmap.json"]
   }
 }

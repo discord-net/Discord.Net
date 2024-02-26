@@ -39,6 +39,8 @@ namespace Discord.WebSocket
                     IGroupChannel groupChannel => ChannelType.Group,
                     INewsChannel newsChannel => ChannelType.News,
                     ITextChannel textChannel => ChannelType.Text,
+                    IMediaChannel mediaChannel => ChannelType.Media,
+                    IForumChannel forumChannel => ChannelType.Forum,
                     _ => throw new InvalidOperationException("Invalid channel type."),
                 };
             }
