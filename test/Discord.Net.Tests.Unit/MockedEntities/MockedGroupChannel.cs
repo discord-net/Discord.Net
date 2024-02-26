@@ -18,7 +18,7 @@ namespace Discord
 
         public string RTCRegion => throw new NotImplementedException();
 
-        public Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false)
+        public Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false, bool disconnect = true)
         {
             throw new NotImplementedException();
         }
