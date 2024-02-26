@@ -53,7 +53,7 @@ namespace Discord
 
         public Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();
         public Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null) => throw new NotImplementedException();
-        public Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false) => throw new NotImplementedException();
+        public Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false, bool disconnect = true) => throw new NotImplementedException();
         public Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null) => throw new NotImplementedException();
         public Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null) => throw new NotImplementedException();
         public Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null) => throw new NotImplementedException();
