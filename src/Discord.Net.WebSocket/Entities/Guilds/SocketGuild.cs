@@ -1723,14 +1723,15 @@ namespace Discord.WebSocket
         {
             return _audioClient?.GetInputStream(userId);
         }
-        internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute, bool external)
+        internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute, bool external, bool disconnect = true)
         {
             TaskCompletionSource<AudioClient> promise;
 
             await _audioLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectAudioInternalAsync().ConfigureAwait(false);
+                if (disconnect)
+                    await DisconnectAudioInternalAsync().ConfigureAwait(false);
                 promise = new TaskCompletionSource<AudioClient>();
                 _audioConnectPromise = promise;
 
