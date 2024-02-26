@@ -58,8 +58,8 @@ namespace Discord.WebSocket
         public override DiscordSocketRestClient Rest { get; }
         /// <summary> Gets the shard of this client. </summary>
         public int ShardId { get; }
-        /// <summary> Gets the current connection state of this client. </summary>
-        public ConnectionState ConnectionState => _connection.State;
+        /// <inheritdoc />
+        public override ConnectionState ConnectionState => _connection.State;
         /// <inheritdoc />
         public override int Latency { get; protected set; }
         /// <inheritdoc />
