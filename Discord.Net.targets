@@ -9,6 +9,7 @@
         <PackageIcon>PackageLogo.png</PackageIcon>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>git://github.com/Discord-Net/Discord.Net</RepositoryUrl>
+        <PackageReadmeFile>NUGET_README.md</PackageReadmeFile>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(BuildNumber)' == '' ">
         <VersionSuffix Condition=" '$(VersionSuffix)' != ''">$(VersionSuffix)-dev</VersionSuffix>
@@ -25,5 +26,6 @@
     </PropertyGroup>
     <ItemGroup>
         <None Include="../../docs/marketing/logo/PackageLogo.png" Pack="true" PackagePath=""/>
+        <None Include="../../NUGET_README.md" Pack="true" PackagePath=""/>
     </ItemGroup>
 </Project>

@@ -102,11 +102,12 @@ namespace Discord
         /// </summary>
         /// <param name="guildId">The guild snowflake identifier.</param>
         /// <param name="iconId">The icon identifier.</param>
+        /// <param name="size">The size of the image to return in horizontal pixels. This can be any power of two between 16 and 2048.</param>
         /// <returns>
         ///     A URL pointing to the guild's icon.
         /// </returns>
-        public static string GetGuildIconUrl(ulong guildId, string iconId)
-            => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg" : null;
+        public static string GetGuildIconUrl(ulong guildId, string iconId, ushort size = 2048)
+            => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg?size={size}" : null;
         /// <summary>
         ///     Returns a guild role's icon URL.
         /// </summary>

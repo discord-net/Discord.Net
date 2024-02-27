@@ -370,7 +370,7 @@ namespace Discord.API
             Preconditions.GreaterThan(args.Bitrate, 0, nameof(args.Bitrate));
             Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
             Preconditions.AtMost(args.Name.Length, 100, nameof(args.Name));
-            if (args.Topic.IsSpecified)
+            if (args.Topic is { IsSpecified: true, Value: not null })
                 Preconditions.AtMost(args.Topic.Value.Length, 1024, nameof(args.Name));
 
             options = RequestOptions.CreateOrClone(options);
