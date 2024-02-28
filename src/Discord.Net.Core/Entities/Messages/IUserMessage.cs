@@ -27,7 +27,7 @@ namespace Discord
         /// <remarks>
         ///     Will be <see langword="null"/> if the message is not a response to an interaction.
         /// </remarks>
-        BaseMessageInteractionMetadata InteractionMetadata { get; }
+        IMessageInteractionMetadata InteractionMetadata { get; }
 
         /// <summary>
         ///     Modifies this message.

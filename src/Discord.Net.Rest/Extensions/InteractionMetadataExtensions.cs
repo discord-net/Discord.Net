@@ -4,7 +4,7 @@ namespace Discord.Rest;
 
 internal static class InteractionMetadataExtensions
 {
-    public static BaseMessageInteractionMetadata ToInteractionMetadata(this API.MessageInteractionMetadata metadata)
+    public static IMessageInteractionMetadata ToInteractionMetadata(this API.MessageInteractionMetadata metadata)
     {
         switch (metadata.Type)
         {

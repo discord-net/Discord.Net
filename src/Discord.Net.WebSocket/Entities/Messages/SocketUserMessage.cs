@@ -50,7 +50,7 @@ namespace Discord.WebSocket
         public IUserMessage ReferencedMessage => _referencedMessage;
 
         /// <inheritdoc />
-        public BaseMessageInteractionMetadata InteractionMetadata { get; internal set; }
+        public IMessageInteractionMetadata InteractionMetadata { get; internal set; }
 
         /// <inheritdoc />
         public MessageResolvedData ResolvedData { get; internal set; }
