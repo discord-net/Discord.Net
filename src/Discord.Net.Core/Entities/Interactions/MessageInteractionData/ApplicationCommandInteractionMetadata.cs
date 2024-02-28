@@ -6,7 +6,7 @@ namespace Discord;
 /// <summary>
 ///     
 /// </summary>
-public class ApplicationCommandInteractionMetadata : IMessageInteractionMetadata
+public readonly struct ApplicationCommandInteractionMetadata : IMessageInteractionMetadata
 {
     /// <inheritdoc />
     public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
