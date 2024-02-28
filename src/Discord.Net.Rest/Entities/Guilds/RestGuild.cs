@@ -91,21 +91,10 @@ namespace Discord.Rest
         public int? ApproximatePresenceCount { get; private set; }
         /// <inheritdoc/>
         public int MaxBitrate
-        {
-            get
-            {
-                return PremiumTier switch
-                {
-                    PremiumTier.Tier1 => 128000,
-                    PremiumTier.Tier2 => 256000,
-                    PremiumTier.Tier3 => 384000,
-                    _ => 96000,
-                };
-            }
-        }
+            => GuildHelper.GetMaxBitrate(PremiumTier);
         /// <inheritdoc/>
         public ulong MaxUploadLimit
-            => GuildHelper.GetUploadLimit(this);
+            => GuildHelper.GetUploadLimit(PremiumTier);
         /// <inheritdoc />
         public NsfwLevel NsfwLevel { get; private set; }
         /// <inheritdoc />
