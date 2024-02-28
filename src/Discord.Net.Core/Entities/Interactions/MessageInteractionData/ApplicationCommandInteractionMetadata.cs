@@ -35,5 +35,6 @@ public readonly struct ApplicationCommandInteractionMetadata : IMessageInteracti
         Type = type;
         IntegrationOwners = integrationOwners;
         OriginalResponseMessageId = originalResponseMessageId;
+        Name = name;
     }
 }
