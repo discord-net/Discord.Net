@@ -519,7 +519,7 @@ namespace Discord.Interactions
         {
             EnsureClientReady();
 
-            var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).ToList();
+            var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).Distinct().ToList();
 
             if (!deleteMissing)
             {
@@ -543,7 +543,7 @@ namespace Discord.Interactions
         {
             EnsureClientReady();
 
-            var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).ToList();
+            var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).Distinct().ToList();
 
             if (!deleteMissing)
             {
