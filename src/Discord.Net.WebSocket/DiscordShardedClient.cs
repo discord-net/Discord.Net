@@ -431,6 +431,8 @@ namespace Discord.WebSocket
                 return Task.Delay(0);
             };
 
+            client.SentRequest += (method, endpoint, millis) => _sentRequest.InvokeAsync(method, endpoint, millis);
+
             client.Connected += () => _shardConnectedEvent.InvokeAsync(client);
             client.Disconnected += (exception) => _shardDisconnectedEvent.InvokeAsync(exception, client);
             client.Ready += () => _shardReadyEvent.InvokeAsync(client);
