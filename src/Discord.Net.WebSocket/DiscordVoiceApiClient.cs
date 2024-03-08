@@ -166,6 +166,16 @@ namespace Discord.Audio
             });
         }
 
+        public Task SendResume(string token, string sessionId)
+        {
+            return SendAsync(VoiceOpCode.Resume, new ResumeParams
+            {
+                ServerId = GuildId,
+                SessionId = sessionId,
+                Token = token
+            });
+        }
+
         public async Task ConnectAsync(string url)
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
