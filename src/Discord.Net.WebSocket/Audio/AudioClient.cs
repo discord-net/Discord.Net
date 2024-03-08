@@ -22,19 +22,10 @@ namespace Discord.Audio
         private static readonly int ConnectionTimeoutMs = 30000; // 30 seconds
         private static readonly int KeepAliveIntervalMs = 5000; // 5 seconds
 
-        private static readonly int[] BlacklistedResumeCodes =
-        [
-            4001,
-            4002,
-            4003,
-            4004,
-            4005,
-            4006,
-            4009,
-            4012,
-            1014,
-            4016
-        ];
+        private static readonly int[] BlacklistedResumeCodes = new int[]
+        {
+            4001, 4002, 4003, 4004, 4005, 4006, 4009, 4012, 1014, 4016
+        };
 
         private struct StreamPair
         {
