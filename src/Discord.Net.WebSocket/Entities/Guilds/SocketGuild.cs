@@ -1761,7 +1761,7 @@ namespace Discord.WebSocket
                     var audioClient = new AudioClient(this, Discord.GetAudioId(), channelId);
                     audioClient.Disconnected += async ex =>
                     {
-                        if (!promise.Task.IsCompleted)
+                        if (promise.Task.IsCompleted && audioClient.IsFinished)
                         {
                             try
                             { audioClient.Dispose(); }

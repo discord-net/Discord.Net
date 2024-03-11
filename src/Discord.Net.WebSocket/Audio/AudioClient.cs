@@ -64,6 +64,7 @@ namespace Discord.Audio
         public int UdpLatency { get; private set; }
         public ulong ChannelId { get; internal set; }
         internal byte[] SecretKey { get; private set; }
+        internal bool IsFinished { get; private set; }
 
         private DiscordSocketClient Discord => Guild.Discord;
         public ConnectionState ConnectionState => _connection.State;
@@ -86,6 +87,7 @@ namespace Discord.Audio
             _connection = new ConnectionManager(_stateLock, _audioLogger, ConnectionTimeoutMs,
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => _connectedEvent.InvokeAsync();
+            _connection.Disconnected += (exception, _) => _disconnectedEvent.InvokeAsync(exception);
             _heartbeatTimes = new ConcurrentQueue<long>();
             _keepaliveTimes = new ConcurrentQueue<KeyValuePair<ulong, int>>();
             _ssrcMap = new ConcurrentDictionary<uint, ulong>();
@@ -201,7 +203,7 @@ namespace Discord.Audio
 
                 await ClearInputStreamsAsync().ConfigureAwait(false);
 
-                await Task.Run(() => _disconnectedEvent.InvokeAsync(ex)).ConfigureAwait(false);
+                IsFinished = true;
             }
         }
 
