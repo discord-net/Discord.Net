@@ -261,7 +261,7 @@ namespace Discord.Rest
         #region IAudioChannel
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Connecting to a group channel is not supported.</exception>
-        Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
+        Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external, bool disconnect) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
         Task IAudioChannel.ModifyAsync(Action<AudioChannelProperties> func, RequestOptions options) { throw new NotSupportedException(); }
         #endregion

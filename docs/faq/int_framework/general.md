@@ -43,16 +43,16 @@ Ideally, use pattern matching to make sure its the type of interaction you are e
 
 ## My interaction commands are not showing up?
 
-If you registered your commands globally, it can take up to 1 hour for them to register.
-Did you register a guild command (should be instant), or waited more than an hour and still don't have them show up?
-
 - Try to check for any errors in the console, there is a good chance something might have been thrown.
+- - Make sure you have setup logging. If you use `InteractionService` hook into [`InteractionService.Log`]) event
 
 - Register your commands after the Ready event in the client. The client is not configured to register commands before this moment.
 
-- Check if no bad form exception is thrown; If so, refer to the above question.
+- Check if no bad form exception is thrown;
 
 - Do you have the application commands scope checked when adding your bot to guilds?
+
+- Try reloading your Discord client. On desktop it's done with `Ctrl+R` key combo.
 
 ## Do I need to create commands on startup?
 
@@ -65,3 +65,6 @@ Overwriting is only required if you make changes to existing commands, or add ne
 Message and user commands have a limit of 5 per guild, and another 5 globally.
 If you have more than 5 guild-only message commands being registered, no more than 5 will actually show up.
 You can get up to 10 entries to show if you register 5 per guild, and another 5 globally.
+
+
+[`InteractionService.Log`]: xref:Discord.Interactions.InteractionService.Log
