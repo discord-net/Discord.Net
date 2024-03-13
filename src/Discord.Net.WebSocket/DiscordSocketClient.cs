@@ -58,8 +58,8 @@ namespace Discord.WebSocket
         public override DiscordSocketRestClient Rest { get; }
         /// <summary> Gets the shard of this client. </summary>
         public int ShardId { get; }
-        /// <summary> Gets the current connection state of this client. </summary>
-        public ConnectionState ConnectionState => _connection.State;
+        /// <inheritdoc />
+        public override ConnectionState ConnectionState => _connection.State;
         /// <inheritdoc />
         public override int Latency { get; protected set; }
         /// <inheritdoc />
@@ -648,7 +648,6 @@ namespace Discord.WebSocket
             if (ConnectionState == ConnectionState.Connected)
             {
                 EnsureGatewayIntent(GatewayIntents.GuildMembers);
-
                 //Race condition leads to guilds being requested twice, probably okay
                 return ProcessUserDownloadsAsync(guilds.Select(x => GetGuild(x.Id)).Where(x => x != null));
             }
@@ -722,7 +721,12 @@ namespace Discord.WebSocket
             if (!string.IsNullOrEmpty(streamUrl))
                 Activity = new StreamingGame(name, streamUrl);
             else if (!string.IsNullOrEmpty(name))
-                Activity = new Game(name, type);
+            {
+                if (type is ActivityType.CustomStatus)
+                    Activity = new CustomStatusGame(name);
+                else
+                    Activity = new Game(name, type);
+            }
             else
                 Activity = null;
             return SendStatusAsync();
@@ -997,7 +1001,14 @@ namespace Discord.WebSocket
                                                 return;
 
                                             if (BaseConfig.AlwaysDownloadUsers)
-                                                _ = DownloadUsersAsync(Guilds.Where(x => x.IsAvailable && !x.HasAllMembers));
+                                                try
+                                                {
+                                                    _ = DownloadUsersAsync(Guilds.Where(x => x.IsAvailable && !x.HasAllMembers));
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    await _gatewayLogger.WarningAsync(ex);
+                                                }
 
                                             await TimedInvokeAsync(_readyEvent, nameof(Ready)).ConfigureAwait(false);
                                             await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);

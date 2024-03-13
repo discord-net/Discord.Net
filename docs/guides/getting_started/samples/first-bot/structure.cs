@@ -10,21 +10,7 @@ using Discord.WebSocket;
 class Program
 {
     // Program entry point
-    static Task Main(string[] args)
-    {
-        // Call the Program constructor, followed by the 
-        // MainAsync method and wait until it finishes (which should be never).
-        return new Program().MainAsync();
-    }
-
-    private readonly DiscordSocketClient _client;
-    
-    // Keep the CommandService and DI container around for use with commands.
-    // These two types require you install the Discord.Net.Commands package.
-    private readonly CommandService _commands;
-    private readonly IServiceProvider _services;
-
-    private Program()
+    static async Task Main(string[] args)
     {
         _client = new DiscordSocketClient(new DiscordSocketConfig
         {
@@ -58,8 +44,14 @@ class Program
         
         // Setup your DI container.
         _services = ConfigureServices();
-        
     }
+
+    private static DiscordSocketClient _client;
+    
+    // Keep the CommandService and DI container around for use with commands.
+    // These two types require you install the Discord.Net.Commands package.
+    private static CommandService _commands;
+    private static IServiceProvider _services;
     
     // If any services require the client, or the CommandService, or something else you keep on hand,
     // pass them as parameters into this method as needed.
@@ -110,7 +102,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private async Task MainAsync()
+    private static async Task MainAsync()
     {
         // Centralize the logic for commands into a separate method.
         await InitCommands();
@@ -125,7 +117,7 @@ class Program
         await Task.Delay(Timeout.Infinite);
     }
 
-    private async Task InitCommands()
+    private static async Task InitCommands()
     {
         // Either search the program and add all Module classes that can be found.
         // Module classes MUST be marked 'public' or they will be ignored.
@@ -140,7 +132,7 @@ class Program
         _client.MessageReceived += HandleCommandAsync;
     }
 
-    private async Task HandleCommandAsync(SocketMessage arg)
+    private static async Task HandleCommandAsync(SocketMessage arg)
     {
         // Bail out if it's a System Message.
         var msg = arg as SocketUserMessage;

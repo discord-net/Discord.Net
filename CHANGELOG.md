@@ -1,5 +1,29 @@
 # Changelog
 
+## [3.13.1] - 2024-02-11
+
+### Added
+- #2804 Add Incident actions message types (178ff58)
+- #2805 Add `AppliedTags` to `DiscordWebhookClient.SendXAsync` (d382e5c)
+- #2700 Optional Aliasses, Summary and Remarks Properties to CommandAttribute (5a8582c)
+- #2584 Log InteractionCommand execution exceptions in Wrapped Exception (0f0f3f7)
+- #2827 `44` (Add message type 44) (541571c)
+- #2837 Allow creating announcement channels (f1777de)
+
+### Fixed
+- #2801 Add null check in `SelectMenuBuilder` (b18cc31)
+- #2813 Incorrect json model for Guild Scheduled Events (de4b6b9)
+- #2800 Warning about missing intents not being logged (8227d70)
+- #2818 `GetEventCoverImageUrl` throwing NRE in case event cover image is null (138e18c)
+
+### Misc
+- #2807 Incorrect xmldoc (d234db7)
+- #2823 Update sample projects & samples in docs (e2e8c0f)
+- #2819 [2024] Very important changes (update licence & docs) (ff9b9b4)
+- #2831 Add checks for whitespace-only strings in button builder (89efe0f)
+- #2835 Additional select menu option validations (4d7e384)
+
+
 ## [3.13.0] - 2023-11-18
 
 ### Added

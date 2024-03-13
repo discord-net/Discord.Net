@@ -203,21 +203,10 @@ namespace Discord.WebSocket
         }
         /// <inheritdoc/>
         public int MaxBitrate
-        {
-            get
-            {
-                return PremiumTier switch
-                {
-                    PremiumTier.Tier1 => 128000,
-                    PremiumTier.Tier2 => 256000,
-                    PremiumTier.Tier3 => 384000,
-                    _ => 96000,
-                };
-            }
-        }
+            => GuildHelper.GetMaxBitrate(PremiumTier);
         /// <inheritdoc/>
         public ulong MaxUploadLimit
-            => GuildHelper.GetUploadLimit(this);
+            => GuildHelper.GetUploadLimit(PremiumTier);
         /// <summary>
         ///     Gets the widget channel (i.e. the channel set in the guild's widget settings) in this guild.
         /// </summary>
@@ -840,6 +829,11 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<RestTextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateTextChannelAsync(this, Discord, name, options, func);
+
+        /// <inheritdoc cref="IGuild.CreateNewsChannelAsync"/>
+        public Task<RestNewsChannel> CreateNewsChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null)
+            => GuildHelper.CreateNewsChannelAsync(this, Discord, name, options, func);
+
         /// <summary>
         ///     Creates a new voice channel in this guild.
         /// </summary>
@@ -1729,14 +1723,15 @@ namespace Discord.WebSocket
         {
             return _audioClient?.GetInputStream(userId);
         }
-        internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute, bool external)
+        internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute, bool external, bool disconnect = true)
         {
             TaskCompletionSource<AudioClient> promise;
 
             await _audioLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectAudioInternalAsync().ConfigureAwait(false);
+                if (disconnect || !external)
+                    await DisconnectAudioInternalAsync().ConfigureAwait(false);
                 promise = new TaskCompletionSource<AudioClient>();
                 _audioConnectPromise = promise;
 
@@ -1750,11 +1745,9 @@ namespace Discord.WebSocket
 
                 if (external)
                 {
-#pragma warning disable IDISP001
-                    var _ = promise.TrySetResultAsync(null);
+                    _ = promise.TrySetResultAsync(null);
                     await Discord.ApiClient.SendVoiceStateUpdateAsync(_voiceStateUpdateParams).ConfigureAwait(false);
                     return null;
-#pragma warning restore IDISP001
                 }
 
                 if (_audioClient == null)
@@ -1772,19 +1765,15 @@ namespace Discord.WebSocket
                                 await promise.TrySetExceptionAsync(ex);
                             else
                                 await promise.TrySetCanceledAsync();
-                            return;
                         }
                     };
                     audioClient.Connected += () =>
                     {
-#pragma warning disable IDISP001
-                        var _ = promise.TrySetResultAsync(_audioClient);
-#pragma warning restore IDISP001
+                        _ = promise.TrySetResultAsync(_audioClient);
                         return Task.Delay(0);
                     };
-#pragma warning disable IDISP003
+
                     _audioClient = audioClient;
-#pragma warning restore IDISP003
                 }
 
                 await Discord.ApiClient.SendVoiceStateUpdateAsync(_voiceStateUpdateParams).ConfigureAwait(false);
@@ -2132,6 +2121,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, Action<TextChannelProperties> func, RequestOptions options)
             => await CreateTextChannelAsync(name, func, options).ConfigureAwait(false);
+
+        /// <inheritdoc />
+        async Task<INewsChannel> IGuild.CreateNewsChannelAsync(string name, Action<TextChannelProperties> func, RequestOptions options)
+            => await CreateNewsChannelAsync(name, func, options).ConfigureAwait(false);
+
         /// <inheritdoc />
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func, RequestOptions options)
             => await CreateVoiceChannelAsync(name, func, options).ConfigureAwait(false);

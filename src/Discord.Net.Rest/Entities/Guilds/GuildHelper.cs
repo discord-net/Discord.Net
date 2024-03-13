@@ -136,17 +136,29 @@ namespace Discord.Rest
         public static Task DeleteAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
             => client.ApiClient.DeleteGuildAsync(guild.Id, options);
 
-        public static ulong GetUploadLimit(IGuild guild)
+        public static int GetMaxBitrate(PremiumTier premiumTier)
         {
-            var tierFactor = guild.PremiumTier switch
+            return premiumTier switch
+            {
+                PremiumTier.Tier1 => 128000,
+                PremiumTier.Tier2 => 256000,
+                PremiumTier.Tier3 => 384000,
+                _ => 96000,
+            };
+        }
+
+        public static ulong GetUploadLimit(PremiumTier premiumTier)
+        {
+            ulong tierFactor = premiumTier switch
             {
                 PremiumTier.Tier2 => 50,
                 PremiumTier.Tier3 => 100,
                 _ => 25
             };
 
-            var mebibyte = Math.Pow(2, 20);
-            return (ulong)(tierFactor * mebibyte);
+            // 1 << 20 = 2 pow 20
+            var mebibyte = 1UL << 20;
+            return tierFactor * mebibyte;
         }
 
         public static async Task<GuildIncidentsData> ModifyGuildIncidentActionsAsync(IGuild guild, BaseDiscordClient client, Action<GuildIncidentsDataProperties> func, RequestOptions options = null)
@@ -280,6 +292,39 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
         }
+
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
+        public static async Task<RestNewsChannel> CreateNewsChannelAsync(IGuild guild, BaseDiscordClient client,
+            string name, RequestOptions options, Action<TextChannelProperties> func = null)
+        {
+            if (name == null)
+                throw new ArgumentNullException(paramName: nameof(name));
+
+            var props = new TextChannelProperties();
+            func?.Invoke(props);
+
+            var args = new CreateGuildChannelParams(name, ChannelType.News)
+            {
+                CategoryId = props.CategoryId,
+                Topic = props.Topic,
+                IsNsfw = props.IsNsfw,
+                Position = props.Position,
+                SlowModeInterval = props.SlowModeInterval,
+                Overwrites = props.PermissionOverwrites.IsSpecified
+                    ? props.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
+                DefaultAutoArchiveDuration = props.AutoArchiveDuration
+            };
+            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
+            return RestNewsChannel.Create(client, guild, model);
+        }
+
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestVoiceChannel> CreateVoiceChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<VoiceChannelProperties> func = null)
