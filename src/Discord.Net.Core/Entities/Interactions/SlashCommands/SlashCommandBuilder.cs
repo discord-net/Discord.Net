@@ -76,28 +76,14 @@ namespace Discord
         public IReadOnlyDictionary<string, string> DescriptionLocalizations => _descriptionLocalizations;
 
         /// <summary>
-        ///     
+        ///     Gets the context types this command can be executed in. <see langword="null"/> if not set.
         /// </summary>
-        public HashSet<InteractionContextType> ContextTypes
-        {
-            get => _contextTypes;
-            set
-            {
-                _contextTypes = value;
-            }
-        }
+        public HashSet<InteractionContextType> ContextTypes { get; set; }
 
         /// <summary>
-        ///     
+        ///     Gets the installation method for this command. <see langword="null"/> if not set.
         /// </summary>
-        public HashSet<ApplicationIntegrationType> IntegrationTypes
-        {
-            get => _integrationTypes;
-            set
-            {
-                _integrationTypes = value;
-            }
-        }
+        public HashSet<ApplicationIntegrationType> IntegrationTypes { get; set; }
 
         /// <summary>
         ///     Gets or sets whether the command is enabled by default when the app is added to a guild
@@ -124,8 +110,6 @@ namespace Discord
         private Dictionary<string, string> _nameLocalizations;
         private Dictionary<string, string> _descriptionLocalizations;
         private List<SlashCommandOptionBuilder> _options;
-        private HashSet<ApplicationIntegrationType> _integrationTypes;
-        private HashSet<InteractionContextType> _contextTypes;
 
         /// <summary>
         ///     Build the current builder into a <see cref="SlashCommandProperties"/> class.
@@ -134,8 +118,8 @@ namespace Discord
         public SlashCommandProperties Build()
         {
             // doing ?? 1 for now until we know default values (if these become non-optional)
-            Preconditions.AtLeast(_contextTypes?.Count ?? 1, 1, nameof(ContextTypes), "At least 1 context type must be specified");
-            Preconditions.AtLeast(_integrationTypes?.Count ?? 1, 1, nameof(IntegrationTypes), "At least 1 integration type must be specified");
+            Preconditions.AtLeast(ContextTypes?.Count ?? 1, 1, nameof(ContextTypes), "At least 1 context type must be specified");
+            Preconditions.AtLeast(IntegrationTypes?.Count ?? 1, 1, nameof(IntegrationTypes), "At least 1 integration type must be specified");
 
             var props = new SlashCommandProperties
             {
@@ -147,8 +131,8 @@ namespace Discord
                 IsDMEnabled = IsDMEnabled,
                 DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified,
                 IsNsfw = IsNsfw,
-                ContextTypes = _contextTypes ?? Optional<HashSet<InteractionContextType>>.Unspecified,
-                IntegrationTypes = _integrationTypes ?? Optional<HashSet<ApplicationIntegrationType>>.Unspecified
+                ContextTypes = ContextTypes ?? Optional<HashSet<InteractionContextType>>.Unspecified,
+                IntegrationTypes = IntegrationTypes ?? Optional<HashSet<ApplicationIntegrationType>>.Unspecified
             };
 
             if (Options != null && Options.Any())
@@ -232,9 +216,9 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Sets the install method for this command.
+        ///     Sets the installation method for this command.
         /// </summary>
-        /// <param name="integrationTypes">Install types for this command.</param>
+        /// <param name="integrationTypes">Installation types for this command.</param>
         /// <returns>The builder instance.</returns>
         public SlashCommandBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
         {
