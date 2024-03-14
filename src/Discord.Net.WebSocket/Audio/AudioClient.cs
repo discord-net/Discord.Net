@@ -578,7 +578,7 @@ namespace Discord.Audio
         }
 
         /// <summary>
-        /// Waits until all post-disconnect actions are done.
+        ///     Waits until all post-disconnect actions are done.
         /// </summary>
         /// <param name="timeout">Maximum time to wait.</param>
         /// <returns>
