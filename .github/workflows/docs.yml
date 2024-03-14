@@ -6,6 +6,8 @@ on:
       - '*'
     paths:
       - 'docs/**'
+    branches:
+      - 'dev'
   workflow_dispatch:
   pull_request:
     paths:
