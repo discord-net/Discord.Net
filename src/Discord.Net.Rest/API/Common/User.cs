@@ -16,6 +16,8 @@ namespace Discord.API
         public Optional<string> Avatar { get; set; }
         [JsonProperty("banner")]
         public Optional<string> Banner { get; set; }
+        [JsonProperty("banner_color")]
+        public Optional<Color?> BannerColor { get; set; }
         [JsonProperty("accent_color")]
         public Optional<uint?> AccentColor { get; set; }
 
