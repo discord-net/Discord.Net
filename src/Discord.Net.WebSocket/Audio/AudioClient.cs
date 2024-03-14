@@ -581,7 +581,9 @@ namespace Discord.Audio
         /// Waits until all post-disconnect actions are done.
         /// </summary>
         /// <param name="timeout">Maximum time to wait.</param>
-        /// <returns>A <see cref="Task"/> that represents an asynchronous process of waiting.</returns>
+        /// <returns>
+        ///     A <see cref="Task"/> that represents an asynchronous process of waiting.
+        /// </returns>
         internal async Task WaitForDisconnectAsync(TimeSpan timeout)
         {
             if (ConnectionState == ConnectionState.Disconnected)
