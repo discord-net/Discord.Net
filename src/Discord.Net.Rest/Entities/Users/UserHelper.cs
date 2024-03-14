@@ -17,7 +17,8 @@ namespace Discord.Rest
             var apiArgs = new API.Rest.ModifyCurrentUserParams
             {
                 Avatar = args.Avatar.IsSpecified ? args.Avatar.Value?.ToModel() : Optional.Create<ImageModel?>(),
-                Username = args.Username
+                Username = args.Username,
+                Banner = args.Banner.IsSpecified ? args.Banner.Value?.ToModel() : Optional.Create<ImageModel?>()
             };
 
             if (!apiArgs.Avatar.IsSpecified && user.AvatarId != null)
