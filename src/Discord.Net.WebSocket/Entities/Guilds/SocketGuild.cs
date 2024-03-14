@@ -1450,7 +1450,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of the requested audit log entries.
-        /// </returns>        
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null, ActionType? actionType = null, ulong? afterId = null)
             => GuildHelper.GetAuditLogsAsync(this, Discord, beforeId, limit, options, userId: userId, actionType: actionType, afterId: afterId);
 
@@ -1687,7 +1687,7 @@ namespace Discord.WebSocket
                     if (after.VoiceChannel != null && _audioClient.ChannelId != after.VoiceChannel?.Id)
                     {
                         _audioClient.ChannelId = after.VoiceChannel.Id;
-                        await RepopulateAudioStreamsAsync().ConfigureAwait(false);
+                        await _audioClient.StopAsync(Audio.AudioClient.StopReason.Moved);
                     }
                 }
                 else
@@ -1711,7 +1711,13 @@ namespace Discord.WebSocket
             if (_voiceStates.TryRemove(id, out SocketVoiceState voiceState))
             {
                 if (_audioClient != null)
+                {
                     await _audioClient.RemoveInputStreamAsync(id).ConfigureAwait(false); //User changed channels, end their stream
+
+                    if (id == CurrentUser.Id)
+                        await _audioClient.StopAsync(Audio.AudioClient.StopReason.Disconnected);
+                }
+
                 return voiceState;
             }
             return null;
@@ -1755,7 +1761,7 @@ namespace Discord.WebSocket
                     var audioClient = new AudioClient(this, Discord.GetAudioId(), channelId);
                     audioClient.Disconnected += async ex =>
                     {
-                        if (!promise.Task.IsCompleted)
+                        if (promise.Task.IsCompleted && audioClient.IsFinished)
                         {
                             try
                             { audioClient.Dispose(); }
@@ -1866,6 +1872,21 @@ namespace Discord.WebSocket
                 if (_audioClient != null)
                 {
                     await RepopulateAudioStreamsAsync().ConfigureAwait(false);
+
+                    if (_audioClient.ConnectionState != ConnectionState.Disconnected)
+                    {
+                        try
+                        {
+                            await _audioClient.WaitForDisconnectAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+                        }
+                        catch (TimeoutException)
+                        {
+                            await Discord.LogManager.WarningAsync("Failed to wait for disconnect audio client in time", null).ConfigureAwait(false);
+                        }
+                    }
+
+                    await Task.Delay(TimeSpan.FromMilliseconds(5)).ConfigureAwait(false);
+
                     await _audioClient.StartAsync(url, Discord.CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
                 }
             }
