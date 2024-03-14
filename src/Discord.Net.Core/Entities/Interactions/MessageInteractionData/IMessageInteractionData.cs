@@ -3,22 +3,28 @@ using System.Collections.Generic;
 namespace Discord;
 
 /// <summary>
-///     
+///     Represents the metadata of an interaction.
 /// </summary>
 public interface IMessageInteractionMetadata : ISnowflakeEntity
 {
     /// <summary>
-    ///     
+    ///     Gets the type of the interaction.
     /// </summary>
-    public InteractionType Type { get; }
+    InteractionType Type { get; }
+
+    /// <summary>
+    ///     Gets the ID of the user who triggered the interaction.
+    /// </summary>
+    ulong UserId { get; }
 
     /// <summary>
     ///     
     /// </summary>
-    public IReadOnlyDictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; }
+    IReadOnlyDictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; }
 
     /// <summary>
-    /// 
+    ///     Gets the ID of the original response message if the message is a followup.
+    ///     <see langword="null"/> on original response messages.
     /// </summary>
-    public ulong? OriginalResponseMessageId { get; }
+    ulong? OriginalResponseMessageId { get; }
 }

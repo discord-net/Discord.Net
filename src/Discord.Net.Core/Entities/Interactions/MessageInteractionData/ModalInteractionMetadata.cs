@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Discord;
 
 /// <summary>
-///     
+///     Represents the metadata of a modal interaction.
 /// </summary>
 public readonly struct ModalSubmitInteractionMetadata :IMessageInteractionMetadata
 {
@@ -18,21 +18,25 @@ public readonly struct ModalSubmitInteractionMetadata :IMessageInteractionMetada
     public InteractionType Type { get; }
 
     /// <inheritdoc />
+    public ulong UserId { get; }
+
+    /// <inheritdoc />
     public IReadOnlyDictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; }
 
     /// <inheritdoc />
     public ulong? OriginalResponseMessageId { get; }
 
     /// <summary>
-    ///     
+    ///     Gets the interaction metadata of the interaction that responded with the modal.
     /// </summary>
     public IMessageInteractionMetadata TriggeringInteractionMetadata { get; }
 
-    internal ModalSubmitInteractionMetadata(ulong id, InteractionType type, IReadOnlyDictionary<ApplicationIntegrationType, ulong> integrationOwners,
+    internal ModalSubmitInteractionMetadata(ulong id, InteractionType type, ulong userId, IReadOnlyDictionary<ApplicationIntegrationType, ulong> integrationOwners,
         ulong? originalResponseMessageId, IMessageInteractionMetadata triggeringInteractionMetadata)
     {
         Id = id;
         Type = type;
+        UserId = userId;
         IntegrationOwners = integrationOwners;
         OriginalResponseMessageId = originalResponseMessageId;
         TriggeringInteractionMetadata = triggeringInteractionMetadata;

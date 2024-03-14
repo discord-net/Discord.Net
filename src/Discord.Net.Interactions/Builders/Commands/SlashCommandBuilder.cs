@@ -50,6 +50,7 @@ namespace Discord.Interactions.Builders
         {
             IntegrationTypes = module.IntegrationTypes;
             ContextTypes = module.ContextTypes;
+            IsEnabledInDm = module.IsEnabledInDm;
         }
 
         /// <summary>

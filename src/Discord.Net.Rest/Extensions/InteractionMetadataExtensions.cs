@@ -12,6 +12,7 @@ internal static class InteractionMetadataExtensions
                 return new ApplicationCommandInteractionMetadata(
                     metadata.Id,
                     metadata.Type,
+                    metadata.UserId,
                     metadata.IntegrationOwners.ToImmutableDictionary(),
                     metadata.OriginalResponseMessageId.IsSpecified ? metadata.OriginalResponseMessageId.Value : null,
                     metadata.Name.GetValueOrDefault(null));
@@ -20,6 +21,7 @@ internal static class InteractionMetadataExtensions
                 return new MessageComponentInteractionMetadata(
                     metadata.Id,
                     metadata.Type,
+                    metadata.UserId,
                     metadata.IntegrationOwners.ToImmutableDictionary(),
                     metadata.OriginalResponseMessageId.IsSpecified ? metadata.OriginalResponseMessageId.Value : null,
                     metadata.InteractedMessageId.GetValueOrDefault(0));
@@ -28,6 +30,7 @@ internal static class InteractionMetadataExtensions
                 return new ModalSubmitInteractionMetadata(
                     metadata.Id,
                     metadata.Type,
+                    metadata.UserId,
                     metadata.IntegrationOwners.ToImmutableDictionary(),
                     metadata.OriginalResponseMessageId.IsSpecified ? metadata.OriginalResponseMessageId.Value : null,
                     metadata.TriggeringInteractionMetadata.GetValueOrDefault(null)?.ToInteractionMetadata());
