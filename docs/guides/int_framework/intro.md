@@ -30,8 +30,8 @@ A new module instance is created before a command execution starts then it will 
 
 Every module class must:
 
-- be public
-- inherit [InteractionModuleBase]
+- Be public
+- Inherit from [InteractionModuleBase]
 
 Optionally you can override the included :
 
@@ -61,7 +61,7 @@ Valid **Interaction Commands** must comply with the following requirements:
 |[Autocomplete Command](#autocomplete-commands)| `Task`/`Task<RuntimeResult>` | -             | -                   | `[AutocompleteCommand]`|
 
 > [!NOTE]
-> a `TypeConverter` that is capable of parsing type in question must be registered to the [InteractionService] instance.
+> A `TypeConverter` that is capable of parsing type in question must be registered to the [InteractionService] instance.
 > You should avoid using long running code in your command module.
 > Depending on your setup, long running code may block the Gateway thread of your bot, interrupting its connection to Discord.
 
@@ -94,13 +94,17 @@ By default, your methods can feature the following parameter types:
 - `sbyte`, `byte`
 - `int16`, `int32`, `int64`
 - `uint16`, `uint32`, `uint64`
-- `enum` (Values are registered as multiple choice options and are enforced by Discord. Use the `[Hide]` attribute on enum values to prevent them from getting registered.)
+- `enum`
 - `DateTime`
 - `TimeSpan`
 
+> [!NOTE]
+> Enum values are registered as multiple choice options and are enforced by Discord. Use the `[Hide]` attribute on enum values to prevent them from getting registered.
+
 ---
 
-**You can use more specialized implementations of [IChannel] to restrict the allowed channel types for a channel type option.*
+**You can use more specialized implementations of [IChannel] to restrict the allowed channel types for a channel type option.**
+
 | interface           | Channel Type                  |
 |---------------------|-------------------------------|
 | `IStageChannel`     | Stage Channels                |
