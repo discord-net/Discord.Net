@@ -184,8 +184,20 @@ code {
 }
 
 /* MAKES PARAMETERS MORE SPACIOUS */
-dl.parameters > dt > code {
-    padding: 3px;
+:not(pre) > code {
+  padding: 3px;
+}
+
+/* MAKES LIST ITEMS BE SLIGHTLY MORE SEPARATED */
+/* THIS AVOIDS CODE BLOCK OVERLAP */
+ul:not(.navbar-nav) > li:not(:last-child) {
+  margin-bottom: 4px;
+}
+
+/* MAKES NAVBAR LINKS LOOK BETTER IN MOBILE */
+.navbar-expand-md .navbar-nav .nav-link {
+  padding-right: var(--bs-navbar-nav-link-padding-x);
+  padding-left: var(--bs-navbar-nav-link-padding-x);
 }
 
 /* MAKES INHERITANCE LIST READABLE */
