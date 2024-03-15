@@ -401,6 +401,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task RemoveBanAsync(ulong userId, RequestOptions options = null)
             => GuildHelper.RemoveBanAsync(this, Discord, userId, options);
+
+        /// <inheritdoc />
+        public Task<BulkBanResult> BulkBanAsync(IEnumerable<ulong> userIds, int? deleteMessageSeconds = null, RequestOptions options = null)
+            => GuildHelper.BulkBanAsync(this, Discord, userIds.ToArray(), deleteMessageSeconds, options);
         #endregion
 
         #region Channels

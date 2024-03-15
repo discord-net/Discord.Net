@@ -1418,5 +1418,16 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="IncidentsData"/>.
         /// </returns>
         Task<GuildIncidentsData> ModifyIncidentActionsAsync(Action<GuildIncidentsDataProperties> props, RequestOptions options = null);
+
+        /// <summary>
+        ///     Executes a bulk ban on the specified users.
+        /// </summary>
+        /// <param name="userIds">A collection of user ids to ban.</param>
+        /// <param name="deleteMessageSeconds">The number of seconds to delete messages for. Max 604800.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="BulkBanResult"/>.
+        /// </returns>
+        Task<BulkBanResult> BulkBanAsync(IEnumerable<ulong> userIds, int? deleteMessageSeconds = null, RequestOptions options = null);
     }
 }
