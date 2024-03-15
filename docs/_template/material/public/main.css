@@ -194,6 +194,12 @@ ul:not(.navbar-nav) > li:not(:last-child) {
   margin-bottom: 4px;
 }
 
+/* MAKES NAVBAR LINKS LOOK BETTER IN MOBILE */
+.navbar-expand-md .navbar-nav .nav-link {
+  padding-right: var(--bs-navbar-nav-link-padding-x);
+  padding-left: var(--bs-navbar-nav-link-padding-x);
+}
+
 /* MAKES INHERITANCE LIST READABLE */
 :is(dl.typelist.inheritedMembers, dl.typelist.extensionMethods) > dd > div::after {
   content: none !important;
