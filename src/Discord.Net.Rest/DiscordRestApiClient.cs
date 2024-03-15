@@ -1771,6 +1771,23 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return SendAsync("DELETE", () => $"guilds/{guildId}/bans/{userId}", ids, options: options);
         }
+
+        public Task<BulkBanResult> BulkBanAsync(ulong guildId, ulong[] userIds, int? deleteMessagesSeconds = null, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(userIds.Length, 0, nameof(userIds));
+            Preconditions.AtMost(userIds.Length, 200, nameof(userIds));
+            Preconditions.AtMost(deleteMessagesSeconds ?? 0, 604800, nameof(deleteMessagesSeconds));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var data = new BulkBanParams
+            {
+                DeleteMessageSeconds = deleteMessagesSeconds ?? Optional<int>.Unspecified,
+                UserIds = userIds
+            };
+
+            return SendJsonAsync<BulkBanResult>("POST", () => $"guilds/{guildId}/bulk-ban", data, new BucketIds(guildId), options: options);
+        }
         #endregion
 
         #region Guild Widget
