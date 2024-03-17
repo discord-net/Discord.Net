@@ -17,5 +17,8 @@ public class CommandContextTypeAttribute : Attribute
     {
         ContextTypes = contextTypes?.Distinct().ToImmutableArray()
                        ?? throw new ArgumentNullException(nameof(contextTypes));
+
+        if (ContextTypes.Count == 0)
+            throw new ArgumentException("A command must have at least one supported context type.", nameof(contextTypes));
     }
 }

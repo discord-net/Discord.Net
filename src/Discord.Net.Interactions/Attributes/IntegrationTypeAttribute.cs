@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Discord.Interactions;
 
@@ -14,7 +15,10 @@ public class IntegrationTypeAttribute : Attribute
 
     public IntegrationTypeAttribute(params ApplicationIntegrationType[] integrationTypes)
     {
-        IntegrationTypes = integrationTypes?.ToImmutableArray()
+        IntegrationTypes = integrationTypes?.Distinct().ToImmutableArray()
                            ?? throw new ArgumentNullException(nameof(integrationTypes));
+
+        if (integrationTypes.Length == 0)
+            throw new ArgumentException("A command must have at least one integration type.", nameof(integrationTypes));
     }
 }
