@@ -1,6 +1,6 @@
 ---
-uid: Root.Landing
-title: Home
+uid: Home.Landing
+_layout: landing
 ---
 
 # Discord.NET Documentation
