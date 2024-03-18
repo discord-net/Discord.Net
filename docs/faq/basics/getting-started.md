@@ -1,6 +1,6 @@
 ---
 uid: FAQ.Basics.GetStarted
-title: Beginner Questions / How to Get Started
+title: Getting Started
 ---
 
 # Getting Started

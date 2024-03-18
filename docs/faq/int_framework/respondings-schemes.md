@@ -1,6 +1,6 @@
 ---
 uid: FAQ.Interactions.RespondingSchemes
-title: Interaction response schemes
+title: Interaction Response Schemes
 ---
 
 # Interaction Response Schemes

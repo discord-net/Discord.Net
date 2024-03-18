@@ -1,9 +1,9 @@
 ---
 uid: FAQ.Interactions.General
-title: Interactions
+title: Interaction Basics
 ---
 
-# Interaction basics
+# Interaction Basics
 
 This chapter mostly refers to interactions in general,
 and will include questions that are common among users of the Interaction Framework
