@@ -1,5 +1,33 @@
 # Changelog
 
+## [3.14.0] - 2023-03-19
+
+### Added
+- #2849 Allow setting channel topic to null when creating channels (7c96844)
+- #2832 Add Icon size parameter to `GetGuildIconUrl` CDN method (eb5678a)
+- #2883 Initial user apps support (24a6978)
+- #2881 Bulk ban support (03402cd)
+- #2880 More banner support (4efe3be)
+- #2858 Allow setting custom status with `SetGameAsync` (ee386b1)
+- #2870 SentRequest event (fc2fc87)
+- #2873 Voice reconnection and resuming (09680c5)
+- #2879 Support setting banner on bot profiles (d0c0a56)
+
+### Fixed
+- #2866 Allow switching voice channels without disconnecting (external clients only) (5a62ba1)
+- #2857 Receiving voice packets (use system-assigned port) (1a16f4d)
+- #2850 NRE in automod audit logs (1eb7a53)
+- #2862 Fixed a bug when creating a `SelectMenuBuilder` from a `SelectMenuComponent` incorrectly set the `CustomId` (6870ac5)
+- Incorrect ConnectionState of a DiscordSocketClient casted to IDiscordClient/BaseSocketClient (955fae0)
+- #2867 `InteractionService.AddModulesXAsync` command duplication (2787db3)
+
+### Misc
+- #2806 Update library dependencies (bfc8dc2)
+- #2847 Remove some redundant notes & small updates (d0e9c8b)
+- #2854 Refactor `MaxBitrate` and `UploadLimit` in `GuildHelper` (6256de4)
+- #2869 Fix optional param being non-optional (fa51f0a)
+
+
 ## [3.13.1] - 2024-02-11
 
 ### Added
