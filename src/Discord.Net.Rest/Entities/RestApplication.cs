@@ -193,7 +193,7 @@ public class RestApplication : RestEntity<ulong>, IApplication
     ///     Gets the name of the application.
     /// </summary>
     /// <returns>
-    ///     Name of the application.
+    ///     The name of the application.
     /// </returns>
     public override string ToString() => Name;
     private string DebuggerDisplay => $"{Name} ({Id})";
