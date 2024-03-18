@@ -40,7 +40,7 @@ jobs:
             run: dotnet restore ./Discord.Net.sln -v minimal
 
           - name: Build
-            run: dotnet build "Discord.Net.sln" -v minimal -c Release --no-restore /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=$(IsTagBuild)
+            run: dotnet build "Discord.Net.sln" -v minimal -c Release --no-restore /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
 
           - name: Unit Test
             run: dotnet test "test/Discord.Net.Tests.Unit/Discord.Net.Tests.Unit.csproj" --no-restore --no-build -v minimal -c Release --logger trx
