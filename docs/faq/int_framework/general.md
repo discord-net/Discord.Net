@@ -1,6 +1,6 @@
 ---
 uid: FAQ.Interactions.General
-title: Interactions
+title: Interaction Basics
 ---
 
 # Interaction basics
