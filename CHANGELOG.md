@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.14.1] - 2023-03-19
+### Fixed
+- Version number contains commit hash
+
 ## [3.14.0] - 2023-03-19
 
 ### Added

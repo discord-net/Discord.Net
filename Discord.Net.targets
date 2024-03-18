@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <VersionPrefix>3.14.0</VersionPrefix>
+        <VersionPrefix>3.14.1</VersionPrefix>
         <LangVersion>latest</LangVersion>
         <Authors>Discord.Net Contributors</Authors>
         <PackageTags>discord;discordapp</PackageTags>
@@ -11,7 +11,11 @@
         <RepositoryUrl>git://github.com/Discord-Net/Discord.Net</RepositoryUrl>
         <PackageReadmeFile>NUGET_README.md</PackageReadmeFile>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(BuildNumber)' == '' ">
+    <PropertyGroup Condition=" '$(IsTagBuild)' == 'true' ">
+        <VersionSuffix></VersionSuffix>
+        <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(BuildNumber)' == '' And $(IsTagBuild) != 'true' ">
         <VersionSuffix Condition=" '$(VersionSuffix)' != ''">$(VersionSuffix)-dev</VersionSuffix>
         <VersionSuffix Condition=" '$(VersionSuffix)' == ''">dev</VersionSuffix>
     </PropertyGroup>
