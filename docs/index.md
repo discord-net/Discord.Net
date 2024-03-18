@@ -1,5 +1,6 @@
 ---
 uid: Home.Landing
+title: Home
 _layout: landing
 ---
 
