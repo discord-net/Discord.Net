@@ -76,6 +76,16 @@ namespace Discord
         public IReadOnlyDictionary<string, string> DescriptionLocalizations => _descriptionLocalizations;
 
         /// <summary>
+        ///     Gets the context types this command can be executed in. <see langword="null"/> if not set.
+        /// </summary>
+        public HashSet<InteractionContextType> ContextTypes { get; set; }
+
+        /// <summary>
+        ///     Gets the installation method for this command. <see langword="null"/> if not set.
+        /// </summary>
+        public HashSet<ApplicationIntegrationType> IntegrationTypes { get; set; }
+
+        /// <summary>
         ///     Gets or sets whether the command is enabled by default when the app is added to a guild
         /// </summary>
         public bool IsDefaultPermission { get; set; } = true;
@@ -83,6 +93,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets whether or not this command can be used in DMs.
         /// </summary>
+        [Obsolete("This property will be deprecated soon. Configure with ContextTypes instead.")]
         public bool IsDMEnabled { get; set; } = true;
 
         /// <summary>
@@ -107,6 +118,10 @@ namespace Discord
         /// <returns>A <see cref="SlashCommandProperties"/> that can be used to create slash commands.</returns>
         public SlashCommandProperties Build()
         {
+            // doing ?? 1 for now until we know default values (if these become non-optional)
+            Preconditions.AtLeast(ContextTypes?.Count ?? 1, 1, nameof(ContextTypes), "At least 1 context type must be specified");
+            Preconditions.AtLeast(IntegrationTypes?.Count ?? 1, 1, nameof(IntegrationTypes), "At least 1 integration type must be specified");
+
             var props = new SlashCommandProperties
             {
                 Name = Name,
@@ -114,9 +129,13 @@ namespace Discord
                 IsDefaultPermission = IsDefaultPermission,
                 NameLocalizations = _nameLocalizations,
                 DescriptionLocalizations = _descriptionLocalizations,
+#pragma warning disable CS0618 // Type or member is obsolete
                 IsDMEnabled = IsDMEnabled,
+#pragma warning restore CS0618 // Type or member is obsolete
                 DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified,
                 IsNsfw = IsNsfw,
+                ContextTypes = ContextTypes ?? Optional<HashSet<InteractionContextType>>.Unspecified,
+                IntegrationTypes = IntegrationTypes ?? Optional<HashSet<ApplicationIntegrationType>>.Unspecified
             };
 
             if (Options != null && Options.Any())
@@ -171,6 +190,7 @@ namespace Discord
         /// </summary>
         /// <param name="permission"><see langword="true"/> if the command is available in dms, otherwise <see langword="false"/>.</param>
         /// <returns>The current builder.</returns>
+        [Obsolete("This method will be deprecated soon. Configure using WithContextTypes instead.")]
         public SlashCommandBuilder WithDMPermission(bool permission)
         {
             IsDMEnabled = permission;
@@ -196,6 +216,32 @@ namespace Discord
         public SlashCommandBuilder WithDefaultMemberPermissions(GuildPermission? permissions)
         {
             DefaultMemberPermissions = permissions;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the installation method for this command.
+        /// </summary>
+        /// <param name="integrationTypes">Installation types for this command.</param>
+        /// <returns>The builder instance.</returns>
+        public SlashCommandBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
+        {
+            IntegrationTypes = integrationTypes is not null
+                ? new HashSet<ApplicationIntegrationType>(integrationTypes)
+                : null;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets context types this command can be executed in.
+        /// </summary>
+        /// <param name="contextTypes">Context types the command can be executed in.</param>
+        /// <returns>The builder instance.</returns>
+        public SlashCommandBuilder WithContextTypes(params InteractionContextType[] contextTypes)
+        {
+            ContextTypes = contextTypes is not null
+                ? new HashSet<InteractionContextType>(contextTypes)
+                : null;
             return this;
         }
 

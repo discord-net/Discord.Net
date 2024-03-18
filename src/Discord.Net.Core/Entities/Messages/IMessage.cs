@@ -215,6 +215,7 @@ namespace Discord
         /// <returns>
         ///     A <see cref="IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null"/>.
         /// </returns>
+        [Obsolete("This property will be deprecated soon. Use IUserMessage.InteractionMetadata instead.")]
         IMessageInteraction Interaction { get; }
 
         /// <summary>

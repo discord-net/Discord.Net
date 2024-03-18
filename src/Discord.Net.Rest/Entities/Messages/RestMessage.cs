@@ -308,6 +308,7 @@ namespace Discord.Rest
         IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
 
         /// <inheritdoc/>
+        [Obsolete("This property will be deprecated soon. Use IUserMessage.InteractionMetadata instead.")]
         IMessageInteraction IMessage.Interaction => Interaction;
 
         /// <inheritdoc />

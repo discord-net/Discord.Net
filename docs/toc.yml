@@ -1,11 +1,11 @@
 - name: Home
   href: index.md
-- name: Documentation
-  href: api/
-  topicUid: API.Docs
 - name: Guides
   href: guides/
   topicUid: Guides.Introduction
+- name: API Reference
+  href: api/
+  topicUid: API.Docs
 - name: FAQ
   href: faq/
   topicUid: FAQ.Basics.GetStarted

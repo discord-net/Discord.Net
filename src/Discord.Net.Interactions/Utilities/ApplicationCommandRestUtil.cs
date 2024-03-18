@@ -53,9 +53,17 @@ namespace Discord.Interactions
                 Name = commandInfo.Name,
                 Description = commandInfo.Description,
                 IsDefaultPermission = commandInfo.DefaultPermission,
+#pragma warning disable CS0618 // Type or member is obsolete
                 IsDMEnabled = commandInfo.IsEnabledInDm,
+#pragma warning restore CS0618 // Type or member is obsolete
                 IsNsfw = commandInfo.IsNsfw,
                 DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
+                IntegrationTypes = commandInfo.IntegrationTypes is not null
+                    ? new HashSet<ApplicationIntegrationType>(commandInfo.IntegrationTypes)
+                    : null,
+                ContextTypes = commandInfo.ContextTypes is not null
+                    ? new HashSet<InteractionContextType>(commandInfo.ContextTypes)
+                    : null,
             }.WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
             .WithDescriptionLocalizations(localizationManager?.GetAllDescriptions(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
             .Build();
@@ -82,7 +90,7 @@ namespace Discord.Interactions
                 Options = commandInfo.FlattenedParameters?.Select(x => x.ToApplicationCommandOptionProps())
                     ?.ToList(),
                 NameLocalizations = localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty,
-                DescriptionLocalizations = localizationManager?.GetAllDescriptions(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty
+                DescriptionLocalizations = localizationManager?.GetAllDescriptions(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty, 
             };
         }
 
@@ -98,8 +106,16 @@ namespace Discord.Interactions
                     Name = commandInfo.Name,
                     IsDefaultPermission = commandInfo.DefaultPermission,
                     DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
+#pragma warning disable CS0618 // Type or member is obsolete
                     IsDMEnabled = commandInfo.IsEnabledInDm,
+#pragma warning restore CS0618 // Type or member is obsolete
                     IsNsfw = commandInfo.IsNsfw,
+                    IntegrationTypes = commandInfo.IntegrationTypes is not null
+                        ? new HashSet<ApplicationIntegrationType>(commandInfo.IntegrationTypes)
+                        : null,
+                    ContextTypes = commandInfo.ContextTypes is not null
+                        ? new HashSet<InteractionContextType>(commandInfo.ContextTypes)
+                        : null,
                 }
                 .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
                 .Build(),
@@ -109,7 +125,15 @@ namespace Discord.Interactions
                     IsDefaultPermission = commandInfo.DefaultPermission,
                     DefaultMemberPermissions = ((commandInfo.DefaultMemberPermissions ?? 0) | (commandInfo.Module.DefaultMemberPermissions ?? 0)).SanitizeGuildPermissions(),
                     IsNsfw = commandInfo.IsNsfw,
-                    IsDMEnabled = commandInfo.IsEnabledInDm
+#pragma warning disable CS0618 // Type or member is obsolete
+                    IsDMEnabled = commandInfo.IsEnabledInDm,
+#pragma warning restore CS0618 // Type or member is obsolete
+                    IntegrationTypes = commandInfo.IntegrationTypes is not null
+                        ? new HashSet<ApplicationIntegrationType>(commandInfo.IntegrationTypes)
+                        : null,
+                    ContextTypes = commandInfo.ContextTypes is not null
+                        ? new HashSet<InteractionContextType>(commandInfo.ContextTypes)
+                        : null,
                 }
                 .WithNameLocalizations(localizationManager?.GetAllNames(commandPath, LocalizationTarget.Command) ?? ImmutableDictionary<string, string>.Empty)
                 .Build(),
@@ -165,10 +189,16 @@ namespace Discord.Interactions
                     Description = moduleInfo.Description,
 #pragma warning disable CS0618 // Type or member is obsolete
                     IsDefaultPermission = moduleInfo.DefaultPermission,
-#pragma warning restore CS0618 // Type or member is obsolete
                     IsDMEnabled = moduleInfo.IsEnabledInDm,
+#pragma warning restore CS0618 // Type or member is obsolete
                     IsNsfw = moduleInfo.IsNsfw,
-                    DefaultMemberPermissions = moduleInfo.DefaultMemberPermissions
+                    DefaultMemberPermissions = moduleInfo.DefaultMemberPermissions,
+                    IntegrationTypes = moduleInfo.IntegrationTypes is not null
+                        ? new HashSet<ApplicationIntegrationType>(moduleInfo.IntegrationTypes)
+                        : null,
+                    ContextTypes = moduleInfo.ContextTypes is not null
+                        ? new HashSet<InteractionContextType>(moduleInfo.ContextTypes)
+                        : null,
                 }
                 .WithNameLocalizations(localizationManager?.GetAllNames(modulePath, LocalizationTarget.Group) ?? ImmutableDictionary<string, string>.Empty)
                 .WithDescriptionLocalizations(localizationManager?.GetAllDescriptions(modulePath, LocalizationTarget.Group) ?? ImmutableDictionary<string, string>.Empty)
@@ -230,11 +260,19 @@ namespace Discord.Interactions
                     Description = command.Description,
                     IsDefaultPermission = command.IsDefaultPermission,
                     DefaultMemberPermissions = command.DefaultMemberPermissions.RawValue == 0 ? new Optional<GuildPermission>() : (GuildPermission)command.DefaultMemberPermissions.RawValue,
+#pragma warning disable CS0618 // Type or member is obsolete
                     IsDMEnabled = command.IsEnabledInDm,
+#pragma warning restore CS0618 // Type or member is obsolete
                     IsNsfw = command.IsNsfw,
                     Options = command.Options?.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified,
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
                     DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
+                    ContextTypes = command.ContextTypes is not null
+                        ? new HashSet<InteractionContextType>(command.ContextTypes)
+                        : Optional<HashSet<InteractionContextType>>.Unspecified,
+                    IntegrationTypes = command.IntegrationTypes is not null
+                        ? new HashSet<ApplicationIntegrationType>(command.IntegrationTypes)
+                        : Optional<HashSet<ApplicationIntegrationType>>.Unspecified,
                 },
                 ApplicationCommandType.User => new UserCommandProperties
                 {
@@ -242,9 +280,17 @@ namespace Discord.Interactions
                     IsDefaultPermission = command.IsDefaultPermission,
                     DefaultMemberPermissions = command.DefaultMemberPermissions.RawValue == 0 ? new Optional<GuildPermission>() : (GuildPermission)command.DefaultMemberPermissions.RawValue,
                     IsNsfw = command.IsNsfw,
+#pragma warning disable CS0618 // Type or member is obsolete
                     IsDMEnabled = command.IsEnabledInDm,
+#pragma warning restore CS0618 // Type or member is obsolete
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
-                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty
+                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
+                    ContextTypes = command.ContextTypes is not null
+                        ? new HashSet<InteractionContextType>(command.ContextTypes)
+                        : Optional<HashSet<InteractionContextType>>.Unspecified,
+                    IntegrationTypes = command.IntegrationTypes is not null
+                        ? new HashSet<ApplicationIntegrationType>(command.IntegrationTypes)
+                        : Optional<HashSet<ApplicationIntegrationType>>.Unspecified,
                 },
                 ApplicationCommandType.Message => new MessageCommandProperties
                 {
@@ -252,9 +298,17 @@ namespace Discord.Interactions
                     IsDefaultPermission = command.IsDefaultPermission,
                     DefaultMemberPermissions = command.DefaultMemberPermissions.RawValue == 0 ? new Optional<GuildPermission>() : (GuildPermission)command.DefaultMemberPermissions.RawValue,
                     IsNsfw = command.IsNsfw,
+#pragma warning disable CS0618 // Type or member is obsolete
                     IsDMEnabled = command.IsEnabledInDm,
+#pragma warning restore CS0618 // Type or member is obsolete
                     NameLocalizations = command.NameLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
-                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty
+                    DescriptionLocalizations = command.DescriptionLocalizations?.ToImmutableDictionary() ?? ImmutableDictionary<string, string>.Empty,
+                    ContextTypes = command.ContextTypes is not null
+                        ? new HashSet<InteractionContextType>(command.ContextTypes)
+                        : Optional<HashSet<InteractionContextType>>.Unspecified,
+                    IntegrationTypes = command.IntegrationTypes is not null
+                        ? new HashSet<ApplicationIntegrationType>(command.IntegrationTypes)
+                        : Optional<HashSet<ApplicationIntegrationType>>.Unspecified,
                 },
                 _ => throw new InvalidOperationException($"Cannot create command properties for command type {command.Type}"),
             };

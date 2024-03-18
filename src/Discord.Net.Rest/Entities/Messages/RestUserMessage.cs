@@ -49,6 +49,9 @@ namespace Discord.Rest
         public IUserMessage ReferencedMessage => _referencedMessage;
 
         /// <inheritdoc />
+        public IMessageInteractionMetadata InteractionMetadata { get; internal set; }
+
+        /// <inheritdoc />
         public MessageResolvedData ResolvedData { get; internal set; }
 
         internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
@@ -162,6 +165,8 @@ namespace Discord.Rest
 
                 ResolvedData = new MessageResolvedData(users, members, roles, channels);
             }
+            if (model.InteractionMetadata.IsSpecified)
+                InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata();
         }
 
         /// <inheritdoc />

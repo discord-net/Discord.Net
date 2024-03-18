@@ -117,6 +117,16 @@ namespace Discord.Interactions
         /// </summary>
         public bool DontAutoRegister { get; }
 
+        /// <summary>
+        ///     Gets the context types commands in this module can be executed in.
+        /// </summary>
+        public IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
+
+        /// <summary>
+        ///     Gets the install method for commands in this module.
+        /// </summary>
+        public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
+
         internal ModuleInfo(ModuleBuilder builder, InteractionService commandService, IServiceProvider services, ModuleInfo parent = null)
         {
             CommandService = commandService;
@@ -129,7 +139,9 @@ namespace Discord.Interactions
             DefaultPermission = builder.DefaultPermission;
 #pragma warning restore CS0618 // Type or member is obsolete
             IsNsfw = builder.IsNsfw;
+#pragma warning disable CS0618 // Type or member is obsolete
             IsEnabledInDm = builder.IsEnabledInDm;
+#pragma warning restore CS0618 // Type or member is obsolete
             DefaultMemberPermissions = BuildDefaultMemberPermissions(builder);
             SlashCommands = BuildSlashCommands(builder).ToImmutableArray();
             ContextCommands = BuildContextCommands(builder).ToImmutableArray();
@@ -141,6 +153,8 @@ namespace Discord.Interactions
             Preconditions = BuildPreconditions(builder).ToImmutableArray();
             IsTopLevelGroup = IsSlashGroup && CheckTopLevel(parent);
             DontAutoRegister = builder.DontAutoRegister;
+            ContextTypes = builder.ContextTypes?.ToImmutableArray();
+            IntegrationTypes = builder.IntegrationTypes?.ToImmutableArray();
 
             GroupedPreconditions = Preconditions.ToLookup(x => x.Group, x => x, StringComparer.Ordinal);
         }

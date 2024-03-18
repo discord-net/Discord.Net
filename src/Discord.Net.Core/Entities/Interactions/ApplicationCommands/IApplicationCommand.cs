@@ -40,6 +40,7 @@ namespace Discord
         /// <remarks>
         ///     Only for globally-scoped commands.
         /// </remarks>
+        [Obsolete("This property will be deprecated soon. Use ContextTypes instead.")]
         bool IsEnabledInDm { get; }
 
         /// <summary>
@@ -82,6 +83,16 @@ namespace Discord
         ///     Only returned when the `withLocalizations` query parameter is set to <see langword="false"/> when requesting the command.
         /// </remarks>
         string DescriptionLocalized { get; }
+
+        /// <summary>
+        ///     Gets context types the command can be used in; <see langword="null" /> if not specified.
+        /// </summary>
+        IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
+
+        /// <summary>
+        ///     Gets the install method for the command; <see langword="null" /> if not specified.
+        /// </summary>
+        IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
 
         /// <summary>
         ///     Modifies the current application command.

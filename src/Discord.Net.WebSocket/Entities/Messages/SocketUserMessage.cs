@@ -50,6 +50,9 @@ namespace Discord.WebSocket
         public IUserMessage ReferencedMessage => _referencedMessage;
 
         /// <inheritdoc />
+        public IMessageInteractionMetadata InteractionMetadata { get; internal set; }
+
+        /// <inheritdoc />
         public MessageResolvedData ResolvedData { get; internal set; }
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
@@ -203,6 +206,9 @@ namespace Discord.WebSocket
 
                 ResolvedData = new MessageResolvedData(users, members, roles, channels);
             }
+
+            if (model.InteractionMetadata.IsSpecified)
+                InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata();
         }
 
         /// <inheritdoc />
