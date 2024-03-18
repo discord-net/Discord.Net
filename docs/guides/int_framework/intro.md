@@ -164,6 +164,8 @@ Interaction service complex parameter constructors are prioritized in the follow
 3. Type's only public constuctor.
 
 #### DM Permissions
+> [!WARNING]
+> [EnabledInDmAttribute] is being deprecated in favor of [CommandContextTypes] attribute.
 
 You can use the [EnabledInDmAttribute] to configure whether a globally-scoped top level command should be enabled in Dms or not. Only works on top level commands.
 
@@ -419,6 +421,12 @@ Discord Slash Commands support name/description localization. Localization is av
 }
 ```
 
+## User Apps
+
+User apps are the kind of Discord applications that are installed onto a user instead of a guild, thus making commands usable anywhere on Discord. Note that only users who have installed the application will see the commands. This sample shows you how to create a simple user install command.
+
+[!code-csharp[Registering Commands Example](samples/intro/userapps.cs)]
+
 [AutocompleteHandlers]: xref:Guides.IntFw.AutoCompletion
 [DependencyInjection]: xref:Guides.DI.Intro
 
@@ -447,6 +455,8 @@ Discord Slash Commands support name/description localization. Localization is av
 [ChannelTypesAttribute]: xref:Discord.Interactions.ChannelTypesAttribute
 [MaxValueAttribute]: xref:Discord.Interactions.MaxValueAttribute
 [MinValueAttribute]: xref:Discord.Interactions.MinValueAttribute
+[EnabledInDmAttribute]: xref:Discord.Interactions.EnabledInDmAttribute
+[CommandContextTypes]: xref:Discord.Interactions.CommandContextTypesAttribute
 
 [IChannel]: xref:Discord.IChannel
 [IRole]: xref:Discord.IRole
