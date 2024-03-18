@@ -40,12 +40,12 @@ namespace Discord.Interactions
         public GuildPermission? DefaultMemberPermissions { get; }
 
         /// <summary>
-        ///     Gets context types this command can be executed in.
+        ///     Gets the context types this command can be executed in.
         /// </summary>
         public IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
 
         /// <summary>
-        ///     Gets install methods for this command.
+        ///     Gets the install methods for this command.
         /// </summary>
         public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
     }

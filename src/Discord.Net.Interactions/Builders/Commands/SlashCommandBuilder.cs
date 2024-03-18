@@ -37,12 +37,12 @@ namespace Discord.Interactions.Builders
         public GuildPermission? DefaultMemberPermissions { get; set; } = null;
 
         /// <summary>
-        ///     Gets the install method for this command.
+        ///     Gets or sets the install method for this command.
         /// </summary>
         public HashSet<ApplicationIntegrationType> IntegrationTypes { get; set; } = null;
 
         /// <summary>
-        ///     Gets the context types this command can be executed in.
+        ///     Gets or sets the context types this command can be executed in.
         /// </summary>
         public HashSet<InteractionContextType> ContextTypes { get; set; } = null;
 
@@ -145,7 +145,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Sets <see cref="IntegrationTypes"/>.
+        ///     Sets the <see cref="IntegrationTypes"/> on this <see cref="SlashCommandBuilder"/>.
         /// </summary>
         /// <param name="integrationTypes">Install types for this command.</param>
         /// <returns>The builder instance.</returns>
@@ -158,7 +158,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Sets <see cref="ContextTypes"/>.
+        ///     Sets the <see cref="ContextTypes"/> on this <see cref="SlashCommandBuilder"/>.
         /// </summary>
         /// <param name="contextTypes">Context types the command can be executed in.</param>
         /// <returns>The builder instance.</returns>

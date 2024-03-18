@@ -145,7 +145,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Sets <see cref="IntegrationTypes"/>.
+        ///     Sets the <see cref="IntegrationTypes"/> of this <see cref="ContextCommandBuilder"/>.
         /// </summary>
         /// <param name="integrationTypes">Install types for this command.</param>
         /// <returns>The builder instance.</returns>
@@ -156,7 +156,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Sets <see cref="ContextTypes"/>.
+        ///     Sets the <see cref="ContextTypes"/> of this <see cref="ContextCommandBuilder"/>.
         /// </summary>
         /// <param name="contextTypes">Context types the command can be executed in.</param>
         /// <returns>The builder instance.</returns>

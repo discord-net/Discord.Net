@@ -1,5 +1,8 @@
 namespace Discord;
 
+/// <summary>
+///     Defines where an application can be installed.
+/// </summary>
 public enum ApplicationIntegrationType
 {
     /// <summary>

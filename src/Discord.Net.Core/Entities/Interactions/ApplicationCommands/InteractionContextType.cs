@@ -1,5 +1,8 @@
 namespace Discord;
 
+/// <summary>
+///     Represents a context in Discord where an interaction can be used.
+/// </summary>
 public enum InteractionContextType
 {
     /// <summary>

@@ -58,12 +58,12 @@ namespace Discord
         public GuildPermission? DefaultMemberPermissions { get; set; }
 
         /// <summary>
-        ///     Gets the install method for this command.
+        ///     Gets the install method for this command; <see langword="null" /> if not specified.
         /// </summary>
         public HashSet<ApplicationIntegrationType> IntegrationTypes { get; set; } = null;
 
         /// <summary>
-        ///     Gets the context types this command can be executed in.
+        ///     Gets the context types this command can be executed in; <see langword="null" /> if not specified.
         /// </summary>
         public HashSet<InteractionContextType> ContextTypes { get; set; } = null;
 

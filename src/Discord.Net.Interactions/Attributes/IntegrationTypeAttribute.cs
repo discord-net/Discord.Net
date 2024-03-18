@@ -11,8 +11,15 @@ namespace Discord.Interactions;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class IntegrationTypeAttribute : Attribute
 {
+    /// <summary>
+    ///     Gets integration install types for this command.
+    /// </summary>
     public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
 
+    /// <summary>
+    ///     Sets the <see cref="IApplicationCommandInfo.IntegrationTypes"/> property of an application command or module.
+    /// </summary>
+    /// <param name="integrationTypes">Integration install types set for the command.</param>
     public IntegrationTypeAttribute(params ApplicationIntegrationType[] integrationTypes)
     {
         IntegrationTypes = integrationTypes?.Distinct().ToImmutableArray()

@@ -118,7 +118,7 @@ namespace Discord.Interactions
         public bool DontAutoRegister { get; }
 
         /// <summary>
-        ///     Gets context types commands in this module can be executed in.
+        ///     Gets the context types commands in this module can be executed in.
         /// </summary>
         public IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
 
