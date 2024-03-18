@@ -50,7 +50,9 @@ namespace Discord.Interactions.Builders
         {
             IntegrationTypes = module.IntegrationTypes;
             ContextTypes = module.ContextTypes;
+#pragma warning disable CS0618 // Type or member is obsolete
             IsEnabledInDm = module.IsEnabledInDm;
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         /// <summary>

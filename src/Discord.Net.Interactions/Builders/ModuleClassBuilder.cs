@@ -88,11 +88,13 @@ namespace Discord.Interactions.Builders
                         }
                         break;
 #pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
                     case EnabledInDmAttribute enabledInDm:
-                        {
+                    {
                             builder.IsEnabledInDm = enabledInDm.IsEnabled;
                         }
                         break;
+#pragma warning restore CS0618 // Type or member is obsolete
                     case DefaultMemberPermissionsAttribute memberPermission:
                         {
                             builder.DefaultMemberPermissions = memberPermission.Permissions;
@@ -192,12 +194,12 @@ namespace Discord.Interactions.Builders
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
                         }
                         break;
-#pragma warning restore CS0618 // Type or member is obsolete
                     case EnabledInDmAttribute enabledInDm:
                         {
                             builder.IsEnabledInDm = enabledInDm.IsEnabled;
                         }
                         break;
+#pragma warning restore CS0618 // Type or member is obsolete
                     case DefaultMemberPermissionsAttribute memberPermission:
                         {
                             builder.DefaultMemberPermissions = memberPermission.Permissions;
@@ -255,12 +257,12 @@ namespace Discord.Interactions.Builders
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
                         }
                         break;
-#pragma warning restore CS0618 // Type or member is obsolete
                     case EnabledInDmAttribute enabledInDm:
                         {
                             builder.IsEnabledInDm = enabledInDm.IsEnabled;
                         }
                         break;
+#pragma warning restore CS0618 // Type or member is obsolete
                     case DefaultMemberPermissionsAttribute memberPermission:
                         {
                             builder.DefaultMemberPermissions = memberPermission.Permissions;

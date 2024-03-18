@@ -51,12 +51,13 @@ namespace Discord.Interactions.Builders
         /// <summary>
         ///     Gets and sets the default permission of this module.
         /// </summary>
-        [Obsolete($"To be deprecated soon, use {nameof(IsEnabledInDm)} and {nameof(DefaultMemberPermissions)} instead.")]
+        [Obsolete($"To be deprecated soon, use {nameof(ContextTypes)} and {nameof(DefaultMemberPermissions)} instead.")]
         public bool DefaultPermission { get; set; } = true;
 
         /// <summary>
         ///     Gets whether this command can be used in DMs.
         /// </summary>
+        [Obsolete("This property will be deprecated soon. Use ContextTypes instead.")]
         public bool IsEnabledInDm { get; set; } = true;
 
         /// <summary>
@@ -199,6 +200,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
+        [Obsolete("This method will be deprecated soon. Use WithContextTypes instead.")]
         public ModuleBuilder SetEnabledInDm(bool isEnabled)
         {
             IsEnabledInDm = isEnabled;

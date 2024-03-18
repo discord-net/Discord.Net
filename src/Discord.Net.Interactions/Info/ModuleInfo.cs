@@ -139,7 +139,9 @@ namespace Discord.Interactions
             DefaultPermission = builder.DefaultPermission;
 #pragma warning restore CS0618 // Type or member is obsolete
             IsNsfw = builder.IsNsfw;
+#pragma warning disable CS0618 // Type or member is obsolete
             IsEnabledInDm = builder.IsEnabledInDm;
+#pragma warning restore CS0618 // Type or member is obsolete
             DefaultMemberPermissions = BuildDefaultMemberPermissions(builder);
             SlashCommands = BuildSlashCommands(builder).ToImmutableArray();
             ContextCommands = BuildContextCommands(builder).ToImmutableArray();
