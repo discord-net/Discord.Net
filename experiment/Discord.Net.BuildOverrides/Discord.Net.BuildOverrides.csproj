@@ -7,10 +7,12 @@
     <Description>A Discord.Net extension adding a way to add build overrides for testing.</Description>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net6.0;net5.0;</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net6.0;net5.0;</TargetFrameworks>
+    <IsTrimmable>false</IsTrimmable>
+    <IsAotCompatible>false</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
