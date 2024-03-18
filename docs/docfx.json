@@ -39,7 +39,7 @@
           "langwordMapping.yml",
           "marketing/logo/**.svg",
           "marketing/logo/**.png",
-          "favicon.ico",
+          "favicon.png",
           "../src/Discord.Net.Examples/**.cs"
         ]
       }
@@ -62,7 +62,7 @@
       "_appFooter": "Discord.Net © 2015-2024 3.13.1",
       "_enableSearch": true,
       "_appLogoPath": "marketing/logo/SVG/Logomark Purple.svg",
-      "_appFaviconPath": "favicon.ico"
+      "_appFaviconPath": "favicon.png"
     },
     "xref": ["https://github.com/dotnet/docfx/raw/main/.xrefmap.json"]
   }
