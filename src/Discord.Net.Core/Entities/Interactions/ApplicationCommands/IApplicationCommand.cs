@@ -40,6 +40,7 @@ namespace Discord
         /// <remarks>
         ///     Only for globally-scoped commands.
         /// </remarks>
+        [Obsolete("This property will be deprecated soon. Use ContextTypes instead.")]
         bool IsEnabledInDm { get; }
 
         /// <summary>

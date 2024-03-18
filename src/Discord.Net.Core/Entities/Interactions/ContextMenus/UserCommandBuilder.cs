@@ -44,6 +44,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets whether or not this command can be used in DMs.
         /// </summary>
+        [Obsolete("This property will be deprecated soon. Configure with ContextTypes instead.")]
         public bool IsDMEnabled { get; set; } = true;
 
         /// <summary>
@@ -79,7 +80,9 @@ namespace Discord
             {
                 Name = Name,
                 IsDefaultPermission = IsDefaultPermission,
+#pragma warning disable CS0618 // Type or member is obsolete
                 IsDMEnabled = IsDMEnabled,
+#pragma warning restore CS0618 // Type or member is obsolete
                 DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified,
                 NameLocalizations = NameLocalizations,
                 IsNsfw = IsNsfw,
@@ -143,6 +146,7 @@ namespace Discord
         /// </summary>
         /// <param name="permission"><see langword="true"/> if the command is available in dms, otherwise <see langword="false"/>.</param>
         /// <returns>The current builder.</returns>
+        [Obsolete("This method will be deprecated soon. Configure with WithContextTypes instead.")]
         public UserCommandBuilder WithDMPermission(bool permission)
         {
             IsDMEnabled = permission;
