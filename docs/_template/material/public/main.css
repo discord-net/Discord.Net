@@ -77,6 +77,7 @@ img {
   border-radius: 0;
   box-shadow: none;
   color: var(--bs-nav-link-color);
+  margin-right: var(--bs-navbar-brand-margin-end);
 }
 
 [data-bs-theme='light'] nav.navbar {
@@ -184,8 +185,20 @@ code {
 }
 
 /* MAKES PARAMETERS MORE SPACIOUS */
-dl.parameters > dt > code {
-    padding: 3px;
+:not(pre) > code {
+  padding: 3px;
+}
+
+/* MAKES LIST ITEMS BE SLIGHTLY MORE SEPARATED */
+/* THIS AVOIDS CODE BLOCK OVERLAP */
+ul:not(.navbar-nav) > li:not(:last-child) {
+  margin-bottom: 4px;
+}
+
+/* MAKES NAVBAR LINKS LOOK BETTER IN MOBILE */
+.navbar-expand-md .navbar-nav .nav-link {
+  padding-right: var(--bs-navbar-nav-link-padding-x);
+  padding-left: var(--bs-navbar-nav-link-padding-x);
 }
 
 /* MAKES INHERITANCE LIST READABLE */
@@ -203,17 +216,21 @@ dl.parameters > dt > code {
 }
 
 /* MAKES INDEX LOGO VISIBLE ON DIFFERENT THEMES */
-article[data-uid="Root.Landing"] img[alt="logo"] {
+article[data-uid="Home.Landing"] img[alt="logo"] {
     height: 100pt !important;
     box-shadow: none;
 }
 
-[data-bs-theme="light"] article[data-uid="Root.Landing"] img[alt="logo"] {
+[data-bs-theme="light"] article[data-uid="Home.Landing"] img[alt="logo"] {
     content: url('/marketing/logo/SVG/Combinationmark.svg') !important;
 }
 
-[data-bs-theme="dark"] article[data-uid="Root.Landing"] img[alt="logo"] {
+[data-bs-theme="dark"] article[data-uid="Home.Landing"] img[alt="logo"] {
     content: url('/marketing/logo/SVG/Combinationmark White.svg') !important;
+}
+
+article[data-uid="Home.Landing"] img {
+    border-radius: 0;
 }
 
 /* MAKES SIDEBAR LINKS A BIT MORE DISTINGUISHABLE */

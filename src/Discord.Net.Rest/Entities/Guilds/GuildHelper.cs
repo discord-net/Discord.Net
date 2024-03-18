@@ -244,6 +244,13 @@ namespace Discord.Rest
 
         public static Task RemoveBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, RequestOptions options)
             => client.ApiClient.RemoveGuildBanAsync(guild.Id, userId, options);
+
+        public static async Task<BulkBanResult> BulkBanAsync(IGuild guild, BaseDiscordClient client, ulong[] userIds, int? deleteMessageSeconds, RequestOptions options)
+        {
+            var model = await client.ApiClient.BulkBanAsync(guild.Id, userIds, deleteMessageSeconds, options);
+            return new(model.BannedUsers?.ToImmutableArray() ?? ImmutableArray<ulong>.Empty,
+                model.FailedUsers?.ToImmutableArray() ?? ImmutableArray<ulong>.Empty);
+        }
         #endregion
 
         #region Channels

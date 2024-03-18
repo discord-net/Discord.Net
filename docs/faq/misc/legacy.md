@@ -1,6 +1,6 @@
 ---
 uid: FAQ.Legacy
-title: Questions about Legacy Versions
+title: Legacy Questions
 ---
 
 # Legacy Questions

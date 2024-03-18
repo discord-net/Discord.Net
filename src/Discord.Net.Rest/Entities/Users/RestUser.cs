@@ -25,8 +25,23 @@ namespace Discord.Rest
         public ushort DiscriminatorValue { get; private set; }
         /// <inheritdoc />
         public string AvatarId { get; private set; }
-        /// <inheritdoc />
+
+        /// <summary>
+        ///     Gets the hash of the banner.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no banner set.
+        /// </remarks>
         public string BannerId { get; private set; }
+
+        /// <summary>
+        ///     Gets the color of the banner.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no banner set.
+        /// </remarks>
+        public Color? BannerColor { get; private set; }
+
         /// <inheritdoc />
         public Color? AccentColor { get; private set; }
         /// <inheritdoc />
@@ -92,6 +107,8 @@ namespace Discord.Rest
                 AvatarId = model.Avatar.Value;
             if (model.Banner.IsSpecified)
                 BannerId = model.Banner.Value;
+            if (model.BannerColor.IsSpecified)
+                BannerColor = model.BannerColor.Value;
             if (model.AccentColor.IsSpecified)
                 AccentColor = model.AccentColor.Value;
             if (model.Discriminator.IsSpecified)

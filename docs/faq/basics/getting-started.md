@@ -1,15 +1,15 @@
 ---
 uid: FAQ.Basics.GetStarted
-title: Beginner Questions / How to Get Started
+title: Getting Started
 ---
 
-# Basic Concepts / Getting Started
+# Getting Started
 
 In this following section, you will find commonly asked questions and
 answers about how to get started with Discord.Net, as well as basic
 introduction to the Discord API ecosystem.
 
-## How do I add my bot to my server/guild?
+## How do I add my bot to my guild?
 
 Inviting your bot can be done by using the OAuth2 url generator provided by the [Discord Developer Portal].
 
@@ -86,10 +86,10 @@ it will return the user ID of the aforementioned user.
 > Right-clicking on the role and copying the ID will **not** work.
 > This will only copy the message ID.
 
-Several common ways to do this:
+There are several common ways to do this:
 
-1. (Easiest) Right click on the role either in the Server Settings
-   or in the user's role list.
+1. Right click on the role either in the Server Settings
+   or in the user's role list (recommended).  
    ![Roles](images/role-copy.png)
 2. Make the role mentionable and mention the role, and escape it
   using the `\` character in front.
