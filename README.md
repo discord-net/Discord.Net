@@ -10,8 +10,11 @@
   <a href="https://www.myget.org/feed/Packages/discord-net">
     <img src="https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg" alt="MyGet">
   </a>
-  <a href="https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev">
-    <img src="https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev" alt="Build Status">
+  <a href="https://github.com/discord-net/Discord.Net/actions/workflows/docs.yml">
+    <img src="https://github.com/discord-net/Discord.Net/actions/workflows/docs.yml/badge.svg" alt="Docs Build Status">
+  </a>
+  <a href="https://github.com/discord-net/Discord.Net/actions/workflows/dotnet.yml">
+    <img src="https://github.com/discord-net/Discord.Net/actions/workflows/dotnet.yml/badge.svg" alt="Dotnet Build Status">
   </a>
   <a href="https://discord.gg/dnet">
     <img src="https://discord.com/api/guilds/848176216011046962/widget.png" alt="Discord">
