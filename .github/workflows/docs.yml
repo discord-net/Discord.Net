@@ -50,6 +50,9 @@ jobs:
         name: static-docs
         path: output/
     
+    - name: Add CNAME
+      run: echo "${{ vars.DOCS_DOMAIN }} > output/CNAME
+    
     - name: Auth DNet bot
       id: bot_auth
       uses: machine-learning-apps/actions-app-token@master
