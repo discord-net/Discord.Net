@@ -264,6 +264,11 @@ namespace Discord
         UseSoundboard = 1L << 42,
 
         /// <summary>
+        ///     Allows members to use sounds from other servers.
+        /// </summary>
+        UseExternalSounds = 1L << 45,
+
+        /// <summary>
         ///     Allows for creating emojis, stickers, and soundboard sounds, and editing and deleting those created by the current user.
         /// </summary>
         CreateGuildExpressions = 1L << 43,

@@ -30,6 +30,16 @@ namespace Discord
             => iconId != null ? $"{DiscordConfig.CDNUrl}app-icons/{appId}/{iconId}.jpg" : null;
 
         /// <summary>
+        ///     Returns a soundboard sound URL.
+        /// </summary>
+        /// <param name="soundId">The sound identifier.</param>
+        /// <returns>
+        ///     A URL pointing to the soundboard sound.
+        /// </returns>
+        public static string GetSoundboardSoundUrl(ulong soundId)
+            => $"{DiscordConfig.CDNUrl}soundboard-sounds/{soundId}.mp3";
+
+        /// <summary>
         ///     Returns a user avatar URL.
         /// </summary>
         /// <param name="userId">The user snowflake identifier.</param>

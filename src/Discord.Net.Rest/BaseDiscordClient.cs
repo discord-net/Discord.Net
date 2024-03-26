@@ -292,6 +292,10 @@ namespace Discord.Rest
         /// </summary>
         Task<IReadOnlyCollection<SKU>> IDiscordClient.GetSKUsAsync(RequestOptions options) => Task.FromResult<IReadOnlyCollection<SKU>>(Array.Empty<SKU>());
 
+        /// <inheritdoc cref="IDiscordClient.GetDefaultSoundboardSoundsAsync" />
+        Task<IReadOnlyCollection<SoundboardSound>> IDiscordClient.GetDefaultSoundboardSoundsAsync(RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<SoundboardSound>>(ImmutableArray.Create<SoundboardSound>());
+
         #endregion
     }
 }

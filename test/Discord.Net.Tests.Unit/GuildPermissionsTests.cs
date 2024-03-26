@@ -106,10 +106,11 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(useClydeAI: true), GuildPermission.UseClydeAI);
             AssertFlag(() => new GuildPermissions(createGuildExpressions: true), GuildPermission.CreateGuildExpressions);
             AssertFlag(() => new GuildPermissions(setVoiceChannelStatus: true), GuildPermission.SetVoiceChannelStatus);
+            AssertFlag(() => new GuildPermissions(useExternalSounds: true), GuildPermission.UseExternalSounds);
         }
 
         /// <summary>
-        ///     Tests the behavior of <see cref="Discord.GuildPermissions.Modify(bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?, bool?)"/>
+        ///     Tests the behavior of <see cref="GuildPermissions.Modify"/>
         ///     with each of the parameters.
         /// </summary>
         [Fact]
@@ -190,6 +191,7 @@ namespace Discord
             AssertUtil(GuildPermission.UseClydeAI, x => x.UseClydeAI, (p, enable) => p.Modify(useClydeAI: enable));
             AssertUtil(GuildPermission.CreateGuildExpressions, x => x.CreateGuildExpressions, (p, enable) => p.Modify(createGuildExpressions: enable));
             AssertUtil(GuildPermission.SetVoiceChannelStatus, x => x.SetVoiceChannelStatus, (p, enable) => p.Modify(setVoiceChannelStatus: enable));
+            AssertUtil(GuildPermission.UseExternalSounds, x => x.UseExternalSounds, (p, enable) => p.Modify(useExternalSounds: enable));
         }
     }
 }

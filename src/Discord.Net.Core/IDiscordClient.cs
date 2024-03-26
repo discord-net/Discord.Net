@@ -349,5 +349,10 @@ namespace Discord
         ///     Returns all SKUs for a given application. 
         /// </summary>
         Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///    Returns all default soundboard sounds.
+        /// </summary>
+        Task<IReadOnlyCollection<SoundboardSound>> GetDefaultSoundboardSoundsAsync(RequestOptions options = null);
     }
 }

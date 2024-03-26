@@ -177,6 +177,11 @@ namespace Discord
         ///     Allows members to edit and cancel events in this channel.
         /// </summary>
         CreateEvents = 1L << 44,
+        
+        /// <summary>
+        ///     Allows members to use sounds from other servers.
+        /// </summary>
+        UseExternalSounds = 1L << 45,
 
         /// <summary>
         ///     Allows sending voice messages.
