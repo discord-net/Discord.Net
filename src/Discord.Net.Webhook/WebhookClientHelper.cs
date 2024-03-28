@@ -26,8 +26,13 @@ namespace Discord.Webhook
         public static async Task<ulong> SendMessageAsync(DiscordWebhookClient client,
             string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl,
             AllowedMentions allowedMentions, RequestOptions options, MessageComponent components,
-            MessageFlags flags, ulong? threadId = null, string threadName = null, ulong[] appliedTags = null)
+            MessageFlags flags, ulong? threadId = null, string threadName = null, ulong[] appliedTags = null,
+            Embed embed = null)
         {
+            embeds ??= Array.Empty<Embed>();
+            if (embed != null)
+                embeds = new[] { embed }.Concat(embeds).ToArray();
+
             var args = new CreateWebhookMessageParams
             {
                 Content = text,
