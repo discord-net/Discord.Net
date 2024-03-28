@@ -24,6 +24,6 @@ class Program
 
         // Webhooks are able to send multiple embeds per message
         // As such, your embeds must be passed as a collection.
-        await client.SendMessageAsync(text: "Send a message to this webhook!", embeds: new[] { embed.Build() });
+        await client.SendMessageAsync(text: "Send a message to this webhook!", embed: embed.Build() );
     }
 }
