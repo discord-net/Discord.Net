@@ -10,7 +10,7 @@ _layout: landing
 [![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000)](https://www.nuget.org/packages/Discord.Net)
 [![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg)](https://www.myget.org/feed/Packages/discord-net)
 [![Build Status](https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev)](https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev)
-[![Discord](https://discord.com/api/guilds/848176216011046962/widget.png)](https://discord.gg/dnet)
+[![Discord](https://img.shields.io/discord/848176216011046962?logo=discord&logoColor=white&label=discord&color=%235865F2)](https://discord.gg/dnet)
 
 ## What is Discord.NET?
 

@@ -74,7 +74,6 @@ img {
 
 /** NAVBAR **/
 .navbar-brand > img {
-  border-radius: 0;
   box-shadow: none;
   color: var(--bs-nav-link-color);
   margin-right: var(--bs-navbar-brand-margin-end);
