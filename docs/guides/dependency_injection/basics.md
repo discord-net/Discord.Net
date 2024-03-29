@@ -23,7 +23,7 @@ DI is not native to .NET. You need to install the extension packages to your pro
 
 ### Visual Package Manager:
 
-[Installing](images/manager.png)
+![Installing](images/manager.png)
 
 ### Command Line:
 

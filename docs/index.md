@@ -11,7 +11,8 @@ _layout: landing
 [![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg)](https://www.myget.org/feed/Packages/discord-net)
 [![Dotnet Build](https://github.com/discord-net/Discord.Net/actions/workflows/dotnet.yml/badge.svg)](https://github.com/discord-net/Discord.Net/actions/workflows/dotnet.yml)
 [![Deploy Docs](https://github.com/discord-net/Discord.Net/actions/workflows/docs.yml/badge.svg)](https://github.com/discord-net/Discord.Net/actions/workflows/docs.yml)
-[![Discord](https://discord.com/api/guilds/848176216011046962/widget.png)](https://discord.gg/dnet)
+[![Discord](https://img.shields.io/discord/848176216011046962?logo=discord&logoColor=white&label=discord&color=%235865F2)](https://discord.gg/dnet)
+
 
 ## What is Discord.NET?
 

@@ -17,7 +17,7 @@
     <img src="https://github.com/discord-net/Discord.Net/actions/workflows/dotnet.yml/badge.svg" alt="Dotnet Build Status">
   </a>
   <a href="https://discord.gg/dnet">
-    <img src="https://discord.com/api/guilds/848176216011046962/widget.png" alt="Discord">
+    <img src="https://img.shields.io/discord/848176216011046962?logo=discord&logoColor=white&label=discord&color=%235865F2" alt="Discord">
   </a>
 </p>
 Discord.Net is an unofficial .NET API Wrapper for the Discord API (https://discord.com).
