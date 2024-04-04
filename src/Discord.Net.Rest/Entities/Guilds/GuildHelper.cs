@@ -237,7 +237,7 @@ namespace Discord.Rest
 
         public static Task AddBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, int pruneDays, string reason, RequestOptions options)
         {
-            Preconditions.AtLeast(pruneDays, 0, nameof(pruneDays), "Prune length must be within [0, 604800]");
+            Preconditions.AtLeast(pruneDays, 0, nameof(pruneDays), "Prune length must be within [0, 7]");
             return client.ApiClient.CreateGuildBanAsync(guild.Id, userId, (uint)pruneDays * 86400, reason, options);
         }
 
