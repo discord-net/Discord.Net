@@ -543,7 +543,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous add operation for the ban.
         /// </returns>
-        Task BanUserAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions options = null);
+        Task AddBanAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions options = null);
 
         /// <summary>
         ///     Bans the user from this guild and optionally prunes their recent messages.
@@ -565,7 +565,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous add operation for the ban.
         /// </returns>
-        Task AddBanAsync(ulong userId, uint pruneSeconds = 0, RequestOptions options = null);
+        Task BanUserAsync(ulong userId, uint pruneSeconds = 0, RequestOptions options = null);
 
         /// <summary>
         ///     Unbans the user if they are currently banned.
