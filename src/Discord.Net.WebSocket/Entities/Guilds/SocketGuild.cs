@@ -713,11 +713,11 @@ namespace Discord.WebSocket
         public Task AddBanAsync(IUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
             => GuildHelper.AddBanAsync(this, Discord, user.Id, pruneDays, reason, options);
         /// <inheritdoc />
-        public Task AddBanAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions options = null)
+        public Task BanUserAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions options = null)
             => GuildHelper.AddBanAsync(this, Discord, userId, pruneDays, reason, options);
 
         /// <inheritdoc />
-        public Task AddBanAsync(IUser user, uint pruneSeconds = 0, RequestOptions options = null)
+        public Task BanUserAsync(IUser user, uint pruneSeconds = 0, RequestOptions options = null)
             => GuildHelper.AddBanAsync(this, Discord, user.Id, pruneSeconds, options);
         /// <inheritdoc />
         public Task AddBanAsync(ulong userId, uint pruneSeconds = 0, RequestOptions options = null)
