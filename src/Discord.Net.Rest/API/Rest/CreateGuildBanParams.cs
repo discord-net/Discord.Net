@@ -1,8 +1,9 @@
-namespace Discord.API.Rest
+using Newtonsoft.Json;
+
+namespace Discord.API.Rest;
+
+internal class CreateGuildBanParams
 {
-    internal class CreateGuildBanParams
-    {
-        public Optional<int> DeleteMessageDays { get; set; }
-        public string Reason { get; set; }
-    }
+    [JsonProperty("delete_message_seconds")]
+    public uint DeleteMessageSeconds { get; set; }
 }
