@@ -544,6 +544,29 @@ namespace Discord
         ///     A task that represents the asynchronous add operation for the ban.
         /// </returns>
         Task AddBanAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Bans the user from this guild and optionally prunes their recent messages.
+        /// </summary>
+        /// <param name="user">The user to ban.</param>
+        /// <param name="pruneSeconds">The number of seconds to remover messages from this user for, between 0 and 604800</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous add operation for the ban.
+        /// </returns>
+        Task BanUserAsync(IUser user, uint pruneSeconds = 0, RequestOptions options = null);
+
+        /// <summary>
+        ///     Bans the user from this guild and optionally prunes their recent messages.
+        /// </summary>
+        /// <param name="userId">The ID of the user to ban.</param>
+        /// <param name="pruneSeconds">The number of seconds to remover messages from this user for, between 0 and 604800</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous add operation for the ban.
+        /// </returns>
+        Task BanUserAsync(ulong userId, uint pruneSeconds = 0, RequestOptions options = null);
+
         /// <summary>
         ///     Unbans the user if they are currently banned.
         /// </summary>

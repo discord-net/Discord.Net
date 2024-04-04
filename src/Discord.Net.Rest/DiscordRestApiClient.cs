@@ -1743,22 +1743,23 @@ namespace Discord.API
         /// <exception cref="ArgumentException">
         /// <paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.
         /// -and-
-        /// <paramref name="args.DeleteMessageDays"/> must be between 0 to 7.
+        /// <paramref name="deleteMessageSeconds"/> must be between 0 and 604800.
         /// </exception>
-        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
-        public Task CreateGuildBanAsync(ulong guildId, ulong userId, CreateGuildBanParams args, RequestOptions options = null)
+        public Task CreateGuildBanAsync(ulong guildId, ulong userId, uint deleteMessageSeconds, string reason, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
-            Preconditions.NotNull(args, nameof(args));
-            Preconditions.AtLeast(args.DeleteMessageDays, 0, nameof(args.DeleteMessageDays), "Prune length must be within [0, 7]");
-            Preconditions.AtMost(args.DeleteMessageDays, 7, nameof(args.DeleteMessageDays), "Prune length must be within [0, 7]");
+
+            Preconditions.AtMost(deleteMessageSeconds, 604800, nameof(deleteMessageSeconds), "Prune length must be within [0, 604800]");
+
+            var data = new CreateGuildBanParams { DeleteMessageSeconds = deleteMessageSeconds };
+
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            if (!string.IsNullOrWhiteSpace(args.Reason))
-                options.AuditLogReason = args.Reason;
-            return SendAsync("PUT", () => $"guilds/{guildId}/bans/{userId}?delete_message_days={args.DeleteMessageDays}", ids, options: options);
+            if (!string.IsNullOrWhiteSpace(reason))
+                options.AuditLogReason = reason;
+            return SendJsonAsync("PUT", () => $"guilds/{guildId}/bans/{userId}", data, ids, options: options);
         }
 
         /// <exception cref="ArgumentException"><paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.</exception>

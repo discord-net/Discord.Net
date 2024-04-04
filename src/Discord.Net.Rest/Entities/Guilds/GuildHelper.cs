@@ -235,11 +235,15 @@ namespace Discord.Rest
             return model == null ? null : RestBan.Create(client, model);
         }
 
-        public static Task AddBanAsync(IGuild guild, BaseDiscordClient client,
-            ulong userId, int pruneDays, string reason, RequestOptions options)
+        public static Task AddBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, int pruneDays, string reason, RequestOptions options)
         {
-            var args = new CreateGuildBanParams { DeleteMessageDays = pruneDays, Reason = reason };
-            return client.ApiClient.CreateGuildBanAsync(guild.Id, userId, args, options);
+            Preconditions.AtLeast(pruneDays, 0, nameof(pruneDays), "Prune length must be within [0, 7]");
+            return client.ApiClient.CreateGuildBanAsync(guild.Id, userId, (uint)pruneDays * 86400, reason, options);
+        }
+
+        public static Task AddBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, uint pruneSeconds, RequestOptions options)
+        {
+            return client.ApiClient.CreateGuildBanAsync(guild.Id, userId, pruneSeconds, null, options);
         }
 
         public static Task RemoveBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, RequestOptions options)
