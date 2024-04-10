@@ -1,10 +1,10 @@
 # Changelog
 
-## [3.14.1] - 2023-03-19
+## [3.14.1] - 2024-03-19
 ### Fixed
 - Version number contains commit hash
 
-## [3.14.0] - 2023-03-19
+## [3.14.0] - 2024-03-19
 
 ### Added
 - #2849 Allow setting channel topic to null when creating channels (7c96844)
