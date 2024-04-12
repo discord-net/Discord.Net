@@ -2082,7 +2082,7 @@ namespace Discord.WebSocket
 
                             case "MESSAGE_POLL_VOTE_REMOVE":
                                 {
-                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_POLL_VOTE_ADD)").ConfigureAwait(false);
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_POLL_VOTE_REMOVE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<PollVote>(_serializer);
 
@@ -2129,7 +2129,7 @@ namespace Discord.WebSocket
                                         messageCacheable = new(message, data.MessageId, message is not null, async () => await (channel ?? (IMessageChannel)await Rest.GetDMChannelAsync(data.ChannelId)).GetMessageAsync(data.MessageId) as IUserMessage);
                                     }
 
-                                    await TimedInvokeAsync(_pollVoteAdded, nameof(PollVoteAdded), userCacheable, channelCacheable, messageCacheable, guildCacheable, data.AnswerId);
+                                    await TimedInvokeAsync(_pollVoteRemoved, nameof(PollVoteRemoved), userCacheable, channelCacheable, messageCacheable, guildCacheable, data.AnswerId);
                                 }
                                 break;
 
