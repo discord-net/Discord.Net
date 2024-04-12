@@ -48,6 +48,6 @@ internal static class PollExtensions
             poll.LayoutType,
             new PollResults(
                 poll.PollResults.IsFinalized,
-                poll.PollResults.AnswerCounts.Select(x => new PollAnswerCounts(x.Id, x.Count, x.MeVoted)).ToImmutableArray())
+                poll.PollResults?.AnswerCounts.Select(x => new PollAnswerCounts(x.Id, x.Count, x.MeVoted)).ToImmutableArray())
             );
 }
