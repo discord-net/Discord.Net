@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace Discord.Rest;
@@ -29,4 +30,24 @@ internal static class PollExtensions
                 Text = poll.Question.Text,
             },
         };
+
+    public static Poll ToEntity(this API.Poll poll)
+        => new(
+            new PollMedia (poll.Question.Text,
+                poll.Question.Emoji.IsSpecified
+                    ? poll.Question.Emoji.Value.ToIEmote()
+                    : null),
+            poll.Answers.Select(x =>
+                new PollAnswer(
+                    x.AnswerId,
+                    new PollMedia(x.PollMedia.Text, x.PollMedia.Emoji.IsSpecified
+                        ? x.PollMedia.Emoji.Value.ToIEmote()
+                        : null))).ToImmutableArray(),
+            poll.Expiry,
+            poll.AllowMultiselect,
+            poll.LayoutType,
+            new PollResults(
+                poll.PollResults.IsFinalized,
+                poll.PollResults.AnswerCounts.Select(x => new PollAnswerCounts(x.Id, x.Count, x.MeVoted)).ToImmutableArray())
+            );
 }

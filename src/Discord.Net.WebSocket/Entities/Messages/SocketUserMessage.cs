@@ -53,6 +53,9 @@ namespace Discord.WebSocket
         public IMessageInteractionMetadata InteractionMetadata { get; internal set; }
 
         /// <inheritdoc />
+        public Poll? Poll { get; internal set; }
+
+        /// <inheritdoc />
         public MessageResolvedData ResolvedData { get; internal set; }
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
@@ -209,6 +212,9 @@ namespace Discord.WebSocket
 
             if (model.InteractionMetadata.IsSpecified)
                 InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata();
+
+            if (model.Poll.IsSpecified)
+                Poll = model.Poll.Value.ToEntity();
         }
 
         /// <inheritdoc />

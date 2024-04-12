@@ -8,7 +8,7 @@ internal class PollAnswerCount
     public ulong Id { get; set; }
 
     [JsonProperty("count")]
-    public int Count { get; set; }
+    public uint Count { get; set; }
 
     [JsonProperty("me_voted")]
     public bool MeVoted { get; set; }

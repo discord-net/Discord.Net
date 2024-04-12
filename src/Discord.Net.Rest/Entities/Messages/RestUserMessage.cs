@@ -52,6 +52,9 @@ namespace Discord.Rest
         public IMessageInteractionMetadata InteractionMetadata { get; internal set; }
 
         /// <inheritdoc />
+        public Poll? Poll { get; internal set; }
+
+        /// <inheritdoc />
         public MessageResolvedData ResolvedData { get; internal set; }
 
         internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
@@ -167,6 +170,9 @@ namespace Discord.Rest
             }
             if (model.InteractionMetadata.IsSpecified)
                 InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata();
+
+            if (model.Poll.IsSpecified)
+                Poll = model.Poll.Value.ToEntity();
         }
 
         /// <inheritdoc />

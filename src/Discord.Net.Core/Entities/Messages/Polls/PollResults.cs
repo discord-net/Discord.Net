@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Discord;
 
 /// <summary>
@@ -13,9 +15,9 @@ public readonly struct PollResults
     /// <summary>
     ///     Gets the answer counts for the poll.
     /// </summary>
-    public readonly PollAnswerCounts AnswerCounts;
+    public readonly IReadOnlyCollection<PollAnswerCounts> AnswerCounts;
 
-    internal PollResults(bool isFinalized, PollAnswerCounts answerCounts)
+    internal PollResults(bool isFinalized, IReadOnlyCollection<PollAnswerCounts> answerCounts)
     {
         IsFinalized = isFinalized;
         AnswerCounts = answerCounts;

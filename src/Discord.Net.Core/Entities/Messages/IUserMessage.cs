@@ -30,6 +30,14 @@ namespace Discord
         IMessageInteractionMetadata InteractionMetadata { get; }
 
         /// <summary>
+        ///     Gets the poll sent with this message.
+        /// </summary>
+        /// <remarks>
+        ///     Will be <see langword="null"/> if the message has no poll.
+        /// </remarks>
+        Poll? Poll { get; }
+
+        /// <summary>
         ///     Modifies this message.
         /// </summary>
         /// <remarks>

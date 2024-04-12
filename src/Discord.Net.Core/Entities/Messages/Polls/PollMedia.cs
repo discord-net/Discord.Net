@@ -11,7 +11,7 @@ public readonly struct PollMedia
     public readonly string Text;
 
     /// <summary>
-    ///     Gets the emoji of the field.
+    ///     Gets the emoji of the field. <see langword="null"/> if no emoji is set.
     /// </summary>
     public readonly IEmote Emoji;
 

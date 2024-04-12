@@ -523,6 +523,9 @@ namespace Discord.WebSocket
             client.EntitlementCreated += (arg1) => _entitlementCreated.InvokeAsync(arg1);
             client.EntitlementUpdated += (arg1, arg2) => _entitlementUpdated.InvokeAsync(arg1, arg2);
             client.EntitlementDeleted += (arg1) => _entitlementDeleted.InvokeAsync(arg1);
+
+            client.PollVoteAdded += (arg1, arg2, arg3, arg4, arg5) => _pollVoteAdded.InvokeAsync(arg1, arg2, arg3, arg4, arg5);
+            client.PollVoteRemoved += (arg1, arg2, arg3, arg4, arg5) => _pollVoteRemoved.InvokeAsync(arg1, arg2, arg3, arg4, arg5);
         }
 
         public async Task<SocketApplicationCommand> CreateGlobalApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
