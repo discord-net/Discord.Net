@@ -11,7 +11,7 @@ internal class CreatePollParams
     public PollAnswer[] Answers { get; set; }
 
     [JsonProperty("duration")]
-    public int Duration { get; set; }
+    public uint Duration { get; set; }
 
     [JsonProperty("allow_multiselect")]
     public bool AllowMultiselect { get; set; }
