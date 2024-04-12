@@ -291,23 +291,23 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Fired when a vote is added to a poll.
         /// </summary>
-        public event Func<Cacheable<SocketUser, RestUser, IUser, ulong>, Cacheable<SocketGuildChannel, RestGuildChannel, IGuildChannel, ulong>, Cacheable<SocketUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>, ulong, Task> PollVoteAdded
+        public event Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task> PollVoteAdded
         {
             add { _pollVoteAdded.Add(value); }
             remove { _pollVoteAdded.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<SocketUser, RestUser, IUser, ulong>, Cacheable<SocketGuildChannel, RestGuildChannel, IGuildChannel, ulong>, Cacheable<SocketUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>, ulong, Task>> _pollVoteAdded = new ();
+        internal readonly AsyncEvent<Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task>> _pollVoteAdded = new ();
 
         /// <summary>
         ///     Fired when a vote is removed from a poll.
         /// </summary>
-        public event Func<Cacheable<SocketUser, RestUser, IUser, ulong>, Cacheable<SocketGuildChannel, RestGuildChannel, IGuildChannel, ulong>, Cacheable<SocketUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>, ulong, Task> PollVoteRemoved
+        public event Func<Cacheable< IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task> PollVoteRemoved
         {
             add { _pollVoteRemoved.Add(value); }
             remove { _pollVoteRemoved.Remove(value); }
         }
 
-        internal readonly AsyncEvent<Func<Cacheable<SocketUser, RestUser, IUser, ulong>, Cacheable<SocketGuildChannel, RestGuildChannel, IGuildChannel, ulong>, Cacheable<SocketUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>, ulong, Task>> _pollVoteRemoved = new ();
+        internal readonly AsyncEvent<Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task>> _pollVoteRemoved = new ();
 
         #endregion
 
