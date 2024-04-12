@@ -20,6 +20,6 @@ internal class Poll
     [JsonProperty("layout_type")]
     public PollLayout LayoutType { get; set; }
 
-    [JsonProperty("poll_results")]
+    [JsonProperty("results")]
     public PollResults PollResults { get; set; }
 }

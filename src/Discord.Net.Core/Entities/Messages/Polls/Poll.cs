@@ -34,7 +34,7 @@ public readonly struct Poll
     public readonly PollLayout LayoutType;
 
     /// <summary>
-    ///     Gets the results of the poll. Can <see langword="null"/> if the poll has no votes.
+    ///     Gets the results of the poll. Can <see langword="null"/> if the poll is not finalized yet.
     /// </summary>
     public readonly PollResults? Results;
 
