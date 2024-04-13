@@ -260,7 +260,6 @@ namespace Discord
         CannotEditAPollMessage = 520003,
         CannotUseAnEmojiIncludedWithThePoll = 520004,
         CannotExpireANonPollMessage = 520006,
-        PollIsAlreadyExpired = 520007
 
         #endregion
     }
