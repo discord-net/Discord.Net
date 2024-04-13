@@ -59,6 +59,9 @@ public class Program
         await Task.Delay(Timeout.Infinite);
     }
 
-    private static async Task LogAsync(LogMessage message)
-        => Console.WriteLine(message.ToString());
+    private static Task LogAsync(LogMessage message)
+    {
+        Console.WriteLine(message.ToString());
+        return Task.CompletedTask;
+    }
 }

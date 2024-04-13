@@ -61,7 +61,7 @@ public class ExampleModule : InteractionModuleBase<SocketInteractionContext>
     // Select Menu interactions, contain ids of the menu options that were selected by the user. You can access the option ids from the method parameters.
     // You can also use the wild card pattern with Select Menus, in that case, the wild card captures will be passed on to the method first, followed by the option ids.
     [ComponentInteraction("roleSelect")]
-    public async Task RoleSelect(string[] selections)
+    public Task RoleSelect(string[] selections)
     {
         throw new NotImplementedException();
     }
