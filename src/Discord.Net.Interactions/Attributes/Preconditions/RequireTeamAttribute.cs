@@ -23,7 +23,7 @@ namespace Discord.Interactions
         /// <summary>
         ///      The team roles to require. Valid values: "*", "admin", "developer", or "read_only"
         /// </summary>
-        public string[] TeamRoles { get; }
+        public string[] TeamRoles { get; } = [];
 
         /// <summary>
         ///     Requires that the user invoking the command to have a specific team role.
@@ -31,7 +31,7 @@ namespace Discord.Interactions
         /// <param name="teamRoles">The team roles to require. Valid values: "*", "admin", "developer", or "read_only"</param>
         public RequireTeamAttribute(params string[] teamRoles)
         {
-            TeamRoles = teamRoles;
+            TeamRoles ??= teamRoles;
         }
 
         /// <inheritdoc />
