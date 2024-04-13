@@ -16,10 +16,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Examples", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Interactions", "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj", "{137DB209-B357-4EE8-A6EE-4B6127F6DEE9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Analyzers", "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj", "{24C231FD-8CF3-444A-9E7C-45C18BAD4A0D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Analyzers.Tests", "test\Discord.Net.Analyzers.Tests\Discord.Net.Analyzers.Tests.csproj", "{FC67057C-E92F-4E1C-98BE-46F839C8AD71}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Tests.Unit", "test\Discord.Net.Tests.Unit\Discord.Net.Tests.Unit.csproj", "{DBF8B16E-5967-4480-8EDE-15D98A0DF0C4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Tests.Integration", "test\Discord.Net.Tests.Integration\Discord.Net.Tests.Integration.csproj", "{E169E15A-E82C-45BF-8C24-C2CADB7093AA}"
