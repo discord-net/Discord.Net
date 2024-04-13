@@ -34,11 +34,11 @@ public readonly struct Poll
     public readonly PollLayout LayoutType;
 
     /// <summary>
-    ///     Gets the results of the poll. Can <see langword="null"/> if the poll is not finalized yet.
+    ///     Gets the results of the poll.
     /// </summary>
-    public readonly PollResults? Results;
+    public readonly PollResults Results;
 
-    internal Poll(PollMedia question, IReadOnlyCollection<PollAnswer> answers, DateTimeOffset expiresAt, bool allowMultiselect, PollLayout layoutType, PollResults? results)
+    internal Poll(PollMedia question, IReadOnlyCollection<PollAnswer> answers, DateTimeOffset expiresAt, bool allowMultiselect, PollLayout layoutType, PollResults results)
     {
         Question = question;
         Answers = answers;

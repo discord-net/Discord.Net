@@ -11,15 +11,18 @@ internal static class PollExtensions
             AllowMultiselect = poll.AllowMultiselect,
             Duration = poll.Duration,
             LayoutType = poll.LayoutType,
-            Answers = poll.Answers.Select(x => new API.PollAnswer { PollMedia = new API.PollMedia
+            Answers = poll.Answers.Select(x => new API.PollAnswer
             {
-                Emoji = new API.Emoji
+                PollMedia = new API.PollMedia
                 {
-                    Id = x.Emoji is Emote emote ? emote.Id : null,
-                    Name = x.Emoji is Emoji emoji ? emoji.Name : null,
-                },
-                Text = x.Text,
-            }} ).ToArray(),
+                    Emoji = new API.Emoji
+                    {
+                        Id = x.Emoji is Emote emote ? emote.Id : null,
+                        Name = x.Emoji is Emoji emoji ? emoji.Name : null,
+                    },
+                    Text = x.Text,
+                }
+            }).ToArray(),
             Question = new API.PollMedia
             {
                 Emoji = new API.Emoji
@@ -33,7 +36,7 @@ internal static class PollExtensions
 
     public static Poll ToEntity(this API.Poll poll)
         => new(
-            new PollMedia (poll.Question.Text,
+            new PollMedia(poll.Question.Text,
                 poll.Question.Emoji.IsSpecified
                     ? poll.Question.Emoji.Value.ToIEmote()
                     : null),
@@ -46,10 +49,8 @@ internal static class PollExtensions
             poll.Expiry,
             poll.AllowMultiselect,
             poll.LayoutType,
-            poll.PollResults is not null
-                ? new PollResults(
-                    poll.PollResults.IsFinalized,
-                    poll.PollResults.AnswerCounts.Select(x => new PollAnswerCounts(x.Id, x.Count, x.MeVoted)).ToImmutableArray())
-                : null
+            new PollResults(
+                poll.PollResults.IsFinalized,
+                poll.PollResults.AnswerCounts.Select(x => new PollAnswerCounts(x.Id, x.Count, x.MeVoted)).ToImmutableArray())
             );
 }
