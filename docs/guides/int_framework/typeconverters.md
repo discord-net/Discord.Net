@@ -5,7 +5,7 @@ title: Parameter Type Converters
 
 # TypeConverters
 
-[TypeConverters] are responsible for registering command parameters to Discord and parsing the user inputs into method parameters.
+[TypeConverter]s are responsible for registering command parameters to Discord and parsing the user inputs into method parameters.
 
 By default, TypeConverters for the following types are provided with @Discord.Interactions library.
 

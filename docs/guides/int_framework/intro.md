@@ -459,6 +459,7 @@ User apps are the kind of Discord applications that are installed onto a user in
 [CommandContextTypes]: xref:Discord.Interactions.CommandContextTypesAttribute
 
 [IChannel]: xref:Discord.IChannel
+[IAttachment]: xref:Discord.IAttachment
 [IRole]: xref:Discord.IRole
 [IUser]: xref:Discord.IUser
 [IMessage]: xref:Discord.IMessage
