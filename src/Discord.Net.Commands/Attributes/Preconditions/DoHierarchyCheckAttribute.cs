@@ -13,17 +13,17 @@ namespace Discord.Commands
     /// [RequireContext(ContextType.Guild)]
     /// [RequireBotPermission(GuildPermission.ManageRoles)]
     /// [RequireUserPermission(GuildPermission.ManageRoles)]
-    /// [SlashCommand("role", "Adds a role to a user within a guild.")]
+    /// [Command("role")]
     /// public async Task RoleAsync(IGuildUser user, [DoHierarchyCheck] IRole role)
     /// {
     ///     if (user.RoleIds.Any(id => id == role.Id))
     ///     {
-    ///         await RespondAsync($"{user.Mention} already has {role.Mention}!");
+    ///         await ReplyAsync($"{user.Mention} already has {role.Mention}!");
     ///         return;
     ///     }
     /// 
     ///     await user.AddRoleAsync(role);
-    ///     await RespondAsync($"Added {role.Mention} to {user.Mention}.");
+    ///     await ReplyAsync($"Added {role.Mention} to {user.Mention}.");
     /// }
     /// ]]>
     /// </code>
