@@ -29,6 +29,7 @@ to use.
 * @Discord.Interactions.RequireUserPermissionAttribute
 * @Discord.Interactions.RequireNsfwAttribute
 * @Discord.Interactions.RequireRoleAttribute
+* @Dicsord.Interactions.RequireTeamAttribute
 
 ## Using Preconditions
 
