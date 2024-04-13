@@ -39,8 +39,11 @@ public class InteractionHandler
         _handler.InteractionExecuted += HandleInteractionExecute;
     }
 
-    private async Task LogAsync(LogMessage log)
-        => Console.WriteLine(log);
+    private Task LogAsync(LogMessage log)
+    {
+        Console.WriteLine(log);
+        return Task.CompletedTask;
+    }
 
     private async Task ReadyAsync()
     {
@@ -80,7 +83,7 @@ public class InteractionHandler
         }
     }
 
-    private async Task HandleInteractionExecute(ICommandInfo commandInfo, IInteractionContext context, IResult result)
+    private Task HandleInteractionExecute(ICommandInfo commandInfo, IInteractionContext context, IResult result)
     {
         if (!result.IsSuccess)
             switch (result.Error)
@@ -91,5 +94,7 @@ public class InteractionHandler
                 default:
                     break;
             }
+
+        return Task.CompletedTask;
     }
 }
