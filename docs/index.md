@@ -1,7 +1,8 @@
 ---
 uid: Home.Landing
 title: Home
-_layout: landing
+_disableToc: true
+_disableBreadcrumb: true
 ---
 
 ![logo](marketing/logo/SVG/Combinationmark%20White%20Border.svg)
