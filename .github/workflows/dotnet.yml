@@ -116,7 +116,6 @@ jobs:
             nuget setApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
             nuget setApiKey ${{ secrets.NIGHTLY_FEED_API_KEY }} -Source ${{ vars.NIGHTLY_FEED }}
             nuget setApiKey ${{ secrets.GITHUB_TOKEN }} -Source ${{ env.REPOSITORY_URL }}
-            nuget setApiKey ${{ secrets.MYGET_API_KEY }} -Source https://www.myget.org/F/discord-net/api/v2/package
 
         - name: Push Nightly
           if: vars.PUSH_NIGHTLY == 'true'
@@ -125,10 +124,6 @@ jobs:
         - name: Push Nightly to GitHub Pacakges
           if: vars.PUSH_NIGHTLY == 'true'            
           run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source ${{ env.REPOSITORY_URL }}
-
-        - name: Push Nightly to MyGet
-          if: vars.PUSH_MYGET == 'true'            
-          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source https://www.myget.org/F/discord-net/api/v2/package
 
         - name: Push Release
           if: env.IsTagBuild == 'true' && vars.PUSH_NUGET == 'true'
