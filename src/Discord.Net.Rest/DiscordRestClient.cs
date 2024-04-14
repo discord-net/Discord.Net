@@ -249,10 +249,10 @@ namespace Discord.Rest
         public Task DeleteAllGlobalCommandsAsync(RequestOptions options = null)
             => InteractionHelper.DeleteAllGlobalCommandsAsync(this, options);
 
-        public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId)
-            => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
-        public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId)
-            => ClientHelper.RemoveRoleAsync(this, guildId, userId, roleId);
+        public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+            => ClientHelper.AddRoleAsync(this, guildId, userId, roleId, options);
+        public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+            => ClientHelper.RemoveRoleAsync(this, guildId, userId, roleId, options);
 
         public Task AddReactionAsync(ulong channelId, ulong messageId, IEmote emote, RequestOptions options = null)
             => MessageHelper.AddReactionAsync(channelId, messageId, emote, this, options);
