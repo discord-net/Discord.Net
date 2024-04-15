@@ -31,15 +31,15 @@ namespace Discord.Rest
         /// </summary>
         public IReadOnlyCollection<RestUser> Users => ImmutableArray.Create(CurrentUser, Recipient);
 
-        internal RestDMChannel(BaseDiscordClient discord, ulong id, ulong recipientId)
+        internal RestDMChannel(BaseDiscordClient discord, ulong id, ulong? recipientId)
             : base(discord, id)
         {
-            Recipient = new RestUser(Discord, recipientId);
+            Recipient = recipientId.HasValue ? new RestUser(Discord, recipientId.Value) : null;
             CurrentUser = new RestUser(Discord, discord.CurrentUser.Id);
         }
         internal new static RestDMChannel Create(BaseDiscordClient discord, Model model)
         {
-            var entity = new RestDMChannel(discord, model.Id, model.Recipients.Value[0].Id);
+            var entity = new RestDMChannel(discord, model.Id, model.Recipients.GetValueOrDefault(null)?[0].Id);
             entity.Update(model);
             return entity;
         }
