@@ -29,7 +29,9 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets a collection that is the current logged-in user and the recipient.
         /// </summary>
-        public IReadOnlyCollection<RestUser> Users => ImmutableArray.Create(CurrentUser, Recipient);
+        public IReadOnlyCollection<RestUser> Users => Recipient is null
+            ? Array.Empty<RestUser>()
+            : ImmutableArray.Create(CurrentUser, Recipient);
 
         internal RestDMChannel(BaseDiscordClient discord, ulong id, ulong? recipientId)
             : base(discord, id)
@@ -45,7 +47,8 @@ namespace Discord.Rest
         }
         internal override void Update(Model model)
         {
-            Recipient.Update(model.Recipients.Value[0]);
+            if(model.Recipients.IsSpecified)
+                Recipient?.Update(model.Recipients.Value[0]);
         }
 
         /// <inheritdoc />
@@ -68,7 +71,7 @@ namespace Discord.Rest
         /// </returns>
         public RestUser GetUser(ulong id)
         {
-            if (id == Recipient.Id)
+            if (id == Recipient?.Id)
                 return Recipient;
             else if (id == Discord.CurrentUser.Id)
                 return CurrentUser;
