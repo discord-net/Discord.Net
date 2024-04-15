@@ -15,7 +15,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Provides a client to send REST-based requests to Discord.
     /// </summary>
-    public class DiscordRestClient : BaseDiscordClient, IDiscordClient
+    public class DiscordRestClient : BaseDiscordClient, IDiscordClient, IRestClientProvider
     {
         #region DiscordRestClient
         private RestApplication _applicationInfo;
@@ -399,5 +399,7 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties, RequestOptions options)
             => await BulkOverwriteGlobalCommands(properties, options).ConfigureAwait(false);
         #endregion
+
+        DiscordRestClient IRestClientProvider.RestClient => this;
     }
 }
