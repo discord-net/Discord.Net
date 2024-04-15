@@ -44,7 +44,7 @@ Interaction Services determines the most suitable [TypeConverter] for a paramete
 3. It searches for a generic `TypeConverter<T>` with a matching type constraint. If there are more multiple matches,
 the one whose type constraint is the most specialized will be chosen.
 
-> [!NOTE}
+> [!NOTE]
 > Alternatively, you can use the generic variant (`TypeConverter<T>`) of the
 > [TypeConverter] base class which implements the following method body for `CanConvertTo()` method
 
