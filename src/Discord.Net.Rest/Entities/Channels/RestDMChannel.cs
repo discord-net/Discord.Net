@@ -30,7 +30,7 @@ namespace Discord.Rest
         ///     Gets a collection that is the current logged-in user and the recipient.
         /// </summary>
         public IReadOnlyCollection<RestUser> Users => Recipient is null
-            ? Array.Empty<RestUser>()
+            ? ImmutableArray<RestUser>.Empty
             : ImmutableArray.Create(CurrentUser, Recipient);
 
         internal RestDMChannel(BaseDiscordClient discord, ulong id, ulong? recipientId)
