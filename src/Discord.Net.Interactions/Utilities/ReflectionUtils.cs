@@ -40,7 +40,7 @@ namespace Discord.Interactions
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to create \"{ownerType.FullName}\".", ex);
+                throw new TargetInvocationException($"Failed to create \"{ownerType.FullName}\".", ex);
             }
         }
         private static ConstructorInfo GetConstructor(TypeInfo ownerType)

@@ -37,7 +37,7 @@ namespace Discord.Commands
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to create \"{ownerType.FullName}\".", ex);
+                throw new TargetInvocationException($"Failed to create \"{ownerType.FullName}\".", ex);
             }
         }
 
