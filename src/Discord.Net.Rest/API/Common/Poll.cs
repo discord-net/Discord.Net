@@ -21,5 +21,5 @@ internal class Poll
     public PollLayout LayoutType { get; set; }
 
     [JsonProperty("results")]
-    public PollResults PollResults { get; set; }
+    public Optional<PollResults> PollResults { get; set; }
 }

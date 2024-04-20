@@ -49,8 +49,10 @@ internal static class PollExtensions
             poll.Expiry,
             poll.AllowMultiselect,
             poll.LayoutType,
-            new PollResults(
-                poll.PollResults.IsFinalized,
-                poll.PollResults.AnswerCounts.Select(x => new PollAnswerCounts(x.Id, x.Count, x.MeVoted)).ToImmutableArray())
+            poll.PollResults.IsSpecified
+                ? new PollResults(
+                    poll.PollResults.Value.IsFinalized,
+                    poll.PollResults.Value.AnswerCounts.Select(x => new PollAnswerCounts(x.Id, x.Count, x.MeVoted)).ToImmutableArray())
+                : null
             );
 }

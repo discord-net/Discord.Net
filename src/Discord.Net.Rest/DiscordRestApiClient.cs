@@ -2832,10 +2832,10 @@ namespace Discord.API
 
         #region Polls
 
-        public Task<User[]> GetAnswerVotesAsync(ulong channelId, ulong messageId, uint answerId, int limit = 100, ulong? afterId = null, RequestOptions options = null)
+        public Task<PollAnswerVoters> GetPollAnswerVotersAsync(ulong channelId, ulong messageId, uint answerId, int limit = 100, ulong? afterId = null, RequestOptions options = null)
         {
             var urlParams = $"?limit={limit}{(afterId is not null ? $"&after={afterId}" : string.Empty)}";
-            return SendAsync<User[]>("GET", () => $"channels/{channelId}/polls/{messageId}/answers/{answerId}{urlParams}", new BucketIds(channelId: channelId), options: options);
+            return SendAsync<PollAnswerVoters>("GET", () => $"channels/{channelId}/polls/{messageId}/answers/{answerId}{urlParams}", new BucketIds(channelId: channelId), options: options);
         }
 
         public Task<Message> ExpirePollAsync(ulong channelId, ulong messageId, RequestOptions options = null)
