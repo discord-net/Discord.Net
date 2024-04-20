@@ -1,6 +1,7 @@
 using Discord.Logging;
 using Discord.Net;
 using System;
+using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -43,15 +44,16 @@ namespace Discord
                 {
                     var ex2 = ex as WebSocketClosedException;
                     if (ex2?.CloseCode == 4006)
-                        CriticalError(new Exception("WebSocket session expired", ex));
+                        CriticalError(new WebSocketException(WebSocketError.ConnectionClosedPrematurely, "WebSocket session expired", ex));
                     else if (ex2?.CloseCode == 4014)
-                        CriticalError(new Exception("WebSocket connection was closed", ex));
+                        CriticalError(new WebSocketException(WebSocketError.ConnectionClosedPrematurely, "WebSocket connection was closed", ex));
                     else
-                        Error(new Exception("WebSocket connection was closed", ex));
+                        Error(new WebSocketException(WebSocketError.ConnectionClosedPrematurely, "WebSocket connection was closed", ex));
                 }
                 else
-                    Error(new Exception("WebSocket connection was closed"));
-                return Task.Delay(0);
+                    Error(new WebSocketException(WebSocketError.ConnectionClosedPrematurely, "WebSocket connection was closed"));
+
+                return Task.CompletedTask;
             });
         }
 
