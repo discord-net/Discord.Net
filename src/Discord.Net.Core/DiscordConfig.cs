@@ -261,5 +261,15 @@ namespace Discord
         ///     Returns the maximum number of poll answer voters that can be gotten per-batch.
         /// </summary>
         public const int MaxPollVotersPerBatch = 100;
+
+        /// <summary>
+        ///     Returns the maximum length of a poll answer text.
+        /// </summary>
+        public const int MaxPollAnswerTextLength = 55;
+
+        /// <summary>
+        ///     Returns the maximum length of a poll question text.
+        /// </summary>
+        public const int MaxPollQuestionTextLength = 300;
     }
 }
