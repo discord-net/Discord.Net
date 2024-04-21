@@ -91,6 +91,9 @@ namespace Discord
             if (embeds != null && embeds.Count != 0)
                 return;
 
+            if (poll is not null)
+                return;
+
             throw new ArgumentException($"At least one of 'Content', 'Embeds', 'Components', 'Attachments' or 'Poll' must be specified.");
         }
 
