@@ -15,21 +15,24 @@ internal static class PollExtensions
             {
                 PollMedia = new API.PollMedia
                 {
-                    Emoji = new API.Emoji
-                    {
-                        Id = x.Emoji is Emote emote ? emote.Id : null,
-                        Name = x.Emoji is Emoji emoji ? emoji.Name : null,
-                    },
+                    Emoji = x.Emoji is not null
+                        ? new API.Emoji
+                        {
+                            Id = x.Emoji is Emote emote ? emote.Id : null,
+                            Name = x.Emoji is Emoji emoji ? emoji.Name : null,
+                        } : Optional<API.Emoji>.Unspecified,
                     Text = x.Text,
                 }
             }).ToArray(),
             Question = new API.PollMedia
             {
-                Emoji = new API.Emoji
-                {
-                    Id = poll.Question.Emoji is Emote emote ? emote.Id : null,
-                    Name = poll.Question.Emoji is Emoji emoji ? emoji.Name : null,
-                },
+                Emoji = poll.Question.Emoji is not null
+                    ? new API.Emoji
+                    {
+                        Id = poll.Question.Emoji is Emote emote ? emote.Id : null,
+                        Name = poll.Question.Emoji is Emoji emoji ? emoji.Name : null,
+                    }
+                    : Optional<API.Emoji>.Unspecified,
                 Text = poll.Question.Text,
             },
         };
