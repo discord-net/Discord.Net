@@ -26,6 +26,7 @@ using RoleModel = Discord.API.Role;
 using StickerModel = Discord.API.Sticker;
 using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
+using SoundboardSoundModel = Discord.API.SoundboardSound;
 
 namespace Discord.WebSocket
 {
@@ -47,6 +48,7 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketCustomSticker> _stickers;
         private ConcurrentDictionary<ulong, SocketGuildEvent> _events;
         private ConcurrentDictionary<ulong, SocketAutoModRule> _automodRules;
+        private ConcurrentDictionary<ulong, SoundboardSound> _soundboardSounds;
         private ImmutableArray<GuildEmote> _emotes;
 
         private readonly AuditLogCache _auditLogs;
@@ -414,6 +416,14 @@ namespace Discord.WebSocket
         /// </returns>
         public IReadOnlyCollection<SocketGuildEvent> Events => _events.ToReadOnlyCollection();
 
+        /// <summary>
+        ///     Gets a collection of all soundboard sounds in this guild.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of soundboard sounds found within this guild.
+        /// </returns>
+        public IReadOnlyCollection<SoundboardSound> SoundboardSounds => _soundboardSounds.ToReadOnlyCollection();
+
         internal SocketGuild(DiscordSocketClient client, ulong id)
             : base(client, id)
         {
@@ -441,6 +451,8 @@ namespace Discord.WebSocket
                     _members = new ConcurrentDictionary<ulong, SocketGuildUser>();
                 if (_roles == null)
                     _roles = new ConcurrentDictionary<ulong, SocketRole>();
+                if (_soundboardSounds == null)
+                    _soundboardSounds = new ConcurrentDictionary<ulong, SoundboardSound>();
                 /*if (Emojis == null)
                     _emojis = ImmutableArray.Create<Emoji>();
                 if (Features == null)
@@ -513,6 +525,15 @@ namespace Discord.WebSocket
             }
             _events = events;
 
+            var soundboardSounds = new ConcurrentDictionary<ulong, SoundboardSound>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.SoundboardSounds.Length * 1.05));
+            {
+                for (var i = 0; i < model.SoundboardSounds.Length; i++)
+                {
+                    var sound = model.SoundboardSounds[i].ToEntity(GetUser(model.SoundboardSounds[i].UserId), Discord);
+                    soundboardSounds.TryAdd(sound.SoundId, sound);
+                }
+            }
+            _soundboardSounds = soundboardSounds;
 
             _syncPromise = new TaskCompletionSource<bool>();
             _downloaderPromise = new TaskCompletionSource<bool>();
@@ -2028,6 +2049,45 @@ namespace Discord.WebSocket
             var model = await GuildHelper.ModifyGuildOnboardingAsync(this, props, Discord, options);
 
             return new SocketGuildOnboarding(Discord, model, this);
+        }
+
+        #endregion
+
+        #region Soundboard
+
+        /// <summary>
+        ///     Gets a cached soundboard sound from this guild.
+        /// </summary>
+        public SoundboardSound GetSoundboardSound(ulong id)
+            => _soundboardSounds.TryGetValue(id, out var sound) ? sound : null;
+
+        internal SoundboardSound RemoveSoundboardSound(ulong id)
+            => _soundboardSounds.TryRemove(id, out var value) ? value : null;
+
+        internal SoundboardSound AddOrUpdateSoundboardSound(SoundboardSoundModel model)
+        {
+            if (_soundboardSounds.TryGetValue(model.SoundId, out var value))
+            {
+                value.Volume = model.Volume;
+                value.Name = model.Name;
+                value.IsAvailable = model.IsAvailable.GetValueOrDefault(false);
+                value.Author = (IUser)GetUser(model.UserId) ?? (model.User.IsSpecified
+                    ? RestUser.Create(Discord, model.User.Value)
+                    : null);
+
+                if (model.EmojiId is { IsSpecified: true, Value: not null })
+                    value.Emoji = new Emote(model.EmojiId.Value.Value, model.EmojiName.GetValueOrDefault(null), false);
+                else if (!string.IsNullOrWhiteSpace(model.EmojiName.GetValueOrDefault(null)))
+                    value.Emoji = new Emoji(model.EmojiName.GetValueOrDefault(null));
+                else
+                    value.Emoji = null;
+            }
+            else
+            {
+                value = model.ToEntity(GetUser(model.UserId), Discord);
+                _soundboardSounds[model.SoundId] = value;
+            }
+            return value;
         }
 
         #endregion

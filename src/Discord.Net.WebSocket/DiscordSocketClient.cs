@@ -447,6 +447,10 @@ namespace Discord.WebSocket
         public Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null)
             => ClientHelper.ListSKUsAsync(this, options);
 
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<SoundboardSound>> GetDefaultSoundboardSoundsAsync(RequestOptions options = null)
+            => ClientHelper.GetDefaultSoundboardSoundsAsync(this, options);
+
         /// <summary>
         ///     Gets entitlements from cache.
         /// </summary>
@@ -2366,6 +2370,13 @@ namespace Discord.WebSocket
                                     await TimedInvokeAsync(_voiceChannelStatusUpdated, nameof(VoiceChannelStatusUpdated), channelCacheable, before, after);
                                 }
                                 break;
+
+                            case "VOICE_CHANNEL_EFFECT_SEND":
+                                {
+
+                                }
+                                break;
+
                             #endregion
 
                             #region Invites
@@ -3167,6 +3178,53 @@ namespace Discord.WebSocket
                                         entitlement is not null, () => null);
 
                                     await TimedInvokeAsync(_entitlementDeleted, nameof(EntitlementDeleted), cacheableEntitlement);
+                                }
+                                break;
+
+                            #endregion
+
+                            #region SoundBoard
+
+                            case "GUILD_SOUNDBOARD_SOUND_CREATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_SOUNDBOARD_SOUND_CREATE)").ConfigureAwait(false);
+                                    var data = (payload as JToken).ToObject<API.SoundboardSound>(_serializer);
+
+                                    var guild = GetGuild(data.GuildId.Value);
+
+                                    var sound = guild.AddOrUpdateSoundboardSound(data);
+
+                                    await TimedInvokeAsync(_soundboardSoundCreated, nameof(SoundboardSoundCreated), guild, sound);
+                                }
+                                break;
+
+                            case "GUILD_SOUNDBOARD_SOUND_UPDATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_SOUNDBOARD_SOUND_UPDATE)").ConfigureAwait(false);
+                                    var data = (payload as JToken).ToObject<API.SoundboardSound>(_serializer);
+
+                                    var guild = GetGuild(data.GuildId.Value);
+
+                                    var before = guild.GetSoundboardSound(data.SoundId)?.Clone();
+                                    var beforeCacheable = new Cacheable<SoundboardSound, ulong>(before, data.SoundId, before is not null, () => null);
+
+                                    var after = guild.AddOrUpdateSoundboardSound(data);
+
+                                    await TimedInvokeAsync(_soundboardSoundUpdated, nameof(SoundboardSoundUpdated), guild, beforeCacheable, after);
+                                }
+                                break;
+
+                            case "GUILD_SOUNDBOARD_SOUND_DELETE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_SOUNDBOARD_SOUND_DELETE)").ConfigureAwait(false);
+                                    var data = (payload as JToken).ToObject<SoundboardSoundDeletedEvent>(_serializer);
+
+                                    var guild = GetGuild(data.GuildId);
+
+                                    var sound = guild.RemoveSoundboardSound(data.SoundId);
+                                    var soundCacheable = new Cacheable<SoundboardSound, ulong>(sound, data.SoundId, sound is not null, () => null);
+
+                                    await TimedInvokeAsync(_soundboardSoundDeleted, nameof(SoundboardSoundDeleted), guild, soundCacheable);
                                 }
                                 break;
 

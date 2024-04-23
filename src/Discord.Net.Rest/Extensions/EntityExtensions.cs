@@ -169,6 +169,11 @@ namespace Discord.Rest
             return new API.Image(entity.Stream);
         }
 
+        public static API.Sound ToModel(this Sound entity)
+        {
+            return new API.Sound(entity.Stream);
+        }
+
         public static Overwrite ToEntity(this API.Overwrite model)
         {
             return new Overwrite(model.TargetId, model.TargetType, new OverwritePermissions(model.Allow, model.Deny));
@@ -217,5 +222,20 @@ namespace Discord.Rest
                 Id = interaction.Id,
             };
         }
+
+        public static SoundboardSound ToEntity(this API.SoundboardSound model, IUser cachedAuthor = null, BaseDiscordClient discord = null)
+            => new(model.SoundId,
+                model.Name,
+                model.UserId,
+                model.Volume,
+                model.GuildId.IsSpecified
+                    ? model.GuildId.Value
+                    : null,
+                model.EmojiName.GetValueOrDefault(null),
+                model.EmojiId.GetValueOrDefault(null),
+                cachedAuthor ?? (model.User.IsSpecified
+                    ? RestUser.Create(discord, model.User.Value)
+                    : null),
+                model.IsAvailable.GetValueOrDefault(false));
     }
 }

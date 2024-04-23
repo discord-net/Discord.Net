@@ -296,6 +296,10 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null)
             => ClientHelper.ListSKUsAsync(this, options);
 
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<SoundboardSound>> GetDefaultSoundboardSoundsAsync(RequestOptions options = null)
+            => ClientHelper.GetDefaultSoundboardSoundsAsync(this, options);
+
         #endregion
 
         #region IDiscordClient

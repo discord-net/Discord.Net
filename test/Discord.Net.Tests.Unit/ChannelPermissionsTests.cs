@@ -92,6 +92,7 @@ namespace Discord
             AssertFlag(() => new ChannelPermissions(startEmbeddedActivities: true), ChannelPermission.StartEmbeddedActivities);
             AssertFlag(() => new ChannelPermissions(useSoundboard: true), ChannelPermission.UseSoundboard);
             AssertFlag(() => new ChannelPermissions(createEvents: true), ChannelPermission.CreateEvents);
+            AssertFlag(() => new ChannelPermissions(useExternalSounds: true), ChannelPermission.UseExternalSounds);
             AssertFlag(() => new ChannelPermissions(sendVoiceMessages: true), ChannelPermission.SendVoiceMessages);
             AssertFlag(() => new ChannelPermissions(useClydeAI: true), ChannelPermission.UseClydeAI);
             AssertFlag(() => new ChannelPermissions(setVoiceChannelStatus: true), ChannelPermission.SetVoiceChannelStatus);
@@ -162,6 +163,7 @@ namespace Discord
             AssertUtil(ChannelPermission.SendVoiceMessages, x => x.SendVoiceMessages, (p, enable) => p.Modify(sendVoiceMessages: enable));
             AssertUtil(ChannelPermission.UseClydeAI, x => x.UseClydeAI, (p, enable) => p.Modify(useClydeAI: enable));
             AssertUtil(ChannelPermission.SetVoiceChannelStatus, x => x.SetVoiceChannelStatus, (p, enable) => p.Modify(setVoiceChannelStatus: enable));
+            AssertUtil(ChannelPermission.UseExternalSounds, x => x.UseExternalSounds, (p, enable) => p.Modify(useExternalSounds: enable));
         }
 
         /// <summary>
