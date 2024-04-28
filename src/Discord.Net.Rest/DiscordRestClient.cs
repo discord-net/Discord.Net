@@ -296,6 +296,10 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null)
             => ClientHelper.ListSKUsAsync(this, options);
 
+        /// <inheritdoc />
+        public Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => ClientHelper.ConsumeEntitlementAsync(this, entitlementId, options);
+
         #endregion
 
         #region IDiscordClient
