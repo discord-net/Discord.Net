@@ -101,4 +101,7 @@ internal class Message
 
     [JsonProperty("interaction_metadata")]
     public Optional<MessageInteractionMetadata> InteractionMetadata { get; set; }
+
+    [JsonProperty("message_snapshot")]
+    public Optional<MessageSnapshot[]> MessageSnapshots { get; set; }
 }

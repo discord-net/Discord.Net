@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -28,6 +29,11 @@ namespace Discord
         ///     Will be <see langword="null"/> if the message is not a response to an interaction.
         /// </remarks>
         IMessageInteractionMetadata InteractionMetadata { get; }
+
+        /// <summary>
+        ///     Gets a collection of partial messages that were forwarded with this message.
+        /// </summary>
+        IReadOnlyCollection<MessageSnapshot> ForwardedMessages { get; }
 
         /// <summary>
         ///     Modifies this message.
