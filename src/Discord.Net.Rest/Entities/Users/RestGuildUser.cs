@@ -91,7 +91,9 @@ namespace Discord.Rest
         {
             if (guild is not null)
                 Guild = guild;
-            GuildId = guildId ?? Guild.Id;
+
+            // kind of dangerous if the callee fucks up the 'guildId' parameter.
+            GuildId = guildId ?? Guild?.Id ?? throw new ArgumentNullException(nameof(guild), $"Expected either {nameof(guild)} or {nameof(guildId)} to be non-null");
         }
         internal static RestGuildUser Create(BaseDiscordClient discord, IGuild guild, Model model, ulong? guildId = null)
         {
