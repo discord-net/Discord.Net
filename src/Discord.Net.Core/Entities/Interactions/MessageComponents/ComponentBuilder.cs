@@ -950,7 +950,7 @@ namespace Discord
             bool isDisabled = false, ComponentType type = ComponentType.SelectMenu, List<ChannelType> channelTypes = null, List<SelectMenuDefaultValue> defaultValues = null)
         {
             CustomId = customId;
-            Options = options;
+            Options = options ?? new();
             Placeholder = placeholder;
             IsDisabled = isDisabled;
             MaxValues = maxValues;
