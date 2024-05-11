@@ -1,5 +1,6 @@
 using Discord.Commands;
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Discord
@@ -38,10 +39,10 @@ namespace Discord
         [InlineData("-2m1s", true)]        // tests format "-%m'm'%s's'"
         [InlineData("-2m", true)]          // tests format "-%m'm'"
         [InlineData("-1s", true)]          // tests format "-%s's'"
-        public void TestTimeSpanParse(string input, bool isNegative)
+        public async Task TestTimeSpanParse(string input, bool isNegative)
         {
             var reader = new TimeSpanTypeReader();
-            var result = reader.ReadAsync(null, input, null).Result;
+            var result = await reader.ReadAsync(null, input, null);
             Assert.True(result.IsSuccess);
 
             var actual = (TimeSpan)result.BestMatch;

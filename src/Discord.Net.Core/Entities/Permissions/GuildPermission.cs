@@ -282,5 +282,10 @@ namespace Discord
         ///     Allows setting voice channel status.
         /// </summary>
         SetVoiceChannelStatus = 1L << 48,
+
+        /// <summary>
+        ///     Allows sending polls.
+        /// </summary>
+        SendPolls = 1L << 49,
     }
 }

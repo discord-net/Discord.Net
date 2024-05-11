@@ -15,13 +15,13 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestNewsChannel : RestTextChannel, INewsChannel
     {
-        internal RestNewsChannel(BaseDiscordClient discord, IGuild guild, ulong id)
-            : base(discord, guild, id)
+        internal RestNewsChannel(BaseDiscordClient discord, IGuild guild, ulong id, ulong guildId)
+            : base(discord, guild, id, guildId)
         {
         }
         internal new static RestNewsChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestNewsChannel(discord, guild, model.Id);
+            var entity = new RestNewsChannel(discord, guild, model.Id, guild?.Id ?? model.GuildId.Value);
             entity.Update(model);
             return entity;
         }

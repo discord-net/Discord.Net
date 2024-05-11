@@ -286,6 +286,31 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, IEmote, Task>> _reactionsRemovedForEmoteEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, IEmote, Task>>();
         #endregion
 
+        #region Polls
+
+        /// <summary>
+        ///     Fired when a vote is added to a poll.
+        /// </summary>
+        public event Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task> PollVoteAdded
+        {
+            add { _pollVoteAdded.Add(value); }
+            remove { _pollVoteAdded.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task>> _pollVoteAdded = new ();
+
+        /// <summary>
+        ///     Fired when a vote is removed from a poll.
+        /// </summary>
+        public event Func<Cacheable< IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task> PollVoteRemoved
+        {
+            add { _pollVoteRemoved.Add(value); }
+            remove { _pollVoteRemoved.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task>> _pollVoteRemoved = new ();
+
+        #endregion
+
         #region Roles
         /// <summary> Fired when a role is created. </summary>
         public event Func<SocketRole, Task> RoleCreated

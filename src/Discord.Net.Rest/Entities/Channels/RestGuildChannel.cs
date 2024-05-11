@@ -23,16 +23,18 @@ namespace Discord.Rest
         public string Name { get; private set; }
         /// <inheritdoc />
         public int Position { get; private set; }
+
         /// <inheritdoc />
-        public ulong GuildId => Guild.Id;
+        public ulong GuildId { get; }
 
         /// <inheritdoc />
         public ChannelFlags Flags { get; private set; }
 
-        internal RestGuildChannel(BaseDiscordClient discord, IGuild guild, ulong id)
+        internal RestGuildChannel(BaseDiscordClient discord, IGuild guild, ulong id, ulong guildId)
             : base(discord, id)
         {
             Guild = guild;
+            GuildId = guildId;
         }
         internal static RestGuildChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
@@ -46,7 +48,7 @@ namespace Discord.Rest
                 ChannelType.Forum => RestForumChannel.Create(discord, guild, model),
                 ChannelType.Category => RestCategoryChannel.Create(discord, guild, model),
                 ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.NewsThread => RestThreadChannel.Create(discord, guild, model),
-                _ => new RestGuildChannel(discord, guild, model.Id),
+                _ => new RestGuildChannel(discord, guild, model.Id, guild?.Id ?? model.GuildId.Value),
             };
         }
         internal override void Update(Model model)

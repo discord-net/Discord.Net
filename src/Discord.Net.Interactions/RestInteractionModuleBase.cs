@@ -43,8 +43,8 @@ namespace Discord.Interactions
         ///     A Task representing the operation of creating the interaction response.
         /// </returns>
         /// <exception cref="InvalidOperationException">Thrown if the interaction isn't a type of <see cref="RestInteraction"/>.</exception>
-        protected override Task RespondAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, Embed embed = null)
-            => HandleInteractionAsync(x => x.Respond(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options));
+        protected override Task RespondAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, Embed embed = null, PollProperties poll = null)
+            => HandleInteractionAsync(x => x.Respond(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll));
 
         /// <summary>
         ///     Responds to the interaction with a modal.
