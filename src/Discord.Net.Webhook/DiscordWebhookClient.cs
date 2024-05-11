@@ -115,8 +115,8 @@ public class DiscordWebhookClient : IDisposable
     public Task<ulong> SendMessageAsync(string text = null, bool isTTS = false, IEnumerable<Embed> embeds = null,
         string username = null, string avatarUrl = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
         MessageComponent components = null, MessageFlags flags = MessageFlags.None, ulong? threadId = null, string threadName = null,
-        ulong[] appliedTags = null)
-        => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, components, flags, threadId, threadName, appliedTags);
+        ulong[] appliedTags = null, Embed embed = null)
+        => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, components, flags, threadId, threadName, appliedTags, embed);
 
     /// <summary>
     ///     Modifies a message posted using this webhook.
