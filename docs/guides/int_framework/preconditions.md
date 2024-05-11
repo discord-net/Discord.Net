@@ -30,6 +30,7 @@ to use.
 * @Discord.Interactions.RequireNsfwAttribute
 * @Discord.Interactions.RequireRoleAttribute
 * @Discord.Interactions.RequireTeamAttribute
+* @Discord.Interactions.DoHierarchyCheckAttribute
 
 ## Using Preconditions
 
