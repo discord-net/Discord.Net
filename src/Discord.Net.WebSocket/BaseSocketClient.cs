@@ -10,7 +10,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents the base of a WebSocket-based Discord client.
     /// </summary>
-    public abstract partial class BaseSocketClient : BaseDiscordClient, IDiscordClient
+    public abstract partial class BaseSocketClient : BaseDiscordClient, IDiscordClient, IRestClientProvider
     {
         #region BaseSocketClient
         protected readonly DiscordSocketConfig BaseConfig;
@@ -352,5 +352,7 @@ namespace Discord.WebSocket
             return await GetVoiceRegionsAsync().ConfigureAwait(false);
         }
         #endregion
+
+        DiscordRestClient IRestClientProvider.RestClient => Rest;
     }
 }

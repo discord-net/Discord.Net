@@ -271,5 +271,10 @@ namespace Discord
         ///     Returns the maximum length of a poll question text.
         /// </summary>
         public const int MaxPollQuestionTextLength = 300;
+      
+        /// <summary>
+        ///     Returns the maximum number of bans that can be banned in a single bulk request.
+        /// </summary>
+        public const int MaxBansPerBulkBatch = 200;
     }
 }

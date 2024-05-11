@@ -118,5 +118,9 @@ namespace Discord.Rest
         //IAutocompleteInteraction
         /// <inheritdoc/>
         IAutocompleteInteractionData IAutocompleteInteraction.Data => Data;
+
+        /// <inheritdoc/>
+        Task IAutocompleteInteraction.RespondAsync(IEnumerable<AutocompleteResult> result, RequestOptions options)
+            =>Task.FromResult(Respond(result, options));
     }
 }

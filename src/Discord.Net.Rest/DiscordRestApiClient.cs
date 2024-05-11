@@ -2828,6 +2828,9 @@ namespace Discord.API
         public Task<SKU[]> ListSKUsAsync(RequestOptions options = null)
             => SendAsync<SKU[]>("GET", () => $"applications/{CurrentApplicationId}/skus", new BucketIds(), options: options);
 
+        public Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => SendAsync("POST", () => $"applications/{CurrentApplicationId}/entitlements/{entitlementId}/consume", new BucketIds(), options: options);
+
         #endregion
 
         #region Polls

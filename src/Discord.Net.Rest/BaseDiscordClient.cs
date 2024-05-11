@@ -292,6 +292,11 @@ namespace Discord.Rest
         /// </summary>
         Task<IReadOnlyCollection<SKU>> IDiscordClient.GetSKUsAsync(RequestOptions options) => Task.FromResult<IReadOnlyCollection<SKU>>(Array.Empty<SKU>());
 
+        /// <summary>
+        ///     Marks a given one-time purchase entitlement for the user as consumed.
+        /// </summary>
+        Task IDiscordClient.ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options) => Task.CompletedTask;
+
         #endregion
     }
 }

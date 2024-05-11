@@ -50,9 +50,9 @@ namespace Discord.Rest
                 apiArgs.ChannelId = args.ChannelId.Value;
 
             if (args.Roles.IsSpecified)
-                apiArgs.RoleIds = args.Roles.Value.Select(x => x.Id).ToArray();
+                apiArgs.RoleIds = args.Roles.Value.Select(x => x.Id).Distinct().ToArray();
             else if (args.RoleIds.IsSpecified)
-                apiArgs.RoleIds = args.RoleIds.Value.ToArray();
+                apiArgs.RoleIds = args.RoleIds.Value.Distinct().ToArray();
 
             /*
              * Ensure that the nick passed in the params of the request is not null.

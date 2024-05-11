@@ -29,23 +29,26 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets a collection that is the current logged-in user and the recipient.
         /// </summary>
-        public IReadOnlyCollection<RestUser> Users => ImmutableArray.Create(CurrentUser, Recipient);
+        public IReadOnlyCollection<RestUser> Users => Recipient is null
+            ? ImmutableArray<RestUser>.Empty
+            : ImmutableArray.Create(CurrentUser, Recipient);
 
-        internal RestDMChannel(BaseDiscordClient discord, ulong id, ulong recipientId)
+        internal RestDMChannel(BaseDiscordClient discord, ulong id, ulong? recipientId)
             : base(discord, id)
         {
-            Recipient = new RestUser(Discord, recipientId);
+            Recipient = recipientId.HasValue ? new RestUser(Discord, recipientId.Value) : null;
             CurrentUser = new RestUser(Discord, discord.CurrentUser.Id);
         }
         internal new static RestDMChannel Create(BaseDiscordClient discord, Model model)
         {
-            var entity = new RestDMChannel(discord, model.Id, model.Recipients.Value[0].Id);
+            var entity = new RestDMChannel(discord, model.Id, model.Recipients.GetValueOrDefault(null)?[0].Id);
             entity.Update(model);
             return entity;
         }
         internal override void Update(Model model)
         {
-            Recipient.Update(model.Recipients.Value[0]);
+            if(model.Recipients.IsSpecified)
+                Recipient?.Update(model.Recipients.Value[0]);
         }
 
         /// <inheritdoc />
@@ -68,7 +71,7 @@ namespace Discord.Rest
         /// </returns>
         public RestUser GetUser(ulong id)
         {
-            if (id == Recipient.Id)
+            if (id == Recipient?.Id)
                 return Recipient;
             else if (id == Discord.CurrentUser.Id)
                 return CurrentUser;

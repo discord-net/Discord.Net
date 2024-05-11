@@ -30,13 +30,13 @@ namespace Discord.Rest
         /// <inheritdoc />
         public int DefaultSlowModeInterval { get; private set; }
 
-        internal RestTextChannel(BaseDiscordClient discord, IGuild guild, ulong id)
-            : base(discord, guild, id)
+        internal RestTextChannel(BaseDiscordClient discord, IGuild guild, ulong id, ulong guildId)
+            : base(discord, guild, id, guildId)
         {
         }
         internal new static RestTextChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestTextChannel(discord, guild, model.Id);
+            var entity = new RestTextChannel(discord, guild, model.Id, guild?.Id ?? model.GuildId.Value);
             entity.Update(model);
             return entity;
         }

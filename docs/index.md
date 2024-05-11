@@ -1,7 +1,8 @@
 ---
 uid: Home.Landing
 title: Home
-_layout: landing
+_disableToc: true
+_disableBreadcrumb: true
 ---
 
 ![logo](marketing/logo/SVG/Combinationmark%20White%20Border.svg)
@@ -33,8 +34,7 @@ objects in the library.
 ## Nightlies
 
 Nightlies are builds of Discord.NET that are still in an experimental phase, and have not been released.  
-They are available through 3 different sources:
-- [MyGet](https://www.myget.org/F/discord-net/api/v3/index.json)
+They are available through 2 different sources:
 - [BaGet](https://baget.discordnet.dev/)
 - [GitHub Packages](https://github.com/orgs/discord-net/packages?repo_name=Discord.Net)
 
