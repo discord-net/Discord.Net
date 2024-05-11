@@ -1,5 +1,30 @@
 # Changelog
 
+## [3.15.0] - 2024-05-12
+### Added
+- #2902 Polls (476ec06)
+- #2898 Guild bans with seconds prune period (d1da2a0)
+- #2903 Create `RequireTeamAttribute` (753724d)
+- #2906 Create `DoHierarchyCheckAttribute` (1a5cba8)
+- #2923 Create `RequireRoleAttribute` (5dadcb2)
+- #2919 More store stuff (f9086d3)
+- #2920 Add `SocketInteraction.InteractionChannel` (3054505)
+
+### Fixed
+- #2910 RestDMChannel relies on recipient (13ea566)
+- #2911 Don't rely on Guild for id (397a887)
+- #2912 Don't depend on WebSocket for Interaction service (a2f624e)
+- #2922 NRE with rest interactions & no api call (again) (83fdc89) 
+- #2924 Fix null error when using a `SelectMenuBuilder` constructor (93cb71a)
+
+### Misc
+- #2905 Remove analyzer project & resolve some build warnings (7aab366)
+- #2913 Replace generic exceptions. (54d2fe5)
+- #2908 Support options in Rest's AddRoleAsync (b70e21b)
+- #2914 `.Distinct()` roles(ids) in `IGuildUser.ModifyAsync` (27a0785)
+- #2915 Improve bulk bans (f85bf9a)
+
+
 ## [3.14.1] - 2024-03-19
 ### Fixed
 - Version number contains commit hash
