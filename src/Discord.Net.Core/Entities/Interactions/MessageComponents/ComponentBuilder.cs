@@ -77,7 +77,7 @@ namespace Discord
                         AddComponent(cmp, row);
                     break;
                 case SelectMenuComponent menu:
-                    WithSelectMenu(menu.CustomId, menu.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.IsDisabled, row);
+                    WithSelectMenu(menu.CustomId, menu.Options?.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.IsDisabled, row);
                     break;
             }
         }
@@ -1040,6 +1040,8 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder AddOption(SelectMenuOptionBuilder option)
         {
+            Options ??= new();
+
             if (Options.Count >= MaxOptionCount)
                 throw new InvalidOperationException($"Options count reached {MaxOptionCount}.");
 
