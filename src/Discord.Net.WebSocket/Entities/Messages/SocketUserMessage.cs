@@ -53,6 +53,9 @@ namespace Discord.WebSocket
         public IMessageInteractionMetadata InteractionMetadata { get; internal set; }
 
         /// <inheritdoc />
+        public Poll? Poll { get; internal set; }
+
+        /// <inheritdoc />
         public MessageResolvedData ResolvedData { get; internal set; }
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
@@ -209,6 +212,9 @@ namespace Discord.WebSocket
 
             if (model.InteractionMetadata.IsSpecified)
                 InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata();
+
+            if (model.Poll.IsSpecified)
+                Poll = model.Poll.Value.ToEntity();
         }
 
         /// <inheritdoc />
@@ -243,6 +249,15 @@ namespace Discord.WebSocket
 
             return MessageHelper.CrosspostAsync(this, Discord, options);
         }
+
+        /// <inheritdoc />
+        public Task EndPollAsync(RequestOptions options = null)
+            => MessageHelper.EndPollAsync(Channel.Id, Id, Discord, options);
+
+        /// <inheritdoc />
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetPollAnswerVotersAsync(uint answerId, int? limit = null, ulong? afterId = null,
+            RequestOptions options = null)
+            => MessageHelper.GetPollAnswerVotersAsync(Channel.Id, Id, afterId, answerId, limit, Discord, options);
 
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
         internal new SocketUserMessage Clone() => MemberwiseClone() as SocketUserMessage;

@@ -2029,6 +2029,116 @@ namespace Discord.WebSocket
                                 break;
                             #endregion
 
+                            #region Polls
+
+                            case "MESSAGE_POLL_VOTE_ADD":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_POLL_VOTE_ADD)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<PollVote>(_serializer);
+
+                                    Cacheable<SocketGuild, RestGuild, IGuild, ulong>? guildCacheable = null;
+
+                                    Cacheable<IUser, ulong> userCacheable;
+                                    Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong> channelCacheable;
+                                    Cacheable<IUserMessage, ulong> messageCacheable;
+
+                                    if (data.GuildId.IsSpecified)
+                                    {
+                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        guildCacheable = new (guild, data.GuildId.Value, guild is not null, () => Rest.GetGuildAsync(data.GuildId.Value));
+
+                                        if (guild is not null)
+                                        {
+                                            var user = guild.GetUser(data.UserId);
+                                            userCacheable = new (user, data.UserId, user is not null, async () => await Rest.GetGuildUserAsync(data.GuildId.Value, data.UserId));
+
+                                            var channel = guild.GetTextChannel(data.ChannelId);
+                                            channelCacheable = new(channel, data.ChannelId, channel is not null, async () => (RestTextChannel)await Rest.GetChannelAsync(data.ChannelId));
+
+                                            var message = channel?.GetCachedMessage(data.MessageId) as IUserMessage;
+                                            messageCacheable = new (message, data.MessageId, message is not null,
+                                                async () => (channel ?? (ITextChannel)await Rest.GetChannelAsync(data.ChannelId)).GetMessageAsync(data.MessageId) as IUserMessage);
+                                        }
+                                        else
+                                        {
+                                            userCacheable = new (null, data.UserId, false, async () => await Rest.GetGuildUserAsync(data.GuildId.Value, data.UserId));
+                                            channelCacheable = new(null, data.ChannelId, false, async () => (RestTextChannel)(await Rest.GetChannelAsync(data.ChannelId)));
+                                            messageCacheable = new(null, data.MessageId, false,
+                                                async () => await ((ITextChannel)await Rest.GetChannelAsync(data.ChannelId)).GetMessageAsync(data.MessageId) as IUserMessage);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var user = State.GetUser(data.UserId);
+                                        userCacheable = new(user, data.UserId, user is not null, async () => await GetUserAsync(data.UserId));
+
+                                        var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
+                                        channelCacheable = new(channel, data.ChannelId, channel is not null, async () => await Rest.GetDMChannelAsync(data.ChannelId) as IRestMessageChannel);
+
+                                        var message = channel?.GetCachedMessage(data.MessageId) as IUserMessage;
+                                        messageCacheable = new(message, data.MessageId, message is not null, async () => await (channel ?? (IMessageChannel)await Rest.GetDMChannelAsync(data.ChannelId)).GetMessageAsync(data.MessageId) as IUserMessage);
+                                    }
+
+                                    await TimedInvokeAsync(_pollVoteAdded, nameof(PollVoteAdded), userCacheable, channelCacheable, messageCacheable, guildCacheable, data.AnswerId);
+                                }
+                                break;
+
+                            case "MESSAGE_POLL_VOTE_REMOVE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_POLL_VOTE_REMOVE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<PollVote>(_serializer);
+
+                                    Cacheable<SocketGuild, RestGuild, IGuild, ulong>? guildCacheable = null;
+
+                                    Cacheable<IUser, ulong> userCacheable;
+                                    Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong> channelCacheable;
+                                    Cacheable<IUserMessage, ulong> messageCacheable;
+
+                                    if (data.GuildId.IsSpecified)
+                                    {
+                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        guildCacheable = new(guild, data.GuildId.Value, guild is not null, () => Rest.GetGuildAsync(data.GuildId.Value));
+
+                                        if (guild is not null)
+                                        {
+                                            var user = guild.GetUser(data.UserId);
+                                            userCacheable = new(user, data.UserId, user is not null, async () => await Rest.GetGuildUserAsync(data.GuildId.Value, data.UserId));
+
+                                            var channel = guild.GetTextChannel(data.ChannelId);
+                                            channelCacheable = new(channel, data.ChannelId, channel is not null, async () => (RestTextChannel)await Rest.GetChannelAsync(data.ChannelId));
+
+                                            var message = channel?.GetCachedMessage(data.MessageId) as IUserMessage;
+                                            messageCacheable = new(message, data.MessageId, message is not null,
+                                                async () => (channel ?? (ITextChannel)await Rest.GetChannelAsync(data.ChannelId)).GetMessageAsync(data.MessageId) as IUserMessage);
+                                        }
+                                        else
+                                        {
+                                            userCacheable = new(null, data.UserId, false, async () => await Rest.GetGuildUserAsync(data.GuildId.Value, data.UserId));
+                                            channelCacheable = new(null, data.ChannelId, false, async () => (RestTextChannel)(await Rest.GetChannelAsync(data.ChannelId)));
+                                            messageCacheable = new(null, data.MessageId, false,
+                                                async () => await ((ITextChannel)await Rest.GetChannelAsync(data.ChannelId)).GetMessageAsync(data.MessageId) as IUserMessage);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var user = State.GetUser(data.UserId);
+                                        userCacheable = new(user, data.UserId, user is not null, async () => await GetUserAsync(data.UserId));
+
+                                        var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
+                                        channelCacheable = new(channel, data.ChannelId, channel is not null, async () => await Rest.GetDMChannelAsync(data.ChannelId) as IRestMessageChannel);
+
+                                        var message = channel?.GetCachedMessage(data.MessageId) as IUserMessage;
+                                        messageCacheable = new(message, data.MessageId, message is not null, async () => await (channel ?? (IMessageChannel)await Rest.GetDMChannelAsync(data.ChannelId)).GetMessageAsync(data.MessageId) as IUserMessage);
+                                    }
+
+                                    await TimedInvokeAsync(_pollVoteRemoved, nameof(PollVoteRemoved), userCacheable, channelCacheable, messageCacheable, guildCacheable, data.AnswerId);
+                                }
+                                break;
+
+                            #endregion
+
                             #region Statuses
                             case "PRESENCE_UPDATE":
                                 {
