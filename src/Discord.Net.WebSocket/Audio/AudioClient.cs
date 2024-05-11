@@ -506,7 +506,7 @@ namespace Discord.Audio
                     if (_heartbeatTimes.Count != 0 && (now - _lastMessageTime) > intervalMillis &&
                         ConnectionState == ConnectionState.Connected)
                     {
-                        _connection.Error(new Exception("Server missed last heartbeat"));
+                        _connection.Error(new WebSocketException(WebSocketError.InvalidState, "Server missed last heartbeat"));
                         return;
                     }
 
