@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.Commands.Attributes.Preconditions
+namespace Discord.Commands
 {
     /// <summary>
     ///     Requires the user invoking the command to have a specified role.
