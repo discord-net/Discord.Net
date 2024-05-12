@@ -10,7 +10,7 @@ var poll = new PollProperties
     // Set the duration of the poll in hours
     Duration = 69,
     // Add answers to the poll
-    // You can add from 1 to 10 answers4
+    // You can add from 1 to 10 answers
     Answers = [
         // An answer can consist of text and an emoji
         new PollMediaProperties
