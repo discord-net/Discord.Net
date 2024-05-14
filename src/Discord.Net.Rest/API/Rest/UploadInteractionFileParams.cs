@@ -23,6 +23,7 @@ namespace Discord.API.Rest
         public Optional<AllowedMentions> AllowedMentions { get; set; }
         public Optional<ActionRowComponent[]> MessageComponents { get; set; }
         public Optional<MessageFlags> Flags { get; set; }
+        public Optional<CreatePollParams> Poll { get; set; }
 
         public bool HasData
             => Content.IsSpecified ||
@@ -31,7 +32,8 @@ namespace Discord.API.Rest
                AllowedMentions.IsSpecified ||
                MessageComponents.IsSpecified ||
                Flags.IsSpecified ||
-               Files.Any();
+               Files.Any()
+               || Poll.IsSpecified;
 
         public UploadInteractionFileParams(params FileAttachment[] files)
         {
@@ -59,6 +61,8 @@ namespace Discord.API.Rest
                 data["allowed_mentions"] = AllowedMentions.Value;
             if (Flags.IsSpecified)
                 data["flags"] = Flags.Value;
+            if (Poll.IsSpecified)
+                data["poll"] = Poll.Value;
 
             List<object> attachments = new();
 

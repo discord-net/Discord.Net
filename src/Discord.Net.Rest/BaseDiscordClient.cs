@@ -20,6 +20,13 @@ namespace Discord.Rest
         public event Func<Task> LoggedOut { add { _loggedOutEvent.Add(value); } remove { _loggedOutEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _loggedOutEvent = new AsyncEvent<Func<Task>>();
 
+        internal readonly AsyncEvent<Func<string, string, double, Task>> _sentRequest = new();
+        /// <summary>
+        ///     Fired when a REST request is sent to the API. First parameter is the HTTP method,
+        ///     second is the endpoint, and third is the time taken to complete the request.
+        /// </summary>
+        public event Func<string, string, double, Task> SentRequest { add { _sentRequest.Add(value); } remove { _sentRequest.Remove(value); } }
+
         internal readonly Logger _restLogger;
         private readonly SemaphoreSlim _stateLock;
         private bool _isFirstLogin, _isDisposed;
@@ -61,6 +68,7 @@ namespace Discord.Rest
                     await _restLogger.WarningAsync($"Rate limit triggered: {endpoint} Remaining: {info.Value.RetryAfter}s {(id.IsHashBucket ? $"(Bucket: {id.BucketHash})" : "")}").ConfigureAwait(false);
             };
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
+            ApiClient.SentRequest += (method, endpoint, millis) => _sentRequest.InvokeAsync(method, endpoint, millis);
         }
 
         public async Task LoginAsync(TokenType tokenType, string token, bool validateToken = true)
@@ -178,11 +186,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
             => ClientHelper.GetBotGatewayAsync(this, options);
+
+        /// <inheritdoc />
+        public virtual ConnectionState ConnectionState => ConnectionState.Disconnected;
         #endregion
 
         #region IDiscordClient
-        /// <inheritdoc />
-        ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
         /// <inheritdoc />
         ISelfUser IDiscordClient.CurrentUser => CurrentUser;
 
@@ -282,6 +291,11 @@ namespace Discord.Rest
         ///     Gets all SKUs for a given application.
         /// </summary>
         Task<IReadOnlyCollection<SKU>> IDiscordClient.GetSKUsAsync(RequestOptions options) => Task.FromResult<IReadOnlyCollection<SKU>>(Array.Empty<SKU>());
+
+        /// <summary>
+        ///     Marks a given one-time purchase entitlement for the user as consumed.
+        /// </summary>
+        Task IDiscordClient.ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options) => Task.CompletedTask;
 
         #endregion
     }

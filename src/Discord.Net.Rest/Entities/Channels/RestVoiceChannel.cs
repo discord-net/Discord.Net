@@ -31,13 +31,13 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public VideoQualityMode VideoQualityMode { get; private set; }
 
-        internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
-            : base(discord, guild, id)
+        internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id, ulong guildId)
+            : base(discord, guild, id, guildId)
         {
         }
         internal new static RestVoiceChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestVoiceChannel(discord, guild, model.Id);
+            var entity = new RestVoiceChannel(discord, guild, model.Id, guild?.Id ?? model.GuildId.Value);
             entity.Update(model);
             return entity;
         }
@@ -89,7 +89,7 @@ namespace Discord.Rest
         #region IAudioChannel
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Connecting to a REST-based channel is not supported.</exception>
-        Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
+        Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external, bool disconnect) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
         Task IAudioChannel.ModifyAsync(Action<AudioChannelProperties> func, RequestOptions options) { throw new NotSupportedException(); }
         #endregion

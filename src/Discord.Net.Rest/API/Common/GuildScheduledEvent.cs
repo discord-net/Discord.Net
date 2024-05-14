@@ -1,9 +1,6 @@
 using Newtonsoft.Json;
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.API
 {
@@ -16,7 +13,7 @@ namespace Discord.API
         [JsonProperty("channel_id")]
         public Optional<ulong?> ChannelId { get; set; }
         [JsonProperty("creator_id")]
-        public Optional<ulong> CreatorId { get; set; }
+        public Optional<ulong?> CreatorId { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("description")]

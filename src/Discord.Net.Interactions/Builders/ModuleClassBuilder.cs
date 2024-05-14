@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -80,16 +81,20 @@ namespace Discord.Interactions.Builders
                             builder.Description = group.Description;
                         }
                         break;
+#pragma warning disable CS0618 // Type or member is obsolete
                     case DefaultPermissionAttribute defPermission:
                         {
                             builder.DefaultPermission = defPermission.IsDefaultPermission;
                         }
                         break;
+#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
                     case EnabledInDmAttribute enabledInDm:
-                        {
+                    {
                             builder.IsEnabledInDm = enabledInDm.IsEnabled;
                         }
                         break;
+#pragma warning restore CS0618 // Type or member is obsolete
                     case DefaultMemberPermissionsAttribute memberPermission:
                         {
                             builder.DefaultMemberPermissions = memberPermission.Permissions;
@@ -103,6 +108,12 @@ namespace Discord.Interactions.Builders
                         break;
                     case NsfwCommandAttribute nsfwCommand:
                         builder.SetNsfw(nsfwCommand.IsNsfw);
+                        break;
+                    case CommandContextTypeAttribute contextType:
+                        builder.WithContextTypes(contextType.ContextTypes?.ToArray());
+                        break;
+                    case IntegrationTypeAttribute integrationType:
+                        builder.WithIntegrationTypes(integrationType.IntegrationTypes?.ToArray());
                         break;
                     default:
                         builder.AddAttributes(attribute);
@@ -177,6 +188,7 @@ namespace Discord.Interactions.Builders
                             builder.RunMode = command.RunMode;
                         }
                         break;
+#pragma warning disable CS0618 // Type or member is obsolete
                     case DefaultPermissionAttribute defaultPermission:
                         {
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
@@ -187,6 +199,7 @@ namespace Discord.Interactions.Builders
                             builder.IsEnabledInDm = enabledInDm.IsEnabled;
                         }
                         break;
+#pragma warning restore CS0618 // Type or member is obsolete
                     case DefaultMemberPermissionsAttribute memberPermission:
                         {
                             builder.DefaultMemberPermissions = memberPermission.Permissions;
@@ -197,6 +210,12 @@ namespace Discord.Interactions.Builders
                         break;
                     case NsfwCommandAttribute nsfwCommand:
                         builder.SetNsfw(nsfwCommand.IsNsfw);
+                        break;
+                    case CommandContextTypeAttribute contextType:
+                        builder.WithContextTypes(contextType.ContextTypes.ToArray());
+                        break;
+                    case IntegrationTypeAttribute integrationType:
+                        builder.WithIntegrationTypes(integrationType.IntegrationTypes.ToArray());
                         break;
                     default:
                         builder.WithAttributes(attribute);
@@ -232,6 +251,7 @@ namespace Discord.Interactions.Builders
                             command.CheckMethodDefinition(methodInfo);
                         }
                         break;
+#pragma warning disable CS0618 // Type or member is obsolete
                     case DefaultPermissionAttribute defaultPermission:
                         {
                             builder.DefaultPermission = defaultPermission.IsDefaultPermission;
@@ -242,6 +262,7 @@ namespace Discord.Interactions.Builders
                             builder.IsEnabledInDm = enabledInDm.IsEnabled;
                         }
                         break;
+#pragma warning restore CS0618 // Type or member is obsolete
                     case DefaultMemberPermissionsAttribute memberPermission:
                         {
                             builder.DefaultMemberPermissions = memberPermission.Permissions;
@@ -252,6 +273,12 @@ namespace Discord.Interactions.Builders
                         break;
                     case NsfwCommandAttribute nsfwCommand:
                         builder.SetNsfw(nsfwCommand.IsNsfw);
+                        break;
+                    case CommandContextTypeAttribute contextType:
+                        builder.WithContextTypes(contextType.ContextTypes.ToArray());
+                        break;
+                    case IntegrationTypeAttribute integrationType:
+                        builder.WithIntegrationTypes(integrationType.IntegrationTypes.ToArray());
                         break;
                     default:
                         builder.WithAttributes(attribute);
@@ -413,8 +440,9 @@ namespace Discord.Interactions.Builders
                 }
                 catch (Exception ex)
                 {
-                    await commandService._cmdLogger.ErrorAsync(ex).ConfigureAwait(false);
-                    return ExecuteResult.FromError(ex);
+                    var interactionException = new InteractionException(commandInfo, context, ex);
+                    await commandService._cmdLogger.ErrorAsync(interactionException).ConfigureAwait(false);
+                    return ExecuteResult.FromError(interactionException);
                 }
                 finally
                 {

@@ -20,7 +20,7 @@ namespace Discord.Interactions
         public IReadOnlyCollection<IRouteSegmentMatch> SegmentMatches { get; private set; }
 
         /// <summary>
-        ///     Initializes a new <see cref="SocketInteractionContext{TInteraction}"/>.
+        ///     Initializes a new <see cref="InteractionContext"/>.
         /// </summary>
         /// <param name="client">The underlying client.</param>
         /// <param name="interaction">The underlying interaction.</param>

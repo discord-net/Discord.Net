@@ -102,11 +102,12 @@ namespace Discord
         /// </summary>
         /// <param name="guildId">The guild snowflake identifier.</param>
         /// <param name="iconId">The icon identifier.</param>
+        /// <param name="size">The size of the image to return in horizontal pixels. This can be any power of two between 16 and 2048.</param>
         /// <returns>
         ///     A URL pointing to the guild's icon.
         /// </returns>
-        public static string GetGuildIconUrl(ulong guildId, string iconId)
-            => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg" : null;
+        public static string GetGuildIconUrl(ulong guildId, string iconId, ushort size = 2048)
+            => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg?size={size}" : null;
         /// <summary>
         ///     Returns a guild role's icon URL.
         /// </summary>
@@ -223,7 +224,7 @@ namespace Discord
             => $"{DiscordConfig.CDNUrl}stickers/{stickerId}.{FormatToExtension(format)}";
 
         /// <summary>
-        ///     Returns an events cover image url.
+        ///     Returns an events cover image url. <see langword="null"/> if the assetId <see langword="null"/>.
         /// </summary>
         /// <param name="guildId">The guild id that the event is in.</param>
         /// <param name="eventId">The id of the event.</param>
@@ -232,7 +233,9 @@ namespace Discord
         /// <param name="size">The size of the image.</param>
         /// <returns></returns>
         public static string GetEventCoverImageUrl(ulong guildId, ulong eventId, string assetId, ImageFormat format = ImageFormat.Auto, ushort size = 1024)
-            => $"{DiscordConfig.CDNUrl}guild-events/{eventId}/{assetId}.{FormatToExtension(format, assetId)}?size={size}";
+            => string.IsNullOrEmpty(assetId)
+                ? null
+                : $"{DiscordConfig.CDNUrl}guild-events/{eventId}/{assetId}.{FormatToExtension(format, assetId)}?size={size}";
 
         private static string FormatToExtension(StickerFormatType format)
         {

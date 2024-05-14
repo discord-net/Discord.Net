@@ -5,8 +5,8 @@ title: Command Autocompletion
 
 # AutocompleteHandlers
 
-[Autocompleters] provide a similar pattern to TypeConverters.
-[Autocompleters] are cached, singleton services and they are used by the
+[AutocompleteHandler]s provide a similar pattern to TypeConverters.
+[AutocompleteHandler]s are cached, singleton services and they are used by the
 Interaction Service to handle Autocomplete Interactions targeted to a specific Slash Command parameter.
 
 To start using AutocompleteHandlers, use the `[AutocompleteAttribute(Type type)]` overload of the [AutocompleteAttribute].
@@ -37,13 +37,12 @@ AutocompleteHandler dependencies are resolved using the same dependency injectio
 pattern as the Interaction Modules.
 Property injection and constructor injection are both valid ways to get service dependencies.
 
-Because [AutocompleterHandlers] are constructed at service startup,
+Because [AutocompleteHandler]s are constructed at service startup,
 class dependencies are resolved only once.
 
 > [!NOTE]
 > If you need to access per-request dependencies you can use the
 > IServiceProvider parameter of the `GenerateSuggestionsAsync()` method.
 
-[AutoCompleteHandlers]: xref:Discord.Interactions.AutocompleteHandler
 [AutoCompleteHandler]: xref:Discord.Interactions.AutocompleteHandler
-[AutoCompleteAttribute]: 
+[AutoCompleteAttribute]: xref:Discord.Interactions.AutocompleteAttribute

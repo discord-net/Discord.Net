@@ -106,6 +106,8 @@ namespace Discord.Rest
                 DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
                 DmPermission = arg.IsDMEnabled.ToNullable(),
                 Nsfw = arg.IsNsfw.GetValueOrDefault(false),
+                IntegrationTypes = arg.IntegrationTypes,
+                ContextTypes = arg.ContextTypes
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -146,7 +148,9 @@ namespace Discord.Rest
                     // TODO: better conversion to nullable optionals
                     DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
                     DmPermission = arg.IsDMEnabled.ToNullable(),
-                    Nsfw = arg.IsNsfw.GetValueOrDefault(false)
+                    Nsfw = arg.IsNsfw.GetValueOrDefault(false),
+                    IntegrationTypes = arg.IntegrationTypes,
+                    ContextTypes = arg.ContextTypes
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -190,7 +194,9 @@ namespace Discord.Rest
                     // TODO: better conversion to nullable optionals
                     DefaultMemberPermission = arg.DefaultMemberPermissions.ToNullable(),
                     DmPermission = arg.IsDMEnabled.ToNullable(),
-                    Nsfw = arg.IsNsfw.GetValueOrDefault(false)
+                    Nsfw = arg.IsNsfw.GetValueOrDefault(false),
+                    IntegrationTypes = arg.IntegrationTypes,
+                    ContextTypes = arg.ContextTypes
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -254,7 +260,9 @@ namespace Discord.Rest
                 NameLocalizations = args.NameLocalizations?.ToDictionary(),
                 DescriptionLocalizations = args.DescriptionLocalizations?.ToDictionary(),
                 Nsfw = args.IsNsfw.GetValueOrDefault(false),
-                DefaultMemberPermission = args.DefaultMemberPermissions.ToNullable()
+                DefaultMemberPermission = args.DefaultMemberPermissions.ToNullable(),
+                IntegrationTypes = args.IntegrationTypes,
+                ContextTypes = args.ContextTypes
             };
 
             if (args is SlashCommandProperties slashProps)

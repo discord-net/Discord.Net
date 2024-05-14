@@ -1,0 +1,128 @@
+name: Dotnet Build
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+on:
+    push:
+        branches: ["dev"]
+        tags: ["*"]
+        paths-ignore:
+          - 'docs/**'
+    pull_request:
+        paths-ignore:
+          - 'docs/**'
+
+jobs:
+    build:
+        name: Build and Test
+        runs-on: ubuntu-latest
+        env:
+          ArtifactStagingDirectory: "artifacts"
+          IsTagBuild: false
+          DOTNET_INSTALL_DIR: "/usr/share/dotnet"
+          Suffix: ${{ github.run_number }}
+        steps:
+          - uses: actions/checkout@v4    
+          
+          - name: Setup .NET
+            uses: actions/setup-dotnet@v4
+            with:
+              dotnet-version: 8.0.x
+
+          - name: Is Tag Build
+            if: startsWith(github.ref, 'refs/tags/')
+            run: echo "IsTagBuild=true" >> $GITHUB_ENV
+          
+          - name: Generate Suffix
+            if: env.IsTagBuild != 'true'
+            run: echo "Suffix=$(date +'%Y%m%d')-${{ github.run_number }}" >> $GITHUB_ENV
+
+          - name: Restore
+            run: dotnet restore ./Discord.Net.sln -v minimal
+
+          - name: Build
+            run: dotnet build "Discord.Net.sln" -v minimal -c Release --no-restore /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+
+          - name: Unit Test
+            run: dotnet test "test/Discord.Net.Tests.Unit/Discord.Net.Tests.Unit.csproj" --no-restore --no-build -v minimal -c Release --logger trx
+
+          - name: Publish Test Results
+            uses: EnricoMi/publish-unit-test-result-action@v2
+            if: failure() || success()
+            with:
+              files: ./**/*.trx
+          
+          - name: Pack
+            env: 
+              buildNumber: $Suffix
+            run: |
+              dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+#              dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+          
+          - name: Publish Artifacts
+            uses: actions/upload-artifact@v4
+            with:
+              name: discord-net
+              path: ${{ env.ArtifactStagingDirectory }}/*
+    
+    deploy:
+      name: Deploy
+      runs-on: ubuntu-latest
+      needs: [build]
+      if: github.event_name != 'pull_request'
+      env:
+        IsTagBuild: false
+        ArtifactStagingDirectory: "artifacts"
+        REPOSITORY_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+      steps:
+        - uses: actions/checkout@v4
+        
+        - name: Is Tag Build
+          if: startsWith(github.ref, 'refs/tags/')
+          run: echo "IsTagBuild=true" >> $GITHUB_ENV
+
+        - name: Generate Suffix
+          run: echo "Suffix=$(date +'%Y%m%d')-${{ github.run_number }}" >> $GITHUB_ENV
+          
+        - name: setup NuGet
+          uses: nuget/setup-nuget@v2
+          with:
+            nuget-version: '6.x'
+
+        - name: Download artifacts
+          uses: actions/download-artifact@v4
+          with:
+            name: discord-net
+            path: ${{ env.ArtifactStagingDirectory }}
+        
+        - name: Pack Metapackage
+          if: env.IsTagBuild != 'true'
+          run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }} -NonInteractive -p "suffix=-${{ env.Suffix }}"
+
+        - name: Pack Metapackage
+          if: env.IsTagBuild == 'true'
+          run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }}
+
+        - name: Set API Keys
+          run: |
+            nuget setApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
+            nuget setApiKey ${{ secrets.NIGHTLY_FEED_API_KEY }} -Source ${{ vars.NIGHTLY_FEED }}
+            nuget setApiKey ${{ secrets.GITHUB_TOKEN }} -Source ${{ env.REPOSITORY_URL }}
+
+        - name: Push Nightly
+          if: vars.PUSH_NIGHTLY == 'true'
+          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source ${{ vars.NIGHTLY_FEED }}
+
+        - name: Push Nightly to GitHub Pacakges
+          if: vars.PUSH_NIGHTLY == 'true'            
+          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source ${{ env.REPOSITORY_URL }}
+
+        - name: Push Release
+          if: env.IsTagBuild == 'true' && vars.PUSH_NUGET == 'true'
+          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source https://api.nuget.org/v3/index.json

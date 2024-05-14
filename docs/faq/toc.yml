@@ -22,7 +22,7 @@
   items: 
     - name: Text Command basics
       topicUid: FAQ.TextCommands.General
-- name: Legacy or Upgrade
+- name: Legacy Questions
   topicUid: FAQ.Legacy
 - name: Build Overrides
   topicUid: FAQ.BuildOverrides.WhatAreThey

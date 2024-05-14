@@ -77,7 +77,7 @@ namespace Discord
                         AddComponent(cmp, row);
                     break;
                 case SelectMenuComponent menu:
-                    WithSelectMenu(menu.CustomId, menu.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.IsDisabled, row);
+                    WithSelectMenu(menu.CustomId, menu.Options?.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.IsDisabled, row);
                     break;
             }
         }
@@ -753,10 +753,10 @@ namespace Discord
         /// <exception cref="InvalidOperationException">A non-link button must contain a custom id</exception>
         public ButtonComponent Build()
         {
-            if (string.IsNullOrEmpty(Label) && Emote == null)
+            if (string.IsNullOrWhiteSpace(Label) && Emote == null)
                 throw new InvalidOperationException("A button must have an Emote or a label!");
 
-            if (!(string.IsNullOrEmpty(Url) ^ string.IsNullOrEmpty(CustomId)))
+            if (!(string.IsNullOrWhiteSpace(Url) ^ string.IsNullOrWhiteSpace(CustomId)))
                 throw new InvalidOperationException("A button must contain either a URL or a CustomId, but not both!");
 
             if (Style == 0)
@@ -764,11 +764,11 @@ namespace Discord
 
             if (Style == ButtonStyle.Link)
             {
-                if (string.IsNullOrEmpty(Url))
+                if (string.IsNullOrWhiteSpace(Url))
                     throw new InvalidOperationException("Link buttons must have a link associated with them");
                 UrlValidation.ValidateButton(Url);
             }
-            else if (string.IsNullOrEmpty(CustomId))
+            else if (string.IsNullOrWhiteSpace(CustomId))
                 throw new InvalidOperationException("Non-link buttons must have a custom id associated with them");
 
             return new ButtonComponent(Style, Label, Emote, CustomId, Url, IsDisabled);
@@ -925,7 +925,7 @@ namespace Discord
         public SelectMenuBuilder(SelectMenuComponent selectMenu)
         {
             Placeholder = selectMenu.Placeholder;
-            CustomId = selectMenu.Placeholder;
+            CustomId = selectMenu.CustomId;
             MaxValues = selectMenu.MaxValues;
             MinValues = selectMenu.MinValues;
             IsDisabled = selectMenu.IsDisabled;
@@ -1040,6 +1040,8 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder AddOption(SelectMenuOptionBuilder option)
         {
+            Options ??= new();
+
             if (Options.Count >= MaxOptionCount)
                 throw new InvalidOperationException($"Options count reached {MaxOptionCount}.");
 
@@ -1103,7 +1105,7 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder WithDefaultValues(params SelectMenuDefaultValue[] defaultValues)
         {
-            DefaultValues = defaultValues.ToList();
+            DefaultValues = defaultValues?.ToList();
             return this;
         }
 
@@ -1363,6 +1365,16 @@ namespace Discord
         /// <returns>The newly built <see cref="SelectMenuOption"/>.</returns>
         public SelectMenuOption Build()
         {
+            if (string.IsNullOrWhiteSpace(Label))
+                throw new ArgumentNullException(nameof(Label), "Option must have a label.");
+
+            Preconditions.AtMost(Label.Length, MaxSelectLabelLength, nameof(Label), $"Label length must be less or equal to {MaxSelectLabelLength}.");
+
+            if (string.IsNullOrWhiteSpace(Value))
+                throw new ArgumentNullException(nameof(Value), "Option must have a value.");
+
+            Preconditions.AtMost(Value.Length, MaxSelectValueLength, nameof(Value), $"Value length must be less or equal to {MaxSelectValueLength}.");
+
             return new SelectMenuOption(Label, Value, Description, Emote, IsDefault);
         }
     }

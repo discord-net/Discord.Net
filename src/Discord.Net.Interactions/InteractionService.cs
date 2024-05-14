@@ -150,32 +150,16 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="discord">The discord client.</param>
         /// <param name="config">The configuration class.</param>
-        public InteractionService(DiscordSocketClient discord, InteractionServiceConfig config = null)
-            : this(() => discord.Rest, config ?? new InteractionServiceConfig()) { }
-
-        /// <summary>
-        ///     Initialize a <see cref="InteractionService"/> with provided configurations.
-        /// </summary>
-        /// <param name="discord">The discord client.</param>
-        /// <param name="config">The configuration class.</param>
-        public InteractionService(DiscordShardedClient discord, InteractionServiceConfig config = null)
-            : this(() => discord.Rest, config ?? new InteractionServiceConfig()) { }
-
-        /// <summary>
-        ///     Initialize a <see cref="InteractionService"/> with provided configurations.
-        /// </summary>
-        /// <param name="discord">The discord client.</param>
-        /// <param name="config">The configuration class.</param>
-        public InteractionService(BaseSocketClient discord, InteractionServiceConfig config = null)
-            : this(() => discord.Rest, config ?? new InteractionServiceConfig()) { }
-
-        /// <summary>
-        ///     Initialize a <see cref="InteractionService"/> with provided configurations.
-        /// </summary>
-        /// <param name="discord">The discord client.</param>
-        /// <param name="config">The configuration class.</param>
         public InteractionService(DiscordRestClient discord, InteractionServiceConfig config = null)
             : this(() => discord, config ?? new InteractionServiceConfig()) { }
+
+        /// <summary>
+        ///     Initialize a <see cref="InteractionService"/> with provided configurations.
+        /// </summary>
+        /// <param name="discordProvider">The discord client provider.</param>
+        /// <param name="config">The configuration class.</param>
+        public InteractionService(IRestClientProvider discordProvider, InteractionServiceConfig config = null)
+            : this(() => discordProvider.RestClient, config ?? new InteractionServiceConfig()) { }
 
         private InteractionService(Func<DiscordRestClient> getRestClient, InteractionServiceConfig config = null)
         {
@@ -519,7 +503,7 @@ namespace Discord.Interactions
         {
             EnsureClientReady();
 
-            var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).ToList();
+            var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).Distinct().ToList();
 
             if (!deleteMissing)
             {
@@ -543,7 +527,7 @@ namespace Discord.Interactions
         {
             EnsureClientReady();
 
-            var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).ToList();
+            var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).Distinct().ToList();
 
             if (!deleteMissing)
             {

@@ -136,17 +136,29 @@ namespace Discord.Rest
         public static Task DeleteAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
             => client.ApiClient.DeleteGuildAsync(guild.Id, options);
 
-        public static ulong GetUploadLimit(IGuild guild)
+        public static int GetMaxBitrate(PremiumTier premiumTier)
         {
-            var tierFactor = guild.PremiumTier switch
+            return premiumTier switch
+            {
+                PremiumTier.Tier1 => 128000,
+                PremiumTier.Tier2 => 256000,
+                PremiumTier.Tier3 => 384000,
+                _ => 96000,
+            };
+        }
+
+        public static ulong GetUploadLimit(PremiumTier premiumTier)
+        {
+            ulong tierFactor = premiumTier switch
             {
                 PremiumTier.Tier2 => 50,
                 PremiumTier.Tier3 => 100,
                 _ => 25
             };
 
-            var mebibyte = Math.Pow(2, 20);
-            return (ulong)(tierFactor * mebibyte);
+            // 1 << 20 = 2 pow 20
+            var mebibyte = 1UL << 20;
+            return tierFactor * mebibyte;
         }
 
         public static async Task<GuildIncidentsData> ModifyGuildIncidentActionsAsync(IGuild guild, BaseDiscordClient client, Action<GuildIncidentsDataProperties> func, RequestOptions options = null)
@@ -223,15 +235,37 @@ namespace Discord.Rest
             return model == null ? null : RestBan.Create(client, model);
         }
 
-        public static Task AddBanAsync(IGuild guild, BaseDiscordClient client,
-            ulong userId, int pruneDays, string reason, RequestOptions options)
+        public static Task AddBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, int pruneDays, string reason, RequestOptions options)
         {
-            var args = new CreateGuildBanParams { DeleteMessageDays = pruneDays, Reason = reason };
-            return client.ApiClient.CreateGuildBanAsync(guild.Id, userId, args, options);
+            Preconditions.AtLeast(pruneDays, 0, nameof(pruneDays), "Prune length must be within [0, 7]");
+            return client.ApiClient.CreateGuildBanAsync(guild.Id, userId, (uint)pruneDays * 86400, reason, options);
+        }
+
+        public static Task AddBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, uint pruneSeconds, RequestOptions options)
+        {
+            return client.ApiClient.CreateGuildBanAsync(guild.Id, userId, pruneSeconds, null, options);
         }
 
         public static Task RemoveBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, RequestOptions options)
             => client.ApiClient.RemoveGuildBanAsync(guild.Id, userId, options);
+
+        public static async Task<BulkBanResult> BulkBanAsync(IGuild guild, BaseDiscordClient client, ulong[] userIds, int? deleteMessageSeconds, RequestOptions options)
+        {
+            var pos = 0;
+            var banned = new List<ulong>(userIds.Length);
+            var failed = new List<ulong>();
+            while (pos * DiscordConfig.MaxBansPerBulkBatch < userIds.Length)
+            {
+                var toBan = userIds
+                    .Skip(pos * DiscordConfig.MaxBansPerBulkBatch)
+                    .Take(DiscordConfig.MaxBansPerBulkBatch);
+                pos++;
+                var model = await client.ApiClient.BulkBanAsync(guild.Id, toBan.ToArray(), deleteMessageSeconds, options);
+                banned.AddRange(model.BannedUsers ?? []);
+                failed.AddRange(model.FailedUsers ?? []);
+            }
+            return new(banned.ToImmutableArray(), failed.ToImmutableArray());
+        }
         #endregion
 
         #region Channels
@@ -280,6 +314,39 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
         }
+
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
+        public static async Task<RestNewsChannel> CreateNewsChannelAsync(IGuild guild, BaseDiscordClient client,
+            string name, RequestOptions options, Action<TextChannelProperties> func = null)
+        {
+            if (name == null)
+                throw new ArgumentNullException(paramName: nameof(name));
+
+            var props = new TextChannelProperties();
+            func?.Invoke(props);
+
+            var args = new CreateGuildChannelParams(name, ChannelType.News)
+            {
+                CategoryId = props.CategoryId,
+                Topic = props.Topic,
+                IsNsfw = props.IsNsfw,
+                Position = props.Position,
+                SlowModeInterval = props.SlowModeInterval,
+                Overwrites = props.PermissionOverwrites.IsSpecified
+                    ? props.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
+                DefaultAutoArchiveDuration = props.AutoArchiveDuration
+            };
+            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
+            return RestNewsChannel.Create(client, guild, model);
+        }
+
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
         public static async Task<RestVoiceChannel> CreateVoiceChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<VoiceChannelProperties> func = null)

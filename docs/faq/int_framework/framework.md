@@ -43,7 +43,7 @@ If you are using `RunMode.Async` you need to setup your post-execution pipeline 
 
 Refer to the [documentation about preconditions]
 
-[documentation about preconditions]: xref:Guides.ChatCommands.Preconditions
+[documentation about preconditions]: xref:Guides.IntFw.Preconditions
 
 ## How do I send the HTTP Response from inside the command modules.
 

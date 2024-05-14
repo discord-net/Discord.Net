@@ -154,5 +154,10 @@ namespace Discord
         ///     Gets the application's verification state.
         /// </summary>
         ApplicationVerificationState VerificationState { get; }
+
+        /// <summary>
+        ///     Gets application install params configured for integration install types.
+        /// </summary>
+        IReadOnlyDictionary<ApplicationIntegrationType, ApplicationInstallParams> IntegrationTypesConfig { get; }
     }
 }

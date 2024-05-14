@@ -59,5 +59,9 @@ namespace Discord
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the value does not fall within [0, 21600].</exception>
         public Optional<int> DefaultSlowModeInterval { get; set; }
 
+        /// <summary>
+        ///     Gets or sets the type of the channel. Only applicable for <see cref="ChannelType.Text"/> or <see cref="ChannelType.News"/> channels.
+        /// </summary>
+        public Optional<ChannelType> ChannelType { get; set; }
     }
 }

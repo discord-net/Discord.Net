@@ -77,7 +77,7 @@ namespace Discord
         #region Message Validation
 
         public static void WebhookMessageAtLeastOneOf(string text = null, MessageComponent components = null, ICollection<IEmbed> embeds = null,
-            IEnumerable<FileAttachment> attachments = null)
+            IEnumerable<FileAttachment> attachments = null, PollProperties poll = null)
         {
             if (!string.IsNullOrEmpty(text))
                 return;
@@ -91,11 +91,14 @@ namespace Discord
             if (embeds != null && embeds.Count != 0)
                 return;
 
-            throw new ArgumentException($"At least one of 'Content', 'Embeds', 'Components' or 'Attachments' must be specified.");
+            if (poll is not null)
+                return;
+
+            throw new ArgumentException($"At least one of 'Content', 'Embeds', 'Components', 'Attachments' or 'Poll' must be specified.");
         }
 
         public static void MessageAtLeastOneOf(string text = null, MessageComponent components = null, ICollection<IEmbed> embeds = null,
-                    ICollection<ISticker> stickers = null, IEnumerable<FileAttachment> attachments = null)
+                    ICollection<ISticker> stickers = null, IEnumerable<FileAttachment> attachments = null, PollProperties poll = null)
         {
             if (!string.IsNullOrEmpty(text))
                 return;
@@ -112,7 +115,31 @@ namespace Discord
             if (embeds != null && embeds.Count != 0)
                 return;
 
-            throw new ArgumentException($"At least one of 'Content', 'Embeds', 'Components', 'Stickers' or 'Attachments' must be specified.");
+            if (poll is not null)
+                return;
+
+            throw new ArgumentException($"At least one of 'Content', 'Embeds', 'Components', 'Stickers', 'Attachments' or 'Poll' must be specified.");
+        }
+
+        public static void ValidatePoll(PollProperties poll)
+        {
+            if (poll is null)
+                return;
+
+            if (poll.Answers.Count is < 1 or > 10)
+                throw new ArgumentOutOfRangeException(nameof(poll.Answers), "Poll answers must be between 1 and 10.");
+            if (poll.Answers.Any(x => x.Text.Length > DiscordConfig.MaxPollAnswerTextLength))
+                throw new ArgumentOutOfRangeException(nameof(poll.Answers), $"Poll answer text must be less than or equal to {DiscordConfig.MaxPollAnswerTextLength} characters.");
+            if (poll.Answers.All(x => string.IsNullOrWhiteSpace(x.Text) && x.Emoji is null))
+                throw new ArgumentException("Poll answers must have at least one of text or emoji.", nameof(poll.Answers));
+            if (poll.Question is null)
+                throw new ArgumentNullException(nameof(poll.Question), "Poll question must not be null.");
+            if (poll.Question.Text.Length > DiscordConfig.MaxPollQuestionTextLength)
+                throw new ArgumentOutOfRangeException(nameof(poll.Question), $"Poll question text must be less than or equal to {DiscordConfig.MaxPollQuestionTextLength} characters.");
+            if (string.IsNullOrWhiteSpace(poll.Question.Text) && poll.Question.Emoji is null)
+                throw new ArgumentException("Poll question must have at least one of text or emoji.", nameof(poll.Question));
+            if (poll.Duration is > 168 or 0)
+                throw new ArgumentOutOfRangeException(nameof(poll.Duration), "Poll duration must be between 1 and 168 hours.");
         }
 
         #endregion
