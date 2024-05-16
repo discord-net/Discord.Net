@@ -45,6 +45,7 @@ namespace Discord.Rest
         public TokenType TokenType => ApiClient.AuthTokenType;
         internal bool UseInteractionSnowflakeDate { get; private set; }
         internal bool FormatUsersInBidirectionalUnicode { get; private set; }
+        internal bool ResponseInternalTimeCheck { get; private set; }
 
         /// <summary> Creates a new REST-only Discord client. </summary>
         internal BaseDiscordClient(DiscordRestConfig config, API.DiscordRestApiClient client)
@@ -59,6 +60,7 @@ namespace Discord.Rest
 
             UseInteractionSnowflakeDate = config.UseInteractionSnowflakeDate;
             FormatUsersInBidirectionalUnicode = config.FormatUsersInBidirectionalUnicode;
+            ResponseInternalTimeCheck = config.ResponseInternalTimeCheck;
 
             ApiClient.RequestQueue.RateLimitTriggered += async (id, info, endpoint) =>
             {
