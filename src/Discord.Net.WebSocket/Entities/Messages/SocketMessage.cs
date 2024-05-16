@@ -215,7 +215,8 @@ namespace Discord.WebSocket
                                         : null,
                                     parsed.CustomId.GetValueOrDefault(),
                                     parsed.Url.GetValueOrDefault(),
-                                    parsed.Disabled.GetValueOrDefault());
+                                    parsed.Disabled.GetValueOrDefault(),
+                                    parsed.SkuId.ToNullable());
                             }
                         case ComponentType.SelectMenu:
                             {
