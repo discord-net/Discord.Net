@@ -206,6 +206,14 @@ namespace Discord
         public bool UseInteractionSnowflakeDate { get; set; } = true;
 
         /// <summary>
+        ///     Gets or sets whether or not any responses to Discord will make an internal expiration check.
+        /// </summary>
+        /// <remarks>
+        ///     This should generally be set to <see langword="false"/> in a development environment due to potential latency issues.
+        /// </remarks>
+        public bool ResponseInternalTimeCheck { get; set; } = true;
+
+        /// <summary>
         ///     Gets or sets if the Rest/Socket user <see cref="object.ToString"/> override formats the string in respect to bidirectional unicode.
         /// </summary>
         /// <remarks>
