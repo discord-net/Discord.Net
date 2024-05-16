@@ -84,7 +84,7 @@ namespace Discord.WebSocket
         internal bool LogGatewayIntentWarnings { get; private set; }
         internal bool SuppressUnknownDispatchWarnings { get; private set; }
         internal int AuditLogCacheSize { get; private set; }
-        internal bool DeferAsyncTimeCheck { get; private set; }
+        internal bool ResponseInternalTimeCheck { get; private set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
@@ -159,7 +159,7 @@ namespace Discord.WebSocket
             AlwaysResolveStickers = config.AlwaysResolveStickers;
             LogGatewayIntentWarnings = config.LogGatewayIntentWarnings;
             SuppressUnknownDispatchWarnings = config.SuppressUnknownDispatchWarnings;
-            DeferAsyncTimeCheck = config.DeferAsyncTimeCheck;
+            ResponseInternalTimeCheck = config.ResponseInternalTimeCheck;
             HandlerTimeout = config.HandlerTimeout;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);

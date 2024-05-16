@@ -352,7 +352,7 @@ namespace Discord.WebSocket
         /// </returns>
         public override async Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
         {
-            if (!InteractionHelper.CanSendResponse(this) && Discord.DeferAsyncTimeCheck)
+            if (!InteractionHelper.CanSendResponse(this) && Discord.ResponseInternalTimeCheck)
                 throw new TimeoutException($"Cannot defer an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
 
             var response = new API.InteractionResponse
