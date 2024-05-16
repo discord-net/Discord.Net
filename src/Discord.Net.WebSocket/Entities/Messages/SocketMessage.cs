@@ -87,6 +87,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IThreadChannel IMessage.Thread => Thread;
 
+        /// <inheritdoc />
+        public MessageCallData? CallData { get; private set; }
+
         /// <summary>
         ///     Returns all attachments included in this message.
         /// </summary>
@@ -298,6 +301,9 @@ namespace Discord.WebSocket
                 SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
                 Thread = guild?.AddOrUpdateChannel(state, model.Thread.Value) as SocketThreadChannel;
             }
+
+            if (model.Call.IsSpecified)
+                CallData = new MessageCallData(model.Call.Value.Participants, model.Call.Value.EndedTimestamp.ToNullable());
         }
 
         /// <inheritdoc />
