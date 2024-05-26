@@ -31,8 +31,13 @@ namespace Discord
         /// </returns>
         public string Url => CDN.GetEmojiUrl(Id, Animated);
 
-        internal Emote(ulong id, string name, bool animated)
+        /// <summary>
+        ///    Creates a new instance of <see cref="Emote" />.
+        /// </summary>
+        public Emote(ulong id, string name, bool animated = false)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("A custom emote must have a name", nameof(name));
             Id = id;
             Name = name;
             Animated = animated;
