@@ -3,6 +3,6 @@ uid: FAQ.Basics.ChannelInheritance
 title: Channel Inheritance
 ---
 
-# Discord.Net channel inheritance tree
+# Discord.NET channel inheritance tree
 
-![`IChannel` interface inheritance tree](images/channel-interface-tree.png)
+![`IChannel` interface inheritance tree](images/channel-interface-tree.svg)
