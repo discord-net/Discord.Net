@@ -8,6 +8,8 @@
       topicUid: FAQ.Basics.ClientBasics
     - name: Dependency Injection
       topicUid: FAQ.Basics.DI
+    - name: Channel Inheritance
+      topicUid: FAQ.Basics.ChannelInheritance
 - name: Interactions
   items:
     - name: Starting out
