@@ -20,8 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="API\" />
-    <Folder Include="Converters\Channels\" />
     <Folder Include="EntityProperties\Guilds\Onboarding\" />
   </ItemGroup>
 
