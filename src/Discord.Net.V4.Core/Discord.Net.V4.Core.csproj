@@ -14,4 +14,13 @@
     <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Discord.Net.Models\Discord.Net.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="API\" />
+    <Folder Include="Converters\Channels\" />
+  </ItemGroup>
+
 </Project>

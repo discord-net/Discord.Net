@@ -66,10 +66,13 @@ public readonly struct GuildFeatures : IReadOnlySet<string>, IImmutableSet<strin
     /// <inheritdoc/>
     public int Count => _features.Count;
 
+    internal string[] RawValue { get; }
+
     private readonly ImmutableHashSet<string> _features;
 
     internal GuildFeatures(string[] features)
     {
+        RawValue = features;
         _features = features.ToImmutableHashSet();
     }
 

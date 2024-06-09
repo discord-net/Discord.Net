@@ -117,7 +117,7 @@ namespace Discord.Gateway
             => _source.PremiumSubscriptionCount;
 
         public int? MaxPresences
-            => _source.MaxPresense;
+            => _source.MaxPresence;
 
         public int? MaxMembers
             => _source.MaxMembers;
