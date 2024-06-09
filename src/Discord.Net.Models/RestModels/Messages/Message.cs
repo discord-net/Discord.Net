@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Message
+public sealed class Message : IMessageModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -17,16 +17,16 @@ public sealed class Message
     public Optional<string> Content { get; set; }
 
     [JsonPropertyName("timestamp")]
-    public Optional<DateTimeOffset> Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
 
     [JsonPropertyName("edited_timestamp")]
     public DateTimeOffset? EditedTimestamp { get; set; }
 
     [JsonPropertyName("tts")]
-    public bool IsTextToSpeech { get; set; }
+    public bool TTS { get; set; }
 
     [JsonPropertyName("mention_everyone")]
-    public bool MentionEveryone { get; set; }
+    public bool MentionsEveryone { get; set; }
 
     [JsonPropertyName("mentions")]
     public required User[] UserMentions { get; set; }
@@ -95,4 +95,64 @@ public sealed class Message
 
     [JsonPropertyName("role_subscription_data")]
     public Optional<MessageRoleSubscriptionData> RoleSubscriptionData { get; set; }
+
+    ulong IMessageModel.AuthorId => Author.Map(v => v.Id);
+    string? IMessageModel.Content => Content;
+    bool IMessageModel.IsTTS => TTS;
+
+    ulong[] IMessageModel.MentionedUsers => UserMentions.Select(x => x.Id).ToArray();
+
+    ulong[] IMessageModel.MentionedRoles => RoleMentions;
+
+    ulong[] IMessageModel.MentionedChannels => ChannelMentions.Map(v => v.Select(x => x.Id).ToArray()) | [];
+
+    IEnumerable<IAttachmentModel> IMessageModel.Attachments => Attachments | [];
+
+    IEnumerable<IEmbedModel> IMessageModel.Embeds => Embeds;
+
+    IEnumerable<IReactionModel> IMessageModel.Reactions => Reactions | [];
+    bool IMessageModel.IsWebhook => WebhookId.IsSpecified;
+
+    int? IMessageModel.ActivityType => Activity.Map(v => v.Type);
+
+    string? IMessageModel.ActivityPartyId => Activity.Map(v => v.PartyId);
+
+    ulong? IMessageModel.ApplicationId => ApplicationId | Application.Map(v => v.Id);
+    string? IMessageModel.ApplicationCoverImage => Application.Map(v => v.CoverImage);
+
+    string? IMessageModel.ApplicationDescription => Application.Map(v => v.Description);
+
+    string? IMessageModel.ApplicationIcon => Application.Map(v => v.Icon);
+
+    string? IMessageModel.ApplicationName => Application.Map(v => v.Name);
+
+    ulong? IMessageModel.ReferenceMessageId => Reference.Map(v => v.MessageId);
+
+    ulong? IMessageModel.ReferenceChannelId => Reference.Map(v => v.ChannelId);
+
+    ulong? IMessageModel.ReferenceGuildId => Reference.Map(v => v.GuildId);
+
+    int IMessageModel.Flags => Flags;
+
+    ulong? IMessageModel.InteractionId => Interaction.Map(v => v.Id);
+
+    int IMessageModel.InteractionType => Interaction.Map(v => v.Type);
+
+    string? IMessageModel.InteractionName => Interaction.Map(v => v.Name);
+
+    ulong? IMessageModel.InteractionUserId => Interaction.Map(v => v.User.Id);
+
+    ulong? IMessageModel.ThreadId => Thread.Map(v => v.Id);
+
+    IEnumerable<IStickerItemModel> IMessageModel.Stickers => StickerItems | [];
+
+    int? IMessageModel.Position => Position;
+
+    ulong? IMessageModel.RoleSubscriptionListingId => RoleSubscriptionData.Map(v => v.SubscriptionListingId);
+
+    string? IMessageModel.TierName => RoleSubscriptionData.Map(v => v.TierName);
+
+    int? IMessageModel.TotalMonthsSubscribed => RoleSubscriptionData.Map(v => v.MonthsSubscribed);
+
+    bool IMessageModel.IsRenewed => RoleSubscriptionData.Map(v => v.IsRenewal);
 }

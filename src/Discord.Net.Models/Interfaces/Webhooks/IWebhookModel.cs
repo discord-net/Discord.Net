@@ -1,4 +1,4 @@
-namespace Discord.Models.Webhooks;
+namespace Discord.Models;
 
 public interface IWebhookModel : IEntityModel<ulong>
 {
@@ -7,10 +7,10 @@ public interface IWebhookModel : IEntityModel<ulong>
     ulong? ChannelId { get; }
     ulong? UserId { get; }
     string? Name { get; }
-    string? AvatarHash { get; }
+    string? Avatar { get; }
     string? Token { get; }
     ulong? ApplicationId { get; }
-    ulong SourceGuildId { get; }
-    ulong SourceChannelId { get; }
+    ulong? SourceGuildId { get; }
+    ulong? SourceChannelId { get; }
     string? Url { get; }
 }

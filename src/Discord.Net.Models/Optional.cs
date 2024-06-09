@@ -34,14 +34,12 @@ public readonly struct Optional<T>
         IsSpecified = true;
     }
 
-    [return: MaybeNull]
     public T? GetValueOrDefault() => _value;
 
-    [return: NotNullIfNotNull(nameof(defaultValue)), MaybeNull]
-    public T GetValueOrDefault([AllowNull] T defaultValue) => IsSpecified ? _value : defaultValue;
+    [return: NotNullIfNotNull(nameof(defaultValue))]
+    public T? GetValueOrDefault(T? defaultValue) => IsSpecified ? _value : defaultValue;
 
-    [return: NotNullIfNotNull(nameof(other)), MaybeNull]
-    public T Or([AllowNull] T other)
+    public T Or(T other)
         => IsSpecified ? _value ?? other : other;
 
     public override bool Equals(object? other)
@@ -61,15 +59,25 @@ public readonly struct Optional<T>
         return _value?.Equals(other) ?? false;
     }
     public override int GetHashCode() => IsSpecified ? _value?.GetHashCode() ?? 0 : 0;
-
     public override string? ToString() => IsSpecified ? _value?.ToString() : null;
+
+    public Optional<U> Map<U>(Func<T, U> func)
+    {
+        return IsSpecified ? Optional.Create(func(_value)) : Optional<U>.Unspecified;
+    }
+
+    public Optional<U> Map<U>(Func<T, Optional<U>> func)
+    {
+        return IsSpecified ? func(_value) : Optional<U>.Unspecified;
+    }
+
     private string DebuggerDisplay => IsSpecified ? _value?.ToString() ?? "<null>" : "<unspecified>";
 
     public static implicit operator T?(Optional<T> value) => ~value;
     public static implicit operator Optional<T>(T value) => new(value);
 
-    [return: NotNullIfNotNull(nameof(other)), MaybeNull]
-    public static T operator ^(Optional<T> value, [AllowNull] T other) => value.Or(other);
+    [return: NotNullIfNotNull(nameof(other))]
+    public static T operator |(Optional<T> value, T other) => value.Or(other);
 
     public static T? operator ~(Optional<T> value) => value.GetValueOrDefault();
 

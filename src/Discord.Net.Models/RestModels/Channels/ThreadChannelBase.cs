@@ -2,37 +2,13 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public abstract class ThreadChannelBase : Channel
+public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel
 {
-    [JsonPropertyName("last_pin_timestamp")]
-    public Optional<DateTimeOffset?> LastPinTimestamp { get; set; }
-
-    [JsonPropertyName("last_message_id")]
-    public Optional<ulong?> LastMessageId { get; set; }
-
-    [JsonPropertyName("flags")]
-    public int Flags { get; set; }
-
-    [JsonPropertyName("guild_id")]
-    public ulong GuildId { get; set; }
-
-    [JsonPropertyName("name")]
-    public required string Name { get; set; }
-
-    [JsonPropertyName("parent_id")]
-    public Optional<ulong?> ParentId { get; set; }
-
-    [JsonPropertyName("rate_limit_per_user")]
-    public Optional<int?> RatelimitPerUser { get; set; }
-
-    [JsonPropertyName("permissions")]
-    public Optional<ulong> Permissions { get; set; }
-
     [JsonPropertyName("owner_id")]
     public ulong OwnerId { get; set; }
 
     [JsonPropertyName("thread_metadata")]
-    public Optional<ThreadMetadata> Metadata { get; set; }
+    public required ThreadMetadata Metadata { get; set; }
 
     [JsonPropertyName("message_count")]
     public int MessageCount { get; set; }
@@ -48,4 +24,24 @@ public abstract class ThreadChannelBase : Channel
 
     [JsonPropertyName("member")]
     public Optional<ThreadMember> Member { get; set; }
+
+    bool IThreadChannelModel.IsInvitable => Metadata.Invitable;
+
+    DateTimeOffset? IThreadChannelModel.CreatedAt => Metadata.CreatedAt;
+
+    bool IThreadChannelModel.IsArchived => Metadata.Archived;
+
+    int IThreadChannelModel.AutoArchiveDuration => Metadata.AutoArchiveDuration;
+
+    DateTimeOffset IThreadChannelModel.ArchiveTimestamp => Metadata.ArchiveTimestamp;
+
+    bool IThreadChannelModel.IsLocked => Metadata.Locked;
+
+    bool IGuildTextChannelModel.IsNsfw => Nsfw;
+
+    string? IGuildTextChannelModel.Topic => Topic;
+
+    int? IGuildTextChannelModel.RatelimitPerUser => RatelimitPerUser;
+
+    int IGuildTextChannelModel.DefaultArchiveDuration => DefaultAutoArchiveDuration;
 }

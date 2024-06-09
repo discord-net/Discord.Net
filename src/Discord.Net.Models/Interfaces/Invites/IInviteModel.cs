@@ -2,16 +2,16 @@ namespace Discord.Models;
 
 public interface IInviteModel
 {
-    string Code { get; set; }
-    ulong? GuildId { get; set; }
-    ulong? ChannelId { get; set; }
-    ulong? InviterId { get; set; }
-    int? TargetType { get; set; }
-    ulong? TargetUserId { get; set; }
-    IApplicationModel? TargetApplication { get; set; }
+    string Code { get; }
+    ulong? GuildId { get; }
+    ulong? ChannelId { get; }
+    ulong? InviterId { get; }
+    int? TargetType { get; }
+    ulong? TargetUserId { get; }
+    IApplicationModel? TargetApplication { get; }
 
-    int? ApproximatePresenceCount { get; set; }
-    int? ApproximateMemberCount { get; set; }
-    DateTimeOffset? ExpiresAt { get; set; }
-    ulong? ScheduledEventId { get; set; }
+    int? ApproximatePresenceCount { get; }
+    int? ApproximateMemberCount { get; }
+    DateTimeOffset? ExpiresAt { get; }
+    ulong? ScheduledEventId { get; }
 }

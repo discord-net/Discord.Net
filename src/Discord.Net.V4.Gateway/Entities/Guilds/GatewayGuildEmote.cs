@@ -41,7 +41,7 @@ namespace Discord.Gateway
         {
             Update(model);
             Roles = new(guildId, () => _source.Roles, id => new GuildRoleCacheable(id, discord, discord.State.GuildRoles.ProvideSpecific(id)));
-            Author = new(guildId, model.CreatorId, discord, discord.State.Members.ProvideSpecific(model.CreatorId, guildId));
+            Author = new(guildId, model.UserId, discord, discord.State.Members.ProvideSpecific(model.UserId, guildId));
         }
 
         [MemberNotNull(nameof(_source))]

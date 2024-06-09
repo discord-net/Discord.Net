@@ -1,8 +1,10 @@
 
 namespace Discord.Models;
 
-public interface IThreadMemberModel : IEntityModel<ulong>
+public interface IThreadMemberModel : IEntityModel<ulong?>
 {
-    ulong UserId { get; }
-    DateTimeOffset JoinedAt { get; }
+    ulong? UserId { get; }
+    DateTimeOffset JoinTimestamp { get; }
+    int Flags { get; }
+    
 }

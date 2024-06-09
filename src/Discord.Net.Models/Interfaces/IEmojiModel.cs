@@ -1,6 +1,6 @@
 namespace Discord.Models;
 
-public interface IEmojiModel : IEntityModel<string>
+public interface IEmojiModel
 {
-
+    string? Name { get; }
 }

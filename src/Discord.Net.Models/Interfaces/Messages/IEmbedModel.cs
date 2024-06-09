@@ -7,7 +7,7 @@ public interface IEmbedModel
     string? Description { get; }
     string? Url { get; }
     DateTimeOffset? Timestamp { get; }
-    int? Color { get; }
+    uint? Color { get; }
 
     // footer
     string? FooterText { get; }
@@ -48,5 +48,5 @@ public interface IEmbedFieldModel
 {
     string Name { get; }
     string Value { get; }
-    bool Inline { get; }
+    bool? Inline { get; }
 }

@@ -3,7 +3,7 @@ namespace Discord.Models;
 public interface IRoleModel : IEntityModel<ulong>
 {
     string Name { get; }
-    int Color { get; }
+    uint Color { get; }
     bool IsHoisted { get; }
     string? Icon { get; }
     string? UnicodeEmoji { get; }

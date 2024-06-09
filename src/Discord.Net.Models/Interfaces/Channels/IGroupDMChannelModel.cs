@@ -1,6 +1,6 @@
 namespace Discord.Models;
 
-public interface IGroupDMChannelModel : IAudioChannelModel, IChannelModel
+public interface IGroupDMChannelModel : IChannelModel
 {
     ulong[] Recipients { get; }
 }

@@ -11,11 +11,11 @@ public interface IIntegrationModel : IEntityModel<ulong>
     int? ExpireBehavior { get; }
     int? ExpireGracePeriod { get; }
     ulong? UserId { get; }
-    ulong? AccountId { get; }
+    string? AccountId { get; }
     string? AccountName { get; }
     DateTimeOffset? SyncedAt { get; }
     int? SubscriberCount { get; }
     bool? IsRevoked { get; }
     IApplicationModel? Application { get; }
-    IEnumerable<string>? Scopes { get; }
+    string[]? Scopes { get; }
 }

@@ -14,7 +14,7 @@ public sealed class GuildOnboardingPromptOption
     public required ulong[] RoleIds { get; set; }
 
     [JsonPropertyName("emoji")]
-    public Emoji? Emoji { get; set; }
+    public IEmote? Emoji { get; set; }
 
     [JsonPropertyName("title")]
     public required string Title { get; set; }

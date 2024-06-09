@@ -60,7 +60,7 @@ namespace Discord.Gateway
                 Discord,
                 Category,
                 Discord.State.CategoryChannels,
-                model.Parent,
+                model.ParentId,
                 Guild.Id
             );
         }

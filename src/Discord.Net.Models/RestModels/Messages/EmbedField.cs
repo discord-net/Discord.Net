@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class EmbedField
+public sealed class EmbedField : IEmbedFieldModel
 {
     [JsonPropertyName("name")]
     public required string Name { get; set; }
@@ -12,4 +12,6 @@ public sealed class EmbedField
 
     [JsonPropertyName("inline")]
     public Optional<bool> Inline { get; set; }
+
+    bool? IEmbedFieldModel.Inline => Inline;
 }

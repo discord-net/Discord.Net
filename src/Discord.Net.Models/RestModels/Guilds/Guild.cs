@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Guild
+public sealed class Guild : IGuildModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -54,7 +54,7 @@ public sealed class Guild
     public required Role[] Roles { get; set; }
 
     [JsonPropertyName("emojis")]
-    public required Emoji[] Emojis { get; set; }
+    public required GuildEmote[] Emojis { get; set; }
 
     [JsonPropertyName("features")]
     public required string[] Features { get; set; }
@@ -124,8 +124,22 @@ public sealed class Guild
     public Optional<Sticker[]> Stickers { get; set; }
 
     [JsonPropertyName("premium_progress_bar_enabled")]
-    public Optional<bool> IsBoostProgressBarEnabled { get; set; }
+    public Optional<bool> PremiumProgressBarEnabled { get; set; }
 
     [JsonPropertyName("safety_alerts_channel_id")]
     public Optional<ulong?> SafetyAlertsChannelId { get; set; }
+
+    int? IGuildModel.MaxPresence => MaxPresences;
+    int? IGuildModel.MaxMembers => MaxMembers;
+    bool? IGuildModel.PremiumProgressBarEnabled => PremiumProgressBarEnabled;
+    ulong? IGuildModel.SafetyAlertsChannelId => SafetyAlertsChannelId;
+    int? IGuildModel.MaxVideoChannelUsers => MaxVideoChannelUsers;
+    int? IGuildModel.MaxStageVideoChannelUsers => MaxStageVideoChannelUsers;
+    int? IGuildModel.ApproximateMemberCount => ApproximateMemberCount;
+    IWelcomeScreenModel? IGuildModel.WelcomeScreen => ~WelcomeScreen;
+    int? IGuildModel.PremiumSubscriptionCount => PremiumSubscriptionCount;
+    string? IGuildModel.Vanity => VanityUrlCode;
+    bool IGuildModel.WidgetEnabled => WidgetEnabled;
+    ulong? IGuildModel.WidgetChannelId => WidgetChannelId;
+
 }

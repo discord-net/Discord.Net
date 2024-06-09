@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Application
+public sealed class Application : IApplicationModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -24,6 +24,9 @@ public sealed class Application
 
     [JsonPropertyName("bot_require_code_grant")]
     public Optional<bool> BotRequiresCodeGrant { get; set; }
+
+    [JsonPropertyName("bot")]
+    public Optional<User> Bot { get; set; }
 
     [JsonPropertyName("terms_of_service_url")]
     public Optional<string> TermsOfService { get; set; }
@@ -70,4 +73,5 @@ public sealed class Application
     [JsonPropertyName("redirect_uris")]
     public Optional<string[]> RedirectUris { get; set; }
 
+    ulong? IApplicationModel.BotId => Bot.Map(v => v.Id);
 }

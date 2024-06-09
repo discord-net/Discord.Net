@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class User
+public sealed class User : IUserModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -55,4 +55,14 @@ public sealed class User
 
     [JsonPropertyName("avatar_decoration")]
     public Optional<string?> AvatarDecoration { get; set; }
+
+    bool? IUserModel.IsBot => IsBot;
+    bool? IUserModel.IsSystem => IsSystem;
+    bool? IUserModel.MFAEnabled => MFAEnabled;
+    string? IUserModel.Locale => Locale;
+    bool? IUserModel.Verified => IsVerified;
+    string? IUserModel.Email => Email;
+    int? IUserModel.Flags => Flags;
+    int? IUserModel.Premium => Premium;
+    int? IUserModel.PublicFlags => PublicFlags;
 }

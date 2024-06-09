@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class IntegrationApplication
+public sealed class IntegrationApplication : IApplicationModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -18,4 +18,7 @@ public sealed class IntegrationApplication
 
     [JsonPropertyName("bot")]
     public Optional<User> Bot { get; set; }
+
+    ulong? IApplicationModel.BotId => Bot.Map(v => v.Id);
+
 }

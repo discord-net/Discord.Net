@@ -2,8 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Attachment
+public sealed class Attachment : IAttachmentModel
 {
+
+
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
 
@@ -35,11 +37,25 @@ public sealed class Attachment
     public Optional<bool> Ephemeral { get; set; }
 
     [JsonPropertyName("duration_secs")]
-    public Optional<double> DurationSeconds { get; set; }
+    public Optional<float> DurationSeconds { get; set; }
 
     [JsonPropertyName("waveform")]
     public Optional<string> Waveform { get; set; }
 
     [JsonPropertyName("flags")]
     public Optional<int> Flags { get; set; }
+
+    int? IAttachmentModel.Height => Height;
+
+    int? IAttachmentModel.Width => Width;
+
+    bool IAttachmentModel.Ephemeral => Ephemeral;
+
+    string? IAttachmentModel.Description => Description;
+
+    string? IAttachmentModel.ContentType => ContentType;
+
+    float? IAttachmentModel.Duration => DurationSeconds;
+
+    string? IAttachmentModel.Waveform => Waveform;
 }

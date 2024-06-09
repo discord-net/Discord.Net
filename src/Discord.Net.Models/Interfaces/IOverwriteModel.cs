@@ -1,10 +1,9 @@
-namespace Discord.Models
+namespace Discord.Models;
+
+public interface IOverwriteModel
 {
-    public interface IOverwriteModel
-    {
-        ulong Target { get; }
-        int Type { get; }
-        ulong Allow { get; }
-        ulong Deny { get; }
-    }
+    ulong TargetId { get; }
+    int Type { get; }
+    ulong Allow { get; }
+    ulong Deny { get; }
 }

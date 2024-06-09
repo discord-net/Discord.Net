@@ -1,6 +1,6 @@
 namespace Discord.Models;
 
-public interface IUserConnectionModel : IEntityModel<ulong>
+public interface IUserConnectionModel : IEntityModel<string>
 {
     string Name { get; }
     string Type { get; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public abstract class GuildChannelBase : Channel
+public abstract class GuildChannelBase : Channel, IGuildChannelModel
 {
     [JsonPropertyName("last_pin_timestamp")]
     public Optional<DateTimeOffset?> LastPinTimestamp { get; set; }
@@ -69,4 +69,11 @@ public abstract class GuildChannelBase : Channel
 
     [JsonPropertyName("default_forum_layout")]
     public Optional<int> DefaultForumLayout { get; set; }
+
+    ulong? IGuildChannelModel.ParentId => ParentId;
+
+    IEnumerable<IOverwriteModel> IGuildChannelModel.Permissions => PermissionOverwrites.Or([]);
+
+    int? IGuildChannelModel.Flags => Flags;
+
 }

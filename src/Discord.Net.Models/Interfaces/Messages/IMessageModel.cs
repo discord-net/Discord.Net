@@ -6,12 +6,12 @@ public interface IMessageModel : IEntityModel<ulong>
     ulong ChannelId { get; }
     string? Content { get; }
     DateTimeOffset Timestamp { get; }
-    DateTimeOffset EditedTimestamp { get; }
+    DateTimeOffset? EditedTimestamp { get; }
     bool IsTTS { get; }
     bool MentionsEveryone { get; }
-    IEnumerable<ulong> MentionedUsers { get; }
-    IEnumerable<ulong> MentionedRoles { get; }
-    IEnumerable<ulong> MentionedChannels { get; }
+    ulong[] MentionedUsers { get; }
+    ulong[] MentionedRoles { get; }
+    ulong[] MentionedChannels { get; }
     IEnumerable<IAttachmentModel> Attachments { get; }
     IEnumerable<IEmbedModel> Embeds { get; }
     IEnumerable<IReactionModel> Reactions { get; }
@@ -20,17 +20,15 @@ public interface IMessageModel : IEntityModel<ulong>
     int Type { get; }
 
     // activity
-    int? MessageActivityType { get; }
-    string? MessageActivityId { get; }
+    int? ActivityType { get; }
+    string? ActivityPartyId { get; }
 
     // message application
-    ulong? MessageAppId { get; }
-    string? MessageAppCoverImage { get; }
-    string? MessageAppDescription { get; }
-    string? MessageAppIcon { get; }
-    string? MessageAppName { get; }
-
     ulong? ApplicationId { get; }
+    string? ApplicationCoverImage { get; }
+    string? ApplicationDescription { get; }
+    string? ApplicationIcon { get; }
+    string? ApplicationName { get; }
 
     // message reference
     ulong? ReferenceMessageId { get; }

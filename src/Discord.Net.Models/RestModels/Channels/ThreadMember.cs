@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class ThreadMember
+public sealed class ThreadMember : IThreadMemberModel
 {
     [JsonPropertyName("id")]
     public Optional<ulong> Id { get; set; }
@@ -18,4 +18,7 @@ public sealed class ThreadMember
 
     [JsonPropertyName("member")]
     public Optional<GuildMember> GuildMember { get; set; }
+
+    ulong? IThreadMemberModel.UserId => UserId;
+    ulong? IEntityModel<ulong?>.Id => Id;
 }

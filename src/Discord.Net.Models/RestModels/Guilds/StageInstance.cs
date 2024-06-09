@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class StageInstance
+public sealed class StageInstance : IStageInstanceModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -24,4 +24,6 @@ public sealed class StageInstance
 
     [JsonPropertyName("guild_scheduled_event_id")]
     public ulong? ScheduledEventId { get; set; }
+
+    ulong? IStageInstanceModel.EventId => ScheduledEventId;
 }

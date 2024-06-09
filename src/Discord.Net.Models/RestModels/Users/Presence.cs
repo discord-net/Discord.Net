@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Presence
+public sealed class Presence : IPresenceModel
 {
     [JsonPropertyName("user")]
     public required User User { get; set; }
@@ -18,4 +18,10 @@ public sealed class Presence
 
     [JsonPropertyName("activities")]
     public Optional<Activity[]> Activities { get; set; }
+
+    ulong IPresenceModel.UserId => User.Id;
+    ulong? IPresenceModel.GuildId => GuildId;
+    string? IPresenceModel.Status => Status;
+    IEnumerable<IActivityModel>? IPresenceModel.Activities => Activities | [];
+    IDictionary<string, string>? IPresenceModel.ClientStatus => ~ClientStatus;
 }

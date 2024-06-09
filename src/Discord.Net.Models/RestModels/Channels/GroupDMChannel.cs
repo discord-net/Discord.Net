@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [ChannelTypeOf(ChannelType.GroupDM)]
-public sealed class GroupDMChannel : Channel
+public sealed class GroupDMChannel : Channel, IGroupDMChannelModel
 {
     [JsonPropertyName("last_message_id")]
     public Optional<ulong?> LastMessageId { get; set; }
@@ -16,7 +16,7 @@ public sealed class GroupDMChannel : Channel
     public Optional<int> Flags { get; set; }
 
     [JsonPropertyName("recipients")]
-    public Optional<User[]> Recipients { get; set; }
+    public required User[] Recipients { get; set; }
 
     [JsonPropertyName("icon")]
     public Optional<string?> Icon { get; set; }
@@ -32,4 +32,6 @@ public sealed class GroupDMChannel : Channel
 
     [JsonPropertyName("application_id")]
     public Optional<ulong> ApplicationId { get; set; }
+
+    ulong[] IGroupDMChannelModel.Recipients => Recipients.Select(x => x.Id).ToArray();
 }

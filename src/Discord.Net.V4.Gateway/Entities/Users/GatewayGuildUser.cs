@@ -24,10 +24,10 @@ namespace Discord.Gateway
             => _source.Nickname;
 
         public string? DisplayAvatarId
-            => _source.GuildAvatar ?? AvatarId;
+            => _source.Avatar ?? AvatarId;
 
         public string? GuildAvatarId
-            => _source.GuildAvatar;
+            => _source.Avatar;
 
         public GuildUserFlags Flags
             => _source.Flags;

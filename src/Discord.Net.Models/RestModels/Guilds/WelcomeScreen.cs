@@ -11,5 +11,5 @@ public sealed class WelcomeScreen : IWelcomeScreenModel
     [JsonPropertyName("welcome_channels")]
     public required WelcomeScreenChannel[] WelcomeChannels { get; set; }
 
-    IWelcomeScreenChannelModel[] IWelcomeScreenModel.WelcomeChannels => WelcomeChannels;
+    IEnumerable<IWelcomeScreenChannelModel> IWelcomeScreenModel.WelcomeChannels => WelcomeChannels;
 }

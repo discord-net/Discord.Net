@@ -2,7 +2,6 @@ namespace Discord.Models;
 
 public interface IThreadChannelModel : IGuildTextChannelModel
 {
-    bool HasJoined { get; }
     bool IsArchived { get; }
     int AutoArchiveDuration { get; }
     DateTimeOffset ArchiveTimestamp { get; }

@@ -1,10 +1,10 @@
 namespace Discord.Models;
 
-public interface IMemberModel : IEntityModel<ulong>
+public interface IMemberModel : IEntityModel<ulong?>
 {
     int Flags { get; }
     string? Nickname { get;}
-    string? GuildAvatar { get;}
+    string? Avatar { get;}
     ulong[] RoleIds { get;}
     DateTimeOffset? JoinedAt { get;}
     DateTimeOffset? PremiumSince { get;}

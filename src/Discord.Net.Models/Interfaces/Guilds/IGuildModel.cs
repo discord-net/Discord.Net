@@ -41,7 +41,7 @@ public interface IGuildModel : IEntityModel<ulong>
 public interface IWelcomeScreenModel
 {
     string? Description { get; }
-    IWelcomeScreenChannelModel[] WelcomeChannels { get; }
+    IEnumerable<IWelcomeScreenChannelModel> WelcomeChannels { get; }
 }
 
 public interface IWelcomeScreenChannelModel

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Integration
+public sealed class Integration : IIntegrationModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -51,4 +51,26 @@ public sealed class Integration
 
     [JsonPropertyName("scopes")]
     public Optional<string[]> Scopes { get; set; }
+
+    bool? IIntegrationModel.IsSyncing => IsSyncing;
+    ulong? IIntegrationModel.RoleId => RoleId;
+    bool? IIntegrationModel.EnableEmoticons => EnableEmoticons;
+    int? IIntegrationModel.ExpireBehavior => ExpireBehavior;
+    int? IIntegrationModel.ExpireGracePeriod => ExpireGracePeriod;
+
+    ulong? IIntegrationModel.UserId => User.Map(v => v.Id);
+
+    string? IIntegrationModel.AccountId => Account.Map(v => v.Id);
+
+    string? IIntegrationModel.AccountName => Account.Map(v => v.Name);
+
+    DateTimeOffset? IIntegrationModel.SyncedAt => SyncedAt;
+
+    int? IIntegrationModel.SubscriberCount => SubscriberAccount;
+
+    bool? IIntegrationModel.IsRevoked => Revoked;
+
+    IApplicationModel? IIntegrationModel.Application => ~Application;
+
+    string[]? IIntegrationModel.Scopes => Scopes;
 }

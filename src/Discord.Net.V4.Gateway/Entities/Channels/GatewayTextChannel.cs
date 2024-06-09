@@ -17,7 +17,7 @@ namespace Discord.Gateway
             => _source.Topic;
 
         public virtual int SlowModeInterval
-            => _source.Slowmode;
+            => _source.RatelimitPerUser;
 
         public ThreadArchiveDuration DefaultArchiveDuration
             => _source.DefaultArchiveDuration;
@@ -26,7 +26,7 @@ namespace Discord.Gateway
             => MentionUtils.MentionChannel(Id);
 
         public ulong? CategoryId
-            => _source.Parent;
+            => _source.ParentId;
 
         public GuildChannelCacheable? Category { get; private set; }
 
@@ -52,7 +52,7 @@ namespace Discord.Gateway
                 Discord,
                 Category,
                 Discord.State.GuildChannels,
-                model.Parent,
+                model.ParentId,
                 Guild.Id
             );
         }
@@ -93,7 +93,7 @@ namespace Discord.Gateway
         public Task<IUserMessage> SendMessageAsync(string? text = null, bool isTTS = false, Embed? embed = null, RequestOptions? options = null, AllowedMentions? allowedMentions = null, MessageReference? messageReference = null, MessageComponent? components = null, ISticker[]? stickers = null, Embed[]? embeds = null, MessageFlags flags = MessageFlags.None) => throw new NotImplementedException();
         public Task SyncPermissionsAsync(RequestOptions? options = null) => throw new NotImplementedException();
         public Task TriggerTypingAsync(RequestOptions? options = null) => throw new NotImplementedException();
-        
+
         internal override object Clone() => throw new NotImplementedException();
         internal override void DisposeClone() => throw new NotImplementedException();
         public Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions? options = null) => throw new NotImplementedException();
