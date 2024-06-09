@@ -1,4 +1,3 @@
-using Discord.API;
 using Discord.Models.Json;
 
 namespace Discord;
@@ -19,12 +18,6 @@ public sealed class ModifySelfUserProperties : IEntityProperties<ModifyCurrentUs
     /// </summary>
     public Optional<Image?> Avatar { get; set; }
 
-    public ModifyCurrentUserParams ToApiModel()
-    {
-        return new ModifyCurrentUserParams()
-        {
-            Avatar = Avatar.Map(v => v?.ToImageData()),
-            Username = Username
-        };
-    }
+    public ModifyCurrentUserParams ToApiModel() =>
+        new() {Avatar = Avatar.Map(v => v?.ToImageData()), Username = Username};
 }

@@ -35,7 +35,7 @@ public interface IStageInstance : ISnowflakeEntity, IDeletable, IModifyable<Modi
     bool IsDiscoverableDisabled { get; }
 
     /// <summary>
-    ///     Gets the guild scheduled event tied to this stage instance, if any; otherwise <see langword="null"/>.
+    ///     Gets the guild scheduled event tied to this stage instance, if any; otherwise <see langword="null" />.
     /// </summary>
     IEntitySource<ulong, IGuildScheduledEvent>? Event { get; }
 }

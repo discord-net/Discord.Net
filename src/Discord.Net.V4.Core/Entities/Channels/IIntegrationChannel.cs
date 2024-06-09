@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-
 namespace Discord;
 
 /// <summary>
@@ -9,5 +5,4 @@ namespace Discord;
 /// </summary>
 public interface IIntegrationChannel : IGuildChannel
 {
-
 }

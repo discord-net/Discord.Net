@@ -1,15 +1,22 @@
 namespace Discord;
 
 /// <summary>
-///     Represents a <see cref="IMessageComponent"/> text input.
+///     Represents a <see cref="IMessageComponent" /> text input.
 /// </summary>
 public class TextInputComponent : IMessageComponent
 {
-    /// <inheritdoc/>
-    public ComponentType Type => ComponentType.TextInput;
-
-    /// <inheritdoc/>
-    public string CustomId { get; }
+    internal TextInputComponent(string customId, string label, string? placeholder, int? minLength, int? maxLength,
+        TextInputStyle style, bool? required, string? value)
+    {
+        CustomId = customId;
+        Label = label;
+        Placeholder = placeholder;
+        MinLength = minLength;
+        MaxLength = maxLength;
+        Style = style;
+        Required = required;
+        Value = value;
+    }
 
     /// <summary>
     ///     Gets the label of the component; this is the text shown above it.
@@ -46,16 +53,9 @@ public class TextInputComponent : IMessageComponent
     /// </summary>
     public string? Value { get; }
 
-    internal TextInputComponent(string customId, string label, string? placeholder, int? minLength, int? maxLength,
-        TextInputStyle style, bool? required, string? value)
-    {
-        CustomId = customId;
-        Label = label;
-        Placeholder = placeholder;
-        MinLength = minLength;
-        MaxLength = maxLength;
-        Style = style;
-        Required = required;
-        Value = value;
-    }
+    /// <inheritdoc />
+    public ComponentType Type => ComponentType.TextInput;
+
+    /// <inheritdoc />
+    public string CustomId { get; }
 }

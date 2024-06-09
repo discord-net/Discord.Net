@@ -13,7 +13,8 @@ internal static class EntityProviderExtensions
         where TApi : class, TModel
         where TBody : class
     {
-        var model = await provider.Client.RestApiClient.ExecuteAsync(route, options ?? provider.Client.DefaultRequestOptions, token);
+        var model = await provider.Client.RestApiClient.ExecuteAsync(route,
+            options ?? provider.Client.DefaultRequestOptions, token);
 
         return model is not null
             ? TResult.Construct<TResult>(model)
@@ -28,7 +29,8 @@ internal static class EntityProviderExtensions
         where TModel : IEntityModel
         where TApi : class, TModel
     {
-        var model = await provider.Client.RestApiClient.ExecuteAsync(route, options ?? provider.Client.DefaultRequestOptions, token);
+        var model = await provider.Client.RestApiClient.ExecuteAsync(route,
+            options ?? provider.Client.DefaultRequestOptions, token);
 
         return model is not null
             ? TResult.Construct<TResult>(model)

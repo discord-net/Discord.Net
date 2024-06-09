@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     Provides properties that are used to modify an <see cref="IGuild" /> with the specified changes.
 /// </summary>
-/// <see cref="IGuild.ModifyAsync"/>
+/// <see cref="IGuild.ModifyAsync" />
 public class ModifyGuildProperties
 {
     /// <summary>
@@ -54,7 +54,7 @@ public class ModifyGuildProperties
     public Optional<Image?> Splash { get; set; }
 
     /// <summary>
-    ///     Gets or sets the <see cref="IVoiceChannel"/> where AFK users should be sent.
+    ///     Gets or sets the <see cref="IVoiceChannel" /> where AFK users should be sent.
     /// </summary>
     public Optional<EntityOrId<ulong, IVoiceChannel>?> AfkChannel { get; set; }
 
@@ -78,13 +78,16 @@ public class ModifyGuildProperties
     /// </summary>
     /// <remarks>
     ///     These flags are inverted. Setting a flag will disable that system channel message from being sent.
-    ///     A value of <see cref="SystemChannelMessageDeny.None"/> will allow all system channel message types to be sent,
-    ///     given that the <see cref="SystemChannelId"/> has also been set.
-    ///     A value of <see cref="SystemChannelMessageDeny.GuildBoost"/> will deny guild boost messages from being sent, and allow all
+    ///     A value of <see cref="SystemChannelMessageDeny.None" /> will allow all system channel message types to be sent,
+    ///     given that the <see cref="SystemChannelId" /> has also been set.
+    ///     A value of <see cref="SystemChannelMessageDeny.GuildBoost" /> will deny guild boost messages from being sent, and
+    ///     allow all
     ///     other types of messages.
-    ///     Refer to the extension methods <see cref="GuildExtensions.GetGuildBoostMessagesEnabled(IGuild)"/>,  
-    ///     <see cref="GuildExtensions.GetWelcomeMessagesEnabled(IGuild)"/>, <see cref="GuildExtensions.GetGuildSetupTipMessagesEnabled(IGuild)"/>,
-    ///     and <see cref="GuildExtensions.GetGuildWelcomeMessageReplyEnabled(IGuild)"/> to check if these system channel message types
+    ///     Refer to the extension methods <see cref="GuildExtensions.GetGuildBoostMessagesEnabled(IGuild)" />,
+    ///     <see cref="GuildExtensions.GetWelcomeMessagesEnabled(IGuild)" />,
+    ///     <see cref="GuildExtensions.GetGuildSetupTipMessagesEnabled(IGuild)" />,
+    ///     and <see cref="GuildExtensions.GetGuildWelcomeMessageReplyEnabled(IGuild)" /> to check if these system channel
+    ///     message types
     ///     are enabled, without the need to manipulate the logic of the flag.
     /// </remarks>
     public Optional<SystemChannelFlags> SystemChannelFlags { get; set; }
@@ -93,8 +96,8 @@ public class ModifyGuildProperties
     ///     Gets or sets the preferred locale of the guild in IETF BCP 47 language tag format.
     /// </summary>
     /// <remarks>
-    ///     This property takes precedence over <see cref="PreferredCulture"/>.
-    ///     When it is set, the value of <see cref="PreferredCulture"/>
+    ///     This property takes precedence over <see cref="PreferredCulture" />.
+    ///     When it is set, the value of <see cref="PreferredCulture" />
     ///     will not be used.
     /// </remarks>
     public Optional<string> PreferredLocale { get; set; }
@@ -103,9 +106,9 @@ public class ModifyGuildProperties
     ///     Gets or sets the preferred locale of the guild.
     /// </summary>
     /// <remarks>
-    ///     The <see cref="PreferredLocale"/> property takes precedence
-    ///     over this property. When <see cref="PreferredLocale"/> is set,
-    ///     the value of <see cref="PreferredCulture"/> will be unused.
+    ///     The <see cref="PreferredLocale" /> property takes precedence
+    ///     over this property. When <see cref="PreferredLocale" /> is set,
+    ///     the value of <see cref="PreferredCulture" /> will be unused.
     /// </remarks>
     public Optional<CultureInfo> PreferredCulture { get; set; }
 

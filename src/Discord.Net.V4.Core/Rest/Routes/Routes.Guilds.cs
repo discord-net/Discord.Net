@@ -9,8 +9,7 @@ public partial class Routes
         => new(nameof(CreateGuild),
             RequestMethod.Post,
             "guilds",
-            body,
-            ContentType.JsonBody);
+            body);
 
     public static ApiRoute<Guild> GetGuild(ulong guildId, bool? withCounts = default)
         => new(nameof(GetGuild),
@@ -43,7 +42,8 @@ public partial class Routes
             $"guilds/{guildId}/channels",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<CreateGuildChannelParams, Channel> CreateGuildChannel(ulong guildId, CreateGuildChannelParams body)
+    public static ApiBodyRoute<CreateGuildChannelParams, Channel> CreateGuildChannel(ulong guildId,
+        CreateGuildChannelParams body)
         => new(nameof(CreateGuildChannel),
             RequestMethod.Post,
             $"guilds/{guildId}/channels",
@@ -52,7 +52,8 @@ public partial class Routes
             (ScopeType.Guild, guildId)
         );
 
-    public static ApiBodyRoute<ModifyGuildChannelPositionsParams> ModifyGuildChannelPositions(ulong guildId, ModifyGuildChannelPositionsParams body)
+    public static ApiBodyRoute<ModifyGuildChannelPositionsParams> ModifyGuildChannelPositions(ulong guildId,
+        ModifyGuildChannelPositionsParams body)
         => new(nameof(ModifyGuildChannelPositions),
             RequestMethod.Patch,
             $"guild/{guildId}/channels",
@@ -72,7 +73,8 @@ public partial class Routes
             $"guilds/{guildId}/members/{userId}",
             (ScopeType.Guild, guildId));
 
-    public static ApiRoute<GuildMember[]> ListGuildMembers(ulong guildId, int? limit = default, ulong? afterId = default)
+    public static ApiRoute<GuildMember[]> ListGuildMembers(ulong guildId, int? limit = default,
+        ulong? afterId = default)
         => new(nameof(ListGuildMembers),
             RequestMethod.Get,
             $"guilds/{guildId}/members{RouteUtils.GetUrlEncodedQueryParams(("limit", limit), ("after", afterId))}",
@@ -84,7 +86,8 @@ public partial class Routes
             $"guilds/{guildId}/members/search{RouteUtils.GetUrlEncodedQueryParams(("query", query), ("limit", limit))}",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<AddGuildMemberParams, GuildMember> AddGuildMember(ulong guildId, ulong userId, AddGuildMemberParams body)
+    public static ApiBodyRoute<AddGuildMemberParams, GuildMember> AddGuildMember(ulong guildId, ulong userId,
+        AddGuildMemberParams body)
         => new(nameof(AddGuildMember),
             RequestMethod.Put,
             $"guilds/{guildId}/members/{userId}",
@@ -92,7 +95,8 @@ public partial class Routes
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyGuildMemberParams, GuildMember> ModifyGuildMember(ulong guildId, ulong userId, ModifyGuildMemberParams body)
+    public static ApiBodyRoute<ModifyGuildMemberParams, GuildMember> ModifyGuildMember(ulong guildId, ulong userId,
+        ModifyGuildMemberParams body)
         => new(nameof(ModifyGuildMember),
             RequestMethod.Patch,
             $"guilds/{guildId}/members/{userId}",
@@ -100,7 +104,8 @@ public partial class Routes
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyCurrentMemberParams, GuildMember> ModifyCurrentMember(ulong guildId, ModifyCurrentMemberParams body)
+    public static ApiBodyRoute<ModifyCurrentMemberParams, GuildMember> ModifyCurrentMember(ulong guildId,
+        ModifyCurrentMemberParams body)
         => new(nameof(ModifyCurrentMember),
             RequestMethod.Patch,
             $"guilds/{guildId}/members/@me",
@@ -126,7 +131,8 @@ public partial class Routes
             $"guilds/{guildId}/members/{userId}",
             (ScopeType.Guild, guildId));
 
-    public static ApiRoute<Ban[]> GetGuildBans(ulong guildId, int? limit = default, ulong? beforeId = default, ulong? afterId = default)
+    public static ApiRoute<Ban[]> GetGuildBans(ulong guildId, int? limit = default, ulong? beforeId = default,
+        ulong? afterId = default)
         => new(nameof(GetGuildBans),
             RequestMethod.Get,
             $"guilds/{guildId}/bans{RouteUtils.GetUrlEncodedQueryParams(("limit", limit), ("before", beforeId), ("after", afterId))}",
@@ -138,7 +144,8 @@ public partial class Routes
             $"guilds/{guildId}/bans/{userId}",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<CreateGuildBanParams> CreateGuildBan(ulong guildId, ulong userId, CreateGuildBanParams body)
+    public static ApiBodyRoute<CreateGuildBanParams> CreateGuildBan(ulong guildId, ulong userId,
+        CreateGuildBanParams body)
         => new(nameof(CreateGuildBan),
             RequestMethod.Put,
             $"guilds/{guildId}/bans/{userId}",
@@ -166,7 +173,8 @@ public partial class Routes
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyGuildRolePositionParams[], Role[]> ModifyGuildRolePositions(ulong guildId, ModifyGuildRolePositionParams[] body)
+    public static ApiBodyRoute<ModifyGuildRolePositionParams[], Role[]> ModifyGuildRolePositions(ulong guildId,
+        ModifyGuildRolePositionParams[] body)
         => new(nameof(ModifyGuildRolePositions),
             RequestMethod.Patch,
             $"guilds/{guildId}/roles",
@@ -174,7 +182,8 @@ public partial class Routes
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyGuildRoleParams, Role> ModifyGuildRole(ulong guildId, ulong roleId, ModifyGuildRoleParams body)
+    public static ApiBodyRoute<ModifyGuildRoleParams, Role> ModifyGuildRole(ulong guildId, ulong roleId,
+        ModifyGuildRoleParams body)
         => new(nameof(ModifyGuildRole),
             RequestMethod.Patch,
             $"guilds/{guildId}/roles/{roleId}",
@@ -182,7 +191,8 @@ public partial class Routes
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyGuildMfaLevelParams, MfaLevelResponse> ModifyGuildMfaLevel(ulong guildId, ModifyGuildMfaLevelParams body)
+    public static ApiBodyRoute<ModifyGuildMfaLevelParams, MfaLevelResponse> ModifyGuildMfaLevel(ulong guildId,
+        ModifyGuildMfaLevelParams body)
         => new(nameof(ModifyGuildMfaLevel),
             RequestMethod.Patch,
             $"guilds/{guildId}/mfa",
@@ -196,13 +206,15 @@ public partial class Routes
             $"guilds/{guildId}/roles/{roleId}",
             (ScopeType.Guild, guildId));
 
-    public static ApiRoute<GuildPruneCount> GetGuildPruneCount(ulong guildId, int? days = default, ulong[]? includeRoles = default)
+    public static ApiRoute<GuildPruneCount> GetGuildPruneCount(ulong guildId, int? days = default,
+        ulong[]? includeRoles = default)
         => new(nameof(GetGuildPruneCount),
             RequestMethod.Get,
             $"guilds/{guildId}/prune{RouteUtils.GetUrlEncodedQueryParams(("days", days), ("include_roles", includeRoles))}",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<BeginGuildPruneParams, GuildPruneCount> BeginGuildPrune(ulong guildId, BeginGuildPruneParams body)
+    public static ApiBodyRoute<BeginGuildPruneParams, GuildPruneCount> BeginGuildPrune(ulong guildId,
+        BeginGuildPruneParams body)
         => new(nameof(BeginGuildPrune),
             RequestMethod.Post,
             $"guilds/{guildId}/prune",
@@ -240,7 +252,8 @@ public partial class Routes
             $"guilds/{guildId}/widget",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyGuildWidgetParams, GuildWidgetSettings> ModifyGuildWidgetSettings(ulong guildId, ModifyGuildWidgetParams body)
+    public static ApiBodyRoute<ModifyGuildWidgetParams, GuildWidgetSettings> ModifyGuildWidgetSettings(ulong guildId,
+        ModifyGuildWidgetParams body)
         => new(nameof(ModifyGuildWidgetSettings),
             RequestMethod.Patch,
             $"guilds/{guildId}/widget",
@@ -266,7 +279,8 @@ public partial class Routes
             $"guilds/{guildId}/welcome-screen",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyGuildWelcomeScreenParams, WelcomeScreen> ModifyGuildWelcomeScreen(ulong guildId, ModifyGuildWelcomeScreenParams body)
+    public static ApiBodyRoute<ModifyGuildWelcomeScreenParams, WelcomeScreen> ModifyGuildWelcomeScreen(ulong guildId,
+        ModifyGuildWelcomeScreenParams body)
         => new(nameof(ModifyGuildWelcomeScreen),
             RequestMethod.Patch,
             $"guilds/{guildId}/welcome-screen",
@@ -278,7 +292,8 @@ public partial class Routes
     //public static string GuildOnboarding(ulong guildId)
     //        => $"guilds/{guildId}/onboarding";
 
-    public static ApiBodyRoute<ModifyCurrentUserVoiceState> ModifyCurrentUserVoiceState(ulong guildId, ModifyCurrentUserVoiceState body)
+    public static ApiBodyRoute<ModifyCurrentUserVoiceState> ModifyCurrentUserVoiceState(ulong guildId,
+        ModifyCurrentUserVoiceState body)
         => new(nameof(ModifyCurrentUserVoiceState),
             RequestMethod.Patch,
             $"guilds/{guildId}/voice-states/@me",
@@ -286,12 +301,12 @@ public partial class Routes
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyUserVoiceState> ModifyUserVoiceState(ulong guildId, ulong userId, ModifyUserVoiceState body)
+    public static ApiBodyRoute<ModifyUserVoiceState> ModifyUserVoiceState(ulong guildId, ulong userId,
+        ModifyUserVoiceState body)
         => new(nameof(ModifyUserVoiceState),
             RequestMethod.Patch,
             $"guilds/{guildId}/voice-states/{userId}",
             body,
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
-
 }

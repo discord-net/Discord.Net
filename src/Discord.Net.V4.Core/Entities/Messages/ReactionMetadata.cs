@@ -9,7 +9,7 @@ public readonly struct ReactionMetadata
     ///     The number of reactions.
     /// </summary>
     /// <returns>
-    ///     An <see cref="int"/> representing the number of this reactions that has been added to this message.
+    ///     An <see cref="int" /> representing the number of this reactions that has been added to this message.
     /// </returns>
     public readonly int ReactionCount;
 

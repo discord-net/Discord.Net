@@ -23,5 +23,5 @@ public enum GuildScheduledEntityType
     /// <summary>
     ///     The event is set for somewhere externally from discord.
     /// </summary>
-    External = 3,
+    External = 3
 }

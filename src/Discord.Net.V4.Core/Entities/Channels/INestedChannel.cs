@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace Discord;
 
 /// <summary>
@@ -12,7 +9,7 @@ public interface INestedChannel : IGuildChannel, IInvitableChannel
     ///     Gets the parent (category) of this channel in the guild's channel list.
     /// </summary>
     /// <returns>
-    ///     A <see cref="IEntitySource{TId, TEntity}"/> representing the category of this channel;
+    ///     A <see cref="IEntitySource{TId, TEntity}" /> representing the category of this channel;
     ///     <see langword="null" /> if none is set.
     /// </returns>
     IEntitySource<ulong, ICategoryChannel>? Category { get; }
@@ -21,7 +18,7 @@ public interface INestedChannel : IGuildChannel, IInvitableChannel
     ///     Syncs the permissions of this nested channel with its parent's.
     /// </summary>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents the asynchronous operation for syncing channel permissions with its parent's.
     /// </returns>

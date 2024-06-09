@@ -5,13 +5,13 @@ namespace Discord;
 /// </summary>
 public enum ChannelFlags
 {
-    /// <summary> 
+    /// <summary>
     ///     Default value for flags, when none are given to a channel.
     /// </summary>
     None = 0,
 
     /// <summary>
-    ///      Flag given to a thread channel pinned on top of parent forum channel.
+    ///     Flag given to a thread channel pinned on top of parent forum channel.
     /// </summary>
     Pinned = 1 << 1,
 

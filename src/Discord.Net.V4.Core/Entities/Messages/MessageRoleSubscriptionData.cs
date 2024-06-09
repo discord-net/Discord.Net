@@ -1,7 +1,7 @@
 namespace Discord;
 
 /// <summary>
-///     Represents a role subscription data in <see cref="IMessage"/>.
+///     Represents a role subscription data in <see cref="IMessage" />.
 /// </summary>
 public readonly struct MessageRoleSubscriptionData
 {

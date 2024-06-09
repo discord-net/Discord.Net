@@ -1,5 +1,3 @@
-using System;
-
 namespace Discord;
 
 [Flags]
@@ -23,5 +21,5 @@ public enum AttachmentFlags
     /// <summary>
     ///     Indicates that this attachment has been edited using the remix feature on mobile.
     /// </summary>
-    IsRemix = 1 << 2,
+    IsRemix = 1 << 2
 }

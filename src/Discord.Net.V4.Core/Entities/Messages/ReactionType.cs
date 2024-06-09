@@ -10,5 +10,5 @@ public enum ReactionType
     /// <summary>
     ///     The reaction is a super reaction.
     /// </summary>
-    Burst = 1,
+    Burst = 1
 }

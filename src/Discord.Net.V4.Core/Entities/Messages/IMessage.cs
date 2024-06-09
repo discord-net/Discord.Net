@@ -16,7 +16,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     ///     Gets the flags related to this message.
     /// </summary>
     /// <remarks>
-    ///     This value is determined by bitwise OR-ing <see cref="MessageFlags"/> values together.
+    ///     This value is determined by bitwise OR-ing <see cref="MessageFlags" /> values together.
     /// </remarks>
     MessageFlags Flags { get; }
 
@@ -24,7 +24,8 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     ///     Gets the value that indicates whether or not this message's embeds are suppressed.
     /// </summary>
     /// <returns>
-    ///     <see langword="true" /> if the embeds in this message have been suppressed (made invisible); otherwise <see langword="false" />.
+    ///     <see langword="true" /> if the embeds in this message have been suppressed (made invisible); otherwise
+    ///     <see langword="false" />.
     /// </returns>
     bool IsSuppressed
         => Flags.HasFlag(MessageFlags.SuppressEmbeds);
@@ -41,7 +42,8 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     ///     Gets the value that indicates whether this message is pinned.
     /// </summary>
     /// <returns>
-    ///     <see langword="true" /> if this message was added to its channel's pinned messages; otherwise <see langword="false" />.
+    ///     <see langword="true" /> if this message was added to its channel's pinned messages; otherwise
+    ///     <see langword="false" />.
     /// </returns>
     bool IsPinned { get; }
 
@@ -57,7 +59,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     ///     Gets the content for this message.
     /// </summary>
     /// <remarks>
-    ///     This will be empty if the privileged <see cref="GatewayIntents.MessageContent"/> is disabled.
+    ///     This will be empty if the privileged <see cref="GatewayIntents.MessageContent" /> is disabled.
     /// </remarks>
     /// <returns>
     ///     A string that contains the body of the message; note that this field may be empty if there is an embed.
@@ -71,6 +73,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     ///     Time of when the message was sent.
     /// </returns>
     DateTimeOffset Timestamp { get; }
+
     /// <summary>
     ///     Gets the time of this message's last edit.
     /// </summary>
@@ -113,7 +116,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// <remarks>
     ///     This property gets a read-only collection of embeds associated with this message. Depending on the
     ///     message, a sent message may contain one or more embeds. This is usually true when multiple link previews
-    ///     are generated; however, only one <see cref="EmbedType.Rich"/> <see cref="Embed"/> can be featured.
+    ///     are generated; however, only one <see cref="EmbedType.Rich" /> <see cref="Embed" /> can be featured.
     /// </remarks>
     /// <returns>
     ///     A read-only collection of embed objects.
@@ -167,7 +170,7 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
 
     /// <summary>
-    ///     The <see cref="IMessageComponent"/>'s attached to this message
+    ///     The <see cref="IMessageComponent" />'s attached to this message
     /// </summary>
     IReadOnlyCollection<IMessageComponent> Components { get; }
 
@@ -183,15 +186,18 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     ///     Gets the interaction this message is a response to.
     /// </summary>
     /// <returns>
-    ///     A <see cref="IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null" />.
+    ///     A <see cref="IMessageInteraction" /> if the message is a response to an interaction; otherwise
+    ///     <see langword="null" />.
     /// </returns>
     IMessageInteraction? Interaction { get; }
 
     /// <summary>
-    ///     Gets the data of the role subscription purchase or renewal that prompted this <see cref="MessageType.RoleSubscriptionPurchase"/> message.
-    /// </summary> 
+    ///     Gets the data of the role subscription purchase or renewal that prompted this
+    ///     <see cref="MessageType.RoleSubscriptionPurchase" /> message.
+    /// </summary>
     /// <returns>
-    ///     A <see cref="MessageRoleSubscriptionData"/> if the message is a role subscription purchase message; otherwise <see langword="null" />.
+    ///     A <see cref="MessageRoleSubscriptionData" /> if the message is a role subscription purchase message; otherwise
+    ///     <see langword="null" />.
     /// </returns>
     MessageRoleSubscriptionData? RoleSubscriptionData { get; }
 }

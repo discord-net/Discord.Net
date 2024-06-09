@@ -43,5 +43,5 @@ public enum ComponentType
     /// <summary>
     ///     A select menu for picking from channels.
     /// </summary>
-    ChannelSelect = 8,
+    ChannelSelect = 8
 }

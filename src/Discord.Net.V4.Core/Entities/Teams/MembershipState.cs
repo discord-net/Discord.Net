@@ -7,5 +7,5 @@ public enum MembershipState
 {
     Invited,
 
-    Accepted,
+    Accepted
 }

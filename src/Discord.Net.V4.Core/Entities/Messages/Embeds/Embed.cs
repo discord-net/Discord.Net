@@ -1,52 +1,51 @@
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Drawing;
 
 namespace Discord;
 
 /// <summary>
-///     Represents an embed object seen in an <see cref="IUserMessage"/>.
+///     Represents an embed object seen in an <see cref="IUserMessage" />.
 /// </summary>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 public readonly struct Embed
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly EmbedType Type;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly string? Description;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly string? Url;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly string? Title;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly DateTimeOffset? Timestamp;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly Color? Color;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly EmbedImage? Image;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly EmbedVideo? Video;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly EmbedAuthor? Author;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly EmbedFooter? Footer;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly EmbedProvider? Provider;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly EmbedThumbnail? Thumbnail;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public readonly ImmutableArray<EmbedField> Fields;
 
     internal Embed(EmbedType type)
@@ -114,20 +113,21 @@ public readonly struct Embed
         => !(left == right);
 
     /// <summary>
-    /// Determines whether the specified object is equal to the current <see cref="Embed"/>.
+    ///     Determines whether the specified object is equal to the current <see cref="Embed" />.
     /// </summary>
     /// <remarks>
-    /// If the object passes is an <see cref="Embed"/>, <see cref="Equals(Embed)"/> will be called to compare the 2 instances
+    ///     If the object passes is an <see cref="Embed" />, <see cref="Equals(Embed)" /> will be called to compare the 2
+    ///     instances
     /// </remarks>
-    /// <param name="obj">The object to compare with the current <see cref="Embed"/></param>
+    /// <param name="obj">The object to compare with the current <see cref="Embed" /></param>
     /// <returns></returns>
     public override bool Equals(object? obj)
         => obj is Embed embed && Equals(embed);
 
     /// <summary>
-    /// Determines whether the specified <see cref="Embed"/> is equal to the current <see cref="Embed"/>
+    ///     Determines whether the specified <see cref="Embed" /> is equal to the current <see cref="Embed" />
     /// </summary>
-    /// <param name="embed">The <see cref="Embed"/> to compare with the current <see cref="Embed"/></param>
+    /// <param name="embed">The <see cref="Embed" /> to compare with the current <see cref="Embed" /></param>
     /// <returns></returns>
     public bool Equals(Embed? embed)
         => GetHashCode() == embed?.GetHashCode();
@@ -138,7 +138,8 @@ public readonly struct Embed
         unchecked
         {
             var hash = 17;
-            hash = hash * 23 + (Type, Title, Description, Timestamp, Color, Image, Video, Author, Footer, Provider, Thumbnail).GetHashCode();
+            hash = hash * 23 + (Type, Title, Description, Timestamp, Color, Image, Video, Author, Footer, Provider,
+                Thumbnail).GetHashCode();
             foreach (var field in Fields)
                 hash = hash * 23 + field.GetHashCode();
             return hash;

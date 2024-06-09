@@ -2,7 +2,8 @@ namespace Discord;
 
 public sealed class BasicApiRoute(string name, RequestMethod method, string endpoint, BucketInfo? bucket = null)
     : ApiRoute(name, method, endpoint, bucket)
-{}
+{
+}
 
 public sealed class ApiBodyRoute<TRequestBody>(
     string name,
@@ -34,7 +35,8 @@ public sealed class ApiBodyRoute<TRequestBody, TResponseBody>(
 
 public sealed class ApiRoute<TResponse>(string name, RequestMethod method, string endpoint, BucketInfo? bucket = null)
     : ApiRoute(name, method, endpoint, bucket)
-{}
+{
+}
 
 public abstract class ApiRoute(string name, RequestMethod method, string endpoint, BucketInfo? bucket = null)
 {
@@ -43,8 +45,5 @@ public abstract class ApiRoute(string name, RequestMethod method, string endpoin
     public string Endpoint { get; } = endpoint;
     public BucketInfo? Bucket { get; } = bucket;
 
-    public override string ToString()
-    {
-        return $"{Method.ToString().ToUpper()} {Endpoint} ({Name})";
-    }
+    public override string ToString() => $"{Method.ToString().ToUpper()} {Endpoint} ({Name})";
 }

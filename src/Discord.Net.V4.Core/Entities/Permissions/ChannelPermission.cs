@@ -134,7 +134,8 @@ public enum ChannelPermission : ulong
     UseApplicationCommands = 1L << 31,
 
     /// <summary>
-    ///     Allows for requesting to speak in stage channels. (This permission is under active development and may be changed or removed.)
+    ///     Allows for requesting to speak in stage channels. (This permission is under active development and may be changed
+    ///     or removed.)
     /// </summary>
     RequestToSpeak = 1L << 32,
 
@@ -181,5 +182,5 @@ public enum ChannelPermission : ulong
     /// <summary>
     ///     Allows sending voice messages.
     /// </summary>
-    SendVoiceMessages = 1L << 46,
+    SendVoiceMessages = 1L << 46
 }

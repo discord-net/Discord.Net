@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+namespace Discord;
 
-namespace Discord
+public interface IEntityProperties<T>
 {
-    public interface IEntityProperties<T>
-    {
-        T ToApiModel();
-    }
+    T ToApiModel();
 }

@@ -7,7 +7,7 @@ public interface ISnowflakeEntity : IEntity<ulong>
     ///     Gets when the snowflake was created.
     /// </summary>
     /// <returns>
-    ///     A <see cref="DateTimeOffset"/> representing when the entity was first created.
+    ///     A <see cref="DateTimeOffset" /> representing when the entity was first created.
     /// </returns>
     DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 }

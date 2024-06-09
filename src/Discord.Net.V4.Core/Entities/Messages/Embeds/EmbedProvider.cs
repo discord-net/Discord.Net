@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace Discord;
 
-/// <summary> A provider field for an <see cref="Embed"/>. </summary>
+/// <summary> A provider field for an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct EmbedProvider
 {
@@ -29,6 +29,7 @@ public readonly struct EmbedProvider
     }
 
     private string DebuggerDisplay => $"{Name} ({Url})";
+
     /// <summary>
     ///     Gets the name of the provider.
     /// </summary>
@@ -38,28 +39,32 @@ public readonly struct EmbedProvider
     public override string? ToString() => Name;
 
     public static bool operator ==(EmbedProvider? left, EmbedProvider? right)
-        => left is null ? right is null
+        => left is null
+            ? right is null
             : left.Equals(right);
 
     public static bool operator !=(EmbedProvider? left, EmbedProvider? right)
         => !(left == right);
 
     /// <summary>
-    ///     Determines whether the specified object is equal to the current <see cref="EmbedProvider"/>.
+    ///     Determines whether the specified object is equal to the current <see cref="EmbedProvider" />.
     /// </summary>
     /// <remarks>
-    ///     If the object passes is an <see cref="EmbedProvider"/>, <see cref="Equals(EmbedProvider?)"/> will be called to compare the 2 instances
+    ///     If the object passes is an <see cref="EmbedProvider" />, <see cref="Equals(EmbedProvider?)" /> will be called to
+    ///     compare the 2 instances
     /// </remarks>
-    /// <param name="obj">The object to compare with the current <see cref="EmbedProvider"/></param>
-    /// <inheritdoc/>
+    /// <param name="obj">The object to compare with the current <see cref="EmbedProvider" /></param>
+    /// <inheritdoc />
     public override bool Equals(object? obj)
         => obj is EmbedProvider embedProvider && Equals(embedProvider);
 
     /// <summary>
-    ///     Determines whether the specified <see cref="EmbedProvider"/> is equal to the current <see cref="EmbedProvider"/>
+    ///     Determines whether the specified <see cref="EmbedProvider" /> is equal to the current <see cref="EmbedProvider" />
     /// </summary>
-    /// <param name="embedProvider">The <see cref="EmbedProvider"/> to compare with the current <see cref="EmbedProvider"/></param>
-    /// <inheritdoc cref="Equals(object?)"/>
+    /// <param name="embedProvider">
+    ///     The <see cref="EmbedProvider" /> to compare with the current <see cref="EmbedProvider" />
+    /// </param>
+    /// <inheritdoc cref="Equals(object?)" />
     public bool Equals(EmbedProvider? embedProvider)
         => GetHashCode() == embedProvider?.GetHashCode();
 

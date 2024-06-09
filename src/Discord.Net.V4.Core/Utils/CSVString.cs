@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord;
 
 /// <summary>
@@ -17,13 +11,13 @@ public readonly struct CSVString
     public readonly string Value;
 
     /// <summary>
-    ///     Gets a string array formed from splitting the <see cref="Value"/> by a comma.
+    ///     Gets a string array formed from splitting the <see cref="Value" /> by a comma.
     /// </summary>
     public string[] Values
         => Value.Split(',');
 
     /// <summary>
-    ///     Constructs a new <see cref="CSVString"/>.
+    ///     Constructs a new <see cref="CSVString" />.
     /// </summary>
     /// <param name="collection">A collection of strings to be joined together by a comma.</param>
     public CSVString(IEnumerable<string> collection)
@@ -32,7 +26,7 @@ public readonly struct CSVString
     }
 
     /// <summary>
-    ///     Constructs a new <see cref="CSVString"/>.
+    ///     Constructs a new <see cref="CSVString" />.
     /// </summary>
     /// <param name="value">A string containing the list of values seperated by a comma.</param>
     public CSVString(string value)
@@ -40,11 +34,11 @@ public readonly struct CSVString
         Value = value;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override string ToString()
         => Value;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override int GetHashCode()
         => Value.GetHashCode();
 

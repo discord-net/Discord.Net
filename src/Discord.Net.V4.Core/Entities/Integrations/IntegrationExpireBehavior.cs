@@ -6,6 +6,7 @@ public enum IntegrationExpireBehavior
     ///     Removes a role from an expired subscriber.
     /// </summary>
     RemoveRole = 0,
+
     /// <summary>
     ///     Kicks an expired subscriber from the guild.
     /// </summary>

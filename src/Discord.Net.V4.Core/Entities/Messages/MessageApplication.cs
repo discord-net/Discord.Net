@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Discord;
 
 /// <summary>
-///     Represents an application found within a <see cref="IMessage"/>.
+///     Represents an application found within a <see cref="IMessage" />.
 /// </summary>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 public readonly struct MessageApplication
@@ -50,6 +50,7 @@ public readonly struct MessageApplication
 
     private string DebuggerDisplay
         => $"{Name} ({Id}): {Description}";
+
     public override string ToString()
         => DebuggerDisplay;
 }

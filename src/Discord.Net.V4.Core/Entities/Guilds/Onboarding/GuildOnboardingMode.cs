@@ -13,5 +13,5 @@ public enum GuildOnboardingMode
     /// <summary>
     ///     Counts Default Channels and Questions towards constraints.
     /// </summary>
-    Advanced = 1,
+    Advanced = 1
 }

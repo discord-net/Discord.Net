@@ -23,5 +23,5 @@ public enum GuildScheduledEventStatus
     /// <summary>
     ///     The event was canceled.
     /// </summary>
-    Cancelled = 4,
+    Cancelled = 4
 }

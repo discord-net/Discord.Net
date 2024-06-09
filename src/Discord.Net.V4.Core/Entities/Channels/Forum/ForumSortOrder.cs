@@ -1,7 +1,7 @@
 namespace Discord;
 
 /// <summary>
-/// Defines the rule used to order posts in forum channels.
+///     Defines the rule used to order posts in forum channels.
 /// </summary>
 public enum ForumSortOrder
 {

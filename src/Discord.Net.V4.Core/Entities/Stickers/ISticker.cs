@@ -17,7 +17,7 @@ public interface ISticker : IStickerItem
     ///     Gets the description of this sticker.
     /// </summary>
     /// <returns>
-    ///     A <see langword="string"/> with the description of this sticker.
+    ///     A <see langword="string" /> with the description of this sticker.
     /// </returns>
     string? Description { get; }
 

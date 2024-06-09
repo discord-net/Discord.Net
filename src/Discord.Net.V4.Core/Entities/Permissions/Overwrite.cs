@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Represent a permission overwrite object.
 /// </summary>
-public readonly struct Overwrite 
+public readonly struct Overwrite
 {
     /// <summary>
     ///     The unique identifier for the object this overwrite is targeting.
@@ -26,7 +26,7 @@ public readonly struct Overwrite
     public readonly GuildPermission Denied;
 
     /// <summary>
-    ///     Initializes a new <see cref="Overwrite"/> with provided target information and modified permissions.
+    ///     Initializes a new <see cref="Overwrite" /> with provided target information and modified permissions.
     /// </summary>
     public Overwrite(ulong targetId, PermissionTarget targetType, GuildPermission allowed, GuildPermission denied)
     {

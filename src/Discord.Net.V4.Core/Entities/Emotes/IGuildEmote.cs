@@ -10,6 +10,7 @@ public interface IGuildEmote : IEmote, ISnowflakeEntity, IModifyable<EmoteProper
     /// </summary>
     /// <returns>
     bool IsManaged { get; }
+
     /// <summary>
     ///     Gets whether this emoji must be wrapped in colons.
     /// </summary>
@@ -21,7 +22,7 @@ public interface IGuildEmote : IEmote, ISnowflakeEntity, IModifyable<EmoteProper
     bool IsAnimated { get; }
 
     /// <summary>
-    ///     Gets whether this emoji is available for use, may be <see langword="false"/> due to loss of Server Boosts
+    ///     Gets whether this emoji is available for use, may be <see langword="false" /> due to loss of Server Boosts
     /// </summary>
     bool IsAvailable { get; }
 

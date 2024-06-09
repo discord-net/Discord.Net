@@ -28,7 +28,8 @@ public enum RetryMode
     Retry502 = 0x8,
 
     /// <summary>
-    ///     Continuously retry a request until it times out, its cancel token is triggered, or the server responds with a non-502 error.
+    ///     Continuously retry a request until it times out, its cancel token is triggered, or the server responds with a
+    ///     non-502 error.
     /// </summary>
-    AlwaysRetry = RetryTimeouts | /*RetryErrors |*/ RetryRatelimit | Retry502,
+    AlwaysRetry = RetryTimeouts | /*RetryErrors |*/ RetryRatelimit | Retry502
 }

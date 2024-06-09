@@ -10,9 +10,10 @@ public interface INewsChannel : ITextChannel
     /// </summary>
     /// <param name="channelId">The target channel ID to receive messages.</param>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents the asynchronous operation of following the channel.
     /// </returns>
-    Task<ulong> FollowAnnouncementChannelAsync(ulong channelId, RequestOptions? options = null, CancellationToken token = default);
+    Task<ulong> FollowAnnouncementChannelAsync(ulong channelId, RequestOptions? options = null,
+        CancellationToken token = default);
 }

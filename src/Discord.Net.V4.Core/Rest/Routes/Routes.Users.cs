@@ -1,4 +1,3 @@
-using Discord.API;
 using Discord.Models.Json;
 using Discord.Utils;
 
@@ -10,6 +9,11 @@ public static partial class Routes
         = new(nameof(GetCurrentUser),
             RequestMethod.Get,
             "users/@me");
+
+    public static readonly ApiRoute<UserConnection> GetUserConnections
+        = new(nameof(GetUserConnections),
+            RequestMethod.Get,
+            "users/@me/connections");
 
     public static ApiRoute<User> GetUser(ulong userId)
         => new(nameof(GetUser),
@@ -47,26 +51,22 @@ public static partial class Routes
             "users/@me/channels",
             body);
 
-    public static ApiBodyRoute<CreateGroupDMChannelParams, GroupDMChannel> CreateGroupDm(CreateGroupDMChannelParams body)
+    public static ApiBodyRoute<CreateGroupDMChannelParams, GroupDMChannel> CreateGroupDm(
+        CreateGroupDMChannelParams body)
         => new(nameof(CreateGroupDm),
             RequestMethod.Post,
             "users/@me/channels",
             body);
-
-    public static readonly ApiRoute<UserConnection> GetUserConnections
-        = new(nameof(GetUserConnections),
-            RequestMethod.Get,
-            "users/@me/connections");
 
     public static ApiRoute<ApplicationRoleConnection> GetUserApplicationRoleConnection(ulong applicationId)
         => new(nameof(GetUserApplicationRoleConnection),
             RequestMethod.Get,
             $"/users/@me/applications/{applicationId}/role-connection");
 
-    public static ApiBodyRoute<ModifyUserRoleConnectionParams, ApplicationRoleConnection> UpdateUserApplicationRoleConnection(ulong applicationId, ModifyUserRoleConnectionParams body)
+    public static ApiBodyRoute<ModifyUserRoleConnectionParams, ApplicationRoleConnection>
+        UpdateUserApplicationRoleConnection(ulong applicationId, ModifyUserRoleConnectionParams body)
         => new(nameof(UpdateUserApplicationRoleConnection),
             RequestMethod.Put,
             $"/users/@me/applications/{applicationId}/role-connection",
-            body,
-            ContentType.JsonBody);
+            body);
 }

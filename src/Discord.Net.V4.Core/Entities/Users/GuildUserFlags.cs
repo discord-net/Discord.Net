@@ -38,5 +38,5 @@ public enum GuildUserFlags
     /// <remarks>
     ///     Cannot be modified.
     /// </remarks>
-    StartedOnboarding = 1 << 3,
+    StartedOnboarding = 1 << 3
 }

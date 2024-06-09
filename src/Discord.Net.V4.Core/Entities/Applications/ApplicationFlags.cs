@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord;
 
 /// <summary>
@@ -58,7 +52,7 @@ public enum ApplicationFlags
     GatewayMessageContentLimited = 1 << 19,
 
     /// <summary>
-    /// 	Indicates if an app has registered global application commands.
+    ///     Indicates if an app has registered global application commands.
     /// </summary>
     ApplicationCommandBadge = 1 << 23,
 
@@ -67,4 +61,3 @@ public enum ApplicationFlags
     /// </summary>
     ActiveApplication = 1 << 24
 }
-

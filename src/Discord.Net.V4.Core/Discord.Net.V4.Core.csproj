@@ -12,15 +12,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
+    <PackageReference Include="System.Interactive.Async" Version="6.0.1"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Discord.Net.Models\Discord.Net.Models.csproj" />
+    <ProjectReference Include="..\Discord.Net.Models\Discord.Net.Models.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="EntityProperties\Guilds\Onboarding\" />
+    <Folder Include="EntityProperties\Guilds\Onboarding\"/>
   </ItemGroup>
 
 </Project>

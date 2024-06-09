@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using StandardColor = System.Drawing.Color;
 
@@ -12,65 +11,86 @@ public readonly struct Color
 {
     /// <summary> Gets the max decimal value of color. </summary>
     public const uint MaxDecimalValue = 0xFFFFFF;
+
     /// <summary> Gets the default user color value. </summary>
     public static readonly Color Default = new(0);
+
     /// <summary> Gets the teal color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/1ABC9C">1ABC9C</see>.</returns>
     public static readonly Color Teal = new(0x1ABC9C);
+
     /// <summary> Gets the dark teal color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/11806A">11806A</see>.</returns>
     public static readonly Color DarkTeal = new(0x11806A);
+
     /// <summary> Gets the green color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/2ECC71">2ECC71</see>.</returns>
     public static readonly Color Green = new(0x2ECC71);
+
     /// <summary> Gets the dark green color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/1F8B4C">1F8B4C</see>.</returns>
     public static readonly Color DarkGreen = new(0x1F8B4C);
+
     /// <summary> Gets the blue color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/3498DB">3498DB</see>.</returns>
     public static readonly Color Blue = new(0x3498DB);
+
     /// <summary> Gets the dark blue color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/206694">206694</see>.</returns>
     public static readonly Color DarkBlue = new(0x206694);
+
     /// <summary> Gets the purple color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/9B59B6">9B59B6</see>.</returns>
     public static readonly Color Purple = new(0x9B59B6);
+
     /// <summary> Gets the dark purple color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/71368A">71368A</see>.</returns>
     public static readonly Color DarkPurple = new(0x71368A);
+
     /// <summary> Gets the magenta color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/E91E63">E91E63</see>.</returns>
     public static readonly Color Magenta = new(0xE91E63);
+
     /// <summary> Gets the dark magenta color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/AD1457">AD1457</see>.</returns>
     public static readonly Color DarkMagenta = new(0xAD1457);
+
     /// <summary> Gets the gold color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/F1C40F">F1C40F</see>.</returns>
     public static readonly Color Gold = new(0xF1C40F);
+
     /// <summary> Gets the light orange color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/C27C0E">C27C0E</see>.</returns>
     public static readonly Color LightOrange = new(0xC27C0E);
+
     /// <summary> Gets the orange color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/E67E22">E67E22</see>.</returns>
     public static readonly Color Orange = new(0xE67E22);
+
     /// <summary> Gets the dark orange color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/A84300">A84300</see>.</returns>
     public static readonly Color DarkOrange = new(0xA84300);
+
     /// <summary> Gets the red color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/E74C3C">E74C3C</see>.</returns>
     public static readonly Color Red = new(0xE74C3C);
+
     /// <summary> Gets the dark red color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/992D22">992D22</see>.</returns>
     public static readonly Color DarkRed = new(0x992D22);
+
     /// <summary> Gets the light grey color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/979C9F">979C9F</see>.</returns>
     public static readonly Color LightGrey = new(0x979C9F);
+
     /// <summary> Gets the lighter grey color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/95A5A6">95A5A6</see>.</returns>
     public static readonly Color LighterGrey = new(0x95A5A6);
+
     /// <summary> Gets the dark grey color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/607D8B">607D8B</see>.</returns>
     public static readonly Color DarkGrey = new(0x607D8B);
+
     /// <summary> Gets the darker grey color value. </summary>
     /// <returns> A color struct with the hex value of <see href="http://www.color-hex.com/color/546E7A">546E7A</see>.</returns>
     public static readonly Color DarkerGrey = new(0x546E7A);
@@ -84,13 +104,15 @@ public readonly struct Color
 
     /// <summary> Gets the red component for this color. </summary>
     public readonly byte R => (byte)(RawValue >> 16);
+
     /// <summary> Gets the green component for this color. </summary>
     public readonly byte G => (byte)(RawValue >> 8);
+
     /// <summary> Gets the blue component for this color. </summary>
-    public readonly byte B => (byte)(RawValue);
+    public readonly byte B => (byte)RawValue;
 
     /// <summary>
-    ///     Initializes a <see cref="Color"/> struct with the given raw value.
+    ///     Initializes a <see cref="Color" /> struct with the given raw value.
     /// </summary>
     /// <example>
     ///     The following will create a color that has a hex value of
@@ -100,11 +122,12 @@ public readonly struct Color
     ///     </code>
     /// </example>
     /// <param name="rawValue">The raw value of the color (e.g. <c>0x607D8B</c>).</param>
-    /// <exception cref="ArgumentException">Value exceeds <see cref="MaxDecimalValue"/>.</exception>
+    /// <exception cref="ArgumentException">Value exceeds <see cref="MaxDecimalValue" />.</exception>
     public Color(uint rawValue)
     {
         if (rawValue > MaxDecimalValue)
-            throw new ArgumentException($"{nameof(RawValue)} of color cannot be greater than {MaxDecimalValue}!", nameof(rawValue));
+            throw new ArgumentException($"{nameof(RawValue)} of color cannot be greater than {MaxDecimalValue}!",
+                nameof(rawValue));
 
         RawValue = rawValue;
     }
@@ -122,12 +145,12 @@ public readonly struct Color
     /// <param name="r">The byte that represents the red color.</param>
     /// <param name="g">The byte that represents the green color.</param>
     /// <param name="b">The byte that represents the blue color.</param>
-    /// <exception cref="ArgumentException">Value exceeds <see cref="MaxDecimalValue"/>.</exception>
+    /// <exception cref="ArgumentException">Value exceeds <see cref="MaxDecimalValue" />.</exception>
     public Color(byte r, byte g, byte b)
     {
-        uint value = ((uint)r << 16)
-                   | ((uint)g << 8)
-                   | (uint)b;
+        var value = ((uint)r << 16)
+                    | ((uint)g << 8)
+                    | b;
 
         if (value > MaxDecimalValue)
             throw new ArgumentException($"{nameof(RawValue)} of color cannot be greater than {MaxDecimalValue}!");
@@ -136,7 +159,7 @@ public readonly struct Color
     }
 
     /// <summary>
-    ///     Initializes a <see cref="Color"/> struct with the given RGB value.
+    ///     Initializes a <see cref="Color" /> struct with the given RGB value.
     /// </summary>
     /// <example>
     ///     The following will create a color that has a value of
@@ -158,11 +181,12 @@ public readonly struct Color
         if (b < 0 || b > 255)
             throw new ArgumentOutOfRangeException(nameof(b), "Value must be within [0,255].");
         RawValue = ((uint)r << 16)
-                 | ((uint)g << 8)
-                 | (uint)b;
+                   | ((uint)g << 8)
+                   | (uint)b;
     }
+
     /// <summary>
-    ///     Initializes a <see cref="Color"/> struct with the given RGB float value.
+    ///     Initializes a <see cref="Color" /> struct with the given RGB float value.
     /// </summary>
     /// <example>
     ///     The following will create a color that has a value of
@@ -184,8 +208,8 @@ public readonly struct Color
         if (b < 0.0f || b > 1.0f)
             throw new ArgumentOutOfRangeException(nameof(b), "Value must be within [0,1].");
         RawValue = ((uint)(r * 255.0f) << 16)
-                 | ((uint)(g * 255.0f) << 8)
-                 | (uint)(b * 255.0f);
+                   | ((uint)(g * 255.0f) << 8)
+                   | (uint)(b * 255.0f);
     }
 
     public static bool operator ==(Color lhs, Color rhs)
@@ -200,7 +224,7 @@ public readonly struct Color
     public static implicit operator uint(Color color)
         => color.RawValue;
 
-    public override readonly bool Equals(object? obj)
+    public readonly override bool Equals(object? obj)
         => obj is Color c && RawValue == c.RawValue;
 
     public override int GetHashCode() => RawValue.GetHashCode();
@@ -209,7 +233,7 @@ public readonly struct Color
         => StandardColor.FromArgb((int)color.RawValue);
 
     public static explicit operator Color(StandardColor color)
-        => new((uint)color.ToArgb() << 8 >> 8);
+        => new(((uint)color.ToArgb() << 8) >> 8);
 
     /// <summary>
     ///     Gets the hexadecimal representation of the color (e.g. <c>#000ccc</c>).
@@ -219,6 +243,7 @@ public readonly struct Color
     /// </returns>
     public override string ToString() =>
         string.Format("#{0:X6}", RawValue);
+
     private string DebuggerDisplay =>
         string.Format("#{0:X6} ({0})", RawValue);
 }

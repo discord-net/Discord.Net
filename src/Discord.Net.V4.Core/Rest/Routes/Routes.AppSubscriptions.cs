@@ -1,4 +1,3 @@
-using Discord.API;
 using Discord.Models.Json;
 
 namespace Discord.Rest;
@@ -10,12 +9,12 @@ public partial class Routes
             RequestMethod.Get,
             $"applications/{applicationId}/entitlements");
 
-    public static ApiBodyRoute<CreateTestEntitlementParams, Entitlement> CreateTestEntitlement(ulong applicationId, CreateTestEntitlementParams body)
+    public static ApiBodyRoute<CreateTestEntitlementParams, Entitlement> CreateTestEntitlement(ulong applicationId,
+        CreateTestEntitlementParams body)
         => new(nameof(CreateTestEntitlement),
             RequestMethod.Post,
             $"applications/{applicationId}/entitlements",
-            body,
-            ContentType.JsonBody);
+            body);
 
     public static BasicApiRoute DeleteTestEntitlement(ulong applicationId, ulong entitlementId)
         => new(nameof(DeleteTestEntitlement),

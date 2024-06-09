@@ -2,7 +2,8 @@ namespace Discord;
 
 /// <summary>
 ///     Represents different styles to use with buttons. You can see an example of
-///     the different styles at <see href="https://discord.com/developers/docs/interactions/message-components#button-object-button-styles"/>
+///     the different styles at
+///     <see href="https://discord.com/developers/docs/interactions/message-components#button-object-button-styles" />
 /// </summary>
 public enum ButtonStyle
 {
@@ -27,7 +28,7 @@ public enum ButtonStyle
     Danger = 4,
 
     /// <summary>
-    ///     A <see cref="Secondary"/> button with a little popup box indicating that this button is a link.
+    ///     A <see cref="Secondary" /> button with a little popup box indicating that this button is a link.
     /// </summary>
     Link = 5
 }

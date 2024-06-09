@@ -35,16 +35,20 @@ public static class CDN
     /// <param name="config">The client configuration.</param>
     /// <param name="userId">The user snowflake identifier.</param>
     /// <param name="avatarId">The avatar identifier.</param>
-    /// <param name="size">The size of the image to return in horizontal pixels. This can be any power of two between 16 and 2048.</param>
+    /// <param name="size">
+    ///     The size of the image to return in horizontal pixels. This can be any power of two between 16 and
+    ///     2048.
+    /// </param>
     /// <param name="format">The format to return.</param>
     /// <returns>
     ///     A URL pointing to the user's avatar in the specified size.
     /// </returns>
-    public static string? GetUserAvatarUrl(DiscordConfig config, ulong userId, string? avatarId, ushort size, ImageFormat format)
+    public static string? GetUserAvatarUrl(DiscordConfig config, ulong userId, string? avatarId, ushort size,
+        ImageFormat format)
     {
         if (avatarId == null)
             return null;
-        string extension = FormatToExtension(format, avatarId);
+        var extension = FormatToExtension(format, avatarId);
         return $"{config.CDNUrl}avatars/{userId}/{avatarId}.{extension}?size={size}";
     }
 
@@ -55,12 +59,16 @@ public static class CDN
     /// <param name="userId">The user snowflake identifier.</param>
     /// <param name="guildId">The guild snowflake identifier.</param>
     /// <param name="avatarId">The avatar identifier.</param>
-    /// <param name="size">The size of the image to return in horizontal pixels. This can be any power of two between 16 and 2048.</param>
+    /// <param name="size">
+    ///     The size of the image to return in horizontal pixels. This can be any power of two between 16 and
+    ///     2048.
+    /// </param>
     /// <param name="format">The format to return.</param>
     /// <returns>
     ///     A URL pointing to the user's avatar in the specified size.
     /// </returns>
-    public static string? GetGuildUserAvatarUrl(DiscordConfig config, ulong userId, ulong guildId, string? avatarId, ushort size, ImageFormat format)
+    public static string? GetGuildUserAvatarUrl(DiscordConfig config, ulong userId, ulong guildId, string? avatarId,
+        ushort size, ImageFormat format)
     {
         if (avatarId == null)
             return null;
@@ -74,16 +82,20 @@ public static class CDN
     /// <param name="config">The client configuration.</param>
     /// <param name="userId">The user snowflake identifier.</param>
     /// <param name="bannerId">The banner identifier.</param>
-    /// <param name="size">The size of the image to return in horizontal pixels. This can be any power of two between 16 and 2048.</param>
+    /// <param name="size">
+    ///     The size of the image to return in horizontal pixels. This can be any power of two between 16 and
+    ///     2048.
+    /// </param>
     /// <param name="format">The format to return.</param>
     /// <returns>
     ///     A URL pointing to the user's banner in the specified size.
     /// </returns>
-    public static string? GetUserBannerUrl(DiscordConfig config, ulong userId, string? bannerId, ushort size, ImageFormat format)
+    public static string? GetUserBannerUrl(DiscordConfig config, ulong userId, string? bannerId, ushort size,
+        ImageFormat format)
     {
         if (bannerId == null)
             return null;
-        string extension = FormatToExtension(format, bannerId);
+        var extension = FormatToExtension(format, bannerId);
         return $"{config.CDNUrl}banners/{userId}/{bannerId}.{extension}?size={size}";
     }
 
@@ -95,10 +107,8 @@ public static class CDN
     /// <returns>
     ///     A URL pointing to the user's default avatar when one isn't set.
     /// </returns>
-    public static string GetDefaultUserAvatarUrl(DiscordConfig config, ushort discriminator)
-    {
-        return $"{config.CDNUrl}embed/avatars/{discriminator % 5}.png";
-    }
+    public static string GetDefaultUserAvatarUrl(DiscordConfig config, ushort discriminator) =>
+        $"{config.CDNUrl}embed/avatars/{discriminator % 5}.png";
 
     /// <summary>
     ///     Returns the default user avatar URL.
@@ -108,10 +118,8 @@ public static class CDN
     /// <returns>
     ///     A URL pointing to the user's default avatar when one isn't set.
     /// </returns>
-    public static string GetDefaultUserAvatarUrl(DiscordConfig config, ulong userId)
-    {
-        return $"{config.CDNUrl}embed/avatars/{(userId >> 22) % 6}.png";
-    }
+    public static string GetDefaultUserAvatarUrl(DiscordConfig config, ulong userId) =>
+        $"{config.CDNUrl}embed/avatars/{(userId >> 22) % 6}.png";
 
     /// <summary>
     ///     Returns an icon URL.
@@ -180,16 +188,21 @@ public static class CDN
     /// <param name="guildId">The guild snowflake identifier.</param>
     /// <param name="bannerId">The banner image identifier.</param>
     /// <param name="format">The format to return.</param>
-    /// <param name="size">The size of the image to return in horizontal pixels. This can be any power of two between 16 and 2048 inclusive.</param>
+    /// <param name="size">
+    ///     The size of the image to return in horizontal pixels. This can be any power of two between 16 and
+    ///     2048 inclusive.
+    /// </param>
     /// <returns>
     ///     A URL pointing to the guild's banner image.
     /// </returns>
-    public static string? GetGuildBannerUrl(DiscordConfig config, ulong guildId, string? bannerId, ImageFormat format, ushort? size = null)
+    public static string? GetGuildBannerUrl(DiscordConfig config, ulong guildId, string? bannerId, ImageFormat format,
+        ushort? size = null)
     {
         if (string.IsNullOrEmpty(bannerId))
             return null;
-        string extension = FormatToExtension(format, bannerId);
-        return $"{config.CDNUrl}banners/{guildId}/{bannerId}.{extension}" + (size.HasValue ? $"?size={size}" : string.Empty);
+        var extension = FormatToExtension(format, bannerId);
+        return $"{config.CDNUrl}banners/{guildId}/{bannerId}.{extension}" +
+               (size.HasValue ? $"?size={size}" : string.Empty);
     }
 
     /// <summary>
@@ -215,7 +228,8 @@ public static class CDN
     /// <returns>
     ///     A URL pointing to the asset image in the specified size.
     /// </returns>
-    public static string GetRichAssetUrl(DiscordConfig config, ulong appId, string assetId, ushort size, ImageFormat format)
+    public static string GetRichAssetUrl(DiscordConfig config, ulong appId, string assetId, ushort size,
+        ImageFormat format)
     {
         var extension = FormatToExtension(format, "");
         return $"{config.CDNUrl}app-assets/{appId}/{assetId}.{extension}?size={size}";
@@ -230,6 +244,7 @@ public static class CDN
     /// </returns>
     public static string GetSpotifyAlbumArtUrl(string albumArtId)
         => $"https://i.scdn.co/image/{albumArtId}";
+
     /// <summary>
     ///     Returns a Spotify direct URL for a track.
     /// </summary>
@@ -249,7 +264,8 @@ public static class CDN
     /// <returns>
     ///     A URL to the sticker.
     /// </returns>
-    public static string GetStickerUrl(DiscordConfig config, ulong stickerId, StickerFormatType format = StickerFormatType.Png)
+    public static string GetStickerUrl(DiscordConfig config, ulong stickerId,
+        StickerFormatType format = StickerFormatType.Png)
         => $"{config.CDNUrl}stickers/{stickerId}.{FormatToExtension(format)}";
 
     /// <summary>
@@ -262,18 +278,19 @@ public static class CDN
     /// <param name="format">The format of the image.</param>
     /// <param name="size">The size of the image.</param>
     /// <returns></returns>
-    public static string GetEventCoverImageUrl(DiscordConfig config, ulong guildId, ulong eventId, string assetId, ImageFormat format = ImageFormat.Auto, ushort size = 1024)
+    public static string GetEventCoverImageUrl(DiscordConfig config, ulong guildId, ulong eventId, string assetId,
+        ImageFormat format = ImageFormat.Auto, ushort size = 1024)
         => $"{config.CDNUrl}guild-events/{eventId}/{assetId}.{FormatToExtension(format, assetId)}?size={size}";
 
-    private static string FormatToExtension(StickerFormatType format)
-    {
-        return format switch
+    private static string FormatToExtension(StickerFormatType format) =>
+        format switch
         {
-            StickerFormatType.None or StickerFormatType.Png or StickerFormatType.Apng => "png", // In the case of the Sticker endpoint, the sticker will be available as PNG if its format_type is PNG or APNG, and as Lottie if its format_type is LOTTIE.
+            StickerFormatType.None or StickerFormatType.Png
+                or StickerFormatType.Apng =>
+                "png", // In the case of the Sticker endpoint, the sticker will be available as PNG if its format_type is PNG or APNG, and as Lottie if its format_type is LOTTIE.
             StickerFormatType.Lottie => "lottie",
-            _ => throw new ArgumentException(nameof(format)),
+            _ => throw new ArgumentException(nameof(format))
         };
-    }
 
     private static string FormatToExtension(ImageFormat format, string imageId)
     {
@@ -285,7 +302,7 @@ public static class CDN
             ImageFormat.Jpeg => "jpeg",
             ImageFormat.Png => "png",
             ImageFormat.WebP => "webp",
-            _ => throw new ArgumentException(nameof(format)),
+            _ => throw new ArgumentException(nameof(format))
         };
     }
 }

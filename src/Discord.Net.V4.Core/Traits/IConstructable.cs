@@ -1,5 +1,4 @@
 using Discord.Models;
-using System.Runtime.Versioning;
 
 namespace Discord;
 
@@ -12,8 +11,6 @@ public interface IConstructable<in TModel>
 #pragma warning restore CA2252
 
     static T Create<T>(TModel model)
-        where T : IConstructable<TModel>
-    {
-        return T.Construct<T>(model);
-    }
+        where T : IConstructable<TModel> =>
+        Construct<T>(model);
 }

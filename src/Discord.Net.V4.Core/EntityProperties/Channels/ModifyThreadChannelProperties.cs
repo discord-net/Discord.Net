@@ -1,9 +1,9 @@
 namespace Discord;
 
 /// <summary>
-///     Provides properties that are used to modify an <see cref="IThreadChannel"/> with the specified changes.
+///     Provides properties that are used to modify an <see cref="IThreadChannel" /> with the specified changes.
 /// </summary>
-/// <seealso cref="IThreadChannel.ModifyAsync(Action{ModifyThreadChannelProperties}, RequestOptions)"/>
+/// <seealso cref="IThreadChannel.ModifyAsync(Action{ModifyThreadChannelProperties}, RequestOptions)" />
 public class ModifyThreadChannelProperties : ModifyTextChannelProperties
 {
     /// <summary>

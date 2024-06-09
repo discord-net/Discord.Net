@@ -1,7 +1,7 @@
 namespace Discord;
 
 /// <summary>
-///     Represents a partial <see cref="IDiscordInteraction"/> within a message.
+///     Represents a partial <see cref="IDiscordInteraction" /> within a message.
 /// </summary>
 public interface IMessageInteraction
 {
@@ -21,7 +21,7 @@ public interface IMessageInteraction
     string Name { get; }
 
     /// <summary>
-    ///     Gets the <seealso cref="IUser"/> who invoked the interaction.
+    ///     Gets the <seealso cref="IUser" /> who invoked the interaction.
     /// </summary>
     IEntitySource<ulong, IUser> User { get; }
 }

@@ -15,5 +15,5 @@ public enum AutoModActionType
     /// <summary>
     ///     Timeout user for a specified duration.
     /// </summary>
-    Timeout = 3,
+    Timeout = 3
 }

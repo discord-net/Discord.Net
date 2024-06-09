@@ -7,21 +7,26 @@ namespace Discord.Utils;
 public static class FormatUtils
 {
     // Characters which need escaping
-    private static readonly string[] SensitiveCharacters = {
-        "\\", "*", "_", "~", "`", ".", ":", "/", ">", "|" };
+    private static readonly string[] SensitiveCharacters = {"\\", "*", "_", "~", "`", ".", ":", "/", ">", "|"};
 
     /// <summary> Returns a markdown-formatted string with bold formatting. </summary>
     public static string Bold(string text) => $"**{text}**";
+
     /// <summary> Returns a markdown-formatted string with italics formatting. </summary>
     public static string Italics(string text) => $"*{text}*";
+
     /// <summary> Returns a markdown-formatted string with underline formatting. </summary>
     public static string Underline(string text) => $"__{text}__";
+
     /// <summary> Returns a markdown-formatted string with strike-through formatting. </summary>
     public static string Strikethrough(string text) => $"~~{text}~~";
+
     /// <summary> Returns a string with spoiler formatting. </summary>
     public static string Spoiler(string text) => $"||{text}||";
-    /// <summary> Returns a markdown-formatted URL. Only works in <see cref="EmbedBuilder"/> descriptions and fields. </summary>
+
+    /// <summary> Returns a markdown-formatted URL. Only works in <see cref="EmbedBuilder" /> descriptions and fields. </summary>
     public static string Url(string text, string url) => $"[{text}]({url})";
+
     /// <summary> Escapes a URL so that a preview is not generated. </summary>
     public static string EscapeUrl(string url) => $"<{url}>";
 
@@ -30,8 +35,7 @@ public static class FormatUtils
     {
         if (language != null || text.Contains("\n"))
             return $"```{language ?? ""}\n{text}\n```";
-        else
-            return $"`{text}`";
+        return $"`{text}`";
     }
 
     /// <summary> Sanitizes the string, safely escaping any Markdown sequences. </summary>
@@ -55,9 +59,9 @@ public static class FormatUtils
         if (string.IsNullOrWhiteSpace(text))
             return text;
 
-        StringBuilder result = new StringBuilder();
+        var result = new StringBuilder();
 
-        int startIndex = 0;
+        var startIndex = 0;
         int newLineIndex;
         do
         {
@@ -74,9 +78,9 @@ public static class FormatUtils
                 var str = text.Substring(startIndex, newLineIndex - startIndex);
                 result.Append($"> {str}\n");
             }
+
             startIndex = newLineIndex + 1;
-        }
-        while (newLineIndex != -1 && startIndex != text.Length);
+        } while (newLineIndex != -1 && startIndex != text.Length);
 
         return result.ToString();
     }
@@ -96,7 +100,7 @@ public static class FormatUtils
     }
 
     /// <summary>
-    /// Remove discord supported markdown from text.
+    ///     Remove discord supported markdown from text.
     /// </summary>
     /// <param name="text">The to remove markdown from.</param>
     /// <returns>Gets the unformatted text.</returns>
@@ -113,10 +117,8 @@ public static class FormatUtils
     /// <param name="doBidirectional">To format the string in bidirectional unicode or not</param>
     /// <param name="user">The user whose username and discriminator to format</param>
     /// <returns>The username + discriminator</returns>
-    public static string UsernameAndDiscriminator(IUser user, bool doBidirectional)
-    {
-        return doBidirectional
+    public static string UsernameAndDiscriminator(IUser user, bool doBidirectional) =>
+        doBidirectional
             ? $"\u2066{user.Username}\u2069#{user.Discriminator}"
             : $"{user.Username}#{user.Discriminator}";
-    }
 }

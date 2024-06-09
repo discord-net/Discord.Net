@@ -8,7 +8,7 @@ public interface ILoadableEntity<T>
     where T : class
 {
     /// <summary>
-    ///     Gets the entity if present; otherwise <see langword="null"/>.
+    ///     Gets the entity if present; otherwise <see langword="null" />.
     /// </summary>
     T? Value { get; }
 
@@ -20,8 +20,8 @@ public interface ILoadableEntity<T>
     /// <param name="options">Request options to use when making an API request.</param>
     /// <param name="token">A cancellation token used to cancel the asynchronous operation.</param>
     /// <returns>
-    ///     A <see cref="ValueTask"/> representing the asynchronous operation of loading
-    ///     the entity. The result of the <see cref="ValueTask"/> is the entity OR <see langword="null"/> if
+    ///     A <see cref="ValueTask" /> representing the asynchronous operation of loading
+    ///     the entity. The result of the <see cref="ValueTask" /> is the entity OR <see langword="null" /> if
     ///     the entity could not be loaded.
     /// </returns>
     ValueTask<T?> GetOrLoadAsync(RequestOptions? options = null, CancellationToken token = default)
@@ -37,8 +37,8 @@ public interface ILoadableEntity<T>
     /// <param name="options">Request options to use when making an API request.</param>
     /// <param name="token">A cancellation token used to cancel the asynchronous operation.</param>
     /// <returns>
-    ///     A <see cref="ValueTask"/> representing the asynchronous operation of loading
-    ///     the entity. The result of the <see cref="ValueTask"/> is the entity OR <see langword="null"/> if
+    ///     A <see cref="ValueTask" /> representing the asynchronous operation of loading
+    ///     the entity. The result of the <see cref="ValueTask" /> is the entity OR <see langword="null" /> if
     ///     the entity could not be loaded.
     /// </returns>
     ValueTask<T?> LoadAsync(RequestOptions? options = null, CancellationToken token = default);

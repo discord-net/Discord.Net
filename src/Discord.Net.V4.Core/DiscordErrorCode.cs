@@ -8,6 +8,7 @@ public enum DiscordErrorCode
     GeneralError = 0,
 
     #region UnknownXYZ (10XXX)
+
     UnknownAccount = 10001,
     UnknownApplication = 10002,
     UnknownChannel = 10003,
@@ -49,9 +50,11 @@ public enum DiscordErrorCode
     UnknownGuildWelcomeScreen = 10069,
     UnknownGuildScheduledEvent = 10070,
     UnknownGuildScheduledEventUser = 10071,
+
     #endregion
 
     #region General Actions (20XXX)
+
     UnknownTag = 10087,
     BotsCannotUse = 20001,
     OnlyBotsCanUse = 20002,
@@ -65,9 +68,11 @@ public enum DiscordErrorCode
     WriteRatelimitReached = 20029,
     WordsNotAllowed = 20031,
     GuildPremiumTooLow = 20035,
+
     #endregion
 
     #region Numeric Limits Reached (30XXX)
+
     MaximumGuildsReached = 30001,
     MaximumFriendsReached = 30002,
     MaximumPinsReached = 30003,
@@ -101,9 +106,11 @@ public enum DiscordErrorCode
     MaximumNumberOfWebhooksReached = 30058,
     MaximumNumberOfChannelPermissionOverwritesReached = 30060,
     TheChannelsForThisGuildAreTooLarge = 30061,
+
     #endregion
 
     #region General Request Errors (40XXX)
+
     TokenUnauthorized = 40001,
     InvalidVerification = 40002,
     OpeningDMTooFast = 40003,
@@ -122,9 +129,11 @@ public enum DiscordErrorCode
     ServiceResourceIsBeingRateLimited = 40062,
     ThereAreNoTagsAvailableThatCanBeSetByNonModerators = 40066,
     ATagIsRequiredToCreateAForumPostInThisChannel = 40067,
+
     #endregion
 
     #region Action Preconditions/Checks (50XXX)
+
     MissingPermissions = 50001,
     InvalidAccountType = 50002,
     CannotExecuteForDM = 50003,
@@ -184,38 +193,52 @@ public enum DiscordErrorCode
     FeatureInProcessOfRollingOut = 50155,
     CannotSendVoiceMessageInThisChannel = 50173,
     MissingPermissionToSendThisSticker = 50600,
+
     #endregion
 
     #region 2FA (60XXX)
+
     Requires2FA = 60003,
+
     #endregion
 
     #region User Searches (80XXX)
+
     NoUsersWithTag = 80004,
+
     #endregion
 
     #region Reactions (90XXX)
+
     ReactionBlocked = 90001,
+
     #endregion
 
     #region API Status (130XXX)
+
     ApplicationNotYetAvailable = 110001,
     APIOverloaded = 130000,
+
     #endregion
 
     #region Stage Errors (150XXX)
+
     StageAlreadyOpened = 150006,
+
     #endregion
 
     #region Reply and Thread Errors (160XXX)
+
     CannotReplyWithoutReadMessageHistory = 160002,
     MessageAlreadyContainsThread = 160004,
     ThreadIsLocked = 160005,
     MaximumActiveThreadsReached = 160006,
     MaximumAnnouncementThreadsReached = 160007,
+
     #endregion
 
     #region Sticker Uploads (170XXX)
+
     InvalidJSONLottie = 170001,
     LottieCantContainRasters = 170002,
     StickerMaximumFramerateExceeded = 170003,
@@ -223,14 +246,18 @@ public enum DiscordErrorCode
     LottieMaximumDimensionsExceeded = 170005,
     StickerFramerateBoundsExceeded = 170006,
     StickerAnimationDurationTooLong = 170007,
+
     #endregion
 
     #region Guild Scheduled Events
+
     CannotUpdateFinishedEvent = 180000,
     FailedStageCreation = 180002,
+
     #endregion
 
     #region Forum & Automod
+
     MessageWasBlockedByAutomaticModeration = 200000,
     TitleWasBlockedByAutomaticModeration = 200001,
     WebhooksPostedToForumChannelsMustHaveAThreadNameOrThreadId = 220001,
@@ -238,5 +265,6 @@ public enum DiscordErrorCode
     WebhooksCanOnlyCreateThreadsInForumChannels = 220003,
     WebhookServicesCannotBeUsedInForumChannels = 220004,
     MessageBlockedByHarmfulLinksFilter = 240000,
+
     #endregion
 }

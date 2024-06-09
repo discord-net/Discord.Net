@@ -15,5 +15,5 @@ public enum KeywordPresetTypes
     /// <summary>
     ///     Personal insults or words that may be considered hate speech.
     /// </summary>
-    Slurs = 3,
+    Slurs = 3
 }

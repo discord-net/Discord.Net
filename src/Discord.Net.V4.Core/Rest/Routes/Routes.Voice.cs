@@ -1,4 +1,3 @@
-using Discord.API;
 using Discord.Models.Json;
 
 namespace Discord.Rest;

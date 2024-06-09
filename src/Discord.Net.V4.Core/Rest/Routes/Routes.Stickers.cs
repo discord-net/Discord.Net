@@ -1,19 +1,18 @@
-using Discord.API;
 using Discord.Models.Json;
 
 namespace Discord.Rest;
 
 public static partial class Routes
 {
-    public static ApiRoute<Sticker> GetSticker(ulong stickerId)
-        => new(nameof(GetSticker),
-            RequestMethod.Get,
-            $"stickers/{stickerId}");
-
     public static readonly ApiRoute<StickerPack[]> ListStickerPacks
         = new(nameof(ListStickerPacks),
             RequestMethod.Get,
             "sticker-packs");
+
+    public static ApiRoute<Sticker> GetSticker(ulong stickerId)
+        => new(nameof(GetSticker),
+            RequestMethod.Get,
+            $"stickers/{stickerId}");
 
     public static ApiRoute<Sticker[]> ListGuildStickers(ulong guildId)
         => new(nameof(ListGuildStickers),
@@ -27,7 +26,8 @@ public static partial class Routes
             $"guilds/{guildId}/stickers/{stickerId}",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<CreateStickerProperties, Sticker> CreateGuildSticker(ulong guildId, CreateStickerProperties body)
+    public static ApiBodyRoute<CreateStickerProperties, Sticker> CreateGuildSticker(ulong guildId,
+        CreateStickerProperties body)
         => new(nameof(CreateGuildSticker),
             RequestMethod.Post,
             $"guilds/{guildId}/stickers",
@@ -35,7 +35,8 @@ public static partial class Routes
             ContentType.MultipartForm,
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyStickerProperties, Sticker> ModifyGuildSticker(ulong guildId, ModifyStickerProperties body)
+    public static ApiBodyRoute<ModifyStickerProperties, Sticker> ModifyGuildSticker(ulong guildId,
+        ModifyStickerProperties body)
         => new(nameof(ModifyGuildSticker),
             RequestMethod.Patch,
             $"guilds/{guildId}/stickers",

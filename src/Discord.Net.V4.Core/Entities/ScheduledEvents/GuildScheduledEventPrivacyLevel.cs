@@ -14,5 +14,5 @@ public enum GuildScheduledEventPrivacyLevel
     /// <summary>
     ///     The scheduled event is only accessible to guild members.
     /// </summary>
-    Private = 2,
+    Private = 2
 }

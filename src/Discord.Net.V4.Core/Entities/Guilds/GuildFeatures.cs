@@ -9,6 +9,7 @@ namespace Discord;
 public readonly struct GuildFeatures : IReadOnlySet<string>, IImmutableSet<string>
 {
     #region Features
+
     public const string AnimatedBanner = "ANIMATED_BANNER";
     public const string AnimatedIcon = "ANIMATED_ICON";
     public const string ApplicationCommandsPermissionsV2 = "APPLICATION_COMMAND_PERMISSIONS_V2";
@@ -28,7 +29,11 @@ public readonly struct GuildFeatures : IReadOnlySet<string>, IImmutableSet<strin
     public const string ForceRelay = "FORCE_RELAY";
     public const string HasDirectoryEntry = "HAS_DIRECTORY_ENTRY";
     public const string Hub = "HUB";
-    public const string InternalEmployeeOnly = "INTERNAL_EMPLOYEE_ONLY"; // sus :O (pls help i've not been fed in 23 days and quahu is keeping me in his basement)
+
+    public const string
+        InternalEmployeeOnly =
+            "INTERNAL_EMPLOYEE_ONLY"; // sus :O (pls help i've not been fed in 23 days and quahu is keeping me in his basement)
+
     public const string InviteSplash = "INVITE_SPLASH";
     public const string InvitesDisabled = "INVITES_DISABLED";
     public const string LinkedToHub = "LINKED_TO_HUB";
@@ -63,7 +68,7 @@ public readonly struct GuildFeatures : IReadOnlySet<string>, IImmutableSet<strin
 
     #endregion
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public int Count => _features.Count;
 
     internal string[] RawValue { get; }
@@ -76,54 +81,57 @@ public readonly struct GuildFeatures : IReadOnlySet<string>, IImmutableSet<strin
         _features = features.ToImmutableHashSet();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool Contains(string item) => _features.Contains(item);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsProperSubsetOf(IEnumerable<string> other) => _features.IsProperSubsetOf(other);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsProperSupersetOf(IEnumerable<string> other) => _features.IsProperSupersetOf(other);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsSubsetOf(IEnumerable<string> other) => _features.IsSubsetOf(other);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsSupersetOf(IEnumerable<string> other) => _features.IsSupersetOf(other);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool Overlaps(IEnumerable<string> other) => _features.Overlaps(other);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool SetEquals(IEnumerable<string> other) => _features.SetEquals(other);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IEnumerator<string> GetEnumerator() => ((IEnumerable<string>)_features).GetEnumerator();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_features).GetEnumerator();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IImmutableSet<string> Add(string value) => ((IImmutableSet<string>)_features).Add(value);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IImmutableSet<string> Clear() => ((IImmutableSet<string>)_features).Clear();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IImmutableSet<string> Except(IEnumerable<string> other) => ((IImmutableSet<string>)_features).Except(other);
 
-    /// <inheritdoc/>
-    public IImmutableSet<string> Intersect(IEnumerable<string> other) => ((IImmutableSet<string>)_features).Intersect(other);
+    /// <inheritdoc />
+    public IImmutableSet<string> Intersect(IEnumerable<string> other) =>
+        ((IImmutableSet<string>)_features).Intersect(other);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IImmutableSet<string> Remove(string value) => ((IImmutableSet<string>)_features).Remove(value);
 
-    /// <inheritdoc/>
-    public IImmutableSet<string> SymmetricExcept(IEnumerable<string> other) => ((IImmutableSet<string>)_features).SymmetricExcept(other);
+    /// <inheritdoc />
+    public IImmutableSet<string> SymmetricExcept(IEnumerable<string> other) =>
+        ((IImmutableSet<string>)_features).SymmetricExcept(other);
 
-    /// <inheritdoc/>
-    public bool TryGetValue(string equalValue, out string actualValue) => _features.TryGetValue(equalValue, out actualValue);
+    /// <inheritdoc />
+    public bool TryGetValue(string equalValue, out string actualValue) =>
+        _features.TryGetValue(equalValue, out actualValue);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IImmutableSet<string> Union(IEnumerable<string> other) => ((IImmutableSet<string>)_features).Union(other);
 }

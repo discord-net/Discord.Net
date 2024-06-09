@@ -11,5 +11,5 @@ public enum RoleFlags
     /// <summary>
     ///     Indicates that the role can be selected by members in an onboarding.
     /// </summary>
-    InPrompt = 1 << 0,
+    InPrompt = 1 << 0
 }

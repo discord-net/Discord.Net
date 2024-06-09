@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord;
 
 /// <summary>
@@ -11,5 +5,4 @@ namespace Discord;
 /// </summary>
 public interface IInvitableChannel : IGuildChannel
 {
-
 }

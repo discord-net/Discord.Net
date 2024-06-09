@@ -9,6 +9,7 @@ public interface ISelfUser : IUser, IModifyable<ModifySelfUserProperties>
     ///     Gets the email associated with this user.
     /// </summary>
     string Email { get; }
+
     /// <summary>
     ///     Indicates whether or not this user has their email verified.
     /// </summary>
@@ -16,23 +17,27 @@ public interface ISelfUser : IUser, IModifyable<ModifySelfUserProperties>
     ///     <see langword="true" /> if this user's email has been verified; <see langword="false" /> if not.
     /// </returns>
     bool IsVerified { get; }
+
     /// <summary>
     ///     Indicates whether or not this user has MFA enabled on their account.
     /// </summary>
     /// <returns>
-    ///     <see langword="true" /> if this user has enabled multi-factor authentication on their account; <see langword="false" /> if not.
+    ///     <see langword="true" /> if this user has enabled multi-factor authentication on their account;
+    ///     <see langword="false" /> if not.
     /// </returns>
     bool IsMfaEnabled { get; }
+
     /// <summary>
     ///     Gets the flags that are applied to a user's account.
     /// </summary>
     /// <remarks>
-    ///     This value is determined by bitwise OR-ing <see cref="UserProperties"/> values together.
+    ///     This value is determined by bitwise OR-ing <see cref="UserProperties" /> values together.
     /// </remarks>
     /// <returns>
     ///     The value of flags for this user.
     /// </returns>
     UserFlags Flags { get; }
+
     /// <summary>
     ///     Gets the type of Nitro subscription that is active on this user's account.
     /// </summary>
@@ -43,6 +48,7 @@ public interface ISelfUser : IUser, IModifyable<ModifySelfUserProperties>
     ///     The type of Nitro subscription the user subscribes to, if any.
     /// </returns>
     PremiumType PremiumType { get; }
+
     /// <summary>
     ///     Gets the user's chosen language option.
     /// </summary>

@@ -11,7 +11,7 @@ public enum VideoQualityMode
     Auto = 1,
 
     /// <summary>
-    /// 	720p.
+    ///     720p.
     /// </summary>
     Full = 2
 }

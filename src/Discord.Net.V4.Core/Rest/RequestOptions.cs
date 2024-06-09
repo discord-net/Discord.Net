@@ -6,6 +6,19 @@ namespace Discord;
 public sealed record RequestOptions
 {
     /// <summary>
+    ///     Initializes a new <see cref="RequestOptions" /> class with the default request timeout set in
+    ///     <see cref="DiscordConfig" />.
+    /// </summary>
+    public RequestOptions(int? timeout = null, bool? useSystemClock = null, string? auditLogReason = null,
+        RetryMode? retryMode = null)
+    {
+        UseSystemClock = useSystemClock;
+        AuditLogReason = auditLogReason;
+        RetryMode = retryMode;
+        Timeout = DiscordConfig.DefaultRequestTimeout;
+    }
+
+    /// <summary>
     ///     Gets or sets the maximum time to wait for this request to complete.
     /// </summary>
     /// <remarks>
@@ -14,7 +27,7 @@ public sealed record RequestOptions
     ///     and will not be unpaused in time, this request will fail immediately.
     /// </remarks>
     /// <returns>
-    ///     A <see cref="int"/> in milliseconds for when the request times out.
+    ///     A <see cref="int" /> in milliseconds for when the request times out.
     /// </returns>
     public int Timeout { get; set; }
 
@@ -33,27 +46,14 @@ public sealed record RequestOptions
     public string? AuditLogReason { get; set; }
 
     /// <summary>
-    ///		Gets or sets whether or not this request should use the system
-    ///		clock for rate-limiting. Defaults to <see langword="true" />.
+    ///     Gets or sets whether or not this request should use the system
+    ///     clock for rate-limiting. Defaults to <see langword="true" />.
     /// </summary>
     /// <remarks>
-    ///		This property can also be set in <see cref="DiscordConfig"/>.
-    ///		On a per-request basis, the system clock should only be disabled
-    ///		when millisecond precision is especially important, and the
-    ///		hosting system is known to have a desynced clock.
+    ///     This property can also be set in <see cref="DiscordConfig" />.
+    ///     On a per-request basis, the system clock should only be disabled
+    ///     when millisecond precision is especially important, and the
+    ///     hosting system is known to have a desynced clock.
     /// </remarks>
     public bool? UseSystemClock { get; set; }
-
-    /// <summary>
-    ///     Initializes a new <see cref="RequestOptions" /> class with the default request timeout set in
-    ///     <see cref="DiscordConfig"/>.
-    /// </summary>
-    public RequestOptions(int? timeout = null, bool? useSystemClock = null, string? auditLogReason = null,
-        RetryMode? retryMode = null)
-    {
-        UseSystemClock = useSystemClock;
-        AuditLogReason = auditLogReason;
-        RetryMode = retryMode;
-        Timeout = DiscordConfig.DefaultRequestTimeout;
-    }
 }

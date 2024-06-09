@@ -7,16 +7,16 @@ public static class EmbedBuilderExtensions
     public static EmbedBuilder WithColor(this EmbedBuilder builder, uint rawValue) =>
         builder.WithColor(new Color(rawValue));
 
-    /// <summary> Adds embed color based on the provided RGB <see cref="byte"/> value. </summary>
+    /// <summary> Adds embed color based on the provided RGB <see cref="byte" /> value. </summary>
     public static EmbedBuilder WithColor(this EmbedBuilder builder, byte r, byte g, byte b) =>
         builder.WithColor(new Color(r, g, b));
 
-    /// <summary> Adds embed color based on the provided RGB <see cref="int"/> value. </summary>
+    /// <summary> Adds embed color based on the provided RGB <see cref="int" /> value. </summary>
     /// <exception cref="ArgumentOutOfRangeException">The argument value is not between 0 to 255.</exception>
     public static EmbedBuilder WithColor(this EmbedBuilder builder, int r, int g, int b) =>
         builder.WithColor(new Color(r, g, b));
 
-    /// <summary> Adds embed color based on the provided RGB <see cref="float"/> value. </summary>
+    /// <summary> Adds embed color based on the provided RGB <see cref="float" /> value. </summary>
     /// <exception cref="ArgumentOutOfRangeException">The argument value is not between 0 to 1.</exception>
     public static EmbedBuilder WithColor(this EmbedBuilder builder, float r, float g, float b) =>
         builder.WithColor(new Color(r, g, b));
@@ -25,8 +25,8 @@ public static class EmbedBuilderExtensions
     public static EmbedBuilder WithAuthor(this EmbedBuilder builder, IUser user) =>
         builder.WithAuthor($"{user.Username}#{user.Discriminator}", user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
 
-    /// <summary> Converts a <see cref="EmbedType.Rich"/> <see cref="IEmbed"/> object to a <see cref="EmbedBuilder"/>. </summary>
-    /// <exception cref="InvalidOperationException">The embed type is not <see cref="EmbedType.Rich"/>.</exception>
+    /// <summary> Converts a <see cref="EmbedType.Rich" /> <see cref="IEmbed" /> object to a <see cref="EmbedBuilder" />. </summary>
+    /// <exception cref="InvalidOperationException">The embed type is not <see cref="EmbedType.Rich" />.</exception>
     public static EmbedBuilder ToEmbedBuilder(this Embed embed)
     {
         if (embed.Type != EmbedType.Rich)
@@ -34,19 +34,19 @@ public static class EmbedBuilderExtensions
 
         var builder = new EmbedBuilder
         {
-            Author = embed.Author.HasValue ? new EmbedAuthorBuilder
-            {
-                Name = embed.Author.Value.Name,
-                IconUrl = embed.Author?.IconUrl,
-                Url = embed.Author?.Url
-            } : null,
+            Author =
+                embed.Author.HasValue
+                    ? new EmbedAuthorBuilder
+                    {
+                        Name = embed.Author.Value.Name, IconUrl = embed.Author?.IconUrl, Url = embed.Author?.Url
+                    }
+                    : null,
             Color = embed.Color,
             Description = embed.Description,
-            Footer = embed.Footer.HasValue ? new EmbedFooterBuilder
-            {
-                Text = embed.Footer.Value.Text,
-                IconUrl = embed.Footer?.IconUrl
-            } : null,
+            Footer =
+                embed.Footer.HasValue
+                    ? new EmbedFooterBuilder {Text = embed.Footer.Value.Text, IconUrl = embed.Footer?.IconUrl}
+                    : null,
             ImageUrl = embed.Image?.Url,
             ThumbnailUrl = embed.Thumbnail?.Url,
             Timestamp = embed.Timestamp,
@@ -61,9 +61,9 @@ public static class EmbedBuilderExtensions
     }
 
     /// <summary>
-    ///     Adds the specified fields into this <see cref="EmbedBuilder"/>.
+    ///     Adds the specified fields into this <see cref="EmbedBuilder" />.
     /// </summary>
-    /// <exception cref="ArgumentException">Field count exceeds <see cref="EmbedBuilder.MaxFieldCount"/>.</exception>
+    /// <exception cref="ArgumentException">Field count exceeds <see cref="EmbedBuilder.MaxFieldCount" />.</exception>
     public static EmbedBuilder WithFields(this EmbedBuilder builder, IEnumerable<EmbedFieldBuilder> fields)
     {
         foreach (var field in fields)
@@ -71,8 +71,9 @@ public static class EmbedBuilderExtensions
 
         return builder;
     }
+
     /// <summary>
-    ///     Adds the specified fields into this <see cref="EmbedBuilder"/>.
+    ///     Adds the specified fields into this <see cref="EmbedBuilder" />.
     /// </summary>
     public static EmbedBuilder WithFields(this EmbedBuilder builder, params EmbedFieldBuilder[] fields)
         => WithFields(builder, fields.AsEnumerable());

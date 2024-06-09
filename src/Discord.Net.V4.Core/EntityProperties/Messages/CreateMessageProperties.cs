@@ -11,9 +11,7 @@ public sealed record CreateMessageProperties(
     Optional<IEnumerable<FileAttachment>> Attachments = default,
     Optional<MessageFlags> Flags = default)
 {
-    internal bool IsValid()
-    {
+    internal bool IsValid() =>
         // TODO: Validate
-        return true;
-    }
+        true;
 }

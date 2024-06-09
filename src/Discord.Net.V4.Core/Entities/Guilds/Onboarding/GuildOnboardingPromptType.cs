@@ -13,5 +13,5 @@ public enum GuildOnboardingPromptType
     /// <summary>
     ///     The prompt uses a dropdown menu.
     /// </summary>
-    Dropdown = 1,
+    Dropdown = 1
 }

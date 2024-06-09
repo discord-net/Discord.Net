@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord;
 
 /// <summary>
@@ -34,5 +28,5 @@ public enum AutoModTriggerType
     /// <summary>
     ///     Check if content contains more unique mentions than allowed.
     /// </summary>
-    MentionSpam = 5,
+    MentionSpam = 5
 }

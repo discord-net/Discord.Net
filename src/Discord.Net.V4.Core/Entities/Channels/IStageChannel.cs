@@ -15,22 +15,23 @@ public interface IStageChannel : IVoiceChannel
     /// </summary>
     /// <param name="topic">The topic for the stage/</param>
     /// <param name="sendStartNotification">
-    ///     Notify @everyone that a Stage instance has started, requires <see cref="GuildPermission.MentionEveryone"/>.
+    ///     Notify @everyone that a Stage instance has started, requires <see cref="GuildPermission.MentionEveryone" />.
     /// </param>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents the asynchronous start operation.
     /// </returns>
     Task<IStageInstance> StartStageAsync(
-        string topic, bool sendStartNotification = false, RequestOptions? options = null, CancellationToken token = default
+        string topic, bool sendStartNotification = false, RequestOptions? options = null,
+        CancellationToken token = default
     );
 
     /// <summary>
     ///     Stops the stage, deleting the stage instance.
     /// </summary>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents the asynchronous stop operation.
     /// </returns>
@@ -40,7 +41,7 @@ public interface IStageChannel : IVoiceChannel
     ///     Indicates that the bot would like to speak within a stage channel.
     /// </summary>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents the asynchronous request to speak operation.
     /// </returns>
@@ -50,7 +51,7 @@ public interface IStageChannel : IVoiceChannel
     ///     Makes the current user become a speaker within a stage.
     /// </summary>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents the asynchronous speaker modify operation.
     /// </returns>
@@ -60,7 +61,7 @@ public interface IStageChannel : IVoiceChannel
     ///     Makes the current user a listener.
     /// </summary>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents the asynchronous stop operation.
     /// </returns>
@@ -71,7 +72,7 @@ public interface IStageChannel : IVoiceChannel
     /// </summary>
     /// <param name="userId">The user to make the speaker.</param>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents the asynchronous move operation.
     /// </returns>
@@ -82,7 +83,7 @@ public interface IStageChannel : IVoiceChannel
     /// </summary>
     /// <param name="userId">The user to remove from speaking.</param>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents the asynchronous remove operation.
     /// </returns>

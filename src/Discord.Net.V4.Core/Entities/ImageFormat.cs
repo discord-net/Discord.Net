@@ -28,5 +28,5 @@ public enum ImageFormat
     /// <summary>
     ///     Use GIF.
     /// </summary>
-    Gif,
+    Gif
 }

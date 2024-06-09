@@ -1,5 +1,3 @@
-using Discord.Entities.Channels.Threads;
-
 namespace Discord;
 
 /// <summary>
@@ -37,8 +35,8 @@ public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyabl
     ///     Gets the current rate limit on creating posts in this forum channel.
     /// </summary>
     /// <returns>
-    ///     An <see cref="int"/> representing the time in seconds required before the user can send another
-    ///     message; <see langword="null"/> if disabled.
+    ///     An <see cref="int" /> representing the time in seconds required before the user can send another
+    ///     message; <see langword="null" /> if disabled.
     /// </returns>
     int? ThreadCreationInterval { get; }
 
@@ -46,13 +44,13 @@ public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyabl
     ///     Gets the current default slow-mode delay for threads in this forum channel.
     /// </summary>
     /// <returns>
-    ///     An <see cref="int"/> representing the time in seconds required before the user can send another
-    ///     message; <see langword="null"/> if disabled.
+    ///     An <see cref="int" /> representing the time in seconds required before the user can send another
+    ///     message; <see langword="null" /> if disabled.
     /// </returns>
     int? DefaultSlowModeInterval { get; }
 
     /// <summary>
-    /// 	Gets the emoji to show in the add reaction button on a thread in a forum channel
+    ///     Gets the emoji to show in the add reaction button on a thread in a forum channel
     /// </summary>
     ILoadableEntity<IEmote> DefaultReactionEmoji { get; }
 
@@ -60,7 +58,7 @@ public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyabl
     ///     Gets the rule used to order posts in forum channels.
     /// </summary>
     /// <remarks>
-    ///     Defaults to <see langword="null"/>, which indicates a preferred sort order hasn't been set
+    ///     Defaults to <see langword="null" />, which indicates a preferred sort order hasn't been set
     /// </remarks>
     ForumSortOrder? DefaultSortOrder { get; }
 
@@ -77,7 +75,7 @@ public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyabl
     /// <param name="archiveDuration">The archive duration of the post.</param>
     /// <param name="slowmode">The slowmode for the posts thread.</param>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents the asynchronous creation operation.
     /// </returns>
@@ -91,7 +89,7 @@ public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyabl
     ///     Gets a collection of active threads within this forum channel.
     /// </summary>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
     ///     a collection of active threads.
@@ -106,7 +104,7 @@ public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyabl
     /// <param name="limit">The optional limit of how many to get.</param>
     /// <param name="before">The optional date to return threads created before this timestamp.</param>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
     ///     a collection of publicly archived threads.
@@ -120,12 +118,12 @@ public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyabl
     ///     Gets a collection of privately archived threads within this forum channel.
     /// </summary>
     /// <remarks>
-    ///     The bot requires the <see cref="GuildPermission.ManageThreads"/> permission in order to execute this request.
+    ///     The bot requires the <see cref="GuildPermission.ManageThreads" /> permission in order to execute this request.
     /// </remarks>
     /// <param name="limit">The optional limit of how many to get.</param>
     /// <param name="before">The optional date to return threads created before this timestamp.</param>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
     ///     a collection of privately archived threads.
@@ -141,7 +139,7 @@ public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyabl
     /// <param name="limit">The optional limit of how many to get.</param>
     /// <param name="before">The optional date to return threads created before this timestamp.</param>
     /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
     ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
     ///     a collection of privately archived threads.

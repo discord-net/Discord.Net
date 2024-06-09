@@ -1,4 +1,3 @@
-using Discord.API;
 using Discord.Models.Json;
 using Discord.Utils;
 
@@ -18,7 +17,8 @@ public partial class Routes
             $"/guilds/{guildId}/scheduled-events/{eventId}",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<CreateGuildScheduledEventParams, GuildScheduledEvent> CreateGuildScheduledEvent(ulong guildId, CreateGuildScheduledEventParams body)
+    public static ApiBodyRoute<CreateGuildScheduledEventParams, GuildScheduledEvent> CreateGuildScheduledEvent(
+        ulong guildId, CreateGuildScheduledEventParams body)
         => new(nameof(CreateGuildScheduledEvent),
             RequestMethod.Post,
             $"/guilds/{guildId}/scheduled-events",
@@ -26,7 +26,8 @@ public partial class Routes
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyGuildScheduledEventParams, GuildScheduledEvent> ModifyGuildScheduledEvent(ulong guildId, ulong eventId, ModifyGuildScheduledEventParams body)
+    public static ApiBodyRoute<ModifyGuildScheduledEventParams, GuildScheduledEvent> ModifyGuildScheduledEvent(
+        ulong guildId, ulong eventId, ModifyGuildScheduledEventParams body)
         => new(nameof(ModifyGuildScheduledEvent),
             RequestMethod.Patch,
             $"/guilds/{guildId}/scheduled-events/{eventId}",
@@ -40,7 +41,8 @@ public partial class Routes
             $"/guilds/{guildId}/scheduled-events/{eventId}",
             (ScopeType.Guild, guildId));
 
-    public static ApiRoute<GuildScheduledEventUser[]> GetGuildScheduledEventUsers(ulong guildId, ulong eventId, int? limit = default,
+    public static ApiRoute<GuildScheduledEventUser[]> GetGuildScheduledEventUsers(ulong guildId, ulong eventId,
+        int? limit = default,
         bool? withMember = default, ulong? beforeId = default, ulong? afterId = default)
         => new(nameof(GetGuildScheduledEventUsers),
             RequestMethod.Get,

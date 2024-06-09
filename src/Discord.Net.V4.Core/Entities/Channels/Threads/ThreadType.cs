@@ -16,7 +16,8 @@ public enum ThreadType
     PublicThread = 11,
 
     /// <summary>
-    ///     Represents a temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited and those with the MANAGE_THREADS permission
+    ///     Represents a temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited and those
+    ///     with the MANAGE_THREADS permission
     /// </summary>
     PrivateThread = 12
 }

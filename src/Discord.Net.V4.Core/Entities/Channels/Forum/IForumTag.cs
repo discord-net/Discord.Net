@@ -17,7 +17,7 @@ public interface IForumTag : ISnowflakeEntity
 
     /// <summary>
     ///     Gets whether this tag can only be added to or removed from threads by a member
-    ///     with the <see cref="GuildPermissions.ManageThreads"/> permission
+    ///     with the <see cref="GuildPermissions.ManageThreads" /> permission
     /// </summary>
     bool IsModerated { get; }
 }

@@ -1,4 +1,3 @@
-using Discord.Utils;
 using System.Globalization;
 
 namespace Discord;
@@ -10,7 +9,7 @@ public interface IGuild : IPartialGuild, IDeletable, IModifyable<ModifyGuildProp
     ///     automatically moved to the AFK voice channel.
     /// </summary>
     /// <returns>
-    ///     An <see langword="int"/> representing the amount of time in seconds for a user to be marked as inactive
+    ///     An <see langword="int" /> representing the amount of time in seconds for a user to be marked as inactive
     ///     and moved into the AFK voice channel.
     /// </returns>
     int AFKTimeout { get; }
@@ -68,6 +67,7 @@ public interface IGuild : IPartialGuild, IDeletable, IModifyable<ModifyGuildProp
     ///     A URL pointing to the guild's splash image; <see langword="null" /> if none is set.
     /// </returns>
     string? SplashUrl => CDN.GetGuildSplashUrl(Client.Config, Id, SplashId);
+
     /// <summary>
     ///     Gets the ID of this guild's discovery splash image.
     /// </summary>
@@ -200,7 +200,7 @@ public interface IGuild : IPartialGuild, IDeletable, IModifyable<ModifyGuildProp
     ///     Gets the max bitrate for voice channels in this guild.
     /// </summary>
     /// <returns>
-    ///     A <see cref="int"/> representing the maximum bitrate value allowed by Discord in this guild.
+    ///     A <see cref="int" /> representing the maximum bitrate value allowed by Discord in this guild.
     /// </returns>
     int MaxBitrate { get; }
 
@@ -229,11 +229,12 @@ public interface IGuild : IPartialGuild, IDeletable, IModifyable<ModifyGuildProp
     ///     The preferred culture information of this guild.
     /// </returns>
     CultureInfo PreferredCulture { get; }
+
     /// <summary>
     ///     Gets whether the guild has the boost progress bar enabled.
     /// </summary>
     /// <returns>
-    ///     <see langword="true"/> if the boost progress bar is enabled; otherwise <see langword="false"/>.
+    ///     <see langword="true" /> if the boost progress bar is enabled; otherwise <see langword="false" />.
     /// </returns>
     bool IsBoostProgressBarEnabled { get; }
 

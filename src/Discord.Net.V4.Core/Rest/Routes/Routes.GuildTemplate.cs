@@ -1,4 +1,3 @@
-using Discord.API;
 using Discord.Models.Json;
 
 namespace Discord.Rest;
@@ -10,7 +9,8 @@ public partial class Routes
             RequestMethod.Get,
             $"guilds/templates/{templateCode}");
 
-    public static ApiBodyRoute<CreateGuildFromTemplateParams, Guild> CreateGuildFromTemplate(string templateCode, CreateGuildFromTemplateParams body)
+    public static ApiBodyRoute<CreateGuildFromTemplateParams, Guild> CreateGuildFromTemplate(string templateCode,
+        CreateGuildFromTemplateParams body)
         => new(nameof(CreateGuildFromTemplate),
             RequestMethod.Post,
             $"guilds/templates/{templateCode}",
@@ -28,7 +28,8 @@ public partial class Routes
             $"guilds/{guildId}/templates/{templateCode}",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyGuildTemplateParams, GuildTemplate> ModifyGuildTemplate(ulong guildId, string templateCode, ModifyGuildTemplateParams body)
+    public static ApiBodyRoute<ModifyGuildTemplateParams, GuildTemplate> ModifyGuildTemplate(ulong guildId,
+        string templateCode, ModifyGuildTemplateParams body)
         => new(nameof(ModifyGuildTemplate),
             RequestMethod.Patch,
             $"guilds/{guildId}/templates/{templateCode}",

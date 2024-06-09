@@ -18,8 +18,8 @@ public class ModifyForumChannelProperties : ModifyTextChannelProperties
     ///     Setting this value to anything above zero will require each user to wait X seconds before
     ///     creating another thread; setting this value to <c>0</c> will disable rate limits for this channel.
     ///     <note>
-    ///         Users with <see cref="Discord.ChannelPermission.ManageMessages"/> or 
-    ///         <see cref="ChannelPermission.ManageChannels"/> will be exempt from rate limits.
+    ///         Users with <see cref="Discord.ChannelPermission.ManageMessages" /> or
+    ///         <see cref="ChannelPermission.ManageChannels" /> will be exempt from rate limits.
     ///     </note>
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if the value does not fall within [0, 21600].</exception>

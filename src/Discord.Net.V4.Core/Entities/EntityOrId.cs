@@ -15,7 +15,7 @@ public readonly struct EntityOrId<TId, TEntity>
     public readonly TId Id;
 
     /// <summary>
-    ///     Constructs a new <see cref="EntityOrId{TId, TEntity}"/>.
+    ///     Constructs a new <see cref="EntityOrId{TId, TEntity}" />.
     /// </summary>
     /// <param name="id">The ID of the entity</param>
     public EntityOrId(TId id)
@@ -24,7 +24,7 @@ public readonly struct EntityOrId<TId, TEntity>
     }
 
     /// <summary>
-    ///     Constructs a new <see cref="EntityOrId{TId, TEntity}"/>.
+    ///     Constructs a new <see cref="EntityOrId{TId, TEntity}" />.
     /// </summary>
     /// <param name="entity">The entity of which to get the ID from.</param>
     public EntityOrId(TEntity entity)

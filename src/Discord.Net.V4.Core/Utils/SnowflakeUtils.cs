@@ -14,8 +14,9 @@ public static class SnowflakeUtils
     /// </returns>
     public static DateTimeOffset FromSnowflake(in ulong value)
         => DateTimeOffset.FromUnixTimeMilliseconds((long)((value >> 22) + 1420070400000UL));
+
     /// <summary>
-    ///     Generates a pseudo-snowflake identifier with a <see cref="DateTimeOffset"/>.
+    ///     Generates a pseudo-snowflake identifier with a <see cref="DateTimeOffset" />.
     /// </summary>
     /// <param name="value">The time to be used in the new snowflake.</param>
     /// <returns>

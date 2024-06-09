@@ -25,10 +25,12 @@ public class ModifyRoleProperties
     ///     This value may not be set if the role is an @everyone role.
     /// </remarks>
     public Optional<string> Name { get; set; }
+
     /// <summary>
-    ///     Gets or sets the role's <see cref="GuildPermission"/>.
+    ///     Gets or sets the role's <see cref="GuildPermission" />.
     /// </summary>
     public Optional<GuildPermission> Permissions { get; set; }
+
     /// <summary>
     ///     Gets or sets the position of the role. This is 0-based!
     /// </summary>
@@ -36,6 +38,7 @@ public class ModifyRoleProperties
     ///     This value may not be set if the role is an @everyone role.
     /// </remarks>
     public Optional<int> Position { get; set; }
+
     /// <summary>
     ///     Gets or sets the color of the role.
     /// </summary>
@@ -43,6 +46,7 @@ public class ModifyRoleProperties
     ///     This value may not be set if the role is an @everyone role.
     /// </remarks>
     public Optional<Color> Color { get; set; }
+
     /// <summary>
     ///     Gets or sets whether or not this role should be displayed independently in the user list.
     /// </summary>
@@ -50,24 +54,25 @@ public class ModifyRoleProperties
     ///     This value may not be set if the role is an @everyone role.
     /// </remarks>
     public Optional<bool> Hoist { get; set; }
+
     /// <summary>
     ///     Gets or sets the icon of the role.
     /// </summary>
     /// <remarks>
     ///     This value cannot be set at the same time as Emoji, as they are both exclusive.
-    ///     
     ///     Setting an Icon will override a currently existing Emoji if present.
     /// </remarks>
     public Optional<Image?> Icon { get; set; }
+
     /// <summary>
     ///     Gets or sets the unicode emoji of the role.
     /// </summary>
     /// <remarks>
     ///     This value cannot be set at the same time as Icon, as they are both exclusive.
-    ///
     ///     Setting an Emoji will override a currently existing Icon if present.
     /// </remarks>
     public Optional<Emoji> Emoji { get; set; }
+
     /// <summary>
     ///     Gets or sets whether or not this role can be mentioned.
     /// </summary>

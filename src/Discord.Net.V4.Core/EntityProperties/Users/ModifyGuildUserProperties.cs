@@ -1,5 +1,3 @@
-using System.Data;
-
 namespace Discord;
 
 /// <summary>
@@ -29,7 +27,7 @@ public sealed class ModifyGuildUserProperties
     /// </summary>
     /// <remarks>
     ///     To clear the user's nickname, this value can be set to <see langword="null" /> or
-    ///     <see cref="string.Empty"/>.
+    ///     <see cref="string.Empty" />.
     /// </remarks>
     public Optional<string> Nickname { get; set; }
 
@@ -39,11 +37,12 @@ public sealed class ModifyGuildUserProperties
     public Optional<IEnumerable<EntityOrId<ulong, IRole>>> Roles { get; set; }
 
     /// <summary>
-    ///     Moves a user to a voice channel. If <see langword="null" />, this user will be disconnected from their current voice channel.
+    ///     Moves a user to a voice channel. If <see langword="null" />, this user will be disconnected from their current
+    ///     voice channel.
     /// </summary>
     /// <remarks>
-    ///     This user MUST already be in a <see cref="IVoiceChannel"/> for this to work.
-    ///     When set, this property takes precedence over <see cref="ChannelId"/>.
+    ///     This user MUST already be in a <see cref="IVoiceChannel" /> for this to work.
+    ///     When set, this property takes precedence over <see cref="ChannelId" />.
     /// </remarks>
     public Optional<EntityOrId<ulong, IVoiceChannel>> Channel { get; set; }
 

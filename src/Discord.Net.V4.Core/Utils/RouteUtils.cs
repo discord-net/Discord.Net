@@ -1,4 +1,3 @@
-
 using System.Net;
 
 namespace Discord.Utils;

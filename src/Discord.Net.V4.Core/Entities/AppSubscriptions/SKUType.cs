@@ -8,7 +8,7 @@ public enum SKUType
     Subscription = 5,
 
     /// <summary>
-    ///     System-generated group for each <see cref="Subscription"/> SKU created.
+    ///     System-generated group for each <see cref="Subscription" /> SKU created.
     /// </summary>
-    SubscriptionGroup = 6,
+    SubscriptionGroup = 6
 }

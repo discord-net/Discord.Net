@@ -34,7 +34,8 @@ public interface IVoiceState
     ///     Gets a value that indicates whether this user has marked themselves as deafened.
     /// </summary>
     /// <returns>
-    ///     <see langword="true" /> if this user has deafened themselves (i.e. not permitted to listen to or speak to others); otherwise <see langword="false" />.
+    ///     <see langword="true" /> if this user has deafened themselves (i.e. not permitted to listen to or speak to others);
+    ///     otherwise <see langword="false" />.
     /// </returns>
     bool IsSelfDeafened
         => Flags.HasFlag(VoiceStateFlags.SelfDeafened);
@@ -53,7 +54,8 @@ public interface IVoiceState
     ///     Gets a value that indicates whether the user is muted by the current user.
     /// </summary>
     /// <returns>
-    ///     <see langword="true" /> if the guild is temporarily blocking audio to/from this user; otherwise <see langword="false" />.
+    ///     <see langword="true" /> if the guild is temporarily blocking audio to/from this user; otherwise
+    ///     <see langword="false" />.
     /// </returns>
     bool IsSuppressed
         => Flags.HasFlag(VoiceStateFlags.Suppressed);

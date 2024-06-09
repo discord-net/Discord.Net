@@ -1,7 +1,7 @@
 namespace Discord;
 
 /// <summary>
-///    Represents the types of application commands.
+///     Represents the types of application commands.
 /// </summary>
 public enum ApplicationCommandType : byte
 {

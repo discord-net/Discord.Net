@@ -3,15 +3,25 @@ using System.Collections.Immutable;
 namespace Discord;
 
 /// <summary>
-///     Represents a select menu component defined at <see href="https://discord.com/developers/docs/interactions/message-components#select-menu-object"/>
+///     Represents a select menu component defined at
+///     <see href="https://discord.com/developers/docs/interactions/message-components#select-menu-object" />
 /// </summary>
 public class SelectMenuComponent : IMessageComponent
 {
-    /// <inheritdoc/>
-    public ComponentType Type { get; }
-
-    /// <inheritdoc/>
-    public string CustomId { get; }
+    internal SelectMenuComponent(
+        string customId, IEnumerable<SelectMenuOption>? options, string? placeholder,
+        int minValues, int maxValues, bool disabled, ComponentType type,
+        IEnumerable<ChannelType>? channelTypes = null)
+    {
+        CustomId = customId;
+        Options = options?.ToImmutableArray();
+        Placeholder = placeholder;
+        MinValues = minValues;
+        MaxValues = maxValues;
+        IsDisabled = disabled;
+        Type = type;
+        ChannelTypes = channelTypes?.ToArray() ?? Array.Empty<ChannelType>();
+    }
 
     /// <summary>
     ///     Gets the menus options to select from.
@@ -43,18 +53,9 @@ public class SelectMenuComponent : IMessageComponent
     /// </summary>
     public IReadOnlyCollection<ChannelType>? ChannelTypes { get; }
 
-    internal SelectMenuComponent(
-        string customId, IEnumerable<SelectMenuOption>? options, string? placeholder,
-        int minValues, int maxValues, bool disabled, ComponentType type,
-        IEnumerable<ChannelType>? channelTypes = null)
-    {
-        CustomId = customId;
-        Options = options?.ToImmutableArray();
-        Placeholder = placeholder;
-        MinValues = minValues;
-        MaxValues = maxValues;
-        IsDisabled = disabled;
-        Type = type;
-        ChannelTypes = channelTypes?.ToArray() ?? Array.Empty<ChannelType>();
-    }
+    /// <inheritdoc />
+    public ComponentType Type { get; }
+
+    /// <inheritdoc />
+    public string CustomId { get; }
 }

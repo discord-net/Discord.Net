@@ -5,11 +5,8 @@ namespace Discord;
 /// </summary>
 public sealed class Emoji : IEmote
 {
-    /// <inheritdoc />
-    public string Name { get; }
-
     /// <summary>
-    ///     Initializes a new <see cref="Emoji"/> class with the provided Unicode.
+    ///     Initializes a new <see cref="Emoji" /> class with the provided Unicode.
     /// </summary>
     /// <param name="unicode">The pure UTF-8 encoding of an emoji.</param>
     public Emoji(string unicode)
@@ -17,11 +14,14 @@ public sealed class Emoji : IEmote
         Name = unicode;
     }
 
+    /// <inheritdoc />
+    public string Name { get; }
+
     /// <summary>
     ///     Gets the Unicode representation of this emoji.
     /// </summary>
     /// <returns>
-    ///     A string that resolves to <see cref="Emoji.Name"/>.
+    ///     A string that resolves to <see cref="Emoji.Name" />.
     /// </returns>
     public override string ToString() => Name;
 

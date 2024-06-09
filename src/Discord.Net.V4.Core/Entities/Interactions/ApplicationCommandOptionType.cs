@@ -1,7 +1,12 @@
 namespace Discord;
 
 /// <summary>
-///     The option type of the Slash command parameter, See <see href="https://discord.com/developers/docs/interactions/slash-commands#applicationcommandoptiontype">the discord docs</see>.
+///     The option type of the Slash command parameter, See
+///     <see href="https://discord.com/developers/docs/interactions/slash-commands#applicationcommandoptiontype">
+///         the
+///         discord docs
+///     </see>
+///     .
 /// </summary>
 public enum ApplicationCommandOptionType : byte
 {
@@ -16,47 +21,47 @@ public enum ApplicationCommandOptionType : byte
     SubCommandGroup = 2,
 
     /// <summary>
-    ///     A <see langword="string"/> of text.
+    ///     A <see langword="string" /> of text.
     /// </summary>
     String = 3,
 
     /// <summary>
-    ///     An <see langword="long"/>.
+    ///     An <see langword="long" />.
     /// </summary>
     Integer = 4,
 
     /// <summary>
-    ///     A <see langword="bool"/>.
+    ///     A <see langword="bool" />.
     /// </summary>
     Boolean = 5,
 
     /// <summary>
-    ///     A <see cref="IUser"/>.
+    ///     A <see cref="IUser" />.
     /// </summary>
     User = 6,
 
     /// <summary>
-    ///     A <see cref="IGuildChannel"/>.
+    ///     A <see cref="IGuildChannel" />.
     /// </summary>
     Channel = 7,
 
     /// <summary>
-    ///     A <see cref="IRole"/>.
+    ///     A <see cref="IRole" />.
     /// </summary>
     Role = 8,
 
     /// <summary>
-    ///     A <see cref="IUser"/> or <see cref="IRole"/>.
+    ///     A <see cref="IUser" /> or <see cref="IRole" />.
     /// </summary>
     Mentionable = 9,
 
     /// <summary>
-    ///     A <see cref="double"/>.
+    ///     A <see cref="double" />.
     /// </summary>
     Number = 10,
 
     /// <summary>
-    ///     A <see cref="IAttachment"/>.
+    ///     A <see cref="IAttachment" />.
     /// </summary>
     Attachment = 11
 }

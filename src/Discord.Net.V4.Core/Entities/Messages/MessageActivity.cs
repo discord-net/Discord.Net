@@ -19,6 +19,7 @@ public readonly struct MessageActivity
     ///     The type of activity of this message.
     /// </summary>
     public readonly MessageActivityType Type;
+
     /// <summary>
     ///     The party ID of this activity.
     /// </summary>

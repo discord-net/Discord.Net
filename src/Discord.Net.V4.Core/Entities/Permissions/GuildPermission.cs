@@ -67,7 +67,7 @@ public enum GuildPermission : ulong
     AddReactions = 1L << 6,
 
     /// <summary>
-    ///		Allows for viewing of audit logs.
+    ///     Allows for viewing of audit logs.
     /// </summary>
     ViewAuditLog = 1L << 7,
 
@@ -94,6 +94,7 @@ public enum GuildPermission : ulong
     ///     authentication when used on a guild that has server-wide 2FA enabled.
     /// </remarks>
     ManageMessages = 1L << 13,
+
     /// <summary>
     ///     Allows links sent by users with this permission will be auto-embedded.
     /// </summary>
@@ -151,7 +152,7 @@ public enum GuildPermission : ulong
     UseVAD = 1L << 25,
 
     /// <summary>
-    ///     Allows for using priority speaker in a voice channel.	
+    ///     Allows for using priority speaker in a voice channel.
     /// </summary>
     PrioritySpeaker = 1L << 8,
 
@@ -170,6 +171,7 @@ public enum GuildPermission : ulong
     ///     Allows for modification of other users nicknames.
     /// </summary>
     ManageNicknames = 1L << 27,
+
     /// <summary>
     ///     Allows management and editing of roles.
     /// </summary>
@@ -198,7 +200,7 @@ public enum GuildPermission : ulong
     ManageEmojisAndStickers = 1L << 30,
 
     /// <summary>
-    ///     Allows members to use application commands like slash commands and context menus in text channels.	
+    ///     Allows members to use application commands like slash commands and context menus in text channels.
     /// </summary>
     UseApplicationCommands = 1L << 31,
 
@@ -269,5 +271,5 @@ public enum GuildPermission : ulong
     /// <summary>
     ///     Allows sending voice messages.
     /// </summary>
-    SendVoiceMessages = 1L << 46,
+    SendVoiceMessages = 1L << 46
 }

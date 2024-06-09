@@ -1,5 +1,3 @@
-using System;
-
 namespace Discord;
 
 /// <summary>
@@ -28,9 +26,9 @@ public enum AllowedMentionTypes : byte
     ///     Controls user mentions.
     /// </summary>
     Users = 1 << 1,
-    
+
     /// <summary>
     ///     Controls <code>@everyone</code> and <code>@here</code> mentions.
     /// </summary>
-    Everyone = 1 << 2,
+    Everyone = 1 << 2
 }

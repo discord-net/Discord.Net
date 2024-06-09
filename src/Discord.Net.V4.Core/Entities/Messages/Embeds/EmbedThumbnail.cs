@@ -1,9 +1,8 @@
-using System;
 using System.Diagnostics;
 
 namespace Discord;
 
-/// <summary> A thumbnail featured in an <see cref="Embed"/>. </summary>
+/// <summary> A thumbnail featured in an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct EmbedThumbnail
 {
@@ -27,7 +26,7 @@ public readonly struct EmbedThumbnail
     ///     The height of this thumbnail.
     /// </summary>
     /// <returns>
-    ///     A <see cref="int"/> representing the height of this thumbnail if it can be retrieved; otherwise 
+    ///     A <see cref="int" /> representing the height of this thumbnail if it can be retrieved; otherwise
     ///     <see langword="null" />.
     /// </returns>
     public readonly int? Height;
@@ -36,7 +35,7 @@ public readonly struct EmbedThumbnail
     ///     The width of this thumbnail.
     /// </summary>
     /// <returns>
-    ///     A <see cref="int"/> representing the width of this thumbnail if it can be retrieved; otherwise 
+    ///     A <see cref="int" /> representing the width of this thumbnail if it can be retrieved; otherwise
     ///     <see langword="null" />.
     /// </returns>
     public readonly int? Width;
@@ -50,6 +49,7 @@ public readonly struct EmbedThumbnail
     }
 
     private string DebuggerDisplay => $"{Url} ({(Width != null && Height != null ? $"{Width}x{Height}" : "0x0")})";
+
     /// <summary>
     ///     Gets the URL of the thumbnail.
     /// </summary>
@@ -59,28 +59,34 @@ public readonly struct EmbedThumbnail
     public override string? ToString() => Url;
 
     public static bool operator ==(EmbedThumbnail? left, EmbedThumbnail? right)
-        => left is null ? right is null
+        => left is null
+            ? right is null
             : left.Equals(right);
 
     public static bool operator !=(EmbedThumbnail? left, EmbedThumbnail? right)
         => !(left == right);
 
     /// <summary>
-    ///     Determines whether the specified object is equal to the current <see cref="EmbedThumbnail"/>.
+    ///     Determines whether the specified object is equal to the current <see cref="EmbedThumbnail" />.
     /// </summary>
     /// <remarks>
-    ///     If the object passes is an <see cref="EmbedThumbnail"/>, <see cref="Equals(EmbedThumbnail?)"/> will be called to compare the 2 instances
+    ///     If the object passes is an <see cref="EmbedThumbnail" />, <see cref="Equals(EmbedThumbnail?)" /> will be called to
+    ///     compare the 2 instances
     /// </remarks>
-    /// <param name="obj">The object to compare with the current <see cref="EmbedThumbnail"/></param>
-    /// <inheritdoc/>
+    /// <param name="obj">The object to compare with the current <see cref="EmbedThumbnail" /></param>
+    /// <inheritdoc />
     public override bool Equals(object? obj)
         => obj is EmbedThumbnail embedThumbnail && Equals(embedThumbnail);
 
     /// <summary>
-    /// Determines whether the specified <see cref="EmbedThumbnail"/> is equal to the current <see cref="EmbedThumbnail"/>
+    ///     Determines whether the specified <see cref="EmbedThumbnail" /> is equal to the current
+    ///     <see cref="EmbedThumbnail" />
     /// </summary>
-    /// <param name="embedThumbnail">The <see cref="EmbedThumbnail"/> to compare with the current <see cref="EmbedThumbnail"/></param>
-    /// <inheritdoc cref="Equals(object?)"/>
+    /// <param name="embedThumbnail">
+    ///     The <see cref="EmbedThumbnail" /> to compare with the current
+    ///     <see cref="EmbedThumbnail" />
+    /// </param>
+    /// <inheritdoc cref="Equals(object?)" />
     public bool Equals(EmbedThumbnail? embedThumbnail)
         => GetHashCode() == embedThumbnail?.GetHashCode();
 

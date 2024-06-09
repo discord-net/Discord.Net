@@ -21,5 +21,5 @@ public enum WebhookType
     /// <summary>
     ///     An application (interaction) webhook.
     /// </summary>
-    Application = 3,
+    Application = 3
 }
