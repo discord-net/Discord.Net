@@ -185,7 +185,7 @@ public class DiscordConfig
     /// </returns>
     public string InviteUrl { get; set; } = "https://discord.gg/";
 
-    public JsonSerializerOptions JsonSerializerOptions { get; set; }
+    public JsonSerializerOptions? JsonSerializerOptions { get; set; }
 
     /// <summary>
     ///     Gets or sets how a request should act in the case of an error, by default.
