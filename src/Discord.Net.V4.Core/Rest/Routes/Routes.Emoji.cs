@@ -1,22 +1,23 @@
 using Discord.API;
+using Discord.Models.Json;
 
 namespace Discord.Rest;
 
 public partial class Routes
 {
-    public static ApiRoute<API.Emoji[]> ListGuildEmojis(ulong guildId)
+    public static ApiRoute<GuildEmote[]> ListGuildEmojis(ulong guildId)
         => new(nameof(ListGuildEmojis),
             RequestMethod.Get,
             $"guilds/{guildId}/emojis",
             (ScopeType.Guild, guildId));
 
-    public static ApiRoute<API.Emoji> GetGuildEmoji(ulong guildId, ulong emojiId)
+    public static ApiRoute<GuildEmote> GetGuildEmoji(ulong guildId, ulong emojiId)
         => new(nameof(GetGuildEmoji),
         RequestMethod.Get,
         $"guilds/{guildId}/emojis/{emojiId}",
         (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<CreateEmojiParams, API.Emoji> CreateGuildEmoji(ulong guildId, CreateEmojiParams body)
+    public static ApiBodyRoute<CreateEmojiParams, GuildEmote> CreateGuildEmoji(ulong guildId, CreateEmojiParams body)
         => new (nameof(CreateGuildEmoji),
             RequestMethod.Post,
             $"guilds/{guildId}/emojis",
@@ -24,7 +25,7 @@ public partial class Routes
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyEmojiParams, API.Emoji> ModifyGuildEmoji(ulong guildId, ulong emojiId, ModifyEmojiParams body)
+    public static ApiBodyRoute<ModifyEmojiParams, GuildEmote> ModifyGuildEmoji(ulong guildId, ulong emojiId, ModifyEmojiParams body)
         => new(nameof(ModifyGuildEmoji),
             RequestMethod.Patch,
             $"guilds/{guildId}/emojis/{emojiId}",

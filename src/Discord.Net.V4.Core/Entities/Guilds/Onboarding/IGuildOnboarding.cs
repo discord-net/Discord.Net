@@ -17,7 +17,7 @@ public interface IGuildOnboarding
     /// <summary>
     ///     Gets the guild this onboarding is part of.
     /// </summary>
-    IGuild Guild { get; }
+    IEntitySource<ulong, IGuild> Guild { get; }
 
     /// <summary>
     ///     Gets prompts shown during onboarding and in customize community.
@@ -43,9 +43,4 @@ public interface IGuildOnboarding
     ///     Gets whether the server does not meet requirements to enable guild onboarding.
     /// </summary>
     bool IsBelowRequirements { get; }
-
-    /// <summary>
-    ///     Modifies the onboarding object.
-    /// </summary>
-    Task ModifyAsync(Action<GuildOnboardingProperties> props, RequestOptions options = null);
 }

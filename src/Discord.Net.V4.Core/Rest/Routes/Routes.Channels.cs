@@ -1,4 +1,5 @@
 using Discord.API;
+using Discord.Models.Json;
 using System.Net;
 using Discord.Utils;
 

@@ -1,9 +1,10 @@
 using Discord.Models;
+using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
 
-public static partial class DiscordClienExtensions
+public static partial class DiscordClientExtensions
 {
     public static Task<T?> FetchUserAsync<T>(
         this IEntityProvider<T, IUser, IUserModel> provider,
@@ -17,7 +18,7 @@ public static partial class DiscordClienExtensions
 
     public static Task<T?> ModifyCurrentUserAsync<T>(
         this IEntityProvider<T, ISelfUser, IUserModel> provider,
-        PropertiesOrModel<ModifySelfUserProperties, API.ModifyCurrentUserParams> properties,
+        PropertiesOrModel<ModifySelfUserProperties, ModifyCurrentUserParams> properties,
         RequestOptions? options = null, CancellationToken token = default)
         where T : class, ISelfUser, IModifyable<ModifySelfUserProperties>, IConstructable<IUserModel>
     {

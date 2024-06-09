@@ -1,14 +1,21 @@
+using System.Security.Cryptography;
+using System.Text;
+
 namespace Discord;
 
-public readonly struct Image
+public readonly struct Image(Stream stream)
 {
-    public Stream Stream
-        => _stream;
+    public Stream Stream { get; } = stream;
 
-    private readonly Stream _stream;
-
-    public Image(Stream stream)
+    public string ToImageData()
     {
-        _stream = stream;
+        var sb = new StringBuilder("data:image/jpeg;base64,");
+        using (var base64Stream = new CryptoStream(Stream, new ToBase64Transform(), CryptoStreamMode.Read))
+        using (var reader = new StreamReader(base64Stream))
+        {
+            sb.Append(reader.ReadToEnd());
+        }
+
+        return sb.ToString();
     }
 }

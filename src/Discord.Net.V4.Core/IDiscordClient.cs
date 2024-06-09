@@ -13,4 +13,7 @@ public interface IDiscordClient : IDisposable, IAsyncDisposable
     IEntitySource<ulong, ISelfUser> CurrentUser { get; }
 
     IRestApiClient RestApiClient { get; }
+
+    internal DiscordConfig Config { get; }
+    internal RequestOptions DefaultRequestOptions { get; }
 }

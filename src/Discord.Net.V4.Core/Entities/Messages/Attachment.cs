@@ -1,6 +1,6 @@
 namespace Discord;
 
-public readonly struct Attachment : ISnowflakeEntity
+public readonly struct Attachment
 {
     /// <summary>
     ///     The ID of this attachment.
@@ -103,6 +103,4 @@ public readonly struct Attachment : ISnowflakeEntity
         Waveform = waveform;
         Flags = flags;
     }
-
-    ulong IEntity<ulong>.Id => Id;
 }

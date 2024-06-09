@@ -1,4 +1,5 @@
 using Discord.API;
+using Discord.Models.Json;
 using Discord.Utils;
 
 namespace Discord.Rest;
@@ -40,13 +41,13 @@ public static partial class Routes
             $"users/@me/guilds/{guildId}",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<CreateDMChannelParams, Channel> CreateDm(CreateDMChannelParams body)
+    public static ApiBodyRoute<CreateDMChannelParams, DMChannelModel> CreateDm(CreateDMChannelParams body)
         => new(nameof(CreateDm),
             RequestMethod.Post,
             "users/@me/channels",
             body);
 
-    public static ApiBodyRoute<CreateGroupDMChannelParams, Channel> CreateGroupDm(CreateGroupDMChannelParams body)
+    public static ApiBodyRoute<CreateGroupDMChannelParams, GroupDMChannel> CreateGroupDm(CreateGroupDMChannelParams body)
         => new(nameof(CreateGroupDm),
             RequestMethod.Post,
             "users/@me/channels",

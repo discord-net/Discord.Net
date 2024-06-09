@@ -1,4 +1,5 @@
 using Discord.API;
+using Discord.Models.Json;
 
 namespace Discord;
 
@@ -22,7 +23,7 @@ public sealed class ModifySelfUserProperties : IEntityProperties<ModifyCurrentUs
     {
         return new ModifyCurrentUserParams()
         {
-            Avatar = Avatar,
+            Avatar = Avatar.Map(v => v?.ToImageData()),
             Username = Username
         };
     }

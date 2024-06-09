@@ -162,14 +162,6 @@ public class DiscordConfig
     public RetryMode DefaultRetryMode { get; set; } = RetryMode.AlwaysRetry;
 
     /// <summary>
-    ///     Gets or sets the default callback for ratelimits.
-    /// </summary>
-    /// <remarks>
-    ///     This property is mutually exclusive with <see cref="RequestOptions.RatelimitCallback"/>.
-    /// </remarks>
-    public Func<IRateLimitInfo, Task>? DefaultRatelimitCallback { get; set; }
-
-    /// <summary>
     ///     Gets or sets whether the initial log entry should be printed.
     /// </summary>
     /// <remarks>

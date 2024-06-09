@@ -1,8 +1,4 @@
 using Discord.Entities.Channels.Threads;
-using Discord.EntityProperties.Channels;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Discord;
 
@@ -11,6 +7,9 @@ namespace Discord;
 /// </summary>
 public interface IThreadChannel : ITextChannel, IModifyable<ModifyThreadChannelProperties>
 {
+    IEntitySource<ulong, IUser>? Owner { get; }
+    IEntitySource<ulong, IThreadUser> CurrentUser { get; }
+
     /// <summary>
     ///     Gets the type of the current thread channel.
     /// </summary>
@@ -75,51 +74,4 @@ public interface IThreadChannel : ITextChannel, IModifyable<ModifyThreadChannelP
     ///     property will be that date.
     /// </remarks>
     new DateTimeOffset CreatedAt { get; }
-
-    /// <summary>
-    ///     Gets the id of the creator of the thread.
-    /// </summary>
-    ulong OwnerId { get; }
-
-    /// <summary>
-    ///     Joins the current thread.
-    /// </summary>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
-    /// <returns>
-    ///     A task that represents the asynchronous join operation.
-    /// </returns>
-    Task JoinAsync(RequestOptions? options = null, CancellationToken token = default);
-
-    /// <summary>
-    ///     Leaves the current thread.
-    /// </summary>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
-    /// <returns>
-    ///     A task that represents the asynchronous leave operation.
-    /// </returns>
-    Task LeaveAsync(RequestOptions? options = null, CancellationToken token = default);
-
-    /// <summary>
-    ///     Adds a user to this thread.
-    /// </summary>
-    /// <param name="userId">The user to add.</param>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
-    /// <returns>
-    ///     A task that represents the asynchronous operation of adding a member to a thread.
-    /// </returns>
-    Task AddUserAsync(ulong userId, RequestOptions? options = null, CancellationToken token = default);
-
-    /// <summary>
-    ///     Removes a user from this thread.
-    /// </summary>
-    /// <param name="user">The user to remove from this thread.</param>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
-    /// <returns>
-    ///     A task that represents the asynchronous operation of removing a user from this thread.
-    /// </returns>
-    Task RemoveUserAsync(ulong userId, RequestOptions? options = null, CancellationToken token = default);
 }

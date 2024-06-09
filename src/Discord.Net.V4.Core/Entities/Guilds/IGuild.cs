@@ -1,17 +1,10 @@
+using Discord.Utils;
 using System.Globalization;
 
 namespace Discord;
 
-public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<ModifyGuildProperties>
+public interface IGuild : IPartialGuild, IDeletable, IModifyable<ModifyGuildProperties>
 {
-    /// <summary>
-    ///     Gets the name of this guild.
-    /// </summary>
-    /// <returns>
-    ///     A string containing the name of this guild.
-    /// </returns>
-    string Name { get; }
-
     /// <summary>
     ///     Gets the amount of time (in seconds) a user must be inactive in a voice channel for until they are
     ///     automatically moved to the AFK voice channel.
@@ -50,7 +43,7 @@ public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<ModifyGuildP
     /// <returns>
     ///     The level of requirements.
     /// </returns>
-    VerificationLevel VerificationLevel { get; }
+    new VerificationLevel VerificationLevel { get; }
 
     /// <summary>
     ///     Gets the level of content filtering applied to user's content in a Guild.
@@ -61,28 +54,12 @@ public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<ModifyGuildP
     ExplicitContentFilterLevel ExplicitContentFilter { get; }
 
     /// <summary>
-    ///     Gets the ID of this guild's icon.
-    /// </summary>
-    /// <returns>
-    ///     An identifier for the splash image; <see langword="null" /> if none is set.
-    /// </returns>
-    string? IconId { get; }
-
-    /// <summary>
     ///     Gets the URL of this guild's icon.
     /// </summary>
     /// <returns>
     ///     A URL pointing to the guild's icon; <see langword="null" /> if none is set.
     /// </returns>
-    string? IconUrl => CDN.GetGuildIconUrl(Id, IconId);
-
-    /// <summary>
-    ///     Gets the ID of this guild's splash image.
-    /// </summary>
-    /// <returns>
-    ///     An identifier for the splash image; <see langword="null" /> if none is set.
-    /// </returns>
-    string? SplashId { get; }
+    string? IconUrl => CDN.GetGuildIconUrl(Client.Config, Id, IconId);
 
     /// <summary>
     ///     Gets the URL of this guild's splash image.
@@ -90,7 +67,7 @@ public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<ModifyGuildP
     /// <returns>
     ///     A URL pointing to the guild's splash image; <see langword="null" /> if none is set.
     /// </returns>
-    string? SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
+    string? SplashUrl => CDN.GetGuildSplashUrl(Client.Config, Id, SplashId);
     /// <summary>
     ///     Gets the ID of this guild's discovery splash image.
     /// </summary>
@@ -126,7 +103,7 @@ public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<ModifyGuildP
 
     IEntityEnumerableSource<ulong, IGuildSticker> Stickers { get; }
 
-    GuildFeatures Features { get; }
+    new GuildFeatures Features { get; }
 
     IEntityEnumerableSource<ulong, IRole> Roles { get; }
 
@@ -139,28 +116,12 @@ public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<ModifyGuildP
     PremiumTier PremiumTier { get; }
 
     /// <summary>
-    ///     Gets the identifier for this guilds banner image.
-    /// </summary>
-    /// <returns>
-    ///     An identifier for the banner image; <see langword="null" /> if none is set.
-    /// </returns>
-    string BannerId { get; }
-
-    /// <summary>
     ///     Gets the URL of this guild's banner image.
     /// </summary>
     /// <returns>
     ///     A URL pointing to the guild's banner image; <see langword="null" /> if none is set.
     /// </returns>
     string BannerUrl { get; }
-
-    /// <summary>
-    ///     Gets the code for this guild's vanity invite URL.
-    /// </summary>
-    /// <returns>
-    ///     A string containing the vanity invite code for this guild; <see langword="null" /> if none is set.
-    /// </returns>
-    string VanityURLCode { get; }
 
     /// <summary>
     ///     Gets the flags for the types of system channel messages that are disabled.
@@ -171,14 +132,6 @@ public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<ModifyGuildP
     SystemChannelFlags SystemChannelFlags { get; }
 
     /// <summary>
-    ///     Gets the description for the guild.
-    /// </summary>
-    /// <returns>
-    ///     The description for the guild; <see langword="null" /> if none is set.
-    /// </returns>
-    string Description { get; }
-
-    /// <summary>
     ///     Gets the number of premium subscribers of this guild.
     /// </summary>
     /// <remarks>
@@ -187,7 +140,7 @@ public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<ModifyGuildP
     /// <returns>
     ///     The number of premium subscribers of this guild; <see langword="null" /> if not available.
     /// </returns>
-    int PremiumSubscriptionCount { get; }
+    new int PremiumSubscriptionCount { get; }
 
     /// <summary>
     ///     Gets the maximum number of presences for the guild.
@@ -267,7 +220,7 @@ public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<ModifyGuildP
     /// <returns>
     ///     The NSFW level of this guild.
     /// </returns>
-    NsfwLevel NsfwLevel { get; }
+    new NsfwLevel NsfwLevel { get; }
 
     /// <summary>
     ///     Gets the preferred culture of this guild.
@@ -289,5 +242,8 @@ public interface IGuild : ISnowflakeEntity, IDeletable, IModifyable<ModifyGuildP
     /// </summary>
     ulong MaxUploadLimit { get; }
 
-
+    VerificationLevel? IPartialGuild.VerificationLevel => VerificationLevel;
+    GuildFeatures? IPartialGuild.Features => Features;
+    NsfwLevel? IPartialGuild.NsfwLevel => NsfwLevel;
+    int? IPartialGuild.PremiumSubscriptionCount => PremiumSubscriptionCount;
 }

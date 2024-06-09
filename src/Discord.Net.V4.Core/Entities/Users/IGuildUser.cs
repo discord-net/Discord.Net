@@ -1,6 +1,3 @@
-using Discord.EntityProperties.Users;
-using Discord.Models;
-
 namespace Discord;
 
 public interface IGuildUser : IUser, IModifyable<ModifyGuildUserProperties>
@@ -9,7 +6,7 @@ public interface IGuildUser : IUser, IModifyable<ModifyGuildUserProperties>
     ///     Gets when this user joined the guild.
     /// </summary>
     /// <returns>
-    ///     A <see cref="DateTimeOffset"/> representing the time of which the user has joined the guild; 
+    ///     A <see cref="DateTimeOffset"/> representing the time of which the user has joined the guild;
     ///     <see langword="null" /> when it cannot be obtained.
     /// </returns>
     DateTimeOffset? JoinedAt { get; }
