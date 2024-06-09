@@ -62,7 +62,7 @@ public interface IRole : ISnowflakeEntity, IDeletable, IMentionable, IComparable
     ///     An image url of the icon role.
     /// </returns>
     string? IconUrl
-        => CDN.GetGuildRoleIconUrl(Id, IconId);
+        => CDN.GetGuildRoleIconUrl(Client.Config, Id, IconId);
 
     /// <summary>
     ///     Gets the unicode emoji of this role.
