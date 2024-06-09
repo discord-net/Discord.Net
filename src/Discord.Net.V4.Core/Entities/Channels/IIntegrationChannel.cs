@@ -9,5 +9,5 @@ namespace Discord;
 /// </summary>
 public interface IIntegrationChannel : IGuildChannel
 {
-    
+
 }
