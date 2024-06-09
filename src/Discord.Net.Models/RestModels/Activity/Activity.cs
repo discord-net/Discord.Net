@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Activity : IActivityModel
+public sealed class Activity : IActivityModel, IEntityModelSource
 {
     [JsonPropertyName("name")]
     public required string Name { get; set; }
@@ -80,4 +80,10 @@ public sealed class Activity : IActivityModel
     DateTimeOffset? IActivityModel.TimestampStart => Timestamps.Map(v => v.Start);
 
     DateTimeOffset? IActivityModel.TimestampEnd => Timestamps.Map(v => v.End);
+
+    public IEnumerable<IEntityModel> GetEntities()
+    {
+        if (Emoji is {IsSpecified: true, Value: not null})
+            yield return Emoji.Value;
+    }
 }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Application : IApplicationModel
+public sealed class Application : IApplicationModel, IEntityModelSource
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -74,4 +74,13 @@ public sealed class Application : IApplicationModel
     public Optional<string[]> RedirectUris { get; set; }
 
     ulong? IApplicationModel.BotId => Bot.Map(v => v.Id);
+
+    public IEnumerable<IEntityModel> GetEntities()
+    {
+        if (Bot.IsSpecified)
+            yield return Bot.Value;
+
+        if (Owner.IsSpecified)
+            yield return Owner.Value;
+    }
 }

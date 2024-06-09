@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class StickerPack
+public sealed class StickerPack : IEntityModelSource
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -24,4 +24,6 @@ public sealed class StickerPack
 
     [JsonPropertyName("banner_asset_id")]
     public Optional<ulong> BannerAssetId { get; set; }
+
+    public IEnumerable<IEntityModel> GetEntities() => Stickers;
 }

@@ -4,8 +4,6 @@ namespace Discord.Models.Json;
 
 public sealed class Attachment : IAttachmentModel
 {
-
-
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
 

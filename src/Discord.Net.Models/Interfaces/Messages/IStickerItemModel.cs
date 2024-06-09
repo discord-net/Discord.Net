@@ -1,8 +1,7 @@
 namespace Discord.Models;
 
-public interface IStickerItemModel
+public interface IStickerItemModel : IEntityModel<ulong>
 {
-    ulong Id { get; }
     string Name { get; }
     int FormatType { get; }
 }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildScheduledEventUser
+public sealed class GuildScheduledEventUser : IEntityModelSource
 {
     [JsonPropertyName("guild_scheduled_event_id")]
     public ulong GuildScheduledEventId { get; set; }
@@ -12,4 +12,13 @@ public sealed class GuildScheduledEventUser
 
     [JsonPropertyName("member")]
     public Optional<GuildMember> Member { get; set; }
+
+    public IEnumerable<IEntityModel> GetEntities()
+    {
+        yield return User;
+
+        if (Member)
+            yield return Member.Value;
+
+    }
 }

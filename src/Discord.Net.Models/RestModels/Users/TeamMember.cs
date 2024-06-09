@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class TeamMember
+public sealed class TeamMember : IEntityModelSource
 {
     [JsonPropertyName("membership_state")]
     public required int MembershipState { get; set; }
@@ -15,4 +15,6 @@ public sealed class TeamMember
 
     [JsonPropertyName("user")]
     public required User User { get; set; }
+
+    public IEnumerable<IEntityModel> GetEntities() => [User];
 }

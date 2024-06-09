@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Interaction
+public sealed class Interaction : IEntityModelSource
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -48,4 +48,19 @@ public sealed class Interaction
 
     [JsonPropertyName("guild_locale")]
     public Optional<string> GuildLocale { get; set; }
+
+    public IEnumerable<IEntityModel> GetEntities()
+    {
+        if (Channel.IsSpecified)
+            yield return Channel.Value;
+
+        if (Member.IsSpecified)
+            yield return Member.Value;
+
+        if (User.IsSpecified)
+            yield return User.Value;
+
+        if (Message.IsSpecified)
+            yield return Message.Value;
+    }
 }

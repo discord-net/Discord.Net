@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Reaction : IReactionModel
+public sealed class Reaction : IReactionModel, IEntityModelSource
 {
     [JsonPropertyName("count")]
     public int Count { get; set; }
@@ -25,4 +25,9 @@ public sealed class Reaction : IReactionModel
     ulong? IReactionModel.EmojiId => (Emoji as GuildEmote)?.Id;
 
     string? IReactionModel.EmojiName => Emoji.Name;
+
+    public IEnumerable<IEntityModel> GetEntities()
+    {
+        yield return Emoji;
+    }
 }

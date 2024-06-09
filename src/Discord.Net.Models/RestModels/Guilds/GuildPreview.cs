@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildPreview
+public sealed class GuildPreview : IEntityModelSource
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -36,4 +36,6 @@ public sealed class GuildPreview
 
     [JsonPropertyName("stickers")]
     public required Sticker[] Stickers { get; set; }
+
+    public IEnumerable<IEntityModel> GetEntities() => [..Emojis, ..Stickers];
 }

@@ -44,4 +44,13 @@ public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel
     int? IGuildTextChannelModel.RatelimitPerUser => RatelimitPerUser;
 
     int IGuildTextChannelModel.DefaultArchiveDuration => DefaultAutoArchiveDuration;
+
+    public override IEnumerable<IEntityModel> GetEntities()
+    {
+        if(Member.IsSpecified)
+            yield return Member.Value;
+
+        foreach (var entity in base.GetEntities())
+            yield return entity;
+    }
 }

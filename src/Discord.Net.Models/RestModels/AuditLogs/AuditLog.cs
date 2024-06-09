@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class AuditLog
+public sealed class AuditLog : IEntityModelSource
 {
     [JsonPropertyName("application_commands")]
     public required ApplicationCommand[] Commands { get; set; }
@@ -27,4 +27,7 @@ public sealed class AuditLog
 
     [JsonPropertyName("webhooks")]
     public required Webhook[] Webhooks { get; set; }
+
+    public IEnumerable<IEntityModel> GetEntities()
+        => [..GuildScheduledEvents, ..Integrations, ..Threads, ..Users, ..Webhooks];
 }

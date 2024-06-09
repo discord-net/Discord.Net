@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Message : IMessageModel
+public sealed class Message : IMessageModel, IEntityModelSource
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -155,4 +155,22 @@ public sealed class Message : IMessageModel
     int? IMessageModel.TotalMonthsSubscribed => RoleSubscriptionData.Map(v => v.MonthsSubscribed);
 
     bool IMessageModel.IsRenewed => RoleSubscriptionData.Map(v => v.IsRenewal);
+
+    public IEnumerable<IEntityModel> GetEntities()
+    {
+        if (Author.IsSpecified)
+            yield return Author.Value;
+
+        foreach (var mention in UserMentions)
+            yield return mention;
+
+        if (ReferencedMessage is {IsSpecified: true, Value: not null})
+            yield return ReferencedMessage.Value;
+
+        if (Thread.IsSpecified)
+            yield return Thread.Value;
+
+        if(StickerItems.IsSpecified) foreach (var item in StickerItems.Value)
+            yield return item;
+    }
 }

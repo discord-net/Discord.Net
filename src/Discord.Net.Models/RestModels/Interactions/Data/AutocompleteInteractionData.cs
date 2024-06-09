@@ -1,8 +1,10 @@
+using Discord.Converters;
 using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class AutocompleteInteractionData
+[InteractionDataType(InteractionDataTypes.ApplicationCommandAutocomplete)]
+public sealed class AutocompleteInteractionData : InteractionData
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }

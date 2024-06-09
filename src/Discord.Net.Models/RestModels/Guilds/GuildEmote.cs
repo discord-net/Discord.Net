@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildEmote : IEmote, IGuildEmoteModel
+public sealed class GuildEmote : IEmote, IGuildEmoteModel, IEntityModelSource
 {
     [JsonPropertyName("id")]
     public required ulong Id { get; set; }
@@ -36,4 +36,10 @@ public sealed class GuildEmote : IEmote, IGuildEmoteModel
     bool IGuildEmoteModel.IsAvailable => Available;
 
     ulong IGuildEmoteModel.UserId => User.Map(v => v.Id);
+
+    public IEnumerable<IEntityModel> GetEntities()
+    {
+        if (User.IsSpecified)
+            yield return User.Value;
+    }
 }

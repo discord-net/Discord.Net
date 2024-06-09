@@ -90,6 +90,9 @@ public readonly struct Optional<T>
     {
         return !(left == right);
     }
+
+    public static bool operator true(Optional<T> value) => value.IsSpecified;
+    public static bool operator false(Optional<T> value) => !value.IsSpecified;
 }
 public static class Optional
 {

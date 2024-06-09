@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public class Invite : IInviteModel
+public class Invite : IInviteModel, IEntityModelSource
 {
     [JsonPropertyName("code")]
     public required string Code { get; set; }
@@ -56,4 +56,22 @@ public class Invite : IInviteModel
     DateTimeOffset? IInviteModel.ExpiresAt => ExpiresAt;
 
     ulong? IInviteModel.ScheduledEventId => ScheduledEvent.Map(v => v.Id);
+
+    public IEnumerable<IEntityModel> GetEntities()
+    {
+        if (Channel is not null)
+            yield return Channel;
+
+        if (TargetUser.IsSpecified)
+            yield return TargetUser.Value;
+
+        if (Inviter.IsSpecified)
+            yield return Inviter.Value;
+
+        if (TargetApplication.IsSpecified)
+            yield return TargetApplication.Value;
+
+        if (ScheduledEvent.IsSpecified)
+            yield return ScheduledEvent.Value;
+    }
 }

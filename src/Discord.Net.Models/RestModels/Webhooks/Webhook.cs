@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Webhook : IWebhookModel
+public sealed class Webhook : IWebhookModel, IEntityModelSource
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -45,4 +45,10 @@ public sealed class Webhook : IWebhookModel
     ulong? IWebhookModel.SourceChannelId => SourceChannel.Map(v => v.Id);
     string? IWebhookModel.Url => Url;
     ulong? IWebhookModel.UserId => Creator.Map(v => v.Id);
+
+    public IEnumerable<IEntityModel> GetEntities()
+    {
+        if (SourceChannel) yield return SourceChannel.Value;
+        if (Creator) yield return Creator.Value;
+    }
 }

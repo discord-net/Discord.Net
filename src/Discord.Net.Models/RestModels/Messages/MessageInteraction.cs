@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class MessageInteraction
+public sealed class MessageInteraction : IEntityModelSource
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -18,4 +18,12 @@ public sealed class MessageInteraction
 
     [JsonPropertyName("member")]
     public Optional<GuildMember> Member { get; set; }
+
+    public IEnumerable<IEntityModel> GetEntities()
+    {
+        yield return User;
+
+        if (Member.IsSpecified)
+            yield return Member.Value;
+    }
 }
