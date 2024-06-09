@@ -12,5 +12,5 @@ public interface IConstructable<in TModel>
 
     static T Create<T>(TModel model)
         where T : IConstructable<TModel> =>
-        Construct<T>(model);
+        T.Construct<T>(model);
 }
