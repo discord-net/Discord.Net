@@ -16,7 +16,7 @@ public abstract class ModifyChannelBaseProperties : IEntityProperties<ModifyChan
     /// </remarks>
     public Optional<string> Name { get; set; }
 
-    public ModifyChannelParams ToApiModel(ModifyChannelParams? existing = default)
+    public virtual ModifyChannelParams ToApiModel(ModifyChannelParams? existing = default)
     {
         existing ??= new();
 

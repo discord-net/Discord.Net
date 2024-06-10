@@ -64,17 +64,18 @@ public sealed class ModifyGuildUserProperties : IEntityProperties<ModifyGuildMem
     /// </remarks>
     public Optional<GuildUserFlags> Flags { get; set; }
 
-    public ModifyGuildMemberParams ToApiModel()
+    public ModifyGuildMemberParams ToApiModel(ModifyGuildMemberParams? existing = default)
     {
-        return new ModifyGuildMemberParams()
-        {
-            Nickname = Nickname,
-            IsDeaf = Deaf,
-            IsMute = Mute,
-            RoleIds = Roles.Map(v => v.Select(v => v.Id).ToArray()),
-            UserFlags = Flags.Map(v => (int)v),
-            CommunicationDisabledUntil = TimedOutUntil,
-            VoiceChannelId = Channel.Map(v => v?.Id)
-        };
+        existing ??= new();
+
+        existing.Nickname = Nickname;
+        existing.IsDeaf = Deaf;
+        existing.IsMute = Mute;
+        existing.RoleIds = Roles.Map(v => v.Select(v => v.Id).ToArray());
+        existing.UserFlags = Flags.Map(v => (int)v);
+        existing.CommunicationDisabledUntil = TimedOutUntil;
+        existing.VoiceChannelId = Channel.Map(v => v?.Id);
+
+        return existing;
     }
 }

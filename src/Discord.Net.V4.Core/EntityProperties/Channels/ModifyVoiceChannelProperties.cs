@@ -1,3 +1,5 @@
+using Discord.Models.Json;
+
 namespace Discord;
 
 /// <summary>
@@ -23,5 +25,18 @@ public class ModifyVoiceChannelProperties : ModifyGuildChannelProperties
     /// <summary>
     ///     Get or sets the video quality mode for this channel.
     /// </summary>
-    public Optional<VideoQualityMode> VideoQualityMode { get; set; }
+    public Optional<VideoQualityMode?> VideoQualityMode { get; set; }
+
+    public override ModifyGuildChannelParams ToApiModel(ModifyGuildChannelParams? existing = null)
+    {
+        existing ??= new();
+        base.ToApiModel(existing);
+
+        existing.Bitrate = Bitrate;
+        existing.UserLimit = UserLimit;
+        existing.RtcRegion = RTCRegion;
+        existing.VideoQualityMode = VideoQualityMode.Map(v => (int?)v);
+
+        return existing;
+    }
 }

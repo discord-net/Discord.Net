@@ -17,6 +17,13 @@ public class ModifyStageInstanceProperties : IEntityProperties<ModifyStageInstan
     /// </summary>
     public Optional<StagePrivacyLevel> PrivacyLevel { get; set; }
 
-    public ModifyStageInstanceParams ToApiModel()
-        => new() {Topic = Topic, PrivacyLevel = PrivacyLevel.Map(v => (int)v)};
+    public ModifyStageInstanceParams ToApiModel(ModifyStageInstanceParams? existing = default)
+    {
+        existing ??= new();
+
+        existing.Topic = Topic;
+        existing.PrivacyLevel = PrivacyLevel.Map(v => (int)v);
+
+        return existing;
+    }
 }

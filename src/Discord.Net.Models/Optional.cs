@@ -42,6 +42,9 @@ public readonly struct Optional<T>
     public T Or(T other)
         => IsSpecified ? _value ?? other : other;
 
+    public Optional<T> Or(Optional<T> other)
+        => IsSpecified ? this : other;
+
     public override bool Equals(object? other)
     {
         if(other is Optional<T> otherOptional)
@@ -78,6 +81,8 @@ public readonly struct Optional<T>
 
     [return: NotNullIfNotNull(nameof(other))]
     public static T operator |(Optional<T> value, T other) => value.Or(other);
+
+    public static Optional<T> operator |(Optional<T> value, Optional<T> other) => value.Or(other);
 
     public static T? operator ~(Optional<T> value) => value.GetValueOrDefault();
 

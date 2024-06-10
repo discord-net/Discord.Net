@@ -1,11 +1,12 @@
 using Discord.Entities.Channels.Threads;
+using Discord.Models.Json;
 
 namespace Discord;
 
 /// <summary>
 ///     Represents a thread channel inside of a guild.
 /// </summary>
-public interface IThreadChannel : ITextChannel, IModifiable<ModifyThreadChannelProperties>
+public interface IThreadChannel : ITextChannel, IModifiable<ModifyThreadChannelProperties, ModifyThreadChannelParams>
 {
     ILoadableEntity<ulong, IUser>? Owner { get; }
     ILoadableEntity<ulong, IThreadUser> CurrentUser { get; }

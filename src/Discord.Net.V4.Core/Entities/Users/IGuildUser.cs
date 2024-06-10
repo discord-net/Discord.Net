@@ -115,6 +115,6 @@ public interface IGuildUser : IUser, IModifiable<ModifyGuildUserProperties, Modi
     /// </summary>
     GuildUserFlags Flags { get; }
 
-    RouteFactory IModifiable<ModifyGuildUserProperties, ModifyGuildMemberParams>.Route
+    RouteFactory IModifiable<ModifyGuildUserProperties, ModifyGuildMemberParams>.ModifyRoute
         => args => Routes.ModifyGuildMember(Guild.Id, Id, args);
 }

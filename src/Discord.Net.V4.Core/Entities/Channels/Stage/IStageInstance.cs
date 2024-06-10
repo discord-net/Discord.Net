@@ -42,6 +42,6 @@ public interface IStageInstance : ISnowflakeEntity, IDeletable, IModifiable<Modi
     /// </summary>
     ILoadableEntity<ulong, IGuildScheduledEvent>? Event { get; }
 
-    RouteFactory IModifiable<ModifyStageInstanceProperties, ModifyStageInstanceParams>.Route
+    RouteFactory IModifiable<ModifyStageInstanceProperties, ModifyStageInstanceParams>.ModifyRoute
         => args => Routes.ModifyStageInstance(Channel.Id, args);
 }

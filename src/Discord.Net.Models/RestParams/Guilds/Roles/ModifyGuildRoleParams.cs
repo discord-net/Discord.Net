@@ -8,13 +8,13 @@ public sealed class ModifyGuildRoleParams
     public Optional<string> Name { get; set; }
 
     [JsonPropertyName("permissions")]
-    public Optional<string[]> Permissions { get; set; }
+    public Optional<string> Permissions { get; set; }
 
     [JsonPropertyName("color")]
     public Optional<uint> Color { get; set; }
 
     [JsonPropertyName("hoist")]
-    public Optional<bool> IsHoisted { get; set; }
+    public Optional<bool> Hoist { get; set; }
 
     [JsonPropertyName("icon")]
     public Optional<string?> Icon { get; set; }
@@ -23,5 +23,5 @@ public sealed class ModifyGuildRoleParams
     public Optional<string> UnicodeEmoji { get; set; }
 
     [JsonPropertyName("mentionable")]
-    public Optional<bool> IsMentionable { get; set; }
+    public Optional<bool> Mentionable { get; set; }
 }

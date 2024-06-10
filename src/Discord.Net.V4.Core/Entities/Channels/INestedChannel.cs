@@ -13,14 +13,4 @@ public interface INestedChannel : IGuildChannel, IInvitableChannel
     ///     <see langword="null" /> if none is set.
     /// </returns>
     ILoadableEntity<ulong, ICategoryChannel>? Category { get; }
-
-    /// <summary>
-    ///     Syncs the permissions of this nested channel with its parent's.
-    /// </summary>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
-    /// <returns>
-    ///     A task that represents the asynchronous operation for syncing channel permissions with its parent's.
-    /// </returns>
-    Task SyncPermissionsAsync(RequestOptions? options = null, CancellationToken token = default);
 }

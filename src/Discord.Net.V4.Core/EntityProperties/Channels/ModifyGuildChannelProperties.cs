@@ -21,8 +21,10 @@ public class ModifyGuildChannelProperties : ModifyChannelBaseProperties, IEntity
     {
         existing ??= new();
         base.ToApiModel(existing);
+
         existing.Position = Position;
         existing.PermissionOverwrites = PermissionOverwrites.Map(v => v.Select(x => x.ToApiModel()).ToArray());
+
         return existing;
     }
 }

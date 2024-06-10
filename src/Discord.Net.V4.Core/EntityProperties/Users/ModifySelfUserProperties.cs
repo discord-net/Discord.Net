@@ -18,6 +18,13 @@ public sealed class ModifySelfUserProperties : IEntityProperties<ModifyCurrentUs
     /// </summary>
     public Optional<Image?> Avatar { get; set; }
 
-    public ModifyCurrentUserParams ToApiModel() =>
-        new() {Avatar = Avatar.Map(v => v?.ToImageData()), Username = Username};
+    public ModifyCurrentUserParams ToApiModel(ModifyCurrentUserParams? existing = default)
+    {
+        existing ??= new();
+        
+        existing.Username = Username;
+        existing.Avatar = Avatar.Map(v => v?.ToImageData());
+
+        return existing;
+    }
 }

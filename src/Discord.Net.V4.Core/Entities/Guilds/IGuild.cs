@@ -1,8 +1,9 @@
+using Discord.Models.Json;
 using System.Globalization;
 
 namespace Discord;
 
-public interface IGuild : IPartialGuild, IDeletable, IModifiable<ModifyGuildProperties>
+public interface IGuild : IPartialGuild, IDeletable, IModifiable<ModifyGuildProperties, ModifyGuildParams>
 {
     /// <summary>
     ///     Gets the amount of time (in seconds) a user must be inactive in a voice channel for until they are

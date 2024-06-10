@@ -7,7 +7,7 @@ internal static class EntityProviderExtensions
     public static async Task<TResult?> ExecuteAndConstructAsync<TResult, TCoreEntity, TModel, TApi, TBody>(
         this IEntityProvider<TResult, TCoreEntity, TModel> provider,
         ApiBodyRoute<TBody, TApi> route, RequestOptions? options, CancellationToken token)
-        where TResult : class, TCoreEntity, IConstructable<TModel>
+        where TResult : class, TCoreEntity, IConstructable<TResult, TModel>
         where TCoreEntity : IEntity
         where TModel : IEntityModel
         where TApi : class, TModel
@@ -17,14 +17,14 @@ internal static class EntityProviderExtensions
             options ?? provider.Client.DefaultRequestOptions, token);
 
         return model is not null
-            ? TResult.Construct<TResult>(model)
+            ? TResult.Construct(provider.Client, model)
             : null;
     }
 
     public static async Task<TResult?> ExecuteAndConstructAsync<TResult, TCoreEntity, TModel, TApi>(
         this IEntityProvider<TResult, TCoreEntity, TModel> provider,
         ApiRoute<TApi> route, RequestOptions? options, CancellationToken token = default)
-        where TResult : class, TCoreEntity, IConstructable<TModel>
+        where TResult : class, TCoreEntity, IConstructable<TResult, TModel>
         where TCoreEntity : IEntity
         where TModel : IEntityModel
         where TApi : class, TModel
@@ -33,7 +33,7 @@ internal static class EntityProviderExtensions
             options ?? provider.Client.DefaultRequestOptions, token);
 
         return model is not null
-            ? TResult.Construct<TResult>(model)
+            ? TResult.Construct(provider.Client, model)
             : null;
     }
 }

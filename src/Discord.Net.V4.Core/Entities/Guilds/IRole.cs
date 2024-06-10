@@ -1,7 +1,9 @@
+using Discord.Models.Json;
+
 namespace Discord;
 
 public interface IRole : ISnowflakeEntity, IDeletable, IMentionable, IComparable<IRole>,
-    IModifiable<ModifyRoleProperties>
+    IModifiable<ModifyRoleProperties, ModifyGuildRoleParams>
 {
     ILoadableEntity<ulong, IGuild> Guild { get; }
 

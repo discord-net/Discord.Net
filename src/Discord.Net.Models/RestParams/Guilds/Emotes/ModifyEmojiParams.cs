@@ -5,8 +5,8 @@ namespace Discord.Models.Json;
 public sealed class ModifyEmojiParams
 {
     [JsonPropertyName("name")]
-    public required string Name { get; set; }
+    public Optional<string> Name { get; set; }
 
     [JsonPropertyName("roles")]
-    public ulong[]? Roles { get; set; }
+    public Optional<ulong[]?> Roles { get; set; }
 }

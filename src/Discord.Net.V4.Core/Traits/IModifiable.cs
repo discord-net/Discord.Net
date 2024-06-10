@@ -12,8 +12,8 @@ public interface IModifiable<out TParams, TApi> : IEntity
     {
         var args = new TParams();
         func(args);
-        return Client.RestApiClient.ExecuteAsync(Route(args.ToApiModel()), options ?? Client.DefaultRequestOptions, token);
+        return Client.RestApiClient.ExecuteAsync(ModifyRoute(args.ToApiModel()), options ?? Client.DefaultRequestOptions, token);
     }
 
-    internal RouteFactory Route { get; }
+    internal RouteFactory ModifyRoute { get; }
 }

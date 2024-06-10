@@ -1,14 +1,16 @@
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
 
 /// <summary>
 ///     An image-based emote that is attached to a guild.
 /// </summary>
-public interface IGuildEmote : IEmote, ISnowflakeEntity, IModifiable<EmoteProperties>
+public interface IGuildEmote : IEmote, ISnowflakeEntity, IModifiable<EmoteProperties, ModifyEmojiParams>, IDeletable
 {
     /// <summary>
     ///     Gets whether this emoji is managed by an integration.
     /// </summary>
-    /// <returns>
     bool IsManaged { get; }
 
     /// <summary>
@@ -31,4 +33,9 @@ public interface IGuildEmote : IEmote, ISnowflakeEntity, IModifiable<EmoteProper
     ILoadableEntity<ulong, IUser>? Creator { get; }
 
     ILoadableEntity<ulong, IGuild> Guild { get; }
+
+    RouteFactory IModifiable<EmoteProperties, ModifyEmojiParams>.ModifyRoute
+        => args => Routes.ModifyGuildEmoji(Guild.Id, Id, args);
+
+    BasicApiRoute IDeletable.DeleteRoute => Routes.DeleteGuildEmoji(Guild.Id, Id);
 }

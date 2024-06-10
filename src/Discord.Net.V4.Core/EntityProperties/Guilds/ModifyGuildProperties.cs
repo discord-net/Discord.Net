@@ -1,3 +1,4 @@
+using Discord.Models.Json;
 using System.Globalization;
 
 namespace Discord;
@@ -6,7 +7,7 @@ namespace Discord;
 ///     Provides properties that are used to modify an <see cref="IGuild" /> with the specified changes.
 /// </summary>
 /// <see cref="IGuild.ModifyAsync" />
-public class ModifyGuildProperties
+public class ModifyGuildProperties : IEntityProperties<ModifyGuildParams>
 {
     /// <summary>
     ///     Gets or sets the name of the guild. Must be within 100 characters.
@@ -14,20 +15,14 @@ public class ModifyGuildProperties
     public Optional<string> Name { get; set; }
 
     /// <summary>
-    ///     Gets or sets the ID of the region for the guild's voice connections.
-    /// </summary>
-    [Obsolete("Deprecated in the API", true)]
-    public Optional<string> RegionId { get; set; }
-
-    /// <summary>
     ///     Gets or sets the verification level new users need to achieve before speaking.
     /// </summary>
-    public Optional<VerificationLevel> VerificationLevel { get; set; }
+    public Optional<VerificationLevel?> VerificationLevel { get; set; }
 
     /// <summary>
     ///     Gets or sets the default message notification state for the guild.
     /// </summary>
-    public Optional<DefaultMessageNotifications> DefaultMessageNotifications { get; set; }
+    public Optional<DefaultMessageNotifications?> DefaultMessageNotifications { get; set; }
 
     /// <summary>
     ///     Gets or sets how many seconds before a user is sent to AFK. This value MUST be one of: (60, 300, 900,
@@ -71,25 +66,11 @@ public class ModifyGuildProperties
     /// <summary>
     ///     Gets or sets the explicit content filter level of this guild.
     /// </summary>
-    public Optional<ExplicitContentFilterLevel> ExplicitContentFilter { get; set; }
+    public Optional<ExplicitContentFilterLevel?> ExplicitContentFilter { get; set; }
 
     /// <summary>
     ///     Gets or sets the flags that DISABLE types of system channel messages.
     /// </summary>
-    /// <remarks>
-    ///     These flags are inverted. Setting a flag will disable that system channel message from being sent.
-    ///     A value of <see cref="SystemChannelMessageDeny.None" /> will allow all system channel message types to be sent,
-    ///     given that the <see cref="SystemChannelId" /> has also been set.
-    ///     A value of <see cref="SystemChannelMessageDeny.GuildBoost" /> will deny guild boost messages from being sent, and
-    ///     allow all
-    ///     other types of messages.
-    ///     Refer to the extension methods <see cref="GuildExtensions.GetGuildBoostMessagesEnabled(IGuild)" />,
-    ///     <see cref="GuildExtensions.GetWelcomeMessagesEnabled(IGuild)" />,
-    ///     <see cref="GuildExtensions.GetGuildSetupTipMessagesEnabled(IGuild)" />,
-    ///     and <see cref="GuildExtensions.GetGuildWelcomeMessageReplyEnabled(IGuild)" /> to check if these system channel
-    ///     message types
-    ///     are enabled, without the need to manipulate the logic of the flag.
-    /// </remarks>
     public Optional<SystemChannelFlags> SystemChannelFlags { get; set; }
 
     /// <summary>
@@ -125,5 +106,29 @@ public class ModifyGuildProperties
     /// <summary>
     ///     Gets or sets the ID of the safety alerts channel.
     /// </summary>
-    public Optional<ulong> SafetyAlertsChannelId { get; set; }
+    public Optional<EntityOrId<ulong, IChannel>?> SafetyAlertsChannelId { get; set; }
+
+    public ModifyGuildParams ToApiModel(ModifyGuildParams? existing = default)
+    {
+        existing ??= new();
+
+        existing.Name = Name;
+        existing.VerificationLevel = VerificationLevel.Map(v => (int?)v);
+        existing.DefaultMessageNotifications = DefaultMessageNotifications.Map(v => (int?)v);
+        existing.Icon = Icon.Map(v => v?.ToImageData());
+        existing.Banner = Banner.Map(v => v?.ToImageData());
+        existing.Splash = Splash.Map(v => v?.ToImageData());
+        existing.AfkTimeout = AfkTimeout;
+        existing.AfkChannelId = AfkChannel.Map(v => v?.Id);
+        existing.SystemChannelId = SystemChannel.Map(v => v?.Id);
+        existing.OwnerId = Owner.Map(v => v?.Id);
+        existing.ExplicitContentFilter = ExplicitContentFilter.Map(v => (int?)v);
+        existing.SystemChannelFlags = SystemChannelFlags.Map(v => (int)v);
+        existing.PreferredLocale = PreferredCulture.Map(v => v.Name) | PreferredLocale;
+        existing.PremiumProgressBarEnabled = IsBoostProgressBarEnabled;
+        existing.Features = Features.Map(v => v.RawValue);
+        existing.SafetyAlertsChannelId = SafetyAlertsChannelId.Map(v => v?.Id);
+
+        return existing;
+    }
 }

@@ -1,6 +1,8 @@
+using Discord.Models.Json;
+
 namespace Discord;
 
-public interface IVoiceChannel : ITextChannel, IAudioChannel, IModifiable<ModifyVoiceChannelProperties>
+public interface IVoiceChannel : ITextChannel, IAudioChannel, IModifiable<ModifyVoiceChannelProperties, ModifyGuildChannelParams>
 {
     /// <summary>
     ///     Gets the bit-rate that the clients in this voice channel are requested to use.

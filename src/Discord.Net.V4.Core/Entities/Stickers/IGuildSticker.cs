@@ -1,9 +1,11 @@
+using Discord.Models.Json.Stickers;
+
 namespace Discord;
 
 /// <summary>
 ///     Represents a custom sticker within a guild.
 /// </summary>
-public interface IGuildSticker : ISticker, IModifiable<ModifyStickerProperties>, IDeletable
+public interface IGuildSticker : ISticker, IModifiable<ModifyStickerProperties, ModifyGuildStickersParams>, IDeletable
 {
     /// <summary>
     ///     Gets the user that uploaded the guild sticker.

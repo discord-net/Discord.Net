@@ -12,7 +12,8 @@ public static partial class Routes
             $"/channels/{channelId}",
             (ScopeType.Channel, channelId));
 
-    public static ApiBodyRoute<ModifyChannelParams, Channel> ModifyChannel(ulong channelId, ModifyChannelParams body)
+    public static ApiBodyRoute<TArgs, Channel> ModifyChannel<TArgs>(ulong channelId, TArgs body)
+        where TArgs : ModifyChannelParams
         => new(nameof(ModifyChannel),
             RequestMethod.Patch,
             $"/channels/{channelId}",

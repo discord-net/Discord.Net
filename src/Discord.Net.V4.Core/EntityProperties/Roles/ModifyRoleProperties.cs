@@ -1,3 +1,5 @@
+using Discord.Models.Json;
+
 namespace Discord;
 
 /// <summary>
@@ -16,7 +18,7 @@ namespace Discord;
 ///     </code>
 /// </example>
 /// <seealso cref="IRole.ModifyAsync" />
-public class ModifyRoleProperties
+public class ModifyRoleProperties : IEntityProperties<ModifyGuildRoleParams>
 {
     /// <summary>
     ///     Gets or sets the name of the role.
@@ -32,14 +34,6 @@ public class ModifyRoleProperties
     public Optional<GuildPermission> Permissions { get; set; }
 
     /// <summary>
-    ///     Gets or sets the position of the role. This is 0-based!
-    /// </summary>
-    /// <remarks>
-    ///     This value may not be set if the role is an @everyone role.
-    /// </remarks>
-    public Optional<int> Position { get; set; }
-
-    /// <summary>
     ///     Gets or sets the color of the role.
     /// </summary>
     /// <remarks>
@@ -53,7 +47,7 @@ public class ModifyRoleProperties
     /// <remarks>
     ///     This value may not be set if the role is an @everyone role.
     /// </remarks>
-    public Optional<bool> Hoist { get; set; }
+    public Optional<bool> IsHoisted { get; set; }
 
     /// <summary>
     ///     Gets or sets the icon of the role.
@@ -79,5 +73,20 @@ public class ModifyRoleProperties
     /// <remarks>
     ///     This value may not be set if the role is an @everyone role.
     /// </remarks>
-    public Optional<bool> Mentionable { get; set; }
+    public Optional<bool> IsMentionable { get; set; }
+
+    public ModifyGuildRoleParams ToApiModel(ModifyGuildRoleParams? existing = default)
+    {
+        existing ??= new();
+
+        existing.Name = Name;
+        existing.Permissions = Permissions.Map(v => ((ulong)v).ToString());
+        existing.Color = Color.Map(v => v.RawValue);
+        existing.Hoist = IsHoisted;
+        existing.Icon = Icon.Map(v => v?.ToImageData());
+        existing.UnicodeEmoji = Emoji.Map(v => v.Name);
+        existing.Mentionable = IsMentionable;
+
+        return existing;
+    }
 }

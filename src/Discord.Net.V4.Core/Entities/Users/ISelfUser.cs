@@ -61,5 +61,5 @@ public interface ISelfUser : IUser, IModifiable<ModifySelfUserProperties, Modify
     /// </returns>
     string Locale { get; }
 
-    RouteFactory IModifiable<ModifySelfUserProperties, ModifyCurrentUserParams>.Route => Routes.ModifyCurrentUser;
+    RouteFactory IModifiable<ModifySelfUserProperties, ModifyCurrentUserParams>.ModifyRoute => Routes.ModifyCurrentUser;
 }
