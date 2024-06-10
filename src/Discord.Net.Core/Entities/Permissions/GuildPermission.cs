@@ -287,5 +287,10 @@ namespace Discord
         ///     Allows sending polls.
         /// </summary>
         SendPolls = 1L << 49,
+
+        /// <summary>
+        ///     Allows user-installed apps to send public responses.
+        /// </summary>
+        UseExternalApps = 1L << 50,
     }
 }
