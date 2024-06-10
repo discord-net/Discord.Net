@@ -24,14 +24,14 @@ public class RestUser : RestEntity<ulong>, IUser, IModeled<ulong, IUserModel>
     public virtual bool IsWebhook => false;
 
     public UserFlags PublicFlags
-        => Model.PublicFlags ?? UserFlags.None;
+        => (UserFlags?)Model.PublicFlags ?? UserFlags.None;
 
-    public virtual IUserModel Model { get; protected set; }
+    public IUserModel Model { get; protected set; }
 
     protected RestUser(DiscordRestClient client, IUserModel model)
         : base(client, model.Id)
     {
-        Update(model);
+        Model = model;
     }
 
     internal static RestUser Create(DiscordRestClient client, IUserModel model)

@@ -1,9 +1,12 @@
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
 
 /// <summary>
 ///     Represents the logged-in Discord user.
 /// </summary>
-public interface ISelfUser : IUser, IModifyable<ModifySelfUserProperties>
+public interface ISelfUser : IUser, IModifiable<ModifySelfUserProperties, ModifyCurrentUserParams>
 {
     /// <summary>
     ///     Gets the email associated with this user.
@@ -31,7 +34,7 @@ public interface ISelfUser : IUser, IModifyable<ModifySelfUserProperties>
     ///     Gets the flags that are applied to a user's account.
     /// </summary>
     /// <remarks>
-    ///     This value is determined by bitwise OR-ing <see cref="UserProperties" /> values together.
+    ///     This value is determined by bitwise OR-ing <see cref="UserFlags" /> values together.
     /// </remarks>
     /// <returns>
     ///     The value of flags for this user.
@@ -57,4 +60,6 @@ public interface ISelfUser : IUser, IModifyable<ModifySelfUserProperties>
     ///     For example, a locale of "English, US" is "en-US", "Chinese (Taiwan)" is "zh-TW", etc.
     /// </returns>
     string Locale { get; }
+
+    RouteFactory IModifiable<ModifySelfUserProperties, ModifyCurrentUserParams>.Route => Routes.ModifyCurrentUser;
 }

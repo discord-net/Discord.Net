@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Guild : IGuildModel, IEntityModelSource
+public class Guild : IGuildModel, IEntityModelSource
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -142,7 +142,7 @@ public sealed class Guild : IGuildModel, IEntityModelSource
     bool IGuildModel.WidgetEnabled => WidgetEnabled;
     ulong? IGuildModel.WidgetChannelId => WidgetChannelId;
 
-    public IEnumerable<IEntityModel> GetEntities()
+    public virtual IEnumerable<IEntityModel> GetEntities()
     {
         IEnumerable<IEntityModel> entities = [..Roles, ..Emojis];
 

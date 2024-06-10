@@ -1,11 +1,11 @@
 namespace Discord;
 
 /// <summary>
-///     Represents a collection wrapper of <see cref="IEntitySource{TEntity, TId}" />.
+///     Represents a collection wrapper of <see cref="ILoadableEntity{TId,TEntity}" />.
 /// </summary>
 /// <typeparam name="TEntity">The entity type.</typeparam>
 /// <typeparam name="TId">The ID type of the entity.</typeparam>
-public interface IEntityEnumerableSource<TId, TEntity> : IAsyncEnumerable<IEntitySource<TId, TEntity>>
+public interface ILoadableEntityEnumerable<TId, TEntity> : IAsyncEnumerable<ILoadableEntity<TId, TEntity>>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
 {
@@ -39,7 +39,7 @@ public interface IEntityEnumerableSource<TId, TEntity> : IAsyncEnumerable<IEntit
     ValueTask<TEntity?> GetAsync(TId id, RequestOptions? options = null, CancellationToken token = default);
 
     /// <summary>
-    ///     Flattens this <see cref="IAsyncEnumerable{T}" /> of <see cref="IEntitySource{TEntity, TId}" />
+    ///     Flattens this <see cref="IAsyncEnumerable{T}" /> of <see cref="ILoadableEntity{TId,TEntity}" />
     ///     to a readonly collection of <see cref="TEntity" />s.
     /// </summary>
     /// <returns>

@@ -72,9 +72,9 @@ namespace Discord.Gateway
         public IDisposable EnterTypingState(RequestOptions? options = null) => throw new NotImplementedException();
 
 
-        IEntitySource<IUser, ulong> IDMChannel.Recipient
+        ILoadableEntity<IUser, ulong> IDMChannel.Recipient
             => Recipient;
 
-        public IEntityEnumerableSource<IUser, ulong> Recipients => throw new NotImplementedException(); // TOD
+        public ILoadableEntityEnumerable<IUser, ulong> Recipients => throw new NotImplementedException(); // TOD
     }
 }

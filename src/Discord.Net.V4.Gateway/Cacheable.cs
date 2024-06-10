@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway
 {
-    public class Cacheable<TId, TGateway, TRest, TCommon> : Cacheable<TId, TGateway>, IEntitySource<TCommon, TId>
+    public class Cacheable<TId, TGateway, TRest, TCommon> : Cacheable<TId, TGateway>, ILoadableEntity<TCommon, TId>
         where TGateway : class, ICacheableEntity<TId>, TCommon
         where TRest : class, IEntity<TId>, TCommon // TODO: RestEntity<TId>
         where TCommon : class, IEntity<TId>
@@ -53,13 +53,13 @@ namespace Discord.Gateway
             return await FetchAsync(options, token);
         }
 
-        TCommon? IEntitySource<TCommon, TId>.Value => Value;
+        TCommon? ILoadableEntity<TCommon, TId>.Value => Value;
 
-        ValueTask<TCommon?> IEntitySource<TCommon, TId>.LoadAsync(RequestOptions? options, CancellationToken token)
+        ValueTask<TCommon?> ILoadableEntity<TCommon, TId>.LoadAsync(RequestOptions? options, CancellationToken token)
             => GetOrFetchAsync(options, token);
     }
 
-    public class Cacheable<TId, TGateway> : IEntitySource<TGateway, TId>
+    public class Cacheable<TId, TGateway> : ILoadableEntity<TGateway, TId>
         where TGateway : class, ICacheableEntity<TId>
         where TId : IEquatable<TId>
     {
@@ -121,7 +121,7 @@ namespace Discord.Gateway
             return null;
         }
 
-        ValueTask<TGateway?> IEntitySource<TGateway, TId>.LoadAsync(RequestOptions? options, CancellationToken token)
+        ValueTask<TGateway?> ILoadableEntity<TGateway, TId>.LoadAsync(RequestOptions? options, CancellationToken token)
             => GetAsync(token);
 
         public static implicit operator TGateway?(Cacheable<TId, TGateway> cacheable) => cacheable.Value;

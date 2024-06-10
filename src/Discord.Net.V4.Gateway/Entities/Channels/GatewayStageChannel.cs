@@ -38,7 +38,7 @@ namespace Discord.Gateway
         void ICacheUpdatable<ulong, IStageInstanceModel>.Update(IStageInstanceModel model, CacheOperation operation)
             => Update(model, operation);
 
-        IEntitySource<IStageInstance, ulong>? IStageChannel.StageInstance => Instance;
+        ILoadableEntity<IStageInstance, ulong>? IStageChannel.StageInstance => Instance;
     }
 }
 

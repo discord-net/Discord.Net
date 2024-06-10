@@ -20,4 +20,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="API\Gateway\" />
+  </ItemGroup>
 </Project>

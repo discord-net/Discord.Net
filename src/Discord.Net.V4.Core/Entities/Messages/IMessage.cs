@@ -85,17 +85,17 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// <summary>
     ///     Gets the author of this message.
     /// </summary>
-    IEntitySource<ulong, IUser> Author { get; }
+    ILoadableEntity<ulong, IUser> Author { get; }
 
     /// <summary>
     ///     Gets the source channel of the message.
     /// </summary>
-    IEntitySource<ulong, IMessageChannel> Channel { get; }
+    ILoadableEntity<ulong, IMessageChannel> Channel { get; }
 
     /// <summary>
     ///     Gets the thread that was started from this message.
     /// </summary>
-    IEntitySource<ulong, IThreadChannel> Thread { get; }
+    ILoadableEntity<ulong, IThreadChannel> Thread { get; }
 
     /// <summary>
     ///     Gets all attachments included in this message.
@@ -123,11 +123,11 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// </returns>
     IReadOnlyCollection<Embed> Embeds { get; }
 
-    IEntityEnumerableSource<ulong, IChannel> MentionedChannels { get; }
+    ILoadableEntityEnumerable<ulong, IChannel> MentionedChannels { get; }
 
-    IEntityEnumerableSource<ulong, IRole> MentionedRoles { get; }
+    ILoadableEntityEnumerable<ulong, IRole> MentionedRoles { get; }
 
-    IEntityEnumerableSource<ulong, IUser> MentionedUsers { get; }
+    ILoadableEntityEnumerable<ulong, IUser> MentionedUsers { get; }
 
     /// <summary>
     ///     Gets the activity associated with a message.

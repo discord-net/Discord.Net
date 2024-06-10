@@ -1,4 +1,5 @@
-using System;
+using Discord.Models;
+using Discord.Models.Json;
 using System.Text.Json.Serialization;
 
 namespace Discord.API.Gateway
@@ -31,6 +32,28 @@ namespace Discord.API.Gateway
 
         [JsonPropertyName("stage_instances")]
         public StageInstance[]? StageInstances { get; set; }
+
+        public override IEnumerable<IEntityModel> GetEntities()
+        {
+            var entities = base.GetEntities();
+
+            if (Presences is not null)
+                entities = entities.Concat(Presences);
+
+            if (Members is not null)
+                entities = entities.Concat(Members);
+
+            if (Channels is not null)
+                entities = entities.Concat(Channels);
+
+            if (GuildScheduledEvents is not null)
+                entities = entities.Concat(GuildScheduledEvents);
+
+            if (StageInstances is not null)
+                entities = entities.Concat(StageInstances);
+
+            return entities;
+        }
     }
 }
 

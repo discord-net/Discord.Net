@@ -69,11 +69,11 @@ namespace Discord.Gateway
 
         public IReadOnlyCollection<ITag> Tags => throw new NotImplementedException();
 
-        public IEntityEnumerableSource<IChannel, ulong>? MentionedChannels => throw new NotImplementedException();
+        public ILoadableEntityEnumerable<IChannel, ulong>? MentionedChannels => throw new NotImplementedException();
 
-        public IEntityEnumerableSource<IRole, ulong>? MentionedRoles => throw new NotImplementedException();
+        public ILoadableEntityEnumerable<IRole, ulong>? MentionedRoles => throw new NotImplementedException();
 
-        public IEntityEnumerableSource<IUser, ulong>? MentionedUsers => throw new NotImplementedException();
+        public ILoadableEntityEnumerable<IUser, ulong>? MentionedUsers => throw new NotImplementedException();
 
         public MessageActivity? Activity => throw new NotImplementedException();
 
@@ -127,10 +127,10 @@ namespace Discord.Gateway
         public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions? options = null) => throw new NotImplementedException();
         public Task DeleteAsync(RequestOptions? options = null) => throw new NotImplementedException();
 
-        IEntitySource<IMessageChannel, ulong> IMessage.Channel => Channel;
+        ILoadableEntity<IMessageChannel, ulong> IMessage.Channel => Channel;
 
-        IEntitySource<IUser, ulong> IMessage.Author => Author;
+        ILoadableEntity<IUser, ulong> IMessage.Author => Author;
 
-        IEntitySource<IThreadChannel, ulong>? IMessage.Thread => Thread;
+        ILoadableEntity<IThreadChannel, ulong>? IMessage.Thread => Thread;
     }
 }

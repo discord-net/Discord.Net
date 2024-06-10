@@ -1,7 +1,25 @@
 namespace Discord;
 
 /// <summary>
-///     Represents a barebones lazy-loadable entity.
+///     Represents a wrapper of a relation between 2 entities, this
+///     provides an implementation-agnostic way to lazily represent
+///     a relation.
+/// </summary>
+/// <typeparam name="TEntity">The entity type of the source.</typeparam>
+/// <typeparam name="TId">The ID type of the source.</typeparam>
+public interface ILoadableEntity<out TId, TEntity> : ILoadableEntity<TEntity>
+    where TEntity : class, IEntity<TId>
+    where TId : IEquatable<TId>
+{
+    /// <summary>
+    ///     Gets the unique identifier of the entity being represented.
+    /// </summary>
+    TId Id { get; }
+}
+
+
+/// <summary>
+///     Represents a bare bones lazy-loadable entity.
 /// </summary>
 /// <typeparam name="T">The entity type.</typeparam>
 public interface ILoadableEntity<T>

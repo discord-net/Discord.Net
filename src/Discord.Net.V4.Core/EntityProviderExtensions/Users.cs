@@ -25,7 +25,7 @@ public static class Users
         this IEntityProvider<T, ISelfUser, IUserModel> provider,
         PropertiesOrModel<ModifySelfUserProperties, ModifyCurrentUserParams> properties,
         RequestOptions? options = null, CancellationToken token = default)
-        where T : class, ISelfUser, IModifyable<ModifySelfUserProperties>, IConstructable<IUserModel> =>
+        where T : class, ISelfUser, IModifiable<ModifySelfUserProperties>, IConstructable<IUserModel> =>
         provider.ExecuteAndConstructAsync(
             Routes.ModifyCurrentUser(properties.Model),
             options, token

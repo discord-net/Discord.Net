@@ -80,11 +80,11 @@ namespace Discord.Gateway
         internal override object Clone() => throw new NotImplementedException();
         internal override void DisposeClone() => throw new NotImplementedException();
 
-        IEntitySource<IGuild, ulong> IGuildScheduledEvent.Guild => Guild;
+        ILoadableEntity<IGuild, ulong> IGuildScheduledEvent.Guild => Guild;
 
-        IEntitySource<IGuildUser, ulong> IGuildScheduledEvent.Creator => Creator;
+        ILoadableEntity<IGuildUser, ulong> IGuildScheduledEvent.Creator => Creator;
 
-        IEntitySource<IGuildChannel, ulong>? IGuildScheduledEvent.Channel => Channel;
+        ILoadableEntity<IGuildChannel, ulong>? IGuildScheduledEvent.Channel => Channel;
     }
 }
 

@@ -1,9 +1,9 @@
 namespace Discord;
 
 public interface IRole : ISnowflakeEntity, IDeletable, IMentionable, IComparable<IRole>,
-    IModifyable<ModifyRoleProperties>
+    IModifiable<ModifyRoleProperties>
 {
-    IEntitySource<ulong, IGuild> Guild { get; }
+    ILoadableEntity<ulong, IGuild> Guild { get; }
 
     /// <summary>
     ///     Gets the color given to users of this role.

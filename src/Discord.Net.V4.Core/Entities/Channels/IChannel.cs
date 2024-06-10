@@ -13,5 +13,5 @@ public interface IChannel : ISnowflakeEntity
     /// <summary>
     ///     Gets a collection of users that are able to view the channel or are currently in this channel.
     /// </summary>
-    IEntityEnumerableSource<ulong, IUser> Users { get; }
+    ILoadableEntityEnumerable<ulong, IUser> Users { get; }
 }

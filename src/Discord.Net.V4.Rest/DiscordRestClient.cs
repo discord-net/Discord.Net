@@ -5,7 +5,7 @@ namespace Discord.Rest;
 
 public sealed class DiscordRestClient : IDiscordClient
 {
-    public RestSelfUserSource CurrentUser { get; }
+    public RestLoadableEntity<,,,> CurrentUser { get; }
     public ApiClient RestApiClient { get; }
     internal RateLimiter RateLimiter { get; }
 
@@ -29,7 +29,7 @@ public sealed class DiscordRestClient : IDiscordClient
 
         // load the ID from the token
 
-        CurrentUser = RestSelfUserSource.Create(
+        CurrentUser = RestLoadableEntity<,,,>.Create(
             this,
             TokenUtils.GetUserIdFromToken(config.Token.Value),
             Routes.GetCurrentUser,
@@ -42,5 +42,5 @@ public sealed class DiscordRestClient : IDiscordClient
     public ValueTask DisposeAsync() => throw new NotImplementedException();
 
     IRestApiClient IDiscordClient.RestApiClient => RestApiClient;
-    IEntitySource<ulong, ISelfUser> IDiscordClient.CurrentUser => CurrentUser;
+    ILoadableEntity<ulong, ISelfUser> IDiscordClient.CurrentUser => CurrentUser;
 }

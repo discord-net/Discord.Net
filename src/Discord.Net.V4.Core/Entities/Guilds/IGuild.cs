@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace Discord;
 
-public interface IGuild : IPartialGuild, IDeletable, IModifyable<ModifyGuildProperties>
+public interface IGuild : IPartialGuild, IDeletable, IModifiable<ModifyGuildProperties>
 {
     /// <summary>
     ///     Gets the amount of time (in seconds) a user must be inactive in a voice channel for until they are
@@ -84,28 +84,28 @@ public interface IGuild : IPartialGuild, IDeletable, IModifyable<ModifyGuildProp
     /// </returns>
     string DiscoverySplashUrl { get; }
 
-    IEntitySource<ulong, IVoiceChannel> AFKChannel { get; }
-    IEntitySource<ulong, ITextChannel> WidgetChannel { get; }
-    IEntitySource<ulong, ITextChannel> SafetyAlertsChannel { get; }
-    IEntitySource<ulong, ITextChannel> SystemChannel { get; }
-    IEntitySource<ulong, ITextChannel> RulesChannel { get; }
-    IEntitySource<ulong, ITextChannel> PublicUpdatesChannel { get; }
-    IEntitySource<ulong, IGuildUser> Owner { get; }
+    ILoadableEntity<ulong, IVoiceChannel> AFKChannel { get; }
+    ILoadableEntity<ulong, ITextChannel> WidgetChannel { get; }
+    ILoadableEntity<ulong, ITextChannel> SafetyAlertsChannel { get; }
+    ILoadableEntity<ulong, ITextChannel> SystemChannel { get; }
+    ILoadableEntity<ulong, ITextChannel> RulesChannel { get; }
+    ILoadableEntity<ulong, ITextChannel> PublicUpdatesChannel { get; }
+    ILoadableEntity<ulong, IGuildUser> Owner { get; }
 
     ulong? ApplicationId { get; }
 
     [Obsolete("Deprecated in the Discord API")]
     string? VoiceRegion { get; }
 
-    IEntitySource<ulong, IRole> EveryoneRole { get; }
+    ILoadableEntity<ulong, IRole> EveryoneRole { get; }
 
-    IEntityEnumerableSource<ulong, IGuildEmote> Emotes { get; }
+    ILoadableEntityEnumerable<ulong, IGuildEmote> Emotes { get; }
 
-    IEntityEnumerableSource<ulong, IGuildSticker> Stickers { get; }
+    ILoadableEntityEnumerable<ulong, IGuildSticker> Stickers { get; }
 
     new GuildFeatures Features { get; }
 
-    IEntityEnumerableSource<ulong, IRole> Roles { get; }
+    ILoadableEntityEnumerable<ulong, IRole> Roles { get; }
 
     /// <summary>
     ///     Gets the tier of guild boosting in this guild.

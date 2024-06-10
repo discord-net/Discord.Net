@@ -5,8 +5,8 @@ using System.Collections.Immutable;
 
 namespace Discord.Gateway
 {
-    public sealed class CacheableCollection<TCacheable, TId, TGateway, TCommon> : IEntityEnumerableSource<TCommon, TId>
-        where TCacheable : Cacheable<TId, TGateway>, IEntitySource<TCommon, TId>
+    public sealed class CacheableCollection<TCacheable, TId, TGateway, TCommon> : ILoadableEntityEnumerable<TCommon, TId>
+        where TCacheable : Cacheable<TId, TGateway>, ILoadableEntity<TCommon, TId>
         where TGateway : GatewayCacheableEntity<TId>, TCommon
         where TId : IEquatable<TId>
         where TCommon : class, IEntity<TId>
@@ -162,10 +162,10 @@ namespace Discord.Gateway
             return new Enumerator(_parent, _idsFactory, _factory, _cleanupTask, token);
         }
 
-        async ValueTask<IReadOnlyCollection<TCommon>> IEntityEnumerableSource<TCommon, TId>.FlattenAsync(RequestOptions? option, CancellationToken token)
+        async ValueTask<IReadOnlyCollection<TCommon>> ILoadableEntityEnumerable<TCommon, TId>.FlattenAsync(RequestOptions? option, CancellationToken token)
             => await FlattenAsync(option, token);
 
-        IAsyncEnumerator<IEntitySource<TCommon, TId>> IAsyncEnumerable<IEntitySource<TCommon, TId>>.GetAsyncEnumerator(CancellationToken cancellationToken)
+        IAsyncEnumerator<ILoadableEntity<TCommon, TId>> IAsyncEnumerable<ILoadableEntity<TCommon, TId>>.GetAsyncEnumerator(CancellationToken cancellationToken)
             => GetAsyncEnumerator(cancellationToken);
     }
 }

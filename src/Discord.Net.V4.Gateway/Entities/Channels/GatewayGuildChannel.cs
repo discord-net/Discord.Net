@@ -43,6 +43,6 @@ namespace Discord.Gateway
         public Task DeleteAsync(RequestOptions? options = null) => throw new NotImplementedException();
 
 
-        IEntitySource<IGuild, ulong> IGuildChannel.Guild => Guild;
+        ILoadableEntity<IGuild, ulong> IGuildChannel.Guild => Guild;
     }
 }

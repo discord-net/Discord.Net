@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     An image-based emote that is attached to a guild.
 /// </summary>
-public interface IGuildEmote : IEmote, ISnowflakeEntity, IModifyable<EmoteProperties>
+public interface IGuildEmote : IEmote, ISnowflakeEntity, IModifiable<EmoteProperties>
 {
     /// <summary>
     ///     Gets whether this emoji is managed by an integration.
@@ -26,9 +26,9 @@ public interface IGuildEmote : IEmote, ISnowflakeEntity, IModifyable<EmoteProper
     /// </summary>
     bool IsAvailable { get; }
 
-    IEntityEnumerableSource<ulong, IRole> Roles { get; }
+    ILoadableEntityEnumerable<ulong, IRole> Roles { get; }
 
-    IEntitySource<ulong, IUser>? Creator { get; }
+    ILoadableEntity<ulong, IUser>? Creator { get; }
 
-    IEntitySource<ulong, IGuild> Guild { get; }
+    ILoadableEntity<ulong, IGuild> Guild { get; }
 }

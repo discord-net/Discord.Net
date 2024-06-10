@@ -41,7 +41,7 @@ public sealed class ModifyGuildChannelParams : ModifyChannelParams
     public Optional<int?> DefaultAutoArchiveDuration { get; set; }
 
     [JsonPropertyName("flags")]
-    public Optional<int?> Flags { get; set; }
+    public Optional<int> Flags { get; set; }
 
     [JsonPropertyName("available_tags")]
     public Optional<ForumTag[]> AvailableTags { get; set; }

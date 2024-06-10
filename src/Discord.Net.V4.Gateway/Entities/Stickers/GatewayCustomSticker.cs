@@ -51,9 +51,9 @@ namespace Discord.Gateway
 
         #region  ICustomSticker
 
-        IEntitySource<IGuild, ulong> ICustomSticker.Guild => Guild;
+        ILoadableEntity<IGuild, ulong> ICustomSticker.Guild => Guild;
 
-        IEntitySource<IGuildUser, ulong>? ICustomSticker.Author => Author;
+        ILoadableEntity<IGuildUser, ulong>? ICustomSticker.Author => Author;
         #endregion
     }
 }

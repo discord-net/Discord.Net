@@ -1,6 +1,6 @@
 namespace Discord;
 
-public interface IAudioChannel : IChannel, IModifyable<ModifyAudioChannelProperties>
+public interface IAudioChannel : IChannel
 {
     string? RTCRegion { get; }
 }

@@ -1,18 +1,18 @@
 namespace Discord;
 
-public sealed class BasicApiRoute(string name, RequestMethod method, string endpoint, BucketInfo? bucket = null)
+public class BasicApiRoute(string name, RequestMethod method, string endpoint, BucketInfo? bucket = null)
     : ApiRoute(name, method, endpoint, bucket)
 {
 }
 
-public sealed class ApiBodyRoute<TRequestBody>(
+public class ApiBodyRoute<TRequestBody>(
     string name,
     RequestMethod method,
     string endpoint,
     TRequestBody body,
     ContentType contentType = ContentType.JsonBody,
     BucketInfo? bucket = null)
-    : ApiRoute(name, method, endpoint, bucket)
+    : BasicApiRoute(name, method, endpoint, bucket)
 {
     public TRequestBody Body { get; } = body;
     public ContentType ContentType { get; } = contentType;
@@ -25,16 +25,15 @@ public sealed class ApiBodyRoute<TRequestBody, TResponseBody>(
     TRequestBody body,
     ContentType contentType = ContentType.JsonBody,
     BucketInfo? bucket = null)
-    : ApiRoute(name, method, endpoint, bucket)
+    : ApiBodyRoute<TRequestBody>(name, method, endpoint,body, contentType, bucket)
     where TRequestBody : class
     where TResponseBody : class
 {
-    public TRequestBody Body { get; } = body;
-    public ContentType ContentType { get; } = contentType;
+
 }
 
 public sealed class ApiRoute<TResponse>(string name, RequestMethod method, string endpoint, BucketInfo? bucket = null)
-    : ApiRoute(name, method, endpoint, bucket)
+    : BasicApiRoute(name, method, endpoint, bucket)
 {
 }
 

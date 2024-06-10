@@ -1,3 +1,4 @@
+
 using Discord.Rest;
 
 namespace Discord;
@@ -10,7 +11,10 @@ public interface IDiscordClient : IDisposable, IAsyncDisposable
     /// <summary>
     ///     Gets the currently logged-in user.
     /// </summary>
-    IEntitySource<ulong, ISelfUser> CurrentUser { get; }
+    ILoadableEntity<ulong, ISelfUser> CurrentUser { get; }
+
+    IRootEntitySource<IGuildsEntitySource<IGuild>, ulong, IGuild> Guilds { get; }
+    IGuildsEntitySource<IGuild> Guild(ulong id) => Guilds[id];
 
     IRestApiClient RestApiClient { get; }
 

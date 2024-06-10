@@ -80,6 +80,6 @@ namespace Discord.Gateway
 
         internal string DebuggerDisplay => $"{Name} ({Id})";
 
-        IEntitySource<IUser, ulong>? ISticker.User => throw new NotImplementedException();
+        ILoadableEntity<IUser, ulong>? ISticker.User => throw new NotImplementedException();
     }
 }

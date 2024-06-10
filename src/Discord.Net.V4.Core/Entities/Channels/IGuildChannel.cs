@@ -1,6 +1,8 @@
+using Discord.Models.Json;
+
 namespace Discord;
 
-public interface IGuildChannel : IChannel, IDeletable, IModifyable<ModifyGuildChannelProperties>
+public interface IGuildChannel : IChannel, IDeletable, IModifiable<ModifyGuildChannelProperties, ModifyGuildChannelParams>
 {
     /// <summary>
     ///     Gets the position of this channel.
@@ -28,7 +30,7 @@ public interface IGuildChannel : IChannel, IDeletable, IModifyable<ModifyGuildCh
     /// <returns>
     ///     A guild object that this channel belongs to.
     /// </returns>
-    IEntitySource<ulong, IGuild> Guild { get; }
+    ILoadableEntity<ulong, IGuild> Guild { get; }
 
     /// <summary>
     ///     Gets a collection of permission overwrites for this channel.
@@ -41,7 +43,7 @@ public interface IGuildChannel : IChannel, IDeletable, IModifyable<ModifyGuildCh
     /// <summary>
     ///     Gets a collection of users that are able to view the channel or are currently in this channel.
     /// </summary>
-    new IEntityEnumerableSource<ulong, IGuildUser> Users { get; }
+    new ILoadableEntityEnumerable<ulong, IGuildUser> Users { get; }
 
     /// <summary>
     ///     Adds or updates the permission overwrite.

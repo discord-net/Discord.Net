@@ -1,6 +1,9 @@
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
 
-public interface IGuildUser : IUser, IModifyable<ModifyGuildUserProperties>
+public interface IGuildUser : IUser, IModifiable<ModifyGuildUserProperties, ModifyGuildMemberParams>
 {
     /// <summary>
     ///     Gets when this user joined the guild.
@@ -61,7 +64,7 @@ public interface IGuildUser : IUser, IModifyable<ModifyGuildUserProperties>
     /// <returns>
     ///     A guild object that this user belongs to.
     /// </returns>
-    IEntitySource<ulong, IGuild> Guild { get; }
+    ILoadableEntity<ulong, IGuild> Guild { get; }
 
     /// <summary>
     ///     Gets the date and time for when this user's guild boost began.
@@ -84,7 +87,7 @@ public interface IGuildUser : IUser, IModifyable<ModifyGuildUserProperties>
     ///     A read-only collection of <see cref="ulong" />, each representing a snowflake identifier for a role that
     ///     this user possesses.
     /// </returns>
-    IEntityEnumerableSource<ulong, IRole> RoleIds { get; }
+    ILoadableEntityEnumerable<ulong, IRole> RoleIds { get; }
 
     /// <summary>
     ///     Whether the user has passed the guild's Membership Screening requirements.
@@ -111,4 +114,7 @@ public interface IGuildUser : IUser, IModifyable<ModifyGuildUserProperties>
     ///     Gets the public flags for this guild member.
     /// </summary>
     GuildUserFlags Flags { get; }
+
+    RouteFactory IModifiable<ModifyGuildUserProperties, ModifyGuildMemberParams>.Route
+        => args => Routes.ModifyGuildMember(Guild.Id, Id, args);
 }

@@ -90,6 +90,6 @@ namespace Discord.Gateway
         public Task DisconnectAsync() => throw new NotImplementedException();
         public Task ModifyAsync(Action<ModifyAudioChannelProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
 
-        IEntityEnumerableSource<IUser, ulong> IPrivateChannel.Recipients => Recipients;
+        ILoadableEntityEnumerable<IUser, ulong> IPrivateChannel.Recipients => Recipients;
     }
 }

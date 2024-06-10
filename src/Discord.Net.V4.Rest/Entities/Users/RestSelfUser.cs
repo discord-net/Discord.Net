@@ -16,10 +16,10 @@ public sealed class RestSelfUser : RestUser, ISelfUser
         => Model.MFAEnabled ?? false;
 
     public UserFlags Flags
-        => Model.Flags ?? UserFlags.None;
+        => (UserFlags?)Model.Flags ?? UserFlags.None;
 
     public PremiumType PremiumType
-        => Model.Premium ?? PremiumType.None;
+        => (PremiumType?)Model.Premium ?? PremiumType.None;
 
     public string Locale
         => Model.Locale!;

@@ -1,9 +1,11 @@
+using Discord.Models;
+
 namespace Discord;
 
 /// <summary>
 ///     Represents properties to use when modifying a stage instance.
 /// </summary>
-public class ModifyStageInstanceProperties
+public class ModifyStageInstanceProperties : IEntityProperties<ModifyStageInstanceParams>
 {
     /// <summary>
     ///     Gets or sets the topic of the stage.
@@ -14,4 +16,7 @@ public class ModifyStageInstanceProperties
     ///     Gets or sets the privacy level of the stage.
     /// </summary>
     public Optional<StagePrivacyLevel> PrivacyLevel { get; set; }
+
+    public ModifyStageInstanceParams ToApiModel()
+        => new() {Topic = Topic, PrivacyLevel = PrivacyLevel.Map(v => (int)v)};
 }

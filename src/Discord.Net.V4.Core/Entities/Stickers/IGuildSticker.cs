@@ -3,15 +3,15 @@ namespace Discord;
 /// <summary>
 ///     Represents a custom sticker within a guild.
 /// </summary>
-public interface IGuildSticker : ISticker, IModifyable<ModifyStickerProperties>, IDeletable
+public interface IGuildSticker : ISticker, IModifiable<ModifyStickerProperties>, IDeletable
 {
     /// <summary>
     ///     Gets the user that uploaded the guild sticker.
     /// </summary>
-    IEntitySource<ulong, IGuildUser>? Author { get; }
+    ILoadableEntity<ulong, IGuildUser>? Author { get; }
 
     /// <summary>
     ///     Gets the guild that this custom sticker is in.
     /// </summary>
-    IEntitySource<ulong, IGuild> Guild { get; }
+    ILoadableEntity<ulong, IGuild> Guild { get; }
 }

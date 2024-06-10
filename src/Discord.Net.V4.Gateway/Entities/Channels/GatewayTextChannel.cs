@@ -98,7 +98,7 @@ namespace Discord.Gateway
         internal override void DisposeClone() => throw new NotImplementedException();
         public Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions? options = null) => throw new NotImplementedException();
 
-        IEntitySource<ICategoryChannel, ulong>? INestedChannel.Category => Category; // TODO: category cacheable
+        ILoadableEntity<ICategoryChannel, ulong>? INestedChannel.Category => Category; // TODO: category cacheable
     }
 }
 

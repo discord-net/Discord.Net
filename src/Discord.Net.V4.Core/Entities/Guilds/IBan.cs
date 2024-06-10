@@ -11,7 +11,7 @@ public interface IBan
     /// <returns>
     ///     A user that was banned.
     /// </returns>
-    IEntitySource<ulong, IUser> User { get; }
+    ILoadableEntity<ulong, IUser> User { get; }
 
     /// <summary>
     ///     Gets the reason why the user is banned if specified.

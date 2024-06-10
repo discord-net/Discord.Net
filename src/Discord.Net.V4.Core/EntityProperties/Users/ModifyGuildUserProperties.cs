@@ -1,10 +1,12 @@
+using Discord.Models.Json;
+
 namespace Discord;
 
 /// <summary>
 ///     Properties that are used to modify an <see cref="IGuildUser" /> with the following parameters.
 /// </summary>
 /// <seealso cref="IGuildUser.ModifyAsync" />
-public sealed class ModifyGuildUserProperties
+public sealed class ModifyGuildUserProperties : IEntityProperties<ModifyGuildMemberParams>
 {
     /// <summary>
     ///     Gets or sets whether the user should be muted in a voice channel.
@@ -44,7 +46,7 @@ public sealed class ModifyGuildUserProperties
     ///     This user MUST already be in a <see cref="IVoiceChannel" /> for this to work.
     ///     When set, this property takes precedence over <see cref="ChannelId" />.
     /// </remarks>
-    public Optional<EntityOrId<ulong, IVoiceChannel>> Channel { get; set; }
+    public Optional<EntityOrId<ulong, IVoiceChannel>?> Channel { get; set; }
 
     /// <summary>
     ///     Sets a timestamp how long a user should be timed out for.
@@ -61,4 +63,18 @@ public sealed class ModifyGuildUserProperties
     ///     Not all flags can be modified, these are reserved for Discord.
     /// </remarks>
     public Optional<GuildUserFlags> Flags { get; set; }
+
+    public ModifyGuildMemberParams ToApiModel()
+    {
+        return new ModifyGuildMemberParams()
+        {
+            Nickname = Nickname,
+            IsDeaf = Deaf,
+            IsMute = Mute,
+            RoleIds = Roles.Map(v => v.Select(v => v.Id).ToArray()),
+            UserFlags = Flags.Map(v => (int)v),
+            CommunicationDisabledUntil = TimedOutUntil,
+            VoiceChannelId = Channel.Map(v => v?.Id)
+        };
+    }
 }

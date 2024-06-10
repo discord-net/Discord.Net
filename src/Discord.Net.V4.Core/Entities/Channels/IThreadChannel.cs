@@ -5,10 +5,10 @@ namespace Discord;
 /// <summary>
 ///     Represents a thread channel inside of a guild.
 /// </summary>
-public interface IThreadChannel : ITextChannel, IModifyable<ModifyThreadChannelProperties>
+public interface IThreadChannel : ITextChannel, IModifiable<ModifyThreadChannelProperties>
 {
-    IEntitySource<ulong, IUser>? Owner { get; }
-    IEntitySource<ulong, IThreadUser> CurrentUser { get; }
+    ILoadableEntity<ulong, IUser>? Owner { get; }
+    ILoadableEntity<ulong, IThreadUser> CurrentUser { get; }
 
     /// <summary>
     ///     Gets the type of the current thread channel.

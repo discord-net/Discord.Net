@@ -2,20 +2,20 @@ using Discord.Models;
 
 namespace Discord.Rest;
 
-public class RestEntitySource<TId, TEntity, TModel, TCommon> : RestEntitySource<TId, TEntity, TCommon>
+public class RestLoadableEntity<TId, TEntity, TModel, TCommon> : RestLoadableEntity<TId, TEntity, TCommon>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>, IEntity<TId>, TCommon, IModeled<TId, TModel>
     where TCommon : class, IEntity<TId>
     where TModel : class, IEntityModel<TId>
 {
-    internal RestEntitySource(DiscordRestClient client, TId id, LoadEntity loadFunc) : base(client, id, loadFunc)
+    internal RestLoadableEntity(DiscordRestClient client, TId id, LoadEntity loadFunc) : base(client, id, loadFunc)
     { }
 
-    internal static RestEntitySource<TId, TEntity, TModel, TCommon> Create<T>(DiscordRestClient client, TId id,
+    internal static RestLoadableEntity<TId, TEntity, TModel, TCommon> Create<T>(DiscordRestClient client, TId id,
         ApiRoute<T> route, Func<DiscordRestClient, TModel, TEntity> factory)
         where T : class, TModel
     {
-        return new RestEntitySource<TId, TEntity, TModel, TCommon>(
+        return new RestLoadableEntity<TId, TEntity, TModel, TCommon>(
             client,
             id,
             async (delegateClient, _, options, token) =>
@@ -28,7 +28,7 @@ public class RestEntitySource<TId, TEntity, TModel, TCommon> : RestEntitySource<
     }
 }
 
-public class RestEntitySource<TId, TEntity, TCommon> : IEntitySource<TId, TCommon>
+public class RestLoadableEntity<TId, TEntity, TCommon> : ILoadableEntity<TId, TCommon>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>, IEntity<TId>, TCommon
     where TCommon : class, IEntity<TId>
@@ -42,7 +42,7 @@ public class RestEntitySource<TId, TEntity, TCommon> : IEntitySource<TId, TCommo
     private readonly DiscordRestClient _client;
     private readonly LoadEntity _loadFunc;
 
-    internal RestEntitySource(DiscordRestClient client, TId id, LoadEntity loadFunc)
+    internal RestLoadableEntity(DiscordRestClient client, TId id, LoadEntity loadFunc)
     {
         Id = id;
         Value = null;

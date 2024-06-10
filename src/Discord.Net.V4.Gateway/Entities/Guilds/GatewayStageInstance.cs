@@ -48,9 +48,9 @@ namespace Discord.Gateway
         internal override object Clone() => throw new NotImplementedException();
         internal override void DisposeClone() => throw new NotImplementedException();
 
-        IEntitySource<IGuild, ulong> IStageInstance.Guild => Guild;
+        ILoadableEntity<IGuild, ulong> IStageInstance.Guild => Guild;
 
-        IEntitySource<IGuildChannel, ulong> IStageInstance.Channel => Channel;
+        ILoadableEntity<IGuildChannel, ulong> IStageInstance.Channel => Channel;
     }
 }
 

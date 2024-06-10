@@ -2,7 +2,7 @@ namespace Discord;
 
 public interface IVoiceState
 {
-    IEntitySource<ulong, IVoiceChannel> VoiceChannel { get; }
+    ILoadableEntity<ulong, IVoiceChannel> VoiceChannel { get; }
 
     string VoiceSessionId { get; }
 

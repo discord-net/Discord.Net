@@ -8,9 +8,8 @@ public interface IGuildForumChannelModel : IGuildChannelModel
     IEnumerable<IForumTagModel> AvailableTags { get; }
 }
 
-public interface IForumTagModel
+public interface IForumTagModel : IEntityModel<ulong>
 {
-    ulong Id { get; }
     string Name { get; }
     bool Moderated { get; }
     string? EmojiName { get; }

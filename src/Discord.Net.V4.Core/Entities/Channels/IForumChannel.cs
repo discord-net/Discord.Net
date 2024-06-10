@@ -1,9 +1,11 @@
+using Discord.Models.Json;
+
 namespace Discord;
 
 /// <summary>
 ///     Represents a forum channel in a guild that can create posts.
 /// </summary>
-public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyable<ModifyForumChannelProperties>
+public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifiable<ModifyForumChannelProperties, ModifyGuildChannelParams>
 {
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
@@ -29,7 +31,7 @@ public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifyabl
     /// <summary>
     ///     Gets a collection of tags inside of this forum channel.
     /// </summary>
-    IReadOnlyCollection<IForumTag> Tags { get; }
+    IReadOnlyCollection<ForumTag> Tags { get; }
 
     /// <summary>
     ///     Gets the current rate limit on creating posts in this forum channel.

@@ -13,7 +13,7 @@ public interface IGuildOnboarding
     /// <summary>
     ///     Gets the guild this onboarding is part of.
     /// </summary>
-    IEntitySource<ulong, IGuild> Guild { get; }
+    ILoadableEntity<ulong, IGuild> Guild { get; }
 
     /// <summary>
     ///     Gets prompts shown during onboarding and in customize community.

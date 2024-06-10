@@ -9,10 +9,10 @@ public interface INestedChannel : IGuildChannel, IInvitableChannel
     ///     Gets the parent (category) of this channel in the guild's channel list.
     /// </summary>
     /// <returns>
-    ///     A <see cref="IEntitySource{TId, TEntity}" /> representing the category of this channel;
+    ///     A <see cref="ILoadableEntity{TId,TEntity}" /> representing the category of this channel;
     ///     <see langword="null" /> if none is set.
     /// </returns>
-    IEntitySource<ulong, ICategoryChannel>? Category { get; }
+    ILoadableEntity<ulong, ICategoryChannel>? Category { get; }
 
     /// <summary>
     ///     Syncs the permissions of this nested channel with its parent's.

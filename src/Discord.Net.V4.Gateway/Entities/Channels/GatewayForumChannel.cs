@@ -93,6 +93,6 @@ namespace Discord.Gateway
         internal override object Clone() => throw new NotImplementedException();
         internal override void DisposeClone() => throw new NotImplementedException();
 
-        IEntitySource<ICategoryChannel, ulong>? INestedChannel.Category => Category;
+        ILoadableEntity<ICategoryChannel, ulong>? INestedChannel.Category => Category;
     }
 }

@@ -116,8 +116,8 @@ namespace Discord.Gateway
                 base.Update(user);
         }
 
-        IEntitySource<IGuild, ulong> IGuildUser.Guild => Guild;
+        ILoadableEntity<IGuild, ulong> IGuildUser.Guild => Guild;
 
-        IEntitySource<IVoiceChannel, ulong> IVoiceState.VoiceChannel => throw new NotImplementedException();
+        ILoadableEntity<IVoiceChannel, ulong> IVoiceState.VoiceChannel => throw new NotImplementedException();
     }
 }

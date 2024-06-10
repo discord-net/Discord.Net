@@ -101,7 +101,7 @@ namespace Discord.Gateway
         public string GetIconUrl() => throw new NotImplementedException();
         public Task ModifyAsync(Action<ModifyRoleProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
 
-        IEntitySource<IGuild, ulong> IRole.Guild => Guild;
+        ILoadableEntity<IGuild, ulong> IRole.Guild => Guild;
     }
 }
 
