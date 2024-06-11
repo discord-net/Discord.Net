@@ -11,7 +11,7 @@ public interface IGuild :
     IPartialGuild,
     Deletable,
     Modifiable,
-    IGuildEntitySource
+    IGuildEntitySource<IGuild>
 {
     /// <summary>
     ///     Gets the amount of time (in seconds) a user must be inactive in a voice channel for until they are
@@ -67,7 +67,7 @@ public interface IGuild :
     /// <returns>
     ///     A URL pointing to the guild's icon; <see langword="null" /> if none is set.
     /// </returns>
-    string? IconUrl => CDN.GetGuildIconUrl(Client.Config, (this as ISnowflakeEntity).Id, IconId);
+    string? IconUrl => CDN.GetGuildIconUrl(Client.Config, Id, IconId);
 
     /// <summary>
     ///     Gets the URL of this guild's splash image.
@@ -75,7 +75,7 @@ public interface IGuild :
     /// <returns>
     ///     A URL pointing to the guild's splash image; <see langword="null" /> if none is set.
     /// </returns>
-    string? SplashUrl => CDN.GetGuildSplashUrl(Client.Config, (this as ISnowflakeEntity).Id, SplashId);
+    string? SplashUrl => CDN.GetGuildSplashUrl(Client.Config, Id, SplashId);
 
     /// <summary>
     ///     Gets the ID of this guild's discovery splash image.
@@ -248,8 +248,6 @@ public interface IGuild :
 
     static ApiBodyRoute<ModifyGuildParams> Modifiable.ModifyRoute(IPathable path, ulong id, ModifyGuildParams args)
         => Routes.ModifyGuild(id, args);
-
-    ulong ILoadableEntity<ulong, IGuild>.Id => ((ISnowflakeEntity)this).Id;
 
     VerificationLevel? IPartialGuild.VerificationLevel => VerificationLevel;
     GuildFeatures? IPartialGuild.Features => Features;

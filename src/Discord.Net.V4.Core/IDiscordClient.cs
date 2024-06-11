@@ -13,8 +13,11 @@ public interface IDiscordClient : IDisposable, IAsyncDisposable
     /// </summary>
     ILoadableEntity<ulong, ISelfUser> CurrentUser { get; }
 
-    IRootEntitySource<IGuildEntitySource, ulong, IGuild> Guilds { get; }
-    IGuildEntitySource Guild(ulong id) => Guilds[id];
+    IRootEntitySource<ILoadableGuildEntitySource<IGuild>, ulong, IGuild> Guilds { get; }
+    ILoadableGuildEntitySource<IGuild> Guild(ulong id) => Guilds[id];
+
+    IRootEntitySource<ILoadableChannelEntitySource<IChannel>, ulong, IChannel> Channels { get; }
+    ILoadableChannelEntitySource<IChannel> Channel(ulong id) => Channels[id];
 
     IRestApiClient RestApiClient { get; }
 

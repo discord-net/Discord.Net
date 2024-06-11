@@ -2,8 +2,9 @@ using Discord.Models;
 
 namespace Discord;
 
-public interface IEntityProvider<TEntity, TAbstraction, TModel> : IClientProvider
-    where TEntity : class, TAbstraction, IConstructable<TEntity, TModel>
+public interface IEntityProvider<out TEntity, in TModel> : IClientProvider
+    where TEntity : IEntity
     where TModel : IEntityModel?
 {
+    TEntity Create(TModel model);
 }

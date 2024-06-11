@@ -26,7 +26,7 @@ public static partial class Routes
             "users/@me",
             body);
 
-    public static ApiRoute<PartialGuild> GetCurrentUserGuilds(ulong? before, ulong? after, int? limit, bool? withCounts)
+    public static ApiRoute<IEnumerable<PartialGuild>> GetCurrentUserGuilds(ulong? before, ulong? after, int? limit, bool? withCounts)
         => new(
             nameof(GetCurrentUserGuilds),
             RequestMethod.Get,

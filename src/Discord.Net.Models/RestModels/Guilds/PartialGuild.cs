@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class PartialGuild
+public sealed class PartialGuild : IPartialGuildModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -34,9 +34,6 @@ public sealed class PartialGuild
     [JsonPropertyName("premium_subscription_count")]
     public Optional<int> PremiumSubscriptionCount { get; set; }
 
-    [JsonPropertyName("nsfw")]
-    public Optional<bool?> Nsfw { get; set; }
-
     [JsonPropertyName("nsfw_level")]
     public Optional<int> NsfwLevel { get; set; }
 
@@ -48,5 +45,19 @@ public sealed class PartialGuild
 
     [JsonPropertyName("approximate_presence_count")]
     public Optional<int> ApproximatePresenceCount { get; set; }
+
+    string? IPartialGuildModel.SplashId => Splash;
+
+    string? IPartialGuildModel.BannerId => BannerHash;
+
+    string? IPartialGuildModel.Description => Description;
+
+    string? IPartialGuildModel.IconId => IconHash;
+
+    string[]? IPartialGuildModel.Features => Features;
+    int? IPartialGuildModel.VerificationLevel => VerificationLevel.ToNullable();
+    string? IPartialGuildModel.VanityUrlCode => VanityUrlCode;
+    int? IPartialGuildModel.NsfwLevel => NsfwLevel;
+    int? IPartialGuildModel.PremiumSubscriptionCount => PremiumSubscriptionCount;
 
 }
