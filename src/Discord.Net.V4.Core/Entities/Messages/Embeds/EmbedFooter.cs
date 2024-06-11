@@ -4,7 +4,7 @@ namespace Discord;
 
 /// <summary> A footer field for an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedFooter
+public readonly struct EmbedFooter : IEntityProperties<Models.Json.EmbedFooter>, IConstructable<EmbedFooter, Models.Json.EmbedFooter>
 {
     /// <summary>
     ///     The text of the footer field.
@@ -28,13 +28,13 @@ public readonly struct EmbedFooter
     /// <returns>
     ///     A string containing the proxied URL of the footer icon.
     /// </returns>
-    public readonly string? ProxyUrl;
+    public readonly string? ProxyIconUrl;
 
-    internal EmbedFooter(string text, string? iconUrl, string? proxyUrl)
+    internal EmbedFooter(string text, string? iconUrl, string? proxyIconUrl)
     {
         Text = text;
         IconUrl = iconUrl;
-        ProxyUrl = proxyUrl;
+        ProxyIconUrl = proxyIconUrl;
     }
 
     private string DebuggerDisplay => $"{Text} ({IconUrl})";
@@ -54,6 +54,18 @@ public readonly struct EmbedFooter
 
     public static bool operator !=(EmbedFooter? left, EmbedFooter? right)
         => !(left == right);
+
+    public Models.Json.EmbedFooter ToApiModel(Models.Json.EmbedFooter? existing = default)
+    {
+        existing ??= new() {Text = Text};
+
+        existing.IconUrl = Optional.FromNullable(IconUrl);
+        existing.ProxyIconUrl = Optional.FromNullable(ProxyIconUrl);
+
+        return existing;
+    }
+
+    public static EmbedFooter Construct(IDiscordClient client, Models.Json.EmbedFooter model) => throw new NotImplementedException();
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedFooter" />.
@@ -77,5 +89,5 @@ public readonly struct EmbedFooter
 
     /// <inheritdoc />
     public override int GetHashCode()
-        => (Text, IconUrl, ProxyUrl).GetHashCode();
+        => (Text, IconUrl, ProxyUrl: ProxyIconUrl).GetHashCode();
 }

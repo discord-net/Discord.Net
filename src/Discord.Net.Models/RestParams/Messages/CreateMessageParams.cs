@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class CreateMessageParams
+public sealed class CreateMessageParams : AttachmentUploadParams
 {
     [JsonPropertyName("content")]
     public Optional<string> Content { get; set; }

@@ -2,13 +2,13 @@ namespace Discord.Extensions;
 
 public static class DeletableEntitySourceExtensions
 {
-    public static Task DeleteAsync<TLoadable, TId, TEntity>(
-        this TLoadable entity,
+    public static Task DeleteAsync<TSource, TId, TEntity>(
+        this TSource entity,
         RequestOptions? options = null,
         CancellationToken token = default
     )
-        where TLoadable : ILoadableEntity<TId, TEntity>, IPathable, IClientProvider
-        where TEntity : class, IPathableDeletable<TEntity, TId>, IEntity<TId>
+        where TSource : IEntitySource<TId, TEntity>
+        where TEntity : class, IDeletable<TId, TEntity>, IEntity<TId>
         where TId : IEquatable<TId>
-        => IPathableDeletable<TEntity, TId>.DeleteAsync(entity.Client, entity, entity.Id, options, token);
+        => IDeletable<TId, TEntity>.DeleteAsync(entity.Client, entity, entity.Id, options, token);
 }

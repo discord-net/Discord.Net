@@ -1,4 +1,5 @@
 using Discord.Models.Json;
+using Discord.Models.Json.Stickers;
 
 namespace Discord.Rest;
 
@@ -35,11 +36,11 @@ public static partial class Routes
             ContentType.MultipartForm,
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<ModifyStickerProperties, Sticker> ModifyGuildSticker(ulong guildId,
-        ModifyStickerProperties body)
+    public static ApiBodyRoute<ModifyGuildStickersParams, Sticker> ModifyGuildSticker(ulong guildId, ulong stickerId,
+        ModifyGuildStickersParams body)
         => new(nameof(ModifyGuildSticker),
             RequestMethod.Patch,
-            $"guilds/{guildId}/stickers",
+            $"guilds/{guildId}/stickers/{stickerId}",
             body,
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));

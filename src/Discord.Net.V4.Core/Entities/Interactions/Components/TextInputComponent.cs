@@ -1,3 +1,5 @@
+using Discord.Models.Json;
+
 namespace Discord;
 
 /// <summary>
@@ -58,4 +60,20 @@ public class TextInputComponent : IMessageComponent
 
     /// <inheritdoc />
     public string CustomId { get; }
+
+    public MessageComponent ToApiModel(MessageComponent? existing = default)
+    {
+        return existing ?? new Models.Json.TextInputComponent()
+        {
+            Label = Label,
+            Type = (uint)Type,
+            CustomId = CustomId,
+            Placeholder = Optional.FromNullable(Placeholder),
+            Required = Optional.FromNullable(Required),
+            Style = (int)Style,
+            Value = Optional.FromNullable(Value),
+            MaxLength = Optional.FromNullable(MaxLength),
+            MinLength = Optional.FromNullable(MinLength)
+        };
+    }
 }

@@ -7,15 +7,9 @@ namespace Discord;
 /// </summary>
 /// <typeparam name="TEntity">The entity type of the source.</typeparam>
 /// <typeparam name="TId">The ID type of the source.</typeparam>
-public interface ILoadableEntity<out TId, TEntity> : ILoadableEntity<TEntity>
+public interface ILoadableEntity<out TId, TEntity> : ILoadableEntity<TEntity>, IIdentifiable<TId>
     where TEntity : class, IEntity<TId>
-    where TId : IEquatable<TId>
-{
-    /// <summary>
-    ///     Gets the unique identifier of the entity being represented.
-    /// </summary>
-    TId Id { get; }
-}
+    where TId : IEquatable<TId>;
 
 
 /// <summary>

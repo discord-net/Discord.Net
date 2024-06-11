@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a choice for a <see cref="SelectMenuComponent" />.
 /// </summary>
-public class SelectMenuOption
+public readonly struct SelectMenuOption : IEntityProperties<Models.Json.SelectMenuOption>
 {
     internal SelectMenuOption(string label, string value, string? description, IEmote? emote, bool? defaultValue)
     {
@@ -38,4 +38,16 @@ public class SelectMenuOption
     ///     Gets whether or not this option will render as selected by default.
     /// </summary>
     public bool? IsDefault { get; }
+
+    public Models.Json.SelectMenuOption ToApiModel(Models.Json.SelectMenuOption? existing = default)
+    {
+        return existing ?? new Models.Json.SelectMenuOption()
+        {
+            Label = Label,
+            Value = Value,
+            Description = Optional.FromNullable(Description),
+            IsDefault = Optional.FromNullable(IsDefault),
+            Emoji = Optional.FromNullable(Emote).Map(v => v.ToApiModel())
+        };
+    }
 }

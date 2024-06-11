@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a general container for any type of emote in a message.
 /// </summary>
-public interface IEmote
+public interface IEmote : IEntityProperties<Models.Json.IEmote>
 {
     /// <summary>
     ///     Gets the display name or Unicode representation of this emote.

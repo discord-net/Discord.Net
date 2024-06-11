@@ -4,54 +4,53 @@ using System.Diagnostics;
 namespace Discord;
 
 /// <summary>
-///     Represents an embed object seen in an <see cref="IUserMessage" />.
+///     Represents an embed object seen in an <see cref="IMessage" />.
 /// </summary>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-public readonly struct Embed
+public sealed class Embed : IEntityProperties<Discord.Models.Json.Embed>, IConstructable<Embed, Discord.Models.Json.Embed>
 {
-    /// <inheritdoc />
-    public readonly EmbedType Type;
+    public EmbedType Type { get; }
 
-    /// <inheritdoc />
-    public readonly string? Description;
 
-    /// <inheritdoc />
-    public readonly string? Url;
+    public string? Description { get; }
 
-    /// <inheritdoc />
-    public readonly string? Title;
 
-    /// <inheritdoc />
-    public readonly DateTimeOffset? Timestamp;
+    public string? Url { get; }
 
-    /// <inheritdoc />
-    public readonly Color? Color;
 
-    /// <inheritdoc />
-    public readonly EmbedImage? Image;
+    public string? Title { get; }
 
-    /// <inheritdoc />
-    public readonly EmbedVideo? Video;
 
-    /// <inheritdoc />
-    public readonly EmbedAuthor? Author;
+    public DateTimeOffset? Timestamp { get; }
 
-    /// <inheritdoc />
-    public readonly EmbedFooter? Footer;
 
-    /// <inheritdoc />
-    public readonly EmbedProvider? Provider;
+    public Color? Color { get; }
 
-    /// <inheritdoc />
-    public readonly EmbedThumbnail? Thumbnail;
 
-    /// <inheritdoc />
-    public readonly ImmutableArray<EmbedField> Fields;
+    public EmbedImage? Image { get; }
+
+
+    public EmbedVideo? Video { get; }
+
+
+    public EmbedAuthor? Author { get; }
+
+
+    public EmbedFooter? Footer { get; }
+
+
+    public EmbedProvider? Provider { get; }
+
+
+    public EmbedThumbnail? Thumbnail { get; }
+
+
+    public IReadOnlyCollection<EmbedField> Fields { get; }
 
     internal Embed(EmbedType type)
     {
         Type = type;
-        Fields = ImmutableArray.Create<EmbedField>();
+        Fields = [];
     }
 
     internal Embed(EmbedType type,
@@ -66,7 +65,7 @@ public readonly struct Embed
         EmbedFooter? footer,
         EmbedProvider? provider,
         EmbedThumbnail? thumbnail,
-        ImmutableArray<EmbedField> fields)
+        IEnumerable<EmbedField> fields)
     {
         Type = type;
         Title = title;
@@ -80,7 +79,7 @@ public readonly struct Embed
         Footer = footer;
         Provider = provider;
         Thumbnail = thumbnail;
-        Fields = fields;
+        Fields = fields.ToImmutableArray();
     }
 
     /// <summary>
@@ -111,6 +110,48 @@ public readonly struct Embed
 
     public static bool operator !=(Embed? left, Embed? right)
         => !(left == right);
+
+    public Models.Json.Embed ToApiModel(Models.Json.Embed? existing = default)
+    {
+        existing ??= new();
+
+        existing.Type = Optional.FromNullable<string>(Type);
+        existing.Description = Optional.FromNullable(Description);
+        existing.Url = Optional.FromNullable(Url);
+        existing.Title = Optional.FromNullable(Title);
+        existing.Timestamp = Timestamp;
+        existing.Color = Optional.FromNullable(Color).Map(v => v.RawValue);
+        existing.Image = Optional.FromNullable(Image).Map(v => v.ToApiModel());
+        existing.Video = Optional.FromNullable(Video).Map(v => v.ToApiModel());
+        existing.Author = Optional.FromNullable(Author).Map(v => v.ToApiModel());
+        existing.Footer = Optional.FromNullable(Footer).Map(v => v.ToApiModel());
+        existing.Provider = Optional.FromNullable(Provider).Map(v => v.ToApiModel());
+        existing.Thumbnail = Optional.FromNullable(Thumbnail).Map(v => v.ToApiModel());
+        existing.Fields = Fields.Count == 0
+            ? Optional<Models.Json.EmbedField[]>.Unspecified
+            : new Optional<Models.Json.EmbedField[]>(Fields.Select(v => v.ToApiModel()).ToArray());
+
+        return existing;
+    }
+
+    public static Embed Construct(IDiscordClient client, Discord.Models.Json.Embed model)
+    {
+        return new Embed(
+            model.Type.Map(v => new EmbedType(v)) | EmbedType.Unspecified,
+            model.Title,
+            model.Description,
+            model.Url,
+            model.Timestamp,
+            model.Color.Map(v => new Color(v)),
+            model.Image.Map(v => EmbedImage.Construct(client, v)),
+            model.Video.Map(v => EmbedVideo.Construct(client, v)),
+            model.Author.Map(v => EmbedAuthor.Construct(client, v)),
+            model.Footer.Map(v => EmbedFooter.Construct(client, v)),
+            model.Provider.Map(v => EmbedProvider.Construct(client, v)),
+            model.Thumbnail.Map(v => EmbedThumbnail.Construct(client, v)),
+            model.Fields.Map(v => v.Select(v => EmbedField.Construct(client, v)).ToArray()) | []
+        );
+    }
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="Embed" />.

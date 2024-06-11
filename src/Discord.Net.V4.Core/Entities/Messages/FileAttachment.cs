@@ -1,6 +1,8 @@
+using Discord.Models;
+
 namespace Discord;
 
-public struct FileAttachment : IDisposable
+public struct FileAttachment : IDisposable, IEntityProperties<AttachmentParam>, IEntityProperties<Models.UploadAttachment>
 {
     /// <summary>
     ///     The filename of this <see cref="FileAttachment" />.
@@ -83,10 +85,27 @@ public struct FileAttachment : IDisposable
 
     public void Dispose()
     {
-        if (!_isDisposed)
-        {
-            Content?.Dispose();
-            _isDisposed = true;
-        }
+        if (_isDisposed) return;
+        Content?.Dispose();
+        _isDisposed = true;
     }
+
+    public AttachmentParam ToApiModel(AttachmentParam? existing = default)
+    {
+        return new AttachmentParam
+        {
+            Stream = Content, Attachment = ToUploadAttachmentModel()
+        };
+    }
+
+    private UploadAttachment ToUploadAttachmentModel()
+    {
+        return new UploadAttachment()
+        {
+            Filename = IsSpoiler ? AttachmentUtils.AppendSpoilerPrefix(FileName) : FileName,
+            Description = Optional.FromNullable(Description),
+        };
+    }
+
+    UploadAttachment IEntityProperties<UploadAttachment>.ToApiModel(UploadAttachment? existing) => ToUploadAttachmentModel();
 }

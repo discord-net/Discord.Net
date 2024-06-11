@@ -4,7 +4,7 @@ namespace Discord;
 
 /// <summary> A provider field for an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedProvider
+public readonly struct EmbedProvider : IEntityProperties<Models.Json.EmbedProvider>, IConstructable<EmbedProvider, Models.Json.EmbedProvider>
 {
     /// <summary>
     ///     The name of the provider.
@@ -22,7 +22,7 @@ public readonly struct EmbedProvider
     /// </returns>
     public readonly string? Url;
 
-    internal EmbedProvider(string name, string url)
+    internal EmbedProvider(string? name, string? url)
     {
         Name = name;
         Url = url;
@@ -45,6 +45,21 @@ public readonly struct EmbedProvider
 
     public static bool operator !=(EmbedProvider? left, EmbedProvider? right)
         => !(left == right);
+
+    public Models.Json.EmbedProvider ToApiModel(Models.Json.EmbedProvider? existing = default)
+    {
+        existing ??= new();
+
+        existing.Name = Optional.FromNullable(Name);
+        existing.Url = Optional.FromNullable(Url);
+
+        return existing;
+    }
+
+    public static EmbedProvider Construct(IDiscordClient client, Models.Json.EmbedProvider model)
+    {
+        return new EmbedProvider(model.Name, model.Url);
+    }
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedProvider" />.

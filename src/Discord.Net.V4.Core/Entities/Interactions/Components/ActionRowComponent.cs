@@ -1,3 +1,4 @@
+using Discord.Models.Json;
 using System.Collections.Immutable;
 
 namespace Discord;
@@ -24,4 +25,13 @@ public sealed class ActionRowComponent : IMessageComponent
     /// </remarks>
     public string? CustomId
         => null;
+
+    public MessageComponent ToApiModel(MessageComponent? existing = default)
+    {
+        return existing ?? new ActionRow
+        {
+            Type = (uint)Type,
+            Components = Components.Select(x => x.ToApiModel()).ToArray()
+        };
+    }
 }

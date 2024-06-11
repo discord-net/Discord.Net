@@ -66,7 +66,7 @@ public readonly struct Optional<T>
 
     public Optional<U> Map<U>(Func<T, U> func)
     {
-        return IsSpecified ? Optional.Create(func(_value)) : Optional<U>.Unspecified;
+        return IsSpecified ? Optional.Some(func(_value)) : Optional<U>.Unspecified;
     }
 
     public Optional<U> Map<U>(Func<T, Optional<U>> func)
@@ -101,8 +101,14 @@ public readonly struct Optional<T>
 }
 public static class Optional
 {
-    public static Optional<T> Create<T>() => Optional<T>.Unspecified;
-    public static Optional<T> Create<T>(T value) => new(value);
+    public static Optional<T> FromNullable<T>(T? value)
+        where T : struct
+        => value.HasValue ? Some(value.Value) : Optional<T>.Unspecified;
+    public static Optional<T> FromNullable<T>(T? value)
+        where T : class
+        => value is null ? Optional<T>.Unspecified : Some<T>(value);
+    public static Optional<T> Some<T>() => Optional<T>.Unspecified;
+    public static Optional<T> Some<T>(T value) => new(value);
 
     public static T? ToNullable<T>(this Optional<T> val)
         where T : struct

@@ -4,7 +4,7 @@ namespace Discord;
 
 /// <summary> A thumbnail featured in an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedThumbnail
+public readonly struct EmbedThumbnail : IEntityProperties<Models.Json.EmbedThumbnail>, IConstructable<EmbedThumbnail, Models.Json.EmbedThumbnail>
 {
     /// <summary>
     ///     The URL of the thumbnail.
@@ -12,7 +12,7 @@ public readonly struct EmbedThumbnail
     /// <returns>
     ///     A string containing the URL of the thumbnail.
     /// </returns>
-    public readonly string? Url;
+    public readonly string Url;
 
     /// <summary>
     ///     A proxied URL of this thumbnail.
@@ -40,7 +40,7 @@ public readonly struct EmbedThumbnail
     /// </returns>
     public readonly int? Width;
 
-    internal EmbedThumbnail(string? url, string? proxyUrl, int? height, int? width)
+    internal EmbedThumbnail(string url, string? proxyUrl, int? height, int? width)
     {
         Url = url;
         ProxyUrl = proxyUrl;
@@ -65,6 +65,22 @@ public readonly struct EmbedThumbnail
 
     public static bool operator !=(EmbedThumbnail? left, EmbedThumbnail? right)
         => !(left == right);
+
+    public Models.Json.EmbedThumbnail ToApiModel(Models.Json.EmbedThumbnail? existing = default)
+    {
+        existing ??= new() {Url = Url};
+
+        existing.ProxyUrl = Optional.FromNullable(ProxyUrl);
+        existing.Height = Optional.FromNullable(Height);
+        existing.Width = Optional.FromNullable(Width);
+
+        return existing;
+    }
+
+    public static EmbedThumbnail Construct(IDiscordClient client, Models.Json.EmbedThumbnail model)
+    {
+        return new EmbedThumbnail(model.Url, model.ProxyUrl, model.Height, model.Width);
+    }
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedThumbnail" />.

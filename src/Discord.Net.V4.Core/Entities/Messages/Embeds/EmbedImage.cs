@@ -4,7 +4,9 @@ namespace Discord;
 
 /// <summary> An image for an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedImage
+public readonly struct EmbedImage :
+    IEntityProperties<Models.Json.EmbedImage>,
+    IConstructable<EmbedImage, Models.Json.EmbedImage>
 {
     /// <summary>
     ///     The URL of the image.
@@ -12,7 +14,7 @@ public readonly struct EmbedImage
     /// <returns>
     ///     A string containing the URL of the image.
     /// </returns>
-    public readonly string? Url;
+    public readonly string Url;
 
     /// <summary>
     ///     A proxied URL of this image.
@@ -40,7 +42,7 @@ public readonly struct EmbedImage
     /// </returns>
     public readonly int? Width;
 
-    internal EmbedImage(string? url, string? proxyUrl, int? height, int? width)
+    internal EmbedImage(string url, string? proxyUrl, int? height, int? width)
     {
         Url = url;
         ProxyUrl = proxyUrl;
@@ -65,6 +67,22 @@ public readonly struct EmbedImage
 
     public static bool operator !=(EmbedImage? left, EmbedImage? right)
         => !(left == right);
+
+    public Models.Json.EmbedImage ToApiModel(Models.Json.EmbedImage? existing = default)
+    {
+        existing ??= new() {Url = Url};
+
+        existing.ProxyUrl = Optional.FromNullable(ProxyUrl);
+        existing.Height = Optional.FromNullable(Height);
+        existing.Width = Optional.FromNullable(Width);
+
+        return existing;
+    }
+
+    public static EmbedImage Construct(IDiscordClient client, Models.Json.EmbedImage model)
+    {
+        return new EmbedImage(model.Url, model.ProxyUrl, model.Height, model.Width);
+    }
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedImage" />.

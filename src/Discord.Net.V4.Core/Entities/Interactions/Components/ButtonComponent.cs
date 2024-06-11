@@ -1,3 +1,5 @@
+using Discord.Models.Json;
+
 namespace Discord;
 
 /// <summary>
@@ -25,7 +27,7 @@ public sealed class ButtonComponent : IMessageComponent
     /// <summary>
     ///     Gets the label of the button, this is the text that is shown.
     /// </summary>
-    public string Label { get; }
+    public string? Label { get; }
 
     /// <summary>
     ///     Gets the <see cref="IEmote" /> displayed with this button.
@@ -43,11 +45,25 @@ public sealed class ButtonComponent : IMessageComponent
     /// <summary>
     ///     Gets whether this button is disabled or not.
     /// </summary>
-    public bool IsDisabled { get; }
+    public bool? IsDisabled { get; }
 
     /// <inheritdoc />
     public ComponentType Type => ComponentType.Button;
 
     /// <inheritdoc />
     public string? CustomId { get; }
+
+    public MessageComponent ToApiModel(MessageComponent? existing = default)
+    {
+        return existing ?? new Models.Json.ButtonComponent()
+        {
+            Type = (uint)Type,
+            Emote = Optional.FromNullable(Emote).Map(v => v.ToApiModel()),
+            Label = Optional.FromNullable(Label),
+            Style = (int)Style,
+            IsDisabled = Optional.FromNullable(IsDisabled),
+            CustomId = Optional.FromNullable(CustomId),
+            Url = Optional.FromNullable(Url)
+        };
+    }
 }

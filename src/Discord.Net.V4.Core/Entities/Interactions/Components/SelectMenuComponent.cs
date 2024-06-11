@@ -1,3 +1,4 @@
+using Discord.Models.Json;
 using System.Collections.Immutable;
 
 namespace Discord;
@@ -58,4 +59,21 @@ public class SelectMenuComponent : IMessageComponent
 
     /// <inheritdoc />
     public string CustomId { get; }
+
+    public MessageComponent ToApiModel(MessageComponent? existing = default)
+    {
+        return existing ?? new Models.Json.SelectMenuComponent()
+        {
+            Type = (uint)Type,
+            CustomId = CustomId,
+            IsDisabled = IsDisabled,
+            Options = Options
+                .OptionalIf(v => v?.Count > 0)
+                .Map(v => v!.Select(v => v.ToApiModel()).ToArray()),
+            Placeholder = Optional.FromNullable(Placeholder),
+            ChannelTypes = Optional.FromNullable(ChannelTypes).Map(v => v.Select(v => (int)v).ToArray()),
+            MaxValues = MaxValues,
+            MinValues = MinValues,
+        };
+    }
 }

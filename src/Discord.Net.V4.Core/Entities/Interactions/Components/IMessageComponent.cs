@@ -1,9 +1,11 @@
+using Discord.Models.Json;
+
 namespace Discord;
 
 /// <summary>
 ///     Represents a message component on a message.
 /// </summary>
-public interface IMessageComponent
+public interface IMessageComponent : IEntityProperties<MessageComponent>
 {
     /// <summary>
     ///     Gets the <see cref="ComponentType" /> of this Message Component.

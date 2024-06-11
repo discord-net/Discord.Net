@@ -11,7 +11,7 @@ public interface IGuild :
     IPartialGuild,
     Deletable,
     Modifiable,
-    IGuildEntitySource<IGuild>
+    IGuildEntitySource
 {
     /// <summary>
     ///     Gets the amount of time (in seconds) a user must be inactive in a voice channel for until they are
@@ -75,7 +75,7 @@ public interface IGuild :
     /// <returns>
     ///     A URL pointing to the guild's splash image; <see langword="null" /> if none is set.
     /// </returns>
-    string? SplashUrl => CDN.GetGuildSplashUrl(Client.Config, Id, SplashId);
+    string? SplashUrl => CDN.GetGuildSplashUrl(Client.Config, (this as ISnowflakeEntity).Id, SplashId);
 
     /// <summary>
     ///     Gets the ID of this guild's discovery splash image.
@@ -105,13 +105,7 @@ public interface IGuild :
 
     ILoadableEntity<ulong, IRole> EveryoneRole { get; }
 
-    ILoadableEntityEnumerable<ulong, IGuildEmote> Emotes { get; }
-
-    ILoadableEntityEnumerable<ulong, IGuildSticker> Stickers { get; }
-
     new GuildFeatures Features { get; }
-
-    ILoadableEntityEnumerable<ulong, IRole> Roles { get; }
 
     /// <summary>
     ///     Gets the tier of guild boosting in this guild.

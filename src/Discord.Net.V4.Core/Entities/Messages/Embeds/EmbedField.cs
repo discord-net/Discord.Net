@@ -6,7 +6,7 @@ namespace Discord;
 ///     A field for an <see cref="Embed" />.
 /// </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedField
+public readonly struct EmbedField : IEntityProperties<Models.Json.EmbedField>, IConstructable<EmbedField, Models.Json.EmbedField>
 {
     /// <summary>
     ///     The name of the field.
@@ -21,9 +21,9 @@ public readonly struct EmbedField
     /// <summary>
     ///     A value that indicates whether the field should be in-line with each other.
     /// </summary>
-    public readonly bool Inline;
+    public readonly bool? Inline;
 
-    internal EmbedField(string name, string value, bool inline)
+    internal EmbedField(string name, string value, bool? inline)
     {
         Name = name;
         Value = value;
@@ -47,6 +47,20 @@ public readonly struct EmbedField
 
     public static bool operator !=(EmbedField? left, EmbedField? right)
         => !(left == right);
+
+    public Models.Json.EmbedField ToApiModel(Models.Json.EmbedField? existing = default)
+    {
+        existing ??= new() {Name = Name, Value = Value};
+
+        existing.Inline = Optional.FromNullable(Inline);
+
+        return existing;
+    }
+
+    public static EmbedField Construct(IDiscordClient client, Models.Json.EmbedField model)
+    {
+        return new EmbedField(model.Name, model.Value, model.Inline);
+    }
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedField" />.

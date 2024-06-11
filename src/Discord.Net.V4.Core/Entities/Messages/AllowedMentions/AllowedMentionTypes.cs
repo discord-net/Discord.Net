@@ -3,32 +3,30 @@ namespace Discord;
 /// <summary>
 ///     Specifies the type of mentions that will be notified from the message content.
 /// </summary>
-[Flags]
-public enum AllowedMentionTypes : byte
+public readonly struct AllowedMentionTypes(HashSet<string> values) : IEquatable<AllowedMentionTypes>
 {
-    /// <summary>
-    ///     No flag is set.
-    /// </summary>
-    /// <remarks>
-    ///     This flag is not used to control mentions.
-    ///     <note type="warning">
-    ///         It will always be present and does not mean mentions will not be allowed.
-    ///     </note>
-    /// </remarks>
-    None = 0,
+    public static readonly AllowedMentionTypes None = new((string[])[]);
+    public static readonly AllowedMentionTypes Roles = new("roles");
+    public static readonly AllowedMentionTypes Users = new("users");
+    public static readonly AllowedMentionTypes Everyone = new("everyone");
+    public static readonly AllowedMentionTypes All = Roles | Users | Everyone;
 
-    /// <summary>
-    ///     Controls role mentions.
-    /// </summary>
-    Roles = 1 << 0,
+    public readonly HashSet<string> Values = values;
 
-    /// <summary>
-    ///     Controls user mentions.
-    /// </summary>
-    Users = 1 << 1,
+    public AllowedMentionTypes(params string[] values) : this(values.ToHashSet()) {}
 
-    /// <summary>
-    ///     Controls <code>@everyone</code> and <code>@here</code> mentions.
-    /// </summary>
-    Everyone = 1 << 2
+    public static implicit operator AllowedMentionTypes(string value) => new(value);
+
+    public static AllowedMentionTypes operator |(AllowedMentionTypes a, AllowedMentionTypes b) =>
+        new((string[])[..a.Values, ..b.Values]);
+
+    public bool Equals(AllowedMentionTypes other) => Values.Equals(other.Values);
+
+    public override bool Equals(object? obj) => obj is AllowedMentionTypes other && Equals(other);
+
+    public override int GetHashCode() => Values.GetHashCode();
+
+    public static bool operator ==(AllowedMentionTypes left, AllowedMentionTypes right) => left.Equals(right);
+
+    public static bool operator !=(AllowedMentionTypes left, AllowedMentionTypes right) => !left.Equals(right);
 }

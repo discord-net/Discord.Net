@@ -7,5 +7,5 @@ namespace Discord.Models.Json;
 public class MessageComponent
 {
     [JsonPropertyName("type")]
-    public uint Type { get; set; }
+    public required uint Type { get; set; }
 }

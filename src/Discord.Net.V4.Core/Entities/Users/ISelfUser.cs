@@ -3,10 +3,14 @@ using Discord.Rest;
 
 namespace Discord;
 
+using Modifiable = IModifiable<ulong, ISelfUser, ModifySelfUserProperties, ModifyCurrentUserParams>;
+
 /// <summary>
 ///     Represents the logged-in Discord user.
 /// </summary>
-public interface ISelfUser : IUser, IModifiable<ModifySelfUserProperties, ModifyCurrentUserParams>
+public interface ISelfUser :
+    IUser,
+    Modifiable
 {
     /// <summary>
     ///     Gets the email associated with this user.
@@ -61,5 +65,7 @@ public interface ISelfUser : IUser, IModifiable<ModifySelfUserProperties, Modify
     /// </returns>
     string Locale { get; }
 
-    RouteFactory IModifiable<ModifySelfUserProperties, ModifyCurrentUserParams>.ModifyRoute => Routes.ModifyCurrentUser;
+    static ApiBodyRoute<ModifyCurrentUserParams> Modifiable.ModifyRoute(IPathable path, ulong id,
+        ModifyCurrentUserParams args)
+        => Routes.ModifyCurrentUser(args);
 }

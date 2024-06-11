@@ -6,7 +6,7 @@ namespace Discord;
 ///     A video featured in an <see cref="Embed" />.
 /// </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedVideo
+public readonly struct EmbedVideo : IEntityProperties<Models.Json.EmbedVideo>, IConstructable<EmbedVideo, Models.Json.EmbedVideo>
 {
     /// <summary>
     ///     The URL of the video.
@@ -14,7 +14,9 @@ public readonly struct EmbedVideo
     /// <returns>
     ///     A string containing the URL of the image.
     /// </returns>
-    public readonly string Url;
+    public readonly string? Url;
+
+    public readonly string? ProxyUrl;
 
     /// <summary>
     ///     The height of the video.
@@ -34,9 +36,10 @@ public readonly struct EmbedVideo
     /// </returns>
     public readonly int? Width;
 
-    internal EmbedVideo(string url, int? height, int? width)
+    internal EmbedVideo(string url, string proxyUrl, int? height, int? width)
     {
         Url = url;
+        ProxyUrl = proxyUrl;
         Height = height;
         Width = width;
     }
@@ -49,7 +52,7 @@ public readonly struct EmbedVideo
     /// <returns>
     ///     A string that resolves to <see cref="Url" />.
     /// </returns>
-    public override string ToString() => Url;
+    public override string ToString() => Url ?? ProxyUrl ?? "<unknown>";
 
     public static bool operator ==(EmbedVideo? left, EmbedVideo? right)
         => left is null
@@ -58,6 +61,20 @@ public readonly struct EmbedVideo
 
     public static bool operator !=(EmbedVideo? left, EmbedVideo? right)
         => !(left == right);
+
+    public Models.Json.EmbedVideo ToApiModel(Models.Json.EmbedVideo? existing = default)
+    {
+        existing ??= new();
+
+        existing.Url = Optional.FromNullable(Url);
+        existing.ProxyUrl = Optional.FromNullable(ProxyUrl);
+        existing.Height = Optional.FromNullable(Height);
+        existing.Width = Optional.FromNullable(Width);
+
+        return existing;
+    }
+
+    public static EmbedVideo Construct(IDiscordClient client, Models.Json.EmbedVideo model) => throw new NotImplementedException();
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedVideo" />.

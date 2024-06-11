@@ -1,9 +1,15 @@
+using Discord.EntityRelationships;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
 
-public interface IGuildUser : IUser, IModifiable<ModifyGuildUserProperties, ModifyGuildMemberParams>
+using Modifiable = IModifiable<ulong, IGuildUser, ModifyGuildUserProperties, ModifyGuildMemberParams>;
+
+public interface IGuildUser :
+    IUser,
+    Modifiable,
+    IGuildMemberEntitySource
 {
     /// <summary>
     ///     Gets when this user joined the guild.
@@ -59,14 +65,6 @@ public interface IGuildUser : IUser, IModifiable<ModifyGuildUserProperties, Modi
     GuildPermission GuildPermissions { get; }
 
     /// <summary>
-    ///     Gets the guild for this user.
-    /// </summary>
-    /// <returns>
-    ///     A guild object that this user belongs to.
-    /// </returns>
-    ILoadableEntity<ulong, IGuild> Guild { get; }
-
-    /// <summary>
     ///     Gets the date and time for when this user's guild boost began.
     /// </summary>
     /// <returns>
@@ -74,20 +72,6 @@ public interface IGuildUser : IUser, IModifiable<ModifyGuildUserProperties, Modi
     ///     not boosting the guild.
     /// </returns>
     DateTimeOffset? PremiumSince { get; }
-
-    /// <summary>
-    ///     Gets a collection of IDs for the roles that this user currently possesses in the guild.
-    /// </summary>
-    /// <remarks>
-    ///     This property returns a read-only collection of the identifiers of the roles that this user possesses.
-    ///     For WebSocket users, a Roles property can be found in place of this property. Due to the REST
-    ///     implementation, only a collection of identifiers can be retrieved instead of the full role objects.
-    /// </remarks>
-    /// <returns>
-    ///     A read-only collection of <see cref="ulong" />, each representing a snowflake identifier for a role that
-    ///     this user possesses.
-    /// </returns>
-    ILoadableEntityEnumerable<ulong, IRole> RoleIds { get; }
 
     /// <summary>
     ///     Whether the user has passed the guild's Membership Screening requirements.
@@ -115,6 +99,7 @@ public interface IGuildUser : IUser, IModifiable<ModifyGuildUserProperties, Modi
     /// </summary>
     GuildUserFlags Flags { get; }
 
-    RouteFactory IModifiable<ModifyGuildUserProperties, ModifyGuildMemberParams>.ModifyRoute
-        => args => Routes.ModifyGuildMember(Guild.Id, Id, args);
+    static ApiBodyRoute<ModifyGuildMemberParams> Modifiable.ModifyRoute(IPathable path, ulong id,
+        ModifyGuildMemberParams args)
+        => Routes.ModifyGuildMember(path.Require<IGuild>(), id, args);
 }

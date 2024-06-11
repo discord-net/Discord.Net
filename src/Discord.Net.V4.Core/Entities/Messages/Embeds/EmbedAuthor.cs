@@ -6,7 +6,7 @@ namespace Discord;
 ///     A author field of an <see cref="Embed" />.
 /// </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedAuthor
+public readonly struct EmbedAuthor : IEntityProperties<Models.Json.EmbedAuthor>, IConstructable<EmbedAuthor, Models.Json.EmbedAuthor>
 {
     /// <summary>
     ///     The name of the author field.
@@ -52,6 +52,22 @@ public readonly struct EmbedAuthor
 
     public static bool operator !=(EmbedAuthor? left, EmbedAuthor? right)
         => !(left == right);
+
+    public Models.Json.EmbedAuthor ToApiModel(Models.Json.EmbedAuthor? existing = default)
+    {
+        existing ??= new() {Name = Name};
+
+        existing.Url = Optional.FromNullable(Url);
+        existing.IconUrl = Optional.FromNullable(IconUrl);
+        existing.ProxyIconUrl = Optional.FromNullable(ProxyIconUrl);
+
+        return existing;
+    }
+
+    public static EmbedAuthor Construct(IDiscordClient client, Models.Json.EmbedAuthor model)
+    {
+        return new EmbedAuthor(model.Name, model.Url, model.IconUrl, model.ProxyIconUrl);
+    }
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedAuthor" />.
