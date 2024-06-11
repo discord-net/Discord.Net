@@ -1,9 +1,17 @@
 using Discord.Models.Json;
+using Discord.Rest;
 
 namespace Discord;
 
-public interface IRole : ISnowflakeEntity, IDeletable, IMentionable, IComparable<IRole>,
-    IModifiable<ModifyRoleProperties, ModifyGuildRoleParams>
+using Deletable = IDeletable<ulong, IRole>;
+using Modifiable = IModifiable<ulong, IRole, ModifyRoleProperties, ModifyGuildRoleParams>;
+
+public interface IRole :
+    ISnowflakeEntity,
+    Deletable,
+    IMentionable,
+    IComparable<IRole>,
+    Modifiable
 {
     ILoadableEntity<ulong, IGuild> Guild { get; }
 
@@ -71,7 +79,7 @@ public interface IRole : ISnowflakeEntity, IDeletable, IMentionable, IComparable
     ///     Gets the unicode emoji of this role.
     /// </summary>
     /// <remarks>
-    ///     This field is mutually exclusive with <see cref="Icon" />, either icon is set or emoji is set.
+    ///     This field is mutually exclusive with <see cref="IconId" />, either icon is set or emoji is set.
     /// </remarks>
     Emoji? Emoji { get; }
 
@@ -100,4 +108,11 @@ public interface IRole : ISnowflakeEntity, IDeletable, IMentionable, IComparable
     ///     Gets flags related to this role.
     /// </summary>
     RoleFlags Flags { get; }
+
+    static BasicApiRoute Deletable.DeleteRoute(IPathable path, ulong id)
+        => Routes.DeleteGuildRole(path.Require<IGuild>(), id);
+
+    static ApiBodyRoute<ModifyGuildRoleParams> Modifiable.ModifyRoute(IPathable path, ulong id,
+        ModifyGuildRoleParams args)
+        => Routes.ModifyGuildRole(path.Require<IGuild>(), id, args);
 }

@@ -1,23 +1,22 @@
+using Discord.EntityRelationships;
 using Discord.Models;
 using Discord.Rest;
 
 namespace Discord;
 
+using Deletable = IDeletable<ulong, IStageInstance>;
+using Modifiable = IModifiable<ulong, IStageInstance, ModifyStageInstanceProperties, ModifyStageInstanceParams>;
+
 /// <summary>
 ///     Represents a live stage instance within a stage channel.
 /// </summary>
-public interface IStageInstance : ISnowflakeEntity, IDeletable, IModifiable<ModifyStageInstanceProperties, ModifyStageInstanceParams>
+public interface IStageInstance :
+    ISnowflakeEntity,
+    Deletable,
+    Modifiable,
+    IGuildRelationship,
+    IChannelRelationship
 {
-    /// <summary>
-    ///     Gets the guild associated with the stage instance.
-    /// </summary>
-    ILoadableEntity<ulong, IGuild> Guild { get; }
-
-    /// <summary>
-    ///     Gets the stage channel which this instance is hosted in.
-    /// </summary>
-    ILoadableEntity<ulong, IStageChannel> Channel { get; }
-
     /// <summary>
     ///     Gets the topic of the stage.
     /// </summary>
@@ -42,6 +41,11 @@ public interface IStageInstance : ISnowflakeEntity, IDeletable, IModifiable<Modi
     /// </summary>
     ILoadableEntity<ulong, IGuildScheduledEvent>? Event { get; }
 
-    RouteFactory IModifiable<ModifyStageInstanceProperties, ModifyStageInstanceParams>.ModifyRoute
-        => args => Routes.ModifyStageInstance(Channel.Id, args);
+    static ApiBodyRoute<ModifyStageInstanceParams> Modifiable.ModifyRoute(IPathable path, ulong id,
+        ModifyStageInstanceParams args)
+        => Routes.ModifyStageInstance(path.Require<IChannel>(), args);
+
+    static BasicApiRoute Deletable.DeleteRoute(IPathable pathable, ulong id)
+        => Routes.DeleteStageInstance(pathable.Require<IChannel>());
+
 }

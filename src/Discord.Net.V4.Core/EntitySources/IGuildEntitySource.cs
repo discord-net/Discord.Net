@@ -1,8 +1,9 @@
 namespace Discord;
 
-public interface IGuildsEntitySource<TGuild> : ILoadableEntity<ulong, TGuild>, IClientProvider, IAsyncEnumerable<TGuild>
+public interface IGuildEntitySource<TGuild> : IClientProvider, ILoadableEntity<ulong, TGuild>, IPathable
     where TGuild : class, IGuild
 {
+    IRootEntitySource<IMessageChannelEntitySource<ITextChannel>, ulong, ITextChannel> TextChannels { get; }
     IRootEntitySource<ILoadableEntity<ulong, IGuildChannel>, ulong, IGuildChannel> Channels { get; }
     ILoadableEntity<ulong, IGuildChannel> Channel(ulong id) => Channels[id];
 

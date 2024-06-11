@@ -1,12 +1,21 @@
+using Discord.EntityRelationships;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
 
+using Modifiable = IModifiable<ulong, IGuildEmote, EmoteProperties, ModifyEmojiParams>;
+using Deletable = IDeletable<ulong, IGuildEmote>;
+
 /// <summary>
 ///     An image-based emote that is attached to a guild.
 /// </summary>
-public interface IGuildEmote : IEmote, ISnowflakeEntity, IModifiable<EmoteProperties, ModifyEmojiParams>, IDeletable
+public interface IGuildEmote :
+    IEmote,
+    ISnowflakeEntity,
+    Modifiable,
+    Deletable,
+    IGuildRelationship
 {
     /// <summary>
     ///     Gets whether this emoji is managed by an integration.
@@ -32,10 +41,9 @@ public interface IGuildEmote : IEmote, ISnowflakeEntity, IModifiable<EmoteProper
 
     ILoadableEntity<ulong, IUser>? Creator { get; }
 
-    ILoadableEntity<ulong, IGuild> Guild { get; }
+    static ApiBodyRoute<ModifyEmojiParams> Modifiable.ModifyRoute(IPathable path, ulong id, ModifyEmojiParams args)
+        => Routes.ModifyGuildEmoji(path.Require<IGuild>(), id, args);
 
-    RouteFactory IModifiable<EmoteProperties, ModifyEmojiParams>.ModifyRoute
-        => args => Routes.ModifyGuildEmoji(Guild.Id, Id, args);
-
-    BasicApiRoute IDeletable.DeleteRoute => Routes.DeleteGuildEmoji(Guild.Id, Id);
+    static BasicApiRoute Deletable.DeleteRoute(IPathable path, ulong id)
+        => Routes.DeleteGuildEmoji(path.Require<IGuild>(), id);
 }

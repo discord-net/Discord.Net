@@ -1,7 +1,18 @@
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
 
-public interface IMessage : ISnowflakeEntity, IDeletable
+using Deletable = IDeletable<ulong, IMessage>;
+using Modifiable = IModifiable<ulong, IMessage, ModifyMessageProperties, ModifyMessageParams>;
+
+public interface IMessage :
+    ISnowflakeEntity,
+    Deletable,
+    Modifiable
 {
+    #region Properties
+
     /// <summary>
     ///     Gets the type of this message.
     /// </summary>
@@ -123,11 +134,11 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     /// </returns>
     IReadOnlyCollection<Embed> Embeds { get; }
 
-    ILoadableEntityEnumerable<ulong, IChannel> MentionedChannels { get; }
+    IDefinedLoadableEntityEnumerable<ulong, IChannel> MentionedChannels { get; }
 
-    ILoadableEntityEnumerable<ulong, IRole> MentionedRoles { get; }
+    IDefinedLoadableEntityEnumerable<ulong, IRole> MentionedRoles { get; }
 
-    ILoadableEntityEnumerable<ulong, IUser> MentionedUsers { get; }
+    IDefinedLoadableEntityEnumerable<ulong, IUser> MentionedUsers { get; }
 
     /// <summary>
     ///     Gets the activity associated with a message.
@@ -200,4 +211,12 @@ public interface IMessage : ISnowflakeEntity, IDeletable
     ///     <see langword="null" />.
     /// </returns>
     MessageRoleSubscriptionData? RoleSubscriptionData { get; }
+
+    #endregion
+
+    static BasicApiRoute Deletable.DeleteRoute(IPathable path, ulong id)
+        => Routes.DeleteMessage(path.Require<IChannel>(), id);
+
+    static ApiBodyRoute<ModifyMessageParams> Modifiable.ModifyRoute(IPathable path, ulong id, ModifyMessageParams args) =>
+        Routes.ModifyMessage(path.Require<IChannel>(), id, args);
 }

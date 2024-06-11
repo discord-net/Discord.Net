@@ -17,7 +17,7 @@ public sealed class ForumTag(
     public ILoadableEntity<ulong, IGuildEmote>? Emote { get; } = emote;
     public string? Emoji { get; } = emoji;
 
-    IDiscordClient IEntity.Client => client;
+    IDiscordClient IClientProvider.Client => client;
 
     public Models.Json.ForumTag ToApiModel(Models.Json.ForumTag? existing = null)
     {

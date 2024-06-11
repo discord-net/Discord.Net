@@ -1,11 +1,18 @@
 using Discord.Models.Json;
+using Discord.Rest;
 
 namespace Discord;
+
+using Modifiable = IModifiable<ulong, IForumChannel, ModifyForumChannelProperties, ModifyGuildChannelParams>;
+
 
 /// <summary>
 ///     Represents a forum channel in a guild that can create posts.
 /// </summary>
-public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifiable<ModifyForumChannelProperties, ModifyGuildChannelParams>
+public interface IForumChannel :
+    INestedChannel,
+    IIntegrationChannel,
+    Modifiable
 {
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
@@ -69,85 +76,7 @@ public interface IForumChannel : INestedChannel, IIntegrationChannel, IModifiabl
     /// </summary>
     ForumLayout DefaultLayout { get; }
 
-    /// <summary>
-    ///     Creates a new post (thread) within the forum.
-    /// </summary>
-    /// <param name="title">The title of the post.</param>
-    /// <param name="message">The message to be sent</param>
-    /// <param name="archiveDuration">The archive duration of the post.</param>
-    /// <param name="slowmode">The slowmode for the posts thread.</param>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
-    /// <returns>
-    ///     A task that represents the asynchronous creation operation.
-    /// </returns>
-    Task<IThreadChannel> CreatePostAsync(
-        string title, CreateMessageProperties message,
-        ThreadArchiveDuration archiveDuration = ThreadArchiveDuration.OneDay,
-        int? slowmode = null, RequestOptions? options = null,
-        CancellationToken token = default);
-
-    /// <summary>
-    ///     Gets a collection of active threads within this forum channel.
-    /// </summary>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
-    /// <returns>
-    ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
-    ///     a collection of active threads.
-    /// </returns>
-    Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(
-        RequestOptions? options = null, CancellationToken token = default
-    );
-
-    /// <summary>
-    ///     Gets a collection of publicly archived threads within this forum channel.
-    /// </summary>
-    /// <param name="limit">The optional limit of how many to get.</param>
-    /// <param name="before">The optional date to return threads created before this timestamp.</param>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
-    /// <returns>
-    ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
-    ///     a collection of publicly archived threads.
-    /// </returns>
-    Task<IReadOnlyCollection<IThreadChannel>> GetPublicArchivedThreadsAsync(
-        int? limit = null, DateTimeOffset? before = null,
-        RequestOptions? options = null, CancellationToken token = default
-    );
-
-    /// <summary>
-    ///     Gets a collection of privately archived threads within this forum channel.
-    /// </summary>
-    /// <remarks>
-    ///     The bot requires the <see cref="GuildPermission.ManageThreads" /> permission in order to execute this request.
-    /// </remarks>
-    /// <param name="limit">The optional limit of how many to get.</param>
-    /// <param name="before">The optional date to return threads created before this timestamp.</param>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
-    /// <returns>
-    ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
-    ///     a collection of privately archived threads.
-    /// </returns>
-    Task<IReadOnlyCollection<IThreadChannel>> GetPrivateArchivedThreadsAsync(
-        int? limit = null, DateTimeOffset? before = null,
-        RequestOptions? options = null, CancellationToken token = default
-    );
-
-    /// <summary>
-    ///     Gets a collection of privately archived threads that the current bot has joined within this forum channel.
-    /// </summary>
-    /// <param name="limit">The optional limit of how many to get.</param>
-    /// <param name="before">The optional date to return threads created before this timestamp.</param>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
-    /// <returns>
-    ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
-    ///     a collection of privately archived threads.
-    /// </returns>
-    Task<IReadOnlyCollection<IThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(
-        int? limit = null, DateTimeOffset? before = null,
-        RequestOptions? options = null, CancellationToken token = default
-    );
+    static ApiBodyRoute<ModifyGuildChannelParams> Modifiable.ModifyRoute(IPathable path, ulong id,
+        ModifyGuildChannelParams args)
+        => Routes.ModifyChannel(id, args);
 }

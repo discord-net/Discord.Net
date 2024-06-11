@@ -6,7 +6,7 @@ public interface IEntity<out T> : IEntity
     T Id { get; }
 }
 
-public interface IEntity
+public interface IEntity : IClientProvider
 {
-    IDiscordClient Client { get; }
+
 }

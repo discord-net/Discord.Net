@@ -1,9 +1,17 @@
+using Discord.EntityRelationships;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
 
-public interface IGuildChannel : IChannel, IDeletable, IModifiable<ModifyGuildChannelProperties, ModifyGuildChannelParams>
+using Deletable = IDeletable<ulong, IGuildChannel>;
+using Modifiable = IModifiable<ulong, IGuildChannel, ModifyGuildChannelProperties, ModifyGuildChannelParams>;
+
+public interface IGuildChannel :
+    IChannel,
+    IGuildRelationship,
+    Deletable,
+    Modifiable
 {
     /// <summary>
     ///     Gets the position of this channel.
@@ -26,14 +34,6 @@ public interface IGuildChannel : IChannel, IDeletable, IModifiable<ModifyGuildCh
     ChannelFlags Flags { get; }
 
     /// <summary>
-    ///     Gets the guild associated with this channel.
-    /// </summary>
-    /// <returns>
-    ///     A guild object that this channel belongs to.
-    /// </returns>
-    ILoadableEntity<ulong, IGuild> Guild { get; }
-
-    /// <summary>
     ///     Gets a collection of permission overwrites for this channel.
     /// </summary>
     /// <returns>
@@ -41,13 +41,10 @@ public interface IGuildChannel : IChannel, IDeletable, IModifiable<ModifyGuildCh
     /// </returns>
     IReadOnlyCollection<Overwrite> PermissionOverwrites { get; }
 
-    /// <summary>
-    ///     Gets a collection of users that are able to view the channel or are currently in this channel.
-    /// </summary>
-    new ILoadableEntityEnumerable<ulong, IGuildUser> Users { get; }
+    static BasicApiRoute Deletable.DeleteRoute(IPathable pathable, ulong id)
+        => Routes.DeleteChannel(id);
 
-    BasicApiRoute IDeletable.DeleteRoute => Routes.DeleteChannel(Id);
-
-    RouteFactory IModifiable<ModifyGuildChannelProperties, ModifyGuildChannelParams>.ModifyRoute
-        => args => Routes.ModifyChannel(Id, args);
+    static ApiBodyRoute<ModifyGuildChannelParams> Modifiable.ModifyRoute(IPathable path, ulong id,
+        ModifyGuildChannelParams args)
+        => Routes.ModifyChannel(id, args);
 }

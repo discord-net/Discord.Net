@@ -9,9 +9,4 @@ public interface IChannel : ISnowflakeEntity
     ///     A string containing the name of this channel.
     /// </returns>
     string Name { get; }
-
-    /// <summary>
-    ///     Gets a collection of users that are able to view the channel or are currently in this channel.
-    /// </summary>
-    ILoadableEntityEnumerable<ulong, IUser> Users { get; }
 }

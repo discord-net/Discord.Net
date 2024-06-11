@@ -1,9 +1,15 @@
 namespace Discord;
 
-public interface IDeletable : IEntity
+
+public interface IDeletable<TId, TSelf> : IEntity<TId>, IPathable
+    where TSelf : IDeletable<TId, TSelf>, IEntity<TId>, IPathable
+    where TId : IEquatable<TId>
 {
     Task DeleteAsync(RequestOptions? options = null, CancellationToken token = default)
-        => Client.RestApiClient.ExecuteAsync(DeleteRoute, options ?? Client.DefaultRequestOptions, token);
+        => DeleteAsync(Client, this, Id, options, token);
 
-    internal BasicApiRoute DeleteRoute { get; }
+    internal static Task DeleteAsync(IDiscordClient client, IPathable path, TId id, RequestOptions? options = null, CancellationToken token = default)
+        => client.RestApiClient.ExecuteAsync(TSelf.DeleteRoute(path, id), options ?? client.DefaultRequestOptions, token);
+
+    internal static abstract BasicApiRoute DeleteRoute(IPathable path, TId id);
 }

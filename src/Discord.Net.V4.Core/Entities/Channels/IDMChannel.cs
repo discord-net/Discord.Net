@@ -3,7 +3,8 @@ namespace Discord;
 /// <summary>
 ///     Represents a generic direct-message channel.
 /// </summary>
-public interface IDMChannel : IMessageChannel, IPrivateChannel
+public interface IDMChannel :
+    IMessageChannel
 {
     /// <summary>
     ///     Gets the recipient of all messages in this channel.

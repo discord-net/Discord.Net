@@ -1,9 +1,17 @@
 using Discord.Models.Json;
+using Discord.Rest;
 using System.Globalization;
 
 namespace Discord;
 
-public interface IGuild : IPartialGuild, IDeletable, IModifiable<ModifyGuildProperties, ModifyGuildParams>
+using Deletable = IDeletable<ulong, IGuild>;
+using Modifiable = IModifiable<ulong, IGuild, ModifyGuildProperties, ModifyGuildParams>;
+
+public interface IGuild :
+    IPartialGuild,
+    Deletable,
+    Modifiable,
+    IGuildEntitySource<IGuild>
 {
     /// <summary>
     ///     Gets the amount of time (in seconds) a user must be inactive in a voice channel for until they are
@@ -59,7 +67,7 @@ public interface IGuild : IPartialGuild, IDeletable, IModifiable<ModifyGuildProp
     /// <returns>
     ///     A URL pointing to the guild's icon; <see langword="null" /> if none is set.
     /// </returns>
-    string? IconUrl => CDN.GetGuildIconUrl(Client.Config, Id, IconId);
+    string? IconUrl => CDN.GetGuildIconUrl(Client.Config, (this as ISnowflakeEntity).Id, IconId);
 
     /// <summary>
     ///     Gets the URL of this guild's splash image.
@@ -94,9 +102,6 @@ public interface IGuild : IPartialGuild, IDeletable, IModifiable<ModifyGuildProp
     ILoadableEntity<ulong, IGuildUser> Owner { get; }
 
     ulong? ApplicationId { get; }
-
-    [Obsolete("Deprecated in the Discord API")]
-    string? VoiceRegion { get; }
 
     ILoadableEntity<ulong, IRole> EveryoneRole { get; }
 
@@ -243,6 +248,14 @@ public interface IGuild : IPartialGuild, IDeletable, IModifiable<ModifyGuildProp
     ///     Gets the upload limit in bytes for this guild. This number is dependent on the guild's boost status.
     /// </summary>
     ulong MaxUploadLimit { get; }
+
+    static BasicApiRoute Deletable.DeleteRoute(IPathable path, ulong id)
+        => Routes.DeleteGuild(id);
+
+    static ApiBodyRoute<ModifyGuildParams> Modifiable.ModifyRoute(IPathable path, ulong id, ModifyGuildParams args)
+        => Routes.ModifyGuild(id, args);
+
+    ulong ILoadableEntity<ulong, IGuild>.Id => ((ISnowflakeEntity)this).Id;
 
     VerificationLevel? IPartialGuild.VerificationLevel => VerificationLevel;
     GuildFeatures? IPartialGuild.Features => Features;

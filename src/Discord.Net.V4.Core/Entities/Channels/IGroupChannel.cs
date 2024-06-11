@@ -1,17 +1,26 @@
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
+
+using Modifiable = IModifiable<ulong, IGroupChannel, ModifyGroupDMProperties, ModifyGroupDmParams>;
 
 /// <summary>
 ///     Represents a generic private group channel.
 /// </summary>
-public interface IGroupChannel : IMessageChannel, IPrivateChannel, IAudioChannel
+public interface IGroupChannel :
+    IMessageChannel,
+    IAudioChannel,
+    Modifiable
 {
     /// <summary>
-    ///     Leaves this group.
+    ///     Gets the users that can access this channel.
     /// </summary>
-    /// <param name="options">The options to be used when sending the request.</param>
-    /// <param name="token">A <see cref="CancellationToken" /> used to cancel the asynchronous operation.</param>
     /// <returns>
-    ///     A task that represents the asynchronous leave operation.
+    ///     A <see cref="IDefinedLoadableEntityEnumerable{TId,TEntity}" /> of users that can access this channel.
     /// </returns>
-    Task LeaveAsync(RequestOptions? options = null, CancellationToken token = default);
+    IDefinedLoadableEntityEnumerable<ulong, IUser> Recipients { get; }
+
+    static ApiBodyRoute<ModifyGroupDmParams> Modifiable.ModifyRoute(IPathable path, ulong id, ModifyGroupDmParams args)
+        => Routes.ModifyChannel(id, args);
 }
