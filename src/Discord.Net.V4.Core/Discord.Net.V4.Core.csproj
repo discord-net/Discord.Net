@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Discord.Net.Models\Discord.Net.Models.csproj"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Paging\" />
+  </ItemGroup>
+
 </Project>

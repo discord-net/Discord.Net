@@ -13,4 +13,17 @@ public interface IRestApiClient
     Task<U?> ExecuteAsync<T, U>(ApiBodyRoute<T, U> route, RequestOptions options, CancellationToken token)
         where T : class
         where U : class;
+
+    async Task<U> ExecuteRequiredAsync<T, U>(ApiBodyRoute<T, U> route, RequestOptions options, CancellationToken token)
+        where T : class
+        where U : class
+    {
+        return await ExecuteAsync(route, options, token) ?? throw new MissingApiResultException(route, options);
+    }
+
+    async Task<T> ExecuteRequiredAsync<T>(ApiRoute<T> route, RequestOptions options, CancellationToken token)
+        where T : class
+    {
+        return await ExecuteAsync(route, options, token) ?? throw new MissingApiResultException(route, options);
+    }
 }

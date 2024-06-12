@@ -1,4 +1,5 @@
 
+using Discord.Models;
 using Discord.Rest;
 
 namespace Discord;
@@ -6,12 +7,17 @@ namespace Discord;
 /// <summary>
 ///     Represents a generic Discord client.
 /// </summary>
-public interface IDiscordClient : IDisposable, IAsyncDisposable
+public interface IDiscordClient :
+    IDisposable,
+    IAsyncDisposable,
+    IEntityProvider<IPartialGuild, IPartialGuildModel>,
+    IEntityProvider<IGuildUser, IMemberModel>,
+    IEntityProvider<IDMChannel, IDMChannelModel>
 {
     /// <summary>
     ///     Gets the currently logged-in user.
     /// </summary>
-    ILoadableEntity<ulong, ISelfUser> CurrentUser { get; }
+    ILoadableCurrentUserEntitySource<ISelfUser> CurrentUser { get; }
 
     IRootEntitySource<ILoadableGuildEntitySource<IGuild>, ulong, IGuild> Guilds { get; }
     ILoadableGuildEntitySource<IGuild> Guild(ulong id) => Guilds[id];

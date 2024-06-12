@@ -10,7 +10,7 @@ public static partial class Routes
             RequestMethod.Get,
             "users/@me");
 
-    public static readonly ApiRoute<UserConnection> GetUserConnections
+    public static readonly ApiRoute<Discord.Models.Json.UserConnection[]> GetUserConnections
         = new(nameof(GetUserConnections),
             RequestMethod.Get,
             "users/@me/connections");

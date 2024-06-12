@@ -28,4 +28,6 @@ public interface IGuildEntitySource<out TGuild> :
 
     IRootEntitySource<ILoadableEntity<ulong, IGuildScheduledEvent>, ulong, IGuildScheduledEvent> ScheduledEvents { get; }
     ILoadableEntity<ulong, IGuildScheduledEvent> ScheduledEvent(ulong id) => ScheduledEvents[id];
+
+    
 }

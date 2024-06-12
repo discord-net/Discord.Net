@@ -25,6 +25,9 @@ public sealed class Emoji : IEmote
     /// </returns>
     public override string ToString() => Name;
 
+    public Models.Json.IEmote ToApiModel(Models.Json.IEmote? existing = default) =>
+        existing ?? new Models.Json.Emoji() {Name = Name};
+
     /// <summary>
     ///     Determines whether the specified emoji is equal to the current one.
     /// </summary>
