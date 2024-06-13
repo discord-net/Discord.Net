@@ -30,4 +30,7 @@ public sealed class CreateMessageParams : AttachmentUploadParams
 
     [JsonPropertyName("flags")]
     public Optional<int> Flags { get; set; }
+
+    [JsonPropertyName("poll")]
+    public Optional<CreatePollParams> Poll { get; set; }
 }
