@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Discord.Interactions.Builders
 {
@@ -35,7 +36,24 @@ namespace Discord.Interactions.Builders
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; set; } = null;
 
-        internal ContextCommandBuilder(ModuleBuilder module) : base(module) { }
+        /// <summary>
+        ///     Gets the install method for this command.
+        /// </summary>
+        public HashSet<ApplicationIntegrationType> IntegrationTypes { get; set; } = null;
+
+        /// <summary>
+        ///     Gets the context types this command can be executed in.
+        /// </summary>
+        public HashSet<InteractionContextType> ContextTypes { get; set; } = null;
+
+        internal ContextCommandBuilder(ModuleBuilder module) : base(module)
+        {
+            IntegrationTypes = module.IntegrationTypes;
+            ContextTypes = module.ContextTypes;
+#pragma warning disable CS0618 // Type or member is obsolete
+            IsEnabledInDm = module.IsEnabledInDm;
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
 
         /// <summary>
         ///     Initializes a new <see cref="ContextCommandBuilder"/>.
@@ -123,6 +141,28 @@ namespace Discord.Interactions.Builders
         public ContextCommandBuilder WithDefaultMemberPermissions(GuildPermission permissions)
         {
             DefaultMemberPermissions = permissions;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the <see cref="IntegrationTypes"/> of this <see cref="ContextCommandBuilder"/>.
+        /// </summary>
+        /// <param name="integrationTypes">Install types for this command.</param>
+        /// <returns>The builder instance.</returns>
+        public ContextCommandBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
+        {
+            IntegrationTypes = new HashSet<ApplicationIntegrationType>(integrationTypes);
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the <see cref="ContextTypes"/> of this <see cref="ContextCommandBuilder"/>.
+        /// </summary>
+        /// <param name="contextTypes">Context types the command can be executed in.</param>
+        /// <returns>The builder instance.</returns>
+        public ContextCommandBuilder WithContextTypes(params InteractionContextType[] contextTypes)
+        {
+            ContextTypes = new HashSet<InteractionContextType>(contextTypes);
             return this;
         }
 

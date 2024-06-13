@@ -46,15 +46,25 @@ namespace Discord.Interactions
         /// </summary>
         public IReadOnlyList<SlashCommandParameterInfo> FlattenedParameters { get; }
 
+        /// <inheritdoc/>
+        public IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
+
         internal SlashCommandInfo(Builders.SlashCommandBuilder builder, ModuleInfo module, InteractionService commandService) : base(builder, module, commandService)
         {
             Description = builder.Description;
+#pragma warning disable CS0618 // Type or member is obsolete
             DefaultPermission = builder.DefaultPermission;
+#pragma warning restore CS0618 // Type or member is obsolete
             IsEnabledInDm = builder.IsEnabledInDm;
             IsNsfw = builder.IsNsfw;
             DefaultMemberPermissions = builder.DefaultMemberPermissions;
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
             FlattenedParameters = FlattenParameters(Parameters).ToImmutableArray();
+            ContextTypes = builder.ContextTypes?.ToImmutableArray();
+            IntegrationTypes = builder.IntegrationTypes?.ToImmutableArray();
 
             for (var i = 0; i < FlattenedParameters.Count - 1; i++)
                 if (!FlattenedParameters.ElementAt(i).IsRequired && FlattenedParameters.ElementAt(i + 1).IsRequired)

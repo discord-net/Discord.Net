@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace Discord.Audio
 {
@@ -17,7 +18,7 @@ namespace Discord.Audio
             {
                 int error = SecretBoxEasy(outPtr + outputOffset, inPtr + inputOffset, inputLength, nonce, secret);
                 if (error != 0)
-                    throw new Exception($"Sodium Error: {error}");
+                    throw new SecurityException($"Sodium Error: {error}");
                 return inputLength + 16;
             }
         }
@@ -28,7 +29,7 @@ namespace Discord.Audio
             {
                 int error = SecretBoxOpenEasy(outPtr + outputOffset, inPtr + inputOffset, inputLength, nonce, secret);
                 if (error != 0)
-                    throw new Exception($"Sodium Error: {error}");
+                    throw new SecurityException($"Sodium Error: {error}");
                 return inputLength - 16;
             }
         }

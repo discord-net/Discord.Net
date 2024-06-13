@@ -1,6 +1,6 @@
 ---
 uid: FAQ.Basics.ClientBasics
-title: Basic Questions about Client
+title: Client Basics Questions
 ---
 
 # Client Basics Questions

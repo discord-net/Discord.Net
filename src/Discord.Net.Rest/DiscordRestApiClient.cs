@@ -370,7 +370,7 @@ namespace Discord.API
             Preconditions.GreaterThan(args.Bitrate, 0, nameof(args.Bitrate));
             Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
             Preconditions.AtMost(args.Name.Length, 100, nameof(args.Name));
-            if (args.Topic.IsSpecified)
+            if (args.Topic is { IsSpecified: true, Value: not null })
                 Preconditions.AtMost(args.Topic.Value.Length, 1024, nameof(args.Name));
 
             options = RequestOptions.CreateOrClone(options);
@@ -1743,22 +1743,23 @@ namespace Discord.API
         /// <exception cref="ArgumentException">
         /// <paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.
         /// -and-
-        /// <paramref name="args.DeleteMessageDays"/> must be between 0 to 7.
+        /// <paramref name="deleteMessageSeconds"/> must be between 0 and 604800.
         /// </exception>
-        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
-        public Task CreateGuildBanAsync(ulong guildId, ulong userId, CreateGuildBanParams args, RequestOptions options = null)
+        public Task CreateGuildBanAsync(ulong guildId, ulong userId, uint deleteMessageSeconds, string reason, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
-            Preconditions.NotNull(args, nameof(args));
-            Preconditions.AtLeast(args.DeleteMessageDays, 0, nameof(args.DeleteMessageDays), "Prune length must be within [0, 7]");
-            Preconditions.AtMost(args.DeleteMessageDays, 7, nameof(args.DeleteMessageDays), "Prune length must be within [0, 7]");
+
+            Preconditions.AtMost(deleteMessageSeconds, 604800, nameof(deleteMessageSeconds), "Prune length must be within [0, 604800]");
+
+            var data = new CreateGuildBanParams { DeleteMessageSeconds = deleteMessageSeconds };
+
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            if (!string.IsNullOrWhiteSpace(args.Reason))
-                options.AuditLogReason = args.Reason;
-            return SendAsync("PUT", () => $"guilds/{guildId}/bans/{userId}?delete_message_days={args.DeleteMessageDays}", ids, options: options);
+            if (!string.IsNullOrWhiteSpace(reason))
+                options.AuditLogReason = reason;
+            return SendJsonAsync("PUT", () => $"guilds/{guildId}/bans/{userId}", data, ids, options: options);
         }
 
         /// <exception cref="ArgumentException"><paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.</exception>
@@ -1770,6 +1771,23 @@ namespace Discord.API
 
             var ids = new BucketIds(guildId: guildId);
             return SendAsync("DELETE", () => $"guilds/{guildId}/bans/{userId}", ids, options: options);
+        }
+
+        public Task<BulkBanResult> BulkBanAsync(ulong guildId, ulong[] userIds, int? deleteMessagesSeconds = null, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(userIds.Length, 0, nameof(userIds));
+            Preconditions.AtMost(userIds.Length, 200, nameof(userIds));
+            Preconditions.AtMost(deleteMessagesSeconds ?? 0, 604800, nameof(deleteMessagesSeconds));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var data = new BulkBanParams
+            {
+                DeleteMessageSeconds = deleteMessagesSeconds ?? Optional<int>.Unspecified,
+                UserIds = userIds
+            };
+
+            return SendJsonAsync<BulkBanResult>("POST", () => $"guilds/{guildId}/bulk-ban", data, new BucketIds(guildId), options: options);
         }
         #endregion
 
@@ -2809,6 +2827,22 @@ namespace Discord.API
 
         public Task<SKU[]> ListSKUsAsync(RequestOptions options = null)
             => SendAsync<SKU[]>("GET", () => $"applications/{CurrentApplicationId}/skus", new BucketIds(), options: options);
+
+        public Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => SendAsync("POST", () => $"applications/{CurrentApplicationId}/entitlements/{entitlementId}/consume", new BucketIds(), options: options);
+
+        #endregion
+
+        #region Polls
+
+        public Task<PollAnswerVoters> GetPollAnswerVotersAsync(ulong channelId, ulong messageId, uint answerId, int limit = 100, ulong? afterId = null, RequestOptions options = null)
+        {
+            var urlParams = $"?limit={limit}{(afterId is not null ? $"&after={afterId}" : string.Empty)}";
+            return SendAsync<PollAnswerVoters>("GET", () => $"channels/{channelId}/polls/{messageId}/answers/{answerId}{urlParams}", new BucketIds(channelId: channelId), options: options);
+        }
+
+        public Task<Message> ExpirePollAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+            => SendAsync<Message>("POST", () => $"channels/{channelId}/polls/{messageId}/expire", new BucketIds(channelId: channelId), options: options);
 
         #endregion
     }

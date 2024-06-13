@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Discord.Interactions
 {
@@ -37,5 +38,15 @@ namespace Discord.Interactions
         ///     Gets the default permissions needed for executing this command.
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; }
+
+        /// <summary>
+        ///     Gets the context types this command can be executed in.
+        /// </summary>
+        public IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
+
+        /// <summary>
+        ///     Gets the install methods for this command.
+        /// </summary>
+        public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
     }
 }

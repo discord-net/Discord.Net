@@ -249,7 +249,18 @@ namespace Discord
 
         #region Onboarding (350XXX)
         CannotEnableOnboardingUnmetRequirements = 350000,
-        CannotUpdateOnboardingBelowRequirements = 350001
+        CannotUpdateOnboardingBelowRequirements = 350001,
+        #endregion
+
+        #region Polls (520XXX)
+
+        PollVotingBlocked = 520000,
+        PollExpired = 520001,
+        InvalidChannelTypeForPollCreation = 520002,
+        CannotEditAPollMessage = 520003,
+        CannotUseAnEmojiIncludedWithThePoll = 520004,
+        CannotExpireANonPollMessage = 520006,
+
         #endregion
     }
 }

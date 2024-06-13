@@ -32,7 +32,7 @@ public class DiscordRestApiClientTests : IClassFixture<RestGuildFixture>, IAsync
     [Fact]
     public async Task UploadFile_WithMaximumSize_DontThrowsException()
     {
-        var fileSize = GuildHelper.GetUploadLimit(_guild);
+        var fileSize = GuildHelper.GetUploadLimit(_guild.PremiumTier);
         using var stream = new MemoryStream(new byte[fileSize]);
 
         await _apiClient.UploadFileAsync(_channel.Id, new UploadFileParams(new FileAttachment(stream, "filename")));
@@ -41,7 +41,7 @@ public class DiscordRestApiClientTests : IClassFixture<RestGuildFixture>, IAsync
     [Fact]
     public async Task UploadFile_WithOverSize_ThrowsException()
     {
-        var fileSize = GuildHelper.GetUploadLimit(_guild) + 1;
+        var fileSize = GuildHelper.GetUploadLimit(_guild.PremiumTier) + 1;
         using var stream = new MemoryStream(new byte[fileSize]);
 
         Func<Task> upload = async () =>
