@@ -62,7 +62,11 @@ jobs:
               dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
               dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
               dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
-              dotnet pack "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.Models\Discord.Net.Models.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.V4.Audio\Discord.Net.V4.Audio.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.V4.Core\Discord.Net.V4.Core.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.V4.Gateway\Discord.Net.V4.Gateway.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "src\Discord.Net.V4.Rest\Discord.Net.V4.Rest.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
 #              dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
           
           - name: Publish Artifacts
