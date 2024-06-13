@@ -3,13 +3,9 @@ using Discord.Rest;
 
 namespace Discord;
 
-using Deletable = IDeletable<ulong, IMessage>;
-using Modifiable = IModifiable<ulong, IMessage, ModifyMessageProperties, ModifyMessageParams>;
-
 public interface IMessage :
     ISnowflakeEntity,
-    Deletable,
-    Modifiable
+    IMessageActor<IMessage>
 {
     #region Properties
 
@@ -99,14 +95,9 @@ public interface IMessage :
     ILoadableEntity<ulong, IUser> Author { get; }
 
     /// <summary>
-    ///     Gets the source channel of the message.
-    /// </summary>
-    ILoadableEntity<ulong, IMessageChannel> Channel { get; }
-
-    /// <summary>
     ///     Gets the thread that was started from this message.
     /// </summary>
-    ILoadableEntity<ulong, IThreadChannel> Thread { get; }
+    ILoadableEntity<ulong, IThreadChannel>? Thread { get; }
 
     /// <summary>
     ///     Gets all attachments included in this message.
@@ -213,10 +204,4 @@ public interface IMessage :
     MessageRoleSubscriptionData? RoleSubscriptionData { get; }
 
     #endregion
-
-    static BasicApiRoute Deletable.DeleteRoute(IPathable path, ulong id)
-        => Routes.DeleteMessage(path.Require<IChannel>(), id);
-
-    static ApiBodyRoute<ModifyMessageParams> Modifiable.ModifyRoute(IPathable path, ulong id, ModifyMessageParams args) =>
-        Routes.ModifyMessage(path.Require<IChannel>(), id, args);
 }

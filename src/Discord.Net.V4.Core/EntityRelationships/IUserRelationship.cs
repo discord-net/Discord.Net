@@ -1,4 +1,4 @@
-namespace Discord.EntityRelationships;
+namespace Discord;
 
 public interface IUserRelationship : IUserRelationship<IUser>;
 public interface IUserRelationship<TUser> : IRelationship<ulong, TUser>

@@ -5,6 +5,9 @@ namespace Discord.Rest;
 
 public static partial class Routes
 {
+    public static ApiBodyRoute<CreateStageInstanceParams, StageInstance> CreateStageInstance(
+        CreateStageInstanceParams args)
+        => new(nameof(CreateStageInstance), RequestMethod.Post, $"stage-instances", args);
     public static ApiRoute<StageInstance> GetStageInstance(ulong channelId)
         => new(nameof(GetStageInstance), RequestMethod.Get, $"stage-instances/{channelId}");
 

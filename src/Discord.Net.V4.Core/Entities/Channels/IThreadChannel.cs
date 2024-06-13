@@ -4,15 +4,17 @@ using Discord.Rest;
 
 namespace Discord;
 
-using Modifiable = IModifiable<ulong, IThreadChannel, ModifyThreadChannelProperties, ModifyThreadChannelParams>;
-
+public interface IThreadChannel : IThreadChannel<IThreadChannel>;
 /// <summary>
 ///     Represents a thread channel inside of a guild.
 /// </summary>
-public interface IThreadChannel : ITextChannel, Modifiable
+public interface IThreadChannel<out TThreadChannel> :
+    IMessageChannel<TThreadChannel>,
+    IGuildChannel<TThreadChannel>,
+    IThreadActor<TThreadChannel>
+    where TThreadChannel : IThreadChannel<TThreadChannel>
 {
-    ILoadableEntity<ulong, IUser>? Owner { get; }
-    ILoadableEntity<ulong, IThreadUser> CurrentUser { get; }
+    ILoadableEntity<ulong, IUser> Owner { get; }
 
     /// <summary>
     ///     Gets the type of the current thread channel.
@@ -78,8 +80,4 @@ public interface IThreadChannel : ITextChannel, Modifiable
     ///     property will be that date.
     /// </remarks>
     new DateTimeOffset CreatedAt { get; }
-
-    static ApiBodyRoute<ModifyThreadChannelParams> Modifiable.ModifyRoute(IPathable path, ulong id,
-        ModifyThreadChannelParams args)
-        => Routes.ModifyChannel(id, args);
 }

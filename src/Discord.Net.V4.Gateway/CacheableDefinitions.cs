@@ -1,13 +1,13 @@
 global using Discord.Models;
 
 global using GuildCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayGuild, Discord.Rest.RestGuild, Discord.IGuild>;
-global using GuildUserCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayGuildUser, Discord.Rest.RestGuildUser, Discord.IGuildUser>;
+global using GuildUserCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayGuildMember, Discord.Rest.RestGuildUser, Discord.IGuildMember>;
 global using UserCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayUser, Discord.Rest.RestUser, Discord.IUser>;
 global using MessageCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayMessage, Discord.Rest.RestMessage, Discord.IMessage>;
 global using GuildChannelCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayGuildChannel, Discord.Rest.RestGuildChannel, Discord.IGuildChannel>;
 global using GuildStickerCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayCustomSticker, Discord.Rest.CustomSticker, Discord.ICustomSticker>;
 global using GuildRoleCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayRole, Discord.Rest.RestRole, Discord.IRole>;
-global using GuildMemberCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayGuildUser, Discord.Rest.RestGuildUser, Discord.IGuildUser>;
+global using GuildMemberCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayGuildMember, Discord.Rest.RestGuildUser, Discord.IGuildMember>;
 global using GuildEmoteCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayGuildEmote>;
 global using GuildEventCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayGuildEvent, Discord.Rest.RestGuildEvent, Discord.IGuildScheduledEvent>;
 global using GuildStageInstanceCacheable = Discord.Gateway.Cacheable<ulong, Discord.Gateway.GatewayStageInstance, Discord.Rest.RestStageInstance, Discord.IStageInstance>;

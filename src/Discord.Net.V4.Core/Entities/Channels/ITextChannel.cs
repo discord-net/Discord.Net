@@ -4,17 +4,18 @@ using Discord.Rest;
 
 namespace Discord;
 
-using Modifiable = IModifiable<ulong, ITextChannel, ModifyTextChannelProperties, ModifyGuildChannelParams>;
+public interface ITextChannel : ITextChannel<ITextChannel>;
 
 /// <summary>
 ///     Represents a generic channel in a guild that can send and receive messages.
 /// </summary>
-public interface ITextChannel :
-    IMessageChannel,
+public interface ITextChannel<out TChannel> :
+    IMessageChannel<TChannel>,
     IMentionable,
-    INestedChannel,
-    IIntegrationChannel,
-    Modifiable
+    INestedChannel<TChannel>,
+    IIntegrationChannel<TChannel>,
+    ITextChannelActor<TChannel>
+    where TChannel : ITextChannel<TChannel>
 {
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
@@ -60,8 +61,4 @@ public interface ITextChannel :
     ///     The default auto-archive duration for thread creation in this channel.
     /// </returns>
     ThreadArchiveDuration DefaultArchiveDuration { get; }
-
-    static ApiBodyRoute<ModifyGuildChannelParams> Modifiable.ModifyRoute(IPathable path, ulong id,
-        ModifyGuildChannelParams args)
-        => Routes.ModifyChannel(id, args);
 }

@@ -5,13 +5,14 @@ namespace Discord;
 
 using Modifiable = IModifiable<ulong, INestedChannel, ModifyGuildChannelPositionProperties, ModifyGuildChannelPositionsParams>;
 
+public interface INestedChannel : INestedChannel<INestedChannel>;
 /// <summary>
 ///     Represents a type of guild channel that can be nested within a category.
 /// </summary>
-public interface INestedChannel :
-    IGuildChannel,
-    IInvitableChannel,
+public interface INestedChannel<out TChannel> :
+    IInvitableChannel<TChannel>,
     Modifiable
+    where TChannel : INestedChannel<TChannel>
 {
     /// <summary>
     ///     Gets the parent (category) of this channel in the guild's channel list.

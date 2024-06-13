@@ -3,9 +3,9 @@ using Discord.Models.Json;
 namespace Discord;
 
 /// <summary>
-///     Properties that are used to modify an <see cref="IGuildUser" /> with the following parameters.
+///     Properties that are used to modify an <see cref="IGuildMember" /> with the following parameters.
 /// </summary>
-/// <seealso cref="IGuildUser.ModifyAsync" />
+/// <seealso cref="IGuildMember.ModifyAsync" />
 public sealed class ModifyGuildUserProperties : IEntityProperties<ModifyGuildMemberParams>
 {
     /// <summary>
@@ -62,7 +62,7 @@ public sealed class ModifyGuildUserProperties : IEntityProperties<ModifyGuildMem
     /// <remarks>
     ///     Not all flags can be modified, these are reserved for Discord.
     /// </remarks>
-    public Optional<GuildUserFlags> Flags { get; set; }
+    public Optional<GuildMemberFlags> Flags { get; set; }
 
     public ModifyGuildMemberParams ToApiModel(ModifyGuildMemberParams? existing = default)
     {

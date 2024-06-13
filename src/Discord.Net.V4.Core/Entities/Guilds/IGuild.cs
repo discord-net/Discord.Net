@@ -4,14 +4,9 @@ using System.Globalization;
 
 namespace Discord;
 
-using Deletable = IDeletable<ulong, IGuild>;
-using Modifiable = IModifiable<ulong, IGuild, ModifyGuildProperties, ModifyGuildParams>;
-
 public interface IGuild :
     IPartialGuild,
-    Deletable,
-    Modifiable,
-    IGuildEntitySource<IGuild>
+    IGuildActor<IGuild>
 {
     /// <summary>
     ///     Gets the amount of time (in seconds) a user must be inactive in a voice channel for until they are
@@ -99,7 +94,7 @@ public interface IGuild :
     ILoadableEntity<ulong, ITextChannel> SystemChannel { get; }
     ILoadableEntity<ulong, ITextChannel> RulesChannel { get; }
     ILoadableEntity<ulong, ITextChannel> PublicUpdatesChannel { get; }
-    ILoadableEntity<ulong, IGuildUser> Owner { get; }
+    ILoadableEntity<ulong, IGuildMember> Owner { get; }
 
     ulong? ApplicationId { get; }
 
@@ -242,12 +237,6 @@ public interface IGuild :
     ///     Gets the upload limit in bytes for this guild. This number is dependent on the guild's boost status.
     /// </summary>
     ulong MaxUploadLimit { get; }
-
-    static BasicApiRoute Deletable.DeleteRoute(IPathable path, ulong id)
-        => Routes.DeleteGuild(id);
-
-    static ApiBodyRoute<ModifyGuildParams> Modifiable.ModifyRoute(IPathable path, ulong id, ModifyGuildParams args)
-        => Routes.ModifyGuild(id, args);
 
     VerificationLevel? IPartialGuild.VerificationLevel => VerificationLevel;
     GuildFeatures? IPartialGuild.Features => Features;

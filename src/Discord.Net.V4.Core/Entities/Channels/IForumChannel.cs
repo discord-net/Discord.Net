@@ -3,16 +3,16 @@ using Discord.Rest;
 
 namespace Discord;
 
-using Modifiable = IModifiable<ulong, IForumChannel, ModifyForumChannelProperties, ModifyGuildChannelParams>;
 
-
+public interface IForumChannel : IForumChannel<IForumChannel>;
 /// <summary>
 ///     Represents a forum channel in a guild that can create posts.
 /// </summary>
-public interface IForumChannel :
-    INestedChannel,
-    IIntegrationChannel,
-    Modifiable
+public interface IForumChannel<out TForum> :
+    INestedChannel<TForum>,
+    IIntegrationChannel<TForum>,
+    IForumChannelActor<TForum>
+    where TForum : IForumChannel<TForum>
 {
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
@@ -75,8 +75,4 @@ public interface IForumChannel :
     ///     Gets the rule used to display posts in a forum channel.
     /// </summary>
     ForumLayout DefaultLayout { get; }
-
-    static ApiBodyRoute<ModifyGuildChannelParams> Modifiable.ModifyRoute(IPathable path, ulong id,
-        ModifyGuildChannelParams args)
-        => Routes.ModifyChannel(id, args);
 }

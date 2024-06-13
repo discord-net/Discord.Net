@@ -3,9 +3,13 @@ using Discord.Rest;
 
 namespace Discord;
 
-using Modifiable = IModifiable<ulong, IVoiceChannel, ModifyVoiceChannelProperties, ModifyGuildChannelParams>;
+public interface IVoiceChannel : IVoiceChannel<IVoiceChannel>;
 
-public interface IVoiceChannel : ITextChannel, IAudioChannel, Modifiable
+public interface IVoiceChannel<out TChannel> :
+    IMessageChannel<TChannel>,
+    IGuildChannel<TChannel>,
+    IAudioChannel<TChannel>
+    where TChannel : IVoiceChannel<TChannel>
 {
     /// <summary>
     ///     Gets the bit-rate that the clients in this voice channel are requested to use.
@@ -29,8 +33,4 @@ public interface IVoiceChannel : ITextChannel, IAudioChannel, Modifiable
     ///     Gets the video quality mode for this channel.
     /// </summary>
     VideoQualityMode VideoQualityMode { get; }
-
-    static ApiBodyRoute<ModifyGuildChannelParams> Modifiable.ModifyRoute(IPathable path, ulong id,
-        ModifyGuildChannelParams args)
-        => Routes.ModifyChannel(id, args);
 }

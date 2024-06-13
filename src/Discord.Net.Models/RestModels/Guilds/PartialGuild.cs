@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class PartialGuild : IPartialGuildModel
+public class PartialGuild : IPartialGuildModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -20,7 +20,7 @@ public sealed class PartialGuild : IPartialGuildModel
     public Optional<string?> Description { get; set; }
 
     [JsonPropertyName("icon")]
-    public Optional<string?> IconHash { get; set; }
+    public Optional<string?> Icon { get; set; }
 
     [JsonPropertyName("features")]
     public Optional<string[]> Features { get; set; }
@@ -52,7 +52,7 @@ public sealed class PartialGuild : IPartialGuildModel
 
     string? IPartialGuildModel.Description => Description;
 
-    string? IPartialGuildModel.IconId => IconHash;
+    string? IPartialGuildModel.IconId => Icon;
 
     string[]? IPartialGuildModel.Features => Features;
     int? IPartialGuildModel.VerificationLevel => VerificationLevel.ToNullable();

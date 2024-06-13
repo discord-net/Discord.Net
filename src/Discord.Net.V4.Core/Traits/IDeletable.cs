@@ -1,7 +1,7 @@
 namespace Discord;
 
 
-public interface IDeletable<TId, TSelf> : IEntity<TId>, IPathable
+public interface IDeletable<TId, out TSelf> : IEntity<TId>, IPathable
     where TSelf : IDeletable<TId, TSelf>, IEntity<TId>, IPathable
     where TId : IEquatable<TId>
 {

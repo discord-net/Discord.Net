@@ -1,17 +1,13 @@
-using Discord.EntityRelationships;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
 
-using Deletable = IDeletable<ulong, IGuildChannel>;
-using Modifiable = IModifiable<ulong, IGuildChannel, ModifyGuildChannelProperties, ModifyGuildChannelParams>;
-
-public interface IGuildChannel :
-    IChannel,
-    IGuildRelationship,
-    Deletable,
-    Modifiable
+public interface IGuildChannel : IGuildChannel<IGuildChannel>;
+public interface IGuildChannel<out TGuildChannel> :
+    IChannel<TGuildChannel>,
+    IGuildChannelActor<TGuildChannel>
+    where TGuildChannel : IGuildChannel<TGuildChannel>
 {
     /// <summary>
     ///     Gets the position of this channel.
@@ -40,11 +36,4 @@ public interface IGuildChannel :
     ///     A collection of overwrites associated with this channel.
     /// </returns>
     IReadOnlyCollection<Overwrite> PermissionOverwrites { get; }
-
-    static BasicApiRoute Deletable.DeleteRoute(IPathable pathable, ulong id)
-        => Routes.DeleteChannel(id);
-
-    static ApiBodyRoute<ModifyGuildChannelParams> Modifiable.ModifyRoute(IPathable path, ulong id,
-        ModifyGuildChannelParams args)
-        => Routes.ModifyChannel(id, args);
 }

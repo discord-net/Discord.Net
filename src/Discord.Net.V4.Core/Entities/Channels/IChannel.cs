@@ -1,6 +1,10 @@
 namespace Discord;
 
-public interface IChannel : ISnowflakeEntity
+public interface IChannel : IChannel<IChannel>;
+public interface IChannel<out TChannel> :
+    ISnowflakeEntity,
+    IChannelActor<TChannel>
+    where TChannel : IChannel<TChannel>
 {
     /// <summary>
     ///     Gets the name of this channel.

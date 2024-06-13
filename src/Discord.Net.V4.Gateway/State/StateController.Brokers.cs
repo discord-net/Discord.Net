@@ -1,5 +1,5 @@
 using UserBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayUser, Discord.Models.IUserModel>;
-using MemberBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayGuildUser, Discord.Models.IMemberModel, Discord.Models.IUserModel>;
+using MemberBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayGuildMember, Discord.Models.IMemberModel, Discord.Models.IUserModel>;
 using PresenseBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayPresense, Discord.Models.IPresenseModel>;
 using GuildBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayGuild, Discord.Models.IGuildModel>;
 using ChannelBroker = Discord.Gateway.State.EntityBroker<ulong, Discord.Gateway.GatewayChannel, Discord.Models.IChannelModel>;
@@ -35,7 +35,7 @@ internal partial class StateController
                 ConstructGuildUserAsync
             );
     private MemberBroker? _memberBroker;
-    private async ValueTask<GatewayGuildUser> ConstructGuildUserAsync(IUserModel? userModel, Optional<ulong> guildId, IMemberModel model, CancellationToken token)
+    private async ValueTask<GatewayGuildMember> ConstructGuildUserAsync(IUserModel? userModel, Optional<ulong> guildId, IMemberModel model, CancellationToken token)
     {
         if (!guildId.IsSpecified)
             throw new ArgumentException("Guild id must be specified to construct a guild user");
@@ -54,7 +54,7 @@ internal partial class StateController
             userModel = user;
         }
 
-        return new GatewayGuildUser(_client, guildId.Value, model, userModel);
+        return new GatewayGuildMember(_client, guildId.Value, model, userModel);
     }
 
     #endregion

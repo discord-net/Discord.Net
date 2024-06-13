@@ -3,15 +3,16 @@ using Discord.Rest;
 
 namespace Discord;
 
-using Modifiable = IModifiable<ulong, IGroupChannel, ModifyGroupDMProperties, ModifyGroupDmParams>;
+interface IGroupChannel : IGroupChannel<IGroupChannel>;
 
 /// <summary>
 ///     Represents a generic private group channel.
 /// </summary>
-public interface IGroupChannel :
-    IMessageChannel,
-    IAudioChannel,
-    Modifiable
+public interface IGroupChannel<out TChannel> :
+    IMessageChannel<TChannel>,
+    IAudioChannel<TChannel>,
+    IGroupChannelActor<TChannel>
+    where TChannel : IGroupChannel<TChannel>
 {
     /// <summary>
     ///     Gets the users that can access this channel.
@@ -20,7 +21,4 @@ public interface IGroupChannel :
     ///     A <see cref="IDefinedLoadableEntityEnumerable{TId,TEntity}" /> of users that can access this channel.
     /// </returns>
     IDefinedLoadableEntityEnumerable<ulong, IUser> Recipients { get; }
-
-    static ApiBodyRoute<ModifyGroupDmParams> Modifiable.ModifyRoute(IPathable path, ulong id, ModifyGroupDmParams args)
-        => Routes.ModifyChannel(id, args);
 }

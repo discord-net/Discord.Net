@@ -3,14 +3,12 @@ using Discord.Rest;
 
 namespace Discord;
 
-using Modifiable = IModifiable<ulong, ISelfUser, ModifySelfUserProperties, ModifyCurrentUserParams>;
-
 /// <summary>
 ///     Represents the logged-in Discord user.
 /// </summary>
 public interface ISelfUser :
     IUser,
-    Modifiable
+    ISelfUserActor<ISelfUser>
 {
     /// <summary>
     ///     Gets the email associated with this user.
@@ -64,8 +62,4 @@ public interface ISelfUser :
     ///     For example, a locale of "English, US" is "en-US", "Chinese (Taiwan)" is "zh-TW", etc.
     /// </returns>
     string Locale { get; }
-
-    static ApiBodyRoute<ModifyCurrentUserParams> Modifiable.ModifyRoute(IPathable path, ulong id,
-        ModifyCurrentUserParams args)
-        => Routes.ModifyCurrentUser(args);
 }

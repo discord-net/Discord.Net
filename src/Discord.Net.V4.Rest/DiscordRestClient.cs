@@ -42,5 +42,5 @@ public sealed class DiscordRestClient : IDiscordClient
     public ValueTask DisposeAsync() => throw new NotImplementedException();
 
     IRestApiClient IDiscordClient.RestApiClient => RestApiClient;
-    ILoadableEntity<ulong, ISelfUser> IDiscordClient.CurrentUser => CurrentUser;
+    ILoadableEntity<ulong, ISelfUser> IDiscordClient.SelfUser => CurrentUser;
 }

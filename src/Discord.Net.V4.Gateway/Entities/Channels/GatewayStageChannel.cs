@@ -28,8 +28,8 @@ namespace Discord.Gateway
 
         public Task BecomeSpeakerAsync(RequestOptions? options = null) => throw new NotImplementedException();
         public Task ModifyInstanceAsync(Action<ModifyStageInstanceProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
-        public Task MoveToSpeakerAsync(IGuildUser user, RequestOptions? options = null) => throw new NotImplementedException();
-        public Task RemoveFromSpeakerAsync(IGuildUser user, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task MoveToSpeakerAsync(IGuildMember member, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task RemoveFromSpeakerAsync(IGuildMember member, RequestOptions? options = null) => throw new NotImplementedException();
         public Task RequestToSpeakAsync(RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IStageInstance> StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, bool sendStartNotification = false, RequestOptions? options = null) => throw new NotImplementedException();
         public Task StopSpeakingAsync(RequestOptions? options = null) => throw new NotImplementedException();

@@ -2,7 +2,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface IModifiable<TId, TSelf, out TParams, TApi> : IEntity<TId>, IPathable
+public interface IModifiable<TId, out TSelf, out TParams, TApi> : IEntity<TId>, IPathable
     where TSelf : IModifiable<TId, TSelf, TParams, TApi>
     where TId : IEquatable<TId>
     where TParams : IEntityProperties<TApi>, new()

@@ -198,7 +198,7 @@ namespace Discord.Gateway
         #region Methods
         public Task AddBanAsync(IUser user, int pruneDays = 0, string? reason = null, RequestOptions? options = null) => throw new NotImplementedException();
         public Task AddBanAsync(ulong userId, int pruneDays = 0, string? reason = null, RequestOptions? options = null) => throw new NotImplementedException();
-        public Task<IGuildUser> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties>? func = null, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task<IGuildMember> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties>? func = null, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IReadOnlyCollection<IApplicationCommand>> BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IApplicationCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<ICategoryChannel> CreateCategoryAsync(string name, Action<ModifyGuildChannelProperties>? func = null, RequestOptions? options = null) => throw new NotImplementedException();
@@ -216,7 +216,7 @@ namespace Discord.Gateway
         public Task DeleteEmoteAsync(GuildEmote emote, RequestOptions? options = null) => throw new NotImplementedException();
         public Task DeleteIntegrationAsync(ulong id, RequestOptions? options = null) => throw new NotImplementedException();
         public Task DeleteStickerAsync(ICustomSticker sticker, RequestOptions? options = null) => throw new NotImplementedException();
-        public Task DisconnectAsync(IGuildUser user) => throw new NotImplementedException();
+        public Task DisconnectAsync(IGuildMember member) => throw new NotImplementedException();
         public Task DownloadUsersAsync() => throw new NotImplementedException();
         public Task<IVoiceChannel> GetAFKChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IApplicationCommand> GetApplicationCommandAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
@@ -230,7 +230,7 @@ namespace Discord.Gateway
         public Task<IReadOnlyCollection<ICategoryChannel>> GetCategoriesAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IGuildChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
-        public Task<IGuildUser> GetCurrentUserAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task<IGuildMember> GetCurrentUserAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<ITextChannel> GetDefaultChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions? options = null) => throw new NotImplementedException();
@@ -238,7 +238,7 @@ namespace Discord.Gateway
         public Task<IReadOnlyCollection<IGuildScheduledEvent>> GetEventsAsync(RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IReadOnlyCollection<IIntegration>> GetIntegrationsAsync(RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions? options = null) => throw new NotImplementedException();
-        public Task<IGuildUser> GetOwnerAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task<IGuildMember> GetOwnerAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<ITextChannel> GetPublicUpdatesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public IRole GetRole(ulong id) => throw new NotImplementedException();
         public Task<ITextChannel> GetRulesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
@@ -251,8 +251,8 @@ namespace Discord.Gateway
         public Task<IReadOnlyCollection<ITextChannel>> GetTextChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IThreadChannel> GetThreadChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IReadOnlyCollection<IThreadChannel>> GetThreadChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
-        public Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
-        public Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task<IGuildMember> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task<IReadOnlyCollection<IGuildMember>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IInviteMetadata> GetVanityInviteAsync(RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<IReadOnlyCollection<IVoiceChannel>> GetVoiceChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
@@ -264,13 +264,13 @@ namespace Discord.Gateway
         public Task ModifyAsync(Action<ModifyGuildProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
         public Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
         public Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions? options = null) => throw new NotImplementedException();
-        public Task MoveAsync(IGuildUser user, IVoiceChannel targetChannel) => throw new NotImplementedException();
+        public Task MoveAsync(IGuildMember member, IVoiceChannel targetChannel) => throw new NotImplementedException();
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions? options = null, IEnumerable<ulong>? includeRoleIds = null) => throw new NotImplementedException();
         public Task RemoveBanAsync(IUser user, RequestOptions? options = null) => throw new NotImplementedException();
         public Task RemoveBanAsync(ulong userId, RequestOptions? options = null) => throw new NotImplementedException();
         public Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions? options = null) => throw new NotImplementedException();
         public Task ReorderRolesAsync(IEnumerable<ReorderRoleProperties> args, RequestOptions? options = null) => throw new NotImplementedException();
-        public Task<IReadOnlyCollection<IGuildUser>> SearchUsersAsync(string query, int limit = 1000, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
+        public Task<IReadOnlyCollection<IGuildMember>> SearchUsersAsync(string query, int limit = 1000, CacheMode mode = CacheMode.AllowDownload, RequestOptions? options = null) => throw new NotImplementedException();
         #endregion
 
 

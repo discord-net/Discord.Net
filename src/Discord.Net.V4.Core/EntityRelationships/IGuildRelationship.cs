@@ -1,10 +1,11 @@
-namespace Discord.EntityRelationships;
+namespace Discord;
 
 public interface IGuildRelationship : IGuildRelationship<IGuild>;
-public interface IGuildRelationship<TGuild> : IRelationship<ulong, TGuild, ILoadableGuildEntitySource<TGuild>>
+public interface IGuildRelationship<TGuild> :
+    IRelationship<ulong, TGuild, ILoadableGuildActor<TGuild>>
     where TGuild : class, IGuild
 {
-    ILoadableGuildEntitySource<TGuild> Guild { get; }
+    ILoadableGuildActor<TGuild> Guild { get; }
 
-    ILoadableGuildEntitySource<TGuild> IRelationship<ulong, TGuild, ILoadableGuildEntitySource<TGuild>>.RelationshipLoadable => Guild;
+    ILoadableGuildActor<TGuild> IRelationship<ulong, TGuild, ILoadableGuildActor<TGuild>>.RelationshipLoadable => Guild;
 }

@@ -38,8 +38,8 @@ namespace Discord.Gateway
         public Task RemovePermissionOverwriteAsync(IUser user, RequestOptions? options = null) => throw new NotImplementedException();
         public Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions? options = null) => throw new NotImplementedException();
         public Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions? options = null) => throw new NotImplementedException();
-        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions? options) => throw new NotImplementedException();
-        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions? options) => throw new NotImplementedException();
+        IAsyncEnumerable<IReadOnlyCollection<IGuildMember>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions? options) => throw new NotImplementedException();
+        Task<IGuildMember> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions? options) => throw new NotImplementedException();
         public Task DeleteAsync(RequestOptions? options = null) => throw new NotImplementedException();
 
 

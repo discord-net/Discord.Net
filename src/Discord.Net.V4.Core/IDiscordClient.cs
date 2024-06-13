@@ -1,4 +1,5 @@
 
+using Discord.Extensions;
 using Discord.Models;
 using Discord.Rest;
 
@@ -11,22 +12,28 @@ public interface IDiscordClient :
     IDisposable,
     IAsyncDisposable,
     IEntityProvider<IPartialGuild, IPartialGuildModel>,
-    IEntityProvider<IGuildUser, IMemberModel>,
-    IEntityProvider<IDMChannel, IDMChannelModel>
+    IEntityProvider<IGuildMember, IMemberModel>,
+    IEntityProvider<IDMChannel, IDMChannelModel>,
+    IEntityProvider<IStageInstance, IStageInstanceModel>
 {
     /// <summary>
     ///     Gets the currently logged-in user.
     /// </summary>
-    ILoadableCurrentUserEntitySource<ISelfUser> CurrentUser { get; }
+    ILoadableSelfUserActor<ISelfUser> SelfUser { get; }
 
-    IRootEntitySource<ILoadableGuildEntitySource<IGuild>, ulong, IGuild> Guilds { get; }
-    ILoadableGuildEntitySource<IGuild> Guild(ulong id) => Guilds[id];
+    IPagedLoadableRootActor<ILoadableGuildActor<IGuild>, ulong, IGuild, IPartialGuild> Guilds { get; }
+    ILoadableGuildActor<IGuild> Guild(ulong id) => Guilds[id];
 
-    IRootEntitySource<ILoadableChannelEntitySource<IChannel>, ulong, IChannel> Channels { get; }
-    ILoadableChannelEntitySource<IChannel> Channel(ulong id) => Channels[id];
+    IRootActor<ILoadableChannelActor<IChannel>, ulong, IChannel> Channels { get; }
+    ILoadableChannelActor<IChannel> Channel(ulong id) => Channels[id];
 
     IRestApiClient RestApiClient { get; }
 
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }
+
+    async Task Test()
+    {
+
+    }
 }

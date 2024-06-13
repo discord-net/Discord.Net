@@ -3,22 +3,10 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public class Guild : IGuildModel, IEntityModelSource
+public class Guild : PartialGuild, IGuildModel, IEntityModelSource
 {
-    [JsonPropertyName("id")]
-    public ulong Id { get; set; }
-
-    [JsonPropertyName("name")]
-    public required string Name { get; set; }
-
-    [JsonPropertyName("icon")]
-    public string? Icon { get; set; }
-
     [JsonPropertyName("icon_hash")]
-    public string? IconHash { get; set; }
-
-    [JsonPropertyName("splash")]
-    public string? Splash { get; set; }
+    public Optional<string?> IconHash { get; set; }
 
     [JsonPropertyName("discovery_splash")]
     public string? DiscoverySplash { get; set; }
@@ -41,9 +29,6 @@ public class Guild : IGuildModel, IEntityModelSource
     [JsonPropertyName("widget_channel_id")]
     public Optional<ulong?> WidgetChannelId { get; set; }
 
-    [JsonPropertyName("verification_level")]
-    public int VerificationLevel { get; set; }
-
     [JsonPropertyName("default_message_notifications")]
     public int DefaultMessageNotifications { get; set; }
 
@@ -55,9 +40,6 @@ public class Guild : IGuildModel, IEntityModelSource
 
     [JsonPropertyName("emojis")]
     public required GuildEmote[] Emojis { get; set; }
-
-    [JsonPropertyName("features")]
-    public required string[] Features { get; set; }
 
     [JsonPropertyName("mfa_level")]
     public int MFALevel { get; set; }
@@ -81,20 +63,11 @@ public class Guild : IGuildModel, IEntityModelSource
     [JsonPropertyName("max_members")]
     public Optional<int> MaxMembers { get; set; }
 
-    [JsonPropertyName("vanity_url_code")]
-    public string? VanityUrlCode { get; set; }
-
-    [JsonPropertyName("description")]
-    public string? Description { get; set; }
-
     [JsonPropertyName("banner")]
     public string? Banner { get; set; }
 
     [JsonPropertyName("premium_tier")]
     public int PremiumTier { get; set; }
-
-    [JsonPropertyName("premium_subscription_count")]
-    public Optional<int> PremiumSubscriptionCount { get; set; }
 
     [JsonPropertyName("preferred_locale")]
     public required string PreferredLocale { get; set; }
@@ -107,18 +80,6 @@ public class Guild : IGuildModel, IEntityModelSource
 
     [JsonPropertyName("max_stage_video_channel_users")]
     public Optional<int> MaxStageVideoChannelUsers { get; set; }
-
-    [JsonPropertyName("approximate_member_count")]
-    public Optional<int> ApproximateMemberCount { get; set; }
-
-    [JsonPropertyName("approximate_presence_count")]
-    public Optional<int> ApproximatePresenceCount { get; set; }
-
-    [JsonPropertyName("welcome_screen")]
-    public Optional<WelcomeScreen> WelcomeScreen { get; set; }
-
-    [JsonPropertyName("nsfw_level")]
-    public int NsfwLevel { get; set; }
 
     [JsonPropertyName("stickers")]
     public Optional<Sticker[]> Stickers { get; set; }
@@ -137,10 +98,12 @@ public class Guild : IGuildModel, IEntityModelSource
     int? IGuildModel.MaxStageVideoChannelUsers => MaxStageVideoChannelUsers;
     int? IGuildModel.ApproximateMemberCount => ApproximateMemberCount;
     IWelcomeScreenModel? IGuildModel.WelcomeScreen => ~WelcomeScreen;
-    int? IGuildModel.PremiumSubscriptionCount => PremiumSubscriptionCount;
     string? IGuildModel.Vanity => VanityUrlCode;
     bool IGuildModel.WidgetEnabled => WidgetEnabled;
     ulong? IGuildModel.WidgetChannelId => WidgetChannelId;
+    string? IGuildModel.Icon => Icon;
+
+    string? IGuildModel.Splash => Splash;
 
     public virtual IEnumerable<IEntityModel> GetEntities()
     {

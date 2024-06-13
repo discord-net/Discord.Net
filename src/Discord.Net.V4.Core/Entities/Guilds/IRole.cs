@@ -3,17 +3,12 @@ using Discord.Rest;
 
 namespace Discord;
 
-using Deletable = IDeletable<ulong, IRole>;
-using Modifiable = IModifiable<ulong, IRole, ModifyRoleProperties, ModifyGuildRoleParams>;
-
 public interface IRole :
     ISnowflakeEntity,
-    Deletable,
     IMentionable,
     IComparable<IRole>,
-    Modifiable
+    IRoleActor<IRole>
 {
-    ILoadableEntity<ulong, IGuild> Guild { get; }
 
     /// <summary>
     ///     Gets the color given to users of this role.
@@ -108,11 +103,4 @@ public interface IRole :
     ///     Gets flags related to this role.
     /// </summary>
     RoleFlags Flags { get; }
-
-    static BasicApiRoute Deletable.DeleteRoute(IPathable path, ulong id)
-        => Routes.DeleteGuildRole(path.Require<IGuild>(), id);
-
-    static ApiBodyRoute<ModifyGuildRoleParams> Modifiable.ModifyRoute(IPathable path, ulong id,
-        ModifyGuildRoleParams args)
-        => Routes.ModifyGuildRole(path.Require<IGuild>(), id, args);
 }

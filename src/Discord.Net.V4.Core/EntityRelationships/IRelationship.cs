@@ -1,4 +1,4 @@
-namespace Discord.EntityRelationships;
+namespace Discord;
 
 public interface IRelationship<TId, TEntity> : IRelationship<TId, TEntity, ILoadableEntity<TId, TEntity>>
     where TId : IEquatable<TId>

@@ -1,11 +1,7 @@
-using Discord.EntityRelationships;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
-
-using Modifiable = IModifiable<ulong, IGuildEmote, EmoteProperties, ModifyEmojiParams>;
-using Deletable = IDeletable<ulong, IGuildEmote>;
 
 /// <summary>
 ///     An image-based emote that is attached to a guild.
@@ -13,9 +9,7 @@ using Deletable = IDeletable<ulong, IGuildEmote>;
 public interface IGuildEmote :
     IEmote,
     ISnowflakeEntity,
-    Modifiable,
-    Deletable,
-    IGuildRelationship
+    IGuildEmoteActor<IGuildEmote>
 {
     /// <summary>
     ///     Gets whether this emoji is managed by an integration.
@@ -40,10 +34,4 @@ public interface IGuildEmote :
     ILoadableEntityEnumerable<ulong, IRole> Roles { get; }
 
     ILoadableEntity<ulong, IUser>? Creator { get; }
-
-    static ApiBodyRoute<ModifyEmojiParams> Modifiable.ModifyRoute(IPathable path, ulong id, ModifyEmojiParams args)
-        => Routes.ModifyGuildEmoji(path.Require<IGuild>(), id, args);
-
-    static BasicApiRoute Deletable.DeleteRoute(IPathable path, ulong id)
-        => Routes.DeleteGuildEmoji(path.Require<IGuild>(), id);
 }

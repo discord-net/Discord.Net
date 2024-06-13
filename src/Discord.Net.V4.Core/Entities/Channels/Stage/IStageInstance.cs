@@ -1,4 +1,3 @@
-using Discord.EntityRelationships;
 using Discord.Models;
 using Discord.Rest;
 

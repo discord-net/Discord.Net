@@ -82,7 +82,7 @@ namespace Discord.Gateway
 
         ILoadableEntity<IGuild, ulong> IGuildScheduledEvent.Guild => Guild;
 
-        ILoadableEntity<IGuildUser, ulong> IGuildScheduledEvent.Creator => Creator;
+        ILoadableEntity<IGuildMember, ulong> IGuildScheduledEvent.Creator => Creator;
 
         ILoadableEntity<IGuildChannel, ulong>? IGuildScheduledEvent.Channel => Channel;
     }

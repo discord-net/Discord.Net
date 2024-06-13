@@ -53,7 +53,7 @@ namespace Discord.Gateway
 
         ILoadableEntity<IGuild, ulong> ICustomSticker.Guild => Guild;
 
-        ILoadableEntity<IGuildUser, ulong>? ICustomSticker.Author => Author;
+        ILoadableEntity<IGuildMember, ulong>? ICustomSticker.Author => Author;
         #endregion
     }
 }
