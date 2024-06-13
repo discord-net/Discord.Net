@@ -96,7 +96,7 @@ public sealed class Message : IMessageModel, IEntityModelSource
     [JsonPropertyName("role_subscription_data")]
     public Optional<MessageRoleSubscriptionData> RoleSubscriptionData { get; set; }
 
-    [JsonPropertyName("poll")]]
+    [JsonPropertyName("poll")]
     public Optional<Poll> Poll { get; set; }
 
     ulong IMessageModel.AuthorId => Author.Map(v => v.Id);
