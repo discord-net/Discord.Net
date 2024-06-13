@@ -28,7 +28,7 @@ in [our GitHub repository].
 [polymorphism]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/polymorphism
 [interface]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/interfaces/
 
-## New to .NET/C#?
+## New to .NET?
 
 All examples or snippets featured in this guide and all API
 documentation will be written in C#.
@@ -38,9 +38,9 @@ difficult, but don't worry! There are many resources online that can
 help you get started in the wonderful world of .NET. Here are some
 resources to get you started.
 
-- [C# Programming Guide (MSDN/Microsoft, Free)](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/)
-- [C# Fundamentals For Absolute Beginners (Channel9/Microsoft, Free)](https://channel9.msdn.com/Series/C-Fundamentals-for-Absolute-Beginners)
-- [C# Path (Pluralsight, Paid)](https://www.pluralsight.com/paths/csharp)
+- [C# Programming Guide](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/) (Microsoft, Free)
+- [Learn .NET](https://dotnet.microsoft.com/en-us/learn) (Microsoft, Free)
+- [C# Path](https://www.pluralsight.com/paths/csharp) (Pluralsight, Paid)
 
 ## Still have questions?
 

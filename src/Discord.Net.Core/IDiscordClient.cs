@@ -349,5 +349,12 @@ namespace Discord
         ///     Returns all SKUs for a given application. 
         /// </summary>
         Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Marks a given one-time purchase entitlement for the user as consumed.
+        /// </summary>
+        /// <param name="entitlementId">The id of the entitlement.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null);
     }
 }

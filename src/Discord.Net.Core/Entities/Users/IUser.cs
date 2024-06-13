@@ -19,6 +19,13 @@ namespace Discord
         ///         If you wish to retrieve the display avatar for this user, consider using <see cref="GetDisplayAvatarUrl"/>.
         ///     </note>
         /// </remarks>
+        /// <example>
+        ///     <para
+        ///         >The following example attempts to retrieve the user's current avatar and send it to a channel; if one is
+        ///         not set, a default avatar for this user will be returned instead.</para>
+        ///     <code language="cs" region="GetAvatarUrl"
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Users/IUser.Examples.cs"/>
+        /// </example>
         /// <param name="format">The format of the image.</param>
         /// <param name="size">The size of the image that matches any power of two, ranging from 16 to 2048.</param>
         /// <returns>

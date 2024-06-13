@@ -8,6 +8,8 @@
       topicUid: FAQ.Basics.ClientBasics
     - name: Dependency Injection
       topicUid: FAQ.Basics.DI
+    - name: Channel Inheritance
+      topicUid: FAQ.Basics.ChannelInheritance
 - name: Interactions
   items:
     - name: Starting out
@@ -22,7 +24,7 @@
   items: 
     - name: Text Command basics
       topicUid: FAQ.TextCommands.General
-- name: Legacy or Upgrade
+- name: Legacy Questions
   topicUid: FAQ.Legacy
 - name: Build Overrides
   topicUid: FAQ.BuildOverrides.WhatAreThey

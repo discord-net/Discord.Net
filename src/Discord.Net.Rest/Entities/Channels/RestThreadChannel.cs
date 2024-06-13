@@ -51,15 +51,15 @@ namespace Discord.Rest
         /// </summary>
         public ulong ParentChannelId { get; private set; }
 
-        internal RestThreadChannel(BaseDiscordClient discord, IGuild guild, ulong id, DateTimeOffset? createdAt)
-            : base(discord, guild, id)
+        internal RestThreadChannel(BaseDiscordClient discord, IGuild guild, ulong id, ulong guildId, DateTimeOffset? createdAt)
+            : base(discord, guild, id, guildId)
         {
             CreatedAt = createdAt ?? new DateTimeOffset(2022, 1, 9, 0, 0, 0, TimeSpan.Zero);
         }
 
         internal new static RestThreadChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestThreadChannel(discord, guild, model.Id, model.ThreadMetadata.GetValueOrDefault()?.CreatedAt.GetValueOrDefault());
+            var entity = new RestThreadChannel(discord, guild, model.Id, guild?.Id ?? model.GuildId.Value, model.ThreadMetadata.GetValueOrDefault()?.CreatedAt.GetValueOrDefault());
             entity.Update(model);
             return entity;
         }

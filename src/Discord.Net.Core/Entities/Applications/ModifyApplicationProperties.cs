@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Discord;
 
 /// <summary>
@@ -53,5 +55,10 @@ public class ModifyApplicationProperties
     ///     <see cref="ApplicationFlags.GatewayPresenceLimited"/> flags can be updated.
     /// </remarks>
     public Optional<ApplicationFlags> Flags { get; set; }
+
+    /// <summary>
+    ///     Gets or sets application install params configured for integration install types.
+    /// </summary>
+    public Optional<Dictionary<ApplicationIntegrationType, ApplicationInstallParams>> IntegrationTypesConfig { get; set; }
 
 }

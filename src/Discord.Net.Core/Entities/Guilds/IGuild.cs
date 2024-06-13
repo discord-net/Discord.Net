@@ -544,6 +544,29 @@ namespace Discord
         ///     A task that represents the asynchronous add operation for the ban.
         /// </returns>
         Task AddBanAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Bans the user from this guild and optionally prunes their recent messages.
+        /// </summary>
+        /// <param name="user">The user to ban.</param>
+        /// <param name="pruneSeconds">The number of seconds to remover messages from this user for, between 0 and 604800</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous add operation for the ban.
+        /// </returns>
+        Task BanUserAsync(IUser user, uint pruneSeconds = 0, RequestOptions options = null);
+
+        /// <summary>
+        ///     Bans the user from this guild and optionally prunes their recent messages.
+        /// </summary>
+        /// <param name="userId">The ID of the user to ban.</param>
+        /// <param name="pruneSeconds">The number of seconds to remover messages from this user for, between 0 and 604800</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous add operation for the ban.
+        /// </returns>
+        Task BanUserAsync(ulong userId, uint pruneSeconds = 0, RequestOptions options = null);
+
         /// <summary>
         ///     Unbans the user if they are currently banned.
         /// </summary>
@@ -790,7 +813,7 @@ namespace Discord
         /// <example>
         ///     <para>The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.</para>
         ///     <code language="cs" region="CreateTextChannelAsync"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Guilds\IGuild.Examples.cs"/>
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Guilds/IGuild.Examples.cs"/>
         /// </example>
         /// <param name="name">The new name for the text channel.</param>
         /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
@@ -800,6 +823,21 @@ namespace Discord
         ///     text channel.
         /// </returns>
         Task<ITextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null);
+        /// <summary>
+        ///     Creates a new announcement channel in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     Announcement channels are only available in Community guilds.
+        /// </remarks>
+        /// <param name="name">The new name for the announcement channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     announcement channel.
+        /// </returns>
+        Task<INewsChannel> CreateNewsChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null);
+
         /// <summary>
         ///     Creates a new voice channel in this guild.
         /// </summary>
@@ -1403,5 +1441,16 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="IncidentsData"/>.
         /// </returns>
         Task<GuildIncidentsData> ModifyIncidentActionsAsync(Action<GuildIncidentsDataProperties> props, RequestOptions options = null);
+
+        /// <summary>
+        ///     Executes a bulk ban on the specified users.
+        /// </summary>
+        /// <param name="userIds">A collection of user ids to ban.</param>
+        /// <param name="deleteMessageSeconds">The number of seconds to delete messages for. Max 604800.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="BulkBanResult"/>.
+        /// </returns>
+        Task<BulkBanResult> BulkBanAsync(IEnumerable<ulong> userIds, int? deleteMessageSeconds = null, RequestOptions options = null);
     }
 }

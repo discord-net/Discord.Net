@@ -14,12 +14,9 @@ public class GuildHelperTests
     [InlineData(PremiumTier.Tier3, 100)]
     public void GetUploadLimit(PremiumTier tier, ulong factor)
     {
-        var guild = Substitute.For<IGuild>();
-        guild.PremiumTier.Returns(tier);
-
         var expected = factor * (ulong)Math.Pow(2, 20);
 
-        var actual = GuildHelper.GetUploadLimit(guild);
+        var actual = GuildHelper.GetUploadLimit(tier);
 
         Assert.Equal(expected, actual);
     }

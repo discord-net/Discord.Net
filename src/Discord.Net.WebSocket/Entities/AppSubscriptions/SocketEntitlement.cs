@@ -67,7 +67,7 @@ public class SocketEntitlement : SocketEntity<ulong>, IEntitlement
 
         ApplicationId = model.ApplicationId;
         Type = model.Type;
-        IsConsumed = model.IsConsumed;
+        IsConsumed = model.IsConsumed.GetValueOrDefault(false);
         StartsAt = model.StartsAt.IsSpecified
             ? model.StartsAt.Value
             : null;

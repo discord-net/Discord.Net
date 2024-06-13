@@ -28,6 +28,7 @@ namespace Discord.Rest
         public bool IsDefaultPermission { get; private set; }
 
         /// <inheritdoc/>
+        [Obsolete("This property will be deprecated soon. Use ContextTypes instead.")]
         public bool IsEnabledInDm { get; private set; }
 
         /// <inheritdoc/>
@@ -67,6 +68,12 @@ namespace Discord.Rest
         /// </remarks>
         public string DescriptionLocalized { get; private set; }
 
+        /// <inheritdoc />
+        public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; private set; }
+
+        /// <inheritdoc />
+        public IReadOnlyCollection<InteractionContextType> ContextTypes { get; private set; }
+
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(Id);
@@ -102,9 +109,14 @@ namespace Discord.Rest
             NameLocalized = model.NameLocalized.GetValueOrDefault();
             DescriptionLocalized = model.DescriptionLocalized.GetValueOrDefault();
 
+#pragma warning disable CS0618 // Type or member is obsolete
             IsEnabledInDm = model.DmPermission.GetValueOrDefault(true).GetValueOrDefault(true);
+#pragma warning restore CS0618 // Type or member is obsolete
             DefaultMemberPermissions = new GuildPermissions((ulong)model.DefaultMemberPermission.GetValueOrDefault(0).GetValueOrDefault(0));
             IsNsfw = model.Nsfw.GetValueOrDefault(false).GetValueOrDefault(false);
+
+            IntegrationTypes = model.IntegrationTypes.GetValueOrDefault(null)?.ToImmutableArray();
+            ContextTypes = model.ContextTypes.GetValueOrDefault(null)?.ToImmutableArray();
         }
 
         /// <inheritdoc/>

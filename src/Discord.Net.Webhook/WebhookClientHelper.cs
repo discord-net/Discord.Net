@@ -26,7 +26,8 @@ namespace Discord.Webhook
         public static async Task<ulong> SendMessageAsync(DiscordWebhookClient client,
             string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl,
             AllowedMentions allowedMentions, RequestOptions options, MessageComponent components,
-            MessageFlags flags, ulong? threadId = null, string threadName = null, ulong[] appliedTags = null)
+            MessageFlags flags, ulong? threadId = null, string threadName = null, ulong[] appliedTags = null,
+            PollProperties poll = null)
         {
             var args = new CreateWebhookMessageParams
             {
@@ -35,7 +36,8 @@ namespace Discord.Webhook
                 Flags = flags
             };
 
-            Preconditions.WebhookMessageAtLeastOneOf(text, components, embeds?.ToArray());
+            Preconditions.WebhookMessageAtLeastOneOf(text, components, embeds?.ToArray(), poll: poll);
+            Preconditions.ValidatePoll(poll);
 
             if (embeds != null)
                 args.Embeds = embeds.Select(x => x.ToModel()).ToArray();
@@ -51,6 +53,8 @@ namespace Discord.Webhook
                 args.ThreadName = threadName;
             if (appliedTags != null)
                 args.AppliedTags = appliedTags;
+            if (poll != null)
+                args.Poll = poll.ToModel();
 
             if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
                 throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
@@ -136,36 +140,37 @@ namespace Discord.Webhook
         public static async Task<ulong> SendFileAsync(DiscordWebhookClient client, string filePath, string text, bool isTTS,
             IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options,
             bool isSpoiler, MessageComponent components, MessageFlags flags = MessageFlags.None, ulong? threadId = null, string threadName = null,
-            ulong[] appliedTags = null)
+            ulong[] appliedTags = null, PollProperties poll = null)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
-                return await SendFileAsync(client, file, filename, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, isSpoiler, components, flags, threadId, threadName, appliedTags).ConfigureAwait(false);
+                return await SendFileAsync(client, file, filename, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, isSpoiler, components, flags, threadId, threadName, appliedTags, poll).ConfigureAwait(false);
         }
 
         public static Task<ulong> SendFileAsync(DiscordWebhookClient client, Stream stream, string filename, string text, bool isTTS,
             IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options, bool isSpoiler,
-            MessageComponent components, MessageFlags flags, ulong? threadId, string threadName = null, ulong[] appliedTags = null)
-            => SendFileAsync(client, new FileAttachment(stream, filename, isSpoiler: isSpoiler), text, isTTS, embeds, username, avatarUrl, allowedMentions, components, options, flags, threadId, threadName, appliedTags);
+            MessageComponent components, MessageFlags flags, ulong? threadId, string threadName = null, ulong[] appliedTags = null, PollProperties poll = null)
+            => SendFileAsync(client, new FileAttachment(stream, filename, isSpoiler: isSpoiler), text, isTTS, embeds, username, avatarUrl, allowedMentions, components, options, flags, threadId, threadName, appliedTags, poll);
 
         public static Task<ulong> SendFileAsync(DiscordWebhookClient client, FileAttachment attachment, string text, bool isTTS,
             IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions,
             MessageComponent components, RequestOptions options, MessageFlags flags, ulong? threadId, string threadName = null,
-            ulong[] appliedTags = null)
-            => SendFilesAsync(client, new FileAttachment[] { attachment }, text, isTTS, embeds, username, avatarUrl, allowedMentions, components, options, flags, threadId, threadName, appliedTags);
+            ulong[] appliedTags = null, PollProperties poll = null)
+            => SendFilesAsync(client, new FileAttachment[] { attachment }, text, isTTS, embeds, username, avatarUrl, allowedMentions, components, options, flags, threadId, threadName, appliedTags, poll);
 
         public static async Task<ulong> SendFilesAsync(DiscordWebhookClient client,
             IEnumerable<FileAttachment> attachments, string text, bool isTTS, IEnumerable<Embed> embeds, string username,
             string avatarUrl, AllowedMentions allowedMentions, MessageComponent components, RequestOptions options,
-            MessageFlags flags, ulong? threadId, string threadName = null, ulong[] appliedTags = null)
+            MessageFlags flags, ulong? threadId, string threadName = null, ulong[] appliedTags = null, PollProperties poll = null)
         {
             embeds ??= Array.Empty<Embed>();
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Count(), DiscordConfig.MaxEmbedsPerMessage, nameof(embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
+            Preconditions.ValidatePoll(poll);
 
-            Preconditions.WebhookMessageAtLeastOneOf(text, components, embeds.ToArray(), attachments);
+            Preconditions.WebhookMessageAtLeastOneOf(text, components, embeds.ToArray(), attachments, poll: poll);
 
             foreach (var attachment in attachments)
             {
@@ -202,7 +207,8 @@ namespace Discord.Webhook
                 MessageComponents = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 Flags = flags,
                 ThreadName = threadName,
-                AppliedTags = appliedTags
+                AppliedTags = appliedTags,
+                Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified
             };
             var msg = await client.ApiClient.UploadWebhookFileAsync(client.Webhook.Id, args, options, threadId).ConfigureAwait(false);
             return msg.Id;

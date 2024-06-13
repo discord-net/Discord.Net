@@ -1,9 +1,9 @@
 ---
 uid: FAQ.Basics.DI
-title: Questions about Dependency Injection.
+title: Questions about Dependency Injection
 ---
 
-# Dependency-injection-related Questions
+# Dependency Injection-related Questions
 
 In the following section, you will find common questions and answers
 to utilizing dependency injection with @Discord.Commands and @Discord.Interactions, as well as
