@@ -104,4 +104,7 @@ internal class Message
 
     [JsonProperty("poll")]
     public Optional<Poll> Poll { get; set; }
+
+    [JsonProperty("call")]
+    public Optional<MessageCallData> Call { get; set; }
 }

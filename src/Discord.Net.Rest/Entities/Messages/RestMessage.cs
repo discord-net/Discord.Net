@@ -93,6 +93,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
 
+        /// <inheritdoc />
+        public MessageCallData? CallData { get; private set; }
+
         /// <inheritdoc cref="IMessage.Components"/>
         public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
         /// <summary>
@@ -272,6 +275,9 @@ namespace Discord.Rest
 
             if (model.Thread.IsSpecified)
                 Thread = RestThreadChannel.Create(Discord, new RestGuild(Discord, model.Thread.Value.GuildId.Value), model.Thread.Value);
+
+            if (model.Call.IsSpecified)
+                CallData = new MessageCallData(model.Call.Value.Participants, model.Call.Value.EndedTimestamp.ToNullable());
         }
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
