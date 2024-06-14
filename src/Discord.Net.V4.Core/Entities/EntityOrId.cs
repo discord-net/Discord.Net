@@ -6,8 +6,8 @@ namespace Discord;
 /// <typeparam name="TId">The ID type of the entity.</typeparam>
 /// <typeparam name="TEntity">The entity type represented by the ID.</typeparam>
 public readonly struct EntityOrId<TId, TEntity>
-    where TId : notnull, IEquatable<TId>
-    where TEntity : IEntity<TId>
+    where TId : IEquatable<TId>
+    where TEntity : IIdentifiable<TId>
 {
     /// <summary>
     ///     The ID of the entity.

@@ -31,5 +31,5 @@ public sealed class ModifyGuildScheduledEventParams
     public Optional<int> Status { get; set; }
 
     [JsonPropertyName("image")]
-    public Optional<string> Image { get; set; }
+    public Optional<string?> Image { get; set; }
 }

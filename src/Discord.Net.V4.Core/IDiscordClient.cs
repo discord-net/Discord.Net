@@ -1,5 +1,4 @@
 
-using Discord.Extensions;
 using Discord.Models;
 using Discord.Rest;
 
@@ -14,7 +13,8 @@ public interface IDiscordClient :
     IEntityProvider<IPartialGuild, IPartialGuildModel>,
     IEntityProvider<IGuildMember, IMemberModel>,
     IEntityProvider<IDMChannel, IDMChannelModel>,
-    IEntityProvider<IStageInstance, IStageInstanceModel>
+    IEntityProvider<IStageInstance, IStageInstanceModel>,
+    IEntityProvider<IGuildChannel, IGuildChannelModel>
 {
     /// <summary>
     ///     Gets the currently logged-in user.

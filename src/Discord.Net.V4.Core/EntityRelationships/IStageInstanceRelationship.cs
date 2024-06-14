@@ -2,13 +2,14 @@ using Discord.Stage;
 
 namespace Discord;
 
-using Relationship = IRelationship<ulong, IStageInstance, ILoadableStageInstanceActor<IStageInstance>>;
+public interface IStageInstanceRelationship : IStageInstanceRelationship<IStageInstance>;
 
-public interface IStageInstanceRelationship
-    : Relationship
+public interface IStageInstanceRelationship<TStageInstance> :
+    IRelationship<ulong, TStageInstance, ILoadableStageInstanceActor<TStageInstance>>
+    where TStageInstance : class, IStageInstance<TStageInstance>
 {
-    ILoadableStageInstanceActor<IStageInstance> StageInstance { get; }
+    ILoadableStageInstanceActor<TStageInstance> StageInstance { get; }
 
-    ILoadableStageInstanceActor<IStageInstance> Relationship.RelationshipLoadable
+    ILoadableStageInstanceActor<TStageInstance> IRelationship<ulong, TStageInstance, ILoadableStageInstanceActor<TStageInstance>>.RelationshipLoadable
         => StageInstance;
 }

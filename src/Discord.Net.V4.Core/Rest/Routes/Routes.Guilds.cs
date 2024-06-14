@@ -42,7 +42,7 @@ public partial class Routes
             $"guilds/{guildId}/channels",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<CreateGuildChannelParams, Channel> CreateGuildChannel(ulong guildId,
+    public static ApiBodyRoute<CreateGuildChannelParams, GuildChannelBase> CreateGuildChannel(ulong guildId,
         CreateGuildChannelParams body)
         => new(nameof(CreateGuildChannel),
             RequestMethod.Post,
@@ -52,8 +52,8 @@ public partial class Routes
             (ScopeType.Guild, guildId)
         );
 
-    public static ApiBodyRoute<ModifyGuildChannelPositionsParams> ModifyGuildChannelPositions(ulong guildId,
-        ModifyGuildChannelPositionsParams body)
+    public static ApiBodyRoute<ModifyGuildChannelPositionsParams[]> ModifyGuildChannelPositions(ulong guildId,
+        ModifyGuildChannelPositionsParams[] body)
         => new(nameof(ModifyGuildChannelPositions),
             RequestMethod.Patch,
             $"guild/{guildId}/channels",

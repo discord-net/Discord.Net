@@ -3,7 +3,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-using Modifiable = IModifiable<ulong, INestedChannel, ModifyGuildChannelPositionProperties, ModifyGuildChannelPositionsParams>;
+//using Modifiable = IModifiable<ulong, INestedChannel, ModifyGuildChannelPositionProperties, ModifyGuildChannelPositionsParams>;
 
 public interface INestedChannel : INestedChannel<INestedChannel>;
 /// <summary>

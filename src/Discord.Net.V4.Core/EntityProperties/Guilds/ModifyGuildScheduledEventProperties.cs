@@ -13,7 +13,7 @@ public sealed class ModifyGuildScheduledEventProperties : IEntityProperties<Modi
     public Optional<string?> Description { get; set; }
     public Optional<GuildScheduledEntityType> EntityType { get; set; }
     public Optional<GuildScheduledEventStatus> Status { get; set; }
-    public Optional<Image> Image { get; set; }
+    public Optional<Image?> Image { get; set; }
 
     public ModifyGuildScheduledEventParams ToApiModel(ModifyGuildScheduledEventParams? existing = default)
     {
@@ -32,7 +32,7 @@ public sealed class ModifyGuildScheduledEventProperties : IEntityProperties<Modi
         existing.Description = Description;
         existing.EntityType = EntityType.Map(v => (int)v);
         existing.Status = Status.Map(v => (int)v);
-        existing.Image = Image.Map(v => v.ToImageData());
+        existing.Image = Image.Map(v => v?.ToImageData());
 
         return existing;
     }

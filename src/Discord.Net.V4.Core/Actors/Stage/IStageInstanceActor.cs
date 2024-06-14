@@ -6,14 +6,14 @@ namespace Discord.Stage;
 public interface ILoadableStageInstanceActor<TStageInstance> :
     IStageInstanceActor<TStageInstance>,
     ILoadableEntity<ulong, TStageInstance>
-    where TStageInstance : class, IStageInstance;
+    where TStageInstance : class, IStageInstance<TStageInstance>;
 
 public interface IStageInstanceActor<out TStageInstance> :
     IStageChannelRelationship,
     IModifiable<ulong, IStageInstanceActor<TStageInstance>, ModifyStageInstanceProperties, ModifyStageInstanceParams>,
     IDeletable<ulong, IStageInstanceActor<TStageInstance>>,
     IActor<ulong, TStageInstance>
-    where TStageInstance : IStageInstance
+    where TStageInstance : class, IStageInstance<TStageInstance>
 {
     static BasicApiRoute IDeletable<ulong, IStageInstanceActor<TStageInstance>>.DeleteRoute(IPathable path,
         ulong id)
