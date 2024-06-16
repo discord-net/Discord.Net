@@ -81,6 +81,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
 
+        /// <inheritdoc />
+        public PurchaseNotification PurchaseNotification { get; private set; }
+
         /// <inheritdoc cref="IMessage.Thread"/>
         public SocketThreadChannel Thread { get; private set; }
 
@@ -297,6 +300,14 @@ namespace Discord.WebSocket
             {
                 SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
                 Thread = guild?.AddOrUpdateChannel(state, model.Thread.Value) as SocketThreadChannel;
+            }
+
+            if (model.PurchaseNotification.IsSpecified)
+            {
+                PurchaseNotification = new PurchaseNotification(model.PurchaseNotification.Value.Type,
+                    model.PurchaseNotification.Value.ProductPurchase.IsSpecified
+                        ? new GuildProductPurchase(model.PurchaseNotification.Value.ProductPurchase.Value.ListingId, model.PurchaseNotification.Value.ProductPurchase.Value.ProductName)
+                        : null);
             }
         }
 
