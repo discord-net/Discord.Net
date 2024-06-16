@@ -227,6 +227,11 @@ namespace Discord
         MessageRoleSubscriptionData RoleSubscriptionData { get; }
 
         /// <summary>
+        ///     Gets the purchase notification for this message.
+        /// </summary>
+        PurchaseNotification PurchaseNotification { get; }
+        
+        /// <summary>
         ///     Gets the call data of the message.
         /// </summary>
         MessageCallData? CallData { get; }

@@ -94,6 +94,9 @@ namespace Discord.Rest
         public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
 
         /// <inheritdoc />
+        public PurchaseNotification PurchaseNotification { get; private set; }
+        
+        /// <inheritdoc />
         public MessageCallData? CallData { get; private set; }
 
         /// <inheritdoc cref="IMessage.Components"/>
@@ -276,9 +279,18 @@ namespace Discord.Rest
             if (model.Thread.IsSpecified)
                 Thread = RestThreadChannel.Create(Discord, new RestGuild(Discord, model.Thread.Value.GuildId.Value), model.Thread.Value);
 
+            if (model.PurchaseNotification.IsSpecified)
+            {
+                PurchaseNotification = new PurchaseNotification(model.PurchaseNotification.Value.Type,
+                    model.PurchaseNotification.Value.ProductPurchase.IsSpecified
+                        ? new GuildProductPurchase(model.PurchaseNotification.Value.ProductPurchase.Value.ListingId, model.PurchaseNotification.Value.ProductPurchase.Value.ProductName)
+                        : null);
+            }
+            
             if (model.Call.IsSpecified)
                 CallData = new MessageCallData(model.Call.Value.Participants, model.Call.Value.EndedTimestamp.ToNullable());
         }
+        
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
         {
