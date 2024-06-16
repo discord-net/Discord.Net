@@ -230,6 +230,11 @@ namespace Discord
         ///     Gets the purchase notification for this message.
         /// </summary>
         PurchaseNotification PurchaseNotification { get; }
+        
+        /// <summary>
+        ///     Gets the call data of the message.
+        /// </summary>
+        MessageCallData? CallData { get; }
 
         /// <summary>
         ///     Adds a reaction to this message.

@@ -107,4 +107,7 @@ internal class Message
 
     [JsonProperty("purchase_notification")]
     public Optional<MessagePurchaseNotification> PurchaseNotification { get; set; }
+  
+    [JsonProperty("call")]
+    public Optional<MessageCallData> Call { get; set; }
 }

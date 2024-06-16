@@ -90,6 +90,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IThreadChannel IMessage.Thread => Thread;
 
+        /// <inheritdoc />
+        public MessageCallData? CallData { get; private set; }
+
         /// <summary>
         ///     Returns all attachments included in this message.
         /// </summary>
@@ -218,7 +221,8 @@ namespace Discord.WebSocket
                                         : null,
                                     parsed.CustomId.GetValueOrDefault(),
                                     parsed.Url.GetValueOrDefault(),
-                                    parsed.Disabled.GetValueOrDefault());
+                                    parsed.Disabled.GetValueOrDefault(),
+                                    parsed.SkuId.ToNullable());
                             }
                         case ComponentType.SelectMenu:
                             {
@@ -309,6 +313,9 @@ namespace Discord.WebSocket
                         ? new GuildProductPurchase(model.PurchaseNotification.Value.ProductPurchase.Value.ListingId, model.PurchaseNotification.Value.ProductPurchase.Value.ProductName)
                         : null);
             }
+            
+            if (model.Call.IsSpecified)
+                CallData = new MessageCallData(model.Call.Value.Participants, model.Call.Value.EndedTimestamp.ToNullable());
         }
 
         /// <inheritdoc />
