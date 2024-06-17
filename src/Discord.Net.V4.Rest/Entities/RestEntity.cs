@@ -6,5 +6,5 @@ public abstract class RestEntity<TId>(DiscordRestClient client, TId id) : IEntit
     protected DiscordRestClient Client { get; } = client;
     public TId Id { get; } = id;
 
-    IDiscordClient IEntity.Client => Client;
+    IDiscordClient IClientProvider.Client => Client;
 }

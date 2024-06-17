@@ -4,10 +4,9 @@ public interface IGuildChannelRelationship : IGuildChannelRelationship<IGuildCha
 public interface IGuildChannelRelationship<TChannel> :
     IChannelRelationship<TChannel, ILoadableGuildChannelActor<TChannel>>,
     IGuildRelationship
-    where TChannel : class, IGuildChannel<TChannel>;
+    where TChannel : class, IGuildChannel;
 
 public interface IGuildChannelRelationship<TChannel, out TLoadable> :
-    IChannelRelationship<TChannel, TLoadable>,
-    IGuildRelationship
-    where TChannel : class, IGuildChannel<TChannel>
+    IChannelRelationship<TChannel, TLoadable>
+    where TChannel : class, IGuildChannel
     where TLoadable : ILoadableGuildChannelActor<TChannel>;

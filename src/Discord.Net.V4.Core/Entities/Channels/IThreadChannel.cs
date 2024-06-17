@@ -4,15 +4,13 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface IThreadChannel : IThreadChannel<IThreadChannel>;
 /// <summary>
 ///     Represents a thread channel inside of a guild.
 /// </summary>
-public interface IThreadChannel<out TThreadChannel> :
-    IMessageChannel<TThreadChannel>,
-    IGuildChannel<TThreadChannel>,
-    IThreadActor<TThreadChannel>
-    where TThreadChannel : IThreadChannel<TThreadChannel>
+public interface IThreadChannel :
+    IMessageChannel,
+    IGuildChannel,
+    IThreadActor
 {
     ILoadableEntity<ulong, IUser> Owner { get; }
 

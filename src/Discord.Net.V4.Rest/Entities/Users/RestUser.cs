@@ -1,49 +1,20 @@
 using Discord.Models;
-using Discord.Rest;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Discord.Rest;
+namespace Discord.Rest.Users;
 
-public class RestUser : RestEntity<ulong>, IUser, IModeled<ulong, IUserModel>
+public class RestUser(DiscordRestClient client, IUserModel model) : RestEntity<ulong>(client, model.Id), IUser
 {
-    public string? AvatarId
-        => Model.AvatarHash;
+    protected virtual IUserModel Model { get; } = model;
 
-    public ushort Discriminator
-        => ushort.Parse(Model.Discriminator);
+    public string? AvatarId => Model.AvatarHash;
 
-    public string Username
-        => Model.Username;
+    public ushort Discriminator => ushort.Parse(Model.Discriminator);
 
-    public string? GlobalName
-        => Model.GlobalName;
+    public string Username => Model.Username;
 
-    public bool IsBot
-        => Model.IsBot ?? false;
+    public string? GlobalName => Model.GlobalName;
 
-    public virtual bool IsWebhook => false;
+    public bool IsBot => Model.IsBot ?? false;
 
-    public UserFlags PublicFlags
-        => (UserFlags?)Model.PublicFlags ?? UserFlags.None;
-
-    public IUserModel Model { get; protected set; }
-
-    protected RestUser(DiscordRestClient client, IUserModel model)
-        : base(client, model.Id)
-    {
-        Model = model;
-    }
-
-    internal static RestUser Create(DiscordRestClient client, IUserModel model)
-    {
-        return model.Id == client.CurrentUser.Id
-            ? RestSelfUser.Create(client, model)
-            : new RestUser(client, model);
-    }
-
-    [MemberNotNull(nameof(Model))]
-    protected virtual void Update(IUserModel model)
-    {
-        Model = model;
-    }
+    public UserFlags PublicFlags => (UserFlags?)Model.PublicFlags ?? UserFlags.None;
 }

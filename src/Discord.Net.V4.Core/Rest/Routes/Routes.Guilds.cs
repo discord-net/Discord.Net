@@ -159,6 +159,14 @@ public partial class Routes
             $"guilds/{guildId}/bans/{userId}",
             (ScopeType.Guild, guildId));
 
+    public static ApiBodyRoute<BulkBanUsersParams, BulkBanResponse> BulkGuildBan(ulong guildId, BulkBanUsersParams args)
+        => new(nameof(BulkGuildBan),
+            RequestMethod.Post,
+            $"guilds/{guildId}/bulk-ban",
+            args,
+            ContentType.JsonBody,
+            (ScopeType.Guild, guildId));
+
     public static ApiRoute<Role[]> GetGuildRoles(ulong guildId)
         => new(nameof(GetGuildRoles),
             RequestMethod.Get,
@@ -222,7 +230,7 @@ public partial class Routes
             ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    public static ApiRoute<VoiceRegion[]> GetGuildVoiceRegions(ulong guildId)
+    public static ApiRoute<Discord.Models.Json.VoiceRegion[]> GetGuildVoiceRegions(ulong guildId)
         => new(nameof(GetGuildVoiceRegions),
             RequestMethod.Get,
             $"guilds/{guildId}/regions",
@@ -234,7 +242,7 @@ public partial class Routes
             $"guilds/{guildId}/invites",
             (ScopeType.Guild, guildId));
 
-    public static ApiRoute<Integration[]> GetGuildIntegrations(ulong guildId)
+    public static ApiRoute<Models.Json.Integration[]> GetGuildIntegrations(ulong guildId)
         => new(nameof(GetGuildIntegrations),
             RequestMethod.Get,
             $"guilds/{guildId}/integrations",

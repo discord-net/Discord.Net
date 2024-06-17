@@ -14,8 +14,12 @@ public interface IDiscordClient :
     IEntityProvider<IGuildMember, IMemberModel>,
     IEntityProvider<IDMChannel, IDMChannelModel>,
     IEntityProvider<IStageInstance, IStageInstanceModel>,
-    IEntityProvider<IGuildChannel, IGuildChannelModel>
+    IEntityProvider<IGuildChannel, IGuildChannelModel>,
+    IEntityProvider<IInvite, IInviteModel>,
+    IEntityProvider<IUser, IUserModel>
 {
+    IRestApiClient RestApiClient { get; }
+
     /// <summary>
     ///     Gets the currently logged-in user.
     /// </summary>
@@ -27,13 +31,6 @@ public interface IDiscordClient :
     IRootActor<ILoadableChannelActor<IChannel>, ulong, IChannel> Channels { get; }
     ILoadableChannelActor<IChannel> Channel(ulong id) => Channels[id];
 
-    IRestApiClient RestApiClient { get; }
-
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }
-
-    async Task Test()
-    {
-
-    }
 }

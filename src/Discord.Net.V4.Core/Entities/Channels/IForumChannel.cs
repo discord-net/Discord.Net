@@ -3,16 +3,13 @@ using Discord.Rest;
 
 namespace Discord;
 
-
-public interface IForumChannel : IForumChannel<IForumChannel>;
 /// <summary>
 ///     Represents a forum channel in a guild that can create posts.
 /// </summary>
-public interface IForumChannel<out TForum> :
-    INestedChannel<TForum>,
-    IIntegrationChannel<TForum>,
-    IForumChannelActor<TForum>
-    where TForum : IForumChannel<TForum>
+public interface IForumChannel :
+    INestedChannel,
+    IIntegrationChannel,
+    IForumChannelActor
 {
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
@@ -38,7 +35,7 @@ public interface IForumChannel<out TForum> :
     /// <summary>
     ///     Gets a collection of tags inside of this forum channel.
     /// </summary>
-    IReadOnlyCollection<ForumTag> Tags { get; }
+    IReadOnlyCollection<ForumTag> AvailableTags { get; }
 
     /// <summary>
     ///     Gets the current rate limit on creating posts in this forum channel.
@@ -47,7 +44,7 @@ public interface IForumChannel<out TForum> :
     ///     An <see cref="int" /> representing the time in seconds required before the user can send another
     ///     message; <see langword="null" /> if disabled.
     /// </returns>
-    int? ThreadCreationInterval { get; }
+    int? ThreadCreationSlowmode { get; }
 
     /// <summary>
     ///     Gets the current default slow-mode delay for threads in this forum channel.

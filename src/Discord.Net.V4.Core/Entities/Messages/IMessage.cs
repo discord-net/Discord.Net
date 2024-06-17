@@ -5,7 +5,7 @@ namespace Discord;
 
 public interface IMessage :
     ISnowflakeEntity,
-    IMessageActor<IMessage>
+    IMessageActor
 {
     #region Properties
 

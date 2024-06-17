@@ -4,8 +4,7 @@ using Discord.Rest;
 namespace Discord;
 
 public interface IGuildMember :
-    IUser,
-    IGuildMemberActor<IGuildMember>
+    IGuildMemberActor
 {
     /// <summary>
     ///     Gets when this user joined the guild.
@@ -16,14 +15,6 @@ public interface IGuildMember :
     /// </returns>
     DateTimeOffset? JoinedAt { get; }
 
-    /// <summary>
-    ///     Gets the displayed name for this user.
-    /// </summary>
-    /// <returns>
-    ///     A string representing the display name of the user; If the nickname is null, this will be the username.
-    /// </returns>
-    string DisplayName
-        => Nickname ?? Username;
 
     /// <summary>
     ///     Gets the nickname for this user.
@@ -33,15 +24,6 @@ public interface IGuildMember :
     /// </returns>
     string? Nickname { get; }
 
-    /// <summary>
-    ///     Gets the displayed avatar for this user.
-    /// </summary>
-    /// <returns>
-    ///     The users displayed avatar hash. If the user does not have a guild avatar, this will be the regular avatar.
-    ///     If the user also does not have a regular avatar, this will be <see langword="null" />.
-    /// </returns>
-    string? DisplayAvatarId
-        => GuildAvatarId ?? AvatarId;
 
     /// <summary>
     ///     Gets the guild specific avatar for this user.

@@ -20,7 +20,7 @@ public class RestLoadableEntity<TId, TEntity, TModel, TCommon> : RestLoadableEnt
             id,
             async (delegateClient, _, options, token) =>
             {
-                var result = await delegateClient.RestApiClient.ExecuteAsync(route, options, token);
+                var result = await delegateClient.ApiClient.ExecuteAsync(route, options, token);
 
                 return result is null ? null : factory(client, result);
             }

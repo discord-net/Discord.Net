@@ -4,4 +4,4 @@ public interface IStageChannelRelationship : IStageChannelRelationship<IStageCha
 
 public interface IStageChannelRelationship<TStageChannel> :
     IGuildChannelRelationship<TStageChannel, ILoadableStageChannelActor<TStageChannel>>
-    where TStageChannel : class, IStageChannel<TStageChannel>;
+    where TStageChannel : class, IStageChannel;

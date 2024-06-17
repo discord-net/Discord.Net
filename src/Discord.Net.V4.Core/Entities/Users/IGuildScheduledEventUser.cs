@@ -1,8 +1,5 @@
 namespace Discord;
 
-public interface IGuildScheduledEventUser : IGuildScheduledEventUser<IGuildScheduledEventUser>;
-
-public interface IGuildScheduledEventUser<TGuildScheduledEventUser> :
+public interface IGuildScheduledEventUser :
     IEntity<ulong>,
-    IGuildScheduledEventUserActor<TGuildScheduledEventUser>
-    where TGuildScheduledEventUser : IGuildScheduledEventUser<TGuildScheduledEventUser>;
+    IGuildScheduledEventUserActor;

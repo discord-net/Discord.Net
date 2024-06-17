@@ -10,6 +10,7 @@
     <RootNamespace>Discord</RootNamespace>
     <EnablePreviewFeatures>true</EnablePreviewFeatures>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>CA2252</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -4,15 +4,15 @@ using Discord.Rest;
 namespace Discord;
 
 public interface ILoadableGuildMemberActor<TMember> :
-    IGuildMemberActor<TMember>,
+    IGuildMemberActor,
     ILoadableEntity<ulong, TMember>
     where TMember : class, IGuildMember;
 
-public interface IGuildMemberActor<out TMember> :
+public interface IGuildMemberActor :
     IGuildRelationship,
-    IModifiable<ulong, IGuildMemberActor<TMember>, ModifyGuildUserProperties, ModifyGuildMemberParams>,
-    IActor<ulong, TMember>
-    where TMember : IGuildMember
+    IUserRelationship,
+    IModifiable<ulong, IGuildMemberActor, ModifyGuildUserProperties, ModifyGuildMemberParams>,
+    IActor<ulong, IGuildMember>
 {
     IDefinedLoadableEntityEnumerable<ulong, IRole> Roles { get; }
     ILoadableEntity<ulong, IRole> Role(ulong id) => Roles[id];
@@ -74,7 +74,7 @@ public interface IGuildMemberActor<out TMember> :
         token
     );
 
-    static ApiBodyRoute<ModifyGuildMemberParams> IModifiable<ulong, IGuildMemberActor<TMember>, ModifyGuildUserProperties, ModifyGuildMemberParams>.ModifyRoute(IPathable path, ulong id,
+    static ApiBodyRoute<ModifyGuildMemberParams> IModifiable<ulong, IGuildMemberActor, ModifyGuildUserProperties, ModifyGuildMemberParams>.ModifyRoute(IPathable path, ulong id,
         ModifyGuildMemberParams args)
         => Routes.ModifyGuildMember(path.Require<IGuild>(), id, args);
 }

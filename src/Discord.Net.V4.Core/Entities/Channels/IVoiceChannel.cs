@@ -3,13 +3,10 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface IVoiceChannel : IVoiceChannel<IVoiceChannel>;
-
-public interface IVoiceChannel<out TChannel> :
-    IMessageChannel<TChannel>,
-    IGuildChannel<TChannel>,
-    IAudioChannel<TChannel>
-    where TChannel : IVoiceChannel<TChannel>
+public interface IVoiceChannel :
+    IMessageChannel,
+    IGuildChannel,
+    IAudioChannel
 {
     /// <summary>
     ///     Gets the bit-rate that the clients in this voice channel are requested to use.

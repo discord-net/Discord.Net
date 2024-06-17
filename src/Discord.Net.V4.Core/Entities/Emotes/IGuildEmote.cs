@@ -9,7 +9,7 @@ namespace Discord;
 public interface IGuildEmote :
     IEmote,
     ISnowflakeEntity,
-    IGuildEmoteActor<IGuildEmote>
+    IGuildEmoteActor
 {
     /// <summary>
     ///     Gets whether this emoji is managed by an integration.

@@ -8,7 +8,7 @@ namespace Discord;
 /// </summary>
 public interface IGuildSticker :
     ISticker,
-    IGuildStickerActor<IGuildSticker>
+    IGuildStickerActor
 {
     /// <summary>
     ///     Gets the user that uploaded the guild sticker.

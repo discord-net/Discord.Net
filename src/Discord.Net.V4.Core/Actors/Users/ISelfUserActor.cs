@@ -6,13 +6,12 @@ namespace Discord;
 
 public interface ILoadableSelfUserActor<TSelfUser> :
     ILoadableEntity<ulong, TSelfUser>,
-    ISelfUserActor<TSelfUser>
+    ISelfUserActor
     where TSelfUser : class, ISelfUser;
 
-public interface ISelfUserActor<out TSelfUser> :
-    IModifiable<ulong, ISelfUserActor<TSelfUser>, ModifySelfUserProperties, ModifyCurrentUserParams>,
-    IActor<ulong, TSelfUser>
-    where TSelfUser : ISelfUser
+public interface ISelfUserActor :
+    IModifiable<ulong, ISelfUserActor, ModifySelfUserProperties, ModifyCurrentUserParams>,
+    IActor<ulong, ISelfUser>
 {
     async Task<IEnumerable<IPartialGuild>?> GetGuildsAsync(
         EntityOrId<ulong, IPartialGuild>? before,
@@ -86,7 +85,7 @@ public interface ISelfUserActor<out TSelfUser> :
     // - https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection
     // - https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection
 
-    static ApiBodyRoute<ModifyCurrentUserParams> IModifiable<ulong, ISelfUserActor<TSelfUser>, ModifySelfUserProperties, ModifyCurrentUserParams>.ModifyRoute(IPathable path, ulong id,
+    static ApiBodyRoute<ModifyCurrentUserParams> IModifiable<ulong, ISelfUserActor, ModifySelfUserProperties, ModifyCurrentUserParams>.ModifyRoute(IPathable path, ulong id,
         ModifyCurrentUserParams args)
         => Routes.ModifyCurrentUser(args);
 }

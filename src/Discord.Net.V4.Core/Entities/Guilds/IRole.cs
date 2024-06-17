@@ -7,7 +7,7 @@ public interface IRole :
     ISnowflakeEntity,
     IMentionable,
     IComparable<IRole>,
-    IRoleActor<IRole>
+    IRoleActor
 {
 
     /// <summary>

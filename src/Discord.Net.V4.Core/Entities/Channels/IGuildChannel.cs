@@ -3,11 +3,9 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface IGuildChannel : IGuildChannel<IGuildChannel>;
-public interface IGuildChannel<out TGuildChannel> :
-    IChannel<TGuildChannel>,
-    IGuildChannelActor<TGuildChannel>
-    where TGuildChannel : IGuildChannel<TGuildChannel>
+public interface IGuildChannel :
+    IChannel,
+    IGuildChannelActor
 {
     /// <summary>
     ///     Gets the position of this channel.

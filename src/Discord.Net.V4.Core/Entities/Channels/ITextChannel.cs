@@ -4,18 +4,16 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ITextChannel : ITextChannel<ITextChannel>;
 
 /// <summary>
 ///     Represents a generic channel in a guild that can send and receive messages.
 /// </summary>
-public interface ITextChannel<out TChannel> :
-    IMessageChannel<TChannel>,
+public interface ITextChannel :
+    IMessageChannel,
     IMentionable,
-    INestedChannel<TChannel>,
-    IIntegrationChannel<TChannel>,
-    ITextChannelActor<TChannel>
-    where TChannel : ITextChannel<TChannel>
+    INestedChannel,
+    IIntegrationChannel,
+    ITextChannelActor
 {
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.

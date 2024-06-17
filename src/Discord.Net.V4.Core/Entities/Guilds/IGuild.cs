@@ -6,7 +6,7 @@ namespace Discord;
 
 public interface IGuild :
     IPartialGuild,
-    IGuildActor<IGuild>
+    IGuildActor
 {
     /// <summary>
     ///     Gets the amount of time (in seconds) a user must be inactive in a voice channel for until they are

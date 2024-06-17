@@ -3,7 +3,7 @@ namespace Discord;
 public interface IThreadRelationship : IThreadRelationship<IThreadChannel>;
 public interface IThreadRelationship<TThread> :
     IGuildChannelRelationship<TThread, ILoadableThreadActor<TThread>>
-    where TThread : class, IThreadChannel<TThread>
+    where TThread : class, IThreadChannel
 {
     ILoadableThreadActor<TThread> Thread { get; }
 

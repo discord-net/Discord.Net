@@ -5,14 +5,14 @@ using Discord.Stage;
 namespace Discord;
 
 public interface ILoadableStageChannelActor<TChannel> :
-    IStageChannelActor<TChannel>,
+    IStageChannelActor,
     ILoadableGuildChannelActor<TChannel>
-    where TChannel : class, IStageChannel<TChannel>;
+    where TChannel : class, IStageChannel;
 
-public interface IStageChannelActor<out TChannel> :
-    IGuildChannelActor<TChannel>,
-    IStageInstanceRelationship
-    where TChannel : IStageChannel<TChannel>
+public interface IStageChannelActor :
+    IGuildChannelActor,
+    IStageInstanceRelationship,
+    IActor<ulong, IStageChannel>
 {
     async Task<IStageInstance> CreateStageInstanceAsync(
         string topic,

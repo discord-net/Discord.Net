@@ -3,16 +3,15 @@ using Discord.Rest;
 namespace Discord;
 
 public interface ILoadableThreadMemberActor<TThreadMember> :
-    IThreadMemberActor<TThreadMember>,
+    IThreadMemberActor,
     ILoadableEntity<ulong, TThreadMember>
     where TThreadMember : class, IThreadMember;
 
-public interface IThreadMemberActor<out TThreadMember> :
-    IActor<ulong, TThreadMember>,
+public interface IThreadMemberActor :
+    IActor<ulong, IThreadMember>,
     IThreadRelationship,
     IMemberRelationship,
     IUserRelationship
-    where TThreadMember : class, IThreadMember
 {
     Task RemoveAsync(RequestOptions? options = null, CancellationToken token = default)
         => Client.RestApiClient.ExecuteAsync(

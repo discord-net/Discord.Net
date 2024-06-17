@@ -4,21 +4,20 @@ using Discord.Rest;
 namespace Discord;
 
 public interface ILoadableRoleActor<TRole> :
-    IRoleActor<TRole>,
+    IRoleActor,
     ILoadableEntity<ulong, TRole>
     where TRole : class, IRole;
 
-public interface IRoleActor<out TRole> :
+public interface IRoleActor :
     IGuildRelationship,
-    IModifiable<ulong, IRoleActor<TRole>, ModifyRoleProperties, ModifyGuildRoleParams>,
-    IDeletable<ulong, IRoleActor<TRole>>,
-    IActor<ulong, TRole>
-    where TRole : IRole
+    IModifiable<ulong, IRoleActor, ModifyRoleProperties, ModifyGuildRoleParams>,
+    IDeletable<ulong, IRoleActor>,
+    IActor<ulong, IRole>
 {
-    static BasicApiRoute IDeletable<ulong, IRoleActor<TRole>>.DeleteRoute(IPathable path, ulong id)
+    static BasicApiRoute IDeletable<ulong, IRoleActor>.DeleteRoute(IPathable path, ulong id)
         => Routes.DeleteGuildRole(path.Require<IGuild>(), id);
 
-    static ApiBodyRoute<ModifyGuildRoleParams> IModifiable<ulong, IRoleActor<TRole>, ModifyRoleProperties, ModifyGuildRoleParams>.ModifyRoute(IPathable path, ulong id,
+    static ApiBodyRoute<ModifyGuildRoleParams> IModifiable<ulong, IRoleActor, ModifyRoleProperties, ModifyGuildRoleParams>.ModifyRoute(IPathable path, ulong id,
         ModifyGuildRoleParams args)
         => Routes.ModifyGuildRole(path.Require<IGuild>(), id, args);
 }

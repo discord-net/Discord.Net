@@ -2,7 +2,7 @@ namespace Discord;
 
 public interface IThreadMember :
     ISnowflakeEntity,
-    IThreadMemberActor<IThreadMember>
+    IThreadMemberActor
 {
     DateTimeOffset JoinedAt { get; }
 }

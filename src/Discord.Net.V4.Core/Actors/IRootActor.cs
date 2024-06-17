@@ -3,7 +3,7 @@ using Discord.Paging;
 namespace Discord;
 
 public interface ILoadableRootActor<out TSource, in TId, TEntity> : IRootActor<TSource, TId, TEntity>
-    where TSource : ILoadableEntity<TId, TEntity>
+    where TSource : IActor<TId, TEntity>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
 {
@@ -12,13 +12,13 @@ public interface ILoadableRootActor<out TSource, in TId, TEntity> : IRootActor<T
 
 public interface IPagedLoadableRootActor<out TSource, in TId, out TEntity> :
     IPagedLoadableRootActor<TSource, TId, TEntity, TEntity>
-    where TSource : ILoadableEntity<TId, TEntity>
+    where TSource : IActor<TId, TEntity>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>;
 
 public interface IPagedLoadableRootActor<out TSource, in TId, out TEntity, out TPagedEntityType> :
     IRootActor<TSource, TId, TEntity>
-    where TSource : ILoadableEntity<TId, TEntity>
+    where TSource : IActor<TId, TEntity>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
     where TPagedEntityType : class, IEntity<TId>
@@ -27,7 +27,7 @@ public interface IPagedLoadableRootActor<out TSource, in TId, out TEntity, out T
 }
 
 public interface IRootActor<out TSource, in TId, out TEntity>
-    where TSource : ILoadableEntity<TId, TEntity>
+    where TSource : IActor<TId, TEntity>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
 {

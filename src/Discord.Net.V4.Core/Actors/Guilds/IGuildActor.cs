@@ -1,19 +1,28 @@
+using Discord.Integration;
 using Discord.Models.Json;
 using Discord.Rest;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-public interface ILoadableGuildActor<TGuild> : IGuildActor<TGuild>, ILoadableEntity<ulong, TGuild>
+public interface ILoadableGuildActor<TGuild> :
+    IGuildActor,
+    ILoadableEntity<ulong, TGuild>
     where TGuild : class, IGuild;
 
-public interface IGuildActor<out TGuild> :
-    IActor<ulong, TGuild>,
-    IModifiable<ulong, IGuildActor<TGuild>, ModifyGuildProperties, ModifyGuildParams>,
-    IDeletable<ulong, IGuildActor<TGuild>>
-    where TGuild : IGuild
+public interface IGuildActor :
+    IActor<ulong, IGuild>,
+    IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams>,
+    IDeletable<ulong, IGuildActor>
 {
     #region Sub-actors
+
+    IRootActor<IIntegrationActor, ulong, IIntegration> Integrations { get; }
+    IIntegrationActor Integration(ulong id) => Integrations[id];
+
+    IPagedLoadableRootActor<ILoadableGuildBanActor<IBan>, ulong, IBan> Bans { get; }
+    ILoadableGuildBanActor<IBan> Ban(ulong userId) => Bans[userId];
 
     IRootActor<ILoadableStageChannelActor<IStageChannel>, ulong, IStageChannel> StageChannels { get; }
     ILoadableStageChannelActor<IStageChannel> StageChannel(ulong id) => StageChannels[id];
@@ -41,6 +50,9 @@ public interface IGuildActor<out TGuild> :
 
     ILoadableRootActor<ILoadableGuildScheduledEventActor<IGuildScheduledEvent>, ulong, IGuildScheduledEvent> ScheduledEvents { get; }
     ILoadableGuildScheduledEventActor<IGuildScheduledEvent> ScheduledEvent(ulong id) => ScheduledEvents[id];
+
+    ILoadableRootActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites { get; }
+    ILoadableInviteActor<IInvite> Invite(string code) => Invites[code];
 
     #endregion
 
@@ -155,14 +167,138 @@ public interface IGuildActor<out TGuild> :
         token
     );
 
+    Task CreateGuildBanAsync(
+        EntityOrId<ulong, IUser> user,
+        int? purgeMessageSeconds = null,
+        RequestOptions? options = null,
+        CancellationToken token = default
+    ) => Client.RestApiClient.ExecuteAsync(
+        Routes.CreateGuildBan(Id, user.Id, new CreateGuildBanParams()
+        {
+            DeleteMessageSeconds = Optional.FromNullable(purgeMessageSeconds)
+        }),
+        options ?? Client.DefaultRequestOptions,
+        token
+    );
 
+    Task RemoveGuildBanAsync(
+        EntityOrId<ulong, IUser> user,
+        RequestOptions? options = null,
+        CancellationToken token = default
+    ) => Client.RestApiClient.ExecuteAsync(
+        Routes.RemoveGuildBan(Id, user.Id),
+        options ?? Client.DefaultRequestOptions,
+        token
+    );
+
+    async Task<BulkBanResult> BulkGuildBanAsync(
+        IEnumerable<EntityOrId<ulong, IUser>> users,
+        int? purgeMessageSeconds = null,
+        RequestOptions? options = null,
+        CancellationToken token = default)
+    {
+        var result = await Client.RestApiClient.ExecuteRequiredAsync(
+            Routes.BulkGuildBan(Id, new BulkBanUsersParams()
+            {
+                UserIds = users.Select(x => x.Id).ToArray(),
+                DeleteMessageSeconds = Optional.FromNullable(purgeMessageSeconds)
+            }),
+            options ?? Client.DefaultRequestOptions,
+            token
+        );
+
+        return BulkBanResult.Construct(Client, result);
+    }
+
+    async Task<MfaLevel> ModifyGuildMFALevelAsync(
+        MfaLevel level,
+        RequestOptions? options = null,
+        CancellationToken token = default)
+    {
+        var result = await Client.RestApiClient.ExecuteRequiredAsync(
+            Routes.ModifyGuildMfaLevel(Id, new ModifyGuildMfaLevelParams()
+            {
+                Level = (int)level
+            }),
+            options ?? Client.DefaultRequestOptions,
+            token
+        );
+
+        return (MfaLevel)result.Level;
+    }
+
+    async Task<int> GetGuildPruneCountAsync(
+        int? days = null,
+        Optional<IEnumerable<EntityOrId<ulong, IRole>>> includeRoles = default,
+        RequestOptions? options = null,
+        CancellationToken token = default)
+    {
+        var result = await Client.RestApiClient.ExecuteRequiredAsync(
+            Routes.GetGuildPruneCount(
+                Id,
+                days,
+                includeRoles.Map(v => v.Select(v => v.Id).ToArray())
+            ),
+            options ?? Client.DefaultRequestOptions,
+            token
+        );
+
+        return result.Pruned;
+    }
+
+    async Task<int?> BeginGuildPruneAsync(
+        int? days = null,
+        bool? computePruneCount = null,
+        Optional<IEnumerable<EntityOrId<ulong, IRole>>> includeRoles = default,
+        string? reason = null,
+        RequestOptions? options = null,
+        CancellationToken token = default)
+    {
+        var result = await Client.RestApiClient.ExecuteAsync(
+            Routes.BeginGuildPrune(Id,
+                new BeginGuildPruneParams()
+                {
+                    Days = Optional.FromNullable(days),
+                    Reason = Optional.FromNullable(reason),
+                    ComputePruneCount = Optional.FromNullable(computePruneCount),
+                    IncludeRoleIds = includeRoles.Map(v => v.Select(v => v.Id).ToArray())
+                }),
+            options ?? Client.DefaultRequestOptions,
+            token
+        );
+
+        return result?.Pruned;
+    }
+
+    async Task<IReadOnlyCollection<VoiceRegion>> GetGuildVoiceRegionsAsync(
+        RequestOptions? options = null,
+        CancellationToken token = default)
+    {
+        var result = await Client.RestApiClient.ExecuteRequiredAsync(
+            Routes.GetGuildVoiceRegions(Id),
+            options ?? Client.DefaultRequestOptions,
+            token
+        );
+
+        return result.Select(v => VoiceRegion.Construct(Client, v)).ToImmutableArray();
+    }
+
+    Task DeleteGuildIntegration(
+        EntityOrId<ulong, IIntegration> integration,
+        RequestOptions? options = null,
+        CancellationToken token = default
+    ) => Client.RestApiClient.ExecuteAsync(
+        Routes.DeleteGuildIntegration(Id, integration.Id),
+        options ?? Client.DefaultRequestOptions,
+        token
+    );
 
     #endregion
 
 
-    static BasicApiRoute IDeletable<ulong, IGuildActor<TGuild>>
+    static BasicApiRoute IDeletable<ulong, IGuildActor>
         .DeleteRoute(IPathable path, ulong id) => Routes.DeleteGuild(id);
 
-    static ApiBodyRoute<ModifyGuildParams> IModifiable<ulong, IGuildActor<TGuild>, ModifyGuildProperties, ModifyGuildParams>
+    static ApiBodyRoute<ModifyGuildParams> IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams>
         .ModifyRoute(IPathable path, ulong id, ModifyGuildParams args) => Routes.ModifyGuild(id, args);
 }

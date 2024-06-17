@@ -8,7 +8,7 @@ namespace Discord;
 /// </summary>
 public interface ISelfUser :
     IUser,
-    ISelfUserActor<ISelfUser>
+    ISelfUserActor
 {
     /// <summary>
     ///     Gets the email associated with this user.

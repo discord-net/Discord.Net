@@ -49,10 +49,7 @@ public interface IDefinedLoadableEntityEnumerable<TId, TEntity> : ILoadableEntit
     /// <summary>
     ///     Gets a read-only collection of ids that are explicitly defined for this enumerable source.
     /// </summary>
-    /// <remarks>
-    ///     This can be <see langword="null" /> if the ids are dynamically loaded, either from cache or from rest.
-    /// </remarks>
-    IReadOnlyCollection<TId>? Ids { get; }
+    IReadOnlyCollection<TId> Ids { get; }
 
     /// <summary>
     ///     Gets a collection of IDs for the entities that this collection represents.

@@ -12,5 +12,11 @@ public sealed class GuildMediaChannel : GuildChannelBase, IGuildForumChannelMode
 
     int IGuildForumChannelModel.DefaultAutoArchiveDuration => DefaultAutoArchiveDuration;
 
+    int? IGuildForumChannelModel.RatelimitPerUser => RatelimitPerUser;
+
+    int? IGuildForumChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
+
+    IEmote? IGuildForumChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
+
     IEnumerable<IForumTagModel> IGuildForumChannelModel.AvailableTags => AvailableTags | [];
 }

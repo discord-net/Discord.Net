@@ -3,16 +3,11 @@ using Discord.Rest;
 
 namespace Discord;
 
-//using Modifiable = IModifiable<ulong, INestedChannel, ModifyGuildChannelPositionProperties, ModifyGuildChannelPositionsParams>;
-
-public interface INestedChannel : INestedChannel<INestedChannel>;
 /// <summary>
 ///     Represents a type of guild channel that can be nested within a category.
 /// </summary>
-public interface INestedChannel<out TChannel> :
-    IInvitableChannel<TChannel>,
-    Modifiable
-    where TChannel : INestedChannel<TChannel>
+public interface INestedChannel :
+    IInvitableChannel
 {
     /// <summary>
     ///     Gets the parent (category) of this channel in the guild's channel list.
@@ -22,13 +17,4 @@ public interface INestedChannel<out TChannel> :
     ///     <see langword="null" /> if none is set.
     /// </returns>
     ILoadableEntity<ulong, ICategoryChannel>? Category { get; }
-
-    static ApiBodyRoute<ModifyGuildChannelPositionsParams> Modifiable.ModifyRoute(IPathable path, ulong id,
-        ModifyGuildChannelPositionsParams args)
-    {
-        // inject the channel id into the args
-        args.Id = id;
-
-        return Routes.ModifyGuildChannelPositions(path.Require<IGuild>(), args);
-    }
 }

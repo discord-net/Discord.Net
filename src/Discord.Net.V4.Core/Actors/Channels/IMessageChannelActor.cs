@@ -1,14 +1,14 @@
 namespace Discord;
 
 public interface ILoadableMessageChannelActor<TMessageChannel> :
-    IMessageChannelActor<TMessageChannel>,
+    IMessageChannelActor,
     ILoadableChannelActor<TMessageChannel>
-    where TMessageChannel : class, IMessageChannel<TMessageChannel>;
+    where TMessageChannel : class, IMessageChannel;
 
-public interface IMessageChannelActor<out TMessageChannel> :
-    IChannelActor<TMessageChannel>
-    where TMessageChannel : IMessageChannel<TMessageChannel>
+public interface IMessageChannelActor :
+    IChannelActor,
+    IActor<ulong, IMessageChannel>
 {
-    IRootActor<ILoadableEntity<ulong, IMessage>, ulong, IMessage> Messages { get; }
-    ILoadableEntity<ulong, IMessage> Message(ulong id) => Messages[id];
+    IRootActor<ILoadableMessageActor<IMessage>, ulong, IMessage> Messages { get; }
+    ILoadableMessageActor<IMessage> Message(ulong id) => Messages[id];
 }

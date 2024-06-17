@@ -1,12 +1,12 @@
 namespace Discord;
 
 public interface ILoadableGuildScheduledEventUserActor<TEventUser> :
-    IGuildScheduledEventUserActor<TEventUser>,
+    IGuildScheduledEventUserActor,
     ILoadableEntity<ulong, TEventUser>
-    where TEventUser : class, IGuildScheduledEventUser<TEventUser>;
+    where TEventUser : class, IGuildScheduledEventUser;
 
-public interface IGuildScheduledEventUserActor<TEventUser> :
+public interface IGuildScheduledEventUserActor :
     IUserRelationship,
     IMemberRelationship,
-    IGuildScheduledEventRelationship
-    where TEventUser : IGuildScheduledEventUser<TEventUser>;
+    IGuildScheduledEventRelationship,
+    IActor<ulong, IGuildScheduledEventUser>;

@@ -52,6 +52,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.V4.Audio", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Models", "src\Discord.Net.Models\Discord.Net.Models.csproj", "{2EC5A01A-91CB-4E3F-AFBD-7DDAEC61FF15}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceGenerators", "SourceGenerators", "{C1C763AF-3DC5-4F7D-8551-0A65B6011305}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.SourceGenerators.EntityHierarchies", "sourcegen\Discord.Net.SourceGenerators.EntityHierarchies\Discord.Net.SourceGenerators.EntityHierarchies.csproj", "{B72700E8-86FC-4146-9DA0-E6F2565B7444}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -314,6 +318,18 @@ Global
 		{2EC5A01A-91CB-4E3F-AFBD-7DDAEC61FF15}.Release|x64.Build.0 = Release|Any CPU
 		{2EC5A01A-91CB-4E3F-AFBD-7DDAEC61FF15}.Release|x86.ActiveCfg = Release|Any CPU
 		{2EC5A01A-91CB-4E3F-AFBD-7DDAEC61FF15}.Release|x86.Build.0 = Release|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Debug|x64.Build.0 = Debug|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Debug|x86.Build.0 = Debug|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Release|x64.ActiveCfg = Release|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Release|x64.Build.0 = Release|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Release|x86.ActiveCfg = Release|Any CPU
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -337,6 +353,7 @@ Global
 		{ED101B80-B0BB-42BE-85C4-5DEE315D4EC4} = {288C363D-A636-4EAE-9AC1-4698B641B26E}
 		{2341577A-49B7-4F3C-915F-787974832DEF} = {288C363D-A636-4EAE-9AC1-4698B641B26E}
 		{EE97E2F3-8A85-46D4-A5D6-EE985047F9F6} = {288C363D-A636-4EAE-9AC1-4698B641B26E}
+		{B72700E8-86FC-4146-9DA0-E6F2565B7444} = {C1C763AF-3DC5-4F7D-8551-0A65B6011305}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D2404771-EEC8-45F2-9D71-F3373F6C1495}

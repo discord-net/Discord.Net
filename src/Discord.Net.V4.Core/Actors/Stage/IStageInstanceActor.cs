@@ -4,23 +4,22 @@ using Discord.Rest;
 namespace Discord.Stage;
 
 public interface ILoadableStageInstanceActor<TStageInstance> :
-    IStageInstanceActor<TStageInstance>,
+    IStageInstanceActor,
     ILoadableEntity<ulong, TStageInstance>
     where TStageInstance : class, IStageInstance<TStageInstance>;
 
-public interface IStageInstanceActor<out TStageInstance> :
+public interface IStageInstanceActor :
     IStageChannelRelationship,
-    IModifiable<ulong, IStageInstanceActor<TStageInstance>, ModifyStageInstanceProperties, ModifyStageInstanceParams>,
-    IDeletable<ulong, IStageInstanceActor<TStageInstance>>,
-    IActor<ulong, TStageInstance>
-    where TStageInstance : class, IStageInstance<TStageInstance>
+    IModifiable<ulong, IStageInstanceActor, ModifyStageInstanceProperties, ModifyStageInstanceParams>,
+    IDeletable<ulong, IStageInstanceActor>,
+    IActor<ulong, IStageInstance>
 {
-    static BasicApiRoute IDeletable<ulong, IStageInstanceActor<TStageInstance>>.DeleteRoute(IPathable path,
+    static BasicApiRoute IDeletable<ulong, IStageInstanceActor>.DeleteRoute(IPathable path,
         ulong id)
         => Routes.DeleteStageInstance(path.Require<IChannel>());
 
     static ApiBodyRoute<ModifyStageInstanceParams>
-        IModifiable<ulong, IStageInstanceActor<TStageInstance>, ModifyStageInstanceProperties,
+        IModifiable<ulong, IStageInstanceActor, ModifyStageInstanceProperties,
             ModifyStageInstanceParams>.ModifyRoute(IPathable path, ulong id, ModifyStageInstanceParams args)
         => Routes.ModifyStageInstance(path.Require<IChannel>(), args);
 }

@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a generic ban object.
 /// </summary>
-public interface IBan
+public interface IBan : IEntity<ulong>
 {
     /// <summary>
     ///     Gets the banned user.

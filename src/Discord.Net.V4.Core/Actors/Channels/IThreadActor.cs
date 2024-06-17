@@ -4,15 +4,15 @@ using Discord.Rest;
 namespace Discord;
 
 public interface ILoadableThreadActor<TThread> :
-    IThreadActor<TThread>,
+    IThreadActor,
     ILoadableGuildChannelActor<TThread>
-    where TThread : class, IThreadChannel<TThread>;
+    where TThread : class, IThreadChannel;
 
-public interface IThreadActor<out TThread> :
-    IGuildChannelActor<TThread>,
+public interface IThreadActor :
+    IGuildChannelActor,
     IThreadMemberRelationship,
-    IModifiable<ulong, IThreadActor<TThread>, ModifyThreadChannelProperties, ModifyThreadChannelParams>
-    where TThread : IThreadChannel<TThread>
+    IActor<ulong, IThreadChannel>,
+    IModifiable<ulong, IThreadActor, ModifyThreadChannelProperties, ModifyThreadChannelParams>
 {
     ILoadableThreadMemberActor<IThreadMember> CurrentThreadMember { get; }
 
@@ -35,7 +35,7 @@ public interface IThreadActor<out TThread> :
     ILoadableThreadMemberActor<IThreadMember> IThreadMemberRelationship<IThreadMember>.ThreadMember
         => CurrentThreadMember;
 
-    static ApiBodyRoute<ModifyThreadChannelParams> IModifiable<ulong, IThreadActor<TThread>, ModifyThreadChannelProperties, ModifyThreadChannelParams>.ModifyRoute(IPathable path, ulong id,
+    static ApiBodyRoute<ModifyThreadChannelParams> IModifiable<ulong, IThreadActor, ModifyThreadChannelProperties, ModifyThreadChannelParams>.ModifyRoute(IPathable path, ulong id,
         ModifyThreadChannelParams args)
         => Routes.ModifyChannel(id, args);
 }

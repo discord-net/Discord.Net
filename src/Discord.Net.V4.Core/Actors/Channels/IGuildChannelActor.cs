@@ -1,24 +1,32 @@
+using Discord.Invites;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
 
 public interface ILoadableGuildChannelActor<TGuildChannel> :
-    ILoadableChannelActor<TGuildChannel>,
-    IGuildChannelActor<TGuildChannel>
-    where TGuildChannel : class, IGuildChannel<TGuildChannel>;
+    IGuildChannelActor,
+    ILoadableChannelActor<TGuildChannel>
+    where TGuildChannel : class, IGuildChannel;
 
-public interface IGuildChannelActor<out TGuildChannel> :
-    IChannelActor<TGuildChannel>,
+public interface IGuildChannelActor :
+    IChannelActor,
     IGuildRelationship,
-    IDeletable<ulong, IGuildChannelActor<TGuildChannel>>,
-    IModifiable<ulong, IGuildChannelActor<TGuildChannel>, ModifyGuildChannelProperties, ModifyGuildChannelParams>
-    where TGuildChannel : IGuildChannel<TGuildChannel>
+    IActor<ulong, IGuildChannel>,
+    IDeletable<ulong, IGuildChannelActor>,
+    IModifiable<ulong, IGuildChannelActor, ModifyGuildChannelProperties, ModifyGuildChannelParams>
 {
-    static BasicApiRoute IDeletable<ulong, IGuildChannelActor<TGuildChannel>>.DeleteRoute(IPathable pathable, ulong id)
+    ILoadableRootActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites { get; }
+
+    Task<IInvite> CreateInviteAsync(
+        CreateChannelInviteProperties args,
+        RequestOptions? options = null,
+        CancellationToken token = default);
+
+    static BasicApiRoute IDeletable<ulong, IGuildChannelActor>.DeleteRoute(IPathable pathable, ulong id)
         => Routes.DeleteChannel(id);
 
-    static ApiBodyRoute<ModifyGuildChannelParams> IModifiable<ulong, IGuildChannelActor<TGuildChannel>, ModifyGuildChannelProperties, ModifyGuildChannelParams>.ModifyRoute(IPathable path, ulong id,
+    static ApiBodyRoute<ModifyGuildChannelParams> IModifiable<ulong, IGuildChannelActor, ModifyGuildChannelProperties, ModifyGuildChannelParams>.ModifyRoute(IPathable path, ulong id,
         ModifyGuildChannelParams args)
         => Routes.ModifyChannel(id, args);
 }

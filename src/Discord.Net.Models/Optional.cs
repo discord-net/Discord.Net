@@ -10,7 +10,7 @@ namespace Discord;
 [JsonConverter(typeof(OptionalConverter))]
 public readonly struct Optional<T>
 {
-    public static Optional<T> Unspecified => default;
+    public static readonly Optional<T> Unspecified = default;
     private readonly T _value;
 
     /// <summary> Gets the value for this parameter. </summary>

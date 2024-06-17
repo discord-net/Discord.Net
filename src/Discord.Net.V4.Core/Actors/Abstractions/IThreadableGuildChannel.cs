@@ -1,13 +1,12 @@
 namespace Discord;
 
 public interface ILoadableThreadableGuildChannelActor<TGuildChannel> :
-    IThreadableGuildChannelActor<TGuildChannel>,
-    ILoadableEntity<ulong, TGuildChannel>
-    where TGuildChannel : class, IGuildChannel<TGuildChannel>;
+    IThreadableGuildChannelActor,
+    ILoadableGuildChannelActor<TGuildChannel>
+    where TGuildChannel : class, IGuildChannel;
 
-public interface IThreadableGuildChannelActor<out TGuildChannel> :
-    IGuildChannelActor<TGuildChannel>
-    where TGuildChannel : IGuildChannel<TGuildChannel>
+public interface IThreadableGuildChannelActor :
+    IGuildChannelActor
 {
     IPagedLoadableRootActor<ILoadableThreadActor<IThreadChannel>, ulong, IThreadChannel> PublicArchivedThreads { get; }
     IPagedLoadableRootActor<ILoadableThreadActor<IThreadChannel>, ulong, IThreadChannel> PrivateArchivedThreads { get; }

@@ -4,28 +4,27 @@ using Discord.Rest;
 namespace Discord;
 
 public interface ILoadableGuildScheduledEventActor<TScheduledEvent> :
-    IGuildScheduledEventActor<TScheduledEvent>,
+    IGuildScheduledEventActor,
     ILoadableEntity<ulong, TScheduledEvent>
     where TScheduledEvent : class, IGuildScheduledEvent;
 
-public interface IGuildScheduledEventActor<out TScheduledEvent> :
+public interface IGuildScheduledEventActor :
     IGuildRelationship,
-    IModifiable<ulong, IGuildScheduledEventActor<TScheduledEvent>, ModifyGuildScheduledEventProperties, ModifyGuildScheduledEventParams>,
-    IDeletable<ulong, IGuildScheduledEventActor<TScheduledEvent>>,
-    IActor<ulong, TScheduledEvent>
-    where TScheduledEvent : IGuildScheduledEvent
+    IModifiable<ulong, IGuildScheduledEventActor, ModifyGuildScheduledEventProperties, ModifyGuildScheduledEventParams>,
+    IDeletable<ulong, IGuildScheduledEventActor>,
+    IActor<ulong, IGuildScheduledEvent>
 {
     ILoadableRootActor<ILoadableGuildScheduledEventUserActor<IGuildScheduledEventUser>, ulong, IGuildScheduledEventUser> RSVPs
     {
         get;
     }
 
-    static BasicApiRoute IDeletable<ulong, IGuildScheduledEventActor<TScheduledEvent>>.DeleteRoute(
+    static BasicApiRoute IDeletable<ulong, IGuildScheduledEventActor>.DeleteRoute(
         IPathable path, ulong id)
         => Routes.DeleteGuildScheduledEvent(path.Require<IGuild>(), id);
 
     static ApiBodyRoute<ModifyGuildScheduledEventParams>
-        IModifiable<ulong, IGuildScheduledEventActor<TScheduledEvent>, ModifyGuildScheduledEventProperties,
+        IModifiable<ulong, IGuildScheduledEventActor, ModifyGuildScheduledEventProperties,
             ModifyGuildScheduledEventParams>.ModifyRoute(IPathable path, ulong id, ModifyGuildScheduledEventParams args)
         => Routes.ModifyGuildScheduledEvent(path.Require<IGuild>(), path.Require<IChannel>(), args);
 }
