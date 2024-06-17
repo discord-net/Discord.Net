@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.15.1] - 2024-06-18
+### Added
+- #2927 Add missing PollProperties (a59f4ba)
+- #2942 Add purchase notification (9d92435)
+- #2934 Add MessageCallData (21195a8)
+- #2932 Config Bypass for CanSendResponse (9030a5b)
+- #2933 Premium Buttons (531b5eb)
+- #2941 Add UseExternalApps permission (f7f29d5)
+### Misc
+- #2936 Public constructor for Emote (3be72a8)
+- #2935 Generic autocomplete (35b102a)
+- #2929 Enable nuget debug symbols. (aa424f6)
+
 ## [3.15.0] - 2024-05-12
 ### Added
 - #2902 Polls (476ec06)
