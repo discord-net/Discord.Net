@@ -267,9 +267,6 @@ public class ButtonBuilder
     /// <exception cref="InvalidOperationException">A non-link button must contain a custom id</exception>
     public ButtonComponent Build()
     {
-        if (string.IsNullOrWhiteSpace(Label) && Emote is null)
-            throw new InvalidOperationException("A button must have an Emote or a label!");
-
         var a = 0;
         if (!string.IsNullOrWhiteSpace(Url))
             a++;
@@ -293,6 +290,8 @@ public class ButtonBuilder
             case ButtonStyle.Success:
             case ButtonStyle.Danger:
             {
+                if (string.IsNullOrWhiteSpace(Label) && Emote is null)
+                    throw new InvalidOperationException("A button must have an Emote or a label!");
                 if (string.IsNullOrWhiteSpace(CustomId))
                     throw new InvalidOperationException("Non-link and non-premium buttons must have a custom id associated with them");
 
@@ -301,6 +300,8 @@ public class ButtonBuilder
 
             case ButtonStyle.Link:
             {
+                if (string.IsNullOrWhiteSpace(Label) && Emote is null)
+                    throw new InvalidOperationException("A button must have an Emote or a label!");
                 if (string.IsNullOrWhiteSpace(Url))
                     throw new InvalidOperationException("Link buttons must have a link associated with them");
                 UrlValidation.ValidateButton(Url);
