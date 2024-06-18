@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.15.2] - 2024-06-18
+### Hotfix
+- fix `AutocompleteAttribute` with empty constructor
+- fix `Emote` constructor related issues
+
 ## [3.15.1] - 2024-06-18
 ### Added
 - #2927 Add missing PollProperties (a59f4ba)
