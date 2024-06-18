@@ -27,6 +27,11 @@ public class AutocompleteAttribute : Attribute
 
         AutocompleteHandlerType = autocompleteHandlerType;
     }
+
+    /// <summary>
+    ///     Set the <see cref="ApplicationCommandOptionProperties.IsAutocomplete"/> to <see langword="true"/> without specifying a <see cref="AutocompleteHandler"/>.
+    /// </summary>
+    public AutocompleteAttribute() { }
 }
 
 /// <summary>
