@@ -2,7 +2,6 @@ namespace Discord;
 
 public interface IGuildScheduledEvent : ISnowflakeEntity
 {
-    ILoadableEntity<ulong, IGuild> Guild { get; }
     ILoadableEntity<ulong, IChannel>? Channel { get; }
     ILoadableEntity<ulong, IUser> Creator { get; }
     string Name { get; }

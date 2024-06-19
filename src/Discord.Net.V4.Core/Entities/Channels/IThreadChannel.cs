@@ -12,6 +12,7 @@ public interface IThreadChannel :
     IGuildChannel,
     IThreadActor
 {
+    ILoadableGuildChannelActor Parent { get; }
     ILoadableEntity<ulong, IUser> Owner { get; }
 
     /// <summary>

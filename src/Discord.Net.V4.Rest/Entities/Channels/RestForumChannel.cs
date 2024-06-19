@@ -12,11 +12,11 @@ public partial class RestForumChannelActor(DiscordRestClient client, ulong guild
     RestGuildChannelActor(client, guildId, id),
     IForumChannelActor
 {
-    public IPagedLoadableRootActor<ILoadableThreadActor<IThreadChannel>, ulong, IThreadChannel> PublicArchivedThreads => throw new NotImplementedException();
+    public IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> PublicArchivedThreads => throw new NotImplementedException();
 
-    public IPagedLoadableRootActor<ILoadableThreadActor<IThreadChannel>, ulong, IThreadChannel> PrivateArchivedThreads => throw new NotImplementedException();
+    public IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> PrivateArchivedThreads => throw new NotImplementedException();
 
-    public IPagedLoadableRootActor<ILoadableThreadActor<IThreadChannel>, ulong, IThreadChannel> JoinedPrivateArchivedThreads => throw new NotImplementedException();
+    public IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> JoinedPrivateArchivedThreads => throw new NotImplementedException();
 }
 
 public partial class RestForumChannel(DiscordRestClient client, ulong guildId, IGuildForumChannelModel model, RestForumChannelActor? actor = null) :
@@ -26,7 +26,7 @@ public partial class RestForumChannel(DiscordRestClient client, ulong guildId, I
     internal override IGuildForumChannelModel Model { get; } = model;
 
     [ProxyInterface(typeof(IForumChannelActor), typeof(IThreadableGuildChannelActor))]
-    internal override RestGuildChannelActor Actor { get; } = actor ?? new(client, guildId, model.Id);
+    internal override RestForumChannelActor Actor { get; } = actor ?? new(client, guildId, model.Id);
 
     public ILoadableEntity<ulong, ICategoryChannel>? Category => throw new NotImplementedException();
 

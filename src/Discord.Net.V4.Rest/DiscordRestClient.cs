@@ -69,7 +69,7 @@ public sealed class DiscordRestClient : IDiscordClient
 
     public IPagedLoadableRootActor<ILoadableGuildActor, ulong, IGuild, IPartialGuild> Guilds => throw new NotImplementedException();
 
-    public IRootActor<ILoadableChannelActor<IChannel>, ulong, IChannel> Channels => throw new NotImplementedException();
+    public IRootActor<ILoadableChannelActor, ulong, IChannel> Channels => throw new NotImplementedException();
 
     IRestApiClient IDiscordClient.RestApiClient => ApiClient;
     IDiscordClient IClientProvider.Client => this;

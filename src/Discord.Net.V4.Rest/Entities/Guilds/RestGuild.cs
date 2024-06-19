@@ -29,7 +29,7 @@ public partial class RestGuildActor(DiscordRestClient client, ulong id) :
 
     public IRootActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels => throw new NotImplementedException();
 
-    public ILoadableRootActor<ILoadableThreadActor<IThreadChannel>, ulong, IThreadChannel> ActiveThreads => throw new NotImplementedException();
+    public ILoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> ActiveThreads => throw new NotImplementedException();
 
     public IRootActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels => throw new NotImplementedException();
 

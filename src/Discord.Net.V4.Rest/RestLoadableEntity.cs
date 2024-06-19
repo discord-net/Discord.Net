@@ -14,7 +14,17 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
     where TId : IEquatable<TId>
     where TModel : class
 {
-    public TId Id { get; } = id;
+    public TId Id
+    {
+        get => id;
+        internal set
+        {
+            id = value;
+            if (Value is not null && !Value.Id.Equals(value))
+                Value = null;
+        }
+    }
+
     public TEntity? Value { get; private set; }
 
     public async ValueTask<TEntity?> FetchAsync(RequestOptions? options = null, CancellationToken token = default)

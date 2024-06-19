@@ -34,7 +34,7 @@ public sealed partial class RestLoadableGuildChannel(DiscordRestClient client, u
     typeof(IModifiable<ulong, IGuildChannelActor, ModifyGuildChannelProperties, ModifyGuildChannelParams>)
 )]
 public partial class RestGuildChannelActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestActor<ulong, RestGuildChannel>(client, id),
+    RestChannelActor(client, id),
     IGuildChannelActor
 {
     public RestLoadableGuildActor Guild { get; } = new(client, guildId);
@@ -52,7 +52,7 @@ public partial class RestGuildChannel(DiscordRestClient client, ulong guildId, I
     internal override IGuildChannelModel Model { get; } = model;
 
     [ProxyInterface(typeof(IGuildChannelActor), typeof(IGuildRelationship))]
-    internal virtual RestGuildChannelActor Actor { get; } = actor ?? new RestGuildChannelActor(client, guildId, model.Id);
+    internal override RestGuildChannelActor Actor { get; } = actor ?? new RestGuildChannelActor(client, guildId, model.Id);
 
 
     public int Position => Model.Position;

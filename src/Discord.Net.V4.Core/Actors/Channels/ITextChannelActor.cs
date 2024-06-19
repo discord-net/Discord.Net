@@ -5,8 +5,7 @@ namespace Discord;
 
 public interface ILoadableTextChannelActor :
     ITextChannelActor,
-    ILoadableThreadableGuildChannelActor,
-    ILoadableMessageChannelActor;
+    ILoadableEntity<ulong, ITextChannel>;
 
 public interface ITextChannelActor :
     IMessageChannelActor,

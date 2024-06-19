@@ -5,15 +5,10 @@ using System.Runtime.InteropServices;
 namespace Discord;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct PermissionSet(long lower, long upper) : IEquatable<PermissionSet>
+public struct PermissionSet(ulong lower, ulong upper) : IEquatable<PermissionSet>
 {
-#if BIGENDIAN
-        private readonly ulong _upper = upper;
-        private readonly ulong _lower = lower;
-#else
-    private readonly long _lower = lower;
-    private readonly long _upper = upper;
-#endif
+    private readonly ulong _lower = lower;
+    private readonly ulong _upper = upper;
 
     /// <summary>
     ///     Creates a new permission set with the nth bit set.
@@ -25,11 +20,11 @@ public struct PermissionSet(long lower, long upper) : IEquatable<PermissionSet>
     /// <param name="setBit">The 0-based bit index to set.</param>
     public PermissionSet(byte setBit) :
         this(
-            setBit is <= sizeof(long) << 3 and > 0
-                ? 1L << setBit
+            setBit is <= sizeof(ulong) << 3 and > 0
+                ? 1UL << setBit
                 : 0L,
-            setBit is <= sizeof(long) << 4 and > sizeof(long) << 3
-                ? 1L << setBit
+            setBit is <= sizeof(ulong) << 4 and > sizeof(ulong) << 3
+                ? 1UL << setBit
                 : 0L
         ) { }
 
@@ -77,6 +72,32 @@ public struct PermissionSet(long lower, long upper) : IEquatable<PermissionSet>
 
     public static bool operator !=(PermissionSet left, PermissionSet right) => !left.Equals(right);
 
+#if NET7_0_OR_GREATER
+    public static implicit operator Int128(PermissionSet set)
+        => new(set._lower, set._upper);
+
+    public static implicit operator PermissionSet(Int128 num)
+    {
+        ref var numRef = ref Unsafe.As<Int128, ulong>(ref num);
+
+        if (BitConverter.IsLittleEndian)
+        {
+            return new PermissionSet(
+                numRef,
+                Unsafe.Add(ref numRef, 1)
+            );
+        }
+        else
+        {
+            return new PermissionSet(
+                Unsafe.Add(ref numRef, 1),
+                numRef
+            );
+        }
+    }
+#endif
+
+
     public static unsafe implicit operator BigInteger(PermissionSet set)
         => new(MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<PermissionSet, byte>(ref set), sizeof(PermissionSet)));
 
@@ -88,8 +109,8 @@ public struct PermissionSet(long lower, long upper) : IEquatable<PermissionSet>
             throw new ArgumentOutOfRangeException(nameof(set));
 
 
-        ref var lower = ref Unsafe.As<byte, long>(ref bytes[0]);            // 0..4
-        ref var upper = ref Unsafe.As<byte, long>(ref bytes[sizeof(long)]); // 4..8
+        ref var lower = ref Unsafe.As<byte, ulong>(ref bytes[0]);            // 0..4
+        ref var upper = ref Unsafe.As<byte, ulong>(ref bytes[sizeof(long)]); // 4..8
 
         return new PermissionSet(lower, upper);
     }

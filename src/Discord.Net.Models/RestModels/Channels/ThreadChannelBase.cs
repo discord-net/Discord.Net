@@ -25,7 +25,9 @@ public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel
     [JsonPropertyName("member")]
     public Optional<ThreadMember> Member { get; set; }
 
-    bool IThreadChannelModel.IsInvitable => Metadata.Invitable;
+    ulong[] IThreadChannelModel.AppliedTags => AppliedTags | [];
+
+    bool? IThreadChannelModel.IsInvitable => Metadata.Invitable;
 
     DateTimeOffset? IThreadChannelModel.CreatedAt => Metadata.CreatedAt;
 
@@ -44,6 +46,8 @@ public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel
     int IGuildTextChannelModel.RatelimitPerUser => RatelimitPerUser;
 
     int IGuildTextChannelModel.DefaultArchiveDuration => DefaultAutoArchiveDuration;
+
+    bool IThreadChannelModel.HasJoined => Member.IsSpecified;
 
     public override IEnumerable<IEntityModel> GetEntities()
     {

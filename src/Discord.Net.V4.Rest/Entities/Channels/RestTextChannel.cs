@@ -29,11 +29,11 @@ public partial class RestTextChannelActor(DiscordRestClient client, ulong guildI
 {
     public IRootActor<ILoadableMessageActor<IMessage>, ulong, IMessage> Messages => throw new NotImplementedException();
 
-    public IPagedLoadableRootActor<ILoadableThreadActor<IThreadChannel>, ulong, IThreadChannel> PublicArchivedThreads => throw new NotImplementedException();
+    public IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> PublicArchivedThreads => throw new NotImplementedException();
 
-    public IPagedLoadableRootActor<ILoadableThreadActor<IThreadChannel>, ulong, IThreadChannel> PrivateArchivedThreads => throw new NotImplementedException();
+    public IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> PrivateArchivedThreads => throw new NotImplementedException();
 
-    public IPagedLoadableRootActor<ILoadableThreadActor<IThreadChannel>, ulong, IThreadChannel> JoinedPrivateArchivedThreads => throw new NotImplementedException();
+    public IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> JoinedPrivateArchivedThreads => throw new NotImplementedException();
 }
 
 public partial class RestTextChannel(DiscordRestClient client, ulong guildId, IGuildTextChannelModel model, RestTextChannelActor? actor = null) :
@@ -46,8 +46,7 @@ public partial class RestTextChannel(DiscordRestClient client, ulong guildId, IG
     [ProxyInterface(
         typeof(ITextChannelActor),
         typeof(IMessageChannelActor),
-        typeof(IThreadableGuildChannelActor),
-        typeof(IGuildChannelActor)
+        typeof(IThreadableGuildChannelActor)
     )]
     internal override RestTextChannelActor Actor { get; } = actor ?? new(client, guildId, model.Id);
 

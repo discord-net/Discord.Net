@@ -8,6 +8,8 @@ public interface IThreadChannelModel : IGuildTextChannelModel
     bool IsLocked { get; }
     int MemberCount { get; }
     int MessageCount { get; }
-    bool IsInvitable { get; }
+    bool? IsInvitable { get; }
+    bool HasJoined { get; }
     DateTimeOffset? CreatedAt { get; }
+    ulong[] AppliedTags { get; }
 }

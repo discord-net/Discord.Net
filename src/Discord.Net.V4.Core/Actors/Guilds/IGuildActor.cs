@@ -23,11 +23,11 @@ public interface IGuildActor :
     IPagedLoadableRootActor<ILoadableGuildBanActor, ulong, IBan> Bans { get; }
     ILoadableGuildBanActor Ban(ulong userId) => Bans[userId];
 
-    IRootActor<ILoadableStageChannelActor<IStageChannel>, ulong, IStageChannel> StageChannels { get; }
-    ILoadableStageChannelActor<IStageChannel> StageChannel(ulong id) => StageChannels[id];
+    IRootActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels { get; }
+    ILoadableStageChannelActor StageChannel(ulong id) => StageChannels[id];
 
-    ILoadableRootActor<ILoadableThreadActor<IThreadChannel>, ulong, IThreadChannel> ActiveThreads { get; }
-    ILoadableThreadActor<IThreadChannel> ActiveThread(ulong id) => ActiveThreads[id];
+    ILoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> ActiveThreads { get; }
+    ILoadableThreadActor ActiveThread(ulong id) => ActiveThreads[id];
 
     IRootActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels { get; }
     ILoadableTextChannelActor TextChannel(ulong id) => TextChannels[id];

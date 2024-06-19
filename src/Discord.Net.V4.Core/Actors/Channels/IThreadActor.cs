@@ -3,13 +3,13 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableThreadActor<TThread> :
+public interface ILoadableThreadActor :
     IThreadActor,
-    ILoadableGuildChannelActor
-    where TThread : class, IThreadChannel;
+    ILoadableEntity<ulong, IThreadChannel>;
 
 public interface IThreadActor :
     IGuildChannelActor,
+    IMessageChannelActor,
     IThreadMemberRelationship,
     IActor<ulong, IThreadChannel>,
     IModifiable<ulong, IThreadActor, ModifyThreadChannelProperties, ModifyThreadChannelParams>
