@@ -16,14 +16,13 @@
     <ProjectReference Include="..\..\sourcegen\Discord.Net.SourceGenerators.EntityHierarchies\Discord.Net.SourceGenerators.EntityHierarchies.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false"/>
+    <ProjectReference Include="..\..\sourcegen\Discord.Net.SourceGenerators.InterfaceProxy\Discord.Net.SourceGenerators.InterfaceProxy.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false"/>
     <ProjectReference Include="..\Discord.Net.V4.Core\Discord.Net.V4.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Utils\" />
   </ItemGroup>
 </Project>

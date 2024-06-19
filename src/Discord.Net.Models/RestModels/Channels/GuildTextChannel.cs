@@ -9,7 +9,7 @@ public class GuildTextChannel : GuildChannelBase, IGuildTextChannelModel
 
     string? IGuildTextChannelModel.Topic => Topic;
 
-    int? IGuildTextChannelModel.RatelimitPerUser => RatelimitPerUser;
+    int IGuildTextChannelModel.RatelimitPerUser => RatelimitPerUser;
 
     int IGuildTextChannelModel.DefaultArchiveDuration => DefaultAutoArchiveDuration;
 }

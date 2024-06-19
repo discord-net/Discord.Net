@@ -35,7 +35,7 @@ public sealed class GuildEmote : IEmote, IGuildEmoteModel, IEntityModelSource
     bool IGuildEmoteModel.IsAnimated => Animated;
     bool IGuildEmoteModel.IsAvailable => Available;
 
-    ulong IGuildEmoteModel.UserId => User.Map(v => v.Id);
+    ulong? IGuildEmoteModel.UserId => User.Map(v => v.Id);
 
     public IEnumerable<IEntityModel> GetEntities()
     {

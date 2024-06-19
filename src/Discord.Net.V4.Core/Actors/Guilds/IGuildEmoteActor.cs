@@ -3,10 +3,9 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableGuildEmoteActor<TEmote> :
+public interface ILoadableGuildEmoteActor :
     IGuildEmoteActor,
-    ILoadableEntity<ulong, TEmote>
-    where TEmote : class, IGuildEmote;
+    ILoadableEntity<ulong, IGuildEmote>;
 
 public interface IGuildEmoteActor :
     IActor<ulong, IGuildEmote>,

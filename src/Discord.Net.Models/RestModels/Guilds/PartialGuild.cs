@@ -59,5 +59,6 @@ public class PartialGuild : IPartialGuildModel
     string? IPartialGuildModel.VanityUrlCode => VanityUrlCode;
     int? IPartialGuildModel.NsfwLevel => NsfwLevel;
     int? IPartialGuildModel.PremiumSubscriptionCount => PremiumSubscriptionCount;
-
+    int? IPartialGuildModel.ApproximateMemberCount => ApproximateMemberCount;
+    int? IPartialGuildModel.ApproximatePresenceCount => ApproximatePresenceCount;
 }

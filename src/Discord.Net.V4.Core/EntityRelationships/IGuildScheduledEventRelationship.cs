@@ -1,13 +1,11 @@
 namespace Discord;
 
-public interface IGuildScheduledEventRelationship : IGuildScheduledEventRelationship<IGuildScheduledEvent>;
-public interface IGuildScheduledEventRelationship<TEvent> :
-    IRelationship<ulong, TEvent, ILoadableGuildScheduledEventActor<TEvent>>
-    where TEvent : class, IGuildScheduledEvent
+public interface IGuildScheduledEventRelationship :
+    IRelationship<ulong, IGuildScheduledEvent, ILoadableGuildScheduledEventActor>
 {
-    ILoadableGuildScheduledEventActor<TEvent> GuildScheduledEvent { get; }
+    ILoadableGuildScheduledEventActor GuildScheduledEvent { get; }
 
-    ILoadableGuildScheduledEventActor<TEvent>
-        IRelationship<ulong, TEvent, ILoadableGuildScheduledEventActor<TEvent>>.RelationshipLoadable =>
+    ILoadableGuildScheduledEventActor
+        IRelationship<ulong, IGuildScheduledEvent, ILoadableGuildScheduledEventActor>.RelationshipLoadable =>
         GuildScheduledEvent;
 }

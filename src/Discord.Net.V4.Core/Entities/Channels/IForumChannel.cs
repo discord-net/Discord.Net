@@ -47,15 +47,6 @@ public interface IForumChannel :
     int? ThreadCreationSlowmode { get; }
 
     /// <summary>
-    ///     Gets the current default slow-mode delay for threads in this forum channel.
-    /// </summary>
-    /// <returns>
-    ///     An <see cref="int" /> representing the time in seconds required before the user can send another
-    ///     message; <see langword="null" /> if disabled.
-    /// </returns>
-    int? DefaultSlowModeInterval { get; }
-
-    /// <summary>
     ///     Gets the emoji to show in the add reaction button on a thread in a forum channel
     /// </summary>
     ILoadableEntity<IEmote> DefaultReactionEmoji { get; }

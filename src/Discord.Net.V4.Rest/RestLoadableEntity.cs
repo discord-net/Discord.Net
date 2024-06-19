@@ -2,61 +2,86 @@ using Discord.Models;
 
 namespace Discord.Rest;
 
-public class RestLoadableEntity<TId, TEntity, TModel, TCommon> : RestLoadableEntity<TId, TEntity, TCommon>
+public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
+    DiscordRestClient client,
+    TId id,
+    ApiRoute<TModel> route,
+    Func<TId, TModel?, TEntity?> factory
+):
+    ILoadableEntity<TId, TCoreEntity>,
+    IDisposable, IAsyncDisposable where TCoreEntity : class, IEntity<TId>
+    where TEntity : RestEntity<TId>, TCoreEntity
     where TId : IEquatable<TId>
-    where TEntity : RestEntity<TId>, IEntity<TId>, TCommon, IModeled<TId, TModel>
-    where TCommon : class, IEntity<TId>
-    where TModel : class, IEntityModel<TId>
+    where TModel : class
 {
-    internal RestLoadableEntity(DiscordRestClient client, TId id, LoadEntity loadFunc) : base(client, id, loadFunc)
-    { }
+    public TId Id { get; } = id;
+    public TEntity? Value { get; private set; }
 
-    internal static RestLoadableEntity<TId, TEntity, TModel, TCommon> Create<T>(DiscordRestClient client, TId id,
-        ApiRoute<T> route, Func<DiscordRestClient, TModel, TEntity> factory)
-        where T : class, TModel
+    public async ValueTask<TEntity?> FetchAsync(RequestOptions? options = null, CancellationToken token = default)
     {
-        return new RestLoadableEntity<TId, TEntity, TModel, TCommon>(
+        var model = await client.ApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token);
+
+        return Value = factory(Id, model);
+    }
+
+    async ValueTask<TCoreEntity?> ILoadableEntity<TCoreEntity>.LoadAsync(RequestOptions? options,
+        CancellationToken token)
+        => await FetchAsync(options, token);
+
+    TCoreEntity? ILoadableEntity<TCoreEntity>.Value => Value;
+
+    public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromConstructable<TConstructable>(
+        DiscordRestClient client,
+        TId id,
+        Func<TId, ApiRoute<TModel>> route
+    )
+        where TConstructable : TEntity, IConstructable<TConstructable, TModel, DiscordRestClient>
+        => FromConstructable<TConstructable>(client, id, route(id));
+
+    public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromConstructable<TConstructable>(
+        DiscordRestClient client,
+        TId id,
+        ApiRoute<TModel> route
+    )
+        where TConstructable : TEntity, IConstructable<TConstructable, TModel, DiscordRestClient>
+    {
+        return new RestLoadable<TId, TEntity, TCoreEntity, TModel>(
             client,
             id,
-            async (delegateClient, _, options, token) =>
-            {
-                var result = await delegateClient.ApiClient.ExecuteAsync(route, options, token);
-
-                return result is null ? null : factory(client, result);
-            }
+            route,
+            (id, model) => model is null ? null : TConstructable.Construct(client, model)
         );
     }
-}
 
-public class RestLoadableEntity<TId, TEntity, TCommon> : ILoadableEntity<TId, TCommon>
-    where TId : IEquatable<TId>
-    where TEntity : RestEntity<TId>, IEntity<TId>, TCommon
-    where TCommon : class, IEntity<TId>
-{
-    internal delegate Task<TEntity?> LoadEntity(DiscordRestClient client, TId id, RequestOptions options,
-        CancellationToken token);
+    public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromContextConstructable<TConstructable, TContext>(
+        DiscordRestClient client,
+        TId id,
+        Func<TContext, TId, ApiRoute<TModel>> route,
+        TContext context
+    )
+        where TConstructable : TEntity, IContextConstructable<TConstructable, TModel, TContext, DiscordRestClient>
+        => FromContextConstructable<TConstructable, TContext>(client, id, route(context, id), context);
 
-    public TId Id { get; }
-    public TEntity? Value { get; }
-
-    private readonly DiscordRestClient _client;
-    private readonly LoadEntity _loadFunc;
-
-    internal RestLoadableEntity(DiscordRestClient client, TId id, LoadEntity loadFunc)
+    public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromContextConstructable<TConstructable, TContext>(
+        DiscordRestClient client,
+        TId id,
+        ApiRoute<TModel> route,
+        TContext context
+    )
+        where TConstructable : TEntity, IContextConstructable<TConstructable, TModel, TContext, DiscordRestClient>
     {
-        Id = id;
+        return new RestLoadable<TId, TEntity, TCoreEntity, TModel>(
+            client,
+            id,
+            route,
+            (id, model) => model is null ? null : TConstructable.Construct(client, model, context)
+        );
+    }
+
+    public void Dispose()
+    {
         Value = null;
-        _loadFunc = loadFunc;
-        _client = client;
     }
 
-    public ValueTask<TEntity?> LoadAsync(RequestOptions? options = null, CancellationToken token = default)
-    {
-        return new ValueTask<TEntity?>(_loadFunc(_client, Id, options ?? _client.DefaultRequestOptions, token));
-    }
-
-    TCommon? ILoadableEntity<TCommon>.Value => Value;
-
-    async ValueTask<TCommon?> ILoadableEntity<TCommon>.LoadAsync(RequestOptions? options, CancellationToken token)
-        => await LoadAsync(options, token);
+    public async ValueTask DisposeAsync() => await client.DisposeAsync();
 }

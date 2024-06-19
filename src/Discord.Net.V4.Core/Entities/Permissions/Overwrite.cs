@@ -20,17 +20,17 @@ public readonly struct Overwrite : IEntityProperties<Models.Json.Overwrite>, ICo
     /// <summary>
     ///     The allowed permissions associated with this overwrite entry.
     /// </summary>
-    public readonly GuildPermission Allowed;
+    public readonly PermissionSet Allowed;
 
     /// <summary>
     ///     The denied permissions associated with this overwrite entry.
     /// </summary>
-    public readonly GuildPermission Denied;
+    public readonly PermissionSet Denied;
 
     /// <summary>
     ///     Initializes a new <see cref="Overwrite" /> with provided target information and modified permissions.
     /// </summary>
-    public Overwrite(ulong targetId, PermissionTarget targetType, GuildPermission allowed, GuildPermission denied)
+    public Overwrite(ulong targetId, PermissionTarget targetType, PermissionSet allowed, PermissionSet denied)
     {
         TargetId = targetId;
         TargetType = targetType;
@@ -44,13 +44,13 @@ public readonly struct Overwrite : IEntityProperties<Models.Json.Overwrite>, ICo
 
         existing.TargetId = TargetId;
         existing.Type = (int)TargetType;
-        existing.Allow = (ulong)Allowed;
-        existing.Deny = (ulong)Denied;
+        existing.Allow = Allowed;
+        existing.Deny = Denied;
 
         return existing;
     }
 
     public static Overwrite Construct(IDiscordClient client, IOverwriteModel model)
-        => new(model.TargetId, (PermissionTarget)model.Type, (GuildPermission)model.Allow,
-            (GuildPermission)model.Deny);
+        => new(model.TargetId, (PermissionTarget)model.Type, model.Allow,
+            model.Deny);
 }

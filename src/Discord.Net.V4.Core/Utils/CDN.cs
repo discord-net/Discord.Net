@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Discord;
 
 /// <summary>
@@ -195,6 +197,7 @@ public static class CDN
     /// <returns>
     ///     A URL pointing to the guild's banner image.
     /// </returns>
+    [return: NotNullIfNotNull(nameof(bannerId))]
     public static string? GetGuildBannerUrl(DiscordConfig config, ulong guildId, string? bannerId, ImageFormat format,
         ushort? size = null)
     {

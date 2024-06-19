@@ -31,7 +31,7 @@ public class ModifyRoleProperties : IEntityProperties<ModifyGuildRoleParams>
     /// <summary>
     ///     Gets or sets the role's <see cref="GuildPermission" />.
     /// </summary>
-    public Optional<GuildPermission> Permissions { get; set; }
+    public Optional<PermissionSet> Permissions { get; set; }
 
     /// <summary>
     ///     Gets or sets the color of the role.
@@ -80,7 +80,7 @@ public class ModifyRoleProperties : IEntityProperties<ModifyGuildRoleParams>
         existing ??= new();
 
         existing.Name = Name;
-        existing.Permissions = Permissions.Map(v => ((ulong)v).ToString());
+        existing.Permissions = Permissions.Map(v => v.ToString());
         existing.Color = Color.Map(v => v.RawValue);
         existing.Hoist = IsHoisted;
         existing.Icon = Icon.Map(v => v?.ToImageData());

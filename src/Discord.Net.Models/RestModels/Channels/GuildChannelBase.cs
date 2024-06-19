@@ -65,7 +65,7 @@ public abstract class GuildChannelBase : Channel, IGuildChannelModel, IEntityMod
     public Optional<Emoji> DefaultReactionEmoji { get; set; }
 
     [JsonPropertyName("default_sort_order")]
-    public Optional<int> DefaultSortOrder { get; set; }
+    public Optional<int?> DefaultSortOrder { get; set; }
 
     [JsonPropertyName("default_forum_layout")]
     public Optional<int> DefaultForumLayout { get; set; }

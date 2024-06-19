@@ -11,7 +11,7 @@ namespace Discord.Gateway
     public class GatewayUser : GatewayCacheableEntity<ulong, IUserModel>, IUser
     {
         public string? AvatarId
-            => _source.AvatarHash;
+            => _source.Avatar;
 
         public string Discriminator
             => _source.Discriminator;

@@ -4,13 +4,13 @@ using System.Collections.Immutable;
 
 namespace Discord;
 
-public interface ILoadableSelfUserActor<TSelfUser> :
-    ILoadableEntity<ulong, TSelfUser>,
-    ISelfUserActor
-    where TSelfUser : class, ISelfUser;
+public interface ILoadableSelfUserActor :
+    ILoadableEntity<ulong, ISelfUser>,
+    ISelfUserActor;
 
 public interface ISelfUserActor :
     IModifiable<ulong, ISelfUserActor, ModifySelfUserProperties, ModifyCurrentUserParams>,
+    IUserActor,
     IActor<ulong, ISelfUser>
 {
     async Task<IEnumerable<IPartialGuild>?> GetGuildsAsync(

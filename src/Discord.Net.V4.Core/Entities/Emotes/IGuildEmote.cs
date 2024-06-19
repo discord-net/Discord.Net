@@ -31,7 +31,22 @@ public interface IGuildEmote :
     /// </summary>
     bool IsAvailable { get; }
 
-    ILoadableEntityEnumerable<ulong, IRole> Roles { get; }
+    IDefinedLoadableEntityEnumerable<ulong, IRole> Roles { get; }
 
     ILoadableEntity<ulong, IUser>? Creator { get; }
+
+    new Models.Json.IEmote ToApiModel(Models.Json.IEmote? existing = null)
+        => existing ?? new GuildEmote()
+        {
+            Id = Id,
+            RequireColons = RequireColons,
+            Animated = IsAnimated,
+            Available = IsAvailable,
+            Managed = IsManaged,
+            Name = Name,
+            RoleIds = Roles.Ids.ToArray()
+        };
+
+    Models.Json.IEmote IEntityProperties<Models.Json.IEmote>.ToApiModel(Models.Json.IEmote? existing)
+        => ToApiModel(existing);
 }

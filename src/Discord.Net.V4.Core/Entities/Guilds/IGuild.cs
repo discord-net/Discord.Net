@@ -78,7 +78,7 @@ public interface IGuild :
     /// <returns>
     ///     An identifier for the discovery splash image; <see langword="null" /> if none is set.
     /// </returns>
-    string DiscoverySplashId { get; }
+    string? DiscoverySplashId { get; }
 
     /// <summary>
     ///     Gets the URL of this guild's discovery splash image.
@@ -86,7 +86,7 @@ public interface IGuild :
     /// <returns>
     ///     A URL pointing to the guild's discovery splash image; <see langword="null" /> if none is set.
     /// </returns>
-    string DiscoverySplashUrl { get; }
+    string? DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Client.Config, Id, DiscoverySplashId);
 
     ILoadableEntity<ulong, IVoiceChannel> AFKChannel { get; }
     ILoadableEntity<ulong, ITextChannel> WidgetChannel { get; }
@@ -116,7 +116,7 @@ public interface IGuild :
     /// <returns>
     ///     A URL pointing to the guild's banner image; <see langword="null" /> if none is set.
     /// </returns>
-    string BannerUrl { get; }
+    string? BannerUrl => CDN.GetGuildBannerUrl(Client.Config, Id, BannerId, ImageFormat.Auto);
 
     /// <summary>
     ///     Gets the flags for the types of system channel messages that are disabled.
@@ -197,7 +197,14 @@ public interface IGuild :
     /// <returns>
     ///     A <see cref="int" /> representing the maximum bitrate value allowed by Discord in this guild.
     /// </returns>
-    int MaxBitrate { get; }
+    int MaxBitrate
+        => PremiumTier switch
+        {
+            PremiumTier.Tier1 => 128000,
+            PremiumTier.Tier2 => 256000,
+            PremiumTier.Tier3 => 384000,
+            _ => 96000
+        };
 
     /// <summary>
     ///     Gets the preferred locale of this guild in IETF BCP 47
@@ -236,7 +243,13 @@ public interface IGuild :
     /// <summary>
     ///     Gets the upload limit in bytes for this guild. This number is dependent on the guild's boost status.
     /// </summary>
-    ulong MaxUploadLimit { get; }
+    ulong MaxUploadLimit
+        => (ulong)(PremiumTier switch
+        {
+            PremiumTier.Tier2 => 50,
+            PremiumTier.Tier3 => 100,
+            _ => 25
+        }) * (1UL << 20);
 
     VerificationLevel? IPartialGuild.VerificationLevel => VerificationLevel;
     GuildFeatures? IPartialGuild.Features => Features;

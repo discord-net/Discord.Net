@@ -7,7 +7,7 @@ public sealed class ForumTag(
     bool isModerated,
     ILoadableEntity<ulong, IGuildEmote>? emote,
     string? emoji)
-    : ISnowflakeEntity, IEntityProperties<Models.Json.ForumTag>, IConstructable<ForumTag, Models.IForumTagModel, ForumTag.Context>
+    : ISnowflakeEntity, IEntityProperties<Models.Json.ForumTag>, IContextConstructable<ForumTag, Models.IForumTagModel, ForumTag.Context>
 {
     public readonly record struct Context(ulong GuildId);
 

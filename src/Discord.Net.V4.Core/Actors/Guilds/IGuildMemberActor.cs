@@ -3,10 +3,9 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableGuildMemberActor<TMember> :
+public interface ILoadableGuildMemberActor :
     IGuildMemberActor,
-    ILoadableEntity<ulong, TMember>
-    where TMember : class, IGuildMember;
+    ILoadableEntity<ulong, IGuildMember>;
 
 public interface IGuildMemberActor :
     IGuildRelationship,
@@ -14,9 +13,6 @@ public interface IGuildMemberActor :
     IModifiable<ulong, IGuildMemberActor, ModifyGuildUserProperties, ModifyGuildMemberParams>,
     IActor<ulong, IGuildMember>
 {
-    IDefinedLoadableEntityEnumerable<ulong, IRole> Roles { get; }
-    ILoadableEntity<ulong, IRole> Role(ulong id) => Roles[id];
-
     Task AddRoleAsync(
         EntityOrId<ulong, IRole> role,
         RequestOptions? options = null,

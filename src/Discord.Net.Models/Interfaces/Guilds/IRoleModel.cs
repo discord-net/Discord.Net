@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Discord.Models;
 
 public interface IRoleModel : IEntityModel<ulong>
@@ -8,7 +10,7 @@ public interface IRoleModel : IEntityModel<ulong>
     string? Icon { get; }
     string? UnicodeEmoji { get; }
     int Position { get; }
-    ulong Permissions { get; }
+    BigInteger Permissions { get; }
     bool IsManaged { get; }
     bool IsMentionable { get; }
     int Flags { get; }

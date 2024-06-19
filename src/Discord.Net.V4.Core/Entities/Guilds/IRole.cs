@@ -81,7 +81,7 @@ public interface IRole :
     /// <summary>
     ///     Gets the permissions granted to members of this role.
     /// </summary>
-    GuildPermission Permissions { get; }
+    PermissionSet Permissions { get; }
 
     /// <summary>
     ///     Gets this role's position relative to other roles in the same guild.
@@ -103,4 +103,6 @@ public interface IRole :
     ///     Gets flags related to this role.
     /// </summary>
     RoleFlags Flags { get; }
+
+    string IMentionable.Mention => $"<@&{Id}>";
 }

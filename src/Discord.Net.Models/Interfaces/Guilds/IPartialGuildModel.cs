@@ -12,4 +12,6 @@ public interface IPartialGuildModel : IEntityModel<ulong>
     string? VanityUrlCode { get; }
     int? NsfwLevel { get; }
     int? PremiumSubscriptionCount { get; }
+    int? ApproximateMemberCount { get; }
+    int? ApproximatePresenceCount { get; }
 }

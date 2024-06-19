@@ -1,14 +1,48 @@
 using Discord.Models;
+using Discord.Models.Json;
 
-namespace Discord.Rest.Users;
+namespace Discord.Rest;
 
-public class RestUser(DiscordRestClient client, IUserModel model) : RestEntity<ulong>(client, model.Id), IUser
+public partial class RestLoadableUserActor(DiscordRestClient client, ulong id) :
+    RestUserActor(client, id),
+    ILoadableUserActor
 {
+    [ProxyInterface(typeof(ILoadableEntity<IUser>))]
+    internal RestLoadable<ulong, RestUser, IUser, User> Loadable { get; } =
+        RestLoadable<ulong, RestUser, IUser, User>.FromConstructable<RestUser>(
+            client,
+            id,
+            Routes.GetUser
+        );
+}
+
+[ExtendInterfaceDefaults(typeof(IUserActor))]
+public partial class RestUserActor(DiscordRestClient client, ulong id) :
+    RestActor<ulong, RestSelfUser>(client, id),
+    IUserActor;
+
+public partial class RestUser(DiscordRestClient client, IUserModel model, RestUserActor? actor = null) :
+    RestEntity<ulong>(client, model.Id),
+    IUser,
+    IConstructable<RestUser, IUserModel, DiscordRestClient>
+{
+    [ProxyInterface(typeof(IUserActor))]
+    protected virtual RestUserActor Actor { get; } = actor ?? new(client, model.Id);
+
     protected virtual IUserModel Model { get; } = model;
 
-    public string? AvatarId => Model.AvatarHash;
+    public static RestUser Construct(DiscordRestClient client, IUserModel model)
+    {
+        return model switch
+        {
+            ISelfUserModel selfUserModel => RestSelfUser.Construct(client, selfUserModel),
+            _ => new RestUser(client, model)
+        };
+    }
 
-    public ushort Discriminator => ushort.Parse(Model.Discriminator);
+    public string? AvatarId => Model.Avatar;
+
+    public ushort Discriminator => Model.Discriminator;
 
     public string Username => Model.Username;
 

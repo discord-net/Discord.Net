@@ -5,7 +5,7 @@ namespace Discord;
 
 public interface ILoadableThreadActor<TThread> :
     IThreadActor,
-    ILoadableGuildChannelActor<TThread>
+    ILoadableGuildChannelActor
     where TThread : class, IThreadChannel;
 
 public interface IThreadActor :

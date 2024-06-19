@@ -1,11 +1,9 @@
 namespace Discord;
 
-public interface IMemberRelationship : IMemberRelationship<IGuildMember>;
-public interface IMemberRelationship<TMember> :
-    IRelationship<ulong, TMember, ILoadableGuildMemberActor<TMember>>
-    where TMember : class, IGuildMember
+public interface IMemberRelationship :
+    IRelationship<ulong, IGuildMember, ILoadableGuildMemberActor>
 {
-    ILoadableGuildMemberActor<TMember> Member { get; }
+    ILoadableGuildMemberActor Member { get; }
 
-    ILoadableGuildMemberActor<TMember> IRelationship<ulong, TMember, ILoadableGuildMemberActor<TMember>>.RelationshipLoadable => Member;
+    ILoadableGuildMemberActor IRelationship<ulong, IGuildMember, ILoadableGuildMemberActor>.RelationshipLoadable => Member;
 }

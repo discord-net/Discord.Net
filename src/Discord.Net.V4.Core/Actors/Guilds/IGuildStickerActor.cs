@@ -3,10 +3,9 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableGuildStickerActor<TSticker> :
+public interface ILoadableGuildStickerActor :
     IGuildStickerActor,
-    ILoadableEntity<ulong, TSticker>
-    where TSticker : class, IGuildSticker;
+    ILoadableEntity<ulong, IGuildSticker>;
 
 public interface IGuildStickerActor :
     IGuildRelationship,

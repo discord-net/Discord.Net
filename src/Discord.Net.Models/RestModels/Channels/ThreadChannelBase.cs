@@ -41,7 +41,7 @@ public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel
 
     string? IGuildTextChannelModel.Topic => Topic;
 
-    int? IGuildTextChannelModel.RatelimitPerUser => RatelimitPerUser;
+    int IGuildTextChannelModel.RatelimitPerUser => RatelimitPerUser;
 
     int IGuildTextChannelModel.DefaultArchiveDuration => DefaultAutoArchiveDuration;
 

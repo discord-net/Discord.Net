@@ -48,8 +48,7 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
                 var nodes = attributes
                     .FirstOrDefault(a => a.DescendantNodes().OfType<IdentifierNameSyntax>()
                         .Any(dt => dt.Identifier.ValueText == ExtendingAttributeName))
-                    ?.DescendantNodes().OfType<IdentifierNameSyntax>()
-                    .Skip(1)
+                    ?.DescendantNodes().OfType<TypeOfExpressionSyntax>()
                     .ToList();
 
                 if (nodes is null || nodes.Count == 0)
@@ -62,13 +61,16 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
                 {
                     log.AppendLine($"// - Processing node {node}");
 
-                    if (node.Parent is null)
-                    {
-                        log.AppendLine("// - No parent found for node");
-                        continue;
-                    }
+                    TypeInfo semanticInterface;
 
-                    var semanticInterface = semanticTarget.GetTypeInfo(node);
+                    if (node.DescendantNodes().FirstOrDefault() is GenericNameSyntax generic)
+                    {
+                        semanticInterface = semanticTarget.GetTypeInfo(generic);
+                    }
+                    else
+                    {
+                        semanticInterface = semanticTarget.GetTypeInfo(node.Type);
+                    }
 
                     if (semanticInterface.Type is null)
                     {
@@ -90,7 +92,8 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
                     }
                     else
                     {
-                        var ifaceSymbol = semanticInterface.Type.ContainingAssembly.GetTypeByMetadataName(semanticInterface.Type.ToString());
+                        var metadataName = GetFullMetadataName(semanticInterface.Type);
+                        var ifaceSymbol = semanticInterface.Type.ContainingAssembly.GetTypeByMetadataName(metadataName);
 
                         if (ifaceSymbol is null)
                         {
@@ -98,7 +101,7 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
                             continue;
                         }
 
-                        declarations = CreateDeclarationsFromSymbol(ifaceSymbol, semanticInterface);
+                        declarations = CreateDeclarationsFromSymbol(ifaceSymbol, semanticInterface, log);
                     }
 
                     if (declarations.Count == 0)
@@ -140,7 +143,44 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
         }
     }
 
-    private List<string> CreateDeclarationsFromSymbol(INamedTypeSymbol symbol, TypeInfo semanticInterface)
+    private ITypeSymbol ResolveGeneric(ITypeSymbol arg, INamedTypeSymbol root, TypeInfo info, StringBuilder log)
+    {
+        if (root.TypeArguments.Any(arg.Equals))
+        {
+            var typeArg = ((info.Type as INamedTypeSymbol)!).TypeArguments[root.TypeArguments.IndexOf(arg)];
+            log.AppendLine(
+                $"// -----> Generic found: {typeArg}");
+
+            return typeArg.WithNullableAnnotation(arg.NullableAnnotation);
+        }
+
+        log.AppendLine($"// -----> Processing {arg}");
+
+        if (arg is not INamedTypeSymbol namedArg)
+            return arg;
+
+        if (namedArg is {IsGenericType: false, IsUnboundGenericType: false})
+            return arg;
+
+        var newTypes = namedArg.TypeArguments
+            .Select(x => ResolveGeneric(x, root, info, log)).ToArray();
+
+        if (!newTypes.SequenceEqual(namedArg.TypeArguments, SymbolEqualityComparer.Default))
+        {
+            log.AppendLine($"// -----> {namedArg}");
+
+            foreach (var newType in newTypes)
+            {
+                log.AppendLine($"// ------> Constructing with {newType} {newType.BaseType}");
+            }
+
+            return namedArg.ConstructedFrom.Construct(newTypes);
+        }
+
+        return arg;
+    }
+
+    private List<string> CreateDeclarationsFromSymbol(INamedTypeSymbol symbol, TypeInfo semanticInterface, StringBuilder log)
     {
         var declarations = new List<string>();
 
@@ -154,7 +194,7 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
 
             var parameterSymbols = method.Parameters.Select(x =>
             {
-                var param = $"{x.Type} {x.Name}";
+                var param = $"{ResolveGeneric(x.Type, symbol, semanticInterface, log)} {x.Name}";
 
 
                 if (x.HasExplicitDefaultValue)
@@ -166,7 +206,7 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
             });
 
             declarations.Add(
-                $"public {method.ReturnType} {method.Name}({string.Join(", ", parameterSymbols)})" +
+                $"public {ResolveGeneric(method.ReturnType, symbol, semanticInterface, log)} {method.Name}({string.Join(", ", parameterSymbols)})" +
                 $" => (this as {semanticInterface.Type!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}).{method.Name}({parameterIdentifiers});"
             );
         }
@@ -211,5 +251,42 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
                     .Any(x => x.Name.GetText().ToString() == ExtendingAttributeName)
                 )
             ).ToArray();
+    }
+
+    public static string GetFullMetadataName(ISymbol? s)
+    {
+        if (s == null || IsRootNamespace(s))
+        {
+            return string.Empty;
+        }
+
+        var sb = new StringBuilder(s.MetadataName);
+        var last = s;
+
+        s = s.ContainingSymbol;
+
+        while (!IsRootNamespace(s))
+        {
+            if (s is ITypeSymbol && last is ITypeSymbol)
+            {
+                sb.Insert(0, '+');
+            }
+            else
+            {
+                sb.Insert(0, '.');
+            }
+
+            sb.Insert(0, s.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
+            //sb.Insert(0, s.MetadataName);
+            s = s.ContainingSymbol;
+        }
+
+        return sb.ToString();
+    }
+
+    private static bool IsRootNamespace(ISymbol symbol)
+    {
+        INamespaceSymbol? s = null;
+        return ((s = symbol as INamespaceSymbol) != null) && s.IsGlobalNamespace;
     }
 }

@@ -3,10 +3,9 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableGuildScheduledEventActor<TScheduledEvent> :
+public interface ILoadableGuildScheduledEventActor :
     IGuildScheduledEventActor,
-    ILoadableEntity<ulong, TScheduledEvent>
-    where TScheduledEvent : class, IGuildScheduledEvent;
+    ILoadableEntity<ulong, IGuildScheduledEvent>;
 
 public interface IGuildScheduledEventActor :
     IGuildRelationship,

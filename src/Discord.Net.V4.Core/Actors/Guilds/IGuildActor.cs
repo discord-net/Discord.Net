@@ -6,10 +6,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-public interface ILoadableGuildActor<TGuild> :
+public interface ILoadableGuildActor :
     IGuildActor,
-    ILoadableEntity<ulong, TGuild>
-    where TGuild : class, IGuild;
+    ILoadableEntity<ulong, IGuild>;
 
 public interface IGuildActor :
     IActor<ulong, IGuild>,
@@ -21,8 +20,8 @@ public interface IGuildActor :
     IRootActor<IIntegrationActor, ulong, IIntegration> Integrations { get; }
     IIntegrationActor Integration(ulong id) => Integrations[id];
 
-    IPagedLoadableRootActor<ILoadableGuildBanActor<IBan>, ulong, IBan> Bans { get; }
-    ILoadableGuildBanActor<IBan> Ban(ulong userId) => Bans[userId];
+    IPagedLoadableRootActor<ILoadableGuildBanActor, ulong, IBan> Bans { get; }
+    ILoadableGuildBanActor Ban(ulong userId) => Bans[userId];
 
     IRootActor<ILoadableStageChannelActor<IStageChannel>, ulong, IStageChannel> StageChannels { get; }
     ILoadableStageChannelActor<IStageChannel> StageChannel(ulong id) => StageChannels[id];
@@ -30,26 +29,26 @@ public interface IGuildActor :
     ILoadableRootActor<ILoadableThreadActor<IThreadChannel>, ulong, IThreadChannel> ActiveThreads { get; }
     ILoadableThreadActor<IThreadChannel> ActiveThread(ulong id) => ActiveThreads[id];
 
-    IRootActor<ILoadableTextChannelActor<ITextChannel>, ulong, ITextChannel> TextChannels { get; }
-    ILoadableTextChannelActor<ITextChannel> TextChannel(ulong id) => TextChannels[id];
+    IRootActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels { get; }
+    ILoadableTextChannelActor TextChannel(ulong id) => TextChannels[id];
 
-    ILoadableRootActor<ILoadableGuildChannelActor<IGuildChannel>, ulong, IGuildChannel> Channels { get; }
-    ILoadableGuildChannelActor<IGuildChannel> Channel(ulong id) => Channels[id];
+    ILoadableRootActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels { get; }
+    ILoadableGuildChannelActor Channel(ulong id) => Channels[id];
 
-    IPagedLoadableRootActor<ILoadableGuildMemberActor<IGuildMember>, ulong, IGuildMember> Members { get; }
-    ILoadableGuildMemberActor<IGuildMember> Member(ulong id) => Members[id];
+    IPagedLoadableRootActor<ILoadableGuildMemberActor, ulong, IGuildMember> Members { get; }
+    ILoadableGuildMemberActor Member(ulong id) => Members[id];
 
-    ILoadableRootActor<ILoadableGuildEmoteActor<IGuildEmote>, ulong, IGuildEmote> Emotes { get; }
-    ILoadableGuildEmoteActor<IGuildEmote> Emote(ulong id) => Emotes[id];
+    ILoadableRootActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes { get; }
+    ILoadableGuildEmoteActor Emote(ulong id) => Emotes[id];
 
-    ILoadableRootActor<ILoadableRoleActor<IRole>, ulong, IRole> Roles { get; }
-    ILoadableRoleActor<IRole> Role(ulong id) => Roles[id];
+    ILoadableRootActor<IRoleActor, ulong, IRole> Roles { get; }
+    IRoleActor Role(ulong id) => Roles[id];
 
-    ILoadableRootActor<ILoadableGuildStickerActor<IGuildSticker>, ulong, IGuildSticker> Stickers { get; }
-    ILoadableGuildStickerActor<IGuildSticker> Sticker(ulong id) => Stickers[id];
+    ILoadableRootActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers { get; }
+    ILoadableGuildStickerActor Sticker(ulong id) => Stickers[id];
 
-    ILoadableRootActor<ILoadableGuildScheduledEventActor<IGuildScheduledEvent>, ulong, IGuildScheduledEvent> ScheduledEvents { get; }
-    ILoadableGuildScheduledEventActor<IGuildScheduledEvent> ScheduledEvent(ulong id) => ScheduledEvents[id];
+    ILoadableRootActor<ILoadableGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents { get; }
+    ILoadableGuildScheduledEventActor ScheduledEvent(ulong id) => ScheduledEvents[id];
 
     ILoadableRootActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites { get; }
     ILoadableInviteActor<IInvite> Invite(string code) => Invites[code];

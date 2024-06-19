@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
@@ -26,7 +27,7 @@ public sealed class Role : IRoleModel
     public int Position { get; set; }
 
     [JsonPropertyName("permissions")]
-    public ulong Permissions { get; set; }
+    public BigInteger Permissions { get; set; }
 
     [JsonPropertyName("managed")]
     public bool Managed { get; set; }

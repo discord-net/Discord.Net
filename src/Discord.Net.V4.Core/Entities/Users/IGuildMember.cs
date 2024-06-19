@@ -6,6 +6,9 @@ namespace Discord;
 public interface IGuildMember :
     IGuildMemberActor
 {
+    IDefinedLoadableEntityEnumerable<ulong, IRole> Roles { get; }
+    ILoadableEntity<ulong, IRole> Role(ulong id) => Roles[id];
+
     /// <summary>
     ///     Gets when this user joined the guild.
     /// </summary>
@@ -34,15 +37,6 @@ public interface IGuildMember :
     string? GuildAvatarId { get; }
 
     /// <summary>
-    ///     Gets the guild-level permissions for this user.
-    /// </summary>
-    /// <returns>
-    ///     A <see cref="Discord.GuildPermission" /> enum for this user, representing what
-    ///     permissions this user has in the guild.
-    /// </returns>
-    GuildPermission GuildPermissions { get; }
-
-    /// <summary>
     ///     Gets the date and time for when this user's guild boost began.
     /// </summary>
     /// <returns>
@@ -55,11 +49,6 @@ public interface IGuildMember :
     ///     Whether the user has passed the guild's Membership Screening requirements.
     /// </summary>
     bool? IsPending { get; }
-
-    /// <summary>
-    ///     Gets the users position within the role hierarchy.
-    /// </summary>
-    int Hierarchy { get; }
 
     /// <summary>
     ///     Gets the date and time that indicates if and for how long a user has been timed out.

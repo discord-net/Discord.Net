@@ -23,13 +23,13 @@ public interface IDiscordClient :
     /// <summary>
     ///     Gets the currently logged-in user.
     /// </summary>
-    ILoadableSelfUserActor<ISelfUser> SelfUser { get; }
+    ILoadableSelfUserActor SelfUser { get; }
 
-    IPagedLoadableRootActor<ILoadableGuildActor<IGuild>, ulong, IGuild, IPartialGuild> Guilds { get; }
-    ILoadableGuildActor<IGuild> Guild(ulong id) => Guilds[id];
+    IPagedLoadableRootActor<ILoadableGuildActor, ulong, IGuild, IPartialGuild> Guilds { get; }
+    ILoadableGuildActor Guild(ulong id) => Guilds[id];
 
-    IRootActor<ILoadableChannelActor<IChannel>, ulong, IChannel> Channels { get; }
-    ILoadableChannelActor<IChannel> Channel(ulong id) => Channels[id];
+    IRootActor<ILoadableChannelActor, ulong, IChannel> Channels { get; }
+    ILoadableChannelActor Channel(ulong id) => Channels[id];
 
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }

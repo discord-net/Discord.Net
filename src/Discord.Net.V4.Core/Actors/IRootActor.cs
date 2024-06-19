@@ -2,23 +2,23 @@ using Discord.Paging;
 
 namespace Discord;
 
-public interface ILoadableRootActor<out TSource, in TId, TEntity> : IRootActor<TSource, TId, TEntity>
-    where TSource : IActor<TId, TEntity>
+public interface ILoadableRootActor<out TActor, in TId, TEntity> : IRootActor<TActor, TId, TEntity>
+    where TActor : IActor<TId, TEntity>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
 {
     Task<IReadOnlyCollection<TEntity>> AllAsync();
 }
 
-public interface IPagedLoadableRootActor<out TSource, in TId, out TEntity> :
-    IPagedLoadableRootActor<TSource, TId, TEntity, TEntity>
-    where TSource : IActor<TId, TEntity>
+public interface IPagedLoadableRootActor<out TActor, in TId, out TEntity> :
+    IPagedLoadableRootActor<TActor, TId, TEntity, TEntity>
+    where TActor : IActor<TId, TEntity>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>;
 
-public interface IPagedLoadableRootActor<out TSource, in TId, out TEntity, out TPagedEntityType> :
-    IRootActor<TSource, TId, TEntity>
-    where TSource : IActor<TId, TEntity>
+public interface IPagedLoadableRootActor<out TActor, in TId, out TEntity, out TPagedEntityType> :
+    IRootActor<TActor, TId, TEntity>
+    where TActor : IActor<TId, TEntity>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
     where TPagedEntityType : class, IEntity<TId>
@@ -26,11 +26,11 @@ public interface IPagedLoadableRootActor<out TSource, in TId, out TEntity, out T
     IAsyncPaged<TPagedEntityType> PagedAsync();
 }
 
-public interface IRootActor<out TSource, in TId, out TEntity>
-    where TSource : IActor<TId, TEntity>
+public interface IRootActor<out TActor, in TId, out TEntity>
+    where TActor : IActor<TId, TEntity>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
 {
-    TSource this[TId id] { get => Specifically(id); }
-    TSource Specifically(TId id);
+    TActor this[TId id] { get => Specifically(id); }
+    TActor Specifically(TId id);
 }

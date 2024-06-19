@@ -10,5 +10,5 @@ public class Channel : IChannelModel
     public ulong Id { get; set; }
 
     [JsonPropertyName("type")]
-    public uint Type { get; set; }
+    public int Type { get; set; }
 }

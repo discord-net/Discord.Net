@@ -8,5 +8,5 @@ public interface IGuildEmoteModel : IEntityModel<ulong>
     bool IsManaged { get; }
     bool IsAnimated { get; }
     bool IsAvailable { get; }
-    ulong UserId { get; }
+    ulong? UserId { get; }
 }

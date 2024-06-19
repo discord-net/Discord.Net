@@ -17,7 +17,7 @@ public interface IThreadChannel :
     /// <summary>
     ///     Gets the type of the current thread channel.
     /// </summary>
-    ThreadType Type { get; }
+    new ThreadType Type { get; }
 
     /// <summary>
     ///     Gets whether or not the current user has joined this thread.

@@ -3,11 +3,10 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableTextChannelActor<TTextChannel> :
+public interface ILoadableTextChannelActor :
     ITextChannelActor,
-    ILoadableThreadableGuildChannelActor<TTextChannel>,
-    ILoadableMessageChannelActor<TTextChannel>
-    where TTextChannel : class, ITextChannel;
+    ILoadableThreadableGuildChannelActor,
+    ILoadableMessageChannelActor;
 
 public interface ITextChannelActor :
     IMessageChannelActor,

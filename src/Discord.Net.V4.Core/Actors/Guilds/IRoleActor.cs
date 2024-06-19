@@ -3,11 +3,6 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableRoleActor<TRole> :
-    IRoleActor,
-    ILoadableEntity<ulong, TRole>
-    where TRole : class, IRole;
-
 public interface IRoleActor :
     IGuildRelationship,
     IModifiable<ulong, IRoleActor, ModifyRoleProperties, ModifyGuildRoleParams>,

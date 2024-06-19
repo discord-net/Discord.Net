@@ -5,7 +5,7 @@ namespace Discord;
 
 public interface ILoadableGroupChannelActor<TGroupChannel> :
     IGroupChannelActor,
-    ILoadableChannelActor<TGroupChannel>
+    ILoadableChannelActor
     where TGroupChannel : class, IGroupChannel;
 
 public interface IGroupChannelActor :

@@ -26,9 +26,8 @@ public interface IGuildModel : IPartialGuildModel, IEntityModel<ulong>
     ulong? PublicUpdatesChannelId { get; }
     int? MaxVideoChannelUsers { get; }
     int? MaxStageVideoChannelUsers { get; }
-    int? ApproximateMemberCount { get; }
     IWelcomeScreenModel? WelcomeScreen { get; }
-    bool? PremiumProgressBarEnabled { get; }
+    bool PremiumProgressBarEnabled { get; }
     ulong? SafetyAlertsChannelId { get; }
 }
 

@@ -1,9 +1,8 @@
 namespace Discord;
 
-public interface ILoadableThreadableGuildChannelActor<TGuildChannel> :
+public interface ILoadableThreadableGuildChannelActor :
     IThreadableGuildChannelActor,
-    ILoadableGuildChannelActor<TGuildChannel>
-    where TGuildChannel : class, IGuildChannel;
+    ILoadableGuildChannelActor;
 
 public interface IThreadableGuildChannelActor :
     IGuildChannelActor

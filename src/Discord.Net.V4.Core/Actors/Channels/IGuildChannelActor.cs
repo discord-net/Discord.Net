@@ -4,10 +4,9 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableGuildChannelActor<TGuildChannel> :
+public interface ILoadableGuildChannelActor :
     IGuildChannelActor,
-    ILoadableChannelActor<TGuildChannel>
-    where TGuildChannel : class, IGuildChannel;
+    ILoadableChannelActor;
 
 public interface IGuildChannelActor :
     IChannelActor,
@@ -18,10 +17,19 @@ public interface IGuildChannelActor :
 {
     ILoadableRootActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites { get; }
 
-    Task<IInvite> CreateInviteAsync(
+    async Task<IInvite> CreateInviteAsync(
         CreateChannelInviteProperties args,
         RequestOptions? options = null,
-        CancellationToken token = default);
+        CancellationToken token = default)
+    {
+        var model = await Client.RestApiClient.ExecuteRequiredAsync(
+            Routes.CreateChannelInvite(Id, args.ToApiModel()),
+            options ?? Client.DefaultRequestOptions,
+            token
+        );
+
+        return Client.CreateEntity(model);
+    }
 
     static BasicApiRoute IDeletable<ulong, IGuildChannelActor>.DeleteRoute(IPathable pathable, ulong id)
         => Routes.DeleteChannel(id);

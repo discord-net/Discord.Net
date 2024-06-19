@@ -6,6 +6,10 @@ namespace Discord.Models.Json;
 [ChannelTypeOf(ChannelType.GuildForum)]
 public sealed class GuildForumChannel : GuildChannelBase, IGuildForumChannelModel
 {
+    int IGuildForumChannelModel.DefaultForumLayout => DefaultForumLayout;
+
+    int? IGuildForumChannelModel.DefaultSortOrder => DefaultSortOrder;
+
     bool IGuildForumChannelModel.IsNsfw => Nsfw;
 
     string? IGuildForumChannelModel.Topic => Topic;

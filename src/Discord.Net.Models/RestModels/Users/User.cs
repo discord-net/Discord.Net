@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class User : IUserModel
+public sealed class User : IUserModel, ISelfUserModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -12,13 +12,13 @@ public sealed class User : IUserModel
     public required string Username { get; set; }
 
     [JsonPropertyName("discriminator")]
-    public required string Discriminator { get; set; }
+    public required ushort Discriminator { get; set; }
 
     [JsonPropertyName("global_name")]
     public string? GlobalName { get; set; }
 
     [JsonPropertyName("avatar")]
-    public string? AvatarHash { get; set; }
+    public string? Avatar { get; set; }
 
     [JsonPropertyName("bot")]
     public Optional<bool> IsBot { get; set; }
@@ -48,7 +48,7 @@ public sealed class User : IUserModel
     public Optional<int> Flags { get; set; }
 
     [JsonPropertyName("premium_type")]
-    public Optional<int> Premium { get; set; }
+    public Optional<int> PremiumType { get; set; }
 
     [JsonPropertyName("public_flags")]
     public Optional<int> PublicFlags { get; set; }
@@ -58,11 +58,11 @@ public sealed class User : IUserModel
 
     bool? IUserModel.IsBot => IsBot;
     bool? IUserModel.IsSystem => IsSystem;
-    bool? IUserModel.MFAEnabled => MFAEnabled;
-    string? IUserModel.Locale => Locale;
-    bool? IUserModel.Verified => IsVerified;
-    string? IUserModel.Email => Email;
+    bool? ISelfUserModel.MFAEnabled => MFAEnabled;
+    string? ISelfUserModel.Locale => Locale;
+    bool? ISelfUserModel.Verified => IsVerified;
+    string? ISelfUserModel.Email => Email;
     int? IUserModel.Flags => Flags;
-    int? IUserModel.Premium => Premium;
+    int? ISelfUserModel.PremiumType => PremiumType;
     int? IUserModel.PublicFlags => PublicFlags;
 }

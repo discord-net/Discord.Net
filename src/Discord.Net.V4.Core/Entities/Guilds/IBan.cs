@@ -3,16 +3,8 @@ namespace Discord;
 /// <summary>
 ///     Represents a generic ban object.
 /// </summary>
-public interface IBan : IEntity<ulong>
+public interface IBan : IGuildBanActor, IEntity<ulong>
 {
-    /// <summary>
-    ///     Gets the banned user.
-    /// </summary>
-    /// <returns>
-    ///     A user that was banned.
-    /// </returns>
-    ILoadableEntity<ulong, IUser> User { get; }
-
     /// <summary>
     ///     Gets the reason why the user is banned if specified.
     /// </summary>

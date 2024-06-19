@@ -4,14 +4,14 @@ public interface IInvite :
     IInviteActor
 {
     InviteType Type { get; }
-    ILoadableGuildActor<IGuild>? Guild { get; }
-    ILoadableChannelActor<IChannel>? Channel { get; }
-    ILoadableUserActor<IUser>? Inviter { get; }
+    ILoadableGuildActor? Guild { get; }
+    ILoadableChannelActor? Channel { get; }
+    ILoadableUserActor? Inviter { get; }
     InviteTargetType TargetType { get; }
-    ILoadableUserActor<IUser>? TargetUser { get; }
+    ILoadableUserActor? TargetUser { get; }
     // TODO: application
     int? ApproximatePresenceCount { get; }
     int? ApproximateMemberCount { get; }
     DateTimeOffset? ExpiresAt { get; }
-    ILoadableGuildScheduledEventActor<IGuildScheduledEvent>? GuildScheduledEvent { get; }
+    ILoadableGuildScheduledEventActor? GuildScheduledEvent { get; }
 }

@@ -19,4 +19,8 @@ public sealed class GuildMediaChannel : GuildChannelBase, IGuildForumChannelMode
     IEmote? IGuildForumChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
 
     IEnumerable<IForumTagModel> IGuildForumChannelModel.AvailableTags => AvailableTags | [];
+
+    int? IGuildForumChannelModel.DefaultSortOrder => DefaultSortOrder;
+
+    int IGuildForumChannelModel.DefaultForumLayout => DefaultForumLayout;
 }

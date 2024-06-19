@@ -11,6 +11,8 @@ public interface IGuildForumChannelModel : IGuildChannelModel
     int? DefaultThreadRateLimitPerUser { get; }
     IEmote? DefaultReactionEmoji { get; }
     IEnumerable<IForumTagModel> AvailableTags { get; }
+    int? DefaultSortOrder { get; }
+    int DefaultForumLayout { get; }
 }
 
 public interface IForumTagModel : IEntityModel<ulong>

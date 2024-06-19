@@ -4,10 +4,9 @@ using Discord.Stage;
 
 namespace Discord;
 
-public interface ILoadableStageChannelActor<TChannel> :
+public interface ILoadableStageChannelActor :
     IStageChannelActor,
-    ILoadableGuildChannelActor<TChannel>
-    where TChannel : class, IStageChannel;
+    ILoadableGuildChannelActor;
 
 public interface IStageChannelActor :
     IGuildChannelActor,

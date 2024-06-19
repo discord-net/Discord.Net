@@ -1,9 +1,8 @@
 namespace Discord;
 
-public interface ILoadableChannelActor<TChannel> :
+public interface ILoadableChannelActor :
     IChannelActor,
-    ILoadableEntity<ulong, TChannel>
-    where TChannel : class, IChannel;
+    ILoadableEntity<ulong, IChannel>;
 
 public interface IChannelActor :
     IActor<ulong, IChannel>;

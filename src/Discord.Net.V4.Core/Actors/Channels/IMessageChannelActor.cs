@@ -1,9 +1,8 @@
 namespace Discord;
 
-public interface ILoadableMessageChannelActor<TMessageChannel> :
+public interface ILoadableMessageChannelActor :
     IMessageChannelActor,
-    ILoadableChannelActor<TMessageChannel>
-    where TMessageChannel : class, IMessageChannel;
+    ILoadableChannelActor;
 
 public interface IMessageChannelActor :
     IChannelActor,

@@ -85,18 +85,17 @@ public class Guild : PartialGuild, IGuildModel, IEntityModelSource
     public Optional<Sticker[]> Stickers { get; set; }
 
     [JsonPropertyName("premium_progress_bar_enabled")]
-    public Optional<bool> PremiumProgressBarEnabled { get; set; }
+    public bool PremiumProgressBarEnabled { get; set; }
 
     [JsonPropertyName("safety_alerts_channel_id")]
     public Optional<ulong?> SafetyAlertsChannelId { get; set; }
 
     int? IGuildModel.MaxPresence => MaxPresences;
     int? IGuildModel.MaxMembers => MaxMembers;
-    bool? IGuildModel.PremiumProgressBarEnabled => PremiumProgressBarEnabled;
+    bool IGuildModel.PremiumProgressBarEnabled => PremiumProgressBarEnabled;
     ulong? IGuildModel.SafetyAlertsChannelId => SafetyAlertsChannelId;
     int? IGuildModel.MaxVideoChannelUsers => MaxVideoChannelUsers;
     int? IGuildModel.MaxStageVideoChannelUsers => MaxStageVideoChannelUsers;
-    int? IGuildModel.ApproximateMemberCount => ApproximateMemberCount;
     IWelcomeScreenModel? IGuildModel.WelcomeScreen => ~WelcomeScreen;
     string? IGuildModel.Vanity => VanityUrlCode;
     bool IGuildModel.WidgetEnabled => WidgetEnabled;

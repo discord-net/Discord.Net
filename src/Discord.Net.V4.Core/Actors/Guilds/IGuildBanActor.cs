@@ -1,9 +1,8 @@
 namespace Discord;
 
-public interface ILoadableGuildBanActor<TBan> :
+public interface ILoadableGuildBanActor :
     IGuildBanActor,
-    ILoadableEntity<ulong, TBan>
-    where TBan : class, IBan;
+    ILoadableEntity<ulong, IBan>;
 
 public interface IGuildBanActor :
     IGuildRelationship,

@@ -18,7 +18,7 @@ public sealed class MissingPermissionException : DiscordException
     ///     Constructs a new <see cref="MissingPermissionException" />.
     /// </summary>
     /// <param name="missing">The permissions that were missing.</param>
-    public MissingPermissionException(GuildPermission missing)
+    public MissingPermissionException(PermissionSet missing)
         : base($"Missing the required permission(s) {missing}")
     {
         Permissions = missing;
@@ -27,5 +27,5 @@ public sealed class MissingPermissionException : DiscordException
     /// <summary>
     ///     Gets the permissions that was required but missing.
     /// </summary>
-    public GuildPermission? Permissions { get; }
+    public PermissionSet? Permissions { get; }
 }
