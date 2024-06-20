@@ -11,7 +11,7 @@ public partial class RestChannel(DiscordRestClient client, IChannelModel model, 
     RestEntity<ulong>(client, model.Id),
     IChannel
 {
-    internal virtual IChannelModel Model { get; } = model;
+    internal IChannelModel Model { get; } = model;
 
     internal virtual RestChannelActor Actor { get; } = actor ?? new(client, model.Id);
 

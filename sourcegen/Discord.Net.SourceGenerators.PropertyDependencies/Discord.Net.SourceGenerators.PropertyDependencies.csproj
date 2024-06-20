@@ -9,8 +9,8 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <IsRoslynComponent>true</IsRoslynComponent>
 
-    <RootNamespace>Discord.Net.SourceGenerators.InterfaceProxy</RootNamespace>
-    <PackageId>Discord.Net.SourceGenerators.InterfaceProxy</PackageId>
+    <RootNamespace>Discord.Net.SourceGenerators.PropertyDependencies</RootNamespace>
+    <PackageId>Discord.Net.SourceGenerators.PropertyDependencies</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +26,5 @@
     <Compile Include="../Discord.Net.SourceGenerators.Common/**/*.cs" Link="Discord.Net.SourceGenerators.Common"/>
     <Compile Remove="../Discord.Net.SourceGenerators.Common/obj/**/*.cs" />
   </ItemGroup>
-
 
 </Project>

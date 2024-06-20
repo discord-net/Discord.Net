@@ -42,7 +42,7 @@ public partial class RestThreadChannel(DiscordRestClient client, ulong guildId, 
     IThreadChannel,
     IContextConstructable<RestThreadChannel, IThreadChannelModel, ulong, DiscordRestClient>
 {
-    internal override IThreadChannelModel Model { get; } = model;
+    internal new IThreadChannelModel Model { get; } = model;
 
     [ProxyInterface(typeof(IThreadActor), typeof(IThreadMemberRelationship), typeof(IMessageChannelActor))]
     internal override RestThreadChannelActor Actor { get; } = actor ?? new(client, guildId, model.Id);

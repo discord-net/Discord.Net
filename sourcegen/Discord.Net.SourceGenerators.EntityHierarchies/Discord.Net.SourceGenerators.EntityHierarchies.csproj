@@ -22,5 +22,10 @@
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.3.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Include="../Discord.Net.SourceGenerators.Common/**/*.cs" Link="Discord.Net.SourceGenerators.Common"/>
+      <Compile Remove="../Discord.Net.SourceGenerators.Common/obj/**/*.cs" />
+    </ItemGroup>
+
 
 </Project>

@@ -49,7 +49,7 @@ public partial class RestGuildChannel(DiscordRestClient client, ulong guildId, I
     IGuildChannel,
     IContextConstructable<RestGuildChannel, IGuildChannelModel, ulong, DiscordRestClient>
 {
-    internal override IGuildChannelModel Model { get; } = model;
+    internal new IGuildChannelModel Model { get; set; } = model;
 
     [ProxyInterface(typeof(IGuildChannelActor), typeof(IGuildRelationship))]
     internal override RestGuildChannelActor Actor { get; } = actor ?? new RestGuildChannelActor(client, guildId, model.Id);

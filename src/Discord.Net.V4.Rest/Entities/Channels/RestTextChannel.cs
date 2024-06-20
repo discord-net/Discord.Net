@@ -41,7 +41,7 @@ public partial class RestTextChannel(DiscordRestClient client, ulong guildId, IG
     ITextChannel,
     IContextConstructable<RestTextChannel, IGuildTextChannelModel, ulong, DiscordRestClient>
 {
-    internal override IGuildTextChannelModel Model { get; } = model;
+    internal new IGuildTextChannelModel Model { get; } = model;
 
     [ProxyInterface(
         typeof(ITextChannelActor),

@@ -23,7 +23,7 @@ public partial class RestForumChannel(DiscordRestClient client, ulong guildId, I
     RestGuildChannel(client, guildId, model, actor),
     IForumChannel
 {
-    internal override IGuildForumChannelModel Model { get; } = model;
+    internal new IGuildForumChannelModel Model { get; } = model;
 
     [ProxyInterface(typeof(IForumChannelActor), typeof(IThreadableGuildChannelActor))]
     internal override RestForumChannelActor Actor { get; } = actor ?? new(client, guildId, model.Id);

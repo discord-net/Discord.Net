@@ -1,3 +1,4 @@
+using Discord.Net.SourceGenerators.Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -25,7 +26,7 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
 
         try
         {
-            var targets = FindTargets(ref context);
+            var targets = Searching.FindClassesWithAttribute(ref context, ExtendingAttributeName);
             var interfaces = GetInterfaces(ref context);
 
             log.AppendLine($"// {targets.Length} possible targets found");
@@ -92,7 +93,7 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
                     }
                     else
                     {
-                        var metadataName = GetFullMetadataName(semanticInterface.Type);
+                        var metadataName = semanticInterface.Type.GetFullMetadataName();
                         var ifaceSymbol = semanticInterface.Type.ContainingAssembly.GetTypeByMetadataName(metadataName);
 
                         if (ifaceSymbol is null)
@@ -238,55 +239,4 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
         => context.Compilation.SyntaxTrees.SelectMany(x =>
             x.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>()
         ).ToArray();
-
-    private ClassDeclarationSyntax[] FindTargets(ref GeneratorExecutionContext context)
-    {
-        return context.Compilation.SyntaxTrees
-            .SelectMany(x => x
-                .GetRoot()
-                .DescendantNodes()
-                .OfType<ClassDeclarationSyntax>()
-                .Where(x => x.AttributeLists
-                    .SelectMany(x => x.Attributes)
-                    .Any(x => x.Name.GetText().ToString() == ExtendingAttributeName)
-                )
-            ).ToArray();
-    }
-
-    public static string GetFullMetadataName(ISymbol? s)
-    {
-        if (s == null || IsRootNamespace(s))
-        {
-            return string.Empty;
-        }
-
-        var sb = new StringBuilder(s.MetadataName);
-        var last = s;
-
-        s = s.ContainingSymbol;
-
-        while (!IsRootNamespace(s))
-        {
-            if (s is ITypeSymbol && last is ITypeSymbol)
-            {
-                sb.Insert(0, '+');
-            }
-            else
-            {
-                sb.Insert(0, '.');
-            }
-
-            sb.Insert(0, s.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
-            //sb.Insert(0, s.MetadataName);
-            s = s.ContainingSymbol;
-        }
-
-        return sb.ToString();
-    }
-
-    private static bool IsRootNamespace(ISymbol symbol)
-    {
-        INamespaceSymbol? s = null;
-        return ((s = symbol as INamespaceSymbol) != null) && s.IsGlobalNamespace;
-    }
 }
