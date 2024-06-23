@@ -8,7 +8,7 @@ public sealed class ModifyGroupDMProperties : ModifyChannelBaseProperties, IEnti
 
     public ModifyGroupDmParams ToApiModel(ModifyGroupDmParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyGroupDmParams();
         base.ToApiModel(existing);
 
         existing.Icon = Icon.Map(v => v?.ToImageData());

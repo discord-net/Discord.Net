@@ -4,25 +4,25 @@ namespace Discord.Rest;
 
 public partial class Routes
 {
-    public static ApiRoute<Entitlement[]> ListAppSubscriptions(ulong applicationId)
-        => new(nameof(ListAppSubscriptions),
+    public static IApiOutRoute<Entitlement[]> ListAppSubscriptions(ulong applicationId)
+        => new ApiOutRoute<Entitlement[]>(nameof(ListAppSubscriptions),
             RequestMethod.Get,
             $"applications/{applicationId}/entitlements");
 
-    public static ApiBodyRoute<CreateTestEntitlementParams, Entitlement> CreateTestEntitlement(ulong applicationId,
+    public static IApiInOutRoute<CreateTestEntitlementParams, Entitlement> CreateTestEntitlement(ulong applicationId,
         CreateTestEntitlementParams body)
-        => new(nameof(CreateTestEntitlement),
+        => new ApiInOutRoute<CreateTestEntitlementParams, Entitlement>(nameof(CreateTestEntitlement),
             RequestMethod.Post,
             $"applications/{applicationId}/entitlements",
             body);
 
-    public static BasicApiRoute DeleteTestEntitlement(ulong applicationId, ulong entitlementId)
-        => new(nameof(DeleteTestEntitlement),
+    public static IApiRoute DeleteTestEntitlement(ulong applicationId, ulong entitlementId)
+        => new ApiRoute(nameof(DeleteTestEntitlement),
             RequestMethod.Delete,
             $"applications/{applicationId}/entitlements/{entitlementId}");
 
-    public static ApiRoute<SKU[]> ListSKUs(ulong applicationId)
-        => new(nameof(ListSKUs),
+    public static IApiOutRoute<SKU[]> ListSKUs(ulong applicationId)
+        => new ApiOutRoute<SKU[]>(nameof(ListSKUs),
             RequestMethod.Get,
             $"applications/{applicationId}/skus");
 }

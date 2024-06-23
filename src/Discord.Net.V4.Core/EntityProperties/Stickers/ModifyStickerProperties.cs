@@ -24,7 +24,7 @@ public class ModifyStickerProperties : IEntityProperties<ModifyGuildStickersPara
 
     public ModifyGuildStickersParams ToApiModel(ModifyGuildStickersParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyGuildStickersParams();
 
         existing.Name = Name;
         existing.Description = Description;

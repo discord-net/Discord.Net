@@ -1,3 +1,4 @@
+using Discord.Models;
 using System.Collections.Immutable;
 using System.Diagnostics;
 
@@ -7,8 +8,43 @@ namespace Discord;
 ///     Represents an embed object seen in an <see cref="IMessage" />.
 /// </summary>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-public sealed class Embed : IEntityProperties<Discord.Models.Json.Embed>, IConstructable<Embed, Discord.Models.Json.Embed>
+public sealed class Embed : IEntityProperties<Models.Json.Embed>, IConstructable<Embed, IEmbedModel>
 {
+    internal Embed(EmbedType type)
+    {
+        Type = type;
+        Fields = [];
+    }
+
+    internal Embed(EmbedType type,
+        string? title,
+        string? description,
+        string? url,
+        DateTimeOffset? timestamp,
+        Color? color,
+        EmbedImage? image,
+        EmbedVideo? video,
+        EmbedAuthor? author,
+        EmbedFooter? footer,
+        EmbedProvider? provider,
+        EmbedThumbnail? thumbnail,
+        IEnumerable<EmbedField> fields)
+    {
+        Type = type;
+        Title = title;
+        Description = description;
+        Url = url;
+        Color = color;
+        Timestamp = timestamp;
+        Image = image;
+        Video = video;
+        Author = author;
+        Footer = footer;
+        Provider = provider;
+        Thumbnail = thumbnail;
+        Fields = fields.ToImmutableArray();
+    }
+
     public EmbedType Type { get; }
 
 
@@ -47,41 +83,6 @@ public sealed class Embed : IEntityProperties<Discord.Models.Json.Embed>, IConst
 
     public IReadOnlyCollection<EmbedField> Fields { get; }
 
-    internal Embed(EmbedType type)
-    {
-        Type = type;
-        Fields = [];
-    }
-
-    internal Embed(EmbedType type,
-        string? title,
-        string? description,
-        string? url,
-        DateTimeOffset? timestamp,
-        Color? color,
-        EmbedImage? image,
-        EmbedVideo? video,
-        EmbedAuthor? author,
-        EmbedFooter? footer,
-        EmbedProvider? provider,
-        EmbedThumbnail? thumbnail,
-        IEnumerable<EmbedField> fields)
-    {
-        Type = type;
-        Title = title;
-        Description = description;
-        Url = url;
-        Color = color;
-        Timestamp = timestamp;
-        Image = image;
-        Video = video;
-        Author = author;
-        Footer = footer;
-        Provider = provider;
-        Thumbnail = thumbnail;
-        Fields = fields.ToImmutableArray();
-    }
-
     /// <summary>
     ///     Gets the total length of all embed properties.
     /// </summary>
@@ -98,22 +99,30 @@ public sealed class Embed : IEntityProperties<Discord.Models.Json.Embed>, IConst
         }
     }
 
-    /// <summary>
-    ///     Gets the title of the embed.
-    /// </summary>
-    public override string? ToString() => Title;
-
     private string DebuggerDisplay => $"{Title} ({Type})";
 
-    public static bool operator ==(Embed? left, Embed? right)
-        => left?.Equals(right) ?? right is null;
-
-    public static bool operator !=(Embed? left, Embed? right)
-        => !(left == right);
+    public static Embed Construct(IDiscordClient client, IEmbedModel model) =>
+        new(
+            model.Type is not null ? new EmbedType(model.Type) : EmbedType.Unspecified,
+            model.Title,
+            model.Description,
+            model.Url,
+            model.Timestamp,
+            model.Color is not null ? new Color(model.Color.Value) : null,
+            model.Image is not null ? EmbedImage.Construct(client, model.Image) : null,
+            model.Video is not null ? EmbedVideo.Construct(client, model.Video) : null,
+            model.Author is not null ? EmbedAuthor.Construct(client, model.Author) : null,
+            model.Footer is not null ? EmbedFooter.Construct(client, model.Footer) : null,
+            model.Provider is not null ? EmbedProvider.Construct(client, model.Provider) : null,
+            model.Thumbnail is not null ? EmbedThumbnail.Construct(client, model.Thumbnail) : null,
+            model.Fields is not null
+                ? model.Fields.Select(x => EmbedField.Construct(client, x)).ToArray()
+                : []
+        );
 
     public Models.Json.Embed ToApiModel(Models.Json.Embed? existing = default)
     {
-        existing ??= new();
+        existing ??= new Models.Json.Embed();
 
         existing.Type = Optional.FromNullable<string>(Type);
         existing.Description = Optional.FromNullable(Description);
@@ -134,24 +143,16 @@ public sealed class Embed : IEntityProperties<Discord.Models.Json.Embed>, IConst
         return existing;
     }
 
-    public static Embed Construct(IDiscordClient client, Discord.Models.Json.Embed model)
-    {
-        return new Embed(
-            model.Type.Map(v => new EmbedType(v)) | EmbedType.Unspecified,
-            model.Title,
-            model.Description,
-            model.Url,
-            model.Timestamp,
-            model.Color.Map(v => new Color(v)),
-            model.Image.Map(v => EmbedImage.Construct(client, v)),
-            model.Video.Map(v => EmbedVideo.Construct(client, v)),
-            model.Author.Map(v => EmbedAuthor.Construct(client, v)),
-            model.Footer.Map(v => EmbedFooter.Construct(client, v)),
-            model.Provider.Map(v => EmbedProvider.Construct(client, v)),
-            model.Thumbnail.Map(v => EmbedThumbnail.Construct(client, v)),
-            model.Fields.Map(v => v.Select(v => EmbedField.Construct(client, v)).ToArray()) | []
-        );
-    }
+    /// <summary>
+    ///     Gets the title of the embed.
+    /// </summary>
+    public override string? ToString() => Title;
+
+    public static bool operator ==(Embed? left, Embed? right)
+        => left?.Equals(right) ?? right is null;
+
+    public static bool operator !=(Embed? left, Embed? right)
+        => !(left == right);
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="Embed" />.

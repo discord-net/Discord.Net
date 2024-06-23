@@ -1,9 +1,11 @@
+using Discord.Models;
+
 namespace Discord;
 
 /// <summary>
 ///     A Unicode emoji.
 /// </summary>
-public sealed class Emoji : IEmote
+public sealed class Emoji : IEmote, IIdentifiable<string>, IConstructable<Emoji, IEmojiModel>
 {
     /// <summary>
     ///     Initializes a new <see cref="Emoji" /> class with the provided Unicode.
@@ -14,8 +16,16 @@ public sealed class Emoji : IEmote
         Name = unicode;
     }
 
+    public static Emoji Construct(IDiscordClient client, IEmojiModel model)
+        => new(model.Name!);
+
     /// <inheritdoc />
     public string Name { get; }
+
+    public Models.Json.IEmote ToApiModel(Models.Json.IEmote? existing = default) =>
+        existing ?? new Models.Json.Emoji {Name = Name};
+
+    string IIdentifiable<string>.Id => Name;
 
     /// <summary>
     ///     Gets the Unicode representation of this emoji.
@@ -24,9 +34,6 @@ public sealed class Emoji : IEmote
     ///     A string that resolves to <see cref="Emoji.Name" />.
     /// </returns>
     public override string ToString() => Name;
-
-    public Models.Json.IEmote ToApiModel(Models.Json.IEmote? existing = default) =>
-        existing ?? new Models.Json.Emoji() {Name = Name};
 
     /// <summary>
     ///     Determines whether the specified emoji is equal to the current one.

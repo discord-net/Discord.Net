@@ -4,23 +4,21 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [ChannelTypeOf(ChannelType.GuildMedia)]
-public sealed class GuildMediaChannel : GuildChannelBase, IGuildForumChannelModel
+public sealed class GuildMediaChannel : GuildChannelBase, IGuildMediaChannelModel
 {
-    bool IGuildForumChannelModel.IsNsfw => Nsfw;
+    bool IGuildMediaChannelModel.IsNsfw => Nsfw;
 
-    string? IGuildForumChannelModel.Topic => Topic;
+    string? IGuildMediaChannelModel.Topic => Topic;
 
-    int IGuildForumChannelModel.DefaultAutoArchiveDuration => DefaultAutoArchiveDuration;
+    int IGuildMediaChannelModel.DefaultAutoArchiveDuration => DefaultAutoArchiveDuration;
 
-    int? IGuildForumChannelModel.RatelimitPerUser => RatelimitPerUser;
+    int? IGuildMediaChannelModel.RatelimitPerUser => RatelimitPerUser;
 
-    int? IGuildForumChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
+    int? IGuildMediaChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
 
-    IEmote? IGuildForumChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
+    IEmote? IGuildMediaChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
 
-    IEnumerable<IForumTagModel> IGuildForumChannelModel.AvailableTags => AvailableTags | [];
+    IEnumerable<ITagModel> IGuildMediaChannelModel.AvailableTags => AvailableTags | [];
 
-    int? IGuildForumChannelModel.DefaultSortOrder => DefaultSortOrder;
-
-    int IGuildForumChannelModel.DefaultForumLayout => DefaultForumLayout;
+    int? IGuildMediaChannelModel.DefaultSortOrder => DefaultSortOrder;
 }

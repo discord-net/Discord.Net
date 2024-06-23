@@ -2,7 +2,6 @@ using Discord.Models.Json;
 
 namespace Discord;
 
-
 public class CreateGuildChannelProperties : IEntityProperties<CreateGuildChannelParams>
 {
     public required string Name { get; set; }
@@ -12,7 +11,7 @@ public class CreateGuildChannelProperties : IEntityProperties<CreateGuildChannel
 
     public virtual CreateGuildChannelParams ToApiModel(CreateGuildChannelParams? existing = default)
     {
-        existing ??= new CreateGuildChannelParams() {Name = Name};
+        existing ??= new CreateGuildChannelParams {Name = Name};
 
         existing.Type = Type.MapToInt();
         existing.Position = Position;

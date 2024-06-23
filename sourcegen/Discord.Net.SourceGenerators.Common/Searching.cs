@@ -6,7 +6,7 @@ namespace Discord.Net.SourceGenerators.Common;
 
 public static class Searching
 {
-    public static ClassDeclarationSyntax[] FindClassesWithAttribute(ref GeneratorExecutionContext context, string attributeName)
+    public static ClassDeclarationSyntax[] FindClassesWithAttribute(in GeneratorExecutionContext context, string attributeName)
     {
         return context.Compilation.SyntaxTrees
             .SelectMany(x => x
@@ -20,7 +20,7 @@ public static class Searching
             ).ToArray();
     }
 
-    public static ClassDeclarationSyntax[] FindPropertiesWithAttribute(ref GeneratorExecutionContext context, string attributeName)
+    public static ClassDeclarationSyntax[] FindPropertiesWithAttribute(in GeneratorExecutionContext context, string attributeName)
     {
         return context.Compilation.SyntaxTrees
             .SelectMany(x => x

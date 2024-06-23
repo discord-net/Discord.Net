@@ -1,3 +1,4 @@
+using Discord.Models;
 using System.Diagnostics;
 
 namespace Discord;
@@ -6,7 +7,7 @@ namespace Discord;
 ///     Represents an application found within a <see cref="IMessage" />.
 /// </summary>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-public readonly struct MessageApplication
+public readonly struct MessageApplication : IConstructable<MessageApplication, IMessageApplicationModel>
 {
     /// <summary>
     ///     The snowflake ID of the application.
@@ -50,6 +51,9 @@ public readonly struct MessageApplication
 
     private string DebuggerDisplay
         => $"{Name} ({Id}): {Description}";
+
+    public static MessageApplication Construct(IDiscordClient client, IMessageApplicationModel model)
+        => new(model.Id, model.Name, model.Description, model.Icon, model.CoverImage);
 
     public override string ToString()
         => DebuggerDisplay;

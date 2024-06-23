@@ -29,7 +29,7 @@ public class ModifyVoiceChannelProperties : ModifyGuildChannelProperties
 
     public override ModifyGuildChannelParams ToApiModel(ModifyGuildChannelParams? existing = null)
     {
-        existing ??= new();
+        existing ??= new ModifyGuildChannelParams();
         base.ToApiModel(existing);
 
         existing.Bitrate = Bitrate;

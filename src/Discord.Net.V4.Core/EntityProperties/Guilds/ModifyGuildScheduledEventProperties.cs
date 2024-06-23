@@ -17,11 +17,11 @@ public sealed class ModifyGuildScheduledEventProperties : IEntityProperties<Modi
 
     public ModifyGuildScheduledEventParams ToApiModel(ModifyGuildScheduledEventParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyGuildScheduledEventParams();
 
         existing.ChannelId = Channel.Map(v => v?.Id);
         existing.EntityMetadata = Location
-            .Map<GuildScheduledEventEntityMetadata?>(v => new()
+            .Map<GuildScheduledEventEntityMetadata?>(v => new GuildScheduledEventEntityMetadata
             {
                 Location = Optional.FromNullable(v)
             });

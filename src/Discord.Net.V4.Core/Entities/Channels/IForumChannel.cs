@@ -1,6 +1,3 @@
-using Discord.Models.Json;
-using Discord.Rest;
-
 namespace Discord;
 
 /// <summary>
@@ -57,7 +54,7 @@ public interface IForumChannel :
     /// <remarks>
     ///     Defaults to <see langword="null" />, which indicates a preferred sort order hasn't been set
     /// </remarks>
-    ForumSortOrder? DefaultSortOrder { get; }
+    SortOrder? DefaultSortOrder { get; }
 
     /// <summary>
     ///     Gets the rule used to display posts in a forum channel.

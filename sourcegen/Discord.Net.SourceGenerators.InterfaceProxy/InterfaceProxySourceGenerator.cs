@@ -4,196 +4,186 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CSharpExtensions = Microsoft.CodeAnalysis.CSharp.CSharpExtensions;
 
 namespace Discord.Net.SourceGenerators.InterfaceProxy;
 
 [Generator]
-public class InterfaceProxySourceGenerator : ISourceGenerator
+public class InterfaceProxySourceGenerator : DiscordSourceGenerator
 {
     public const string AttributeTarget = "ProxyInterface";
 
-    public void Initialize(GeneratorInitializationContext context) {}
-
-    public void Execute(GeneratorExecutionContext context)
+    public override void OnExecute(in GeneratorExecutionContext context)
     {
-        var log = new StringBuilder();
+        var targets = Searching.FindPropertiesWithAttribute(in context, AttributeTarget);
 
-        try
+        Log($"found {targets.Length} targets");
+
+        foreach (var target in targets)
         {
-            var targets = Searching.FindPropertiesWithAttribute(ref context, AttributeTarget);
+            Log($"processing target {target.Identifier.ValueText}");
 
-            log.AppendLine($"// found {targets.Length} targets");
+            var semanticTarget = context.Compilation.GetSemanticModel(target.SyntaxTree);
 
-            foreach (var target in targets)
+            var typeSymbol = semanticTarget.GetDeclaredSymbol(target);
+
+            if (typeSymbol is null)
             {
-                log.AppendLine($"// processing target {target.Identifier.ValueText}");
+                Log($"- Couldn't find type symbol for '{target.Identifier}'");
+                continue;
+            }
 
-                var semanticTarget = context.Compilation.GetSemanticModel(target.SyntaxTree);
+            // get the property with the attribute
+            var targetProperties = target.Members
+                .OfType<PropertyDeclarationSyntax>()
+                .Where(x => x.AttributeLists
+                    .SelectMany(x => x.Attributes)
+                    .Any(x => x.Name.GetText().ToString() == AttributeTarget)
+                );
 
-                var typeSymbol = semanticTarget.GetDeclaredSymbol(target);
+            foreach (var targetProperty in targetProperties)
+            {
+                Log($"--> Processing property {targetProperty.Identifier.ValueText}");
 
-                if (typeSymbol is null)
+                // pull the attribute types
+                var types = targetProperty.AttributeLists.SelectMany(x => x.Attributes)
+                    .First(x => x.Name.GetText().ToString() == AttributeTarget)
+                    .DescendantNodes()
+                    .OfType<TypeOfExpressionSyntax>()
+                    .ToList();
+
+                Log($"--> found {types.Count} proxy type");
+
+                foreach (var toProxy in types)
                 {
-                    log.AppendLine($"// - Couldn't find type symbol for '{target.Identifier}'");
-                    continue;
-                }
+                    Log($"---> processing proxy type {toProxy.Type}");
 
-                // get the property with the attribute
-                var targetProperties = target.Members
-                    .OfType<PropertyDeclarationSyntax>()
-                    .Where(x => x.AttributeLists
-                        .SelectMany(x => x.Attributes)
-                        .Any(x => x.Name.GetText().ToString() == AttributeTarget)
-                    );
+                    TypeInfo semanticToProxy;
 
-                foreach (var targetProperty in targetProperties)
-                {
-                    log.AppendLine($"// --> Processing property {targetProperty.Identifier.ValueText}");
-
-                    // pull the attribute types
-                    var types = targetProperty.AttributeLists.SelectMany(x => x.Attributes)
-                        .First(x => x.Name.GetText().ToString() == AttributeTarget)
-                        .DescendantNodes()
-                        .OfType<TypeOfExpressionSyntax>()
-                        .ToList();
-
-                    log.AppendLine($"// --> found {types.Count} proxy type");
-
-                    foreach (var toProxy in types)
+                    if (toProxy.DescendantNodes().FirstOrDefault() is GenericNameSyntax generic)
                     {
-                        log.AppendLine($"// ---> processing proxy type {toProxy.Type}");
-
-                        TypeInfo semanticToProxy;
-
-                        if (toProxy.DescendantNodes().FirstOrDefault() is GenericNameSyntax generic)
-                        {
-                            semanticToProxy = semanticTarget.GetTypeInfo(generic);
-                        }
-                        else
-                        {
-                            semanticToProxy = semanticTarget.GetTypeInfo(toProxy.Type);
-                        }
-
-                        if (semanticToProxy.Type is null)
-                        {
-                            log.AppendLine("// ---> No type info found");
-                            continue;
-                        }
-
-                        var metadataName = semanticToProxy.Type.GetFullMetadataName();
-
-                        log.AppendLine($"// ---> Searching '{metadataName}'");
-
-                        var proxyTypeSymbol = semanticToProxy.Type.ContainingAssembly.GetTypeByMetadataName(metadataName);
-
-                        if (proxyTypeSymbol is null)
-                        {
-                            log.AppendLine("// ---> No type symbol found");
-                            continue;
-                        }
-
-                        var proxiedMembers = new List<string>();
-
-                        var members = proxyTypeSymbol.GetMembers();
-
-                        log.AppendLine($"// ---> Members: {members.Length}");
-
-                        foreach (var proxyMember in members)
-                        {
-                            switch (proxyMember)
-                            {
-                                case IMethodSymbol method:
-                                    if (method.IsStatic)
-                                    {
-                                        log.AppendLine($"// ----> Skipping {method.Name} (static)");
-                                        continue;
-                                    }
-
-                                    if (method.MethodKind is not MethodKind.Ordinary)
-                                    {
-                                        log.AppendLine($"// ----> Skipping {method.Name} ({method.MethodKind})");
-                                        continue;
-                                    }
-
-                                    var parameterIdentifiers = method.Parameters.Select(x => x.Name);
-                                    var parameterSymbols = method.Parameters.Select(x =>
-                                    {
-                                        var param = $"{ResolveGeneric(x.Type, proxyTypeSymbol, semanticToProxy, log)} {x.Name}";
-
-
-                                        if (x.HasExplicitDefaultValue)
-                                            param += x.ExplicitDefaultValue is null ? " = default" : $" = {x.ExplicitDefaultValue.ToString().ToLowerInvariant()}";
-                                        else if (x.IsOptional)
-                                            param += " = default";
-
-                                        return param;
-                                    });
-
-                                    log.AppendLine($"// ----> Adding {method}");
-
-                                    proxiedMembers.Add(
-                                        $"public {ResolveGeneric(method.ReturnType, proxyTypeSymbol, semanticToProxy, log)} {method.Name}({string.Join(", ", parameterSymbols)}) => ({targetProperty.Identifier} as {semanticToProxy.Type}).{method.Name}({string.Join(", ", parameterIdentifiers)});"
-                                    );
-                                    break;
-                                case IPropertySymbol property:
-                                    if (property.ExplicitInterfaceImplementations.Length > 0)
-                                    {
-                                        log.AppendLine($"// ----> Skipping {property.Name} (has explicit impl)");
-                                        continue;
-                                    }
-
-                                    log.AppendLine($"// ----> Adding {property}");
-
-                                    proxiedMembers.Add(
-                                        $"public {ResolveGeneric(property.Type, proxyTypeSymbol, semanticToProxy, log)} {property.Name} => ({targetProperty.Identifier} as {semanticToProxy.Type}).{property.Name};"
-                                    );
-                                    break;
-                                default:
-                                    log.AppendLine($"// ----> Unknown symbol '{proxyMember.GetType()}'");
-                                    break;
-                            }
-                        }
-
-                        context.AddSource(
-                            $"{target.Identifier}_{semanticToProxy.Type.Name}.g.cs",
-                            $$"""
-                            namespace {{typeSymbol.ContainingNamespace}};
-
-                            #nullable enable
-
-                            public partial class {{target.Identifier}}
-                            {
-                                {{string.Join("\n    ", proxiedMembers)}}
-                            }
-
-                            #nullable restore
-
-                            """
-                        );
+                        semanticToProxy = semanticTarget.GetTypeInfo(generic);
                     }
+                    else
+                    {
+                        semanticToProxy = semanticTarget.GetTypeInfo(toProxy.Type);
+                    }
+
+                    if (semanticToProxy.Type is null)
+                    {
+                        Log("---> No type info found");
+                        continue;
+                    }
+
+                    var metadataName = semanticToProxy.Type.GetFullMetadataName();
+
+                    Log($"---> Searching '{metadataName}'");
+
+                    var proxyTypeSymbol = semanticToProxy.Type.ContainingAssembly.GetTypeByMetadataName(metadataName);
+
+                    if (proxyTypeSymbol is null)
+                    {
+                        Log("---> No type symbol found");
+                        continue;
+                    }
+
+                    var proxiedMembers = new List<string>();
+
+                    var members = proxyTypeSymbol.GetMembers();
+
+                    Log($"---> Members: {members.Length}");
+
+                    foreach (var proxyMember in members)
+                    {
+                        switch (proxyMember)
+                        {
+                            case IMethodSymbol method:
+                                if (method.IsStatic)
+                                {
+                                    Log($"----> Skipping {method.Name} (static)");
+                                    continue;
+                                }
+
+                                if (method.MethodKind is not MethodKind.Ordinary)
+                                {
+                                    Log($"----> Skipping {method.Name} ({method.MethodKind})");
+                                    continue;
+                                }
+
+                                var parameterIdentifiers = method.Parameters.Select(x => x.Name);
+                                var parameterSymbols = method.Parameters.Select(x =>
+                                {
+                                    var param = $"{ResolveGeneric(x.Type, proxyTypeSymbol, semanticToProxy)} {x.Name}";
+
+
+                                    if (x.HasExplicitDefaultValue)
+                                        param += x.ExplicitDefaultValue is null
+                                            ? " = default"
+                                            : $" = {x.ExplicitDefaultValue.ToString().ToLowerInvariant()}";
+                                    else if (x.IsOptional)
+                                        param += " = default";
+
+                                    return param;
+                                });
+
+                                Log($"----> Adding {method}");
+
+                                proxiedMembers.Add(
+                                    $"public {ResolveGeneric(method.ReturnType, proxyTypeSymbol, semanticToProxy)} {method.Name}({string.Join(", ", parameterSymbols)}) => ({targetProperty.Identifier} as {semanticToProxy.Type}).{method.Name}({string.Join(", ", parameterIdentifiers)});"
+                                );
+                                break;
+                            case IPropertySymbol property:
+                                if (property.ExplicitInterfaceImplementations.Length > 0)
+                                {
+                                    Log($"----> Skipping {property.Name} (has explicit impl)");
+                                    continue;
+                                }
+
+                                Log($"----> Adding {property}");
+
+                                proxiedMembers.Add(
+                                    $"public {ResolveGeneric(property.Type, proxyTypeSymbol, semanticToProxy)} {property.Name} => ({targetProperty.Identifier} as {semanticToProxy.Type}).{property.Name};"
+                                );
+                                break;
+                            default:
+                                Log($"----> Unknown symbol '{proxyMember.GetType()}'");
+                                break;
+                        }
+                    }
+
+                    context.AddSource(
+                        $"{target.Identifier}_{semanticToProxy.Type.Name}.g.cs",
+                        $$"""
+                          namespace {{typeSymbol.ContainingNamespace}};
+
+                          #nullable enable
+
+                          public partial class {{target.Identifier}}
+                          {
+                              {{string.Join("\n    ", proxiedMembers)}}
+                          }
+
+                          #nullable restore
+
+                          """
+                    );
                 }
             }
         }
-        finally
-        {
-            context.AddSource("log.g.cs", log.ToString());
-        }
     }
 
-    private ITypeSymbol ResolveGeneric(ITypeSymbol arg, INamedTypeSymbol root, TypeInfo info, StringBuilder log)
+    private ITypeSymbol ResolveGeneric(ITypeSymbol arg, INamedTypeSymbol root, TypeInfo info)
     {
         if (root.TypeArguments.Any(arg.Equals))
         {
             var typeArg = ((info.Type as INamedTypeSymbol)!).TypeArguments[root.TypeArguments.IndexOf(arg)];
-            log.AppendLine(
-                $"// -----> Generic found: {typeArg}");
+            Log(
+                $"-----> Generic found: {typeArg}");
 
             return typeArg.WithNullableAnnotation(arg.NullableAnnotation);
         }
 
-        log.AppendLine($"// -----> Processing {arg}");
+        Log($"-----> Processing {arg}");
 
         if (arg is not INamedTypeSymbol namedArg)
             return arg;
@@ -202,15 +192,15 @@ public class InterfaceProxySourceGenerator : ISourceGenerator
             return arg;
 
         var newTypes = namedArg.TypeArguments
-            .Select(x => ResolveGeneric(x, root, info, log)).ToArray();
+            .Select(x => ResolveGeneric(x, root, info)).ToArray();
 
         if (!newTypes.SequenceEqual(namedArg.TypeArguments, SymbolEqualityComparer.Default))
         {
-            log.AppendLine($"// -----> {namedArg}");
+            Log($"-----> {namedArg}");
 
             foreach (var newType in newTypes)
             {
-                log.AppendLine($"// ------> Constructing with {newType} {newType.BaseType}");
+                Log($"------> Constructing with {newType} {newType.BaseType}");
             }
 
             return namedArg.ConstructedFrom.Construct(newTypes);

@@ -13,7 +13,9 @@ public interface ITextChannelActor :
     IActor<ulong, ITextChannel>,
     IModifiable<ulong, ITextChannelActor, ModifyTextChannelProperties, ModifyGuildChannelParams>
 {
-    static ApiBodyRoute<ModifyGuildChannelParams> IModifiable<ulong, ITextChannelActor, ModifyTextChannelProperties, ModifyGuildChannelParams>.ModifyRoute(IPathable path, ulong id,
-        ModifyGuildChannelParams args)
+    static IApiInRoute<ModifyGuildChannelParams>
+        IModifiable<ulong, ITextChannelActor, ModifyTextChannelProperties, ModifyGuildChannelParams>.ModifyRoute(
+            IPathable path, ulong id,
+            ModifyGuildChannelParams args)
         => Routes.ModifyChannel(id, args);
 }

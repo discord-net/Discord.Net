@@ -1,5 +1,3 @@
-using Discord.Models;
-
 namespace Discord;
 #pragma warning disable CA2252
 
@@ -10,7 +8,6 @@ public interface IConstructable<out TSelf, in TModel, in TClient>
     where TSelf : IConstructable<TSelf, TModel, TClient>
     where TClient : IDiscordClient
 {
-
     static abstract TSelf Construct(TClient client, TModel model);
 }
 

@@ -1,6 +1,3 @@
-using Discord.Models.Json;
-using Discord.Rest;
-
 namespace Discord;
 
 public interface IRole :
@@ -9,7 +6,6 @@ public interface IRole :
     IComparable<IRole>,
     IRoleActor
 {
-
     /// <summary>
     ///     Gets the color given to users of this role.
     /// </summary>

@@ -1,6 +1,3 @@
-using Discord.Models.Json.Stickers;
-using Discord.Rest;
-
 namespace Discord;
 
 /// <summary>
@@ -13,5 +10,5 @@ public interface IGuildSticker :
     /// <summary>
     ///     Gets the user that uploaded the guild sticker.
     /// </summary>
-    ILoadableEntity<ulong, IGuildMember>? Author { get; }
+    ILoadableGuildMemberActor? Author { get; }
 }

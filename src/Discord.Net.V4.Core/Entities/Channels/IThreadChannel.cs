@@ -1,6 +1,4 @@
 using Discord.Entities.Channels.Threads;
-using Discord.Models.Json;
-using Discord.Rest;
 
 namespace Discord;
 
@@ -13,7 +11,7 @@ public interface IThreadChannel :
     IThreadActor
 {
     ILoadableGuildChannelActor Parent { get; }
-    ILoadableEntity<ulong, IUser> Owner { get; }
+    ILoadableUserActor? Owner { get; }
 
     /// <summary>
     ///     Gets the type of the current thread channel.

@@ -1,3 +1,4 @@
+using Discord.Models;
 using System.Diagnostics;
 
 namespace Discord;
@@ -6,7 +7,7 @@ namespace Discord;
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct EmbedImage :
     IEntityProperties<Models.Json.EmbedImage>,
-    IConstructable<EmbedImage, Models.Json.EmbedImage>
+    IConstructable<EmbedImage, IEmbedImageModel>
 {
     /// <summary>
     ///     The URL of the image.
@@ -70,7 +71,7 @@ public readonly struct EmbedImage :
 
     public Models.Json.EmbedImage ToApiModel(Models.Json.EmbedImage? existing = default)
     {
-        existing ??= new() {Url = Url};
+        existing ??= new Models.Json.EmbedImage {Url = Url};
 
         existing.ProxyUrl = Optional.FromNullable(ProxyUrl);
         existing.Height = Optional.FromNullable(Height);
@@ -79,10 +80,8 @@ public readonly struct EmbedImage :
         return existing;
     }
 
-    public static EmbedImage Construct(IDiscordClient client, Models.Json.EmbedImage model)
-    {
-        return new EmbedImage(model.Url, model.ProxyUrl, model.Height, model.Width);
-    }
+    public static EmbedImage Construct(IDiscordClient client, IEmbedImageModel model) =>
+        new(model.Url, model.ProxyUrl, model.Height, model.Width);
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedImage" />.

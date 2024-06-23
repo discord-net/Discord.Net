@@ -1,10 +1,12 @@
+using Discord.Models;
 using System.Diagnostics;
 
 namespace Discord;
 
 /// <summary> A thumbnail featured in an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedThumbnail : IEntityProperties<Models.Json.EmbedThumbnail>, IConstructable<EmbedThumbnail, Models.Json.EmbedThumbnail>
+public readonly struct EmbedThumbnail : IEntityProperties<Models.Json.EmbedThumbnail>,
+    IConstructable<EmbedThumbnail, IEmbedThumbnailModel>
 {
     /// <summary>
     ///     The URL of the thumbnail.
@@ -68,7 +70,7 @@ public readonly struct EmbedThumbnail : IEntityProperties<Models.Json.EmbedThumb
 
     public Models.Json.EmbedThumbnail ToApiModel(Models.Json.EmbedThumbnail? existing = default)
     {
-        existing ??= new() {Url = Url};
+        existing ??= new Models.Json.EmbedThumbnail {Url = Url};
 
         existing.ProxyUrl = Optional.FromNullable(ProxyUrl);
         existing.Height = Optional.FromNullable(Height);
@@ -77,10 +79,8 @@ public readonly struct EmbedThumbnail : IEntityProperties<Models.Json.EmbedThumb
         return existing;
     }
 
-    public static EmbedThumbnail Construct(IDiscordClient client, Models.Json.EmbedThumbnail model)
-    {
-        return new EmbedThumbnail(model.Url, model.ProxyUrl, model.Height, model.Width);
-    }
+    public static EmbedThumbnail Construct(IDiscordClient client, IEmbedThumbnailModel model) =>
+        new(model.Url, model.ProxyUrl, model.Height, model.Width);
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedThumbnail" />.

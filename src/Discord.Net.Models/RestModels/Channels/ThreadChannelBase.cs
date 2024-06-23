@@ -5,7 +5,7 @@ namespace Discord.Models.Json;
 public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel
 {
     [JsonPropertyName("owner_id")]
-    public ulong OwnerId { get; set; }
+    public ulong? OwnerId { get; set; }
 
     [JsonPropertyName("thread_metadata")]
     public required ThreadMetadata Metadata { get; set; }

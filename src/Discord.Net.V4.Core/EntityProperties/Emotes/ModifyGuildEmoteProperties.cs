@@ -19,7 +19,7 @@ public class EmoteProperties : IEntityProperties<ModifyEmojiParams>
 
     public ModifyEmojiParams ToApiModel(ModifyEmojiParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyEmojiParams();
         existing.Name = Name;
         existing.Roles = Roles.Map(v => v?.Select(v => v.Id).ToArray());
         return existing;

@@ -51,47 +51,16 @@ public sealed class Embed : IEmbedModel
 
     string? IEmbedModel.Title => Title;
 
-    string? IEmbedModel.FooterText => Footer.Map(v => v.Text);
-
-    string? IEmbedModel.FooterIconUrl => Footer.Map(v => v.IconUrl);
-
-    string? IEmbedModel.FooterProxyIconUrl => Footer.Map(v => v.ProxyIconUrl);
-
-    string? IEmbedModel.ImageUrl => Image.Map(v => v.Url);
-
-    string? IEmbedModel.ImageProxyUrl => Image.Map(v => v.ProxyUrl);
-
-    int? IEmbedModel.ImageHeight => Image.Map(v => v.Height);
-
-    int? IEmbedModel.ImageWidth => Image.Map(v => v.Width);
-
-    string? IEmbedModel.ThumbnailUrl => Thumbnail.Map(v => v.Url);
-
-    string? IEmbedModel.ThumbnailProxyUrl => Thumbnail.Map(v => v.ProxyUrl);
-
-    int? IEmbedModel.ThumbnailHeight => Thumbnail.Map(v => v.Height);
-
-    int? IEmbedModel.ThumbnailWidth => Thumbnail.Map(v => v.Width);
-
-    string? IEmbedModel.VideoUrl => Video.Map(v => v.Url);
-
-    string? IEmbedModel.VideoProxyUrl => Video.Map(v => v.ProxyUrl);
-
-    int? IEmbedModel.VideoHeight => Video.Map(v => v.Height);
-
-    int? IEmbedModel.VideoWidth => Video.Map(v => v.Width);
-
-    string? IEmbedModel.ProviderName => Provider.Map(v => v.Name);
-
-    string? IEmbedModel.ProviderUrl => Provider.Map(v => v.Url);
-
-    string? IEmbedModel.AuthorName => Author.Map(v => v.Name);
-
-    string? IEmbedModel.AuthorUrl => Author.Map(v => v.Url);
-
-    string? IEmbedModel.AuthorIconUrl => Author.Map(v => v.IconUrl);
-
-    string? IEmbedModel.AuthorProxyIconUrl => Author.Map(v => v.ProxyIconUrl);
-
     IEnumerable<IEmbedFieldModel> IEmbedModel.Fields => Fields | [];
+    IEmbedFooterModel? IEmbedModel.Footer => ~Footer;
+
+    IEmbedImageModel? IEmbedModel.Image => ~Image;
+
+    IEmbedThumbnailModel? IEmbedModel.Thumbnail => ~Thumbnail;
+
+    IEmbedVideoModel? IEmbedModel.Video => ~Video;
+
+    IEmbedProviderModel? IEmbedModel.Provider => ~Provider;
+
+    IEmbedAuthorModel? IEmbedModel.Author => ~Author;
 }

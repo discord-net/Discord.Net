@@ -20,7 +20,7 @@ public sealed class ModifySelfUserProperties : IEntityProperties<ModifyCurrentUs
 
     public ModifyCurrentUserParams ToApiModel(ModifyCurrentUserParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyCurrentUserParams();
 
         existing.Username = Username;
         existing.Avatar = Avatar.Map(v => v?.ToImageData());

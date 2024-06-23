@@ -26,7 +26,7 @@ public sealed class ApiClient : IRestApiClient, IDisposable
         };
     }
 
-    public Task ExecuteAsync(BasicApiRoute route, RequestOptions options, CancellationToken token)
+    public Task ExecuteAsync(IApiRoute route, RequestOptions options, CancellationToken token)
         => SendAsync(
             route,
             new HttpRequestMessage(
@@ -37,14 +37,14 @@ public sealed class ApiClient : IRestApiClient, IDisposable
             token
         );
 
-    public async Task<T?> ExecuteAsync<T>(ApiRoute<T> route, RequestOptions options, CancellationToken token)
+    public async Task<T?> ExecuteAsync<T>(IApiOutRoute<T> outRoute, RequestOptions options, CancellationToken token)
         where T : class
     {
          var result = await SendAsync(
-            route,
+            outRoute,
             new HttpRequestMessage(
-                ToHttpMethod(route.Method),
-                route.Endpoint
+                ToHttpMethod(outRoute.Method),
+                outRoute.Endpoint
             ),
             options,
             token
@@ -56,25 +56,25 @@ public sealed class ApiClient : IRestApiClient, IDisposable
          return await JsonSerializer.DeserializeAsync<T>(result, _restClient.Config.JsonSerializerOptions, token);
     }
 
-    public Task ExecuteAsync<T>(ApiBodyRoute<T> route, RequestOptions options, CancellationToken token)
+    public Task ExecuteAsync<T>(IApiInRoute<T> route, RequestOptions options, CancellationToken token)
         where T : class
     {
         var request = new HttpRequestMessage(
             ToHttpMethod(route.Method),
             route.Endpoint
-        ) { Content = EncodeBodyContent(route.Body, route.ContentType) };
+        ) { Content = EncodeBodyContent(route.RequestBody, route.ContentType) };
 
         return SendAsync(route, request, options, token);
     }
 
-    public async Task<U?> ExecuteAsync<T, U>(ApiBodyRoute<T, U> route, RequestOptions options, CancellationToken token)
+    public async Task<U?> ExecuteAsync<T, U>(IApiInOutRoute<T, U> route, RequestOptions options, CancellationToken token)
         where T : class
         where U : class
     {
         var request = new HttpRequestMessage(
             ToHttpMethod(route.Method),
             route.Endpoint
-        ) { Content = EncodeBodyContent(route.Body, route.ContentType) };
+        ) { Content = EncodeBodyContent(route.RequestBody, route.ContentType) };
 
         var result = await SendAsync(route, request, options, token);
 
@@ -85,7 +85,7 @@ public sealed class ApiClient : IRestApiClient, IDisposable
     }
 
     private async Task<Stream?> SendAsync(
-        ApiRoute route,
+        IApiRoute route,
         HttpRequestMessage request,
         RequestOptions options,
         CancellationToken token = default)

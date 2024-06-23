@@ -1,9 +1,9 @@
 namespace Discord;
 
 /// <summary>
-///     Represents a partial <see cref="IDiscordInteraction" /> within a message.
+///     Represents a partial interaction within a message.
 /// </summary>
-public interface IMessageInteraction
+public interface IMessageInteractionMetadata
 {
     /// <summary>
     ///     Gets the snowflake id of the interaction.
@@ -16,12 +16,13 @@ public interface IMessageInteraction
     InteractionType Type { get; }
 
     /// <summary>
-    ///     Gets the name of the application command used.
+    ///     Gets the <see cref="IUser" /> who invoked the interaction.
     /// </summary>
-    string Name { get; }
+    ILoadableUserActor User { get; }
 
-    /// <summary>
-    ///     Gets the <seealso cref="IUser" /> who invoked the interaction.
-    /// </summary>
-    ILoadableEntity<ulong, IUser> User { get; }
+    IReadOnlyDictionary<ApplicationIntegrationType, ulong> AuthorizingIntegrationOwners { get; }
+
+    ILoadableMessageActor? OriginalResponseMessage { get; }
+    ILoadableMessageActor? InteractedMessage { get; }
+    IMessageInteractionMetadata? TriggeringInteractionMetadata { get; }
 }

@@ -3,7 +3,9 @@ namespace Discord;
 /// <summary>
 ///     Represents a partial sticker item received with a message.
 /// </summary>
-public interface IStickerItem : ISnowflakeEntity
+public interface IStickerItem :
+    ISnowflakeEntity,
+    ILoadableEntity<ulong, ISticker>
 {
     /// <summary>
     ///     The name of the sticker.

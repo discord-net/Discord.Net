@@ -1,6 +1,3 @@
-using Discord.Models.Json;
-using Discord.Rest;
-
 namespace Discord;
 
 public interface IVoiceChannel :
@@ -8,6 +5,8 @@ public interface IVoiceChannel :
     IGuildChannel,
     IAudioChannel
 {
+    string? RTCRegion { get; }
+
     /// <summary>
     ///     Gets the bit-rate that the clients in this voice channel are requested to use.
     /// </summary>

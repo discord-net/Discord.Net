@@ -87,7 +87,7 @@ namespace Discord.Gateway
 
         public IReadOnlyCollection<IStickerItem> Stickers => throw new NotImplementedException();
 
-        public IMessageInteraction? Interaction => throw new NotImplementedException();
+        public IMessageInteractionMetadata? InteractionMetadata => throw new NotImplementedException();
 
         public MessageRoleSubscriptionData? RoleSubscriptionData => throw new NotImplementedException();
 

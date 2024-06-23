@@ -1,6 +1,3 @@
-using Discord.Models.Json;
-using Discord.Rest;
-
 namespace Discord;
 
 /// <summary>
@@ -35,8 +32,11 @@ public interface IGuildEmote :
 
     ILoadableEntity<ulong, IUser>? Creator { get; }
 
+    Models.Json.IEmote IEntityProperties<Models.Json.IEmote>.ToApiModel(Models.Json.IEmote? existing)
+        => ToApiModel(existing);
+
     new Models.Json.IEmote ToApiModel(Models.Json.IEmote? existing = null)
-        => existing ?? new GuildEmote()
+        => existing ?? new Models.Json.GuildEmote
         {
             Id = Id,
             RequireColons = RequireColons,
@@ -46,7 +46,4 @@ public interface IGuildEmote :
             Name = Name,
             RoleIds = Roles.Ids.ToArray()
         };
-
-    Models.Json.IEmote IEntityProperties<Models.Json.IEmote>.ToApiModel(Models.Json.IEmote? existing)
-        => ToApiModel(existing);
 }

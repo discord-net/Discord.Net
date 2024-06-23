@@ -12,4 +12,5 @@ public interface IThreadChannelModel : IGuildTextChannelModel
     bool HasJoined { get; }
     DateTimeOffset? CreatedAt { get; }
     ulong[] AppliedTags { get; }
+    ulong? OwnerId { get; }
 }

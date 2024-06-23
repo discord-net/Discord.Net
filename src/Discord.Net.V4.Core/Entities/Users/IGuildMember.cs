@@ -1,13 +1,9 @@
-using Discord.Models.Json;
-using Discord.Rest;
-
 namespace Discord;
 
 public interface IGuildMember :
     IGuildMemberActor
 {
     IDefinedLoadableEntityEnumerable<ulong, IRole> Roles { get; }
-    ILoadableEntity<ulong, IRole> Role(ulong id) => Roles[id];
 
     /// <summary>
     ///     Gets when this user joined the guild.
@@ -65,4 +61,6 @@ public interface IGuildMember :
     ///     Gets the public flags for this guild member.
     /// </summary>
     GuildMemberFlags Flags { get; }
+
+    ILoadableEntity<ulong, IRole> Role(ulong id) => Roles[id];
 }

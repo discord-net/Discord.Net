@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [ComponentType(ComponentTypes.Button)]
-public sealed class ButtonComponent : MessageComponent, IEntityModelSource
+public sealed class ButtonComponent : MessageComponent, IEntityModelSource, IButtonComponentModel
 {
     [JsonPropertyName("style")]
     public int Style { get; set; }
@@ -13,7 +13,7 @@ public sealed class ButtonComponent : MessageComponent, IEntityModelSource
     public Optional<string> Label { get; set; }
 
     [JsonPropertyName("emoji")]
-    public Optional<IEmote> Emote { get; set; }
+    public Optional<IEmoteModel> Emote { get; set; }
 
     [JsonPropertyName("custom_id")]
     public Optional<string> CustomId { get; set; }
@@ -23,6 +23,12 @@ public sealed class ButtonComponent : MessageComponent, IEntityModelSource
 
     [JsonPropertyName("disabled")]
     public Optional<bool> IsDisabled { get; set; }
+
+    string? IButtonComponentModel.Label => Label;
+    IEmoteModel? IButtonComponentModel.Emote => ~Emote;
+    string? IButtonComponentModel.CustomId => CustomId;
+    string? IButtonComponentModel.Url => Url;
+    bool? IButtonComponentModel.IsDisabled => IsDisabled;
 
     public IEnumerable<IEntityModel> GetEntities()
     {

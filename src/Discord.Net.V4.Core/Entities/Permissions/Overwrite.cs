@@ -40,7 +40,7 @@ public readonly struct Overwrite : IEntityProperties<Models.Json.Overwrite>, ICo
 
     public Models.Json.Overwrite ToApiModel(Models.Json.Overwrite? existing = default)
     {
-        existing ??= new();
+        existing ??= new Models.Json.Overwrite();
 
         existing.TargetId = TargetId;
         existing.Type = (int)TargetType;

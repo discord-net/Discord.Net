@@ -3,16 +3,17 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableGroupChannelActor<TGroupChannel> :
+public interface ILoadableGroupChannelActor :
     IGroupChannelActor,
-    ILoadableChannelActor
-    where TGroupChannel : class, IGroupChannel;
+    ILoadableEntity<ulong, IGroupChannel>;
 
 public interface IGroupChannelActor :
     IMessageChannelActor,
     IActor<ulong, IGroupChannel>,
     IModifiable<ulong, IGroupChannelActor, ModifyGroupDMProperties, ModifyGroupDmParams>
 {
-    static ApiBodyRoute<ModifyGroupDmParams> IModifiable<ulong, IGroupChannelActor, ModifyGroupDMProperties, ModifyGroupDmParams>.ModifyRoute(IPathable path, ulong id, ModifyGroupDmParams args)
+    static IApiInRoute<ModifyGroupDmParams>
+        IModifiable<ulong, IGroupChannelActor, ModifyGroupDMProperties, ModifyGroupDmParams>.ModifyRoute(IPathable path,
+            ulong id, ModifyGroupDmParams args)
         => Routes.ModifyChannel(id, args);
 }

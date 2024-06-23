@@ -1,10 +1,12 @@
+using Discord.Models;
 using System.Diagnostics;
 
 namespace Discord;
 
 /// <summary> A provider field for an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedProvider : IEntityProperties<Models.Json.EmbedProvider>, IConstructable<EmbedProvider, Models.Json.EmbedProvider>
+public readonly struct EmbedProvider : IEntityProperties<Models.Json.EmbedProvider>,
+    IConstructable<EmbedProvider, IEmbedProviderModel>
 {
     /// <summary>
     ///     The name of the provider.
@@ -48,7 +50,7 @@ public readonly struct EmbedProvider : IEntityProperties<Models.Json.EmbedProvid
 
     public Models.Json.EmbedProvider ToApiModel(Models.Json.EmbedProvider? existing = default)
     {
-        existing ??= new();
+        existing ??= new Models.Json.EmbedProvider();
 
         existing.Name = Optional.FromNullable(Name);
         existing.Url = Optional.FromNullable(Url);
@@ -56,10 +58,8 @@ public readonly struct EmbedProvider : IEntityProperties<Models.Json.EmbedProvid
         return existing;
     }
 
-    public static EmbedProvider Construct(IDiscordClient client, Models.Json.EmbedProvider model)
-    {
-        return new EmbedProvider(model.Name, model.Url);
-    }
+    public static EmbedProvider Construct(IDiscordClient client, IEmbedProviderModel model) =>
+        new(model.Name, model.Url);
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedProvider" />.

@@ -11,6 +11,6 @@ public interface IDMChannelActor :
     IDeletable<ulong, IDMChannelActor>,
     IActor<ulong, IDMChannel>
 {
-    static BasicApiRoute IDeletable<ulong, IDMChannelActor>.DeleteRoute(IPathable path, ulong id)
+    static IApiRoute IDeletable<ulong, IDMChannelActor>.DeleteRoute(IPathable path, ulong id)
         => Routes.DeleteChannel(id);
 }

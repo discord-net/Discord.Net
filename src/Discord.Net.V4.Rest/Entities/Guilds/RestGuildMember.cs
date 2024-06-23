@@ -3,18 +3,19 @@ using Discord.Models.Json;
 
 namespace Discord.Rest.Guilds;
 
-public sealed partial class RestLoadableGuildMemberActor(DiscordRestClient client, ulong guildId, ulong id) :
+public sealed partial class RestLoadableGuildMemberActor(DiscordRestClient client, ulong guildId, ulong id, IMemberModel? model = null) :
     RestGuildMemberActor(client, guildId, id),
     ILoadableGuildMemberActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IGuildMember>))]
-    internal RestLoadable<ulong, RestGuildMember, IGuildMember, GuildMember> Loadable { get; } =
-        RestLoadable<ulong, RestGuildMember, IGuildMember, GuildMember>
+    internal RestLoadable<ulong, RestGuildMember, IGuildMember, IMemberModel> Loadable { get; } =
+        RestLoadable<ulong, RestGuildMember, IGuildMember, IMemberModel>
             .FromContextConstructable<RestGuildMember, RestGuildMember.ConstructionContext>(
                 client,
                 id,
                 (ctx, id) => Routes.GetGuildMember(ctx.GuildId, id),
-                new(guildId, id)
+                new(guildId, id),
+                model
             );
 }
 

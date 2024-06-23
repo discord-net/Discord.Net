@@ -20,7 +20,7 @@ public sealed class ThreadMember : IThreadMemberModel, IEntityModelSource
     public Optional<GuildMember> GuildMember { get; set; }
 
     ulong? IThreadMemberModel.UserId => UserId;
-    ulong? IEntityModel<ulong?>.Id => Id;
+    ulong IEntityModel<ulong>.Id => Id;
 
     public IEnumerable<IEntityModel> GetEntities()
     {

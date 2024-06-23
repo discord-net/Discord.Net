@@ -13,9 +13,10 @@ public interface IGuildEmoteActor :
     IModifiable<ulong, IGuildEmoteActor, EmoteProperties, ModifyEmojiParams>,
     IDeletable<ulong, IGuildEmoteActor>
 {
-    static ApiBodyRoute<ModifyEmojiParams> IModifiable<ulong, IGuildEmoteActor, EmoteProperties, ModifyEmojiParams>.ModifyRoute(IPathable path, ulong id, ModifyEmojiParams args)
-        => Routes.ModifyGuildEmoji(path.Require<IGuild>(), id, args);
-
-    static BasicApiRoute IDeletable<ulong, IGuildEmoteActor>.DeleteRoute(IPathable path, ulong id)
+    static IApiRoute IDeletable<ulong, IGuildEmoteActor>.DeleteRoute(IPathable path, ulong id)
         => Routes.DeleteGuildEmoji(path.Require<IGuild>(), id);
+
+    static IApiInRoute<ModifyEmojiParams> IModifiable<ulong, IGuildEmoteActor, EmoteProperties, ModifyEmojiParams>.
+        ModifyRoute(IPathable path, ulong id, ModifyEmojiParams args)
+        => Routes.ModifyGuildEmoji(path.Require<IGuild>(), id, args);
 }

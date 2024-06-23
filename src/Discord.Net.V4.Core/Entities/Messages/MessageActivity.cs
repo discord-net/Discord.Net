@@ -1,3 +1,4 @@
+using Discord.Models;
 using System.Diagnostics;
 
 namespace Discord;
@@ -13,7 +14,7 @@ namespace Discord;
 ///     <para>For example, a Spotify party invitation counts as a message activity.</para>
 /// </remarks>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-public readonly struct MessageActivity
+public readonly struct MessageActivity : IConstructable<MessageActivity, IMessageActivityModel>
 {
     /// <summary>
     ///     The type of activity of this message.
@@ -33,6 +34,9 @@ public readonly struct MessageActivity
 
     private string DebuggerDisplay
         => $"{Type}{(string.IsNullOrWhiteSpace(PartyId) ? "" : $" {PartyId}")}";
+
+    public static MessageActivity Construct(IDiscordClient client, IMessageActivityModel model)
+        => new((MessageActivityType)model.Type, model.PartyId);
 
     public override string ToString() => DebuggerDisplay;
 }

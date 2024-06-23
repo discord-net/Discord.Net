@@ -11,9 +11,8 @@ public readonly struct VoiceRegion(string id, string name, bool isOptimal, bool 
     public readonly bool IsDeprecated = isDeprecated;
     public readonly bool IsCustom = isCustom;
 
-    public Models.Json.VoiceRegion ToApiModel(Models.Json.VoiceRegion? existing = default)
-    {
-        return existing ??= new Models.Json.VoiceRegion()
+    public Models.Json.VoiceRegion ToApiModel(Models.Json.VoiceRegion? existing = default) =>
+        existing ??= new Models.Json.VoiceRegion
         {
             Id = Id,
             Name = Name,
@@ -21,18 +20,15 @@ public readonly struct VoiceRegion(string id, string name, bool isOptimal, bool 
             IsDeprecated = IsDeprecated,
             IsOptimal = IsOptimal
         };
-    }
 
-    public static VoiceRegion Construct(IDiscordClient client, Models.Json.VoiceRegion model)
-    {
-        return new VoiceRegion(
+    public static VoiceRegion Construct(IDiscordClient client, Models.Json.VoiceRegion model) =>
+        new(
             model.Id,
             model.Name,
             model.IsOptimal,
             model.IsDeprecated,
             model.IsCustom
         );
-    }
 
     string IIdentifiable<string>.Id => Id;
 }

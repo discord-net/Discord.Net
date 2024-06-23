@@ -1,3 +1,5 @@
+using Discord.Models.Json;
+
 namespace Discord.Models;
 
 public interface IMessageModel : IEntityModel<ulong>
@@ -19,40 +21,63 @@ public interface IMessageModel : IEntityModel<ulong>
     bool IsWebhook { get; }
     int Type { get; }
 
-    // activity
-    int? ActivityType { get; }
-    string? ActivityPartyId { get; }
+    IMessageActivityModel? Activity { get; }
+    IMessageApplicationModel? Application { get; }
 
-    // message application
-    ulong? ApplicationId { get; }
-    string? ApplicationCoverImage { get; }
-    string? ApplicationDescription { get; }
-    string? ApplicationIcon { get; }
-    string? ApplicationName { get; }
-
-    // message reference
-    ulong? ReferenceMessageId { get; }
-    ulong? ReferenceChannelId { get; }
-    ulong? ReferenceGuildId { get; }
+    IMessageReferenceModel? MessageReference { get; }
 
     int Flags { get; }
 
-    // message interaction
-    ulong? InteractionId { get; }
-    int InteractionType { get; }
-    string? InteractionName { get; }
-    ulong? InteractionUserId { get; }
+    IMessageInteractionMetadataModel? InteractionMetadata { get; }
 
     ulong? ThreadId { get; }
+    ulong? ThreadGuildId { get; } // used for constructing thread loadables, always present with 'thread' in the API
 
-    // TODO: components
+    IEnumerable<MessageComponent> Components { get; }
     IEnumerable<IStickerItemModel> Stickers { get; }
 
     int? Position { get; }
 
-    // role sub data
-    ulong? RoleSubscriptionListingId { get; }
-    string? TierName { get; }
-    int? TotalMonthsSubscribed { get; }
-    bool IsRenewed { get; }
+    IMessageRoleSubscriptionData? RoleSubscriptionData { get; }
+}
+
+public interface IMessageRoleSubscriptionData
+{
+    ulong RoleSubscriptionListingId { get; }
+    string TierName { get; }
+    int TotalMonthsSubscribed { get; }
+    bool IsRenewal { get; }
+}
+
+public interface IMessageInteractionMetadataModel
+{
+    ulong Id { get; }
+    int Type { get; }
+    ulong UserId { get; }
+    IDictionary<int, ulong> AuthorizingIntegrationOwners { get; }
+    ulong? OriginalResponseMessageId { get; }
+    ulong? InteractedMessageId { get; }
+    IMessageInteractionMetadataModel? TriggeringInteractionMetadata { get; }
+}
+
+public interface IMessageReferenceModel
+{
+    ulong? MessageId { get; }
+    ulong? ChannelId { get; }
+    ulong GuildId { get; }
+}
+
+public interface IMessageApplicationModel
+{
+    ulong Id { get; }
+    string CoverImage { get; }
+    string Description { get; }
+    string Icon { get; }
+    string Name { get; }
+}
+
+public interface IMessageActivityModel
+{
+    int Type { get; }
+    string? PartyId { get; }
 }

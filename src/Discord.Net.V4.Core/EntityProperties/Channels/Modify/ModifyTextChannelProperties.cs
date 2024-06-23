@@ -16,9 +16,9 @@ public class ModifyTextChannelProperties : ModifyGuildChannelProperties
 
     public override ModifyGuildChannelParams ToApiModel(ModifyGuildChannelParams? existing = null)
     {
-        existing ??= new();
+        existing ??= new ModifyGuildChannelParams();
         base.ToApiModel(existing);
-        
+
         existing.Type = Type.Map(v => (int)v);
         existing.Topic = Topic;
         existing.RateLimitPerUser = Slowmode;

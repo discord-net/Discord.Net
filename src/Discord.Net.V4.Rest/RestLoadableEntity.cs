@@ -5,14 +5,15 @@ namespace Discord.Rest;
 public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
     DiscordRestClient client,
     TId id,
-    ApiRoute<TModel> route,
-    Func<TId, TModel?, TEntity?> factory
+    IApiOutRoute<TModel> outRoute,
+    Func<TId, TModel?, TEntity?> factory,
+    TModel? cachedModel = null
 ):
     ILoadableEntity<TId, TCoreEntity>,
     IDisposable, IAsyncDisposable where TCoreEntity : class, IEntity<TId>
-    where TEntity : RestEntity<TId>, TCoreEntity
+    where TEntity : class, IEntity<TId>, TCoreEntity
     where TId : IEquatable<TId>
-    where TModel : class
+    where TModel : class, IEntityModel
 {
     public TId Id
     {
@@ -25,11 +26,29 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
         }
     }
 
-    public TEntity? Value { get; private set; }
+    public TEntity? Value
+    {
+        get
+        {
+            if (_value is not null)
+                return _value;
+
+            if (cachedModel is null) return null;
+
+            // model is only valid only once
+            _value = factory(id, cachedModel);
+            cachedModel = null;
+            return _value;
+
+        }
+        set => _value = value;
+    }
+
+    private TEntity? _value;
 
     public async ValueTask<TEntity?> FetchAsync(RequestOptions? options = null, CancellationToken token = default)
     {
-        var model = await client.ApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token);
+        var model = await client.ApiClient.ExecuteAsync(outRoute, options ?? client.DefaultRequestOptions, token);
 
         return Value = factory(Id, model);
     }
@@ -43,48 +62,54 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromConstructable<TConstructable>(
         DiscordRestClient client,
         TId id,
-        Func<TId, ApiRoute<TModel>> route
+        Func<TId, IApiOutRoute<TModel>> route,
+        TModel? value = null
     )
         where TConstructable : TEntity, IConstructable<TConstructable, TModel, DiscordRestClient>
-        => FromConstructable<TConstructable>(client, id, route(id));
+        => FromConstructable<TConstructable>(client, id, route(id), value);
 
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromConstructable<TConstructable>(
         DiscordRestClient client,
         TId id,
-        ApiRoute<TModel> route
+        IApiOutRoute<TModel> outRoute,
+        TModel? value = null
     )
         where TConstructable : TEntity, IConstructable<TConstructable, TModel, DiscordRestClient>
     {
         return new RestLoadable<TId, TEntity, TCoreEntity, TModel>(
             client,
             id,
-            route,
-            (id, model) => model is null ? null : TConstructable.Construct(client, model)
+            outRoute,
+            (_, model) => model is null ? null : TConstructable.Construct(client, model),
+            value
         );
     }
 
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromContextConstructable<TConstructable, TContext>(
         DiscordRestClient client,
         TId id,
-        Func<TContext, TId, ApiRoute<TModel>> route,
-        TContext context
+        Func<TContext, TId, IApiOutRoute<TModel>> route,
+        TContext context,
+        TModel? value = null
     )
         where TConstructable : TEntity, IContextConstructable<TConstructable, TModel, TContext, DiscordRestClient>
-        => FromContextConstructable<TConstructable, TContext>(client, id, route(context, id), context);
+        => FromContextConstructable<TConstructable, TContext>(client, id, route(context, id), context, value);
 
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromContextConstructable<TConstructable, TContext>(
         DiscordRestClient client,
         TId id,
-        ApiRoute<TModel> route,
-        TContext context
+        IApiOutRoute<TModel> outRoute,
+        TContext context,
+        TModel? value = null
     )
         where TConstructable : TEntity, IContextConstructable<TConstructable, TModel, TContext, DiscordRestClient>
     {
         return new RestLoadable<TId, TEntity, TCoreEntity, TModel>(
             client,
             id,
-            route,
-            (id, model) => model is null ? null : TConstructable.Construct(client, model, context)
+            outRoute,
+            (_, model) => model is null ? null : TConstructable.Construct(client, model, context),
+            value
         );
     }
 

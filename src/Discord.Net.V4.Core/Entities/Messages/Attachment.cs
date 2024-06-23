@@ -1,6 +1,8 @@
+using Discord.Models;
+
 namespace Discord;
 
-public readonly struct Attachment
+public readonly struct Attachment : IConstructable<Attachment, IAttachmentModel>
 {
     /// <summary>
     ///     The ID of this attachment.
@@ -113,4 +115,21 @@ public readonly struct Attachment
         Waveform = waveform;
         Flags = flags;
     }
+
+    public static Attachment Construct(IDiscordClient client, IAttachmentModel model) =>
+        new(
+            model.Id,
+            model.Filename,
+            model.Url,
+            model.ProxyUrl,
+            model.Size,
+            model.Ephemeral,
+            model.Height,
+            model.Width,
+            model.Description,
+            model.ContentType,
+            model.Duration,
+            model.Waveform,
+            (AttachmentFlags?)model.Flags ?? AttachmentFlags.None
+        );
 }

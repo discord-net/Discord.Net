@@ -8,8 +8,8 @@ public sealed partial class RestLoadableGuildEmoteActor(DiscordRestClient client
     ILoadableGuildEmoteActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IGuildEmote>))]
-    internal RestLoadable<ulong, RestGuildEmote, IGuildEmote, GuildEmote> Loadable { get; } =
-        RestLoadable<ulong, RestGuildEmote, IGuildEmote, GuildEmote>
+    internal RestLoadable<ulong, RestGuildEmote, IGuildEmote, Discord.Models.Json.GuildEmote> Loadable { get; } =
+        RestLoadable<ulong, RestGuildEmote, IGuildEmote, Discord.Models.Json.GuildEmote>
             .FromContextConstructable<RestGuildEmote, ulong>(
                 client,
                 id,

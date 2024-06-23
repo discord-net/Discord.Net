@@ -6,4 +6,3 @@ public interface IActor<out TId, out TEntity> :
     IIdentifiable<TId>
     where TId : IEquatable<TId>
     where TEntity : IEntity<TId>;
-

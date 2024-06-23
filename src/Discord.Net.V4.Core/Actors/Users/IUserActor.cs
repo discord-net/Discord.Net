@@ -13,10 +13,7 @@ public interface IUserActor :
     async Task<IDMChannel> CreateDMAsync(RequestOptions? options = null, CancellationToken token = default)
     {
         var model = await Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.CreateDm(new CreateDMChannelParams()
-            {
-                RecipientId = Id
-            }),
+            Routes.CreateDm(new CreateDMChannelParams {RecipientId = Id}),
             options ?? Client.DefaultRequestOptions,
             token
         );

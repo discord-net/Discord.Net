@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Models.Json;
 
 namespace Discord;
@@ -5,7 +6,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a <see cref="IMessageComponent" /> text input.
 /// </summary>
-public class TextInputComponent : IMessageComponent
+public class TextInputComponent : IMessageComponent, IConstructable<TextInputComponent, ITextInputComponentModel>
 {
     internal TextInputComponent(string customId, string label, string? placeholder, int? minLength, int? maxLength,
         TextInputStyle style, bool? required, string? value)
@@ -55,15 +56,26 @@ public class TextInputComponent : IMessageComponent
     /// </summary>
     public string? Value { get; }
 
+    public static TextInputComponent Construct(IDiscordClient client, ITextInputComponentModel model) =>
+        new(
+            model.CustomId,
+            model.Label,
+            model.Placeholder,
+            model.MinLength,
+            model.MaxLength,
+            (TextInputStyle)model.Style,
+            model.IsRequired,
+            model.Value
+        );
+
     /// <inheritdoc />
     public ComponentType Type => ComponentType.TextInput;
 
     /// <inheritdoc />
     public string CustomId { get; }
 
-    public MessageComponent ToApiModel(MessageComponent? existing = default)
-    {
-        return existing ?? new Models.Json.TextInputComponent()
+    public MessageComponent ToApiModel(MessageComponent? existing = default) =>
+        existing ?? new Models.Json.TextInputComponent
         {
             Label = Label,
             Type = (uint)Type,
@@ -75,5 +87,4 @@ public class TextInputComponent : IMessageComponent
             MaxLength = Optional.FromNullable(MaxLength),
             MinLength = Optional.FromNullable(MinLength)
         };
-    }
 }

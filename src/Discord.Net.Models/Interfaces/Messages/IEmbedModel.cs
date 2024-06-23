@@ -9,39 +9,64 @@ public interface IEmbedModel
     DateTimeOffset? Timestamp { get; }
     uint? Color { get; }
 
-    // footer
-    string? FooterText { get; }
-    string? FooterIconUrl { get; }
-    string? FooterProxyIconUrl { get; }
+    IEmbedFooterModel? Footer { get; }
 
-    // image
-    string? ImageUrl { get; }
-    string? ImageProxyUrl { get; }
-    int? ImageHeight { get; }
-    int? ImageWidth { get; }
+    IEmbedImageModel? Image { get; }
 
-    // thumbnail
-    string? ThumbnailUrl { get; }
-    string? ThumbnailProxyUrl { get; }
-    int? ThumbnailHeight { get; }
-    int? ThumbnailWidth { get; }
+    IEmbedThumbnailModel? Thumbnail { get; }
 
-    // video
-    string? VideoUrl { get; }
-    string? VideoProxyUrl { get; }
-    int? VideoHeight { get; }
-    int? VideoWidth { get; }
+    IEmbedVideoModel? Video { get; }
 
-    // provider
-    string? ProviderName { get; }
-    string? ProviderUrl { get; }
+    IEmbedProviderModel? Provider { get; }
 
-    string? AuthorName { get; }
-    string? AuthorUrl { get; }
-    string? AuthorIconUrl { get; }
-    string? AuthorProxyIconUrl { get; }
+    IEmbedAuthorModel? Author { get; }
 
-    IEnumerable<IEmbedFieldModel> Fields { get; }
+    IEnumerable<IEmbedFieldModel>? Fields { get; }
+}
+
+public interface IEmbedFooterModel
+{
+    string Text { get; }
+    string? IconUrl { get; }
+    string? ProxyIconUrl { get; }
+}
+
+public interface IEmbedImageModel
+{
+    string Url { get; }
+    string? ProxyUrl { get; }
+    int? Height { get; }
+    int? Width { get; }
+}
+
+public interface IEmbedThumbnailModel
+{
+    string Url { get; }
+    string? ProxyUrl { get; }
+    int? Height { get; }
+    int? Width { get; }
+}
+
+public interface IEmbedVideoModel
+{
+    string? Url { get; }
+    string? ProxyUrl { get; }
+    int? Height { get; }
+    int? Width { get; }
+}
+
+public interface IEmbedProviderModel
+{
+    string? Name { get; }
+    string? Url { get; }
+}
+
+public interface IEmbedAuthorModel
+{
+    string Name { get; }
+    string? Url { get; }
+    string? IconUrl { get; }
+    string? ProxyIconUrl { get; }
 }
 
 public interface IEmbedFieldModel

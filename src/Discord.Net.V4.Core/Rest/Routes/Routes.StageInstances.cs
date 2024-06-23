@@ -5,15 +5,19 @@ namespace Discord.Rest;
 
 public static partial class Routes
 {
-    public static ApiBodyRoute<CreateStageInstanceParams, StageInstance> CreateStageInstance(
-        CreateStageInstanceParams args)
-        => new(nameof(CreateStageInstance), RequestMethod.Post, $"stage-instances", args);
-    public static ApiRoute<StageInstance> GetStageInstance(ulong channelId)
-        => new(nameof(GetStageInstance), RequestMethod.Get, $"stage-instances/{channelId}");
+    public static IApiInOutRoute<CreateStageInstanceParams, StageInstance> CreateStageInstance(
+        CreateStageInstanceParams args) =>
+        new ApiInOutRoute<CreateStageInstanceParams, StageInstance>(nameof(CreateStageInstance), RequestMethod.Post,
+            "stage-instances", args);
 
-    public static ApiBodyRoute<ModifyStageInstanceParams, StageInstance> ModifyStageInstance(ulong channelId, ModifyStageInstanceParams args)
-        => new(nameof(ModifyStageInstance), RequestMethod.Patch, $"stage-instance/{channelId}", args);
+    public static IApiOutRoute<StageInstance> GetStageInstance(ulong channelId) =>
+        new ApiOutRoute<StageInstance>(nameof(GetStageInstance), RequestMethod.Get, $"stage-instances/{channelId}");
 
-    public static BasicApiRoute DeleteStageInstance(ulong channelId)
-        => new(nameof(DeleteStageInstance), RequestMethod.Delete, $"stage-instance/{channelId}");
+    public static IApiInOutRoute<ModifyStageInstanceParams, StageInstance> ModifyStageInstance(ulong channelId,
+        ModifyStageInstanceParams args) =>
+        new ApiInOutRoute<ModifyStageInstanceParams, StageInstance>(nameof(ModifyStageInstance), RequestMethod.Patch,
+            $"stage-instance/{channelId}", args);
+
+    public static IApiRoute DeleteStageInstance(ulong channelId) =>
+        new ApiRoute(nameof(DeleteStageInstance), RequestMethod.Delete, $"stage-instance/{channelId}");
 }

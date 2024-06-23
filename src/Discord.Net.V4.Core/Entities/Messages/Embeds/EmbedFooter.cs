@@ -1,10 +1,12 @@
+using Discord.Models;
 using System.Diagnostics;
 
 namespace Discord;
 
 /// <summary> A footer field for an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedFooter : IEntityProperties<Models.Json.EmbedFooter>, IConstructable<EmbedFooter, Models.Json.EmbedFooter>
+public readonly struct EmbedFooter : IEntityProperties<Models.Json.EmbedFooter>,
+    IConstructable<EmbedFooter, IEmbedFooterModel>
 {
     /// <summary>
     ///     The text of the footer field.
@@ -57,7 +59,7 @@ public readonly struct EmbedFooter : IEntityProperties<Models.Json.EmbedFooter>,
 
     public Models.Json.EmbedFooter ToApiModel(Models.Json.EmbedFooter? existing = default)
     {
-        existing ??= new() {Text = Text};
+        existing ??= new Models.Json.EmbedFooter {Text = Text};
 
         existing.IconUrl = Optional.FromNullable(IconUrl);
         existing.ProxyIconUrl = Optional.FromNullable(ProxyIconUrl);
@@ -65,7 +67,8 @@ public readonly struct EmbedFooter : IEntityProperties<Models.Json.EmbedFooter>,
         return existing;
     }
 
-    public static EmbedFooter Construct(IDiscordClient client, Models.Json.EmbedFooter model) => throw new NotImplementedException();
+    public static EmbedFooter Construct(IDiscordClient client, IEmbedFooterModel model)
+        => new(model.Text, model.IconUrl, model.ProxyIconUrl);
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedFooter" />.

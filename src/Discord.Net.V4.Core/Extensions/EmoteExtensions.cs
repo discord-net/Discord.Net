@@ -9,9 +9,9 @@ public static class EmoteExtensions
         switch (emote)
         {
             case IGuildEmote guildEmote:
-                return new DefaultReaction { Id = guildEmote.Id };
+                return new DefaultReaction {Id = guildEmote.Id};
             default:
-                return new DefaultReaction { Name = emote.Name };
+                return new DefaultReaction {Name = emote.Name};
         }
     }
 }

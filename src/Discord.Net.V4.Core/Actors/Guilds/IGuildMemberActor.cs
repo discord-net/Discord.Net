@@ -13,6 +13,12 @@ public interface IGuildMemberActor :
     IModifiable<ulong, IGuildMemberActor, ModifyGuildUserProperties, ModifyGuildMemberParams>,
     IActor<ulong, IGuildMember>
 {
+    static IApiInRoute<ModifyGuildMemberParams>
+        IModifiable<ulong, IGuildMemberActor, ModifyGuildUserProperties, ModifyGuildMemberParams>.ModifyRoute(
+            IPathable path, ulong id,
+            ModifyGuildMemberParams args)
+        => Routes.ModifyGuildMember(path.Require<IGuild>(), id, args);
+
     Task AddRoleAsync(
         EntityOrId<ulong, IRole> role,
         RequestOptions? options = null,
@@ -50,7 +56,7 @@ public interface IGuildMemberActor :
         Routes.CreateGuildBan(
             Guild.Id,
             Id,
-            new CreateGuildBanParams()
+            new CreateGuildBanParams
             {
                 DeleteMessageSeconds = Optional
                     .FromNullable(pruneDuration)
@@ -69,8 +75,4 @@ public interface IGuildMemberActor :
         options ?? Client.DefaultRequestOptions,
         token
     );
-
-    static ApiBodyRoute<ModifyGuildMemberParams> IModifiable<ulong, IGuildMemberActor, ModifyGuildUserProperties, ModifyGuildMemberParams>.ModifyRoute(IPathable path, ulong id,
-        ModifyGuildMemberParams args)
-        => Routes.ModifyGuildMember(path.Require<IGuild>(), id, args);
 }

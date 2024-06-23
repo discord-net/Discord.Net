@@ -7,7 +7,7 @@ public interface ILoadableThreadableGuildChannelActor :
 public interface IThreadableGuildChannelActor :
     IGuildChannelActor
 {
-    IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> PublicArchivedThreads { get; }
-    IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> PrivateArchivedThreads { get; }
-    IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> JoinedPrivateArchivedThreads { get; }
+    IPagedActor<ulong, IThreadChannel> PublicArchivedThreads { get; }
+    IPagedActor<ulong, IThreadChannel> PrivateArchivedThreads { get; }
+    IPagedActor<ulong, IThreadChannel> JoinedPrivateArchivedThreads { get; }
 }

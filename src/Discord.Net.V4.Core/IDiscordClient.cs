@@ -1,4 +1,3 @@
-
 using Discord.Models;
 using Discord.Rest;
 
@@ -16,7 +15,8 @@ public interface IDiscordClient :
     IEntityProvider<IStageInstance, IStageInstanceModel>,
     IEntityProvider<IGuildChannel, IGuildChannelModel>,
     IEntityProvider<IInvite, IInviteModel>,
-    IEntityProvider<IUser, IUserModel>
+    IEntityProvider<IUser, IUserModel>,
+    IEntityProvider<IMessage, IMessageModel>
 {
     IRestApiClient RestApiClient { get; }
 
@@ -25,12 +25,17 @@ public interface IDiscordClient :
     /// </summary>
     ILoadableSelfUserActor SelfUser { get; }
 
-    IPagedLoadableRootActor<ILoadableGuildActor, ulong, IGuild, IPartialGuild> Guilds { get; }
-    ILoadableGuildActor Guild(ulong id) => Guilds[id];
+    IPagedIndexableActor<ILoadableGuildActor, ulong, IGuild, IPartialGuild> Guilds { get; }
 
-    IRootActor<ILoadableChannelActor, ulong, IChannel> Channels { get; }
-    ILoadableChannelActor Channel(ulong id) => Channels[id];
+    IIndexableActor<ILoadableChannelActor, ulong, IChannel> Channels { get; }
+
+    IIndexableActor<ILoadableUserActor, ulong, IUser> Users { get; }
 
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }
+    ILoadableGuildActor Guild(ulong id) => Guilds[id];
+    ILoadableChannelActor Channel(ulong id) => Channels[id];
+    ILoadableUserActor User(ulong id) => Users[id];
+
+    ILoadableWebhookActor Webhook(ulong id, string? token = null);
 }

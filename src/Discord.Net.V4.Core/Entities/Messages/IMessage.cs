@@ -1,6 +1,3 @@
-using Discord.Models.Json;
-using Discord.Rest;
-
 namespace Discord;
 
 public interface IMessage :
@@ -13,11 +10,6 @@ public interface IMessage :
     ///     Gets the type of this message.
     /// </summary>
     MessageType Type { get; }
-
-    /// <summary>
-    ///     Gets the source type of this message.
-    /// </summary>
-    MessageSource Source { get; }
 
     /// <summary>
     ///     Gets the flags related to this message.
@@ -53,6 +45,8 @@ public interface IMessage :
     ///     <see langword="false" />.
     /// </returns>
     bool IsPinned { get; }
+
+    ILoadableWebhookActor? Webhook { get; }
 
     /// <summary>
     ///     Gets the value that indicates whether this message mentioned everyone.
@@ -92,12 +86,12 @@ public interface IMessage :
     /// <summary>
     ///     Gets the author of this message.
     /// </summary>
-    ILoadableEntity<ulong, IUser> Author { get; }
+    ILoadableUserActor Author { get; }
 
     /// <summary>
     ///     Gets the thread that was started from this message.
     /// </summary>
-    ILoadableEntity<ulong, IThreadChannel>? Thread { get; }
+    ILoadableThreadActor? Thread { get; }
 
     /// <summary>
     ///     Gets all attachments included in this message.
@@ -141,7 +135,7 @@ public interface IMessage :
     /// <returns>
     ///     A message's activity, if any is associated.
     /// </returns>
-    MessageActivity Activity { get; }
+    MessageActivity? Activity { get; }
 
     /// <summary>
     ///     Gets the application associated with a message.
@@ -152,7 +146,7 @@ public interface IMessage :
     /// <returns>
     ///     A message's application, if any is associated.
     /// </returns>
-    MessageApplication Application { get; }
+    MessageApplication? Application { get; }
 
     /// <summary>
     ///     Gets the reference to the original message if it is a crosspost, channel follow add, pin, or reply message.
@@ -164,12 +158,12 @@ public interface IMessage :
     /// <returns>
     ///     A message's reference, if any is associated.
     /// </returns>
-    MessageReference Reference { get; }
+    MessageReference? Reference { get; }
 
     /// <summary>
     ///     Gets all reactions included in this message.
     /// </summary>
-    IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
+    MessageReactions Reactions { get; }
 
     /// <summary>
     ///     The <see cref="IMessageComponent" />'s attached to this message
@@ -188,10 +182,10 @@ public interface IMessage :
     ///     Gets the interaction this message is a response to.
     /// </summary>
     /// <returns>
-    ///     A <see cref="IMessageInteraction" /> if the message is a response to an interaction; otherwise
+    ///     A <see cref="IMessageInteractionMetadata" /> if the message is a response to an interaction; otherwise
     ///     <see langword="null" />.
     /// </returns>
-    IMessageInteraction? Interaction { get; }
+    IMessageInteractionMetadata? InteractionMetadata { get; }
 
     /// <summary>
     ///     Gets the data of the role subscription purchase or renewal that prompted this

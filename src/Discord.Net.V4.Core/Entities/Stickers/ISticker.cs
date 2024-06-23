@@ -3,8 +3,18 @@ namespace Discord;
 /// <summary>
 ///     Represents a discord sticker.
 /// </summary>
-public interface ISticker : IStickerItem
+public interface ISticker : ISnowflakeEntity
 {
+    /// <summary>
+    ///     The name of the sticker.
+    /// </summary>
+    string Name { get; }
+
+    /// <summary>
+    ///     The format of the sticker.
+    /// </summary>
+    StickerFormatType Format { get; }
+
     /// <summary>
     ///     Gets the ID of the pack of this sticker.
     /// </summary>

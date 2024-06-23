@@ -1,3 +1,5 @@
+using Discord.Models;
+
 namespace Discord;
 
 public sealed class ForumTag(
@@ -7,29 +9,15 @@ public sealed class ForumTag(
     bool isModerated,
     ILoadableEntity<ulong, IGuildEmote>? emote,
     string? emoji)
-    : ISnowflakeEntity, IEntityProperties<Models.Json.ForumTag>, IContextConstructable<ForumTag, Models.IForumTagModel, ForumTag.Context>
+    : ISnowflakeEntity, IEntityProperties<Models.Json.ForumTag>,
+        IContextConstructable<ForumTag, ITagModel, ForumTag.Context>
 {
-    public readonly record struct Context(ulong GuildId);
-
-    public ulong Id { get; } = id;
     public string Name { get; } = name;
     public bool IsModerated { get; } = isModerated;
     public ILoadableEntity<ulong, IGuildEmote>? Emote { get; } = emote;
     public string? Emoji { get; } = emoji;
 
-    IDiscordClient IClientProvider.Client => client;
-
-    public Models.Json.ForumTag ToApiModel(Models.Json.ForumTag? existing = null)
-    {
-        existing ??= new() {Name = Name};
-        existing.Moderated = IsModerated;
-        existing.EmojiName = Emoji;
-        existing.Id = Id;
-        existing.EmojiId = Emote?.Id;
-        return existing;
-    }
-
-    public static ForumTag Construct(IDiscordClient client, Models.IForumTagModel model, Context context)
+    public static ForumTag Construct(IDiscordClient client, ITagModel model, Context context)
     {
         var emote = model.EmojiId.HasValue
             ? client.Guild(context.GuildId).Emote(model.EmojiId.Value)
@@ -44,4 +32,20 @@ public sealed class ForumTag(
             model.EmojiName
         );
     }
+
+    public Models.Json.ForumTag ToApiModel(Models.Json.ForumTag? existing = null)
+    {
+        existing ??= new Models.Json.ForumTag {Name = Name};
+        existing.Moderated = IsModerated;
+        existing.EmojiName = Emoji;
+        existing.Id = Id;
+        existing.EmojiId = Emote?.Id;
+        return existing;
+    }
+
+    public ulong Id { get; } = id;
+
+    IDiscordClient IClientProvider.Client => client;
+
+    public readonly record struct Context(ulong GuildId);
 }

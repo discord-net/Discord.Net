@@ -2,10 +2,9 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableThreadMemberActor<TThreadMember> :
+public interface ILoadableThreadMemberActor :
     IThreadMemberActor,
-    ILoadableEntity<ulong, TThreadMember>
-    where TThreadMember : class, IThreadMember;
+    ILoadableEntity<ulong, IThreadMember>;
 
 public interface IThreadMemberActor :
     IActor<ulong, IThreadMember>,

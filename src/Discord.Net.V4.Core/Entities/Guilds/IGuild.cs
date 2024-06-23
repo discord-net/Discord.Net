@@ -1,5 +1,3 @@
-using Discord.Models.Json;
-using Discord.Rest;
 using System.Globalization;
 
 namespace Discord;
@@ -88,17 +86,15 @@ public interface IGuild :
     /// </returns>
     string? DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Client.Config, Id, DiscoverySplashId);
 
-    ILoadableEntity<ulong, IVoiceChannel> AFKChannel { get; }
-    ILoadableEntity<ulong, ITextChannel> WidgetChannel { get; }
-    ILoadableEntity<ulong, ITextChannel> SafetyAlertsChannel { get; }
-    ILoadableEntity<ulong, ITextChannel> SystemChannel { get; }
-    ILoadableEntity<ulong, ITextChannel> RulesChannel { get; }
-    ILoadableEntity<ulong, ITextChannel> PublicUpdatesChannel { get; }
-    ILoadableEntity<ulong, IGuildMember> Owner { get; }
+    ILoadableTextChannelActor? AFKChannel { get; }
+    ILoadableTextChannelActor? WidgetChannel { get; }
+    ILoadableTextChannelActor? SafetyAlertsChannel { get; }
+    ILoadableTextChannelActor? SystemChannel { get; }
+    ILoadableTextChannelActor? RulesChannel { get; }
+    ILoadableTextChannelActor? PublicUpdatesChannel { get; }
+    ILoadableGuildMemberActor Owner { get; }
 
     ulong? ApplicationId { get; }
-
-    ILoadableEntity<ulong, IRole> EveryoneRole { get; }
 
     new GuildFeatures Features { get; }
 

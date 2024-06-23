@@ -12,7 +12,6 @@ public interface ILoadableEntity<out TId, TEntity> :
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>;
 
-
 /// <summary>
 ///     Represents a bare bones lazy-loadable entity.
 /// </summary>

@@ -2,7 +2,6 @@ using Discord.Integration;
 using Discord.Models.Json;
 using Discord.Rest;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
@@ -15,42 +14,48 @@ public interface IGuildActor :
     IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams>,
     IDeletable<ulong, IGuildActor>
 {
+    static IApiRoute IDeletable<ulong, IGuildActor>
+        .DeleteRoute(IPathable path, ulong id) => Routes.DeleteGuild(id);
+
+    static IApiInRoute<ModifyGuildParams> IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams>
+        .ModifyRoute(IPathable path, ulong id, ModifyGuildParams args) => Routes.ModifyGuild(id, args);
+
     #region Sub-actors
 
-    IRootActor<IIntegrationActor, ulong, IIntegration> Integrations { get; }
+    IIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations { get; }
     IIntegrationActor Integration(ulong id) => Integrations[id];
 
-    IPagedLoadableRootActor<ILoadableGuildBanActor, ulong, IBan> Bans { get; }
+    IPagedIndexableActor<ILoadableGuildBanActor, ulong, IBan> Bans { get; }
     ILoadableGuildBanActor Ban(ulong userId) => Bans[userId];
 
-    IRootActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels { get; }
+    IIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels { get; }
     ILoadableStageChannelActor StageChannel(ulong id) => StageChannels[id];
 
-    ILoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> ActiveThreads { get; }
+    IEnumerableIndexableActor<ILoadableThreadActor, ulong, IThreadChannel> ActiveThreads { get; }
     ILoadableThreadActor ActiveThread(ulong id) => ActiveThreads[id];
 
-    IRootActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels { get; }
+    IIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels { get; }
     ILoadableTextChannelActor TextChannel(ulong id) => TextChannels[id];
 
-    ILoadableRootActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels { get; }
+    IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels { get; }
     ILoadableGuildChannelActor Channel(ulong id) => Channels[id];
 
-    IPagedLoadableRootActor<ILoadableGuildMemberActor, ulong, IGuildMember> Members { get; }
+    IPagedIndexableActor<ILoadableGuildMemberActor, ulong, IGuildMember> Members { get; }
     ILoadableGuildMemberActor Member(ulong id) => Members[id];
 
-    ILoadableRootActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes { get; }
+    IEnumerableIndexableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes { get; }
     ILoadableGuildEmoteActor Emote(ulong id) => Emotes[id];
 
-    ILoadableRootActor<IRoleActor, ulong, IRole> Roles { get; }
+    IEnumerableIndexableActor<IRoleActor, ulong, IRole> Roles { get; }
     IRoleActor Role(ulong id) => Roles[id];
 
-    ILoadableRootActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers { get; }
+    IEnumerableIndexableActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers { get; }
     ILoadableGuildStickerActor Sticker(ulong id) => Stickers[id];
 
-    ILoadableRootActor<ILoadableGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents { get; }
+    IEnumerableIndexableActor<ILoadableGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents { get; }
     ILoadableGuildScheduledEventActor ScheduledEvent(ulong id) => ScheduledEvents[id];
 
-    ILoadableRootActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites { get; }
+    IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites { get; }
     ILoadableInviteActor<IInvite> Invite(string code) => Invites[code];
 
     #endregion
@@ -111,14 +116,15 @@ public interface IGuildActor :
         CancellationToken token = default)
     {
         var result = await Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.AddGuildMember(Id, user.Id, new AddGuildMemberParams
-            {
-                AccessToken = accessToken,
-                Nickname = Optional.FromNullable(nickname),
-                IsDeaf = Optional.FromNullable(deaf),
-                IsMute = Optional.FromNullable(mute),
-                RoleIds = Optional.FromNullable(roles).Map(v => v.Select(v => v.Id).ToArray())
-            }),
+            Routes.AddGuildMember(Id, user.Id,
+                new AddGuildMemberParams
+                {
+                    AccessToken = accessToken,
+                    Nickname = Optional.FromNullable(nickname),
+                    IsDeaf = Optional.FromNullable(deaf),
+                    IsMute = Optional.FromNullable(mute),
+                    RoleIds = Optional.FromNullable(roles).Map(v => v.Select(v => v.Id).ToArray())
+                }),
             options ?? Client.DefaultRequestOptions,
             token
         );
@@ -172,10 +178,8 @@ public interface IGuildActor :
         RequestOptions? options = null,
         CancellationToken token = default
     ) => Client.RestApiClient.ExecuteAsync(
-        Routes.CreateGuildBan(Id, user.Id, new CreateGuildBanParams()
-        {
-            DeleteMessageSeconds = Optional.FromNullable(purgeMessageSeconds)
-        }),
+        Routes.CreateGuildBan(Id, user.Id,
+            new CreateGuildBanParams {DeleteMessageSeconds = Optional.FromNullable(purgeMessageSeconds)}),
         options ?? Client.DefaultRequestOptions,
         token
     );
@@ -197,11 +201,12 @@ public interface IGuildActor :
         CancellationToken token = default)
     {
         var result = await Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.BulkGuildBan(Id, new BulkBanUsersParams()
-            {
-                UserIds = users.Select(x => x.Id).ToArray(),
-                DeleteMessageSeconds = Optional.FromNullable(purgeMessageSeconds)
-            }),
+            Routes.BulkGuildBan(Id,
+                new BulkBanUsersParams
+                {
+                    UserIds = users.Select(x => x.Id).ToArray(),
+                    DeleteMessageSeconds = Optional.FromNullable(purgeMessageSeconds)
+                }),
             options ?? Client.DefaultRequestOptions,
             token
         );
@@ -215,10 +220,7 @@ public interface IGuildActor :
         CancellationToken token = default)
     {
         var result = await Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.ModifyGuildMfaLevel(Id, new ModifyGuildMfaLevelParams()
-            {
-                Level = (int)level
-            }),
+            Routes.ModifyGuildMfaLevel(Id, new ModifyGuildMfaLevelParams {Level = (int)level}),
             options ?? Client.DefaultRequestOptions,
             token
         );
@@ -255,7 +257,7 @@ public interface IGuildActor :
     {
         var result = await Client.RestApiClient.ExecuteAsync(
             Routes.BeginGuildPrune(Id,
-                new BeginGuildPruneParams()
+                new BeginGuildPruneParams
                 {
                     Days = Optional.FromNullable(days),
                     Reason = Optional.FromNullable(reason),
@@ -293,11 +295,4 @@ public interface IGuildActor :
     );
 
     #endregion
-
-
-    static BasicApiRoute IDeletable<ulong, IGuildActor>
-        .DeleteRoute(IPathable path, ulong id) => Routes.DeleteGuild(id);
-
-    static ApiBodyRoute<ModifyGuildParams> IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams>
-        .ModifyRoute(IPathable path, ulong id, ModifyGuildParams args) => Routes.ModifyGuild(id, args);
 }

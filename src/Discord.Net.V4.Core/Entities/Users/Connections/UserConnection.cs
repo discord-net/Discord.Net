@@ -9,12 +9,15 @@ public readonly struct UserConnection(
     bool isFriendSynced,
     bool showActivity,
     bool isTwoWayLink,
-    ConnectionVisibility visibility) : IEntityProperties<Models.Json.UserConnection>, IConstructable<UserConnection, Models.Json.UserConnection>
+    ConnectionVisibility visibility) : IEntityProperties<Models.Json.UserConnection>,
+    IConstructable<UserConnection, Models.Json.UserConnection>
 {
     public readonly string Id = id;
     public readonly string Name = name;
     public readonly string Type = type;
+
     public readonly bool? IsRevoked = isRevoked;
+
     //public readonly IReadOnlyCollection<Integration> Integrations;
     public readonly bool IsVerified = isVerified;
     public readonly bool IsFriendSynced = isFriendSynced;
@@ -22,9 +25,8 @@ public readonly struct UserConnection(
     public readonly bool IsTwoWayLink = isTwoWayLink;
     public readonly ConnectionVisibility Visibility = visibility;
 
-    public Models.Json.UserConnection ToApiModel(Models.Json.UserConnection? existing = default)
-    {
-        return new Models.Json.UserConnection()
+    public Models.Json.UserConnection ToApiModel(Models.Json.UserConnection? existing = default) =>
+        new()
         {
             Id = Id,
             FriendSync = IsFriendSynced,
@@ -34,14 +36,12 @@ public readonly struct UserConnection(
             IsVerified = IsVerified,
             Visibility = (int)Visibility,
             ShowActivity = ShowActivity,
-            IsTwoWayLink = IsTwoWayLink,
+            IsTwoWayLink = IsTwoWayLink
             //TODO: Integrations =
         };
-    }
 
-    public static UserConnection Construct(IDiscordClient client, Models.Json.UserConnection model)
-    {
-        return new UserConnection(
+    public static UserConnection Construct(IDiscordClient client, Models.Json.UserConnection model) =>
+        new(
             model.Id,
             model.Name,
             model.Type,
@@ -52,5 +52,4 @@ public readonly struct UserConnection(
             model.IsTwoWayLink,
             (ConnectionVisibility)model.Visibility
         );
-    }
 }

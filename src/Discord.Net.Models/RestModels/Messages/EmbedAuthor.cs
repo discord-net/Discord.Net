@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class EmbedAuthor
+public sealed class EmbedAuthor : IEmbedAuthorModel
 {
     [JsonPropertyName("name")]
     public required string Name { get; set; }
@@ -15,4 +15,8 @@ public sealed class EmbedAuthor
 
     [JsonPropertyName("proxy_icon_url")]
     public Optional<string> ProxyIconUrl { get; set; }
+
+    string? IEmbedAuthorModel.Url => Url;
+    string? IEmbedAuthorModel.IconUrl => IconUrl;
+    string? IEmbedAuthorModel.ProxyIconUrl => ProxyIconUrl;
 }

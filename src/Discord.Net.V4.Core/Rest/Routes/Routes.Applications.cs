@@ -4,26 +4,28 @@ namespace Discord.Rest;
 
 public partial class Routes
 {
-    public static ApiRoute<Application> GetCurrentApplication
-        => new(nameof(GetCurrentApplication), RequestMethod.Get, "applications/@me");
+    public static IApiOutRoute<Application> GetCurrentApplication
+        => new ApiOutRoute<Application>(nameof(GetCurrentApplication), RequestMethod.Get, "applications/@me");
 
-    public static ApiBodyRoute<ModifyCurrentApplicationParams, Application> ModifyCurrentApplication(
+    public static IApiInOutRoute<ModifyCurrentApplicationParams, Application> ModifyCurrentApplication(
         ModifyCurrentApplicationParams body)
-        => new(nameof(ModifyCurrentApplication),
+        => new ApiInOutRoute<ModifyCurrentApplicationParams, Application>(nameof(ModifyCurrentApplication),
             RequestMethod.Patch,
             "applications/@me",
             body);
 
-    public static ApiRoute<ApplicationRoleConnectionMetadata> GetApplicationRoleConnectionMetadata(ulong applicationId,
+    public static IApiOutRoute<ApplicationRoleConnectionMetadata> GetApplicationRoleConnectionMetadata(
+        ulong applicationId,
         ulong roleId)
-        => new(nameof(GetApplicationRoleConnectionMetadata),
+        => new ApiOutRoute<ApplicationRoleConnectionMetadata>(nameof(GetApplicationRoleConnectionMetadata),
             RequestMethod.Get,
             $"applications/{applicationId}/role-connections/{roleId}/metadata");
 
-    public static ApiBodyRoute<ApplicationRoleConnectionMetadata, ApplicationRoleConnectionMetadata>
+    public static IApiInOutRoute<ApplicationRoleConnectionMetadata, ApplicationRoleConnectionMetadata>
         ModifyApplicationRoleConnectionMetadata(ulong applicationId, ulong roleId,
             ApplicationRoleConnectionMetadata body)
-        => new(nameof(GetApplicationRoleConnectionMetadata),
+        => new ApiInOutRoute<ApplicationRoleConnectionMetadata, ApplicationRoleConnectionMetadata>(
+            nameof(GetApplicationRoleConnectionMetadata),
             RequestMethod.Get,
             $"applications/{applicationId}/role-connections/{roleId}/metadata",
             body);

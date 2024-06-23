@@ -8,13 +8,15 @@ public partial class RestDMChannelActor(DiscordRestClient client, ulong id) :
     RestChannelActor(client, id),
     IDMChannelActor
 {
-    public IRootActor<ILoadableMessageActor<IMessage>, ulong, IMessage> Messages => throw new NotImplementedException();
+    [ProxyInterface(typeof(IMessageChannelActor))]
+    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, null, id);
 }
 
 public partial class RestDMChannel(DiscordRestClient client, IDMChannelModel model, RestDMChannelActor? actor = null) :
     RestChannel(client, model),
     IDMChannel,
-    INotifyPropertyChanged
+    INotifyPropertyChanged,
+    IConstructable<RestDMChannel, IDMChannelModel, DiscordRestClient>
 {
     internal new IDMChannelModel Model { get; set; } = model;
 
@@ -25,4 +27,7 @@ public partial class RestDMChannel(DiscordRestClient client, IDMChannelModel mod
     public RestLoadableUserActor Recipient { get; } = new(client, model.RecipientId);
 
     ILoadableEntity<ulong, IUser> IDMChannel.Recipient => Recipient;
+
+    public static RestDMChannel Construct(DiscordRestClient client, IDMChannelModel model)
+        => new(client, model);
 }

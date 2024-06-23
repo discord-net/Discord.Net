@@ -1,6 +1,7 @@
 using Discord.Integration;
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Channels;
 using System.Globalization;
 
 namespace Discord.Rest.Guilds;
@@ -23,29 +24,29 @@ public partial class RestGuildActor(DiscordRestClient client, ulong id) :
     RestActor<ulong, RestGuild>(client, id),
     IGuildActor
 {
-    public IRootActor<IIntegrationActor, ulong, IIntegration> Integrations => throw new NotImplementedException();
+    public IIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations => throw new NotImplementedException();
 
-    public IPagedLoadableRootActor<ILoadableGuildBanActor, ulong, IBan> Bans => throw new NotImplementedException();
+    public IPagedIndexableActor<ILoadableGuildBanActor, ulong, IBan> Bans => throw new NotImplementedException();
 
-    public IRootActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels => throw new NotImplementedException();
+    public IIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels => throw new NotImplementedException();
 
-    public ILoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> ActiveThreads => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableThreadActor, ulong, IThreadChannel> ActiveThreads => throw new NotImplementedException();
 
-    public IRootActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels => throw new NotImplementedException();
+    public IIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels => throw new NotImplementedException();
 
-    public ILoadableRootActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels => throw new NotImplementedException();
 
-    public IPagedLoadableRootActor<ILoadableGuildMemberActor, ulong, IGuildMember> Members => throw new NotImplementedException();
+    public IPagedIndexableActor<ILoadableGuildMemberActor, ulong, IGuildMember> Members => throw new NotImplementedException();
 
-    public ILoadableRootActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes => throw new NotImplementedException();
 
-    public ILoadableRootActor<IRoleActor, ulong, IRole> Roles => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IRoleActor, ulong, IRole> Roles => throw new NotImplementedException();
 
-    public ILoadableRootActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers => throw new NotImplementedException();
 
-    public ILoadableRootActor<ILoadableGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents => throw new NotImplementedException();
 
-    public ILoadableRootActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites => throw new NotImplementedException();
 }
 
 public partial class RestGuild(DiscordRestClient client, IGuildModel model, RestGuildActor? actor = null) :
@@ -63,20 +64,31 @@ public partial class RestGuild(DiscordRestClient client, IGuildModel model, Rest
 
     #region Loadables
 
-    public ILoadableEntity<ulong, IVoiceChannel> AFKChannel => throw new NotImplementedException();
+    public RestLoadableTextChannelActor? AFKChannel { get; } = model.AFKChannelId.HasValue
+        ? new(client, model.Id, model.AFKChannelId.Value)
+        : null;
 
-    public ILoadableEntity<ulong, ITextChannel> WidgetChannel => throw new NotImplementedException();
+    public RestLoadableTextChannelActor? WidgetChannel { get; } = model.WidgetChannelId.HasValue
+        ? new(client, model.Id, model.WidgetChannelId.Value)
+        : null;
 
-    public ILoadableEntity<ulong, ITextChannel> SafetyAlertsChannel => throw new NotImplementedException();
+    public RestLoadableTextChannelActor? SafetyAlertsChannel { get; } = model.SafetyAlertsChannelId.HasValue
+        ? new(client, model.Id, model.SafetyAlertsChannelId.Value)
+        : null;
 
-    public ILoadableEntity<ulong, ITextChannel> SystemChannel => throw new NotImplementedException();
+    public RestLoadableTextChannelActor? SystemChannel { get; } = model.SystemChannelId.HasValue
+        ? new(client, model.Id, model.SystemChannelId.Value)
+        : null;
 
-    public ILoadableEntity<ulong, ITextChannel> RulesChannel => throw new NotImplementedException();
+    public RestLoadableTextChannelActor? RulesChannel { get; } = model.RulesChannelId.HasValue
+        ? new(client, model.Id, model.RulesChannelId.Value)
+        : null;
 
-    public ILoadableEntity<ulong, ITextChannel> PublicUpdatesChannel => throw new NotImplementedException();
+    public RestLoadableTextChannelActor? PublicUpdatesChannel { get; } = model.PublicUpdatesChannelId.HasValue
+        ? new(client, model.Id, model.PublicUpdatesChannelId.Value)
+        : null;
 
-    public ILoadableEntity<ulong, IGuildMember> Owner => throw new NotImplementedException();
-    public ILoadableEntity<ulong, IRole> EveryoneRole => throw new NotImplementedException();
+    public RestLoadableGuildMemberActor Owner { get; } = new(client, model.Id, model.OwnerId);
 
     #endregion
 
@@ -127,4 +139,12 @@ public partial class RestGuild(DiscordRestClient client, IGuildModel model, Rest
     public ulong? ApplicationId => Model.ApplicationId;
 
     #endregion
+
+    ILoadableTextChannelActor? IGuild.AFKChannel => AFKChannel;
+    ILoadableTextChannelActor? IGuild.WidgetChannel => WidgetChannel;
+    ILoadableTextChannelActor? IGuild.SafetyAlertsChannel => SafetyAlertsChannel;
+    ILoadableTextChannelActor? IGuild.SystemChannel => SystemChannel;
+    ILoadableTextChannelActor? IGuild.RulesChannel => RulesChannel;
+    ILoadableTextChannelActor? IGuild.PublicUpdatesChannel => PublicUpdatesChannel;
+    ILoadableGuildMemberActor IGuild.Owner => Owner;
 }

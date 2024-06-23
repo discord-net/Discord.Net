@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [ComponentType(ComponentTypes.SelectMenu)]
-public sealed class SelectMenuComponent : MessageComponent
+public sealed class SelectMenuComponent : MessageComponent, ISelectMenuComponentModel
 {
     [JsonPropertyName("custom_id")]
     public required string CustomId { get; set; }
@@ -18,18 +18,26 @@ public sealed class SelectMenuComponent : MessageComponent
     [JsonPropertyName("placeholder")]
     public Optional<string> Placeholder { get; set; }
 
+    [JsonPropertyName("default_values")]
+    public Optional<SelectMenuDefaultValueModel[]> DefaultValues { get; set; }
+
     [JsonPropertyName("min_values")]
-    public int MinValues { get; set; }
+    public Optional<int> MinValues { get; set; }
 
     [JsonPropertyName("max_values")]
-    public int MaxValues { get; set; }
+    public Optional<int> MaxValues { get; set; }
 
     [JsonPropertyName("disabled")]
-    public bool IsDisabled { get; set; }
+    public Optional<bool> IsDisabled { get; set; }
 
-    [JsonPropertyName("resolved")]
-    public Optional<InteractionDataResolved> Resolved { get; set; }
+    IEnumerable<ISelectMenuOptionModel> ISelectMenuComponentModel.Options => Options | [];
 
-    [JsonPropertyName("values")]
-    public Optional<string[]> Values { get; set; }
+    int[]? ISelectMenuComponentModel.ChannelTypes => ChannelTypes;
+    string? ISelectMenuComponentModel.Placeholder => Placeholder;
+
+    IEnumerable<ISelectMenuDefaultValueModel> ISelectMenuComponentModel.DefaultValues => DefaultValues | [];
+
+    int? ISelectMenuComponentModel.MinValues => MinValues;
+    int? ISelectMenuComponentModel.MaxValues => MaxValues;
+    bool? ISelectMenuComponentModel.IsDisabled => IsDisabled;
 }

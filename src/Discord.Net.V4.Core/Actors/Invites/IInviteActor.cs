@@ -11,6 +11,6 @@ public interface IInviteActor :
     IDeletable<string, IInviteActor>,
     IActor<string, IInvite>
 {
-    static BasicApiRoute IDeletable<string, IInviteActor>.DeleteRoute(IPathable path, string id)
+    static IApiRoute IDeletable<string, IInviteActor>.DeleteRoute(IPathable path, string id)
         => Routes.DeleteInvite(id);
 }

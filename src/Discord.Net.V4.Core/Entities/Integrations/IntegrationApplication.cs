@@ -12,16 +12,14 @@ public readonly struct IntegrationApplication(ulong id, string name, string? ico
     public readonly IUser? Bot = bot;
 
 
-    public static IntegrationApplication Construct(IDiscordClient client, Models.Json.IntegrationApplication model)
-    {
-        return new IntegrationApplication(
+    public static IntegrationApplication Construct(IDiscordClient client, Models.Json.IntegrationApplication model) =>
+        new(
             model.Id,
             model.Name,
             model.Icon,
             model.Description,
             ~model.Bot.Map(client.CreateEntity)
         );
-    }
 
     ulong IIdentifiable<ulong>.Id => Id;
 }

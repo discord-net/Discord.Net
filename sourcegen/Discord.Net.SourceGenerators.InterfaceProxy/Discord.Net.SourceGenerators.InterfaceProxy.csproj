@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../Discord.Net.SourceGenerators.Common/**/*.cs" Link="Discord.Net.SourceGenerators.Common"/>
+    <Compile Include="../Discord.Net.SourceGenerators.Common/**/*.cs" Link="common\Discord.Net.SourceGenerators.Common"/>
     <Compile Remove="../Discord.Net.SourceGenerators.Common/obj/**/*.cs" />
   </ItemGroup>
 

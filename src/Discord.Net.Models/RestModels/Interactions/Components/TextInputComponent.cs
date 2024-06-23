@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [ComponentType(ComponentTypes.TextInput)]
-public sealed class TextInputComponent : MessageComponent
+public sealed class TextInputComponent : MessageComponent, ITextInputComponentModel
 {
     [JsonPropertyName("style")]
     public int Style { get; set; }
@@ -29,4 +29,10 @@ public sealed class TextInputComponent : MessageComponent
 
     [JsonPropertyName("required")]
     public Optional<bool> Required { get; set; }
+
+    int? ITextInputComponentModel.MinLength => MinLength;
+    int? ITextInputComponentModel.MaxLength => MaxLength;
+    bool? ITextInputComponentModel.IsRequired => Required;
+    string? ITextInputComponentModel.Value => Value;
+    string? ITextInputComponentModel.Placeholder => Placeholder;
 }

@@ -38,7 +38,7 @@ namespace Discord.Gateway
 
         public IEmote DefaultReactionEmoji => throw new NotImplementedException();
 
-        public ForumSortOrder? DefaultSortOrder => throw new NotImplementedException();
+        public SortOrder? DefaultSortOrder => throw new NotImplementedException();
 
         public ForumLayout DefaultLayout => throw new NotImplementedException();
 

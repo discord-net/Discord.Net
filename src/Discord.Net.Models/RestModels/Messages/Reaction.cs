@@ -5,7 +5,7 @@ namespace Discord.Models.Json;
 public sealed class Reaction : IReactionModel, IEntityModelSource
 {
     [JsonPropertyName("count")]
-    public int Count { get; set; }
+    public int Total { get; set; }
 
     [JsonPropertyName("me")]
     public bool Me { get; set; }
@@ -25,6 +25,12 @@ public sealed class Reaction : IReactionModel, IEntityModelSource
     ulong? IReactionModel.EmojiId => (Emoji as GuildEmote)?.Id;
 
     string? IReactionModel.EmojiName => Emoji.Name;
+
+    int IReactionModel.BurstCount => CountDetails.BurstCount;
+
+    int IReactionModel.NormalCount => CountDetails.NormalCount;
+    bool IReactionModel.MeBurst => IsMeBurst;
+    string[] IReactionModel.BurstColors => Colors;
 
     public IEnumerable<IEntityModel> GetEntities()
     {

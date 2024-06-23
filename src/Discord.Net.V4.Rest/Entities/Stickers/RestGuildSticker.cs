@@ -45,5 +45,23 @@ public sealed partial class RestGuildSticker(DiscordRestClient client, ulong gui
     public static RestGuildSticker Construct(DiscordRestClient client, IStickerModel model, ulong context)
         => new(client, context, model);
 
-    public ILoadableEntity<ulong, IGuildMember>? Author => throw new NotImplementedException();
+    protected override void OnModelUpdated()
+    {
+        base.OnModelUpdated();
+
+        if (Model.AuthorId != Author?.Id)
+        {
+            if (Model.AuthorId.HasValue)
+                (Author ??= new(Client, guildId, Model.AuthorId.Value)).Loadable.Id = Model.AuthorId.Value;
+            else
+                Author = null;
+        }
+    }
+
+    public RestLoadableGuildMemberActor? Author { get; private set; }
+        = model.AuthorId.HasValue
+            ? new(client, guildId, model.AuthorId.Value)
+            : null;
+
+    ILoadableGuildMemberActor? IGuildSticker.Author => Author;
 }

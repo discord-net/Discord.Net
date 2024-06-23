@@ -3,16 +3,17 @@ using Discord.Models.Json;
 
 namespace Discord.Rest;
 
-public partial class RestLoadableUserActor(DiscordRestClient client, ulong id) :
+public partial class RestLoadableUserActor(DiscordRestClient client, ulong id, IUserModel? value = null) :
     RestUserActor(client, id),
     ILoadableUserActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IUser>))]
-    internal RestLoadable<ulong, RestUser, IUser, User> Loadable { get; } =
-        RestLoadable<ulong, RestUser, IUser, User>.FromConstructable<RestUser>(
+    internal RestLoadable<ulong, RestUser, IUser, IUserModel> Loadable { get; } =
+        RestLoadable<ulong, RestUser, IUser, IUserModel>.FromConstructable<RestUser>(
             client,
             id,
-            Routes.GetUser
+            Routes.GetUser,
+            value
         );
 }
 

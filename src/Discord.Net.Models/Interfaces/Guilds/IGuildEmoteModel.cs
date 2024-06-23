@@ -1,6 +1,6 @@
 namespace Discord.Models;
 
-public interface IGuildEmoteModel : IEntityModel<ulong>
+public interface IGuildEmoteModel : IEmoteModel, IEntityModel<ulong>
 {
     string? Name { get; }
     ulong[] Roles { get; }

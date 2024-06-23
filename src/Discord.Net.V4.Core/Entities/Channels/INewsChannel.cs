@@ -5,5 +5,4 @@ namespace Discord;
 /// </summary>
 public interface INewsChannel : ITextChannel
 {
-
 }

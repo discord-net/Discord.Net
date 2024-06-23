@@ -17,7 +17,7 @@ public class ModifyMediaChannelProperties : ModifyGuildChannelProperties, IEntit
 
     public override ModifyGuildChannelParams ToApiModel(ModifyGuildChannelParams? existing = null)
     {
-        existing ??= new();
+        existing ??= new ModifyGuildChannelParams();
         base.ToApiModel(existing);
 
         existing.Topic = Topic;
@@ -29,7 +29,7 @@ public class ModifyMediaChannelProperties : ModifyGuildChannelProperties, IEntit
         existing.AvailableTags = AvailableTags.Map(v => v.Select(v => v.ToApiModel()).ToArray());
         existing.DefaultReactionEmoji = DefaultReaction.Map(v => v?.ToDefaultReactionModel());
         existing.DefaultThreadRateLimitPerUser = DefaultThreadSlowmode;
-        existing.DefaultForumSortOrder = DefaultSortOrder.Map(v => (int?)v);
+        existing.DefaultForumSortOrder = DefaultSortOrder.Map(v => v);
 
         return existing;
     }

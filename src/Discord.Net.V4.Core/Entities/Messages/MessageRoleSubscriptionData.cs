@@ -1,9 +1,12 @@
+using Discord.Models;
+
 namespace Discord;
 
 /// <summary>
 ///     Represents a role subscription data in <see cref="IMessage" />.
 /// </summary>
-public readonly struct MessageRoleSubscriptionData
+public readonly struct
+    MessageRoleSubscriptionData : IConstructable<MessageRoleSubscriptionData, IMessageRoleSubscriptionData>
 {
     /// <summary>
     ///     The id of the sku and listing that the user is subscribed to.
@@ -32,4 +35,7 @@ public readonly struct MessageRoleSubscriptionData
         MonthsSubscribed = monthsSubscribed;
         IsRenewal = isRenewal;
     }
+
+    public static MessageRoleSubscriptionData Construct(IDiscordClient client, IMessageRoleSubscriptionData model)
+        => new(model.RoleSubscriptionListingId, model.TierName, model.TotalMonthsSubscribed, model.IsRenewal);
 }

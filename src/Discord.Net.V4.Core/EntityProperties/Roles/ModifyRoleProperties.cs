@@ -77,7 +77,7 @@ public class ModifyRoleProperties : IEntityProperties<ModifyGuildRoleParams>
 
     public ModifyGuildRoleParams ToApiModel(ModifyGuildRoleParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyGuildRoleParams();
 
         existing.Name = Name;
         existing.Permissions = Permissions.Map(v => v.ToString());

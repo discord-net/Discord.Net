@@ -13,12 +13,12 @@ public class ModifyForumChannelProperties : ModifyGuildChannelProperties, IEntit
     public Optional<IEnumerable<ForumTag>> AvailableTags { get; set; }
     public Optional<IEmote?> DefaultReaction { get; set; }
     public Optional<int?> DefaultThreadSlowmode { get; set; }
-    public Optional<ForumSortOrder?> DefaultSortOrder { get; set; }
+    public Optional<SortOrder?> DefaultSortOrder { get; set; }
     public Optional<ForumLayout> DefaultForumLayout { get; set; }
 
     public override ModifyGuildChannelParams ToApiModel(ModifyGuildChannelParams? existing = null)
     {
-        existing ??= new();
+        existing ??= new ModifyGuildChannelParams();
         base.ToApiModel(existing);
 
         existing.Topic = Topic;

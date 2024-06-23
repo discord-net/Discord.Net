@@ -1,5 +1,3 @@
-using Discord.Rest;
-
 namespace Discord;
 
 public interface IModifiable<TId, out TSelf, out TParams, TApi> : IEntity<TId>, IPathable
@@ -11,12 +9,14 @@ public interface IModifiable<TId, out TSelf, out TParams, TApi> : IEntity<TId>, 
     Task ModifyAsync(Action<TParams> func, RequestOptions? options = null, CancellationToken token = default)
         => ModifyAsync(Client, this, Id, func, options, token);
 
-    internal static Task ModifyAsync(IDiscordClient client, IPathable path, TId id, Action<TParams> func, RequestOptions? options = null, CancellationToken token = default)
+    internal static Task ModifyAsync(IDiscordClient client, IPathable path, TId id, Action<TParams> func,
+        RequestOptions? options = null, CancellationToken token = default)
     {
         var args = new TParams();
         func(args);
-        return client.RestApiClient.ExecuteAsync(TSelf.ModifyRoute(path, id, args.ToApiModel()), options ?? client.DefaultRequestOptions, token);
+        return client.RestApiClient.ExecuteAsync(TSelf.ModifyRoute(path, id, args.ToApiModel()),
+            options ?? client.DefaultRequestOptions, token);
     }
 
-    internal static abstract ApiBodyRoute<TApi> ModifyRoute(IPathable path, TId id, TApi args);
+    internal static abstract IApiInRoute<TApi> ModifyRoute(IPathable path, TId id, TApi args);
 }

@@ -9,7 +9,7 @@ public interface ILoadableEntityEnumerable<TId, TEntity> : IAsyncEnumerable<TEnt
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
 {
-    ILoadableEntity<TId, TEntity> this[TId id] { get => Specifically(id); }
+    ILoadableEntity<TId, TEntity> this[TId id] => Specifically(id);
 
     ILoadableEntity<TId, TEntity> Specifically(TId id);
 
@@ -66,5 +66,3 @@ public interface IDefinedLoadableEntityEnumerable<TId, TEntity> : ILoadableEntit
 
     IAsyncEnumerable<ILoadableEntity<TId, TEntity>> EnumerateLoadables();
 }
-
-

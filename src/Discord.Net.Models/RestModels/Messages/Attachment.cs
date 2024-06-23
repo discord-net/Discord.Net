@@ -56,4 +56,5 @@ public sealed class Attachment : IAttachmentModel
     float? IAttachmentModel.Duration => DurationSeconds;
 
     string? IAttachmentModel.Waveform => Waveform;
+    int? IAttachmentModel.Flags => Flags;
 }

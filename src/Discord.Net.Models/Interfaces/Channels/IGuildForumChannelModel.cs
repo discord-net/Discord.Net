@@ -10,15 +10,7 @@ public interface IGuildForumChannelModel : IGuildChannelModel
     int? RatelimitPerUser { get; }
     int? DefaultThreadRateLimitPerUser { get; }
     IEmote? DefaultReactionEmoji { get; }
-    IEnumerable<IForumTagModel> AvailableTags { get; }
+    IEnumerable<ITagModel> AvailableTags { get; }
     int? DefaultSortOrder { get; }
     int DefaultForumLayout { get; }
-}
-
-public interface IForumTagModel : IEntityModel<ulong>
-{
-    string Name { get; }
-    bool Moderated { get; }
-    string? EmojiName { get; }
-    ulong? EmojiId { get; }
 }

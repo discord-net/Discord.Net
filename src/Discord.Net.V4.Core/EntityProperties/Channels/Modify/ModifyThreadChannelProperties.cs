@@ -17,7 +17,7 @@ public class ModifyThreadChannelProperties : ModifyChannelBaseProperties, IEntit
 
     public ModifyThreadChannelParams ToApiModel(ModifyThreadChannelParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyThreadChannelParams();
         base.ToApiModel(existing);
 
         existing.IsArchived = IsArchived;

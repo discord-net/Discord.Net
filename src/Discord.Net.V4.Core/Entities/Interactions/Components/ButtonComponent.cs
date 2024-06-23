@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Models.Json;
 
 namespace Discord;
@@ -5,10 +6,10 @@ namespace Discord;
 /// <summary>
 ///     Represents a <see cref="IMessageComponent" /> Button.
 /// </summary>
-public sealed class ButtonComponent : IMessageComponent
+public sealed class ButtonComponent : IMessageComponent, IConstructable<ButtonComponent, IButtonComponentModel>
 {
-    internal ButtonComponent(ButtonStyle style, string label, IEmote? emote, string? customId, string? url,
-        bool isDisabled)
+    internal ButtonComponent(ButtonStyle style, string? label, IEmote? emote, string? customId, string? url,
+        bool? isDisabled)
     {
         Style = style;
         Label = label;
@@ -47,23 +48,31 @@ public sealed class ButtonComponent : IMessageComponent
     /// </summary>
     public bool? IsDisabled { get; }
 
+    public static ButtonComponent Construct(IDiscordClient client, IButtonComponentModel model)
+        => new(
+            (ButtonStyle)model.Style,
+            model.Label,
+            model.Emote is not null ? IEmote.Construct(client, model.Emote) : null,
+            model.CustomId,
+            model.Url,
+            model.IsDisabled
+        );
+
     /// <inheritdoc />
     public ComponentType Type => ComponentType.Button;
 
     /// <inheritdoc />
     public string? CustomId { get; }
 
-    public MessageComponent ToApiModel(MessageComponent? existing = default)
-    {
-        return existing ?? new Models.Json.ButtonComponent()
+    public MessageComponent ToApiModel(MessageComponent? existing = default) =>
+        existing ?? new Models.Json.ButtonComponent
         {
             Type = (uint)Type,
-            Emote = Optional.FromNullable(Emote).Map(v => v.ToApiModel()),
+            Emote = Optional.FromNullable(Emote).Map(v => (IEmoteModel)v.ToApiModel()),
             Label = Optional.FromNullable(Label),
             Style = (int)Style,
             IsDisabled = Optional.FromNullable(IsDisabled),
             CustomId = Optional.FromNullable(CustomId),
             Url = Optional.FromNullable(Url)
         };
-    }
 }

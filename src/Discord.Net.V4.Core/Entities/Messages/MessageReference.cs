@@ -1,3 +1,4 @@
+using Discord.Models;
 using System.Diagnostics;
 
 namespace Discord;
@@ -6,7 +7,7 @@ namespace Discord;
 ///     Contains the IDs sent from a crossposted message or inline reply.
 /// </summary>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-public readonly struct MessageReference
+public readonly struct MessageReference : IConstructable<MessageReference, IMessageReferenceModel>
 {
     /// <summary>
     ///     The Message ID of the original message.
@@ -59,6 +60,9 @@ public readonly struct MessageReference
         => $"Channel ID: ({ChannelId}){(GuildId.HasValue ? $", Guild ID: ({GuildId.Value})" : "")}" +
            $"{(MessageId.HasValue ? $", Message ID: ({MessageId.Value})" : "")}" +
            $", FailIfNotExists: ({FailIfNotExists})";
+
+    public static MessageReference Construct(IDiscordClient client, IMessageReferenceModel model)
+        => new(model.MessageId, model.ChannelId, model.GuildId);
 
     /// <inheritdoc />
     public override string ToString()

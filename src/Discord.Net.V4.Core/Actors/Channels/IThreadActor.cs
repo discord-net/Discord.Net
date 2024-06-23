@@ -14,9 +14,18 @@ public interface IThreadActor :
     IActor<ulong, IThreadChannel>,
     IModifiable<ulong, IThreadActor, ModifyThreadChannelProperties, ModifyThreadChannelParams>
 {
-    ILoadableThreadMemberActor<IThreadMember> CurrentThreadMember { get; }
+    ILoadableThreadMemberActor CurrentThreadMember { get; }
 
-    ILoadableRootActor<ILoadableThreadMemberActor<IThreadMember>, ulong, IThreadMember> ThreadMembers { get; }
+    IEnumerableIndexableActor<ILoadableThreadMemberActor, ulong, IThreadMember> ThreadMembers { get; }
+
+    static IApiInRoute<ModifyThreadChannelParams>
+        IModifiable<ulong, IThreadActor, ModifyThreadChannelProperties, ModifyThreadChannelParams>.ModifyRoute(
+            IPathable path, ulong id,
+            ModifyThreadChannelParams args)
+        => Routes.ModifyChannel(id, args);
+
+    ILoadableThreadMemberActor IThreadMemberRelationship.ThreadMember
+        => CurrentThreadMember;
 
     Task JoinAsync(RequestOptions? options = null, CancellationToken token = default)
         => Client.RestApiClient.ExecuteAsync(Routes.JoinThread(Id), options ?? Client.DefaultRequestOptions, token);
@@ -31,11 +40,4 @@ public interface IThreadActor :
 
     Task LeaveAsync(RequestOptions? options = null, CancellationToken token = default)
         => Client.RestApiClient.ExecuteAsync(Routes.LeaveThread(Id), options ?? Client.DefaultRequestOptions, token);
-
-    ILoadableThreadMemberActor<IThreadMember> IThreadMemberRelationship<IThreadMember>.ThreadMember
-        => CurrentThreadMember;
-
-    static ApiBodyRoute<ModifyThreadChannelParams> IModifiable<ulong, IThreadActor, ModifyThreadChannelProperties, ModifyThreadChannelParams>.ModifyRoute(IPathable path, ulong id,
-        ModifyThreadChannelParams args)
-        => Routes.ModifyChannel(id, args);
 }

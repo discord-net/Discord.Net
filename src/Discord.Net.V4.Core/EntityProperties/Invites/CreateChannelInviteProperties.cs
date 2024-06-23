@@ -13,9 +13,8 @@ public class CreateChannelInviteProperties : IEntityProperties<CreateChannelInvi
     public Optional<ulong> TargetApplicationId { get; set; }
 
 
-    public CreateChannelInviteParams ToApiModel(CreateChannelInviteParams? existing = default)
-    {
-        return existing ??= new CreateChannelInviteParams()
+    public CreateChannelInviteParams ToApiModel(CreateChannelInviteParams? existing = default) =>
+        existing ??= new CreateChannelInviteParams
         {
             IsTemporary = IsTemporary,
             IsUnique = IsUnique,
@@ -25,5 +24,4 @@ public class CreateChannelInviteProperties : IEntityProperties<CreateChannelInvi
             TargetApplicationId = TargetApplicationId,
             TargetUserId = TargetUser.MapToId()
         };
-    }
 }

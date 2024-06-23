@@ -14,7 +14,7 @@ public struct PermissionSet(ulong lower, ulong upper) : IEquatable<PermissionSet
     ///     Creates a new permission set with the nth bit set.
     /// </summary>
     /// <remarks>
-    ///     The <paramref name="setBit"/> parameter is 0-based, ex <c>new PermissionSet(0)</c> will set the 0th bit
+    ///     The <paramref name="setBit" /> parameter is 0-based, ex <c>new PermissionSet(0)</c> will set the 0th bit
     ///     (first) to <c>1</c>
     /// </remarks>
     /// <param name="setBit">The 0-based bit index to set.</param>
@@ -26,7 +26,9 @@ public struct PermissionSet(ulong lower, ulong upper) : IEquatable<PermissionSet
             setBit is <= sizeof(ulong) << 4 and > sizeof(ulong) << 3
                 ? 1UL << setBit
                 : 0L
-        ) { }
+        )
+    {
+    }
 
     public bool Has(in PermissionSet other)
         => (this | other) == other;
@@ -105,11 +107,11 @@ public struct PermissionSet(ulong lower, ulong upper) : IEquatable<PermissionSet
     {
         Span<byte> bytes = stackalloc byte[sizeof(PermissionSet)];
 
-        if(!set.TryWriteBytes(bytes, out _))
+        if (!set.TryWriteBytes(bytes, out _))
             throw new ArgumentOutOfRangeException(nameof(set));
 
 
-        ref var lower = ref Unsafe.As<byte, ulong>(ref bytes[0]);            // 0..4
+        ref var lower = ref Unsafe.As<byte, ulong>(ref bytes[0]); // 0..4
         ref var upper = ref Unsafe.As<byte, ulong>(ref bytes[sizeof(long)]); // 4..8
 
         return new PermissionSet(lower, upper);

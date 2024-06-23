@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Models.Json;
 using System.Collections.Immutable;
 
@@ -7,11 +8,11 @@ namespace Discord;
 ///     Represents a select menu component defined at
 ///     <see href="https://discord.com/developers/docs/interactions/message-components#select-menu-object" />
 /// </summary>
-public class SelectMenuComponent : IMessageComponent
+public class SelectMenuComponent : IMessageComponent, IConstructable<SelectMenuComponent, ISelectMenuComponentModel>
 {
     internal SelectMenuComponent(
         string customId, IEnumerable<SelectMenuOption>? options, string? placeholder,
-        int minValues, int maxValues, bool disabled, ComponentType type,
+        int? minValues, int? maxValues, bool? disabled, ComponentType type,
         IEnumerable<ChannelType>? channelTypes = null)
     {
         CustomId = customId;
@@ -21,7 +22,7 @@ public class SelectMenuComponent : IMessageComponent
         MaxValues = maxValues;
         IsDisabled = disabled;
         Type = type;
-        ChannelTypes = channelTypes?.ToArray() ?? Array.Empty<ChannelType>();
+        ChannelTypes = channelTypes?.ToArray() ?? [];
     }
 
     /// <summary>
@@ -37,22 +38,34 @@ public class SelectMenuComponent : IMessageComponent
     /// <summary>
     ///     Gets the minimum number of items that must be chosen.
     /// </summary>
-    public int MinValues { get; }
+    public int? MinValues { get; }
 
     /// <summary>
     ///     Gets the maximum number of items that can be chosen.
     /// </summary>
-    public int MaxValues { get; }
+    public int? MaxValues { get; }
 
     /// <summary>
     ///     Gets whether this menu is disabled or not.
     /// </summary>
-    public bool IsDisabled { get; }
+    public bool? IsDisabled { get; }
 
     /// <summary>
     ///     Gets the allowed channel types for this modal
     /// </summary>
     public IReadOnlyCollection<ChannelType>? ChannelTypes { get; }
+
+    public static SelectMenuComponent Construct(IDiscordClient client, ISelectMenuComponentModel model) =>
+        new(
+            model.CustomId,
+            model.Options.Select(x => SelectMenuOption.Construct(client, x)),
+            model.Placeholder,
+            model.MinValues,
+            model.MaxValues,
+            model.IsDisabled,
+            (ComponentType)model.Type,
+            model.ChannelTypes?.Select(x => (ChannelType)x)
+        );
 
     /// <inheritdoc />
     public ComponentType Type { get; }
@@ -60,20 +73,18 @@ public class SelectMenuComponent : IMessageComponent
     /// <inheritdoc />
     public string CustomId { get; }
 
-    public MessageComponent ToApiModel(MessageComponent? existing = default)
-    {
-        return existing ?? new Models.Json.SelectMenuComponent()
+    public MessageComponent ToApiModel(MessageComponent? existing = default) =>
+        existing ?? new Models.Json.SelectMenuComponent
         {
             Type = (uint)Type,
             CustomId = CustomId,
-            IsDisabled = IsDisabled,
+            IsDisabled = Optional.FromNullable(IsDisabled),
             Options = Options
                 .OptionalIf(v => v?.Count > 0)
                 .Map(v => v!.Select(v => v.ToApiModel()).ToArray()),
             Placeholder = Optional.FromNullable(Placeholder),
             ChannelTypes = Optional.FromNullable(ChannelTypes).Map(v => v.Select(v => (int)v).ToArray()),
-            MaxValues = MaxValues,
-            MinValues = MinValues,
+            MaxValues = Optional.FromNullable(MaxValues),
+            MinValues = Optional.FromNullable(MinValues)
         };
-    }
 }

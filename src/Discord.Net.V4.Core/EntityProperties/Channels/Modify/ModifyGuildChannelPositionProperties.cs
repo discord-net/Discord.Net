@@ -11,7 +11,7 @@ public class ModifyGuildChannelPositionProperties : IEntityProperties<ModifyGuil
 
     public ModifyGuildChannelPositionsParams ToApiModel(ModifyGuildChannelPositionsParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyGuildChannelPositionsParams();
 
         existing.Id = Channel.Id;
         existing.Position = Position;

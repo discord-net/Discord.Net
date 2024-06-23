@@ -110,7 +110,7 @@ public class ModifyGuildProperties : IEntityProperties<ModifyGuildParams>
 
     public ModifyGuildParams ToApiModel(ModifyGuildParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyGuildParams();
 
         existing.Name = Name;
         existing.VerificationLevel = VerificationLevel.Map(v => (int?)v);

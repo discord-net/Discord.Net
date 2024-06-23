@@ -50,7 +50,7 @@ internal sealed class RateLimiter
         return new RequestHandle(() => _requestQueue.Release());
     }
 
-    public async Task<RatelimitContract> AcquireContractAsync(ApiRoute route, CancellationToken token = default)
+    public async Task<RatelimitContract> AcquireContractAsync(IApiRoute route, CancellationToken token = default)
     {
         return await CreateContractForBucketAsync(await GetOrCreateBucketAsync(route, token), token);
     }
@@ -62,7 +62,7 @@ internal sealed class RateLimiter
         return contract;
     }
 
-    private async Task<Bucket> GetOrCreateBucketAsync(ApiRoute route, CancellationToken token = default)
+    private async Task<Bucket> GetOrCreateBucketAsync(IApiRoute route, CancellationToken token = default)
     {
         await _bucketSemaphore.WaitAsync(token);
 

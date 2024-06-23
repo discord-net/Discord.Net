@@ -2,7 +2,7 @@ using Discord.Models;
 
 namespace Discord;
 
-public struct FileAttachment : IDisposable, IEntityProperties<AttachmentParam>, IEntityProperties<Models.UploadAttachment>
+public struct FileAttachment : IDisposable, IEntityProperties<AttachmentParam>, IEntityProperties<UploadAttachment>
 {
     /// <summary>
     ///     The filename of this <see cref="FileAttachment" />.
@@ -90,22 +90,16 @@ public struct FileAttachment : IDisposable, IEntityProperties<AttachmentParam>, 
         _isDisposed = true;
     }
 
-    public AttachmentParam ToApiModel(AttachmentParam? existing = default)
-    {
-        return new AttachmentParam
-        {
-            Stream = Content, Attachment = ToUploadAttachmentModel()
-        };
-    }
+    public AttachmentParam ToApiModel(AttachmentParam? existing = default) =>
+        new() {Stream = Content, Attachment = ToUploadAttachmentModel()};
 
-    private UploadAttachment ToUploadAttachmentModel()
-    {
-        return new UploadAttachment()
+    private UploadAttachment ToUploadAttachmentModel() =>
+        new()
         {
             Filename = IsSpoiler ? AttachmentUtils.AppendSpoilerPrefix(FileName) : FileName,
-            Description = Optional.FromNullable(Description),
+            Description = Optional.FromNullable(Description)
         };
-    }
 
-    UploadAttachment IEntityProperties<UploadAttachment>.ToApiModel(UploadAttachment? existing) => ToUploadAttachmentModel();
+    UploadAttachment IEntityProperties<UploadAttachment>.ToApiModel(UploadAttachment? existing) =>
+        ToUploadAttachmentModel();
 }

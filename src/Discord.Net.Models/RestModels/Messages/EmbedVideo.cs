@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class EmbedVideo
+public sealed class EmbedVideo : IEmbedVideoModel
 {
     [JsonPropertyName("url")]
     public Optional<string> Url { get; set; }
@@ -15,4 +15,9 @@ public sealed class EmbedVideo
 
     [JsonPropertyName("width")]
     public Optional<int> Width { get; set; }
+
+    string? IEmbedVideoModel.ProxyUrl => ProxyUrl;
+    int? IEmbedVideoModel.Height => Height;
+    int? IEmbedVideoModel.Width => Width;
+    string? IEmbedVideoModel.Url => Url;
 }

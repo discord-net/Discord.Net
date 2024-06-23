@@ -1,4 +1,3 @@
-
 namespace Discord;
 
 public interface IChannelRelationship : IChannelRelationship<ILoadableChannelActor>;
@@ -9,6 +8,5 @@ public interface IChannelRelationship<out TLoadable> :
 {
     TLoadable Channel { get; }
 
-    TLoadable IRelationship<ulong, IChannel, TLoadable>.
-        RelationshipLoadable => Channel;
+    TLoadable IRelationship<ulong, IChannel, TLoadable>.RelationshipLoadable => Channel;
 }

@@ -10,6 +10,8 @@ public sealed class DiscordRestClient : IDiscordClient
 {
     public ApiClient ApiClient { get; }
 
+    public ILoadableWebhookActor Webhook(ulong id, string? token = null) => throw new NotImplementedException();
+
     public DiscordConfig Config { get; }
 
     public RequestOptions DefaultRequestOptions { get; set; } = new();
@@ -67,10 +69,13 @@ public sealed class DiscordRestClient : IDiscordClient
 
     public ILoadableSelfUserActor SelfUser => throw new NotImplementedException();
 
-    public IPagedLoadableRootActor<ILoadableGuildActor, ulong, IGuild, IPartialGuild> Guilds => throw new NotImplementedException();
+    public IPagedIndexableActor<ILoadableGuildActor, ulong, IGuild, IPartialGuild> Guilds => throw new NotImplementedException();
 
-    public IRootActor<ILoadableChannelActor, ulong, IChannel> Channels => throw new NotImplementedException();
+    public IIndexableActor<ILoadableChannelActor, ulong, IChannel> Channels => throw new NotImplementedException();
+
+    public IIndexableActor<ILoadableUserActor, ulong, IUser> Users => throw new NotImplementedException();
 
     IRestApiClient IDiscordClient.RestApiClient => ApiClient;
     IDiscordClient IClientProvider.Client => this;
+    public IMessage CreateEntity(IMessageModel model) => throw new NotImplementedException();
 }

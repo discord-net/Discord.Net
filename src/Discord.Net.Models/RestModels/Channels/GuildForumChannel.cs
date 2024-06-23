@@ -22,5 +22,5 @@ public sealed class GuildForumChannel : GuildChannelBase, IGuildForumChannelMode
 
     IEmote? IGuildForumChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
 
-    IEnumerable<IForumTagModel> IGuildForumChannelModel.AvailableTags => AvailableTags | [];
+    IEnumerable<ITagModel> IGuildForumChannelModel.AvailableTags => AvailableTags | [];
 }

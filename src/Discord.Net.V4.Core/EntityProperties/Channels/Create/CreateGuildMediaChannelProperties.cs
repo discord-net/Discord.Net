@@ -11,7 +11,7 @@ public class CreateGuildMediaChannel : CreateGuildChannelProperties
     public Optional<ThreadArchiveDuration?> DefaultAutoArchiveDuration { get; set; }
     public Optional<IEmote?> DefaultReactionEmoji { get; set; }
     public Optional<ForumTag[]?> AvailableTags { get; set; }
-    public Optional<ForumSortOrder?> DefaultSortOrder { get; set; }
+    public Optional<SortOrder?> DefaultSortOrder { get; set; }
     public Optional<int?> DefaultThreadSlowmode { get; set; }
 
     public override CreateGuildChannelParams ToApiModel(CreateGuildChannelParams? existing = default)

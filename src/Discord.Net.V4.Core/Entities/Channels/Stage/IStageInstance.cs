@@ -1,16 +1,10 @@
-using Discord.Models;
-using Discord.Rest;
-
 namespace Discord;
-
-public interface IStageInstance : IStageInstance<IStageInstance>;
 
 /// <summary>
 ///     Represents a live stage instance within a stage channel.
 /// </summary>
-public interface IStageInstance<TStageInstance> :
+public interface IStageInstance :
     ISnowflakeEntity
-    where TStageInstance : IStageInstance<TStageInstance>
 {
     /// <summary>
     ///     Gets the topic of the stage.

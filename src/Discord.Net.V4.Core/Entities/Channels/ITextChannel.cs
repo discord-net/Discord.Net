@@ -1,9 +1,4 @@
-using Discord.Entities.Channels.Threads;
-using Discord.Models.Json;
-using Discord.Rest;
-
 namespace Discord;
-
 
 /// <summary>
 ///     Represents a generic channel in a guild that can send and receive messages.

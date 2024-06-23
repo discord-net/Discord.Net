@@ -1,43 +1,42 @@
 namespace Discord;
 
-public class BasicApiRoute(string name, RequestMethod method, string endpoint, BucketInfo? bucket = null)
-    : ApiRoute(name, method, endpoint, bucket)
-{
-}
-
-public class ApiBodyRoute<TRequestBody>(
+public class ApiInRoute<TRequestBody>(
     string name,
     RequestMethod method,
     string endpoint,
     TRequestBody body,
     ContentType contentType = ContentType.JsonBody,
-    BucketInfo? bucket = null)
-    : BasicApiRoute(name, method, endpoint, bucket)
+    BucketInfo? bucket = null
+) :
+    ApiRoute(name, method, endpoint, bucket),
+    IApiInRoute<TRequestBody>
 {
-    public TRequestBody Body { get; } = body;
+    public TRequestBody RequestBody { get; } = body;
     public ContentType ContentType { get; } = contentType;
 }
 
-public sealed class ApiBodyRoute<TRequestBody, TResponseBody>(
+public sealed class ApiInOutRoute<TRequestBody, TResponseBody>(
     string name,
     RequestMethod method,
     string endpoint,
     TRequestBody body,
     ContentType contentType = ContentType.JsonBody,
-    BucketInfo? bucket = null)
-    : ApiBodyRoute<TRequestBody>(name, method, endpoint,body, contentType, bucket)
+    BucketInfo? bucket = null
+) :
+    ApiInRoute<TRequestBody>(name, method, endpoint, body, contentType, bucket),
+    IApiInOutRoute<TRequestBody, TResponseBody>
     where TRequestBody : class
-    where TResponseBody : class
-{
+    where TResponseBody : class;
 
-}
+public sealed class ApiOutRoute<TResponse>(
+    string name,
+    RequestMethod method,
+    string endpoint,
+    BucketInfo? bucket = null) :
+    ApiRoute(name, method, endpoint, bucket),
+    IApiOutRoute<TResponse>;
 
-public sealed class ApiRoute<TResponse>(string name, RequestMethod method, string endpoint, BucketInfo? bucket = null)
-    : BasicApiRoute(name, method, endpoint, bucket)
-{
-}
-
-public abstract class ApiRoute(string name, RequestMethod method, string endpoint, BucketInfo? bucket = null)
+public class ApiRoute(string name, RequestMethod method, string endpoint, BucketInfo? bucket = null) : IApiRoute
 {
     public string Name { get; } = name;
     public RequestMethod Method { get; } = method;
@@ -45,4 +44,24 @@ public abstract class ApiRoute(string name, RequestMethod method, string endpoin
     public BucketInfo? Bucket { get; } = bucket;
 
     public override string ToString() => $"{Method.ToString().ToUpper()} {Endpoint} ({Name})";
+}
+
+public interface IApiInOutRoute<out TParams, out TBody> :
+    IApiInRoute<TParams>,
+    IApiOutRoute<TBody>;
+
+public interface IApiInRoute<out TParams> : IApiRoute
+{
+    TParams RequestBody { get; }
+    ContentType ContentType { get; }
+}
+
+public interface IApiOutRoute<out TBody> : IApiRoute;
+
+public interface IApiRoute
+{
+    string Name { get; }
+    RequestMethod Method { get; }
+    string Endpoint { get; }
+    BucketInfo? Bucket { get; }
 }

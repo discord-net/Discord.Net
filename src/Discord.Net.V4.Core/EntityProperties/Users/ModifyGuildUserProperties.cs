@@ -66,7 +66,7 @@ public sealed class ModifyGuildUserProperties : IEntityProperties<ModifyGuildMem
 
     public ModifyGuildMemberParams ToApiModel(ModifyGuildMemberParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyGuildMemberParams();
 
         existing.Nickname = Nickname;
         existing.IsDeaf = Deaf;

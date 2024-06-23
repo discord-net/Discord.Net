@@ -1,12 +1,11 @@
 using Discord.Models;
 using Discord.Rest;
-using Discord.Stage;
 
 namespace Discord;
 
 public interface ILoadableStageChannelActor :
     IStageChannelActor,
-    ILoadableGuildChannelActor;
+    ILoadableEntity<ulong, IStageChannel>;
 
 public interface IStageChannelActor :
     IGuildChannelActor,
@@ -22,7 +21,7 @@ public interface IStageChannelActor :
         CancellationToken token = default)
     {
         var result = await Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.CreateStageInstance(new CreateStageInstanceParams()
+            Routes.CreateStageInstance(new CreateStageInstanceParams
             {
                 Topic = topic,
                 ChannelId = Id,

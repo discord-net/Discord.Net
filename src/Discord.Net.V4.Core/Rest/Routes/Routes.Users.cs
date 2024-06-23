@@ -5,68 +5,60 @@ namespace Discord.Rest;
 
 public static partial class Routes
 {
-    public static readonly ApiRoute<User> GetCurrentUser
-        = new(nameof(GetCurrentUser),
+    public static readonly IApiOutRoute<User> GetCurrentUser
+        = new ApiOutRoute<User>(nameof(GetCurrentUser),
             RequestMethod.Get,
             "users/@me");
 
-    public static readonly ApiRoute<Discord.Models.Json.UserConnection[]> GetUserConnections
-        = new(nameof(GetUserConnections),
+    public static readonly IApiOutRoute<Models.Json.UserConnection[]> GetUserConnections
+        = new ApiOutRoute<Models.Json.UserConnection[]>(nameof(GetUserConnections),
             RequestMethod.Get,
             "users/@me/connections");
 
-    public static ApiRoute<User> GetUser(ulong userId)
-        => new(nameof(GetUser),
+    public static IApiOutRoute<User> GetUser(ulong userId)
+        => new ApiOutRoute<User>(nameof(GetUser),
             RequestMethod.Get,
             $"users/{userId}");
 
-    public static ApiBodyRoute<ModifyCurrentUserParams, User> ModifyCurrentUser(ModifyCurrentUserParams body)
-        => new(nameof(ModifyCurrentUser),
-            RequestMethod.Patch,
-            "users/@me",
+    public static IApiInOutRoute<ModifyCurrentUserParams, User> ModifyCurrentUser(ModifyCurrentUserParams body) =>
+        new ApiInOutRoute<ModifyCurrentUserParams, User>(nameof(ModifyCurrentUser), RequestMethod.Patch, "users/@me",
             body);
 
-    public static ApiRoute<IEnumerable<PartialGuild>> GetCurrentUserGuilds(ulong? before, ulong? after, int? limit, bool? withCounts)
-        => new(
+    public static IApiOutRoute<IEnumerable<PartialGuild>> GetCurrentUserGuilds(ulong? before, ulong? after, int? limit,
+        bool? withCounts)
+        => new ApiOutRoute<IEnumerable<PartialGuild>>(
             nameof(GetCurrentUserGuilds),
             RequestMethod.Get,
             $"users/@me/guilds{RouteUtils.GetUrlEncodedQueryParams(("before", before), ("after", after), ("limit", limit), ("with_counts", withCounts))}"
         );
 
-    public static ApiRoute<GuildMember> GetCurrentUserGuildMember(ulong guildId)
-        => new(nameof(GetCurrentUserGuildMember),
+    public static IApiOutRoute<GuildMember> GetCurrentUserGuildMember(ulong guildId)
+        => new ApiOutRoute<GuildMember>(nameof(GetCurrentUserGuildMember),
             RequestMethod.Get,
             $"users/@me/guilds/{guildId}/member",
             (ScopeType.Guild, guildId));
 
-    public static BasicApiRoute LeaveGuild(ulong guildId)
-        => new(nameof(LeaveGuild),
-            RequestMethod.Delete,
-            $"users/@me/guilds/{guildId}",
+    public static IApiRoute LeaveGuild(ulong guildId) =>
+        new ApiRoute(nameof(LeaveGuild), RequestMethod.Delete, $"users/@me/guilds/{guildId}",
             (ScopeType.Guild, guildId));
 
-    public static ApiBodyRoute<CreateDMChannelParams, DMChannelModel> CreateDm(CreateDMChannelParams body)
-        => new(nameof(CreateDm),
-            RequestMethod.Post,
-            "users/@me/channels",
-            body);
+    public static IApiInOutRoute<CreateDMChannelParams, DMChannelModel> CreateDm(CreateDMChannelParams body) =>
+        new ApiInOutRoute<CreateDMChannelParams, DMChannelModel>(nameof(CreateDm), RequestMethod.Post,
+            "users/@me/channels", body);
 
-    public static ApiBodyRoute<CreateGroupDMChannelParams, GroupDMChannel> CreateGroupDm(
-        CreateGroupDMChannelParams body)
-        => new(nameof(CreateGroupDm),
-            RequestMethod.Post,
-            "users/@me/channels",
-            body);
+    public static IApiInOutRoute<CreateGroupDMChannelParams, GroupDMChannel> CreateGroupDm(
+        CreateGroupDMChannelParams body) =>
+        new ApiInOutRoute<CreateGroupDMChannelParams, GroupDMChannel>(nameof(CreateGroupDm), RequestMethod.Post,
+            "users/@me/channels", body);
 
-    public static ApiRoute<ApplicationRoleConnection> GetUserApplicationRoleConnection(ulong applicationId)
-        => new(nameof(GetUserApplicationRoleConnection),
+    public static IApiOutRoute<ApplicationRoleConnection> GetUserApplicationRoleConnection(ulong applicationId)
+        => new ApiOutRoute<ApplicationRoleConnection>(nameof(GetUserApplicationRoleConnection),
             RequestMethod.Get,
             $"/users/@me/applications/{applicationId}/role-connection");
 
-    public static ApiBodyRoute<ModifyUserRoleConnectionParams, ApplicationRoleConnection>
-        UpdateUserApplicationRoleConnection(ulong applicationId, ModifyUserRoleConnectionParams body)
-        => new(nameof(UpdateUserApplicationRoleConnection),
-            RequestMethod.Put,
-            $"/users/@me/applications/{applicationId}/role-connection",
-            body);
+    public static IApiInOutRoute<ModifyUserRoleConnectionParams, ApplicationRoleConnection>
+        UpdateUserApplicationRoleConnection(ulong applicationId, ModifyUserRoleConnectionParams body) =>
+        new ApiInOutRoute<ModifyUserRoleConnectionParams, ApplicationRoleConnection>(
+            nameof(UpdateUserApplicationRoleConnection), RequestMethod.Put,
+            $"/users/@me/applications/{applicationId}/role-connection", body);
 }

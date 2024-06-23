@@ -34,6 +34,8 @@ public partial class RestSelfUser(DiscordRestClient client, ISelfUserModel model
 
     protected override ISelfUserModel Model { get; } = model;
 
+    public static RestSelfUser Construct(DiscordRestClient client, ISelfUserModel model) => new(client, model);
+
     public string Email => Model.Email!;
 
     public bool IsVerified => Model.Verified ?? false;
@@ -46,5 +48,4 @@ public partial class RestSelfUser(DiscordRestClient client, ISelfUserModel model
 
     public string Locale => Model.Locale!;
 
-    public static RestSelfUser Construct(DiscordRestClient client, ISelfUserModel model) => new(client, model);
 }

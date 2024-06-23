@@ -27,13 +27,11 @@ public partial class RestTextChannelActor(DiscordRestClient client, ulong guildI
     RestGuildChannelActor(client, guildId, id),
     ITextChannelActor
 {
-    public IRootActor<ILoadableMessageActor<IMessage>, ulong, IMessage> Messages => throw new NotImplementedException();
+    [ProxyInterface(typeof(IMessageChannelActor))]
+    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, guildId, id);
 
-    public IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> PublicArchivedThreads => throw new NotImplementedException();
-
-    public IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> PrivateArchivedThreads => throw new NotImplementedException();
-
-    public IPagedLoadableRootActor<ILoadableThreadActor, ulong, IThreadChannel> JoinedPrivateArchivedThreads => throw new NotImplementedException();
+    [ProxyInterface(typeof(IThreadableGuildChannelActor))]
+    internal RestThreadableGuildChannelActor ThreadableGuildChannelActor { get; } = new(client, guildId, id);
 }
 
 public partial class RestTextChannel(DiscordRestClient client, ulong guildId, IGuildTextChannelModel model, RestTextChannelActor? actor = null) :

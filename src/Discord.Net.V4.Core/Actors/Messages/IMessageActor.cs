@@ -3,10 +3,9 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableMessageActor<TMessage> :
+public interface ILoadableMessageActor :
     IMessageActor,
-    ILoadableEntity<ulong, TMessage>
-    where TMessage : class, IMessage;
+    ILoadableEntity<ulong, IMessage>;
 
 public interface IMessageActor :
     IMessageChannelRelationship,
@@ -14,9 +13,11 @@ public interface IMessageActor :
     IDeletable<ulong, IMessageActor>,
     IActor<ulong, IMessage>
 {
-    static BasicApiRoute IDeletable<ulong, IMessageActor>.DeleteRoute(IPathable path, ulong id)
+    static IApiRoute IDeletable<ulong, IMessageActor>.DeleteRoute(IPathable path, ulong id)
         => Routes.DeleteMessage(path.Require<IChannel>(), id);
 
-    static ApiBodyRoute<ModifyMessageParams> IModifiable<ulong, IMessageActor, ModifyMessageProperties, ModifyMessageParams>.ModifyRoute(IPathable path, ulong id, ModifyMessageParams args) =>
+    static IApiInRoute<ModifyMessageParams>
+        IModifiable<ulong, IMessageActor, ModifyMessageProperties, ModifyMessageParams>.ModifyRoute(IPathable path,
+            ulong id, ModifyMessageParams args) =>
         Routes.ModifyMessage(path.Require<IChannel>(), id, args);
 }

@@ -79,7 +79,7 @@ public sealed class Message : IMessageModel, IEntityModelSource
     public Optional<Message?> ReferencedMessage { get; set; }
 
     [JsonPropertyName("interaction")]
-    public Optional<MessageInteraction> Interaction { get; set; }
+    public Optional<MessageInteractionMetadata> Interaction { get; set; }
 
     [JsonPropertyName("thread")]
     public Optional<Channel> Thread { get; set; }
@@ -99,9 +99,16 @@ public sealed class Message : IMessageModel, IEntityModelSource
     [JsonPropertyName("poll")]
     public Optional<Poll> Poll { get; set; }
 
+    IMessageRoleSubscriptionData? IMessageModel.RoleSubscriptionData => ~RoleSubscriptionData;
+    IMessageApplicationModel? IMessageModel.Application => ~Application;
+
+    IMessageReferenceModel? IMessageModel.MessageReference => ~Reference;
+    IMessageInteractionMetadataModel? IMessageModel.InteractionMetadata => ~Interaction;
+
     ulong IMessageModel.AuthorId => Author.Map(v => v.Id);
     string? IMessageModel.Content => Content;
     bool IMessageModel.IsTTS => TTS;
+    IMessageActivityModel? IMessageModel.Activity => ~Activity;
 
     ulong[] IMessageModel.MentionedUsers => UserMentions.Select(x => x.Id).ToArray();
 
@@ -116,48 +123,17 @@ public sealed class Message : IMessageModel, IEntityModelSource
     IEnumerable<IReactionModel> IMessageModel.Reactions => Reactions | [];
     bool IMessageModel.IsWebhook => WebhookId.IsSpecified;
 
-    int? IMessageModel.ActivityType => Activity.Map(v => v.Type);
-
-    string? IMessageModel.ActivityPartyId => Activity.Map(v => v.PartyId);
-
-    ulong? IMessageModel.ApplicationId => ApplicationId | Application.Map(v => v.Id);
-    string? IMessageModel.ApplicationCoverImage => Application.Map(v => v.CoverImage);
-
-    string? IMessageModel.ApplicationDescription => Application.Map(v => v.Description);
-
-    string? IMessageModel.ApplicationIcon => Application.Map(v => v.Icon);
-
-    string? IMessageModel.ApplicationName => Application.Map(v => v.Name);
-
-    ulong? IMessageModel.ReferenceMessageId => Reference.Map(v => v.MessageId);
-
-    ulong? IMessageModel.ReferenceChannelId => Reference.Map(v => v.ChannelId);
-
-    ulong? IMessageModel.ReferenceGuildId => Reference.Map(v => v.GuildId);
-
     int IMessageModel.Flags => Flags;
 
-    ulong? IMessageModel.InteractionId => Interaction.Map(v => v.Id);
-
-    int IMessageModel.InteractionType => Interaction.Map(v => v.Type);
-
-    string? IMessageModel.InteractionName => Interaction.Map(v => v.Name);
-
-    ulong? IMessageModel.InteractionUserId => Interaction.Map(v => v.User.Id);
-
     ulong? IMessageModel.ThreadId => Thread.Map(v => v.Id);
+    ulong? IMessageModel.ThreadGuildId => Thread.Map(v => (v as GuildChannelBase)?.GuildId);
+
+
+    IEnumerable<MessageComponent> IMessageModel.Components => Components | [];
 
     IEnumerable<IStickerItemModel> IMessageModel.Stickers => StickerItems | [];
 
     int? IMessageModel.Position => Position;
-
-    ulong? IMessageModel.RoleSubscriptionListingId => RoleSubscriptionData.Map(v => v.SubscriptionListingId);
-
-    string? IMessageModel.TierName => RoleSubscriptionData.Map(v => v.TierName);
-
-    int? IMessageModel.TotalMonthsSubscribed => RoleSubscriptionData.Map(v => v.MonthsSubscribed);
-
-    bool IMessageModel.IsRenewed => RoleSubscriptionData.Map(v => v.IsRenewal);
 
     public IEnumerable<IEntityModel> GetEntities()
     {

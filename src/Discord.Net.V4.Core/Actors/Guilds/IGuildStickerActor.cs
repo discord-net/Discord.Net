@@ -13,10 +13,12 @@ public interface IGuildStickerActor :
     IDeletable<ulong, IGuildStickerActor>,
     IActor<ulong, IGuildSticker>
 {
-    static BasicApiRoute IDeletable<ulong, IGuildStickerActor>.DeleteRoute(IPathable path, ulong id)
+    static IApiRoute IDeletable<ulong, IGuildStickerActor>.DeleteRoute(IPathable path, ulong id)
         => Routes.DeleteMessage(path.Require<IChannel>(), id);
 
-    static ApiBodyRoute<ModifyGuildStickersParams> IModifiable<ulong, IGuildStickerActor, ModifyStickerProperties, ModifyGuildStickersParams>.ModifyRoute(IPathable path, ulong id,
-        ModifyGuildStickersParams args)
+    static IApiInRoute<ModifyGuildStickersParams>
+        IModifiable<ulong, IGuildStickerActor, ModifyStickerProperties, ModifyGuildStickersParams>.ModifyRoute(
+            IPathable path, ulong id,
+            ModifyGuildStickersParams args)
         => Routes.ModifyGuildSticker(path.Require<IGuild>(), id, args);
 }

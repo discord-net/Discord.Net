@@ -13,4 +13,5 @@ public interface IAttachmentModel : IEntityModel<ulong>
     bool Ephemeral { get; }
     float? Duration { get; }
     string? Waveform { get; }
+    int? Flags { get; }
 }

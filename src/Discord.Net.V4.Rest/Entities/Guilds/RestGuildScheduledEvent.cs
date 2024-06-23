@@ -30,7 +30,7 @@ public partial class RestGuildScheduledEventActor(DiscordRestClient client, ulon
 {
     public RestLoadableGuildActor Guild { get; } = new(client, guildId);
 
-    public ILoadableRootActor<ILoadableGuildScheduledEventUserActor<IGuildScheduledEventUser>, ulong, IGuildScheduledEventUser> RSVPs => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableGuildScheduledEventUserActor<IGuildScheduledEventUser>, ulong, IGuildScheduledEventUser> RSVPs => throw new NotImplementedException();
 
     ILoadableGuildActor IGuildRelationship.Guild => Guild;
 }

@@ -1,3 +1,4 @@
+using Discord.Models;
 using System.Diagnostics;
 
 namespace Discord;
@@ -6,7 +7,8 @@ namespace Discord;
 ///     A field for an <see cref="Embed" />.
 /// </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedField : IEntityProperties<Models.Json.EmbedField>, IConstructable<EmbedField, Models.Json.EmbedField>
+public readonly struct EmbedField : IEntityProperties<Models.Json.EmbedField>,
+    IConstructable<EmbedField, IEmbedFieldModel>
 {
     /// <summary>
     ///     The name of the field.
@@ -50,17 +52,15 @@ public readonly struct EmbedField : IEntityProperties<Models.Json.EmbedField>, I
 
     public Models.Json.EmbedField ToApiModel(Models.Json.EmbedField? existing = default)
     {
-        existing ??= new() {Name = Name, Value = Value};
+        existing ??= new Models.Json.EmbedField {Name = Name, Value = Value};
 
         existing.Inline = Optional.FromNullable(Inline);
 
         return existing;
     }
 
-    public static EmbedField Construct(IDiscordClient client, Models.Json.EmbedField model)
-    {
-        return new EmbedField(model.Name, model.Value, model.Inline);
-    }
+    public static EmbedField Construct(IDiscordClient client, IEmbedFieldModel model) =>
+        new(model.Name, model.Value, model.Inline);
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedField" />.

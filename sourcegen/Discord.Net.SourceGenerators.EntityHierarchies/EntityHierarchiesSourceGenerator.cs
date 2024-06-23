@@ -6,156 +6,137 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
 namespace Discord.Net.SourceGenerators.EntityHierarchies;
 
 [Generator]
-public class EntityHierarchiesSourceGenerator : ISourceGenerator
+public class EntityHierarchiesSourceGenerator : DiscordSourceGenerator
 {
     public const string ExtendingAttributeName = "ExtendInterfaceDefaults";
 
-    public void Initialize(GeneratorInitializationContext context)
+    public override void OnExecute(in GeneratorExecutionContext context)
     {
+        var targets = Searching.FindClassesWithAttribute(in context, ExtendingAttributeName);
+        var interfaces = GetInterfaces(in context);
 
-    }
+        Log($"{targets.Length} possible targets found");
+        Log($"{interfaces.Length} interfaces declared");
 
-    public void Execute(GeneratorExecutionContext context)
-    {
-        StringBuilder log = new();
-
-        try
+        foreach (var target in targets)
         {
-            var targets = Searching.FindClassesWithAttribute(ref context, ExtendingAttributeName);
-            var interfaces = GetInterfaces(ref context);
+            Log($"Processing target {target.Identifier}");
 
-            log.AppendLine($"// {targets.Length} possible targets found");
-            log.AppendLine($"// {interfaces.Length} interfaces declared");
+            var semanticTarget = context.Compilation.GetSemanticModel(target.SyntaxTree);
 
-            foreach (var target in targets)
+            var attributes = target
+                .DescendantNodes()
+                .OfType<AttributeSyntax>()
+                .ToArray();
+
+            Log($"Attributes: {attributes.Length}:");
+
+            // parameter identifiers of the attribute
+            var nodes = attributes
+                .FirstOrDefault(a => a.DescendantNodes().OfType<IdentifierNameSyntax>()
+                    .Any(dt => dt.Identifier.ValueText == ExtendingAttributeName))
+                ?.DescendantNodes().OfType<TypeOfExpressionSyntax>()
+                .ToList();
+
+            if (nodes is null || nodes.Count == 0)
             {
-                log.AppendLine($"// Processing target {target.Identifier}");
+                Log(" - no nodes found");
+                continue;
+            }
 
-                var semanticTarget = context.Compilation.GetSemanticModel(target.SyntaxTree);
+            foreach (var node in nodes)
+            {
+                Log($" - Processing node {node}");
 
-                var attributes = target
-                    .DescendantNodes()
-                    .OfType<AttributeSyntax>()
-                    .ToArray();
+                TypeInfo semanticInterface;
 
-                log.AppendLine($"// - Attributes: {attributes.Length}:");
-
-                // parameter identifiers of the attribute
-                var nodes = attributes
-                    .FirstOrDefault(a => a.DescendantNodes().OfType<IdentifierNameSyntax>()
-                        .Any(dt => dt.Identifier.ValueText == ExtendingAttributeName))
-                    ?.DescendantNodes().OfType<TypeOfExpressionSyntax>()
-                    .ToList();
-
-                if (nodes is null || nodes.Count == 0)
+                if (node.DescendantNodes().FirstOrDefault() is GenericNameSyntax generic)
                 {
-                    log.AppendLine("// - no nodes found");
+                    semanticInterface = semanticTarget.GetTypeInfo(generic);
+                }
+                else
+                {
+                    semanticInterface = semanticTarget.GetTypeInfo(node.Type);
+                }
+
+                if (semanticInterface.Type is null)
+                {
+                    Log(" - No semantic type found for node");
                     continue;
                 }
 
-                foreach (var node in nodes)
+                Log($" -> {semanticInterface.Type} {semanticInterface.Type.ContainingAssembly}");
+
+                List<string> declarations;
+
+                var ifaceSyntax = interfaces
+                    .FirstOrDefault(x => x.Identifier.ValueText == semanticInterface.Type.Name);
+
+
+                if (ifaceSyntax is not null)
                 {
-                    log.AppendLine($"// - Processing node {node}");
-
-                    TypeInfo semanticInterface;
-
-                    if (node.DescendantNodes().FirstOrDefault() is GenericNameSyntax generic)
-                    {
-                        semanticInterface = semanticTarget.GetTypeInfo(generic);
-                    }
-                    else
-                    {
-                        semanticInterface = semanticTarget.GetTypeInfo(node.Type);
-                    }
-
-                    if (semanticInterface.Type is null)
-                    {
-                        log.AppendLine("// - No semantic type found for node");
-                        continue;
-                    }
-
-                    log.AppendLine($"// -> {semanticInterface.Type} {semanticInterface.Type.ContainingAssembly}");
-
-                    List<string> declarations;
-
-                    var ifaceSyntax = interfaces
-                        .FirstOrDefault(x => x.Identifier.ValueText == semanticInterface.Type.Name);
-
-
-                    if (ifaceSyntax is not null)
-                    {
-                        declarations = CreateDeclarationsFromSource(ifaceSyntax, semanticInterface);
-                    }
-                    else
-                    {
-                        var metadataName = semanticInterface.Type.GetFullMetadataName();
-                        var ifaceSymbol = semanticInterface.Type.ContainingAssembly.GetTypeByMetadataName(metadataName);
-
-                        if (ifaceSymbol is null)
-                        {
-                            log.AppendLine("// - Couldn't find interface symbol");
-                            continue;
-                        }
-
-                        declarations = CreateDeclarationsFromSymbol(ifaceSymbol, semanticInterface, log);
-                    }
-
-                    if (declarations.Count == 0)
-                    {
-                        log.AppendLine("// - no implementable declarations found, skipping");
-                        continue;
-                    }
-
-                    foreach (var dec in declarations)
-                    {
-                        log.AppendLine($"// --> {dec}");
-                    }
-
-                    context.AddSource(
-                        $"{target.Identifier.ValueText}_{semanticInterface.Type.Name}.g.cs",
-                        $$"""
-                          namespace {{semanticTarget.GetDeclaredSymbol(target)!.ContainingNamespace}};
-
-                          #nullable enable
-
-                          public partial class {{target.Identifier}}
-                          {
-                              {{string.Join("\n    ", declarations)}}
-                          }
-
-                          #nullable restore
-                          """
-                    );
+                    declarations = CreateDeclarationsFromSource(ifaceSyntax, semanticInterface);
                 }
+                else
+                {
+                    var metadataName = semanticInterface.Type.GetFullMetadataName();
+                    var ifaceSymbol = semanticInterface.Type.ContainingAssembly.GetTypeByMetadataName(metadataName);
+
+                    if (ifaceSymbol is null)
+                    {
+                        Log(" - Couldn't find interface symbol");
+                        continue;
+                    }
+
+                    declarations = CreateDeclarationsFromSymbol(ifaceSymbol, semanticInterface);
+                }
+
+                if (declarations.Count == 0)
+                {
+                    Log(" - no implementable declarations found, skipping");
+                    continue;
+                }
+
+                foreach (var dec in declarations)
+                {
+                    Log($" --> {dec}");
+                }
+
+                context.AddSource(
+                    $"{target.Identifier.ValueText}_{semanticInterface.Type.Name}.g.cs",
+                    $$"""
+                      namespace {{semanticTarget.GetDeclaredSymbol(target)!.ContainingNamespace}};
+
+                      #nullable enable
+
+                      public partial class {{target.Identifier}}
+                      {
+                          {{string.Join("\n    ", declarations)}}
+                      }
+
+                      #nullable restore
+                      """
+                );
             }
-        }
-        catch (Exception x)
-        {
-            log.AppendLine(x.ToString());
-        }
-        finally
-        {
-            context.AddSource("Log.g.cs", log.ToString());
         }
     }
 
-    private ITypeSymbol ResolveGeneric(ITypeSymbol arg, INamedTypeSymbol root, TypeInfo info, StringBuilder log)
+    private ITypeSymbol ResolveGeneric(ITypeSymbol arg, INamedTypeSymbol root, TypeInfo info)
     {
         if (root.TypeArguments.Any(arg.Equals))
         {
             var typeArg = ((info.Type as INamedTypeSymbol)!).TypeArguments[root.TypeArguments.IndexOf(arg)];
-            log.AppendLine(
-                $"// -----> Generic found: {typeArg}");
+            Log(
+                $" -----> Generic found: {typeArg}");
 
             return typeArg.WithNullableAnnotation(arg.NullableAnnotation);
         }
 
-        log.AppendLine($"// -----> Processing {arg}");
+        Log($" -----> Processing {arg}");
 
         if (arg is not INamedTypeSymbol namedArg)
             return arg;
@@ -164,15 +145,15 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
             return arg;
 
         var newTypes = namedArg.TypeArguments
-            .Select(x => ResolveGeneric(x, root, info, log)).ToArray();
+            .Select(x => ResolveGeneric(x, root, info)).ToArray();
 
         if (!newTypes.SequenceEqual(namedArg.TypeArguments, SymbolEqualityComparer.Default))
         {
-            log.AppendLine($"// -----> {namedArg}");
+            Log($" -----> {namedArg}");
 
             foreach (var newType in newTypes)
             {
-                log.AppendLine($"// ------> Constructing with {newType} {newType.BaseType}");
+                Log($" ------> Constructing with {newType} {newType.BaseType}");
             }
 
             return namedArg.ConstructedFrom.Construct(newTypes);
@@ -181,7 +162,7 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
         return arg;
     }
 
-    private List<string> CreateDeclarationsFromSymbol(INamedTypeSymbol symbol, TypeInfo semanticInterface, StringBuilder log)
+    private List<string> CreateDeclarationsFromSymbol(INamedTypeSymbol symbol, TypeInfo semanticInterface)
     {
         var declarations = new List<string>();
 
@@ -195,11 +176,13 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
 
             var parameterSymbols = method.Parameters.Select(x =>
             {
-                var param = $"{ResolveGeneric(x.Type, symbol, semanticInterface, log)} {x.Name}";
+                var param = $"{ResolveGeneric(x.Type, symbol, semanticInterface)} {x.Name}";
 
 
                 if (x.HasExplicitDefaultValue)
-                    param += x.ExplicitDefaultValue is null ? " = default" : $" = {x.ExplicitDefaultValue.ToString().ToLowerInvariant()}";
+                    param += x.ExplicitDefaultValue is null
+                        ? " = default"
+                        : $" = {x.ExplicitDefaultValue.ToString().ToLowerInvariant()}";
                 else if (x.IsOptional)
                     param += " = default";
 
@@ -207,7 +190,7 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
             });
 
             declarations.Add(
-                $"public {ResolveGeneric(method.ReturnType, symbol, semanticInterface, log)} {method.Name}({string.Join(", ", parameterSymbols)})" +
+                $"public {ResolveGeneric(method.ReturnType, symbol, semanticInterface)} {method.Name}({string.Join(", ", parameterSymbols)})" +
                 $" => (this as {semanticInterface.Type!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}).{method.Name}({parameterIdentifiers});"
             );
         }
@@ -235,7 +218,7 @@ public class EntityHierarchiesSourceGenerator : ISourceGenerator
         return declarations;
     }
 
-    private InterfaceDeclarationSyntax[] GetInterfaces(ref GeneratorExecutionContext context)
+    private InterfaceDeclarationSyntax[] GetInterfaces(in GeneratorExecutionContext context)
         => context.Compilation.SyntaxTrees.SelectMany(x =>
             x.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>()
         ).ToArray();

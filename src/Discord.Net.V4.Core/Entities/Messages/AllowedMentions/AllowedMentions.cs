@@ -58,7 +58,7 @@ public readonly struct AllowedMentions(
 
     public Models.Json.AllowedMentions ToApiModel(Models.Json.AllowedMentions? existing = default)
     {
-        existing ??= new();
+        existing ??= new Models.Json.AllowedMentions();
 
         existing.Parse = AllowedTypes.Values.ToArray();
         existing.Roles = RoleIds.OptionalIf(v => v?.Count > 0).Map(v => v!.ToArray());
@@ -68,13 +68,11 @@ public readonly struct AllowedMentions(
         return existing;
     }
 
-    public static AllowedMentions Construct(IDiscordClient client, Models.Json.AllowedMentions model)
-    {
-        return new AllowedMentions(
+    public static AllowedMentions Construct(IDiscordClient client, Models.Json.AllowedMentions model) =>
+        new(
             new AllowedMentionTypes(model.Parse | []),
             ~model.Roles,
             ~model.Users,
             model.RepliedUser
         );
-    }
 }

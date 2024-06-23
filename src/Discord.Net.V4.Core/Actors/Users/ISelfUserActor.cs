@@ -13,6 +13,16 @@ public interface ISelfUserActor :
     IUserActor,
     IActor<ulong, ISelfUser>
 {
+    // TODO:
+    // - https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection
+    // - https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection
+
+    static IApiInRoute<ModifyCurrentUserParams>
+        IModifiable<ulong, ISelfUserActor, ModifySelfUserProperties, ModifyCurrentUserParams>.ModifyRoute(
+            IPathable path, ulong id,
+            ModifyCurrentUserParams args)
+        => Routes.ModifyCurrentUser(args);
+
     async Task<IEnumerable<IPartialGuild>?> GetGuildsAsync(
         EntityOrId<ulong, IPartialGuild>? before,
         EntityOrId<ulong, IPartialGuild>? after,
@@ -60,7 +70,7 @@ public interface ISelfUserActor :
         CancellationToken token = default)
     {
         var model = await Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.CreateDm(new CreateDMChannelParams() {RecipientId = recipient.Id}),
+            Routes.CreateDm(new CreateDMChannelParams {RecipientId = recipient.Id}),
             options ?? Client.DefaultRequestOptions,
             token
         );
@@ -80,12 +90,4 @@ public interface ISelfUserActor :
 
         return models.Select(x => UserConnection.Construct(Client, x)).ToImmutableArray();
     }
-
-    // TODO:
-    // - https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection
-    // - https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection
-
-    static ApiBodyRoute<ModifyCurrentUserParams> IModifiable<ulong, ISelfUserActor, ModifySelfUserProperties, ModifyCurrentUserParams>.ModifyRoute(IPathable path, ulong id,
-        ModifyCurrentUserParams args)
-        => Routes.ModifyCurrentUser(args);
 }

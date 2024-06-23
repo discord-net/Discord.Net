@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class EmbedFooter
+public sealed class EmbedFooter : IEmbedFooterModel
 {
     [JsonPropertyName("text")]
     public required string Text { get; set; }
@@ -12,4 +12,7 @@ public sealed class EmbedFooter
 
     [JsonPropertyName("proxy_icon_url")]
     public Optional<string> ProxyIconUrl { get; set; }
+
+    string? IEmbedFooterModel.IconUrl => IconUrl;
+    string? IEmbedFooterModel.ProxyIconUrl => ProxyIconUrl;
 }

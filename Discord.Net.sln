@@ -62,6 +62,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.SourceGenerator
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.SourceGenerators.PropertyDependencies", "sourcegen\Discord.Net.SourceGenerators.PropertyDependencies\Discord.Net.SourceGenerators.PropertyDependencies.csproj", "{E3DA28E6-070B-4125-B1A4-9A1A5DC65280}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.SourceGenerators.PropertyVersioning", "sourcegen\Discord.Net.SourceGenerators.PropertyVersioning\Discord.Net.SourceGenerators.PropertyVersioning.csproj", "{B6988273-6FA6-404B-8807-D7674E238C63}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -372,6 +374,18 @@ Global
 		{E3DA28E6-070B-4125-B1A4-9A1A5DC65280}.Release|x64.Build.0 = Release|Any CPU
 		{E3DA28E6-070B-4125-B1A4-9A1A5DC65280}.Release|x86.ActiveCfg = Release|Any CPU
 		{E3DA28E6-070B-4125-B1A4-9A1A5DC65280}.Release|x86.Build.0 = Release|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Debug|x64.Build.0 = Debug|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Debug|x86.Build.0 = Debug|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Release|x64.ActiveCfg = Release|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Release|x64.Build.0 = Release|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Release|x86.ActiveCfg = Release|Any CPU
+		{B6988273-6FA6-404B-8807-D7674E238C63}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -399,6 +413,7 @@ Global
 		{0C23DADA-4222-4D1E-8DAF-4AFE7E257AEC} = {C1C763AF-3DC5-4F7D-8551-0A65B6011305}
 		{27F62824-8438-491E-AE72-66E6AE4826B7} = {C1C763AF-3DC5-4F7D-8551-0A65B6011305}
 		{E3DA28E6-070B-4125-B1A4-9A1A5DC65280} = {C1C763AF-3DC5-4F7D-8551-0A65B6011305}
+		{B6988273-6FA6-404B-8807-D7674E238C63} = {C1C763AF-3DC5-4F7D-8551-0A65B6011305}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D2404771-EEC8-45F2-9D71-F3373F6C1495}

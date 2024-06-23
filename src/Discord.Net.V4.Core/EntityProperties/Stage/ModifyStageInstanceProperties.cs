@@ -19,7 +19,7 @@ public class ModifyStageInstanceProperties : IEntityProperties<ModifyStageInstan
 
     public ModifyStageInstanceParams ToApiModel(ModifyStageInstanceParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyStageInstanceParams();
 
         existing.Topic = Topic;
         existing.PrivacyLevel = PrivacyLevel.Map(v => (int)v);

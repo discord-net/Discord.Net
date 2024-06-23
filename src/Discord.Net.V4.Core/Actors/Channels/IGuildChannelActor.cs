@@ -15,7 +15,16 @@ public interface IGuildChannelActor :
     IDeletable<ulong, IGuildChannelActor>,
     IModifiable<ulong, IGuildChannelActor, ModifyGuildChannelProperties, ModifyGuildChannelParams>
 {
-    ILoadableRootActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites { get; }
+    IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites { get; }
+
+    static IApiRoute IDeletable<ulong, IGuildChannelActor>.DeleteRoute(IPathable pathable, ulong id)
+        => Routes.DeleteChannel(id);
+
+    static IApiInRoute<ModifyGuildChannelParams>
+        IModifiable<ulong, IGuildChannelActor, ModifyGuildChannelProperties, ModifyGuildChannelParams>.ModifyRoute(
+            IPathable path, ulong id,
+            ModifyGuildChannelParams args)
+        => Routes.ModifyChannel(id, args);
 
     async Task<IInvite> CreateInviteAsync(
         CreateChannelInviteProperties args,
@@ -30,11 +39,4 @@ public interface IGuildChannelActor :
 
         return Client.CreateEntity(model);
     }
-
-    static BasicApiRoute IDeletable<ulong, IGuildChannelActor>.DeleteRoute(IPathable pathable, ulong id)
-        => Routes.DeleteChannel(id);
-
-    static ApiBodyRoute<ModifyGuildChannelParams> IModifiable<ulong, IGuildChannelActor, ModifyGuildChannelProperties, ModifyGuildChannelParams>.ModifyRoute(IPathable path, ulong id,
-        ModifyGuildChannelParams args)
-        => Routes.ModifyChannel(id, args);
 }

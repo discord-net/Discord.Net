@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\sourcegen\Discord.Net.SourceGenerators.PropertyDependencies\Discord.Net.SourceGenerators.PropertyDependencies.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     <ProjectReference Include="..\..\sourcegen\Discord.Net.SourceGenerators.EntityHierarchies\Discord.Net.SourceGenerators.EntityHierarchies.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\sourcegen\Discord.Net.SourceGenerators.InterfaceProxy\Discord.Net.SourceGenerators.InterfaceProxy.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\sourcegen\Discord.Net.SourceGenerators.PropertyVersioning\Discord.Net.SourceGenerators.PropertyVersioning.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\Discord.Net.V4.Core\Discord.Net.V4.Core.csproj" />
   </ItemGroup>
 

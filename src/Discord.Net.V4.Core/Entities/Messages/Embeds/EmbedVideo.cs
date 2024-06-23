@@ -1,3 +1,4 @@
+using Discord.Models;
 using System.Diagnostics;
 
 namespace Discord;
@@ -6,7 +7,8 @@ namespace Discord;
 ///     A video featured in an <see cref="Embed" />.
 /// </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct EmbedVideo : IEntityProperties<Models.Json.EmbedVideo>, IConstructable<EmbedVideo, Models.Json.EmbedVideo>
+public readonly struct EmbedVideo : IEntityProperties<Models.Json.EmbedVideo>,
+    IConstructable<EmbedVideo, IEmbedVideoModel>
 {
     /// <summary>
     ///     The URL of the video.
@@ -36,7 +38,7 @@ public readonly struct EmbedVideo : IEntityProperties<Models.Json.EmbedVideo>, I
     /// </returns>
     public readonly int? Width;
 
-    internal EmbedVideo(string url, string proxyUrl, int? height, int? width)
+    internal EmbedVideo(string? url, string? proxyUrl, int? height, int? width)
     {
         Url = url;
         ProxyUrl = proxyUrl;
@@ -64,7 +66,7 @@ public readonly struct EmbedVideo : IEntityProperties<Models.Json.EmbedVideo>, I
 
     public Models.Json.EmbedVideo ToApiModel(Models.Json.EmbedVideo? existing = default)
     {
-        existing ??= new();
+        existing ??= new Models.Json.EmbedVideo();
 
         existing.Url = Optional.FromNullable(Url);
         existing.ProxyUrl = Optional.FromNullable(ProxyUrl);
@@ -74,7 +76,8 @@ public readonly struct EmbedVideo : IEntityProperties<Models.Json.EmbedVideo>, I
         return existing;
     }
 
-    public static EmbedVideo Construct(IDiscordClient client, Models.Json.EmbedVideo model) => throw new NotImplementedException();
+    public static EmbedVideo Construct(IDiscordClient client, IEmbedVideoModel model)
+        => new(model.Url, model.ProxyUrl, model.Height, model.Width);
 
     /// <summary>
     ///     Determines whether the specified object is equal to the current <see cref="EmbedVideo" />.

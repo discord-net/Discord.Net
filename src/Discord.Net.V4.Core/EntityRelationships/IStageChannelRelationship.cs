@@ -1,4 +1,10 @@
 namespace Discord;
 
 public interface IStageChannelRelationship :
-    IGuildChannelRelationship<ILoadableStageChannelActor>;
+    IRelationship<ulong, IStageChannel, ILoadableStageChannelActor>
+{
+    ILoadableStageChannelActor Channel { get; }
+
+    ILoadableStageChannelActor IRelationship<ulong, IStageChannel, ILoadableStageChannelActor>.RelationshipLoadable =>
+        Channel;
+}

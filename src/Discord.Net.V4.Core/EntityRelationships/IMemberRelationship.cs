@@ -5,5 +5,6 @@ public interface IMemberRelationship :
 {
     ILoadableGuildMemberActor Member { get; }
 
-    ILoadableGuildMemberActor IRelationship<ulong, IGuildMember, ILoadableGuildMemberActor>.RelationshipLoadable => Member;
+    ILoadableGuildMemberActor IRelationship<ulong, IGuildMember, ILoadableGuildMemberActor>.RelationshipLoadable =>
+        Member;
 }

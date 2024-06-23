@@ -1,5 +1,4 @@
 using Discord.Models.Json;
-using Discord.Rest;
 
 namespace Discord;
 
@@ -14,7 +13,7 @@ public class ModifyMessageProperties : IEntityProperties<ModifyMessageParams>
 
     public ModifyMessageParams ToApiModel(ModifyMessageParams? existing = default)
     {
-        existing ??= new();
+        existing ??= new ModifyMessageParams();
 
         existing.Content = Content;
         existing.Embeds = Embeds.Map(v => v.Select(x => x.ToApiModel()).ToArray());

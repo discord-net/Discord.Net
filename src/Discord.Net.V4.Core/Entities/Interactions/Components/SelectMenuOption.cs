@@ -1,9 +1,13 @@
+using Discord.Models;
+
 namespace Discord;
 
 /// <summary>
 ///     Represents a choice for a <see cref="SelectMenuComponent" />.
 /// </summary>
-public readonly struct SelectMenuOption : IEntityProperties<Models.Json.SelectMenuOption>
+public readonly struct SelectMenuOption :
+    IEntityProperties<Models.Json.SelectMenuOption>,
+    IConstructable<SelectMenuOption, ISelectMenuOptionModel>
 {
     internal SelectMenuOption(string label, string value, string? description, IEmote? emote, bool? defaultValue)
     {
@@ -35,13 +39,12 @@ public readonly struct SelectMenuOption : IEntityProperties<Models.Json.SelectMe
     public IEmote? Emote { get; }
 
     /// <summary>
-    ///     Gets whether or not this option will render as selected by default.
+    ///     Gets whether this option will render as selected by default.
     /// </summary>
     public bool? IsDefault { get; }
 
-    public Models.Json.SelectMenuOption ToApiModel(Models.Json.SelectMenuOption? existing = default)
-    {
-        return existing ?? new Models.Json.SelectMenuOption()
+    public Models.Json.SelectMenuOption ToApiModel(Models.Json.SelectMenuOption? existing = default) =>
+        existing ?? new Models.Json.SelectMenuOption
         {
             Label = Label,
             Value = Value,
@@ -49,5 +52,13 @@ public readonly struct SelectMenuOption : IEntityProperties<Models.Json.SelectMe
             IsDefault = Optional.FromNullable(IsDefault),
             Emoji = Optional.FromNullable(Emote).Map(v => v.ToApiModel())
         };
-    }
+
+    public static SelectMenuOption Construct(IDiscordClient client, ISelectMenuOptionModel model) =>
+        new(
+            model.Label,
+            model.Value,
+            model.Description,
+            model.Emote is not null ? IEmote.Construct(client, model.Emote) : null,
+            model.IsDefault
+        );
 }
