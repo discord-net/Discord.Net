@@ -211,7 +211,7 @@ namespace Discord.WebSocket
             }
 
             if (model.InteractionMetadata.IsSpecified)
-                InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata();
+                InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata(Discord);
 
             if (model.Poll.IsSpecified)
                 Poll = model.Poll.Value.ToEntity();
