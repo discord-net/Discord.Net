@@ -4,5 +4,5 @@ namespace Discord;
 
 public interface IUpdatable<in TModel> where TModel : IEntityModel
 {
-    ValueTask UpdateAsync(TModel model, CancellationToken cancellationToken = default);
+    ValueTask UpdateAsync(TModel model, CancellationToken token = default);
 }

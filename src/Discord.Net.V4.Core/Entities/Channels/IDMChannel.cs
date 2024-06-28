@@ -1,10 +1,13 @@
+using Discord.Models;
+
 namespace Discord;
 
 /// <summary>
 ///     Represents a generic direct-message channel.
 /// </summary>
 public interface IDMChannel :
-    IMessageChannel
+    IMessageChannel,
+    IUpdatable<IDMChannelModel>
 {
     /// <summary>
     ///     Gets the recipient of all messages in this channel.

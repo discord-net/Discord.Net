@@ -22,27 +22,51 @@ public partial class RestLoadableVoiceChannelActor(DiscordRestClient client, ulo
 [ExtendInterfaceDefaults(
     typeof(IModifiable<ulong, IVoiceChannelActor, ModifyVoiceChannelProperties, ModifyGuildChannelParams>)
 )]
-public partial class RestVoiceChannelActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestTextChannelActor(client, guildId, id),
-    IVoiceChannelActor;
-
-public partial class RestVoiceChannel(
+public partial class RestVoiceChannelActor(
     DiscordRestClient client,
-    ulong guildId,
-    IGuildVoiceChannelModel model,
-    RestVoiceChannelActor? actor = null
+    GuildIdentity guild,
+    IIdentifiableEntityOrModel<ulong, RestVoiceChannel> channel
 ):
-    RestTextChannel(client, guildId, model),
-    IVoiceChannel,
-    IContextConstructable<RestVoiceChannel, IGuildVoiceChannelModel, ulong, DiscordRestClient>
+    RestTextChannelActor(client, guild, channel),
+    IVoiceChannelActor
 {
-    internal new IGuildVoiceChannelModel Model { get; } = model;
+    public IVoiceChannel CreateEntity(IGuildVoiceChannelModel model)
+        => RestVoiceChannel.Construct(Client, model, Guild.Identity);
+}
 
-    [ProxyInterface(typeof(IVoiceChannelActor))]
-    internal override RestVoiceChannelActor ChannelActor { get; } = actor ?? new(client, guildId, model.Id);
+public partial class RestVoiceChannel :
+    RestTextChannel,
+    IVoiceChannel,
+    IContextConstructable<RestVoiceChannel, IGuildVoiceChannelModel, GuildIdentity, DiscordRestClient>
+{
+    internal override IGuildVoiceChannelModel Model => _model;
 
-    public static RestVoiceChannel Construct(DiscordRestClient client, IGuildVoiceChannelModel model, ulong context)
-        => new(client, context, model);
+    [ProxyInterface(
+        typeof(IVoiceChannelActor),
+        typeof(IEntityProvider<IVoiceChannel, IGuildVoiceChannelModel>)
+    )]
+    internal override RestVoiceChannelActor ChannelActor { get; }
+
+    private IGuildVoiceChannelModel _model;
+
+    internal RestVoiceChannel(DiscordRestClient client,
+        GuildIdentity guild,
+        IGuildVoiceChannelModel model,
+        RestVoiceChannelActor? actor = null) : base(client, guild, model)
+    {
+        _model = model;
+
+        ChannelActor = actor ?? new(client, guild, this);
+    }
+
+    public ValueTask UpdateAsync(IGuildVoiceChannelModel model, CancellationToken token = default)
+    {
+        _model = model;
+        return base.UpdateAsync(model, token);
+    }
+
+    public static RestVoiceChannel Construct(DiscordRestClient client, IGuildVoiceChannelModel model, GuildIdentity guild)
+        => new(client, guild, model);
 
     public string? RTCRegion => Model.RTCRegion;
 
@@ -51,6 +75,4 @@ public partial class RestVoiceChannel(
     public int? UserLimit => Model.UserLimit;
 
     public VideoQualityMode VideoQualityMode => (VideoQualityMode?)Model.VideoQualityMode ?? VideoQualityMode.Auto;
-
-
 }

@@ -4,21 +4,22 @@ using Discord.Rest.Guilds;
 
 namespace Discord.Rest;
 
+using ThreadIdentity = IdentifiableEntityOrModel<ulong, RestThreadChannel, IThreadChannelModel>;
+using ThreadMemberIdentity = IdentifiableEntityOrModel<ulong, RestThreadMember, IThreadMemberModel>;
+
 public sealed partial class RestLoadableThreadMemberActor(
     DiscordRestClient client,
-    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-    ulong threadId,
-    ulong id,
-    IThreadMemberModel? model = null,
-    IThreadChannelModel? thread = null,
-    IMemberModel? member = null,
-    IUserModel? user = null
+    GuildIdentity guild,
+    ThreadIdentity thread,
+    ThreadMemberIdentity member
 ):
     RestThreadMemberActor(client, guild, threadId, id, thread, member, user),
     ILoadableThreadMemberActor
 {
+    internal ThreadMemberIdentity Identity { get; } = member;
+
     [ProxyInterface(typeof(ILoadableEntity<IThreadMember>))]
-    public RestLoadable<ulong, RestThreadMember, IThreadMember, IThreadMemberModel> Loadable { get; }
+    internal RestLoadable<ulong, RestThreadMember, IThreadMember, IThreadMemberModel> Loadable { get; }
         = RestLoadable<ulong, RestThreadMember, IThreadMember, IThreadMemberModel>
             .FromContextConstructable<RestThreadMember, RestThreadMember.Context>(
                 client,
@@ -32,51 +33,42 @@ public sealed partial class RestLoadableThreadMemberActor(
 [ExtendInterfaceDefaults(typeof(IThreadMemberActor))]
 public partial class RestThreadMemberActor(
     DiscordRestClient client,
-    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-    ulong threadId,
-    ulong id,
-    IThreadChannelModel? thread = null,
-    IMemberModel? member = null,
-    IUserModel? user = null
+    GuildIdentity guild,
+    ThreadIdentity thread,
+    ThreadMemberIdentity threadMember,
+    MemberIdentity? member = null,
+    UserIdentity? user = null
 ):
-    RestActor<ulong, RestThreadMember>(client, id),
+    RestActor<ulong, RestThreadMember>(client, threadMember.Id),
     IThreadMemberActor
 {
     public RestLoadableThreadChannelChannelActor Thread { get; } =
-        new(client, guild, threadId, thread);
+        new(client, guild, thread);
 
     public RestLoadableGuildMemberActor Member { get; } =
-        new(client, guild, id, member);
+        new(client, guild, member ?? threadMember.Id);
 
     public RestLoadableUserActor User { get; } =
-        new(client, id, user);
+        new(client, user ?? threadMember.Id);
 
     ILoadableThreadChannelActor IThreadRelationship.ThreadChannel => Thread;
     ILoadableGuildMemberActor IMemberRelationship.Member => Member;
     ILoadableUserActor IUserRelationship.User => User;
 }
 
-public sealed partial class RestThreadMember(
-    DiscordRestClient client,
-    ulong guildId,
-    ulong threadId,
-    IThreadMemberModel model,
-    RestThreadMemberActor? actor = null,
-    IThreadChannelModel? thread = null,
-    IMemberModel? member = null,
-    IUserModel? user = null
-):
-    RestEntity<ulong>(client, model.Id),
+public sealed partial class RestThreadMember :
+    RestEntity<ulong>,
     IThreadMember,
     IContextConstructable<RestThreadMember, IThreadMemberModel, RestThreadMember.Context, DiscordRestClient>
 {
     public readonly record struct Context(
-        ulong GuildId,
-        ulong ThreadId,
-        IThreadChannelModel? Thread = null,
-        IMemberModel? Member = null,
-        IUserModel? User = null
+        GuildIdentity Guild,
+        ThreadIdentity Thread,
+        MemberIdentity? Member = null,
+        UserIdentity? User = null
     );
+
+    internal IThreadMemberModel Model { get; private set; }
 
     [ProxyInterface(
         typeof(IThreadMemberActor),
@@ -84,18 +76,37 @@ public sealed partial class RestThreadMember(
         typeof(IMemberRelationship),
         typeof(IUserRelationship)
     )]
-    internal RestThreadMemberActor Actor { get; } = actor ?? new(client, guildId, threadId, model.Id, thread, member, user);
+    internal RestThreadMemberActor Actor { get; }
+
+    internal RestThreadMember(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        ThreadIdentity thread,
+        IThreadMemberModel model,
+        RestThreadMemberActor? actor = null,
+        MemberIdentity? member = null,
+        UserIdentity? user = null
+    ) : base(client, model.Id)
+    {
+        Model = model;
+        Actor = actor ?? new(client, guild, thread, this, member, user);
+    }
+
+    public ValueTask UpdateAsync(IThreadMemberModel model, CancellationToken token = default)
+    {
+        Model = model;
+        return ValueTask.CompletedTask;
+    }
 
     public static RestThreadMember Construct(DiscordRestClient client, IThreadMemberModel model, Context context)
         => new(
             client,
-            context.GuildId,
-            context.ThreadId,
+            context.Guild,
+            context.Thread,
             model,
-            thread: context.Thread,
             member: context.Member,
             user: context.User
         );
 
-    public DateTimeOffset JoinedAt => model.JoinTimestamp;
+    public DateTimeOffset JoinedAt => Model.JoinTimestamp;
 }

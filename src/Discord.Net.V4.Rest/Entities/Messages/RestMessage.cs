@@ -1,5 +1,4 @@
 using Discord.Models;
-using Discord.Rest.Channels;
 using Discord.Rest.Guilds;
 using Discord.Rest.Stickers;
 using PropertyChanged;
@@ -10,9 +9,9 @@ namespace Discord.Rest.Messages;
 
 public partial class RestLoadableMessageActor(
     DiscordRestClient client,
-    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>? guild,
-    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel,
-    IIdentifiableEntityOrModel<ulong, RestMessage, IMessageModel> message) :
+    GuildIdentity? guild,
+    IChannelIdentity channel,
+    IIdentifiableEntityOrModel<ulong, RestMessage> message) :
     RestMessageActor(client, guild, channel, message),
     ILoadableMessageActor
 {
@@ -29,9 +28,9 @@ public partial class RestLoadableMessageActor(
 
 public partial class RestMessageActor(
     DiscordRestClient client,
-    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>? guild,
-    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel,
-    IIdentifiableEntityOrModel<ulong, RestMessage, IMessageModel> message
+    GuildIdentity? guild,
+    IChannelIdentity channel,
+    IIdentifiableEntityOrModel<ulong, RestMessage> message
 ):
     RestActor<ulong, RestMessage>(client, message.Id),
     IMessageActor
@@ -39,6 +38,9 @@ public partial class RestMessageActor(
     public RestLoadableMessageChannelActor Channel { get; } = new(client, guild, channel);
 
     ILoadableMessageChannelActor IMessageChannelRelationship.Channel => Channel;
+
+    public IMessage CreateEntity(IMessageModel model)
+        => RestMessage.Construct(client, model, guild);
 }
 
 public partial class RestMessage(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>? guild, IMessageModel model, RestMessageActor? actor = null) :

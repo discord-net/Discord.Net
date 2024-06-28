@@ -9,9 +9,10 @@ namespace Discord.Rest.Channels;
 
 public sealed partial class RestLoadableGuildChannel(
     DiscordRestClient client,
-    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-    IIdentifiableEntityOrModel<ulong, RestGuildChannel, IChannelModel> channel) :
-    RestGuildChannelActor(client, guild, channel.Id),
+    GuildIdentity guild,
+    IIdentifiableEntityOrModel<ulong, RestGuildChannel> channel
+):
+    RestGuildChannelActor(client, guild, channel),
     ILoadableGuildChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IGuildChannel>))]
@@ -40,8 +41,8 @@ public sealed partial class RestLoadableGuildChannel(
 )]
 public partial class RestGuildChannelActor(
     DiscordRestClient client,
-    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-    IIdentifiableEntityOrModel<ulong, RestGuildChannel, IGuildChannelModel> channel) :
+    GuildIdentity guild,
+    IIdentifiableEntityOrModel<ulong, RestGuildChannel> channel) :
     RestChannelActor(client, channel),
     IGuildChannelActor
 {
@@ -49,30 +50,63 @@ public partial class RestGuildChannelActor(
 
     public IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites => throw new NotImplementedException();
 
+    public IGuildChannel CreateEntity(IGuildChannelModel model)
+        => RestGuildChannel.Construct(Client, model, Guild.Identity);
+
     ILoadableGuildActor IGuildRelationship.Guild => Guild;
 }
 
-public partial class RestGuildChannel(
-    DiscordRestClient client,
-    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-    IGuildChannelModel model,
-    RestGuildChannelActor? actor = null
-):
-    RestChannel(client, model),
+public partial class RestGuildChannel :
+    RestChannel,
     IGuildChannel,
-    IContextConstructable<RestGuildChannel, IGuildChannelModel, RestGuildIdentifiable, DiscordRestClient>,
-    INotifyPropertyChanged
+    IContextConstructable<RestGuildChannel, IGuildChannelModel, GuildIdentity, DiscordRestClient>
 {
-    [OnChangedMethod(nameof(OnModelChanged))]
-    internal new IGuildChannelModel Model { get; set; } = model;
+    internal override IGuildChannelModel Model => _model;
 
-    [ProxyInterface(typeof(IGuildChannelActor), typeof(IGuildRelationship))]
-    internal override RestGuildChannelActor ChannelActor { get; } = actor ?? new RestGuildChannelActor(client, guild, model.Id);
+    [ProxyInterface(
+        typeof(IGuildChannelActor),
+        typeof(IGuildRelationship),
+        typeof(IEntityProvider<IGuildChannel, IGuildChannelModel>)
+    )]
+    internal override RestGuildChannelActor ChannelActor { get; }
+
+    private IGuildChannelModel _model;
+
+    internal RestGuildChannel(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        IGuildChannelModel model,
+        RestGuildChannelActor? actor = null
+    ) : base(client, model)
+    {
+        _model = model;
+        ChannelActor = actor ?? new RestGuildChannelActor(
+            client,
+            guild,
+            this.Identity<ulong, RestGuildChannel, IGuildChannelModel>()
+        );
+
+        PermissionOverwrites = model.Permissions.Select(x => Overwrite.Construct(client, x)).ToImmutableArray();
+    }
+
+    public ValueTask UpdateAsync(IGuildChannelModel model, CancellationToken token = default)
+    {
+        if (!_model.Permissions.SequenceEqual(model.Permissions))
+        {
+            PermissionOverwrites = _model.Permissions
+                .Select(x => Overwrite.Construct(Client, x))
+                .ToImmutableArray();
+        }
+
+        _model = model;
+
+        return base.UpdateAsync(model, token);
+    }
 
     public static RestGuildChannel Construct(
         DiscordRestClient client,
         IGuildChannelModel model,
-        IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild)
+        GuildIdentity guild)
     {
         return model switch
         {
@@ -91,18 +125,9 @@ public partial class RestGuildChannel(
         };
     }
 
-    private void OnModelChanged()
-    {
-        PermissionOverwrites = Model.Permissions
-            .Select(x => Overwrite.Construct(Client, x))
-            .ToImmutableArray();
-    }
-
     public int Position => Model.Position;
 
     public ChannelFlags Flags => (ChannelFlags?)Model.Flags ?? ChannelFlags.None;
 
-    public IReadOnlyCollection<Overwrite> PermissionOverwrites { get; private set; } =
-        model.Permissions.Select(x => Overwrite.Construct(client, x)).ToImmutableArray();
-
+    public IReadOnlyCollection<Overwrite> PermissionOverwrites { get; private set; }
 }

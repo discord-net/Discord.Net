@@ -44,6 +44,9 @@ public partial class RestGroupChannelActor :
     {
         MessageChannelActor = new RestMessageChannelActor(client, null, channel);
     }
+
+    public IGroupChannel CreateEntity(IGroupDMChannelModel model)
+        => RestGroupChannel.Construct(Client, model);
 }
 
 public partial class RestGroupChannel :
@@ -53,10 +56,16 @@ public partial class RestGroupChannel :
 {
     public IDefinedLoadableEntityEnumerable<ulong, IUser> Recipients => throw new NotImplementedException();
 
-    internal new IGroupDMChannelModel Model { get; }
+    internal override IGroupDMChannelModel Model => _model;
 
-    [ProxyInterface(typeof(IGroupChannelActor), typeof(IMessageChannelActor))]
+    [ProxyInterface(
+        typeof(IGroupChannelActor),
+        typeof(IMessageChannelActor),
+        typeof(IEntityProvider<IGroupChannel, IGroupDMChannelModel>)
+        )]
     internal override RestGroupChannelActor ChannelActor { get; }
+
+    private IGroupDMChannelModel _model;
 
     internal RestGroupChannel(
         DiscordRestClient client,
@@ -64,11 +73,17 @@ public partial class RestGroupChannel :
         RestGroupChannelActor? actor = null
     ) : base(client, model)
     {
-        Model = model;
+        _model = model;
         ChannelActor = actor ?? new(client, this);
+    }
+
+    public ValueTask UpdateAsync(IGroupDMChannelModel model, CancellationToken token = default)
+    {
+        _model = model;
+
+        return base.UpdateAsync(model, token);
     }
 
     public static RestGroupChannel Construct(DiscordRestClient client, IGroupDMChannelModel model)
         => new(client, model);
-
 }

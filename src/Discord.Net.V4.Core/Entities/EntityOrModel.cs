@@ -2,7 +2,7 @@ using Discord.Models;
 
 namespace Discord;
 
-public sealed class IdentifiableEntityOrModel<TId, TEntity, TModel> : IIdentifiableEntityOrModel<TId, TEntity, TModel>
+public sealed class IdentifiableEntityOrModel<TId, TEntity, TModel> : IIdentifiableEntityOrModel<TId, TEntity>
     where TId : IEquatable<TId>
     where TEntity : class, IEntity<TId>
     where TModel : IEntityModel<TId>
@@ -49,10 +49,9 @@ public sealed class IdentifiableEntityOrModel<TId, TEntity, TModel> : IIdentifia
     public static implicit operator IdentifiableEntityOrModel<TId, TEntity, TModel>(TEntity entity) => new(entity);
 }
 
-public interface IIdentifiableEntityOrModel<out TId, out TEntity, out TModel> : IIdentifiable<TId>
+public interface IIdentifiableEntityOrModel<out TId, out TEntity> : IIdentifiable<TId>
     where TId : IEquatable<TId>
     where TEntity : class, IEntity<TId>
-    where TModel : IEntityModel<TId>
 {
     TEntity? Entity { get; }
 }

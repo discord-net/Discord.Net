@@ -1,3 +1,5 @@
+using Discord.Models;
+
 namespace Discord;
 
 /// <summary>
@@ -5,6 +7,7 @@ namespace Discord;
 /// </summary>
 public interface IStageChannel :
     IVoiceChannel,
-    IStageChannelActor
+    IStageChannelActor,
+    IUpdatable<IGuildStageChannelModel>
 {
 }

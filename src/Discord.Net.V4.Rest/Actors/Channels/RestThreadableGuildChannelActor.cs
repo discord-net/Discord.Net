@@ -9,7 +9,7 @@ namespace Discord.Rest;
 public partial class RestLoadableThreadableGuildChannelActor(
     DiscordRestClient client,
     IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-    IIdentifiableEntityOrModel<ulong, RestGuildChannel, IGuildChannelModel> channel
+    IIdentifiableEntityOrModel<ulong, RestGuildChannel> channel
 ):
     RestThreadableGuildChannelActor(client, guild, channel),
     ILoadableThreadableGuildChannelActor
@@ -29,7 +29,7 @@ public partial class RestLoadableThreadableGuildChannelActor(
 public partial class RestThreadableGuildChannelActor(
     DiscordRestClient client,
     IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-    IIdentifiableEntityOrModel<ulong, RestGuildChannel, IGuildChannelModel> channel
+    IIdentifiableEntityOrModel<ulong, RestGuildChannel> channel
 ):
     RestGuildChannelActor(client, guild, channel),
     IThreadableGuildChannelActor

@@ -4,7 +4,7 @@ namespace Discord.Rest;
 
 public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
     DiscordRestClient client,
-    IIdentifiableEntityOrModel<TId, TEntity, TModel> deferredEntity,
+    IIdentifiableEntityOrModel<TId, TEntity> deferredEntity,
     IApiOutRoute<TModel> outRoute,
     Func<TId, TModel?, TEntity?> factory
 ):
@@ -48,7 +48,7 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
 
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromConstructable<TConstructable>(
         DiscordRestClient client,
-        IIdentifiableEntityOrModel<TId, TEntity, TModel> deferredEntity,
+        IIdentifiableEntityOrModel<TId, TEntity> deferredEntity,
         Func<TId, IApiOutRoute<TModel>> route
     )
         where TConstructable : TEntity, IConstructable<TConstructable, TModel, DiscordRestClient>
@@ -56,7 +56,7 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
 
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromConstructable<TConstructable>(
         DiscordRestClient client,
-        IIdentifiableEntityOrModel<TId, TEntity, TModel> deferredEntity,
+        IIdentifiableEntityOrModel<TId, TEntity> deferredEntity,
         IApiOutRoute<TModel> outRoute
     )
         where TConstructable : TEntity, IConstructable<TConstructable, TModel, DiscordRestClient>
@@ -71,7 +71,7 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
 
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromContextConstructable<TConstructable, TContext>(
         DiscordRestClient client,
-        IIdentifiableEntityOrModel<TId, TEntity, TModel> deferredEntity,
+        IIdentifiableEntityOrModel<TId, TEntity> deferredEntity,
         Func<TContext, TId, IApiOutRoute<TModel>> route,
         TContext context
     )
@@ -80,7 +80,7 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
 
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromContextConstructable<TConstructable, TContext>(
         DiscordRestClient client,
-        IIdentifiableEntityOrModel<TId, TEntity, TModel> deferredEntity,
+        IIdentifiableEntityOrModel<TId, TEntity> deferredEntity,
         IApiOutRoute<TModel> outRoute,
         TContext context
     )

@@ -11,6 +11,7 @@ using IModifiable =
 ///     Represents a generic channel in a guild that can send and receive messages.
 /// </summary>
 public interface ITextChannel :
+    IThreadableChannel,
     IMessageChannel,
     IMentionable,
     INestedChannel,
@@ -48,17 +49,6 @@ public interface ITextChannel :
     ///     message; <c>0</c> if disabled.
     /// </returns>
     int SlowModeInterval { get; }
-
-    /// <summary>
-    ///     Gets the default auto-archive duration for client-created threads in this channel.
-    /// </summary>
-    /// <remarks>
-    ///     The value of this property does not affect API thread creation, it will not respect this value.
-    /// </remarks>
-    /// <returns>
-    ///     The default auto-archive duration for thread creation in this channel.
-    /// </returns>
-    ThreadArchiveDuration DefaultArchiveDuration { get; }
 
     string IMentionable.Mention => $"<#{Id}>";
 }

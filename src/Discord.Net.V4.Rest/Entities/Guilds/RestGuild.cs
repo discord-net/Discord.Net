@@ -6,10 +6,12 @@ using System.Globalization;
 
 namespace Discord.Rest.Guilds;
 
-public partial class RestLoadableGuildActor(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild) :
+public partial class RestLoadableGuildActor(DiscordRestClient client, GuildIdentity guild) :
     RestGuildActor(client, guild.Id),
     ILoadableGuildActor
 {
+    internal GuildIdentity Identity { get; } = guild;
+
     [ProxyInterface(typeof(ILoadableEntity<IGuild>))]
     internal RestLoadable<ulong, RestGuild, IGuild, IGuildModel> Loadable { get; } =
         RestLoadable<ulong, RestGuild, IGuild, IGuildModel>.FromConstructable<RestGuild>(

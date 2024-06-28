@@ -4,18 +4,22 @@ using Discord.Rest.Guilds;
 
 namespace Discord.Rest.Channels;
 
-public sealed partial class RestLoadableTextChannelActor(DiscordRestClient client,
-    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-    IIdentifiableEntityOrModel<ulong, RestTextChannel, IGuildTextChannelModel> channel) :
-    RestTextChannelActor(client, guild, channel.Id),
+using IChannelIdentity = IIdentifiableEntityOrModel<ulong, RestTextChannel>;
+
+public sealed partial class RestLoadableTextChannelActor(
+    DiscordRestClient client,
+    GuildIdentity guild,
+    IChannelIdentity channel
+):
+    RestTextChannelActor(client, guild, channel),
     ILoadableTextChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<ITextChannel>))]
     internal RestLoadable<ulong, RestTextChannel, ITextChannel, Channel> Loadable { get; } =
         new(
             client,
-            id,
-            Routes.GetChannel(id),
+            channel,
+            Routes.GetChannel(channel.Id),
             EntityUtils.FactoryOfDescendantModel<ulong, Channel, RestTextChannel, GuildTextChannel>(
                 (_, model) => RestTextChannel.Construct(client, model, guild)
             )
@@ -28,8 +32,8 @@ public sealed partial class RestLoadableTextChannelActor(DiscordRestClient clien
 )]
 public partial class RestTextChannelActor(
     DiscordRestClient client,
-    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-    IIdentifiableEntityOrModel<ulong, RestTextChannel, IGuildTextChannelModel> channel) :
+    GuildIdentity guild,
+    IChannelIdentity channel) :
     RestGuildChannelActor(client, guild, channel),
     ITextChannelActor
 {
@@ -37,23 +41,17 @@ public partial class RestTextChannelActor(
     internal RestMessageChannelActor MessageChannelActor { get; } = new(client, guild, channel);
 
     [ProxyInterface(typeof(IThreadableGuildChannelActor))]
-    internal RestThreadableGuildChannelActor ThreadableGuildChannelActor { get; } = new(client, guild, id);
+    internal RestThreadableGuildChannelActor ThreadableGuildChannelActor { get; } = new(client, guild, channel);
+
+    public ITextChannel CreateEntity(IGuildTextChannelModel model)
+        => RestTextChannel.Construct(Client, model, Guild.Identity);
 }
 
-public partial class RestTextChannel(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild, IGuildTextChannelModel model, RestTextChannelActor? actor = null) :
-    RestGuildChannel(client, guild, model, actor),
+public partial class RestTextChannel :
+    RestGuildChannel,
     ITextChannel,
-    IContextConstructable<RestTextChannel, IGuildTextChannelModel, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>, DiscordRestClient>
+    IContextConstructable<RestTextChannel, IGuildTextChannelModel, GuildIdentity, DiscordRestClient>
 {
-    internal new IGuildTextChannelModel Model { get; } = model;
-
-    [ProxyInterface(
-        typeof(ITextChannelActor),
-        typeof(IMessageChannelActor),
-        typeof(IThreadableGuildChannelActor)
-    )]
-    internal override RestTextChannelActor ChannelActor { get; } = actor ?? new(client, guild, model.Id);
-
     public ILoadableEntity<ulong, ICategoryChannel>? Category => throw new NotImplementedException();
 
     public bool IsNsfw => Model.IsNsfw;
@@ -64,6 +62,36 @@ public partial class RestTextChannel(DiscordRestClient client, IdentifiableEntit
 
     public ThreadArchiveDuration DefaultArchiveDuration => (ThreadArchiveDuration)Model.DefaultArchiveDuration;
 
-    public static RestTextChannel Construct(DiscordRestClient client, IGuildTextChannelModel model, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild)
+    internal override IGuildTextChannelModel Model => _model;
+
+    [ProxyInterface(
+        typeof(ITextChannelActor),
+        typeof(IMessageChannelActor),
+        typeof(IThreadableGuildChannelActor),
+        typeof(IEntityProvider<ITextChannel, IGuildTextChannelModel>)
+    )]
+    internal override RestTextChannelActor ChannelActor { get; }
+
+    private IGuildTextChannelModel _model;
+
+    internal RestTextChannel(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        IGuildTextChannelModel model,
+        RestTextChannelActor? actor = null
+    ) : base(client, guild, model, actor)
+    {
+        _model = model;
+        ChannelActor = actor ?? new(client, guild, this.Identity<ulong, RestTextChannel, IGuildTextChannelModel>());
+    }
+
+    public ValueTask UpdateAsync(IGuildTextChannelModel model, CancellationToken token = default)
+    {
+        _model = model;
+
+        return base.UpdateAsync(model, token);
+    }
+
+    public static RestTextChannel Construct(DiscordRestClient client, IGuildTextChannelModel model, GuildIdentity guild)
         => new(client, guild, model);
 }

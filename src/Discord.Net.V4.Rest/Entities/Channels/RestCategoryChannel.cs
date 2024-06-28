@@ -5,11 +5,11 @@ namespace Discord.Rest.Channels;
 public class RestCategoryChannel :
     RestGuildChannel,
     ICategoryChannel,
-    IContextConstructable<RestCategoryChannel, IGuildCategoryChannelModel, RestGuildIdentifiable, DiscordRestClient>
+    IContextConstructable<RestCategoryChannel, IGuildCategoryChannelModel, GuildIdentity, DiscordRestClient>
 {
     internal RestCategoryChannel(
         DiscordRestClient client,
-        RestGuildIdentifiable guild,
+        GuildIdentity guild,
         IGuildCategoryChannelModel model
     ) : base(client, guild, model)
     { }
@@ -17,6 +17,6 @@ public class RestCategoryChannel :
     public static RestCategoryChannel Construct(
         DiscordRestClient client,
         IGuildCategoryChannelModel model,
-        RestGuildIdentifiable guild
+        GuildIdentity guild
     ) => new(client, guild, model);
 }

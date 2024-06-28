@@ -24,17 +24,26 @@ public partial class RestDMChannel :
     [AssignOnPropertyChanged(nameof(Model), nameof(Recipient.Loadable.Id), nameof(Model.RecipientId))]
     public RestLoadableUserActor Recipient { get; }
 
-    internal new IDMChannelModel Model { get; set; }
+    internal override IDMChannelModel Model => _model;
 
     [ProxyInterface(typeof(IChannelActor), typeof(IMessageChannelActor))]
     internal override RestDMChannelActor ChannelActor { get; }
+
+    private IDMChannelModel _model;
 
     internal RestDMChannel(DiscordRestClient client, IDMChannelModel model, RestDMChannelActor? actor = null)
         : base(client, model, actor)
     {
         ChannelActor = actor ?? new(client, this);
-        Model = model;
+        _model = model;
+
         Recipient =  new(client, model.RecipientId);
+    }
+
+    public ValueTask UpdateAsync(IDMChannelModel model, CancellationToken token = default)
+    {
+        _model = model;
+        return base.UpdateAsync(model, token);
     }
 
     public static RestDMChannel Construct(DiscordRestClient client, IDMChannelModel model)

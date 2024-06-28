@@ -6,7 +6,7 @@ namespace Discord.Rest.Channels;
 
 public partial class RestLoadableChannelActor(
     DiscordRestClient client,
-    IRestChannelIdentifiable channel) :
+    IChannelIdentity channel) :
     RestChannelActor(client, channel),
     ILoadableChannelActor
 {
@@ -22,7 +22,7 @@ public partial class RestLoadableChannelActor(
 [ExtendInterfaceDefaults(typeof(IChannelActor))]
 public partial class RestChannelActor(
     DiscordRestClient client,
-    IRestChannelIdentifiable channel) :
+    IChannelIdentity channel) :
     RestActor<ulong, RestChannel>(client, channel.Id),
     IChannelActor;
 
@@ -30,14 +30,16 @@ public partial class RestChannel :
     RestEntity<ulong>,
     IChannel,
     IConstructable<RestChannel, IChannelModel, DiscordRestClient>,
-    IContextConstructable<RestChannel, IChannelModel, RestGuildIdentifiable, DiscordRestClient>
+    IContextConstructable<RestChannel, IChannelModel, GuildIdentity, DiscordRestClient>
 {
     public ChannelType Type => (ChannelType)Model.Type;
 
-    internal virtual IChannelModel Model { get; set; }
+    internal virtual IChannelModel Model => _model;
 
     [ProxyInterface(typeof(IChannelActor))]
     internal virtual RestChannelActor ChannelActor { get; }
+
+    private IChannelModel _model;
 
     internal RestChannel(
         DiscordRestClient client,
@@ -45,8 +47,14 @@ public partial class RestChannel :
         RestChannelActor? actor = null
     ) : base(client, model.Id)
     {
-        Model = model;
-        ChannelActor = actor ?? new(client, (RestChannelIdentifiable)this);
+        _model = model;
+        ChannelActor = actor ?? new(client, this.Identity<ulong, RestChannel, IChannelModel>());
+    }
+
+    public ValueTask UpdateAsync(IChannelModel model, CancellationToken token = default)
+    {
+        _model = model;
+        return ValueTask.CompletedTask;
     }
 
     public static RestChannel Construct(DiscordRestClient client, IChannelModel model)
@@ -61,7 +69,7 @@ public partial class RestChannel :
     }
 
 
-    public static RestChannel Construct(DiscordRestClient client, IChannelModel model, RestGuildIdentifiable guild)
+    public static RestChannel Construct(DiscordRestClient client, IChannelModel model, GuildIdentity guild)
     {
         return model switch
         {
