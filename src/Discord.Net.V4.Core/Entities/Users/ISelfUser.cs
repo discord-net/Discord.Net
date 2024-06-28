@@ -1,12 +1,31 @@
+using Discord.Models;
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
+
+using IModifiable = IModifiable<ulong, ISelfUser, ModifySelfUserProperties, ModifyCurrentUserParams, ISelfUserModel>;
 
 /// <summary>
 ///     Represents the logged-in Discord user.
 /// </summary>
 public interface ISelfUser :
     IUser,
-    ISelfUserActor
+    ISelfUserActor,
+    IModifiable,
+    IRefreshable<ISelfUser, ulong, ISelfUserModel>
 {
+    static IApiOutRoute<ISelfUserModel> IRefreshable<ISelfUser, ulong, ISelfUserModel>.RefreshRoute(
+        ISelfUser self,
+        ulong id
+    ) => Routes.GetCurrentUser;
+
+    static IApiInOutRoute<ModifyCurrentUserParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyCurrentUserParams args
+    ) => Routes.ModifyCurrentUser(args);
+
     /// <summary>
     ///     Gets the email associated with this user.
     /// </summary>

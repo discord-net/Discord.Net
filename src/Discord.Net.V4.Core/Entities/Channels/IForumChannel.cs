@@ -1,4 +1,11 @@
+using Discord.Models;
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
+
+using IModifiable =
+    IModifiable<ulong, IForumChannel, ModifyForumChannelProperties, ModifyGuildChannelParams, IGuildForumChannelModel>;
 
 /// <summary>
 ///     Represents a forum channel in a guild that can create posts.
@@ -6,8 +13,15 @@ namespace Discord;
 public interface IForumChannel :
     INestedChannel,
     IIntegrationChannel,
-    IForumChannelActor
+    IForumChannelActor,
+    IModifiable
 {
+    static IApiInOutRoute<ModifyGuildChannelParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyGuildChannelParams args
+    ) => Routes.ModifyChannel(id, args);
+
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
     /// </summary>

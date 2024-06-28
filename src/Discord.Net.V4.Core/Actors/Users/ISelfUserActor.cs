@@ -1,15 +1,19 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 using System.Collections.Immutable;
 
 namespace Discord;
 
+using IModifiable =
+    IModifiable<ulong, ISelfUserActor, ModifySelfUserProperties, ModifyCurrentUserParams, ISelfUser, ISelfUserModel>;
+
 public interface ILoadableSelfUserActor :
     ILoadableEntity<ulong, ISelfUser>,
     ISelfUserActor;
 
 public interface ISelfUserActor :
-    IModifiable<ulong, ISelfUserActor, ModifySelfUserProperties, ModifyCurrentUserParams>,
+    IModifiable,
     IUserActor,
     IActor<ulong, ISelfUser>
 {
@@ -17,11 +21,11 @@ public interface ISelfUserActor :
     // - https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection
     // - https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection
 
-    static IApiInRoute<ModifyCurrentUserParams>
-        IModifiable<ulong, ISelfUserActor, ModifySelfUserProperties, ModifyCurrentUserParams>.ModifyRoute(
-            IPathable path, ulong id,
-            ModifyCurrentUserParams args)
-        => Routes.ModifyCurrentUser(args);
+    static IApiInOutRoute<ModifyCurrentUserParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyCurrentUserParams args
+    ) => Routes.ModifyCurrentUser(args);
 
     async Task<IEnumerable<IPartialGuild>?> GetGuildsAsync(
         EntityOrId<ulong, IPartialGuild>? before,

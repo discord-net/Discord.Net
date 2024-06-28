@@ -1,11 +1,24 @@
+using Discord.Models;
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
+
+using IModifiable = IModifiable<ulong, IRole, ModifyRoleProperties, ModifyGuildRoleParams, IRoleModel>;
 
 public interface IRole :
     ISnowflakeEntity,
     IMentionable,
     IComparable<IRole>,
-    IRoleActor
+    IRoleActor,
+    IModifiable
 {
+    static IApiInOutRoute<ModifyGuildRoleParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyGuildRoleParams args
+    ) => Routes.ModifyGuildRole(path.Require<IGuild>(), id, args);
+
     /// <summary>
     ///     Gets the color given to users of this role.
     /// </summary>

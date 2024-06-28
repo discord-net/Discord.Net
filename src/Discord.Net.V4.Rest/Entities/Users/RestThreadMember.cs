@@ -6,7 +6,7 @@ namespace Discord.Rest;
 
 public sealed partial class RestLoadableThreadMemberActor(
     DiscordRestClient client,
-    ulong guildId,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
     ulong threadId,
     ulong id,
     IThreadMemberModel? model = null,
@@ -14,7 +14,7 @@ public sealed partial class RestLoadableThreadMemberActor(
     IMemberModel? member = null,
     IUserModel? user = null
 ):
-    RestThreadMemberActor(client, guildId, threadId, id, thread, member, user),
+    RestThreadMemberActor(client, guild, threadId, id, thread, member, user),
     ILoadableThreadMemberActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IThreadMember>))]
@@ -24,15 +24,15 @@ public sealed partial class RestLoadableThreadMemberActor(
                 client,
                 id,
                 Routes.GetThreadMember(threadId, id, true),
-                new RestThreadMember.Context(guildId, threadId, thread, member, user),
-                model
+                new RestThreadMember.Context(guild, threadId, thread, member, user),
+                model: model
             );
 }
 
 [ExtendInterfaceDefaults(typeof(IThreadMemberActor))]
 public partial class RestThreadMemberActor(
     DiscordRestClient client,
-    ulong guildId,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
     ulong threadId,
     ulong id,
     IThreadChannelModel? thread = null,
@@ -42,16 +42,16 @@ public partial class RestThreadMemberActor(
     RestActor<ulong, RestThreadMember>(client, id),
     IThreadMemberActor
 {
-    public RestLoadableThreadChannelActor Thread { get; } =
-        new(client, guildId, threadId, thread);
+    public RestLoadableThreadChannelChannelActor Thread { get; } =
+        new(client, guild, threadId, thread);
 
     public RestLoadableGuildMemberActor Member { get; } =
-        new(client, guildId, id, member);
+        new(client, guild, id, member);
 
     public RestLoadableUserActor User { get; } =
         new(client, id, user);
 
-    ILoadableThreadActor IThreadRelationship.Thread => Thread;
+    ILoadableThreadChannelActor IThreadRelationship.ThreadChannel => Thread;
     ILoadableGuildMemberActor IMemberRelationship.Member => Member;
     ILoadableUserActor IUserRelationship.User => User;
 }

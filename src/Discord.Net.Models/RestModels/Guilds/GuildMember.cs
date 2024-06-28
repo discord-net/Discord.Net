@@ -52,7 +52,7 @@ public sealed class GuildMember : IMemberModel, IEntityModelSource
 
     DateTimeOffset? IMemberModel.CommunicationsDisabledUntil => CommunicationsDisabledUntil;
     string? IMemberModel.Nickname => Nick;
-    ulong? IEntityModel<ulong?>.Id => User.Map(v => v.Id);
+    ulong IEntityModel<ulong>.Id => User.Map(v => v.Id);
 
     public IEnumerable<IEntityModel> GetEntities()
     {

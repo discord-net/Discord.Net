@@ -1,7 +1,12 @@
+using Discord.Models;
 using Discord.Models.Json.Stickers;
 using Discord.Rest;
 
 namespace Discord;
+
+using IModifiable =
+    IModifiable<ulong, IGuildStickerActor, ModifyStickerProperties, ModifyGuildStickersParams, IGuildSticker,
+        IStickerModel>;
 
 public interface ILoadableGuildStickerActor :
     IGuildStickerActor,
@@ -9,16 +14,16 @@ public interface ILoadableGuildStickerActor :
 
 public interface IGuildStickerActor :
     IGuildRelationship,
-    IModifiable<ulong, IGuildStickerActor, ModifyStickerProperties, ModifyGuildStickersParams>,
+    IModifiable,
     IDeletable<ulong, IGuildStickerActor>,
     IActor<ulong, IGuildSticker>
 {
     static IApiRoute IDeletable<ulong, IGuildStickerActor>.DeleteRoute(IPathable path, ulong id)
         => Routes.DeleteMessage(path.Require<IChannel>(), id);
 
-    static IApiInRoute<ModifyGuildStickersParams>
-        IModifiable<ulong, IGuildStickerActor, ModifyStickerProperties, ModifyGuildStickersParams>.ModifyRoute(
-            IPathable path, ulong id,
-            ModifyGuildStickersParams args)
-        => Routes.ModifyGuildSticker(path.Require<IGuild>(), id, args);
+    static IApiInOutRoute<ModifyGuildStickersParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyGuildStickersParams args
+    ) => Routes.ModifyGuildSticker(path.Require<IGuild>(), id, args);
 }

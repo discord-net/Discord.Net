@@ -25,7 +25,7 @@ public interface IDiscordClient :
     /// </summary>
     ILoadableSelfUserActor SelfUser { get; }
 
-    IPagedIndexableActor<ILoadableGuildActor, ulong, IGuild, IPartialGuild> Guilds { get; }
+    IPagedIndexableActor<ILoadableGuildActor, ulong, IGuild, IPartialGuild, PageUserGuildsParams> Guilds { get; }
 
     IIndexableActor<ILoadableChannelActor, ulong, IChannel> Channels { get; }
 

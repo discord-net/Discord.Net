@@ -1,5 +1,6 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Guilds;
 
 namespace Discord.Rest.Channels;
 
@@ -20,22 +21,22 @@ public partial class RestLoadableNewsChannelActor(DiscordRestClient client, ulon
 }
 
 [ExtendInterfaceDefaults(typeof(INewsChannelActor))]
-public partial class RestNewsChannelActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestGuildChannelActor(client, guildId, id),
+public partial class RestNewsChannelActor(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild, ulong id) :
+    RestGuildChannelActor(client, guild, id),
     INewsChannelActor
 {
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, guildId, id);
+    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, guild, id);
 
     [ProxyInterface(typeof(IThreadableGuildChannelActor))]
-    internal RestThreadableGuildChannelActor ThreadableActor { get; } = new(client, guildId, id);
+    internal RestThreadableGuildChannelActor ThreadableActor { get; } = new(client, guild, id);
 }
 
-public partial class RestNewsChannel(DiscordRestClient client, ulong guildId, IGuildNewsChannelModel model) :
-    RestTextChannel(client, guildId, model),
+public partial class RestNewsChannel(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild, IGuildNewsChannelModel model) :
+    RestTextChannel(client, guild, model),
     INewsChannel,
-    IContextConstructable<RestNewsChannel, IGuildNewsChannelModel, ulong, DiscordRestClient>
+    IContextConstructable<RestNewsChannel, IGuildNewsChannelModel, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>, DiscordRestClient>
 {
-    public static RestNewsChannel Construct(DiscordRestClient client, IGuildNewsChannelModel model, ulong context)
-        => new(client, context, model);
+    public static RestNewsChannel Construct(DiscordRestClient client, IGuildNewsChannelModel model, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild)
+        => new(client, guild, model);
 }

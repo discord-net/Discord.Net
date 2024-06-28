@@ -1,9 +1,25 @@
+using Discord.Models;
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
+
+using IModifiable = IModifiable<ulong, IMessage, ModifyMessageProperties, ModifyMessageParams, IMessageModel>;
 
 public interface IMessage :
     ISnowflakeEntity,
-    IMessageActor
+    IMessageActor,
+    IRefreshable<IMessage, ulong, IMessageModel>,
+    IModifiable
 {
+    static IApiInOutRoute<ModifyMessageParams, IEntityModel> IModifiable.ModifyRoute(IPathable path, ulong id,
+        ModifyMessageParams args)
+        => Routes.ModifyMessage(path.Require<IChannel>(), id, args);
+
+    static IApiOutRoute<IMessageModel> IRefreshable<IMessage, ulong, IMessageModel>.RefreshRoute(IMessage self,
+        ulong id)
+        => Routes.GetChannelMessage(self.Channel.Id, id);
+
     #region Properties
 
     /// <summary>
@@ -91,7 +107,7 @@ public interface IMessage :
     /// <summary>
     ///     Gets the thread that was started from this message.
     /// </summary>
-    ILoadableThreadActor? Thread { get; }
+    ILoadableThreadChannelActor? Thread { get; }
 
     /// <summary>
     ///     Gets all attachments included in this message.

@@ -1,9 +1,11 @@
-using Discord.Integration;
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 using System.Collections.Immutable;
 
 namespace Discord;
+
+using IModifiable = IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams, IGuild, IGuildModel>;
 
 public interface ILoadableGuildActor :
     IGuildActor,
@@ -11,36 +13,39 @@ public interface ILoadableGuildActor :
 
 public interface IGuildActor :
     IActor<ulong, IGuild>,
-    IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams>,
+    IModifiable,
     IDeletable<ulong, IGuildActor>
 {
     static IApiRoute IDeletable<ulong, IGuildActor>
         .DeleteRoute(IPathable path, ulong id) => Routes.DeleteGuild(id);
 
-    static IApiInRoute<ModifyGuildParams> IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams>
-        .ModifyRoute(IPathable path, ulong id, ModifyGuildParams args) => Routes.ModifyGuild(id, args);
+    static IApiInOutRoute<ModifyGuildParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyGuildParams args
+    ) => Routes.ModifyGuild(id, args);
 
     #region Sub-actors
 
-    IIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations { get; }
+    IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations { get; }
     IIntegrationActor Integration(ulong id) => Integrations[id];
 
-    IPagedIndexableActor<ILoadableGuildBanActor, ulong, IBan> Bans { get; }
+    IPagedIndexableActor<ILoadableGuildBanActor, ulong, IBan, PageGuildBansParams> Bans { get; }
     ILoadableGuildBanActor Ban(ulong userId) => Bans[userId];
 
-    IIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels { get; }
+    IEnumerableIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels { get; }
     ILoadableStageChannelActor StageChannel(ulong id) => StageChannels[id];
 
-    IEnumerableIndexableActor<ILoadableThreadActor, ulong, IThreadChannel> ActiveThreads { get; }
-    ILoadableThreadActor ActiveThread(ulong id) => ActiveThreads[id];
+    IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ActiveThreads { get; }
+    ILoadableThreadChannelActor ActiveThread(ulong id) => ActiveThreads[id];
 
-    IIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels { get; }
+    IEnumerableIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels { get; }
     ILoadableTextChannelActor TextChannel(ulong id) => TextChannels[id];
 
     IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels { get; }
     ILoadableGuildChannelActor Channel(ulong id) => Channels[id];
 
-    IPagedIndexableActor<ILoadableGuildMemberActor, ulong, IGuildMember> Members { get; }
+    IPagedIndexableActor<ILoadableGuildMemberActor, ulong, IGuildMember, PageGuildMembersParams> Members { get; }
     ILoadableGuildMemberActor Member(ulong id) => Members[id];
 
     IEnumerableIndexableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes { get; }

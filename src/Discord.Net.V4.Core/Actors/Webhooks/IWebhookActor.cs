@@ -1,24 +1,29 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
+
+using IModifiable =
+    IModifiable<ulong, IWebhookActor, ModifyWebhookProperties, ModifyWebhookParams, IWebhook, IWebhookModel>;
 
 public interface ILoadableWebhookActor :
     IWebhookActor,
     ILoadableEntity<ulong, IWebhook>;
 
 public interface IWebhookActor :
-    IModifiable<ulong, IWebhookActor, ModifyWebhookProperties, ModifyWebhookParams>,
+    IModifiable,
     IDeletable<ulong, IWebhookActor>,
     IActor<ulong, IWebhook>
 {
     static IApiRoute IDeletable<ulong, IWebhookActor>.DeleteRoute(IPathable path, ulong id)
         => Routes.DeleteWebhook(id);
 
-    static IApiInRoute<ModifyWebhookParams>
-        IModifiable<ulong, IWebhookActor, ModifyWebhookProperties, ModifyWebhookParams>.ModifyRoute(IPathable path,
-            ulong id, ModifyWebhookParams args)
-        => Routes.ModifyWebhook(id, args);
+    static IApiInOutRoute<ModifyWebhookParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyWebhookParams args
+    ) => Routes.ModifyWebhook(id, args);
 
     async Task<IMessage?> GetWebhookMessageAsync(
         string webhookToken,

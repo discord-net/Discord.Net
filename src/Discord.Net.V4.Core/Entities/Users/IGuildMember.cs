@@ -1,8 +1,27 @@
+using Discord.Models;
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
 
+using IModifiable = IModifiable<ulong, IGuildMember, ModifyGuildUserProperties, ModifyGuildMemberParams, IMemberModel>;
+
 public interface IGuildMember :
-    IGuildMemberActor
+    IGuildMemberActor,
+    IEntity<ulong>,
+    IRefreshable<IGuildMember, ulong, IMemberModel>,
+    IModifiable
 {
+    static IApiInOutRoute<ModifyGuildMemberParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyGuildMemberParams args
+    ) => Routes.ModifyGuildMember(path.Require<IGuild>(), id, args);
+
+    static IApiOutRoute<IMemberModel> IRefreshable<IGuildMember, ulong, IMemberModel>.RefreshRoute(IGuildMember self,
+        ulong id)
+        => Routes.GetGuildMember(self.Require<IGuild>(), id);
+
     IDefinedLoadableEntityEnumerable<ulong, IRole> Roles { get; }
 
     /// <summary>

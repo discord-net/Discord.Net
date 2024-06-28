@@ -1,7 +1,10 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
+
+using IModifiable = IModifiable<ulong, IGuildMemberActor, ModifyGuildUserProperties, ModifyGuildMemberParams, IGuildMember, IMemberModel>;
 
 public interface ILoadableGuildMemberActor :
     IGuildMemberActor,
@@ -10,11 +13,11 @@ public interface ILoadableGuildMemberActor :
 public interface IGuildMemberActor :
     IGuildRelationship,
     IUserRelationship,
-    IModifiable<ulong, IGuildMemberActor, ModifyGuildUserProperties, ModifyGuildMemberParams>,
+    IModifiable,
     IActor<ulong, IGuildMember>
 {
-    static IApiInRoute<ModifyGuildMemberParams>
-        IModifiable<ulong, IGuildMemberActor, ModifyGuildUserProperties, ModifyGuildMemberParams>.ModifyRoute(
+    static IApiInOutRoute<ModifyGuildMemberParams, IEntityModel>
+        IModifiable.ModifyRoute(
             IPathable path, ulong id,
             ModifyGuildMemberParams args)
         => Routes.ModifyGuildMember(path.Require<IGuild>(), id, args);

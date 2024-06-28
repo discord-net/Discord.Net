@@ -1,7 +1,10 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
+
+using IModifiable = IModifiable<ulong, IGroupChannelActor, ModifyGroupDMProperties, ModifyGroupDmParams, IGroupChannel, IGroupDMChannelModel>;
 
 public interface ILoadableGroupChannelActor :
     IGroupChannelActor,
@@ -10,10 +13,11 @@ public interface ILoadableGroupChannelActor :
 public interface IGroupChannelActor :
     IMessageChannelActor,
     IActor<ulong, IGroupChannel>,
-    IModifiable<ulong, IGroupChannelActor, ModifyGroupDMProperties, ModifyGroupDmParams>
+    IModifiable
 {
-    static IApiInRoute<ModifyGroupDmParams>
-        IModifiable<ulong, IGroupChannelActor, ModifyGroupDMProperties, ModifyGroupDmParams>.ModifyRoute(IPathable path,
-            ulong id, ModifyGroupDmParams args)
-        => Routes.ModifyChannel(id, args);
+    static IApiInOutRoute<ModifyGroupDmParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyGroupDmParams args
+    ) => Routes.ModifyChannel(id, args);
 }

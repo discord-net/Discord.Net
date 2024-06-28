@@ -1,36 +1,53 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Guilds;
 
 namespace Discord.Rest.Channels;
 
-public partial class RestLoadableChannelActor(DiscordRestClient client, ulong id) :
-    RestChannelActor(client, id),
+public partial class RestLoadableChannelActor(
+    DiscordRestClient client,
+    IRestChannelIdentifiable channel) :
+    RestChannelActor(client, channel),
     ILoadableChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IChannel>))]
-    internal RestLoadable<ulong, RestChannel, IChannel, Channel> Loadable { get; } =
-        RestLoadable<ulong, RestChannel, IChannel, Channel>.FromConstructable<RestChannel>(
+    internal RestLoadable<ulong, RestChannel, IChannel, IChannelModel> Loadable { get; } =
+        RestLoadable<ulong, RestChannel, IChannel, IChannelModel>.FromConstructable<RestChannel>(
             client,
-            id,
+            channel,
             Routes.GetChannel
         );
 }
 
 [ExtendInterfaceDefaults(typeof(IChannelActor))]
-public partial class RestChannelActor(DiscordRestClient client, ulong id) :
-    RestActor<ulong, RestChannel>(client, id),
+public partial class RestChannelActor(
+    DiscordRestClient client,
+    IRestChannelIdentifiable channel) :
+    RestActor<ulong, RestChannel>(client, channel.Id),
     IChannelActor;
 
-public partial class RestChannel(DiscordRestClient client, IChannelModel model, RestChannelActor? actor = null) :
-    RestEntity<ulong>(client, model.Id),
+public partial class RestChannel :
+    RestEntity<ulong>,
     IChannel,
     IConstructable<RestChannel, IChannelModel, DiscordRestClient>,
-    IContextConstructable<RestChannel, IChannelModel, ulong, DiscordRestClient>
+    IContextConstructable<RestChannel, IChannelModel, RestGuildIdentifiable, DiscordRestClient>
 {
-    internal IChannelModel Model { get; } = model;
+    public ChannelType Type => (ChannelType)Model.Type;
+
+    internal virtual IChannelModel Model { get; set; }
 
     [ProxyInterface(typeof(IChannelActor))]
-    internal virtual RestChannelActor Actor { get; } = actor ?? new(client, model.Id);
+    internal virtual RestChannelActor ChannelActor { get; }
+
+    internal RestChannel(
+        DiscordRestClient client,
+        IChannelModel model,
+        RestChannelActor? actor = null
+    ) : base(client, model.Id)
+    {
+        Model = model;
+        ChannelActor = actor ?? new(client, (RestChannelIdentifiable)this);
+    }
 
     public static RestChannel Construct(DiscordRestClient client, IChannelModel model)
     {
@@ -38,33 +55,31 @@ public partial class RestChannel(DiscordRestClient client, IChannelModel model, 
         {
             DMChannelModel dmChannelModel => RestDMChannel.Construct(client, dmChannelModel),
             GroupDMChannel groupDMChannel => RestGroupChannel.Construct(client, groupDMChannel),
-            GuildChannelBase => throw new InvalidOperationException(
-                $"Cannot construct a channel from {model.GetType()}: missing guild id"),
+            GuildChannelBase guildChannelBase => Construct(client, model, guildChannelBase.GuildId),
             _ => new RestChannel(client, model)
         };
     }
 
-    public ChannelType Type => (ChannelType)Model.Type;
 
-    public static RestChannel Construct(DiscordRestClient client, IChannelModel model, ulong guildId)
+    public static RestChannel Construct(DiscordRestClient client, IChannelModel model, RestGuildIdentifiable guild)
     {
         return model switch
         {
             GuildChannelBase guildChannel => guildChannel switch
             {
                 IGuildNewsChannelModel guildAnnouncementChannel => RestNewsChannel.Construct(client,
-                    guildAnnouncementChannel, guildId),
+                    guildAnnouncementChannel, guild),
                 IGuildCategoryChannelModel guildCategoryChannel => RestCategoryChannel.Construct(client, guildCategoryChannel,
-                    guildId),
+                    guild),
                 IGuildDirectoryChannel guildDirectoryChannel => RestGuildChannel.Construct(client, guildDirectoryChannel,
-                    guildId),
-                IGuildForumChannelModel guildForumChannel => RestForumChannel.Construct(client, guildForumChannel, guildId),
-                IGuildMediaChannelModel guildMediaChannel => RestMediaChannel.Construct(client, guildMediaChannel, guildId),
+                    guild),
+                IGuildForumChannelModel guildForumChannel => RestForumChannel.Construct(client, guildForumChannel, guild),
+                IGuildMediaChannelModel guildMediaChannel => RestMediaChannel.Construct(client, guildMediaChannel, guild),
                 IGuildStageChannelModel guildStageVoiceChannel => RestStageChannel.Construct(client,
-                    guildStageVoiceChannel, guildId),
-                IGuildVoiceChannelModel guildVoiceChannel => RestVoiceChannel.Construct(client, guildVoiceChannel, guildId),
-                IThreadChannelModel threadChannel => RestThreadChannel.Construct(client, threadChannel, new(guildId)),
-                IGuildTextChannelModel guildTextChannel => RestTextChannel.Construct(client, guildTextChannel, guildId),
+                    guildStageVoiceChannel, guild),
+                IGuildVoiceChannelModel guildVoiceChannel => RestVoiceChannel.Construct(client, guildVoiceChannel, guild),
+                IThreadChannelModel threadChannel => RestThreadChannel.Construct(client, threadChannel, new(guild)),
+                IGuildTextChannelModel guildTextChannel => RestTextChannel.Construct(client, guildTextChannel, guild),
                 _ => throw new ArgumentOutOfRangeException(nameof(guildChannel))
             },
             _ => Construct(client, model)

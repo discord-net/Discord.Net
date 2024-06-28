@@ -6,38 +6,48 @@ using Discord.Rest.Channels;
 
 namespace Discord.Rest;
 
-public sealed class RestPagedIndexableActor<TActor, TId, TEntity, TModel>(
+public sealed class RestPagedIndexableActor<TActor, TId, TEntity, TModel, TParams>(
     DiscordRestClient client,
     Func<TId, TActor> actorFactory,
-    IApiOutRoute<TModel> initial,
+    Func<TParams?, IApiOutRoute<TModel>> initial,
     Func<EntityPager<TEntity, TModel>, TModel, IEnumerable<TEntity>> factory,
-    Func<EntityPager<TEntity, TModel>, TModel, IApiOutRoute<TModel>?> nextPage,
+    Func<EntityPager<TEntity, TModel>, TModel, TParams?, IApiOutRoute<TModel>?> nextPage,
     int? defaultPageSize = null
 ):
-    RestPagedActor<TId, TEntity, TModel>(client, initial, factory, nextPage, defaultPageSize),
-    IIndexableActor<TActor, TId, TEntity>
+    RestPagedActor<TId, TEntity, TModel, TParams>(client, initial, factory, nextPage, defaultPageSize),
+    IPagedIndexableActor<TActor, TId, TEntity, TParams>
     where TActor : IActor<TId, TEntity>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>
     where TModel : class
+    where TParams : IPagingParams
 {
     internal RestIndexableActor<TActor, TId, TEntity> IndexerActor { get; } = new(actorFactory);
     public TActor Specifically(TId id) => IndexerActor.Specifically(id);
 }
 
-public class RestPagedActor<TId, TEntity, TModel>(
+public class RestPagedActor<TId, TEntity, TModel, TParams>(
     DiscordRestClient client,
-    IApiOutRoute<TModel> initial,
+    Func<TParams?, IApiOutRoute<TModel>> initial,
     Func<EntityPager<TEntity, TModel>, TModel, IEnumerable<TEntity>> factory,
-    Func<EntityPager<TEntity, TModel>, TModel, IApiOutRoute<TModel>?> nextPage,
+    Func<EntityPager<TEntity, TModel>, TModel, TParams?, IApiOutRoute<TModel>?> nextPage,
     int? defaultPageSize = null
 ):
-    IPagedActor<TId, TEntity>
+    IPagedActor<TId, TEntity, TParams>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>
     where TModel : class
+    where TParams : IPagingParams
 {
 
-    public IAsyncPaged<TEntity> PagedAsync(int? pageSize, RequestOptions? options = null)
-        => new EntityPager<TEntity, TModel>(client, pageSize ?? defaultPageSize, initial, factory, nextPage, options);
+    public IAsyncPaged<TEntity> PagedAsync(TParams? pagingParams = default, RequestOptions? options = null)
+        => new EntityPager<TEntity, TModel>(
+            client,
+            pagingParams?.PageSize ?? defaultPageSize,
+            pagingParams?.Total,
+            initial(pagingParams),
+            factory,
+            (pager, model) => nextPage(pager, model, pagingParams),
+            options
+       );
 }

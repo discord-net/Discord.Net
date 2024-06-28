@@ -1,3 +1,6 @@
+using Discord.Models;
+using Discord.Rest;
+
 namespace Discord;
 
 public interface ILoadableChannelActor :
@@ -5,4 +8,7 @@ public interface ILoadableChannelActor :
     ILoadableEntity<ulong, IChannel>;
 
 public interface IChannelActor :
-    IActor<ulong, IChannel>;
+    IActor<ulong, IChannel>
+{
+
+}

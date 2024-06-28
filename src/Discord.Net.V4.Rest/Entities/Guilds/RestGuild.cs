@@ -1,18 +1,22 @@
-using Discord.Integration;
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Channels;
+using Discord.Rest.Guilds.Integrations;
 using System.Globalization;
 
 namespace Discord.Rest.Guilds;
 
-public partial class RestLoadableGuildActor(DiscordRestClient client, ulong id) :
-    RestGuildActor(client, id),
+public partial class RestLoadableGuildActor(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild) :
+    RestGuildActor(client, guild.Id),
     ILoadableGuildActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IGuild>))]
-    internal RestLoadable<ulong, RestGuild, IGuild, Guild> Loadable { get; } =
-        RestLoadable<ulong, RestGuild, IGuild, Guild>.FromConstructable<RestGuild>(client, id, Routes.GetGuild(id));
+    internal RestLoadable<ulong, RestGuild, IGuild, IGuildModel> Loadable { get; } =
+        RestLoadable<ulong, RestGuild, IGuild, IGuildModel>.FromConstructable<RestGuild>(
+            client,
+            guild,
+            Routes.GetGuild(guild.Id)
+        );
 }
 
 [ExtendInterfaceDefaults(
@@ -20,23 +24,32 @@ public partial class RestLoadableGuildActor(DiscordRestClient client, ulong id) 
     typeof(IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams>),
     typeof(IDeletable<ulong, IGuildActor>)
 )]
-public partial class RestGuildActor(DiscordRestClient client, ulong id) :
-    RestActor<ulong, RestGuild>(client, id),
+public partial class RestGuildActor(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild) :
+    RestActor<ulong, RestGuild>(client, guild.Id),
     IGuildActor
 {
-    public IIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations => throw new NotImplementedException();
+    public RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IEnumerable<IIntegrationModel>> Integrations
+    {
+        get;
+    } = RestActors.Integrations(client, id, guild);
 
-    public IPagedIndexableActor<ILoadableGuildBanActor, ulong, IBan> Bans => throw new NotImplementedException();
+    public RestPagedIndexableActor<RestLoadableBanActor, ulong, RestBan, IEnumerable<IBanModel>, PageGuildBansParams> Bans { get; }
+        = RestActors.Bans(client, id);
 
-    public IIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels { get; }
+        = RestActors.StageChannels(client, guild);
 
-    public IEnumerableIndexableActor<ILoadableThreadActor, ulong, IThreadChannel> ActiveThreads => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ActiveThreads => throw new NotImplementedException();
 
-    public IIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels => throw new NotImplementedException();
 
     public IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels => throw new NotImplementedException();
 
-    public IPagedIndexableActor<ILoadableGuildMemberActor, ulong, IGuildMember> Members => throw new NotImplementedException();
+    public RestPagedIndexableActor<RestLoadableGuildMemberActor, ulong, RestGuildMember, IEnumerable<IMemberModel>,
+        PageGuildMembersParams> Members
+    {
+        get;
+    } = RestActors.Members(client, id);
 
     public IEnumerableIndexableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes => throw new NotImplementedException();
 
@@ -47,6 +60,13 @@ public partial class RestGuildActor(DiscordRestClient client, ulong id) :
     public IEnumerableIndexableActor<ILoadableGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents => throw new NotImplementedException();
 
     public IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites => throw new NotImplementedException();
+
+    IPagedIndexableActor<ILoadableGuildBanActor, ulong, IBan, PageGuildBansParams> IGuildActor.Bans => Bans;
+
+    IPagedIndexableActor<ILoadableGuildMemberActor, ulong, IGuildMember, PageGuildMembersParams> IGuildActor.Members =>
+        Members;
+
+    IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> IGuildActor.Integrations => Integrations;
 }
 
 public partial class RestGuild(DiscordRestClient client, IGuildModel model, RestGuildActor? actor = null) :

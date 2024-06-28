@@ -1,6 +1,6 @@
 namespace Discord.Models;
 
-public interface IInviteModel : IEntityModel
+public interface IInviteModel : IEntityModel<string>
 {
     string Code { get; }
     ulong? GuildId { get; }
@@ -14,4 +14,6 @@ public interface IInviteModel : IEntityModel
     int? ApproximateMemberCount { get; }
     DateTimeOffset? ExpiresAt { get; }
     ulong? ScheduledEventId { get; }
+
+    string IEntityModel<string>.Id => Code;
 }

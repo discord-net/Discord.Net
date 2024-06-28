@@ -8,73 +8,74 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
-public sealed partial class RestLoadableThreadChannelActor(DiscordRestClient client, ulong guildId, ulong id, IThreadChannelModel? model = null) :
-    RestThreadChannelActor(client, guildId, id),
-    ILoadableThreadActor
+public sealed partial class RestLoadableThreadChannelChannelActor(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IdentifiableEntityOrModel<ulong, RestThreadChannel, IChannelModel> thread) :
+    RestThreadChannelChannelActor(client, guild, thread.Id),
+    ILoadableThreadChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IThreadChannel>))]
     public RestLoadable<ulong, RestThreadChannel, IThreadChannel, IChannelModel> Loadable { get; } =
         new(
             client,
-            id,
-            Routes.GetChannel(id),
+            thread,
+            Routes.GetChannel(thread.Id),
             EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestThreadChannel, ThreadChannelBase>(
-                (_, thread) => RestThreadChannel.Construct(client, thread, new(guildId))
-            ),
-            model
+                (_, thread) => RestThreadChannel.Construct(client, thread, new(guild))
+            )
         );
 }
 
 [ExtendInterfaceDefaults(
-    typeof(IThreadActor),
-    typeof(IModifiable<ulong, IThreadActor, ModifyThreadChannelProperties, ModifyThreadChannelParams>)
+    typeof(IThreadChannelActor),
+    typeof(IModifiable<ulong, IThreadChannelActor, ModifyThreadChannelProperties, ModifyThreadChannelParams>)
 )]
-public partial class RestThreadChannelActor(
+public partial class RestThreadChannelChannelActor(
     DiscordRestClient client,
-    ulong guildId,
-    ulong id,
-    IThreadChannelModel? model = null,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IdentifiableEntityOrModel<ulong, RestThreadChannel, IChannelModel> thread,
     IThreadMemberModel? currentThreadMember = null
 ):
-    RestGuildChannelActor(client, guildId, id),
-    IThreadActor,
+    RestGuildChannelActor(client, guild, thread.Id),
+    IThreadChannelActor,
     IActor<ulong, RestThreadChannel>
 {
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, guildId, id);
+    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, guild, id);
 
     public RestLoadableThreadMemberActor CurrentThreadMember { get; } =
-        new(client, guildId, id, client.SelfUser.Id, model: currentThreadMember, thread: model);
+        new(client, guild, id, client.SelfUser.Id, model: currentThreadMember, thread: model);
 
     public IEnumerableIndexableActor<ILoadableThreadMemberActor, ulong, IThreadMember> ThreadMembers => throw new NotImplementedException();
 
-    ILoadableThreadMemberActor IThreadActor.CurrentThreadMember => CurrentThreadMember;
+    ILoadableThreadMemberActor IThreadChannelActor.CurrentThreadMember => CurrentThreadMember;
 }
 
 public partial class RestThreadChannel(
     DiscordRestClient client,
-    ulong guildId,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
     IThreadChannelModel model,
-    RestThreadChannelActor? actor = null,
-    IThreadMemberModel? currentThreadMember = null
+    RestThreadChannelChannelActor? actor = null,
+    IdentifiableEntityOrModel<ulong, RestThreadMember, IThreadMemberModel>? currentThreadMember = null //IThreadMemberModel? currentThreadMember = null
 ):
-    RestGuildChannel(client, guildId, model, actor),
+    RestGuildChannel(client, guild, model, actor),
     IThreadChannel,
     IContextConstructable<RestThreadChannel, IThreadChannelModel, RestThreadChannel.Context, DiscordRestClient>
 {
     public readonly record struct Context(
-        ulong GuildId,
+        IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> Guild,
         IThreadMemberModel? CurrentThreadMember = null
     );
 
     [OnChangedMethod(nameof(OnModelUpdated))]
     internal new IThreadChannelModel Model { get; } = model;
 
-    [ProxyInterface(typeof(IThreadActor), typeof(IThreadMemberRelationship), typeof(IMessageChannelActor))]
-    internal override RestThreadChannelActor Actor { get; }
+    [ProxyInterface(typeof(IThreadChannelActor), typeof(IThreadMemberRelationship), typeof(IMessageChannelActor))]
+    internal override RestThreadChannelChannelActor ChannelActor { get; }
         = actor ?? new(
             client,
-            guildId,
+            guild,
             model.Id,
             model,
             currentThreadMember ?? model.GetReferencedEntityModel<ulong, IThreadMemberModel>(client.SelfUser.Id));

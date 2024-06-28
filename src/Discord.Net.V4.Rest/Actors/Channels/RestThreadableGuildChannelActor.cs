@@ -2,39 +2,48 @@ using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Actors;
 using Discord.Rest.Channels;
+using Discord.Rest.Guilds;
 
 namespace Discord.Rest;
 
-public partial class RestLoadableThreadableGuildChannelActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestThreadableGuildChannelActor(client, guildId, id),
+public partial class RestLoadableThreadableGuildChannelActor(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IIdentifiableEntityOrModel<ulong, RestGuildChannel, IGuildChannelModel> channel
+):
+    RestThreadableGuildChannelActor(client, guild, channel),
     ILoadableThreadableGuildChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IGuildChannel>))]
-    internal RestLoadable<ulong, RestGuildChannel, IGuildChannel, Channel> Loadable { get; } =
+    internal RestLoadable<ulong, RestGuildChannel, IGuildChannel, IChannelModel> Loadable { get; } =
         new(
             client,
-            id,
-            Routes.GetChannel(id),
-            EntityUtils.FactoryOfDescendantModel<ulong, Channel, RestGuildChannel, GuildChannelBase>(
-                (_, model) => RestGuildChannel.Construct(client, model, guildId)
+            channel,
+            Routes.GetChannel(channel.Id),
+            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestGuildChannel, GuildChannelBase>(
+                (_, model) => RestGuildChannel.Construct(client, model, guild)
             )
         );
 }
 
-public partial class RestThreadableGuildChannelActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestGuildChannelActor(client, guildId, id),
+public partial class RestThreadableGuildChannelActor(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IIdentifiableEntityOrModel<ulong, RestGuildChannel, IGuildChannelModel> channel
+):
+    RestGuildChannelActor(client, guild, channel),
     IThreadableGuildChannelActor
 {
-    public RestPagedActor<ulong, RestThreadChannel, ChannelThreads> PublicArchivedThreads { get; }
-        = RestActors.PublicArchivedThreads(client, guildId, id);
+    public RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams> PublicArchivedThreads { get; }
+        = RestActors.PublicArchivedThreads(client, guild, channel);
 
-    public RestPagedActor<ulong, RestThreadChannel, ChannelThreads> PrivateArchivedThreads { get; }
-        = RestActors.PrivateArchivedThreads(client, guildId, id);
+    public RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams> PrivateArchivedThreads { get; }
+        = RestActors.PrivateArchivedThreads(client, guild, channel);
 
-    public RestPagedActor<ulong, RestThreadChannel, ChannelThreads> JoinedPrivateArchivedThreads { get; }
-        = RestActors.JoinedPrivateArchivedThreads(client, guildId, id);
+    public RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams> JoinedPrivateArchivedThreads { get; }
+        = RestActors.JoinedPrivateArchivedThreads(client, guild, channel);
 
-    IPagedActor<ulong, IThreadChannel> IThreadableGuildChannelActor.PublicArchivedThreads => PublicArchivedThreads;
-    IPagedActor<ulong, IThreadChannel> IThreadableGuildChannelActor.PrivateArchivedThreads => PrivateArchivedThreads;
-    IPagedActor<ulong, IThreadChannel> IThreadableGuildChannelActor.JoinedPrivateArchivedThreads => JoinedPrivateArchivedThreads;
+    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> IThreadableGuildChannelActor.PublicArchivedThreads => PublicArchivedThreads;
+    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> IThreadableGuildChannelActor.PrivateArchivedThreads => PrivateArchivedThreads;
+    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> IThreadableGuildChannelActor.JoinedPrivateArchivedThreads => JoinedPrivateArchivedThreads;
 }

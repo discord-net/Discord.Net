@@ -1,15 +1,28 @@
 using Discord.Entities.Channels.Threads;
+using Discord.Models;
+using Discord.Models.Json;
+using Discord.Rest;
 
 namespace Discord;
 
+using IModifiable =
+    IModifiable<ulong, IThreadChannel, ModifyThreadChannelProperties, ModifyThreadChannelParams, IThreadChannelModel>;
+
 /// <summary>
-///     Represents a thread channel inside of a guild.
+///     Represents a thread channel inside a guild.
 /// </summary>
 public interface IThreadChannel :
     IMessageChannel,
     IGuildChannel,
-    IThreadActor
+    IThreadChannelActor,
+    IModifiable
 {
+    static IApiInOutRoute<ModifyThreadChannelParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyThreadChannelParams args
+    ) => Routes.ModifyChannel(id, args);
+
     ILoadableGuildChannelActor Parent { get; }
     ILoadableUserActor? Owner { get; }
 

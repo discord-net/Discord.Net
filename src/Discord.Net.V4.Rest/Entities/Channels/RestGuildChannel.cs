@@ -7,16 +7,19 @@ using System.ComponentModel;
 
 namespace Discord.Rest.Channels;
 
-public sealed partial class RestLoadableGuildChannel(DiscordRestClient client, ulong guildId, ulong id) :
-    RestGuildChannelActor(client, guildId, id),
+public sealed partial class RestLoadableGuildChannel(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IIdentifiableEntityOrModel<ulong, RestGuildChannel, IChannelModel> channel) :
+    RestGuildChannelActor(client, guild, channel.Id),
     ILoadableGuildChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IGuildChannel>))]
-    public RestLoadable<ulong, RestGuildChannel, IGuildChannel, Channel> Loadable { get; } =
+    public RestLoadable<ulong, RestGuildChannel, IGuildChannel, IChannelModel> Loadable { get; } =
         new(
             client,
-            id,
-            Routes.GetChannel(id),
+            channel,
+            Routes.GetChannel(channel.Id),
             (_, model) =>
             {
                 if (model is null)
@@ -25,7 +28,7 @@ public sealed partial class RestLoadableGuildChannel(DiscordRestClient client, u
                 if (model is not GuildChannelBase guildChannelModel)
                     throw new DiscordException($"Channel type is not a guild channel ({(ChannelType)model.Type})");
 
-                return RestGuildChannel.Construct(client, guildChannelModel, guildId);
+                return RestGuildChannel.Construct(client, guildChannelModel, guild);
             }
         );
 }
@@ -35,45 +38,56 @@ public sealed partial class RestLoadableGuildChannel(DiscordRestClient client, u
     typeof(IDeletable<ulong, IGuildChannelActor>),
     typeof(IModifiable<ulong, IGuildChannelActor, ModifyGuildChannelProperties, ModifyGuildChannelParams>)
 )]
-public partial class RestGuildChannelActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestChannelActor(client, id),
+public partial class RestGuildChannelActor(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IIdentifiableEntityOrModel<ulong, RestGuildChannel, IGuildChannelModel> channel) :
+    RestChannelActor(client, channel),
     IGuildChannelActor
 {
-    public RestLoadableGuildActor Guild { get; } = new(client, guildId);
+    public RestLoadableGuildActor Guild { get; } = new(client, guild);
 
     public IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites => throw new NotImplementedException();
 
     ILoadableGuildActor IGuildRelationship.Guild => Guild;
 }
 
-public partial class RestGuildChannel(DiscordRestClient client, ulong guildId, IGuildChannelModel model, RestGuildChannelActor? actor = null) :
+public partial class RestGuildChannel(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IGuildChannelModel model,
+    RestGuildChannelActor? actor = null
+):
     RestChannel(client, model),
     IGuildChannel,
-    IContextConstructable<RestGuildChannel, IGuildChannelModel, ulong, DiscordRestClient>,
+    IContextConstructable<RestGuildChannel, IGuildChannelModel, RestGuildIdentifiable, DiscordRestClient>,
     INotifyPropertyChanged
 {
     [OnChangedMethod(nameof(OnModelChanged))]
     internal new IGuildChannelModel Model { get; set; } = model;
 
     [ProxyInterface(typeof(IGuildChannelActor), typeof(IGuildRelationship))]
-    internal override RestGuildChannelActor Actor { get; } = actor ?? new RestGuildChannelActor(client, guildId, model.Id);
+    internal override RestGuildChannelActor ChannelActor { get; } = actor ?? new RestGuildChannelActor(client, guild, model.Id);
 
-    public static RestGuildChannel Construct(DiscordRestClient client, IGuildChannelModel model, ulong context)
+    public static RestGuildChannel Construct(
+        DiscordRestClient client,
+        IGuildChannelModel model,
+        IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild)
     {
         return model switch
         {
             IGuildForumChannelModel guildForumChannelModel => RestForumChannel.Construct(client, guildForumChannelModel,
-                context),
+                guild),
             IGuildMediaChannelModel guildMediaChannelModel => RestMediaChannel.Construct(client, guildMediaChannelModel,
-                context),
+                guild),
             IGuildNewsChannelModel guildNewsChannelModel => RestNewsChannel.Construct(client, guildNewsChannelModel,
-                context),
+                guild),
             IGuildVoiceChannelModel guildVoiceChannelModel => RestVoiceChannel.Construct(client, guildVoiceChannelModel,
-                context),
-            IThreadChannelModel threadChannelModel => RestThreadChannel.Construct(client, threadChannelModel, context),
+                guild),
+            IThreadChannelModel threadChannelModel => RestThreadChannel.Construct(client, threadChannelModel, guild),
             IGuildTextChannelModel guildTextChannelModel => RestTextChannel.Construct(client, guildTextChannelModel,
-                context),
-            _ => new(client, context, model)
+                guild),
+            _ => new(client, guild, model)
         };
     }
 

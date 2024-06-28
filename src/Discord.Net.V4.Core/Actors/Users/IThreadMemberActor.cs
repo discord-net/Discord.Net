@@ -14,7 +14,7 @@ public interface IThreadMemberActor :
 {
     Task RemoveAsync(RequestOptions? options = null, CancellationToken token = default)
         => Client.RestApiClient.ExecuteAsync(
-            Routes.RemoveThreadMember(Thread.Id, Id),
+            Routes.RemoveThreadMember(ThreadChannel.Id, Id),
             options ?? Client.DefaultRequestOptions, token
         );
 }

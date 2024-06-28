@@ -1,5 +1,6 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Guilds;
 using PropertyChanged;
 using System.Collections.Immutable;
 
@@ -25,26 +26,31 @@ public partial class RestLoadableMediaChannelActor(DiscordRestClient client, ulo
 [ExtendInterfaceDefaults(
     typeof(IModifiable<ulong, IMediaChannelActor, ModifyMediaChannelProperties, ModifyGuildChannelParams>)
 )]
-public partial class RestMediaChannelActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestGuildChannelActor(client, guildId, id),
+public partial class RestMediaChannelActor(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild, ulong id) :
+    RestGuildChannelActor(client, guild, id),
     IMediaChannelActor
 {
     [ProxyInterface(typeof(IThreadableGuildChannelActor))]
-    internal RestThreadableGuildChannelActor ThreadableGuildChannelActor { get; } = new(client, guildId, id);
+    internal RestThreadableGuildChannelActor ThreadableGuildChannelActor { get; } = new(client, guild, id);
 }
 
-public partial class RestMediaChannel(DiscordRestClient client, ulong guildId, IGuildMediaChannelModel model, RestMediaChannelActor? actor = null) :
-    RestGuildChannel(client, guildId, model),
+public partial class RestMediaChannel(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IGuildMediaChannelModel model,
+    RestMediaChannelActor? actor = null
+):
+    RestGuildChannel(client, guild, model),
     IMediaChannel,
-    IContextConstructable<RestMediaChannel, IGuildMediaChannelModel, ulong, DiscordRestClient>
+    IContextConstructable<RestMediaChannel, IGuildMediaChannelModel, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>, DiscordRestClient>
 {
     [OnChangedMethod(nameof(OnModelUpdated))]
     internal new IGuildMediaChannelModel Model { get; } = model;
 
     [ProxyInterface(typeof(IMediaChannelActor), typeof(IThreadableGuildChannelActor))]
-    internal override RestMediaChannelActor Actor { get; } = actor ?? new(client, guildId, model.Id);
+    internal override RestMediaChannelActor ChannelActor { get; } = actor ?? new(client, guild, model.Id);
 
-    public static RestMediaChannel Construct(DiscordRestClient client, IGuildMediaChannelModel model, ulong context)
+    public static RestMediaChannel Construct(DiscordRestClient client, IGuildMediaChannelModel model, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> context)
         => new(client, context, model);
 
     private void OnModelUpdated()
@@ -64,7 +70,7 @@ public partial class RestMediaChannel(DiscordRestClient client, ulong guildId, I
 
     public IReadOnlyCollection<ForumTag> AvailableTags { get; private set; } =
         model.AvailableTags
-            .Select(x => ForumTag.Construct(client, x, new ForumTag.Context(guildId)))
+            .Select(x => ForumTag.Construct(client, x, new ForumTag.Context(guild.Id)))
             .ToImmutableArray();
 
     public int? ThreadCreationSlowmode => Model.DefaultThreadRateLimitPerUser;

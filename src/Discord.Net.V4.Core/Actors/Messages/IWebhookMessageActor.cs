@@ -7,7 +7,9 @@ public interface ILoadableWebhookMessageActor :
     ILoadableEntity<ulong, IWebhookMessage>;
 
 public interface IWebhookMessageActor :
-    IMessageActor
+    IMessageActor,
+    IWebhookRelationship,
+    IActor<ulong, IWebhookMessage>
 {
     Task DeleteAsync(
         string webhookToken,
@@ -16,7 +18,7 @@ public interface IWebhookMessageActor :
         CancellationToken token = default
     ) => DeleteAsync(
         Client,
-        Routes.DeleteWebhookMessage(Require<IWebhook>(), webhookToken, Id, thread?.Id),
+        Routes.DeleteWebhookMessage(Webhook.Id, webhookToken, Id, thread?.Id),
         options,
         token
     );
@@ -32,7 +34,7 @@ public interface IWebhookMessageActor :
         func(args);
         return Client.RestApiClient.ExecuteAsync(
             Routes.ModifyWebhookMessage(
-                Require<IWebhook>(),
+                Webhook.Id,
                 webhookToken,
                 Id,
                 args.ToApiModel(),

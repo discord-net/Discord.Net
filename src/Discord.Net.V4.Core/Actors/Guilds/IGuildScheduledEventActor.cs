@@ -1,7 +1,12 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
+
+using IModifiable =
+    IModifiable<ulong, IGuildScheduledEventActor, ModifyGuildScheduledEventProperties, ModifyGuildScheduledEventParams,
+        IGuildScheduledEvent, IGuildScheduledEventModel>;
 
 public interface ILoadableGuildScheduledEventActor :
     IGuildScheduledEventActor,
@@ -9,11 +14,12 @@ public interface ILoadableGuildScheduledEventActor :
 
 public interface IGuildScheduledEventActor :
     IGuildRelationship,
-    IModifiable<ulong, IGuildScheduledEventActor, ModifyGuildScheduledEventProperties, ModifyGuildScheduledEventParams>,
+    IModifiable,
     IDeletable<ulong, IGuildScheduledEventActor>,
     IActor<ulong, IGuildScheduledEvent>
 {
-    IEnumerableIndexableActor<ILoadableGuildScheduledEventUserActor<IGuildScheduledEventUser>, ulong, IGuildScheduledEventUser>
+    IEnumerableIndexableActor<ILoadableGuildScheduledEventUserActor<IGuildScheduledEventUser>, ulong,
+            IGuildScheduledEventUser>
         RSVPs
     {
         get;
@@ -23,8 +29,9 @@ public interface IGuildScheduledEventActor :
         IPathable path, ulong id)
         => Routes.DeleteGuildScheduledEvent(path.Require<IGuild>(), id);
 
-    static IApiInRoute<ModifyGuildScheduledEventParams>
-        IModifiable<ulong, IGuildScheduledEventActor, ModifyGuildScheduledEventProperties,
-            ModifyGuildScheduledEventParams>.ModifyRoute(IPathable path, ulong id, ModifyGuildScheduledEventParams args)
-        => Routes.ModifyGuildScheduledEvent(path.Require<IGuild>(), path.Require<IChannel>(), args);
+    static IApiInOutRoute<ModifyGuildScheduledEventParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyGuildScheduledEventParams args
+    ) => Routes.ModifyGuildScheduledEvent(path.Require<IGuild>(), path.Require<IChannel>(), args);
 }

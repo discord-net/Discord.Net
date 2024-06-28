@@ -7,8 +7,8 @@ public interface IEntityProvider<out TEntity, in TModel> : IClientProvider
     where TEntity : IEntity
     where TModel : IEntityModel?
 {
-    TEntity CreateEntity(TModel model);
+    internal TEntity CreateEntity(TModel model);
 
     [return: NotNullIfNotNull(nameof(model))]
-    TEntity? CreateNullableEntity(TModel? model) => model is null ? default : CreateEntity(model);
+    internal TEntity? CreateNullableEntity(TModel? model) => model is null ? default : CreateEntity(model);
 }

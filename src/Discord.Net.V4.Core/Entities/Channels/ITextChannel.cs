@@ -1,4 +1,11 @@
+using Discord.Models;
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
+
+using IModifiable =
+    IModifiable<ulong, ITextChannel, ModifyTextChannelProperties, ModifyGuildChannelParams, IGuildTextChannelModel>;
 
 /// <summary>
 ///     Represents a generic channel in a guild that can send and receive messages.
@@ -8,8 +15,15 @@ public interface ITextChannel :
     IMentionable,
     INestedChannel,
     IIntegrationChannel,
-    ITextChannelActor
+    ITextChannelActor,
+    IModifiable
 {
+    static IApiInOutRoute<ModifyGuildChannelParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyGuildChannelParams args
+    ) => Routes.ModifyChannel(id, args);
+
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
     /// </summary>

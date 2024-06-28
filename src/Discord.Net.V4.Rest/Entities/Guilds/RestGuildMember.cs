@@ -3,8 +3,8 @@ using Discord.Models.Json;
 
 namespace Discord.Rest.Guilds;
 
-public sealed partial class RestLoadableGuildMemberActor(DiscordRestClient client, ulong guildId, ulong id, IMemberModel? model = null) :
-    RestGuildMemberActor(client, guildId, id),
+public sealed partial class RestLoadableGuildMemberActor(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild, ulong id, IMemberModel? model = null) :
+    RestGuildMemberActor(client, guild, id),
     ILoadableGuildMemberActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IGuildMember>))]
@@ -14,17 +14,16 @@ public sealed partial class RestLoadableGuildMemberActor(DiscordRestClient clien
                 client,
                 id,
                 (ctx, id) => Routes.GetGuildMember(ctx.GuildId, id),
-                new(guildId, id),
-                model
+                new(guildId, id)
             );
 }
 
 [ExtendInterfaceDefaults(typeof(IGuildMemberActor))]
-public partial class RestGuildMemberActor(DiscordRestClient client, ulong guildId, ulong id) :
+public partial class RestGuildMemberActor(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild, ulong id) :
     RestActor<ulong, RestGuildMember>(client, id),
     IGuildMemberActor
 {
-    public RestLoadableGuildActor Guild { get; } = new(client, guildId);
+    public RestLoadableGuildActor Guild { get; } = new(client, guild);
     public RestLoadableUserActor User { get; } = new(client, id);
 
     ILoadableGuildActor IGuildRelationship.Guild => Guild;
@@ -32,24 +31,24 @@ public partial class RestGuildMemberActor(DiscordRestClient client, ulong guildI
     ILoadableUserActor IUserRelationship.User => User;
 }
 
-public sealed partial class RestGuildMember(DiscordRestClient client, ulong guildId, ulong userId, IMemberModel model, RestGuildMemberActor? actor = null) :
+public sealed partial class RestGuildMember(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild, ulong userId, IMemberModel model, RestGuildMemberActor? actor = null) :
     RestEntity<ulong>(client, userId),
     IGuildMember,
     IContextConstructable<RestGuildMember, IMemberModel, RestGuildMember.ConstructionContext, DiscordRestClient>
 {
-    public readonly record struct ConstructionContext(ulong GuildId, ulong UserId);
+    public readonly record struct ConstructionContext(IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> Guild, ulong UserId);
 
     [ProxyInterface(
         typeof(IGuildMemberActor),
         typeof(IUserRelationship),
         typeof(IGuildRelationship)
     )]
-    internal RestGuildMemberActor Actor { get; } = actor ?? new(client, guildId, userId);
+    internal RestGuildMemberActor Actor { get; } = actor ?? new(client, guild, userId);
 
     internal IMemberModel Model { get; } = model;
 
     public static RestGuildMember Construct(DiscordRestClient client, IMemberModel model, ConstructionContext context)
-        => new(client, context.GuildId, context.UserId, model);
+        => new(client, context.Guild, context.UserId, model);
 
     public IDefinedLoadableEntityEnumerable<ulong, IRole> Roles => throw new NotImplementedException();
 

@@ -2,11 +2,21 @@ using Discord.Models;
 
 namespace Discord.Rest.Channels;
 
-public class RestCategoryChannel(DiscordRestClient client, ulong guildId, IGuildCategoryChannelModel model) :
-    RestGuildChannel(client, guildId, model),
+public class RestCategoryChannel :
+    RestGuildChannel,
     ICategoryChannel,
-    IContextConstructable<RestCategoryChannel, IGuildCategoryChannelModel, ulong, DiscordRestClient>
+    IContextConstructable<RestCategoryChannel, IGuildCategoryChannelModel, RestGuildIdentifiable, DiscordRestClient>
 {
-    public static RestCategoryChannel Construct(DiscordRestClient client, IGuildCategoryChannelModel model, ulong context)
-        => new(client, context, model);
+    internal RestCategoryChannel(
+        DiscordRestClient client,
+        RestGuildIdentifiable guild,
+        IGuildCategoryChannelModel model
+    ) : base(client, guild, model)
+    { }
+
+    public static RestCategoryChannel Construct(
+        DiscordRestClient client,
+        IGuildCategoryChannelModel model,
+        RestGuildIdentifiable guild
+    ) => new(client, guild, model);
 }

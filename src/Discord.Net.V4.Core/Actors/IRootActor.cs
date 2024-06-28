@@ -6,7 +6,7 @@ public interface IEnumerableActor<in TId, TEntity>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
 {
-    Task<IReadOnlyCollection<TEntity>> AllAsync(RequestOptions? options = null);
+    Task<IReadOnlyCollection<TEntity>> AllAsync(RequestOptions? options = null, CancellationToken token = default);
 }
 
 
@@ -17,26 +17,29 @@ public interface IEnumerableIndexableActor<out TActor, in TId, TEntity> :
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>;
 
-public interface IPagedIndexableActor<out TActor, in TId, out TEntity> :
-    IPagedIndexableActor<TActor, TId, TEntity, TEntity>
-    where TActor : IActor<TId, TEntity>
-    where TEntity : class, IEntity<TId>
-    where TId : IEquatable<TId>;
-
-
-public interface IPagedIndexableActor<out TActor, in TId, out TEntity, out TPaged> :
-    IIndexableActor<TActor, TId, TEntity>,
-    IPagedActor<TId, TPaged>
+public interface IPagedIndexableActor<out TActor, in TId, out TEntity, in TPageParams> :
+    IPagedIndexableActor<TActor, TId, TEntity, TEntity, TPageParams>
     where TActor : IActor<TId, TEntity>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
-    where TPaged : class, IEntity<TId>;
+    where TPageParams : IPagingParams;
 
-public interface IPagedActor<in TId, out TPaged>
+
+public interface IPagedIndexableActor<out TActor, in TId, out TEntity, out TPaged, in TPageParams> :
+    IIndexableActor<TActor, TId, TEntity>,
+    IPagedActor<TId, TPaged, TPageParams>
+    where TActor : IActor<TId, TEntity>
+    where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
     where TPaged : class, IEntity<TId>
+    where TPageParams : IPagingParams;
+
+public interface IPagedActor<in TId, out TPaged, in TPageParams>
+    where TId : IEquatable<TId>
+    where TPaged : class, IEntity<TId>
+    where TPageParams : IPagingParams
 {
-    IAsyncPaged<TPaged> PagedAsync(int? pageSize = null, RequestOptions? options = null);
+    IAsyncPaged<TPaged> PagedAsync(TPageParams? args = default, RequestOptions? options = null);
 }
 
 public interface IIndexableActor<out TActor, in TId, out TEntity>

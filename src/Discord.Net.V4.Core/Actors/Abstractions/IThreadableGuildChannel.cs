@@ -7,7 +7,7 @@ public interface ILoadableThreadableGuildChannelActor :
 public interface IThreadableGuildChannelActor :
     IGuildChannelActor
 {
-    IPagedActor<ulong, IThreadChannel> PublicArchivedThreads { get; }
-    IPagedActor<ulong, IThreadChannel> PrivateArchivedThreads { get; }
-    IPagedActor<ulong, IThreadChannel> JoinedPrivateArchivedThreads { get; }
+    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> PublicArchivedThreads { get; }
+    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> PrivateArchivedThreads { get; }
+    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> JoinedPrivateArchivedThreads { get; }
 }

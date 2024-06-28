@@ -1,5 +1,3 @@
-using Discord.Integration;
-
 namespace Discord;
 
 public interface IIntegration : IEntity<ulong>, IIntegrationActor
@@ -10,7 +8,7 @@ public interface IIntegration : IEntity<ulong>, IIntegrationActor
     bool? IsSyncing { get; }
     IRoleActor? Role { get; }
     bool? EmoticonsEnabled { get; }
-    IntegrationExpireBehavior ExpireBehavior { get; }
+    IntegrationExpireBehavior? ExpireBehavior { get; }
     int? ExpiryGracePeriod { get; }
     ILoadableUserActor? User { get; }
     IntegrationAccount? Account { get; }

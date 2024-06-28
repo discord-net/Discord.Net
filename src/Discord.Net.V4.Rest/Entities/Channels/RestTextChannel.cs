@@ -1,10 +1,13 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Guilds;
 
 namespace Discord.Rest.Channels;
 
-public sealed partial class RestLoadableTextChannelActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestTextChannelActor(client, guildId, id),
+public sealed partial class RestLoadableTextChannelActor(DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IIdentifiableEntityOrModel<ulong, RestTextChannel, IGuildTextChannelModel> channel) :
+    RestTextChannelActor(client, guild, channel.Id),
     ILoadableTextChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<ITextChannel>))]
@@ -14,7 +17,7 @@ public sealed partial class RestLoadableTextChannelActor(DiscordRestClient clien
             id,
             Routes.GetChannel(id),
             EntityUtils.FactoryOfDescendantModel<ulong, Channel, RestTextChannel, GuildTextChannel>(
-                (_, model) => RestTextChannel.Construct(client, model, guildId)
+                (_, model) => RestTextChannel.Construct(client, model, guild)
             )
         );
 }
@@ -23,21 +26,24 @@ public sealed partial class RestLoadableTextChannelActor(DiscordRestClient clien
     typeof(ITextChannelActor),
     typeof(IModifiable<ulong, ITextChannelActor, ModifyTextChannelProperties, ModifyGuildChannelParams>)
 )]
-public partial class RestTextChannelActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestGuildChannelActor(client, guildId, id),
+public partial class RestTextChannelActor(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IIdentifiableEntityOrModel<ulong, RestTextChannel, IGuildTextChannelModel> channel) :
+    RestGuildChannelActor(client, guild, channel),
     ITextChannelActor
 {
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, guildId, id);
+    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, guild, channel);
 
     [ProxyInterface(typeof(IThreadableGuildChannelActor))]
-    internal RestThreadableGuildChannelActor ThreadableGuildChannelActor { get; } = new(client, guildId, id);
+    internal RestThreadableGuildChannelActor ThreadableGuildChannelActor { get; } = new(client, guild, id);
 }
 
-public partial class RestTextChannel(DiscordRestClient client, ulong guildId, IGuildTextChannelModel model, RestTextChannelActor? actor = null) :
-    RestGuildChannel(client, guildId, model, actor),
+public partial class RestTextChannel(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild, IGuildTextChannelModel model, RestTextChannelActor? actor = null) :
+    RestGuildChannel(client, guild, model, actor),
     ITextChannel,
-    IContextConstructable<RestTextChannel, IGuildTextChannelModel, ulong, DiscordRestClient>
+    IContextConstructable<RestTextChannel, IGuildTextChannelModel, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>, DiscordRestClient>
 {
     internal new IGuildTextChannelModel Model { get; } = model;
 
@@ -46,7 +52,7 @@ public partial class RestTextChannel(DiscordRestClient client, ulong guildId, IG
         typeof(IMessageChannelActor),
         typeof(IThreadableGuildChannelActor)
     )]
-    internal override RestTextChannelActor Actor { get; } = actor ?? new(client, guildId, model.Id);
+    internal override RestTextChannelActor ChannelActor { get; } = actor ?? new(client, guild, model.Id);
 
     public ILoadableEntity<ulong, ICategoryChannel>? Category => throw new NotImplementedException();
 
@@ -58,6 +64,6 @@ public partial class RestTextChannel(DiscordRestClient client, ulong guildId, IG
 
     public ThreadArchiveDuration DefaultArchiveDuration => (ThreadArchiveDuration)Model.DefaultArchiveDuration;
 
-    public static RestTextChannel Construct(DiscordRestClient client, IGuildTextChannelModel model, ulong context)
-        => new(client, context, model);
+    public static RestTextChannel Construct(DiscordRestClient client, IGuildTextChannelModel model, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild)
+        => new(client, guild, model);
 }

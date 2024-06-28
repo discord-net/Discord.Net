@@ -1,6 +1,6 @@
 namespace Discord.Models;
 
-public interface IMemberModel : IEntityModel<ulong?>
+public interface IMemberModel : IEntityModel<ulong>
 {
     int Flags { get; }
     string? Nickname { get;}

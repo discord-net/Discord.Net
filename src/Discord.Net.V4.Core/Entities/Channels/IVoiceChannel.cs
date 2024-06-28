@@ -1,10 +1,25 @@
+using Discord.Models;
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
+
+using IModifiable =
+    IModifiable<ulong, IVoiceChannel, ModifyVoiceChannelProperties, ModifyGuildChannelParams, IGuildVoiceChannelModel>;
 
 public interface IVoiceChannel :
     IMessageChannel,
     IGuildChannel,
-    IAudioChannel
+    IAudioChannel,
+    IVoiceChannelActor,
+    IModifiable
 {
+    static IApiInOutRoute<ModifyGuildChannelParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyGuildChannelParams args
+    ) => Routes.ModifyChannel(id, args);
+
     string? RTCRegion { get; }
 
     /// <summary>

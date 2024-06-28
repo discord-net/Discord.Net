@@ -39,7 +39,7 @@ public partial class RestVoiceChannel(
     internal new IGuildVoiceChannelModel Model { get; } = model;
 
     [ProxyInterface(typeof(IVoiceChannelActor))]
-    internal override RestVoiceChannelActor Actor { get; } = actor ?? new(client, guildId, model.Id);
+    internal override RestVoiceChannelActor ChannelActor { get; } = actor ?? new(client, guildId, model.Id);
 
     public static RestVoiceChannel Construct(DiscordRestClient client, IGuildVoiceChannelModel model, ulong context)
         => new(client, context, model);

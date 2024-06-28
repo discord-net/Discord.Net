@@ -3,7 +3,7 @@ using Discord.Models.Json;
 
 namespace Discord.Rest;
 
-public partial class RestLoadableUserActor(DiscordRestClient client, ulong id, IUserModel? value = null) :
+public partial class RestLoadableUserActor(DiscordRestClient client, ulong id, IUserModel? model = null) :
     RestUserActor(client, id),
     ILoadableUserActor
 {
@@ -13,7 +13,8 @@ public partial class RestLoadableUserActor(DiscordRestClient client, ulong id, I
             client,
             id,
             Routes.GetUser,
-            value
+            value: null,
+            model: model
         );
 }
 

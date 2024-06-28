@@ -1,27 +1,32 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Actors;
 using Discord.Rest.Channels;
+using Discord.Rest.Guilds;
 using Discord.Rest.Messages;
 
 namespace Discord.Rest;
 
-public partial class RestLoadableMessageChannelActor(DiscordRestClient client, ulong? guildId, ulong id) :
-    RestMessageChannelActor(client, guildId, id),
+public partial class RestLoadableMessageChannelActor(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>? guild,
+    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel) :
+    RestMessageChannelActor(client, guild, channel),
     ILoadableMessageChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IMessageChannel>))]
     internal RestLoadable<ulong, IMessageChannel, IMessageChannel, Channel> Loadable { get; } =
         new(
             client,
-            id,
+            channel,
             Routes.GetChannel(id),
             (_, model) =>
             {
                 if (model is null)
                     return null;
 
-                var entity = guildId.HasValue
-                    ? RestChannel.Construct(client, model, guildId.Value)
+                var entity = guild is not null
+                    ? RestChannel.Construct(client, model, guild)
                     : RestChannel.Construct(client, model);
 
                 if (entity is not IMessageChannel messageChannel)
@@ -33,12 +38,15 @@ public partial class RestLoadableMessageChannelActor(DiscordRestClient client, u
         );
 }
 
-public partial class RestMessageChannelActor(DiscordRestClient client, ulong? guildId, ulong id) :
-    RestChannelActor(client, id),
+public partial class RestMessageChannelActor(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>? guild,
+    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel) :
+    RestChannelActor(client, channel),
     IMessageChannelActor
 {
     public RestIndexableActor<RestLoadableMessageActor, ulong, RestMessage> Messages { get; } =
-        new(messageId => new(client, guildId, id, messageId));
+        new(messageId => new(client, guild, channel, messageId));
 
     IIndexableActor<ILoadableMessageActor, ulong, IMessage> IMessageChannelActor.Messages => Messages;
 }

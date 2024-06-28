@@ -1,28 +1,33 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableThreadActor :
-    IThreadActor,
+using IModifiable =
+    IModifiable<ulong, IThreadChannelActor, ModifyThreadChannelProperties, ModifyThreadChannelParams, IThreadChannel,
+        IThreadChannelModel>;
+
+public interface ILoadableThreadChannelActor :
+    IThreadChannelActor,
     ILoadableEntity<ulong, IThreadChannel>;
 
-public interface IThreadActor :
+public interface IThreadChannelActor :
     IGuildChannelActor,
     IMessageChannelActor,
     IThreadMemberRelationship,
     IActor<ulong, IThreadChannel>,
-    IModifiable<ulong, IThreadActor, ModifyThreadChannelProperties, ModifyThreadChannelParams>
+    IModifiable
 {
     ILoadableThreadMemberActor CurrentThreadMember { get; }
 
     IEnumerableIndexableActor<ILoadableThreadMemberActor, ulong, IThreadMember> ThreadMembers { get; }
 
-    static IApiInRoute<ModifyThreadChannelParams>
-        IModifiable<ulong, IThreadActor, ModifyThreadChannelProperties, ModifyThreadChannelParams>.ModifyRoute(
-            IPathable path, ulong id,
-            ModifyThreadChannelParams args)
-        => Routes.ModifyChannel(id, args);
+    static IApiInOutRoute<ModifyThreadChannelParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyThreadChannelParams args
+    ) => Routes.ModifyChannel(id, args);
 
     ILoadableThreadMemberActor IThreadMemberRelationship.ThreadMember
         => CurrentThreadMember;

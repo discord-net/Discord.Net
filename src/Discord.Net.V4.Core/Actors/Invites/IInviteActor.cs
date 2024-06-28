@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Rest;
 
 namespace Discord;

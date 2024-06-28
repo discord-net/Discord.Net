@@ -1,5 +1,6 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Guilds;
 using PropertyChanged;
 using System.Collections.Immutable;
 
@@ -9,27 +10,36 @@ namespace Discord.Rest.Channels;
     typeof(IForumChannelActor),
     typeof(IModifiable<ulong, IForumChannelActor, ModifyForumChannelProperties, ModifyGuildChannelParams>)
 )]
-public partial class RestForumChannelActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestGuildChannelActor(client, guildId, id),
+public partial class RestForumChannelActor(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IdentifiableEntityOrModel<ulong, RestForumChannel, IGuildForumChannelModel> channel) :
+    RestGuildChannelActor(client, guild, channel),
     IForumChannelActor
 {
     [ProxyInterface(typeof(IThreadableGuildChannelActor))]
-    internal RestThreadableGuildChannelActor ThreadableGuildChannelActor { get; } = new(client, guildId, id);
+    internal RestThreadableGuildChannelActor ThreadableGuildChannelActor { get; } = new(client, guild, channel);
 }
 
-public partial class RestForumChannel(DiscordRestClient client, ulong guildId, IGuildForumChannelModel model, RestForumChannelActor? actor = null) :
-    RestGuildChannel(client, guildId, model, actor),
+public partial class RestForumChannel(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+    IGuildForumChannelModel model,
+    RestForumChannelActor? actor = null
+):
+    RestGuildChannel(client, guild, model, actor),
     IForumChannel,
-    IContextConstructable<RestForumChannel, IGuildForumChannelModel, ulong, DiscordRestClient>
+    IContextConstructable<RestForumChannel, IGuildForumChannelModel, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>, DiscordRestClient>
 {
     [OnChangedMethod(nameof(OnModelUpdated))]
     internal new IGuildForumChannelModel Model { get; } = model;
 
     [ProxyInterface(typeof(IForumChannelActor), typeof(IThreadableGuildChannelActor))]
-    internal override RestForumChannelActor Actor { get; } = actor ?? new(client, guildId, model.Id);
+    internal override RestForumChannelActor ChannelActor { get; } = actor ?? new(client, guild, model.Id);
 
-    public static RestForumChannel Construct(DiscordRestClient client, IGuildForumChannelModel model, ulong context)
-        => new(client, context, model);
+    public static RestForumChannel Construct(DiscordRestClient client, IGuildForumChannelModel model,
+        IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild)
+        => new(client, guild, model);
 
     private void OnModelUpdated()
     {
@@ -48,7 +58,7 @@ public partial class RestForumChannel(DiscordRestClient client, ulong guildId, I
 
     public IReadOnlyCollection<ForumTag> AvailableTags { get; private set; } =
         model.AvailableTags
-            .Select(x => ForumTag.Construct(client, x, new ForumTag.Context(guildId)))
+            .Select(x => ForumTag.Construct(client, x, new ForumTag.Context(guild.Id)))
             .ToImmutableArray();
 
     public int? ThreadCreationSlowmode => Model.DefaultThreadRateLimitPerUser;

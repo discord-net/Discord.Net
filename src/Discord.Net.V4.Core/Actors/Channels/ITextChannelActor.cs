@@ -1,7 +1,12 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
+
+using IModifiable =
+    IModifiable<ulong, ITextChannelActor, ModifyTextChannelProperties, ModifyGuildChannelParams, ITextChannel,
+        IGuildTextChannelModel>;
 
 public interface ILoadableTextChannelActor :
     ITextChannelActor,
@@ -11,10 +16,10 @@ public interface ITextChannelActor :
     IMessageChannelActor,
     IThreadableGuildChannelActor,
     IActor<ulong, ITextChannel>,
-    IModifiable<ulong, ITextChannelActor, ModifyTextChannelProperties, ModifyGuildChannelParams>
+    IModifiable
 {
-    static IApiInRoute<ModifyGuildChannelParams>
-        IModifiable<ulong, ITextChannelActor, ModifyTextChannelProperties, ModifyGuildChannelParams>.ModifyRoute(
+    static IApiInOutRoute<ModifyGuildChannelParams, IEntityModel>
+        IModifiable.ModifyRoute(
             IPathable path, ulong id,
             ModifyGuildChannelParams args)
         => Routes.ModifyChannel(id, args);

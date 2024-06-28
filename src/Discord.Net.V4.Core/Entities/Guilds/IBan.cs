@@ -1,10 +1,18 @@
+using Discord.Models;
+using Discord.Rest;
+
 namespace Discord;
 
 /// <summary>
 ///     Represents a generic ban object.
 /// </summary>
-public interface IBan : IGuildBanActor, IEntity<ulong>
+public interface IBan :
+    IGuildBanActor,
+    IRefreshable<IBan, ulong, IBanModel>
 {
+    static IApiOutRoute<IBanModel> IRefreshable<IBan, ulong, IBanModel>.RefreshRoute(IBan self, ulong id)
+        => Routes.GetGuildBan(self.Require<IGuild>(), id);
+
     /// <summary>
     ///     Gets the reason why the user is banned if specified.
     /// </summary>

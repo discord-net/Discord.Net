@@ -18,4 +18,7 @@ public readonly struct IntegrationType(string name) : IEquatable<IntegrationType
     public static bool operator ==(IntegrationType left, IntegrationType right) => left.Equals(right);
 
     public static bool operator !=(IntegrationType left, IntegrationType right) => !left.Equals(right);
+
+    public static implicit operator string(IntegrationType type) => type.Name;
+    public static implicit operator IntegrationType(string name) => new(name);
 }

@@ -1,9 +1,9 @@
 namespace Discord;
 
 public interface IThreadRelationship :
-    IRelationship<ulong, IThreadChannel, ILoadableThreadActor>
+    IRelationship<ulong, IThreadChannel, ILoadableThreadChannelActor>
 {
-    ILoadableThreadActor Thread { get; }
+    ILoadableThreadChannelActor ThreadChannel { get; }
 
-    ILoadableThreadActor IRelationship<ulong, IThreadChannel, ILoadableThreadActor>.RelationshipLoadable => Thread;
+    ILoadableThreadChannelActor IRelationship<ulong, IThreadChannel, ILoadableThreadChannelActor>.RelationshipLoadable => ThreadChannel;
 }

@@ -48,7 +48,7 @@ public sealed class DiscordRestClient : IDiscordClient
     }
 
     #region Entity Providers
-
+    public IMessage CreateEntity(IMessageModel model) => throw new NotImplementedException();
     public IPartialGuild CreateEntity(IPartialGuildModel model) => throw new NotImplementedException();
 
     public IGuildMember CreateEntity(IMemberModel model) => throw new NotImplementedException();
@@ -65,11 +65,9 @@ public sealed class DiscordRestClient : IDiscordClient
 
     #endregion
 
-
-
     public ILoadableSelfUserActor SelfUser => throw new NotImplementedException();
 
-    public IPagedIndexableActor<ILoadableGuildActor, ulong, IGuild, IPartialGuild> Guilds => throw new NotImplementedException();
+    public IPagedIndexableActor<ILoadableGuildActor, ulong, IGuild, IPartialGuild, PageUserGuildsParams> Guilds => throw new NotImplementedException();
 
     public IIndexableActor<ILoadableChannelActor, ulong, IChannel> Channels => throw new NotImplementedException();
 
@@ -77,5 +75,4 @@ public sealed class DiscordRestClient : IDiscordClient
 
     IRestApiClient IDiscordClient.RestApiClient => ApiClient;
     IDiscordClient IClientProvider.Client => this;
-    public IMessage CreateEntity(IMessageModel model) => throw new NotImplementedException();
 }

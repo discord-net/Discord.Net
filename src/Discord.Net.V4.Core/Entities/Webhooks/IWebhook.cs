@@ -1,7 +1,40 @@
+using Discord.Models;
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
 
-public interface IWebhook : ISnowflakeEntity, IWebhookActor
+using IModifiable = IModifiable<ulong, IWebhook, ModifyWebhookProperties, ModifyWebhookParams, IWebhookModel>;
+
+public interface IWebhook :
+    ISnowflakeEntity,
+    IWebhookActor,
+    IModifiable,
+    IRefreshable<IWebhook, ulong, IWebhookModel>
 {
+    static IApiOutRoute<IWebhookModel> IRefreshable<IWebhook, ulong, IWebhookModel>.RefreshRoute(
+        IWebhook self,
+        ulong id
+    ) => Routes.GetWebhook(id);
+
+    static IApiInOutRoute<ModifyWebhookParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyWebhookParams args
+    ) => Routes.ModifyWebhook(id, args);
+
+    async Task RefreshWithTokenAsync(string webhookToken, RequestOptions? options = null,
+        CancellationToken token = default)
+    {
+        var model = await Client.RestApiClient.ExecuteRequiredAsync(
+            Routes.GetWebhook(Id),
+            options ?? Client.DefaultRequestOptions,
+            token
+        );
+
+        await UpdateAsync(model, token);
+    }
+
     WebhookType Type { get; }
     ILoadableGuildActor? Guild { get; }
     ILoadableChannelActor? Channel { get; }

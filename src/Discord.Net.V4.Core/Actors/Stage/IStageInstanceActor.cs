@@ -3,13 +3,17 @@ using Discord.Rest;
 
 namespace Discord.Stage;
 
+using IModifiable =
+    IModifiable<ulong, IStageInstanceActor, ModifyStageInstanceProperties, ModifyStageInstanceParams, IStageInstance,
+        IStageInstanceModel>;
+
 public interface ILoadableStageInstanceActor :
     IStageInstanceActor,
     ILoadableEntity<ulong, IStageInstance>;
 
 public interface IStageInstanceActor :
     IStageChannelRelationship,
-    IModifiable<ulong, IStageInstanceActor, ModifyStageInstanceProperties, ModifyStageInstanceParams>,
+    IModifiable,
     IDeletable<ulong, IStageInstanceActor>,
     IActor<ulong, IStageInstance>
 {
@@ -17,8 +21,9 @@ public interface IStageInstanceActor :
         ulong id)
         => Routes.DeleteStageInstance(path.Require<IChannel>());
 
-    static IApiInRoute<ModifyStageInstanceParams>
-        IModifiable<ulong, IStageInstanceActor, ModifyStageInstanceProperties,
-            ModifyStageInstanceParams>.ModifyRoute(IPathable path, ulong id, ModifyStageInstanceParams args)
-        => Routes.ModifyStageInstance(path.Require<IChannel>(), args);
+    static IApiInOutRoute<ModifyStageInstanceParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyStageInstanceParams args
+    ) => Routes.ModifyStageInstance(path.Require<IChannel>(), args);
 }

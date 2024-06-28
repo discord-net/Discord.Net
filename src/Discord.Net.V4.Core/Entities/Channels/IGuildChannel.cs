@@ -1,9 +1,23 @@
+using Discord.Models;
+using Discord.Models.Json;
+using Discord.Rest;
+
 namespace Discord;
+
+using IModifiable =
+    IModifiable<ulong, IGuildChannel, ModifyGuildChannelProperties, ModifyGuildChannelParams, IGuildChannelModel>;
 
 public interface IGuildChannel :
     IChannel,
-    IGuildChannelActor
+    IGuildChannelActor,
+    IModifiable
 {
+    static IApiInOutRoute<ModifyGuildChannelParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyGuildChannelParams args
+    ) => Routes.ModifyChannel(id, args);
+
     /// <summary>
     ///     Gets the position of this channel.
     /// </summary>

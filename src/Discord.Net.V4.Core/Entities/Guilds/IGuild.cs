@@ -1,11 +1,29 @@
+using Discord.Models;
+using Discord.Models.Json;
+using Discord.Rest;
 using System.Globalization;
 
 namespace Discord;
 
+using IModifiable = IModifiable<ulong, IGuild, ModifyGuildProperties, ModifyGuildParams, IGuildModel>;
+
 public interface IGuild :
     IPartialGuild,
-    IGuildActor
+    IGuildActor,
+    IRefreshable<IGuild, ulong, IGuildModel>,
+    IModifiable
 {
+    static IApiInOutRoute<ModifyGuildParams, IEntityModel> IModifiable.ModifyRoute(
+        IPathable path,
+        ulong id,
+        ModifyGuildParams args
+    ) => Routes.ModifyGuild(id, args);
+
+    static IApiOutRoute<IGuildModel> IRefreshable<IGuild, ulong, IGuildModel>.RefreshRoute(
+        IGuild self,
+        ulong id
+    ) => Routes.GetGuild(id, true);
+
     /// <summary>
     ///     Gets the amount of time (in seconds) a user must be inactive in a voice channel for until they are
     ///     automatically moved to the AFK voice channel.

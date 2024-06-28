@@ -1,5 +1,6 @@
 using Discord.Models;
 using Discord.Rest.Channels;
+using Discord.Rest.Guilds;
 using Discord.Rest.Stickers;
 using PropertyChanged;
 using System.Collections.Immutable;
@@ -7,8 +8,12 @@ using System.ComponentModel;
 
 namespace Discord.Rest.Messages;
 
-public partial class RestLoadableMessageActor(DiscordRestClient client, ulong? guildId, ulong channelId, ulong id) :
-    RestMessageActor(client, guildId, channelId, id),
+public partial class RestLoadableMessageActor(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>? guild,
+    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel,
+    IIdentifiableEntityOrModel<ulong, RestMessage, IMessageModel> message) :
+    RestMessageActor(client, guild, channel, message),
     ILoadableMessageActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IMessage>))]
@@ -17,21 +22,26 @@ public partial class RestLoadableMessageActor(DiscordRestClient client, ulong? g
             .FromContextConstructable<RestMessage, ulong?>(
                 client,
                 id,
-                Routes.GetChannelMessage(channelId, id),
-                guildId
+                Routes.GetChannelMessage(channel.Id, id),
+                guild
             );
 }
 
-public partial class RestMessageActor(DiscordRestClient client, ulong? guildId, ulong channelId, ulong id) :
-    RestActor<ulong, RestMessage>(client, id),
+public partial class RestMessageActor(
+    DiscordRestClient client,
+    IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>? guild,
+    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel,
+    IIdentifiableEntityOrModel<ulong, RestMessage, IMessageModel> message
+):
+    RestActor<ulong, RestMessage>(client, message.Id),
     IMessageActor
 {
-    public RestLoadableMessageChannelActor Channel { get; } = new(client, guildId, channelId);
+    public RestLoadableMessageChannelActor Channel { get; } = new(client, guild, channel);
 
     ILoadableMessageChannelActor IMessageChannelRelationship.Channel => Channel;
 }
 
-public partial class RestMessage(DiscordRestClient client, ulong? guildId, IMessageModel model, RestMessageActor? actor = null) :
+public partial class RestMessage(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>? guild, IMessageModel model, RestMessageActor? actor = null) :
     RestEntity<ulong>(client, model.Id),
     IMessage,
     INotifyPropertyChanged,
@@ -41,7 +51,7 @@ public partial class RestMessage(DiscordRestClient client, ulong? guildId, IMess
     internal IMessageModel Model { get; set; } = model;
 
     [ProxyInterface(typeof(IMessageActor), typeof(IMessageChannelRelationship))]
-    internal virtual RestMessageActor Actor { get; } = actor ?? new(client, guildId, model.ChannelId, model.Id);
+    internal virtual RestMessageActor Actor { get; } = actor ?? new(client, guild, model.ChannelId, model.Id);
 
     public static RestMessage Construct(DiscordRestClient client, IMessageModel model, ulong? context)
     {
@@ -120,7 +130,7 @@ public partial class RestMessage(DiscordRestClient client, ulong? guildId, IMess
     public RestLoadableUserActor Author { get; }
         = new(client, model.AuthorId, model.GetReferencedEntityModel<ulong, IUserModel>(model.AuthorId));
 
-    public RestLoadableThreadChannelActor? Thread { get; private set; }
+    public RestLoadableThreadChannelChannelActor? Thread { get; private set; }
         = model.ThreadId.HasValue && model.ThreadGuildId.HasValue
             ? new(client, model.ThreadGuildId.Value, model.ThreadId.Value)
             : null;
@@ -208,6 +218,6 @@ public partial class RestMessage(DiscordRestClient client, ulong? guildId, IMess
 
     IReadOnlyCollection<IStickerItem> IMessage.Stickers => Stickers;
     ILoadableUserActor IMessage.Author => Author;
-    ILoadableThreadActor? IMessage.Thread => Thread;
+    ILoadableThreadChannelActor? IMessage.Thread => Thread;
     IMessageInteractionMetadata? IMessage.InteractionMetadata => InteractionMetadata;
 }
