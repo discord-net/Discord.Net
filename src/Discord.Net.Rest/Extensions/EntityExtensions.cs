@@ -20,7 +20,8 @@ namespace Discord.Rest
                 model.Managed,
                 model.RequireColons,
                 ImmutableArray.Create(model.Roles),
-                model.User.IsSpecified ? model.User.Value.Id : (ulong?)null);
+                model.User.IsSpecified ? model.User.Value.Id : null,
+                model.IsAvailable.ToNullable());
 
         public static Embed ToEntity(this API.Embed model)
         {
