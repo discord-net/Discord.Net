@@ -2705,14 +2705,14 @@ namespace Discord.API
                 int lastIndex = 0;
                 while (true)
                 {
-                    int leftIndex = format.IndexOf("{", lastIndex);
+                    int leftIndex = format.IndexOf('{', lastIndex);
                     if (leftIndex == -1 || leftIndex > endIndex)
                     {
                         builder.Append(format, lastIndex, endIndex - lastIndex);
                         break;
                     }
                     builder.Append(format, lastIndex, leftIndex - lastIndex);
-                    int rightIndex = format.IndexOf("}", leftIndex);
+                    int rightIndex = format.IndexOf('}', leftIndex);
 
                     int argId = int.Parse(format.Substring(leftIndex + 1, rightIndex - leftIndex - 1), NumberStyles.None, CultureInfo.InvariantCulture);
                     string fieldName = GetFieldName(methodArgs[argId + 1]);
