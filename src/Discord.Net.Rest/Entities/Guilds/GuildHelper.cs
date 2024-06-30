@@ -772,11 +772,166 @@ namespace Discord.Rest
                 Limit = limit,
                 After = args is null
                     ? null
-                    : new ()
+                    : new SearchParamsAfter 
                     {
                         UserId = args.After.UserId,
                         GuildJoinedAt = args.After.GuildJoinedAt
-                    }
+                    },
+                Sort = args?.Sort ?? Optional<MemberSearchV2SortType>.Unspecified,
+                OrQuery = args is null
+                    ? Optional<SearchQueryParams>.Unspecified
+                    : args.OrQuery is null
+                        ? Optional<SearchQueryParams>.Unspecified
+                        : new SearchQueryParams
+                        {
+                            GuildJoinedAt = args.OrQuery.Value.GuildJoinedAt is null
+                                ? Optional<SearchRangeProperties>.Unspecified
+                                : new SearchRangeProperties
+                                {
+                                    GreaterThanOrEqual = args.OrQuery.Value.GuildJoinedAt.Value.GreaterThanOrEqual is null
+                                        ? Optional<long>.Unspecified
+                                        : args.OrQuery.Value.GuildJoinedAt.Value.GreaterThanOrEqual.Value,
+                                    LessThanOrEqual = args.OrQuery.Value.GuildJoinedAt.Value.LessThanOrEqual is null
+                                        ? Optional<long>.Unspecified
+                                        : args.OrQuery.Value.GuildJoinedAt.Value.LessThanOrEqual.Value,
+                                },
+                            JoinSourceType = args.OrQuery.Value.JoinSourceType is null
+                                ? Optional<SearchQueryProperties>.Unspecified
+                                : new SearchQueryProperties
+                                {
+                                    AndQuery = args.OrQuery.Value.JoinSourceType.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
+                                    OrQuery = args.OrQuery.Value.JoinSourceType.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
+                                },
+                            RoleIds = args.OrQuery.Value.RoleIds is null
+                                ? Optional<SearchQueryProperties>.Unspecified
+                                : new SearchQueryProperties
+                                {
+                                    AndQuery = args.OrQuery.Value.RoleIds.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
+                                    OrQuery = args.OrQuery.Value.RoleIds.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
+                                },
+                            SourceInviteCode = args.OrQuery.Value.SourceInviteCode is null
+                                ? Optional<SearchQueryProperties>.Unspecified
+                                : new SearchQueryProperties
+                                {
+                                    AndQuery = args.OrQuery.Value.SourceInviteCode.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
+                                    OrQuery = args.OrQuery.Value.SourceInviteCode.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
+                                },
+                            SafetySignals = args.OrQuery.Value.SafetySignals is null
+                                ? Optional<SafetySignalsProperties>.Unspecified
+                                : new SafetySignalsProperties
+                                {
+                                    AutomodQuarantinedUsername = args.OrQuery.Value.SafetySignals.Value.AutomodQuarantinedUsername is null
+                                        ? Optional<bool>.Unspecified
+                                        : args.OrQuery.Value.SafetySignals.Value.AutomodQuarantinedUsername.Value,
+                                    UnusualAccountActivity = args.OrQuery.Value.SafetySignals.Value.UnusualAccountActivity is null
+                                        ? Optional<bool>.Unspecified
+                                        : args.OrQuery.Value.SafetySignals.Value.UnusualAccountActivity.Value,
+                                    CommunicationDisabledUntil = args.OrQuery.Value.SafetySignals.Value.CommunicationDisabledUntil is null
+                                        ? Optional<SafetySignalProperties>.Unspecified
+                                        : new SafetySignalProperties
+                                        {
+                                            Until = new SearchRangeProperties
+                                            {
+                                                GreaterThanOrEqual = args.OrQuery.Value.SafetySignals.Value.CommunicationDisabledUntil.Value.Range.GreaterThanOrEqual ?? Optional<long>.Unspecified,
+                                                LessThanOrEqual = args.OrQuery.Value.SafetySignals.Value.CommunicationDisabledUntil.Value.Range.LessThanOrEqual ?? Optional<long>.Unspecified,
+                                            }
+                                        },
+                                    UnusualDMActivityUntil = args.OrQuery.Value.SafetySignals.Value.UnusualDmActivityUntil is null
+                                        ? Optional<SafetySignalProperties>.Unspecified
+                                        : new SafetySignalProperties
+                                        {
+                                            Until = new SearchRangeProperties
+                                            {
+                                                GreaterThanOrEqual = args.OrQuery.Value.SafetySignals.Value.UnusualDmActivityUntil.Value.Range.GreaterThanOrEqual ?? Optional<long>.Unspecified,
+                                                LessThanOrEqual = args.OrQuery.Value.SafetySignals.Value.UnusualDmActivityUntil.Value.Range.LessThanOrEqual ?? Optional<long>.Unspecified,
+                                            }
+                                        },
+                                },
+                            UserId = args.OrQuery.Value.UserId is null
+                                ? Optional<SearchRangeProperties>.Unspecified
+                                : new SearchRangeProperties
+                                {
+                                    LessThanOrEqual = args.OrQuery.Value.UserId.Value.LessThanOrEqual ?? Optional<long>.Unspecified,
+                                    GreaterThanOrEqual = args.OrQuery.Value.UserId.Value.GreaterThanOrEqual ?? Optional<long>.Unspecified,
+                                },
+                        },
+                AndQuery = args is null
+                    ? Optional<SearchQueryParams>.Unspecified
+                    : args.AndQuery is null
+                        ? Optional<SearchQueryParams>.Unspecified
+                        : new SearchQueryParams
+                        {
+                            GuildJoinedAt = args.AndQuery.Value.GuildJoinedAt is null
+                                ? Optional<SearchRangeProperties>.Unspecified
+                                : new SearchRangeProperties
+                                {
+                                    GreaterThanOrEqual = args.AndQuery.Value.GuildJoinedAt.Value.GreaterThanOrEqual is null
+                                        ? Optional<long>.Unspecified
+                                        : args.AndQuery.Value.GuildJoinedAt.Value.GreaterThanOrEqual.Value,
+                                    LessThanOrEqual = args.AndQuery.Value.GuildJoinedAt.Value.LessThanOrEqual is null
+                                        ? Optional<long>.Unspecified
+                                        : args.AndQuery.Value.GuildJoinedAt.Value.LessThanOrEqual.Value,
+                                },
+                            JoinSourceType = args.AndQuery.Value.JoinSourceType is null
+                                ? Optional<SearchQueryProperties>.Unspecified
+                                : new SearchQueryProperties
+                                {
+                                    AndQuery = args.AndQuery.Value.JoinSourceType.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
+                                    OrQuery = args.AndQuery.Value.JoinSourceType.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
+                                },
+                            RoleIds = args.AndQuery.Value.RoleIds is null
+                                ? Optional<SearchQueryProperties>.Unspecified
+                                : new SearchQueryProperties
+                                {
+                                    AndQuery = args.AndQuery.Value.RoleIds.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
+                                    OrQuery = args.AndQuery.Value.RoleIds.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
+                                },
+                            SourceInviteCode = args.AndQuery.Value.SourceInviteCode is null
+                                ? Optional<SearchQueryProperties>.Unspecified
+                                : new SearchQueryProperties
+                                {
+                                    AndQuery = args.AndQuery.Value.SourceInviteCode.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
+                                    OrQuery = args.AndQuery.Value.SourceInviteCode.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
+                                },
+                            SafetySignals = args.AndQuery.Value.SafetySignals is null
+                                ? Optional<SafetySignalsProperties>.Unspecified
+                                : new SafetySignalsProperties
+                                {
+                                    AutomodQuarantinedUsername = args.AndQuery.Value.SafetySignals.Value.AutomodQuarantinedUsername is null
+                                        ? Optional<bool>.Unspecified
+                                        : args.AndQuery.Value.SafetySignals.Value.AutomodQuarantinedUsername.Value,
+                                    UnusualAccountActivity = args.AndQuery.Value.SafetySignals.Value.UnusualAccountActivity is null
+                                        ? Optional<bool>.Unspecified
+                                        : args.AndQuery.Value.SafetySignals.Value.UnusualAccountActivity.Value,
+                                    CommunicationDisabledUntil = args.AndQuery.Value.SafetySignals.Value.CommunicationDisabledUntil is null
+                                        ? Optional<SafetySignalProperties>.Unspecified
+                                        : new SafetySignalProperties
+                                        {
+                                            Until = new SearchRangeProperties
+                                            {
+                                                GreaterThanOrEqual = args.AndQuery.Value.SafetySignals.Value.CommunicationDisabledUntil.Value.Range.GreaterThanOrEqual ?? Optional<long>.Unspecified,
+                                                LessThanOrEqual = args.AndQuery.Value.SafetySignals.Value.CommunicationDisabledUntil.Value.Range.LessThanOrEqual ?? Optional<long>.Unspecified,
+                                            }
+                                        },
+                                    UnusualDMActivityUntil = args.AndQuery.Value.SafetySignals.Value.UnusualDmActivityUntil is null
+                                        ? Optional<SafetySignalProperties>.Unspecified
+                                        : new SafetySignalProperties
+                                        {
+                                            Until = new SearchRangeProperties
+                                            {
+                                                GreaterThanOrEqual = args.AndQuery.Value.SafetySignals.Value.UnusualDmActivityUntil.Value.Range.GreaterThanOrEqual ?? Optional<long>.Unspecified,
+                                                LessThanOrEqual = args.AndQuery.Value.SafetySignals.Value.UnusualDmActivityUntil.Value.Range.LessThanOrEqual ?? Optional<long>.Unspecified,
+                                            }
+                                        },
+                                },
+                            UserId = args.AndQuery.Value.UserId is null
+                                ? Optional<SearchRangeProperties>.Unspecified
+                                : new SearchRangeProperties
+                                {
+                                    LessThanOrEqual = args.AndQuery.Value.UserId.Value.LessThanOrEqual ?? Optional<long>.Unspecified,
+                                    GreaterThanOrEqual = args.AndQuery.Value.UserId.Value.GreaterThanOrEqual ?? Optional<long>.Unspecified,
+                                },
+                        },
             };
             var model = await client.ApiClient.SearchGuildMembersAsyncV2(guild.Id, apiArgs, options);
 

@@ -1105,6 +1105,9 @@ namespace Discord
         /// </returns>
         Task<IReadOnlyCollection<IGuildUser>> SearchUsersAsync(string query, int limit = DiscordConfig.MaxUsersPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
+        /// <summary>
+        ///     Gets a collection of users in this guild that match the provided search criteria.
+        /// </summary>
         Task<MemberSearchResult> SearchUsersAsyncV2(int limit = DiscordConfig.MaxUsersPerBatch, MemberSearchPropertiesV2 args = null, RequestOptions options = null);
 
         /// <summary>
