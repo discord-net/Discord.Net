@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Discord;
 
+
 /// <summary>
 ///     Represents the properties for searching members in a guild.
 /// </summary>
@@ -20,12 +21,12 @@ public class MemberSearchPropertiesV2
     public MemberSearchV2SortType? Sort { get; set; }
 
     /// <summary>
-    ///     
+    ///     Gets or sets the and query for the search.
     /// </summary>
     public MemberSearchV2QueryParams? AndQuery { get; set; }
 
     /// <summary>
-    ///     
+    ///     Gets or sets the or query for the search.
     /// </summary>
     public MemberSearchV2QueryParams? OrQuery { get; set; }
 }
@@ -59,43 +60,85 @@ public struct MemberSearchPropertiesV2After
     }
 }
 
+
+/// <summary>
+///     Represents the query parameters for searching members in a guild.
+/// </summary>
 public struct MemberSearchV2QueryParams
 {
+    /// <summary>
+    ///     Gets or sets the safety signal search properties.
+    /// </summary>
     public MemberSearchV2SafetySignalsProperties? SafetySignals { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the role IDs to search for.
+    /// </summary>
     public MemberSearchV2QueryProperties? RoleIds { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the range to search for the user ID.
+    /// </summary>
     public MemberSearchV2RangeProperties? UserId { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the range to search for the user's guild joined at timestamp.
+    /// </summary>
     public MemberSearchV2RangeProperties? GuildJoinedAt { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the source invite code to search for.
+    /// </summary>
     public MemberSearchV2QueryProperties? SourceInviteCode { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the join source type to search for.
+    /// </summary>
     public MemberSearchV2QueryProperties? JoinSourceType { get; set; }
 }
 
+
+/// <summary>
+///     Represents the safety signal properties for searching members in a guild.
+/// </summary>
 public struct MemberSearchV2SafetySignalsProperties
 {
+    /// <summary>
+    ///     Gets or sets the unusual DM activity until property for the search.
+    /// </summary>
     public MemberSearchV2SafetySignalProperties? UnusualDmActivityUntil { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the communication disabled until property for the search.
+    /// </summary>
     public MemberSearchV2SafetySignalProperties? CommunicationDisabledUntil { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the unusual account activity property for the search.
+    /// </summary>
     public bool? UnusualAccountActivity { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the automod quarantined username property for the search.
+    /// </summary>
     public bool? AutomodQuarantinedUsername { get; set; }
 }
 
+
+/// <summary>
+///     Represents the query properties for searching members in a guild.
+/// </summary>
 public readonly struct MemberSearchV2QueryProperties
 {
+    /// <summary>
+    ///     Gets the and query for the search.
+    /// </summary>
     public Dictionary<int, object> AndQuery { get; }
 
+    /// <summary>
+    ///     Gets the or query for the search.
+    /// </summary>
     public Dictionary<int, object> OrQuery { get; }
-
-    public MemberSearchV2QueryProperties(Dictionary<int, object> andQuery, Dictionary<int, object> orQuery)
-    {
-        AndQuery = andQuery;
-        OrQuery = orQuery;
-    }
 
     public MemberSearchV2QueryProperties(Dictionary<int, string> andQuery, Dictionary<int, string> orQuery)
     {
@@ -110,11 +153,22 @@ public readonly struct MemberSearchV2QueryProperties
     }
 }
 
+
+/// <summary>
+///     Represents the safety signal properties for searching members in a guild.
+/// </summary>
 public struct MemberSearchV2SafetySignalProperties
 {
+    /// <summary>
+    ///     Gets or sets the range for the search.
+    /// </summary>
     public MemberSearchV2RangeProperties Range { get; set; }
 }
 
+
+/// <summary>
+///     Represents the range properties for searching members in a guild.
+/// </summary>
 public struct MemberSearchV2RangeProperties
 {
     /// <summary>
