@@ -17,7 +17,7 @@ public class MemberSearchPropertiesV2
     /// <summary>
     ///     Gets or sets the sort type for the search.
     /// </summary>
-    public MemberSearchV2SortType Sort { get; set; }
+    public MemberSearchV2SortType? Sort { get; set; }
 
     /// <summary>
     ///     
