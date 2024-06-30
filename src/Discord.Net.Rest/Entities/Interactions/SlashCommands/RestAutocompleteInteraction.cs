@@ -55,7 +55,7 @@ namespace Discord.Rest
         /// </returns>
         public string Respond(IEnumerable<AutocompleteResult> result, RequestOptions options = null)
         {
-            if (!InteractionHelper.CanSendResponse(this))
+            if (!InteractionHelper.CanSendResponse(this) && Discord.ResponseInternalTimeCheck)
                 throw new TimeoutException($"Cannot respond to an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
 
             lock (_lock)

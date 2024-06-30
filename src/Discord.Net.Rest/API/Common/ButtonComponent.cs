@@ -25,6 +25,9 @@ namespace Discord.API
         [JsonProperty("disabled")]
         public Optional<bool> Disabled { get; set; }
 
+        [JsonProperty("sku_id")]
+        public Optional<ulong> SkuId { get; set; }
+
         public ButtonComponent() { }
 
         public ButtonComponent(Discord.ButtonComponent c)
@@ -35,6 +38,7 @@ namespace Discord.API
             CustomId = c.CustomId;
             Url = c.Url;
             Disabled = c.IsDisabled;
+            SkuId = c.SkuId ?? Optional<ulong>.Unspecified;
 
             if (c.Emote != null)
             {

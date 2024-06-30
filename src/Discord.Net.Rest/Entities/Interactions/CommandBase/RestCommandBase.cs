@@ -86,7 +86,7 @@ namespace Discord.Rest
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
-            if (!InteractionHelper.CanSendResponse(this))
+            if (!InteractionHelper.CanSendResponse(this) && Discord.ResponseInternalTimeCheck)
                 throw new TimeoutException($"Cannot respond to an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
 
             embeds ??= Array.Empty<Embed>();
@@ -317,7 +317,7 @@ namespace Discord.Rest
         /// </returns>
         public override string Defer(bool ephemeral = false, RequestOptions options = null)
         {
-            if (!InteractionHelper.CanSendResponse(this))
+            if (!InteractionHelper.CanSendResponse(this) && Discord.ResponseInternalTimeCheck)
                 throw new TimeoutException($"Cannot defer an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
 
             var response = new API.InteractionResponse
@@ -352,7 +352,7 @@ namespace Discord.Rest
         /// <exception cref="InvalidOperationException"></exception>
         public override string RespondWithModal(Modal modal, RequestOptions options = null)
         {
-            if (!InteractionHelper.CanSendResponse(this))
+            if (!InteractionHelper.CanSendResponse(this) && Discord.ResponseInternalTimeCheck)
                 throw new TimeoutException($"Cannot defer an interaction after {InteractionHelper.ResponseTimeLimit} seconds of no response/acknowledgement");
 
             var response = new API.InteractionResponse
