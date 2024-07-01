@@ -138,8 +138,8 @@ namespace Discord
                 throw new ArgumentOutOfRangeException(nameof(poll.Question), $"Poll question text must be less than or equal to {DiscordConfig.MaxPollQuestionTextLength} characters.");
             if (string.IsNullOrWhiteSpace(poll.Question.Text) && poll.Question.Emoji is null)
                 throw new ArgumentException("Poll question must have at least one of text or emoji.", nameof(poll.Question));
-            if (poll.Duration is > 168 or 0)
-                throw new ArgumentOutOfRangeException(nameof(poll.Duration), "Poll duration must be between 1 and 168 hours.");
+            if (poll.Duration is > 768 or 0)
+                throw new ArgumentOutOfRangeException(nameof(poll.Duration), "Poll duration must be between 1 and 768 hours.");
         }
 
         #endregion
