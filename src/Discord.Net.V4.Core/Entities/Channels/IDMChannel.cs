@@ -16,4 +16,6 @@ public interface IDMChannel :
     ///     A user object that represents the other user in this channel.
     /// </returns>
     ILoadableEntity<ulong, IUser> Recipient { get; }
+
+    new IDMChannelModel GetModel();
 }

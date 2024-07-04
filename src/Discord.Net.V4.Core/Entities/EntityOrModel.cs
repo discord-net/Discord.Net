@@ -2,9 +2,10 @@ using Discord.Models;
 
 namespace Discord;
 
-public sealed class IdentifiableEntityOrModel<TId, TEntity, TModel> : IIdentifiableEntityOrModel<TId, TEntity>
+public sealed class IdentifiableEntityOrModel<TId, TEntity, TModel> :
+    IIdentifiableEntityOrModel<TId, TEntity, TModel>
     where TId : IEquatable<TId>
-    where TEntity : class, IEntity<TId>
+    where TEntity : class, IEntity<TId>, IEntityOf<TModel>
     where TModel : IEntityModel<TId>
 {
     public TId Id { get; }
@@ -49,9 +50,22 @@ public sealed class IdentifiableEntityOrModel<TId, TEntity, TModel> : IIdentifia
     public static implicit operator IdentifiableEntityOrModel<TId, TEntity, TModel>(TEntity entity) => new(entity);
 }
 
-public interface IIdentifiableEntityOrModel<out TId, out TEntity> : IIdentifiable<TId>
+public interface IIdentifiableEntityOrModel<out TId, out TEntity, out TModel> : IIdentifiable<TId>
     where TId : IEquatable<TId>
-    where TEntity : class, IEntity<TId>
+    where TEntity : class, IEntity<TId>, IEntityOf<TModel>
+    where TModel : IEntityModel<TId>
 {
     TEntity? Entity { get; }
+
+    static IIdentifiableEntityOrModel<TId, TEntity, TModel> Of(TId id)
+        => new IdentifiableEntityOrModel<TId, TEntity, TModel>(id);
+
+    static IIdentifiableEntityOrModel<TId, TEntity, TModel> Of(TEntity entity)
+        => new IdentifiableEntityOrModel<TId, TEntity, TModel>(entity);
+
+    static IIdentifiableEntityOrModel<TId, TEntity, TModel> Of(TModel model, Func<TModel, TEntity> factory)
+        => new IdentifiableEntityOrModel<TId, TEntity, TModel>(model, factory);
+
+    static IIdentifiableEntityOrModel<TId, TEntity, TModel>? OfNullable(TModel? model, Func<TModel, TEntity> factory)
+        => model is not null ? Of(model, factory) : null;
 }

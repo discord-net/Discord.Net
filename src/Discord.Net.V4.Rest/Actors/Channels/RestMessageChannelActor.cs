@@ -10,7 +10,7 @@ namespace Discord.Rest;
 public partial class RestLoadableMessageChannelActor(
     DiscordRestClient client,
     GuildIdentity? guild,
-    IChannelIdentity channel) :
+    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel) :
     RestMessageChannelActor(client, guild, channel),
     ILoadableMessageChannelActor
 {
@@ -41,7 +41,7 @@ public partial class RestLoadableMessageChannelActor(
 public partial class RestMessageChannelActor(
     DiscordRestClient client,
     GuildIdentity? guild,
-    IChannelIdentity channel) :
+    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel) :
     RestChannelActor(client, channel),
     IMessageChannelActor
 {

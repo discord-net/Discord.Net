@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class User : IUserModel, ISelfUserModel
+public sealed class User : ISelfUserModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }

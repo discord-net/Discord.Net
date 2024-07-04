@@ -44,4 +44,6 @@ public interface IVoiceChannel :
     ///     Gets the video quality mode for this channel.
     /// </summary>
     VideoQualityMode VideoQualityMode { get; }
+
+    new IGuildVoiceChannelModel GetModel();
 }

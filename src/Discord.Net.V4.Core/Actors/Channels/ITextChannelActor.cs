@@ -14,7 +14,7 @@ public interface ILoadableTextChannelActor :
 
 public interface ITextChannelActor :
     IMessageChannelActor,
-    IThreadableGuildChannelActor,
+    IThreadableChannelActor,
     IActor<ulong, ITextChannel>,
     IModifiable
 {

@@ -1,11 +1,12 @@
 namespace Discord;
 
-public interface ILoadableThreadableGuildChannelActor :
-    IThreadableGuildChannelActor,
-    ILoadableGuildChannelActor;
+public interface ILoadableThreadableChannelActor :
+    IThreadableChannelActor,
+    ILoadableEntity<ulong, IThreadableChannel>;
 
-public interface IThreadableGuildChannelActor :
-    IGuildChannelActor
+public interface IThreadableChannelActor :
+    IGuildChannelActor,
+    IActor<ulong, IThreadableChannel>
 {
     IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> PublicArchivedThreads { get; }
     IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> PrivateArchivedThreads { get; }

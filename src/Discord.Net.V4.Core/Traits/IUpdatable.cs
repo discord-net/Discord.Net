@@ -2,7 +2,8 @@ using Discord.Models;
 
 namespace Discord;
 
-public interface IUpdatable<in TModel> where TModel : IEntityModel
+public interface IUpdatable<TModel> : IEntityOf<TModel>
+    where TModel : IEntityModel
 {
     ValueTask UpdateAsync(TModel model, CancellationToken token = default);
 }

@@ -13,7 +13,8 @@ public interface ILoadableVoiceChannelActor :
     ILoadableEntity<ulong, IVoiceChannel>;
 
 public interface IVoiceChannelActor :
-    ITextChannelActor,
+    IMessageChannelActor,
+    IGuildChannelActor,
     IModifiable,
     IActor<ulong, IVoiceChannel>
 {

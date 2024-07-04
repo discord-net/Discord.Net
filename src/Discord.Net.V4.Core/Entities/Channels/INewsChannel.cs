@@ -10,4 +10,5 @@ public interface INewsChannel :
     INewsChannelActor,
     IUpdatable<IGuildNewsChannelModel>
 {
+    new IGuildNewsChannelModel GetModel();
 }

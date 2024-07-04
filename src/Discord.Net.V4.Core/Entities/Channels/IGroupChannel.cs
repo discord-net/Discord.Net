@@ -29,4 +29,6 @@ public interface IGroupChannel :
     ///     A <see cref="IDefinedLoadableEntityEnumerable{TId,TEntity}" /> of users that can access this channel.
     /// </returns>
     IDefinedLoadableEntityEnumerable<ulong, IUser> Recipients { get; }
+
+    new IGroupDMChannelModel GetModel();
 }

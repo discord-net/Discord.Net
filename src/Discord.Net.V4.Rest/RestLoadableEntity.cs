@@ -4,40 +4,47 @@ namespace Discord.Rest;
 
 public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
     DiscordRestClient client,
-    IIdentifiableEntityOrModel<TId, TEntity> deferredEntity,
+    IIdentifiableEntityOrModel<TId, TEntity, TModel> identity,
     IApiOutRoute<TModel> outRoute,
-    Func<TId, TModel?, TEntity?> factory
+    RestLoadable<TId, TEntity, TCoreEntity, TModel>.EntityFactory factory
 ):
     ILoadableEntity<TId, TCoreEntity>,
     IDisposable, IAsyncDisposable where TCoreEntity : class, IEntity<TId>
-    where TEntity : class, IEntity<TId>, TCoreEntity
+    where TEntity : class, IEntity<TId>, IEntityOf<TModel>, TCoreEntity
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
+    public delegate TEntity? EntityFactory(DiscordRestClient client, TId id, TModel? model);
+
     public TId Id
     {
-        get => deferredEntity.Id;
+        get => Identity.Id;
         internal set
         {
-            deferredEntity = (IdentifiableEntityOrModel<TId, TEntity, TModel>)value;
-            if (Value is not null && !Value.Id.Equals(value))
-                Value = null;
+            if (value.Equals(Identity.Id)) return;
+
+            identity = new IdentifiableEntityOrModel<TId, TEntity, TModel>(value);
+            Value = null;
         }
     }
 
-    public TEntity? Value
-    {
-        get => _value;
-        set => _value = value;
-    }
+    public TEntity? Value { get; set; }
 
-    private TEntity? _value = deferredEntity.Entity;
+    internal IIdentifiableEntityOrModel<TId, TEntity, TModel> Identity
+    {
+        get => identity;
+        set
+        {
+            Value = value.Entity;
+            identity = value;
+        }
+    }
 
     public async ValueTask<TEntity?> FetchAsync(RequestOptions? options = null, CancellationToken token = default)
     {
         var model = await client.ApiClient.ExecuteAsync(outRoute, options ?? client.DefaultRequestOptions, token);
 
-        return Value = factory(Id, model);
+        return Value = factory(client, Id, model);
     }
 
     async ValueTask<TCoreEntity?> ILoadableEntity<TCoreEntity>.LoadAsync(RequestOptions? options,
@@ -48,39 +55,39 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
 
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromConstructable<TConstructable>(
         DiscordRestClient client,
-        IIdentifiableEntityOrModel<TId, TEntity> deferredEntity,
+        IIdentifiableEntityOrModel<TId, TEntity, TModel> identity,
         Func<TId, IApiOutRoute<TModel>> route
     )
         where TConstructable : TEntity, IConstructable<TConstructable, TModel, DiscordRestClient>
-        => FromConstructable<TConstructable>(client, deferredEntity, route(deferredEntity.Id));
+        => FromConstructable<TConstructable>(client, identity, route(identity.Id));
 
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromConstructable<TConstructable>(
         DiscordRestClient client,
-        IIdentifiableEntityOrModel<TId, TEntity> deferredEntity,
+        IIdentifiableEntityOrModel<TId, TEntity, TModel> identity,
         IApiOutRoute<TModel> outRoute
     )
         where TConstructable : TEntity, IConstructable<TConstructable, TModel, DiscordRestClient>
     {
         return new RestLoadable<TId, TEntity, TCoreEntity, TModel>(
             client,
-            deferredEntity,
+            identity,
             outRoute,
-            (_, model) => model is null ? null : TConstructable.Construct(client, model)
+            static (client, _, model) => model is null ? null : TConstructable.Construct(client, model)
         );
     }
 
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromContextConstructable<TConstructable, TContext>(
         DiscordRestClient client,
-        IIdentifiableEntityOrModel<TId, TEntity> deferredEntity,
+        IIdentifiableEntityOrModel<TId, TEntity, TModel> identity,
         Func<TContext, TId, IApiOutRoute<TModel>> route,
         TContext context
     )
         where TConstructable : TEntity, IContextConstructable<TConstructable, TModel, TContext, DiscordRestClient>
-        => FromContextConstructable<TConstructable, TContext>(client, deferredEntity, route(context, deferredEntity.Id), context);
+        => FromContextConstructable<TConstructable, TContext>(client, identity, route(context, identity.Id), context);
 
     public static RestLoadable<TId, TEntity, TCoreEntity, TModel> FromContextConstructable<TConstructable, TContext>(
         DiscordRestClient client,
-        IIdentifiableEntityOrModel<TId, TEntity> deferredEntity,
+        IIdentifiableEntityOrModel<TId, TEntity, TModel> identity,
         IApiOutRoute<TModel> outRoute,
         TContext context
     )
@@ -88,9 +95,9 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
     {
         return new RestLoadable<TId, TEntity, TCoreEntity, TModel>(
             client,
-            deferredEntity,
+            identity,
             outRoute,
-            (_, model) => model is null ? null : TConstructable.Construct(client, model, context)
+            (client, _, model) => model is null ? null : TConstructable.Construct(client, model, context)
         );
     }
 

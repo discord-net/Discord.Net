@@ -31,6 +31,8 @@ public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel
 
     DateTimeOffset? IThreadChannelModel.CreatedAt => Metadata.CreatedAt;
 
+    ulong IThreadChannelModel.ParentId => ParentId.Value!.Value;
+
     bool IThreadChannelModel.IsArchived => Metadata.Archived;
 
     int IThreadChannelModel.AutoArchiveDuration => Metadata.AutoArchiveDuration;
@@ -39,13 +41,11 @@ public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel
 
     bool IThreadChannelModel.IsLocked => Metadata.Locked;
 
-    bool IGuildTextChannelModel.IsNsfw => Nsfw;
+    bool IThreadChannelModel.IsNsfw => Nsfw;
 
-    string? IGuildTextChannelModel.Topic => Topic;
+    string? IThreadChannelModel.Topic => Topic;
 
-    int IGuildTextChannelModel.RatelimitPerUser => RatelimitPerUser;
-
-    int IGuildTextChannelModel.DefaultArchiveDuration => DefaultAutoArchiveDuration;
+    int IThreadChannelModel.RatelimitPerUser => RatelimitPerUser;
 
     bool IThreadChannelModel.HasJoined => Member.IsSpecified;
 

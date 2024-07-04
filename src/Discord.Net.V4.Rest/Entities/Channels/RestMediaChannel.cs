@@ -15,14 +15,14 @@ public partial class RestLoadableMediaChannelActor(
     ILoadableMediaChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IMediaChannel>))]
-    internal RestLoadable<ulong, RestMediaChannel, IMediaChannel, Channel> Loadable { get; } =
+    internal RestLoadable<ulong, RestMediaChannel, IMediaChannel, IChannelModel> Loadable { get; } =
         new(
             client,
             channel,
             Routes.GetChannel(channel.Id),
-            EntityUtils.FactoryOfDescendantModel<ulong, Channel, RestMediaChannel, GuildMediaChannel>(
+            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestMediaChannel, IGuildMediaChannelModel>(
                 (_, model) => RestMediaChannel.Construct(client, model, guild)
-            )
+            ).Invoke
         );
 }
 
@@ -34,18 +34,15 @@ public partial class RestMediaChannelActor(
     GuildIdentity guild,
     IdentifiableEntityOrModel<ulong, RestMediaChannel, IGuildMediaChannelModel> channel
 ):
-    RestGuildChannelActor(client, guild, channel),
+    RestThreadableChannelActor(client, guild, channel),
     IMediaChannelActor
 {
-    [ProxyInterface(typeof(IThreadableGuildChannelActor))]
-    internal RestThreadableGuildChannelActor ThreadableGuildChannelActor { get; } = new(client, guild, channel);
-
     public IMediaChannel CreateEntity(IGuildMediaChannelModel model)
         => RestMediaChannel.Construct(Client, model, Guild.Identity);
 }
 
 public partial class RestMediaChannel :
-    RestGuildChannel,
+    RestThreadableChannel,
     IMediaChannel,
     IContextConstructable<RestMediaChannel, IGuildMediaChannelModel, GuildIdentity, DiscordRestClient>
 {
@@ -69,7 +66,7 @@ public partial class RestMediaChannel :
 
     [ProxyInterface(
         typeof(IMediaChannelActor),
-        typeof(IThreadableGuildChannelActor),
+        typeof(IThreadableChannelActor),
         typeof(IEntityProvider<IMediaChannel, IGuildMediaChannelModel>)
     )]
     internal override RestMediaChannelActor ChannelActor { get; }
@@ -92,6 +89,9 @@ public partial class RestMediaChannel :
             .ToImmutableArray();
     }
 
+    public static RestMediaChannel Construct(DiscordRestClient client, IGuildMediaChannelModel model, GuildIdentity guild)
+        => new(client, guild, model);
+
     public ValueTask UpdateAsync(IGuildMediaChannelModel model, CancellationToken token = default)
     {
         if (!_model.AvailableTags.SequenceEqual(model.AvailableTags))
@@ -106,6 +106,5 @@ public partial class RestMediaChannel :
         return base.UpdateAsync(model, token);
     }
 
-    public static RestMediaChannel Construct(DiscordRestClient client, IGuildMediaChannelModel model, GuildIdentity guild)
-        => new(client, guild, model);
+    public override IGuildMediaChannelModel GetModel() => Model;
 }

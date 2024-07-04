@@ -30,4 +30,6 @@ public interface IGuildSticker :
     ///     Gets the user that uploaded the guild sticker.
     /// </summary>
     ILoadableGuildMemberActor? Author { get; }
+
+    new IStickerModel GetModel();
 }

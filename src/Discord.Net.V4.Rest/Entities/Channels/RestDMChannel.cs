@@ -40,14 +40,16 @@ public partial class RestDMChannel :
         Recipient =  new(client, model.RecipientId);
     }
 
+    public static RestDMChannel Construct(DiscordRestClient client, IDMChannelModel model)
+        => new(client, model);
+
     public ValueTask UpdateAsync(IDMChannelModel model, CancellationToken token = default)
     {
         _model = model;
         return base.UpdateAsync(model, token);
     }
 
-    public static RestDMChannel Construct(DiscordRestClient client, IDMChannelModel model)
-        => new(client, model);
+    public override IDMChannelModel GetModel() => Model;
 
     ILoadableEntity<ulong, IUser> IDMChannel.Recipient => Recipient;
 }

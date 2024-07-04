@@ -5,24 +5,27 @@ using System.ComponentModel;
 
 namespace Discord.Rest.Stickers;
 
-public partial class RestSticker(DiscordRestClient client, IStickerModel model) :
-    RestEntity<ulong>(client, model.Id),
+public partial class RestSticker :
+    RestEntity<ulong>,
     ISticker,
-    IConstructable<RestSticker, IStickerModel, DiscordRestClient>,
-    INotifyPropertyChanged
+    IConstructable<RestSticker, IStickerModel, DiscordRestClient>
 {
-    [OnChangedMethod(nameof(OnModelUpdated))]
-    internal IStickerModel Model { get; set; } = model;
+    internal IStickerModel Model { get; private set; }
+
+    internal RestSticker(DiscordRestClient client, IStickerModel model) : base(client, model.Id)
+    {
+        Model = model;
+        Tags = model.Tags.Split(',').ToImmutableArray();
+    }
 
     public static RestSticker Construct(DiscordRestClient client, IStickerModel model)
     {
-        if (model.GuildId.HasValue)
-        {
-            return RestGuildSticker.Construct(client, model, model.GuildId.Value);
-        }
-
-        return new(client, model);
+        return model.GuildId.HasValue
+            ? RestGuildSticker.Construct(client, model, model.GuildId.Value)
+            : new RestSticker(client, model);
     }
+
+
 
     protected virtual void OnModelUpdated()
     {
@@ -37,9 +40,7 @@ public partial class RestSticker(DiscordRestClient client, IStickerModel model) 
 
     public string? Description => Model.Description;
 
-    [VersionOn(nameof(Model.Tags), nameof(model.Tags))]
-    public IReadOnlyCollection<string> Tags { get; private set; } =
-        model.Tags.Split(',').ToImmutableArray();
+    public IReadOnlyCollection<string> Tags { get; private set; }
 
     public StickerType Type => (StickerType)Model.Type;
 

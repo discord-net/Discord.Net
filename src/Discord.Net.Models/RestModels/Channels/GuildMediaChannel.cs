@@ -10,11 +10,11 @@ public sealed class GuildMediaChannel : GuildChannelBase, IGuildMediaChannelMode
 
     string? IGuildMediaChannelModel.Topic => Topic;
 
-    int IGuildMediaChannelModel.DefaultAutoArchiveDuration => DefaultAutoArchiveDuration;
+    int IThreadableChannelModel.DefaultAutoArchiveDuration => DefaultAutoArchiveDuration;
 
     int? IGuildMediaChannelModel.RatelimitPerUser => RatelimitPerUser;
 
-    int? IGuildMediaChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
+    int? IThreadableChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
 
     IEmote? IGuildMediaChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
 

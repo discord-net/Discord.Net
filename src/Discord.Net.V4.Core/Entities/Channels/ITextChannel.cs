@@ -50,5 +50,7 @@ public interface ITextChannel :
     /// </returns>
     int SlowModeInterval { get; }
 
+    new IGuildTextChannelModel GetModel();
+
     string IMentionable.Mention => $"<#{Id}>";
 }

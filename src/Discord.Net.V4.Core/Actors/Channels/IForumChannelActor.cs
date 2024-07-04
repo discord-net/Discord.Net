@@ -12,7 +12,7 @@ public interface ILoadableForumChannelActor :
     ILoadableEntity<ulong, IForumChannel>;
 
 public interface IForumChannelActor :
-    IThreadableGuildChannelActor,
+    IThreadableChannelActor,
     IActor<ulong, IForumChannel>,
     IModifiable
 {

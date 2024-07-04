@@ -74,4 +74,6 @@ public interface IForumChannel :
     ///     Gets the rule used to display posts in a forum channel.
     /// </summary>
     ForumLayout DefaultLayout { get; }
+
+    new IGuildForumChannelModel GetModel();
 }

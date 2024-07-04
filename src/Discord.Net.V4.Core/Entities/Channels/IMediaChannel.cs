@@ -66,4 +66,6 @@ public interface IMediaChannel :
     ///     Defaults to <see langword="null" />, which indicates a preferred sort order hasn't been set
     /// </remarks>
     SortOrder? DefaultSortOrder { get; }
+
+    new IGuildMediaChannelModel GetModel();
 }

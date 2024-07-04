@@ -4,25 +4,23 @@ using Discord.Rest.Guilds;
 
 namespace Discord.Rest.Channels;
 
-using ChannelIdentity = IdentifiableEntityOrModel<ulong, RestNewsChannel, IGuildNewsChannelModel>;
-
 public partial class RestLoadableNewsChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
-    ChannelIdentity channel
+    NewsChannelIdentity channel
 ):
     RestNewsChannelActor(client, guild, channel),
     ILoadableNewsChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<INewsChannel>))]
-    internal RestLoadable<ulong, RestNewsChannel, INewsChannel, Channel> Loadable { get; } =
+    internal RestLoadable<ulong, RestNewsChannel, INewsChannel, IChannelModel> Loadable { get; } =
         new(
             client,
             channel,
             Routes.GetChannel(channel.Id),
-            EntityUtils.FactoryOfDescendantModel<ulong, Channel, RestNewsChannel, GuildAnnouncementChannel>(
+            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestNewsChannel, IGuildNewsChannelModel>(
                 (_, model) => RestNewsChannel.Construct(client, model, guild)
-            )
+            ).Invoke
         );
 }
 
@@ -30,7 +28,7 @@ public partial class RestLoadableNewsChannelActor(
 public partial class RestNewsChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
-    ChannelIdentity channel
+    NewsChannelIdentity channel
 ):
     RestTextChannelActor(client, guild, channel),
     INewsChannelActor;
@@ -55,8 +53,11 @@ public partial class RestNewsChannel :
     {
         _model = model;
 
-        ChannelActor = actor ?? new(client, guild, this);
+        ChannelActor = actor ?? new(client, guild, NewsChannelIdentity.Of(this));
     }
+
+    public static RestNewsChannel Construct(DiscordRestClient client, IGuildNewsChannelModel model, GuildIdentity guild)
+        => new(client, guild, model);
 
     public ValueTask UpdateAsync(IGuildNewsChannelModel model, CancellationToken token = default)
     {
@@ -64,6 +65,5 @@ public partial class RestNewsChannel :
         return base.UpdateAsync(model, token);
     }
 
-    public static RestNewsChannel Construct(DiscordRestClient client, IGuildNewsChannelModel model, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild)
-        => new(client, guild, model);
+    public override IGuildNewsChannelModel GetModel() => Model;
 }

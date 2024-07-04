@@ -11,5 +11,7 @@ public class GuildTextChannel : GuildChannelBase, IGuildTextChannelModel
 
     int IGuildTextChannelModel.RatelimitPerUser => RatelimitPerUser;
 
-    int IGuildTextChannelModel.DefaultArchiveDuration => DefaultAutoArchiveDuration;
+    int IThreadableChannelModel.DefaultAutoArchiveDuration => DefaultAutoArchiveDuration;
+
+    int? IThreadableChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
 }

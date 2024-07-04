@@ -14,11 +14,11 @@ public sealed class GuildForumChannel : GuildChannelBase, IGuildForumChannelMode
 
     string? IGuildForumChannelModel.Topic => Topic;
 
-    int IGuildForumChannelModel.DefaultAutoArchiveDuration => DefaultAutoArchiveDuration;
+    int IThreadableChannelModel.DefaultAutoArchiveDuration => DefaultAutoArchiveDuration;
 
     int? IGuildForumChannelModel.RatelimitPerUser => RatelimitPerUser;
 
-    int? IGuildForumChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
+    int? IThreadableChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
 
     IEmote? IGuildForumChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
 

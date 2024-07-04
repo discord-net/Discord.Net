@@ -6,7 +6,7 @@ namespace Discord.Rest.Channels;
 
 public partial class RestLoadableChannelActor(
     DiscordRestClient client,
-    IChannelIdentity channel) :
+    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel) :
     RestChannelActor(client, channel),
     ILoadableChannelActor
 {
@@ -22,7 +22,7 @@ public partial class RestLoadableChannelActor(
 [ExtendInterfaceDefaults(typeof(IChannelActor))]
 public partial class RestChannelActor(
     DiscordRestClient client,
-    IChannelIdentity channel) :
+    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel) :
     RestActor<ulong, RestChannel>(client, channel.Id),
     IChannelActor;
 
@@ -51,12 +51,6 @@ public partial class RestChannel :
         ChannelActor = actor ?? new(client, this.Identity<ulong, RestChannel, IChannelModel>());
     }
 
-    public ValueTask UpdateAsync(IChannelModel model, CancellationToken token = default)
-    {
-        _model = model;
-        return ValueTask.CompletedTask;
-    }
-
     public static RestChannel Construct(DiscordRestClient client, IChannelModel model)
     {
         return model switch
@@ -69,7 +63,10 @@ public partial class RestChannel :
     }
 
 
-    public static RestChannel Construct(DiscordRestClient client, IChannelModel model, GuildIdentity guild)
+    public static RestChannel Construct(
+        DiscordRestClient client,
+        IChannelModel model,
+        GuildIdentity guild)
     {
         return model switch
         {
@@ -93,4 +90,12 @@ public partial class RestChannel :
             _ => Construct(client, model)
         };
     }
+
+    public ValueTask UpdateAsync(IChannelModel model, CancellationToken token = default)
+    {
+        _model = model;
+        return ValueTask.CompletedTask;
+    }
+
+    public virtual IChannelModel GetModel() => Model;
 }

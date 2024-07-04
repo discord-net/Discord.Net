@@ -23,7 +23,7 @@ public sealed partial class RestLoadableStageChannelActor(
             Routes.GetChannel(channel.Id),
             EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestStageChannel, IGuildStageChannelModel>(
                 (_, model) => RestStageChannel.Construct(client, model, guild)
-            )
+            ).Invoke
         );
 }
 
@@ -64,6 +64,9 @@ public partial class RestStageChannel :
         ChannelActor = actor ?? new(client, guild, model.Id);
     }
 
+    public static RestStageChannel Construct(DiscordRestClient client, IGuildStageChannelModel model, GuildIdentity guild)
+        => new(client, guild, model);
+
     public ValueTask UpdateAsync(IGuildStageChannelModel model, CancellationToken token = default)
     {
         _model = model;
@@ -71,6 +74,5 @@ public partial class RestStageChannel :
         return base.UpdateAsync(model, token);
     }
 
-    public static RestStageChannel Construct(DiscordRestClient client, IGuildStageChannelModel model, GuildIdentity guild)
-        => new(client, guild, model);
+    public override IGuildStageChannelModel GetModel() => Model;
 }

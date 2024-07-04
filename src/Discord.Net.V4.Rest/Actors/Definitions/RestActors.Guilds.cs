@@ -56,7 +56,7 @@ internal static partial class RestActors
         );
     }
 
-    public static RestIndexableActor<RestLoadableThreadChannelChannelActor, ulong, RestThreadChannel> Threads(DiscordRestClient client, ulong guildId)
+    public static RestIndexableActor<RestLoadableThreadChannelActor, ulong, RestThreadChannel> Threads(DiscordRestClient client, ulong guildId)
         => new(threadId => new(client, guildId, threadId));
 
     public static

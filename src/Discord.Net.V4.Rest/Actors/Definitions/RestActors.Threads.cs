@@ -9,26 +9,26 @@ internal static partial class RestActors
 {
     public static RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams> PublicArchivedThreads(
         DiscordRestClient client,
-        IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-        IIdentifiableEntityOrModel<ulong, RestGuildChannel> channel
+        GuildIdentity guild,
+        IIdentifiableEntityOrModel<ulong, RestThreadableChannel, IThreadableChannelModel> channel
     ) => ListThreads(client, guild, channel, Routes.ListPublicArchivedThreads);
 
     public static RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams> PrivateArchivedThreads(
         DiscordRestClient client,
-        IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-        IIdentifiableEntityOrModel<ulong, RestGuildChannel> channel
+        GuildIdentity guild,
+        IIdentifiableEntityOrModel<ulong, RestThreadableChannel, IThreadableChannelModel> channel
     ) => ListThreads(client, guild, channel, Routes.ListPrivateArchivedThreads);
 
     public static RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams> JoinedPrivateArchivedThreads(
         DiscordRestClient client,
-        IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-        IIdentifiableEntityOrModel<ulong, RestGuildChannel> channel
+        GuildIdentity guild,
+        IIdentifiableEntityOrModel<ulong, RestThreadableChannel, IThreadableChannelModel> channel
     ) => ListThreads(client, guild, channel, Routes.ListJoinedPrivateArchivedThreads);
 
     private static RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams> ListThreads(
         DiscordRestClient client,
-        IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
-        IIdentifiableEntityOrModel<ulong, RestGuildChannel> channel,
+        GuildIdentity guild,
+        IIdentifiableEntityOrModel<ulong, RestThreadableChannel, IThreadableChannelModel> channel,
         Func<ulong, DateTimeOffset?, int?, IApiOutRoute<ChannelThreads>> route)
     {
         return new RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams>(

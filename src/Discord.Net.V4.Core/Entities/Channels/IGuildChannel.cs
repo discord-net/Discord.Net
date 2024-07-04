@@ -45,4 +45,6 @@ public interface IGuildChannel :
     ///     A collection of overwrites associated with this channel.
     /// </returns>
     IReadOnlyCollection<Overwrite> PermissionOverwrites { get; }
+
+    new IGuildChannelModel GetModel();
 }

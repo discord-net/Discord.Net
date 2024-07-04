@@ -10,4 +10,5 @@ public interface IStageChannel :
     IStageChannelActor,
     IUpdatable<IGuildStageChannelModel>
 {
+    new IGuildStageChannelModel GetModel();
 }

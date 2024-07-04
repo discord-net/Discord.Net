@@ -2,7 +2,7 @@ namespace Discord.Rest;
 
 public static class EntityUtils
 {
-    public static Func<TId, TModel?, TEntity?> FactoryOfDescendantModel<TId, TModel, TEntity, TDescendingModel>(
+    public static Func<DiscordRestClient, TId, TModel?, TEntity?> FactoryOfDescendantModel<TId, TModel, TEntity, TDescendingModel>(
         Func<TId, TDescendingModel, TEntity> factory
     )
         where TDescendingModel : TModel

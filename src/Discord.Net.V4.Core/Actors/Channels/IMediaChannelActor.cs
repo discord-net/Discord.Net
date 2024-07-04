@@ -11,7 +11,7 @@ public interface ILoadableMediaChannelActor :
     ILoadableEntity<ulong, IMediaChannel>;
 
 public interface IMediaChannelActor :
-    IThreadableGuildChannelActor,
+    IThreadableChannelActor,
     IActor<ulong, IMediaChannel>,
     IModifiable
 {

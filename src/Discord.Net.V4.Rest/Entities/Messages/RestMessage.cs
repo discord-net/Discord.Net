@@ -1,4 +1,5 @@
 using Discord.Models;
+using Discord.Rest.Channels;
 using Discord.Rest.Guilds;
 using Discord.Rest.Stickers;
 using PropertyChanged;
@@ -10,7 +11,7 @@ namespace Discord.Rest.Messages;
 public partial class RestLoadableMessageActor(
     DiscordRestClient client,
     GuildIdentity? guild,
-    IChannelIdentity channel,
+    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel,
     IIdentifiableEntityOrModel<ulong, RestMessage> message) :
     RestMessageActor(client, guild, channel, message),
     ILoadableMessageActor
@@ -29,7 +30,7 @@ public partial class RestLoadableMessageActor(
 public partial class RestMessageActor(
     DiscordRestClient client,
     GuildIdentity? guild,
-    IChannelIdentity channel,
+    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel,
     IIdentifiableEntityOrModel<ulong, RestMessage> message
 ):
     RestActor<ulong, RestMessage>(client, message.Id),
@@ -132,7 +133,7 @@ public partial class RestMessage(DiscordRestClient client, IdentifiableEntityOrM
     public RestLoadableUserActor Author { get; }
         = new(client, model.AuthorId, model.GetReferencedEntityModel<ulong, IUserModel>(model.AuthorId));
 
-    public RestLoadableThreadChannelChannelActor? Thread { get; private set; }
+    public RestLoadableThreadChannelActor? Thread { get; private set; }
         = model.ThreadId.HasValue && model.ThreadGuildId.HasValue
             ? new(client, model.ThreadGuildId.Value, model.ThreadId.Value)
             : null;

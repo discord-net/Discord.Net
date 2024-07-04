@@ -1,9 +1,8 @@
 namespace Discord.Models;
 
-public interface IGuildTextChannelModel : IGuildChannelModel
+public interface IGuildTextChannelModel : IThreadableChannelModel
 {
+    int RatelimitPerUser { get; }
     bool IsNsfw { get; }
     string? Topic { get; }
-    int RatelimitPerUser { get; }
-    int DefaultArchiveDuration { get; }
 }

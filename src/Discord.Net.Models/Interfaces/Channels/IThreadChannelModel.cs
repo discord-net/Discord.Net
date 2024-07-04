@@ -1,7 +1,8 @@
 namespace Discord.Models;
 
-public interface IThreadChannelModel : IGuildTextChannelModel
+public interface IThreadChannelModel : IGuildChannelModel
 {
+    new ulong ParentId { get; }
     bool IsArchived { get; }
     int AutoArchiveDuration { get; }
     DateTimeOffset ArchiveTimestamp { get; }
@@ -13,4 +14,7 @@ public interface IThreadChannelModel : IGuildTextChannelModel
     DateTimeOffset? CreatedAt { get; }
     ulong[] AppliedTags { get; }
     ulong? OwnerId { get; }
+    int RatelimitPerUser { get; }
+    bool IsNsfw { get; }
+    string? Topic { get; }
 }

@@ -15,6 +15,7 @@ public interface IThreadChannel :
     IMessageChannel,
     IGuildChannel,
     IThreadChannelActor,
+    IThreadableRelationship,
     IModifiable
 {
     static IApiInOutRoute<ModifyThreadChannelParams, IEntityModel> IModifiable.ModifyRoute(
@@ -23,7 +24,6 @@ public interface IThreadChannel :
         ModifyThreadChannelParams args
     ) => Routes.ModifyChannel(id, args);
 
-    ILoadableGuildChannelActor Parent { get; }
     ILoadableUserActor? Owner { get; }
 
     /// <summary>
@@ -90,4 +90,6 @@ public interface IThreadChannel :
     ///     property will be that date.
     /// </remarks>
     new DateTimeOffset CreatedAt { get; }
+
+    new IThreadChannelModel GetModel();
 }

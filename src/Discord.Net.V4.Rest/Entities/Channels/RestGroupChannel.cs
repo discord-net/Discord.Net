@@ -21,7 +21,7 @@ public partial class RestLoadableGroupChannelActor :
             Routes.GetChannel(channel.Id),
             EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestGroupChannel, GroupDMChannel>(
                 (_, model) => RestGroupChannel.Construct(client, model)
-            )
+            ).Invoke
         );
     }
 }
@@ -62,7 +62,7 @@ public partial class RestGroupChannel :
         typeof(IGroupChannelActor),
         typeof(IMessageChannelActor),
         typeof(IEntityProvider<IGroupChannel, IGroupDMChannelModel>)
-        )]
+    )]
     internal override RestGroupChannelActor ChannelActor { get; }
 
     private IGroupDMChannelModel _model;
@@ -77,6 +77,9 @@ public partial class RestGroupChannel :
         ChannelActor = actor ?? new(client, this);
     }
 
+    public static RestGroupChannel Construct(DiscordRestClient client, IGroupDMChannelModel model)
+        => new(client, model);
+
     public ValueTask UpdateAsync(IGroupDMChannelModel model, CancellationToken token = default)
     {
         _model = model;
@@ -84,6 +87,5 @@ public partial class RestGroupChannel :
         return base.UpdateAsync(model, token);
     }
 
-    public static RestGroupChannel Construct(DiscordRestClient client, IGroupDMChannelModel model)
-        => new(client, model);
+    public override IGroupDMChannelModel GetModel() => Model;
 }

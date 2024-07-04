@@ -20,7 +20,7 @@ namespace Discord.Gateway
             => _source.RatelimitPerUser;
 
         public ThreadArchiveDuration DefaultArchiveDuration
-            => _source.DefaultArchiveDuration;
+            => _source.DefaultAutoArchiveDuration;
 
         public string Mention
             => MentionUtils.MentionChannel(Id);

@@ -10,7 +10,7 @@ namespace Discord.Rest.Channels;
 public sealed partial class RestLoadableGuildChannel(
     DiscordRestClient client,
     GuildIdentity guild,
-    IIdentifiableEntityOrModel<ulong, RestGuildChannel> channel
+    GuildChannelIdentity channel
 ):
     RestGuildChannelActor(client, guild, channel),
     ILoadableGuildChannelActor
@@ -21,7 +21,7 @@ public sealed partial class RestLoadableGuildChannel(
             client,
             channel,
             Routes.GetChannel(channel.Id),
-            (_, model) =>
+            (client, _, model) =>
             {
                 if (model is null)
                     return null;
@@ -42,7 +42,7 @@ public sealed partial class RestLoadableGuildChannel(
 public partial class RestGuildChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
-    IIdentifiableEntityOrModel<ulong, RestGuildChannel> channel) :
+    GuildChannelIdentity channel) :
     RestChannelActor(client, channel),
     IGuildChannelActor
 {
@@ -61,6 +61,12 @@ public partial class RestGuildChannel :
     IGuildChannel,
     IContextConstructable<RestGuildChannel, IGuildChannelModel, GuildIdentity, DiscordRestClient>
 {
+    public int Position => Model.Position;
+
+    public ChannelFlags Flags => (ChannelFlags?)Model.Flags ?? ChannelFlags.None;
+
+    public IReadOnlyCollection<Overwrite> PermissionOverwrites { get; private set; }
+
     internal override IGuildChannelModel Model => _model;
 
     [ProxyInterface(
@@ -89,20 +95,6 @@ public partial class RestGuildChannel :
         PermissionOverwrites = model.Permissions.Select(x => Overwrite.Construct(client, x)).ToImmutableArray();
     }
 
-    public ValueTask UpdateAsync(IGuildChannelModel model, CancellationToken token = default)
-    {
-        if (!_model.Permissions.SequenceEqual(model.Permissions))
-        {
-            PermissionOverwrites = _model.Permissions
-                .Select(x => Overwrite.Construct(Client, x))
-                .ToImmutableArray();
-        }
-
-        _model = model;
-
-        return base.UpdateAsync(model, token);
-    }
-
     public static RestGuildChannel Construct(
         DiscordRestClient client,
         IGuildChannelModel model,
@@ -125,9 +117,19 @@ public partial class RestGuildChannel :
         };
     }
 
-    public int Position => Model.Position;
+    public ValueTask UpdateAsync(IGuildChannelModel model, CancellationToken token = default)
+    {
+        if (!_model.Permissions.SequenceEqual(model.Permissions))
+        {
+            PermissionOverwrites = _model.Permissions
+                .Select(x => Overwrite.Construct(Client, x))
+                .ToImmutableArray();
+        }
 
-    public ChannelFlags Flags => (ChannelFlags?)Model.Flags ?? ChannelFlags.None;
+        _model = model;
 
-    public IReadOnlyCollection<Overwrite> PermissionOverwrites { get; private set; }
+        return base.UpdateAsync(model, token);
+    }
+
+    public override IGuildChannelModel GetModel() => Model;
 }
