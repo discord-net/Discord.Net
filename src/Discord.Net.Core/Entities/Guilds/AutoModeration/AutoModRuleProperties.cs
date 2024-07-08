@@ -69,7 +69,7 @@ namespace Discord
         /// <summary>
         ///     Returns the max custom message length AutoMod rule action allowed by Discord.
         /// </summary>
-        public const int MaxCustomBlockMessageLength = 50;
+        public const int MaxCustomBlockMessageLength = 150;
 
 
         /// <summary>
