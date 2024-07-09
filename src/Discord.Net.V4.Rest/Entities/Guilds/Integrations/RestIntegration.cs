@@ -1,103 +1,123 @@
-using Discord;
 using Discord.Models;
-using PropertyChanged;
 using System.ComponentModel;
 
 namespace Discord.Rest.Guilds.Integrations;
 
-public sealed partial class RestIntegrationActor(DiscordRestClient client, ulong guildId, ulong id, RestGuild? guild = null) :
-    RestActor<ulong, RestIntegration>(client, id),
+public sealed partial class RestIntegrationActor(
+    DiscordRestClient client,
+    GuildIdentity guild,
+    IntegrationIdentity integration
+):
+    RestActor<ulong, RestIntegration, IntegrationIdentity>(client, integration),
     IIntegrationActor
 {
-    public RestLoadableGuildActor Guild { get; } = new(client, guildId, guild);
+    public RestLoadableGuildActor Guild { get; } = new(client, guild);
 
     ILoadableGuildActor IGuildRelationship.Guild => Guild;
 }
 
-public sealed partial class RestIntegration(
-    DiscordRestClient client,
-    ulong guildId,
-    IIntegrationModel model,
-    RestIntegrationActor? actor = null,
-    RestGuild? guild = null
-):
-    RestEntity<ulong>(client, model.Id),
+public sealed partial class RestIntegration :
+    RestEntity<ulong>,
     IIntegration,
-    IContextConstructable<RestIntegration, IIntegrationModel, RestIntegration.Context, DiscordRestClient>,
-    INotifyPropertyChanged
+    IContextConstructable<RestIntegration, IIntegrationModel, GuildIdentity, DiscordRestClient>
 {
-    public readonly record struct Context(
-        ulong GuildId,
-        RestGuild? Guild = null
-    );
-
     [ProxyInterface(typeof(IIntegrationActor), typeof(IGuildRelationship))]
-    internal RestIntegrationActor Actor { get; } = actor ?? new(client, guildId, model.Id, guild);
+    internal RestIntegrationActor Actor { get; }
 
-    [OnChangedMethod(nameof(OnModelUpdated))]
-    internal IIntegrationModel Model { get; set; } = model;
+    internal IIntegrationModel Model { get; private set; }
 
-    public static RestIntegration Construct(DiscordRestClient client, IIntegrationModel model, Context context)
-        => new(client, context.GuildId, model, guild: context.Guild);
+    public RestIntegration(DiscordRestClient client,
+        GuildIdentity guild,
+        IIntegrationModel model,
+        RestIntegrationActor? actor = null) : base(client, model.Id)
+    {
+        Actor = actor ?? new(client, guild, IntegrationIdentity.Of(this));
+        Model = model;
+
+        Role = model.RoleId.Map(
+            static (id, client, guild) => new RestRoleActor(client, guild, RoleIdentity.Of(id)),
+            client,
+            guild
+        );
+
+        User = model.UserId
+            .Map(
+                static (id, client, model) => new RestLoadableUserActor(
+                    client,
+                    UserIdentity.FromReferenced<RestUser, DiscordRestClient>(model, id, client)
+                ),
+                client,
+                model
+            );
+
+        Account = model is {AccountId: not null, AccountName: not null}
+            ? new IntegrationAccount(model.AccountId, model.AccountName)
+            : null;
+
+        Application = model.Application is not null
+            ? IntegrationApplication.Construct(
+                client,
+                model.Application,
+                model.Application.BotId.HasValue
+                    ? new RestLoadableUserActor(
+                        client,
+                        UserIdentity.FromReferenced<RestUser, DiscordRestClient>(model.Application, model.Application.BotId.Value, client)
+                    ) : null
+            ) : null;
+    }
+
+    public static RestIntegration Construct(DiscordRestClient client, IIntegrationModel model, GuildIdentity guild)
+        => new(client, guild, model);
+
+    public IIntegrationModel GetModel() => Model;
 
     private void OnModelUpdated()
     {
-        if (Model.AccountId != Account?.Id || Model.AccountName != Account?.Name)
-        {
-            Account = Model is {AccountId: not null, AccountName: not null}
-                ? new IntegrationAccount(Model.AccountId, Model.AccountName)
-                : null;
-        }
-
-        if (IsApplicationOutOfDate)
-        {
-            Application = Model.Application is not null
-                ? IntegrationApplication.Construct(
-                    Client,
-                    Model.Application,
-                    Model.Application.BotId.HasValue
-                        ? new RestLoadableUserActor(
-                            Client,
-                            Model.Application.BotId.Value,
-                            Model.GetReferencedEntityModel<ulong, IUserModel>(Model.Application.BotId.Value)
-                        ) : null
-                ) : null;
-        }
-
-        if (IsRoleOutOfDate)
-        {
-            Role = Model.RoleId.HasValue
-                ? new RestRoleActor(Client, guildId, Model.RoleId.Value)
-                : null;
-        }
-
-        if (IsUserOutOfDate)
-        {
-            User = Model.UserId.HasValue
-                ? new RestLoadableUserActor(
-                    Client,
-                    Model.UserId.Value,
-                    Model.GetReferencedEntityModel<ulong, IUserModel>(Model.UserId.Value))
-                : null;
-        }
+        // if (Model.AccountId != Account?.Id || Model.AccountName != Account?.Name)
+        // {
+        //     Account = Model is {AccountId: not null, AccountName: not null}
+        //         ? new IntegrationAccount(Model.AccountId, Model.AccountName)
+        //         : null;
+        // }
+        //
+        // if (IsApplicationOutOfDate)
+        // {
+        //     Application = Model.Application is not null
+        //         ? IntegrationApplication.Construct(
+        //             Client,
+        //             Model.Application,
+        //             Model.Application.BotId.HasValue
+        //                 ? new RestLoadableUserActor(
+        //                     Client,
+        //                     Model.Application.BotId.Value,
+        //                     Model.GetReferencedEntityModel<ulong, IUserModel>(Model.Application.BotId.Value)
+        //                 ) : null
+        //         ) : null;
+        // }
+        //
+        // if (IsRoleOutOfDate)
+        // {
+        //     Role = Model.RoleId.HasValue
+        //         ? new RestRoleActor(Client, guildId, Model.RoleId.Value)
+        //         : null;
+        // }
+        //
+        // if (IsUserOutOfDate)
+        // {
+        //     User = Model.UserId.HasValue
+        //         ? new RestLoadableUserActor(
+        //             Client,
+        //             Model.UserId.Value,
+        //             Model.GetReferencedEntityModel<ulong, IUserModel>(Model.UserId.Value))
+        //         : null;
+        // }
     }
 
     #region Actors
 
-    [VersionOn(nameof(Model.RoleId), nameof(model.RoleId))]
-    public IRoleActor? Role { get; private set; } =
-        model.RoleId.HasValue
-            ? new RestRoleActor(client, guildId, model.RoleId.Value)
-            : null;
+    public IRoleActor? Role { get; private set; }
 
-    [VersionOn(nameof(Model.RoleId), nameof(model.RoleId))]
-    public ILoadableUserActor? User { get; private set; } =
-        model.UserId.HasValue
-            ? new RestLoadableUserActor(
-                client,
-                model.UserId.Value,
-                model.GetReferencedEntityModel<ulong, IUserModel>(model.UserId.Value))
-            : null;
+    public ILoadableUserActor? User { get; private set; }
 
     #endregion
 
@@ -117,10 +137,7 @@ public sealed partial class RestIntegration(
 
     public int? ExpiryGracePeriod => Model.ExpireGracePeriod;
 
-    public IntegrationAccount? Account { get; private set; } =
-        model is {AccountId: not null, AccountName: not null}
-            ? new IntegrationAccount(model.AccountId, model.AccountName)
-            : null;
+    public IntegrationAccount? Account { get; private set; }
 
     public DateTimeOffset? SyncedAt => Model.SyncedAt;
 
@@ -128,19 +145,7 @@ public sealed partial class RestIntegration(
 
     public bool? IsRevoked => Model.IsRevoked;
 
-    [VersionOn(nameof(Model.Application), nameof(model.Application))]
-    public IntegrationApplication? Application { get; private set; } =
-        model.Application is not null
-            ? IntegrationApplication.Construct(
-                client,
-                model.Application,
-                model.Application.BotId.HasValue
-                    ? new RestLoadableUserActor(
-                        client,
-                        model.Application.BotId.Value,
-                        model.GetReferencedEntityModel<ulong, IUserModel>(model.Application.BotId.Value)
-                    ) : null
-            ) : null;
+    public IntegrationApplication? Application { get; private set; }
 
     public string[] Scopes => Model.Scopes ?? [];
 

@@ -24,7 +24,7 @@ public interface IGuildScheduledEvent :
     static IApiOutRoute<IGuildScheduledEventModel> IRefreshable.RefreshRoute(IGuildScheduledEvent self,
         ulong id) => Routes.GetGuildScheduledEvent(self.Require<IGuild>(), id);
 
-    ILoadableEntity<ulong, IChannel>? Channel { get; }
+    ILoadableEntity<ulong, IGuildChannel>? Channel { get; }
     ILoadableEntity<ulong, IUser> Creator { get; }
     string Name { get; }
     string? Description { get; }

@@ -3,23 +3,46 @@ using Discord.Models;
 namespace Discord.Rest.Messages;
 
 [ExtendInterfaceDefaults(typeof(IWebhookMessageActor))]
-public partial class RestWebhookMessageActor(DiscordRestClient client, ulong? guildId, ulong channelId, ulong id) :
-    RestMessageActor(client, guildId, channelId, id),
-    IWebhookMessageActor;
-
-public sealed partial class RestWebhookMessage(
+public partial class RestWebhookMessageActor(
     DiscordRestClient client,
-    ulong? guildId,
-    IMessageModel model,
-    RestWebhookMessageActor? actor = null
+    MessageChannelIdentity channel,
+    MessageIdentity message,
+    GuildIdentity? guild = null
 ):
-    RestMessage(client, guildId, model, actor),
+    RestMessageActor(client, channel, message, guild),
+    IWebhookMessageActor
+{
+    public ILoadableWebhookActor Webhook => throw new NotImplementedException();
+}
+
+public sealed partial class RestWebhookMessage :
+    RestMessage,
     IWebhookMessage,
-    IContextConstructable<RestWebhookMessage, IMessageModel, ulong?, DiscordRestClient>
+    IConstructable<RestWebhookMessage, IMessageModel, DiscordRestClient>,
+    IContextConstructable<RestWebhookMessage, IMessageModel, GuildIdentity?, DiscordRestClient>
 {
     [ProxyInterface(typeof(IWebhookMessageActor))]
-    internal override RestWebhookMessageActor Actor { get; } = actor ?? new(client, guildId, model.ChannelId, model.Id);
+    internal override RestWebhookMessageActor Actor { get; }
 
-    public new static RestWebhookMessage Construct(DiscordRestClient client, IMessageModel model, ulong? context)
-        => new(client, context, model);
+    internal RestWebhookMessage(
+        DiscordRestClient client,
+        IMessageModel model,
+        RestWebhookMessageActor? actor = null,
+        GuildIdentity? guild = null,
+        MessageChannelIdentity? channel = null
+    ) : base(client, model, actor, guild, channel)
+    {
+        Actor = actor ?? new(
+            client,
+            channel ?? MessageChannelIdentity.Of(model.ChannelId),
+            MessageIdentity.Of(this),
+            guild
+        );
+    }
+
+    public new static RestWebhookMessage Construct(DiscordRestClient client, IMessageModel model, GuildIdentity? guild)
+        => new(client, model, guild: guild);
+
+    public new static RestWebhookMessage Construct(DiscordRestClient client, IMessageModel model)
+        => new(client, model);
 }

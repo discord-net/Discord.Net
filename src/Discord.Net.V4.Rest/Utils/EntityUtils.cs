@@ -8,7 +8,7 @@ public static class EntityUtils
         where TDescendingModel : TModel
         where TEntity : class
     {
-        return (id, model) =>
+        return (_, id, model) =>
         {
             if (model is null)
                 return null;

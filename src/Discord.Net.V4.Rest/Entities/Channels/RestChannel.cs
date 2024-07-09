@@ -6,7 +6,7 @@ namespace Discord.Rest.Channels;
 
 public partial class RestLoadableChannelActor(
     DiscordRestClient client,
-    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel) :
+    ChannelIdentity channel) :
     RestChannelActor(client, channel),
     ILoadableChannelActor
 {
@@ -22,8 +22,8 @@ public partial class RestLoadableChannelActor(
 [ExtendInterfaceDefaults(typeof(IChannelActor))]
 public partial class RestChannelActor(
     DiscordRestClient client,
-    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel) :
-    RestActor<ulong, RestChannel>(client, channel.Id),
+    ChannelIdentity channel) :
+    RestActor<ulong, RestChannel, ChannelIdentity>(client, channel),
     IChannelActor;
 
 public partial class RestChannel :
@@ -48,7 +48,7 @@ public partial class RestChannel :
     ) : base(client, model.Id)
     {
         _model = model;
-        ChannelActor = actor ?? new(client, this.Identity<ulong, RestChannel, IChannelModel>());
+        ChannelActor = actor ?? new(client, ChannelIdentity.Of(this));
     }
 
     public static RestChannel Construct(DiscordRestClient client, IChannelModel model)
@@ -57,7 +57,7 @@ public partial class RestChannel :
         {
             DMChannelModel dmChannelModel => RestDMChannel.Construct(client, dmChannelModel),
             GroupDMChannel groupDMChannel => RestGroupChannel.Construct(client, groupDMChannel),
-            GuildChannelBase guildChannelBase => Construct(client, model, guildChannelBase.GuildId),
+            GuildChannelBase guildChannelBase => Construct(client, model, GuildIdentity.Of(guildChannelBase.GuildId)),
             _ => new RestChannel(client, model)
         };
     }

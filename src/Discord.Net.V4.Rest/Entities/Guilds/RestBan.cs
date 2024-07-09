@@ -3,48 +3,74 @@ using Discord.Models.Json;
 
 namespace Discord.Rest.Guilds;
 
-public sealed partial class RestLoadableBanActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestBanActor(client, guildId, id),
+public sealed partial class RestLoadableBanActor(
+    DiscordRestClient client,
+    GuildIdentity guild,
+    BanIdentity ban
+):
+    RestBanActor(client, guild, ban),
     ILoadableGuildBanActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IBan>))]
-    internal RestLoadable<ulong, RestBan, IBan, Ban> Loadable { get; } =
-        RestLoadable<ulong, RestBan, IBan, Ban>.FromContextConstructable<RestBan, ulong>(
+    internal RestLoadable<ulong, RestBan, IBan, IBanModel> Loadable { get; } =
+        RestLoadable<ulong, RestBan, IBan, IBanModel>.FromContextConstructable<RestBan, GuildIdentity>(
             client,
-            id,
-            Routes.GetGuildBan,
-            guildId
+            ban,
+            (guild, id) => Routes.GetGuildBan(guild.Id, id),
+            guild
         );
 }
 
 [ExtendInterfaceDefaults(typeof(IGuildBanActor))]
-public partial class RestBanActor(DiscordRestClient client, ulong guildId, ulong id) :
-    RestActor<ulong, RestBan>(client, id),
+public partial class RestBanActor(
+    DiscordRestClient client,
+    GuildIdentity guild,
+    BanIdentity ban
+) :
+    RestActor<ulong, RestBan, BanIdentity>(client, ban),
     IGuildBanActor
 {
-    public RestLoadableGuildActor Guild { get; } = new(client, guildId);
+    public RestLoadableGuildActor Guild { get; } = new(client, guild);
 
-    public RestLoadableUserActor User { get; } = new(client, id);
+    public RestLoadableUserActor User { get; } = new(client, UserIdentity.Of(ban.Id));
 
     ILoadableGuildActor IGuildRelationship.Guild => Guild;
     ILoadableUserActor IUserRelationship.User => User;
 }
 
-public sealed partial class RestBan(DiscordRestClient client, ulong guildId, IBanModel model, RestBanActor? actor = null) :
-    RestEntity<ulong>(client, model.UserId),
+public sealed partial class RestBan :
+    RestEntity<ulong>,
     IBan,
-    IContextConstructable<RestBan, IBanModel, ulong, DiscordRestClient>
+    IContextConstructable<RestBan, IBanModel, GuildIdentity, DiscordRestClient>
 {
     [ProxyInterface(
         typeof(IGuildBanActor),
         typeof(IUserRelationship),
         typeof(IGuildRelationship)
     )]
-    internal RestBanActor Actor { get; } = actor ?? new(client, guildId, model.UserId);
-    internal IBanModel Model { get; } = model;
+    internal RestBanActor Actor { get; }
+    internal IBanModel Model { get; private set; }
 
-    public static RestBan Construct(DiscordRestClient client, IBanModel model, ulong guildId)
-        => new(client, guildId, model);
+    public RestBan(DiscordRestClient client,
+        GuildIdentity guild,
+        IBanModel model,
+        RestBanActor? actor = null) : base(client, model.UserId)
+    {
+        Actor = actor ?? new(client, guild, BanIdentity.Of(this));
+        Model = model;
+    }
+
+    public static RestBan Construct(DiscordRestClient client, IBanModel model, GuildIdentity guild)
+        => new(client, guild, model);
+
+    public ValueTask UpdateAsync(IBanModel model, CancellationToken token = default)
+    {
+        Model = model;
+        return ValueTask.CompletedTask;
+    }
+
+    public IBanModel GetModel() => Model;
 
     public string? Reason => Model.Reason;
+
 }

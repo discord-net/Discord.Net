@@ -1,19 +1,24 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Actors;
 using Discord.Rest.Guilds;
 
 namespace Discord.Rest.Channels;
 
+using Loadable = RestLoadable<ulong, RestTextChannel, ITextChannel, IChannelModel>;
+
+[method: TypeFactory]
 public sealed partial class RestLoadableTextChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
     TextChannelIdentity channel
 ):
     RestTextChannelActor(client, guild, channel),
-    ILoadableTextChannelActor
+    ILoadableTextChannelActor,
+    IRestLoadableActor<ulong, RestTextChannel, ITextChannel, IChannelModel>
 {
     [ProxyInterface(typeof(ILoadableEntity<ITextChannel>))]
-    internal RestLoadable<ulong, RestTextChannel, ITextChannel, IChannelModel> Loadable { get; } =
+    internal Loadable Loadable { get; } =
         new(
             client,
             channel,
@@ -22,6 +27,8 @@ public sealed partial class RestLoadableTextChannelActor(
                 (_, model) => RestTextChannel.Construct(client, model, guild)
             ).Invoke
         );
+
+    Loadable IRestLoadableActor<ulong, RestTextChannel, ITextChannel, IChannelModel>.Loadable => Loadable;
 }
 
 [ExtendInterfaceDefaults(
@@ -37,7 +44,7 @@ public partial class RestTextChannelActor(
     ITextChannelActor
 {
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, guild, channel);
+    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel, guild);
 
     public ITextChannel CreateEntity(IGuildTextChannelModel model)
         => RestTextChannel.Construct(Client, model, Guild.Identity);

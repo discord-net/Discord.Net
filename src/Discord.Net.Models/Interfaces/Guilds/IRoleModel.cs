@@ -15,7 +15,11 @@ public interface IRoleModel : IEntityModel<ulong>
     bool IsMentionable { get; }
     int Flags { get; }
 
-    // tags
+    IRoleTagsModel? Tags { get; }
+}
+
+public interface IRoleTagsModel
+{
     ulong? BotId { get; }
     ulong? IntegrationId { get; }
     bool IsPremiumSubscriberRole { get; }

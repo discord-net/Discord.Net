@@ -42,7 +42,7 @@ public partial class RestGroupChannelActor :
         IdentifiableEntityOrModel<ulong, RestGroupChannel, IGroupDMChannelModel> channel
     ) : base(client, channel)
     {
-        MessageChannelActor = new RestMessageChannelActor(client, null, channel);
+        MessageChannelActor = new RestMessageChannelActor(client, channel);
     }
 
     public IGroupChannel CreateEntity(IGroupDMChannelModel model)

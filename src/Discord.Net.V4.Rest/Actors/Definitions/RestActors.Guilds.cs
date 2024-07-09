@@ -12,21 +12,21 @@ internal static partial class RestActors
         RestEnumerableIndexableActor<RestLoadableStageChannelActor, ulong, RestStageChannel, IEnumerable<IChannelModel>>
         StageChannels(
             DiscordRestClient client,
-            IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild
+            GuildIdentity guild
         )
     {
         return GuildChannel<RestLoadableStageChannelActor, RestStageChannel, IGuildStageChannelModel>(
             client,
             guild,
             id => new RestLoadableStageChannelActor(client, guild, id),
-            model => RestStageChannel.Construct(client, model, guildId)
+            model => RestStageChannel.Construct(client, model, guild)
         );
     }
 
     public static RestEnumerableIndexableActor<TChannelActor, ulong, TChannel, IEnumerable<IChannelModel>>
         GuildChannel<TChannelActor, TChannel, TChannelModel>(
             DiscordRestClient client,
-            IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild,
+            GuildIdentity guild,
             Func<ulong, TChannelActor> actorFactory,
             Func<TChannelModel, TChannel> factory
         )
@@ -43,33 +43,34 @@ internal static partial class RestActors
     }
 
     public static RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IEnumerable<IIntegrationModel>>
-        Integrations(DiscordRestClient client, ulong guildId, RestGuild? guild)
+        Integrations(
+            DiscordRestClient client,
+            GuildIdentity guild)
     {
         return new RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IEnumerable<IIntegrationModel>>(
             client,
-            integrationId => new RestIntegrationActor(client, guildId, integrationId, guild),
-            model => model.Select(x => RestIntegration.Construct(client, x, new(
-                guildId,
-                guild
-            ))),
-            Routes.GetGuildIntegrations(guildId)
+            integrationId => new RestIntegrationActor(client, guild, IntegrationIdentity.Of(integrationId)),
+            model => model.Select(x => RestIntegration.Construct(client, x, guild)),
+            Routes.GetGuildIntegrations(guild.Id)
         );
     }
 
-    public static RestIndexableActor<RestLoadableThreadChannelActor, ulong, RestThreadChannel> Threads(DiscordRestClient client, ulong guildId)
-        => new(threadId => new(client, guildId, threadId));
+    public static RestIndexableActor<RestLoadableThreadChannelActor, ulong, RestThreadChannel> Threads(
+        DiscordRestClient client,
+        GuildIdentity guild
+    ) => new(threadId => new(client, guild, ThreadIdentity.Of(threadId)));
 
     public static
         RestPagedIndexableActor<RestLoadableGuildMemberActor, ulong, RestGuildMember, IEnumerable<IMemberModel>,
-            PageGuildMembersParams> Members(DiscordRestClient client, ulong guildId)
+            PageGuildMembersParams> Members(DiscordRestClient client, GuildIdentity guild)
     {
         return new(
             client,
-            memberId => new(client, guildId, memberId),
-            args => Routes.ListGuildMembers(guildId, args.PageSize, args.After?.Id),
+            memberId => new(client, guild, MemberIdentity.Of(memberId)),
+            args => Routes.ListGuildMembers(guild.Id, args.PageSize, args.After?.Id),
             (_, models) => models
                 .Select(x =>
-                    RestGuildMember.Construct(client, x, new(guildId, x.Id!.Value))
+                    RestGuildMember.Construct(client, x, guild)
                 ),
             (_, models, args) =>
             {
@@ -79,7 +80,7 @@ internal static partial class RestActors
                     return null;
 
                 return Routes.ListGuildMembers(
-                    guildId,
+                    guild.Id,
                     args.PageSize,
                     nextId
                 );
@@ -87,13 +88,15 @@ internal static partial class RestActors
         );
     }
 
-    public static RestPagedIndexableActor<RestLoadableBanActor, ulong, RestBan, IEnumerable<IBanModel>, PageGuildBansParams> Bans(DiscordRestClient client, ulong guildId)
+    public static RestPagedIndexableActor<RestLoadableBanActor, ulong, RestBan, IEnumerable<IBanModel>, PageGuildBansParams> Bans(
+        DiscordRestClient client,
+        GuildIdentity guild)
     {
         return new RestPagedIndexableActor<RestLoadableBanActor, ulong, RestBan, IEnumerable<IBanModel>, PageGuildBansParams>(
             client,
-            banId => new(client, guildId, banId),
-            args => Routes.GetGuildBans(guildId, args.PageSize, args.Before?.Id, args.After?.Id),
-            (_, models) => models.Select(x=> RestBan.Construct(client, x, guildId)),
+            banId => new(client, guild, BanIdentity.Of(banId)),
+            args => Routes.GetGuildBans(guild.Id, args.PageSize, args.Before?.Id, args.After?.Id),
+            (_, models) => models.Select(x=> RestBan.Construct(client, x, guild)),
             (_, models, args) =>
             {
                 ulong? nextId;
@@ -106,7 +109,7 @@ internal static partial class RestActors
                         return null;
 
                     return Routes.GetGuildBans(
-                        guildId,
+                        guild.Id,
                         args.PageSize,
                         afterId: nextId
                     );
@@ -118,7 +121,7 @@ internal static partial class RestActors
                     return null;
 
                 return Routes.GetGuildBans(
-                    guildId,
+                    guild.Id,
                     args.PageSize,
                     beforeId: nextId
                 );

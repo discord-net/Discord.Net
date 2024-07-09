@@ -1,5 +1,4 @@
 using Discord.Models;
-using PropertyChanged;
 using System.ComponentModel;
 
 namespace Discord.Rest.Channels;
@@ -12,13 +11,12 @@ public partial class RestDMChannelActor(
     IDMChannelActor
 {
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, null, channel);
+    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
 }
 
 public partial class RestDMChannel :
     RestChannel,
     IDMChannel,
-    INotifyPropertyChanged,
     IConstructable<RestDMChannel, IDMChannelModel, DiscordRestClient>
 {
     [AssignOnPropertyChanged(nameof(Model), nameof(Recipient.Loadable.Id), nameof(Model.RecipientId))]
@@ -37,7 +35,7 @@ public partial class RestDMChannel :
         ChannelActor = actor ?? new(client, this);
         _model = model;
 
-        Recipient =  new(client, model.RecipientId);
+        Recipient =  new(client, UserIdentity.Of(model.RecipientId));
     }
 
     public static RestDMChannel Construct(DiscordRestClient client, IDMChannelModel model)

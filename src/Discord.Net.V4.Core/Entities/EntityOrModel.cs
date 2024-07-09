@@ -6,7 +6,7 @@ public sealed class IdentifiableEntityOrModel<TId, TEntity, TModel> :
     IIdentifiableEntityOrModel<TId, TEntity, TModel>
     where TId : IEquatable<TId>
     where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-    where TModel : IEntityModel<TId>
+    where TModel : class, IEntityModel<TId>
 {
     public TId Id { get; }
 
@@ -53,9 +53,32 @@ public sealed class IdentifiableEntityOrModel<TId, TEntity, TModel> :
 public interface IIdentifiableEntityOrModel<out TId, out TEntity, out TModel> : IIdentifiable<TId>
     where TId : IEquatable<TId>
     where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-    where TModel : IEntityModel<TId>
+    where TModel : class, IEntityModel<TId>
 {
     TEntity? Entity { get; }
+
+    static IIdentifiableEntityOrModel<TId, TEntity, TModel> FromReferenced<TConstruct, TClient>(
+        IEntityModel model,
+        TId id,
+        TClient client)
+        where TConstruct : class, TEntity, IConstructable<TConstruct, TModel, TClient>
+        where TClient : IDiscordClient
+        => FromReferenced(model, id, model => TConstruct.Construct(client, model));
+
+    static IIdentifiableEntityOrModel<TId, TEntity, TModel> FromReferenced<TConstruct>(IEntityModel model, TId id,
+        IDiscordClient client)
+        where TConstruct : class, TEntity, IConstructable<TConstruct, TModel>
+        => FromReferenced(model, id, model => TConstruct.Construct(client, model));
+
+    static IIdentifiableEntityOrModel<TId, TEntity, TModel> FromReferenced(IEntityModel model, TId id,
+        Func<TModel, TEntity> factory)
+    {
+        var referenced = model.GetReferencedEntityModel<TId, TModel>(id);
+
+        return referenced is null
+            ? Of(id)
+            : Of(referenced, factory);
+    }
 
     static IIdentifiableEntityOrModel<TId, TEntity, TModel> Of(TId id)
         => new IdentifiableEntityOrModel<TId, TEntity, TModel>(id);

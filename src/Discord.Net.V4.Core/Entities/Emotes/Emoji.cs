@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     A Unicode emoji.
 /// </summary>
-public sealed class Emoji : IEmote, IIdentifiable<string>, IConstructable<Emoji, IEmojiModel>
+public readonly struct Emoji : IEmote, IEquatable<Emoji>, IIdentifiable<string>, IConstructable<Emoji, IEmojiModel>
 {
     /// <summary>
     ///     Initializes a new <see cref="Emoji" /> class with the provided Unicode.
@@ -35,21 +35,20 @@ public sealed class Emoji : IEmote, IIdentifiable<string>, IConstructable<Emoji,
     /// </returns>
     public override string ToString() => Name;
 
-    /// <summary>
-    ///     Determines whether the specified emoji is equal to the current one.
-    /// </summary>
-    /// <param name="other">The object to compare with the current object.</param>
-    public override bool Equals(object? other)
-    {
-        if (other is null)
-            return false;
-
-        if (other == this)
-            return true;
-
-        return other is Emoji otherEmoji && string.Equals(Name, otherEmoji.Name);
-    }
-
     /// <inheritdoc />
     public override int GetHashCode() => Name.GetHashCode();
+
+    public bool Equals(Emoji other) => Name == other.Name;
+
+    public override bool Equals(object? obj) => obj is Emoji other && Equals(other);
+
+    public static bool operator ==(Emoji left, Emoji right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Emoji left, Emoji right)
+    {
+        return !(left == right);
+    }
 }

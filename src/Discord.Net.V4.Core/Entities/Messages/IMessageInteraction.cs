@@ -1,9 +1,11 @@
+using Discord.Models;
+
 namespace Discord;
 
 /// <summary>
 ///     Represents a partial interaction within a message.
 /// </summary>
-public interface IMessageInteractionMetadata
+public interface IMessageInteractionMetadata : IUpdatable<IMessageInteractionMetadataModel>
 {
     /// <summary>
     ///     Gets the snowflake id of the interaction.

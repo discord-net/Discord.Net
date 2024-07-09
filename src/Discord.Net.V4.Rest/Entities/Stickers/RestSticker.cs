@@ -1,5 +1,4 @@
 using Discord.Models;
-using PropertyChanged;
 using System.Collections.Immutable;
 using System.ComponentModel;
 
@@ -10,28 +9,6 @@ public partial class RestSticker :
     ISticker,
     IConstructable<RestSticker, IStickerModel, DiscordRestClient>
 {
-    internal IStickerModel Model { get; private set; }
-
-    internal RestSticker(DiscordRestClient client, IStickerModel model) : base(client, model.Id)
-    {
-        Model = model;
-        Tags = model.Tags.Split(',').ToImmutableArray();
-    }
-
-    public static RestSticker Construct(DiscordRestClient client, IStickerModel model)
-    {
-        return model.GuildId.HasValue
-            ? RestGuildSticker.Construct(client, model, model.GuildId.Value)
-            : new RestSticker(client, model);
-    }
-
-
-
-    protected virtual void OnModelUpdated()
-    {
-        if(IsTagsOutOfDate) Tags = Model.Tags.Split(',').ToImmutableArray();
-    }
-
     public string Name => Model.Name;
 
     public StickerFormatType Format => (StickerFormatType)Model.FormatType;
@@ -44,7 +21,38 @@ public partial class RestSticker :
 
     public StickerType Type => (StickerType)Model.Type;
 
-    public bool? IsAvailable => Model.Available;
-
     public int? SortOrder => Model.SortValue;
+
+    internal virtual IStickerModel Model => _model;
+
+    private IStickerModel _model;
+
+    internal RestSticker(DiscordRestClient client, IStickerModel model) : base(client, model.Id)
+    {
+        _model = model;
+        Tags = model.Tags.Split(',').ToImmutableArray();
+    }
+
+    public static RestSticker Construct(DiscordRestClient client, IStickerModel model)
+    {
+        return model switch
+        {
+            IGuildStickerModel guildSticker
+                => RestGuildSticker.Construct(client, guildSticker, GuildIdentity.Of(guildSticker.GuildId)),
+            _ => new RestSticker(client, model)
+        };
+    }
+
+    public ValueTask UpdateAsync(IStickerModel model, CancellationToken token = default)
+    {
+        if (!_model.Tags.SequenceEqual(model.Tags))
+            Tags = Model.Tags.Split(',').ToImmutableArray();
+
+        _model = model;
+
+        return ValueTask.CompletedTask;
+    }
+
+
+    public virtual IStickerModel GetModel() => Model;
 }

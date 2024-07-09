@@ -1,25 +1,29 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Actors;
 
 namespace Discord.Rest.Channels;
 
+[method: TypeFactory]
 public partial class RestLoadableVoiceChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
     VoiceChannelIdentity channel
-) :
+):
     RestVoiceChannelActor(client, guild, channel),
     ILoadableVoiceChannelActor
 {
+
+    [RestLoadableActorSource]
     [ProxyInterface(typeof(ILoadableEntity<IVoiceChannel>))]
-    internal RestLoadable<ulong, RestVoiceChannel, IVoiceChannel, Channel> Loadable { get; } =
+    internal RestLoadable<ulong, RestVoiceChannel, IVoiceChannel, IChannelModel> Loadable { get; } =
         new(
             client,
             channel,
             Routes.GetChannel(channel.Id),
-            EntityUtils.FactoryOfDescendantModel<ulong, Channel, RestVoiceChannel, GuildVoiceChannel>(
+            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestVoiceChannel, IGuildVoiceChannelModel>(
                 (_, model) => RestVoiceChannel.Construct(client, model, guild)
-            )
+            ).Invoke
         );
 }
 
@@ -35,7 +39,7 @@ public partial class RestVoiceChannelActor(
     IVoiceChannelActor
 {
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, guild, channel);
+    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
 
     public IVoiceChannel CreateEntity(IGuildVoiceChannelModel model)
         => RestVoiceChannel.Construct(Client, model, Guild.Identity);
@@ -76,7 +80,7 @@ public partial class RestVoiceChannel :
         ChannelActor = actor ?? new(
             client,
             guild,
-            this.Identity<ulong, RestVoiceChannel, IGuildVoiceChannelModel>()
+            VoiceChannelIdentity.Of(this)
         );
     }
 

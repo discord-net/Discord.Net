@@ -1,9 +1,11 @@
+using Discord.Models;
+
 namespace Discord;
 
 /// <summary>
 ///     Provides tags related to a discord role.
 /// </summary>
-public readonly struct RoleTags
+public readonly struct RoleTags : IConstructable<RoleTags, IRoleTagsModel>
 {
     /// <summary>
     ///     Gets the identifier of the bot that this role belongs to, if it does.
@@ -56,5 +58,17 @@ public readonly struct RoleTags
         SubscriptionListingId = subscriptionListingId;
         AvailableForPurchase = availableForPurchase;
         GuildConnections = guildConnections;
+    }
+
+    public static RoleTags Construct(IDiscordClient client, IRoleTagsModel model)
+    {
+        return new RoleTags(
+            model.BotId,
+            model.IntegrationId,
+            model.IsPremiumSubscriberRole,
+            model.SubscriptionListingId,
+            model.AvailableForPurchase,
+            model.IsGuildConnection
+        );
     }
 }

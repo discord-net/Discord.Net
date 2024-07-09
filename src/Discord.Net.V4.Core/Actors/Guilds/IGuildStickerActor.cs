@@ -6,7 +6,7 @@ namespace Discord;
 
 using IModifiable =
     IModifiable<ulong, IGuildStickerActor, ModifyStickerProperties, ModifyGuildStickersParams, IGuildSticker,
-        IStickerModel>;
+        IGuildStickerModel>;
 
 public interface ILoadableGuildStickerActor :
     IGuildStickerActor,

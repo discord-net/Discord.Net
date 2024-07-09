@@ -9,7 +9,8 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
     RestLoadable<TId, TEntity, TCoreEntity, TModel>.EntityFactory factory
 ):
     ILoadableEntity<TId, TCoreEntity>,
-    IDisposable, IAsyncDisposable where TCoreEntity : class, IEntity<TId>
+    IDisposable, IAsyncDisposable
+    where TCoreEntity : class, IEntity<TId>
     where TEntity : class, IEntity<TId>, IEntityOf<TModel>, TCoreEntity
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
@@ -28,17 +29,27 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
         }
     }
 
-    public TEntity? Value { get; set; }
+    public TEntity? Value
+    {
+        get => _cachedEntityValue ??= Identity.Entity;
+        set
+        {
+            _cachedEntityValue = value;
+
+            if (value is null)
+            {
+                identity = IIdentifiableEntityOrModel<TId, TEntity, TModel>.Of(identity.Id);
+            }
+        }
+    }
 
     internal IIdentifiableEntityOrModel<TId, TEntity, TModel> Identity
     {
         get => identity;
-        set
-        {
-            Value = value.Entity;
-            identity = value;
-        }
+        set => identity = value;
     }
+
+    private TEntity? _cachedEntityValue;
 
     public async ValueTask<TEntity?> FetchAsync(RequestOptions? options = null, CancellationToken token = default)
     {

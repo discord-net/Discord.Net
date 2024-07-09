@@ -1,13 +1,12 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Guilds;
-using PropertyChanged;
 using System.Collections.Immutable;
 using System.ComponentModel;
 
 namespace Discord.Rest.Channels;
 
-public sealed partial class RestLoadableGuildChannel(
+public sealed partial class RestLoadableGuildChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
     GuildChannelIdentity channel
@@ -89,7 +88,7 @@ public partial class RestGuildChannel :
         ChannelActor = actor ?? new RestGuildChannelActor(
             client,
             guild,
-            this.Identity<ulong, RestGuildChannel, IGuildChannelModel>()
+            GuildChannelIdentity.Of(this)
         );
 
         PermissionOverwrites = model.Permissions.Select(x => Overwrite.Construct(client, x)).ToImmutableArray();

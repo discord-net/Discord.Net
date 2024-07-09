@@ -7,17 +7,6 @@ public class RestPartialGuild(DiscordRestClient client, IPartialGuildModel model
     IPartialGuild,
     IConstructable<RestPartialGuild, IPartialGuildModel, DiscordRestClient>
 {
-    protected virtual IPartialGuildModel Model { get; } = model;
-
-    public static RestPartialGuild Construct(DiscordRestClient client, IPartialGuildModel model)
-    {
-        return model switch
-        {
-            IGuildModel guild => RestGuild.Construct(client, guild),
-            _ => new RestPartialGuild(client, model)
-        };
-    }
-
     public string Name => Model.Name;
 
     public string? SplashId => Model.SplashId;
@@ -38,4 +27,15 @@ public class RestPartialGuild(DiscordRestClient client, IPartialGuildModel model
     public NsfwLevel? NsfwLevel => (NsfwLevel?)Model.NsfwLevel;
 
     public int? PremiumSubscriptionCount => Model.PremiumSubscriptionCount;
+
+    internal virtual IPartialGuildModel Model { get; } = model;
+
+    public static RestPartialGuild Construct(DiscordRestClient client, IPartialGuildModel model)
+    {
+        return model switch
+        {
+            IGuildModel guild => RestGuild.Construct(client, guild),
+            _ => new RestPartialGuild(client, model)
+        };
+    }
 }

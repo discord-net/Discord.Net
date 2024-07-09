@@ -8,8 +8,5 @@ public interface IStickerModel : IEntityModel<ulong>
     string Tags { get; }
     int Type { get; }
     int FormatType { get; }
-    bool? Available { get; }
-    ulong? GuildId { get; }
-    ulong? AuthorId { get; }
     int? SortValue { get; }
 }

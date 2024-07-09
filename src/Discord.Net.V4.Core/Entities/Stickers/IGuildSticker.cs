@@ -5,7 +5,7 @@ using Discord.Rest;
 namespace Discord;
 
 using IModifiable =
-    IModifiable<ulong, IGuildSticker, ModifyStickerProperties, ModifyGuildStickersParams, IStickerModel>;
+    IModifiable<ulong, IGuildSticker, ModifyStickerProperties, ModifyGuildStickersParams, IGuildStickerModel>;
 
 /// <summary>
 ///     Represents a custom sticker within a guild.
@@ -13,7 +13,7 @@ using IModifiable =
 public interface IGuildSticker :
     ISticker,
     IGuildStickerActor,
-    IRefreshable<IGuildSticker, ulong, IStickerModel>,
+    IRefreshable<IGuildSticker, ulong, IGuildStickerModel>,
     IModifiable
 {
     static IApiInOutRoute<ModifyGuildStickersParams, IEntityModel> IModifiable.ModifyRoute(
@@ -22,7 +22,7 @@ public interface IGuildSticker :
         ModifyGuildStickersParams args
     ) => Routes.ModifyGuildSticker(path.Require<IGuild>(), id, args);
 
-    static IApiOutRoute<IStickerModel> IRefreshable<IGuildSticker, ulong, IStickerModel>.RefreshRoute(
+    static IApiOutRoute<IGuildStickerModel> IRefreshable<IGuildSticker, ulong, IGuildStickerModel>.RefreshRoute(
         IGuildSticker self,
         ulong id) => Routes.GetGuildSticker(self.Require<IGuild>(), id);
 
@@ -31,5 +31,13 @@ public interface IGuildSticker :
     /// </summary>
     ILoadableGuildMemberActor? Author { get; }
 
-    new IStickerModel GetModel();
+    /// <summary>
+    ///     Gets whether this guild sticker can be used, may be false due to loss of Server Boosts.
+    /// </summary>
+    bool? IsAvailable { get; }
+
+    new IGuildStickerModel GetModel();
+
+    new Task RefreshAsync(RequestOptions? options = null, CancellationToken token = default)
+        => ((IRefreshable<IGuildSticker, ulong, IGuildStickerModel>)this).RefreshAsync(options, token);
 }

@@ -53,15 +53,5 @@ public sealed class Role : IRoleModel
 
     int IRoleModel.Flags => Flags;
 
-    ulong? IRoleModel.BotId => Tags.Map(v => v.BotId);
-
-    ulong? IRoleModel.IntegrationId => Tags.Map(v => v.IntegrationId);
-
-    // see https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
-    bool IRoleModel.IsPremiumSubscriberRole => Tags.Map(v => v.IsPremiumSubscriber).IsSpecified;
-    ulong? IRoleModel.SubscriptionListingId => Tags.Map(v => v.SubscriptionListingId);
-
-    bool IRoleModel.AvailableForPurchase => Tags.Map(v => v.IsAvailableForPurchase).IsSpecified;
-
-    bool IRoleModel.IsGuildConnection => Tags.Map(v => v.HasGuildConnections).IsSpecified;
+    IRoleTagsModel? IRoleModel.Tags => ~Tags;
 }

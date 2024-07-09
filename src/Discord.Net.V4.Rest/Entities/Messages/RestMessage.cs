@@ -1,120 +1,246 @@
 using Discord.Models;
+using Discord.Models.Json;
 using Discord.Rest.Channels;
 using Discord.Rest.Guilds;
 using Discord.Rest.Stickers;
-using PropertyChanged;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Rest.Messages;
 
 public partial class RestLoadableMessageActor(
     DiscordRestClient client,
-    GuildIdentity? guild,
-    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel,
-    IIdentifiableEntityOrModel<ulong, RestMessage> message) :
-    RestMessageActor(client, guild, channel, message),
+    MessageChannelIdentity channel,
+    MessageIdentity message,
+    GuildIdentity? guild = null
+) :
+    RestMessageActor(client, channel, message, guild),
     ILoadableMessageActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IMessage>))]
     internal RestLoadable<ulong, RestMessage, IMessage, IMessageModel> Loadable { get; } =
         RestLoadable<ulong, RestMessage, IMessage, IMessageModel>
-            .FromContextConstructable<RestMessage, ulong?>(
+            .FromContextConstructable<RestMessage, GuildIdentity?>(
                 client,
-                id,
-                Routes.GetChannelMessage(channel.Id, id),
+                message,
+                Routes.GetChannelMessage(channel.Id, message.Id),
                 guild
             );
 }
 
 public partial class RestMessageActor(
     DiscordRestClient client,
-    GuildIdentity? guild,
-    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel,
-    IIdentifiableEntityOrModel<ulong, RestMessage> message
-):
-    RestActor<ulong, RestMessage>(client, message.Id),
+    MessageChannelIdentity channel,
+    MessageIdentity message,
+    GuildIdentity? guild = null
+) :
+    RestActor<ulong, RestMessage, MessageIdentity>(client, message),
     IMessageActor
 {
-    public RestLoadableMessageChannelActor Channel { get; } = new(client, guild, channel);
+    public RestLoadableMessageChannelActor Channel { get; } = new(client, channel, guild);
 
     ILoadableMessageChannelActor IMessageChannelRelationship.Channel => Channel;
 
     public IMessage CreateEntity(IMessageModel model)
-        => RestMessage.Construct(client, model, guild);
+        => RestMessage.Construct(Client, model, guild);
 }
 
-public partial class RestMessage(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel>? guild, IMessageModel model, RestMessageActor? actor = null) :
-    RestEntity<ulong>(client, model.Id),
+public partial class RestMessage :
+    RestEntity<ulong>,
     IMessage,
-    INotifyPropertyChanged,
-    IContextConstructable<RestMessage, IMessageModel, ulong?, DiscordRestClient>
+    IConstructable<RestMessage, IMessageModel, DiscordRestClient>,
+    IContextConstructable<RestMessage, IMessageModel, GuildIdentity?, DiscordRestClient>
 {
-    [OnChangedMethod(nameof(OnModelUpdated))]
-    internal IMessageModel Model { get; set; } = model;
-
-    [ProxyInterface(typeof(IMessageActor), typeof(IMessageChannelRelationship))]
-    internal virtual RestMessageActor Actor { get; } = actor ?? new(client, guild, model.ChannelId, model.Id);
-
-    public static RestMessage Construct(DiscordRestClient client, IMessageModel model, ulong? context)
+    internal RestMessage(
+        DiscordRestClient client,
+        IMessageModel model,
+        RestMessageActor? actor = null,
+        GuildIdentity? guild = null,
+        MessageChannelIdentity? channel = null
+    ) : base(client, model.Id)
     {
-        return model.IsWebhook
-            ? RestWebhookMessage.Construct(client, model, context)
-            : new(client, context, model);
+        Model = model;
+
+        Actor = actor ?? new(
+            client,
+            channel ?? MessageChannelIdentity.Of(model.ChannelId),
+            MessageIdentity.Of(this),
+            guild
+        );
+        Author = new(
+            client,
+            UserIdentity.OfNullable(
+                model.GetReferencedEntityModel<ulong, IUserModel>(model.AuthorId),
+                model => RestUser.Construct(client, model)
+            ) ?? UserIdentity.Of(model.AuthorId)
+        );
+        Thread = model is {ThreadId: not null, ThreadGuildId: not null}
+            ? CreateThreadLoadable(client, model, guild)
+            : null;
+        Attachments = model.Attachments.Select(x => Attachment.Construct(client, x)).ToImmutableArray();
+        Embeds = model.Embeds.Select(x => Embed.Construct(client, x)).ToImmutableArray();
+        Activity = model.Activity is not null
+            ? MessageActivity.Construct(client, model.Activity)
+            : null;
+        Application = model.Application is not null
+            ? MessageApplication.Construct(client, model.Application)
+            : null;
+        Reference = model.MessageReference is not null
+            ? MessageReference.Construct(client, model.MessageReference)
+            : null;
+        Reactions = MessageReactions.Construct(client, model.Reactions);
+        Components = model.Components.Select(x => IMessageComponent.Construct(client, x)).ToImmutableArray();
+        Stickers = model.Stickers.Select(x => RestStickerItem.Construct(client, x)).ToImmutableArray();
+        InteractionMetadata = model.InteractionMetadata is not null
+            ? RestMessageInteractionMetadata.Construct(client, model.InteractionMetadata, new RestMessageInteractionMetadata.Context(
+                channel ?? MessageChannelIdentity.Of(model.ChannelId),
+                guild
+            ))
+            : null;
+        RoleSubscriptionData = model.RoleSubscriptionData is not null
+            ? MessageRoleSubscriptionData.Construct(client, model.RoleSubscriptionData)
+            : null;
     }
 
-    private void OnModelUpdated()
+    internal IMessageModel Model { get; set; }
+
+    [ProxyInterface(
+        typeof(IMessageActor),
+        typeof(IMessageChannelRelationship),
+        typeof(IEntityProvider<IMessage, IMessageModel>)
+    )]
+    internal virtual RestMessageActor Actor { get; }
+
+    public static RestMessage Construct(DiscordRestClient client, IMessageModel model)
+    {
+        return model.IsWebhook
+            ? RestWebhookMessage.Construct(client, model)
+            : new RestMessage(client, model);
+    }
+
+    public static RestMessage Construct(DiscordRestClient client, IMessageModel model, GuildIdentity? guild)
+    {
+        return model.IsWebhook
+            ? RestWebhookMessage.Construct(client, model, guild)
+            : new RestMessage(client, model, guild: guild);
+    }
+
+    private static RestLoadableThreadChannelActor? CreateThreadLoadable(
+        DiscordRestClient client,
+        IMessageModel model,
+        GuildIdentity? guild)
+    {
+        var threadIdentity = CreateThreadIdentity(
+            client,
+            model,
+            guild,
+            out var guildIdentity,
+            out var threadChannelModel
+        );
+
+        if (threadIdentity is null)
+            return null;
+
+        return new(
+            client,
+            guildIdentity!,
+            threadIdentity,
+            RestThreadChannel.GetCurrentThreadMemberIdentity(client, guildIdentity!, threadIdentity, threadChannelModel)
+        );
+    }
+
+    private static ThreadIdentity? CreateThreadIdentity(
+        DiscordRestClient client,
+        IMessageModel model,
+        GuildIdentity? guild,
+        out GuildIdentity? guildIdentity,
+        out IThreadChannelModel? threadModel)
+    {
+        if (model.ThreadId is null || model.ThreadGuildId is null)
+        {
+            guildIdentity = null;
+            threadModel = null;
+            return null;
+        }
+
+        var guildIdentityLocal = guildIdentity = guild ?? GuildIdentity.Of(model.ThreadGuildId.Value);
+
+        threadModel = model.GetReferencedEntityModel<ulong, IThreadChannelModel>(model.ThreadId.Value);
+
+
+        return ThreadIdentity.OfNullable(
+            threadModel,
+            model => RestThreadChannel.Construct(client, model, new RestThreadChannel.Context(
+                guildIdentityLocal
+            ))
+        ) ?? ThreadIdentity.Of(model.ThreadId.Value);
+    }
+
+    public async ValueTask UpdateAsync(IMessageModel model, CancellationToken token = default)
     {
         if (Thread?.Id != Model.ThreadId)
         {
-            if (Model is {ThreadId: not null, ThreadGuildId: not null})
-                (Thread ??= new(Client, Model.ThreadGuildId.Value, Model.ThreadId.Value))
-                    .Loadable.Id = Model.ThreadId.Value;
+            if (model is {ThreadId: not null, ThreadGuildId: not null})
+            {
+                if (Thread is null)
+                {
+                    Thread = CreateThreadLoadable(Client, model, Actor.Channel.GuildIdentity);
+                }
+                else
+                {
+                    Thread.Loadable.Identity =
+                        CreateThreadIdentity(Client, model, Actor.Channel.GuildIdentity, out _, out _)!;
+                }
+            }
             else
                 Thread = null;
         }
 
-        if(IsAttachmentsOutOfDate)
-            Attachments = Model.Attachments.Select(x => Attachment.Construct(Client, x)).ToImmutableArray();
+        if (!Model.Attachments.SequenceEqual(model.Attachments))
+            Attachments = model.Attachments.Select(x => Attachment.Construct(Client, x)).ToImmutableArray();
 
-        if(IsEmbedsOutOfDate)
-            Embeds = Model.Embeds.Select(x => Embed.Construct(Client, x)).ToImmutableArray();
+        if (!Model.Embeds.SequenceEqual(model.Embeds))
+            Embeds = model.Embeds.Select(x => Embed.Construct(Client, x)).ToImmutableArray();
 
-        if (IsActivityOutOfDate)
-            Activity = Model.Activity is not null
-                ? MessageActivity.Construct(Client, Model.Activity)
+        if (!Model.Activity?.Equals(model.Activity) ?? model.Activity is not null)
+            Activity = model.Activity is not null
+                ? MessageActivity.Construct(Client, model.Activity)
                 : null;
 
-        if(IsReactionsOutOfDate)
-            Reactions = MessageReactions.Construct(Client, Model.Reactions);
+        if (!Model.Reactions.SequenceEqual(model.Reactions))
+            Reactions = MessageReactions.Construct(Client, model.Reactions);
 
-        if (IsComponentsOutOfDate)
-            Components = Model.Components.Select(x => IMessageComponent.Construct(Client, x)).ToImmutableArray();
+        if (!Model.Components.SequenceEqual(model.Components))
+            Components = model.Components.Select(x => IMessageComponent.Construct(Client, x)).ToImmutableArray();
 
-        if(IsStickersOutOfDate)
-            Stickers = Model.Stickers.Select(x => RestStickerItem.Construct(Client, x)).ToImmutableArray();
+        if (!Model.Stickers.SequenceEqual(model.Stickers))
+            Stickers = model.Stickers.Select(x => RestStickerItem.Construct(Client, x)).ToImmutableArray();
 
-        if (IsApplicationOutOfDate)
-            Application = Model.Application is not null
-                ? MessageApplication.Construct(Client, Model.Application)
+        if (!Model.Application?.Equals(model.Application) ?? model.Application is not null)
+            Application = model.Application is not null
+                ? MessageApplication.Construct(Client, model.Application)
                 : null;
 
-        if(IsReferenceOutOfDate)
-            Reference = Model.MessageReference is not null
-                ? MessageReference.Construct(Client, Model.MessageReference)
+        if (!Model.MessageReference?.Equals(model.MessageReference) ?? model.MessageReference is not null)
+            Reference = model.MessageReference is not null
+                ? MessageReference.Construct(Client, model.MessageReference)
                 : null;
 
-        if (IsInteractionMetadataOutOfDate)
+        if (!Model.InteractionMetadata?.Equals(model.InteractionMetadata) ?? model.InteractionMetadata is not null)
         {
-            if (Model.InteractionMetadata is not null)
+            if (model.InteractionMetadata is not null)
             {
                 InteractionMetadata ??= RestMessageInteractionMetadata.Construct(
                     Client,
-                    Model.InteractionMetadata,
-                    (guildId, Model.ChannelId)
+                    model.InteractionMetadata,
+                    new RestMessageInteractionMetadata.Context(
+                        Actor.Channel.Loadable.Identity,
+                        Actor.Channel.GuildIdentity
+                    )
                 );
 
-                InteractionMetadata.Model = Model.InteractionMetadata;
+                await InteractionMetadata.UpdateAsync(model.InteractionMetadata, token);
             }
             else
             {
@@ -122,21 +248,20 @@ public partial class RestMessage(DiscordRestClient client, IdentifiableEntityOrM
             }
         }
 
-        if(IsRoleSubscriptionDataOutOfDate)
-            RoleSubscriptionData = Model.RoleSubscriptionData is not null
-                ? MessageRoleSubscriptionData.Construct(Client, Model.RoleSubscriptionData)
+        if (!Model.RoleSubscriptionData?.Equals(model.RoleSubscriptionData) ?? model.RoleSubscriptionData is not null)
+            RoleSubscriptionData = model.RoleSubscriptionData is not null
+                ? MessageRoleSubscriptionData.Construct(Client, model.RoleSubscriptionData)
                 : null;
     }
+
+    public IMessageModel GetModel() => Model;
+
 
     #region Loadables
 
     public RestLoadableUserActor Author { get; }
-        = new(client, model.AuthorId, model.GetReferencedEntityModel<ulong, IUserModel>(model.AuthorId));
 
     public RestLoadableThreadChannelActor? Thread { get; private set; }
-        = model.ThreadId.HasValue && model.ThreadGuildId.HasValue
-            ? new(client, model.ThreadGuildId.Value, model.ThreadId.Value)
-            : null;
 
     //public ILoadableThreadActor? Thread => throw new NotImplementedException();
 
@@ -167,55 +292,25 @@ public partial class RestMessage(DiscordRestClient client, IdentifiableEntityOrM
 
     public DateTimeOffset? EditedTimestamp => Model.EditedTimestamp;
 
-    [VersionOn(nameof(Model.Attachments), nameof(model.Attachments))]
     public IReadOnlyCollection<Attachment> Attachments { get; private set; }
-        = model.Attachments.Select(x => Attachment.Construct(client, x)).ToImmutableArray();
 
-    [VersionOn(nameof(Model.Embeds), nameof(model.Embeds))]
     public IReadOnlyCollection<Embed> Embeds { get; private set; }
-        = model.Embeds.Select(x => Embed.Construct(client, x)).ToImmutableArray();
 
-    [VersionOn(nameof(Model.Activity), nameof(model.Activity))]
     public MessageActivity? Activity { get; private set; }
-        = model.Activity is not null
-            ? MessageActivity.Construct(client, model.Activity)
-            : null;
 
-    [VersionOn(nameof(Model.Application), nameof(model.Application))]
     public MessageApplication? Application { get; private set; }
-        = model.Application is not null
-            ? MessageApplication.Construct(client, model.Application)
-            : null;
 
-    [VersionOn(nameof(Model.MessageReference), nameof(model.MessageReference))]
     public MessageReference? Reference { get; private set; }
-        = model.MessageReference is not null
-            ? MessageReference.Construct(client, model.MessageReference)
-            : null;
 
-    [VersionOn(nameof(Model.Reactions), nameof(model.Reactions))]
     public MessageReactions Reactions { get; private set; }
-        = MessageReactions.Construct(client, model.Reactions);
 
-    [VersionOn(nameof(Model.Components), nameof(model.Components))]
     public IReadOnlyCollection<IMessageComponent> Components { get; private set; }
-        = model.Components.Select(x => IMessageComponent.Construct(client, x)).ToImmutableArray();
 
-    [VersionOn(nameof(Model.Stickers), nameof(model.Stickers))]
     public IReadOnlyCollection<RestStickerItem> Stickers { get; private set; }
-        = model.Stickers.Select(x => RestStickerItem.Construct(client, x)).ToImmutableArray();
 
-    [VersionOn(nameof(Model.InteractionMetadata), nameof(model.InteractionMetadata))]
     public RestMessageInteractionMetadata? InteractionMetadata { get; private set; }
-        = model.InteractionMetadata is not null
-            ? RestMessageInteractionMetadata.Construct(client, model.InteractionMetadata, (guildId, model.ChannelId))
-            : null;
 
-    [VersionOn(nameof(Model.RoleSubscriptionData), nameof(model.RoleSubscriptionData))]
     public MessageRoleSubscriptionData? RoleSubscriptionData { get; private set; }
-        = model.RoleSubscriptionData is not null
-            ? MessageRoleSubscriptionData.Construct(client, model.RoleSubscriptionData)
-            : null;
 
     #endregion
 

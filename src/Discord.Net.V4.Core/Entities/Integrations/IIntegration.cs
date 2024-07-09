@@ -1,6 +1,8 @@
+using Discord.Models;
+
 namespace Discord;
 
-public interface IIntegration : IEntity<ulong>, IIntegrationActor
+public interface IIntegration : IIntegrationActor, IEntityOf<IIntegrationModel>
 {
     string Name { get; }
     IntegrationType Type { get; }

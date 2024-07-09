@@ -49,7 +49,7 @@ public interface IMessageRoleSubscriptionData
     bool IsRenewal { get; }
 }
 
-public interface IMessageInteractionMetadataModel
+public interface IMessageInteractionMetadataModel : IEntityModel
 {
     ulong Id { get; }
     int Type { get; }

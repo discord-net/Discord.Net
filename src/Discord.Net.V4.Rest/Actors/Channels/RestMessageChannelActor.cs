@@ -9,25 +9,23 @@ namespace Discord.Rest;
 
 public partial class RestLoadableMessageChannelActor(
     DiscordRestClient client,
-    GuildIdentity? guild,
-    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel) :
-    RestMessageChannelActor(client, guild, channel),
+    MessageChannelIdentity channel
+) :
+    RestMessageChannelActor(client, channel),
     ILoadableMessageChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IMessageChannel>))]
-    internal RestLoadable<ulong, IMessageChannel, IMessageChannel, Channel> Loadable { get; } =
+    internal RestLoadable<ulong, IMessageChannel, IMessageChannel, IChannelModel> Loadable { get; } =
         new(
             client,
             channel,
-            Routes.GetChannel(id),
-            (_, model) =>
+            Routes.GetChannel(channel.Id),
+            (client, _, model) =>
             {
                 if (model is null)
                     return null;
 
-                var entity = guild is not null
-                    ? RestChannel.Construct(client, model, guild)
-                    : RestChannel.Construct(client, model);
+                var entity = RestChannel.Construct(client, model);
 
                 if (entity is not IMessageChannel messageChannel)
                     throw new DiscordException(
@@ -40,13 +38,13 @@ public partial class RestLoadableMessageChannelActor(
 
 public partial class RestMessageChannelActor(
     DiscordRestClient client,
-    GuildIdentity? guild,
-    IIdentifiableEntityOrModel<ulong, RestChannel, IChannelModel> channel) :
-    RestChannelActor(client, channel),
+    MessageChannelIdentity channel
+) :
+    RestChannelActor(client, ChannelIdentity.Of(channel.Id)),
     IMessageChannelActor
 {
     public RestIndexableActor<RestLoadableMessageActor, ulong, RestMessage> Messages { get; } =
-        new(messageId => new(client, guild, channel, messageId));
+        new(messageId => new(client, channel, MessageIdentity.Of(messageId)));
 
     IIndexableActor<ILoadableMessageActor, ulong, IMessage> IMessageChannelActor.Messages => Messages;
 }

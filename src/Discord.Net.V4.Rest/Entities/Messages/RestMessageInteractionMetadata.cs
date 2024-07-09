@@ -1,31 +1,37 @@
 using Discord.Models;
-using PropertyChanged;
 using System.Collections.Immutable;
 
 namespace Discord.Rest.Messages;
 
 public sealed partial class RestMessageInteractionMetadata(
     DiscordRestClient client,
-    ulong? guildId,
-    ulong channelId,
-    IMessageInteractionMetadataModel model
-):
+    MessageChannelIdentity channel,
+    IMessageInteractionMetadataModel model,
+    GuildIdentity? guild = null
+) :
     RestEntity<ulong>(client, model.Id),
     IMessageInteractionMetadata,
-    IContextConstructable<RestMessageInteractionMetadata, IMessageInteractionMetadataModel, (ulong? GuildId, ulong ChannelId), DiscordRestClient>
+    IContextConstructable<RestMessageInteractionMetadata, IMessageInteractionMetadataModel,
+        RestMessageInteractionMetadata.Context, DiscordRestClient>
 {
-    [OnChangedMethod(nameof(OnModelUpdated))]
+    public readonly record struct Context(
+        MessageChannelIdentity Channel,
+        GuildIdentity? Guild = null
+    );
+
     internal IMessageInteractionMetadataModel Model { get; set; } = model;
 
     public static RestMessageInteractionMetadata Construct(
         DiscordRestClient client,
         IMessageInteractionMetadataModel model,
-        (ulong? GuildId, ulong ChannelId) context
-    ) => new(client, context.GuildId, context.ChannelId, model);
+        Context context
+    ) => new(client, context.Channel, model, context.Guild);
 
-    private void OnModelUpdated()
+    public IMessageInteractionMetadataModel GetModel() => Model;
+
+    public ValueTask UpdateAsync(IMessageInteractionMetadataModel model, CancellationToken token = default)
     {
-        if(IsAuthorizingIntegrationOwnersOutOfDate)
+        if (IsAuthorizingIntegrationOwnersOutOfDate)
             AuthorizingIntegrationOwners = Model.AuthorizingIntegrationOwners
                 .ToImmutableDictionary(
                     x => (ApplicationIntegrationType)x.Key,
@@ -36,7 +42,13 @@ public sealed partial class RestMessageInteractionMetadata(
         {
             if (Model.OriginalResponseMessageId.HasValue)
             {
-                OriginalResponseMessage ??= new(Client, guildId, channelId, Model.OriginalResponseMessageId.Value);
+                OriginalResponseMessage ??= new(
+                    Client,
+                    channel,
+                    MessageIdentity.Of(Model.OriginalResponseMessageId.Value),
+                    guild
+                );
+
                 OriginalResponseMessage.Loadable.Id = Model.OriginalResponseMessageId.Value;
             }
             else
@@ -49,7 +61,13 @@ public sealed partial class RestMessageInteractionMetadata(
         {
             if (Model.InteractedMessageId.HasValue)
             {
-                InteractedMessage ??= new(Client, guildId, channelId, Model.InteractedMessageId.Value);
+                InteractedMessage ??= new(
+                    Client,
+                    channel,
+                    MessageIdentity.Of(Model.InteractedMessageId.Value),
+                    guild
+                );
+
                 InteractedMessage.Loadable.Id = Model.InteractedMessageId.Value;
             }
             else
@@ -57,12 +75,20 @@ public sealed partial class RestMessageInteractionMetadata(
                 InteractedMessage = null;
             }
         }
+
+        return ValueTask.CompletedTask;
     }
 
     public InteractionType Type => (InteractionType)Model.Type;
 
     public RestLoadableUserActor User { get; }
-        = new(client, model.UserId);
+        = new(
+            client,
+            UserIdentity.OfNullable(
+                model.GetReferencedEntityModel<ulong, IUserModel>(model.UserId),
+                model => RestUser.Construct(client, model)
+            ) ?? UserIdentity.Of(model.UserId)
+        );
 
     [VersionOn(nameof(Model.AuthorizingIntegrationOwners), nameof(model.AuthorizingIntegrationOwners))]
     public IReadOnlyDictionary<ApplicationIntegrationType, ulong> AuthorizingIntegrationOwners { get; private set; }
@@ -70,18 +96,26 @@ public sealed partial class RestMessageInteractionMetadata(
             .ToImmutableDictionary(x => (ApplicationIntegrationType)x.Key, x => x.Value);
 
     public RestLoadableMessageActor? OriginalResponseMessage { get; private set; }
-        = model.OriginalResponseMessageId.HasValue
-            ? new(client, guildId, channelId, model.OriginalResponseMessageId.Value)
-            : null;
+        = model.OriginalResponseMessageId.Map(
+            static (id, client, channel, guild)
+                => new RestLoadableMessageActor(client, channel, MessageIdentity.Of(id), guild),
+            client,
+            channel,
+            guild
+        );
 
     public RestLoadableMessageActor? InteractedMessage { get; private set; }
-        = model.InteractedMessageId.HasValue
-            ? new(client, guildId, channelId, model.InteractedMessageId.Value)
-            : null;
+        = model.InteractedMessageId.Map(
+            static (id, client, channel, guild)
+                => new RestLoadableMessageActor(client, channel, MessageIdentity.Of(id), guild),
+            client,
+            channel,
+            guild
+        );
 
     public RestMessageInteractionMetadata? TriggeringInteractionMetadata { get; }
         = model.TriggeringInteractionMetadata is not null
-            ? Construct(client, model.TriggeringInteractionMetadata, (guildId, channelId))
+            ? Construct(client, model.TriggeringInteractionMetadata, new Context(channel, guild))
             : null;
 
     ILoadableUserActor IMessageInteractionMetadata.User => User;

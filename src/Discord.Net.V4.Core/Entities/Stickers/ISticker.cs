@@ -6,7 +6,9 @@ namespace Discord;
 /// <summary>
 ///     Represents a discord sticker.
 /// </summary>
-public interface ISticker : ISnowflakeEntity, IRefreshable<ISticker, ulong, IStickerModel>
+public interface ISticker :
+    ISnowflakeEntity,
+    IRefreshable<ISticker, ulong, IStickerModel>
 {
     static IApiOutRoute<IStickerModel> IRefreshable<ISticker, ulong, IStickerModel>.RefreshRoute(
         ISticker self,
@@ -51,11 +53,6 @@ public interface ISticker : ISnowflakeEntity, IRefreshable<ISticker, ulong, ISti
     ///     Gets the type of this sticker.
     /// </summary>
     StickerType Type { get; }
-
-    /// <summary>
-    ///     Gets whether this guild sticker can be used, may be false due to loss of Server Boosts.
-    /// </summary>
-    bool? IsAvailable { get; }
 
     /// <summary>
     ///     Gets the standard sticker's sort order within its pack.

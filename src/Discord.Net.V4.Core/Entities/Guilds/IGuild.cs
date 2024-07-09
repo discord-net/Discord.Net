@@ -104,7 +104,7 @@ public interface IGuild :
     /// </returns>
     string? DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Client.Config, Id, DiscoverySplashId);
 
-    ILoadableTextChannelActor? AFKChannel { get; }
+    ILoadableVoiceChannelActor? AFKChannel { get; }
     ILoadableTextChannelActor? WidgetChannel { get; }
     ILoadableTextChannelActor? SafetyAlertsChannel { get; }
     ILoadableTextChannelActor? SystemChannel { get; }

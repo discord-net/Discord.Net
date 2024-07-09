@@ -1,7 +1,6 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Guilds;
-using PropertyChanged;
 using System.Collections.Immutable;
 
 namespace Discord.Rest.Channels;
@@ -63,7 +62,7 @@ public partial class RestForumChannel :
     ) : base(client, guild, model, actor)
     {
         _model = model;
-        ChannelActor = actor ?? new(client, guild, this.Identity<ulong, RestForumChannel, IGuildForumChannelModel>());
+        ChannelActor = actor ?? new(client, guild, ForumChannelIdentity.Of(this));
 
         AvailableTags = model.AvailableTags
             .Select(x => ForumTag.Construct(client, x, new ForumTag.Context(guild.Id)))

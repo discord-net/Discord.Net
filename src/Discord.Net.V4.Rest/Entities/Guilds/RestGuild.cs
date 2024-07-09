@@ -1,17 +1,19 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Channels;
+using Discord.Rest.Extensions;
 using Discord.Rest.Guilds.Integrations;
 using System.Globalization;
 
 namespace Discord.Rest.Guilds;
 
-public partial class RestLoadableGuildActor(DiscordRestClient client, GuildIdentity guild) :
-    RestGuildActor(client, guild.Id),
+public partial class RestLoadableGuildActor(
+    DiscordRestClient client,
+    GuildIdentity guild
+) :
+    RestGuildActor(client, guild),
     ILoadableGuildActor
 {
-    internal GuildIdentity Identity { get; } = guild;
-
     [ProxyInterface(typeof(ILoadableEntity<IGuild>))]
     internal RestLoadable<ulong, RestGuild, IGuild, IGuildModel> Loadable { get; } =
         RestLoadable<ulong, RestGuild, IGuild, IGuildModel>.FromConstructable<RestGuild>(
@@ -26,26 +28,36 @@ public partial class RestLoadableGuildActor(DiscordRestClient client, GuildIdent
     typeof(IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams>),
     typeof(IDeletable<ulong, IGuildActor>)
 )]
-public partial class RestGuildActor(DiscordRestClient client, IdentifiableEntityOrModel<ulong, RestGuild, IGuildModel> guild) :
-    RestActor<ulong, RestGuild>(client, guild.Id),
+public partial class RestGuildActor(
+    DiscordRestClient client,
+    GuildIdentity guild
+) :
+    RestActor<ulong, RestGuild, GuildIdentity>(client, guild),
     IGuildActor
 {
-    public RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IEnumerable<IIntegrationModel>> Integrations
+    public RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IEnumerable<IIntegrationModel>>
+        Integrations
     {
         get;
-    } = RestActors.Integrations(client, id, guild);
+    } = RestActors.Integrations(client, guild);
 
-    public RestPagedIndexableActor<RestLoadableBanActor, ulong, RestBan, IEnumerable<IBanModel>, PageGuildBansParams> Bans { get; }
-        = RestActors.Bans(client, id);
+    public RestPagedIndexableActor<RestLoadableBanActor, ulong, RestBan, IEnumerable<IBanModel>, PageGuildBansParams>
+        Bans { get; }
+        = RestActors.Bans(client, guild);
 
-    public IEnumerableIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels { get; }
+    public RestEnumerableIndexableActor<RestLoadableStageChannelActor, ulong, RestStageChannel, IEnumerable<IChannelModel>> StageChannels { get; }
         = RestActors.StageChannels(client, guild);
 
-    public IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ActiveThreads => throw new NotImplementedException();
+    IEnumerableIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> IGuildActor.StageChannels => StageChannels;
 
-    public IEnumerableIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ActiveThreads =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels =>
+        throw new NotImplementedException();
+
+    public IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels =>
+        throw new NotImplementedException();
 
     public RestPagedIndexableActor<RestLoadableGuildMemberActor, ulong, RestGuildMember, IEnumerable<IMemberModel>,
         PageGuildMembersParams> Members
@@ -53,15 +65,19 @@ public partial class RestGuildActor(DiscordRestClient client, IdentifiableEntity
         get;
     } = RestActors.Members(client, id);
 
-    public IEnumerableIndexableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes =>
+        throw new NotImplementedException();
 
     public IEnumerableIndexableActor<IRoleActor, ulong, IRole> Roles => throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<ILoadableGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites =>
+        throw new NotImplementedException();
 
     IPagedIndexableActor<ILoadableGuildBanActor, ulong, IBan, PageGuildBansParams> IGuildActor.Bans => Bans;
 
@@ -69,58 +85,36 @@ public partial class RestGuildActor(DiscordRestClient client, IdentifiableEntity
         Members;
 
     IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> IGuildActor.Integrations => Integrations;
+
+    IGuild IEntityProvider<IGuild, IGuildModel>.CreateEntity(IGuildModel model)
+        => RestGuild.Construct(Client, model);
 }
 
-public partial class RestGuild(DiscordRestClient client, IGuildModel model, RestGuildActor? actor = null) :
-    RestPartialGuild(client, model),
+public sealed partial class RestGuild :
+    RestPartialGuild,
     IGuild,
     IConstructable<RestGuild, IGuildModel, DiscordRestClient>
 {
-    protected override IGuildModel Model { get; } = model;
+    public RestLoadableVoiceChannelActor? AFKChannel { get; private set; }
 
-    [ProxyInterface(typeof(IGuildActor))]
-    protected virtual RestGuildActor Actor { get; } = actor ?? new(client, model.Id);
+    public RestLoadableTextChannelActor? WidgetChannel { get; private set;}
 
-    public static RestGuild Construct(DiscordRestClient client, IGuildModel model)
-        => new(client, model);
+    public RestLoadableTextChannelActor? SafetyAlertsChannel { get; private set;}
 
-    #region Loadables
+    public RestLoadableTextChannelActor? SystemChannel { get; private set;}
 
-    public RestLoadableTextChannelActor? AFKChannel { get; } = model.AFKChannelId.HasValue
-        ? new(client, model.Id, model.AFKChannelId.Value)
-        : null;
+    public RestLoadableTextChannelActor? RulesChannel { get; private set;}
 
-    public RestLoadableTextChannelActor? WidgetChannel { get; } = model.WidgetChannelId.HasValue
-        ? new(client, model.Id, model.WidgetChannelId.Value)
-        : null;
+    public RestLoadableTextChannelActor? PublicUpdatesChannel { get; private set;}
 
-    public RestLoadableTextChannelActor? SafetyAlertsChannel { get; } = model.SafetyAlertsChannelId.HasValue
-        ? new(client, model.Id, model.SafetyAlertsChannelId.Value)
-        : null;
-
-    public RestLoadableTextChannelActor? SystemChannel { get; } = model.SystemChannelId.HasValue
-        ? new(client, model.Id, model.SystemChannelId.Value)
-        : null;
-
-    public RestLoadableTextChannelActor? RulesChannel { get; } = model.RulesChannelId.HasValue
-        ? new(client, model.Id, model.RulesChannelId.Value)
-        : null;
-
-    public RestLoadableTextChannelActor? PublicUpdatesChannel { get; } = model.PublicUpdatesChannelId.HasValue
-        ? new(client, model.Id, model.PublicUpdatesChannelId.Value)
-        : null;
-
-    public RestLoadableGuildMemberActor Owner { get; } = new(client, model.Id, model.OwnerId);
-
-    #endregion
-
-    #region Properties
+    public RestLoadableGuildMemberActor Owner { get; private set; }
 
     public int AFKTimeout => Model.AFKTimeout;
 
     public bool IsWidgetEnabled => Model.WidgetEnabled;
 
-    public DefaultMessageNotifications DefaultMessageNotifications => (DefaultMessageNotifications)Model.DefaultMessageNotifications;
+    public DefaultMessageNotifications DefaultMessageNotifications =>
+        (DefaultMessageNotifications)Model.DefaultMessageNotifications;
 
     public MfaLevel MfaLevel => (MfaLevel)Model.MFALevel;
 
@@ -160,9 +154,161 @@ public partial class RestGuild(DiscordRestClient client, IGuildModel model, Rest
 
     public ulong? ApplicationId => Model.ApplicationId;
 
-    #endregion
+    internal override IGuildModel Model => _model;
 
-    ILoadableTextChannelActor? IGuild.AFKChannel => AFKChannel;
+    [ProxyInterface(
+        typeof(IGuildActor),
+        typeof(IEntityProvider<IGuild, IGuildModel>)
+    )]
+    internal RestGuildActor Actor { get; }
+
+    private IGuildModel _model;
+
+    internal RestGuild(DiscordRestClient client,
+        IGuildModel model,
+        RestGuildActor? actor = null) : base(client, model)
+    {
+        _model = model;
+        Actor = actor ?? new(client, GuildIdentity.Of(this));
+
+        AFKChannel = model.AFKChannelId
+            .Map(
+                static (id, client, identity) => new RestLoadableVoiceChannelActor(
+                    client,
+                    identity,
+                    VoiceChannelIdentity.Of(id)
+                ),
+                client,
+                Actor.Identity
+            );
+
+        WidgetChannel = model.WidgetChannelId
+            .Map(
+                static (id, client, identity) => new RestLoadableTextChannelActor(
+                    client,
+                    identity,
+                    TextChannelIdentity.Of(id)
+                ),
+                client,
+                Actor.Identity
+            );
+
+        SafetyAlertsChannel = model.SafetyAlertsChannelId
+            .Map(
+                static (id, client, identity) => new RestLoadableTextChannelActor(
+                    client,
+                    identity,
+                    TextChannelIdentity.Of(id)
+                ),
+                client,
+                Actor.Identity
+            );
+
+        SystemChannel = model.SystemChannelId
+            .Map(
+                static (id, client, identity) => new RestLoadableTextChannelActor(
+                    client,
+                    identity,
+                    TextChannelIdentity.Of(id)
+                ),
+                client,
+                Actor.Identity
+            );
+
+        RulesChannel = model.RulesChannelId
+            .Map(
+                static (id, client, identity) => new RestLoadableTextChannelActor(
+                    client,
+                    identity,
+                    TextChannelIdentity.Of(id)
+                ),
+                client,
+                Actor.Identity
+            );
+
+        PublicUpdatesChannel = model.PublicUpdatesChannelId
+            .Map(
+                static (id, client, identity) => new RestLoadableTextChannelActor(
+                    client,
+                    identity,
+                    TextChannelIdentity.Of(id)
+                ),
+                client,
+                Actor.Identity
+            );
+
+        Owner = new(client, Actor.Identity, MemberIdentity.Of(model.OwnerId));
+    }
+
+    public static RestGuild Construct(DiscordRestClient client, IGuildModel model)
+        => new(client, model);
+
+    public ValueTask UpdateAsync(IGuildModel model, CancellationToken token = default)
+    {
+        AFKChannel = AFKChannel.UpdateFrom(
+            model.AFKChannelId,
+            RestLoadableVoiceChannelActor.Factory,
+            VoiceChannelIdentity.Of,
+            Client,
+            Actor.Identity
+        );
+
+        WidgetChannel = WidgetChannel.UpdateFrom(
+            model.WidgetChannelId,
+            RestLoadableTextChannelActor.Factory,
+            TextChannelIdentity.Of,
+            Client,
+            Actor.Identity
+        );
+
+        SafetyAlertsChannel = SafetyAlertsChannel.UpdateFrom(
+            model.SafetyAlertsChannelId,
+            RestLoadableTextChannelActor.Factory,
+            TextChannelIdentity.Of,
+            Client,
+            Actor.Identity
+        );
+
+        SystemChannel = SystemChannel.UpdateFrom(
+            model.SystemChannelId,
+            RestLoadableTextChannelActor.Factory,
+            TextChannelIdentity.Of,
+            Client,
+            Actor.Identity
+        );
+
+        RulesChannel = RulesChannel.UpdateFrom(
+            model.RulesChannelId,
+            RestLoadableTextChannelActor.Factory,
+            TextChannelIdentity.Of,
+            Client,
+            Actor.Identity
+        );
+
+        PublicUpdatesChannel = PublicUpdatesChannel.UpdateFrom(
+            model.PublicUpdatesChannelId,
+            RestLoadableTextChannelActor.Factory,
+            TextChannelIdentity.Of,
+            Client,
+            Actor.Identity
+        );
+
+        Owner = Owner.UpdateFrom(
+            model.OwnerId,
+            RestLoadableGuildMemberActor.Factory,
+            MemberIdentity.Of,
+            Client,
+            Actor.Identity
+        );
+
+        _model = model;
+
+        return ValueTask.CompletedTask;
+    }
+
+    public IGuildModel GetModel() => Model;
+
+    ILoadableVoiceChannelActor? IGuild.AFKChannel => AFKChannel;
     ILoadableTextChannelActor? IGuild.WidgetChannel => WidgetChannel;
     ILoadableTextChannelActor? IGuild.SafetyAlertsChannel => SafetyAlertsChannel;
     ILoadableTextChannelActor? IGuild.SystemChannel => SystemChannel;

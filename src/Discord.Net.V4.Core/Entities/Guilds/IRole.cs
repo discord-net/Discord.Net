@@ -106,7 +106,7 @@ public interface IRole :
     /// <returns>
     ///     A <see cref="RoleTags" /> object containing all tags related to this role.
     /// </returns>
-    RoleTags Tags { get; }
+    RoleTags? Tags { get; }
 
     /// <summary>
     ///     Gets flags related to this role.
