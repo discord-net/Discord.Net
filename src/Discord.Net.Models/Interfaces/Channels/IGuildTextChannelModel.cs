@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IGuildTextChannelModel : IThreadableChannelModel
+[ModelEquality]
+public partial interface IGuildTextChannelModel : IThreadableChannelModel
 {
     int RatelimitPerUser { get; }
     bool IsNsfw { get; }

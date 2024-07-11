@@ -10,6 +10,7 @@
     <RootNamespace>Discord.Rest</RootNamespace>
     <EnablePreviewFeatures>true</EnablePreviewFeatures>
     <NoWarn>CA2252</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -29,5 +30,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Entities\Modeling\" />
   </ItemGroup>
 </Project>

@@ -9,13 +9,13 @@ namespace Discord.Rest;
 internal static partial class RestActors
 {
     public static
-        RestEnumerableIndexableActor<RestLoadableStageChannelActor, ulong, RestStageChannel, IEnumerable<IChannelModel>>
+        RestEnumerableIndexableActor<RestLoadableStageChannelActor, ulong, RestStageChannel, IStageChannel, IEnumerable<IChannelModel>>
         StageChannels(
             DiscordRestClient client,
             GuildIdentity guild
         )
     {
-        return GuildChannel<RestLoadableStageChannelActor, RestStageChannel, IGuildStageChannelModel>(
+        return GuildChannel<RestLoadableStageChannelActor, RestStageChannel, IStageChannel, IGuildStageChannelModel>(
             client,
             guild,
             id => new RestLoadableStageChannelActor(client, guild, id),
@@ -23,18 +23,19 @@ internal static partial class RestActors
         );
     }
 
-    public static RestEnumerableIndexableActor<TChannelActor, ulong, TChannel, IEnumerable<IChannelModel>>
-        GuildChannel<TChannelActor, TChannel, TChannelModel>(
+    public static RestEnumerableIndexableActor<TChannelActor, ulong, TRestChannel, TCoreChannel, IEnumerable<IChannelModel>>
+        GuildChannel<TChannelActor, TRestChannel, TCoreChannel, TChannelModel>(
             DiscordRestClient client,
             GuildIdentity guild,
             Func<ulong, TChannelActor> actorFactory,
-            Func<TChannelModel, TChannel> factory
+            Func<TChannelModel, TRestChannel> factory
         )
-        where TChannel : RestGuildChannel
-        where TChannelActor : RestGuildChannelActor, IActor<ulong, TChannel>
+        where TRestChannel : RestGuildChannel, TCoreChannel
+        where TCoreChannel : class, IGuildChannel
+        where TChannelActor : RestGuildChannelActor, IActor<ulong, TRestChannel>
         where TChannelModel : class, IGuildChannelModel
     {
-        return new RestEnumerableIndexableActor<TChannelActor, ulong, TChannel, IEnumerable<IChannelModel>>(
+        return new RestEnumerableIndexableActor<TChannelActor, ulong, TRestChannel, TCoreChannel, IEnumerable<IChannelModel>>(
             client,
             actorFactory,
             models => models.OfType<TChannelModel>().Select(factory),
@@ -42,12 +43,12 @@ internal static partial class RestActors
         );
     }
 
-    public static RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IEnumerable<IIntegrationModel>>
+    public static RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IIntegration, IEnumerable<IIntegrationModel>>
         Integrations(
             DiscordRestClient client,
             GuildIdentity guild)
     {
-        return new RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IEnumerable<IIntegrationModel>>(
+        return new RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IIntegration, IEnumerable<IIntegrationModel>>(
             client,
             integrationId => new RestIntegrationActor(client, guild, IntegrationIdentity.Of(integrationId)),
             model => model.Select(x => RestIntegration.Construct(client, x, guild)),

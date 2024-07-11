@@ -2,7 +2,8 @@ using System.Numerics;
 
 namespace Discord.Models;
 
-public interface IRoleModel : IEntityModel<ulong>
+[ModelEquality]
+public partial interface IRoleModel : IEntityModel<ulong>
 {
     string Name { get; }
     uint Color { get; }

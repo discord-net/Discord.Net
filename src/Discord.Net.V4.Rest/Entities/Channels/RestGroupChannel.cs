@@ -63,7 +63,7 @@ public partial class RestGroupChannel :
         typeof(IMessageChannelActor),
         typeof(IEntityProvider<IGroupChannel, IGroupDMChannelModel>)
     )]
-    internal override RestGroupChannelActor ChannelActor { get; }
+    internal override RestGroupChannelActor Actor { get; }
 
     private IGroupDMChannelModel _model;
 
@@ -74,7 +74,7 @@ public partial class RestGroupChannel :
     ) : base(client, model)
     {
         _model = model;
-        ChannelActor = actor ?? new(client, this);
+        Actor = actor ?? new(client, this);
     }
 
     public static RestGroupChannel Construct(DiscordRestClient client, IGroupDMChannelModel model)

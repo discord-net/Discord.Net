@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IStickerModel : IEntityModel<ulong>
+[ModelEquality]
+public partial interface IStickerModel : IEntityModel<ulong>
 {
     ulong? PackId { get; }
     string Name { get; }

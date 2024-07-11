@@ -1,12 +1,13 @@
+using Discord.Models;
 using Discord.Models.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Discord.Converters;
 
-public sealed class EmoteConverter : JsonConverter<IEmote>
+public sealed class EmoteConverter : JsonConverter<IEmoteModel>
 {
-    public override IEmote? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override IEmoteModel? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var doc = JsonDocument.ParseValue(ref reader).RootElement;
 
@@ -19,7 +20,7 @@ public sealed class EmoteConverter : JsonConverter<IEmote>
         throw new JsonException("No emoji could be deserialized, missing id/name");
     }
 
-    public override void Write(Utf8JsonWriter writer, IEmote value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, IEmoteModel value, JsonSerializerOptions options)
     {
         JsonSerializer.Serialize(writer, value, options);
     }

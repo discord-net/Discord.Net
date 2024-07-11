@@ -41,10 +41,11 @@ public partial class RestTextChannelActor(
     TextChannelIdentity channel
 ):
     RestThreadableChannelActor(client, guild, channel),
-    ITextChannelActor
+    ITextChannelActor,
+    IActor<ulong, RestTextChannel>
 {
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel, guild);
+    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
 
     public ITextChannel CreateEntity(IGuildTextChannelModel model)
         => RestTextChannel.Construct(Client, model, Guild.Identity);
@@ -57,13 +58,16 @@ public partial class RestTextChannel :
 {
     public ILoadableEntity<ulong, ICategoryChannel>? Category => throw new NotImplementedException();
 
-    public bool IsNsfw => Model.IsNsfw;
+    public bool IsNsfw => ModelSource.Value.IsNsfw;
 
-    public string? Topic => Model.Topic;
+    public string? Topic => ModelSource.Value.Topic;
 
-    public int SlowModeInterval => Model.RatelimitPerUser;
+    public int SlowModeInterval => ModelSource.Value.RatelimitPerUser;
 
-    internal override IGuildTextChannelModel Model => _model;
+    public new IGuildTextChannelModel GetModel() => ModelSource.Value;
+
+    [SourceOfTruth]
+    internal new IModelSource<IGuildTextChannelModel> ModelSource { get; }
 
     [ProxyInterface(
         typeof(ITextChannelActor),
@@ -71,9 +75,7 @@ public partial class RestTextChannel :
         typeof(IThreadableChannelActor),
         typeof(IEntityProvider<ITextChannel, IGuildTextChannelModel>)
     )]
-    internal override RestTextChannelActor ChannelActor { get; }
-
-    private IGuildTextChannelModel _model;
+    internal override RestTextChannelActor Actor { get; }
 
     internal RestTextChannel(
         DiscordRestClient client,
@@ -82,19 +84,13 @@ public partial class RestTextChannel :
         RestTextChannelActor? actor = null
     ) : base(client, guild, model, actor)
     {
-        _model = model;
-        ChannelActor = actor ?? new(client, guild, TextChannelIdentity.Of(this));
+        ModelSource = base.ModelSource.OfDescendingType(model, this);
+        Actor = actor ?? new(client, guild, TextChannelIdentity.Of(this));
     }
 
     public static RestTextChannel Construct(DiscordRestClient client, IGuildTextChannelModel model, GuildIdentity guild)
         => new(client, guild, model);
 
     public ValueTask UpdateAsync(IGuildTextChannelModel model, CancellationToken token = default)
-    {
-        _model = model;
-
-        return base.UpdateAsync(model, token);
-    }
-
-    public override IGuildTextChannelModel GetModel() => Model;
+        => ModelSource.PropagateUpdatesAsync(model, token);
 }

@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IGuildVoiceChannelModel : IGuildChannelModel, IAudioChannelModel
+[ModelEquality]
+public partial interface IGuildVoiceChannelModel : IGuildChannelModel, IAudioChannelModel
 {
     int RatelimitPerUser { get; }
     bool IsNsfw { get; }

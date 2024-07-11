@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IThreadableChannelModel : IGuildChannelModel
+[ModelEquality]
+public partial interface IThreadableChannelModel : IGuildChannelModel
 {
     int DefaultAutoArchiveDuration { get; }
     int? DefaultThreadRateLimitPerUser { get; }

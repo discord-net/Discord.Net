@@ -24,17 +24,18 @@ public sealed class RestEnumerableActor<TId, TEntity, TModel>(
     }
 }
 
-public sealed class RestEnumerableIndexableActor<TActor, TId, TEntity, TModel>(
+public sealed class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TModel>(
     DiscordRestClient client,
     Func<TId, TActor> actorFactory,
     Func<TModel, IEnumerable<TEntity>> factory,
     IApiOutRoute<TModel> route
 ):
-    IEnumerableIndexableActor<TActor, TId, TEntity>
-    where TEntity : RestEntity<TId>
+    IEnumerableIndexableActor<TActor, TId, TCore>
+    where TEntity : RestEntity<TId>, TCore
     where TId : IEquatable<TId>
     where TModel : class
     where TActor : IActor<TId, TEntity>
+    where TCore : class, IEntity<TId>
 {
     internal RestIndexableActor<TActor, TId, TEntity> IndexableActor { get; } = new(actorFactory);
 
@@ -49,4 +50,8 @@ public sealed class RestEnumerableIndexableActor<TActor, TId, TEntity, TModel>(
     }
 
     public TActor Specifically(TId id) => IndexableActor.Specifically(id);
+    async Task<IReadOnlyCollection<TCore>> IEnumerableActor<TId, TCore>.AllAsync(
+        RequestOptions? options,
+        CancellationToken token
+    ) => await AllAsync(options, token);
 }

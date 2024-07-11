@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IGuildChannelModel : IChannelModel
+[ModelEquality]
+public partial interface IGuildChannelModel : IChannelModel
 {
     ulong GuildId { get; }
     ulong? ParentId { get; }

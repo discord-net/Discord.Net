@@ -9,12 +9,16 @@ using IModifiable = IModifiable<ulong, ISelfUser, ModifySelfUserProperties, Modi
 /// <summary>
 ///     Represents the logged-in Discord user.
 /// </summary>
-public interface ISelfUser :
+public partial interface ISelfUser :
     IUser,
     ISelfUserActor,
     IModifiable,
     IRefreshable<ISelfUser, ulong, ISelfUserModel>
 {
+    [SourceOfTruth]
+    new Task RefreshAsync(RequestOptions? options, CancellationToken token)
+        => (this as IRefreshable<ISelfUser, ulong, ISelfUserModel>).RefreshAsync(options, token);
+
     static IApiOutRoute<ISelfUserModel> IRefreshable<ISelfUser, ulong, ISelfUserModel>.RefreshRoute(
         ISelfUser self,
         ulong id
@@ -78,4 +82,9 @@ public interface ISelfUser :
     ///     For example, a locale of "English, US" is "en-US", "Chinese (Taiwan)" is "zh-TW", etc.
     /// </returns>
     string Locale { get; }
+
+    [SourceOfTruth]
+    new ISelfUserModel GetModel();
+
+
 }

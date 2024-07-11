@@ -34,7 +34,8 @@ public partial class RestMediaChannelActor(
     IdentifiableEntityOrModel<ulong, RestMediaChannel, IGuildMediaChannelModel> channel
 ):
     RestThreadableChannelActor(client, guild, channel),
-    IMediaChannelActor
+    IMediaChannelActor,
+    IActor<ulong, RestMediaChannel>
 {
     public IMediaChannel CreateEntity(IGuildMediaChannelModel model)
         => RestMediaChannel.Construct(Client, model, Guild.Identity);
@@ -68,7 +69,7 @@ public partial class RestMediaChannel :
         typeof(IThreadableChannelActor),
         typeof(IEntityProvider<IMediaChannel, IGuildMediaChannelModel>)
     )]
-    internal override RestMediaChannelActor ChannelActor { get; }
+    internal override RestMediaChannelActor Actor { get; }
 
     private IGuildMediaChannelModel _model;
 
@@ -81,7 +82,7 @@ public partial class RestMediaChannel :
     {
         _model = model;
 
-        ChannelActor = actor ?? new(client, guild, this);
+        Actor = actor ?? new(client, guild, this);
 
         AvailableTags = model.AvailableTags
             .Select(x => ForumTag.Construct(client, x, new ForumTag.Context(guild.Id)))

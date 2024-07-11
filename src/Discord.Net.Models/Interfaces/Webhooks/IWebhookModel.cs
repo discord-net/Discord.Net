@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IWebhookModel : IEntityModel<ulong>
+[ModelEquality]
+public partial interface IWebhookModel : IEntityModel<ulong>
 {
     int Type { get; }
     ulong? GuildId { get; }

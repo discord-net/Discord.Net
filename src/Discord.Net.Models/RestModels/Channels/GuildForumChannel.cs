@@ -20,7 +20,7 @@ public sealed class GuildForumChannel : GuildChannelBase, IGuildForumChannelMode
 
     int? IThreadableChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
 
-    IEmote? IGuildForumChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
+    IEmoteModel? IGuildForumChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
 
     IEnumerable<ITagModel> IGuildForumChannelModel.AvailableTags => AvailableTags | [];
 }

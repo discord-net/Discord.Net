@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IUserConnectionModel : IEntityModel<string>
+[ModelEquality]
+public partial interface IUserConnectionModel : IEntityModel<string>
 {
     string Name { get; }
     string Type { get; }

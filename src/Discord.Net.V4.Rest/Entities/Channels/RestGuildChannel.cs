@@ -60,9 +60,9 @@ public partial class RestGuildChannel :
     IGuildChannel,
     IContextConstructable<RestGuildChannel, IGuildChannelModel, GuildIdentity, DiscordRestClient>
 {
-    public int Position => Model.Position;
+    public int Position => ModelSource.Value.Position;
 
-    public ChannelFlags Flags => (ChannelFlags?)Model.Flags ?? ChannelFlags.None;
+    public ChannelFlags Flags => (ChannelFlags?)ModelSource.Value.Flags ?? ChannelFlags.None;
 
     public IReadOnlyCollection<Overwrite> PermissionOverwrites { get; private set; }
 
@@ -73,7 +73,7 @@ public partial class RestGuildChannel :
         typeof(IGuildRelationship),
         typeof(IEntityProvider<IGuildChannel, IGuildChannelModel>)
     )]
-    internal override RestGuildChannelActor ChannelActor { get; }
+    internal override RestGuildChannelActor Actor { get; }
 
     private IGuildChannelModel _model;
 
@@ -85,7 +85,8 @@ public partial class RestGuildChannel :
     ) : base(client, model)
     {
         _model = model;
-        ChannelActor = actor ?? new RestGuildChannelActor(
+
+        Actor = actor ?? new RestGuildChannelActor(
             client,
             guild,
             GuildChannelIdentity.Of(this)
@@ -116,11 +117,12 @@ public partial class RestGuildChannel :
         };
     }
 
-    public ValueTask UpdateAsync(IGuildChannelModel model, CancellationToken token = default)
+    [CovariantOverride]
+    public virtual ValueTask UpdateAsync(IGuildChannelModel model, CancellationToken token = default)
     {
-        if (!_model.Permissions.SequenceEqual(model.Permissions))
+        if (!Model.Permissions.SequenceEqual(model.Permissions))
         {
-            PermissionOverwrites = _model.Permissions
+            PermissionOverwrites = model.Permissions
                 .Select(x => Overwrite.Construct(Client, x))
                 .ToImmutableArray();
         }
@@ -129,6 +131,5 @@ public partial class RestGuildChannel :
 
         return base.UpdateAsync(model, token);
     }
-
     public override IGuildChannelModel GetModel() => Model;
 }

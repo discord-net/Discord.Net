@@ -1,6 +1,11 @@
+using Discord.Converters;
+using System.Text.Json.Serialization;
+
 namespace Discord.Models;
 
-public interface IEmoteModel : IEntityModel
+[ModelEquality]
+[JsonConverter(typeof(EmoteConverter))]
+public partial interface IEmoteModel : IEntityModel
 {
-
+    string? Name { get; }
 }

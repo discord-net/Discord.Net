@@ -7,7 +7,7 @@ namespace Discord;
 using IModifiable =
     IModifiable<ulong, IVoiceChannel, ModifyVoiceChannelProperties, ModifyGuildChannelParams, IGuildVoiceChannelModel>;
 
-public interface IVoiceChannel :
+public partial interface IVoiceChannel :
     IMessageChannel,
     IGuildChannel,
     IAudioChannel,
@@ -45,5 +45,8 @@ public interface IVoiceChannel :
     /// </summary>
     VideoQualityMode VideoQualityMode { get; }
 
+    [SourceOfTruth]
     new IGuildVoiceChannelModel GetModel();
+
+
 }

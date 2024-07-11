@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildEmote : IEmote, IGuildEmoteModel, IEntityModelSource
+public sealed class GuildEmote : IGuildEmoteModel, IEntityModelSource
 {
     [JsonPropertyName("id")]
     public required ulong Id { get; set; }

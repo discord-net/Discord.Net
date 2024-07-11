@@ -1,3 +1,5 @@
 namespace Discord.Models;
 
-public interface IGuildCategoryChannelModel : IGuildChannelModel;
+[ModelEquality]
+public partial interface IGuildCategoryChannelModel : IGuildChannelModel;
+

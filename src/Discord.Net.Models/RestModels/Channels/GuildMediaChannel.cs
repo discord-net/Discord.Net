@@ -16,7 +16,7 @@ public sealed class GuildMediaChannel : GuildChannelBase, IGuildMediaChannelMode
 
     int? IThreadableChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
 
-    IEmote? IGuildMediaChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
+    IEmoteModel? IGuildMediaChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
 
     IEnumerable<ITagModel> IGuildMediaChannelModel.AvailableTags => AvailableTags | [];
 

@@ -2,12 +2,13 @@ using Discord.Models.Json;
 
 namespace Discord.Models;
 
-public interface IGuildMediaChannelModel : IThreadableChannelModel
+[ModelEquality]
+public partial interface IGuildMediaChannelModel : IThreadableChannelModel
 {
     bool IsNsfw { get; }
     string? Topic { get; }
     int? RatelimitPerUser { get; }
-    IEmote? DefaultReactionEmoji { get; }
+    IEmoteModel? DefaultReactionEmoji { get; }
     IEnumerable<ITagModel> AvailableTags { get; }
     int? DefaultSortOrder { get; }
 }

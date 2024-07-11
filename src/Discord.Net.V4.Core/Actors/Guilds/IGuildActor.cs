@@ -25,25 +25,45 @@ public interface IGuildActor :
         ModifyGuildParams args
     ) => Routes.ModifyGuild(id, args);
 
-    #region Sub-actors
+    #region Channels
+
+    IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels { get; }
+    ILoadableGuildChannelActor Channel(ulong id) => Channels[id];
+
+    IEnumerableIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels { get; }
+    ILoadableTextChannelActor TextChannel(ulong id) => TextChannels[id];
+
+    IEnumerableIndexableActor<ILoadableVoiceChannelActor, ulong, IVoiceChannel> VoiceChannels { get; }
+    ILoadableVoiceChannelActor VoiceChannel(ulong id) => VoiceChannels[id];
+
+    IEnumerableIndexableActor<ILoadableCategoryChannelActor, ulong, ICategoryChannel> CategoryChannels { get; }
+    ILoadableCategoryChannelActor CategoryChannel(ulong id) => CategoryChannels[id];
+
+    IEnumerableIndexableActor<ILoadableNewsChannelActor, ulong, INewsChannel> AnnouncementChannels { get; }
+    ILoadableNewsChannelActor AnnouncementChannel(ulong id) => AnnouncementChannels[id];
+
+    IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ThreadChannels { get; }
+    ILoadableThreadChannelActor ThreadChannel(ulong id) => ThreadChannels[id];
+
+    IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ActiveThreadChannels { get; }
+    ILoadableThreadChannelActor ActiveThreadChannel(ulong id) => ActiveThreadChannels[id];
+
+    IEnumerableIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels { get; }
+    ILoadableStageChannelActor StageChannel(ulong id) => StageChannels[id];
+
+    IEnumerableIndexableActor<ILoadableForumChannelActor, ulong, IForumChannel> ForumChannels { get; }
+    ILoadableForumChannelActor ForumChannel(ulong id) => ForumChannels[id];
+
+    IEnumerableIndexableActor<ILoadableMediaChannelActor, ulong, IMediaChannel> MediaChannels { get; }
+    ILoadableMediaChannelActor MediaChannel(ulong id) => MediaChannels[id];
+
+    #endregion
 
     IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations { get; }
     IIntegrationActor Integration(ulong id) => Integrations[id];
 
     IPagedIndexableActor<ILoadableGuildBanActor, ulong, IBan, PageGuildBansParams> Bans { get; }
     ILoadableGuildBanActor Ban(ulong userId) => Bans[userId];
-
-    IEnumerableIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels { get; }
-    ILoadableStageChannelActor StageChannel(ulong id) => StageChannels[id];
-
-    IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ActiveThreads { get; }
-    ILoadableThreadChannelActor ActiveThread(ulong id) => ActiveThreads[id];
-
-    IEnumerableIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels { get; }
-    ILoadableTextChannelActor TextChannel(ulong id) => TextChannels[id];
-
-    IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels { get; }
-    ILoadableGuildChannelActor Channel(ulong id) => Channels[id];
 
     IPagedIndexableActor<ILoadableGuildMemberActor, ulong, IGuildMember, PageGuildMembersParams> Members { get; }
     ILoadableGuildMemberActor Member(ulong id) => Members[id];
@@ -62,8 +82,6 @@ public interface IGuildActor :
 
     IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites { get; }
     ILoadableInviteActor<IInvite> Invite(string code) => Invites[code];
-
-    #endregion
 
     #region Methods
 

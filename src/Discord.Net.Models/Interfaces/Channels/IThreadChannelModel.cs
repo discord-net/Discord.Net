@@ -1,7 +1,9 @@
 namespace Discord.Models;
 
-public interface IThreadChannelModel : IGuildChannelModel
+[ModelEquality]
+public partial interface IThreadChannelModel : IGuildChannelModel
 {
+    [SourceOfTruth]
     new ulong ParentId { get; }
     bool IsArchived { get; }
     int AutoArchiveDuration { get; }

@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IDMChannelModel : IChannelModel
+[ModelEquality]
+public partial interface IDMChannelModel : IChannelModel
 {
     ulong RecipientId { get; }
 }

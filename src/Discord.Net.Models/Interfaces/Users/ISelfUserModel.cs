@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface ISelfUserModel : IUserModel
+[ModelEquality]
+public partial interface ISelfUserModel : IUserModel
 {
     int? PremiumType { get; }
     string? Email { get; }

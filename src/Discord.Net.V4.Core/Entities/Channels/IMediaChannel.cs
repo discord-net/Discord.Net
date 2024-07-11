@@ -7,7 +7,7 @@ namespace Discord;
 using IModifiable =
     IModifiable<ulong, IMediaChannel, ModifyMediaChannelProperties, ModifyGuildChannelParams, IGuildMediaChannelModel>;
 
-public interface IMediaChannel :
+public partial interface IMediaChannel :
     INestedChannel,
     IIntegrationChannel,
     IMediaChannelActor,
@@ -67,5 +67,8 @@ public interface IMediaChannel :
     /// </remarks>
     SortOrder? DefaultSortOrder { get; }
 
+    [SourceOfTruth]
     new IGuildMediaChannelModel GetModel();
+
+
 }

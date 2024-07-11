@@ -2,7 +2,7 @@ using Discord.Models;
 
 namespace Discord;
 
-public interface IThreadableChannel :
+public partial interface IThreadableChannel :
     IEntityOf<IThreadableChannelModel>,
     IGuildChannel
 {
@@ -10,5 +10,8 @@ public interface IThreadableChannel :
 
     ThreadArchiveDuration DefaultArchiveDuration { get; }
 
+    [SourceOfTruth]
     new IThreadableChannelModel GetModel();
+
+
 }

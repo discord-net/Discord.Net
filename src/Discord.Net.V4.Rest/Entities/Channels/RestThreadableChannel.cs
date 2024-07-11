@@ -64,7 +64,7 @@ public partial class RestThreadableChannel :
 
     internal override IThreadableChannelModel Model { get; }
 
-    internal override RestThreadableChannelActor ChannelActor { get; }
+    internal override RestThreadableChannelActor Actor { get; }
 
     internal RestThreadableChannel(
         DiscordRestClient client,
@@ -74,7 +74,7 @@ public partial class RestThreadableChannel :
     ) : base(client, guild, model)
     {
         Model = model;
-        ChannelActor = actor ?? new(
+        Actor = actor ?? new(
             client,
             guild,
             ThreadableChannelIdentity.Of(this)

@@ -36,7 +36,8 @@ public partial class RestVoiceChannelActor(
     VoiceChannelIdentity channel
 ) :
     RestGuildChannelActor(client, guild, channel),
-    IVoiceChannelActor
+    IVoiceChannelActor,
+    IActor<ulong, RestVoiceChannel>
 {
     [ProxyInterface(typeof(IMessageChannelActor))]
     internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
@@ -65,7 +66,7 @@ public partial class RestVoiceChannel :
         typeof(IMessageChannelActor),
         typeof(IEntityProvider<IVoiceChannel, IGuildVoiceChannelModel>)
     )]
-    internal override RestVoiceChannelActor ChannelActor { get; }
+    internal override RestVoiceChannelActor Actor { get; }
 
     private IGuildVoiceChannelModel _model;
 
@@ -77,7 +78,7 @@ public partial class RestVoiceChannel :
     {
         _model = model;
 
-        ChannelActor = actor ?? new(
+        Actor = actor ?? new(
             client,
             guild,
             VoiceChannelIdentity.Of(this)

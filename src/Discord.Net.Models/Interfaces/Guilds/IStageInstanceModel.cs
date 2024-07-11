@@ -1,7 +1,8 @@
 using System;
 namespace Discord.Models
 {
-    public interface IStageInstanceModel : IEntityModel<ulong>
+    [ModelEquality]
+public partial interface IStageInstanceModel : IEntityModel<ulong>
     {
         ulong GuildId { get; }
         ulong ChannelId { get; }

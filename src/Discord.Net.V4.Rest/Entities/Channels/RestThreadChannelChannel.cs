@@ -111,7 +111,7 @@ public partial class RestThreadChannel :
         typeof(IMessageChannelActor),
         typeof(IEntityProvider<IThreadChannel, IThreadChannelModel>)
     )]
-    internal override RestThreadChannelActor ChannelActor { get; }
+    internal override RestThreadChannelActor Actor { get; }
 
     internal RestThreadChannel(
         DiscordRestClient client,
@@ -123,7 +123,7 @@ public partial class RestThreadChannel :
     ) : base(client, guild, model, actor)
     {
         Model = model;
-        ChannelActor = actor ?? new(
+        Actor = actor ?? new(
             client,
             guild,
             ThreadIdentity.Of(this),

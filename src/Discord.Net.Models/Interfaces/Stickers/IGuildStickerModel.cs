@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IGuildStickerModel : IStickerModel
+[ModelEquality]
+public partial interface IGuildStickerModel : IStickerModel
 {
     bool? Available { get; }
     ulong GuildId { get; }

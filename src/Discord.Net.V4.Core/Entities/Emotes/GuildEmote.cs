@@ -37,7 +37,7 @@ public sealed class GuildEmote :
     public string Name { get; }
 
 
-    public Models.Json.IEmote ToApiModel(Models.Json.IEmote? existing = default)
+    public IEmoteModel ToApiModel(IEmoteModel? existing = default)
         => ToApiModel(null);
 
     public ulong Id { get; }

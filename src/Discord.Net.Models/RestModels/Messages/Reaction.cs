@@ -14,7 +14,7 @@ public sealed class Reaction : IReactionModel, IEntityModelSource
     public bool IsMeBurst { get; set; }
 
     [JsonPropertyName("emoji")]
-    public required IEmote Emoji { get; set; }
+    public required IEmoteModel Emoji { get; set; }
 
     [JsonPropertyName("count_details")]
     public required ReactionCountDetails CountDetails { get; set; }

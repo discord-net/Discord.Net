@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IPartialGuildModel : IEntityModel<ulong>
+[ModelEquality]
+public partial interface IPartialGuildModel : IEntityModel<ulong>
 {
     string Name { get; }
     string? SplashId { get; }

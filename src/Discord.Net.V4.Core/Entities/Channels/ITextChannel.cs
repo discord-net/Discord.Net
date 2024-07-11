@@ -10,7 +10,7 @@ using IModifiable =
 /// <summary>
 ///     Represents a generic channel in a guild that can send and receive messages.
 /// </summary>
-public interface ITextChannel :
+public partial interface ITextChannel :
     IThreadableChannel,
     IMessageChannel,
     IMentionable,
@@ -50,7 +50,10 @@ public interface ITextChannel :
     /// </returns>
     int SlowModeInterval { get; }
 
+    [SourceOfTruth]
     new IGuildTextChannelModel GetModel();
+
+
 
     string IMentionable.Mention => $"<#{Id}>";
 }

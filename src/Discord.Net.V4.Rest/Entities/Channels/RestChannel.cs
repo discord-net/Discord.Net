@@ -37,7 +37,7 @@ public partial class RestChannel :
     internal virtual IChannelModel Model => _model;
 
     [ProxyInterface(typeof(IChannelActor))]
-    internal virtual RestChannelActor ChannelActor { get; }
+    internal virtual RestChannelActor Actor { get; }
 
     private IChannelModel _model;
 
@@ -48,7 +48,8 @@ public partial class RestChannel :
     ) : base(client, model.Id)
     {
         _model = model;
-        ChannelActor = actor ?? new(client, ChannelIdentity.Of(this));
+
+        Actor = actor ?? new(client, ChannelIdentity.Of(this));
     }
 
     public static RestChannel Construct(DiscordRestClient client, IChannelModel model)
@@ -61,7 +62,6 @@ public partial class RestChannel :
             _ => new RestChannel(client, model)
         };
     }
-
 
     public static RestChannel Construct(
         DiscordRestClient client,
@@ -91,7 +91,7 @@ public partial class RestChannel :
         };
     }
 
-    public ValueTask UpdateAsync(IChannelModel model, CancellationToken token = default)
+    public virtual ValueTask UpdateAsync(IChannelModel model, CancellationToken token = default)
     {
         _model = model;
         return ValueTask.CompletedTask;

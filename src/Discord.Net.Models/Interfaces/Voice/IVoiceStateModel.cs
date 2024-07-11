@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IVoiceStateModel : IEntityModel<string>
+[ModelEquality]
+public partial interface IVoiceStateModel : IEntityModel<string>
 {
     ulong UserId { get; }
     ulong? ChannelId { get; }

@@ -22,7 +22,7 @@ public readonly struct Emoji : IEmote, IEquatable<Emoji>, IIdentifiable<string>,
     /// <inheritdoc />
     public string Name { get; }
 
-    public Models.Json.IEmote ToApiModel(Models.Json.IEmote? existing = default) =>
+    public IEmoteModel ToApiModel(IEmoteModel? existing = default) =>
         existing ?? new Models.Json.Emoji {Name = Name};
 
     string IIdentifiable<string>.Id => Name;

@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface ISelectMenuComponentModel : IMessageComponentModel
+[ModelEquality]
+public partial interface ISelectMenuComponentModel : IMessageComponentModel
 {
     string CustomId { get; }
     IEnumerable<ISelectMenuOptionModel> Options { get; }

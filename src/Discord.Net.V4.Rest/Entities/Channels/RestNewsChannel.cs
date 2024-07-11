@@ -40,7 +40,7 @@ public partial class RestNewsChannel :
 {
     internal override IGuildNewsChannelModel Model => _model;
 
-    internal override RestNewsChannelActor ChannelActor { get; }
+    internal override RestNewsChannelActor Actor { get; }
 
     private IGuildNewsChannelModel _model;
 
@@ -53,7 +53,7 @@ public partial class RestNewsChannel :
     {
         _model = model;
 
-        ChannelActor = actor ?? new(client, guild, NewsChannelIdentity.Of(this));
+        Actor = actor ?? new(client, guild, NewsChannelIdentity.Of(this));
     }
 
     public static RestNewsChannel Construct(DiscordRestClient client, IGuildNewsChannelModel model, GuildIdentity guild)

@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IActionRowModel : IMessageComponentModel
+[ModelEquality]
+public partial interface IActionRowModel : IMessageComponentModel
 {
     IEnumerable<IMessageComponentModel> Components { get; }
 }

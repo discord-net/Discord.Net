@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IAttachmentModel : IEntityModel<ulong>
+[ModelEquality]
+public partial interface IAttachmentModel : IEntityModel<ulong>
 {
     string Filename { get; }
     string? Description { get; }

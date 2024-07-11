@@ -31,7 +31,7 @@ public sealed class Activity : IActivityModel, IEntityModelSource
     public Optional<string?> State { get; set; }
 
     [JsonPropertyName("emoji")]
-    public Optional<IEmote?> Emoji { get; set; }
+    public Optional<IEmojiModel?> Emoji { get; set; }
 
     [JsonPropertyName("party")]
     public Optional<ActivityParty> Party { get; set; }

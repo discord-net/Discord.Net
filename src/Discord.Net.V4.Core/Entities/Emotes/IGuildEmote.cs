@@ -50,10 +50,10 @@ public interface IGuildEmote :
 
     ILoadableEntity<ulong, IUser>? Creator { get; }
 
-    Models.Json.IEmote IEntityProperties<Models.Json.IEmote>.ToApiModel(Models.Json.IEmote? existing)
+    IEmoteModel IEntityProperties<IEmoteModel>.ToApiModel(IEmoteModel? existing)
         => ToApiModel(existing);
 
-    new Models.Json.IEmote ToApiModel(Models.Json.IEmote? existing = null)
+    new IEmoteModel ToApiModel(IEmoteModel? existing = null)
         => existing ?? new Models.Json.GuildEmote
         {
             Id = Id,

@@ -48,7 +48,7 @@ public partial class RestStageChannel :
     internal override IGuildStageChannelModel Model => _model;
 
     [ProxyInterface(typeof(IStageChannelActor), typeof(IStageInstanceRelationship))]
-    internal override RestStageChannelActor ChannelActor { get; }
+    internal override RestStageChannelActor Actor { get; }
 
     private IGuildStageChannelModel _model;
 
@@ -61,7 +61,7 @@ public partial class RestStageChannel :
     {
         _model = model;
 
-        ChannelActor = actor ?? new(client, guild, model.Id);
+        Actor = actor ?? new(client, guild, model.Id);
     }
 
     public static RestStageChannel Construct(DiscordRestClient client, IGuildStageChannelModel model, GuildIdentity guild)

@@ -46,21 +46,9 @@ public static class VariableFuncArgs
                             x.AttributeClass?.ToDisplayString() == "Discord.VariableFuncArgsAttribute")
                        ) continue;
 
-                    Hanz.Logger.Log($"Found target {parameter.Type} {candidate}");
-
                     return new GenerationTarget(context.SemanticModel, candidateMethodSymbol, invocation.ArgumentList);
                 }
             }
-
-            if (invocation.ToString().Contains("UpdateFrom"))
-            {
-                var alt = context.SemanticModel.GetSymbolInfo(invocation.Expression);
-                Hanz.Logger.Log($"found no alternatives for invocation {alt.CandidateSymbols.Length} : {symbolInfo.CandidateReason} : {invocation}");
-            }
-        }
-        else if (symbolInfo.Symbol.ToString().Contains("UpdateFrom"))
-        {
-            Hanz.Logger.Log($"UPDATE FROM {symbolInfo.Symbol.Kind} {symbolInfo.Symbol}");
         }
 
         return null;
@@ -70,19 +58,14 @@ public static class VariableFuncArgs
     {
         var processed = new Dictionary<string, HashSet<int>>();
 
-        Hanz.Logger.Log($"Processing {targets.Distinct().Count()} targets");
-
         try
         {
             foreach (var target in targets.Distinct())
             {
                 if (target is null)
                 {
-                    Hanz.Logger.Warn("TARGET was null");
                     continue;
                 }
-
-                Hanz.Logger.Log($"VALID TARGET: {target.Method}");
 
                 var declaringSyntax = target.Method.DeclaringSyntaxReferences
                         .FirstOrDefault(x => IsNotGeneratedMethodInfo(x.GetSyntax()))
@@ -100,7 +83,6 @@ public static class VariableFuncArgs
                 if (processed.TryGetValue(target.Method.ToDisplayString(), out var generatedExtras) &&
                     generatedExtras.Contains(extraArgs))
                 {
-                    Hanz.Logger.Log($"SKIPPING {target.Method.ToDisplayString()}: already generated with {extraArgs}");
                     continue;
                 }
 
@@ -116,8 +98,6 @@ public static class VariableFuncArgs
                     if (parameter.GetAttributes().Any(x =>
                             x.AttributeClass?.ToDisplayString() == "Discord.VariableFuncArgsAttribute"))
                     {
-                        Hanz.Logger.Log($"ATTR PARAMETER {parameter}");
-
                         var funcGenericTypes = parameterNode
                             .DescendantNodes()
                             .OfType<TypeArgumentListSyntax>()
@@ -232,8 +212,6 @@ public static class VariableFuncArgs
                     ).NormalizeWhitespace();
 
                     newFunctionSyntax = newFunctionSyntax.ReplaceNode(node, newInvocation);
-
-                    Hanz.Logger.Log($"REPLACE :> {newInvocation}");
                 }
 
                 context.AddSource(

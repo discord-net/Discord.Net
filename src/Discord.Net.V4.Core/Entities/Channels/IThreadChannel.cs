@@ -11,7 +11,7 @@ using IModifiable =
 /// <summary>
 ///     Represents a thread channel inside a guild.
 /// </summary>
-public interface IThreadChannel :
+public partial interface IThreadChannel :
     IMessageChannel,
     IGuildChannel,
     IThreadChannelActor,
@@ -91,5 +91,8 @@ public interface IThreadChannel :
     /// </remarks>
     new DateTimeOffset CreatedAt { get; }
 
+    [SourceOfTruth]
     new IThreadChannelModel GetModel();
+
+
 }

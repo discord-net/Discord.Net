@@ -40,6 +40,21 @@ public sealed class Hanz : IIncrementalGenerator
             transform: static (ctx, _) => RestLoadableSource.GetTargetForGeneration(ctx)
         );
 
+        var sourceOfTruth = context.SyntaxProvider.CreateSyntaxProvider(
+            predicate: static (node, _) => SourceOfTruth.IsValid(node),
+            transform: static (ctx, _) => SourceOfTruth.GetTargetForGeneration(ctx)
+        ).Collect();
+
+        var intrinsicOverride = context.SyntaxProvider.CreateSyntaxProvider(
+            predicate: static (node, _) => CovariantOverride.IsValid(node),
+            transform: static (ctx,_) => CovariantOverride.GetTargetForGeneration(ctx)
+        ).Collect();
+
+        var modelEquality = context.SyntaxProvider.CreateSyntaxProvider(
+            predicate: static (node, _) => ModelEquality.IsValid(node),
+            transform: static (ctx, _) => ModelEquality.GetTargetForGeneration(ctx)
+        );
+
         context.RegisterSourceOutput(
             entityHierarchies,
             EntityHierarchies.Execute
@@ -63,6 +78,21 @@ public sealed class Hanz : IIncrementalGenerator
         context.RegisterSourceOutput(
             restLoadable,
             RestLoadableSource.Execute
+        );
+
+        context.RegisterSourceOutput(
+            sourceOfTruth,
+            SourceOfTruth.Execute
+        );
+
+        context.RegisterSourceOutput(
+            intrinsicOverride,
+            CovariantOverride.Execute
+        );
+
+        context.RegisterSourceOutput(
+            modelEquality,
+            ModelEquality.Execute
         );
 
         var options = context.AnalyzerConfigOptionsProvider.Select((options, _) => GetLoggingOptions(options));

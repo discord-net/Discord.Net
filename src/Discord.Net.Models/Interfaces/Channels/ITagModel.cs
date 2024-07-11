@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface ITagModel : IEntityModel<ulong>
+[ModelEquality]
+public partial interface ITagModel : IEntityModel<ulong>
 {
     string Name { get; }
     bool Moderated { get; }

@@ -7,7 +7,7 @@ namespace Discord;
 using IModifiable =
     IModifiable<ulong, IGuildChannel, ModifyGuildChannelProperties, ModifyGuildChannelParams, IGuildChannelModel>;
 
-public interface IGuildChannel :
+public partial interface IGuildChannel :
     IChannel,
     IGuildChannelActor,
     IModifiable
@@ -46,5 +46,8 @@ public interface IGuildChannel :
     /// </returns>
     IReadOnlyCollection<Overwrite> PermissionOverwrites { get; }
 
+    [SourceOfTruth]
     new IGuildChannelModel GetModel();
+
+
 }

@@ -37,7 +37,7 @@ global using VoiceChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Di
 global using ForumChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestForumChannel, Discord.Models.IGuildForumChannelModel>;
 global using NewsChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestNewsChannel, Discord.Models.IGuildNewsChannelModel>;
 global using TextChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestTextChannel, Discord.Models.IGuildTextChannelModel>;
-
+global using CategoryChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestCategoryChannel, Discord.Models.IGuildCategoryChannelModel>;
 #endregion
 
 #region Messages

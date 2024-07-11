@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IApplicationModel : IEntityModel<ulong>
+[ModelEquality]
+public partial interface IApplicationModel : IEntityModel<ulong>
 {
     string Name { get; }
     string? Icon { get; }

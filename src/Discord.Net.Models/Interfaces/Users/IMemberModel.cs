@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IMemberModel : IEntityModel<ulong>
+[ModelEquality]
+public partial interface IMemberModel : IEntityModel<ulong>
 {
     int Flags { get; }
     string? Nickname { get;}

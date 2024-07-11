@@ -10,7 +10,7 @@ using IModifiable =
 /// <summary>
 ///     Represents a generic private group channel.
 /// </summary>
-public interface IGroupChannel :
+public partial interface IGroupChannel :
     IMessageChannel,
     IAudioChannel,
     IGroupChannelActor,
@@ -30,5 +30,8 @@ public interface IGroupChannel :
     /// </returns>
     IDefinedLoadableEntityEnumerable<ulong, IUser> Recipients { get; }
 
+    [SourceOfTruth]
     new IGroupDMChannelModel GetModel();
+
+
 }

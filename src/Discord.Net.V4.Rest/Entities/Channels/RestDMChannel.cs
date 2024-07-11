@@ -19,21 +19,20 @@ public partial class RestDMChannel :
     IDMChannel,
     IConstructable<RestDMChannel, IDMChannelModel, DiscordRestClient>
 {
-    [AssignOnPropertyChanged(nameof(Model), nameof(Recipient.Loadable.Id), nameof(Model.RecipientId))]
     public RestLoadableUserActor Recipient { get; }
 
-    internal override IDMChannelModel Model => _model;
-
     [ProxyInterface(typeof(IChannelActor), typeof(IMessageChannelActor))]
-    internal override RestDMChannelActor ChannelActor { get; }
+    internal override RestDMChannelActor Actor { get; }
+
+    internal override IDMChannelModel Model => _model;
 
     private IDMChannelModel _model;
 
     internal RestDMChannel(DiscordRestClient client, IDMChannelModel model, RestDMChannelActor? actor = null)
         : base(client, model, actor)
     {
-        ChannelActor = actor ?? new(client, this);
         _model = model;
+        Actor = actor ?? new(client, this);
 
         Recipient =  new(client, UserIdentity.Of(model.RecipientId));
     }
@@ -41,13 +40,14 @@ public partial class RestDMChannel :
     public static RestDMChannel Construct(DiscordRestClient client, IDMChannelModel model)
         => new(client, model);
 
+    [CovariantOverride]
     public ValueTask UpdateAsync(IDMChannelModel model, CancellationToken token = default)
     {
         _model = model;
         return base.UpdateAsync(model, token);
     }
 
-    public override IDMChannelModel GetModel() => Model;
-
     ILoadableEntity<ulong, IUser> IDMChannel.Recipient => Recipient;
+
+    public override IDMChannelModel GetModel() => Model;
 }

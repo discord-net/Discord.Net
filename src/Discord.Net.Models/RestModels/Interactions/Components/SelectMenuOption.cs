@@ -14,7 +14,7 @@ public sealed class SelectMenuOption : IEntityModelSource, ISelectMenuOptionMode
     public Optional<string> Description { get; set; }
 
     [JsonPropertyName("emoji")]
-    public Optional<IEmote> Emoji { get; set; }
+    public Optional<IEmoteModel> Emoji { get; set; }
 
     [JsonPropertyName("default")]
     public Optional<bool> IsDefault { get; set; }

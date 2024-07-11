@@ -2,7 +2,8 @@ using Discord.Models.Json;
 
 namespace Discord.Models;
 
-public interface IButtonComponentModel : IMessageComponentModel
+[ModelEquality]
+public partial interface IButtonComponentModel : IMessageComponentModel
 {
     int Style { get; }
 

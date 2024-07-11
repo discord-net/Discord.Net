@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IVoiceRegionModel : IEntityModel<string>
+[ModelEquality]
+public partial interface IVoiceRegionModel : IEntityModel<string>
 {
     string Name { get; }
     bool IsOptimal { get; }

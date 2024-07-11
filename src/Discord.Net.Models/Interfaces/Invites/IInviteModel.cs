@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IInviteModel : IEntityModel<string>
+[ModelEquality]
+public partial interface IInviteModel : IEntityModel<string>
 {
     string Code { get; }
     ulong? GuildId { get; }

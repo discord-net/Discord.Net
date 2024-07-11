@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IBanModel : IEntityModel<ulong>
+[ModelEquality]
+public partial interface IBanModel : IEntityModel<ulong>
 {
     string? Reason { get; }
     ulong UserId { get; }

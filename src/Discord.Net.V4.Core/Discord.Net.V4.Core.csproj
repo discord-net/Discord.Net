@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\sourcegen\Discord.Net.Hanz\Discord.Net.Hanz.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     <ProjectReference Include="..\Discord.Net.Models\Discord.Net.Models.csproj"/>
   </ItemGroup>
 

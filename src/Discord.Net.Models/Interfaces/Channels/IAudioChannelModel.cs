@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IAudioChannelModel : IChannelModel
+[ModelEquality]
+public partial interface IAudioChannelModel : IChannelModel
 {
     string? RTCRegion { get; }
     int? VideoQualityMode { get; }

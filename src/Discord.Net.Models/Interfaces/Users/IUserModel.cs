@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IUserModel : IEntityModel<ulong>
+[ModelEquality]
+public partial interface IUserModel : IEntityModel<ulong>
 {
     string Username { get; }
     ushort Discriminator { get; }

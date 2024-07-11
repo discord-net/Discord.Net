@@ -1,7 +1,7 @@
 namespace Discord.Rest;
 
 public abstract class RestActor<TId, TEntity, TIdentity>(DiscordRestClient client, TIdentity identity) :
-    IActor<TId, TEntity>
+    IRestActor<TId, TEntity, TIdentity>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>
     where TIdentity : IIdentifiable<TId>
@@ -13,6 +13,20 @@ public abstract class RestActor<TId, TEntity, TIdentity>(DiscordRestClient clien
     public TIdentity Identity { get; } = identity;
 
     public static implicit operator TIdentity(RestActor<TId, TEntity, TIdentity> actor) => actor.Identity;
+}
+
+public interface IRestActor<out TId, out TEntity, out TIdentity> : IRestActor<TId, TEntity>
+    where TId : IEquatable<TId>
+    where TEntity : IEntity<TId>
+{
+    TIdentity Identity { get; }
+}
+
+public interface IRestActor<out TId, out TEntity> : IActor<TId, TEntity>
+    where TId : IEquatable<TId>
+    where TEntity : IEntity<TId>
+{
+    new DiscordRestClient Client { get; }
 
     IDiscordClient IClientProvider.Client => Client;
 }

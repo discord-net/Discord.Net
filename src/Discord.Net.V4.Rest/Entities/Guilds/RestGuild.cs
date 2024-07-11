@@ -35,8 +35,24 @@ public partial class RestGuildActor(
     RestActor<ulong, RestGuild, GuildIdentity>(client, guild),
     IGuildActor
 {
-    public RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IEnumerable<IIntegrationModel>>
-        Integrations
+    public
+    public IEnumerableIndexableActor<ILoadableMediaChannelActor, ulong, IMediaChannel> MediaChannels => throw new NotImplementedException();
+
+    public IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels => throw new NotImplementedException();
+
+    public IEnumerableIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels => throw new NotImplementedException();
+
+    public IEnumerableIndexableActor<ILoadableVoiceChannelActor, ulong, IVoiceChannel> VoiceChannels => throw new NotImplementedException();
+
+    public IEnumerableIndexableActor<ILoadableCategoryChannelActor, ulong, ICategoryChannel> CategoryChannels => throw new NotImplementedException();
+
+    public IEnumerableIndexableActor<ILoadableNewsChannelActor, ulong, INewsChannel> AnnouncementChannels => throw new NotImplementedException();
+
+    public IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ThreadChannels => throw new NotImplementedException();
+
+    public IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ActiveThreadChannels => throw new NotImplementedException();
+
+    public RestEnumerableIndexableIntegrationActor Integrations
     {
         get;
     } = RestActors.Integrations(client, guild);
@@ -45,25 +61,17 @@ public partial class RestGuildActor(
         Bans { get; }
         = RestActors.Bans(client, guild);
 
-    public RestEnumerableIndexableActor<RestLoadableStageChannelActor, ulong, RestStageChannel, IEnumerable<IChannelModel>> StageChannels { get; }
+    public RestEnumerableIndexableStageChannelActor StageChannels { get; }
         = RestActors.StageChannels(client, guild);
 
-    IEnumerableIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> IGuildActor.StageChannels => StageChannels;
+    public IEnumerableIndexableActor<ILoadableForumChannelActor, ulong, IForumChannel> ForumChannels => throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ActiveThreads =>
-        throw new NotImplementedException();
-
-    public IEnumerableIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels =>
-        throw new NotImplementedException();
-
-    public IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels =>
-        throw new NotImplementedException();
 
     public RestPagedIndexableActor<RestLoadableGuildMemberActor, ulong, RestGuildMember, IEnumerable<IMemberModel>,
         PageGuildMembersParams> Members
     {
         get;
-    } = RestActors.Members(client, id);
+    } = RestActors.Members(client, guild);
 
     public IEnumerableIndexableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes =>
         throw new NotImplementedException();
@@ -85,6 +93,7 @@ public partial class RestGuildActor(
         Members;
 
     IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> IGuildActor.Integrations => Integrations;
+    IEnumerableIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> IGuildActor.StageChannels => StageChannels;
 
     IGuild IEntityProvider<IGuild, IGuildModel>.CreateEntity(IGuildModel model)
         => RestGuild.Construct(Client, model);

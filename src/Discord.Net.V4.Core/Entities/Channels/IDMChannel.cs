@@ -5,9 +5,10 @@ namespace Discord;
 /// <summary>
 ///     Represents a generic direct-message channel.
 /// </summary>
-public interface IDMChannel :
+public partial interface IDMChannel :
     IMessageChannel,
-    IUpdatable<IDMChannelModel>
+    IUpdatable<IDMChannelModel>,
+    IDMChannelActor
 {
     /// <summary>
     ///     Gets the recipient of all messages in this channel.
@@ -17,5 +18,6 @@ public interface IDMChannel :
     /// </returns>
     ILoadableEntity<ulong, IUser> Recipient { get; }
 
+    [SourceOfTruth]
     new IDMChannelModel GetModel();
 }

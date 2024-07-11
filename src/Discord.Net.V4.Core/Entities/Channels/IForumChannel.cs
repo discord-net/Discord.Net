@@ -10,7 +10,7 @@ using IModifiable =
 /// <summary>
 ///     Represents a forum channel in a guild that can create posts.
 /// </summary>
-public interface IForumChannel :
+public partial interface IForumChannel :
     INestedChannel,
     IIntegrationChannel,
     IForumChannelActor,
@@ -75,5 +75,6 @@ public interface IForumChannel :
     /// </summary>
     ForumLayout DefaultLayout { get; }
 
+    [SourceOfTruth]
     new IGuildForumChannelModel GetModel();
 }

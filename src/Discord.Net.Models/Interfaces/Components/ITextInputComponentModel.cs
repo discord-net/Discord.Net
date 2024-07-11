@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface ITextInputComponentModel : IMessageComponentModel
+[ModelEquality]
+public partial interface ITextInputComponentModel : IMessageComponentModel
 {
     string CustomId { get; }
     int Style { get; }

@@ -2,7 +2,8 @@ using Discord.Models.Json;
 
 namespace Discord.Models;
 
-public interface IMessageModel : IEntityModel<ulong>
+[ModelEquality]
+public partial interface IMessageModel : IEntityModel<ulong>
 {
     ulong AuthorId { get; }
     ulong ChannelId { get; }
@@ -49,7 +50,8 @@ public interface IMessageRoleSubscriptionData
     bool IsRenewal { get; }
 }
 
-public interface IMessageInteractionMetadataModel : IEntityModel
+[ModelEquality]
+public partial interface IMessageInteractionMetadataModel : IEntityModel
 {
     ulong Id { get; }
     int Type { get; }

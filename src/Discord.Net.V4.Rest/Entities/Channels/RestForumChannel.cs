@@ -50,7 +50,7 @@ public partial class RestForumChannel :
         typeof(IThreadableChannelActor),
         typeof(IEntityProvider<IForumChannel, IGuildForumChannelModel>)
     )]
-    internal override RestForumChannelActor ChannelActor { get; }
+    internal override RestForumChannelActor Actor { get; }
 
     private IGuildForumChannelModel _model;
 
@@ -62,7 +62,7 @@ public partial class RestForumChannel :
     ) : base(client, guild, model, actor)
     {
         _model = model;
-        ChannelActor = actor ?? new(client, guild, ForumChannelIdentity.Of(this));
+        Actor = actor ?? new(client, guild, ForumChannelIdentity.Of(this));
 
         AvailableTags = model.AvailableTags
             .Select(x => ForumTag.Construct(client, x, new ForumTag.Context(guild.Id)))
