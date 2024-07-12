@@ -278,7 +278,7 @@ namespace Discord.Rest
                 Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                 Components = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 Flags = ephemeral ? MessageFlags.Ephemeral : MessageFlags.None,
-                Poll = poll.ToModel() ?? Optional<CreatePollParams>.Unspecified
+                Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified
             };
 
             if (ephemeral)
@@ -409,7 +409,7 @@ namespace Discord.Rest
                 Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 MessageComponents = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
-                Poll = poll.ToModel() ?? Optional<CreatePollParams>.Unspecified
+                Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified
             };
             return InteractionHelper.SendFollowupAsync(Discord, args, Token, Channel, options);
         }
