@@ -6,17 +6,20 @@ using System.Collections.Immutable;
 namespace Discord.Rest.Channels;
 
 [ExtendInterfaceDefaults(
-    typeof(IForumChannelActor),
-    typeof(IModifiable<ulong, IForumChannelActor, ModifyForumChannelProperties, ModifyGuildChannelParams>)
+    typeof(IForumChannelActor)
 )]
 public partial class RestForumChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
-    ForumChannelIdentity channel) :
+    ForumChannelIdentity channel
+) :
     RestThreadableChannelActor(client, guild, channel),
-    IForumChannelActor
+    IForumChannelActor,
+    IActor<ulong, RestForumChannel>
 {
-    public IForumChannel CreateEntity(IGuildForumChannelModel model)
+    [CovariantOverride]
+    [SourceOfTruth]
+    internal RestForumChannel CreateEntity(IGuildForumChannelModel model)
         => RestForumChannel.Construct(Client, model, Guild.Identity);
 }
 
@@ -47,7 +50,6 @@ public partial class RestForumChannel :
 
     [ProxyInterface(
         typeof(IForumChannelActor),
-        typeof(IThreadableChannelActor),
         typeof(IEntityProvider<IForumChannel, IGuildForumChannelModel>)
     )]
     internal override RestForumChannelActor Actor { get; }
@@ -75,6 +77,7 @@ public partial class RestForumChannel :
         GuildIdentity guild
     ) => new(client, guild, model);
 
+    [CovariantOverride]
     public ValueTask UpdateAsync(IGuildForumChannelModel model, CancellationToken token = default)
     {
         _model = model;

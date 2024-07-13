@@ -4,4 +4,6 @@ namespace Discord;
 internal sealed class ExtendInterfaceDefaultsAttribute(params Type[] toExtend) : Attribute
 {
     public readonly Type[] ToExtend = toExtend;
+
+    public bool ExtendAll { get; set; }
 }

@@ -3,7 +3,7 @@ using Discord.Models.Json;
 
 namespace Discord.Rest.Guilds;
 
-[method: TypeFactory]
+[method: TypeFactory(LastParameter = nameof(member))]
 public sealed partial class RestLoadableGuildMemberActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -25,7 +25,7 @@ public sealed partial class RestLoadableGuildMemberActor(
             );
 }
 
-[ExtendInterfaceDefaults(typeof(IGuildMemberActor))]
+[ExtendInterfaceDefaults]
 public partial class RestGuildMemberActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -36,14 +36,15 @@ public partial class RestGuildMemberActor(
     IGuildMemberActor,
     IActor<ulong, RestGuildMember>
 {
+    [SourceOfTruth]
     public RestLoadableGuildActor Guild { get; } = new(client, guild);
+
+    [SourceOfTruth]
     public RestLoadableUserActor User { get; } = new(client, user ?? UserIdentity.Of(member.Id));
 
-    ILoadableGuildActor IGuildRelationship.Guild => Guild;
-
-    ILoadableUserActor IUserRelationship.User => User;
-
-    IGuildMember IEntityProvider<IGuildMember, IMemberModel>.CreateEntity(IMemberModel model)
+    [CovariantOverride]
+    [SourceOfTruth]
+    internal RestGuildMember CreateEntity(IMemberModel model)
         => RestGuildMember.Construct(Client, model, Guild.Identity);
 }
 
@@ -89,10 +90,7 @@ public sealed partial class RestGuildMember :
             client,
             guild,
             MemberIdentity.Of(this),
-            UserIdentity.OfNullable(
-                model.GetReferencedEntityModel<ulong, IUserModel>(model.Id),
-                model => RestUser.Construct(client, model)
-            )
+            UserIdentity.FromReferenced<RestUser, DiscordRestClient>(model, model.Id, client)
         );
         Model = model;
     }

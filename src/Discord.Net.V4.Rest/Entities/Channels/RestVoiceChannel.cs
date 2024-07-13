@@ -27,9 +27,6 @@ public partial class RestLoadableVoiceChannelActor(
         );
 }
 
-[ExtendInterfaceDefaults(
-    typeof(IModifiable<ulong, IVoiceChannelActor, ModifyVoiceChannelProperties, ModifyGuildChannelParams>)
-)]
 public partial class RestVoiceChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -42,7 +39,9 @@ public partial class RestVoiceChannelActor(
     [ProxyInterface(typeof(IMessageChannelActor))]
     internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
 
-    public IVoiceChannel CreateEntity(IGuildVoiceChannelModel model)
+    [SourceOfTruth]
+    [CovariantOverride]
+    internal virtual RestVoiceChannel CreateEntity(IGuildVoiceChannelModel model)
         => RestVoiceChannel.Construct(Client, model, Guild.Identity);
 }
 
@@ -99,7 +98,8 @@ public partial class RestVoiceChannel :
         }
     }
 
-    public ValueTask UpdateAsync(IGuildVoiceChannelModel model, CancellationToken token = default)
+    [CovariantOverride]
+    public virtual ValueTask UpdateAsync(IGuildVoiceChannelModel model, CancellationToken token = default)
     {
         _model = model;
         return base.UpdateAsync(model, token);

@@ -37,7 +37,9 @@ public partial class RestMediaChannelActor(
     IMediaChannelActor,
     IActor<ulong, RestMediaChannel>
 {
-    public IMediaChannel CreateEntity(IGuildMediaChannelModel model)
+    [CovariantOverride]
+    [SourceOfTruth]
+    internal RestMediaChannel CreateEntity(IGuildMediaChannelModel model)
         => RestMediaChannel.Construct(Client, model, Guild.Identity);
 }
 
@@ -66,7 +68,6 @@ public partial class RestMediaChannel :
 
     [ProxyInterface(
         typeof(IMediaChannelActor),
-        typeof(IThreadableChannelActor),
         typeof(IEntityProvider<IMediaChannel, IGuildMediaChannelModel>)
     )]
     internal override RestMediaChannelActor Actor { get; }
@@ -92,6 +93,7 @@ public partial class RestMediaChannel :
     public static RestMediaChannel Construct(DiscordRestClient client, IGuildMediaChannelModel model, GuildIdentity guild)
         => new(client, guild, model);
 
+    [CovariantOverride]
     public ValueTask UpdateAsync(IGuildMediaChannelModel model, CancellationToken token = default)
     {
         if (!_model.AvailableTags.SequenceEqual(model.AvailableTags))

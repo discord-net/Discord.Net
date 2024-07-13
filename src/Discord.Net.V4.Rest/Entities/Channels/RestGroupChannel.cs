@@ -27,8 +27,7 @@ public partial class RestLoadableGroupChannelActor :
 }
 
 [ExtendInterfaceDefaults(
-    typeof(IGroupChannelActor),
-    typeof(IModifiable<ulong, IGroupChannelActor, ModifyGroupDMProperties, ModifyGroupDmParams>)
+    typeof(IGroupChannelActor)
 )]
 public partial class RestGroupChannelActor :
     RestChannelActor,
@@ -45,7 +44,8 @@ public partial class RestGroupChannelActor :
         MessageChannelActor = new RestMessageChannelActor(client, channel);
     }
 
-    public IGroupChannel CreateEntity(IGroupDMChannelModel model)
+    [SourceOfTruth]
+    internal RestGroupChannel CreateEntity(IGroupDMChannelModel model)
         => RestGroupChannel.Construct(Client, model);
 }
 
@@ -80,6 +80,7 @@ public partial class RestGroupChannel :
     public static RestGroupChannel Construct(DiscordRestClient client, IGroupDMChannelModel model)
         => new(client, model);
 
+    [CovariantOverride]
     public ValueTask UpdateAsync(IGroupDMChannelModel model, CancellationToken token = default)
     {
         _model = model;

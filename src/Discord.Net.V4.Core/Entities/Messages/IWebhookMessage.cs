@@ -2,7 +2,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface IWebhookMessage :
+public partial interface IWebhookMessage :
     IMessage,
     IWebhookMessageActor
 {
@@ -26,8 +26,6 @@ public interface IWebhookMessage :
         await UpdateAsync(model, token);
     }
 
+    [SourceOfTruth]
     new ILoadableWebhookActor Webhook { get; }
-
-    ILoadableWebhookActor IMessage.Webhook => Webhook;
-    ILoadableWebhookActor IWebhookRelationship.Webhook => Webhook;
 }

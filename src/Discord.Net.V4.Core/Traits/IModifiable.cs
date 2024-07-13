@@ -6,9 +6,9 @@ public interface IModifiable<TId, in TSelf, out TParams, TApi, TModel> :
     IModifiable<TId, TSelf, TParams, TApi>,
     IUpdatable<TModel>
     where TSelf :
-        IModifiable<TId, TSelf, TParams, TApi, TModel>,
-        IEntity<TId>,
-        IUpdatable<TModel>
+    IModifiable<TId, TSelf, TParams, TApi, TModel>,
+    IEntity<TId>,
+    IUpdatable<TModel>
     where TId : IEquatable<TId>
     where TParams : IEntityProperties<TApi>, new()
     where TApi : class
@@ -64,19 +64,33 @@ public interface IModifiable<TId, in TSelf, out TParams, TApi, TEntity, in TMode
     IModifiable<TId, TSelf, TParams, TApi>,
     IEntityProvider<TEntity, TModel>
     where TSelf :
-        IModifiable<TId, TSelf, TParams, TApi, TEntity, TModel>,
-        IActor<TId, TEntity>,
-        IEntityProvider<TEntity, TModel>
+    IModifiable<TId, TSelf, TParams, TApi, TEntity, TModel>,
+    IActor<TId, TEntity>,
+    IEntityProvider<TEntity, TModel>
     where TId : IEquatable<TId>
     where TParams : IEntityProperties<TApi>, new()
     where TApi : class
     where TEntity : IEntity<TId>
     where TModel : class, IEntityModel<TId>
 {
-    new Task<TEntity> ModifyAsync(Action<TParams> func, RequestOptions? options = null, CancellationToken token = default)
+    new Task<TEntity> ModifyAsync(Action<TParams> func, RequestOptions? options = null,
+        CancellationToken token = default)
         => ModifyAsync(Client, (TSelf)this, Id, func, options, token);
 
     internal new static async Task<TEntity> ModifyAsync(
+        IDiscordClient client,
+        TSelf self,
+        TId id,
+        Action<TParams> func,
+        RequestOptions? options,
+        CancellationToken token)
+    {
+        return self.CreateEntity(
+            await ModifyAndReturnModelAsync(client, self, id, func, options, token)
+        );
+    }
+
+    internal static async Task<TModel> ModifyAndReturnModelAsync(
         IDiscordClient client,
         TSelf self,
         TId id,
@@ -97,7 +111,7 @@ public interface IModifiable<TId, in TSelf, out TParams, TApi, TEntity, in TMode
         if (model is not TModel entityModel)
             throw new DiscordException($"Expected model type '{typeof(TModel).Name}', got '{model.GetType().Name}'");
 
-        return self.CreateEntity(entityModel);
+        return entityModel;
     }
 
     static Task IModifiable<TId, TSelf, TParams, TApi>.ModifyAsync(

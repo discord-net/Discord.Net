@@ -22,7 +22,8 @@ public partial class RestLoadableChannelActor(
 [ExtendInterfaceDefaults(typeof(IChannelActor))]
 public partial class RestChannelActor(
     DiscordRestClient client,
-    ChannelIdentity channel) :
+    ChannelIdentity channel
+) :
     RestActor<ulong, RestChannel, ChannelIdentity>(client, channel),
     IChannelActor;
 
@@ -30,7 +31,7 @@ public partial class RestChannel :
     RestEntity<ulong>,
     IChannel,
     IConstructable<RestChannel, IChannelModel, DiscordRestClient>,
-    IContextConstructable<RestChannel, IChannelModel, GuildIdentity, DiscordRestClient>
+    IContextConstructable<RestChannel, IChannelModel, GuildIdentity?, DiscordRestClient>
 {
     public ChannelType Type => (ChannelType)Model.Type;
 
@@ -66,11 +67,21 @@ public partial class RestChannel :
     public static RestChannel Construct(
         DiscordRestClient client,
         IChannelModel model,
-        GuildIdentity guild)
+        GuildIdentity? guild)
     {
+        switch (guild)
+        {
+            case null when model is IGuildChannelModel guildChannelModel:
+                guild = GuildIdentity.Of(guildChannelModel.GuildId);
+                break;
+            case null:
+                return Construct(client, model);
+        }
+
+
         return model switch
         {
-            GuildChannelBase guildChannel => guildChannel switch
+            IGuildChannelModel guildChannel => guildChannel switch
             {
                 IGuildNewsChannelModel guildAnnouncementChannel => RestNewsChannel.Construct(client,
                     guildAnnouncementChannel, guild),

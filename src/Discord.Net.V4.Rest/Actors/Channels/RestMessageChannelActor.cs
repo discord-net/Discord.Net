@@ -9,9 +9,10 @@ namespace Discord.Rest;
 
 public partial class RestLoadableMessageChannelActor(
     DiscordRestClient client,
-    MessageChannelIdentity channel
+    MessageChannelIdentity channel,
+    GuildIdentity? guild = null
 ) :
-    RestMessageChannelActor(client, channel),
+    RestMessageChannelActor(client, channel, guild),
     ILoadableMessageChannelActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IMessageChannel>))]
@@ -25,7 +26,9 @@ public partial class RestLoadableMessageChannelActor(
                 if (model is null)
                     return null;
 
-                var entity = RestChannel.Construct(client, model);
+                var entity = guild is null
+                    ? RestChannel.Construct(client, model)
+                    : RestChannel.Construct(client, model, guild);
 
                 if (entity is not IMessageChannel messageChannel)
                     throw new DiscordException(
@@ -38,13 +41,14 @@ public partial class RestLoadableMessageChannelActor(
 
 public partial class RestMessageChannelActor(
     DiscordRestClient client,
-    MessageChannelIdentity channel
+    MessageChannelIdentity channel,
+    GuildIdentity? guild = null
 ) :
     RestChannelActor(client, ChannelIdentity.Of(channel.Id)),
     IMessageChannelActor
 {
     public RestIndexableActor<RestLoadableMessageActor, ulong, RestMessage> Messages { get; } =
-        new(messageId => new(client, channel, MessageIdentity.Of(messageId)));
+        new(messageId => new(client, channel, MessageIdentity.Of(messageId), guild));
 
     IIndexableActor<ILoadableMessageActor, ulong, IMessage> IMessageChannelActor.Messages => Messages;
 }

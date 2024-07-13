@@ -15,6 +15,7 @@ public sealed partial class RestLoadableThreadMemberActor(
     RestThreadMemberActor(client, guild, thread, threadMember, member, user),
     ILoadableThreadMemberActor
 {
+    [RestLoadableActorSource]
     [ProxyInterface(typeof(ILoadableEntity<IThreadMember>))]
     internal RestLoadable<ulong, RestThreadMember, IThreadMember, IThreadMemberModel> Loadable { get; }
         = RestLoadable<ulong, RestThreadMember, IThreadMember, IThreadMemberModel>
@@ -34,22 +35,21 @@ public partial class RestThreadMemberActor(
     ThreadMemberIdentity threadMember,
     MemberIdentity? member = null,
     UserIdentity? user = null
-) :
+):
     RestActor<ulong, RestThreadMember, ThreadMemberIdentity>(client, threadMember),
     IThreadMemberActor
 {
+    [SourceOfTruth]
     public RestLoadableThreadChannelActor Thread { get; } =
-        new(client, guild, thread, ThreadMemberIdentity.Of(client.SelfUser.Id));
+        new(client, guild, thread, threadMember);
 
+    [SourceOfTruth]
     public RestLoadableGuildMemberActor Member { get; } =
         new(client, guild, member ?? MemberIdentity.Of(threadMember.Id));
 
+    [SourceOfTruth]
     public RestLoadableUserActor User { get; } =
         new(client, user ?? UserIdentity.Of(threadMember.Id));
-
-    ILoadableThreadChannelActor IThreadRelationship.ThreadChannel => Thread;
-    ILoadableGuildMemberActor IMemberRelationship.Member => Member;
-    ILoadableUserActor IUserRelationship.User => User;
 }
 
 public sealed partial class RestThreadMember :

@@ -7,22 +7,28 @@ using CSharpExtensions = Microsoft.CodeAnalysis.CSharp.CSharpExtensions;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public static class TypeFactories
+public class TypeFactories : IGenerationTask<TypeFactories.GenerationTarget>
 {
+    public class ConstructorArgs(ParameterListSyntax parameters, string? shouldBeLastParameter)
+    {
+        public ParameterListSyntax Parameters { get; } = parameters;
+        public string? ShouldBeLastParameter { get; } = shouldBeLastParameter;
+    }
+
     public class GenerationTarget(
         SemanticModel semanticModel,
         ClassDeclarationSyntax classDeclarationSyntax,
-        ParameterListSyntax? primaryConstructorParameters,
-        List<ConstructorDeclarationSyntax> constructorDeclarationSyntax
+        ConstructorArgs? primaryConstructorParameters,
+        List<ConstructorArgs> constructorDeclarationSyntax
     )
     {
         public SemanticModel SemanticModel { get; } = semanticModel;
         public ClassDeclarationSyntax ClassDeclarationSyntax { get; } = classDeclarationSyntax;
-        public ParameterListSyntax? PrimaryConstructorParameters { get; } = primaryConstructorParameters;
-        public List<ConstructorDeclarationSyntax> ConstructorDeclarationSyntax { get; } = constructorDeclarationSyntax;
+        public ConstructorArgs? PrimaryConstructorParameters { get; } = primaryConstructorParameters;
+        public List<ConstructorArgs> ConstructorDeclarationSyntax { get; } = constructorDeclarationSyntax;
     }
 
-    public static bool IsTarget(SyntaxNode node)
+    public bool IsValid(SyntaxNode node, CancellationToken token)
     {
         if (node is not ClassDeclarationSyntax cls) return false;
         return cls.AttributeLists.Count > 0 || cls.Members.Any(x =>
@@ -30,13 +36,13 @@ public static class TypeFactories
         );
     }
 
-    public static GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
     {
         if (context.Node is not ClassDeclarationSyntax target)
             return null;
 
-        ParameterListSyntax? primaryConstructorParameters = null;
-        List<ConstructorDeclarationSyntax> constructors = new();
+        ConstructorArgs? primaryConstructorParameters = null;
+        List<ConstructorArgs> constructors = new();
 
         // primary constructor
         foreach (var attribute in target.AttributeLists.SelectMany(x => x.Attributes))
@@ -52,7 +58,10 @@ public static class TypeFactories
                 continue;
             }
 
-            primaryConstructorParameters = parameters;
+            primaryConstructorParameters = new ConstructorArgs(
+                parameters,
+                Attributes.GetAttributeNamedNameOfArg(attribute, "LastParameter")
+            );
             break;
         }
 
@@ -63,7 +72,10 @@ public static class TypeFactories
                 if (Attributes.GetAttributeName(attribute, context.SemanticModel) != "Discord.TypeFactoryAttribute")
                     continue;
 
-                constructors.Add(constructor);
+                constructors.Add(new ConstructorArgs(
+                    constructor.ParameterList,
+                    Attributes.GetAttributeNamedNameOfArg(attribute, "LastParameter")
+                ));
             }
         }
 
@@ -73,7 +85,7 @@ public static class TypeFactories
         return null;
     }
 
-    public static void Execute(SourceProductionContext context, GenerationTarget? target)
+    public void Execute(SourceProductionContext context, GenerationTarget? target)
     {
         if (target is null) return;
 
@@ -86,7 +98,7 @@ public static class TypeFactories
 
         foreach (var constructor in target.ConstructorDeclarationSyntax)
         {
-            AppendFactory(sb, target.ClassDeclarationSyntax.Identifier.ValueText, constructor.ParameterList);
+            AppendFactory(sb, target.ClassDeclarationSyntax.Identifier.ValueText, constructor);
         }
 
         context.AddSource(
@@ -102,20 +114,54 @@ public static class TypeFactories
         );
     }
 
-    private static void AppendFactory(StringBuilder builder, string name, ParameterListSyntax parameterList)
+    private static void AppendFactory(StringBuilder builder, string name, ConstructorArgs args)
     {
+        var parameterList = args.Parameters;
         var parameterNames = string.Join(", ", parameterList.Parameters.Select(x => x.Identifier));
+
         builder.AppendLine(
-            $"internal static {name} Factory{parameterList.NormalizeWhitespace()} => new({parameterNames});"
+            $"internal static {name} Factory{ReorderToLast(RemoveParameterDefaults(parameterList), args.ShouldBeLastParameter).NormalizeWhitespace()} => new({parameterNames});"
         );
 
         foreach (var defaultParam in parameterList.Parameters.Where(x => x.Default is not null))
         {
-            var newList = parameterList.RemoveNode(defaultParam, SyntaxRemoveOptions.KeepNoTrivia) ?? SyntaxFactory.ParameterList([]);
+            var newList = RemoveParameterDefaults(parameterList.RemoveNode(defaultParam, SyntaxRemoveOptions.KeepNoTrivia) ?? SyntaxFactory.ParameterList([]));
             parameterNames = string.Join(", ", newList.Parameters.Select(x => x.Identifier));
             builder.AppendLine(
-                $"internal static {name} Factory{newList.NormalizeWhitespace()} => new({parameterNames});"
+                $"internal static {name} Factory{ReorderToLast(newList, args.ShouldBeLastParameter).NormalizeWhitespace()} => new({parameterNames});"
             );
         }
+    }
+
+    private static ParameterListSyntax ReorderToLast(ParameterListSyntax list, string? shouldBeLast)
+    {
+        if (shouldBeLast is null) return list;
+
+        var param = list.Parameters.FirstOrDefault(x => x.Identifier.ValueText == shouldBeLast);
+
+        if (param is null)
+            return list;
+
+        return list
+            .RemoveNode(param, SyntaxRemoveOptions.KeepNoTrivia)!
+            .AddParameters(param);
+    }
+
+    private static ParameterListSyntax RemoveParameterDefaults(ParameterListSyntax list)
+    {
+        var newList = list;
+
+        foreach (var parameter in list.Parameters)
+        {
+            if (parameter.Default is not null)
+            {
+                newList = newList.ReplaceNode(
+                    parameter,
+                    parameter.WithDefault(null)
+                );
+            }
+        }
+
+        return newList;
     }
 }

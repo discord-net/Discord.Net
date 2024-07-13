@@ -1,5 +1,6 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Actors;
 
 namespace Discord.Rest;
 
@@ -11,6 +12,7 @@ public partial class RestLoadableUserActor(
     RestUserActor(client, user),
     ILoadableUserActor
 {
+    [RestLoadableActorSource]
     [ProxyInterface(typeof(ILoadableEntity<IUser>))]
     internal RestLoadable<ulong, RestUser, IUser, IUserModel> Loadable { get; } =
         RestLoadable<ulong, RestUser, IUser, IUserModel>.FromConstructable<RestUser>(
@@ -67,7 +69,7 @@ public partial class RestUser :
         };
     }
 
-    public ValueTask UpdateAsync(IUserModel model, CancellationToken token = default)
+    public virtual ValueTask UpdateAsync(IUserModel model, CancellationToken token = default)
     {
         _model = model;
 

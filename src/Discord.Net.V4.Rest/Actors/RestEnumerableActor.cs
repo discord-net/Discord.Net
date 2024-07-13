@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
-public sealed class RestEnumerableActor<TId, TEntity, TModel>(
+public class RestEnumerableActor<TId, TEntity, TModel>(
     DiscordRestClient client,
     Func<TModel, IEnumerable<TEntity>> factory,
     IApiOutRoute<TModel> route
@@ -24,7 +24,7 @@ public sealed class RestEnumerableActor<TId, TEntity, TModel>(
     }
 }
 
-public sealed class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TModel>(
+public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TModel>(
     DiscordRestClient client,
     Func<TId, TActor> actorFactory,
     Func<TModel, IEnumerable<TEntity>> factory,

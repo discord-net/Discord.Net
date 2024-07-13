@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
+using System.Reflection;
 
 namespace Discord.Net.Hanz;
 
@@ -13,91 +14,68 @@ public sealed class Hanz : IIncrementalGenerator
 
     public record struct LoggingOptions(string FilePath, LogLevel Level);
 
+    private readonly MethodInfo _registerTaskMethod = typeof(Hanz).GetMethods(BindingFlags.Static | BindingFlags.Public).First(x => x.Name.StartsWith("RegisterTask"));
+    private readonly MethodInfo _registerCombineTaskMethod = typeof(Hanz).GetMethods(BindingFlags.Static | BindingFlags.Public).First(x => x.Name.StartsWith("RegisterCombineTask"));
+
+    public static void RegisterTask<T>(IncrementalGeneratorInitializationContext context, IGenerationTask<T> task)
+        where T : class
+    {
+        var provider = context.SyntaxProvider.CreateSyntaxProvider(
+            predicate: task.IsValid,
+            transform: task.GetTargetForGeneration
+        );
+
+        context.RegisterSourceOutput(provider, task.Execute);
+
+        Logger.Log($"Registered {task.GetType().Name} task");
+    }
+
+    public static void RegisterCombineTask<T>(IncrementalGeneratorInitializationContext context, IGenerationCombineTask<T> task)
+        where T : class
+    {
+        var provider = context.SyntaxProvider.CreateSyntaxProvider(
+            predicate: task.IsValid,
+            transform: task.GetTargetForGeneration
+        ).Collect();
+
+        context.RegisterSourceOutput(provider, task.Execute);
+
+        Logger.Log($"Registered {task.GetType().Name} task");
+    }
+
+    private static bool IsGenerationTask(Type type)
+    {
+        return type.IsGenericType && (
+            type.GetGenericTypeDefinition() == typeof(IGenerationTask<>) ||
+            type.GetGenericTypeDefinition() == typeof(IGenerationCombineTask<>)
+        );
+    }
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var entityHierarchies = context.SyntaxProvider.CreateSyntaxProvider(
-            predicate: static (node, _) => node is ClassDeclarationSyntax {AttributeLists.Count: > 0},
-            transform: static (ctx, _) => EntityHierarchies.GetTargetForGeneration(ctx)
-        );
-
-        var proxyInterfaces = context.SyntaxProvider.CreateSyntaxProvider(
-            predicate: static (node, _) => InterfaceProxy.IsTarget(node),
-            transform: static (ctx, _) => InterfaceProxy.GetTargetForGeneration(ctx)
-        );
-
-        var typeFactories = context.SyntaxProvider.CreateSyntaxProvider(
-            predicate: static (node, _) => TypeFactories.IsTarget(node),
-            transform: static (ctx, _) => TypeFactories.GetTargetForGeneration(ctx)
-        );
-
-        var varargs = context.SyntaxProvider.CreateSyntaxProvider(
-            predicate: static (node, _) => VariableFuncArgs.IsValid(node),
-            transform: static (ctx, _) => VariableFuncArgs.GetGenerationTarget(ctx)
-        ).Collect();
-
-        var restLoadable = context.SyntaxProvider.CreateSyntaxProvider(
-            predicate: static (node, _) => RestLoadableSource.IsValid(node),
-            transform: static (ctx, _) => RestLoadableSource.GetTargetForGeneration(ctx)
-        );
-
-        var sourceOfTruth = context.SyntaxProvider.CreateSyntaxProvider(
-            predicate: static (node, _) => SourceOfTruth.IsValid(node),
-            transform: static (ctx, _) => SourceOfTruth.GetTargetForGeneration(ctx)
-        ).Collect();
-
-        var intrinsicOverride = context.SyntaxProvider.CreateSyntaxProvider(
-            predicate: static (node, _) => CovariantOverride.IsValid(node),
-            transform: static (ctx,_) => CovariantOverride.GetTargetForGeneration(ctx)
-        ).Collect();
-
-        var modelEquality = context.SyntaxProvider.CreateSyntaxProvider(
-            predicate: static (node, _) => ModelEquality.IsValid(node),
-            transform: static (ctx, _) => ModelEquality.GetTargetForGeneration(ctx)
-        );
-
-        context.RegisterSourceOutput(
-            entityHierarchies,
-            EntityHierarchies.Execute
-        );
-
-        context.RegisterSourceOutput(
-            proxyInterfaces,
-            InterfaceProxy.Execute
-        );
-
-        context.RegisterSourceOutput(
-            typeFactories,
-            TypeFactories.Execute
-        );
-
-        context.RegisterSourceOutput(
-            varargs,
-            VariableFuncArgs.Execute
-        );
-
-        context.RegisterSourceOutput(
-            restLoadable,
-            RestLoadableSource.Execute
-        );
-
-        context.RegisterSourceOutput(
-            sourceOfTruth,
-            SourceOfTruth.Execute
-        );
-
-        context.RegisterSourceOutput(
-            intrinsicOverride,
-            CovariantOverride.Execute
-        );
-
-        context.RegisterSourceOutput(
-            modelEquality,
-            ModelEquality.Execute
-        );
-
         var options = context.AnalyzerConfigOptionsProvider.Select((options, _) => GetLoggingOptions(options));
 
         SetupLogger(context, options);
+
+        var generationTasks = typeof(Hanz).Assembly.GetTypes()
+            .Where(x => x
+                .GetInterfaces()
+                .Any(IsGenerationTask)
+            );
+
+        foreach (var task in generationTasks)
+        {
+            var generationInterface = task.GetInterfaces().FirstOrDefault(IsGenerationTask);
+
+            if (generationInterface is null) continue;
+
+            if(generationInterface.GetGenericTypeDefinition() == typeof(IGenerationTask<>))
+                _registerTaskMethod.MakeGenericMethod(generationInterface.GenericTypeArguments[0])
+                    .Invoke(null, [context, Activator.CreateInstance(task)]);
+            else if(generationInterface.GetGenericTypeDefinition() == typeof(IGenerationCombineTask<>))
+                _registerCombineTaskMethod.MakeGenericMethod(generationInterface.GenericTypeArguments[0])
+                    .Invoke(null, [context, Activator.CreateInstance(task)]);
+        }
     }
 
     private void SetupLogger(

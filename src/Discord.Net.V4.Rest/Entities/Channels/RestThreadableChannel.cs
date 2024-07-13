@@ -14,14 +14,14 @@ public partial class RestLoadableThreadableChannelActor(
     RestThreadableChannelActor(client, guild, channel),
     ILoadableThreadableChannelActor
 {
-    [ProxyInterface(typeof(ILoadableEntity<IGuildChannel>))]
-    internal RestLoadable<ulong, RestGuildChannel, IGuildChannel, IChannelModel> Loadable { get; } =
+    [ProxyInterface(typeof(ILoadableEntity<IThreadableChannel>))]
+    internal RestLoadable<ulong, RestThreadableChannel, IThreadableChannel, IChannelModel> Loadable { get; } =
         new(
             client,
             channel,
             Routes.GetChannel(channel.Id),
-            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestGuildChannel, IThreadableChannelModel>(
-                (_, model) => RestGuildChannel.Construct(client, model, guild)
+            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestThreadableChannel, IThreadableChannelModel>(
+                (_, model) => RestThreadableChannel.Construct(client, model, guild)
             ).Invoke
         );
 }
@@ -32,25 +32,25 @@ public partial class RestThreadableChannelActor(
     ThreadableChannelIdentity channel
 ) :
     RestGuildChannelActor(client, guild, channel),
-    IThreadableChannelActor
+    IThreadableChannelActor,
+    IActor<ulong, RestThreadableChannel>
 {
+    [SourceOfTruth]
     public ThreadsPagedActor PublicArchivedThreads { get; }
         = RestActors.PublicArchivedThreads(client, guild, channel);
 
+    [SourceOfTruth]
     public ThreadsPagedActor PrivateArchivedThreads { get; }
         = RestActors.PrivateArchivedThreads(client, guild, channel);
 
+    [SourceOfTruth]
     public ThreadsPagedActor JoinedPrivateArchivedThreads { get; }
         = RestActors.JoinedPrivateArchivedThreads(client, guild, channel);
 
-    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> IThreadableChannelActor.PublicArchivedThreads
-        => PublicArchivedThreads;
-
-    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> IThreadableChannelActor.PrivateArchivedThreads
-        => PrivateArchivedThreads;
-
-    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> IThreadableChannelActor.JoinedPrivateArchivedThreads
-        => JoinedPrivateArchivedThreads;
+    [SourceOfTruth]
+    [CovariantOverride]
+    internal virtual RestThreadableChannel CreateEntity(IThreadableChannelModel model)
+        => RestThreadableChannel.Construct(Client, model, Guild.Identity);
 }
 
 public partial class RestThreadableChannel :
@@ -62,9 +62,15 @@ public partial class RestThreadableChannel :
 
     public ThreadArchiveDuration DefaultArchiveDuration => (ThreadArchiveDuration)Model.DefaultAutoArchiveDuration;
 
-    internal override IThreadableChannelModel Model { get; }
+    internal override IThreadableChannelModel Model => _model;
 
+    [ProxyInterface(
+        typeof(IThreadableChannelActor),
+        typeof(IEntityProvider<IThreadableChannel, IThreadableChannelModel>)
+    )]
     internal override RestThreadableChannelActor Actor { get; }
+
+    private IThreadableChannelModel _model;
 
     internal RestThreadableChannel(
         DiscordRestClient client,
@@ -73,7 +79,7 @@ public partial class RestThreadableChannel :
         RestThreadableChannelActor? actor = null
     ) : base(client, guild, model)
     {
-        Model = model;
+        _model = model;
         Actor = actor ?? new(
             client,
             guild,
@@ -98,6 +104,14 @@ public partial class RestThreadableChannel :
                 => RestTextChannel.Construct(client, guildTextChannelModel, guild),
             _ => new RestThreadableChannel(client, guild, model)
         };
+    }
+
+    [CovariantOverride]
+    public virtual ValueTask UpdateAsync(IThreadableChannelModel model, CancellationToken token = default)
+    {
+        _model = model;
+
+        return base.UpdateAsync(model, token);
     }
 
     public override IThreadableChannelModel GetModel() => Model;

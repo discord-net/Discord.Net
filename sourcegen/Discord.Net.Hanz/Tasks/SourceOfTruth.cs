@@ -7,7 +7,7 @@ using Exception = System.Exception;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public static class SourceOfTruth
+public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarget>
 {
     public class GenerationTarget(
         SemanticModel semantic,
@@ -20,7 +20,7 @@ public static class SourceOfTruth
         public MemberDeclarationSyntax MemberDeclarationSyntax { get; } = memberDeclarationSyntax;
     }
 
-    public static bool IsValid(SyntaxNode node)
+    public bool IsValid(SyntaxNode node, CancellationToken token)
     {
         return node switch
         {
@@ -29,7 +29,7 @@ public static class SourceOfTruth
         };
     }
 
-    public static GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
     {
         if (context.Node is not MemberDeclarationSyntax member) return null;
         if (member.Parent is not TypeDeclarationSyntax type) return null;
@@ -49,7 +49,7 @@ public static class SourceOfTruth
         public TypeDeclarationSyntax Syntax { get; set; } = syntax;
     }
 
-    public static void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
     {
         var toGenerate = new Dictionary<string, GenerationResult>();
 
@@ -126,10 +126,20 @@ public static class SourceOfTruth
                         string.Join("\n",
                             target.TypeDeclarationSyntax.SyntaxTree.GetRoot().ChildNodes()
                                 .OfType<UsingDirectiveSyntax>()),
-                        target.TypeDeclarationSyntax
-                            .WithBaseList(null)
-                            .WithMembers([])
-                            .WithAttributeLists([])
+                        SyntaxFactory.TypeDeclaration(
+                            target.TypeDeclarationSyntax.Kind(),
+                            [],
+                            target.TypeDeclarationSyntax.Modifiers,
+                            target.TypeDeclarationSyntax.Keyword,
+                            target.TypeDeclarationSyntax.Identifier,
+                            target.TypeDeclarationSyntax.TypeParameterList,
+                            null,
+                            target.TypeDeclarationSyntax.ConstraintClauses,
+                            target.TypeDeclarationSyntax.OpenBraceToken,
+                            [],
+                            target.TypeDeclarationSyntax.CloseBraceToken,
+                            target.TypeDeclarationSyntax.SemicolonToken
+                        )
                     );
 
                 foreach (var validTarget in validTargets)
@@ -149,7 +159,8 @@ public static class SourceOfTruth
                                         SyntaxFactory.IdentifierName(property.Name)
                                     ),
                                     null,
-                                    SyntaxFactory.Token(SyntaxKind.SemicolonToken))
+                                    SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                                )
                             );
                             break;
                         case IMethodSymbol method:
@@ -202,7 +213,8 @@ public static class SourceOfTruth
                                             )
                                         )
                                     ),
-                                    SyntaxFactory.Token(SyntaxKind.SemicolonToken))
+                                    SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                                )
                             );
                             break;
                     }

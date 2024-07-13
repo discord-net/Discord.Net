@@ -45,10 +45,11 @@ public partial class RestStageChannel :
     IStageChannel,
     IContextConstructable<RestStageChannel, IGuildStageChannelModel, GuildIdentity, DiscordRestClient>
 {
-    internal override IGuildStageChannelModel Model => _model;
 
     [ProxyInterface(typeof(IStageChannelActor), typeof(IStageInstanceRelationship))]
     internal override RestStageChannelActor Actor { get; }
+
+    internal override IGuildStageChannelModel Model => _model;
 
     private IGuildStageChannelModel _model;
 
@@ -67,6 +68,7 @@ public partial class RestStageChannel :
     public static RestStageChannel Construct(DiscordRestClient client, IGuildStageChannelModel model, GuildIdentity guild)
         => new(client, guild, model);
 
+    [CovariantOverride]
     public ValueTask UpdateAsync(IGuildStageChannelModel model, CancellationToken token = default)
     {
         _model = model;

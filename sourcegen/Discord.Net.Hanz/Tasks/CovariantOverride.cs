@@ -6,37 +6,47 @@ using System.Collections.Immutable;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public static class CovariantOverride
+public class CovariantOverride : IGenerationCombineTask<CovariantOverride.GenerationTarget>
 {
     public class GenerationTarget(
         SemanticModel semanticModel,
         MethodDeclarationSyntax methodDeclarationSyntax,
-        ClassDeclarationSyntax classDeclarationSyntax
+        ClassDeclarationSyntax classDeclarationSyntax,
+        bool shouldThrowOnInvalidVariant
     )
     {
         public SemanticModel SemanticModel { get; } = semanticModel;
         public MethodDeclarationSyntax MethodDeclarationSyntax { get; } = methodDeclarationSyntax;
         public ClassDeclarationSyntax ClassDeclarationSyntax { get; } = classDeclarationSyntax;
+        public bool ShouldThrowOnInvalidVariant { get; } = shouldThrowOnInvalidVariant;
     }
 
-    public static bool IsValid(SyntaxNode node)
+    public bool IsValid(SyntaxNode node, CancellationToken token)
         => node is MethodDeclarationSyntax {AttributeLists.Count: > 0};
 
-    public static GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
     {
         if (context.Node is not MethodDeclarationSyntax {AttributeLists.Count: > 0} method)
             return null;
 
-        if (method.AttributeLists
+        var attribute = method.AttributeLists
             .SelectMany(x => x.Attributes)
-            .All(x => Attributes.GetAttributeName(x, context.SemanticModel) != "Discord.CovariantOverrideAttribute"))
+            .FirstOrDefault(x =>
+                Attributes.GetAttributeName(x, context.SemanticModel) == "Discord.CovariantOverrideAttribute");
+
+        if (attribute is null)
             return null;
 
         if (method.Parent is not ClassDeclarationSyntax classDeclaration) return null;
 
         if (classDeclaration.BaseList is null) return null;
 
-        return new GenerationTarget(context.SemanticModel, method, classDeclaration);
+        return new GenerationTarget(
+            context.SemanticModel,
+            method,
+            classDeclaration,
+            Attributes.GetAttributeNamedBoolArg(attribute, "ThrowOnInvalidVariant", true)
+        );
     }
 
     private class GenerationResult(
@@ -50,7 +60,7 @@ public static class CovariantOverride
         public ClassDeclarationSyntax Syntax { get; set; } = syntax;
     }
 
-    public static void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
     {
         var toGenerate = new Dictionary<string, GenerationResult>();
 
@@ -62,7 +72,7 @@ public static class CovariantOverride
 
                 var targetTypeSymbol = target.SemanticModel.GetDeclaredSymbol(target.ClassDeclarationSyntax);
 
-                if(targetTypeSymbol is null) continue;
+                if (targetTypeSymbol is null) continue;
 
                 var targetReturnType = ModelExtensions
                     .GetTypeInfo(target.SemanticModel, target.MethodDeclarationSyntax.ReturnType).Type;
@@ -150,12 +160,18 @@ public static class CovariantOverride
                                 string.Join("\n",
                                     target.ClassDeclarationSyntax.SyntaxTree.GetRoot().ChildNodes()
                                         .OfType<UsingDirectiveSyntax>()),
-                                target.ClassDeclarationSyntax
-                                    .WithBaseList(null)
-                                    .WithMembers([])
+                                SyntaxFactory.ClassDeclaration(
+                                    [],
+                                    target.ClassDeclarationSyntax.Modifiers,
+                                    target.ClassDeclarationSyntax.Identifier,
+                                    target.ClassDeclarationSyntax.TypeParameterList,
+                                    null,
+                                    target.ClassDeclarationSyntax.ConstraintClauses,
+                                    []
+                                )
                             );
 
-                        var resultIsAwaitable =
+                        var shouldAwait =
                             targetMethodSymbol.IsAsync ||
                             member.IsAsync ||
                             targetMethodSymbol.IsAwaitableNonDynamic(
@@ -173,15 +189,24 @@ public static class CovariantOverride
                                       memberAccessExpressionSyntax.Name.Identifier.ValueText == member.Name
                             );
 
+                        if (target.ShouldThrowOnInvalidVariant)
+                        {
+                            shouldReturn = true;
+                            shouldAwait = false;
+                        }
+
                         var modifiers = target.MethodDeclarationSyntax.Modifiers
                             .Add(SyntaxFactory.Token(SyntaxKind.OverrideKeyword));
 
                         var virtualIndex = modifiers.IndexOf(SyntaxKind.VirtualKeyword);
+                        var newIndex = modifiers.IndexOf(SyntaxKind.NewKeyword);
 
+                        if (newIndex >= 0)
+                            modifiers = modifiers.RemoveAt(newIndex);
                         if (virtualIndex >= 0)
                             modifiers = modifiers.RemoveAt(virtualIndex);
 
-                        if (resultIsAwaitable && !shouldReturn)
+                        if (shouldAwait && !shouldReturn)
                             modifiers = modifiers.Add(SyntaxFactory.Token(SyntaxKind.AsyncKeyword));
 
                         generateResult.Syntax = generateResult.Syntax
@@ -219,8 +244,9 @@ public static class CovariantOverride
                                         member,
                                         targetMethodSymbol,
                                         covariantParameters,
-                                        resultIsAwaitable,
-                                        shouldReturn
+                                        shouldAwait,
+                                        shouldReturn,
+                                        target.ShouldThrowOnInvalidVariant
                                     ),
                                     null
                                 )
@@ -258,7 +284,8 @@ public static class CovariantOverride
         IMethodSymbol targetMethod,
         HashSet<IParameterSymbol> covariantParameters,
         bool isAwaitable,
-        bool shouldReturn
+        bool shouldReturn,
+        bool shouldThrow
     )
     {
         // in the case where 'shouldReturn' is true, we would be returning the awaitable so we don't
@@ -333,11 +360,54 @@ public static class CovariantOverride
         if (isAwaitable)
             baseInvocation = SyntaxFactory.AwaitExpression(baseInvocation);
 
+        StatementSyntax fallthrough = shouldThrow
+            ? SyntaxFactory.ThrowStatement(
+                SyntaxFactory.ObjectCreationExpression(
+                    SyntaxFactory.IdentifierName("ArgumentException"),
+                    SyntaxFactory.ArgumentList(
+                        SyntaxFactory.SeparatedList([
+                            SyntaxFactory.Argument(
+                                SyntaxFactory.InterpolatedStringExpression(
+                                    SyntaxFactory.Token(SyntaxKind.InterpolatedStringStartToken),
+                                    SyntaxFactory.List<InterpolatedStringContentSyntax>([
+                                        SyntaxFactory.InterpolatedStringText(
+                                            SyntaxFactory.Token(
+                                                [],
+                                                SyntaxKind.InterpolatedStringTextToken,
+                                                $"Expected {covariantParameters.First().Type.Name}, but got ",
+                                                string.Empty, //$"Expected {covariantParameters.First().Type.Name} but got ",
+                                                []
+                                            )
+                                        ),
+                                        SyntaxFactory.Interpolation(
+                                            SyntaxFactory.ConditionalAccessExpression(
+                                                SyntaxFactory.IdentifierName(covariantParameters.First().Name),
+                                                SyntaxFactory.MemberAccessExpression(
+                                                    SyntaxKind.SimpleMemberAccessExpression,
+                                                    SyntaxFactory.InvocationExpression(
+                                                        SyntaxFactory.MemberBindingExpression(
+                                                            SyntaxFactory.IdentifierName("GetType")
+                                                        )
+                                                    ),
+                                                    SyntaxFactory.IdentifierName("Name")
+                                                )
+                                            )
+                                        )
+                                    ])
+                                )
+                            )
+                        ])
+                    ),
+                    null
+                )
+            )
+            : shouldReturn
+                ? SyntaxFactory.ReturnStatement(baseInvocation)
+                : SyntaxFactory.ExpressionStatement(baseInvocation);
+
         return SyntaxFactory.Block(
             ifClause,
-            shouldReturn
-                ? SyntaxFactory.ReturnStatement(baseInvocation)
-                : SyntaxFactory.ExpressionStatement(baseInvocation)
+            fallthrough
         );
     }
 

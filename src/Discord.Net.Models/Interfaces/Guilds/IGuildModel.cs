@@ -30,6 +30,7 @@ public partial interface IGuildModel : IPartialGuildModel, IEntityModel<ulong>
     IWelcomeScreenModel? WelcomeScreen { get; }
     bool PremiumProgressBarEnabled { get; }
     ulong? SafetyAlertsChannelId { get; }
+    IEnumerable<ulong> RoleIds { get; }
 }
 
 public interface IWelcomeScreenModel

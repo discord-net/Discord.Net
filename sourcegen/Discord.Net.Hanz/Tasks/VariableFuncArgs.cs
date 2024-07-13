@@ -8,53 +8,136 @@ using CSharpExtensions = Microsoft.CodeAnalysis.CSharp.CSharpExtensions;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public static class VariableFuncArgs
+public class VariableFuncArgs : IGenerationCombineTask<VariableFuncArgs.GenerationTarget>
 {
+    private static List<MethodTarget> _methods = new();
+
+    public class MethodTarget(
+        string simpleName,
+        string fullName,
+        MethodDeclarationSyntax methodSyntax,
+        IMethodSymbol methodSymbol)
+    {
+        public string SimpleName { get; } = simpleName;
+        public string FullName { get; } = fullName;
+        public MethodDeclarationSyntax MethodSyntax { get; set; } = methodSyntax;
+        public IMethodSymbol MethodSymbol { get; set; } = methodSymbol;
+
+        public bool CanBeCalledFor(ITypeSymbol node, SemanticModel semanticModel)
+        {
+            if (MethodSymbol.ContainingType.Equals(node, SymbolEqualityComparer.Default))
+                return true;
+
+            if (semanticModel.Compilation.ClassifyCommonConversion(node, MethodSymbol.ContainingType).Exists)
+                return true;
+
+            if (MethodSymbol.IsExtensionMethod)
+            {
+                var extensionParameter = MethodSymbol.Parameters.FirstOrDefault();
+
+                if (extensionParameter is null)
+                    return false;
+
+                var canUse = semanticModel.Compilation.ClassifyCommonConversion(node, extensionParameter.Type);
+                var isEq = node.Equals(extensionParameter.Type, SymbolEqualityComparer.Default);
+
+                if (canUse.Exists || isEq)
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
     public class GenerationTarget(
         SemanticModel semanticModel,
-        IMethodSymbol method,
+        MethodTarget method,
         ArgumentListSyntax arguments
     )
     {
         public SemanticModel SemanticModel { get; } = semanticModel;
-        public IMethodSymbol Method { get; } = method;
+        public MethodTarget Method { get; } = method;
         public ArgumentListSyntax Arguments { get; } = arguments;
     }
 
-    public static bool IsValid(SyntaxNode node)
+    public bool IsValid(SyntaxNode node, CancellationToken token)
     {
-        if (node is not InvocationExpressionSyntax invocation) return false;
+        switch (node)
+        {
+            case MethodDeclarationSyntax method:
+                return method.ParameterList.Parameters.Any(x => x.AttributeLists.Count > 0);
+            case InvocationExpressionSyntax invocation:
+                var methodName = invocation.Expression.ChildNodes().OfType<IdentifierNameSyntax>().LastOrDefault();
+                if (methodName is null) return false;
 
-        return invocation.ArgumentList.Arguments.Count > 0;
+                return _methods.Any(x => x.SimpleName == methodName.Identifier.ValueText);
+            default: return false;
+        }
     }
 
-    public static GenerationTarget? GetGenerationTarget(GeneratorSyntaxContext context)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
     {
-        if (context.Node is not InvocationExpressionSyntax invocation) return null;
-
-        var symbolInfo = ModelExtensions.GetSymbolInfo(context.SemanticModel, invocation);
-
-        if (symbolInfo.Symbol is null)
+        switch (context.Node)
         {
-            foreach (var candidate in symbolInfo.CandidateSymbols)
-            {
-                if (candidate is not IMethodSymbol candidateMethodSymbol) continue;
+            case MethodDeclarationSyntax method:
+                var methodSymbol = context.SemanticModel.GetDeclaredSymbol(method);
 
-                foreach (var parameter in candidateMethodSymbol.Parameters)
+                if (methodSymbol is null)
+                    return null;
+
+                var existing = _methods.FirstOrDefault(x => x.FullName == methodSymbol.ToDisplayString());
+
+                var hasVarFuncParameter = methodSymbol.Parameters
+                    .Any(x => x.GetAttributes()
+                        .Any(y => y.AttributeClass?.ToDisplayString() == "Discord.VariableFuncArgsAttribute")
+                    );
+
+                if (existing is not null && hasVarFuncParameter)
                 {
-                    if (!parameter.GetAttributes().Any(x =>
-                            x.AttributeClass?.ToDisplayString() == "Discord.VariableFuncArgsAttribute")
-                       ) continue;
-
-                    return new GenerationTarget(context.SemanticModel, candidateMethodSymbol, invocation.ArgumentList);
+                    existing.MethodSyntax = method;
+                    existing.MethodSymbol = methodSymbol;
                 }
-            }
-        }
+                else if (existing is not null && !hasVarFuncParameter)
+                {
+                    _methods.Remove(existing);
+                }
+                else if (hasVarFuncParameter)
+                {
+                    _methods.Add(new MethodTarget(
+                        method.Identifier.ValueText,
+                        methodSymbol.ToDisplayString(),
+                        method,
+                        methodSymbol
+                    ));
+                }
 
+                return null;
+            case InvocationExpressionSyntax invocation:
+                var invokeType = invocation.Expression switch
+                {
+                    MemberAccessExpressionSyntax member => context.SemanticModel.GetTypeInfo(member.Expression).Type,
+                    _ => null
+                };
+
+                if (invokeType is null) return null;
+
+                var target = _methods.FirstOrDefault(x => x.CanBeCalledFor(invokeType, context.SemanticModel));
+
+                if (target is null)
+                {
+                    return null;
+                }
+
+                return new GenerationTarget(
+                    context.SemanticModel,
+                    target,
+                    invocation.ArgumentList
+                );
+        }
         return null;
     }
 
-    public static void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
     {
         var processed = new Dictionary<string, HashSet<int>>();
 
@@ -67,20 +150,29 @@ public static class VariableFuncArgs
                     continue;
                 }
 
-                var declaringSyntax = target.Method.DeclaringSyntaxReferences
-                        .FirstOrDefault(x => IsNotGeneratedMethodInfo(x.GetSyntax()))
-                        ?.GetSyntax()
-                    as MethodDeclarationSyntax;
+                if (target.Method.MethodSyntax.Parent is not TypeDeclarationSyntax typeDeclarationSyntax)
+                    return;
 
+                if (target.Method.MethodSyntax.Body is null)
+                {
+                    Hanz.Logger.Warn("Syntax couldn't be resolved");
+                    continue;
+                }
 
-                if (declaringSyntax is null || declaringSyntax.Body is null) continue;
+                var newFunctionSyntax = target.Method.MethodSyntax;
 
-                var newFunctionSyntax = declaringSyntax;
+                var extraArgs = target.Arguments.Arguments.Count - target.Method.MethodSymbol.Parameters.Length;
 
+                if (target.Method.MethodSymbol.IsExtensionMethod)
+                    extraArgs++;
 
-                var extraArgs = target.Arguments.Arguments.Count - target.Method.Parameters.Length;
+                if (extraArgs <= 0)
+                {
+                    Hanz.Logger.Warn("No extra args");
+                    continue;
+                }
 
-                if (processed.TryGetValue(target.Method.ToDisplayString(), out var generatedExtras) &&
+                if (processed.TryGetValue(target.Method.MethodSymbol.ToDisplayString(), out var generatedExtras) &&
                     generatedExtras.Contains(extraArgs))
                 {
                     continue;
@@ -88,13 +180,14 @@ public static class VariableFuncArgs
 
                 string? varargFuncParameterIdentifier = null;
 
-                var offset = target.Method.IsExtensionMethod ? 1 : 0;
+                var offset = target.Method.MethodSymbol.IsExtensionMethod ? 1 : 0;
 
-                for (var index = 0; index < target.Method.Parameters.Length; index++)
+                for (var index = offset; index < target.Method.MethodSymbol.Parameters.Length; index++)
                 {
-                    var parameterNode = declaringSyntax.ParameterList.Parameters[index + offset];
+                    var parameterNode = target.Method.MethodSyntax.ParameterList.Parameters[index];
 
-                    var parameter = target.Method.Parameters[index];
+                    var parameter = target.Method.MethodSymbol.Parameters[index];
+
                     if (parameter.GetAttributes().Any(x =>
                             x.AttributeClass?.ToDisplayString() == "Discord.VariableFuncArgsAttribute"))
                     {
@@ -108,7 +201,7 @@ public static class VariableFuncArgs
 
                         if (funcGenericTypes is null)
                         {
-                            Hanz.Logger.Log(LogLevel.Error, "Somethings really sussy bro");
+                            Hanz.Logger.Log(LogLevel.Error, $"Somethings really sussy bro: {parameterNode} | {parameter}");
                             return;
                         }
 
@@ -134,7 +227,7 @@ public static class VariableFuncArgs
                                 ),
                                 parameterNode.Identifier,
                                 parameterNode.Default
-                            ).NormalizeWhitespace()
+                            )
                         );
 
                         var newTypeArgs = Enumerable.Range(0, extraArgs)
@@ -149,7 +242,7 @@ public static class VariableFuncArgs
                                         .TypeParameterList
                                         .Parameters
                                         .AddRange(newTypeArgs)
-                                ).NormalizeWhitespace()
+                                )
                             );
                         }
                         else
@@ -159,7 +252,6 @@ public static class VariableFuncArgs
                                     SyntaxFactory.TypeParameterList(
                                             SyntaxFactory.SeparatedList(newTypeArgs)
                                         )
-                                        .NormalizeWhitespace()
                                 );
                         }
 
@@ -172,7 +264,7 @@ public static class VariableFuncArgs
                                             .WithTrailingTrivia(SyntaxFactory.Whitespace(" ")),
                                         SyntaxFactory.Identifier($"vararg{x}"),
                                         null
-                                    ).NormalizeWhitespace()
+                                    )
                                 )
                         );
 
@@ -180,7 +272,6 @@ public static class VariableFuncArgs
                             newFunctionSyntax.ParameterList,
                             SyntaxFactory
                                 .ParameterList(newParameters)
-                                .NormalizeWhitespace()
                         );
                     }
                 }
@@ -209,27 +300,28 @@ public static class VariableFuncArgs
                         SyntaxFactory.ArgumentList(
                             newArgFuncList
                         )
-                    ).NormalizeWhitespace();
+                    );
 
                     newFunctionSyntax = newFunctionSyntax.ReplaceNode(node, newInvocation);
                 }
 
-                context.AddSource(
-                    $"VarArgFuncs/{target.Method.ContainingType.Name}_{target.Method.Name}_VARGS{extraArgs}",
-                    $$"""
-                      {{string.Join("\n", declaringSyntax.SyntaxTree.GetRoot().ChildNodes().OfType<UsingDirectiveSyntax>())}}
-                      namespace {{target.Method.ContainingType.ContainingNamespace}};
+                typeDeclarationSyntax = typeDeclarationSyntax
+                    .WithMembers(SyntaxFactory.List<MemberDeclarationSyntax>([newFunctionSyntax]))
+                    .WithAttributeLists([])
+                    .WithBaseList(null);
 
-                      public{{(target.Method.ContainingType.IsStatic ? " static" : "")}} partial class {{target.Method.ContainingType.Name}}
-                      {
-                          [System.Runtime.CompilerServices.CompilerGenerated]
-                          {{newFunctionSyntax}}
-                      }
+                context.AddSource(
+                    $"VarArgFuncs/{target.Method.MethodSymbol.ContainingType.Name}_{target.Method.MethodSymbol.Name}_VARGS{extraArgs}",
+                    $$"""
+                      {{string.Join("\n", target.Method.MethodSyntax.SyntaxTree.GetRoot().ChildNodes().OfType<UsingDirectiveSyntax>())}}
+                      namespace {{target.Method.MethodSymbol.ContainingType.ContainingNamespace}};
+
+                      {{typeDeclarationSyntax.NormalizeWhitespace()}}
                       """
                 );
 
-                if (!processed.TryGetValue(target.Method.ToDisplayString(), out generatedExtras))
-                    processed[target.Method.ToDisplayString()] = generatedExtras = [];
+                if (!processed.TryGetValue(target.Method.MethodSymbol.ToDisplayString(), out generatedExtras))
+                    processed[target.Method.MethodSymbol.ToDisplayString()] = generatedExtras = [];
 
                 generatedExtras.Add(extraArgs);
             }

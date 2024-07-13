@@ -2,11 +2,13 @@ using Discord.Entities.Channels.Threads;
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Channels;
+using Discord.Rest.Extensions;
 using Discord.Rest.Guilds;
 using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
+[method: TypeFactory(LastParameter = nameof(thread))]
 public sealed partial class RestLoadableThreadChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -29,10 +31,7 @@ public sealed partial class RestLoadableThreadChannelActor(
         );
 }
 
-[ExtendInterfaceDefaults(
-    typeof(IThreadChannelActor),
-    typeof(IModifiable<ulong, IThreadChannelActor, ModifyThreadChannelProperties, ModifyThreadChannelParams>)
-)]
+[ExtendInterfaceDefaults]
 public partial class RestThreadChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -46,20 +45,22 @@ public partial class RestThreadChannelActor(
     [ProxyInterface(typeof(IMessageChannelActor))]
     internal RestMessageChannelActor MessageChannelActor { get; } = new(client, thread);
 
+    [SourceOfTruth]
     public RestLoadableThreadMemberActor CurrentThreadMember { get; } =
         new(client, guild, thread, currentThreadMember ?? ThreadMemberIdentity.Of(client.SelfUser.Id));
 
     public IEnumerableIndexableActor<ILoadableThreadMemberActor, ulong, IThreadMember> ThreadMembers =>
         throw new NotImplementedException();
 
-    public IThreadChannel CreateEntity(IThreadChannelModel model)
+    public ILoadableThreadableChannelActor Parent => throw new NotImplementedException();
+
+    [SourceOfTruth]
+    [CovariantOverride]
+    internal RestThreadChannel CreateEntity(IThreadChannelModel model)
         => RestThreadChannel.Construct(Client, model, new RestThreadChannel.Context(
             Guild.Identity,
             CurrentThreadMember.Identity
         ));
-
-    public ILoadableThreadableChannelActor Parent => throw new NotImplementedException();
-    ILoadableThreadMemberActor IThreadChannelActor.CurrentThreadMember => CurrentThreadMember;
 }
 
 public partial class RestThreadChannel :
@@ -103,8 +104,6 @@ public partial class RestThreadChannel :
 
     #endregion
 
-    internal override IThreadChannelModel Model { get; }
-
     [ProxyInterface(
         typeof(IThreadChannelActor),
         typeof(IThreadMemberRelationship),
@@ -112,6 +111,10 @@ public partial class RestThreadChannel :
         typeof(IEntityProvider<IThreadChannel, IThreadChannelModel>)
     )]
     internal override RestThreadChannelActor Actor { get; }
+
+    internal override IThreadChannelModel Model => _model;
+
+    private IThreadChannelModel _model;
 
     internal RestThreadChannel(
         DiscordRestClient client,
@@ -122,7 +125,7 @@ public partial class RestThreadChannel :
         ThreadableChannelIdentity? parent = null
     ) : base(client, guild, model, actor)
     {
-        Model = model;
+        _model = model;
         Actor = actor ?? new(
             client,
             guild,
@@ -142,18 +145,22 @@ public partial class RestThreadChannel :
     public static RestThreadChannel Construct(DiscordRestClient client, IThreadChannelModel model, Context context)
         => new(client, context.Guild ?? GuildIdentity.Of(model.GuildId), model, currentThreadMember: context.CurrentThreadMember, parent: context.Parent);
 
+    [CovariantOverride]
     public ValueTask UpdateAsync(IThreadChannelModel model, CancellationToken token = default)
     {
-        if (!AppliedTags.SequenceEqual(Model.AppliedTags))
-            AppliedTags = Model.AppliedTags.ToImmutableArray();
+        if (!AppliedTags.SequenceEqual(model.AppliedTags))
+            AppliedTags = model.AppliedTags.ToImmutableArray();
 
-        Parent.Loadable.Id = Model.ParentId!;
+        Parent.Loadable.Id = model.ParentId!;
 
-        if (Model.OwnerId.HasValue)
-            (Owner ??= new(Client, UserIdentity.Of(Model.OwnerId.Value)))
-                .Loadable.Id = Model.OwnerId.Value;
-        else
-            Owner = null;
+        Owner = Owner.UpdateFrom(
+            model.OwnerId,
+            RestLoadableUserActor.Factory,
+            UserIdentity.Of,
+            Client
+        );
+
+        _model = model;
 
         return base.UpdateAsync(model, token);
     }

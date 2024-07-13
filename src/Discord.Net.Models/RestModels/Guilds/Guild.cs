@@ -89,7 +89,7 @@ public class Guild : PartialGuild, IGuildModel, IEntityModelSource
 
     [JsonPropertyName("safety_alerts_channel_id")]
     public Optional<ulong?> SafetyAlertsChannelId { get; set; }
-
+    public IEnumerable<ulong> RoleIds => Roles.Select(x => x.Id);
     int? IGuildModel.MaxPresence => MaxPresences;
     int? IGuildModel.MaxMembers => MaxMembers;
     bool IGuildModel.PremiumProgressBarEnabled => PremiumProgressBarEnabled;

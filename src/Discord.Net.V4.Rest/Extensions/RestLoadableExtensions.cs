@@ -15,11 +15,11 @@ public static partial class RestLoadableExtensions
         Func<TId, TIdentity> identityFactory
     )
         where TCoreEntity : class, IEntity<TId>
-        where TEntity : class, IEntity<TId>, IEntityOf<TModel>, TCoreEntity
-        where TId : struct, IEquatable<TId>
-        where TModel : class, IEntityModel<TId>
-        where TResult : class, IRestLoadableActor<TId, TEntity, TCoreEntity, TModel>
-        where TIdentity : class, IIdentifiableEntityOrModel<TId, TEntity, TModel>
+        where TEntity     : class, IEntity<TId>, IEntityOf<TModel>, TCoreEntity
+        where TId         : struct, IEquatable<TId>
+        where TModel      : class, IEntityModel<TId>
+        where TResult     : class, IRestLoadableActor<TId, TEntity, TCoreEntity, TModel>
+        where TIdentity   : class, IIdentifiableEntityOrModel<TId, TEntity, TModel>
     {
         if (id is null && loadableActor is not null)
             return null;

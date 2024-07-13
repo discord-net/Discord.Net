@@ -56,4 +56,6 @@ public sealed record RequestOptions
     ///     hosting system is known to have a desynced clock.
     /// </remarks>
     public bool? UseSystemClock { get; set; }
+
+    public bool ForceUpdate { get; set; }
 }

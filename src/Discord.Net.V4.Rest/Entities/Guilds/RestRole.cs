@@ -5,8 +5,7 @@ namespace Discord.Rest.Guilds;
 
 [ExtendInterfaceDefaults(
     typeof(IRoleActor),
-    typeof(IDeletable<ulong, IRoleActor>),
-    typeof(IModifiable<ulong, IRoleActor, ModifyRoleProperties, ModifyGuildRoleParams>)
+    typeof(IDeletable<ulong, IRoleActor>)
 )]
 public partial class RestRoleActor(
     DiscordRestClient client,
@@ -16,14 +15,16 @@ public partial class RestRoleActor(
     RestActor<ulong, RestRole, RoleIdentity>(client, role),
     IRoleActor
 {
+    [SourceOfTruth]
     public RestLoadableGuildActor Guild { get; } = new(client, guild);
 
-    ILoadableGuildActor IGuildRelationship.Guild => Guild;
-
-    IRole IEntityProvider<IRole, IRoleModel>.CreateEntity(IRoleModel model)
-        => new RestRole(Client, guild, model);
+    [SourceOfTruth]
+    internal RestRole CreateEntity(IRoleModel model)
+        => RestRole.Construct(Client, model, Guild.Identity);
 }
 
+
+[ExtendInterfaceDefaults]
 public sealed partial class RestRole :
     RestEntity<ulong>,
     IRole,
@@ -102,7 +103,4 @@ public sealed partial class RestRole :
     }
 
     public IRoleModel GetModel() => Model;
-
-    public int CompareTo(IRole? other)
-        => other is null ? int.MaxValue : other.Position - Position;
 }

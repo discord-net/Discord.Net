@@ -20,8 +20,7 @@ public sealed partial class RestLoadableSelfUserActor(
 }
 
 [ExtendInterfaceDefaults(
-    typeof(ISelfUserActor),
-    typeof(IModifiable<ulong, ISelfUserActor, ModifySelfUserProperties, ModifyCurrentUserParams>)
+    typeof(ISelfUserActor)
 )]
 public partial class RestSelfUserActor(
     DiscordRestClient client,
@@ -30,7 +29,9 @@ public partial class RestSelfUserActor(
     RestUserActor(client, user),
     ISelfUserActor
 {
-    ISelfUser IEntityProvider<ISelfUser, ISelfUserModel>.CreateEntity(ISelfUserModel model)
+    [CovariantOverride]
+    [SourceOfTruth]
+    internal RestSelfUser CreateEntity(ISelfUserModel model)
         => RestSelfUser.Construct(Client, model);
 }
 
@@ -73,6 +74,7 @@ public partial class RestSelfUser :
 
     public static RestSelfUser Construct(DiscordRestClient client, ISelfUserModel model) => new(client, model);
 
+    [CovariantOverride]
     public ValueTask UpdateAsync(ISelfUserModel model, CancellationToken token = default)
     {
         _model = model;

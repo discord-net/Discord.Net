@@ -16,6 +16,8 @@ public sealed class DiscordRestClient : IDiscordClient
 
     public RequestOptions DefaultRequestOptions { get; set; } = new();
 
+    internal ThreadMemberIdentity CurrentUserThreadMemberIdentity { get; }
+
     internal RateLimiter RateLimiter { get; }
 
     internal ILogger<DiscordRestClient> Logger { get; }
@@ -33,6 +35,8 @@ public sealed class DiscordRestClient : IDiscordClient
         Config = config;
         RateLimiter = new();
         Logger = logger;
+
+        CurrentUserThreadMemberIdentity = ThreadMemberIdentity.Of(SelfUser.Id);
     }
 
     public void Dispose()

@@ -65,12 +65,16 @@ public interface IIdentifiableEntityOrModel<out TId, out TEntity, out TModel> : 
         where TClient : IDiscordClient
         => FromReferenced(model, id, model => TConstruct.Construct(client, model));
 
-    static IIdentifiableEntityOrModel<TId, TEntity, TModel> FromReferenced<TConstruct>(IEntityModel model, TId id,
+    static IIdentifiableEntityOrModel<TId, TEntity, TModel> FromReferenced<TConstruct>(
+        IEntityModel model,
+        TId id,
         IDiscordClient client)
         where TConstruct : class, TEntity, IConstructable<TConstruct, TModel>
         => FromReferenced(model, id, model => TConstruct.Construct(client, model));
 
-    static IIdentifiableEntityOrModel<TId, TEntity, TModel> FromReferenced(IEntityModel model, TId id,
+    static IIdentifiableEntityOrModel<TId, TEntity, TModel> FromReferenced(
+        IEntityModel model,
+        TId id,
         Func<TModel, TEntity> factory)
     {
         var referenced = model.GetReferencedEntityModel<TId, TModel>(id);

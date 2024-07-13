@@ -22,15 +22,15 @@ public sealed partial class RestLoadableCategoryChannelActor(
         );
 }
 
-public class RestCategoryChannelActor(
+public partial class RestCategoryChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
     CategoryChannelIdentity channel
-):
+) :
     RestGuildChannelActor(client, guild, channel),
     ICategoryChannelActor;
 
-public sealed class RestCategoryChannel :
+public sealed partial class RestCategoryChannel :
     RestGuildChannel,
     ICategoryChannel,
     IContextConstructable<RestCategoryChannel, IGuildCategoryChannelModel, GuildIdentity, DiscordRestClient>
@@ -58,5 +58,14 @@ public sealed class RestCategoryChannel :
         GuildIdentity guild
     ) => new(client, guild, model);
 
+    [CovariantOverride]
+    public ValueTask UpdateAsync(IGuildCategoryChannelModel model, CancellationToken token = default)
+    {
+        _model = model;
+        return ValueTask.CompletedTask;
+    }
+
     public override IGuildCategoryChannelModel GetModel() => Model;
+
+
 }

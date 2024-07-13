@@ -43,16 +43,15 @@ public partial class RestSticker :
         };
     }
 
-    public ValueTask UpdateAsync(IStickerModel model, CancellationToken token = default)
+    public virtual ValueTask UpdateAsync(IStickerModel model, CancellationToken token = default)
     {
-        if (!_model.Tags.SequenceEqual(model.Tags))
+        if (_model.Tags != model.Tags)
             Tags = Model.Tags.Split(',').ToImmutableArray();
 
         _model = model;
 
         return ValueTask.CompletedTask;
     }
-
 
     public virtual IStickerModel GetModel() => Model;
 }

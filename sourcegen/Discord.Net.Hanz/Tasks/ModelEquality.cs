@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public static class ModelEquality
+public class ModelEquality : IGenerationTask<ModelEquality.GenerationTarget>
 {
     public class GenerationTarget(
         SemanticModel semanticModel,
@@ -18,12 +18,12 @@ public static class ModelEquality
         public TypeDeclarationSyntax TypeDeclarationSyntax { get; } = typeDeclarationSyntax;
     }
 
-    public static bool IsValid(SyntaxNode node)
+    public bool IsValid(SyntaxNode node, CancellationToken token)
     {
         return node is TypeDeclarationSyntax {AttributeLists.Count: > 0, BaseList: not null};
     }
 
-    public static GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
     {
         if (context.Node is not TypeDeclarationSyntax {AttributeLists.Count: > 0, BaseList: not null} type) return null;
 
@@ -44,7 +44,7 @@ public static class ModelEquality
         return new GenerationTarget(context.SemanticModel, typeSymbol, type);
     }
 
-    public static void Execute(SourceProductionContext context, GenerationTarget? target)
+    public void Execute(SourceProductionContext context, GenerationTarget? target)
     {
         if (target is null) return;
 

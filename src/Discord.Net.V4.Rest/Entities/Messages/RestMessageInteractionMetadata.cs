@@ -1,5 +1,7 @@
 using Discord.Models;
+using Discord.Rest.Extensions;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Rest.Messages;
 
@@ -31,50 +33,30 @@ public sealed partial class RestMessageInteractionMetadata(
 
     public ValueTask UpdateAsync(IMessageInteractionMetadataModel model, CancellationToken token = default)
     {
-        if (IsAuthorizingIntegrationOwnersOutOfDate)
+        if (!DictEquality<int, ulong>.Instance.Equals(Model.AuthorizingIntegrationOwners, model.AuthorizingIntegrationOwners))
             AuthorizingIntegrationOwners = Model.AuthorizingIntegrationOwners
                 .ToImmutableDictionary(
                     x => (ApplicationIntegrationType)x.Key,
                     x => x.Value
                 );
 
-        if (OriginalResponseMessage?.Id != Model.OriginalResponseMessageId)
-        {
-            if (Model.OriginalResponseMessageId.HasValue)
-            {
-                OriginalResponseMessage ??= new(
-                    Client,
-                    channel,
-                    MessageIdentity.Of(Model.OriginalResponseMessageId.Value),
-                    guild
-                );
+        OriginalResponseMessage = OriginalResponseMessage.UpdateFrom(
+            model.OriginalResponseMessageId,
+            RestLoadableMessageActor.Factory,
+            MessageIdentity.Of,
+            Client,
+            channel,
+            guild
+        );
 
-                OriginalResponseMessage.Loadable.Id = Model.OriginalResponseMessageId.Value;
-            }
-            else
-            {
-                OriginalResponseMessage = null;
-            }
-        }
-
-        if (InteractedMessage?.Id != Model.InteractedMessageId)
-        {
-            if (Model.InteractedMessageId.HasValue)
-            {
-                InteractedMessage ??= new(
-                    Client,
-                    channel,
-                    MessageIdentity.Of(Model.InteractedMessageId.Value),
-                    guild
-                );
-
-                InteractedMessage.Loadable.Id = Model.InteractedMessageId.Value;
-            }
-            else
-            {
-                InteractedMessage = null;
-            }
-        }
+        InteractedMessage = InteractedMessage.UpdateFrom(
+            model.InteractedMessageId,
+            RestLoadableMessageActor.Factory,
+            MessageIdentity.Of,
+            Client,
+            channel,
+            guild
+        );
 
         return ValueTask.CompletedTask;
     }
@@ -90,7 +72,6 @@ public sealed partial class RestMessageInteractionMetadata(
             ) ?? UserIdentity.Of(model.UserId)
         );
 
-    [VersionOn(nameof(Model.AuthorizingIntegrationOwners), nameof(model.AuthorizingIntegrationOwners))]
     public IReadOnlyDictionary<ApplicationIntegrationType, ulong> AuthorizingIntegrationOwners { get; private set; }
         = model.AuthorizingIntegrationOwners
             .ToImmutableDictionary(x => (ApplicationIntegrationType)x.Key, x => x.Value);

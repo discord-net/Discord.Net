@@ -35,24 +35,26 @@ public sealed partial class RestLoadableGuildChannelActor(
 
 [ExtendInterfaceDefaults(
     typeof(IGuildChannelActor),
-    typeof(IDeletable<ulong, IGuildChannelActor>),
-    typeof(IModifiable<ulong, IGuildChannelActor, ModifyGuildChannelProperties, ModifyGuildChannelParams>)
+    typeof(IDeletable<ulong, IGuildChannelActor>)
 )]
 public partial class RestGuildChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
-    GuildChannelIdentity channel) :
+    GuildChannelIdentity channel
+) :
     RestChannelActor(client, channel),
-    IGuildChannelActor
+    IGuildChannelActor,
+    IActor<ulong, RestGuildChannel>
 {
+    [SourceOfTruth]
     public RestLoadableGuildActor Guild { get; } = new(client, guild);
 
     public IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites => throw new NotImplementedException();
 
-    public IGuildChannel CreateEntity(IGuildChannelModel model)
+    [SourceOfTruth]
+    internal virtual RestGuildChannel CreateEntity(IGuildChannelModel model)
         => RestGuildChannel.Construct(Client, model, Guild.Identity);
 
-    ILoadableGuildActor IGuildRelationship.Guild => Guild;
 }
 
 public partial class RestGuildChannel :
@@ -60,9 +62,9 @@ public partial class RestGuildChannel :
     IGuildChannel,
     IContextConstructable<RestGuildChannel, IGuildChannelModel, GuildIdentity, DiscordRestClient>
 {
-    public int Position => ModelSource.Value.Position;
+    public int Position => Model.Position;
 
-    public ChannelFlags Flags => (ChannelFlags?)ModelSource.Value.Flags ?? ChannelFlags.None;
+    public ChannelFlags Flags => (ChannelFlags?)Model.Flags ?? ChannelFlags.None;
 
     public IReadOnlyCollection<Overwrite> PermissionOverwrites { get; private set; }
 
@@ -120,7 +122,7 @@ public partial class RestGuildChannel :
     [CovariantOverride]
     public virtual ValueTask UpdateAsync(IGuildChannelModel model, CancellationToken token = default)
     {
-        if (!Model.Permissions.SequenceEqual(model.Permissions))
+        if (!_model.Permissions.SequenceEqual(model.Permissions))
         {
             PermissionOverwrites = model.Permissions
                 .Select(x => Overwrite.Construct(Client, x))

@@ -32,8 +32,8 @@ public partial class RestDMChannel :
         : base(client, model, actor)
     {
         _model = model;
-        Actor = actor ?? new(client, this);
 
+        Actor = actor ?? new(client, this);
         Recipient =  new(client, UserIdentity.Of(model.RecipientId));
     }
 

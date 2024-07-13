@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public static class RestLoadableSource
+public class RestLoadableSource : IGenerationTask<RestLoadableSource.GenerationTarget>
 {
     public class GenerationTarget(
         SemanticModel semanticModel,
@@ -18,14 +18,14 @@ public static class RestLoadableSource
         public ClassDeclarationSyntax ClassDeclarationSyntax { get; } = classDeclarationSyntax;
     }
 
-    public static bool IsValid(SyntaxNode node)
+    public bool IsValid(SyntaxNode node, CancellationToken token)
     {
         if (node is not PropertyDeclarationSyntax property) return false;
 
         return property.AttributeLists.Count > 0;
     }
 
-    public static GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
     {
         if (context.Node is not PropertyDeclarationSyntax property) return null;
 
@@ -54,7 +54,7 @@ public static class RestLoadableSource
         );
     }
 
-    public static void Execute(SourceProductionContext context, GenerationTarget? target)
+    public void Execute(SourceProductionContext context, GenerationTarget? target)
     {
         if (target?.PropertyDeclarationSyntax.Type is not GenericNameSyntax genericPropertyType) return;
 
@@ -107,7 +107,6 @@ public static class RestLoadableSource
         context.AddSource(
             $"RestLoadableSource/{target.ClassDeclarationSyntax.Identifier}",
             $$"""
-            using Discord.Rest.Actors;
             {{string.Join("\n", target.ClassDeclarationSyntax.SyntaxTree.GetRoot().ChildNodes().OfType<UsingDirectiveSyntax>())}}
 
             namespace {{target.SemanticModel.GetDeclaredSymbol(target.ClassDeclarationSyntax)!.ContainingNamespace}};

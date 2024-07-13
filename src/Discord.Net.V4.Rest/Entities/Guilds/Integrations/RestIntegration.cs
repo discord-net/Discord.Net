@@ -11,9 +11,8 @@ public sealed partial class RestIntegrationActor(
     RestActor<ulong, RestIntegration, IntegrationIdentity>(client, integration),
     IIntegrationActor
 {
+    [SourceOfTruth]
     public RestLoadableGuildActor Guild { get; } = new(client, guild);
-
-    ILoadableGuildActor IGuildRelationship.Guild => Guild;
 }
 
 public sealed partial class RestIntegration :

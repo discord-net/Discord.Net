@@ -1,6 +1,6 @@
 using Discord.Models;
 
-namespace Discord.Rest.Actors;
+namespace Discord.Rest;
 
 public interface IRestLoadableActor<TId, TEntity, TCore, TModel>
     where TCore : class, IEntity<TId>

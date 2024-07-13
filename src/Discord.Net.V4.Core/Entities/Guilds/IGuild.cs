@@ -7,7 +7,7 @@ namespace Discord;
 
 using IModifiable = IModifiable<ulong, IGuild, ModifyGuildProperties, ModifyGuildParams, IGuildModel>;
 
-public interface IGuild :
+public partial interface IGuild :
     IPartialGuild,
     IGuildActor,
     IRefreshable<IGuild, ulong, IGuildModel>,
@@ -23,6 +23,15 @@ public interface IGuild :
         IGuild self,
         ulong id
     ) => Routes.GetGuild(id, true);
+
+    [SourceOfTruth]
+    new IDefinedEnumerableActor<IRoleActor, ulong, IRole> Roles { get; }
+
+    [SourceOfTruth]
+    new IDefinedEnumerableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes { get; }
+
+    [SourceOfTruth]
+    new IDefinedEnumerableActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers { get; }
 
     /// <summary>
     ///     Gets the amount of time (in seconds) a user must be inactive in a voice channel for until they are

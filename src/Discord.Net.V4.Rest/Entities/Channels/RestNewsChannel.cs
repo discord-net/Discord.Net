@@ -59,6 +59,7 @@ public partial class RestNewsChannel :
     public static RestNewsChannel Construct(DiscordRestClient client, IGuildNewsChannelModel model, GuildIdentity guild)
         => new(client, guild, model);
 
+    [CovariantOverride]
     public ValueTask UpdateAsync(IGuildNewsChannelModel model, CancellationToken token = default)
     {
         _model = model;

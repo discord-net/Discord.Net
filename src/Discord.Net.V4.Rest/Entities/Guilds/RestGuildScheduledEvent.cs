@@ -28,8 +28,6 @@ public sealed partial class RestLoadableGuildScheduledEventActor(
 
 [ExtendInterfaceDefaults(
     typeof(IGuildScheduledEventActor),
-    typeof(IModifiable<ulong, IGuildScheduledEventActor, ModifyGuildScheduledEventProperties,
-        ModifyGuildScheduledEventParams>),
     typeof(IDeletable<ulong, IGuildScheduledEventActor>)
 )]
 public partial class RestGuildScheduledEventActor(
@@ -40,14 +38,14 @@ public partial class RestGuildScheduledEventActor(
     RestActor<ulong, RestGuildScheduledEvent, GuildScheduledEventIdentity>(client, scheduledEvent),
     IGuildScheduledEventActor
 {
+    [SourceOfTruth]
     public RestLoadableGuildActor Guild { get; } = new(client, guild);
 
     public IEnumerableIndexableActor<ILoadableGuildScheduledEventUserActor<IGuildScheduledEventUser>, ulong,
         IGuildScheduledEventUser> RSVPs => throw new NotImplementedException();
 
-    ILoadableGuildActor IGuildRelationship.Guild => Guild;
-
-    IGuildScheduledEvent IEntityProvider<IGuildScheduledEvent, IGuildScheduledEventModel>.CreateEntity(
+    [SourceOfTruth]
+    internal RestGuildScheduledEvent CreateEntity(
         IGuildScheduledEventModel model
     ) => RestGuildScheduledEvent.Construct(Client, model, Guild.Loadable.Identity);
 }

@@ -114,4 +114,6 @@ public interface IRole :
     RoleFlags Flags { get; }
 
     string IMentionable.Mention => $"<@&{Id}>";
+
+    int IComparable<IRole>.CompareTo(IRole? other) => other is null ? int.MaxValue : other.Position - Position;
 }

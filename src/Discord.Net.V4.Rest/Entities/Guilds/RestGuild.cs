@@ -1,5 +1,6 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Actors;
 using Discord.Rest.Channels;
 using Discord.Rest.Extensions;
 using Discord.Rest.Guilds.Integrations;
@@ -25,7 +26,6 @@ public partial class RestLoadableGuildActor(
 
 [ExtendInterfaceDefaults(
     typeof(IGuildActor),
-    typeof(IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams>),
     typeof(IDeletable<ulong, IGuildActor>)
 )]
 public partial class RestGuildActor(
@@ -35,7 +35,6 @@ public partial class RestGuildActor(
     RestActor<ulong, RestGuild, GuildIdentity>(client, guild),
     IGuildActor
 {
-    public
     public IEnumerableIndexableActor<ILoadableMediaChannelActor, ulong, IMediaChannel> MediaChannels => throw new NotImplementedException();
 
     public IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels => throw new NotImplementedException();
@@ -52,21 +51,24 @@ public partial class RestGuildActor(
 
     public IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ActiveThreadChannels => throw new NotImplementedException();
 
+    [SourceOfTruth]
     public RestEnumerableIndexableIntegrationActor Integrations
     {
         get;
     } = RestActors.Integrations(client, guild);
 
+    [SourceOfTruth]
     public RestPagedIndexableActor<RestLoadableBanActor, ulong, RestBan, IEnumerable<IBanModel>, PageGuildBansParams>
         Bans { get; }
         = RestActors.Bans(client, guild);
 
+    [SourceOfTruth]
     public RestEnumerableIndexableStageChannelActor StageChannels { get; }
         = RestActors.StageChannels(client, guild);
 
     public IEnumerableIndexableActor<ILoadableForumChannelActor, ulong, IForumChannel> ForumChannels => throw new NotImplementedException();
 
-
+    [SourceOfTruth]
     public RestPagedIndexableActor<RestLoadableGuildMemberActor, ulong, RestGuildMember, IEnumerable<IMemberModel>,
         PageGuildMembersParams> Members
     {
@@ -87,15 +89,8 @@ public partial class RestGuildActor(
     public IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites =>
         throw new NotImplementedException();
 
-    IPagedIndexableActor<ILoadableGuildBanActor, ulong, IBan, PageGuildBansParams> IGuildActor.Bans => Bans;
-
-    IPagedIndexableActor<ILoadableGuildMemberActor, ulong, IGuildMember, PageGuildMembersParams> IGuildActor.Members =>
-        Members;
-
-    IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> IGuildActor.Integrations => Integrations;
-    IEnumerableIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> IGuildActor.StageChannels => StageChannels;
-
-    IGuild IEntityProvider<IGuild, IGuildModel>.CreateEntity(IGuildModel model)
+    [SourceOfTruth]
+    internal RestGuild CreateEntity(IGuildModel model)
         => RestGuild.Construct(Client, model);
 }
 
@@ -117,6 +112,12 @@ public sealed partial class RestGuild :
     public RestLoadableTextChannelActor? PublicUpdatesChannel { get; private set;}
 
     public RestLoadableGuildMemberActor Owner { get; private set; }
+
+    public IDefinedEnumerableActor<IRoleActor, ulong, IRole> Roles => throw new NotImplementedException();
+
+    public IDefinedEnumerableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes => throw new NotImplementedException();
+
+    public IDefinedEnumerableActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers => throw new NotImplementedException();
 
     public int AFKTimeout => Model.AFKTimeout;
 

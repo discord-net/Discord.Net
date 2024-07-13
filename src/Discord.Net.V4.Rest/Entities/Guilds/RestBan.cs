@@ -30,12 +30,11 @@ public partial class RestBanActor(
     RestActor<ulong, RestBan, BanIdentity>(client, ban),
     IGuildBanActor
 {
+    [SourceOfTruth]
     public RestLoadableGuildActor Guild { get; } = new(client, guild);
 
+    [SourceOfTruth]
     public RestLoadableUserActor User { get; } = new(client, UserIdentity.Of(ban.Id));
-
-    ILoadableGuildActor IGuildRelationship.Guild => Guild;
-    ILoadableUserActor IUserRelationship.User => User;
 }
 
 public sealed partial class RestBan :

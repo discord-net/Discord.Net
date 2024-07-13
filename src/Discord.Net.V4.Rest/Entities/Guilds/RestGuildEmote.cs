@@ -31,11 +31,11 @@ public partial class RestGuildEmoteActor(
     RestActor<ulong, RestGuildEmote, GuildEmoteIdentity>(client, emote),
     IGuildEmoteActor
 {
+    [SourceOfTruth]
     public RestLoadableGuildActor Guild { get; } = new(client, guild);
 
-    ILoadableGuildActor IGuildRelationship.Guild => Guild;
-
-    IGuildEmote IEntityProvider<IGuildEmote, IGuildEmoteModel>.CreateEntity(IGuildEmoteModel model)
+    [SourceOfTruth]
+    internal RestGuildEmote CreateEntity(IGuildEmoteModel model)
         => RestGuildEmote.Construct(Client, model, guild);
 }
 

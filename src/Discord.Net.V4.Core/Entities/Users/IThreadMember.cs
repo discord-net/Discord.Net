@@ -10,7 +10,7 @@ public interface IThreadMember :
 {
     static IApiOutRoute<IThreadMemberModel> IRefreshable<IThreadMember, ulong, IThreadMemberModel>.RefreshRoute(
         IThreadMember self, ulong id
-    ) => Routes.GetThreadMember(self.ThreadChannel.Id, id, true);
+    ) => Routes.GetThreadMember(self.Thread.Id, id, true);
 
     DateTimeOffset JoinedAt { get; }
 }

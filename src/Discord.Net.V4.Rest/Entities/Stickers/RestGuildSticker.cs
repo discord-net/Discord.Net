@@ -1,6 +1,7 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Models.Json.Stickers;
+using Discord.Rest.Extensions;
 using Discord.Rest.Guilds;
 using System.Diagnostics.CodeAnalysis;
 
@@ -10,7 +11,7 @@ public partial class RestLoadableGuildStickerActor(
     DiscordRestClient client,
     GuildIdentity guild,
     GuildStickerIdentity sticker
-):
+) :
     RestGuildStickerActor(client, guild, sticker),
     ILoadableGuildStickerActor
 {
@@ -27,7 +28,6 @@ public partial class RestLoadableGuildStickerActor(
 
 [ExtendInterfaceDefaults(
     typeof(IGuildStickerActor),
-    typeof(IModifiable<ulong, IGuildStickerActor, ModifyStickerProperties, ModifyGuildStickersParams>),
     typeof(IDeletable<ulong, IGuildStickerActor>)
 )]
 public partial class RestGuildStickerActor(
@@ -38,11 +38,11 @@ public partial class RestGuildStickerActor(
     RestActor<ulong, RestGuildSticker, GuildStickerIdentity>(client, sticker),
     IGuildStickerActor
 {
+    [SourceOfTruth]
     public RestLoadableGuildActor Guild { get; } = new(client, guild);
 
-    ILoadableGuildActor IGuildRelationship.Guild => Guild;
-
-    IGuildSticker IEntityProvider<IGuildSticker, IGuildStickerModel>.CreateEntity(IGuildStickerModel model)
+    [SourceOfTruth]
+    internal RestGuildSticker CreateEntity(IGuildStickerModel model)
         => RestGuildSticker.Construct(Client, model, Guild.Identity);
 }
 
@@ -77,27 +77,39 @@ public sealed partial class RestGuildSticker :
 
         Actor = actor ?? new(client, guild, GuildStickerIdentity.Of(this));
 
-        Author = ConstructAuthorActor(client, guild, model, model.AuthorId);
+        Author = model.AuthorId.Map(
+            static (id, client, guild, model)
+                => new RestLoadableGuildMemberActor(
+                    client,
+                    guild,
+                    MemberIdentity.Of(id),
+                    UserIdentity.FromReferenced<RestUser, DiscordRestClient>(model, id, client)
+                ),
+            client,
+            guild,
+            model
+        );
     }
 
     public static RestGuildSticker Construct(DiscordRestClient client, IGuildStickerModel model, GuildIdentity guild)
         => new(client, guild, model);
 
+    [CovariantOverride]
     public ValueTask UpdateAsync(IGuildStickerModel model, CancellationToken token = default)
     {
-        if (_model.AuthorId != model.AuthorId)
-        {
-            if (model.AuthorId is not null)
-            {
-                Author ??= ConstructAuthorActor(Client, Actor.Guild.Identity, model, model.AuthorId);
-
-                Author.Loadable.Id = model.AuthorId.Value;
-            }
-            else
-            {
-                Author = null;
-            }
-        }
+        Author = Author.UpdateFrom(
+            model.AuthorId,
+            RestLoadableGuildMemberActor.Factory,
+            MemberIdentity.Of,
+            Client,
+            Actor.Guild.Identity,
+            model.AuthorId.Map(
+                static (id, model, client)
+                    => UserIdentity.FromReferenced<RestUser, DiscordRestClient>(model, id, client),
+                model,
+                Client
+            )
+        );
 
         _model = model;
 
@@ -105,32 +117,6 @@ public sealed partial class RestGuildSticker :
     }
 
     public override IGuildStickerModel GetModel() => Model;
-
-
-    [return: NotNullIfNotNull(nameof(authorId))]
-    private static RestLoadableGuildMemberActor? ConstructAuthorActor(
-        DiscordRestClient client,
-        GuildIdentity guild,
-        IGuildStickerModel model,
-        ulong? authorId)
-    {
-        var userAuthorIdentity = authorId.Map(
-            static (id, model, client) =>
-                UserIdentity.OfNullable(
-                    model.GetReferencedEntityModel<ulong, IUserModel>(id),
-                    model => RestUser.Construct(client, model)
-                ),
-            model,
-            client
-        );
-
-        return authorId.Map(static (id, client, guild, userIdentity) => new RestLoadableGuildMemberActor(
-            client,
-            guild,
-            MemberIdentity.Of(id),
-            userIdentity
-        ), client, guild, userAuthorIdentity);
-    }
 
     ILoadableGuildMemberActor? IGuildSticker.Author => Author;
 }
