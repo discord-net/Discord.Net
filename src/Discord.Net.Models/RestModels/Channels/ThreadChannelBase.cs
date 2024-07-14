@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel
+public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel, IModelSourceOf<IThreadMemberModel?>
 {
     [JsonPropertyName("owner_id")]
     public ulong? OwnerId { get; set; }
@@ -49,12 +49,14 @@ public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel
 
     bool IThreadChannelModel.HasJoined => Member.IsSpecified;
 
-    public override IEnumerable<IEntityModel> GetEntities()
+    public override IEnumerable<IEntityModel> GetDefinedModels()
     {
         if(Member.IsSpecified)
             yield return Member.Value;
 
-        foreach (var entity in base.GetEntities())
+        foreach (var entity in base.GetDefinedModels())
             yield return entity;
     }
+
+    IThreadMemberModel? IModelSourceOf<IThreadMemberModel?>.Model => ~Member;
 }

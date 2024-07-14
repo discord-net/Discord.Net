@@ -33,9 +33,9 @@ namespace Discord.API.Gateway
         [JsonPropertyName("stage_instances")]
         public StageInstance[]? StageInstances { get; set; }
 
-        public override IEnumerable<IEntityModel> GetEntities()
+        public override IEnumerable<IEntityModel> GetDefinedModels()
         {
-            var entities = base.GetEntities();
+            var entities = base.GetDefinedModels();
 
             if (Presences is not null)
                 entities = entities.Concat(Presences);

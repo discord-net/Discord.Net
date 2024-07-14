@@ -13,7 +13,7 @@ public class RestEnumerableActor<TId, TEntity, TModel>(
     where TId : IEquatable<TId>
     where TModel : class
 {
-    public async Task<IReadOnlyCollection<TEntity>> AllAsync(RequestOptions? options = null, CancellationToken token = default)
+    public async ValueTask<IReadOnlyCollection<TEntity>> AllAsync(RequestOptions? options = null, CancellationToken token = default)
     {
         var model = await client.ApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token);
 
@@ -39,7 +39,7 @@ public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TModel>(
 {
     internal RestIndexableActor<TActor, TId, TEntity> IndexableActor { get; } = new(actorFactory);
 
-    public async Task<IReadOnlyCollection<TEntity>> AllAsync(RequestOptions? options = null, CancellationToken token = default)
+    public virtual async ValueTask<IReadOnlyCollection<TEntity>> AllAsync(RequestOptions? options = null, CancellationToken token = default)
     {
         var model = await client.ApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token);
 
@@ -49,8 +49,9 @@ public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TModel>(
         return factory(model).ToImmutableArray();
     }
 
-    public TActor Specifically(TId id) => IndexableActor.Specifically(id);
-    async Task<IReadOnlyCollection<TCore>> IEnumerableActor<TId, TCore>.AllAsync(
+    public virtual TActor Specifically(TId id) => IndexableActor.Specifically(id);
+
+    async ValueTask<IReadOnlyCollection<TCore>> IEnumerableActor<TId, TCore>.AllAsync(
         RequestOptions? options,
         CancellationToken token
     ) => await AllAsync(options, token);

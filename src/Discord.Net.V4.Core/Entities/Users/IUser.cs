@@ -9,7 +9,7 @@ public interface IUser :
     IUserActor,
     IRefreshable<IUser, ulong, IUserModel>
 {
-    static IApiOutRoute<IUserModel> IRefreshable<IUser, ulong, IUserModel>.RefreshRoute(IUser self, ulong id)
+    static IApiOutRoute<IUserModel> IRefreshable<IUser, ulong, IUserModel>.RefreshRoute(IPathable path, ulong id)
         => Routes.GetUser(id);
 
     string? AvatarId { get; }

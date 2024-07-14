@@ -3,14 +3,15 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface IInvite :
+[Refreshable(nameof(Routes.GetInvite))]
+public partial interface IInvite :
     IInviteActor,
-    IRefreshable<IInvite, string, IInviteModel>
+    IEntityOf<IInviteModel>
 {
-    static IApiOutRoute<IInviteModel> IRefreshable<IInvite, string, IInviteModel>.RefreshRoute(
-        IInvite self,
-        string id
-    ) => Routes.GetInvite(id, true, true, eventId: self.GuildScheduledEvent?.Id);
+    // static IApiOutRoute<IInviteModel> IRefreshable<IInvite, string, IInviteModel>.RefreshRoute(
+    //     IPathable path,
+    //     string id
+    // ) => Routes.GetInvite(id, true, true, eventId: path.Optionally<IGuildScheduledEvent>());
 
     InviteType Type { get; }
     ILoadableGuildActor? Guild { get; }

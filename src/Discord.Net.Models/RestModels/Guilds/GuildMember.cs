@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildMember : IMemberModel, IEntityModelSource
+public sealed class GuildMember : IMemberModel, IModelSource, IModelSourceOf<IUserModel?>
 {
     [JsonPropertyName("user")]
     public Optional<User> User { get; set; }
@@ -47,16 +47,16 @@ public sealed class GuildMember : IMemberModel, IEntityModelSource
     ulong[] IMemberModel.RoleIds => RoleIds | [];
     DateTimeOffset? IMemberModel.JoinedAt => JoinedAt;
     DateTimeOffset? IMemberModel.PremiumSince => PremiumSince;
-
     bool? IMemberModel.IsPending => Pending;
-
     DateTimeOffset? IMemberModel.CommunicationsDisabledUntil => CommunicationsDisabledUntil;
     string? IMemberModel.Nickname => Nick;
     ulong IEntityModel<ulong>.Id => User.Map(v => v.Id);
 
-    public IEnumerable<IEntityModel> GetEntities()
+    public IEnumerable<IEntityModel> GetDefinedModels()
     {
         if (User.IsSpecified)
             yield return User.Value;
     }
+
+    IUserModel? IModelSourceOf<IUserModel?>.Model => ~User;
 }

@@ -5,9 +5,6 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable =
-    IModifiable<ulong, IThreadChannel, ModifyThreadChannelProperties, ModifyThreadChannelParams, IThreadChannelModel>;
-
 /// <summary>
 ///     Represents a thread channel inside a guild.
 /// </summary>
@@ -16,13 +13,10 @@ public partial interface IThreadChannel :
     IGuildChannel,
     IThreadChannelActor,
     IThreadableRelationship,
-    IModifiable
+    IEntityOf<IThreadableChannelModel>
 {
-    static IApiInOutRoute<ModifyThreadChannelParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyThreadChannelParams args
-    ) => Routes.ModifyChannel(id, args);
+    [SourceOfTruth]
+    new IThreadableChannelModel GetModel();
 
     ILoadableUserActor? Owner { get; }
 
@@ -90,9 +84,4 @@ public partial interface IThreadChannel :
     ///     property will be that date.
     /// </remarks>
     new DateTimeOffset CreatedAt { get; }
-
-    [SourceOfTruth]
-    new IThreadChannelModel GetModel();
-
-
 }

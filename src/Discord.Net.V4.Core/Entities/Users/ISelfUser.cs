@@ -20,7 +20,7 @@ public partial interface ISelfUser :
         => (this as IRefreshable<ISelfUser, ulong, ISelfUserModel>).RefreshAsync(options, token);
 
     static IApiOutRoute<ISelfUserModel> IRefreshable<ISelfUser, ulong, ISelfUserModel>.RefreshRoute(
-        ISelfUser self,
+        IPathable path,
         ulong id
     ) => Routes.GetCurrentUser;
 
@@ -82,9 +82,4 @@ public partial interface ISelfUser :
     ///     For example, a locale of "English, US" is "en-US", "Chinese (Taiwan)" is "zh-TW", etc.
     /// </returns>
     string Locale { get; }
-
-    [SourceOfTruth]
-    new ISelfUserModel GetModel();
-
-
 }

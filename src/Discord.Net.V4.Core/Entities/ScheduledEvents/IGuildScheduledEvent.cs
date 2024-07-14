@@ -4,26 +4,12 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IRefreshable = IRefreshable<IGuildScheduledEvent, ulong, IGuildScheduledEventModel>;
-using IModifiable =
-    IModifiable<ulong, IGuildScheduledEvent, ModifyGuildScheduledEventProperties, ModifyGuildScheduledEventParams,
-        IGuildScheduledEventModel>;
-
-public interface IGuildScheduledEvent :
+[Refreshable(nameof(Routes.GetGuildScheduledEvent))]
+public partial interface IGuildScheduledEvent :
     ISnowflakeEntity,
     IGuildScheduledEventActor,
-    IRefreshable,
-    IModifiable
+    IEntityOf<IGuildScheduledEventModel>
 {
-    static IApiInOutRoute<ModifyGuildScheduledEventParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyGuildScheduledEventParams args
-    ) => Routes.ModifyGuildScheduledEvent(path.Require<IGuild>(), id, args);
-
-    static IApiOutRoute<IGuildScheduledEventModel> IRefreshable.RefreshRoute(IGuildScheduledEvent self,
-        ulong id) => Routes.GetGuildScheduledEvent(self.Require<IGuild>(), id);
-
     ILoadableEntity<ulong, IGuildChannel>? Channel { get; }
     ILoadableEntity<ulong, IUser> Creator { get; }
     string Name { get; }

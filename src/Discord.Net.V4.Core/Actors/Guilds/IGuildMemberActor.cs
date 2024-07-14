@@ -4,24 +4,16 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable = IModifiable<ulong, IGuildMemberActor, ModifyGuildUserProperties, ModifyGuildMemberParams, IGuildMember, IMemberModel>;
-
 public interface ILoadableGuildMemberActor :
     IGuildMemberActor,
     ILoadableEntity<ulong, IGuildMember>;
 
-public interface IGuildMemberActor :
+[Modifiable<ModifyGuildUserProperties>(nameof(Routes.ModifyGuildMember))]
+public partial interface IGuildMemberActor :
     IGuildRelationship,
     IUserRelationship,
-    IModifiable,
     IActor<ulong, IGuildMember>
 {
-    static IApiInOutRoute<ModifyGuildMemberParams, IEntityModel>
-        IModifiable.ModifyRoute(
-            IPathable path, ulong id,
-            ModifyGuildMemberParams args)
-        => Routes.ModifyGuildMember(path.Require<IGuild>(), id, args);
-
     Task AddRoleAsync(
         EntityOrId<ulong, IRole> role,
         RequestOptions? options = null,

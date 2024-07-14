@@ -4,9 +4,6 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable =
-    IModifiable<ulong, ITextChannel, ModifyTextChannelProperties, ModifyGuildChannelParams, IGuildTextChannelModel>;
-
 /// <summary>
 ///     Represents a generic channel in a guild that can send and receive messages.
 /// </summary>
@@ -17,13 +14,10 @@ public partial interface ITextChannel :
     INestedChannel,
     IIntegrationChannel,
     ITextChannelActor,
-    IModifiable
+    IEntityOf<IGuildTextChannelModel>
 {
-    static IApiInOutRoute<ModifyGuildChannelParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyGuildChannelParams args
-    ) => Routes.ModifyChannel(id, args);
+    [SourceOfTruth]
+    new IGuildTextChannelModel GetModel();
 
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
@@ -49,11 +43,6 @@ public partial interface ITextChannel :
     ///     message; <c>0</c> if disabled.
     /// </returns>
     int SlowModeInterval { get; }
-
-    [SourceOfTruth]
-    new IGuildTextChannelModel GetModel();
-
-
 
     string IMentionable.Mention => $"<#{Id}>";
 }

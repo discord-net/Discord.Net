@@ -5,26 +5,15 @@ using System.Collections.Immutable;
 
 namespace Discord;
 
-using IModifiable = IModifiable<ulong, IGuildActor, ModifyGuildProperties, ModifyGuildParams, IGuild, IGuildModel>;
-
 public interface ILoadableGuildActor :
     IGuildActor,
     ILoadableEntity<ulong, IGuild>;
 
-public interface IGuildActor :
-    IActor<ulong, IGuild>,
-    IModifiable,
-    IDeletable<ulong, IGuildActor>
+[Modifiable<ModifyGuildProperties>(nameof(Routes.ModifyGuild))]
+[Deletable(nameof(Routes.DeleteGuild))]
+public partial interface IGuildActor :
+    IActor<ulong, IGuild>
 {
-    static IApiRoute IDeletable<ulong, IGuildActor>
-        .DeleteRoute(IPathable path, ulong id) => Routes.DeleteGuild(id);
-
-    static IApiInOutRoute<ModifyGuildParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyGuildParams args
-    ) => Routes.ModifyGuild(id, args);
-
     #region Channels
 
     IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels { get; }
@@ -62,8 +51,8 @@ public interface IGuildActor :
     IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations { get; }
     IIntegrationActor Integration(ulong id) => Integrations[id];
 
-    IPagedIndexableActor<ILoadableGuildBanActor, ulong, IBan, PageGuildBansParams> Bans { get; }
-    ILoadableGuildBanActor Ban(ulong userId) => Bans[userId];
+    IPagedIndexableActor<ILoadableBanActor, ulong, IBan, PageGuildBansParams> Bans { get; }
+    ILoadableBanActor Ban(ulong userId) => Bans[userId];
 
     IPagedIndexableActor<ILoadableGuildMemberActor, ulong, IGuildMember, PageGuildMembersParams> Members { get; }
     ILoadableGuildMemberActor Member(ulong id) => Members[id];

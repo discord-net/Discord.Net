@@ -9,7 +9,7 @@ public sealed partial class RestLoadableBanActor(
     BanIdentity ban
 ):
     RestBanActor(client, guild, ban),
-    ILoadableGuildBanActor
+    ILoadableBanActor
 {
     [ProxyInterface(typeof(ILoadableEntity<IBan>))]
     internal RestLoadable<ulong, RestBan, IBan, IBanModel> Loadable { get; } =
@@ -21,14 +21,14 @@ public sealed partial class RestLoadableBanActor(
         );
 }
 
-[ExtendInterfaceDefaults(typeof(IGuildBanActor))]
+[ExtendInterfaceDefaults(typeof(IBanActor))]
 public partial class RestBanActor(
     DiscordRestClient client,
     GuildIdentity guild,
     BanIdentity ban
 ) :
     RestActor<ulong, RestBan, BanIdentity>(client, ban),
-    IGuildBanActor
+    IBanActor
 {
     [SourceOfTruth]
     public RestLoadableGuildActor Guild { get; } = new(client, guild);
@@ -43,7 +43,7 @@ public sealed partial class RestBan :
     IContextConstructable<RestBan, IBanModel, GuildIdentity, DiscordRestClient>
 {
     [ProxyInterface(
-        typeof(IGuildBanActor),
+        typeof(IBanActor),
         typeof(IUserRelationship),
         typeof(IGuildRelationship)
     )]

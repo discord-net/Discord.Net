@@ -10,21 +10,14 @@ using IModifiable =
 /// <summary>
 ///     Represents a custom sticker within a guild.
 /// </summary>
-public interface IGuildSticker :
+[Refreshable(nameof(Routes.GetGuildSticker))]
+public partial interface IGuildSticker :
     ISticker,
     IGuildStickerActor,
-    IRefreshable<IGuildSticker, ulong, IGuildStickerModel>,
-    IModifiable
+    IEntityOf<IGuildStickerModel>
 {
-    static IApiInOutRoute<ModifyGuildStickersParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyGuildStickersParams args
-    ) => Routes.ModifyGuildSticker(path.Require<IGuild>(), id, args);
-
-    static IApiOutRoute<IGuildStickerModel> IRefreshable<IGuildSticker, ulong, IGuildStickerModel>.RefreshRoute(
-        IGuildSticker self,
-        ulong id) => Routes.GetGuildSticker(self.Require<IGuild>(), id);
+    [SourceOfTruth]
+    new IGuildStickerModel GetModel();
 
     /// <summary>
     ///     Gets the user that uploaded the guild sticker.
@@ -35,9 +28,4 @@ public interface IGuildSticker :
     ///     Gets whether this guild sticker can be used, may be false due to loss of Server Boosts.
     /// </summary>
     bool? IsAvailable { get; }
-
-    new IGuildStickerModel GetModel();
-
-    new Task RefreshAsync(RequestOptions? options = null, CancellationToken token = default)
-        => ((IRefreshable<IGuildSticker, ulong, IGuildStickerModel>)this).RefreshAsync(options, token);
 }

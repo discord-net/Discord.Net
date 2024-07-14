@@ -4,30 +4,20 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable =
-    IModifiable<ulong, IThreadChannelActor, ModifyThreadChannelProperties, ModifyThreadChannelParams, IThreadChannel,
-        IThreadChannelModel>;
-
 public interface ILoadableThreadChannelActor :
     IThreadChannelActor,
     ILoadableEntity<ulong, IThreadChannel>;
 
-public interface IThreadChannelActor :
+[Modifiable<ModifyThreadChannelProperties>(nameof(Routes.ModifyChannel))]
+public partial interface IThreadChannelActor :
     IGuildChannelActor,
     IMessageChannelActor,
     IThreadMemberRelationship,
-    IActor<ulong, IThreadChannel>,
-    IModifiable
+    IActor<ulong, IThreadChannel>
 {
     ILoadableThreadMemberActor CurrentThreadMember { get; }
 
     IEnumerableIndexableActor<ILoadableThreadMemberActor, ulong, IThreadMember> ThreadMembers { get; }
-
-    static IApiInOutRoute<ModifyThreadChannelParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyThreadChannelParams args
-    ) => Routes.ModifyChannel(id, args);
 
     ILoadableThreadMemberActor IThreadMemberRelationship.ThreadMember
         => CurrentThreadMember;

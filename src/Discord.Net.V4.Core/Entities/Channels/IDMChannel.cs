@@ -17,7 +17,4 @@ public partial interface IDMChannel :
     ///     A user object that represents the other user in this channel.
     /// </returns>
     ILoadableEntity<ulong, IUser> Recipient { get; }
-
-    [SourceOfTruth]
-    new IDMChannelModel GetModel();
 }

@@ -1,5 +1,10 @@
 namespace Discord;
 
+#pragma warning disable CS9113 // Parameter is unread.
+[AttributeUsage(AttributeTargets.Interface)]
+internal sealed class DeletableAttribute(string route) : Attribute;
+#pragma warning restore CS9113 // Parameter is unread.
+
 public interface IDeletable<TId, out TSelf> : IEntity<TId>, IPathable
     where TSelf : IDeletable<TId, TSelf>, IEntity<TId>, IPathable
     where TId : IEquatable<TId>

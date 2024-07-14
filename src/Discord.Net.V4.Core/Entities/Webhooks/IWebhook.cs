@@ -13,7 +13,7 @@ public interface IWebhook :
     IRefreshable<IWebhook, ulong, IWebhookModel>
 {
     static IApiOutRoute<IWebhookModel> IRefreshable<IWebhook, ulong, IWebhookModel>.RefreshRoute(
-        IWebhook self,
+        IPathable path,
         ulong id
     ) => Routes.GetWebhook(id);
 

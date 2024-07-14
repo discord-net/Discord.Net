@@ -5,25 +5,12 @@ using System.Globalization;
 
 namespace Discord;
 
-using IModifiable = IModifiable<ulong, IGuild, ModifyGuildProperties, ModifyGuildParams, IGuildModel>;
-
+[Refreshable(nameof(Routes.GetGuild))]
 public partial interface IGuild :
     IPartialGuild,
     IGuildActor,
-    IRefreshable<IGuild, ulong, IGuildModel>,
-    IModifiable
+    IEntityOf<IGuildModel>
 {
-    static IApiInOutRoute<ModifyGuildParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyGuildParams args
-    ) => Routes.ModifyGuild(id, args);
-
-    static IApiOutRoute<IGuildModel> IRefreshable<IGuild, ulong, IGuildModel>.RefreshRoute(
-        IGuild self,
-        ulong id
-    ) => Routes.GetGuild(id, true);
-
     [SourceOfTruth]
     new IDefinedEnumerableActor<IRoleActor, ulong, IRole> Roles { get; }
 

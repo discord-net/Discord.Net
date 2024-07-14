@@ -4,20 +4,11 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable =
-    IModifiable<ulong, IGuildChannel, ModifyGuildChannelProperties, ModifyGuildChannelParams, IGuildChannelModel>;
-
 public partial interface IGuildChannel :
     IChannel,
     IGuildChannelActor,
-    IModifiable
+    IEntityOf<IGuildChannelModel>
 {
-    static IApiInOutRoute<ModifyGuildChannelParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyGuildChannelParams args
-    ) => Routes.ModifyChannel(id, args);
-
     /// <summary>
     ///     Gets the position of this channel.
     /// </summary>
@@ -45,9 +36,4 @@ public partial interface IGuildChannel :
     ///     A collection of overwrites associated with this channel.
     /// </returns>
     IReadOnlyCollection<Overwrite> PermissionOverwrites { get; }
-
-    [SourceOfTruth]
-    new IGuildChannelModel GetModel();
-
-
 }

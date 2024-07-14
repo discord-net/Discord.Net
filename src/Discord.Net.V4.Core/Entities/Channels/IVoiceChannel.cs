@@ -4,21 +4,15 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable =
-    IModifiable<ulong, IVoiceChannel, ModifyVoiceChannelProperties, ModifyGuildChannelParams, IGuildVoiceChannelModel>;
-
 public partial interface IVoiceChannel :
     IMessageChannel,
     IGuildChannel,
     IAudioChannel,
     IVoiceChannelActor,
-    IModifiable
+    IEntityOf<IGuildVoiceChannelModel>
 {
-    static IApiInOutRoute<ModifyGuildChannelParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyGuildChannelParams args
-    ) => Routes.ModifyChannel(id, args);
+    [SourceOfTruth]
+    new IGuildVoiceChannelModel GetModel();
 
     string? RTCRegion { get; }
 
@@ -44,9 +38,4 @@ public partial interface IVoiceChannel :
     ///     Gets the video quality mode for this channel.
     /// </summary>
     VideoQualityMode VideoQualityMode { get; }
-
-    [SourceOfTruth]
-    new IGuildVoiceChannelModel GetModel();
-
-
 }

@@ -2,7 +2,13 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public class Invite : IInviteModel, IEntityModelSource
+public class Invite :
+    IInviteModel,
+    IModelSource,
+    IModelSourceOf<IPartialGuildModel?>,
+    IModelSourceOfMultiple<IUserModel>,
+    IModelSourceOf<IApplicationModel?>,
+    IModelSourceOf<IGuildScheduledEventModel?>
 {
     [JsonPropertyName("code")]
     public required string Code { get; set; }
@@ -57,7 +63,7 @@ public class Invite : IInviteModel, IEntityModelSource
 
     ulong? IInviteModel.ScheduledEventId => ScheduledEvent.Map(v => v.Id);
 
-    public IEnumerable<IEntityModel> GetEntities()
+    public IEnumerable<IEntityModel> GetDefinedModels()
     {
         if (Channel is not null)
             yield return Channel;
@@ -74,4 +80,19 @@ public class Invite : IInviteModel, IEntityModelSource
         if (ScheduledEvent.IsSpecified)
             yield return ScheduledEvent.Value;
     }
+
+    IEnumerable<IUserModel> IModelSourceOfMultiple<IUserModel>.GetModels()
+    {
+        if (TargetUser.IsSpecified)
+            yield return TargetUser.Value;
+
+        if (Inviter.IsSpecified)
+            yield return Inviter.Value;
+    }
+
+    IPartialGuildModel? IModelSourceOf<IPartialGuildModel?>.Model => ~Guild;
+
+    IApplicationModel? IModelSourceOf<IApplicationModel?>.Model => ~TargetApplication;
+
+    IGuildScheduledEventModel? IModelSourceOf<IGuildScheduledEventModel?>.Model => ~ScheduledEvent;
 }

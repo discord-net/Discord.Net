@@ -6,11 +6,7 @@ public interface ILoadableDMChannelActor :
     IDMChannelActor,
     ILoadableEntity<ulong, IDMChannel>;
 
-public interface IDMChannelActor :
+[Deletable(nameof(Routes.DeleteChannel))]
+public partial interface IDMChannelActor :
     IMessageChannelActor,
-    IDeletable<ulong, IDMChannelActor>,
-    IActor<ulong, IDMChannel>
-{
-    static IApiRoute IDeletable<ulong, IDMChannelActor>.DeleteRoute(IPathable path, ulong id)
-        => Routes.DeleteChannel(id);
-}
+    IActor<ulong, IDMChannel>;

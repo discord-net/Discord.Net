@@ -9,8 +9,8 @@ public interface IThreadMember :
     IRefreshable<IThreadMember, ulong, IThreadMemberModel>
 {
     static IApiOutRoute<IThreadMemberModel> IRefreshable<IThreadMember, ulong, IThreadMemberModel>.RefreshRoute(
-        IThreadMember self, ulong id
-    ) => Routes.GetThreadMember(self.Thread.Id, id, true);
+        IPathable path, ulong id
+    ) => Routes.GetThreadMember(path.Require<IThreadChannel>(), id, true);
 
     DateTimeOffset JoinedAt { get; }
 }

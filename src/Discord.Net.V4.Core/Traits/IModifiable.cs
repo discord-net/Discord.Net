@@ -2,6 +2,11 @@ using Discord.Models;
 
 namespace Discord;
 
+#pragma warning disable CS9113 // Parameter is unread.
+[AttributeUsage(AttributeTargets.Interface)]
+internal sealed class ModifiableAttribute<TParams>(string route) : Attribute;
+#pragma warning restore CS9113 // Parameter is unread.
+
 public interface IModifiable<TId, in TSelf, out TParams, TApi, TModel> :
     IModifiable<TId, TSelf, TParams, TApi>,
     IUpdatable<TModel>

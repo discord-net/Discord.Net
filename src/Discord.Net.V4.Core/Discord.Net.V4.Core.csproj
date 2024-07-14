@@ -13,6 +13,11 @@
     <NoWarn>CA2252</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <HanzLogLevel>debug</HanzLogLevel>
+    <HanzLogFilePath>C:\Users\lynch\Documents\GitHub\Discord.Net\HanzLogs.txt</HanzLogFilePath>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Interactive.Async" Version="6.0.1"/>
   </ItemGroup>

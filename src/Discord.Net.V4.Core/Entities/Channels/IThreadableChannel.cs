@@ -4,23 +4,15 @@ using Discord.Rest;
 
 namespace Discord;
 
-using Modifiable = IModifiable<ulong, IThreadableChannel, ModifyThreadableChannelProperties, ModifyGuildChannelParams, IThreadableChannelModel>;
-
 public partial interface IThreadableChannel :
     IGuildChannel,
     IThreadableChannelActor,
-    Modifiable
+    IEntityOf<IThreadableChannelModel>
 {
-    static IApiInOutRoute<ModifyGuildChannelParams, IEntityModel> Modifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyGuildChannelParams args
-    ) => Routes.ModifyChannel(id, args);
+    [SourceOfTruth]
+    new IThreadableChannelModel GetModel();
 
     int? DefaultThreadSlowmode { get; }
 
     ThreadArchiveDuration DefaultArchiveDuration { get; }
-
-    [SourceOfTruth]
-    new IThreadableChannelModel GetModel();
 }

@@ -16,9 +16,9 @@ public interface IMessage :
         ModifyMessageParams args)
         => Routes.ModifyMessage(path.Require<IChannel>(), id, args);
 
-    static IApiOutRoute<IMessageModel> IRefreshable<IMessage, ulong, IMessageModel>.RefreshRoute(IMessage self,
+    static IApiOutRoute<IMessageModel> IRefreshable<IMessage, ulong, IMessageModel>.RefreshRoute(IPathable path,
         ulong id)
-        => Routes.GetChannelMessage(self.Channel.Id, id);
+        => Routes.GetChannelMessage(path.Require<IChannel>(), id);
 
     #region Properties
 

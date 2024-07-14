@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class UserConnection : IUserConnectionModel, IEntityModelSource
+public sealed class UserConnection : IUserConnectionModel, IModelSource, IModelSourceOfMultiple<IIntegrationModel>
 {
     [JsonPropertyName("id")]
     public required string Id { get; set; }
@@ -39,5 +39,7 @@ public sealed class UserConnection : IUserConnectionModel, IEntityModelSource
     IEnumerable<IIntegrationModel>? IUserConnectionModel.Integrations => Integrations | [];
     bool IUserConnectionModel.FriendSyncEnabled => FriendSync;
 
-    public IEnumerable<IEntityModel> GetEntities() => Integrations | [];
+    IEnumerable<IIntegrationModel> IModelSourceOfMultiple<IIntegrationModel>.GetModels() => Integrations | [];
+
+    public IEnumerable<IEntityModel> GetDefinedModels() => Integrations | [];
 }

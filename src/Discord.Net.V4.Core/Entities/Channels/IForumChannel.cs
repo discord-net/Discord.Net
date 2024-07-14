@@ -4,9 +4,6 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable =
-    IModifiable<ulong, IForumChannel, ModifyForumChannelProperties, ModifyGuildChannelParams, IGuildForumChannelModel>;
-
 /// <summary>
 ///     Represents a forum channel in a guild that can create posts.
 /// </summary>
@@ -14,14 +11,8 @@ public partial interface IForumChannel :
     INestedChannel,
     IIntegrationChannel,
     IForumChannelActor,
-    IModifiable
+    IEntityOf<IGuildForumChannelModel>
 {
-    static IApiInOutRoute<ModifyGuildChannelParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyGuildChannelParams args
-    ) => Routes.ModifyChannel(id, args);
-
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
     /// </summary>
@@ -74,7 +65,4 @@ public partial interface IForumChannel :
     ///     Gets the rule used to display posts in a forum channel.
     /// </summary>
     ForumLayout DefaultLayout { get; }
-
-    [SourceOfTruth]
-    new IGuildForumChannelModel GetModel();
 }

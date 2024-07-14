@@ -2,7 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Sticker : IStickerModel, IGuildStickerModel, IEntityModelSource
+public sealed class Sticker :
+    IGuildStickerModel,
+    IModelSource,
+    IModelSourceOf<IUserModel?>
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -45,8 +48,10 @@ public sealed class Sticker : IStickerModel, IGuildStickerModel, IEntityModelSou
 
     ulong? IGuildStickerModel.AuthorId => User.Map(v => v.Id);
 
-    public IEnumerable<IEntityModel> GetEntities()
+    public IEnumerable<IEntityModel> GetDefinedModels()
     {
         if (User) yield return User.Value;
     }
+
+    IUserModel? IModelSourceOf<IUserModel?>.Model => ~User;
 }

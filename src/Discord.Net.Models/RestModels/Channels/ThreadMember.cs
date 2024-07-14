@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class ThreadMember : IThreadMemberModel, IEntityModelSource
+public sealed class ThreadMember : IThreadMemberModel, IModelSource, IModelSourceOf<IMemberModel?>
 {
     [JsonPropertyName("id")]
     public Optional<ulong> Id { get; set; }
@@ -22,9 +22,11 @@ public sealed class ThreadMember : IThreadMemberModel, IEntityModelSource
     ulong? IThreadMemberModel.UserId => UserId;
     ulong IEntityModel<ulong>.Id => Id;
 
-    public IEnumerable<IEntityModel> GetEntities()
+    public IEnumerable<IEntityModel> GetDefinedModels()
     {
         if (GuildMember.IsSpecified)
             yield return GuildMember.Value;
     }
+
+    IMemberModel? IModelSourceOf<IMemberModel?>.Model => ~GuildMember;
 }

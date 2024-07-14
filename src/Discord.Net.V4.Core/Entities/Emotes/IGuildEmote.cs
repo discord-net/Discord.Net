@@ -4,28 +4,16 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable = IModifiable<ulong, IGuildEmote, EmoteProperties, ModifyEmojiParams, IGuildEmoteModel>;
-
 /// <summary>
 ///     An image-based emote that is attached to a guild.
 /// </summary>
-public interface IGuildEmote :
+[Refreshable(nameof(Routes.GetGuildEmoji))]
+public partial interface IGuildEmote :
     IEmote,
     ISnowflakeEntity,
     IGuildEmoteActor,
-    IRefreshable<IGuildEmote, ulong, IGuildEmoteModel>,
-    IModifiable
+    IEntityOf<IGuildEmoteModel>
 {
-    static IApiInOutRoute<ModifyEmojiParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyEmojiParams args
-    ) => Routes.ModifyGuildEmoji(path.Require<IGuild>(), id, args);
-
-    static IApiOutRoute<IGuildEmoteModel> IRefreshable<IGuildEmote, ulong, IGuildEmoteModel>.RefreshRoute(
-        IGuildEmote self, ulong id)
-        => Routes.GetGuildEmoji(self.Require<IGuild>(), id);
-
     /// <summary>
     ///     Gets whether this emoji is managed by an integration.
     /// </summary>

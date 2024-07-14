@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [ChannelTypeOf(ChannelType.GroupDM)]
-public sealed class GroupDMChannel : Channel, IGroupDMChannelModel, IEntityModelSource
+public sealed class GroupDMChannel : Channel, IGroupDMChannelModel, IModelSourceOfMultiple<IUserModel>
 {
     [JsonPropertyName("last_message_id")]
     public Optional<ulong?> LastMessageId { get; set; }
@@ -33,6 +33,9 @@ public sealed class GroupDMChannel : Channel, IGroupDMChannelModel, IEntityModel
     [JsonPropertyName("application_id")]
     public Optional<ulong> ApplicationId { get; set; }
 
-    ulong[] IGroupDMChannelModel.Recipients => Recipients.Select(x => x.Id).ToArray();
-    public IEnumerable<IEntityModel> GetEntities() => Recipients;
+    IEnumerable<ulong> IGroupDMChannelModel.Recipients => Recipients.Select(x => x.Id);
+
+    IEnumerable<IUserModel> IModelSourceOfMultiple<IUserModel>.GetModels() => Recipients;
+
+    public IEnumerable<IEntityModel> GetDefinedModels() => Recipients;
 }

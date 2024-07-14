@@ -10,10 +10,10 @@ public static partial class Routes
         new ApiOutRoute<Channel>(nameof(GetChannel), RequestMethod.Get, $"/channels/{channelId}",
             (ScopeType.Channel, channelId));
 
-    public static IApiInOutRoute<TArgs, Channel> ModifyChannel<TArgs>(ulong channelId, TArgs body)
+    public static IApiInOutRoute<TArgs, Channel> ModifyChannel<TArgs>(ulong id, TArgs body)
         where TArgs : ModifyChannelParams =>
-        new ApiInOutRoute<TArgs, Channel>(nameof(ModifyChannel), RequestMethod.Patch, $"/channels/{channelId}", body,
-            ContentType.JsonBody, (ScopeType.Channel, channelId));
+        new ApiInOutRoute<TArgs, Channel>(nameof(ModifyChannel), RequestMethod.Patch, $"/channels/{id}", body,
+            ContentType.JsonBody, (ScopeType.Channel, id));
 
     public static IApiRoute DeleteChannel(ulong channelId) =>
         new ApiRoute(nameof(DeleteChannel), RequestMethod.Delete, $"/channels/{channelId}",

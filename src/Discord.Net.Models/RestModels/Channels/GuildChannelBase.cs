@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public abstract class GuildChannelBase : Channel, IGuildChannelModel, IEntityModelSource
+public abstract class GuildChannelBase : Channel, IGuildChannelModel, IModelSource, IModelSourceOf<IEmojiModel?>
 {
     [JsonPropertyName("last_pin_timestamp")]
     public Optional<DateTimeOffset?> LastPinTimestamp { get; set; }
@@ -76,9 +76,11 @@ public abstract class GuildChannelBase : Channel, IGuildChannelModel, IEntityMod
 
     int? IGuildChannelModel.Flags => Flags;
 
-    public virtual IEnumerable<IEntityModel> GetEntities()
+    public virtual IEnumerable<IEntityModel> GetDefinedModels()
     {
         if (DefaultReactionEmoji is {IsSpecified: true, Value: not null})
             yield return DefaultReactionEmoji.Value;
     }
+
+    IEmojiModel? IModelSourceOf<IEmojiModel?>.Model => ~DefaultReactionEmoji;
 }

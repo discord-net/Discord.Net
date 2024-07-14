@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Integration : IIntegrationModel, IEntityModelSource
+public sealed class Integration : IIntegrationModel, IModelSource, IModelSourceOf<IUserModel?>
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -74,9 +74,11 @@ public sealed class Integration : IIntegrationModel, IEntityModelSource
 
     string[]? IIntegrationModel.Scopes => Scopes;
 
-    public IEnumerable<IEntityModel> GetEntities()
+    public IEnumerable<IEntityModel> GetDefinedModels()
     {
         if (User.IsSpecified)
             yield return User.Value;
     }
+
+    IUserModel? IModelSourceOf<IUserModel?>.Model => ~User;
 }

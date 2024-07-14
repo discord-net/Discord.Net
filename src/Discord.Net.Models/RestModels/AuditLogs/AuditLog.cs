@@ -2,7 +2,12 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class AuditLog : IEntityModelSource
+public sealed class AuditLog :
+    IModelSourceOfMultiple<IGuildScheduledEventModel>,
+    IModelSourceOfMultiple<IIntegrationModel>,
+    IModelSourceOfMultiple<IThreadChannelModel>,
+    IModelSourceOfMultiple<IUserModel>,
+    IModelSourceOfMultiple<IWebhookModel>
 {
     [JsonPropertyName("application_commands")]
     public required ApplicationCommand[] Commands { get; set; }
@@ -20,7 +25,7 @@ public sealed class AuditLog : IEntityModelSource
     public required Integration[] Integrations { get; set; }
 
     [JsonPropertyName("threads")]
-    public required Channel[] Threads { get; set; }
+    public required ThreadChannelBase[] Threads { get; set; }
 
     [JsonPropertyName("users")]
     public required User[] Users { get; set; }
@@ -28,6 +33,16 @@ public sealed class AuditLog : IEntityModelSource
     [JsonPropertyName("webhooks")]
     public required Webhook[] Webhooks { get; set; }
 
-    public IEnumerable<IEntityModel> GetEntities()
+    IEnumerable<IGuildScheduledEventModel> IModelSourceOfMultiple<IGuildScheduledEventModel>.GetModels() => GuildScheduledEvents;
+
+    IEnumerable<IIntegrationModel> IModelSourceOfMultiple<IIntegrationModel>.GetModels() => Integrations;
+
+    IEnumerable<IThreadChannelModel> IModelSourceOfMultiple<IThreadChannelModel>.GetModels() => Threads;
+
+    IEnumerable<IUserModel> IModelSourceOfMultiple<IUserModel>.GetModels() => Users;
+
+    IEnumerable<IWebhookModel> IModelSourceOfMultiple<IWebhookModel>.GetModels() => Webhooks;
+
+    public IEnumerable<IEntityModel> GetDefinedModels()
         => [..GuildScheduledEvents, ..Integrations, ..Threads, ..Users, ..Webhooks];
 }

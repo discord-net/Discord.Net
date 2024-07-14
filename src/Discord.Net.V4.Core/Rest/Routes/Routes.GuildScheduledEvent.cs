@@ -10,9 +10,9 @@ public partial class Routes
             $"guilds/{guildId}/scheduled-events{RouteUtils.GetUrlEncodedQueryParams(("with_user_count", withUserCount))}",
             (ScopeType.Guild, guildId));
 
-    public static IApiOutRoute<GuildScheduledEvent> GetGuildScheduledEvent(ulong guildId, ulong eventId) =>
+    public static IApiOutRoute<GuildScheduledEvent> GetGuildScheduledEvent(ulong guildId, ulong id) =>
         new ApiOutRoute<GuildScheduledEvent>(nameof(GetGuildScheduledEvent), RequestMethod.Get,
-            $"/guilds/{guildId}/scheduled-events/{eventId}", (ScopeType.Guild, guildId));
+            $"/guilds/{guildId}/scheduled-events/{id}", (ScopeType.Guild, guildId));
 
     public static IApiInOutRoute<CreateGuildScheduledEventParams, GuildScheduledEvent> CreateGuildScheduledEvent(
         ulong guildId, CreateGuildScheduledEventParams body) =>
@@ -21,14 +21,14 @@ public partial class Routes
             (ScopeType.Guild, guildId));
 
     public static IApiInOutRoute<ModifyGuildScheduledEventParams, GuildScheduledEvent> ModifyGuildScheduledEvent(
-        ulong guildId, ulong eventId, ModifyGuildScheduledEventParams body) =>
+        ulong guildId, ulong id, ModifyGuildScheduledEventParams body) =>
         new ApiInOutRoute<ModifyGuildScheduledEventParams, GuildScheduledEvent>(nameof(ModifyGuildScheduledEvent),
-            RequestMethod.Patch, $"/guilds/{guildId}/scheduled-events/{eventId}", body, ContentType.JsonBody,
+            RequestMethod.Patch, $"/guilds/{guildId}/scheduled-events/{id}", body, ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    public static IApiRoute DeleteGuildScheduledEvent(ulong guildId, ulong eventId) =>
+    public static IApiRoute DeleteGuildScheduledEvent(ulong guildId, ulong id) =>
         new ApiRoute(nameof(DeleteGuildScheduledEvent), RequestMethod.Delete,
-            $"/guilds/{guildId}/scheduled-events/{eventId}", (ScopeType.Guild, guildId));
+            $"/guilds/{guildId}/scheduled-events/{id}", (ScopeType.Guild, guildId));
 
     public static IApiOutRoute<GuildScheduledEventUser[]> GetGuildScheduledEventUsers(ulong guildId, ulong eventId,
         int? limit = default,

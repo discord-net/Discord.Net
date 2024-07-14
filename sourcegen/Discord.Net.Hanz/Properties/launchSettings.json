@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "V4Core": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "../../src/Discord.Net.V4.Core/Discord.Net.V4.Core.csproj"
+    }
+  }
+}

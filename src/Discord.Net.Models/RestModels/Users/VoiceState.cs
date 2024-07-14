@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class VoiceState : IVoiceStateModel, IEntityModelSource
+public sealed class VoiceState : IVoiceStateModel, IModelSource, IModelSourceOf<IMemberModel?>
 {
     [JsonPropertyName("guild_id")]
     public Optional<ulong> GuildId { get; set; }
@@ -47,8 +47,10 @@ public sealed class VoiceState : IVoiceStateModel, IEntityModelSource
     ulong? IVoiceStateModel.GuildId => GuildId;
     string IEntityModel<string>.Id => SessionId;
 
-    public IEnumerable<IEntityModel> GetEntities()
+    public IEnumerable<IEntityModel> GetDefinedModels()
     {
         if (Member) yield return Member.Value;
     }
+
+    IMemberModel? IModelSourceOf<IMemberModel?>.Model => ~Member;
 }

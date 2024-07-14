@@ -6,10 +6,10 @@ public static class ModelUtils
         where TModel : class, IEntityModel<TId>
         where TId : IEquatable<TId>
     {
-        if (model is not IEntityModelSource source)
+        if (model is not IModelSource source)
             return null;
 
-        foreach (var entity in source.GetEntities())
+        foreach (var entity in source.GetDefinedModels())
         {
             if (entity is TModel target && target.Id.Equals(id))
                 return target;

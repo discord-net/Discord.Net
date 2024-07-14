@@ -113,7 +113,9 @@ public sealed partial class RestGuild :
 
     public RestLoadableGuildMemberActor Owner { get; private set; }
 
-    public IDefinedEnumerableActor<IRoleActor, ulong, IRole> Roles => throw new NotImplementedException();
+    [SourceOfTruth]
+    public RestManagedEnumerableActor<RestRoleActor, ulong, RestRole, IRole, IRoleModel> Roles { get; }
+    //public IDefinedEnumerableActor<IRoleActor, ulong, IRole> Roles => throw new NotImplementedException();
 
     public IDefinedEnumerableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes => throw new NotImplementedException();
 
@@ -180,6 +182,17 @@ public sealed partial class RestGuild :
     {
         _model = model;
         Actor = actor ?? new(client, GuildIdentity.Of(this));
+
+        if(model is not IModelSourceOfMultiple<IRoleModel> roles)
+            throw new ArgumentException($"{nameof(model)} must provide a collection of {nameof(IRoleModel)}.");
+
+        Roles = RestManagedEnumerableActor.Create<RestRoleActor, ulong, RestRole, IRole, IRoleModel, GuildIdentity>(
+            client,
+            roles.GetModels(),
+            id => new(client, Actor.Identity, RoleIdentity.Of(id)),
+            Routes.GetGuildRoles(model.Id),
+            Actor.Identity
+        );
 
         AFKChannel = model.AFKChannelId
             .Map(

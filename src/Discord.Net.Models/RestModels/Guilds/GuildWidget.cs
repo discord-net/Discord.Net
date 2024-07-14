@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildWidget : IEntityModelSource
+public sealed class GuildWidget : IModelSource, IModelSourceOfMultiple<IChannelModel>, IModelSourceOfMultiple<IMemberModel>
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -22,5 +22,9 @@ public sealed class GuildWidget : IEntityModelSource
     [JsonPropertyName("presence_count")]
     public int PresenceCount { get; set; }
 
-    public IEnumerable<IEntityModel> GetEntities() => [..Channels, ..Members];
+    IEnumerable<IChannelModel> IModelSourceOfMultiple<IChannelModel>.GetModels() => Channels;
+
+    IEnumerable<IMemberModel> IModelSourceOfMultiple<IMemberModel>.GetModels() => Members;
+
+    public IEnumerable<IEntityModel> GetDefinedModels() => [..Channels, ..Members];
 }

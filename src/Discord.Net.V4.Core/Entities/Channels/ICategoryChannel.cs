@@ -7,8 +7,4 @@ namespace Discord;
 /// </summary>
 public partial interface ICategoryChannel :
     IGuildChannel,
-    IUpdatable<IGuildCategoryChannelModel>
-{
-    [SourceOfTruth]
-    new IGuildCategoryChannelModel GetModel();
-}
+    IUpdatable<IGuildCategoryChannelModel>;

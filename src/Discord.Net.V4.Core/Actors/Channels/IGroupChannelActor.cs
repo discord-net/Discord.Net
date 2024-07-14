@@ -4,20 +4,11 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable = IModifiable<ulong, IGroupChannelActor, ModifyGroupDMProperties, ModifyGroupDmParams, IGroupChannel, IGroupDMChannelModel>;
-
 public interface ILoadableGroupChannelActor :
     IGroupChannelActor,
     ILoadableEntity<ulong, IGroupChannel>;
 
-public interface IGroupChannelActor :
+[Modifiable<ModifyGroupDMProperties>(nameof(Routes.ModifyChannel))]
+public partial interface IGroupChannelActor :
     IMessageChannelActor,
-    IActor<ulong, IGroupChannel>,
-    IModifiable
-{
-    static IApiInOutRoute<ModifyGroupDmParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyGroupDmParams args
-    ) => Routes.ModifyChannel(id, args);
-}
+    IActor<ulong, IGroupChannel>;

@@ -2,10 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class ChannelThreads : IEntityModelSource
+public sealed class ChannelThreads : IModelSource, IModelSourceOfMultiple<IThreadChannelModel>, IModelSourceOfMultiple<IThreadMemberModel>
 {
     [JsonPropertyName("threads")]
-    public required Channel[] Threads { get; set; }
+    public required ThreadChannelBase[] Threads { get; set; }
 
     [JsonPropertyName("members")]
     public required ThreadMember[] Members { get; set; }
@@ -13,5 +13,9 @@ public sealed class ChannelThreads : IEntityModelSource
     [JsonPropertyName("has_more")]
     public bool HasMore { get; set; }
 
-    public IEnumerable<IEntityModel> GetEntities() => [..Threads, ..Members];
+    IEnumerable<IThreadChannelModel> IModelSourceOfMultiple<IThreadChannelModel>.GetModels() => Threads;
+
+    IEnumerable<IThreadMemberModel> IModelSourceOfMultiple<IThreadMemberModel>.GetModels() => Members;
+
+    public IEnumerable<IEntityModel> GetDefinedModels() => [..Threads, ..Members];
 }

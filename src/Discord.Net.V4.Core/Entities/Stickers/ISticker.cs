@@ -6,15 +6,11 @@ namespace Discord;
 /// <summary>
 ///     Represents a discord sticker.
 /// </summary>
-public interface ISticker :
+[Refreshable(nameof(Routes.GetSticker))]
+public partial interface ISticker :
     ISnowflakeEntity,
-    IRefreshable<ISticker, ulong, IStickerModel>
+    IEntityOf<IStickerModel>
 {
-    static IApiOutRoute<IStickerModel> IRefreshable<ISticker, ulong, IStickerModel>.RefreshRoute(
-        ISticker self,
-        ulong id
-    ) => Routes.GetSticker(id);
-
     /// <summary>
     ///     The name of the sticker.
     /// </summary>

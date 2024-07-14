@@ -3,7 +3,13 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public class Guild : PartialGuild, IGuildModel, IEntityModelSource
+public class Guild :
+    PartialGuild,
+    IGuildModel,
+    IModelSource,
+    IModelSourceOfMultiple<IRoleModel>,
+    IModelSourceOfMultiple<IGuildEmoteModel>,
+    IModelSourceOfMultiple<IStickerModel>
 {
     [JsonPropertyName("icon_hash")]
     public Optional<string?> IconHash { get; set; }
@@ -104,7 +110,13 @@ public class Guild : PartialGuild, IGuildModel, IEntityModelSource
 
     string? IGuildModel.Splash => Splash;
 
-    public virtual IEnumerable<IEntityModel> GetEntities()
+    IEnumerable<IRoleModel> IModelSourceOfMultiple<IRoleModel>.GetModels() => Roles;
+
+    IEnumerable<IGuildEmoteModel> IModelSourceOfMultiple<IGuildEmoteModel>.GetModels() => Emojis;
+
+    IEnumerable<IStickerModel> IModelSourceOfMultiple<IStickerModel>.GetModels() => Stickers | [];
+
+    public virtual IEnumerable<IEntityModel> GetDefinedModels()
     {
         IEnumerable<IEntityModel> entities = [..Roles, ..Emojis];
 

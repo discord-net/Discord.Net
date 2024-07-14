@@ -2,7 +2,16 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Message : IMessageModel, IEntityModelSource
+public sealed class Message :
+    IMessageModel,
+    IModelSource,
+    IModelSourceOfMultiple<IUserModel>,
+    IModelSourceOfMultiple<IReactionModel>,
+    IModelSourceOfMultiple<IAttachmentModel>,
+    IModelSourceOf<IMessageModel?>,
+    IModelSourceOf<IThreadChannelModel?>,
+    IModelSourceOfMultiple<IStickerItemModel>
+
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -82,7 +91,7 @@ public sealed class Message : IMessageModel, IEntityModelSource
     public Optional<MessageInteractionMetadata> Interaction { get; set; }
 
     [JsonPropertyName("thread")]
-    public Optional<Channel> Thread { get; set; }
+    public Optional<ThreadChannelBase> Thread { get; set; }
 
     [JsonPropertyName("components")]
     public Optional<MessageComponent[]> Components { get; set; }
@@ -135,7 +144,7 @@ public sealed class Message : IMessageModel, IEntityModelSource
 
     int? IMessageModel.Position => Position;
 
-    public IEnumerable<IEntityModel> GetEntities()
+    public IEnumerable<IEntityModel> GetDefinedModels()
     {
         if (Author.IsSpecified)
             yield return Author.Value;
@@ -152,4 +161,26 @@ public sealed class Message : IMessageModel, IEntityModelSource
         if(StickerItems.IsSpecified) foreach (var item in StickerItems.Value)
             yield return item;
     }
+
+    IEnumerable<IUserModel> IModelSourceOfMultiple<IUserModel>.GetModels()
+    {
+        if (Author.IsSpecified)
+            yield return Author.Value;
+
+        foreach (var mention in UserMentions)
+            yield return mention;
+    }
+
+    IEnumerable<IReactionModel> IModelSourceOfMultiple<IReactionModel>.GetModels()
+        => Reactions | [];
+
+    IEnumerable<IAttachmentModel> IModelSourceOfMultiple<IAttachmentModel>.GetModels()
+        => Attachments | [];
+
+    IEnumerable<IStickerItemModel> IModelSourceOfMultiple<IStickerItemModel>.GetModels()
+        => StickerItems | [];
+
+    IMessageModel? IModelSourceOf<IMessageModel?>.Model => ~ReferencedMessage;
+
+    IThreadChannelModel? IModelSourceOf<IThreadChannelModel?>.Model => ~Thread;
 }

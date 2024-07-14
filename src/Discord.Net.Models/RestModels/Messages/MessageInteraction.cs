@@ -2,7 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class MessageInteractionMetadata : IEntityModelSource, IMessageInteractionMetadataModel
+public sealed class MessageInteractionMetadata :
+    IModelSource,
+    IMessageInteractionMetadataModel,
+    IModelSourceOf<IUserModel>
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -36,8 +39,10 @@ public sealed class MessageInteractionMetadata : IEntityModelSource, IMessageInt
         AuthorizingIntegrationOwners;
     ulong IMessageInteractionMetadataModel.UserId => User.Id;
 
-    public IEnumerable<IEntityModel> GetEntities()
+    public IEnumerable<IEntityModel> GetDefinedModels()
     {
         yield return User;
     }
+
+    IUserModel IModelSourceOf<IUserModel>.Model => User;
 }

@@ -2,7 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildScheduledEvent : IGuildScheduledEventModel, IEntityModelSource
+public sealed class GuildScheduledEvent :
+    IGuildScheduledEventModel,
+    IModelSource,
+    IModelSourceOf<IUserModel?>
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -60,9 +63,11 @@ public sealed class GuildScheduledEvent : IGuildScheduledEventModel, IEntityMode
     DateTimeOffset? IGuildScheduledEventModel.ScheduledEndTime => ScheduledEndTime;
     string? IGuildScheduledEventModel.Location => EntityMetadata?.Location;
 
-    public IEnumerable<IEntityModel> GetEntities()
+    public IEnumerable<IEntityModel> GetDefinedModels()
     {
         if (Creator.IsSpecified)
             yield return Creator.Value;
     }
+
+    IUserModel? IModelSourceOf<IUserModel?>.Model => ~Creator;
 }

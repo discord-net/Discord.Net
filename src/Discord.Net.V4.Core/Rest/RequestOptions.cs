@@ -57,5 +57,5 @@ public sealed record RequestOptions
     /// </remarks>
     public bool? UseSystemClock { get; set; }
 
-    public bool ForceUpdate { get; set; }
+    public bool AllowCached { get; set; }
 }

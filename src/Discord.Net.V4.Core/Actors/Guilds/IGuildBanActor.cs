@@ -3,16 +3,12 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableGuildBanActor :
-    IGuildBanActor,
+public interface ILoadableBanActor :
+    IBanActor,
     ILoadableEntity<ulong, IBan>;
 
-public interface IGuildBanActor :
+[Deletable(nameof(Routes.RemoveGuildBan))]
+public partial interface IBanActor :
     IGuildRelationship,
     IUserRelationship,
-    IActor<ulong, IBan>,
-    IDeletable<ulong, IGuildBanActor>
-{
-    static IApiRoute IDeletable<ulong, IGuildBanActor>.DeleteRoute(IPathable path, ulong id)
-        => Routes.RemoveGuildBan(path.Require<IGuild>(), id);
-}
+    IActor<ulong, IBan>;

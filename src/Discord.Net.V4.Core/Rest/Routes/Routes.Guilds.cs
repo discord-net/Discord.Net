@@ -61,10 +61,10 @@ public partial class Routes
         new ApiInOutRoute<AddGuildMemberParams, GuildMember>(nameof(AddGuildMember), RequestMethod.Put,
             $"guilds/{guildId}/members/{userId}", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
 
-    public static IApiInOutRoute<ModifyGuildMemberParams, GuildMember> ModifyGuildMember(ulong guildId, ulong userId,
+    public static IApiInOutRoute<ModifyGuildMemberParams, GuildMember> ModifyGuildMember(ulong guildId, ulong id,
         ModifyGuildMemberParams body) =>
         new ApiInOutRoute<ModifyGuildMemberParams, GuildMember>(nameof(ModifyGuildMember), RequestMethod.Patch,
-            $"guilds/{guildId}/members/{userId}", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
+            $"guilds/{guildId}/members/{id}", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
 
     public static IApiInOutRoute<ModifyCurrentMemberParams, GuildMember> ModifyCurrentMember(ulong guildId,
         ModifyCurrentMemberParams body) =>
@@ -89,8 +89,8 @@ public partial class Routes
             $"guilds/{guildId}/bans{RouteUtils.GetUrlEncodedQueryParams(("limit", limit), ("before", beforeId), ("after", afterId))}",
             (ScopeType.Guild, guildId));
 
-    public static IApiOutRoute<Ban> GetGuildBan(ulong guildId, ulong userId) =>
-        new ApiOutRoute<Ban>(nameof(GetGuildBan), RequestMethod.Get, $"guilds/{guildId}/bans/{userId}",
+    public static IApiOutRoute<Ban> GetGuildBan(ulong guildId, ulong id) =>
+        new ApiOutRoute<Ban>(nameof(GetGuildBan), RequestMethod.Get, $"guilds/{guildId}/bans/{id}",
             (ScopeType.Guild, guildId));
 
     public static IApiInRoute<CreateGuildBanParams> CreateGuildBan(ulong guildId, ulong userId,
@@ -98,8 +98,8 @@ public partial class Routes
         new ApiInRoute<CreateGuildBanParams>(nameof(CreateGuildBan), RequestMethod.Put,
             $"guilds/{guildId}/bans/{userId}", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
 
-    public static IApiRoute RemoveGuildBan(ulong guildId, ulong userId) =>
-        new ApiRoute(nameof(RemoveGuildBan), RequestMethod.Delete, $"guilds/{guildId}/bans/{userId}",
+    public static IApiRoute RemoveGuildBan(ulong guildId, ulong banId) =>
+        new ApiRoute(nameof(RemoveGuildBan), RequestMethod.Delete, $"guilds/{guildId}/bans/{banId}",
             (ScopeType.Guild, guildId));
 
     public static IApiInOutRoute<BulkBanUsersParams, BulkBanResponse> BulkGuildBan(ulong guildId,

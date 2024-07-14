@@ -22,9 +22,9 @@ public interface IStageInstance :
     ) => Routes.ModifyStageInstance(path.Require<IChannel>(), args);
 
     static IApiOutRoute<IStageInstanceModel> IRefreshable<IStageInstance, ulong, IStageInstanceModel>.RefreshRoute(
-        IStageInstance self,
+        IPathable path,
         ulong id
-    ) => Routes.GetStageInstance(self.Channel.Id);
+    ) => Routes.GetStageInstance(path.Require<IChannel>());
 
     /// <summary>
     ///     Gets the topic of the stage.

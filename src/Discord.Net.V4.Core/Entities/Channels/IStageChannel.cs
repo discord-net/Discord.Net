@@ -8,10 +8,4 @@ namespace Discord;
 public partial interface IStageChannel :
     IVoiceChannel,
     IStageChannelActor,
-    IUpdatable<IGuildStageChannelModel>
-{
-    [SourceOfTruth]
-    new IGuildStageChannelModel GetModel();
-
-
-}
+    IUpdatable<IGuildStageChannelModel>;

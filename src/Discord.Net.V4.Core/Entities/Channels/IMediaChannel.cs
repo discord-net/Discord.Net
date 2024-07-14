@@ -4,21 +4,15 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable =
-    IModifiable<ulong, IMediaChannel, ModifyMediaChannelProperties, ModifyGuildChannelParams, IGuildMediaChannelModel>;
-
 public partial interface IMediaChannel :
     INestedChannel,
     IIntegrationChannel,
     IMediaChannelActor,
-    IModifiable
+    IEntityOf<IGuildMediaChannelModel>
 {
-    static IApiInOutRoute<ModifyGuildChannelParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyGuildChannelParams args
-    ) => Routes.ModifyChannel(id, args);
-
+    [SourceOfTruth]
+    new IGuildMediaChannelModel GetModel();
+    
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
     /// </summary>
@@ -66,9 +60,4 @@ public partial interface IMediaChannel :
     ///     Defaults to <see langword="null" />, which indicates a preferred sort order hasn't been set
     /// </remarks>
     SortOrder? DefaultSortOrder { get; }
-
-    [SourceOfTruth]
-    new IGuildMediaChannelModel GetModel();
-
-
 }

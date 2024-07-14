@@ -8,15 +8,15 @@ public static partial class Routes
     public static readonly IApiOutRoute<StickerPack[]> ListStickerPacks
         = new ApiOutRoute<StickerPack[]>(nameof(ListStickerPacks), RequestMethod.Get, "sticker-packs");
 
-    public static IApiOutRoute<Sticker> GetSticker(ulong stickerId) =>
-        new ApiOutRoute<Sticker>(nameof(GetSticker), RequestMethod.Get, $"stickers/{stickerId}");
+    public static IApiOutRoute<Sticker> GetSticker(ulong id) =>
+        new ApiOutRoute<Sticker>(nameof(GetSticker), RequestMethod.Get, $"stickers/{id}");
 
     public static IApiOutRoute<Sticker[]> ListGuildStickers(ulong guildId) =>
         new ApiOutRoute<Sticker[]>(nameof(ListGuildStickers), RequestMethod.Get, $"guilds/{guildId}/stickers",
             (ScopeType.Guild, guildId));
 
-    public static IApiOutRoute<Sticker> GetGuildSticker(ulong guildId, ulong stickerId) =>
-        new ApiOutRoute<Sticker>(nameof(GetGuildSticker), RequestMethod.Get, $"guilds/{guildId}/stickers/{stickerId}",
+    public static IApiOutRoute<Sticker> GetGuildSticker(ulong guildId, ulong id) =>
+        new ApiOutRoute<Sticker>(nameof(GetGuildSticker), RequestMethod.Get, $"guilds/{guildId}/stickers/{id}",
             (ScopeType.Guild, guildId));
 
     public static IApiInOutRoute<CreateStickerProperties, Sticker> CreateGuildSticker(ulong guildId,

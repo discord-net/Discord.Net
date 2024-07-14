@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildTemplate : IEntityModelSource
+public sealed class GuildTemplate : IModelSource, IModelSourceOf<IUserModel>
 {
     [JsonPropertyName("code")]
     public required string Code { get; set; }
@@ -37,5 +37,7 @@ public sealed class GuildTemplate : IEntityModelSource
     [JsonPropertyName("is_dirty")]
     public bool? IsDirty { get; set; }
 
-    public IEnumerable<IEntityModel> GetEntities() => [Creator];
+    public IEnumerable<IEntityModel> GetDefinedModels() => [Creator];
+
+    IUserModel IModelSourceOf<IUserModel>.Model => Creator;
 }

@@ -8,10 +8,4 @@ namespace Discord;
 public partial interface INewsChannel :
     ITextChannel,
     INewsChannelActor,
-    IUpdatable<IGuildNewsChannelModel>
-{
-    [SourceOfTruth]
-    new IGuildNewsChannelModel GetModel();
-
-
-}
+    IUpdatable<IGuildNewsChannelModel>;
