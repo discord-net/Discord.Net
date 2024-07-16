@@ -19,7 +19,7 @@ public sealed class Interaction :
 
     [JsonPropertyName("guild_id")] public Optional<ulong> GuildId { get; set; }
 
-    [JsonPropertyName("channel")] public Optional<Channel> Channel { get; set; }
+    [JsonPropertyName("channel")] public Optional<ChannelModel> Channel { get; set; }
 
     [JsonPropertyName("channel_id")] public Optional<ulong> ChannelId { get; set; }
 

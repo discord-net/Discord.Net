@@ -4,13 +4,9 @@ using Discord.Rest;
 
 namespace Discord;
 
-using RSVPType = IEnumerableIndexableActor<ILoadableGuildScheduledEventUserActor<IGuildScheduledEventUser>, ulong,
-    IGuildScheduledEventUser>;
+using RSVPType = IEnumerableIndexableActor<IGuildScheduledEventUserActor, ulong, IGuildScheduledEventUser>;
 
-public interface ILoadableGuildScheduledEventActor :
-    IGuildScheduledEventActor,
-    ILoadableEntity<ulong, IGuildScheduledEvent>;
-
+[Loadable(nameof(Routes.GetGuildScheduledEvent))]
 [Deletable(nameof(Routes.DeleteGuildScheduledEvent))]
 [Modifiable<ModifyGuildScheduledEventProperties>(nameof(Routes.ModifyGuildScheduledEvent))]
 public partial interface IGuildScheduledEventActor :

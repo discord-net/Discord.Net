@@ -8,11 +8,14 @@ namespace Discord;
 ///     Represents a forum channel in a guild that can create posts.
 /// </summary>
 public partial interface IForumChannel :
-    INestedChannel,
+    ISnowflakeEntity<IGuildForumChannelModel>,
+    IThreadableChannel,
     IIntegrationChannel,
-    IForumChannelActor,
-    IEntityOf<IGuildForumChannelModel>
+    IForumChannelActor
 {
+    [SourceOfTruth]
+    new IGuildForumChannelModel GetModel();
+
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
     /// </summary>

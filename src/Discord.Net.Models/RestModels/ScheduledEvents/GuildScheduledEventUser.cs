@@ -2,7 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildScheduledEventUser : IModelSource, IModelSourceOf<IUserModel>, IModelSourceOf<IMemberModel?>
+public sealed class GuildScheduledEventUser :
+    IGuildScheduledEventUserModel,
+    IModelSource,
+    IModelSourceOf<IUserModel>,
+    IModelSourceOf<IMemberModel?>
 {
     [JsonPropertyName("guild_scheduled_event_id")]
     public ulong GuildScheduledEventId { get; set; }
@@ -24,4 +28,5 @@ public sealed class GuildScheduledEventUser : IModelSource, IModelSourceOf<IUser
 
     IMemberModel? IModelSourceOf<IMemberModel?>.Model => ~Member;
     IUserModel IModelSourceOf<IUserModel>.Model => User;
+    ulong IGuildScheduledEventUserModel.UserId => User.Id;
 }

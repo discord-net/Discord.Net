@@ -13,7 +13,7 @@ public sealed class ChannelTypeOfAttribute(uint type) : Attribute
     public readonly uint Type = type;
 }
 
-public class ChannelConverter : TypeUnionConverter<Channel, uint>
+public class ChannelConverter : TypeUnionConverter<ChannelModel, uint>
 {
     protected override bool UseGenericAsDefault => true;
     protected override string UnionDelimiterName => "type";
@@ -22,9 +22,9 @@ public class ChannelConverter : TypeUnionConverter<Channel, uint>
 
     static ChannelConverter()
     {
-        Channels = typeof(Channel).Assembly.GetTypes()
+        Channels = typeof(ChannelModel).Assembly.GetTypes()
             .Where(x =>
-                x.IsClass && x.IsAssignableTo(typeof(Channel)) && x != typeof(Channel) &&
+                x.IsClass && x.IsAssignableTo(typeof(ChannelModel)) && x != typeof(ChannelModel) &&
                 x.GetCustomAttribute<ChannelTypeOfAttribute>() is not null)
             .ToDictionary(x => x.GetCustomAttribute<ChannelTypeOfAttribute>()!.Type, x => x);
     }

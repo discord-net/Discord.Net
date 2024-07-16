@@ -12,10 +12,11 @@ namespace Discord.Rest;
 public sealed partial class RestLoadableThreadChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
+    ThreadableChannelIdentity parent,
     ThreadIdentity thread,
     ThreadMemberIdentity? currentThreadMember = null
 ) :
-    RestThreadChannelActor(client, guild, thread, currentThreadMember),
+    RestThreadChannelActor(client, guild, parent, thread, currentThreadMember),
     ILoadableThreadChannelActor
 {
     [RestLoadableActorSource]
@@ -35,6 +36,7 @@ public sealed partial class RestLoadableThreadChannelActor(
 public partial class RestThreadChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
+    ThreadableChannelIdentity parent,
     ThreadIdentity thread,
     ThreadMemberIdentity? currentThreadMember = null
 ) :
@@ -52,7 +54,9 @@ public partial class RestThreadChannelActor(
     public IEnumerableIndexableActor<ILoadableThreadMemberActor, ulong, IThreadMember> ThreadMembers =>
         throw new NotImplementedException();
 
-    public ILoadableThreadableChannelActor Parent => throw new NotImplementedException();
+    [SourceOfTruth]
+    public RestLoadableThreadableChannelActor Parent { get; } =
+        new(client, guild, parent);
 
     [SourceOfTruth]
     [CovariantOverride]
@@ -129,6 +133,7 @@ public partial class RestThreadChannel :
         Actor = actor ?? new(
             client,
             guild,
+            parent ?? ThreadableChannelIdentity.Of(model.ParentId),
             ThreadIdentity.Of(this),
             currentThreadMember ?? GetCurrentThreadMemberIdentity(client, guild, ThreadIdentity.Of(this), model)
         );

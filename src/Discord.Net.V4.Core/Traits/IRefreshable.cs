@@ -10,13 +10,15 @@ internal sealed class RefreshableAttribute(string route) : Attribute;
 public interface IRefreshable<in TSelf, TId, TModel> :
     IFetchable<TId, TModel>,
     IUpdatable<TModel>,
-    IPathable
+    IPathable,
+    IClientProvider,
+    IIdentifiable<TId>
     where TModel : class, IEntityModel<TId>
     where TSelf : IRefreshable<TSelf, TId, TModel>
     where TId : IEquatable<TId>
 {
     Task RefreshAsync(RequestOptions? options = null, CancellationToken token = default)
-        => RefreshInternalAsync((TSelf)this, TSelf.RefreshRoute(this, Id), options, token);
+        => RefreshInternalAsync((TSelf)this, TSelf.FetchRoute(this, Id), options, token);
 
     internal static async Task RefreshInternalAsync(
         TSelf self,
@@ -32,9 +34,4 @@ public interface IRefreshable<in TSelf, TId, TModel> :
 
         await self.UpdateAsync(model, token);
     }
-
-    static abstract IApiOutRoute<TModel> RefreshRoute(IPathable path, TId id);
-
-    static IApiOutRoute<TModel> IFetchable<TId, TModel>.FetchRoute(IPathable path, TId id)
-        => TSelf.RefreshRoute(path, id);
 }

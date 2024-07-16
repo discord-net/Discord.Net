@@ -7,10 +7,10 @@ namespace Discord;
 ///     Represents a generic ban object.
 /// </summary>
 [Refreshable(nameof(Routes.GetGuildBan))]
+[FetchableOfMany(nameof(Routes.GetGuildBans))]
 public partial interface IBan :
-    ISnowflakeEntity,
-    IBanActor,
-    IEntityOf<IBanModel>
+    ISnowflakeEntity<IBanModel>,
+    IBanActor
 {
     /// <summary>
     ///     Gets the reason why the user is banned if specified.

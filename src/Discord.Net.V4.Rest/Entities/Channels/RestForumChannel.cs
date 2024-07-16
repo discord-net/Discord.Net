@@ -5,9 +5,6 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest.Channels;
 
-[ExtendInterfaceDefaults(
-    typeof(IForumChannelActor)
-)]
 public partial class RestForumChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -28,8 +25,6 @@ public partial class RestForumChannel :
     IForumChannel,
     IContextConstructable<RestForumChannel, IGuildForumChannelModel, GuildIdentity, DiscordRestClient>
 {
-    public ILoadableEntity<ulong, ICategoryChannel>? Category => throw new NotImplementedException();
-
     public bool IsNsfw => Model.IsNsfw;
 
     public string? Topic => Model.Topic;

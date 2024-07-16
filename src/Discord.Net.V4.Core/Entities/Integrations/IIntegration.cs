@@ -1,8 +1,12 @@
 using Discord.Models;
+using Discord.Rest;
 
 namespace Discord;
 
-public interface IIntegration : IIntegrationActor, IEntityOf<IIntegrationModel>
+[FetchableOfMany(nameof(Routes.GetGuildIntegrations))]
+public partial interface IIntegration :
+    ISnowflakeEntity<IIntegrationModel>,
+    IIntegrationActor
 {
     string Name { get; }
     IntegrationType Type { get; }
@@ -12,7 +16,7 @@ public interface IIntegration : IIntegrationActor, IEntityOf<IIntegrationModel>
     bool? EmoticonsEnabled { get; }
     IntegrationExpireBehavior? ExpireBehavior { get; }
     int? ExpiryGracePeriod { get; }
-    ILoadableUserActor? User { get; }
+    IUserActor? User { get; }
     IntegrationAccount? Account { get; }
     DateTimeOffset? SyncedAt { get; }
     int? SubscriberCount { get; }

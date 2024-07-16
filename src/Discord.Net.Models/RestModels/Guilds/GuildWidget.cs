@@ -14,7 +14,7 @@ public sealed class GuildWidget : IModelSource, IModelSourceOfMultiple<IChannelM
     public string? InstantInvite { get; set; }
 
     [JsonPropertyName("channels")]
-    public required Channel[] Channels { get; set; }
+    public required ChannelModel[] Channels { get; set; }
 
     [JsonPropertyName("members")]
     public required GuildMember[] Members { get; set; }

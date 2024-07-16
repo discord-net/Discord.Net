@@ -4,10 +4,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableGuildEmoteActor :
-    IGuildEmoteActor,
-    ILoadableEntity<ulong, IGuildEmote>;
-
+[Loadable(nameof(Routes.GetGuildEmoji))]
 [Deletable(nameof(Routes.DeleteGuildEmoji))]
 [Modifiable<EmoteProperties>(nameof(Routes.ModifyGuildEmoji))]
 public partial interface IGuildEmoteActor :

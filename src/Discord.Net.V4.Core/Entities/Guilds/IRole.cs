@@ -6,11 +6,10 @@ namespace Discord;
 
 [FetchableOfMany(nameof(Routes.GetGuildRoles))]
 public partial interface IRole :
-    ISnowflakeEntity,
+    ISnowflakeEntity<IRoleModel>,
     IMentionable,
     IComparable<IRole>,
-    IRoleActor,
-    IEntityOf<IRoleModel>
+    IRoleActor
 {
     /// <summary>
     ///     Gets the color given to users of this role.

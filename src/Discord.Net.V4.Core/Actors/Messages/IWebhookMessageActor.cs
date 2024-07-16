@@ -2,10 +2,6 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableWebhookMessageActor :
-    IWebhookMessageActor,
-    ILoadableEntity<ulong, IWebhookMessage>;
-
 public interface IWebhookMessageActor :
     IMessageActor,
     IWebhookRelationship,

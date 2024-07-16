@@ -12,7 +12,7 @@ public sealed class InteractionDataResolved : IModelSource, IModelSourceOfMultip
 
     [JsonPropertyName("roles")] public Optional<Dictionary<string, Role>> Roles { get; set; }
 
-    [JsonPropertyName("channels")] public Optional<Dictionary<string, Channel>> Channels { get; set; }
+    [JsonPropertyName("channels")] public Optional<Dictionary<string, ChannelModel>> Channels { get; set; }
 
     [JsonPropertyName("messages")] public Optional<Dictionary<string, Message>> Messages { get; set; }
 

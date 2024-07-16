@@ -4,24 +4,12 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable = IModifiable<ulong, IMessage, ModifyMessageProperties, ModifyMessageParams, IMessageModel>;
-
-public interface IMessage :
-    ISnowflakeEntity,
-    IMessageActor,
-    IRefreshable<IMessage, ulong, IMessageModel>,
-    IModifiable
+[FetchableOfMany(nameof(Routes.GetChannelMessages))]
+[Refreshable(nameof(Routes.GetChannelMessage))]
+public partial interface IMessage :
+    ISnowflakeEntity<IMessageModel>,
+    IMessageActor
 {
-    static IApiInOutRoute<ModifyMessageParams, IEntityModel> IModifiable.ModifyRoute(IPathable path, ulong id,
-        ModifyMessageParams args)
-        => Routes.ModifyMessage(path.Require<IChannel>(), id, args);
-
-    static IApiOutRoute<IMessageModel> IRefreshable<IMessage, ulong, IMessageModel>.RefreshRoute(IPathable path,
-        ulong id)
-        => Routes.GetChannelMessage(path.Require<IChannel>(), id);
-
-    #region Properties
-
     /// <summary>
     ///     Gets the type of this message.
     /// </summary>
@@ -62,7 +50,7 @@ public interface IMessage :
     /// </returns>
     bool IsPinned { get; }
 
-    ILoadableWebhookActor? Webhook { get; }
+    IWebhookActor? Webhook { get; }
 
     /// <summary>
     ///     Gets the value that indicates whether this message mentioned everyone.
@@ -102,12 +90,12 @@ public interface IMessage :
     /// <summary>
     ///     Gets the author of this message.
     /// </summary>
-    ILoadableUserActor Author { get; }
+    IUserActor Author { get; }
 
     /// <summary>
     ///     Gets the thread that was started from this message.
     /// </summary>
-    ILoadableThreadChannelActor? Thread { get; }
+    IThreadChannelActor? Thread { get; }
 
     /// <summary>
     ///     Gets all attachments included in this message.
@@ -212,6 +200,4 @@ public interface IMessage :
     ///     <see langword="null" />.
     /// </returns>
     MessageRoleSubscriptionData? RoleSubscriptionData { get; }
-
-    #endregion
 }

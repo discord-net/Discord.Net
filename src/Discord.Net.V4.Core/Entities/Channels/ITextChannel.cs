@@ -8,13 +8,13 @@ namespace Discord;
 ///     Represents a generic channel in a guild that can send and receive messages.
 /// </summary>
 public partial interface ITextChannel :
+    ISnowflakeEntity<IGuildTextChannelModel>,
     IThreadableChannel,
     IMessageChannel,
     IMentionable,
     INestedChannel,
     IIntegrationChannel,
-    ITextChannelActor,
-    IEntityOf<IGuildTextChannelModel>
+    ITextChannelActor
 {
     [SourceOfTruth]
     new IGuildTextChannelModel GetModel();

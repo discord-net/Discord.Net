@@ -4,14 +4,14 @@ using Discord.Rest;
 
 namespace Discord;
 
+[FetchableOfMany(nameof(Routes.ListGuildScheduledEvents))]
 [Refreshable(nameof(Routes.GetGuildScheduledEvent))]
 public partial interface IGuildScheduledEvent :
-    ISnowflakeEntity,
-    IGuildScheduledEventActor,
-    IEntityOf<IGuildScheduledEventModel>
+    ISnowflakeEntity<IGuildScheduledEventModel>,
+    IGuildScheduledEventActor
 {
-    ILoadableEntity<ulong, IGuildChannel>? Channel { get; }
-    ILoadableEntity<ulong, IUser> Creator { get; }
+    IGuildChannelActor? Channel { get; }
+    IUserActor Creator { get; }
     string Name { get; }
     string? Description { get; }
     string? CoverImageId { get; }

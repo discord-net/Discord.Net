@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace Discord.Net.Hanz.Tasks.Traits;
 
 public static class RefreshableTrait
@@ -23,8 +23,7 @@ public static class RefreshableTrait
             return;
         }
 
-        var entityOfInterface = target.InterfaceSymbol.AllInterfaces
-            .LastOrDefault(x => x.ToDisplayString().StartsWith("Discord.IEntityOf<"));
+        var entityOfInterface = EntityTraits.GetEntityModelOfInterface(target.InterfaceSymbol);
 
         if (entityOfInterface is null)
         {
@@ -43,7 +42,7 @@ public static class RefreshableTrait
 
         ExpressionSyntax? routeAccessBody = route switch
         {
-            IMethodSymbol methodSymbol => SyntaxFactory.InvocationExpression(
+            IMethodSymbol methodSymbol => InvocationExpression(
                 routeMemberAccess,
                 EntityTraits.ParseRouteArguments(methodSymbol, target, extra =>
                 {
@@ -58,7 +57,7 @@ public static class RefreshableTrait
                         return null;
 
                     extraParameters.Add(extra, extraSyntax);
-                    return SyntaxFactory.Argument(extraSyntax.Default.Value);
+                    return Argument(extraSyntax.Default.Value);
                 })
             ),
             IPropertySymbol or IFieldSymbol => routeMemberAccess,
@@ -66,15 +65,17 @@ public static class RefreshableTrait
         };
 
         var idType = entityInterface.TypeArguments[0];
-        var modelType = entityOfInterface.TypeArguments[0];
+        var modelType = entityOfInterface.TypeArguments[0] as INamedTypeSymbol;
 
-        var refreshableInterface = SyntaxFactory.GenericName(
-            SyntaxFactory.Identifier("Discord.IRefreshable"),
-            SyntaxFactory.TypeArgumentList(
-                SyntaxFactory.SeparatedList([
-                    SyntaxFactory.IdentifierName(target.InterfaceDeclarationSyntax.Identifier),
-                    SyntaxFactory.ParseTypeName(idType.ToDisplayString()),
-                    SyntaxFactory.ParseTypeName(modelType.ToDisplayString())
+        if (modelType is null) return;
+
+        var refreshableInterface = GenericName(
+            Identifier("Discord.IRefreshable"),
+            TypeArgumentList(
+                SeparatedList([
+                    IdentifierName(target.InterfaceDeclarationSyntax.Identifier),
+                    ParseTypeName(idType.ToDisplayString()),
+                    ParseTypeName(modelType.ToDisplayString())
                 ])
             )
         );
@@ -82,67 +83,67 @@ public static class RefreshableTrait
         if (extraParameters.Count > 0 && route is IMethodSymbol routeMethod)
         {
             syntax = syntax.AddMembers(
-                SyntaxFactory.MethodDeclaration(
+                MethodDeclaration(
                     [],
                     [],
-                    SyntaxFactory.IdentifierName("Task"),
-                    SyntaxFactory.ExplicitInterfaceSpecifier(
+                    IdentifierName("Task"),
+                    ExplicitInterfaceSpecifier(
                         refreshableInterface
                     ),
-                    SyntaxFactory.Identifier("RefreshAsync"),
+                    Identifier("RefreshAsync"),
                     null,
-                    SyntaxFactory.ParameterList(
-                        SyntaxFactory.SeparatedList([
-                            SyntaxFactory.Parameter(
+                    ParameterList(
+                        SeparatedList([
+                            Parameter(
                                 [],
                                 [],
-                                SyntaxFactory.NullableType(SyntaxFactory.IdentifierName("RequestOptions")),
-                                SyntaxFactory.Identifier("options"),
+                                NullableType(IdentifierName("RequestOptions")),
+                                Identifier("options"),
                                 null
                             ),
-                            SyntaxFactory.Parameter(
+                            Parameter(
                                 [],
                                 [],
-                                SyntaxFactory.IdentifierName("CancellationToken"),
-                                SyntaxFactory.Identifier("token"),
+                                IdentifierName("CancellationToken"),
+                                Identifier("token"),
                                 null
                             )
                         ])
                     ),
                     [],
                     null,
-                    SyntaxFactory.ArrowExpressionClause(
-                        SyntaxFactory.InvocationExpression(
-                            SyntaxFactory.IdentifierName("RefreshAsync"),
-                            SyntaxFactory.ArgumentList(
-                                SyntaxFactory.SeparatedList([
+                    ArrowExpressionClause(
+                        InvocationExpression(
+                            IdentifierName("RefreshAsync"),
+                            ArgumentList(
+                                SeparatedList([
                                     ..extraParameters.Values.Select(x =>
-                                        SyntaxFactory.Argument(
+                                        Argument(
                                             x.Default?.Value ??
-                                            SyntaxFactory.LiteralExpression(SyntaxKind.DefaultLiteralExpression)
+                                            LiteralExpression(SyntaxKind.DefaultLiteralExpression)
                                         )
                                     ),
-                                    SyntaxFactory.Argument(SyntaxFactory.IdentifierName("options")),
-                                    SyntaxFactory.Argument(SyntaxFactory.IdentifierName("token"))
+                                    Argument(IdentifierName("options")),
+                                    Argument(IdentifierName("token"))
                                 ])
                             )
                         )
                     ),
-                    SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                    Token(SyntaxKind.SemicolonToken)
                 ).WithLeadingTrivia(
-                    SyntaxFactory.Comment("// point the default refresh method to our implementation")
+                    Comment("// point the default refresh method to our implementation")
                 ),
-                SyntaxFactory.MethodDeclaration(
+                MethodDeclaration(
                     [],
                     [],
-                    SyntaxFactory.IdentifierName("Task"),
+                    IdentifierName("Task"),
                     null,
-                    SyntaxFactory.Identifier("RefreshAsync"),
+                    Identifier("RefreshAsync"),
                     null,
-                    SyntaxFactory.ParameterList(
-                        SyntaxFactory.SeparatedList([
+                    ParameterList(
+                        SeparatedList([
                             ..extraParameters.Select(x =>
-                                SyntaxFactory.Parameter(
+                                Parameter(
                                     [],
                                     [],
                                     x.Value.Type,
@@ -150,36 +151,36 @@ public static class RefreshableTrait
                                     x.Value.Default
                                 )
                             ),
-                            SyntaxFactory.Parameter(
+                            Parameter(
                                 [],
                                 [],
-                                SyntaxFactory.NullableType(SyntaxFactory.IdentifierName("RequestOptions")),
-                                SyntaxFactory.Identifier("options"),
-                                SyntaxFactory.EqualsValueClause(
-                                    SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression)
+                                NullableType(IdentifierName("RequestOptions")),
+                                Identifier("options"),
+                                EqualsValueClause(
+                                    LiteralExpression(SyntaxKind.NullLiteralExpression)
                                 )
                             ),
-                            SyntaxFactory.Parameter(
+                            Parameter(
                                 [],
                                 [],
-                                SyntaxFactory.IdentifierName("CancellationToken"),
-                                SyntaxFactory.Identifier("token"),
-                                SyntaxFactory.EqualsValueClause(
-                                    SyntaxFactory.LiteralExpression(SyntaxKind.DefaultLiteralExpression)
+                                IdentifierName("CancellationToken"),
+                                Identifier("token"),
+                                EqualsValueClause(
+                                    LiteralExpression(SyntaxKind.DefaultLiteralExpression)
                                 )
                             )
                         ])
                     ),
                     [],
                     null,
-                    SyntaxFactory.ArrowExpressionClause(
-                        SyntaxFactory.InvocationExpression(
-                            SyntaxFactory.IdentifierName("RefreshInternalAsync"),
-                            SyntaxFactory.ArgumentList(
-                                SyntaxFactory.SeparatedList([
-                                    SyntaxFactory.Argument(SyntaxFactory.ThisExpression()),
-                                    SyntaxFactory.Argument(
-                                        SyntaxFactory.InvocationExpression(
+                    ArrowExpressionClause(
+                        InvocationExpression(
+                            IdentifierName("RefreshInternalAsync"),
+                            ArgumentList(
+                                SeparatedList([
+                                    Argument(ThisExpression()),
+                                    Argument(
+                                        InvocationExpression(
                                             routeMemberAccess,
                                             EntityTraits.ParseRouteArguments(
                                                 routeMethod,
@@ -187,27 +188,27 @@ public static class RefreshableTrait
                                                 extra =>
                                                 {
                                                     if (extraParameters.TryGetValue(extra, out var extraSyntax))
-                                                        return SyntaxFactory.Argument(
-                                                            SyntaxFactory.IdentifierName(extraSyntax.Identifier));
+                                                        return Argument(
+                                                            IdentifierName(extraSyntax.Identifier));
 
                                                     return null;
                                                 },
-                                                SyntaxFactory.ThisExpression(),
-                                                SyntaxFactory.MemberAccessExpression(
+                                                ThisExpression(),
+                                                MemberAccessExpression(
                                                     SyntaxKind.SimpleMemberAccessExpression,
-                                                    SyntaxFactory.ThisExpression(),
-                                                    SyntaxFactory.IdentifierName("Id")
+                                                    ThisExpression(),
+                                                    IdentifierName("Id")
                                                 )
                                             )
                                         )
                                     ),
-                                    SyntaxFactory.Argument(SyntaxFactory.IdentifierName("options")),
-                                    SyntaxFactory.Argument(SyntaxFactory.IdentifierName("token"))
+                                    Argument(IdentifierName("options")),
+                                    Argument(IdentifierName("token"))
                                 ])
                             )
                         )
                     ),
-                    SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                    Token(SyntaxKind.SemicolonToken)
                 )
             );
         }
@@ -216,50 +217,211 @@ public static class RefreshableTrait
 
         syntax = syntax
             .AddBaseListTypes(
-                SyntaxFactory.SimpleBaseType(refreshableInterface)
-            )
-            .AddMembers(
-                SyntaxFactory.MethodDeclaration(
+                SimpleBaseType(refreshableInterface)
+            );
+
+        FetchableTrait.DefineFetchableRoute(
+            ref syntax,
+            target,
+            idType,
+            modelType,
+            route,
+            routeMemberAccess,
+            "Discord.IFetchable",
+            "FetchRoute",
+            out _
+        );
+            //AddRefreshRouteMethod(ref syntax, idType, modelType, routeAccessBody, refreshableInterface);
+
+        ApplyParentRefreshOverrides(ref syntax, target, modelType, refreshableInterface);
+    }
+
+    private static void ApplyParentRefreshOverrides(
+        ref InterfaceDeclarationSyntax syntax,
+        EntityTraits.GenerationTarget target,
+        INamedTypeSymbol targetModelType,
+        GenericNameSyntax refreshableInterface)
+    {
+        var bases = target.InterfaceSymbol.AllInterfaces.Where(IsRefreshTarget);
+
+        var memberCount = syntax.Members.Count;
+
+        foreach (var baseRefreshable in bases)
+        {
+            var entityIdType = EntityTraits.GetEntityInterface(baseRefreshable)?.TypeArguments.FirstOrDefault();
+            var entityModelType = EntityTraits.GetEntityModelOfInterface(baseRefreshable)?.TypeArguments.FirstOrDefault();
+
+            if (entityModelType is null || entityIdType is null)
+                continue;
+
+            if (!target.SemanticModel.Compilation.ClassifyCommonConversion(targetModelType, entityModelType).Exists)
+                continue;
+
+            syntax = syntax.AddMembers(
+                MethodDeclaration(
                     [],
-                    SyntaxFactory.TokenList(
-                        SyntaxFactory.Token(SyntaxKind.StaticKeyword)
-                    ),
-                    SyntaxFactory.GenericName(
-                        SyntaxFactory.Identifier("Discord.IApiOutRoute"),
-                        SyntaxFactory.TypeArgumentList(
-                            SyntaxFactory.SeparatedList([
-                                SyntaxFactory.ParseTypeName(modelType.ToDisplayString())
-                            ])
+                    [],
+                    IdentifierName("Task"),
+                    ExplicitInterfaceSpecifier(
+                        GenericName(
+                            Identifier("Discord.IRefreshable"),
+                            TypeArgumentList(
+                                SeparatedList([
+                                    ParseTypeName(baseRefreshable.ToDisplayString()),
+                                    ParseTypeName(entityIdType.ToDisplayString()),
+                                    ParseTypeName(entityModelType.ToDisplayString())
+                                ])
+                            )
                         )
                     ),
-                    SyntaxFactory.ExplicitInterfaceSpecifier(refreshableInterface),
-                    SyntaxFactory.Identifier("RefreshRoute"),
+                    Identifier("RefreshAsync"),
                     null,
-                    SyntaxFactory.ParameterList(
-                        SyntaxFactory.SeparatedList([
-                            SyntaxFactory.Parameter(
+                    ParameterList(
+                        SeparatedList([
+                            Parameter(
                                 [],
                                 [],
-                                SyntaxFactory.IdentifierName("Discord.IPathable"),
-                                SyntaxFactory.Identifier("path"),
+                                NullableType(IdentifierName("RequestOptions")),
+                                Identifier("options"),
                                 null
                             ),
-                            SyntaxFactory.Parameter(
+                            Parameter(
                                 [],
                                 [],
-                                SyntaxFactory.ParseTypeName(idType.ToDisplayString()),
-                                SyntaxFactory.Identifier("id"),
+                                IdentifierName("CancellationToken"),
+                                Identifier("token"),
                                 null
                             )
                         ])
                     ),
                     [],
                     null,
-                    SyntaxFactory.ArrowExpressionClause(
-                        routeAccessBody
+                    ArrowExpressionClause(
+                        InvocationExpression(
+                            IdentifierName("RefreshAsync"),
+                            ArgumentList(
+                                SeparatedList([
+                                    Argument(IdentifierName("options")),
+                                    Argument(IdentifierName("token"))
+                                ])
+                            )
+                        )
                     ),
-                    SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                )
+                    Token(SyntaxKind.SemicolonToken)
+                ).WithLeadingTrivia(Comment($"// point {baseRefreshable.Name}'s RefreshAsync method to ours"))
             );
+        }
+
+        if (memberCount != syntax.Members.Count)
+        {
+            syntax = syntax.AddMembers(
+                MethodDeclaration(
+                    [],
+                    TokenList([
+                        Token(SyntaxKind.NewKeyword)
+                    ]),
+                    IdentifierName("Task"),
+                    null,
+                    Identifier("RefreshAsync"),
+                    null,
+                    ParameterList(
+                        SeparatedList([
+                            Parameter(
+                                [],
+                                [],
+                                NullableType(IdentifierName("RequestOptions")),
+                                Identifier("options"),
+                                EqualsValueClause(
+                                    LiteralExpression(SyntaxKind.NullLiteralExpression)
+                                )
+                            ),
+                            Parameter(
+                                [],
+                                [],
+                                IdentifierName("CancellationToken"),
+                                Identifier("token"),
+                                EqualsValueClause(
+                                    LiteralExpression(SyntaxKind.DefaultLiteralExpression)
+                                )
+                            )
+                        ])
+                    ),
+                    [],
+                    null,
+                    ArrowExpressionClause(
+                        InvocationExpression(
+                            IdentifierName("RefreshInternalAsync"),
+                            ArgumentList(
+                                SeparatedList([
+                                    Argument(ThisExpression()),
+                                    Argument(
+                                        InvocationExpression(
+                                            IdentifierName("FetchRoute"),
+                                            ArgumentList(
+                                                SeparatedList([
+                                                    Argument(ThisExpression()),
+                                                    Argument(IdentifierName("Id"))
+                                                ])
+                                            )
+                                        )
+                                    ),
+                                    Argument(IdentifierName("options")),
+                                    Argument(IdentifierName("token"))
+                                ])
+                            )
+                        )
+                    ),
+                    Token(SyntaxKind.SemicolonToken)
+                ).WithLeadingTrivia(Comment("// redeclare RefreshAsync to allow overloading to point to ours")),
+                MethodDeclaration(
+                    [],
+                    [],
+                    IdentifierName("Task"),
+                    ExplicitInterfaceSpecifier(refreshableInterface),
+                    Identifier("RefreshAsync"),
+                    null,
+                    ParameterList(
+                        SeparatedList([
+                            Parameter(
+                                [],
+                                [],
+                                NullableType(IdentifierName("RequestOptions")),
+                                Identifier("options"),
+                                null
+                            ),
+                            Parameter(
+                                [],
+                                [],
+                                IdentifierName("CancellationToken"),
+                                Identifier("token"),
+                                null
+                            )
+                        ])
+                    ),
+                    [],
+                    null,
+                    ArrowExpressionClause(
+                        InvocationExpression(
+                            IdentifierName("RefreshAsync"),
+                            ArgumentList(
+                                SeparatedList([
+                                    Argument(IdentifierName("options")),
+                                    Argument(IdentifierName("token"))
+                                ])
+                            )
+                        )
+                    ),
+                    Token(SyntaxKind.SemicolonToken)
+                ).WithLeadingTrivia(Comment("// point direct RefreshAsync to ours"))
+            );
+        }
+    }
+
+    private static bool IsRefreshTarget(INamedTypeSymbol symbol)
+    {
+        if (symbol.GetAttributes().Any(x => x.AttributeClass?.ToDisplayString() == "Discord.RefreshableAttribute"))
+            return true;
+
+        return false;
     }
 }

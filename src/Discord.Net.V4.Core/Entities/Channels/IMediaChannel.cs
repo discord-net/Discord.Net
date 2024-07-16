@@ -5,14 +5,14 @@ using Discord.Rest;
 namespace Discord;
 
 public partial interface IMediaChannel :
-    INestedChannel,
+    ISnowflakeEntity<IGuildMediaChannelModel>,
+    IThreadableChannel,
     IIntegrationChannel,
-    IMediaChannelActor,
-    IEntityOf<IGuildMediaChannelModel>
+    IMediaChannelActor
 {
     [SourceOfTruth]
     new IGuildMediaChannelModel GetModel();
-    
+
     /// <summary>
     ///     Gets a value that indicates whether the channel is NSFW.
     /// </summary>

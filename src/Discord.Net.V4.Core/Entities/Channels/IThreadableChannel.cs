@@ -5,9 +5,9 @@ using Discord.Rest;
 namespace Discord;
 
 public partial interface IThreadableChannel :
-    IGuildChannel,
-    IThreadableChannelActor,
-    IEntityOf<IThreadableChannelModel>
+    ISnowflakeEntity<IThreadableChannelModel>,
+    INestedChannel,
+    IThreadableChannelActor
 {
     [SourceOfTruth]
     new IThreadableChannelModel GetModel();

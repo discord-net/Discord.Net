@@ -1,34 +1,26 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
-
-using IModifiable = IModifiable<ulong, ISelfUser, ModifySelfUserProperties, ModifyCurrentUserParams, ISelfUserModel>;
 
 /// <summary>
 ///     Represents the logged-in Discord user.
 /// </summary>
+[Refreshable(nameof(Routes.GetCurrentUser))]
+[SuppressMessage(
+    "ReSharper",
+    "PossibleInterfaceMemberAmbiguity",
+    Justification = "Source generator overloads the ambiguous APIs"
+)]
 public partial interface ISelfUser :
+    ISnowflakeEntity<ISelfUserModel>,
     IUser,
-    ISelfUserActor,
-    IModifiable,
-    IRefreshable<ISelfUser, ulong, ISelfUserModel>
+    ISelfUserActor
 {
     [SourceOfTruth]
-    new Task RefreshAsync(RequestOptions? options, CancellationToken token)
-        => (this as IRefreshable<ISelfUser, ulong, ISelfUserModel>).RefreshAsync(options, token);
-
-    static IApiOutRoute<ISelfUserModel> IRefreshable<ISelfUser, ulong, ISelfUserModel>.RefreshRoute(
-        IPathable path,
-        ulong id
-    ) => Routes.GetCurrentUser;
-
-    static IApiInOutRoute<ModifyCurrentUserParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyCurrentUserParams args
-    ) => Routes.ModifyCurrentUser(args);
+    new ISelfUserModel GetModel();
 
     /// <summary>
     ///     Gets the email associated with this user.

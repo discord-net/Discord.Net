@@ -1,12 +1,13 @@
 namespace Discord;
 
-public interface IChannelRelationship : IChannelRelationship<ILoadableChannelActor>;
-
-public interface IChannelRelationship<out TLoadable> :
-    IRelationship<ulong, IChannel, TLoadable>
-    where TLoadable : ILoadableChannelActor
+public interface IChannelRelationship<out TActor, out TChannel> :
+    IRelationship<TActor, ulong, TChannel>
+    where TActor : IActor<ulong, TChannel>
+    where TChannel : IChannel
 {
-    TLoadable Channel { get; }
+    TActor Channel { get; }
 
-    TLoadable IRelationship<ulong, IChannel, TLoadable>.RelationshipLoadable => Channel;
+    TActor IRelationship<TActor, ulong, TChannel>.RelationshipActor => Channel;
 }
+
+public interface IChannelRelationship : IChannelRelationship<IChannelActor, IChannel>;

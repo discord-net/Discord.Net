@@ -6,12 +6,17 @@ namespace Discord.Rest.Channels;
 public partial class RestDMChannelActor(
     DiscordRestClient client,
     IdentifiableEntityOrModel<ulong, RestDMChannel, IDMChannelModel> channel
-):
+) :
     RestChannelActor(client, channel),
     IDMChannelActor
 {
     [ProxyInterface(typeof(IMessageChannelActor))]
     internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
+
+    [SourceOfTruth]
+    [CovariantOverride]
+    internal RestDMChannel CreateEntity(IDMChannelModel model)
+        => RestDMChannel.Construct(Client, model);
 }
 
 public partial class RestDMChannel :
@@ -19,9 +24,14 @@ public partial class RestDMChannel :
     IDMChannel,
     IConstructable<RestDMChannel, IDMChannelModel, DiscordRestClient>
 {
-    public RestLoadableUserActor Recipient { get; }
+    [SourceOfTruth]
+    public RestUserActor Recipient { get; }
 
-    [ProxyInterface(typeof(IChannelActor), typeof(IMessageChannelActor))]
+    [ProxyInterface(
+        typeof(IChannelActor),
+        typeof(IMessageChannelActor),
+        typeof(IEntityProvider<IDMChannel, IDMChannelModel>)
+    )]
     internal override RestDMChannelActor Actor { get; }
 
     internal override IDMChannelModel Model => _model;
@@ -34,7 +44,7 @@ public partial class RestDMChannel :
         _model = model;
 
         Actor = actor ?? new(client, this);
-        Recipient =  new(client, UserIdentity.Of(model.RecipientId));
+        Recipient = new(client, UserIdentity.Of(model.RecipientId));
     }
 
     public static RestDMChannel Construct(DiscordRestClient client, IDMChannelModel model)
@@ -46,8 +56,6 @@ public partial class RestDMChannel :
         _model = model;
         return base.UpdateAsync(model, token);
     }
-
-    ILoadableEntity<ulong, IUser> IDMChannel.Recipient => Recipient;
 
     public override IDMChannelModel GetModel() => Model;
 }

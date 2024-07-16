@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [ChannelTypeOf(ChannelType.GuildForum)]
-public sealed class GuildForumChannel : GuildChannelBase, IGuildForumChannelModel
+public sealed class GuildForumChannelModel : ThreadableChannelModelBase, IGuildForumChannelModel
 {
     int IGuildForumChannelModel.DefaultForumLayout => DefaultForumLayout;
 
@@ -14,11 +14,7 @@ public sealed class GuildForumChannel : GuildChannelBase, IGuildForumChannelMode
 
     string? IGuildForumChannelModel.Topic => Topic;
 
-    int IThreadableChannelModel.DefaultAutoArchiveDuration => DefaultAutoArchiveDuration;
-
     int? IGuildForumChannelModel.RatelimitPerUser => RatelimitPerUser;
-
-    int? IThreadableChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
 
     IEmoteModel? IGuildForumChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
 

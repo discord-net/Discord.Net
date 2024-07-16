@@ -1,7 +1,7 @@
 namespace Discord.Models
 {
     [ModelEquality]
-public partial interface IGuildScheduledEventModel : IEntityModel<ulong>
+    public partial interface IGuildScheduledEventModel : IEntityModel<ulong>
     {
         ulong GuildId { get; }
         ulong? ChannelId { get; }
@@ -21,4 +21,3 @@ public partial interface IGuildScheduledEventModel : IEntityModel<ulong>
         string? Location { get; }
     }
 }
-

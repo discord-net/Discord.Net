@@ -6,5 +6,10 @@ namespace Discord;
 ///     Represents a generic category channel.
 /// </summary>
 public partial interface ICategoryChannel :
+    ISnowflakeEntity<IGuildCategoryChannelModel>,
     IGuildChannel,
-    IUpdatable<IGuildCategoryChannelModel>;
+    IUpdatable<IGuildCategoryChannelModel>
+{
+    [SourceOfTruth]
+    new IGuildCategoryChannelModel GetModel();
+}

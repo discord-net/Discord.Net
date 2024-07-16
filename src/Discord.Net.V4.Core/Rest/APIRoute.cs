@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization.Metadata;
+
 namespace Discord;
 
 public class ApiInRoute<TRequestBody>(
@@ -32,7 +34,8 @@ public sealed class ApiOutRoute<TResponse>(
     string name,
     RequestMethod method,
     string endpoint,
-    BucketInfo? bucket = null) :
+    BucketInfo? bucket = null
+) :
     ApiRoute(name, method, endpoint, bucket),
     IApiOutRoute<TResponse>;
 

@@ -4,6 +4,7 @@ using Discord.Rest.Actors;
 using Discord.Rest.Channels;
 using Discord.Rest.Extensions;
 using Discord.Rest.Guilds.Integrations;
+using Discord.Rest.Stickers;
 using System.Globalization;
 
 namespace Discord.Rest.Guilds;
@@ -117,9 +118,11 @@ public sealed partial class RestGuild :
     public RestManagedEnumerableActor<RestRoleActor, ulong, RestRole, IRole, IRoleModel> Roles { get; }
     //public IDefinedEnumerableActor<IRoleActor, ulong, IRole> Roles => throw new NotImplementedException();
 
-    public IDefinedEnumerableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes => throw new NotImplementedException();
+    [SourceOfTruth]
+    public RestManagedEnumerableActor<RestLoadableGuildEmoteActor, ulong, RestGuildEmote, IGuildEmote, IGuildEmoteModel> Emotes => throw new NotImplementedException();
 
-    public IDefinedEnumerableActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers => throw new NotImplementedException();
+    [SourceOfTruth]
+    public RestManagedEnumerableActor<RestLoadableGuildStickerActor, ulong, RestGuildSticker, IGuildSticker, IGuildStickerModel> Stickers => throw new NotImplementedException();
 
     public int AFKTimeout => Model.AFKTimeout;
 

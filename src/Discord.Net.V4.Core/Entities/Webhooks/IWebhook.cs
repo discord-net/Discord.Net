@@ -4,25 +4,11 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable = IModifiable<ulong, IWebhook, ModifyWebhookProperties, ModifyWebhookParams, IWebhookModel>;
-
-public interface IWebhook :
-    ISnowflakeEntity,
-    IWebhookActor,
-    IModifiable,
-    IRefreshable<IWebhook, ulong, IWebhookModel>
+[Refreshable(nameof(Routes.GetWebhook))]
+public partial interface IWebhook :
+    ISnowflakeEntity<IWebhookModel>,
+    IWebhookActor
 {
-    static IApiOutRoute<IWebhookModel> IRefreshable<IWebhook, ulong, IWebhookModel>.RefreshRoute(
-        IPathable path,
-        ulong id
-    ) => Routes.GetWebhook(id);
-
-    static IApiInOutRoute<ModifyWebhookParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyWebhookParams args
-    ) => Routes.ModifyWebhook(id, args);
-
     async Task RefreshWithTokenAsync(string webhookToken, RequestOptions? options = null,
         CancellationToken token = default)
     {
@@ -36,17 +22,17 @@ public interface IWebhook :
     }
 
     WebhookType Type { get; }
-    ILoadableGuildActor? Guild { get; }
-    ILoadableChannelActor? Channel { get; }
+    IGuildActor? Guild { get; }
+    IChannelActor? Channel { get; }
     IUserActor? User { get; }
     string? Name { get; }
     string? Avatar { get; }
     string? Token { get; }
     ulong? ApplicationId { get; }
-    ILoadableGuildActor? SourceGuild { get; }
+    IGuildActor? SourceGuild { get; }
     string? SourceGuildIcon { get; }
     string? SourceGuildName { get; }
-    ILoadableNewsChannelActor? SourceChannel { get; }
+    INewsChannelActor? SourceChannel { get; }
     string? SourceChannelName { get; }
     string? Url { get; }
 }

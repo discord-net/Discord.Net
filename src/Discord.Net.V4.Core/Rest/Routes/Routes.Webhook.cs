@@ -5,49 +5,53 @@ namespace Discord.Rest;
 
 public partial class Routes
 {
-    public static IApiInOutRoute<CreateWebhookParams, Webhook> CreateChannelWebhook(ulong channelId,
+    public static IApiInOutRoute<CreateWebhookParams, Webhook> CreateChannelWebhook(
+        [IdHeuristic<IIntegrationChannel>] ulong channelId,
         CreateWebhookParams body) =>
         new ApiInOutRoute<CreateWebhookParams, Webhook>(nameof(CreateChannelWebhook), RequestMethod.Post,
             $"channels/{channelId}/webhooks", body, ContentType.JsonBody, (ScopeType.Channel, channelId));
 
-    public static IApiOutRoute<Webhook[]> GetChannelWebhooks(ulong channelId) =>
+    public static IApiOutRoute<Webhook[]> GetChannelWebhooks([IdHeuristic<IIntegrationChannel>] ulong channelId) =>
         new ApiOutRoute<Webhook[]>(nameof(GetChannelWebhooks), RequestMethod.Get, $"channels/{channelId}/webhooks",
             (ScopeType.Channel, channelId));
 
-    public static IApiOutRoute<Webhook[]> GetGuildWebhooks(ulong guildId) =>
+    public static IApiOutRoute<Webhook[]> GetGuildWebhooks([IdHeuristic<IGuild>] ulong guildId) =>
         new ApiOutRoute<Webhook[]>(nameof(GetGuildWebhooks), RequestMethod.Get, $"guilds/{guildId}/webhooks",
             (ScopeType.Guild, guildId));
 
-    public static IApiOutRoute<Webhook> GetWebhook(ulong webhookId) =>
+    public static IApiOutRoute<Webhook> GetWebhook([IdHeuristic<IWebhook>] ulong webhookId) =>
         new ApiOutRoute<Webhook>(nameof(GetWebhook), RequestMethod.Get, $"webhooks/{webhookId}");
 
-    public static IApiOutRoute<Webhook> GetWebhookWithToken(ulong webhookId, string token) =>
+    public static IApiOutRoute<Webhook> GetWebhookWithToken([IdHeuristic<IWebhook>] ulong webhookId, string token) =>
         new ApiOutRoute<Webhook>(nameof(GetWebhookWithToken), RequestMethod.Get, $"webhooks/{webhookId}/{token}");
 
     public static IApiInOutRoute<ModifyWebhookParams, Webhook>
-        ModifyWebhook(ulong webhookId, ModifyWebhookParams body) =>
+        ModifyWebhook([IdHeuristic<IWebhook>] ulong webhookId, ModifyWebhookParams body) =>
         new ApiInOutRoute<ModifyWebhookParams, Webhook>(nameof(ModifyWebhook), RequestMethod.Patch,
             $"webhooks/{webhookId}", body);
 
-    public static IApiInOutRoute<ModifyWebhookWithTokenParams, Webhook> ModifyWebhookWithToken(ulong webhookId,
+    public static IApiInOutRoute<ModifyWebhookWithTokenParams, Webhook> ModifyWebhookWithToken(
+        [IdHeuristic<IWebhook>] ulong webhookId,
         string token, ModifyWebhookWithTokenParams body) =>
         new ApiInOutRoute<ModifyWebhookWithTokenParams, Webhook>(nameof(ModifyWebhookWithToken), RequestMethod.Patch,
             $"webhooks/{webhookId}/{token}", body);
 
-    public static IApiRoute DeleteWebhook(ulong webhookId) =>
+    public static IApiRoute DeleteWebhook([IdHeuristic<IWebhook>] ulong webhookId) =>
         new ApiRoute(nameof(DeleteWebhook), RequestMethod.Delete, $"webhooks/{webhookId}");
 
-    public static IApiRoute DeleteWebhookWithToken(ulong webhookId, string token) =>
+    public static IApiRoute DeleteWebhookWithToken([IdHeuristic<IWebhook>] ulong webhookId, string token) =>
         new ApiRoute(nameof(DeleteWebhookWithToken), RequestMethod.Delete, $"webhooks/{webhookId}/{token}");
 
     // TODO: Add support for multipart/form-data
-    public static IApiInOutRoute<ExecuteWebhookParams, Message> ExecuteWebhook(ulong webhookId, string token,
+    public static IApiInOutRoute<ExecuteWebhookParams, Message> ExecuteWebhook([IdHeuristic<IWebhook>] ulong webhookId,
+        string token,
         ExecuteWebhookParams body, bool wait = false, ulong? threadId = default) =>
         new ApiInOutRoute<ExecuteWebhookParams, Message>(nameof(ExecuteWebhook), RequestMethod.Post,
             $"webhooks/{webhookId}/{token}{RouteUtils.GetUrlEncodedQueryParams(("wait", wait), ("thread_id", threadId))}",
             body, ContentType.JsonBody, (ScopeType.Webhook, webhookId));
 
-    public static IApiOutRoute<Message> GetWebhookMessage(ulong webhookId, string token, ulong messageId,
+    public static IApiOutRoute<Message> GetWebhookMessage([IdHeuristic<IWebhook>] ulong webhookId, string token,
+        [IdHeuristic<IWebhookMessage>] ulong messageId,
         ulong? threadId = default) =>
         new ApiOutRoute<Message>(nameof(GetWebhookMessage), RequestMethod.Get,
             $"webhooks/{webhookId}/{token}/messages/{messageId}{RouteUtils.GetUrlEncodedQueryParams(("thread_id", threadId))}",
@@ -55,14 +59,17 @@ public partial class Routes
 
 
     // TODO: Add support for multipart/form-data
-    public static IApiInOutRoute<ModifyWebhookMessageParams, Message> ModifyWebhookMessage(ulong webhookId,
+    public static IApiInOutRoute<ModifyWebhookMessageParams, Message> ModifyWebhookMessage(
+        [IdHeuristic<IWebhook>] ulong webhookId,
         string token,
-        ulong messageId, ModifyWebhookMessageParams body, ulong? threadId = default) =>
+        [IdHeuristic<IWebhookMessage>] ulong messageId, ModifyWebhookMessageParams body,
+        [IdHeuristic<IThreadChannel>] ulong? threadId = default) =>
         new ApiInOutRoute<ModifyWebhookMessageParams, Message>(nameof(ModifyWebhookMessage), RequestMethod.Patch,
             $"webhooks/{webhookId}/{token}/messages/{messageId}{RouteUtils.GetUrlEncodedQueryParams(("thread_id", threadId))}",
             body, ContentType.JsonBody, (ScopeType.Webhook, webhookId));
 
-    public static IApiRoute DeleteWebhookMessage(ulong webhookId, string token, ulong messageId, ulong? threadId) =>
+    public static IApiRoute DeleteWebhookMessage([IdHeuristic<IWebhook>] ulong webhookId, string token,
+        [IdHeuristic<IWebhookMessage>] ulong messageId, [IdHeuristic<IThreadChannel>] ulong? threadId) =>
         new ApiRoute(nameof(DeleteWebhookMessage), RequestMethod.Delete,
             $"webhooks/{webhookId}/{token}/messages/{messageId}{RouteUtils.GetUrlEncodedQueryParams(("thread_id", threadId))}",
             (ScopeType.Webhook, webhookId));

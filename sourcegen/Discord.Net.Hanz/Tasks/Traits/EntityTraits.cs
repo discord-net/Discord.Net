@@ -2,6 +2,7 @@ using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using System.Collections.Immutable;
 
 namespace Discord.Net.Hanz.Tasks.Traits;
@@ -14,7 +15,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         {"ModifiableAttribute", "Discord.IModifiable"},
         {"RefreshableAttribute", "Discord.IRefreshable"},
         {"FetchableAttribute", "Discord.IFetchable"},
-        {"FetchableOfManyAttribute", "Discord.IFetchableOfMany"}
+        {"FetchableOfManyAttribute", "Discord.IFetchableOfMany"},
+        {"LoadableAttribute", "Discord.ILoadable"}
     };
 
     public class GenerationTarget(
@@ -37,7 +39,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         if (context.Node is not InterfaceDeclarationSyntax {AttributeLists.Count: > 0} interfaceDeclarationSyntax)
             return null;
 
-        if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, interfaceDeclarationSyntax) is not INamedTypeSymbol interfaceSymbol)
+        if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, interfaceDeclarationSyntax) is not INamedTypeSymbol
+            interfaceSymbol)
             return null;
 
         if (interfaceSymbol.AllInterfaces.All(x =>
@@ -50,7 +53,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
 
         foreach (var attribute in interfaceSymbol.GetAttributes())
         {
-            if(attribute.AttributeClass is null) continue;
+            if (attribute.AttributeClass is null) continue;
 
             if (TraitAttributes.TryGetValue(attribute.AttributeClass.Name, out _))
                 traitsRequested.Add(attribute.AttributeClass.Name);
@@ -71,15 +74,17 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
     {
         var entitySyntax = new Dictionary<string, InterfaceDeclarationSyntax>();
 
+        var producedFiles = new HashSet<string>();
+
         foreach (var target in targets)
         {
-            if(target is null)
+            if (target is null)
                 continue;
 
             var fromEntitySyntax = entitySyntax
                 .TryGetValue(target.InterfaceSymbol.ToDisplayString(), out var syntax);
 
-            if(!fromEntitySyntax)
+            if (!fromEntitySyntax)
                 syntax = SyntaxFactory.InterfaceDeclaration(
                     [],
                     target.InterfaceDeclarationSyntax.Modifiers,
@@ -99,11 +104,12 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 }
                 catch (Exception x)
                 {
-                    Hanz.Logger.Log(LogLevel.Error, $"Failed on processing {trait} on {target.InterfaceSymbol.Name}: {x}");
+                    Hanz.Logger.Log(LogLevel.Error,
+                        $"Failed on processing {trait} on {target.InterfaceSymbol.Name}: {x}");
                 }
             }
 
-            if(syntax!.Members.Count == 0)
+            if (syntax!.Members.Count == 0)
                 continue;
 
             if (fromEntitySyntax)
@@ -112,15 +118,21 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 continue;
             }
 
+            if (!producedFiles.Add($"Traits/{target.InterfaceSymbol.Name}"))
+            {
+                Hanz.Logger.Warn($"Attempted to add a second file for {target.InterfaceSymbol}");
+                continue;
+            }
+
             context.AddSource(
                 $"Traits/{target.InterfaceSymbol.Name}",
                 $$"""
-                {{target.InterfaceDeclarationSyntax.GetFormattedUsingDirectives()}}
+                  {{target.InterfaceDeclarationSyntax.GetFormattedUsingDirectives()}}
 
-                namespace {{target.InterfaceSymbol.ContainingNamespace}};
+                  namespace {{target.InterfaceSymbol.ContainingNamespace}};
 
-                {{syntax.NormalizeWhitespace()}}
-                """
+                  {{syntax.NormalizeWhitespace()}}
+                  """
             );
         }
 
@@ -128,15 +140,21 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         {
             var ns = string.Join(".", syntax.Key.Split('.').Take(syntax.Key.Count(x => x is '.')));
 
+            if (!producedFiles.Add($"Traits/{syntax.Value.Identifier}"))
+            {
+                Hanz.Logger.Warn($"Attempted to add a second file for {syntax.Value.Identifier}");
+                continue;
+            }
+
             context.AddSource(
                 $"Traits/{syntax.Value.Identifier}",
                 $$"""
-                using Discord.Rest;
+                  using Discord.Rest;
 
-                namespace {{ns}};
+                  namespace {{ns}};
 
-                {{syntax.Value.NormalizeWhitespace()}}
-                """
+                  {{syntax.Value.NormalizeWhitespace()}}
+                  """
             );
         }
     }
@@ -179,10 +197,16 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
             case "Discord.IFetchable" or "Discord.IFetchableOfMany":
                 FetchableTrait.Process(ref syntax, target, traitAttribute);
                 break;
+            case "Discord.ILoadable":
+                LoadableTrait.Process(ref syntax, target, traitAttribute, entitySyntax);
+                break;
         }
     }
 
-    public static ISymbol? GetRouteSymbol(MemberAccessExpressionSyntax expression, SemanticModel semantic)
+    public static ISymbol? GetRouteSymbol(
+        MemberAccessExpressionSyntax expression,
+        SemanticModel semantic,
+        int genericCount = 0)
     {
         var symbol = semantic.GetSymbolInfo(expression);
 
@@ -193,7 +217,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         if (semantic.GetSymbolInfo(expression.Expression).Symbol is not INamedTypeSymbol namedTypeSymbol)
             return null;
 
-        return namedTypeSymbol.GetMembers(expression.Name.Identifier.ValueText).FirstOrDefault();
+        return namedTypeSymbol.GetMembers(expression.Name.Identifier.ValueText).FirstOrDefault(
+            x => x is not IMethodSymbol method || method.TypeParameters.Length == genericCount);
     }
 
     public static ExpressionSyntax? GetNameOfArgument(AttributeData data)
@@ -222,23 +247,23 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         ExpressionSyntax? pathHolder = null,
         ExpressionSyntax? idParam = null)
     {
+        var hasReturnedId = false;
+
         return SyntaxFactory.ArgumentList(
             SyntaxFactory.SeparatedList(route.Parameters.Select(x =>
             {
                 switch (x.Name)
                 {
                     case "id":
-                        return SyntaxFactory.Argument(idParam ?? SyntaxFactory.IdentifierName("id"));
+                        return ReturnOwnId(ref hasReturnedId, idParam, $"{target.InterfaceSymbol}: {x} -> direct 'id' reference");
                     default:
-                        if (!x.Name.EndsWith("Id"))
-                            break;
-
-                        if (x.Type is INamedTypeSymbol paramType && x.Type.ToDisplayString().StartsWith("Discord.EntityOrId"))
+                        if (x.Type is INamedTypeSymbol paramType &&
+                            x.Type.ToDisplayString().StartsWith("Discord.EntityOrId"))
                         {
                             var targetType =
                                 paramType.Name == "Nullable"
-                                ? (paramType.TypeArguments[0] as INamedTypeSymbol)?.TypeArguments[1]
-                                : paramType.TypeArguments[1];
+                                    ? (paramType.TypeArguments[0] as INamedTypeSymbol)?.TypeArguments[1]
+                                    : paramType.TypeArguments[1];
 
                             if (targetType is null)
                                 break;
@@ -259,46 +284,128 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                                     )
                                 )
                             );
-
                         }
 
-                        var type = x.Name.Remove(x.Name.Length - 2, 2);
-                        type = $"{char.ToUpper(type[0])}{type.Remove(0, 1)}";
+                        var entityType = GetParameterRelationType(target, x);
 
-                        // if it's for the actor type, we can return 'id'
-                        if (target.InterfaceSymbol.Name == $"I{type}Actor")
-                            return SyntaxFactory.Argument(SyntaxFactory.IdentifierName("id"));
+                        if (entityType is null)
+                            break;
 
-                        var entityTypeName = $"Discord.I{type}";
+                        if (entityType.Equals(target.InterfaceSymbol, SymbolEqualityComparer.Default))
+                            return ReturnOwnId(ref hasReturnedId, idParam, $"{target.InterfaceSymbol}: {x} is the relation type");
 
-                        var entityType =
-                            target.SemanticModel.Compilation.GetTypeByMetadataName(entityTypeName);
+                        var actorInterface = GetActorInterface(target.InterfaceSymbol);
 
-                        if (entityType is not null)
-                        {
-                            return SyntaxFactory.Argument(
-                                SyntaxFactory.InvocationExpression(
-                                    SyntaxFactory.MemberAccessExpression(
-                                        SyntaxKind.SimpleMemberAccessExpression,
-                                        pathHolder ?? SyntaxFactory.IdentifierName("path"),
-                                        SyntaxFactory.GenericName(
-                                            SyntaxFactory.Identifier("Require"),
-                                            SyntaxFactory.TypeArgumentList(
-                                                SyntaxFactory.SeparatedList([
-                                                    SyntaxFactory.ParseTypeName(entityType.ToDisplayString())
-                                                ])
-                                            )
+                        CommonConversion? conversion = actorInterface is not null
+                            ? target.SemanticModel.Compilation.ClassifyCommonConversion(
+                                actorInterface.TypeArguments[1],
+                                entityType
+                            )
+                            : null;
+
+                        if (actorInterface is not null &&
+                            (
+                                actorInterface.TypeArguments[1].Equals(entityType, SymbolEqualityComparer.Default) ||
+                                (conversion?.IsImplicit ?? false)
+                            ))
+                            return ReturnOwnId(ref hasReturnedId, idParam, $"{target.InterfaceSymbol}: {x} -> common conversion between {actorInterface.TypeArguments[1]} <> {entityType}");
+
+                        return SyntaxFactory.Argument(
+                            SyntaxFactory.InvocationExpression(
+                                SyntaxFactory.MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    pathHolder ?? SyntaxFactory.IdentifierName("path"),
+                                    SyntaxFactory.GenericName(
+                                        SyntaxFactory.Identifier("Require"),
+                                        SyntaxFactory.TypeArgumentList(
+                                            SyntaxFactory.SeparatedList([
+                                                SyntaxFactory.ParseTypeName(entityType.ToDisplayString())
+                                            ])
                                         )
                                     )
                                 )
-                            );
-                        }
-
-                        break;
+                            )
+                        );
                 }
 
                 return extra?.Invoke(x) ?? throw new NotImplementedException();
             }))
         );
+    }
+
+    private static ArgumentSyntax ReturnOwnId(ref bool hasReturnedThis, ExpressionSyntax? idParam, string source)
+    {
+        if (hasReturnedThis)
+        {
+            Hanz.Logger.Warn($"using double id in route parameters: {source}");
+            //throw new InvalidOperationException("Cannot return 'id' more than once");
+        }
+
+        hasReturnedThis = true;
+
+        return SyntaxFactory.Argument(idParam ?? SyntaxFactory.IdentifierName("id"));
+    }
+
+    private static ITypeSymbol? GetParameterRelationType(GenerationTarget target, IParameterSymbol parameterSymbol)
+    {
+        var heuristic = parameterSymbol.GetAttributes()
+            .FirstOrDefault(x =>
+                x.AttributeClass?.ToDisplayString().StartsWith("Discord.IdHeuristicAttribute") ?? false
+            );
+
+        if (heuristic?.AttributeClass is not null)
+            return heuristic.AttributeClass.TypeArguments[0];
+
+        if (!parameterSymbol.Name.EndsWith("Id"))
+            return null;
+
+        var type = parameterSymbol.Name.Remove(parameterSymbol.Name.Length - 2, 2);
+        type = $"{char.ToUpper(type[0])}{type.Remove(0, 1)}";
+
+        // if it's for the actor type, we can return 'id'
+        if (target.InterfaceSymbol.Name == $"I{type}Actor")
+            return target.InterfaceSymbol;
+
+        var entityTypeName = $"Discord.I{type}";
+
+        return target.SemanticModel.Compilation.GetTypeByMetadataName(entityTypeName);
+    }
+
+    public static ITypeSymbol? GetModelInterface(INamedTypeSymbol symbol)
+    {
+        var model = GetEntityModelOfInterface(symbol)?.TypeArguments[0];
+        if (model is not null)
+            return model;
+
+        var actor = GetActorInterface(symbol);
+
+        if (actor is null)
+            return null;
+
+        return GetEntityModelOfInterface(actor.TypeArguments[1] as INamedTypeSymbol)?.TypeArguments[0];
+    }
+
+    public static INamedTypeSymbol? GetActorInterface(INamedTypeSymbol actor)
+    {
+        return Hierarchy.GetInterfaceHierarchy(actor)
+            .FirstOrDefault(x => x.Interface.ToDisplayString().StartsWith("Discord.IActor<"))
+            .Interface;
+    }
+
+    public static INamedTypeSymbol? GetEntityInterface(INamedTypeSymbol entity)
+    {
+        return Hierarchy.GetInterfaceHierarchy(entity)
+            .FirstOrDefault(x => x.Interface.ToDisplayString().StartsWith("Discord.IEntity<"))
+            .Interface;
+    }
+
+    public static INamedTypeSymbol? GetEntityModelOfInterface(ITypeSymbol? entity)
+    {
+        if (entity is null)
+            return null;
+
+        return Hierarchy.GetInterfaceHierarchy(entity)
+            .FirstOrDefault(x => x.Interface.ToDisplayString().StartsWith("Discord.IEntityOf<"))
+            .Interface;
     }
 }

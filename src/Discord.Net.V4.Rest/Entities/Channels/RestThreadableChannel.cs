@@ -6,26 +6,6 @@ namespace Discord.Rest.Channels;
 
 using ThreadsPagedActor = RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams>;
 
-public partial class RestLoadableThreadableChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    ThreadableChannelIdentity channel
-) :
-    RestThreadableChannelActor(client, guild, channel),
-    ILoadableThreadableChannelActor
-{
-    [ProxyInterface(typeof(ILoadableEntity<IThreadableChannel>))]
-    internal RestLoadable<ulong, RestThreadableChannel, IThreadableChannel, IChannelModel> Loadable { get; } =
-        new(
-            client,
-            channel,
-            Routes.GetChannel(channel.Id),
-            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestThreadableChannel, IThreadableChannelModel>(
-                (_, model) => RestThreadableChannel.Construct(client, model, guild)
-            ).Invoke
-        );
-}
-
 public partial class RestThreadableChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -58,6 +38,8 @@ public partial class RestThreadableChannel :
     IThreadableChannel,
     IContextConstructable<RestThreadableChannel, IThreadableChannelModel, GuildIdentity, DiscordRestClient>
 {
+    [SourceOfTruth]
+    public RestCategoryChannelActor? Category => throw new NotImplementedException();
     public int? DefaultThreadSlowmode => Model.DefaultThreadRateLimitPerUser;
 
     public ThreadArchiveDuration DefaultArchiveDuration => (ThreadArchiveDuration)Model.DefaultAutoArchiveDuration;

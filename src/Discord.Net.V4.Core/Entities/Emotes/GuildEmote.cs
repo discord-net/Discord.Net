@@ -25,7 +25,7 @@ public sealed class GuildEmote :
     }
 
     public IReadOnlyCollection<ulong> RoleIds { get; }
-    public ILoadableUserActor? Creator { get; }
+    public IUserActor? Creator { get; }
     public bool RequiresColons { get; }
     public bool IsManaged { get; }
     public bool IsAnimated { get; }

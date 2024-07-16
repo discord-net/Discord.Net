@@ -4,31 +4,18 @@ using Discord.Rest.Actors;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-public partial class RestLoadableUserActor(
-    DiscordRestClient client,
-    UserIdentity user
-):
-    RestUserActor(client, user),
-    ILoadableUserActor
-{
-    [RestLoadableActorSource]
-    [ProxyInterface(typeof(ILoadableEntity<IUser>))]
-    internal RestLoadable<ulong, RestUser, IUser, IUserModel> Loadable { get; } =
-        RestLoadable<ulong, RestUser, IUser, IUserModel>.FromConstructable<RestUser>(
-            client,
-            user,
-            Routes.GetUser
-        );
-}
-
 [ExtendInterfaceDefaults(typeof(IUserActor))]
 public partial class RestUserActor(
     DiscordRestClient client,
     UserIdentity user
 ) :
     RestActor<ulong, RestSelfUser, UserIdentity>(client, user),
-    IUserActor;
+    IUserActor
+{
+    [SourceOfTruth]
+    internal RestUser CreateEntity(IUserModel model)
+        => RestUser.Construct(Client, model);
+}
 
 public partial class RestUser :
     RestEntity<ulong>,
@@ -47,7 +34,10 @@ public partial class RestUser :
 
     public UserFlags PublicFlags => (UserFlags?)Model.PublicFlags ?? UserFlags.None;
 
-    [ProxyInterface(typeof(IUserActor))]
+    [ProxyInterface(
+        typeof(IUserActor),
+        typeof(IEntityProvider<IUser, IUserModel>)
+    )]
     internal virtual RestUserActor Actor { get; }
 
     internal virtual IUserModel Model => _model;

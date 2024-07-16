@@ -17,7 +17,7 @@ public class Invite :
     public Optional<PartialGuild> Guild { get; set; }
 
     [JsonPropertyName("channel")]
-    public Channel? Channel { get; set; }
+    public ChannelModel? Channel { get; set; }
 
     [JsonPropertyName("inviter")]
     public Optional<User> Inviter { get; set; }

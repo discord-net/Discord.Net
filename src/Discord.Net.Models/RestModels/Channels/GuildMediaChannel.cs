@@ -4,17 +4,13 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [ChannelTypeOf(ChannelType.GuildMedia)]
-public sealed class GuildMediaChannel : GuildChannelBase, IGuildMediaChannelModel
+public sealed class GuildMediaChannelModel : ThreadableChannelModelBase, IGuildMediaChannelModel
 {
     bool IGuildMediaChannelModel.IsNsfw => Nsfw;
 
     string? IGuildMediaChannelModel.Topic => Topic;
 
-    int IThreadableChannelModel.DefaultAutoArchiveDuration => DefaultAutoArchiveDuration;
-
     int? IGuildMediaChannelModel.RatelimitPerUser => RatelimitPerUser;
-
-    int? IThreadableChannelModel.DefaultThreadRateLimitPerUser => DefaultThreadRatelimitPerUser;
 
     IEmoteModel? IGuildMediaChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
 

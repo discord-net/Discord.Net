@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord;
 
 /// <summary>
 ///     Represents a partial sticker item received with a message.
 /// </summary>
 public interface IStickerItem :
-    ISnowflakeEntity,
+    ISnowflakeEntity<IStickerItemModel>,
     ILoadableEntity<ulong, ISticker>
 {
     /// <summary>

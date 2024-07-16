@@ -8,10 +8,10 @@ namespace Discord;
 ///     Represents a generic private group channel.
 /// </summary>
 public partial interface IGroupChannel :
+    ISnowflakeEntity<IGroupDMChannelModel>,
     IMessageChannel,
     IAudioChannel,
-    IGroupChannelActor,
-    IEntityOf<IGroupDMChannelModel>
+    IGroupChannelActor
 {
     /// <summary>
     ///     Gets the users that can access this channel.

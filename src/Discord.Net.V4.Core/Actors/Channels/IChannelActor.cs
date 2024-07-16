@@ -3,9 +3,6 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableChannelActor :
-    IChannelActor,
-    ILoadableEntity<ulong, IChannel>;
-
-public interface IChannelActor :
+[Loadable(nameof(Routes.GetChannel))]
+public partial interface IChannelActor :
     IActor<ulong, IChannel>;

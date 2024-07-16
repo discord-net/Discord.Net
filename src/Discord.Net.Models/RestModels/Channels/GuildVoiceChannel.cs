@@ -3,7 +3,7 @@ using Discord.Converters;
 namespace Discord.Models.Json;
 
 [ChannelTypeOf(ChannelType.GuildVoice)]
-public class GuildVoiceChannel : GuildChannelBase, IGuildVoiceChannelModel
+public class GuildVoiceChannelModel : GuildChannelModelBase, IGuildVoiceChannelModel
 {
     string? IAudioChannelModel.RTCRegion => RTCRegion;
 

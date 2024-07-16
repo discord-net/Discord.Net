@@ -1,3 +1,4 @@
+using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -35,8 +36,9 @@ public static class ModifyTrait
         }
 
         // get the api params type
-        var entityPropertiesInterface = paramsType.AllInterfaces
-            .LastOrDefault(x => x.ToDisplayString().StartsWith("Discord.IEntityProperties"));
+        var entityPropertiesInterface = Hierarchy.GetInterfaceHierarchy(paramsType)
+            .FirstOrDefault(x => x.Interface.ToDisplayString().StartsWith("Discord.IEntityProperties"))
+            .Interface;
 
         if (entityPropertiesInterface is null)
         {
@@ -44,13 +46,11 @@ public static class ModifyTrait
             return;
         }
 
-        var entityModel = actorInterface.TypeArguments[1].Interfaces
-            .Where(x => x.ToDisplayString().StartsWith("Discord.IEntityOf"))
-            .ToArray();
+        var entityModel = EntityTraits.GetEntityModelOfInterface(actorInterface.TypeArguments[1] as INamedTypeSymbol);
 
-        if (entityModel.Length != 1)
+        if (entityModel is null)
         {
-            Hanz.Logger.Warn($"{target.InterfaceSymbol.Name}: Failed to find model, {entityModel.Length} candidates returned");
+            Hanz.Logger.Warn($"{target.InterfaceSymbol.Name}: Failed to find model");
 
             // TODO: resolve direct representation
             return;
@@ -68,7 +68,7 @@ public static class ModifyTrait
         var userPropertiesType = SyntaxFactory.ParseTypeName(paramsType.ToDisplayString());
         var apiParamsType = SyntaxFactory.ParseTypeName(entityPropertiesInterface.TypeArguments[0].ToDisplayString());
         var entityTypeSyntax = SyntaxFactory.ParseTypeName(entityType.ToDisplayString());
-        var modelType = SyntaxFactory.ParseTypeName(entityModel[0].TypeArguments[0].ToDisplayString());
+        var modelType = SyntaxFactory.ParseTypeName(entityModel.TypeArguments[0].ToDisplayString());
 
         var actorModifiableInterface = SyntaxFactory.GenericName(
             SyntaxFactory.Identifier("Discord.IModifiable"),
@@ -123,8 +123,9 @@ public static class ModifyTrait
                 ?.WithMembers([])
                 .WithBaseList(null)
                 .WithAttributeLists([])
-                .AddBaseListTypes(SyntaxFactory.SimpleBaseType(entityModifiableInterface))
                 ?? throw new KeyNotFoundException($"Couldn't find entity syntax for {entityType}");
+
+        entitySyntax = entitySyntax.AddBaseListTypes(SyntaxFactory.SimpleBaseType(entityModifiableInterface));
 
         GenerateModifyOverload(
             ref entitySyntax,

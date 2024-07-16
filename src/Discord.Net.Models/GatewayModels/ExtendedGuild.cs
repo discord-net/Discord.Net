@@ -22,7 +22,7 @@ namespace Discord.API.Gateway
         public GuildMember[]? Members { get; set; }
 
         [JsonPropertyName("channels")]
-        public Channel[]? Channels { get; set; }
+        public ChannelModel[]? Channels { get; set; }
 
         [JsonPropertyName("joined_at")]
         public DateTimeOffset JoinedAt { get; set; }

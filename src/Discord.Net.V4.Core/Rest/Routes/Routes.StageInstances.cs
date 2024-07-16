@@ -10,14 +10,15 @@ public static partial class Routes
         new ApiInOutRoute<CreateStageInstanceParams, StageInstance>(nameof(CreateStageInstance), RequestMethod.Post,
             "stage-instances", args);
 
-    public static IApiOutRoute<StageInstance> GetStageInstance(ulong channelId) =>
+    public static IApiOutRoute<StageInstance> GetStageInstance([IdHeuristic<IStageChannel>] ulong channelId) =>
         new ApiOutRoute<StageInstance>(nameof(GetStageInstance), RequestMethod.Get, $"stage-instances/{channelId}");
 
-    public static IApiInOutRoute<ModifyStageInstanceParams, StageInstance> ModifyStageInstance(ulong channelId,
+    public static IApiInOutRoute<ModifyStageInstanceParams, StageInstance> ModifyStageInstance(
+        [IdHeuristic<IStageChannel>] ulong channelId,
         ModifyStageInstanceParams args) =>
         new ApiInOutRoute<ModifyStageInstanceParams, StageInstance>(nameof(ModifyStageInstance), RequestMethod.Patch,
             $"stage-instance/{channelId}", args);
 
-    public static IApiRoute DeleteStageInstance(ulong channelId) =>
+    public static IApiRoute DeleteStageInstance([IdHeuristic<IStageChannel>] ulong channelId) =>
         new ApiRoute(nameof(DeleteStageInstance), RequestMethod.Delete, $"stage-instance/{channelId}");
 }

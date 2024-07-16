@@ -5,32 +5,6 @@ using Discord.Rest.Guilds;
 
 namespace Discord.Rest.Channels;
 
-using Loadable = RestLoadable<ulong, RestTextChannel, ITextChannel, IChannelModel>;
-
-[method: TypeFactory]
-public sealed partial class RestLoadableTextChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    TextChannelIdentity channel
-):
-    RestTextChannelActor(client, guild, channel),
-    ILoadableTextChannelActor,
-    IRestLoadableActor<ulong, RestTextChannel, ITextChannel, IChannelModel>
-{
-    [ProxyInterface(typeof(ILoadableEntity<ITextChannel>))]
-    internal Loadable Loadable { get; } =
-        new(
-            client,
-            channel,
-            Routes.GetChannel(channel.Id),
-            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestTextChannel, IGuildTextChannelModel>(
-                (_, model) => RestTextChannel.Construct(client, model, guild)
-            ).Invoke
-        );
-
-    Loadable IRestLoadableActor<ulong, RestTextChannel, ITextChannel, IChannelModel>.Loadable => Loadable;
-}
-
 [ExtendInterfaceDefaults(
     typeof(ITextChannelActor)
 )]
@@ -57,8 +31,6 @@ public partial class RestTextChannel :
     ITextChannel,
     IContextConstructable<RestTextChannel, IGuildTextChannelModel, GuildIdentity, DiscordRestClient>
 {
-    public ILoadableEntity<ulong, ICategoryChannel>? Category => throw new NotImplementedException();
-
     public bool IsNsfw => Model.IsNsfw;
 
     public string? Topic => Model.Topic;

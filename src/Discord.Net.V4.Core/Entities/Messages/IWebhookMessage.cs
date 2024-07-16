@@ -27,5 +27,5 @@ public partial interface IWebhookMessage :
     }
 
     [SourceOfTruth]
-    new ILoadableWebhookActor Webhook { get; }
+    new IWebhookActor Webhook { get; }
 }

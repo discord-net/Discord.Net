@@ -13,5 +13,5 @@ public interface INestedChannel :
     ///     A <see cref="ILoadableEntity{TId,TEntity}" /> representing the category of this channel;
     ///     <see langword="null" /> if none is set.
     /// </returns>
-    ILoadableEntity<ulong, ICategoryChannel>? Category { get; }
+    ICategoryChannelActor? Category { get; }
 }

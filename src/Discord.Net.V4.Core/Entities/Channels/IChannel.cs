@@ -5,9 +5,8 @@ namespace Discord;
 
 [Refreshable(nameof(Routes.GetChannel))]
 public partial interface IChannel :
-    ISnowflakeEntity,
-    IChannelActor,
-    IEntityOf<IChannelModel>
+    ISnowflakeEntity<IChannelModel>,
+    IChannelActor
 {
     ChannelType Type { get; }
 }

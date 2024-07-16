@@ -4,9 +4,12 @@ namespace Discord.Rest;
 
 public partial class Routes
 {
-    public static IApiOutRoute<AuditLog> GetAuditLog(ulong guildId)
-        => new ApiOutRoute<AuditLog>(nameof(GetAuditLog),
-            RequestMethod.Get,
-            $"guilds/{guildId}/audit-logs",
-            (ScopeType.Guild, guildId));
+    public static IApiOutRoute<AuditLog> GetAuditLog(
+        [IdHeuristic<IGuild>] ulong guildId
+    ) => new ApiOutRoute<AuditLog>(
+        nameof(GetAuditLog),
+        RequestMethod.Get,
+        $"guilds/{guildId}/audit-logs",
+        (ScopeType.Guild, guildId)
+    );
 }

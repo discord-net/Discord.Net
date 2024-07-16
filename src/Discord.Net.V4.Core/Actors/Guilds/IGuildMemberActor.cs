@@ -4,10 +4,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableGuildMemberActor :
-    IGuildMemberActor,
-    ILoadableEntity<ulong, IGuildMember>;
-
+[Loadable(nameof(Routes.GetGuildMember))]
 [Modifiable<ModifyGuildUserProperties>(nameof(Routes.ModifyGuildMember))]
 public partial interface IGuildMemberActor :
     IGuildRelationship,

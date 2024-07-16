@@ -3,15 +3,12 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface IUser :
-    ISnowflakeEntity,
+[Refreshable(nameof(Routes.GetUser))]
+public partial interface IUser :
+    ISnowflakeEntity<IUserModel>,
     IMentionable,
-    IUserActor,
-    IRefreshable<IUser, ulong, IUserModel>
+    IUserActor
 {
-    static IApiOutRoute<IUserModel> IRefreshable<IUser, ulong, IUserModel>.RefreshRoute(IPathable path, ulong id)
-        => Routes.GetUser(id);
-
     string? AvatarId { get; }
     ushort Discriminator { get; }
     string Username { get; }

@@ -3,27 +3,23 @@ using Discord.Rest;
 
 namespace Discord;
 
+[FetchableOfMany(nameof(Routes.GetGuildInvites))]
 [Refreshable(nameof(Routes.GetInvite))]
 public partial interface IInvite :
     IInviteActor,
-    IEntityOf<IInviteModel>
+    IEntity<string, IInviteModel>
 {
-    // static IApiOutRoute<IInviteModel> IRefreshable<IInvite, string, IInviteModel>.RefreshRoute(
-    //     IPathable path,
-    //     string id
-    // ) => Routes.GetInvite(id, true, true, eventId: path.Optionally<IGuildScheduledEvent>());
-
     InviteType Type { get; }
-    ILoadableGuildActor? Guild { get; }
-    ILoadableChannelActor? Channel { get; }
-    ILoadableUserActor? Inviter { get; }
+    IGuildActor? Guild { get; }
+    IChannelActor? Channel { get; }
+    IUserActor? Inviter { get; }
     InviteTargetType TargetType { get; }
 
-    ILoadableUserActor? TargetUser { get; }
+    IUserActor? TargetUser { get; }
 
     // TODO: application
     int? ApproximatePresenceCount { get; }
     int? ApproximateMemberCount { get; }
     DateTimeOffset? ExpiresAt { get; }
-    ILoadableGuildScheduledEventActor? GuildScheduledEvent { get; }
+    IGuildScheduledEventActor? GuildScheduledEvent { get; }
 }

@@ -3,10 +3,10 @@ using Discord.Stage;
 namespace Discord;
 
 public interface IStageInstanceRelationship :
-    IRelationship<ulong, IStageInstance, ILoadableStageInstanceActor>
+    IRelationship<IStageInstanceActor, ulong, IStageInstance>
 {
-    ILoadableStageInstanceActor StageInstance { get; }
+    IStageInstanceActor StageInstance { get; }
 
-    ILoadableStageInstanceActor IRelationship<ulong, IStageInstance, ILoadableStageInstanceActor>.RelationshipLoadable
+    IStageInstanceActor IRelationship<IStageInstanceActor, ulong, IStageInstance>.RelationshipActor
         => StageInstance;
 }

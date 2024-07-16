@@ -4,11 +4,11 @@ using Discord.Rest;
 
 namespace Discord;
 
+[FetchableOfMany(nameof(Routes.ListGuildMembers))]
 [Refreshable(nameof(Routes.GetGuildMember))]
 public partial interface IGuildMember :
-    IGuildMemberActor,
-    ISnowflakeEntity,
-    IEntityOf<IMemberModel>
+    ISnowflakeEntity<IMemberModel>,
+    IGuildMemberActor
 {
     IDefinedLoadableEntityEnumerable<ulong, IRole> Roles { get; }
 

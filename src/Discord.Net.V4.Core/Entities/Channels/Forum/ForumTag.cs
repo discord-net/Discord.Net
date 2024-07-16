@@ -8,14 +8,14 @@ public sealed class ForumTag(
     ulong id,
     string name,
     bool isModerated,
-    ILoadableEntity<ulong, IGuildEmote>? emote,
+    IGuildEmoteActor? emote,
     string? emoji)
     : ISnowflakeEntity, IEntityProperties<Models.Json.ForumTag>,
         IContextConstructable<ForumTag, ITagModel, ForumTag.Context>
 {
     public string Name { get; } = name;
     public bool IsModerated { get; } = isModerated;
-    public ILoadableEntity<ulong, IGuildEmote>? Emote { get; } = emote;
+    public IGuildEmoteActor? Emote { get; } = emote;
     public string? Emoji { get; } = emoji;
 
     public static ForumTag Construct(IDiscordClient client, ITagModel model, Context context)

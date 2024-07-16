@@ -5,10 +5,7 @@ using System.Collections.Immutable;
 
 namespace Discord;
 
-public interface ILoadableGuildActor :
-    IGuildActor,
-    ILoadableEntity<ulong, IGuild>;
-
+[Loadable(nameof(Routes.GetGuild))]
 [Modifiable<ModifyGuildProperties>(nameof(Routes.ModifyGuild))]
 [Deletable(nameof(Routes.DeleteGuild))]
 public partial interface IGuildActor :
@@ -16,61 +13,61 @@ public partial interface IGuildActor :
 {
     #region Channels
 
-    IEnumerableIndexableActor<ILoadableGuildChannelActor, ulong, IGuildChannel> Channels { get; }
-    ILoadableGuildChannelActor Channel(ulong id) => Channels[id];
+    IEnumerableIndexableActor<IGuildChannelActor, ulong, IGuildChannel> Channels { get; }
+    IGuildChannelActor Channel(ulong id) => Channels[id];
 
-    IEnumerableIndexableActor<ILoadableTextChannelActor, ulong, ITextChannel> TextChannels { get; }
-    ILoadableTextChannelActor TextChannel(ulong id) => TextChannels[id];
+    IEnumerableIndexableActor<ITextChannelActor, ulong, ITextChannel> TextChannels { get; }
+    ITextChannelActor TextChannel(ulong id) => TextChannels[id];
 
-    IEnumerableIndexableActor<ILoadableVoiceChannelActor, ulong, IVoiceChannel> VoiceChannels { get; }
-    ILoadableVoiceChannelActor VoiceChannel(ulong id) => VoiceChannels[id];
+    IEnumerableIndexableActor<IVoiceChannelActor, ulong, IVoiceChannel> VoiceChannels { get; }
+    IVoiceChannelActor VoiceChannel(ulong id) => VoiceChannels[id];
 
-    IEnumerableIndexableActor<ILoadableCategoryChannelActor, ulong, ICategoryChannel> CategoryChannels { get; }
-    ILoadableCategoryChannelActor CategoryChannel(ulong id) => CategoryChannels[id];
+    IEnumerableIndexableActor<ICategoryChannelActor, ulong, ICategoryChannel> CategoryChannels { get; }
+    ICategoryChannelActor CategoryChannel(ulong id) => CategoryChannels[id];
 
-    IEnumerableIndexableActor<ILoadableNewsChannelActor, ulong, INewsChannel> AnnouncementChannels { get; }
-    ILoadableNewsChannelActor AnnouncementChannel(ulong id) => AnnouncementChannels[id];
+    IEnumerableIndexableActor<INewsChannelActor, ulong, INewsChannel> AnnouncementChannels { get; }
+    INewsChannelActor AnnouncementChannel(ulong id) => AnnouncementChannels[id];
 
-    IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ThreadChannels { get; }
-    ILoadableThreadChannelActor ThreadChannel(ulong id) => ThreadChannels[id];
+    IEnumerableIndexableActor<IThreadChannelActor, ulong, IThreadChannel> ThreadChannels { get; }
+    IThreadChannelActor ThreadChannel(ulong id) => ThreadChannels[id];
 
-    IEnumerableIndexableActor<ILoadableThreadChannelActor, ulong, IThreadChannel> ActiveThreadChannels { get; }
-    ILoadableThreadChannelActor ActiveThreadChannel(ulong id) => ActiveThreadChannels[id];
+    IEnumerableIndexableActor<IThreadChannelActor, ulong, IThreadChannel> ActiveThreadChannels { get; }
+    IThreadChannelActor ActiveThreadChannel(ulong id) => ActiveThreadChannels[id];
 
-    IEnumerableIndexableActor<ILoadableStageChannelActor, ulong, IStageChannel> StageChannels { get; }
-    ILoadableStageChannelActor StageChannel(ulong id) => StageChannels[id];
+    IEnumerableIndexableActor<IStageChannelActor, ulong, IStageChannel> StageChannels { get; }
+    IStageChannelActor StageChannel(ulong id) => StageChannels[id];
 
-    IEnumerableIndexableActor<ILoadableForumChannelActor, ulong, IForumChannel> ForumChannels { get; }
-    ILoadableForumChannelActor ForumChannel(ulong id) => ForumChannels[id];
+    IEnumerableIndexableActor<IForumChannelActor, ulong, IForumChannel> ForumChannels { get; }
+    IForumChannelActor ForumChannel(ulong id) => ForumChannels[id];
 
-    IEnumerableIndexableActor<ILoadableMediaChannelActor, ulong, IMediaChannel> MediaChannels { get; }
-    ILoadableMediaChannelActor MediaChannel(ulong id) => MediaChannels[id];
+    IEnumerableIndexableActor<IMediaChannelActor, ulong, IMediaChannel> MediaChannels { get; }
+    IMediaChannelActor MediaChannel(ulong id) => MediaChannels[id];
 
     #endregion
 
     IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations { get; }
     IIntegrationActor Integration(ulong id) => Integrations[id];
 
-    IPagedIndexableActor<ILoadableBanActor, ulong, IBan, PageGuildBansParams> Bans { get; }
-    ILoadableBanActor Ban(ulong userId) => Bans[userId];
+    IPagedIndexableActor<IBanActor, ulong, IBan, PageGuildBansParams> Bans { get; }
+    IBanActor Ban(ulong userId) => Bans[userId];
 
-    IPagedIndexableActor<ILoadableGuildMemberActor, ulong, IGuildMember, PageGuildMembersParams> Members { get; }
-    ILoadableGuildMemberActor Member(ulong id) => Members[id];
+    IPagedIndexableActor<IGuildMemberActor, ulong, IGuildMember, PageGuildMembersParams> Members { get; }
+    IGuildMemberActor Member(ulong id) => Members[id];
 
-    IEnumerableIndexableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes { get; }
-    ILoadableGuildEmoteActor Emote(ulong id) => Emotes[id];
+    IEnumerableIndexableActor<IGuildEmoteActor, ulong, IGuildEmote> Emotes { get; }
+    IGuildEmoteActor Emote(ulong id) => Emotes[id];
 
     IEnumerableIndexableActor<IRoleActor, ulong, IRole> Roles { get; }
     IRoleActor Role(ulong id) => Roles[id];
 
-    IEnumerableIndexableActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers { get; }
-    ILoadableGuildStickerActor Sticker(ulong id) => Stickers[id];
+    IEnumerableIndexableActor<IGuildStickerActor, ulong, IGuildSticker> Stickers { get; }
+    IGuildStickerActor Sticker(ulong id) => Stickers[id];
 
-    IEnumerableIndexableActor<ILoadableGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents { get; }
-    ILoadableGuildScheduledEventActor ScheduledEvent(ulong id) => ScheduledEvents[id];
+    IEnumerableIndexableActor<IGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents { get; }
+    IGuildScheduledEventActor ScheduledEvent(ulong id) => ScheduledEvents[id];
 
-    IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites { get; }
-    ILoadableInviteActor<IInvite> Invite(string code) => Invites[code];
+    IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites { get; }
+    IInviteActor Invite(string code) => Invites[code];
 
     #region Methods
 

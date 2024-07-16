@@ -1,13 +1,15 @@
 namespace Discord;
 
-public interface IRelationship<TId, TEntity> : IRelationship<TId, TEntity, ILoadableEntity<TId, TEntity>>
+public interface IRelationship<out TActor, out TId, out TEntity> :
+    IRelation<TId, TEntity>
+    where TActor : IActor<TId, TEntity>
     where TId : IEquatable<TId>
-    where TEntity : class, IEntity<TId>;
-
-public interface IRelationship<TId, TEntity, out TLoadable>
-    where TLoadable : ILoadableEntity<TId, TEntity>
-    where TId : IEquatable<TId>
-    where TEntity : class, IEntity<TId>
+    where TEntity : IEntity<TId>
 {
-    TLoadable RelationshipLoadable { get; }
+    internal TActor RelationshipActor { get; }
+
+    TId IIdentifiable<TId>.Id => RelationshipActor.Id;
 }
+
+public interface IRelation<out TId, out TEntity> : IIdentifiable<TId>
+    where TId : IEquatable<TId>;

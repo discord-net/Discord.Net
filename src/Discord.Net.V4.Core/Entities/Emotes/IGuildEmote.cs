@@ -8,11 +8,11 @@ namespace Discord;
 ///     An image-based emote that is attached to a guild.
 /// </summary>
 [Refreshable(nameof(Routes.GetGuildEmoji))]
+[FetchableOfMany(nameof(Routes.ListGuildEmojis))]
 public partial interface IGuildEmote :
+    ISnowflakeEntity<IGuildEmoteModel>,
     IEmote,
-    ISnowflakeEntity,
-    IGuildEmoteActor,
-    IEntityOf<IGuildEmoteModel>
+    IGuildEmoteActor
 {
     /// <summary>
     ///     Gets whether this emoji is managed by an integration.

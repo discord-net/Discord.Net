@@ -1,13 +1,12 @@
 using Discord.Models.Json;
 using Discord.Rest;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-public interface ILoadableNewsChannelActor :
-    INewsChannelActor,
-    ILoadableEntity<ulong, INewsChannel>;
-
-public interface INewsChannelActor :
+[Loadable(nameof(Routes.GetChannel), typeof(GuildAnnouncementChannelModel))]
+[SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
+public partial interface INewsChannelActor :
     ITextChannelActor,
     IActor<ulong, INewsChannel>
 {

@@ -7,7 +7,7 @@ namespace Discord;
 internal sealed class ModifiableAttribute<TParams>(string route) : Attribute;
 #pragma warning restore CS9113 // Parameter is unread.
 
-public interface IModifiable<TId, in TSelf, out TParams, TApi, TModel> :
+public interface IModifiable<TId, in TSelf, out TParams, TApi, in TModel> :
     IModifiable<TId, TSelf, TParams, TApi>,
     IUpdatable<TModel>
     where TSelf :

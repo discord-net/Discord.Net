@@ -1,8 +1,9 @@
 namespace Discord;
 
-public interface IUserRelationship : IRelationship<ulong, IUser, ILoadableUserActor>
+public interface IUserRelationship :
+    IRelationship<IUserActor, ulong, IUser>
 {
-    ILoadableUserActor User { get; }
+    IUserActor User { get; }
 
-    ILoadableUserActor IRelationship<ulong, IUser, ILoadableUserActor>.RelationshipLoadable => User;
+    IUserActor IRelationship<IUserActor, ulong, IUser>.RelationshipActor => User;
 }

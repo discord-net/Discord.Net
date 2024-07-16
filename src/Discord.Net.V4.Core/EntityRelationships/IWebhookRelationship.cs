@@ -1,8 +1,9 @@
 namespace Discord;
 
-public interface IWebhookRelationship : IRelationship<ulong, IWebhook, ILoadableWebhookActor>
+public interface IWebhookRelationship :
+    IRelationship<IWebhookActor, ulong, IWebhook>
 {
-    ILoadableWebhookActor Webhook { get; }
+    IWebhookActor Webhook { get; }
 
-    ILoadableWebhookActor IRelationship<ulong, IWebhook, ILoadableWebhookActor>.RelationshipLoadable => Webhook;
+    IWebhookActor IRelationship<IWebhookActor, ulong, IWebhook>.RelationshipActor => Webhook;
 }

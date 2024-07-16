@@ -25,7 +25,7 @@ public sealed class AuditLog :
     public required Integration[] Integrations { get; set; }
 
     [JsonPropertyName("threads")]
-    public required ThreadChannelBase[] Threads { get; set; }
+    public required ThreadChannelModelBase[] Threads { get; set; }
 
     [JsonPropertyName("users")]
     public required User[] Users { get; set; }

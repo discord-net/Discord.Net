@@ -4,4 +4,4 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [ChannelTypeOf(ChannelType.GuildAnnouncement)]
-public sealed class GuildAnnouncementChannel : GuildTextChannel, IGuildNewsChannelModel;
+public sealed class GuildAnnouncementChannelModel : GuildTextChannelModel, IGuildNewsChannelModel;

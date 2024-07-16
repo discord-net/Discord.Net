@@ -1,9 +1,9 @@
 namespace Discord;
 
 public interface IGuildRelationship :
-    IRelationship<ulong, IGuild, ILoadableGuildActor>
+    IRelationship<IGuildActor, ulong, IGuild>
 {
-    ILoadableGuildActor Guild { get; }
+    IGuildActor Guild { get; }
 
-    ILoadableGuildActor IRelationship<ulong, IGuild, ILoadableGuildActor>.RelationshipLoadable => Guild;
+    IGuildActor IRelationship<IGuildActor, ulong, IGuild>.RelationshipActor => Guild;
 }

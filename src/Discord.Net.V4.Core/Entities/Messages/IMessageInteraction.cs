@@ -20,11 +20,11 @@ public interface IMessageInteractionMetadata : IUpdatable<IMessageInteractionMet
     /// <summary>
     ///     Gets the <see cref="IUser" /> who invoked the interaction.
     /// </summary>
-    ILoadableUserActor User { get; }
+    IUserActor User { get; }
 
     IReadOnlyDictionary<ApplicationIntegrationType, ulong> AuthorizingIntegrationOwners { get; }
 
-    ILoadableMessageActor? OriginalResponseMessage { get; }
-    ILoadableMessageActor? InteractedMessage { get; }
+    IMessageActor? OriginalResponseMessage { get; }
+    IMessageActor? InteractedMessage { get; }
     IMessageInteractionMetadata? TriggeringInteractionMetadata { get; }
 }

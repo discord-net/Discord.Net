@@ -4,11 +4,16 @@ using Discord.Rest;
 
 namespace Discord;
 
+[FetchableOfMany(nameof(Routes.GetGuildChannels))]
 public partial interface IGuildChannel :
+    ISnowflakeEntity<IGuildChannelModel>,
     IChannel,
-    IGuildChannelActor,
-    IEntityOf<IGuildChannelModel>
+    IGuildChannelActor
 {
+
+    [SourceOfTruth]
+    new IGuildChannelModel GetModel();
+
     /// <summary>
     ///     Gets the position of this channel.
     /// </summary>

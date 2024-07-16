@@ -2,21 +2,21 @@ using Discord.Invites;
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-public interface ILoadableGuildChannelActor :
-    IGuildChannelActor,
-    ILoadableEntity<ulong, IGuildChannel>;
-
+[Loadable(nameof(Routes.GetChannel), typeof(GuildChannelModelBase))]
 [Modifiable<ModifyGuildChannelProperties>(nameof(Routes.ModifyChannel))]
 [Deletable(nameof(Routes.DeleteChannel))]
+[SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IGuildChannelActor :
     IChannelActor,
     IGuildRelationship,
     IActor<ulong, IGuildChannel>
 {
-    IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites { get; }
+
+    IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites { get; }
 
     async Task<IInvite> CreateInviteAsync(
         CreateChannelInviteProperties args,

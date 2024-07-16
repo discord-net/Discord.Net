@@ -2,33 +2,18 @@ using Discord.Models;
 
 namespace Discord.Rest.Channels;
 
-public sealed partial class RestLoadableCategoryChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    CategoryChannelIdentity channel
-):
-    RestCategoryChannelActor(client, guild, channel),
-    ILoadableCategoryChannelActor
-{
-    [ProxyInterface(typeof(ILoadableEntity<ICategoryChannel>))]
-    internal RestLoadable<ulong, RestCategoryChannel, ICategoryChannel, IChannelModel> Loadable { get; }
-        = new(
-            client,
-            channel,
-            Routes.GetChannel(channel.Id),
-            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestCategoryChannel, IGuildCategoryChannelModel>(
-                (_, model) => RestCategoryChannel.Construct(client, model, guild)
-            ).Invoke
-        );
-}
-
 public partial class RestCategoryChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
     CategoryChannelIdentity channel
 ) :
     RestGuildChannelActor(client, guild, channel),
-    ICategoryChannelActor;
+    ICategoryChannelActor
+{
+    [SourceOfTruth]
+    internal RestCategoryChannel CreateEntity(IGuildCategoryChannelModel model)
+        => RestCategoryChannel.Construct(Client, model, Guild.Identity);
+}
 
 public sealed partial class RestCategoryChannel :
     RestGuildChannel,

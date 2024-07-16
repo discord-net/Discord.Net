@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [JsonConverter(typeof(ChannelConverter))]
-public class Channel : IChannelModel
+public class ChannelModel : IChannelModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }

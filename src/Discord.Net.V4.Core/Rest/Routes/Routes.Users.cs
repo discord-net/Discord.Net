@@ -15,7 +15,7 @@ public static partial class Routes
             RequestMethod.Get,
             "users/@me/connections");
 
-    public static IApiOutRoute<User> GetUser(ulong userId)
+    public static IApiOutRoute<User> GetUser([IdHeuristic<IUser>] ulong userId)
         => new ApiOutRoute<User>(nameof(GetUser),
             RequestMethod.Get,
             $"users/{userId}");
@@ -24,21 +24,22 @@ public static partial class Routes
         new ApiInOutRoute<ModifyCurrentUserParams, User>(nameof(ModifyCurrentUser), RequestMethod.Patch, "users/@me",
             body);
 
-    public static IApiOutRoute<IEnumerable<PartialGuild>> GetCurrentUserGuilds(ulong? before, ulong? after, int? limit,
-        bool? withCounts)
+    public static IApiOutRoute<IEnumerable<PartialGuild>> GetCurrentUserGuilds(ulong? before = null,
+        ulong? after = null, int? limit = null,
+        bool? withCounts = null)
         => new ApiOutRoute<IEnumerable<PartialGuild>>(
             nameof(GetCurrentUserGuilds),
             RequestMethod.Get,
             $"users/@me/guilds{RouteUtils.GetUrlEncodedQueryParams(("before", before), ("after", after), ("limit", limit), ("with_counts", withCounts))}"
         );
 
-    public static IApiOutRoute<GuildMember> GetCurrentUserGuildMember(ulong guildId)
+    public static IApiOutRoute<GuildMember> GetCurrentUserGuildMember([IdHeuristic<IGuild>] ulong guildId)
         => new ApiOutRoute<GuildMember>(nameof(GetCurrentUserGuildMember),
             RequestMethod.Get,
             $"users/@me/guilds/{guildId}/member",
             (ScopeType.Guild, guildId));
 
-    public static IApiRoute LeaveGuild(ulong guildId) =>
+    public static IApiRoute LeaveGuild([IdHeuristic<IGuild>] ulong guildId) =>
         new ApiRoute(nameof(LeaveGuild), RequestMethod.Delete, $"users/@me/guilds/{guildId}",
             (ScopeType.Guild, guildId));
 
@@ -46,9 +47,9 @@ public static partial class Routes
         new ApiInOutRoute<CreateDMChannelParams, DMChannelModel>(nameof(CreateDm), RequestMethod.Post,
             "users/@me/channels", body);
 
-    public static IApiInOutRoute<CreateGroupDMChannelParams, GroupDMChannel> CreateGroupDm(
+    public static IApiInOutRoute<CreateGroupDMChannelParams, GroupDMChannelModel> CreateGroupDm(
         CreateGroupDMChannelParams body) =>
-        new ApiInOutRoute<CreateGroupDMChannelParams, GroupDMChannel>(nameof(CreateGroupDm), RequestMethod.Post,
+        new ApiInOutRoute<CreateGroupDMChannelParams, GroupDMChannelModel>(nameof(CreateGroupDm), RequestMethod.Post,
             "users/@me/channels", body);
 
     public static IApiOutRoute<ApplicationRoleConnection> GetUserApplicationRoleConnection(ulong applicationId)

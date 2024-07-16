@@ -1,6 +1,8 @@
+using Discord.Models;
+
 namespace Discord;
 
-public interface IPartialGuild : ISnowflakeEntity
+public interface IPartialGuild : ISnowflakeEntity<IPartialGuildModel>
 {
     string Name { get; }
     string? SplashId { get; }

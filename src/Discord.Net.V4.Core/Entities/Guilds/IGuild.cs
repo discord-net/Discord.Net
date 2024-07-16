@@ -7,18 +7,12 @@ namespace Discord;
 
 [Refreshable(nameof(Routes.GetGuild))]
 public partial interface IGuild :
+    ISnowflakeEntity<IGuildModel>,
     IPartialGuild,
-    IGuildActor,
-    IEntityOf<IGuildModel>
+    IGuildActor
 {
     [SourceOfTruth]
-    new IDefinedEnumerableActor<IRoleActor, ulong, IRole> Roles { get; }
-
-    [SourceOfTruth]
-    new IDefinedEnumerableActor<ILoadableGuildEmoteActor, ulong, IGuildEmote> Emotes { get; }
-
-    [SourceOfTruth]
-    new IDefinedEnumerableActor<ILoadableGuildStickerActor, ulong, IGuildSticker> Stickers { get; }
+    new IGuildModel GetModel();
 
     /// <summary>
     ///     Gets the amount of time (in seconds) a user must be inactive in a voice channel for until they are
@@ -100,13 +94,13 @@ public partial interface IGuild :
     /// </returns>
     string? DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Client.Config, Id, DiscoverySplashId);
 
-    ILoadableVoiceChannelActor? AFKChannel { get; }
-    ILoadableTextChannelActor? WidgetChannel { get; }
-    ILoadableTextChannelActor? SafetyAlertsChannel { get; }
-    ILoadableTextChannelActor? SystemChannel { get; }
-    ILoadableTextChannelActor? RulesChannel { get; }
-    ILoadableTextChannelActor? PublicUpdatesChannel { get; }
-    ILoadableGuildMemberActor Owner { get; }
+    IVoiceChannelActor? AFKChannel { get; }
+    ITextChannelActor? WidgetChannel { get; }
+    ITextChannelActor? SafetyAlertsChannel { get; }
+    ITextChannelActor? SystemChannel { get; }
+    ITextChannelActor? RulesChannel { get; }
+    ITextChannelActor? PublicUpdatesChannel { get; }
+    IGuildMemberActor Owner { get; }
 
     ulong? ApplicationId { get; }
 

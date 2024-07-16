@@ -5,29 +5,6 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest.Channels;
 
-public partial class RestLoadableMediaChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    IdentifiableEntityOrModel<ulong, RestMediaChannel, IGuildMediaChannelModel> channel
-):
-    RestMediaChannelActor(client, guild, channel),
-    ILoadableMediaChannelActor
-{
-    [ProxyInterface(typeof(ILoadableEntity<IMediaChannel>))]
-    internal RestLoadable<ulong, RestMediaChannel, IMediaChannel, IChannelModel> Loadable { get; } =
-        new(
-            client,
-            channel,
-            Routes.GetChannel(channel.Id),
-            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestMediaChannel, IGuildMediaChannelModel>(
-                (_, model) => RestMediaChannel.Construct(client, model, guild)
-            ).Invoke
-        );
-}
-
-[ExtendInterfaceDefaults(
-    typeof(IModifiable<ulong, IMediaChannelActor, ModifyMediaChannelProperties, ModifyGuildChannelParams>)
-)]
 public partial class RestMediaChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -48,8 +25,6 @@ public partial class RestMediaChannel :
     IMediaChannel,
     IContextConstructable<RestMediaChannel, IGuildMediaChannelModel, GuildIdentity, DiscordRestClient>
 {
-    public ILoadableEntity<ulong, ICategoryChannel>? Category => throw new NotImplementedException();
-
     public bool IsNsfw => Model.IsNsfw;
 
     public string? Topic => Model.Topic;

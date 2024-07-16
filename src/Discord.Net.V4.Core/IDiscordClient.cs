@@ -23,19 +23,19 @@ public interface IDiscordClient :
     /// <summary>
     ///     Gets the currently logged-in user.
     /// </summary>
-    ILoadableSelfUserActor SelfUser { get; }
+    ISelfUserActor SelfUser { get; }
 
-    IPagedIndexableActor<ILoadableGuildActor, ulong, IGuild, IPartialGuild, PageUserGuildsParams> Guilds { get; }
+    IPagedIndexableActor<IGuildActor, ulong, IGuild, IPartialGuild, PageUserGuildsParams> Guilds { get; }
 
-    IIndexableActor<ILoadableChannelActor, ulong, IChannel> Channels { get; }
+    IIndexableActor<IChannelActor, ulong, IChannel> Channels { get; }
 
-    IIndexableActor<ILoadableUserActor, ulong, IUser> Users { get; }
+    IIndexableActor<IUserActor, ulong, IUser> Users { get; }
 
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }
-    ILoadableGuildActor Guild(ulong id) => Guilds[id];
-    ILoadableChannelActor Channel(ulong id) => Channels[id];
-    ILoadableUserActor User(ulong id) => Users[id];
+    IGuildActor Guild(ulong id) => Guilds[id];
+    IChannelActor Channel(ulong id) => Channels[id];
+    IUserActor User(ulong id) => Users[id];
 
-    ILoadableWebhookActor Webhook(ulong id, string? token = null);
+    IWebhookActor Webhook(ulong id, string? token = null);
 }

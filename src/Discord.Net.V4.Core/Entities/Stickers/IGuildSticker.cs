@@ -1,20 +1,24 @@
 using Discord.Models;
 using Discord.Models.Json.Stickers;
 using Discord.Rest;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
-
-using IModifiable =
-    IModifiable<ulong, IGuildSticker, ModifyStickerProperties, ModifyGuildStickersParams, IGuildStickerModel>;
 
 /// <summary>
 ///     Represents a custom sticker within a guild.
 /// </summary>
+[FetchableOfMany(nameof(Routes.ListGuildStickers))]
 [Refreshable(nameof(Routes.GetGuildSticker))]
+[SuppressMessage(
+    "ReSharper",
+    "PossibleInterfaceMemberAmbiguity",
+    Justification = "Source generator overloads the ambiguous APIs"
+)]
 public partial interface IGuildSticker :
+    ISnowflakeEntity<IGuildStickerModel>,
     ISticker,
-    IGuildStickerActor,
-    IEntityOf<IGuildStickerModel>
+    IGuildStickerActor
 {
     [SourceOfTruth]
     new IGuildStickerModel GetModel();
@@ -22,7 +26,7 @@ public partial interface IGuildSticker :
     /// <summary>
     ///     Gets the user that uploaded the guild sticker.
     /// </summary>
-    ILoadableGuildMemberActor? Author { get; }
+    IGuildMemberActor? Author { get; }
 
     /// <summary>
     ///     Gets whether this guild sticker can be used, may be false due to loss of Server Boosts.

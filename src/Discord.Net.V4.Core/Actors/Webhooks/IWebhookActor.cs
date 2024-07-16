@@ -4,27 +4,12 @@ using Discord.Rest;
 
 namespace Discord;
 
-using IModifiable =
-    IModifiable<ulong, IWebhookActor, ModifyWebhookProperties, ModifyWebhookParams, IWebhook, IWebhookModel>;
-
-public interface ILoadableWebhookActor :
-    IWebhookActor,
-    ILoadableEntity<ulong, IWebhook>;
-
-public interface IWebhookActor :
-    IModifiable,
-    IDeletable<ulong, IWebhookActor>,
+[Loadable(nameof(Routes.GetWebhook))]
+[Modifiable<ModifyWebhookProperties>(nameof(Routes.ModifyWebhook))]
+[Deletable(nameof(Routes.DeleteWebhook))]
+public partial interface IWebhookActor :
     IActor<ulong, IWebhook>
 {
-    static IApiRoute IDeletable<ulong, IWebhookActor>.DeleteRoute(IPathable path, ulong id)
-        => Routes.DeleteWebhook(id);
-
-    static IApiInOutRoute<ModifyWebhookParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyWebhookParams args
-    ) => Routes.ModifyWebhook(id, args);
-
     async Task<IMessage?> GetWebhookMessageAsync(
         string webhookToken,
         ulong messageId,

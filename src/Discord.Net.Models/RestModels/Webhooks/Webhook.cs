@@ -35,7 +35,7 @@ public sealed class Webhook : IWebhookModel, IModelSource, IModelSourceOf<IUserM
     public Optional<PartialGuild> SourceGuild { get; set; }
 
     [JsonPropertyName("source_channel")]
-    public Optional<Channel> SourceChannel { get; set; }
+    public Optional<ChannelModel> SourceChannel { get; set; }
 
     [JsonPropertyName("url")]
     public Optional<string> Url { get; set; }

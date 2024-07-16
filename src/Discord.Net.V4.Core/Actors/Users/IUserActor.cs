@@ -3,11 +3,8 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableUserActor :
-    IUserActor,
-    ILoadableEntity<ulong, IUser>;
-
-public interface IUserActor :
+[Loadable(nameof(Routes.GetUser))]
+public partial interface IUserActor :
     IActor<ulong, IUser>
 {
     async Task<IDMChannel> CreateDMAsync(RequestOptions? options = null, CancellationToken token = default)

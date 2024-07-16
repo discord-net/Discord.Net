@@ -1,14 +1,13 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-public interface ILoadableThreadableChannelActor :
-    IThreadableChannelActor,
-    ILoadableEntity<ulong, IThreadableChannel>;
-
+[Loadable(nameof(Routes.GetChannel), typeof(ThreadableChannelModelBase))]
 [Modifiable<ModifyThreadableChannelProperties>(nameof(Routes.ModifyChannel))]
+[SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IThreadableChannelActor :
     IGuildChannelActor,
     IActor<ulong, IThreadableChannel>

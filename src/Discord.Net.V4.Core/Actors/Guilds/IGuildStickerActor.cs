@@ -4,10 +4,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface ILoadableGuildStickerActor :
-    IGuildStickerActor,
-    ILoadableEntity<ulong, IGuildSticker>;
-
+[Loadable(nameof(Routes.GetGuildSticker))]
 [Deletable(nameof(Routes.DeleteGuildSticker))]
 [Modifiable<ModifyStickerProperties>(nameof(Routes.ModifyGuildSticker))]
 public partial interface IGuildStickerActor :

@@ -6,33 +6,6 @@ using System.ComponentModel;
 
 namespace Discord.Rest.Channels;
 
-public sealed partial class RestLoadableGuildChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    GuildChannelIdentity channel
-):
-    RestGuildChannelActor(client, guild, channel),
-    ILoadableGuildChannelActor
-{
-    [ProxyInterface(typeof(ILoadableEntity<IGuildChannel>))]
-    public RestLoadable<ulong, RestGuildChannel, IGuildChannel, IChannelModel> Loadable { get; } =
-        new(
-            client,
-            channel,
-            Routes.GetChannel(channel.Id),
-            (client, _, model) =>
-            {
-                if (model is null)
-                    return null;
-
-                if (model is not GuildChannelBase guildChannelModel)
-                    throw new DiscordException($"Channel type is not a guild channel ({(ChannelType)model.Type})");
-
-                return RestGuildChannel.Construct(client, guildChannelModel, guild);
-            }
-        );
-}
-
 [ExtendInterfaceDefaults(
     typeof(IGuildChannelActor),
     typeof(IDeletable<ulong, IGuildChannelActor>)
@@ -49,12 +22,11 @@ public partial class RestGuildChannelActor(
     [SourceOfTruth]
     public RestLoadableGuildActor Guild { get; } = new(client, guild);
 
-    public IEnumerableIndexableActor<ILoadableInviteActor<IInvite>, string, IInvite> Invites => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites => throw new NotImplementedException();
 
     [SourceOfTruth]
     internal virtual RestGuildChannel CreateEntity(IGuildChannelModel model)
         => RestGuildChannel.Construct(Client, model, Guild.Identity);
-
 }
 
 public partial class RestGuildChannel :

@@ -5,39 +5,21 @@ using Discord.Stage;
 
 namespace Discord.Rest.Channels;
 
-using ChannelIdentity = IdentifiableEntityOrModel<ulong, RestStageChannel, IGuildStageChannelModel>;
-
-public sealed partial class RestLoadableStageChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    ChannelIdentity channel
-):
-    RestStageChannelActor(client, guild, channel),
-    ILoadableStageChannelActor
-{
-    [ProxyInterface(typeof(ILoadableEntity<IStageChannel>))]
-    internal RestLoadable<ulong, RestStageChannel, IStageChannel, IChannelModel> Loadable { get; } =
-        new(
-            client,
-            channel,
-            Routes.GetChannel(channel.Id),
-            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestStageChannel, IGuildStageChannelModel>(
-                (_, model) => RestStageChannel.Construct(client, model, guild)
-            ).Invoke
-        );
-}
-
 [ExtendInterfaceDefaults(typeof(IStageChannelActor))]
 public partial class RestStageChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
-    ChannelIdentity channel
+    StageChannelIdentity channel
 ):
     RestVoiceChannelActor(client, guild, channel),
     IStageChannelActor,
     IActor<ulong, RestStageChannel>
 {
-    public ILoadableStageInstanceActor StageInstance => throw new NotImplementedException();
+    public IStageInstanceActor StageInstance => throw new NotImplementedException();
+
+    [SourceOfTruth]
+    public RestStageChannel CreateEntity(IGuildStageChannelModel model)
+        => RestStageChannel.Construct(Client, model, Guild.Identity);
 }
 
 public partial class RestStageChannel :
@@ -46,7 +28,11 @@ public partial class RestStageChannel :
     IContextConstructable<RestStageChannel, IGuildStageChannelModel, GuildIdentity, DiscordRestClient>
 {
 
-    [ProxyInterface(typeof(IStageChannelActor), typeof(IStageInstanceRelationship))]
+    [ProxyInterface(
+        typeof(IStageChannelActor),
+        typeof(IStageInstanceRelationship),
+        typeof(IEntityProvider<IStageChannel, IGuildStageChannelModel>)
+    )]
     internal override RestStageChannelActor Actor { get; }
 
     internal override IGuildStageChannelModel Model => _model;
@@ -62,7 +48,7 @@ public partial class RestStageChannel :
     {
         _model = model;
 
-        Actor = actor ?? new(client, guild, model.Id);
+        Actor = actor ?? new(client, guild, StageChannelIdentity.Of(this));
     }
 
     public static RestStageChannel Construct(DiscordRestClient client, IGuildStageChannelModel model, GuildIdentity guild)

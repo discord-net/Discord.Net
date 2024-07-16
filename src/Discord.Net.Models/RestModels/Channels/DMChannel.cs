@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [ChannelTypeOf(ChannelType.DM)]
-public sealed class DMChannelModel : Channel, IDMChannelModel, IModelSource, IModelSourceOf<IUserModel>
+public sealed class DMChannelModel : ChannelModel, IDMChannelModel, IModelSource, IModelSourceOf<IUserModel>
 {
     [JsonPropertyName("last_message_id")]
     public Optional<ulong?> LastMessageId { get; set; }

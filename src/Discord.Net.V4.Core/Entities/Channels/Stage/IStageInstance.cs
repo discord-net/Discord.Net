@@ -4,28 +4,14 @@ using Discord.Stage;
 
 namespace Discord;
 
-using IModifiable = IModifiable<ulong, IStageInstance, ModifyStageInstanceProperties, ModifyStageInstanceParams, IStageInstanceModel>;
-
 /// <summary>
 ///     Represents a live stage instance within a stage channel.
 /// </summary>
-public interface IStageInstance :
-    ISnowflakeEntity,
-    IStageInstanceActor,
-    IRefreshable<IStageInstance, ulong, IStageInstanceModel>,
-    IModifiable
+[Refreshable(nameof(Routes.GetStageInstance))]
+public partial interface IStageInstance :
+    ISnowflakeEntity<IStageInstanceModel>,
+    IStageInstanceActor
 {
-    static IApiInOutRoute<ModifyStageInstanceParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyStageInstanceParams args
-    ) => Routes.ModifyStageInstance(path.Require<IChannel>(), args);
-
-    static IApiOutRoute<IStageInstanceModel> IRefreshable<IStageInstance, ulong, IStageInstanceModel>.RefreshRoute(
-        IPathable path,
-        ulong id
-    ) => Routes.GetStageInstance(path.Require<IChannel>());
-
     /// <summary>
     ///     Gets the topic of the stage.
     /// </summary>

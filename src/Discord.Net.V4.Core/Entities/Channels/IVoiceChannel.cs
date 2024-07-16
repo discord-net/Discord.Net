@@ -5,11 +5,11 @@ using Discord.Rest;
 namespace Discord;
 
 public partial interface IVoiceChannel :
+    ISnowflakeEntity<IGuildVoiceChannelModel>,
     IMessageChannel,
     IGuildChannel,
     IAudioChannel,
-    IVoiceChannelActor,
-    IEntityOf<IGuildVoiceChannelModel>
+    IVoiceChannelActor
 {
     [SourceOfTruth]
     new IGuildVoiceChannelModel GetModel();

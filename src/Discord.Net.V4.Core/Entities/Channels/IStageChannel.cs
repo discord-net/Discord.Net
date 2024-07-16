@@ -6,6 +6,11 @@ namespace Discord;
 ///     Represents a generic Stage Channel.
 /// </summary>
 public partial interface IStageChannel :
+    ISnowflakeEntity<IGuildStageChannelModel>,
     IVoiceChannel,
     IStageChannelActor,
-    IUpdatable<IGuildStageChannelModel>;
+    IUpdatable<IGuildStageChannelModel>
+{
+    [SourceOfTruth]
+    new IGuildStageChannelModel GetModel();
+}

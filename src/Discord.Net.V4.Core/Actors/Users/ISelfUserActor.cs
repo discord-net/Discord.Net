@@ -2,30 +2,20 @@ using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-using IModifiable =
-    IModifiable<ulong, ISelfUserActor, ModifySelfUserProperties, ModifyCurrentUserParams, ISelfUser, ISelfUserModel>;
-
-public interface ILoadableSelfUserActor :
-    ILoadableEntity<ulong, ISelfUser>,
-    ISelfUserActor;
-
-public interface ISelfUserActor :
-    IModifiable,
+[Loadable(nameof(Routes.GetCurrentUser))]
+[Modifiable<ModifySelfUserProperties>(nameof(Routes.ModifyCurrentUser))]
+[SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
+public partial interface ISelfUserActor :
     IUserActor,
     IActor<ulong, ISelfUser>
 {
     // TODO:
     // - https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection
     // - https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection
-
-    static IApiInOutRoute<ModifyCurrentUserParams, IEntityModel> IModifiable.ModifyRoute(
-        IPathable path,
-        ulong id,
-        ModifyCurrentUserParams args
-    ) => Routes.ModifyCurrentUser(args);
 
     async Task<IEnumerable<IPartialGuild>?> GetGuildsAsync(
         EntityOrId<ulong, IPartialGuild>? before,

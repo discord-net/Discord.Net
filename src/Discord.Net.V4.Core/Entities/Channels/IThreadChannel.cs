@@ -9,16 +9,15 @@ namespace Discord;
 ///     Represents a thread channel inside a guild.
 /// </summary>
 public partial interface IThreadChannel :
+    ISnowflakeEntity<IThreadChannelModel>,
     IMessageChannel,
     IGuildChannel,
-    IThreadChannelActor,
-    IThreadableRelationship,
-    IEntityOf<IThreadableChannelModel>
+    IThreadChannelActor
 {
     [SourceOfTruth]
-    new IThreadableChannelModel GetModel();
+    new IThreadChannelModel GetModel();
 
-    ILoadableUserActor? Owner { get; }
+    IUserActor? Owner { get; }
 
     /// <summary>
     ///     Gets the type of the current thread channel.
