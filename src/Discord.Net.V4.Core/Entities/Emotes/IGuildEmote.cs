@@ -36,7 +36,7 @@ public partial interface IGuildEmote :
 
     IDefinedLoadableEntityEnumerable<ulong, IRole> Roles { get; }
 
-    ILoadableEntity<ulong, IUser>? Creator { get; }
+    IUserActor? Creator { get; }
 
     IEmoteModel IEntityProperties<IEmoteModel>.ToApiModel(IEmoteModel? existing)
         => ToApiModel(existing);

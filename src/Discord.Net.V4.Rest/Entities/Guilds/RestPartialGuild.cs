@@ -38,4 +38,7 @@ public class RestPartialGuild(DiscordRestClient client, IPartialGuildModel model
             _ => new RestPartialGuild(client, model)
         };
     }
+
+    public virtual IPartialGuildModel GetModel()
+        => Model;
 }

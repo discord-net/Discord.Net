@@ -24,7 +24,7 @@ public partial class Routes
     public static IApiRoute DeleteGuild([IdHeuristic<IGuild>] ulong guildId) =>
         new ApiRoute(nameof(DeleteGuild), RequestMethod.Delete, $"guilds/{guildId}", (ScopeType.Guild, guildId));
 
-    public static IApiOutRoute<GuildChannelModelBase[]> GetGuildChannels([IdHeuristic<IGuild>] ulong guildId) =>
+    public static IApiOutRoute<IEnumerable<GuildChannelModelBase>> GetGuildChannels([IdHeuristic<IGuild>] ulong guildId) =>
         new ApiOutRoute<GuildChannelModelBase[]>(nameof(GetGuildChannels), RequestMethod.Get,
             $"guilds/{guildId}/channels",
             (ScopeType.Guild, guildId));

@@ -15,7 +15,6 @@ public partial interface IGuildChannelActor :
     IGuildRelationship,
     IActor<ulong, IGuildChannel>
 {
-
     IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites { get; }
 
     async Task<IInvite> CreateInviteAsync(

@@ -10,6 +10,9 @@ public class Invite :
     IModelSourceOf<IApplicationModel?>,
     IModelSourceOf<IGuildScheduledEventModel?>
 {
+    [JsonPropertyName("type")]
+    public int Type { get; set; }
+
     [JsonPropertyName("code")]
     public required string Code { get; set; }
 

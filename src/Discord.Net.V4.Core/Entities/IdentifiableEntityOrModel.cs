@@ -2,6 +2,37 @@ using Discord.Models;
 
 namespace Discord;
 
+file sealed class CastedIdentifiableEntityOrModel<TId, TSourceEntity, TSourceModel, TDestinationModel, TDestinationEntity>(
+    IIdentifiableEntityOrModel<TId, TSourceEntity, TSourceModel> source
+):
+    IIdentifiableEntityOrModel<TId, TDestinationEntity, TDestinationModel>
+    where TId : IEquatable<TId>
+    where TDestinationEntity : class, IEntity<TId>, IEntityOf<TDestinationModel>
+    where TSourceEntity : class, IEntity<TId>, IEntityOf<TSourceModel>
+    where TSourceModel : class, IEntityModel<TId>
+    where TDestinationModel : class, IEntityModel<TId>
+{
+    public TId Id => source.Id;
+
+    public TDestinationEntity? Entity
+    {
+        get
+        {
+            var entity = source.Entity;
+
+            if (entity is null)
+                return null;
+
+            if (entity is not TDestinationEntity destinationEntity)
+                throw new InvalidOperationException(
+                    $"Expected an entity of type {typeof(TDestinationEntity).Name}, but got {entity.GetType().Name}"
+                );
+
+            return destinationEntity;
+        }
+    }
+}
+
 public sealed class IdentifiableEntityOrModel<TId, TEntity, TModel> :
     IIdentifiableEntityOrModel<TId, TEntity, TModel>
     where TId : IEquatable<TId>
@@ -50,7 +81,7 @@ public sealed class IdentifiableEntityOrModel<TId, TEntity, TModel> :
     public static implicit operator IdentifiableEntityOrModel<TId, TEntity, TModel>(TEntity entity) => new(entity);
 }
 
-public interface IIdentifiableEntityOrModel<out TId, out TEntity, out TModel> : IIdentifiable<TId>
+public interface IIdentifiableEntityOrModel<TId, out TEntity, out TModel> : IIdentifiable<TId>
     where TId : IEquatable<TId>
     where TEntity : class, IEntity<TId>, IEntityOf<TModel>
     where TModel : class, IEntityModel<TId>
@@ -95,4 +126,9 @@ public interface IIdentifiableEntityOrModel<out TId, out TEntity, out TModel> : 
 
     static IIdentifiableEntityOrModel<TId, TEntity, TModel>? OfNullable(TModel? model, Func<TModel, TEntity> factory)
         => model is not null ? Of(model, factory) : null;
+
+    IIdentifiableEntityOrModel<TId, TNewEntity, TNewModel> Cast<TNewEntity, TNewModel>()
+        where TNewEntity : class, IEntity<TId>, IEntityOf<TNewModel>
+        where TNewModel : class, IEntityModel<TId>
+        => new CastedIdentifiableEntityOrModel<TId, TEntity, TModel, TNewModel, TNewEntity>(this);
 }

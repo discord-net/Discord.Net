@@ -1,26 +1,29 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Actors;
+using Discord.Rest.Extensions;
 
 namespace Discord.Rest.Channels;
 
+[method: TypeFactory]
 public partial class RestVoiceChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
     VoiceChannelIdentity channel
-):
+) :
     RestGuildChannelActor(client, guild, channel),
     IVoiceChannelActor,
-    IActor<ulong, RestVoiceChannel>
+    IRestActor<ulong, RestVoiceChannel, VoiceChannelIdentity>
 {
+    public override VoiceChannelIdentity Identity { get; } = channel;
+
     [ProxyInterface(typeof(IMessageChannelActor))]
     internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
 
     [SourceOfTruth]
     [CovariantOverride]
     internal virtual RestVoiceChannel CreateEntity(IGuildVoiceChannelModel model)
-        => RestVoiceChannel.Construct(Client, model, Guild.Identity);
-
+        => RestVoiceChannel.Construct(Client, Guild.Identity, model);
 }
 
 public partial class RestVoiceChannel :
@@ -28,6 +31,8 @@ public partial class RestVoiceChannel :
     IVoiceChannel,
     IContextConstructable<RestVoiceChannel, IGuildVoiceChannelModel, GuildIdentity, DiscordRestClient>
 {
+    [SourceOfTruth] public RestCategoryChannelActor? Category { get; private set; }
+
     public string? RTCRegion => Model.RTCRegion;
 
     public int Bitrate => Model.Bitrate;
@@ -55,6 +60,12 @@ public partial class RestVoiceChannel :
     {
         _model = model;
 
+        Category = model.ParentId.Map(
+            static (id, client, guild) => new RestCategoryChannelActor(client, guild, CategoryChannelIdentity.Of(id)),
+            client,
+            guild
+        );
+
         Actor = actor ?? new(
             client,
             guild,
@@ -62,15 +73,14 @@ public partial class RestVoiceChannel :
         );
     }
 
-    public static RestVoiceChannel Construct(
-        DiscordRestClient client,
-        IGuildVoiceChannelModel model,
-        GuildIdentity guild)
+    public static RestVoiceChannel Construct(DiscordRestClient client,
+        GuildIdentity guild,
+        IGuildVoiceChannelModel model)
     {
         switch (model)
         {
             case IGuildStageChannelModel stage:
-                return RestStageChannel.Construct(client, stage, guild);
+                return RestStageChannel.Construct(client, guild, stage);
             default:
                 return new(client, guild, model);
         }
@@ -79,7 +89,15 @@ public partial class RestVoiceChannel :
     [CovariantOverride]
     public virtual ValueTask UpdateAsync(IGuildVoiceChannelModel model, CancellationToken token = default)
     {
+        Category = Category.UpdateFrom(
+            model.ParentId,
+            RestCategoryChannelActor.Factory,
+            Client,
+            Actor.Guild.Identity
+        );
+
         _model = model;
+
         return base.UpdateAsync(model, token);
     }
 

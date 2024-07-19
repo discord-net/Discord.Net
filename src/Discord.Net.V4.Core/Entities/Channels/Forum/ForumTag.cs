@@ -18,7 +18,7 @@ public sealed class ForumTag(
     public IGuildEmoteActor? Emote { get; } = emote;
     public string? Emoji { get; } = emoji;
 
-    public static ForumTag Construct(IDiscordClient client, ITagModel model, Context context)
+    public static ForumTag Construct(IDiscordClient client, Context context, ITagModel model)
     {
         var emote = model.EmojiId.HasValue
             ? client.Guild(context.GuildId).Emote(model.EmojiId.Value)

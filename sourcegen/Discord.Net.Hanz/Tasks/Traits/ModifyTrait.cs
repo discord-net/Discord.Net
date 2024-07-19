@@ -7,12 +7,6 @@ namespace Discord.Net.Hanz.Tasks.Traits;
 
 public static class ModifyTrait
 {
-    // static IApiInOutRoute<ModifyGuildParams, IEntityModel> IModifiable.ModifyRoute(
-    //     IPathable path,
-    //     ulong id,
-    //     ModifyGuildParams args
-    // ) => Routes.ModifyGuild(id, args);
-
     public static void Process(
         ref InterfaceDeclarationSyntax syntax,
         EntityTraits.GenerationTarget target,
@@ -36,9 +30,9 @@ public static class ModifyTrait
         }
 
         // get the api params type
-        var entityPropertiesInterface = Hierarchy.GetInterfaceHierarchy(paramsType)
-            .FirstOrDefault(x => x.Interface.ToDisplayString().StartsWith("Discord.IEntityProperties"))
-            .Interface;
+        var entityPropertiesInterface = Hierarchy.GetHierarchy(paramsType)
+            .FirstOrDefault(x => x.Type.ToDisplayString().StartsWith("Discord.IEntityProperties"))
+            .Type;
 
         if (entityPropertiesInterface is null)
         {

@@ -22,5 +22,5 @@ public partial interface IIntegration :
     int? SubscriberCount { get; }
     bool? IsRevoked { get; }
     IntegrationApplication? Application { get; }
-    string[] Scopes { get; }
+    IReadOnlyCollection<string> Scopes { get; }
 }

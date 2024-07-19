@@ -14,22 +14,33 @@ public interface IPathable
         where TEntity : class, IEntity<TId>
         where TId : IEquatable<TId>
     {
-        if (this is not IRelation<TId, TEntity> relationship)
-            throw new KeyNotFoundException($"Cannot find path from {GetType().Name} to {typeof(TEntity).Name}");
-
-        return relationship.Id;
+        return this switch
+        {
+            TEntity entity => entity.Id,
+            IActor<TId, TEntity> actor => actor.Id,
+            IRelation<TId, TEntity> relationship => relationship.Id,
+            _ => throw new KeyNotFoundException($"Cannot find path from {GetType().Name} to {typeof(TEntity).Name}")
+        };
     }
 
     bool TryGet<TId, TEntity>(out TId? id)
         where TEntity : class, IEntity<TId>
         where TId : IEquatable<TId>
     {
-        id = default;
-
-        if (this is not IRelation<TId, TEntity> relationship)
-            return false;
-
-        id = relationship.Id;
-        return true;
+        switch (this)
+        {
+            case TEntity entity:
+                id = entity.Id;
+                return true;
+            case IActor<TId, TEntity> actor:
+                id = actor.Id;
+                return true;
+            case IRelation<TId, TEntity> relationship:
+                id = relationship.Id;
+                return true;
+            default:
+                id = default;
+                return false;
+        }
     }
 }

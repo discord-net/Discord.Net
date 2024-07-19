@@ -38,7 +38,7 @@ public partial class RestSticker :
         return model switch
         {
             IGuildStickerModel guildSticker
-                => RestGuildSticker.Construct(client, guildSticker, GuildIdentity.Of(guildSticker.GuildId)),
+                => RestGuildSticker.Construct(client, GuildIdentity.Of(guildSticker.GuildId), guildSticker),
             _ => new RestSticker(client, model)
         };
     }

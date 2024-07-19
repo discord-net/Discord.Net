@@ -1,32 +1,34 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Extensions;
 using Discord.Rest.Guilds;
 using System.Collections.Immutable;
 using System.ComponentModel;
 
 namespace Discord.Rest.Channels;
 
-[ExtendInterfaceDefaults(
-    typeof(IGuildChannelActor),
-    typeof(IDeletable<ulong, IGuildChannelActor>)
-)]
+[method: TypeFactory]
+[ExtendInterfaceDefaults(typeof(IGuildChannelActor))]
 public partial class RestGuildChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
     GuildChannelIdentity channel
-) :
+):
     RestChannelActor(client, channel),
     IGuildChannelActor,
-    IActor<ulong, RestGuildChannel>
+    IRestActor<ulong, RestGuildChannel, GuildChannelIdentity>
 {
+    public override GuildChannelIdentity Identity { get; } = channel;
+
     [SourceOfTruth]
-    public RestLoadableGuildActor Guild { get; } = new(client, guild);
+    public RestGuildActor Guild { get; } = new(client, guild);
 
     public IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites => throw new NotImplementedException();
 
     [SourceOfTruth]
+    [CovariantOverride]
     internal virtual RestGuildChannel CreateEntity(IGuildChannelModel model)
-        => RestGuildChannel.Construct(Client, model, Guild.Identity);
+        => RestGuildChannel.Construct(Client, Guild.Identity, model);
 }
 
 public partial class RestGuildChannel :
@@ -40,14 +42,12 @@ public partial class RestGuildChannel :
 
     public IReadOnlyCollection<Overwrite> PermissionOverwrites { get; private set; }
 
-    internal override IGuildChannelModel Model => _model;
-
     [ProxyInterface(
-        typeof(IGuildChannelActor),
-        typeof(IGuildRelationship),
-        typeof(IEntityProvider<IGuildChannel, IGuildChannelModel>)
+        typeof(IGuildChannelActor)
     )]
     internal override RestGuildChannelActor Actor { get; }
+
+    internal override IGuildChannelModel Model => _model;
 
     private IGuildChannelModel _model;
 
@@ -69,24 +69,25 @@ public partial class RestGuildChannel :
         PermissionOverwrites = model.Permissions.Select(x => Overwrite.Construct(client, x)).ToImmutableArray();
     }
 
-    public static RestGuildChannel Construct(
-        DiscordRestClient client,
-        IGuildChannelModel model,
-        GuildIdentity guild)
+    public static RestGuildChannel Construct(DiscordRestClient client,
+        GuildIdentity guild,
+        IGuildChannelModel model)
     {
         return model switch
         {
-            IGuildForumChannelModel guildForumChannelModel => RestForumChannel.Construct(client, guildForumChannelModel,
-                guild),
-            IGuildMediaChannelModel guildMediaChannelModel => RestMediaChannel.Construct(client, guildMediaChannelModel,
-                guild),
-            IGuildNewsChannelModel guildNewsChannelModel => RestNewsChannel.Construct(client, guildNewsChannelModel,
-                guild),
-            IGuildVoiceChannelModel guildVoiceChannelModel => RestVoiceChannel.Construct(client, guildVoiceChannelModel,
-                guild),
-            IThreadChannelModel threadChannelModel => RestThreadChannel.Construct(client, threadChannelModel, guild),
-            IGuildTextChannelModel guildTextChannelModel => RestTextChannel.Construct(client, guildTextChannelModel,
-                guild),
+            IGuildForumChannelModel guildForumChannelModel => RestForumChannel.Construct(client,
+                guild, guildForumChannelModel),
+            IGuildMediaChannelModel guildMediaChannelModel => RestMediaChannel.Construct(client,
+                guild, guildMediaChannelModel),
+            IGuildNewsChannelModel guildNewsChannelModel => RestNewsChannel.Construct(client,
+                guild, guildNewsChannelModel),
+            IGuildVoiceChannelModel guildVoiceChannelModel => RestVoiceChannel.Construct(client,
+                guild, guildVoiceChannelModel),
+            IThreadChannelModel threadChannelModel => RestThreadChannel.Construct(client, new RestThreadChannel.Context(
+                guild
+            ), threadChannelModel),
+            IGuildTextChannelModel guildTextChannelModel => RestTextChannel.Construct(client,
+                guild, guildTextChannelModel),
             _ => new(client, guild, model)
         };
     }

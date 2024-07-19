@@ -5,7 +5,7 @@ namespace Discord;
 
 public sealed class MessageReactions : IConstructable<MessageReactions, IEnumerable<IReactionModel>>
 {
-    public MessageReactions(IDiscordClient client, IEnumerable<IReactionModel> reactionModels)
+    private MessageReactions(IDiscordClient client, IEnumerable<IReactionModel> reactionModels)
     {
         var emojiReactions = new Dictionary<string, ReactionMetadata>();
         var emoteReactions = new Dictionary<ulong, ReactionMetadata>();

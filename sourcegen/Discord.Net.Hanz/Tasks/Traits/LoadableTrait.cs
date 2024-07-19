@@ -117,7 +117,32 @@ public static class LoadableTrait
             )
             .AddMembers(
                 SyntaxFactory.MethodDeclaration(
-                    [],
+                    SyntaxFactory.List([
+                        SyntaxFactory.AttributeList(
+                            SyntaxFactory.AttributeTargetSpecifier(SyntaxFactory.Identifier("return")),
+                            SyntaxFactory.SeparatedList([
+                                SyntaxFactory.Attribute(
+                                    SyntaxFactory.IdentifierName("Discord.TypeHeuristicAttribute"),
+                                    SyntaxFactory.AttributeArgumentList(
+                                        SyntaxFactory.SeparatedList([
+                                            SyntaxFactory.AttributeArgument(
+                                                SyntaxFactory.InvocationExpression(
+                                                    SyntaxFactory.IdentifierName("nameof"),
+                                                    SyntaxFactory.ArgumentList(
+                                                        SyntaxFactory.SeparatedList([
+                                                            SyntaxFactory.Argument(
+                                                                SyntaxFactory.IdentifierName("CreateEntity")
+                                                            )
+                                                        ])
+                                                    )
+                                                )
+                                            )
+                                        ])
+                                    )
+                                )
+                            ])
+                        )
+                    ]),
                     extraParameters.Count > 0 && !target.InterfaceSymbol.AllInterfaces.Any(IsLoadable)
                         ? []
                         : SyntaxFactory.TokenList(
@@ -189,6 +214,11 @@ public static class LoadableTrait
                 ?.TypeArguments[0];
 
             if (baseActorInterface is null || baseModelType is null) continue;
+
+            if (
+                !baseModelType.Equals(modelType, SymbolEqualityComparer.Default) &&
+                !target.SemanticModel.Compilation.HasImplicitConversion(modelType, baseModelType)
+            ) continue;
 
             CreateOverloadToFetchAsync(
                 ref syntax,
@@ -283,7 +313,32 @@ public static class LoadableTrait
 
         syntax = syntax.AddMembers(
             SyntaxFactory.MethodDeclaration(
-                [],
+                SyntaxFactory.List([
+                    SyntaxFactory.AttributeList(
+                        SyntaxFactory.AttributeTargetSpecifier(SyntaxFactory.Identifier("return")),
+                        SyntaxFactory.SeparatedList([
+                            SyntaxFactory.Attribute(
+                                SyntaxFactory.IdentifierName("Discord.TypeHeuristicAttribute"),
+                                SyntaxFactory.AttributeArgumentList(
+                                    SyntaxFactory.SeparatedList([
+                                        SyntaxFactory.AttributeArgument(
+                                            SyntaxFactory.InvocationExpression(
+                                                SyntaxFactory.IdentifierName("nameof"),
+                                                SyntaxFactory.ArgumentList(
+                                                    SyntaxFactory.SeparatedList([
+                                                        SyntaxFactory.Argument(
+                                                            SyntaxFactory.IdentifierName("CreateEntity")
+                                                        )
+                                                    ])
+                                                )
+                                            )
+                                        )
+                                    ])
+                                )
+                            )
+                        ])
+                    )
+                ]),
                 async
                     ? SyntaxFactory.TokenList(
                         SyntaxFactory.Token(SyntaxKind.AsyncKeyword)

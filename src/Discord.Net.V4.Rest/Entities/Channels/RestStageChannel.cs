@@ -5,6 +5,7 @@ using Discord.Stage;
 
 namespace Discord.Rest.Channels;
 
+[method: TypeFactory]
 [ExtendInterfaceDefaults(typeof(IStageChannelActor))]
 public partial class RestStageChannelActor(
     DiscordRestClient client,
@@ -13,13 +14,15 @@ public partial class RestStageChannelActor(
 ):
     RestVoiceChannelActor(client, guild, channel),
     IStageChannelActor,
-    IActor<ulong, RestStageChannel>
+    IRestActor<ulong, RestStageChannel, StageChannelIdentity>
 {
+    public override StageChannelIdentity Identity { get; } = channel;
+
     public IStageInstanceActor StageInstance => throw new NotImplementedException();
 
     [SourceOfTruth]
     public RestStageChannel CreateEntity(IGuildStageChannelModel model)
-        => RestStageChannel.Construct(Client, model, Guild.Identity);
+        => RestStageChannel.Construct(Client, Guild.Identity, model);
 }
 
 public partial class RestStageChannel :
@@ -27,7 +30,6 @@ public partial class RestStageChannel :
     IStageChannel,
     IContextConstructable<RestStageChannel, IGuildStageChannelModel, GuildIdentity, DiscordRestClient>
 {
-
     [ProxyInterface(
         typeof(IStageChannelActor),
         typeof(IStageInstanceRelationship),
@@ -51,7 +53,8 @@ public partial class RestStageChannel :
         Actor = actor ?? new(client, guild, StageChannelIdentity.Of(this));
     }
 
-    public static RestStageChannel Construct(DiscordRestClient client, IGuildStageChannelModel model, GuildIdentity guild)
+    public static RestStageChannel Construct(DiscordRestClient client, GuildIdentity guild,
+        IGuildStageChannelModel model)
         => new(client, guild, model);
 
     [CovariantOverride]

@@ -25,11 +25,9 @@ public sealed partial class RestMessageInteractionMetadata(
 
     public static RestMessageInteractionMetadata Construct(
         DiscordRestClient client,
-        IMessageInteractionMetadataModel model,
-        Context context
+        Context context,
+        IMessageInteractionMetadataModel model
     ) => new(client, context.Channel, model, context.Guild);
-
-    public IMessageInteractionMetadataModel GetModel() => Model;
 
     public ValueTask UpdateAsync(IMessageInteractionMetadataModel model, CancellationToken token = default)
     {
@@ -42,8 +40,7 @@ public sealed partial class RestMessageInteractionMetadata(
 
         OriginalResponseMessage = OriginalResponseMessage.UpdateFrom(
             model.OriginalResponseMessageId,
-            RestLoadableMessageActor.Factory,
-            MessageIdentity.Of,
+            RestMessageActor.Factory,
             Client,
             channel,
             guild
@@ -51,8 +48,7 @@ public sealed partial class RestMessageInteractionMetadata(
 
         InteractedMessage = InteractedMessage.UpdateFrom(
             model.InteractedMessageId,
-            RestLoadableMessageActor.Factory,
-            MessageIdentity.Of,
+            RestMessageActor.Factory,
             Client,
             channel,
             guild
@@ -61,9 +57,12 @@ public sealed partial class RestMessageInteractionMetadata(
         return ValueTask.CompletedTask;
     }
 
+    public IMessageInteractionMetadataModel GetModel() => Model;
+
     public InteractionType Type => (InteractionType)Model.Type;
 
-    public RestLoadableUserActor User { get; }
+    [SourceOfTruth]
+    public RestUserActor User { get; }
         = new(
             client,
             UserIdentity.OfNullable(
@@ -76,33 +75,29 @@ public sealed partial class RestMessageInteractionMetadata(
         = model.AuthorizingIntegrationOwners
             .ToImmutableDictionary(x => (ApplicationIntegrationType)x.Key, x => x.Value);
 
-    public RestLoadableMessageActor? OriginalResponseMessage { get; private set; }
+    [SourceOfTruth]
+    public RestMessageActor? OriginalResponseMessage { get; private set; }
         = model.OriginalResponseMessageId.Map(
             static (id, client, channel, guild)
-                => new RestLoadableMessageActor(client, channel, MessageIdentity.Of(id), guild),
+                => new RestMessageActor(client, channel, MessageIdentity.Of(id), guild),
             client,
             channel,
             guild
         );
 
-    public RestLoadableMessageActor? InteractedMessage { get; private set; }
+    [SourceOfTruth]
+    public RestMessageActor? InteractedMessage { get; private set; }
         = model.InteractedMessageId.Map(
             static (id, client, channel, guild)
-                => new RestLoadableMessageActor(client, channel, MessageIdentity.Of(id), guild),
+                => new RestMessageActor(client, channel, MessageIdentity.Of(id), guild),
             client,
             channel,
             guild
         );
 
+    [SourceOfTruth]
     public RestMessageInteractionMetadata? TriggeringInteractionMetadata { get; }
         = model.TriggeringInteractionMetadata is not null
-            ? Construct(client, model.TriggeringInteractionMetadata, new Context(channel, guild))
+            ? Construct(client, new Context(channel, guild), model.TriggeringInteractionMetadata)
             : null;
-
-    ILoadableUserActor IMessageInteractionMetadata.User => User;
-    ILoadableMessageActor? IMessageInteractionMetadata.OriginalResponseMessage => OriginalResponseMessage;
-    ILoadableMessageActor? IMessageInteractionMetadata.InteractedMessage => InteractedMessage;
-
-    IMessageInteractionMetadata? IMessageInteractionMetadata.TriggeringInteractionMetadata =>
-        TriggeringInteractionMetadata;
 }

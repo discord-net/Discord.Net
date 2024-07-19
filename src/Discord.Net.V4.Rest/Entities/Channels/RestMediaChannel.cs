@@ -5,19 +5,22 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest.Channels;
 
+[method: TypeFactory]
 public partial class RestMediaChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
-    IdentifiableEntityOrModel<ulong, RestMediaChannel, IGuildMediaChannelModel> channel
-):
+    MediaChannelIdentity channel
+) :
     RestThreadableChannelActor(client, guild, channel),
     IMediaChannelActor,
-    IActor<ulong, RestMediaChannel>
+    IRestActor<ulong, RestMediaChannel, MediaChannelIdentity>
 {
+    public override MediaChannelIdentity Identity { get; } = channel;
+
     [CovariantOverride]
     [SourceOfTruth]
     internal RestMediaChannel CreateEntity(IGuildMediaChannelModel model)
-        => RestMediaChannel.Construct(Client, model, Guild.Identity);
+        => RestMediaChannel.Construct(Client, Guild.Identity, model);
 }
 
 public partial class RestMediaChannel :
@@ -39,13 +42,10 @@ public partial class RestMediaChannel :
 
     public SortOrder? DefaultSortOrder => (SortOrder?)Model.DefaultSortOrder;
 
-    internal override IGuildMediaChannelModel Model => _model;
-
-    [ProxyInterface(
-        typeof(IMediaChannelActor),
-        typeof(IEntityProvider<IMediaChannel, IGuildMediaChannelModel>)
-    )]
+    [ProxyInterface(typeof(IMediaChannelActor))]
     internal override RestMediaChannelActor Actor { get; }
+
+    internal override IGuildMediaChannelModel Model => _model;
 
     private IGuildMediaChannelModel _model;
 
@@ -58,14 +58,15 @@ public partial class RestMediaChannel :
     {
         _model = model;
 
-        Actor = actor ?? new(client, guild, this);
+        Actor = actor ?? new(client, guild, MediaChannelIdentity.Of(this));
 
         AvailableTags = model.AvailableTags
-            .Select(x => ForumTag.Construct(client, x, new ForumTag.Context(guild.Id)))
+            .Select(x => ForumTag.Construct(client, new ForumTag.Context(guild.Id), x))
             .ToImmutableArray();
     }
 
-    public static RestMediaChannel Construct(DiscordRestClient client, IGuildMediaChannelModel model, GuildIdentity guild)
+    public static RestMediaChannel Construct(DiscordRestClient client,
+        GuildIdentity guild, IGuildMediaChannelModel model)
         => new(client, guild, model);
 
     [CovariantOverride]
@@ -74,7 +75,7 @@ public partial class RestMediaChannel :
         if (!_model.AvailableTags.SequenceEqual(model.AvailableTags))
         {
             AvailableTags = model.AvailableTags
-                .Select(x => ForumTag.Construct(Client, x, new ForumTag.Context(Guild.Id)))
+                .Select(x => ForumTag.Construct(Client, new ForumTag.Context(Actor.Guild.Id), x))
                 .ToImmutableArray();
         }
 

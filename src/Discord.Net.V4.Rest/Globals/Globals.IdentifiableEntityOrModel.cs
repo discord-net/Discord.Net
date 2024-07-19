@@ -28,6 +28,8 @@ global using GuildScheduledEventIdentity = Discord.IIdentifiableEntityOrModel<ul
 
 #region Channels
 
+global using DMChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestDMChannel, Discord.Models.IDMChannelModel>;
+global using GroupChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestGroupChannel, Discord.Models.IGroupDMChannelModel>;
 global using ThreadIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.RestThreadChannel, Discord.Models.IThreadChannelModel>;
 global using ChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestChannel, Discord.Models.IChannelModel>;
 global using MessageChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.IMessageChannel, Discord.Models.IChannelModel>;
@@ -35,6 +37,7 @@ global using GuildChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Di
 global using ThreadableChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestThreadableChannel, Discord.Models.IThreadableChannelModel>;
 global using VoiceChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestVoiceChannel, Discord.Models.IGuildVoiceChannelModel>;
 global using ForumChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestForumChannel, Discord.Models.IGuildForumChannelModel>;
+global using MediaChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestMediaChannel, Discord.Models.IGuildMediaChannelModel>;
 global using NewsChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestNewsChannel, Discord.Models.IGuildNewsChannelModel>;
 global using TextChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestTextChannel, Discord.Models.IGuildTextChannelModel>;
 global using StageChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestStageChannel, Discord.Models.IGuildStageChannelModel>;
@@ -47,3 +50,8 @@ global using MessageIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord
 
 #endregion
 
+#region Invites
+
+global using InviteIdentity = Discord.IIdentifiableEntityOrModel<string, Discord.Rest.Invites.RestInvite, Discord.Models.IInviteModel>;
+
+#endregion

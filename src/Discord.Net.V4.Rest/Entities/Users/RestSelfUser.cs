@@ -3,22 +3,7 @@ using Discord.Models.Json;
 
 namespace Discord.Rest;
 
-public sealed partial class RestLoadableSelfUserActor(
-    DiscordRestClient client,
-    SelfUserIdentity user
-) :
-    RestSelfUserActor(client, user),
-    ILoadableSelfUserActor
-{
-    [ProxyInterface(typeof(ILoadableEntity<ISelfUser>))]
-    internal RestLoadable<ulong, RestSelfUser, ISelfUser, ISelfUserModel> Loadable { get; } =
-        RestLoadable<ulong, RestSelfUser, ISelfUser, ISelfUserModel>.FromConstructable<RestSelfUser>(
-            client,
-            user,
-            Routes.GetCurrentUser
-        );
-}
-
+[method: TypeFactory]
 [ExtendInterfaceDefaults(
     typeof(ISelfUserActor)
 )]

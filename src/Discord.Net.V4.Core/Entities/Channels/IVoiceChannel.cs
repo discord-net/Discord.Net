@@ -7,8 +7,8 @@ namespace Discord;
 public partial interface IVoiceChannel :
     ISnowflakeEntity<IGuildVoiceChannelModel>,
     IMessageChannel,
-    IGuildChannel,
     IAudioChannel,
+    INestedChannel,
     IVoiceChannelActor
 {
     [SourceOfTruth]

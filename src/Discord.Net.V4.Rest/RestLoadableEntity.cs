@@ -108,7 +108,7 @@ public sealed class RestLoadable<TId, TEntity, TCoreEntity, TModel>(
             client,
             identity,
             outRoute,
-            (client, _, model) => model is null ? null : TConstructable.Construct(client, model, context)
+            (client, _, model) => model is null ? null : TConstructable.Construct(client, context, model)
         );
     }
 

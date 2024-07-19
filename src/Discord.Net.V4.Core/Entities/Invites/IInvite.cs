@@ -13,7 +13,7 @@ public partial interface IInvite :
     IGuildActor? Guild { get; }
     IChannelActor? Channel { get; }
     IUserActor? Inviter { get; }
-    InviteTargetType TargetType { get; }
+    InviteTargetType? TargetType { get; }
 
     IUserActor? TargetUser { get; }
 

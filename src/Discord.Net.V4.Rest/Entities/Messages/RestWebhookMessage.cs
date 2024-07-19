@@ -12,7 +12,7 @@ public partial class RestWebhookMessageActor(
     RestMessageActor(client, channel, message, guild),
     IWebhookMessageActor
 {
-    public ILoadableWebhookActor Webhook => throw new NotImplementedException();
+    public IWebhookActor Webhook => throw new NotImplementedException();
 }
 
 public sealed partial class RestWebhookMessage :
@@ -40,7 +40,7 @@ public sealed partial class RestWebhookMessage :
         );
     }
 
-    public new static RestWebhookMessage Construct(DiscordRestClient client, IMessageModel model, GuildIdentity? guild)
+    public new static RestWebhookMessage Construct(DiscordRestClient client, GuildIdentity? guild, IMessageModel model)
         => new(client, model, guild: guild);
 
     public new static RestWebhookMessage Construct(DiscordRestClient client, IMessageModel model)

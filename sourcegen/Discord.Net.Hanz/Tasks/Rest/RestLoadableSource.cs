@@ -11,11 +11,39 @@ public class RestLoadableSource : IGenerationTask<RestLoadableSource.GenerationT
         SemanticModel semanticModel,
         PropertyDeclarationSyntax propertyDeclarationSyntax,
         ClassDeclarationSyntax classDeclarationSyntax
-    )
+    ) : IEquatable<GenerationTarget>
     {
         public SemanticModel SemanticModel { get; } = semanticModel;
         public PropertyDeclarationSyntax PropertyDeclarationSyntax { get; } = propertyDeclarationSyntax;
         public ClassDeclarationSyntax ClassDeclarationSyntax { get; } = classDeclarationSyntax;
+
+        public bool Equals(GenerationTarget? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return PropertyDeclarationSyntax.IsEquivalentTo(other.PropertyDeclarationSyntax) &&
+                   ClassDeclarationSyntax.IsEquivalentTo(other.ClassDeclarationSyntax);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((GenerationTarget) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (PropertyDeclarationSyntax.GetHashCode() * 397) ^ ClassDeclarationSyntax.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(GenerationTarget? left, GenerationTarget? right) => Equals(left, right);
+
+        public static bool operator !=(GenerationTarget? left, GenerationTarget? right) => !Equals(left, right);
     }
 
     public bool IsValid(SyntaxNode node, CancellationToken token)

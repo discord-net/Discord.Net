@@ -10,18 +10,16 @@ public sealed partial class RestStickerItem(DiscordRestClient client, IStickerIt
 {
     internal IStickerItemModel Model { get; } = model;
 
-    [ProxyInterface(typeof(ILoadableEntity<ISticker>))]
-    internal RestLoadable<ulong, RestSticker, ISticker, IStickerModel> Loadable { get; } =
-        RestLoadable<ulong, RestSticker, ISticker, IStickerModel>.FromConstructable<RestSticker>(
-            client,
-            StickerIdentity.Of(model.Id),
-            Routes.GetSticker
-        );
-
     public string Name => Model.Name;
 
     public StickerFormatType Format => (StickerFormatType)Model.FormatType;
 
     public static RestStickerItem Construct(DiscordRestClient client, IStickerItemModel model)
         => new(client, model);
+
+    public IStickerItemModel GetModel() => Model;
+
+    [SourceOfTruth]
+    internal RestSticker CreateEntity(IStickerModel model)
+        => RestSticker.Construct(Client, model);
 }

@@ -23,12 +23,44 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         SemanticModel semanticModel,
         InterfaceDeclarationSyntax interfaceDeclarationSyntax,
         INamedTypeSymbol interfaceSymbol,
-        HashSet<string> requestedTraits)
+        HashSet<string> requestedTraits) : IEquatable<GenerationTarget>
     {
         public SemanticModel SemanticModel { get; } = semanticModel;
         public InterfaceDeclarationSyntax InterfaceDeclarationSyntax { get; } = interfaceDeclarationSyntax;
         public INamedTypeSymbol InterfaceSymbol { get; } = interfaceSymbol;
         public HashSet<string> RequestedTraits { get; } = requestedTraits;
+
+        public bool Equals(GenerationTarget? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return InterfaceDeclarationSyntax.IsEquivalentTo(other.InterfaceDeclarationSyntax) &&
+                   InterfaceSymbol.Equals(other.InterfaceSymbol, SymbolEqualityComparer.Default) &&
+                   RequestedTraits.SequenceEqual(other.RequestedTraits);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((GenerationTarget)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = InterfaceDeclarationSyntax.GetHashCode();
+                hashCode = (hashCode * 397) ^ SymbolEqualityComparer.Default.GetHashCode(InterfaceSymbol);
+                hashCode = (hashCode * 397) ^ RequestedTraits.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(GenerationTarget? left, GenerationTarget? right) => Equals(left, right);
+
+        public static bool operator !=(GenerationTarget? left, GenerationTarget? right) => !Equals(left, right);
     }
 
     public bool IsValid(SyntaxNode node, CancellationToken token = default)
@@ -255,7 +287,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 switch (x.Name)
                 {
                     case "id":
-                        return ReturnOwnId(ref hasReturnedId, idParam, $"{target.InterfaceSymbol}: {x} -> direct 'id' reference");
+                        return ReturnOwnId(ref hasReturnedId, idParam,
+                            $"{target.InterfaceSymbol}: {x} -> direct 'id' reference");
                     default:
                         if (x.Type is INamedTypeSymbol paramType &&
                             x.Type.ToDisplayString().StartsWith("Discord.EntityOrId"))
@@ -292,7 +325,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                             break;
 
                         if (entityType.Equals(target.InterfaceSymbol, SymbolEqualityComparer.Default))
-                            return ReturnOwnId(ref hasReturnedId, idParam, $"{target.InterfaceSymbol}: {x} is the relation type");
+                            return ReturnOwnId(ref hasReturnedId, idParam,
+                                $"{target.InterfaceSymbol}: {x} is the relation type");
 
                         var actorInterface = GetActorInterface(target.InterfaceSymbol);
 
@@ -308,7 +342,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                                 actorInterface.TypeArguments[1].Equals(entityType, SymbolEqualityComparer.Default) ||
                                 (conversion?.IsImplicit ?? false)
                             ))
-                            return ReturnOwnId(ref hasReturnedId, idParam, $"{target.InterfaceSymbol}: {x} -> common conversion between {actorInterface.TypeArguments[1]} <> {entityType}");
+                            return ReturnOwnId(ref hasReturnedId, idParam,
+                                $"{target.InterfaceSymbol}: {x} -> common conversion between {actorInterface.TypeArguments[1]} <> {entityType}");
 
                         return SyntaxFactory.Argument(
                             SyntaxFactory.InvocationExpression(
@@ -387,16 +422,16 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
 
     public static INamedTypeSymbol? GetActorInterface(INamedTypeSymbol actor)
     {
-        return Hierarchy.GetInterfaceHierarchy(actor)
-            .FirstOrDefault(x => x.Interface.ToDisplayString().StartsWith("Discord.IActor<"))
-            .Interface;
+        return Hierarchy.GetHierarchy(actor)
+            .FirstOrDefault(x => x.Type.ToDisplayString().StartsWith("Discord.IActor<"))
+            .Type;
     }
 
     public static INamedTypeSymbol? GetEntityInterface(INamedTypeSymbol entity)
     {
-        return Hierarchy.GetInterfaceHierarchy(entity)
-            .FirstOrDefault(x => x.Interface.ToDisplayString().StartsWith("Discord.IEntity<"))
-            .Interface;
+        return Hierarchy.GetHierarchy(entity)
+            .FirstOrDefault(x => x.Type.ToDisplayString().StartsWith("Discord.IEntity<"))
+            .Type;
     }
 
     public static INamedTypeSymbol? GetEntityModelOfInterface(ITypeSymbol? entity)
@@ -404,8 +439,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         if (entity is null)
             return null;
 
-        return Hierarchy.GetInterfaceHierarchy(entity)
-            .FirstOrDefault(x => x.Interface.ToDisplayString().StartsWith("Discord.IEntityOf<"))
-            .Interface;
+        return Hierarchy.GetHierarchy(entity)
+            .FirstOrDefault(x => x.Type.ToDisplayString().StartsWith("Discord.IEntityOf<"))
+            .Type;
     }
 }

@@ -4,6 +4,7 @@ using Discord.Rest.Guilds;
 
 namespace Discord.Rest.Channels;
 
+[method: TypeFactory]
 [ExtendInterfaceDefaults(typeof(INewsChannelActor))]
 public partial class RestNewsChannelActor(
     DiscordRestClient client,
@@ -11,12 +12,15 @@ public partial class RestNewsChannelActor(
     NewsChannelIdentity channel
 ) :
     RestTextChannelActor(client, guild, channel),
-    INewsChannelActor
+    INewsChannelActor,
+    IRestActor<ulong, RestNewsChannel, NewsChannelIdentity>
 {
+    public override NewsChannelIdentity Identity { get; } = channel;
+
     [SourceOfTruth]
     [CovariantOverride]
     internal RestNewsChannel CreateEntity(IGuildNewsChannelModel model)
-        => RestNewsChannel.Construct(Client, model, Guild.Identity);
+        => RestNewsChannel.Construct(Client, Guild.Identity, model);
 }
 
 public partial class RestNewsChannel :
@@ -46,7 +50,7 @@ public partial class RestNewsChannel :
         Actor = actor ?? new(client, guild, NewsChannelIdentity.Of(this));
     }
 
-    public static RestNewsChannel Construct(DiscordRestClient client, IGuildNewsChannelModel model, GuildIdentity guild)
+    public static RestNewsChannel Construct(DiscordRestClient client, GuildIdentity guild, IGuildNewsChannelModel model)
         => new(client, guild, model);
 
     [CovariantOverride]

@@ -1,11 +1,13 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Channels;
+using Discord.Rest.Extensions;
 
 namespace Discord.Rest.Channels;
 
 using ThreadsPagedActor = RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams>;
 
+[method: TypeFactory]
 public partial class RestThreadableChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -13,8 +15,10 @@ public partial class RestThreadableChannelActor(
 ) :
     RestGuildChannelActor(client, guild, channel),
     IThreadableChannelActor,
-    IActor<ulong, RestThreadableChannel>
+    IRestActor<ulong, RestThreadableChannel, ThreadableChannelIdentity>
 {
+    public override ThreadableChannelIdentity Identity { get; } = channel;
+
     [SourceOfTruth]
     public ThreadsPagedActor PublicArchivedThreads { get; }
         = RestActors.PublicArchivedThreads(client, guild, channel);
@@ -30,7 +34,7 @@ public partial class RestThreadableChannelActor(
     [SourceOfTruth]
     [CovariantOverride]
     internal virtual RestThreadableChannel CreateEntity(IThreadableChannelModel model)
-        => RestThreadableChannel.Construct(Client, model, Guild.Identity);
+        => RestThreadableChannel.Construct(Client, Guild.Identity, model);
 }
 
 public partial class RestThreadableChannel :
@@ -39,7 +43,8 @@ public partial class RestThreadableChannel :
     IContextConstructable<RestThreadableChannel, IThreadableChannelModel, GuildIdentity, DiscordRestClient>
 {
     [SourceOfTruth]
-    public RestCategoryChannelActor? Category => throw new NotImplementedException();
+    public RestCategoryChannelActor? Category { get; private set; }
+
     public int? DefaultThreadSlowmode => Model.DefaultThreadRateLimitPerUser;
 
     public ThreadArchiveDuration DefaultArchiveDuration => (ThreadArchiveDuration)Model.DefaultAutoArchiveDuration;
@@ -62,28 +67,34 @@ public partial class RestThreadableChannel :
     ) : base(client, guild, model)
     {
         _model = model;
+
         Actor = actor ?? new(
             client,
             guild,
             ThreadableChannelIdentity.Of(this)
         );
+
+        Category = model.ParentId.Map(
+            static (id, client, guild) => new RestCategoryChannelActor(client, guild, CategoryChannelIdentity.Of(id)),
+            client,
+            guild
+        );
     }
 
-    public static RestThreadableChannel Construct(
-        DiscordRestClient client,
-        IThreadableChannelModel model,
-        GuildIdentity guild)
+    public static RestThreadableChannel Construct(DiscordRestClient client,
+        GuildIdentity guild,
+        IThreadableChannelModel model)
     {
         return model switch
         {
             IGuildForumChannelModel guildForumChannelModel
-                => RestForumChannel.Construct(client, guildForumChannelModel, guild),
+                => RestForumChannel.Construct(client, guild, guildForumChannelModel),
             IGuildMediaChannelModel guildMediaChannelModel
-                => RestMediaChannel.Construct(client, guildMediaChannelModel, guild),
+                => RestMediaChannel.Construct(client, guild, guildMediaChannelModel),
             IGuildNewsChannelModel guildNewsChannelModel
-                => RestNewsChannel.Construct(client, guildNewsChannelModel, guild),
+                => RestNewsChannel.Construct(client, guild, guildNewsChannelModel),
             IGuildTextChannelModel guildTextChannelModel
-                => RestTextChannel.Construct(client, guildTextChannelModel, guild),
+                => RestTextChannel.Construct(client, guild, guildTextChannelModel),
             _ => new RestThreadableChannel(client, guild, model)
         };
     }
@@ -91,6 +102,13 @@ public partial class RestThreadableChannel :
     [CovariantOverride]
     public virtual ValueTask UpdateAsync(IThreadableChannelModel model, CancellationToken token = default)
     {
+        Category = Category.UpdateFrom(
+            model.Id,
+            RestCategoryChannelActor.Factory,
+            Client,
+            Actor.Guild.Identity
+        );
+
         _model = model;
 
         return base.UpdateAsync(model, token);

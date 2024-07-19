@@ -3,38 +3,23 @@ using Discord.Models.Json;
 
 namespace Discord.Rest.Guilds;
 
-public sealed partial class RestLoadableBanActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    BanIdentity ban
-):
-    RestBanActor(client, guild, ban),
-    ILoadableBanActor
-{
-    [ProxyInterface(typeof(ILoadableEntity<IBan>))]
-    internal RestLoadable<ulong, RestBan, IBan, IBanModel> Loadable { get; } =
-        RestLoadable<ulong, RestBan, IBan, IBanModel>.FromContextConstructable<RestBan, GuildIdentity>(
-            client,
-            ban,
-            (guild, id) => Routes.GetGuildBan(guild.Id, id),
-            guild
-        );
-}
-
 [ExtendInterfaceDefaults(typeof(IBanActor))]
-public partial class RestBanActor(
+public sealed partial class RestBanActor(
     DiscordRestClient client,
     GuildIdentity guild,
-    BanIdentity ban
+    BanIdentity ban,
+    UserIdentity? user = null
 ) :
     RestActor<ulong, RestBan, BanIdentity>(client, ban),
     IBanActor
 {
-    [SourceOfTruth]
-    public RestLoadableGuildActor Guild { get; } = new(client, guild);
+    [SourceOfTruth] public RestGuildActor Guild { get; } = new(client, guild);
+
+    [SourceOfTruth] public RestUserActor User { get; } = new(client, user ?? UserIdentity.Of(ban.Id));
 
     [SourceOfTruth]
-    public RestLoadableUserActor User { get; } = new(client, UserIdentity.Of(ban.Id));
+    internal RestBan CreateEntity(IBanModel model)
+        => RestBan.Construct(Client, Guild.Identity, model);
 }
 
 public sealed partial class RestBan :
@@ -42,12 +27,16 @@ public sealed partial class RestBan :
     IBan,
     IContextConstructable<RestBan, IBanModel, GuildIdentity, DiscordRestClient>
 {
+    public string? Reason => Model.Reason;
+
     [ProxyInterface(
         typeof(IBanActor),
         typeof(IUserRelationship),
-        typeof(IGuildRelationship)
+        typeof(IGuildRelationship),
+        typeof(IEntityProvider<IBan, IBanModel>)
     )]
     internal RestBanActor Actor { get; }
+
     internal IBanModel Model { get; private set; }
 
     public RestBan(DiscordRestClient client,
@@ -55,11 +44,16 @@ public sealed partial class RestBan :
         IBanModel model,
         RestBanActor? actor = null) : base(client, model.UserId)
     {
-        Actor = actor ?? new(client, guild, BanIdentity.Of(this));
+        Actor = actor ?? new(
+            client,
+            guild,
+            BanIdentity.Of(this),
+            UserIdentity.FromReferenced<RestUser, DiscordRestClient>(model, model.UserId, client)
+        );
         Model = model;
     }
 
-    public static RestBan Construct(DiscordRestClient client, IBanModel model, GuildIdentity guild)
+    public static RestBan Construct(DiscordRestClient client, GuildIdentity guild, IBanModel model)
         => new(client, guild, model);
 
     public ValueTask UpdateAsync(IBanModel model, CancellationToken token = default)
@@ -69,7 +63,4 @@ public sealed partial class RestBan :
     }
 
     public IBanModel GetModel() => Model;
-
-    public string? Reason => Model.Reason;
-
 }

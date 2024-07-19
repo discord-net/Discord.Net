@@ -5,13 +5,10 @@ namespace Discord;
 /// <summary>
 ///     Represents a partial interaction within a message.
 /// </summary>
-public interface IMessageInteractionMetadata : IUpdatable<IMessageInteractionMetadataModel>
+public interface IMessageInteractionMetadata :
+    ISnowflakeEntity<IMessageInteractionMetadataModel>,
+    IUpdatable<IMessageInteractionMetadataModel>
 {
-    /// <summary>
-    ///     Gets the snowflake id of the interaction.
-    /// </summary>
-    ulong Id { get; }
-
     /// <summary>
     ///     Gets the type of the interaction.
     /// </summary>

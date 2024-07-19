@@ -5,6 +5,7 @@ using Discord.Rest.Guilds;
 
 namespace Discord.Rest.Channels;
 
+[method: TypeFactory]
 [ExtendInterfaceDefaults(
     typeof(ITextChannelActor)
 )]
@@ -15,15 +16,17 @@ public partial class RestTextChannelActor(
 ):
     RestThreadableChannelActor(client, guild, channel),
     ITextChannelActor,
-    IActor<ulong, RestTextChannel>
+    IRestActor<ulong, RestTextChannel, TextChannelIdentity>
 {
+    public override TextChannelIdentity Identity { get; } = channel;
+
     [ProxyInterface(typeof(IMessageChannelActor))]
     internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
 
     [SourceOfTruth]
     [CovariantOverride]
-    internal RestTextChannel CreateEntity(IGuildTextChannelModel model)
-        => RestTextChannel.Construct(Client, model, Guild.Identity);
+    internal virtual RestTextChannel CreateEntity(IGuildTextChannelModel model)
+        => RestTextChannel.Construct(Client, Guild.Identity, model);
 }
 
 public partial class RestTextChannel :
@@ -59,7 +62,7 @@ public partial class RestTextChannel :
         Actor = actor ?? new(client, guild, TextChannelIdentity.Of(this));
     }
 
-    public static RestTextChannel Construct(DiscordRestClient client, IGuildTextChannelModel model, GuildIdentity guild)
+    public static RestTextChannel Construct(DiscordRestClient client, GuildIdentity guild, IGuildTextChannelModel model)
         => new(client, guild, model);
 
     [CovariantOverride]

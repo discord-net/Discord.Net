@@ -7,7 +7,7 @@ namespace Discord;
 /// </summary>
 public interface IStickerItem :
     ISnowflakeEntity<IStickerItemModel>,
-    ILoadableEntity<ulong, ISticker>
+    ILoadable<IStickerItem, ulong, ISticker, IStickerModel>
 {
     /// <summary>
     ///     The name of the sticker.
@@ -18,4 +18,7 @@ public interface IStickerItem :
     ///     The format of the sticker.
     /// </summary>
     StickerFormatType Format { get; }
+
+    static IApiOutRoute<IStickerModel> IFetchable<ulong, IStickerModel>.FetchRoute(IPathable path, ulong id)
+        => ISticker.FetchRoute(path, id);
 }

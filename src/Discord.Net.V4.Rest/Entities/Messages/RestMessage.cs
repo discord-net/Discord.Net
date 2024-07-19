@@ -11,27 +11,6 @@ using System.Diagnostics.CodeAnalysis;
 namespace Discord.Rest.Messages;
 
 [method: TypeFactory(LastParameter = nameof(message))]
-public partial class RestLoadableMessageActor(
-    DiscordRestClient client,
-    MessageChannelIdentity channel,
-    MessageIdentity message,
-    GuildIdentity? guild = null
-) :
-    RestMessageActor(client, channel, message, guild),
-    ILoadableMessageActor
-{
-    [RestLoadableActorSource]
-    [ProxyInterface(typeof(ILoadableEntity<IMessage>))]
-    internal RestLoadable<ulong, RestMessage, IMessage, IMessageModel> Loadable { get; } =
-        RestLoadable<ulong, RestMessage, IMessage, IMessageModel>
-            .FromContextConstructable<RestMessage, GuildIdentity?>(
-                client,
-                message,
-                Routes.GetChannelMessage(channel.Id, message.Id),
-                guild
-            );
-}
-
 public partial class RestMessageActor(
     DiscordRestClient client,
     MessageChannelIdentity channel,
@@ -41,12 +20,11 @@ public partial class RestMessageActor(
     RestActor<ulong, RestMessage, MessageIdentity>(client, message),
     IMessageActor
 {
-    [SourceOfTruth]
-    public RestLoadableMessageChannelActor Channel { get; } = new(client, channel, guild);
+    [SourceOfTruth] public RestMessageChannelActor Channel { get; } = new(client, channel, guild);
 
     [SourceOfTruth]
     internal RestMessage CreateEntity(IMessageModel model)
-        => RestMessage.Construct(Client, model, guild);
+        => RestMessage.Construct(Client, guild, model);
 }
 
 public partial class RestMessage :
@@ -55,18 +33,16 @@ public partial class RestMessage :
     IConstructable<RestMessage, IMessageModel, DiscordRestClient>,
     IContextConstructable<RestMessage, IMessageModel, GuildIdentity?, DiscordRestClient>
 {
-    [SourceOfTruth]
-    public RestLoadableUserActor Author { get; }
+    [SourceOfTruth] public RestUserActor Author { get; }
 
-    [SourceOfTruth]
-    public RestLoadableThreadChannelActor? Thread { get; private set; }
+    [SourceOfTruth] public RestThreadChannelActor? Thread { get; private set; }
 
     public IDefinedLoadableEntityEnumerable<ulong, IChannel> MentionedChannels => throw new NotImplementedException();
 
     public IDefinedLoadableEntityEnumerable<ulong, IRole> MentionedRoles => throw new NotImplementedException();
 
     public IDefinedLoadableEntityEnumerable<ulong, IUser> MentionedUsers => throw new NotImplementedException();
-    public ILoadableWebhookActor Webhook => throw new NotImplementedException();
+    public IWebhookActor Webhook => throw new NotImplementedException();
 
     public MessageType Type => (MessageType)Model.Type;
 
@@ -98,19 +74,13 @@ public partial class RestMessage :
 
     public IReadOnlyCollection<IMessageComponent> Components { get; private set; }
 
-    [SourceOfTruth]
-    public IReadOnlyCollection<RestStickerItem> Stickers { get; private set; }
+    [SourceOfTruth] public IReadOnlyCollection<RestStickerItem> Stickers { get; private set; }
 
-    [SourceOfTruth]
-    public RestMessageInteractionMetadata? InteractionMetadata { get; private set; }
+    [SourceOfTruth] public RestMessageInteractionMetadata? InteractionMetadata { get; private set; }
 
     public MessageRoleSubscriptionData? RoleSubscriptionData { get; private set; }
 
-    [ProxyInterface(
-        typeof(IMessageActor),
-        typeof(IMessageChannelRelationship),
-        typeof(IEntityProvider<IMessage, IMessageModel>)
-    )]
+    [ProxyInterface(typeof(IMessageActor))]
     internal virtual RestMessageActor Actor { get; }
 
     internal IMessageModel Model { get; private set; }
@@ -135,6 +105,7 @@ public partial class RestMessage :
             MessageIdentity.Of(this),
             guild
         );
+
         Author = new(
             client,
             UserIdentity.OfNullable(
@@ -160,11 +131,11 @@ public partial class RestMessage :
         Components = model.Components.Select(x => IMessageComponent.Construct(client, x)).ToImmutableArray();
         Stickers = model.Stickers.Select(x => RestStickerItem.Construct(client, x)).ToImmutableArray();
         InteractionMetadata = model.InteractionMetadata is not null
-            ? RestMessageInteractionMetadata.Construct(client, model.InteractionMetadata,
+            ? RestMessageInteractionMetadata.Construct(client,
                 new RestMessageInteractionMetadata.Context(
                     channel ?? MessageChannelIdentity.Of(model.ChannelId),
                     guild
-                ))
+                ), model.InteractionMetadata)
             : null;
         RoleSubscriptionData = model.RoleSubscriptionData is not null
             ? MessageRoleSubscriptionData.Construct(client, model.RoleSubscriptionData)
@@ -178,14 +149,14 @@ public partial class RestMessage :
             : new RestMessage(client, model);
     }
 
-    public static RestMessage Construct(DiscordRestClient client, IMessageModel model, GuildIdentity? guild)
+    public static RestMessage Construct(DiscordRestClient client, GuildIdentity? guild, IMessageModel model)
     {
         return model.IsWebhook
-            ? RestWebhookMessage.Construct(client, model, guild)
+            ? RestWebhookMessage.Construct(client, guild, model)
             : new RestMessage(client, model, guild: guild);
     }
 
-    private static RestLoadableThreadChannelActor? CreateThreadLoadable(
+    private static RestThreadChannelActor? CreateThreadLoadable(
         DiscordRestClient client,
         IMessageModel model,
         GuildIdentity? guild)
@@ -230,9 +201,9 @@ public partial class RestMessage :
 
         return ThreadIdentity.OfNullable(
             threadModel,
-            model => RestThreadChannel.Construct(client, model, new RestThreadChannel.Context(
+            model => RestThreadChannel.Construct(client, new RestThreadChannel.Context(
                 guildIdentityLocal
-            ))
+            ), model)
         ) ?? ThreadIdentity.Of(model.ThreadId.Value);
     }
 
@@ -243,11 +214,9 @@ public partial class RestMessage :
 
         Thread = Thread.UpdateFrom(
             model.ThreadId,
-            RestLoadableThreadChannelActor.Factory,
-            ThreadIdentity.Of,
+            RestThreadChannelActor.Factory,
             Client,
-            _guildIdentity!,
-            Client.CurrentUserThreadMemberIdentity
+            _guildIdentity!
         );
 
         if (!Model.Attachments.SequenceEqual(model.Attachments))
@@ -280,27 +249,13 @@ public partial class RestMessage :
                 ? MessageReference.Construct(Client, model.MessageReference)
                 : null;
 
-        if (!Model.InteractionMetadata?.Equals(model.InteractionMetadata) ?? model.InteractionMetadata is not null)
-        {
-            if (model.InteractionMetadata is not null)
-            {
-                if (InteractionMetadata is null)
-                    InteractionMetadata = RestMessageInteractionMetadata.Construct(
-                        Client,
-                        model.InteractionMetadata,
-                        new RestMessageInteractionMetadata.Context(
-                            Actor.Channel.Loadable.Identity,
-                            _guildIdentity
-                        )
-                    );
-                else
-                    await InteractionMetadata.UpdateAsync(model.InteractionMetadata, token);
-            }
-            else
-            {
-                InteractionMetadata = null;
-            }
-        }
+        InteractionMetadata = await InteractionMetadata.UpdateFromAsync(
+            model.InteractionMetadata,
+            RestMessageInteractionMetadata.Construct,
+            Client,
+            new RestMessageInteractionMetadata.Context(Channel.MessageChannelIdentity, _guildIdentity),
+            token: token
+        );
 
         if (!Model.RoleSubscriptionData?.Equals(model.RoleSubscriptionData) ?? model.RoleSubscriptionData is not null)
             RoleSubscriptionData = model.RoleSubscriptionData is not null

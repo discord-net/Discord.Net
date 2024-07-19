@@ -7,29 +7,8 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Rest.Stickers;
 
-public partial class RestLoadableGuildStickerActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    GuildStickerIdentity sticker
-) :
-    RestGuildStickerActor(client, guild, sticker),
-    ILoadableGuildStickerActor
-{
-    [ProxyInterface(typeof(ILoadableEntity<IGuildSticker>))]
-    internal RestLoadable<ulong, RestGuildSticker, IGuildSticker, IGuildStickerModel> Loadable { get; }
-        = RestLoadable<ulong, RestGuildSticker, IGuildSticker, IGuildStickerModel>
-            .FromContextConstructable<RestGuildSticker, GuildIdentity>(
-                client,
-                sticker,
-                (guild, id) => Routes.GetGuildSticker(guild.Id, id),
-                guild
-            );
-}
-
-[ExtendInterfaceDefaults(
-    typeof(IGuildStickerActor),
-    typeof(IDeletable<ulong, IGuildStickerActor>)
-)]
+[method: TypeFactory]
+[ExtendInterfaceDefaults(typeof(IGuildStickerActor))]
 public partial class RestGuildStickerActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -39,11 +18,11 @@ public partial class RestGuildStickerActor(
     IGuildStickerActor
 {
     [SourceOfTruth]
-    public RestLoadableGuildActor Guild { get; } = new(client, guild);
+    public RestGuildActor Guild { get; } = new(client, guild);
 
     [SourceOfTruth]
     internal RestGuildSticker CreateEntity(IGuildStickerModel model)
-        => RestGuildSticker.Construct(Client, model, Guild.Identity);
+        => RestGuildSticker.Construct(Client, Guild.Identity, model);
 }
 
 public sealed partial class RestGuildSticker :
@@ -51,7 +30,8 @@ public sealed partial class RestGuildSticker :
     IGuildSticker,
     IContextConstructable<RestGuildSticker, IGuildStickerModel, GuildIdentity, DiscordRestClient>
 {
-    public RestLoadableGuildMemberActor? Author { get; private set; }
+    [SourceOfTruth]
+    public RestGuildMemberActor? Author { get; private set; }
 
     public bool? IsAvailable => Model.Available;
 
@@ -79,7 +59,7 @@ public sealed partial class RestGuildSticker :
 
         Author = model.AuthorId.Map(
             static (id, client, guild, model)
-                => new RestLoadableGuildMemberActor(
+                => new RestGuildMemberActor(
                     client,
                     guild,
                     MemberIdentity.Of(id),
@@ -91,7 +71,7 @@ public sealed partial class RestGuildSticker :
         );
     }
 
-    public static RestGuildSticker Construct(DiscordRestClient client, IGuildStickerModel model, GuildIdentity guild)
+    public static RestGuildSticker Construct(DiscordRestClient client, GuildIdentity guild, IGuildStickerModel model)
         => new(client, guild, model);
 
     [CovariantOverride]
@@ -99,8 +79,7 @@ public sealed partial class RestGuildSticker :
     {
         Author = Author.UpdateFrom(
             model.AuthorId,
-            RestLoadableGuildMemberActor.Factory,
-            MemberIdentity.Of,
+            RestGuildMemberActor.Factory,
             Client,
             Actor.Guild.Identity,
             model.AuthorId.Map(
@@ -117,6 +96,4 @@ public sealed partial class RestGuildSticker :
     }
 
     public override IGuildStickerModel GetModel() => Model;
-
-    ILoadableGuildMemberActor? IGuildSticker.Author => Author;
 }

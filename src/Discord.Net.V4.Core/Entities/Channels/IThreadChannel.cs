@@ -17,7 +17,7 @@ public partial interface IThreadChannel :
     [SourceOfTruth]
     new IThreadChannelModel GetModel();
 
-    IUserActor? Owner { get; }
+    IUserActor Creator { get; }
 
     /// <summary>
     ///     Gets the type of the current thread channel.

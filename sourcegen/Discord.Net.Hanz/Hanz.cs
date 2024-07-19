@@ -14,11 +14,14 @@ public sealed class Hanz : IIncrementalGenerator
 
     public record struct LoggingOptions(string FilePath, LogLevel Level);
 
-    private readonly MethodInfo _registerTaskMethod = typeof(Hanz).GetMethods(BindingFlags.Static | BindingFlags.Public).First(x => x.Name.StartsWith("RegisterTask"));
-    private readonly MethodInfo _registerCombineTaskMethod = typeof(Hanz).GetMethods(BindingFlags.Static | BindingFlags.Public).First(x => x.Name.StartsWith("RegisterCombineTask"));
+    private readonly MethodInfo _registerTaskMethod = typeof(Hanz).GetMethods(BindingFlags.Static | BindingFlags.Public)
+        .First(x => x.Name.StartsWith("RegisterTask"));
+
+    private readonly MethodInfo _registerCombineTaskMethod = typeof(Hanz)
+        .GetMethods(BindingFlags.Static | BindingFlags.Public).First(x => x.Name.StartsWith("RegisterCombineTask"));
 
     public static void RegisterTask<T>(IncrementalGeneratorInitializationContext context, IGenerationTask<T> task)
-        where T : class
+        where T : class, IEquatable<T>
     {
         var provider = context.SyntaxProvider.CreateSyntaxProvider(
             predicate: task.IsValid,
@@ -30,8 +33,9 @@ public sealed class Hanz : IIncrementalGenerator
         Logger.Log($"Registered {task.GetType().Name} task");
     }
 
-    public static void RegisterCombineTask<T>(IncrementalGeneratorInitializationContext context, IGenerationCombineTask<T> task)
-        where T : class
+    public static void RegisterCombineTask<T>(IncrementalGeneratorInitializationContext context,
+        IGenerationCombineTask<T> task)
+        where T : class, IEquatable<T>
     {
         var provider = context.SyntaxProvider.CreateSyntaxProvider(
             predicate: task.IsValid,
@@ -69,10 +73,10 @@ public sealed class Hanz : IIncrementalGenerator
 
             if (generationInterface is null) continue;
 
-            if(generationInterface.GetGenericTypeDefinition() == typeof(IGenerationTask<>))
+            if (generationInterface.GetGenericTypeDefinition() == typeof(IGenerationTask<>))
                 _registerTaskMethod.MakeGenericMethod(generationInterface.GenericTypeArguments[0])
                     .Invoke(null, [context, Activator.CreateInstance(task)]);
-            else if(generationInterface.GetGenericTypeDefinition() == typeof(IGenerationCombineTask<>))
+            else if (generationInterface.GetGenericTypeDefinition() == typeof(IGenerationCombineTask<>))
                 _registerCombineTaskMethod.MakeGenericMethod(generationInterface.GenericTypeArguments[0])
                     .Invoke(null, [context, Activator.CreateInstance(task)]);
         }

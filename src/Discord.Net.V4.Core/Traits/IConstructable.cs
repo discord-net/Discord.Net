@@ -19,7 +19,7 @@ public interface IContextConstructable<out TSelf, in TModel, in TContext, in TCl
     where TSelf : IContextConstructable<TSelf, TModel, TContext, TClient>
     where TClient : IDiscordClient
 {
-    static abstract TSelf Construct(TClient client, TModel model, TContext context);
+    static abstract TSelf Construct(TClient client, TContext context, TModel model);
 }
 
 #pragma warning restore CA2252

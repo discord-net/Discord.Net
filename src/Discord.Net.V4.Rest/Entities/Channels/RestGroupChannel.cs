@@ -3,23 +3,22 @@ using Discord.Models.Json;
 
 namespace Discord.Rest.Channels;
 
+[method: TypeFactory]
 [ExtendInterfaceDefaults(
     typeof(IGroupChannelActor)
 )]
-public partial class RestGroupChannelActor :
-    RestChannelActor,
-    IGroupChannelActor
+public partial class RestGroupChannelActor(
+    DiscordRestClient client,
+    GroupChannelIdentity channel
+) :
+    RestChannelActor(client, channel),
+    IGroupChannelActor,
+    IRestActor<ulong, RestGroupChannel, GroupChannelIdentity>
 {
-    [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; }
+    public override GroupChannelIdentity Identity { get; } = channel;
 
-    internal RestGroupChannelActor(
-        DiscordRestClient client,
-        IdentifiableEntityOrModel<ulong, RestGroupChannel, IGroupDMChannelModel> channel
-    ) : base(client, channel)
-    {
-        MessageChannelActor = new RestMessageChannelActor(client, channel);
-    }
+    [ProxyInterface(typeof(IMessageChannelActor))]
+    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
 
     [SourceOfTruth]
     internal RestGroupChannel CreateEntity(IGroupDMChannelModel model)
@@ -33,14 +32,14 @@ public partial class RestGroupChannel :
 {
     public IDefinedLoadableEntityEnumerable<ulong, IUser> Recipients => throw new NotImplementedException();
 
-    internal override IGroupDMChannelModel Model => _model;
-
     [ProxyInterface(
         typeof(IGroupChannelActor),
         typeof(IMessageChannelActor),
         typeof(IEntityProvider<IGroupChannel, IGroupDMChannelModel>)
     )]
     internal override RestGroupChannelActor Actor { get; }
+
+    internal override IGroupDMChannelModel Model => _model;
 
     private IGroupDMChannelModel _model;
 
@@ -51,7 +50,7 @@ public partial class RestGroupChannel :
     ) : base(client, model)
     {
         _model = model;
-        Actor = actor ?? new(client, this);
+        Actor = actor ?? new(client, GroupChannelIdentity.Of(this));
     }
 
     public static RestGroupChannel Construct(DiscordRestClient client, IGroupDMChannelModel model)

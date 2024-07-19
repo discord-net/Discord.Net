@@ -24,12 +24,44 @@ public class RestModifiable : IGenerationCombineTask<RestModifiable.GenerationTa
         INamedTypeSymbol classSymbol,
         INamedTypeSymbol[] interfaceSymbols,
         SemanticModel semanticModel
-    )
+    ) : IEquatable<GenerationTarget>
     {
         public ClassDeclarationSyntax ClassDeclaration { get; } = classDeclaration;
         public INamedTypeSymbol ClassSymbol { get; } = classSymbol;
         public INamedTypeSymbol[] InterfaceSymbols { get; } = interfaceSymbols;
         public SemanticModel SemanticModel { get; } = semanticModel;
+
+        public bool Equals(GenerationTarget? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return ClassDeclaration.IsEquivalentTo(other.ClassDeclaration) &&
+                   ClassSymbol.Equals(other.ClassSymbol, SymbolEqualityComparer.Default) &&
+                   InterfaceSymbols.SequenceEqual(other.InterfaceSymbols, SymbolEqualityComparer.Default);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((GenerationTarget)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = ClassDeclaration.GetHashCode();
+                hashCode = (hashCode * 397) ^ SymbolEqualityComparer.Default.GetHashCode(ClassSymbol);
+                hashCode = (hashCode * 397) ^ InterfaceSymbols.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(GenerationTarget? left, GenerationTarget? right) => Equals(left, right);
+
+        public static bool operator !=(GenerationTarget? left, GenerationTarget? right) => !Equals(left, right);
     }
 
     public bool IsValid(SyntaxNode node, CancellationToken token)
@@ -59,7 +91,8 @@ public class RestModifiable : IGenerationCombineTask<RestModifiable.GenerationTa
         );
     }
 
-    private static ITypeSymbol? ResolveActorEntityType(INamedTypeSymbol actor, ClassDeclarationSyntax syntax, SemanticModel semanticModel)
+    private static ITypeSymbol? ResolveActorEntityType(INamedTypeSymbol actor, ClassDeclarationSyntax syntax,
+        SemanticModel semanticModel)
     {
         var actorInterface = actor.Interfaces.FirstOrDefault(x => x.ToDisplayString().StartsWith("Discord.IActor"));
 
@@ -92,7 +125,8 @@ public class RestModifiable : IGenerationCombineTask<RestModifiable.GenerationTa
             if (target is null) continue;
 
             var baseTarget = targets.FirstOrDefault(x =>
-                target.ClassSymbol.BaseType is not null && (x?.ClassSymbol.Equals(target.ClassSymbol.BaseType, SymbolEqualityComparer.Default) ?? false)
+                target.ClassSymbol.BaseType is not null &&
+                (x?.ClassSymbol.Equals(target.ClassSymbol.BaseType, SymbolEqualityComparer.Default) ?? false)
             );
 
             GenerateModifyForClass(context, target, baseTarget);
@@ -161,6 +195,7 @@ public class RestModifiable : IGenerationCombineTask<RestModifiable.GenerationTa
             ]);
 
             #region ModifyAsync
+
             declaration = declaration.AddMembers(
                 MethodDeclaration(
                     [],
@@ -270,6 +305,7 @@ public class RestModifiable : IGenerationCombineTask<RestModifiable.GenerationTa
                     null
                 )
             );
+
             #endregion
         }
 

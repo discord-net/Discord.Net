@@ -3,10 +3,8 @@ using Discord.Models.Json;
 
 namespace Discord.Rest.Guilds;
 
-[ExtendInterfaceDefaults(
-    typeof(IRoleActor),
-    typeof(IDeletable<ulong, IRoleActor>)
-)]
+[method: TypeFactory]
+[ExtendInterfaceDefaults(typeof(IRoleActor))]
 public partial class RestRoleActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -16,11 +14,11 @@ public partial class RestRoleActor(
     IRoleActor
 {
     [SourceOfTruth]
-    public RestLoadableGuildActor Guild { get; } = new(client, guild);
+    public RestGuildActor Guild { get; } = new(client, guild);
 
     [SourceOfTruth]
     internal RestRole CreateEntity(IRoleModel model)
-        => RestRole.Construct(Client, model, Guild.Identity);
+        => RestRole.Construct(Client, Guild.Identity, model);
 }
 
 
@@ -79,7 +77,7 @@ public sealed partial class RestRole :
             : null;
     }
 
-    public static RestRole Construct(DiscordRestClient client, IRoleModel model, GuildIdentity context)
+    public static RestRole Construct(DiscordRestClient client, GuildIdentity context, IRoleModel model)
         => new(client, context, model);
 
     public ValueTask UpdateAsync(IRoleModel model, CancellationToken token = default)

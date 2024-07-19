@@ -4,31 +4,9 @@ using Discord.Rest.Guilds;
 
 namespace Discord.Rest;
 
-public sealed partial class RestLoadableThreadMemberActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    ThreadIdentity thread,
-    ThreadMemberIdentity threadMember,
-    MemberIdentity? member = null,
-    UserIdentity? user = null
-) :
-    RestThreadMemberActor(client, guild, thread, threadMember, member, user),
-    ILoadableThreadMemberActor
-{
-    [RestLoadableActorSource]
-    [ProxyInterface(typeof(ILoadableEntity<IThreadMember>))]
-    internal RestLoadable<ulong, RestThreadMember, IThreadMember, IThreadMemberModel> Loadable { get; }
-        = RestLoadable<ulong, RestThreadMember, IThreadMember, IThreadMemberModel>
-            .FromContextConstructable<RestThreadMember, RestThreadMember.Context>(
-                client,
-                threadMember,
-                Routes.GetThreadMember(thread.Id, threadMember.Id, true),
-                new RestThreadMember.Context(guild, thread, member, user)
-            );
-}
-
+[method: TypeFactory(LastParameter = nameof(threadMember))]
 [ExtendInterfaceDefaults(typeof(IThreadMemberActor))]
-public partial class RestThreadMemberActor(
+public sealed partial class RestThreadMemberActor(
     DiscordRestClient client,
     GuildIdentity guild,
     ThreadIdentity thread,
@@ -40,16 +18,22 @@ public partial class RestThreadMemberActor(
     IThreadMemberActor
 {
     [SourceOfTruth]
-    public RestLoadableThreadChannelActor Thread { get; } =
+    public RestThreadChannelActor Thread { get; } =
         new(client, guild, thread, threadMember);
 
     [SourceOfTruth]
-    public RestLoadableGuildMemberActor Member { get; } =
+    public RestGuildMemberActor Member { get; } =
         new(client, guild, member ?? MemberIdentity.Of(threadMember.Id));
 
     [SourceOfTruth]
-    public RestLoadableUserActor User { get; } =
+    public RestUserActor User { get; } =
         new(client, user ?? UserIdentity.Of(threadMember.Id));
+
+    [SourceOfTruth]
+    internal RestThreadMember CreateEntity(IThreadMemberModel model)
+        => RestThreadMember.Construct(Client, new RestThreadMember.Context(
+            guild, thread, member, user
+        ), model);
 }
 
 public sealed partial class RestThreadMember :
@@ -72,7 +56,8 @@ public sealed partial class RestThreadMember :
         typeof(IThreadMemberActor),
         typeof(IThreadRelationship),
         typeof(IMemberRelationship),
-        typeof(IUserRelationship)
+        typeof(IUserRelationship),
+        typeof(IEntityProvider<IThreadMember, IThreadMemberModel>)
     )]
     internal RestThreadMemberActor Actor { get; }
 
@@ -97,7 +82,7 @@ public sealed partial class RestThreadMember :
         );
     }
 
-    public static RestThreadMember Construct(DiscordRestClient client, IThreadMemberModel model, Context context)
+    public static RestThreadMember Construct(DiscordRestClient client, Context context, IThreadMemberModel model)
         => new(
             client,
             context.Guild,

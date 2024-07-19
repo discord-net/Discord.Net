@@ -6,13 +6,13 @@ public static class Hierarchy
 {
     private static readonly Dictionary<ITypeSymbol, List<SortedHierarchySymbol>> _cache = new(SymbolEqualityComparer.Default);
 
-    public readonly struct SortedHierarchySymbol(int distance, INamedTypeSymbol @interface)
+    public readonly struct SortedHierarchySymbol(int distance, INamedTypeSymbol type)
     {
         public readonly int Distance = distance;
-        public readonly INamedTypeSymbol Interface = @interface;
+        public readonly INamedTypeSymbol Type = type;
     }
 
-    public static List<SortedHierarchySymbol> GetInterfaceHierarchy(ITypeSymbol symbol)
+    public static List<SortedHierarchySymbol> GetHierarchy(ITypeSymbol symbol)
     {
         return _cache.TryGetValue(symbol, out var cached)
             ? cached
@@ -28,15 +28,16 @@ public static class Hierarchy
     {
         if (symbol.BaseType is not null)
         {
-            foreach (var extendedIface in MapHierarchy(symbol.BaseType, depth + 1))
-                yield return extendedIface;
+            yield return new SortedHierarchySymbol(depth, symbol.BaseType);
+            foreach (var extended in MapHierarchy(symbol.BaseType, depth + 1))
+                yield return extended;
         }
 
         foreach (var iface in symbol.Interfaces)
         {
             yield return new SortedHierarchySymbol(depth, iface);
-            foreach (var extendedIface in MapHierarchy(iface, depth + 1))
-                yield return extendedIface;
+            foreach (var extended in MapHierarchy(iface, depth + 1))
+                yield return extended;
         }
     }
 }

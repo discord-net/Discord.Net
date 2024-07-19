@@ -36,7 +36,7 @@ internal static partial class RestActors
             args => route(channel.Id, args.Before, args.PageSize),
             (_, model) => model.Threads
                 .OfType<IThreadChannelModel>()
-                .Select(x => RestThreadChannel.Construct(client, x, new(guild))),
+                .Select(x => RestThreadChannel.Construct(client, new(guild), x)),
             (_, model, args) =>
             {
                 if (!model.HasMore)

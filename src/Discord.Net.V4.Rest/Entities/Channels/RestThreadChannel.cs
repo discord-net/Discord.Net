@@ -8,63 +8,38 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
-[method: TypeFactory(LastParameter = nameof(thread))]
-public sealed partial class RestLoadableThreadChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    ThreadableChannelIdentity parent,
-    ThreadIdentity thread,
-    ThreadMemberIdentity? currentThreadMember = null
-) :
-    RestThreadChannelActor(client, guild, parent, thread, currentThreadMember),
-    ILoadableThreadChannelActor
-{
-    [RestLoadableActorSource]
-    [ProxyInterface(typeof(ILoadableEntity<IThreadChannel>))]
-    public RestLoadable<ulong, RestThreadChannel, IThreadChannel, IChannelModel> Loadable { get; } =
-        new(
-            client,
-            thread,
-            Routes.GetChannel(thread.Id),
-            EntityUtils.FactoryOfDescendantModel<ulong, IChannelModel, RestThreadChannel, IThreadChannelModel>(
-                (_, thread) => RestThreadChannel.Construct(client, thread, new(guild))
-            ).Invoke
-        );
-}
-
+[method: TypeFactory]
 [ExtendInterfaceDefaults]
 public partial class RestThreadChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
-    ThreadableChannelIdentity parent,
     ThreadIdentity thread,
     ThreadMemberIdentity? currentThreadMember = null
-) :
+):
     RestGuildChannelActor(client, guild, thread),
     IThreadChannelActor,
-    IActor<ulong, RestThreadChannel>
+    IRestActor<ulong, RestThreadChannel, ThreadIdentity>
 {
+    public override ThreadIdentity Identity { get; } = thread;
+
     [ProxyInterface(typeof(IMessageChannelActor))]
     internal RestMessageChannelActor MessageChannelActor { get; } = new(client, thread);
 
     [SourceOfTruth]
-    public RestLoadableThreadMemberActor CurrentThreadMember { get; } =
+    public RestThreadMemberActor CurrentThreadMember { get; } =
         new(client, guild, thread, currentThreadMember ?? ThreadMemberIdentity.Of(client.SelfUser.Id));
 
-    public IEnumerableIndexableActor<ILoadableThreadMemberActor, ulong, IThreadMember> ThreadMembers =>
+    public IEnumerableIndexableActor<IThreadMemberActor, ulong, IThreadMember> ThreadMembers =>
         throw new NotImplementedException();
 
-    [SourceOfTruth]
-    public RestLoadableThreadableChannelActor Parent { get; } =
-        new(client, guild, parent);
 
     [SourceOfTruth]
     [CovariantOverride]
     internal RestThreadChannel CreateEntity(IThreadChannelModel model)
-        => RestThreadChannel.Construct(Client, model, new RestThreadChannel.Context(
+        => RestThreadChannel.Construct(Client, new RestThreadChannel.Context(
             Guild.Identity,
             CurrentThreadMember.Identity
-        ));
+        ), model);
 }
 
 public partial class RestThreadChannel :
@@ -78,11 +53,11 @@ public partial class RestThreadChannel :
         ThreadableChannelIdentity? Parent = null
     );
 
-    #region Properties
+    [SourceOfTruth]
+    public RestThreadableChannelActor Parent { get; }
 
-    public RestLoadableThreadableChannelActor Parent { get; }
-
-    public RestLoadableUserActor? Owner { get; private set; }
+    [SourceOfTruth]
+    public RestUserActor Creator { get; }
 
     public new ThreadType Type => (ThreadType)Model.Type;
 
@@ -106,8 +81,6 @@ public partial class RestThreadChannel :
 
     public DateTimeOffset CreatedAt => Model.CreatedAt ?? SnowflakeUtils.FromSnowflake(Id);
 
-    #endregion
-
     [ProxyInterface(
         typeof(IThreadChannelActor),
         typeof(IThreadMemberRelationship),
@@ -130,24 +103,27 @@ public partial class RestThreadChannel :
     ) : base(client, guild, model, actor)
     {
         _model = model;
+
         Actor = actor ?? new(
             client,
             guild,
-            parent ?? ThreadableChannelIdentity.Of(model.ParentId),
             ThreadIdentity.Of(this),
             currentThreadMember ?? GetCurrentThreadMemberIdentity(client, guild, ThreadIdentity.Of(this), model)
         );
+
         Parent = new(
             client,
             guild,
             parent ?? ThreadableChannelIdentity.Of(model.ParentId)
         );
-        Owner = model.OwnerId.HasValue ? new(client, UserIdentity.Of(model.OwnerId.Value)) : null;
+
+        Creator = new RestUserActor(client, UserIdentity.Of(model.OwnerId));
+
         AppliedTags = model.AppliedTags.ToImmutableArray();
     }
 
 
-    public static RestThreadChannel Construct(DiscordRestClient client, IThreadChannelModel model, Context context)
+    public static RestThreadChannel Construct(DiscordRestClient client, Context context, IThreadChannelModel model)
         => new(client, context.Guild ?? GuildIdentity.Of(model.GuildId), model, currentThreadMember: context.CurrentThreadMember, parent: context.Parent);
 
     [CovariantOverride]
@@ -155,15 +131,6 @@ public partial class RestThreadChannel :
     {
         if (!AppliedTags.SequenceEqual(model.AppliedTags))
             AppliedTags = model.AppliedTags.ToImmutableArray();
-
-        Parent.Loadable.Id = model.ParentId!;
-
-        Owner = Owner.UpdateFrom(
-            model.OwnerId,
-            RestLoadableUserActor.Factory,
-            UserIdentity.Of,
-            Client
-        );
 
         _model = model;
 
@@ -180,13 +147,10 @@ public partial class RestThreadChannel :
     {
         return ThreadMemberIdentity.OfNullable(
             model?.GetReferencedEntityModel<ulong, IThreadMemberModel>(client.SelfUser.Id),
-            model => RestThreadMember.Construct(client, model, new RestThreadMember.Context(
+            model => RestThreadMember.Construct(client, new RestThreadMember.Context(
                 guild,
                 thread
-            ))
+            ), model)
         ) ?? ThreadMemberIdentity.Of(client.SelfUser.Id);
     }
-
-    ILoadableUserActor? IThreadChannel.Owner => Owner;
-    ILoadableThreadableChannelActor IThreadableRelationship.Parent => Parent;
 }

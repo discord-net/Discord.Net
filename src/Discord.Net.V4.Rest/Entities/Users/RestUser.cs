@@ -4,6 +4,7 @@ using Discord.Rest.Actors;
 
 namespace Discord.Rest;
 
+[method: TypeFactory]
 [ExtendInterfaceDefaults(typeof(IUserActor))]
 public partial class RestUserActor(
     DiscordRestClient client,
@@ -13,7 +14,7 @@ public partial class RestUserActor(
     IUserActor
 {
     [SourceOfTruth]
-    internal RestUser CreateEntity(IUserModel model)
+    internal virtual RestUser CreateEntity(IUserModel model)
         => RestUser.Construct(Client, model);
 }
 

@@ -4,22 +4,7 @@ using Discord.Rest.Guilds;
 
 namespace Discord.Rest.Channels;
 
-// public partial class RestLoadableChannelActor(
-//     DiscordRestClient client,
-//     ChannelIdentity channel
-// ):
-//     RestChannelActor(client, channel),
-//     ILoadableChannelActor
-// {
-//     [ProxyInterface(typeof(ILoadableEntity<IChannel>))]
-//     internal RestLoadable<ulong, RestChannel, IChannel, IChannelModel> Loadable { get; } =
-//         RestLoadable<ulong, RestChannel, IChannel, IChannelModel>.FromConstructable<RestChannel>(
-//             client,
-//             channel,
-//             Routes.GetChannel
-//         );
-// }
-
+[method: TypeFactory]
 [ExtendInterfaceDefaults(typeof(IChannelActor))]
 public partial class RestChannelActor(
     DiscordRestClient client,
@@ -41,13 +26,13 @@ public partial class RestChannel :
 {
     public ChannelType Type => (ChannelType)Model.Type;
 
-    internal virtual IChannelModel Model => _model;
-
     [ProxyInterface(
         typeof(IChannelActor),
         typeof(IEntityProvider<IChannel, IChannelModel>)
     )]
     internal virtual RestChannelActor Actor { get; }
+
+    internal virtual IChannelModel Model => _model;
 
     private IChannelModel _model;
 
@@ -68,16 +53,15 @@ public partial class RestChannel :
         {
             DMChannelModel dmChannelModel => RestDMChannel.Construct(client, dmChannelModel),
             GroupDMChannelModel groupDMChannel => RestGroupChannel.Construct(client, groupDMChannel),
-            GuildChannelModelBase guildChannelBase => Construct(client, model,
-                GuildIdentity.Of(guildChannelBase.GuildId)),
+            GuildChannelModelBase guildChannelBase => Construct(client,
+                GuildIdentity.Of(guildChannelBase.GuildId), model),
             _ => new RestChannel(client, model)
         };
     }
 
-    public static RestChannel Construct(
-        DiscordRestClient client,
-        IChannelModel model,
-        GuildIdentity? guild)
+    public static RestChannel Construct(DiscordRestClient client,
+        GuildIdentity? guild,
+        IChannelModel model)
     {
         switch (guild)
         {
@@ -93,24 +77,20 @@ public partial class RestChannel :
         {
             IGuildChannelModel guildChannel => guildChannel switch
             {
-                IGuildNewsChannelModel guildAnnouncementChannel => RestNewsChannel.Construct(client,
-                    guildAnnouncementChannel, guild),
+                IGuildNewsChannelModel guildAnnouncementChannel => RestNewsChannel.Construct(client, guild, guildAnnouncementChannel),
                 IGuildCategoryChannelModel guildCategoryChannel => RestCategoryChannel.Construct(client,
-                    guildCategoryChannel,
-                    guild),
+                    guild, guildCategoryChannel),
                 IGuildDirectoryChannel guildDirectoryChannel => RestGuildChannel.Construct(client,
-                    guildDirectoryChannel,
-                    guild),
-                IGuildForumChannelModel guildForumChannel => RestForumChannel.Construct(client, guildForumChannel,
-                    guild),
-                IGuildMediaChannelModel guildMediaChannel => RestMediaChannel.Construct(client, guildMediaChannel,
-                    guild),
-                IGuildStageChannelModel guildStageVoiceChannel => RestStageChannel.Construct(client,
-                    guildStageVoiceChannel, guild),
-                IGuildVoiceChannelModel guildVoiceChannel => RestVoiceChannel.Construct(client, guildVoiceChannel,
-                    guild),
-                IThreadChannelModel threadChannel => RestThreadChannel.Construct(client, threadChannel, new(guild)),
-                IGuildTextChannelModel guildTextChannel => RestTextChannel.Construct(client, guildTextChannel, guild),
+                    guild, guildDirectoryChannel),
+                IGuildForumChannelModel guildForumChannel => RestForumChannel.Construct(client,
+                    guild, guildForumChannel),
+                IGuildMediaChannelModel guildMediaChannel => RestMediaChannel.Construct(client,
+                    guild, guildMediaChannel),
+                IGuildStageChannelModel guildStageVoiceChannel => RestStageChannel.Construct(client, guild, guildStageVoiceChannel),
+                IGuildVoiceChannelModel guildVoiceChannel => RestVoiceChannel.Construct(client,
+                    guild, guildVoiceChannel),
+                IThreadChannelModel threadChannel => RestThreadChannel.Construct(client, new(guild), threadChannel),
+                IGuildTextChannelModel guildTextChannel => RestTextChannel.Construct(client, guild, guildTextChannel),
                 _ => throw new ArgumentOutOfRangeException(nameof(guildChannel))
             },
             _ => Construct(client, model)

@@ -51,9 +51,8 @@ public interface IMessageRoleSubscriptionData
 }
 
 [ModelEquality]
-public partial interface IMessageInteractionMetadataModel : IEntityModel
+public partial interface IMessageInteractionMetadataModel : IEntityModel<ulong>
 {
-    ulong Id { get; }
     int Type { get; }
     ulong UserId { get; }
     IDictionary<int, ulong> AuthorizingIntegrationOwners { get; }

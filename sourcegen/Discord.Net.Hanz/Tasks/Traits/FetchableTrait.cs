@@ -112,13 +112,18 @@ public static class FetchableTrait
                             Identifier("path"),
                             null
                         ),
-                        Parameter(
-                            [],
-                            [],
-                            ParseTypeName(idType.ToDisplayString()),
-                            Identifier("id"),
-                            null
-                        ),
+                        ..fetchMethod == "FetchRoute"
+                            ? (ParameterSyntax[])
+                            [
+                                Parameter(
+                                    [],
+                                    [],
+                                    ParseTypeName(idType.ToDisplayString()),
+                                    Identifier("id"),
+                                    null
+                                )
+                            ]
+                            : [],
                         ..extraParameters.Select(x =>
                             Parameter(
                                 [],
@@ -145,7 +150,9 @@ public static class FetchableTrait
             ArgumentList(
                 SeparatedList([
                     Argument(IdentifierName("path")),
-                    Argument(IdentifierName("id")),
+                    ..fetchMethod == "FetchRoute"
+                        ? (ArgumentSyntax[]) [Argument(IdentifierName("id"))]
+                        : [],
                     ..extraParameters.Select(x =>
                         Argument(
                             NameColon(x.Key.Name),
@@ -180,13 +187,18 @@ public static class FetchableTrait
                                 Identifier("path"),
                                 null
                             ),
-                            Parameter(
-                                [],
-                                [],
-                                ParseTypeName(idType.ToDisplayString()),
-                                Identifier("id"),
-                                null
-                            )
+                            ..fetchMethod == "FetchRoute"
+                                ? (ParameterSyntax[])
+                                [
+                                    Parameter(
+                                        [],
+                                        [],
+                                        ParseTypeName(idType.ToDisplayString()),
+                                        Identifier("id"),
+                                        null
+                                    )
+                                ]
+                                : [],
                         ])
                     ),
                     [],
@@ -214,6 +226,11 @@ public static class FetchableTrait
 
             if (baseModel is null)
                 continue;
+
+            if (
+                !baseModel.Equals(modelType, SymbolEqualityComparer.Default) &&
+                !target.SemanticModel.Compilation.HasImplicitConversion(modelType, baseModel)
+            ) continue;
 
             var baseModelSyntax = ParseTypeName(baseModel.ToDisplayString());
 
@@ -268,13 +285,18 @@ public static class FetchableTrait
                                 Identifier("path"),
                                 null
                             ),
-                            Parameter(
-                                [],
-                                [],
-                                ParseTypeName(idType.ToDisplayString()),
-                                Identifier("id"),
-                                null
-                            )
+                            ..fetchMethod == "FetchRoute"
+                                ? (ParameterSyntax[])
+                                [
+                                    Parameter(
+                                        [],
+                                        [],
+                                        ParseTypeName(idType.ToDisplayString()),
+                                        Identifier("id"),
+                                        null
+                                    )
+                                ]
+                                : [],
                         ])
                     ),
                     [],
@@ -353,7 +375,8 @@ public static class FetchableTrait
 
     public static bool WillBeFetchableTarget(ITypeSymbol interfaceSymbol)
     {
-        return IsFetchableTarget(interfaceSymbol) || IsRefreshable(interfaceSymbol) || LoadableTrait.IsLoadable(interfaceSymbol);
+        return IsFetchableTarget(interfaceSymbol) || IsRefreshable(interfaceSymbol) ||
+               LoadableTrait.IsLoadable(interfaceSymbol);
     }
 
     public static bool WillBeFetchable(ITypeSymbol interfaceSymbol)
@@ -364,7 +387,8 @@ public static class FetchableTrait
 
     public static bool IsRefreshable(ITypeSymbol interfaceSymbol)
     {
-        if (interfaceSymbol.GetAttributes().Any(x => x.AttributeClass?.ToDisplayString() == "Discord.RefreshableAttribute"))
+        if (interfaceSymbol.GetAttributes()
+            .Any(x => x.AttributeClass?.ToDisplayString() == "Discord.RefreshableAttribute"))
             return true;
 
         return interfaceSymbol.AllInterfaces.Any(x => x.ToDisplayString().StartsWith("Discord.IRefreshable"));
@@ -377,7 +401,8 @@ public static class FetchableTrait
 
     public static bool IsFetchable(ITypeSymbol interfaceSymbol)
     {
-        if (interfaceSymbol.GetAttributes().Any(x => x.AttributeClass?.ToDisplayString() == "Discord.FetchableAttribute"))
+        if (interfaceSymbol.GetAttributes()
+            .Any(x => x.AttributeClass?.ToDisplayString() == "Discord.FetchableAttribute"))
             return true;
 
         return interfaceSymbol.AllInterfaces.Any(x => x.ToDisplayString().StartsWith("Discord.IFetchable"));
@@ -385,7 +410,8 @@ public static class FetchableTrait
 
     public static bool IsFetchableOfMany(ITypeSymbol interfaceSymbol)
     {
-        if (interfaceSymbol.GetAttributes().Any(x => x.AttributeClass?.ToDisplayString() == "Discord.FetchableOfManyAttribute"))
+        if (interfaceSymbol.GetAttributes()
+            .Any(x => x.AttributeClass?.ToDisplayString() == "Discord.FetchableOfManyAttribute"))
             return true;
 
         return interfaceSymbol.AllInterfaces.Any(x => x.ToDisplayString().StartsWith("Discord.IFetchableOfMany"));

@@ -1,27 +1,10 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Extensions;
 
 namespace Discord.Rest.Guilds;
 
-public sealed partial class RestLoadableGuildEmoteActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    GuildEmoteIdentity emote
-) :
-    RestGuildEmoteActor(client, guild, emote),
-    ILoadableGuildEmoteActor
-{
-    [ProxyInterface(typeof(ILoadableEntity<IGuildEmote>))]
-    internal RestLoadable<ulong, RestGuildEmote, IGuildEmote, IGuildEmoteModel> Loadable { get; } =
-        RestLoadable<ulong, RestGuildEmote, IGuildEmote, IGuildEmoteModel>
-            .FromContextConstructable<RestGuildEmote, GuildIdentity>(
-                client,
-                emote,
-                (guild, id) => Routes.GetGuildEmoji(guild.Id, id),
-                guild
-            );
-}
-
+[method: TypeFactory]
 [ExtendInterfaceDefaults(typeof(IGuildEmoteActor))]
 public partial class RestGuildEmoteActor(
     DiscordRestClient client,
@@ -32,11 +15,11 @@ public partial class RestGuildEmoteActor(
     IGuildEmoteActor
 {
     [SourceOfTruth]
-    public RestLoadableGuildActor Guild { get; } = new(client, guild);
+    public RestGuildActor Guild { get; } = new(client, guild);
 
     [SourceOfTruth]
     internal RestGuildEmote CreateEntity(IGuildEmoteModel model)
-        => RestGuildEmote.Construct(Client, model, guild);
+        => RestGuildEmote.Construct(Client, guild, model);
 }
 
 public sealed partial class RestGuildEmote :
@@ -46,7 +29,8 @@ public sealed partial class RestGuildEmote :
 {
     public IDefinedLoadableEntityEnumerable<ulong, IRole> Roles => throw new NotImplementedException();
 
-    public RestLoadableUserActor? Creator { get; private set; }
+    [SourceOfTruth]
+    public RestUserActor? Creator { get; private set; }
 
     public string? Name => Model.Name;
 
@@ -78,30 +62,16 @@ public sealed partial class RestGuildEmote :
         Model = model;
     }
 
-    public static RestGuildEmote Construct(DiscordRestClient client, IGuildEmoteModel model, GuildIdentity guild)
+    public static RestGuildEmote Construct(DiscordRestClient client, GuildIdentity guild, IGuildEmoteModel model)
         => new(client, guild, model);
 
     public ValueTask UpdateAsync(IGuildEmoteModel model, CancellationToken token = default)
     {
-        if (Model.UserId != model.UserId)
-        {
-            if (model.UserId is not null)
-            {
-                if (Creator is not null)
-                    Creator.Loadable.Id = model.UserId.Value;
-                else
-                {
-                    Creator = new RestLoadableUserActor(
-                        Client,
-                        UserIdentity.FromReferenced<RestUser, DiscordRestClient>(model, model.UserId.Value, Client)
-                    );
-                }
-            }
-            else
-            {
-                Creator = null;
-            }
-        }
+        Creator = Creator.UpdateFrom(
+            model.UserId,
+            RestUserActor.Factory,
+            Client
+        );
 
         Model = model;
 
@@ -109,7 +79,5 @@ public sealed partial class RestGuildEmote :
     }
 
     public IGuildEmoteModel GetModel() => Model;
-
-    ILoadableEntity<ulong, IUser>? IGuildEmote.Creator => Creator;
 
 }

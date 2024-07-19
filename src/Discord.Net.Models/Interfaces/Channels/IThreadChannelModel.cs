@@ -15,7 +15,7 @@ public partial interface IThreadChannelModel : IGuildChannelModel
     bool HasJoined { get; }
     DateTimeOffset? CreatedAt { get; }
     ulong[] AppliedTags { get; }
-    ulong? OwnerId { get; }
+    ulong OwnerId { get; }
     int RatelimitPerUser { get; }
     bool IsNsfw { get; }
     string? Topic { get; }

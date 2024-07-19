@@ -10,23 +10,21 @@ public abstract class RestActor<TId, TEntity, TIdentity>(DiscordRestClient clien
 
     public TId Id => Identity.Id;
 
-    public TIdentity Identity { get; } = identity;
+    public virtual TIdentity Identity { get; } = identity;
 
     public static implicit operator TIdentity(RestActor<TId, TEntity, TIdentity> actor) => actor.Identity;
 }
 
-public interface IRestActor<out TId, out TEntity, out TIdentity> : IRestActor<TId, TEntity>
+public interface IRestActor<out TId, out TEntity, out TIdentity> :
+    IRestActor<TId, TEntity>
     where TId : IEquatable<TId>
     where TEntity : IEntity<TId>
 {
     TIdentity Identity { get; }
 }
 
-public interface IRestActor<out TId, out TEntity> : IActor<TId, TEntity>
+public interface IRestActor<out TId, out TEntity> :
+    IActor<TId, TEntity>,
+    IRestClientProvider
     where TId : IEquatable<TId>
-    where TEntity : IEntity<TId>
-{
-    new DiscordRestClient Client { get; }
-
-    IDiscordClient IClientProvider.Client => Client;
-}
+    where TEntity : IEntity<TId>;

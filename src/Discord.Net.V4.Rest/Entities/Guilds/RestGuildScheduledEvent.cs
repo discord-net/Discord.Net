@@ -1,35 +1,12 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Channels;
+using Discord.Rest.Extensions;
 
 namespace Discord.Rest.Guilds;
 
-public sealed partial class RestLoadableGuildScheduledEventActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    GuildScheduledEventIdentity scheduledEvent
-) :
-    RestGuildScheduledEventActor(client, guild, scheduledEvent),
-    ILoadableGuildScheduledEventActor
-{
-    [ProxyInterface(typeof(ILoadableEntity<IGuildScheduledEvent>))]
-    internal RestLoadable<ulong, RestGuildScheduledEvent, IGuildScheduledEvent, IGuildScheduledEventModel> Loadable
-    {
-        get;
-    } =
-        RestLoadable<ulong, RestGuildScheduledEvent, IGuildScheduledEvent, IGuildScheduledEventModel>
-            .FromContextConstructable<RestGuildScheduledEvent, GuildIdentity>(
-                client,
-                scheduledEvent,
-                (guild, id) => Routes.GetGuildScheduledEvent(guild.Id, id),
-                guild
-            );
-}
-
-[ExtendInterfaceDefaults(
-    typeof(IGuildScheduledEventActor),
-    typeof(IDeletable<ulong, IGuildScheduledEventActor>)
-)]
+[method: TypeFactory]
+[ExtendInterfaceDefaults(typeof(IGuildScheduledEventActor))]
 public partial class RestGuildScheduledEventActor(
     DiscordRestClient client,
     GuildIdentity guild,
@@ -39,15 +16,15 @@ public partial class RestGuildScheduledEventActor(
     IGuildScheduledEventActor
 {
     [SourceOfTruth]
-    public RestLoadableGuildActor Guild { get; } = new(client, guild);
+    public RestGuildActor Guild { get; } = new(client, guild);
 
-    public IEnumerableIndexableActor<ILoadableGuildScheduledEventUserActor<IGuildScheduledEventUser>, ulong,
+    public IEnumerableIndexableActor<IGuildScheduledEventUserActor, ulong,
         IGuildScheduledEventUser> RSVPs => throw new NotImplementedException();
 
     [SourceOfTruth]
     internal RestGuildScheduledEvent CreateEntity(
         IGuildScheduledEventModel model
-    ) => RestGuildScheduledEvent.Construct(Client, model, Guild.Loadable.Identity);
+    ) => RestGuildScheduledEvent.Construct(Client, Guild.Identity, model);
 }
 
 public sealed partial class RestGuildScheduledEvent :
@@ -55,11 +32,11 @@ public sealed partial class RestGuildScheduledEvent :
     IGuildScheduledEvent,
     IContextConstructable<RestGuildScheduledEvent, IGuildScheduledEventModel, GuildIdentity, DiscordRestClient>
 {
-    #region Properties
+    [SourceOfTruth]
+    public RestGuildChannelActor? Channel { get; private set; }
 
-    public RestLoadableGuildChannelActor? Channel { get; private set; }
-
-    public RestLoadableUserActor Creator { get; }
+    [SourceOfTruth]
+    public RestUserActor Creator { get; }
 
     public string Name => Model.Name;
 
@@ -83,8 +60,6 @@ public sealed partial class RestGuildScheduledEvent :
 
     public int? UserCount => Model.UserCount;
 
-    #endregion
-
     [ProxyInterface(
         typeof(IGuildScheduledEventActor),
         typeof(IGuildRelationship),
@@ -104,39 +79,31 @@ public sealed partial class RestGuildScheduledEvent :
         Actor = actor ?? new(client, guild, GuildScheduledEventIdentity.Of(this));
         Model = model;
 
-        Creator = new RestLoadableUserActor(
+        Creator = new RestUserActor(
             client,
             UserIdentity.FromReferenced(model, model.CreatorId, model => RestUser.Construct(client, model))
         );
 
         Channel = model.ChannelId.Map(
             static (id, client, guild)
-                => new RestLoadableGuildChannelActor(client, guild, GuildChannelIdentity.Of(id)),
+                => new RestGuildChannelActor(client, guild, GuildChannelIdentity.Of(id)),
             client,
             guild
         );
     }
 
-    public static RestGuildScheduledEvent Construct(DiscordRestClient client, IGuildScheduledEventModel model,
-        GuildIdentity guild) =>
+    public static RestGuildScheduledEvent Construct(DiscordRestClient client,
+        GuildIdentity guild, IGuildScheduledEventModel model) =>
         new(client, guild, model);
 
     public ValueTask UpdateAsync(IGuildScheduledEventModel model, CancellationToken token = default)
     {
-        if (!Model.ChannelId?.Equals(model.ChannelId) ?? model.ChannelId is not null)
-        {
-            if (model.ChannelId.HasValue)
-            {
-                Channel ??= new RestLoadableGuildChannelActor(Client, Actor.Guild.Identity,
-                    GuildChannelIdentity.Of(model.ChannelId.Value));
-
-                Channel.Loadable.Id = model.ChannelId.Value;
-            }
-            else
-            {
-                Channel = null;
-            }
-        }
+        Channel = Channel.UpdateFrom(
+            model.ChannelId,
+            RestGuildChannelActor.Factory,
+            Client,
+            Actor.Guild.Identity
+        );
 
         Model = model;
 
@@ -144,8 +111,4 @@ public sealed partial class RestGuildScheduledEvent :
     }
 
     public IGuildScheduledEventModel GetModel() => Model;
-
-    ILoadableEntity<ulong, IUser> IGuildScheduledEvent.Creator => Creator;
-
-    ILoadableEntity<ulong, IGuildChannel>? IGuildScheduledEvent.Channel => Channel;
 }

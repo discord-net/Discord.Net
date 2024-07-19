@@ -17,7 +17,7 @@ public static class RestManagedEnumerableActor
         IEnumerable<TModel> models,
         Func<TId, TActor> actorFactory,
         IApiOutRoute<IEnumerable<TModel>> route)
-        where TActor : IActor<TId, TEntity>
+        where TActor : IRestActor<TId, TEntity>
         where TEntity :
             RestEntity<TId>,
             TCore,
@@ -44,7 +44,7 @@ public static class RestManagedEnumerableActor
         Func<TId, TActor> actorFactory,
         IApiOutRoute<IEnumerable<TModel>> route,
         TContext context)
-        where TActor : IActor<TId, TEntity>
+        where TActor : IRestActor<TId, TEntity>
         where TEntity :
         RestEntity<TId>,
         TCore,
@@ -59,7 +59,7 @@ public static class RestManagedEnumerableActor
             client,
             models,
             actorFactory,
-            model => TEntity.Construct(client, model, context),
+            model => TEntity.Construct(client, context, model),
             route
         );
     }
@@ -68,7 +68,7 @@ public static class RestManagedEnumerableActor
 public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> :
     IDefinedEnumerableActor<TActor, TId, TCore>,
     IReadOnlyDictionary<TId, TEntity>
-    where TActor : IActor<TId, TEntity>
+    where TActor : IRestActor<TId, TEntity>
     where TEntity : RestEntity<TId>, TCore, IProxied<TActor>, IEntityOf<TModel>
     where TId : IEquatable<TId>
     where TCore : class, IEntity<TId>

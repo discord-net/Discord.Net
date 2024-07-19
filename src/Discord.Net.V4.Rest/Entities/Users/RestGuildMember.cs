@@ -4,27 +4,6 @@ using Discord.Models.Json;
 namespace Discord.Rest.Guilds;
 
 [method: TypeFactory(LastParameter = nameof(member))]
-public sealed partial class RestLoadableGuildMemberActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    MemberIdentity member,
-    UserIdentity? user = null
-):
-    RestGuildMemberActor(client, guild, member, user),
-    ILoadableGuildMemberActor
-{
-    [RestLoadableActorSource]
-    [ProxyInterface(typeof(ILoadableEntity<IGuildMember>))]
-    internal RestLoadable<ulong, RestGuildMember, IGuildMember, IMemberModel> Loadable { get; } =
-        RestLoadable<ulong, RestGuildMember, IGuildMember, IMemberModel>
-            .FromContextConstructable<RestGuildMember, GuildIdentity>(
-                client,
-                member,
-                (guild, id) => Routes.GetGuildMember(guild.Id, id),
-                guild
-            );
-}
-
 [ExtendInterfaceDefaults]
 public partial class RestGuildMemberActor(
     DiscordRestClient client,
@@ -32,20 +11,21 @@ public partial class RestGuildMemberActor(
     MemberIdentity member,
     UserIdentity? user = null
 ):
-    RestUserActor(client, UserIdentity.Of(member.Id)),
-    IGuildMemberActor,
-    IActor<ulong, RestGuildMember>
+    RestActor<ulong, RestGuildMember, MemberIdentity>(client, member),
+    IGuildMemberActor
 {
-    [SourceOfTruth]
-    public RestLoadableGuildActor Guild { get; } = new(client, guild);
+    public override MemberIdentity Identity { get; } = member;
 
     [SourceOfTruth]
-    public RestLoadableUserActor User { get; } = new(client, user ?? UserIdentity.Of(member.Id));
+    public RestGuildActor Guild { get; } = new(client, guild);
 
-    [CovariantOverride]
+    [SourceOfTruth]
+    [ProxyInterface(typeof(IUserActor))]
+    public RestUserActor User { get; } = new(client, user ?? UserIdentity.Of(member.Id));
+
     [SourceOfTruth]
     internal RestGuildMember CreateEntity(IMemberModel model)
-        => RestGuildMember.Construct(Client, model, Guild.Identity);
+        => RestGuildMember.Construct(Client, Guild.Identity, model);
 }
 
 public sealed partial class RestGuildMember :
@@ -69,12 +49,7 @@ public sealed partial class RestGuildMember :
 
     public GuildMemberFlags Flags => (GuildMemberFlags)Model.Flags;
 
-    [ProxyInterface(
-        typeof(IGuildMemberActor),
-        typeof(IUserRelationship),
-        typeof(IGuildRelationship),
-        typeof(IEntityProvider<IGuildMember, IMemberModel>)
-    )]
+    [ProxyInterface(typeof(IGuildMemberActor))]
     internal RestGuildMemberActor Actor { get; }
 
     internal IMemberModel Model { get; private set; }
@@ -95,7 +70,7 @@ public sealed partial class RestGuildMember :
         Model = model;
     }
 
-    public static RestGuildMember Construct(DiscordRestClient client, IMemberModel model, GuildIdentity guild)
+    public static RestGuildMember Construct(DiscordRestClient client, GuildIdentity guild, IMemberModel model)
         => new(client, guild, model);
 
     public ValueTask UpdateAsync(IMemberModel model, CancellationToken token = default)

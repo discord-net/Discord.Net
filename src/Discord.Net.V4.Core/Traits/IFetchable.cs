@@ -21,5 +21,5 @@ public interface IFetchableOfMany<in TId, out TModel>
     where TId : IEquatable<TId>
     where TModel : IEntityModel<TId>
 {
-    internal static abstract IApiOutRoute<IEnumerable<TModel>> FetchManyRoute(IPathable path, TId id);
+    internal static abstract IApiOutRoute<IEnumerable<TModel>> FetchManyRoute(IPathable path);
 }

@@ -2,17 +2,47 @@ using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Immutable;
 using System.Text;
 using CSharpExtensions = Microsoft.CodeAnalysis.CSharp.CSharpExtensions;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public class TypeFactories : IGenerationTask<TypeFactories.GenerationTarget>
+public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarget>
 {
     public class ConstructorArgs(ParameterListSyntax parameters, string? shouldBeLastParameter)
+        : IEquatable<ConstructorArgs>
     {
         public ParameterListSyntax Parameters { get; } = parameters;
         public string? ShouldBeLastParameter { get; } = shouldBeLastParameter;
+
+        public bool Equals(ConstructorArgs? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Parameters.IsEquivalentTo(other.Parameters) && ShouldBeLastParameter == other.ShouldBeLastParameter;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((ConstructorArgs)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Parameters.GetHashCode() * 397) ^
+                       (ShouldBeLastParameter != null ? ShouldBeLastParameter.GetHashCode() : 0);
+            }
+        }
+
+        public static bool operator ==(ConstructorArgs? left, ConstructorArgs? right) => Equals(left, right);
+
+        public static bool operator !=(ConstructorArgs? left, ConstructorArgs? right) => !Equals(left, right);
     }
 
     public class GenerationTarget(
@@ -20,12 +50,47 @@ public class TypeFactories : IGenerationTask<TypeFactories.GenerationTarget>
         ClassDeclarationSyntax classDeclarationSyntax,
         ConstructorArgs? primaryConstructorParameters,
         List<ConstructorArgs> constructorDeclarationSyntax
-    )
+    ) : IEquatable<GenerationTarget>
     {
         public SemanticModel SemanticModel { get; } = semanticModel;
         public ClassDeclarationSyntax ClassDeclarationSyntax { get; } = classDeclarationSyntax;
         public ConstructorArgs? PrimaryConstructorParameters { get; } = primaryConstructorParameters;
         public List<ConstructorArgs> ConstructorDeclarationSyntax { get; } = constructorDeclarationSyntax;
+
+        public bool Equals(GenerationTarget? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return ClassDeclarationSyntax.IsEquivalentTo(other.ClassDeclarationSyntax) &&
+                   (PrimaryConstructorParameters?.Equals(other.PrimaryConstructorParameters) ??
+                    other.PrimaryConstructorParameters is not null) &&
+                   ConstructorDeclarationSyntax.SequenceEqual(other.ConstructorDeclarationSyntax);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((GenerationTarget)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = ClassDeclarationSyntax.GetHashCode();
+                hashCode = (hashCode * 397) ^ (PrimaryConstructorParameters != null
+                    ? PrimaryConstructorParameters.GetHashCode()
+                    : 0);
+                hashCode = (hashCode * 397) ^ ConstructorDeclarationSyntax.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(GenerationTarget? left, GenerationTarget? right) => Equals(left, right);
+
+        public static bool operator !=(GenerationTarget? left, GenerationTarget? right) => !Equals(left, right);
     }
 
     public bool IsValid(SyntaxNode node, CancellationToken token)
@@ -85,47 +150,114 @@ public class TypeFactories : IGenerationTask<TypeFactories.GenerationTarget>
         return null;
     }
 
-    public void Execute(SourceProductionContext context, GenerationTarget? target)
+    private readonly struct FactoryDetails(string[] arguments) : IEquatable<FactoryDetails>
     {
-        if (target is null) return;
+        public readonly string[] Arguments = arguments;
 
-        var sb = new StringBuilder();
+        public bool Equals(FactoryDetails other) => Arguments.Equals(other.Arguments);
 
-        if (target.PrimaryConstructorParameters is not null)
-        {
-            AppendFactory(sb, target.ClassDeclarationSyntax.Identifier.ValueText, target.PrimaryConstructorParameters);
-        }
+        public override bool Equals(object? obj) => obj is FactoryDetails other && Equals(other);
 
-        foreach (var constructor in target.ConstructorDeclarationSyntax)
-        {
-            AppendFactory(sb, target.ClassDeclarationSyntax.Identifier.ValueText, constructor);
-        }
+        public override int GetHashCode() => Arguments.GetHashCode();
 
-        context.AddSource(
-            $"Factories/{target.ClassDeclarationSyntax.Identifier}_Factory",
-            $$"""
-            namespace {{target.SemanticModel.GetDeclaredSymbol(target.ClassDeclarationSyntax)!.ContainingNamespace}};
+        public static bool operator ==(FactoryDetails left, FactoryDetails right) => left.Equals(right);
 
-            public partial class {{target.ClassDeclarationSyntax.Identifier}}
-            {
-                {{sb.ToString().Replace("\n", "\n    ")}}
-            }
-            """
-        );
+        public static bool operator !=(FactoryDetails left, FactoryDetails right) => !left.Equals(right);
     }
 
-    private static void AppendFactory(StringBuilder builder, string name, ConstructorArgs args)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
+    {
+        var factoryArgsList = new HashSet<int>();
+
+        foreach (var target in targets)
+        {
+            if (target is null) continue;
+
+            var sb = new StringBuilder();
+
+            var implementedFactories = new HashSet<FactoryDetails>();
+
+            if (target.PrimaryConstructorParameters is not null)
+            {
+                foreach (var details in AppendFactory(sb, target.ClassDeclarationSyntax.Identifier.ValueText, target.PrimaryConstructorParameters))
+                    implementedFactories.Add(details);
+            }
+
+            foreach (var constructor in target.ConstructorDeclarationSyntax)
+            {
+                foreach (var details in AppendFactory(sb, target.ClassDeclarationSyntax.Identifier.ValueText, constructor))
+                    implementedFactories.Add(details);
+            }
+
+            var bases = implementedFactories.Select(x =>
+                $"IFactory<{target.ClassDeclarationSyntax.Identifier}, {string.Join(", ", x.Arguments)}>"
+            ).ToArray();
+
+            context.AddSource(
+                $"Factories/{target.ClassDeclarationSyntax.Identifier}",
+                $$"""
+                  namespace {{target.SemanticModel.GetDeclaredSymbol(target.ClassDeclarationSyntax)!.ContainingNamespace}};
+
+                  public partial class {{target.ClassDeclarationSyntax.Identifier}}{{(bases.Length > 0 ? $" : {string.Join(", ", bases)}"  : "")}}
+                  {
+                      {{sb.ToString().Replace("\n", "\n    ")}}
+
+                      {{string.Join("\n    ", bases.Select((x, i) =>
+                          $$"""
+                            static {{target.ClassDeclarationSyntax.Identifier}} {{x}}.Factory({{string.Join(", ", implementedFactories.ElementAt(i).Arguments.Select((x, i) => $"{x} arg{i}"))}})
+                                    => Factory({{string.Join(", ", implementedFactories.ElementAt(i).Arguments.Select((x, i) => $"arg{i}"))}});
+                            """
+                      ))}}
+                  }
+                  """
+            );
+
+            foreach (var implemented in implementedFactories)
+                factoryArgsList.Add(implemented.Arguments.Length);
+        }
+
+        if (factoryArgsList.Count > 0)
+        {
+            var mapped = factoryArgsList.Select(x =>
+                $$"""
+                internal interface IFactory<TSelf, {{string.Join(", ", Enumerable.Range(0, x).Select(x => $"T{x}"))}}>
+                {
+                    static abstract TSelf Factory({{string.Join(", ", Enumerable.Range(0, x).Select(x => $"T{x} arg{x}"))}});
+                }
+                """
+            );
+
+            context.AddSource(
+                "Factories/IFactory",
+                $$"""
+                namespace Discord;
+
+                {{string.Join("\n\n", mapped)}}
+                """
+            );
+        }
+    }
+
+    private static IEnumerable<FactoryDetails> AppendFactory(StringBuilder builder, string name, ConstructorArgs args)
     {
         var parameterList = args.Parameters;
         var parameterNames = string.Join(", ", parameterList.Parameters.Select(x => x.Identifier));
 
+        var startList = ReorderToLast(RemoveParameterDefaults(parameterList), args.ShouldBeLastParameter).NormalizeWhitespace();
         builder.AppendLine(
-            $"internal static {name} Factory{ReorderToLast(RemoveParameterDefaults(parameterList), args.ShouldBeLastParameter).NormalizeWhitespace()} => new({parameterNames});"
+            $"internal static {name} Factory{startList} => new({parameterNames});"
         );
+
+        yield return new FactoryDetails(startList.Parameters.Select(x => x.Type!.ToString()).ToArray());
 
         foreach (var defaultParam in parameterList.Parameters.Where(x => x.Default is not null))
         {
-            var newList = RemoveParameterDefaults(parameterList.RemoveNode(defaultParam, SyntaxRemoveOptions.KeepNoTrivia) ?? SyntaxFactory.ParameterList([]));
+            var newList =
+                RemoveParameterDefaults(parameterList.RemoveNode(defaultParam, SyntaxRemoveOptions.KeepNoTrivia) ??
+                                        SyntaxFactory.ParameterList([]));
+
+            yield return new FactoryDetails(newList.Parameters.Select(x => x.Type!.ToString()).ToArray());
+
             parameterNames = string.Join(", ", newList.Parameters.Select(x => x.Identifier));
             builder.AppendLine(
                 $"internal static {name} Factory{ReorderToLast(newList, args.ShouldBeLastParameter).NormalizeWhitespace()} => new({parameterNames});"

@@ -2,17 +2,22 @@ using Discord.Models;
 
 namespace Discord.Rest.Channels;
 
+[method: TypeFactory]
 public partial class RestCategoryChannelActor(
     DiscordRestClient client,
     GuildIdentity guild,
     CategoryChannelIdentity channel
 ) :
     RestGuildChannelActor(client, guild, channel),
-    ICategoryChannelActor
+    ICategoryChannelActor,
+    IRestActor<ulong, RestCategoryChannel, CategoryChannelIdentity>
 {
+    public override CategoryChannelIdentity Identity { get; } = channel;
+
     [SourceOfTruth]
+    [CovariantOverride]
     internal RestCategoryChannel CreateEntity(IGuildCategoryChannelModel model)
-        => RestCategoryChannel.Construct(Client, model, Guild.Identity);
+        => RestCategoryChannel.Construct(Client, Guild.Identity, model);
 }
 
 public sealed partial class RestCategoryChannel :
@@ -37,11 +42,9 @@ public sealed partial class RestCategoryChannel :
         Actor = actor ?? new RestCategoryChannelActor(client, guild, CategoryChannelIdentity.Of(this));
     }
 
-    public static RestCategoryChannel Construct(
-        DiscordRestClient client,
-        IGuildCategoryChannelModel model,
-        GuildIdentity guild
-    ) => new(client, guild, model);
+    public static RestCategoryChannel Construct(DiscordRestClient client,
+        GuildIdentity guild,
+        IGuildCategoryChannelModel model) => new(client, guild, model);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IGuildCategoryChannelModel model, CancellationToken token = default)

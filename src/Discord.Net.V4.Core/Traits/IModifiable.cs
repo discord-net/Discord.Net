@@ -78,10 +78,12 @@ public interface IModifiable<TId, in TSelf, out TParams, TApi, TEntity, in TMode
     where TEntity : IEntity<TId>
     where TModel : class, IEntityModel<TId>
 {
+    [return: TypeHeuristic(nameof(CreateEntity))]
     new Task<TEntity> ModifyAsync(Action<TParams> func, RequestOptions? options = null,
         CancellationToken token = default)
         => ModifyAsync(Client, (TSelf)this, Id, func, options, token);
 
+    [return: TypeHeuristic(nameof(CreateEntity))]
     internal new static async Task<TEntity> ModifyAsync(
         IDiscordClient client,
         TSelf self,

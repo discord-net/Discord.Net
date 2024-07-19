@@ -12,7 +12,8 @@ public readonly struct ReactionMetadata(
     int normalReactionCount,
     int burstReactionCount,
     bool isMeBurst,
-    IReadOnlyCollection<string> burstColors) : IConstructable<ReactionMetadata, IReactionModel>
+    IReadOnlyCollection<string> burstColors
+) : IConstructable<ReactionMetadata, IReactionModel>, IEquatable<ReactionMetadata>
 {
     /// <summary>
     ///     The number of reactions.
@@ -45,4 +46,20 @@ public readonly struct ReactionMetadata(
             model.MeBurst,
             model.BurstColors.ToImmutableArray()
         );
+
+    public bool Equals(ReactionMetadata other)
+        => TotalReactionCount == other.TotalReactionCount &&
+           NormalReactionCount == other.NormalReactionCount &&
+           BurstReactionCount == other.BurstReactionCount &&
+           IsMe == other.IsMe &&
+           IsMeBurst == other.IsMeBurst &&
+           BurstColors.SequenceEqual(other.BurstColors);
+
+    public override bool Equals(object? obj) => obj is ReactionMetadata other && Equals(other);
+
+    public override int GetHashCode() => HashCode.Combine(TotalReactionCount, NormalReactionCount, BurstReactionCount, IsMe, IsMeBurst, BurstColors);
+
+    public static bool operator ==(ReactionMetadata left, ReactionMetadata right) => left.Equals(right);
+
+    public static bool operator !=(ReactionMetadata left, ReactionMetadata right) => !left.Equals(right);
 }
