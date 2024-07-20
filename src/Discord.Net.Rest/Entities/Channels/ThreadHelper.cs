@@ -213,7 +213,9 @@ namespace Discord.Rest
                 throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
 
             if (channel.Flags.HasFlag(ChannelFlags.RequireTag))
-                throw new ArgumentException($"The channel {channel.Name} requires posts to have at least one tag.");
+            {
+                Preconditions.AtLeast(tagIds?.Length ?? 0, 1, nameof(tagIds), $"The channel {channel.Name} requires posts to have at least one tag.");
+            }
 
             var args = new CreateMultipartPostAsync(attachments.ToArray())
             {
