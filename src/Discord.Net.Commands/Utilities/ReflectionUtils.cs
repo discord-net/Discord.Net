@@ -37,7 +37,7 @@ namespace Discord.Commands
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to create \"{ownerType.FullName}\".", ex);
+                throw new TargetInvocationException($"Failed to create \"{ownerType.FullName}\".", ex);
             }
         }
 
@@ -45,7 +45,7 @@ namespace Discord.Commands
         {
             var constructors = ownerType.DeclaredConstructors.Where(x => !x.IsStatic).ToArray();
             if (constructors.Length == 0)
-                throw new InvalidOperationException($"No constructor found for \"{ownerType.FullName}\".");
+                throw new MissingMethodException($"No constructor found for \"{ownerType.FullName}\".");
             else if (constructors.Length > 1)
                 throw new InvalidOperationException($"Multiple constructors found for \"{ownerType.FullName}\".");
             return constructors[0];

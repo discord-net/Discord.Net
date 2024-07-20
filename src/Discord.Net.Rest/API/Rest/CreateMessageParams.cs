@@ -31,5 +31,8 @@ namespace Discord.API.Rest
 
         [JsonProperty("flags")]
         public Optional<MessageFlags> Flags { get; set; }
+
+        [JsonProperty("poll")]
+        public Optional<CreatePollParams> Poll { get; set; }
     }
 }

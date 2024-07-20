@@ -93,6 +93,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
 
+        /// <inheritdoc />
+        public PurchaseNotification PurchaseNotification { get; private set; }
+        
+        /// <inheritdoc />
+        public MessageCallData? CallData { get; private set; }
+
         /// <inheritdoc cref="IMessage.Components"/>
         public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
         /// <summary>
@@ -112,6 +118,7 @@ namespace Discord.Rest
             if (model.Type == MessageType.Default ||
                 model.Type == MessageType.Reply ||
                 model.Type == MessageType.ApplicationCommand ||
+                model.Type == MessageType.ContextMenuCommand ||
                 model.Type == MessageType.ThreadStarterMessage)
                 return RestUserMessage.Create(discord, channel, author, model);
             else
@@ -182,7 +189,8 @@ namespace Discord.Rest
                                         : null,
                                     parsed.CustomId.GetValueOrDefault(),
                                     parsed.Url.GetValueOrDefault(),
-                                    parsed.Disabled.GetValueOrDefault());
+                                    parsed.Disabled.GetValueOrDefault(),
+                                    parsed.SkuId.ToNullable());
                             }
                         case ComponentType.SelectMenu or ComponentType.ChannelSelect or ComponentType.RoleSelect or ComponentType.MentionableSelect or ComponentType.UserSelect:
                             {
@@ -272,7 +280,19 @@ namespace Discord.Rest
 
             if (model.Thread.IsSpecified)
                 Thread = RestThreadChannel.Create(Discord, new RestGuild(Discord, model.Thread.Value.GuildId.Value), model.Thread.Value);
+
+            if (model.PurchaseNotification.IsSpecified)
+            {
+                PurchaseNotification = new PurchaseNotification(model.PurchaseNotification.Value.Type,
+                    model.PurchaseNotification.Value.ProductPurchase.IsSpecified
+                        ? new GuildProductPurchase(model.PurchaseNotification.Value.ProductPurchase.Value.ListingId, model.PurchaseNotification.Value.ProductPurchase.Value.ProductName)
+                        : null);
+            }
+            
+            if (model.Call.IsSpecified)
+                CallData = new MessageCallData(model.Call.Value.Participants, model.Call.Value.EndedTimestamp.ToNullable());
         }
+        
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
         {

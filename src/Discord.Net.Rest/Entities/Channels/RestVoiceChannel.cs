@@ -31,13 +31,13 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public VideoQualityMode VideoQualityMode { get; private set; }
 
-        internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
-            : base(discord, guild, id)
+        internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id, ulong guildId)
+            : base(discord, guild, id, guildId)
         {
         }
         internal new static RestVoiceChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestVoiceChannel(discord, guild, model.Id);
+            var entity = new RestVoiceChannel(discord, guild, model.Id, guild?.Id ?? model.GuildId.Value);
             entity.Update(model);
             return entity;
         }

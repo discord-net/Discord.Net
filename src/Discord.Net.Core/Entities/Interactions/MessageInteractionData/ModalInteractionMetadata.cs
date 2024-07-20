@@ -21,6 +21,9 @@ public readonly struct ModalSubmitInteractionMetadata :IMessageInteractionMetada
     public ulong UserId { get; }
 
     /// <inheritdoc />
+    public IUser User { get; }
+
+    /// <inheritdoc />
     public IReadOnlyDictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; }
 
     /// <inheritdoc />
@@ -32,7 +35,7 @@ public readonly struct ModalSubmitInteractionMetadata :IMessageInteractionMetada
     public IMessageInteractionMetadata TriggeringInteractionMetadata { get; }
 
     internal ModalSubmitInteractionMetadata(ulong id, InteractionType type, ulong userId, IReadOnlyDictionary<ApplicationIntegrationType, ulong> integrationOwners,
-        ulong? originalResponseMessageId, IMessageInteractionMetadata triggeringInteractionMetadata)
+        ulong? originalResponseMessageId, IMessageInteractionMetadata triggeringInteractionMetadata, IUser user)
     {
         Id = id;
         Type = type;
@@ -40,5 +43,6 @@ public readonly struct ModalSubmitInteractionMetadata :IMessageInteractionMetada
         IntegrationOwners = integrationOwners;
         OriginalResponseMessageId = originalResponseMessageId;
         TriggeringInteractionMetadata = triggeringInteractionMetadata;
+        User = user;
     }
 }

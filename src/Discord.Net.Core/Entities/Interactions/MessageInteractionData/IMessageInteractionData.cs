@@ -18,6 +18,11 @@ public interface IMessageInteractionMetadata : ISnowflakeEntity
     ulong UserId { get; }
 
     /// <summary>
+    ///     Gets the user who triggered the interaction.
+    /// </summary>
+    IUser User { get; }
+
+    /// <summary>
     ///     Gets the Ids for installation contexts related to the interaction.
     /// </summary>
     IReadOnlyDictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; }

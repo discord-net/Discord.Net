@@ -20,7 +20,8 @@ namespace Discord.Rest
                 model.Managed,
                 model.RequireColons,
                 ImmutableArray.Create(model.Roles),
-                model.User.IsSpecified ? model.User.Value.Id : (ulong?)null);
+                model.User.IsSpecified ? model.User.Value.Id : null,
+                model.IsAvailable.ToNullable());
 
         public static Embed ToEntity(this API.Embed model)
         {
@@ -37,9 +38,12 @@ namespace Discord.Rest
         public static RoleTags ToEntity(this API.RoleTags model)
         {
             return new RoleTags(
-                model.BotId.IsSpecified ? model.BotId.Value : null,
-                model.IntegrationId.IsSpecified ? model.IntegrationId.Value : null,
-                model.IsPremiumSubscriber.IsSpecified);
+                model.BotId.ToNullable(),
+                model.IntegrationId.ToNullable(),
+                model.IsPremiumSubscriber.IsSpecified,
+                model.SubscriptionListingId.ToNullable(),
+                model.IsAvailableForPurchase.IsSpecified,
+                model.GuildConnections.IsSpecified);
         }
         public static API.Embed ToModel(this Embed entity)
         {

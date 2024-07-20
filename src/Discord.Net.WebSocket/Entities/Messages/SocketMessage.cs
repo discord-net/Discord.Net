@@ -81,11 +81,17 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
 
+        /// <inheritdoc />
+        public PurchaseNotification PurchaseNotification { get; private set; }
+
         /// <inheritdoc cref="IMessage.Thread"/>
         public SocketThreadChannel Thread { get; private set; }
 
         /// <inheritdoc />
         IThreadChannel IMessage.Thread => Thread;
+
+        /// <inheritdoc />
+        public MessageCallData? CallData { get; private set; }
 
         /// <summary>
         ///     Returns all attachments included in this message.
@@ -216,7 +222,8 @@ namespace Discord.WebSocket
                                         : null,
                                     parsed.CustomId.GetValueOrDefault(),
                                     parsed.Url.GetValueOrDefault(),
-                                    parsed.Disabled.GetValueOrDefault());
+                                    parsed.Disabled.GetValueOrDefault(),
+                                    parsed.SkuId.ToNullable());
                             }
                         case ComponentType.SelectMenu:
                             {
@@ -299,6 +306,17 @@ namespace Discord.WebSocket
                 SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
                 Thread = guild?.AddOrUpdateChannel(state, model.Thread.Value) as SocketThreadChannel;
             }
+
+            if (model.PurchaseNotification.IsSpecified)
+            {
+                PurchaseNotification = new PurchaseNotification(model.PurchaseNotification.Value.Type,
+                    model.PurchaseNotification.Value.ProductPurchase.IsSpecified
+                        ? new GuildProductPurchase(model.PurchaseNotification.Value.ProductPurchase.Value.ListingId, model.PurchaseNotification.Value.ProductPurchase.Value.ProductName)
+                        : null);
+            }
+            
+            if (model.Call.IsSpecified)
+                CallData = new MessageCallData(model.Call.Value.Participants, model.Call.Value.EndedTimestamp.ToNullable());
         }
 
         /// <inheritdoc />

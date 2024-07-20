@@ -22,7 +22,7 @@ namespace Discord.Rest
         internal readonly Dictionary<ulong, Attachment> Attachments
             = new Dictionary<ulong, Attachment>();
 
-        internal async Task PopulateAsync(DiscordRestClient discord, RestGuild guild, IRestMessageChannel channel, T model, bool doApiCall)
+        internal async Task PopulateAsync(DiscordRestClient discord, RestGuild guild, ulong? guildId, IRestMessageChannel channel, T model, bool doApiCall)
         {
             var resolved = model.Resolved.Value;
 
@@ -67,7 +67,7 @@ namespace Discord.Rest
                 {
                     // pull the adjacent user model
                     member.Value.User = resolved.Users.Value.FirstOrDefault(x => x.Key == member.Key).Value;
-                    var restMember = RestGuildUser.Create(discord, guild, member.Value);
+                    var restMember = RestGuildUser.Create(discord, guild, member.Value, guildId);
 
                     GuildMembers.Add(ulong.Parse(member.Key), restMember);
                 }

@@ -15,7 +15,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Provides a client to send REST-based requests to Discord.
     /// </summary>
-    public class DiscordRestClient : BaseDiscordClient, IDiscordClient
+    public class DiscordRestClient : BaseDiscordClient, IDiscordClient, IRestClientProvider
     {
         #region DiscordRestClient
         private RestApplication _applicationInfo;
@@ -249,10 +249,10 @@ namespace Discord.Rest
         public Task DeleteAllGlobalCommandsAsync(RequestOptions options = null)
             => InteractionHelper.DeleteAllGlobalCommandsAsync(this, options);
 
-        public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId)
-            => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
-        public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId)
-            => ClientHelper.RemoveRoleAsync(this, guildId, userId, roleId);
+        public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+            => ClientHelper.AddRoleAsync(this, guildId, userId, roleId, options);
+        public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+            => ClientHelper.RemoveRoleAsync(this, guildId, userId, roleId, options);
 
         public Task AddReactionAsync(ulong channelId, ulong messageId, IEmote emote, RequestOptions options = null)
             => MessageHelper.AddReactionAsync(channelId, messageId, emote, this, options);
@@ -295,6 +295,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null)
             => ClientHelper.ListSKUsAsync(this, options);
+
+        /// <inheritdoc />
+        public Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => ClientHelper.ConsumeEntitlementAsync(this, entitlementId, options);
 
         #endregion
 
@@ -399,5 +403,7 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties, RequestOptions options)
             => await BulkOverwriteGlobalCommands(properties, options).ConfigureAwait(false);
         #endregion
+
+        DiscordRestClient IRestClientProvider.RestClient => this;
     }
 }

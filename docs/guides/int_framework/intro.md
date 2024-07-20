@@ -165,7 +165,7 @@ Interaction service complex parameter constructors are prioritized in the follow
 
 #### DM Permissions
 > [!WARNING]
-> [EnabledInDmAttribute] is being deprecated in favor of [CommandContextTypes] attribute.
+> [EnabledInDmAttribute] is being deprecated in favor of [CommandContextType] attribute.
 
 You can use the [EnabledInDmAttribute] to configure whether a globally-scoped top level command should be enabled in Dms or not. Only works on top level commands.
 
@@ -257,7 +257,7 @@ To achieve this, make sure your module classes inherit from the generic variant 
 
 The [InteractionService] ships with 4 different kinds of [InteractionContext]:
 
-1. [InteractionContext]]: A bare-bones execution context consisting of only implementation neutral interfaces
+1. [InteractionContext]: A bare-bones execution context consisting of only implementation neutral interfaces
 2. [SocketInteractionContext]: An execution context for use with [DiscordSocketClient]. Socket entities are exposed in this context without the need of casting them.
 3. [ShardedInteractionContext]: [DiscordShardedClient] variant of the [SocketInteractionContext]
 4. [RestInteractionContext]: An execution context designed to be used with a [DiscordRestClient] and webhook based interactions pattern
@@ -266,7 +266,7 @@ You can create custom Interaction Contexts by implementing the [IInteractionCont
 
 One problem with using the concrete type InteractionContexts is that you cannot access the information that is specific to different interaction types without casting. Concrete type interaction contexts are great for creating shared interaction modules but you can also use the generic variants of the built-in interaction contexts to create interaction specific interaction modules.
 
-> [!INFO]
+> [!NOTE]
 > Message component interactions have access to a special method called `UpdateAsync()` to update the body of the method the interaction originated from.
 > Normally this wouldn't be accessible without casting the `Context.Interaction`.
 
@@ -329,7 +329,7 @@ This behaviour can be configured by changing the `RunMode` property of `Interact
 
 > [!WARNING]
 > In the example above, no form of post-execution is presented.
-> Please carefully read the [Post Execution Documentation] for the best approach in resolving the result based on your `RunMode`.
+> Please carefully read the [Post-Execution Documentation] for the best approach in resolving the result based on your `RunMode`.
 
 You can also configure the way [InteractionService] executes the commands.
 By default, commands are executed using `ConstructorInfo.Invoke()` to create module instances and
@@ -429,6 +429,7 @@ User apps are the kind of Discord applications that are installed onto a user in
 
 [AutocompleteHandlers]: xref:Guides.IntFw.AutoCompletion
 [DependencyInjection]: xref:Guides.DI.Intro
+[Post-Execution Documentation]: xref:Guides.IntFw.PostExecution
 
 [GroupAttribute]: xref:Discord.Interactions.GroupAttribute
 [DontAutoRegisterAttribute]: xref:Discord.Interactions.DontAutoRegisterAttribute
@@ -445,10 +446,11 @@ User apps are the kind of Discord applications that are installed onto a user in
 [ModalExecuted]: xref:Discord.WebSocket.BaseSocketClient
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 [DiscordRestClient]: xref:Discord.Rest.DiscordRestClient
+[DiscordShardedClient]: xref:Discord.WebSocket.DiscordShardedClient
 [SocketInteractionContext]: xref:Discord.Interactions.SocketInteractionContext
 [ShardedInteractionContext]: xref:Discord.Interactions.ShardedInteractionContext
 [InteractionContext]: xref:Discord.Interactions.InteractionContext
-[IInteractionContect]: xref:Discord.Interactions.IInteractionContext
+[IInteractionContext]: xref:Discord.IInteractionContext
 [RestInteractionContext]: xref:Discord.Rest.RestInteractionContext
 [SummaryAttribute]: xref:Discord.Interactions.SummaryAttribute
 [ChoiceAttribute]: xref:Discord.Interactions.ChoiceAttribute
@@ -456,9 +458,11 @@ User apps are the kind of Discord applications that are installed onto a user in
 [MaxValueAttribute]: xref:Discord.Interactions.MaxValueAttribute
 [MinValueAttribute]: xref:Discord.Interactions.MinValueAttribute
 [EnabledInDmAttribute]: xref:Discord.Interactions.EnabledInDmAttribute
-[CommandContextTypes]: xref:Discord.Interactions.CommandContextTypesAttribute
+[CommandContextType]: xref:Discord.Interactions.CommandContextTypeAttribute
+[DefaultMemberPermissionsAttribute]: xref:Discord.Interactions.DefaultMemberPermissionsAttribute
 
 [IChannel]: xref:Discord.IChannel
+[IAttachment]: xref:Discord.IAttachment
 [IRole]: xref:Discord.IRole
 [IUser]: xref:Discord.IUser
 [IMessage]: xref:Discord.IMessage

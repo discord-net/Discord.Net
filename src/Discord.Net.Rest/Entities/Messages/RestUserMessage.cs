@@ -52,6 +52,9 @@ namespace Discord.Rest
         public IMessageInteractionMetadata InteractionMetadata { get; internal set; }
 
         /// <inheritdoc />
+        public Poll? Poll { get; internal set; }
+
+        /// <inheritdoc />
         public MessageResolvedData ResolvedData { get; internal set; }
 
         /// <inheritdoc />
@@ -169,7 +172,7 @@ namespace Discord.Rest
                 ResolvedData = new MessageResolvedData(users, members, roles, channels);
             }
             if (model.InteractionMetadata.IsSpecified)
-                InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata();
+                InteractionMetadata = model.InteractionMetadata.Value.ToInteractionMetadata(Discord);
 
             if (model.MessageSnapshots.IsSpecified)
             {
@@ -178,6 +181,9 @@ namespace Discord.Rest
             }
             else
                 ForwardedMessages = ImmutableArray<MessageSnapshot>.Empty;
+
+            if (model.Poll.IsSpecified)
+                Poll = model.Poll.Value.ToEntity();
         }
 
         /// <inheritdoc />
@@ -213,6 +219,15 @@ namespace Discord.Rest
 
             return MessageHelper.CrosspostAsync(this, Discord, options);
         }
+
+        /// <inheritdoc />
+        public Task EndPollAsync(RequestOptions options = null)
+            => MessageHelper.EndPollAsync(Channel.Id, Id, Discord, options);
+
+        /// <inheritdoc />
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetPollAnswerVotersAsync(uint answerId, int? limit = null, ulong? afterId = null,
+            RequestOptions options = null)
+            => MessageHelper.GetPollAnswerVotersAsync(Channel.Id, Id, afterId, answerId, limit, Discord, options);
 
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
     }

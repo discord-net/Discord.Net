@@ -104,4 +104,13 @@ internal class Message
 
     [JsonProperty("message_snapshot")]
     public Optional<MessageSnapshot[]> MessageSnapshots { get; set; }
+  
+    [JsonProperty("poll")]
+    public Optional<Poll> Poll { get; set; }
+
+    [JsonProperty("purchase_notification")]
+    public Optional<MessagePurchaseNotification> PurchaseNotification { get; set; }
+  
+    [JsonProperty("call")]
+    public Optional<MessageCallData> Call { get; set; }
 }

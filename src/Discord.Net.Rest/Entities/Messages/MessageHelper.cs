@@ -386,5 +386,31 @@ namespace Discord.Rest
                 author = RestUser.Create(client, guild, model, webhookId);
             return author;
         }
+
+        public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetPollAnswerVotersAsync(ulong channelId, ulong msgId, ulong? afterId,
+            uint answerId, int? limit, BaseDiscordClient client, RequestOptions options)
+        {
+            return new PagedAsyncEnumerable<IUser>(
+                DiscordConfig.MaxPollVotersPerBatch,
+                async (info, ct) =>
+                {
+                    var model = await client.ApiClient.GetPollAnswerVotersAsync(channelId, msgId, answerId, info.PageSize, info.Position, options).ConfigureAwait(false);
+                    return model.Users.Select(x => RestUser.Create(client, x)).ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxPollVotersPerBatch)
+                        return false;
+
+                    info.Position = lastPage.Max(x => x.Id);
+                    return true;
+                },
+                count: limit,
+                start: afterId
+            );
+        }
+
+        public static Task<Message> EndPollAsync(ulong channelId, ulong messageId, BaseDiscordClient client, RequestOptions options)
+            => client.ApiClient.ExpirePollAsync(channelId, messageId, options);
     }
 }

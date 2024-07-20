@@ -282,5 +282,15 @@ namespace Discord
         ///     Allows setting voice channel status.
         /// </summary>
         SetVoiceChannelStatus = 1L << 48,
+
+        /// <summary>
+        ///     Allows sending polls.
+        /// </summary>
+        SendPolls = 1L << 49,
+
+        /// <summary>
+        ///     Allows user-installed apps to send public responses.
+        /// </summary>
+        UseExternalApps = 1L << 50,
     }
 }

@@ -10,9 +10,9 @@ internal class MessageInteractionMetadata
 
     [JsonProperty("type")]
     public InteractionType Type { get; set; }
-
-    [JsonProperty("user_id")]
-    public ulong UserId { get; set; }
+    
+    [JsonProperty("user")]
+    public User User { get; set; }
 
     [JsonProperty("authorizing_integration_owners")]
     public Dictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; set; }

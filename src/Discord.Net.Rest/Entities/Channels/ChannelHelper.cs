@@ -274,7 +274,7 @@ namespace Discord.Rest
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
         public static async Task<RestUserMessage> SendMessageAsync(IMessageChannel channel, BaseDiscordClient client,
             string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference,
-            MessageComponent components, ISticker[] stickers, RequestOptions options, Embed[] embeds, MessageFlags flags)
+            MessageComponent components, ISticker[] stickers, RequestOptions options, Embed[] embeds, MessageFlags flags, PollProperties poll)
         {
             embeds ??= Array.Empty<Embed>();
             if (embed != null)
@@ -284,7 +284,8 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
 
-            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers);
+            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers, poll: poll);
+            Preconditions.ValidatePoll(poll);
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
@@ -308,7 +309,9 @@ namespace Discord.Rest
             }
 
             if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
-                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
+                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds, SuppressNotification and none.", nameof(flags));
+
+            
 
             var args = new CreateMessageParams
             {
@@ -319,7 +322,8 @@ namespace Discord.Rest
                 MessageReference = messageReference?.ToModel(),
                 Components = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified,
-                Flags = flags
+                Flags = flags,
+                Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified
             };
             var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
@@ -353,12 +357,12 @@ namespace Discord.Rest
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             string filePath, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
             MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
-            bool isSpoiler, Embed[] embeds, MessageFlags flags = MessageFlags.None)
+            bool isSpoiler, Embed[] embeds, MessageFlags flags = MessageFlags.None, PollProperties poll = null)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
                 return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, allowedMentions,
-                messageReference, components, stickers, options, isSpoiler, embeds, flags).ConfigureAwait(false);
+                messageReference, components, stickers, options, isSpoiler, embeds, flags, poll).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -366,11 +370,11 @@ namespace Discord.Rest
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
             MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
-            bool isSpoiler, Embed[] embeds, MessageFlags flags = MessageFlags.None)
+            bool isSpoiler, Embed[] embeds, MessageFlags flags = MessageFlags.None, PollProperties poll = null)
         {
             using (var file = new FileAttachment(stream, filename, isSpoiler: isSpoiler))
                 return await SendFileAsync(channel, client, file, text, isTTS, embed, allowedMentions, messageReference,
-                components, stickers, options, embeds, flags).ConfigureAwait(false);
+                components, stickers, options, embeds, flags, poll).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -378,15 +382,15 @@ namespace Discord.Rest
         public static Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             FileAttachment attachment, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
             MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
-            Embed[] embeds, MessageFlags flags = MessageFlags.None)
+            Embed[] embeds, MessageFlags flags = MessageFlags.None, PollProperties poll = null)
             => SendFilesAsync(channel, client, new[] { attachment }, text, isTTS, embed, allowedMentions, messageReference,
-                components, stickers, options, embeds, flags);
+                components, stickers, options, embeds, flags, poll);
 
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/>, <see cref="MessageFlags.SuppressNotification"/> and <see cref="MessageFlags.None"/>.</exception>
         public static async Task<RestUserMessage> SendFilesAsync(IMessageChannel channel, BaseDiscordClient client,
             IEnumerable<FileAttachment> attachments, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
             MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
-            Embed[] embeds, MessageFlags flags)
+            Embed[] embeds, MessageFlags flags, PollProperties poll = null)
         {
             embeds ??= Array.Empty<Embed>();
             if (embed != null)
@@ -396,7 +400,8 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
 
-            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers, attachments);
+            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers, attachments, poll);
+            Preconditions.ValidatePoll(poll);
 
             foreach (var attachment in attachments)
             {
@@ -446,7 +451,8 @@ namespace Discord.Rest
                 MessageReference = messageReference?.ToModel() ?? Optional<API.MessageReference>.Unspecified,
                 MessageComponent = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified,
-                Flags = flags
+                Flags = flags,
+                Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified
             };
 
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);

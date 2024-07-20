@@ -267,7 +267,7 @@ namespace Discord.Net.WebSockets
             }
             catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
             {
-                var _ = OnClosed(new Exception("Connection timed out.", ex));
+                var _ = OnClosed(new WebSocketException(WebSocketError.ConnectionClosedPrematurely, "Connection timed out.", ex));
             }
             catch (OperationCanceledException) { }
             catch (Exception ex)
