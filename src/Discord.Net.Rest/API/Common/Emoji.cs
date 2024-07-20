@@ -11,16 +11,16 @@ internal class Emoji
     public string Name { get; set; }
 
     [JsonProperty("animated")]
-    public bool? Animated { get; set; }
+    public Optional<bool> Animated { get; set; }
 
     [JsonProperty("roles")]
-    public ulong[] Roles { get; set; }
+    public Optional<ulong[]> Roles { get; set; }
 
     [JsonProperty("require_colons")]
-    public bool RequireColons { get; set; }
+    public Optional<bool> RequireColons { get; set; }
 
     [JsonProperty("managed")]
-    public bool Managed { get; set; }
+    public Optional<bool> Managed { get; set; }
 
     [JsonProperty("user")]
     public Optional<User> User { get; set; }

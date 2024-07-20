@@ -2093,7 +2093,7 @@ namespace Discord.API
         }
         #endregion
 
-        #region Guild emoji
+        #region Guild Emoji
         public Task<IReadOnlyCollection<Emoji>> GetGuildEmotesAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -2843,6 +2843,57 @@ namespace Discord.API
 
         public Task<Message> ExpirePollAsync(ulong channelId, ulong messageId, RequestOptions options = null)
             => SendAsync<Message>("POST", () => $"channels/{channelId}/polls/{messageId}/expire", new BucketIds(channelId: channelId), options: options);
+
+        #endregion
+
+        #region App Emojis
+
+        public Task<Emoji> CreateApplicationEmoteAsync(CreateApplicationEmoteParams args, RequestOptions options = null)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
+            Preconditions.NotNull(args.Image.Stream, nameof(args.Image));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds();
+            return SendJsonAsync<Emoji>("POST", () => $"applications/{CurrentApplicationId}/emojis", args, ids, options: options);
+        }
+
+        public Task<Emoji> ModifyApplicationEmoteAsync(ulong emoteId, ModifyApplicationEmoteParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(emoteId, 0, nameof(emoteId));
+            Preconditions.NotNull(args, nameof(args));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds();
+            return SendJsonAsync<Emoji>("PATCH", () => $"applications/{CurrentApplicationId}/emojis/{emoteId}", args, ids, options: options);
+        }
+
+        public Task DeleteApplicationEmoteAsync(ulong emoteId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(emoteId, 0, nameof(emoteId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds();
+            return SendAsync("DELETE", () => $"applications/{CurrentApplicationId}/emojis/{emoteId}", ids, options: options);
+        }
+
+        public Task<Emoji> GetApplicationEmoteAsync(ulong emoteId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(emoteId, 0, nameof(emoteId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds();
+            return SendAsync<Emoji>("GET", () => $"applications/{CurrentApplicationId}/emojis/{emoteId}", ids, options: options);
+        }
+
+        public Task<ListApplicationEmojisResponse> GetApplicationEmotesAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds();
+            return SendAsync<ListApplicationEmojisResponse>("GET", () => $"applications/{CurrentApplicationId}/emojis", ids, options: options);
+        }
 
         #endregion
     }

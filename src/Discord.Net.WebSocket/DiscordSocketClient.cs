@@ -451,6 +451,26 @@ namespace Discord.WebSocket
         public Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null)
             => ClientHelper.ConsumeEntitlementAsync(this, entitlementId, options);
 
+        /// <inheritdoc />
+        public Task<Emote> GetApplicationEmoteAsync(ulong emoteId, RequestOptions options = null)
+            => ClientHelper.GetApplicationEmojiAsync(this, emoteId, options);
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<Emote>> GetApplicationEmotesAsync(RequestOptions options = null)
+            => ClientHelper.GetApplicationEmojisAsync(this, options);
+
+        /// <inheritdoc />
+        public Task<Emote> ModifyApplicationEmoteAsync(ulong emoteId, Action<ApplicationEmoteProperties> args, RequestOptions options = null)
+            => ClientHelper.ModifyApplicationEmojiAsync(this, emoteId, args, options);
+
+        /// <inheritdoc />
+        public Task<Emote> CreateApplicationEmoteAsync(string name, Image image, RequestOptions options = null)
+            => ClientHelper.CreateApplicationEmojiAsync(this, name, image, options);
+
+        /// <inheritdoc />
+        public Task DeleteApplicationEmoteAsync(ulong emoteId, RequestOptions options = null)
+            => ClientHelper.DeleteApplicationEmojiAsync(this, emoteId, options);
+
         /// <summary>
         ///     Gets entitlements from cache.
         /// </summary>

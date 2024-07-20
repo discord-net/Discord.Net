@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -13,13 +14,21 @@ namespace Discord.Rest
             return new Emoji(model.Name);
         }
 
+        public static Emote ToEmote(this API.Emoji model, BaseDiscordClient discord = null)
+            => new(model.Id.GetValueOrDefault(),
+                model.Name,
+                model.Animated.GetValueOrDefault(false),
+                model.User.IsSpecified ?
+                    RestUser.Create(discord, model.User.Value)
+                    : null);
+
         public static GuildEmote ToEntity(this API.Emoji model)
             => new GuildEmote(model.Id.Value,
                 model.Name,
-                model.Animated.GetValueOrDefault(),
-                model.Managed,
-                model.RequireColons,
-                ImmutableArray.Create(model.Roles),
+                model.Animated.GetValueOrDefault(false),
+                model.Managed.GetValueOrDefault(false),
+                model.RequireColons.GetValueOrDefault(false),
+                model.Roles.GetValueOrDefault([]).ToImmutableArray(),
                 model.User.IsSpecified ? model.User.Value.Id : null,
                 model.IsAvailable.ToNullable());
 

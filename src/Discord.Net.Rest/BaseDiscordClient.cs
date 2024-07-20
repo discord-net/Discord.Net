@@ -299,6 +299,22 @@ namespace Discord.Rest
         /// </summary>
         Task IDiscordClient.ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options) => Task.CompletedTask;
 
+
+        /// <inheritdoc />
+        Task<Emote> IDiscordClient.GetApplicationEmoteAsync(ulong emoteId, RequestOptions options) => Task.FromResult<Emote>(null);
+
+        /// <inheritdoc />
+        Task<IReadOnlyCollection<Emote>> IDiscordClient.GetApplicationEmotesAsync(RequestOptions options) => Task.FromResult<IReadOnlyCollection<Emote>>(ImmutableArray.Create<Emote>());
+
+        /// <inheritdoc />
+        Task<Emote> IDiscordClient.ModifyApplicationEmoteAsync(ulong emoteId, Action<ApplicationEmoteProperties> args, RequestOptions options) => Task.FromResult<Emote>(null);
+
+        /// <inheritdoc />
+        Task<Emote> IDiscordClient.CreateApplicationEmoteAsync(string name, Image image, RequestOptions options) => Task.FromResult<Emote>(null);
+
+        /// <inheritdoc />
+        Task IDiscordClient.DeleteApplicationEmoteAsync(ulong emoteId, RequestOptions options) => Task.CompletedTask;
+
         #endregion
     }
 }

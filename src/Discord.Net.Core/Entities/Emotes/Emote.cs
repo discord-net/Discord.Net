@@ -12,8 +12,10 @@ namespace Discord
     {
         /// <inheritdoc />
         public string Name { get; }
+
         /// <inheritdoc />
         public ulong Id { get; }
+
         /// <summary>
         ///     Gets whether this emote is animated.
         /// </summary>
@@ -21,8 +23,10 @@ namespace Discord
         ///     A boolean that determines whether or not this emote is an animated one.
         /// </returns>
         public bool Animated { get; }
+
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+
         /// <summary>
         ///     Gets the image URL of this emote.
         /// </summary>
@@ -32,6 +36,11 @@ namespace Discord
         public string Url => CDN.GetEmojiUrl(Id, Animated);
 
         /// <summary>
+        ///     Gets the user who created this emote. <see langword="null" /> if not available.
+        /// </summary>
+        public IUser User { get; private set; }
+
+        /// <summary>
         ///    Creates a new instance of <see cref="Emote" />.
         /// </summary>
         public Emote(ulong id, string name, bool animated = false)
@@ -39,6 +48,14 @@ namespace Discord
             Id = id;
             Name = name;
             Animated = animated;
+        }
+
+        internal Emote(ulong id, string name, bool animated = false, IUser user = null)
+        {
+            Id = id;
+            Name = name;
+            Animated = animated;
+            User = user;
         }
 
         /// <summary>

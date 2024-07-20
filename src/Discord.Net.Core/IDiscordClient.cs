@@ -356,5 +356,30 @@ namespace Discord
         /// <param name="entitlementId">The id of the entitlement.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets an emote for the current application.
+        /// </summary>
+        public Task<Emote> GetApplicationEmoteAsync(ulong emoteId, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets all emotes for the current application.
+        /// </summary>
+        public Task<IReadOnlyCollection<Emote>> GetApplicationEmotesAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies an emote for the current application.
+        /// </summary>
+        public Task<Emote> ModifyApplicationEmoteAsync(ulong emoteId, Action<ApplicationEmoteProperties> args, RequestOptions options = null);
+
+        /// <summary>
+        ///    Creates an emote for the current application.
+        /// </summary>
+        public Task<Emote> CreateApplicationEmoteAsync(string name, Image image, RequestOptions options = null);
+
+        /// <summary>
+        ///     Deletes an emote for the current application.
+        /// </summary>
+        public Task DeleteApplicationEmoteAsync(ulong emoteId, RequestOptions options = null);
     }
 }
