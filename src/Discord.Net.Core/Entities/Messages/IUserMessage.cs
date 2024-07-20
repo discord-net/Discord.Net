@@ -34,6 +34,14 @@ namespace Discord
         ///     Gets a collection of partial messages that were forwarded with this message.
         /// </summary>
         IReadOnlyCollection<MessageSnapshot> ForwardedMessages { get; }
+        
+        /// <summary>
+        ///     Gets the poll sent with this message.
+        /// </summary>
+        /// <remarks>
+        ///     Will be <see langword="null"/> if the message has no poll.
+        /// </remarks>
+        Poll? Poll { get; }
 
         /// <summary>
         ///     Modifies this message.
@@ -100,5 +108,23 @@ namespace Discord
             TagHandling roleHandling = TagHandling.Name,
             TagHandling everyoneHandling = TagHandling.Ignore,
             TagHandling emojiHandling = TagHandling.Name);
+
+        /// <summary>
+        ///     Immediately ends the poll.
+        /// </summary>
+        /// <remarks>
+        ///     You cannot end polls from other users.
+        /// </remarks>
+        /// <param name="options">The options to be used when sending the request.</param>
+        Task EndPollAsync(RequestOptions options);
+
+        /// <summary>
+        ///     Get users that voted for this specific answer.
+        /// </summary>
+        /// <param name="answerId">The id on the answer to fetch voters for</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="afterId">The id of a user to start after.</param>
+        /// <param name="limit">The number of users to request.</param>
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetPollAnswerVotersAsync(uint answerId, int? limit = null, ulong? afterId = null, RequestOptions options = null);
     }
 }

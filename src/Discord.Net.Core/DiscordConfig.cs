@@ -206,6 +206,14 @@ namespace Discord
         public bool UseInteractionSnowflakeDate { get; set; } = true;
 
         /// <summary>
+        ///     Gets or sets whether or not any responses to Discord will make an internal expiration check.
+        /// </summary>
+        /// <remarks>
+        ///     This should generally be set to <see langword="false"/> in a development environment due to potential latency issues.
+        /// </remarks>
+        public bool ResponseInternalTimeCheck { get; set; } = true;
+
+        /// <summary>
         ///     Gets or sets if the Rest/Socket user <see cref="object.ToString"/> override formats the string in respect to bidirectional unicode.
         /// </summary>
         /// <remarks>
@@ -256,5 +264,25 @@ namespace Discord
         ///     Returns the maximum number of entitlements that can be gotten per-batch.
         /// </summary>
         public const int MaxEntitlementsPerBatch = 100;
+
+        /// <summary>
+        ///     Returns the maximum number of poll answer voters that can be gotten per-batch.
+        /// </summary>
+        public const int MaxPollVotersPerBatch = 100;
+
+        /// <summary>
+        ///     Returns the maximum length of a poll answer text.
+        /// </summary>
+        public const int MaxPollAnswerTextLength = 55;
+
+        /// <summary>
+        ///     Returns the maximum length of a poll question text.
+        /// </summary>
+        public const int MaxPollQuestionTextLength = 300;
+      
+        /// <summary>
+        ///     Returns the maximum number of bans that can be banned in a single bulk request.
+        /// </summary>
+        public const int MaxBansPerBulkBatch = 200;
     }
 }

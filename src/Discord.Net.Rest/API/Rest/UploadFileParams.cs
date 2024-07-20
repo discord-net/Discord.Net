@@ -23,6 +23,7 @@ namespace Discord.API.Rest
         public Optional<ActionRowComponent[]> MessageComponent { get; set; }
         public Optional<MessageFlags?> Flags { get; set; }
         public Optional<ulong[]> Stickers { get; set; }
+        public Optional<CreatePollParams> Poll { get; set; }
 
         public UploadFileParams(params Discord.FileAttachment[] attachments)
         {
@@ -52,6 +53,8 @@ namespace Discord.API.Rest
                 payload["sticker_ids"] = Stickers.Value;
             if (Flags.IsSpecified)
                 payload["flags"] = Flags.Value;
+            if (Poll.IsSpecified)
+                payload["poll"] = Poll.Value;
 
             List<object> attachments = new();
 

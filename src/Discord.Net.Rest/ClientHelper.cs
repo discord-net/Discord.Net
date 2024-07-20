@@ -446,6 +446,9 @@ namespace Discord.Rest
             return models.Select(x => new SKU(x.Id, x.Type, x.ApplicationId, x.Name, x.Slug)).ToImmutableArray();
         }
 
+        public static Task ConsumeEntitlementAsync(BaseDiscordClient client, ulong entitlementId, RequestOptions options = null)
+            => client.ApiClient.ConsumeEntitlementAsync(entitlementId, options);
+
         #endregion
     }
 }

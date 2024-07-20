@@ -1,5 +1,48 @@
 # Changelog
 
+## [3.15.2] - 2024-06-18
+### Hotfix
+- fix `AutocompleteAttribute` with empty constructor
+- fix `Emote` constructor related issues
+
+## [3.15.1] - 2024-06-18
+### Added
+- #2927 Add missing PollProperties (a59f4ba)
+- #2942 Add purchase notification (9d92435)
+- #2934 Add MessageCallData (21195a8)
+- #2932 Config Bypass for CanSendResponse (9030a5b)
+- #2933 Premium Buttons (531b5eb)
+- #2941 Add UseExternalApps permission (f7f29d5)
+### Misc
+- #2936 Public constructor for Emote (3be72a8)
+- #2935 Generic autocomplete (35b102a)
+- #2929 Enable nuget debug symbols. (aa424f6)
+
+## [3.15.0] - 2024-05-12
+### Added
+- #2902 Polls (476ec06)
+- #2898 Guild bans with seconds prune period (d1da2a0)
+- #2903 Create `RequireTeamAttribute` (753724d)
+- #2906 Create `DoHierarchyCheckAttribute` (1a5cba8)
+- #2923 Create `RequireRoleAttribute` (5dadcb2)
+- #2919 More store stuff (f9086d3)
+- #2920 Add `SocketInteraction.InteractionChannel` (3054505)
+
+### Fixed
+- #2910 RestDMChannel relies on recipient (13ea566)
+- #2911 Don't rely on Guild for id (397a887)
+- #2912 Don't depend on WebSocket for Interaction service (a2f624e)
+- #2922 NRE with rest interactions & no api call (again) (83fdc89) 
+- #2924 Fix null error when using a `SelectMenuBuilder` constructor (93cb71a)
+
+### Misc
+- #2905 Remove analyzer project & resolve some build warnings (7aab366)
+- #2913 Replace generic exceptions. (54d2fe5)
+- #2908 Support options in Rest's AddRoleAsync (b70e21b)
+- #2914 `.Distinct()` roles(ids) in `IGuildUser.ModifyAsync` (27a0785)
+- #2915 Improve bulk bans (f85bf9a)
+
+
 ## [3.14.1] - 2024-03-19
 ### Fixed
 - Version number contains commit hash

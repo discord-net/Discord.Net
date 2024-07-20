@@ -2705,14 +2705,14 @@ namespace Discord.API
                 int lastIndex = 0;
                 while (true)
                 {
-                    int leftIndex = format.IndexOf("{", lastIndex);
+                    int leftIndex = format.IndexOf('{', lastIndex);
                     if (leftIndex == -1 || leftIndex > endIndex)
                     {
                         builder.Append(format, lastIndex, endIndex - lastIndex);
                         break;
                     }
                     builder.Append(format, lastIndex, leftIndex - lastIndex);
-                    int rightIndex = format.IndexOf("}", leftIndex);
+                    int rightIndex = format.IndexOf('}', leftIndex);
 
                     int argId = int.Parse(format.Substring(leftIndex + 1, rightIndex - leftIndex - 1), NumberStyles.None, CultureInfo.InvariantCulture);
                     string fieldName = GetFieldName(methodArgs[argId + 1]);
@@ -2827,6 +2827,22 @@ namespace Discord.API
 
         public Task<SKU[]> ListSKUsAsync(RequestOptions options = null)
             => SendAsync<SKU[]>("GET", () => $"applications/{CurrentApplicationId}/skus", new BucketIds(), options: options);
+
+        public Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => SendAsync("POST", () => $"applications/{CurrentApplicationId}/entitlements/{entitlementId}/consume", new BucketIds(), options: options);
+
+        #endregion
+
+        #region Polls
+
+        public Task<PollAnswerVoters> GetPollAnswerVotersAsync(ulong channelId, ulong messageId, uint answerId, int limit = 100, ulong? afterId = null, RequestOptions options = null)
+        {
+            var urlParams = $"?limit={limit}{(afterId is not null ? $"&after={afterId}" : string.Empty)}";
+            return SendAsync<PollAnswerVoters>("GET", () => $"channels/{channelId}/polls/{messageId}/answers/{answerId}{urlParams}", new BucketIds(channelId: channelId), options: options);
+        }
+
+        public Task<Message> ExpirePollAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+            => SendAsync<Message>("POST", () => $"channels/{channelId}/polls/{messageId}/expire", new BucketIds(channelId: channelId), options: options);
 
         #endregion
     }

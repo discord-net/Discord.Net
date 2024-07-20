@@ -45,6 +45,7 @@ namespace Discord.Rest
         public TokenType TokenType => ApiClient.AuthTokenType;
         internal bool UseInteractionSnowflakeDate { get; private set; }
         internal bool FormatUsersInBidirectionalUnicode { get; private set; }
+        internal bool ResponseInternalTimeCheck { get; private set; }
 
         /// <summary> Creates a new REST-only Discord client. </summary>
         internal BaseDiscordClient(DiscordRestConfig config, API.DiscordRestApiClient client)
@@ -59,6 +60,7 @@ namespace Discord.Rest
 
             UseInteractionSnowflakeDate = config.UseInteractionSnowflakeDate;
             FormatUsersInBidirectionalUnicode = config.FormatUsersInBidirectionalUnicode;
+            ResponseInternalTimeCheck = config.ResponseInternalTimeCheck;
 
             ApiClient.RequestQueue.RateLimitTriggered += async (id, info, endpoint) =>
             {
@@ -291,6 +293,11 @@ namespace Discord.Rest
         ///     Gets all SKUs for a given application.
         /// </summary>
         Task<IReadOnlyCollection<SKU>> IDiscordClient.GetSKUsAsync(RequestOptions options) => Task.FromResult<IReadOnlyCollection<SKU>>(Array.Empty<SKU>());
+
+        /// <summary>
+        ///     Marks a given one-time purchase entitlement for the user as consumed.
+        /// </summary>
+        Task IDiscordClient.ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options) => Task.CompletedTask;
 
         #endregion
     }

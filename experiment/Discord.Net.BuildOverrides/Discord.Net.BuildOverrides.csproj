@@ -9,6 +9,8 @@
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net6.0;net5.0;</TargetFrameworks>
     <IsTrimmable>false</IsTrimmable>
     <IsAotCompatible>false</IsAotCompatible>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>

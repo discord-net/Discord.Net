@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Создано Microsoft Visio, экспорт SVG Dnet-channels.svg Page-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="11.6929in" height="8.26772in"
+		viewBox="0 0 841.89 595.276" xml:space="preserve" color-interpolation-filters="sRGB" class="st6">
+	<v:documentProperties v:langID="1049" v:metric="true" v:viewMarkup="false">
+		<v:userDefs>
+			<v:ud v:nameU="msvSubprocessMaster" v:prompt="" v:val="VT4(Rectangle)"/>
+			<v:ud v:nameU="msvNoAutoConnect" v:val="VT0(1):26"/>
+		</v:userDefs>
+	</v:documentProperties>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#ffffff;stroke:#a5a5a5;stroke-linecap:round;stroke-linejoin:round;stroke-width:2}
+		.st2 {fill:#00008b;font-family:Cascadia Mono;font-size:0.791656em}
+		.st3 {fill:#008000;font-size:0.842113em}
+		.st4 {marker-end:url(#mrkr4-21);stroke:#a5a5a5;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st5 {fill:#a5a5a5;fill-opacity:1;stroke:#a5a5a5;stroke-opacity:1;stroke-width:0.28409090909091}
+		.st6 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend4">
+			<path d="M 2 1 L 0 0 L 2 -1 L 2 1 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr4-21" class="st5" v:arrowType="4" v:arrowSize="2" v:setback="7.04" refX="-7.04" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend4" transform="scale(-3.52,-3.52) "/>
+		</marker>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<v:userDefs>
+			<v:ud v:nameU="msvThemeOrder" v:val="VT0(0):26"/>
+		</v:userDefs>
+		<title>Страница-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="Соединительная линия" v:index="0"/>
+		<g id="shape1-1" v:mID="1" v:groupContext="shape" transform="translate(345.827,-512.865)">
+			<title>Прямоугольник</title>
+			<desc>IChannel Represents a generic channel.</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="45.77" y="564.07" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IChannel<v:newlineChar/><tspan
+						x="21.16" dy="1.278em" class="st3">Represents a generic </tspan><tspan x="49.28" dy="1.425em" class="st3">channel.</tspan></text>		</g>
+		<g id="shape4-6" v:mID="4" v:groupContext="shape" transform="translate(17.0078,-465.716)">
+			<title>Прямоугольник.4</title>
+			<desc>IPrivateChannel Represents a generic channel that is private</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="26.28" y="563.89" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IPrivateChannel<v:newlineChar/><tspan
+						x="21.16" dy="1.256em" class="st3">Represents a generic </tspan><tspan x="14.12" dy="1.425em" class="st3">channel that is private</tspan></text>		</g>
+		<g id="shape7-11" v:mID="7" v:groupContext="shape" transform="translate(510.236,-465.431)">
+			<title>Прямоугольник.7</title>
+			<desc>IGuildChannel Represents a generic guild channel.</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="31.85" y="563.89" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IGuildChannel<v:newlineChar/><tspan
+						x="7.09" dy="1.256em" class="st3">Represents a generic guild </tspan><tspan x="49.28" dy="1.425em"
+						class="st3">channel.</tspan></text>		</g>
+		<g id="shape10-16" v:mID="10" v:groupContext="shape" v:layerMember="0" transform="translate(345.827,-536.297)">
+			<title>Динамическая соединительная линия</title>
+			<path d="M0 595.28 L-260.79 595.28 L-260.79 611.95" class="st4"/>
+		</g>
+		<g id="shape11-22" v:mID="11" v:groupContext="shape" v:layerMember="0" transform="translate(481.89,-536.297)">
+			<title>Динамическая соединительная линия.11</title>
+			<path d="M0 595.28 L96.38 595.28 L96.38 612.24" class="st4"/>
+		</g>
+		<g id="shape12-27" v:mID="12" v:groupContext="shape" transform="translate(345.827,-418.567)">
+			<title>Прямоугольник.12</title>
+			<desc>IMessageChannel Represents a generic channel that can send an...</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="26.28" y="559.09" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IMessageChannel<v:newlineChar/><tspan
+						x="21.16" dy="1.256em" class="st3">Represents a generic </tspan><tspan x="9.44" dy="1.2em" class="st3">channel that can send and </tspan><tspan
+						x="28.19" dy="1.425em" class="st3">receive messages.</tspan></text>		</g>
+		<g id="shape15-33" v:mID="15" v:groupContext="shape" v:layerMember="0" transform="translate(406.772,-512.865)">
+			<title>Динамическая соединительная линия.15</title>
+			<path d="M7.09 595.28 L7.09 635.67" class="st4"/>
+		</g>
+		<g id="shape16-38" v:mID="16" v:groupContext="shape" transform="translate(95.4567,-371.99)">
+			<title>Прямоугольник.16</title>
+			<desc>IDMChannel Represents a generic DM channel</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="40.2" y="563.89" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IDMChannel<v:newlineChar/><tspan
+						x="14.12" dy="1.256em" class="st3">Represents a generic DM </tspan><tspan x="51.63" dy="1.425em"
+						class="st3">channel</tspan></text>		</g>
+		<g id="shape18-43" v:mID="18" v:groupContext="shape" transform="translate(95.4567,-283.465)">
+			<title>Прямоугольник.18</title>
+			<desc>IGroupChannel Represents a generic private group channel.</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="31.85" y="563.89" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IGroupChannel<v:newlineChar/><tspan
+						x="21.16" dy="1.256em" class="st3">Represents a generic </tspan><tspan x="16.47" dy="1.425em" class="st3">private group channel.</tspan></text>		</g>
+		<g id="shape29-48" v:mID="29" v:groupContext="shape" transform="translate(668.976,-465.431)">
+			<title>Прямоугольник.29</title>
+			<desc>ICategoryChannel Represents a generic category channel.</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="23.5" y="563.89" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>ICategoryChannel<v:newlineChar/><tspan
+						x="21.16" dy="1.256em" class="st3">Represents a generic </tspan><tspan x="28.19" dy="1.425em" class="st3">category channel.</tspan></text>		</g>
+		<g id="shape33-53" v:mID="33" v:groupContext="shape" v:layerMember="0" transform="translate(646.299,-481.775)">
+			<title>Динамическая соединительная линия.33</title>
+			<path d="M0 588.19 L15.64 588.19" class="st4"/>
+		</g>
+		<g id="shape34-58" v:mID="34" v:groupContext="shape" transform="translate(510.236,-371.704)">
+			<title>Прямоугольник.34</title>
+			<desc>INestedChannel Represents a type of guild channel that can be...</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="29.07" y="559.09" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>INestedChannel<v:newlineChar/><tspan
+						x="7.09" dy="1.256em" class="st3">Represents a type of guild </tspan><tspan x="7.09" dy="1.2em" class="st3">channel that can be nested </tspan><tspan
+						x="25.84" dy="1.425em" class="st3">within a category.</tspan></text>		</g>
+		<g id="shape36-64" v:mID="36" v:groupContext="shape" v:layerMember="0" transform="translate(571.181,-465.431)">
+			<title>Динамическая соединительная линия.36</title>
+			<path d="M7.09 595.28 L7.09 635.1" class="st4"/>
+		</g>
+		<g id="shape37-69" v:mID="37" v:groupContext="shape" transform="translate(668.976,-371.704)">
+			<title>Прямоугольник.37</title>
+			<desc>IIntegrationChannel Represents a channel in a guild that can ...</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="15.15" y="559.09" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IIntegrationChannel<v:newlineChar/><tspan
+						x="9.44" dy="1.256em" class="st3">Represents a channel in a </tspan><tspan x="18.81" dy="1.2em" class="st3">guild that can create </tspan><tspan
+						x="46.94" dy="1.425em" class="st3">webhooks.</tspan></text>		</g>
+		<g id="shape40-75" v:mID="40" v:groupContext="shape" v:layerMember="0" transform="translate(578.268,-465.431)">
+			<title>Динамическая соединительная линия.40</title>
+			<path d="M0 595.28 L0 629.47 L158.74 629.47 L158.74 635.1" class="st4"/>
+		</g>
+		<g id="shape41-80" v:mID="41" v:groupContext="shape" transform="translate(668.976,-277.978)">
+			<title>Прямоугольник.41</title>
+			<desc>IForumChannel Represents a forum channel in a guild that can ...</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="31.85" y="559.09" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IForumChannel<v:newlineChar/><tspan
+						x="7.09" dy="1.256em" class="st3">Represents a forum channel </tspan><tspan x="7.09" dy="1.2em" class="st3">in a guild that can create </tspan><tspan
+						x="53.97" dy="1.425em" class="st3">posts.</tspan></text>		</g>
+		<g id="shape44-86" v:mID="44" v:groupContext="shape" v:layerMember="0" transform="translate(729.921,-371.704)">
+			<title>Динамическая соединительная линия.44</title>
+			<path d="M7.09 595.28 L7.09 635.1" class="st4"/>
+		</g>
+		<g id="shape46-91" v:mID="46" v:groupContext="shape" v:layerMember="0" transform="translate(578.268,-371.704)">
+			<title>Динамическая соединительная линия.46</title>
+			<path d="M0 595.28 L0 615.48 L32.22 615.48 A2.3622 2.3622 0 0 1 36.94 615.48 L133.23 615.48 L133.23 635.1" class="st4"/>
+		</g>
+		<g id="shape47-96" v:mID="47" v:groupContext="shape" transform="translate(668.976,-184.252)">
+			<title>Прямоугольник.47</title>
+			<desc>IMediaChannel Represents a media channel in a guild that can ...</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="31.85" y="559.09" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IMediaChannel<v:newlineChar/><tspan
+						x="7.09" dy="1.256em" class="st3">Represents a media channel </tspan><tspan x="7.09" dy="1.2em" class="st3">in a guild that can create </tspan><tspan
+						x="53.97" dy="1.425em" class="st3">posts.</tspan></text>		</g>
+		<g id="shape48-102" v:mID="48" v:groupContext="shape" v:layerMember="0" transform="translate(729.921,-277.978)">
+			<title>Динамическая соединительная линия.48</title>
+			<path d="M7.09 595.28 L7.09 635.1" class="st4"/>
+		</g>
+		<g id="shape49-107" v:mID="49" v:groupContext="shape" transform="translate(510.236,-277.978)">
+			<title>Прямоугольник.49</title>
+			<desc>ITextChannel Represents a generic channel in a guild that can...</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="34.63" y="559.09" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>ITextChannel<v:newlineChar/><tspan
+						x="21.16" dy="1.256em" class="st3">Represents a generic </tspan><tspan x="4.75" dy="1.2em" class="st3">channel in a guild that can </tspan><tspan
+						x="7.09" dy="1.425em" class="st3">send and receive messages.</tspan></text>		</g>
+		<g id="shape52-113" v:mID="52" v:groupContext="shape" v:layerMember="0" transform="translate(571.181,-371.704)">
+			<title>Динамическая соединительная линия.52</title>
+			<path d="M7.09 595.28 L7.09 635.1" class="st4"/>
+		</g>
+		<g id="shape53-118" v:mID="53" v:groupContext="shape" v:layerMember="0" transform="translate(737.008,-371.704)">
+			<title>Динамическая соединительная линия.53</title>
+			<path d="M0 595.28 L0 604.15 L-124.16 604.15 L-124.16 635.1" class="st4"/>
+		</g>
+		<g id="shape54-123" v:mID="54" v:groupContext="shape" transform="translate(510.236,-184.252)">
+			<title>Прямоугольник.54</title>
+			<desc>INewsChannel Represents a generic news that can send, receive...</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="34.63" y="559.09" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>INewsChannel<v:newlineChar/><tspan
+						x="9.44" dy="1.256em" class="st3">Represents a generic news </tspan><tspan x="7.09" dy="1.2em" class="st3">that can send, receive and </tspan><tspan
+						x="23.5" dy="1.425em" class="st3">crosspost messages.</tspan></text>		</g>
+		<g id="shape56-129" v:mID="56" v:groupContext="shape" v:layerMember="0" transform="translate(571.181,-277.978)">
+			<title>Динамическая соединительная линия.56</title>
+			<path d="M7.09 595.28 L7.09 635.1" class="st4"/>
+		</g>
+		<g id="shape57-134" v:mID="57" v:groupContext="shape" transform="translate(345.827,-184.252)">
+			<title>Прямоугольник.57</title>
+			<desc>IThreadChannel Represents a thread channel inside of a guild</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="29.07" y="563.89" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IThreadChannel<v:newlineChar/><tspan
+						x="4.75" dy="1.256em" class="st3">Represents a thread channel </tspan><tspan x="28.19" dy="1.425em"
+						class="st3">inside of a guild</tspan></text>		</g>
+		<g id="shape61-139" v:mID="61" v:groupContext="shape" transform="translate(187.087,-184.252)">
+			<title>Прямоугольник.61</title>
+			<desc>IVoiceChannel Represents a generic voice channel in a guild.</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="31.85" y="563.89" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IVoiceChannel<v:newlineChar/><tspan
+						x="7.09" dy="1.256em" class="st3">Represents a generic voice </tspan><tspan x="23.5" dy="1.425em"
+						class="st3">channel in a guild.</tspan></text>		</g>
+		<g id="shape65-144" v:mID="65" v:groupContext="shape" transform="translate(187.087,-90.5258)">
+			<title>Прямоугольник.65</title>
+			<desc>IStageChannel Represents a generic Stage Channel.</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="31.85" y="563.89" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IStageChannel<v:newlineChar/><tspan
+						x="7.09" dy="1.256em" class="st3">Represents a generic Stage </tspan><tspan x="49.28" dy="1.425em"
+						class="st3">Channel.</tspan></text>		</g>
+		<g id="shape66-149" v:mID="66" v:groupContext="shape" v:layerMember="0" transform="translate(248.031,-184.252)">
+			<title>Динамическая соединительная линия.66</title>
+			<path d="M7.09 595.28 L7.09 635.1" class="st4"/>
+		</g>
+		<g id="shape70-154" v:mID="70" v:groupContext="shape" v:layerMember="0" transform="translate(413.858,-418.567)">
+			<title>Динамическая соединительная линия.70</title>
+			<path d="M0 595.28 L0 662.35 L129.83 662.35 L129.83 681.96" class="st4"/>
+		</g>
+		<g id="shape1000-159" v:mID="1000" v:groupContext="shape" transform="translate(181.417,-465.716)">
+			<title>Прямоугольник.1000</title>
+			<desc>IAudioChannel Represents a generic audio channel.</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="68.0315" cy="571.844" width="136.07" height="46.8631"/>
+			<rect x="0" y="548.412" width="136.063" height="46.8631" class="st1"/>
+			<text x="31.85" y="563.89" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>IAudioChannel<v:newlineChar/><tspan
+						x="7.09" dy="1.256em" class="st3">Represents a generic audio </tspan><tspan x="49.28" dy="1.425em"
+						class="st3">channel.</tspan></text>		</g>
+		<g id="shape1001-164" v:mID="1001" v:groupContext="shape" v:layerMember="0" transform="translate(345.827,-536.297)">
+			<title>Динамическая соединительная линия.1001</title>
+			<path d="M0 595.28 L-96.38 595.28 L-96.38 611.95" class="st4"/>
+		</g>
+		<g id="shape1003-169" v:mID="1003" v:groupContext="shape" v:layerMember="0" transform="translate(345.827,-441.999)">
+			<title>Динамическая соединительная линия.1003</title>
+			<path d="M0 595.28 L-94.02 595.28 A2.3622 2.3622 -180 0 0 -98.74 595.28 L-182.34 595.28 L-182.34 611.38" class="st4"/>
+		</g>
+		<g id="shape1005-174" v:mID="1005" v:groupContext="shape" v:layerMember="0" transform="translate(83.1614,-465.716)">
+			<title>Динамическая соединительная линия.1005</title>
+			<path d="M1.88 595.28 L1.88 665.57 L5.26 665.57" class="st4"/>
+		</g>
+		<g id="shape1006-179" v:mID="1006" v:groupContext="shape" v:layerMember="0" transform="translate(83.1614,-465.716)">
+			<title>Динамическая соединительная линия.1006</title>
+			<path d="M1.88 595.28 L1.88 754.1 L5.26 754.1" class="st4"/>
+		</g>
+		<g id="shape1007-184" v:mID="1007" v:groupContext="shape" v:layerMember="0" transform="translate(510.236,-301.41)">
+			<title>Динамическая соединительная линия.1007</title>
+			<path d="M0 595.28 L-96.38 595.28 L-96.38 658.53" class="st4"/>
+		</g>
+		<g id="shape1008-189" v:mID="1008" v:groupContext="shape" v:layerMember="0" transform="translate(510.236,-301.41)">
+			<title>Динамическая соединительная линия.1008</title>
+			<path d="M0 595.28 L-255.12 595.28 L-255.12 658.53" class="st4"/>
+		</g>
+		<g id="shape1009-194" v:mID="1009" v:groupContext="shape" v:layerMember="0" transform="translate(345.827,-441.999)">
+			<title>Динамическая соединительная линия.1009</title>
+			<path d="M0 595.28 L-12.67 595.28 L-12.67 694.27 L-94.02 694.27 A2.3622 2.3622 -180 0 0 -98.74 694.27 L-182.34 694.27
+						 L-182.34 699.91" class="st4"/>
+		</g>
+		<g id="shape1010-199" v:mID="1010" v:groupContext="shape" v:layerMember="0" transform="translate(249.449,-465.716)">
+			<title>Динамическая соединительная линия.1010</title>
+			<path d="M0 595.28 L0 754.1 L-10.89 754.1" class="st4"/>
+		</g>
+		<g id="shape1011-204" v:mID="1011" v:groupContext="shape" v:layerMember="0" transform="translate(242.362,-465.716)">
+			<title>Динамическая соединительная линия.1011</title>
+			<path d="M7.09 595.28 L7.09 822.84" class="st4"/>
+		</g>
+	</g>
+</svg>

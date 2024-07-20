@@ -21,6 +21,9 @@ public readonly struct ApplicationCommandInteractionMetadata : IMessageInteracti
     public ulong UserId { get; }
 
     /// <inheritdoc />
+    public IUser User { get; }
+
+    /// <inheritdoc />
     public IReadOnlyDictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; }
 
     /// <inheritdoc />
@@ -32,7 +35,7 @@ public readonly struct ApplicationCommandInteractionMetadata : IMessageInteracti
     public string Name { get; }
 
     internal ApplicationCommandInteractionMetadata(ulong id, InteractionType type, ulong userId, IReadOnlyDictionary<ApplicationIntegrationType, ulong> integrationOwners,
-        ulong? originalResponseMessageId, string name)
+        ulong? originalResponseMessageId, string name, IUser user)
     {
         Id = id;
         Type = type;
@@ -40,5 +43,6 @@ public readonly struct ApplicationCommandInteractionMetadata : IMessageInteracti
         IntegrationOwners = integrationOwners;
         OriginalResponseMessageId = originalResponseMessageId;
         Name = name;
+        User = user;
     }
 }
