@@ -983,6 +983,10 @@ namespace Discord.Rest
         /// </returns>
         public Task<IReadOnlyCollection<RestGuildUser>> SearchUsersAsync(string query, int limit = DiscordConfig.MaxUsersPerBatch, RequestOptions options = null)
             => GuildHelper.SearchUsersAsync(this, Discord, query, limit, options);
+
+        /// <inheritdoc />
+        public Task<MemberSearchResult> SearchUsersAsyncV2(int limit = DiscordConfig.MaxUsersPerBatch, MemberSearchPropertiesV2 args = null, RequestOptions options = null)
+            => GuildHelper.SearchUsersAsyncV2(this, Discord, limit, args, options);
         #endregion
 
         #region Audit logs

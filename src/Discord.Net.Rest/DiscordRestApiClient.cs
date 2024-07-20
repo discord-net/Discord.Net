@@ -2038,6 +2038,16 @@ namespace Discord.API
             Expression<Func<string>> endpoint = () => $"guilds/{guildId}/members/search?limit={limit}&query={query}";
             return SendAsync<IReadOnlyCollection<GuildMember>>("GET", endpoint, ids, options: options);
         }
+
+        public Task<GuildMemberSearchResponse> SearchGuildMembersAsyncV2(ulong guildId, SearchGuildMembersParamsV2 args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+            
+            var ids = new BucketIds(guildId: guildId);
+            return SendJsonAsync<GuildMemberSearchResponse>("POST", () => $"guilds/{guildId}/members-search", args, ids, options: options);
+        }
+
         #endregion
 
         #region Guild Roles
