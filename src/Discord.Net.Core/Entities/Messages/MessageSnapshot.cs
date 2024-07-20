@@ -10,14 +10,8 @@ public readonly struct MessageSnapshot
     /// </summary>
     public readonly IMessage Message;
 
-    /// <summary>
-    ///     Gets the id of the originating message's guild
-    /// </summary>
-    public readonly ulong? GuildId;
-
-    internal MessageSnapshot(IMessage message, ulong? guildId)
+    internal MessageSnapshot(IMessage message)
     {
         Message = message;
-        GuildId = guildId;
     }
 }

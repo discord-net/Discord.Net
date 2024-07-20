@@ -217,8 +217,7 @@ namespace Discord.WebSocket
             if (model.MessageSnapshots.IsSpecified)
             {
                 ForwardedMessages = model.MessageSnapshots.Value.Select(x =>
-                    new MessageSnapshot(RestMessage.Create(Discord, null, null, x.Message),
-                        x.GuildId.IsSpecified ? x.GuildId.Value : null)).ToImmutableArray();
+                    new MessageSnapshot(RestMessage.Create(Discord, null, null, x.Message))).ToImmutableArray();
             }
             else
                 ForwardedMessages = ImmutableArray<MessageSnapshot>.Empty;
