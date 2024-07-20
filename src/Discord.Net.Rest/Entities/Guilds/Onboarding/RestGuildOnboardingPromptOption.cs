@@ -36,7 +36,7 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
         
         if (model.Emoji.Id.HasValue)
         {
-            Emoji = new Emote(model.Emoji.Id.Value, model.Emoji.Name, model.Emoji.Animated ?? false);
+            Emoji = new Emote(model.Emoji.Id.Value, model.Emoji.Name, model.Emoji.Animated.GetValueOrDefault(false));
         }
         else if (!string.IsNullOrWhiteSpace(model.Emoji.Name))
         {

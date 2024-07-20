@@ -450,5 +450,48 @@ namespace Discord.Rest
             => client.ApiClient.ConsumeEntitlementAsync(entitlementId, options);
 
         #endregion
+
+        #region Application Emojis
+
+        public static async Task<IReadOnlyCollection<Emote>> GetApplicationEmojisAsync(BaseDiscordClient client, RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetApplicationEmotesAsync(options).ConfigureAwait(false);
+            return model.Items.Select(x => x.ToEmote(client)).ToImmutableArray();
+        }
+
+        public static async Task<Emote> GetApplicationEmojiAsync(BaseDiscordClient client, ulong emojiId, RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetApplicationEmoteAsync(emojiId, options).ConfigureAwait(false);
+            return model.ToEmote(client);
+        }
+
+        public static async Task<Emote> CreateApplicationEmojiAsync(BaseDiscordClient client, string name, Image image, RequestOptions options = null)
+        {
+            var model = await client.ApiClient.CreateApplicationEmoteAsync(new CreateApplicationEmoteParams
+            {
+                Name = name,
+                Image = image.ToModel()
+            }, options).ConfigureAwait(false);
+
+            return model.ToEmote(client);
+        }
+
+        public static async Task<Emote> ModifyApplicationEmojiAsync(BaseDiscordClient client, ulong emojiId, Action<ApplicationEmoteProperties> func, RequestOptions options = null)
+        {
+            var args = new ApplicationEmoteProperties();
+            func(args);
+
+            var model = await client.ApiClient.ModifyApplicationEmoteAsync(emojiId, new ModifyApplicationEmoteParams
+            {
+                Name = args.Name,
+            }, options).ConfigureAwait(false);
+
+            return model.ToEmote(client);
+        }
+
+        public static Task DeleteApplicationEmojiAsync(BaseDiscordClient client, ulong emojiId, RequestOptions options = null)
+            => client.ApiClient.DeleteApplicationEmoteAsync(emojiId, options);
+
+        #endregion
     }
 }
