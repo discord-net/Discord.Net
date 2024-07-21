@@ -13,9 +13,9 @@ public sealed partial class RestBanActor(
     RestActor<ulong, RestBan, BanIdentity>(client, ban),
     IBanActor
 {
-    [SourceOfTruth] public RestGuildActor Guild { get; } = new(client, guild);
+    [SourceOfTruth] public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
 
-    [SourceOfTruth] public RestUserActor User { get; } = new(client, user ?? UserIdentity.Of(ban.Id));
+    [SourceOfTruth] public RestUserActor User { get; } = user?.Actor ?? new(client, user ?? UserIdentity.Of(ban.Id));
 
     [SourceOfTruth]
     internal RestBan CreateEntity(IBanModel model)

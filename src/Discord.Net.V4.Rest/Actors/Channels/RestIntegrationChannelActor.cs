@@ -20,7 +20,7 @@ public sealed partial class RestIntegrationChannelActor :
     public RestIntegrationChannelActor(DiscordRestClient client,
         GuildIdentity guild,
         IntegrationChannelIdentity channel
-    ) : base(client, guild, channel.Cast<RestGuildChannel, IGuildChannelModel>())
+    ) : base(client, guild, channel.Cast<RestGuildChannel, RestGuildChannelActor, IGuildChannelModel>())
     {
         IntegrationChannelIdentity = channel;
 

@@ -103,6 +103,8 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
             {
                 if (target?.ClassDeclarationSyntax.BaseList is null) continue;
 
+                var targetLogger = logger.WithSemanticContext(target.SemanticModel);
+
                 var targetTypeSymbol = target.SemanticModel.GetDeclaredSymbol(target.ClassDeclarationSyntax);
 
                 if (targetTypeSymbol is null) continue;
@@ -112,7 +114,7 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
 
                 if (targetReturnType is null)
                 {
-                    logger.Warn(
+                    targetLogger.Warn(
                         $"No return type can be resolved from {target.MethodDeclarationSyntax.ReturnType}");
                     continue;
                 }
@@ -121,7 +123,7 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
                     IMethodSymbol
                     targetMethodSymbol)
                 {
-                    logger.Warn(
+                    targetLogger.Warn(
                         $"No method symbol can be resolved from {target.MethodDeclarationSyntax.Identifier}");
                     continue;
                 }
@@ -131,7 +133,7 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
                     var typeInfo = ModelExtensions.GetTypeInfo(target.SemanticModel, baseType.Type).Type;
                     if (typeInfo is not INamedTypeSymbol namedTypeSymbol)
                     {
-                        logger.Warn($"No type info could be found for {baseType.Type}");
+                        targetLogger.Warn($"No type info could be found for {baseType.Type}");
                         continue;
                     }
 
@@ -146,20 +148,20 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
                         // verify we can override the member
                         if (!member.IsVirtual)
                         {
-                            logger.Warn(
+                            targetLogger.Warn(
                                 $"Member {baseType.Type}.{member.Name} shares the same name, but isn't virtual");
                             continue;
                         }
 
                         if (!IsTypeOrAssignable(target.SemanticModel.Compilation, targetReturnType, member.ReturnType))
                         {
-                            logger.Warn($"{member.ReturnType} is not assignable to {targetReturnType}");
+                            targetLogger.Warn($"{member.ReturnType} is not assignable to {targetReturnType}");
                             continue;
                         }
 
                         if (member.Parameters.Length != targetMethodSymbol.Parameters.Length)
                         {
-                            logger.Warn(
+                            targetLogger.Warn(
                                 $"{member} has mismatch parameter count {member.Parameters.Length} <> {targetMethodSymbol.Parameters.Length}");
                             continue;
                         }
@@ -182,7 +184,7 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
                             if (parameter.Source.Type.Equals(parameter.Target.Type, SymbolEqualityComparer.Default))
                                 continue;
 
-                            logger.Warn($"{parameter.Target} is not assignable to {parameter.Source}");
+                            targetLogger.Warn($"{parameter.Target} is not assignable to {parameter.Source}");
                             goto end_member;
                         }
 

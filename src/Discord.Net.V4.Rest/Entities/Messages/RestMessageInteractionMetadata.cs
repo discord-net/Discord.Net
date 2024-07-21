@@ -21,44 +21,6 @@ public sealed partial class RestMessageInteractionMetadata(
         GuildIdentity? Guild = null
     );
 
-    internal IMessageInteractionMetadataModel Model { get; set; } = model;
-
-    public static RestMessageInteractionMetadata Construct(
-        DiscordRestClient client,
-        Context context,
-        IMessageInteractionMetadataModel model
-    ) => new(client, context.Channel, model, context.Guild);
-
-    public ValueTask UpdateAsync(IMessageInteractionMetadataModel model, CancellationToken token = default)
-    {
-        if (!DictEquality<int, ulong>.Instance.Equals(Model.AuthorizingIntegrationOwners, model.AuthorizingIntegrationOwners))
-            AuthorizingIntegrationOwners = Model.AuthorizingIntegrationOwners
-                .ToImmutableDictionary(
-                    x => (ApplicationIntegrationType)x.Key,
-                    x => x.Value
-                );
-
-        OriginalResponseMessage = OriginalResponseMessage.UpdateFrom(
-            model.OriginalResponseMessageId,
-            RestMessageActor.Factory,
-            Client,
-            channel,
-            guild
-        );
-
-        InteractedMessage = InteractedMessage.UpdateFrom(
-            model.InteractedMessageId,
-            RestMessageActor.Factory,
-            Client,
-            channel,
-            guild
-        );
-
-        return ValueTask.CompletedTask;
-    }
-
-    public IMessageInteractionMetadataModel GetModel() => Model;
-
     public InteractionType Type => (InteractionType)Model.Type;
 
     [SourceOfTruth]
@@ -100,4 +62,42 @@ public sealed partial class RestMessageInteractionMetadata(
         = model.TriggeringInteractionMetadata is not null
             ? Construct(client, new Context(channel, guild), model.TriggeringInteractionMetadata)
             : null;
+
+    internal IMessageInteractionMetadataModel Model { get; set; } = model;
+
+    public static RestMessageInteractionMetadata Construct(
+        DiscordRestClient client,
+        Context context,
+        IMessageInteractionMetadataModel model
+    ) => new(client, context.Channel, model, context.Guild);
+
+    public ValueTask UpdateAsync(IMessageInteractionMetadataModel model, CancellationToken token = default)
+    {
+        if (!DictEquality<int, ulong>.Instance.Equals(Model.AuthorizingIntegrationOwners, model.AuthorizingIntegrationOwners))
+            AuthorizingIntegrationOwners = Model.AuthorizingIntegrationOwners
+                .ToImmutableDictionary(
+                    x => (ApplicationIntegrationType)x.Key,
+                    x => x.Value
+                );
+
+        OriginalResponseMessage = OriginalResponseMessage.UpdateFrom(
+            model.OriginalResponseMessageId,
+            RestMessageActor.Factory,
+            Client,
+            channel,
+            guild
+        );
+
+        InteractedMessage = InteractedMessage.UpdateFrom(
+            model.InteractedMessageId,
+            RestMessageActor.Factory,
+            Client,
+            channel,
+            guild
+        );
+
+        return ValueTask.CompletedTask;
+    }
+
+    public IMessageInteractionMetadataModel GetModel() => Model;
 }

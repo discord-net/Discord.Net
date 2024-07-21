@@ -8,15 +8,7 @@ namespace Discord;
 /// </summary>
 public interface IDiscordClient :
     IDisposable,
-    IAsyncDisposable,
-    IEntityProvider<IPartialGuild, IPartialGuildModel>,
-    IEntityProvider<IGuildMember, IMemberModel>,
-    IEntityProvider<IDMChannel, IDMChannelModel>,
-    IEntityProvider<IStageInstance, IStageInstanceModel>,
-    IEntityProvider<IGuildChannel, IGuildChannelModel>,
-    IEntityProvider<IInvite, IInviteModel>,
-    IEntityProvider<IUser, IUserModel>,
-    IEntityProvider<IMessage, IMessageModel>
+    IAsyncDisposable
 {
     IRestApiClient RestApiClient { get; }
 
@@ -31,11 +23,20 @@ public interface IDiscordClient :
 
     IIndexableActor<IUserActor, ulong, IUser> Users { get; }
 
+    IIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks { get; }
+
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }
+
+    [return: TypeHeuristic(nameof(Guilds))]
     IGuildActor Guild(ulong id) => Guilds[id];
+
+    [return: TypeHeuristic(nameof(Channels))]
     IChannelActor Channel(ulong id) => Channels[id];
+
+    [return: TypeHeuristic(nameof(Users))]
     IUserActor User(ulong id) => Users[id];
 
-    IWebhookActor Webhook(ulong id, string? token = null);
+    [return: TypeHeuristic(nameof(Webhooks))]
+    IWebhookActor Webhook(ulong id) => Webhooks[id];
 }

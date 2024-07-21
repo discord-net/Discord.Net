@@ -16,6 +16,7 @@ public partial interface IThreadChannelActor :
 {
     IThreadMemberActor CurrentThreadMember { get; }
 
+    // TODO: make this paged
     IEnumerableIndexableActor<IThreadMemberActor, ulong, IThreadMember> ThreadMembers { get; }
 
     IThreadMemberActor IThreadMemberRelationship.ThreadMember

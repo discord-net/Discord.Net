@@ -24,15 +24,20 @@ public partial class RestMessageActor(
 
     [SourceOfTruth]
     internal RestMessage CreateEntity(IMessageModel model)
-        => RestMessage.Construct(Client, guild, model);
+        => RestMessage.Construct(Client, new(guild, channel), model);
 }
 
 public partial class RestMessage :
     RestEntity<ulong>,
     IMessage,
     IConstructable<RestMessage, IMessageModel, DiscordRestClient>,
-    IContextConstructable<RestMessage, IMessageModel, GuildIdentity?, DiscordRestClient>
+    IContextConstructable<RestMessage, IMessageModel, RestMessage.Context, DiscordRestClient>
 {
+    public readonly record struct Context(
+        GuildIdentity? Guild = null,
+        MessageChannelIdentity? Channel = null
+    );
+
     [SourceOfTruth] public RestUserActor Author { get; }
 
     [SourceOfTruth] public RestThreadChannelActor? Thread { get; private set; }
@@ -149,11 +154,11 @@ public partial class RestMessage :
             : new RestMessage(client, model);
     }
 
-    public static RestMessage Construct(DiscordRestClient client, GuildIdentity? guild, IMessageModel model)
+    public static RestMessage Construct(DiscordRestClient client, Context context, IMessageModel model)
     {
         return model.IsWebhook
-            ? RestWebhookMessage.Construct(client, guild, model)
-            : new RestMessage(client, model, guild: guild);
+            ? RestWebhookMessage.Construct(client, new(context.Guild, context.Channel), model)
+            : new RestMessage(client, model, guild: context.Guild, channel: context.Channel);
     }
 
     private static RestThreadChannelActor? CreateThreadLoadable(

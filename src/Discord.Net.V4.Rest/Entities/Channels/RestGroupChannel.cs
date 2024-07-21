@@ -30,6 +30,7 @@ public partial class RestGroupChannel :
     IGroupChannel,
     IConstructable<RestGroupChannel, IGroupDMChannelModel, DiscordRestClient>
 {
+    [SourceOfTruth]
     public IDefinedLoadableEntityEnumerable<ulong, IUser> Recipients => throw new NotImplementedException();
 
     [ProxyInterface(

@@ -8,29 +8,55 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
+using EnumerableThreadMembers = RestEnumerableIndexableActor<RestThreadMemberActor, ulong, RestThreadMember, IThreadMember, IEnumerable<IThreadMemberModel>>;
+
 [ExtendInterfaceDefaults]
-public partial class RestThreadChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    ThreadIdentity thread,
-    ThreadMemberIdentity? currentThreadMember = null
-):
-    RestGuildChannelActor(client, guild, thread),
+public partial class RestThreadChannelActor :
+    RestGuildChannelActor,
     IThreadChannelActor,
     IRestActor<ulong, RestThreadChannel, ThreadIdentity>
 {
-    public override ThreadIdentity Identity { get; } = thread;
+    [method: TypeFactory]
+    public RestThreadChannelActor(DiscordRestClient client,
+        GuildIdentity guild,
+        ThreadIdentity thread,
+        ThreadMemberIdentity? currentThreadMember = null) : base(client, guild, thread)
+    {
+        thread = Identity = thread.MostSpecific(this);
+
+        MessageChannelActor = new RestMessageChannelActor(client, thread);
+
+        currentThreadMember ??= ThreadMemberIdentity.Of(client.SelfUser.Id);
+
+        CurrentThreadMember = currentThreadMember.Actor ?? new(
+            client,
+            guild,
+            thread,
+            currentThreadMember
+        );
+
+        ThreadMembers = RestActors.Fetchable(
+            Template.Of<RestThreadMemberActor>(),
+            client,
+            RestThreadMemberActor.Factory,
+            guild,
+            thread,
+            entityFactory: RestThreadMember.Construct,
+            new RestThreadMember.Context(guild, thread),
+            IThreadMember.FetchManyRoute(this)
+        );
+    }
+
+    public override ThreadIdentity Identity { get; }
 
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, thread);
+    internal RestMessageChannelActor MessageChannelActor { get; }
 
     [SourceOfTruth]
-    public RestThreadMemberActor CurrentThreadMember { get; } =
-        new(client, guild, thread, currentThreadMember ?? ThreadMemberIdentity.Of(client.SelfUser.Id));
+    public RestThreadMemberActor CurrentThreadMember { get; }
 
-    public IEnumerableIndexableActor<IThreadMemberActor, ulong, IThreadMember> ThreadMembers =>
-        throw new NotImplementedException();
+    [SourceOfTruth]
+    public EnumerableThreadMembers ThreadMembers { get; }
 
 
     [SourceOfTruth]
@@ -53,11 +79,9 @@ public partial class RestThreadChannel :
         ThreadableChannelIdentity? Parent = null
     );
 
-    [SourceOfTruth]
-    public RestThreadableChannelActor Parent { get; }
+    [SourceOfTruth] public RestThreadableChannelActor Parent { get; }
 
-    [SourceOfTruth]
-    public RestUserActor Creator { get; }
+    [SourceOfTruth] public RestUserActor Creator { get; }
 
     public new ThreadType Type => (ThreadType)Model.Type;
 
@@ -124,7 +148,8 @@ public partial class RestThreadChannel :
 
 
     public static RestThreadChannel Construct(DiscordRestClient client, Context context, IThreadChannelModel model)
-        => new(client, context.Guild ?? GuildIdentity.Of(model.GuildId), model, currentThreadMember: context.CurrentThreadMember, parent: context.Parent);
+        => new(client, context.Guild ?? GuildIdentity.Of(model.GuildId), model,
+            currentThreadMember: context.CurrentThreadMember, parent: context.Parent);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IThreadChannelModel model, CancellationToken token = default)

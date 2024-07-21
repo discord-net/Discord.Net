@@ -17,11 +17,11 @@ public partial class RestGuildMemberActor(
     public override MemberIdentity Identity { get; } = member;
 
     [SourceOfTruth]
-    public RestGuildActor Guild { get; } = new(client, guild);
+    public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
 
     [SourceOfTruth]
     [ProxyInterface(typeof(IUserActor))]
-    public RestUserActor User { get; } = new(client, user ?? UserIdentity.Of(member.Id));
+    public RestUserActor User { get; } = user?.Actor ?? new(client, user ?? UserIdentity.Of(member.Id));
 
     [SourceOfTruth]
     internal RestGuildMember CreateEntity(IMemberModel model)

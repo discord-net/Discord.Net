@@ -11,7 +11,9 @@ namespace Discord;
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface ISelfUserActor :
     IUserActor,
-    IActor<ulong, ISelfUser>
+    IActor<ulong, ISelfUser>,
+    IEntityProvider<IPartialGuild, IPartialGuildModel>,
+    IEntityProvider<IGuildMember, IMemberModel, ulong>
 {
     // TODO:
     // - https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection
@@ -31,7 +33,7 @@ public partial interface ISelfUserActor :
             token
         );
 
-        return result?.Select(Client.CreateEntity);
+        return result?.Select(CreateEntity);
     }
 
     async Task<IGuildMember?> GetCurrentGuildMemberAsync(
@@ -45,7 +47,7 @@ public partial interface ISelfUserActor :
             token
         );
 
-        return Client.CreateNullableEntity(model);
+        return CreateNullableEntity(model, guild.Id);
     }
 
     Task LeaveGuildAsync(
@@ -69,7 +71,7 @@ public partial interface ISelfUserActor :
             token
         );
 
-        return Client.CreateEntity(model);
+        return CreateEntity(model);
     }
 
     async Task<IReadOnlyCollection<UserConnection>> GetConnectionsAsync(

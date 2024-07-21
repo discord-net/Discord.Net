@@ -12,7 +12,7 @@ public partial class RestMessageChannelActor(
     MessageChannelIdentity channel,
     GuildIdentity? guild = null
 ):
-    RestChannelActor(client, channel.Cast<RestChannel, IChannelModel>()),
+    RestChannelActor(client, channel.Cast<RestChannel, RestChannelActor, IChannelModel>()),
     IMessageChannelActor
 {
     internal MessageChannelIdentity MessageChannelIdentity { get; } = channel;

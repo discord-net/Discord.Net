@@ -8,9 +8,10 @@ namespace Discord;
 [Modifiable<ModifyWebhookProperties>(nameof(Routes.ModifyWebhook))]
 [Deletable(nameof(Routes.DeleteWebhook))]
 public partial interface IWebhookActor :
-    IActor<ulong, IWebhook>
+    IActor<ulong, IWebhook>,
+    IEntityProvider<IWebhookMessage, IMessageModel>
 {
-    async Task<IMessage?> GetWebhookMessageAsync(
+    async Task<IWebhookMessage?> GetWebhookMessageAsync(
         string webhookToken,
         ulong messageId,
         EntityOrId<ulong, IThreadChannel>? thread = null,
@@ -23,7 +24,7 @@ public partial interface IWebhookActor :
             token
         );
 
-        return Client.CreateNullableEntity(model);
+        return CreateNullableEntity(model);
     }
 
     Task ModifyWithTokenAsync(

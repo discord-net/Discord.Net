@@ -115,14 +115,25 @@ public static class TransitiveFill
             x => x.Key.Name,
             x => x.Value.ToDisplayString());
 
+        logger.Log($"Computed {genericLookupTable.Count} filled generics for {target.MethodSymbol}");
+        foreach (var entry in genericLookupTable)
+        {
+            logger.Log($". {entry.Key} -> {entry.Value}");
+        }
+
         var filledSyntax = methodSyntax;
+
+        logger.Log("Syntax 0:\n" + filledSyntax);
 
         filledSyntax = filledSyntax.WithParameterList(
             filledSyntax.ParameterList.ReplaceNode(
                 filledSyntax.ParameterList.Parameters[0],
-                filledSyntax.ParameterList.Parameters[0].WithAttributeLists(default)
+                filledSyntax.ParameterList.Parameters[0].WithAttributeLists([])
             )
         );
+
+        logger.Log("Syntax 1:\n" + filledSyntax.NormalizeWhitespace().ToString());
+
 
         filledSyntax = filledSyntax.WithConstraintClauses(
             SyntaxFactory.List(
@@ -132,6 +143,9 @@ public static class TransitiveFill
                     )
             )
         );
+
+        logger.Log("Syntax 2:\n" + filledSyntax.NormalizeWhitespace().ToString());
+
 
         if (methodSyntax.TypeParameterList is not null)
         {
@@ -144,23 +158,24 @@ public static class TransitiveFill
                             filledSyntax.TypeParameterList.Parameters
                                 .Where(x =>
                                     !genericLookupTable.ContainsKey(x.Identifier.ValueText)
-                                ).Select(x => x.WithAttributeLists(default))
+                                ).Select(x => x.WithAttributeLists([]))
                         )
                     )
             );
         }
+
+        logger.Log("Syntax 3:\n" + filledSyntax.NormalizeWhitespace().ToString());
 
         filledSyntax = filledSyntax.ReplaceNodes(
             filledSyntax.DescendantNodes()
                 .OfType<IdentifierNameSyntax>()
                 .Where(x =>
                     genericLookupTable.ContainsKey(x.Identifier.ValueText)
-                ),
-            (node, _) =>
-            {
-                return SyntaxFactory.IdentifierName(genericLookupTable[node.Identifier.ValueText]);
-            }
-        );
+                )
+                .ToArray(),
+            (node, _) => SyntaxFactory.IdentifierName(genericLookupTable[node.Identifier.ValueText]));
+
+        logger.Log("Syntax 4:\n" + filledSyntax.NormalizeWhitespace().ToString());
 
         methodSyntax = filledSyntax;
     }

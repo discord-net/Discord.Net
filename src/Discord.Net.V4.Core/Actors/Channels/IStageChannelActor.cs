@@ -10,7 +10,8 @@ namespace Discord;
 public partial interface IStageChannelActor :
     IVoiceChannelActor,
     IStageInstanceRelationship,
-    IActor<ulong, IStageChannel>
+    IActor<ulong, IStageChannel>,
+    IEntityProvider<IStageInstance, IStageInstanceModel>
 {
     async Task<IStageInstance> CreateStageInstanceAsync(
         string topic,
@@ -33,6 +34,6 @@ public partial interface IStageChannelActor :
             token
         );
 
-        return Client.CreateEntity(result);
+        return CreateEntity(result);
     }
 }

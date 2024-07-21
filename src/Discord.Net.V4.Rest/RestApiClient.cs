@@ -8,11 +8,11 @@ using System.Text.Json;
 
 namespace Discord.Rest;
 
-public sealed class ApiClient : IRestApiClient, IDisposable
+public sealed class RestApiClient : IRestApiClient, IDisposable
 {
     private readonly DiscordRestClient _restClient;
     private readonly HttpClient _httpClient;
-    internal ApiClient(DiscordRestClient client, DiscordToken token)
+    internal RestApiClient(DiscordRestClient client, DiscordToken token)
     {
         _restClient = client;
         _httpClient = new HttpClient

@@ -10,4 +10,10 @@ namespace Discord;
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IDMChannelActor :
     IMessageChannelActor,
-    IActor<ulong, IDMChannel>;
+    IUserRelationship,
+    IActor<ulong, IDMChannel>
+{
+    IUserActor Recipient { get; }
+
+    IUserActor IUserRelationship.User => Recipient;
+}

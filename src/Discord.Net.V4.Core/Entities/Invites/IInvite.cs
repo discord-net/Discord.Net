@@ -4,6 +4,7 @@ using Discord.Rest;
 namespace Discord;
 
 [FetchableOfMany(nameof(Routes.GetGuildInvites))]
+[FetchableOfMany(nameof(Routes.GetChannelInvites))]
 [Refreshable(nameof(Routes.GetInvite))]
 public partial interface IInvite :
     IInviteActor,
@@ -11,7 +12,7 @@ public partial interface IInvite :
 {
     InviteType Type { get; }
     IGuildActor? Guild { get; }
-    IChannelActor? Channel { get; }
+    IGuildChannelActor? Channel { get; }
     IUserActor? Inviter { get; }
     InviteTargetType? TargetType { get; }
 

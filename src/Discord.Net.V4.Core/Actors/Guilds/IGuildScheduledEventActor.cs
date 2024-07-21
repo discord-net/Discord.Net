@@ -13,5 +13,6 @@ public partial interface IGuildScheduledEventActor :
     IGuildRelationship,
     IActor<ulong, IGuildScheduledEvent>
 {
+    // TODO: make this paged
     RSVPType RSVPs { get; }
 }

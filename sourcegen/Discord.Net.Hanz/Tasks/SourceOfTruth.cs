@@ -97,6 +97,8 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
         {
             if (target is null) continue;
 
+            var targetLogger = logger.WithSemanticContext(target.Semantic);
+
             var sourceOfTruthType = (target.MemberDeclarationSyntax switch
             {
                 MethodDeclarationSyntax method => ModelExtensions.GetTypeInfo(target.Semantic, method.ReturnType),
@@ -149,7 +151,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                 {
                     if (proxied.Contains(member))
                     {
-                        logger.Log($"Skipping {member} (implemented by interface proxy)");
+                        targetLogger.Log($"Skipping {member} (implemented by interface proxy)");
                         continue;
                     }
 
@@ -159,7 +161,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                             if (!target.Semantic.Compilation.HasImplicitConversion(sourceOfTruthType,
                                     method.ReturnType))
                             {
-                                logger.Warn(
+                                targetLogger.Warn(
                                     $"No conversion between {sourceOfTruthType.Name} -> {method.ReturnType.Name}");
                                 break;
                             }
@@ -169,7 +171,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                         case IPropertySymbol property when target.MemberDeclarationSyntax is PropertyDeclarationSyntax:
                             if (!target.Semantic.Compilation.HasImplicitConversion(sourceOfTruthType, property.Type))
                             {
-                                logger.Warn(
+                                targetLogger.Warn(
                                     $"No conversion between {sourceOfTruthType.Name} -> {property.Type.Name}");
                                 break;
                             }
@@ -291,7 +293,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
             }
             catch (Exception x)
             {
-                logger.Log(LogLevel.Error, x.ToString());
+                targetLogger.Log(LogLevel.Error, x.ToString());
             }
         }
 

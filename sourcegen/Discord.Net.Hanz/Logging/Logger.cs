@@ -62,7 +62,7 @@ public sealed class Logger : ILogger, IEquatable<Logger>
             return this;
 
         var name = Path.Combine(LogDirectory, model.Compilation.Assembly.Name,
-            Path.GetFileNameWithoutExtension(_logFilePath));
+            Path.GetFileName(_logFilePath));
 
         return _subLoggers.GetOrAdd(name, name =>
         {

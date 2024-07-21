@@ -13,7 +13,7 @@ public sealed partial class RestIntegrationActor(
     IIntegrationActor
 {
     [SourceOfTruth]
-    public RestGuildActor Guild { get; } = new(client, guild);
+    public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
 }
 
 public sealed partial class RestIntegration :

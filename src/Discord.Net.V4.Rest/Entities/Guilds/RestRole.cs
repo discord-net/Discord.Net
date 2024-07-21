@@ -14,7 +14,7 @@ public partial class RestRoleActor(
     IRoleActor
 {
     [SourceOfTruth]
-    public RestGuildActor Guild { get; } = new(client, guild);
+    public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
 
     [SourceOfTruth]
     internal RestRole CreateEntity(IRoleModel model)

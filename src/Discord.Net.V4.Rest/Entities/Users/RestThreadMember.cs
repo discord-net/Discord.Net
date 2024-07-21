@@ -19,15 +19,15 @@ public sealed partial class RestThreadMemberActor(
 {
     [SourceOfTruth]
     public RestThreadChannelActor Thread { get; } =
-        new(client, guild, thread, threadMember);
+        thread.Actor ?? new(client, guild, thread, threadMember);
 
     [SourceOfTruth]
     public RestGuildMemberActor Member { get; } =
-        new(client, guild, member ?? MemberIdentity.Of(threadMember.Id));
+        member?.Actor ?? new(client, guild, member ?? MemberIdentity.Of(threadMember.Id));
 
     [SourceOfTruth]
     public RestUserActor User { get; } =
-        new(client, user ?? UserIdentity.Of(threadMember.Id));
+        user?.Actor ?? new(client, user ?? UserIdentity.Of(threadMember.Id));
 
     [SourceOfTruth]
     internal RestThreadMember CreateEntity(IThreadMemberModel model)

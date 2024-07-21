@@ -27,6 +27,51 @@ public static class VariableFuncArgs
         );
     }
 
+    private static IEnumerable<int> IndexesOfVarArgsParameter(IMethodSymbol symbol)
+    {
+        return symbol.Parameters
+            .Where(x => x
+                .GetAttributes()
+                .Any(y => y.AttributeClass?.ToDisplayString() == "Discord.VariableFuncArgsAttribute")
+            )
+            .Select(x => symbol.Parameters.IndexOf(x));
+    }
+
+    private static int CalculateVarArgsSize(
+        IMethodSymbol method,
+        IParameterSymbol parameter,
+        int offset,
+        IEnumerable<int> indexes,
+        InvocationExpressionSyntax invocationExpressionSyntax)
+    {
+        var index = method.Parameters.IndexOf(parameter);
+
+        if (method.IsExtensionMethod)
+            index--;
+
+        if (invocationExpressionSyntax.ArgumentList.Arguments.Count <= index)
+            return -1;
+
+        if (indexes.Last() == index)
+        {
+            // we can count the difference between the remaining non-optional parameters and the specified ones
+            return invocationExpressionSyntax.ArgumentList.Arguments
+                .Skip(index + 1 + offset)
+                .Count(x =>
+                    x.NameColon is null ||
+                    method.Parameters
+                        .Skip(index)
+                        .Any(y => y.Name == x.NameColon.Name.Identifier.ValueText)
+                ) - method.Parameters.Skip(index + 1).Count(x => !x.IsOptional);
+        }
+
+        // we count up to a name colon
+        return invocationExpressionSyntax.ArgumentList.Arguments
+            .Skip(index + 1 + offset)
+            .TakeWhile(x => x.NameColon is null)
+            .Count();
+    }
+
     public static void Apply(
         ref MethodDeclarationSyntax syntax,
         InvocationExpressionSyntax invocationExpression,
@@ -35,12 +80,12 @@ public static class VariableFuncArgs
         Logger logger
     )
     {
-        var varargIndex = IndexOfVarArgsParameter(target.MethodSymbol);
+        var varargIndexes = IndexesOfVarArgsParameter(target.MethodSymbol).ToArray();
 
         var totalExtraArgs = invocationExpression.ArgumentList.Arguments
                                  .Select((x, i) => (Argument: x, Index: i))
                                  .Count(x =>
-                                     x.Index <= varargIndex || x.Argument.NameColon is null
+                                     x.Index <= varargIndexes.Min() || x.Argument.NameColon is null
                                  )
                              - target.MethodSymbol.Parameters.Count(x => !x.IsOptional);
 
@@ -51,6 +96,8 @@ public static class VariableFuncArgs
         {
             return;
         }
+
+        logger.Log($"Processing {target.MethodSymbol} with {totalExtraArgs}");
 
         var iterationOffset = 0;
         var varargParameters = new Dictionary<string, (int Size, int Nth, int Offset)>();
@@ -87,17 +134,26 @@ public static class VariableFuncArgs
                 .FirstOrDefault(x => x.Key == "InsertAt")
                 .Value.Value as int?) ?? 0;
 
-            var size = target.MethodSymbol.Parameters.Length <= index + 1
-                ? invocationExpression.ArgumentList.Arguments.Count - (target.MethodSymbol.Parameters.Length - offset)
-                : invocationExpression.ArgumentList.Arguments
-                    .Skip(index - offset)
-                    .TakeWhile(x => x.NameColon is null)
-                    .Count() - 1;
+            var size = CalculateVarArgsSize(
+                target.MethodSymbol,
+                parameter,
+                iterationOffset,
+                varargIndexes,
+                invocationExpression
+            );
+            // var size = target.MethodSymbol.Parameters.Length <= index + 1
+            //     ? invocationExpression.ArgumentList.Arguments.Count - (target.MethodSymbol.Parameters.Length - offset)
+            //     : invocationExpression.ArgumentList.Arguments
+            //         .Skip(index - offset)
+            //         .TakeWhile(x => x.NameColon is null)
+            //         .Count() - 1;
 
             var vargOffset = iterationOffset;
             iterationOffset += size;
 
             varargParameters.Add(parameterNode.Identifier.ValueText, (size, vargOffset, insertIndex));
+
+            logger.Log($"Varg parameter: {parameter.Name} > {vargOffset}..{size}\n");
 
             var typeArgsList = (parameterNode.Type as GenericNameSyntax)!
                 .TypeArgumentList
@@ -107,8 +163,6 @@ public static class VariableFuncArgs
                     Enumerable.Range(0, size)
                         .Select(x => SyntaxFactory.IdentifierName($"VARG{vargOffset + x}"))
                 );
-
-            logger.Log($"Varg parameter: {parameter.Name} > {vargOffset}..{size} : {typeArgsList}");
 
             syntax = syntax.ReplaceNode(
                 syntax.ParameterList.Parameters.First(x => x.Identifier.IsEquivalentTo(parameterNode.Identifier)),

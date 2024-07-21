@@ -1,6 +1,7 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Actors;
+using Discord.Rest.Channels;
 
 namespace Discord.Rest;
 
@@ -16,6 +17,9 @@ public partial class RestUserActor(
     [SourceOfTruth]
     internal virtual RestUser CreateEntity(IUserModel model)
         => RestUser.Construct(Client, model);
+
+    public IDMChannel CreateEntity(IDMChannelModel model)
+        => RestDMChannel.Construct(Client, Identity.MostSpecific(this), model);
 }
 
 public partial class RestUser :

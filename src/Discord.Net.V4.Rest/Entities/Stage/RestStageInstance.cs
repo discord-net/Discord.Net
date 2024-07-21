@@ -15,9 +15,9 @@ public sealed partial class RestStageInstanceActor(
     RestActor<ulong, RestStageInstance, StageInstanceIdentity>(client, instance),
     IStageInstanceActor
 {
-    [SourceOfTruth] public RestStageChannelActor Channel { get; } = new(client, guild, channel);
+    [SourceOfTruth] public RestStageChannelActor Channel { get; } = channel.Actor ?? new(client, guild, channel);
 
-    [SourceOfTruth] public RestGuildActor Guild { get; } = new(client, guild);
+    [SourceOfTruth] public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
 
     [SourceOfTruth]
     internal RestStageInstance CreateEntity(IStageInstanceModel model)

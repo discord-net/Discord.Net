@@ -23,6 +23,10 @@ public partial class RestStageChannelActor(
     [SourceOfTruth]
     public RestStageChannel CreateEntity(IGuildStageChannelModel model)
         => RestStageChannel.Construct(Client, Guild.Identity, model);
+
+    [SourceOfTruth]
+    internal RestStageInstance CreateEntity(IStageInstanceModel model)
+        => RestStageInstance.Construct(Client, new(Guild.Identity, Identity), model);
 }
 
 public partial class RestStageChannel :

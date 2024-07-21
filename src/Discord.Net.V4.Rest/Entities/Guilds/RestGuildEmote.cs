@@ -15,7 +15,7 @@ public partial class RestGuildEmoteActor(
     IGuildEmoteActor
 {
     [SourceOfTruth]
-    public RestGuildActor Guild { get; } = new(client, guild);
+    public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
 
     [SourceOfTruth]
     internal RestGuildEmote CreateEntity(IGuildEmoteModel model)

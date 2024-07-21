@@ -115,6 +115,7 @@ public sealed class Message :
     IMessageInteractionMetadataModel? IMessageModel.InteractionMetadata => ~Interaction;
 
     ulong IMessageModel.AuthorId => ~Author.Map(v => v.Id);
+    ulong? IMessageModel.WebhookId => ~WebhookId;
     string? IMessageModel.Content => ~Content;
     bool IMessageModel.IsTTS => TTS;
     IMessageActivityModel? IMessageModel.Activity => ~Activity;

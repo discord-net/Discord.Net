@@ -64,12 +64,16 @@ public partial class RestGuildActor :
     RestActor<ulong, RestGuild, GuildIdentity>,
     IGuildActor
 {
+    public override GuildIdentity Identity { get; }
+
     [TypeFactory]
     public RestGuildActor(
         DiscordRestClient client,
         GuildIdentity guild
     ) : base(client, guild)
     {
+        guild = Identity = guild.MostSpecific(this);
+
         MediaChannels = RestActors.GuildRelatedEntity(Template.Of<RestMediaChannelActor>(), client, this);
         Channels = RestActors.GuildRelatedEntity(Template.Of<RestGuildChannelActor>(), client, this);
         TextChannels = RestActors.GuildRelatedEntity(Template.Of<RestTextChannelActor>(), client, this);
@@ -94,7 +98,16 @@ public partial class RestGuildActor :
         Roles = RestActors.GuildRelatedEntity(Template.Of<RestRoleActor>(), client, this);
         Stickers = RestActors.GuildRelatedEntity(Template.Of<RestGuildStickerActor>(), client, this);
         ScheduledEvents = RestActors.GuildRelatedEntity(Template.Of<RestGuildScheduledEventActor>(), client, this);
-        Invites = RestActors.GuildRelatedEntity(Template.Of<RestInviteActor>(), client, this);
+
+        Invites = RestActors.Fetchable(
+            Template.Of<RestInviteActor>(),
+            Client,
+            RestInviteActor.Factory,
+            guild,
+            entityFactory: RestInvite.Construct,
+            new RestInvite.Context(guild),
+            IInvite.GetGuildInvitesRoute(this)
+        );
 
         Webhooks = RestActors.Fetchable(
             Template.Of<RestWebhookActor>(),
@@ -146,6 +159,14 @@ public partial class RestGuildActor :
     [SourceOfTruth]
     internal RestGuild CreateEntity(IGuildModel model)
         => RestGuild.Construct(Client, model);
+
+    [SourceOfTruth]
+    internal RestGuildChannel CreateEntity(IGuildChannelModel model)
+        => RestGuildChannel.Construct(Client, Identity, model);
+
+    [SourceOfTruth]
+    internal RestGuildMember CreateEntity(IMemberModel model)
+        => RestGuildMember.Construct(Client, Identity, model);
 }
 
 public sealed partial class RestGuild :
@@ -222,9 +243,11 @@ public sealed partial class RestGuild :
 
     private IGuildModel _model;
 
-    internal RestGuild(DiscordRestClient client,
+    internal RestGuild(
+        DiscordRestClient client,
         IGuildModel model,
-        RestGuildActor? actor = null) : base(client, model)
+        RestGuildActor? actor = null
+    ) : base(client, model)
     {
         _model = model;
         Actor = actor ?? new(client, GuildIdentity.Of(this));

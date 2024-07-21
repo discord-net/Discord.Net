@@ -1,5 +1,6 @@
 using Discord.Models;
 using Discord.Models.Json;
+using Discord.Rest.Guilds;
 
 namespace Discord.Rest;
 
@@ -18,6 +19,14 @@ public partial class RestSelfUserActor(
     [SourceOfTruth]
     internal RestSelfUser CreateEntity(ISelfUserModel model)
         => RestSelfUser.Construct(Client, model);
+
+    [SourceOfTruth]
+    internal RestPartialGuild CreateEntity(IPartialGuildModel model)
+        => RestPartialGuild.Construct(Client, model);
+
+    [SourceOfTruth]
+    internal RestGuildMember CreateEntity(IMemberModel model, ulong guildId)
+        => RestGuildMember.Construct(Client, GuildIdentity.Of(guildId), model);
 }
 
 public partial class RestSelfUser :

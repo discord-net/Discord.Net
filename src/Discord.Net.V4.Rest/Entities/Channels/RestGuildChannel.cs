@@ -2,33 +2,56 @@ using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Extensions;
 using Discord.Rest.Guilds;
+using Discord.Rest.Invites;
 using System.Collections.Immutable;
 using System.ComponentModel;
 
 namespace Discord.Rest.Channels;
 
-[method: TypeFactory]
+using EnumerableInvitesActor = RestEnumerableIndexableActor<RestInviteActor, string, RestInvite, IInvite, IEnumerable<IInviteModel>>;
+
 [ExtendInterfaceDefaults(typeof(IGuildChannelActor))]
-public partial class RestGuildChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    GuildChannelIdentity channel
-):
-    RestChannelActor(client, channel),
+public partial class RestGuildChannelActor :
+    RestChannelActor,
     IGuildChannelActor,
     IRestActor<ulong, RestGuildChannel, GuildChannelIdentity>
 {
-    public override GuildChannelIdentity Identity { get; } = channel;
+    [method: TypeFactory]
+    public RestGuildChannelActor(DiscordRestClient client,
+        GuildIdentity guild,
+        GuildChannelIdentity channel) : base(client, channel)
+    {
+        channel = Identity = channel.MostSpecific(this);
+
+        Guild = guild.Actor ?? new RestGuildActor(client, guild);
+
+        Invites = RestActors.Fetchable(
+            Template.Of<RestInviteActor>(),
+            Client,
+            RestInviteActor.Factory,
+            guild,
+            entityFactory: RestInvite.Construct,
+            new RestInvite.Context(guild, channel),
+            IInvite.GetChannelInvitesRoute(this)
+        );
+    }
+
+    public override GuildChannelIdentity Identity { get; }
 
     [SourceOfTruth]
-    public RestGuildActor Guild { get; } = new(client, guild);
+    public RestGuildActor Guild { get; }
 
-    public IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites => throw new NotImplementedException();
+    [SourceOfTruth]
+    public EnumerableInvitesActor Invites { get; }
 
     [SourceOfTruth]
     [CovariantOverride]
     internal virtual RestGuildChannel CreateEntity(IGuildChannelModel model)
         => RestGuildChannel.Construct(Client, Guild.Identity, model);
+
+    [SourceOfTruth]
+    internal RestInvite CreateEntity(IInviteModel model)
+        => RestInvite.Construct(Client, new(Guild.Identity, Identity), model);
 }
 
 public partial class RestGuildChannel :

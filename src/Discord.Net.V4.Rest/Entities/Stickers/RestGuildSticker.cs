@@ -18,7 +18,7 @@ public partial class RestGuildStickerActor(
     IGuildStickerActor
 {
     [SourceOfTruth]
-    public RestGuildActor Guild { get; } = new(client, guild);
+    public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
 
     [SourceOfTruth]
     internal RestGuildSticker CreateEntity(IGuildStickerModel model)

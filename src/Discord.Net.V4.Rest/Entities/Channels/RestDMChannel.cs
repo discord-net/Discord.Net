@@ -6,13 +6,16 @@ namespace Discord.Rest.Channels;
 [method: TypeFactory]
 public partial class RestDMChannelActor(
     DiscordRestClient client,
-    DMChannelIdentity channel
-):
+    DMChannelIdentity channel,
+    UserIdentity recipient
+) :
     RestChannelActor(client, channel),
     IDMChannelActor,
     IRestActor<ulong, RestDMChannel, DMChannelIdentity>
 {
     public override DMChannelIdentity Identity { get; } = channel;
+
+    [SourceOfTruth] public RestUserActor Recipient { get; } = recipient.Actor ?? new(client, recipient);
 
     [ProxyInterface(typeof(IMessageChannelActor))]
     internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
@@ -26,30 +29,30 @@ public partial class RestDMChannelActor(
 public partial class RestDMChannel :
     RestChannel,
     IDMChannel,
-    IConstructable<RestDMChannel, IDMChannelModel, DiscordRestClient>
+    IConstructable<RestDMChannel, IDMChannelModel, DiscordRestClient>,
+    IContextConstructable<RestDMChannel, IDMChannelModel, UserIdentity, DiscordRestClient>
 {
-    [SourceOfTruth]
-    public RestUserActor Recipient { get; }
-
-    [ProxyInterface(
-        typeof(IChannelActor),
-        typeof(IMessageChannelActor),
-        typeof(IEntityProvider<IDMChannel, IDMChannelModel>)
-    )]
+    [ProxyInterface(typeof(IDMChannelActor))]
     internal override RestDMChannelActor Actor { get; }
 
     internal override IDMChannelModel Model => _model;
 
     private IDMChannelModel _model;
 
-    internal RestDMChannel(DiscordRestClient client, IDMChannelModel model, RestDMChannelActor? actor = null)
-        : base(client, model, actor)
+    internal RestDMChannel(
+        DiscordRestClient client,
+        IDMChannelModel model,
+        UserIdentity? recipient = null,
+        RestDMChannelActor? actor = null
+    ) : base(client, model, actor)
     {
         _model = model;
 
-        Actor = actor ?? new(client, DMChannelIdentity.Of(this));
-        Recipient = new(client, UserIdentity.Of(model.RecipientId));
+        Actor = actor ?? new(client, DMChannelIdentity.Of(this), recipient ?? UserIdentity.Of(model.RecipientId));
     }
+
+    public static RestDMChannel Construct(DiscordRestClient client, UserIdentity recipient, IDMChannelModel model)
+        => new(client, model, recipient);
 
     public static RestDMChannel Construct(DiscordRestClient client, IDMChannelModel model)
         => new(client, model);

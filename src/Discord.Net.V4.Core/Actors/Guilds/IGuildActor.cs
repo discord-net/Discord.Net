@@ -9,7 +9,9 @@ namespace Discord;
 [Modifiable<ModifyGuildProperties>(nameof(Routes.ModifyGuild))]
 [Deletable(nameof(Routes.DeleteGuild))]
 public partial interface IGuildActor :
-    IActor<ulong, IGuild>
+    IActor<ulong, IGuild>,
+    IEntityProvider<IGuildChannel, IGuildChannelModel>,
+    IEntityProvider<IGuildMember, IMemberModel>
 {
     #region Channels
 
@@ -105,7 +107,7 @@ public partial interface IGuildActor :
             token
         );
 
-        return Client.CreateEntity(model);
+        return CreateEntity(model);
     }
 
     Task ModifyChannelPositionsAsync(
@@ -133,7 +135,7 @@ public partial interface IGuildActor :
             token
         );
 
-        return result.Select(Client.CreateEntity).ToImmutableArray();
+        return result.Select(CreateEntity).ToImmutableArray();
     }
 
     async Task<IGuildMember> AddGuildMemberAsync(
@@ -160,7 +162,7 @@ public partial interface IGuildActor :
             token
         );
 
-        return Client.CreateEntity(result);
+        return CreateEntity(result);
     }
 
     Task AddGuildMemberRoleAsync(

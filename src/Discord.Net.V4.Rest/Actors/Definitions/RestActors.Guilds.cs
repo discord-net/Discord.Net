@@ -18,6 +18,7 @@ internal static partial class RestActors
             TRouteModel,
             TApiModel,
             TIdentity,
+            TGuildIdentity,
             TId
         >(
             Template<TActor> template,
@@ -27,12 +28,13 @@ internal static partial class RestActors
             Func<TApiModel, IEnumerable<TRouteModel>> transform
         )
         where TActor :
+            class,
             IRestActor<TId, TRestEntity, TIdentity>,
-            IFactory<TActor, DiscordRestClient, GuildIdentity, IIdentifiableEntityOrModel<TId, TRestEntity, TModel>>
+            IFactory<TActor, DiscordRestClient, TGuildIdentity, IIdentifiable<TId, TRestEntity, TActor, TModel>>
         where TRestEntity :
             RestEntity<TId>,
             TCoreEntity,
-            IContextConstructable<TRestEntity, TModel, GuildIdentity, DiscordRestClient>
+            IContextConstructable<TRestEntity, TModel, TGuildIdentity, DiscordRestClient>
         where TCoreEntity :
             class,
             IEntity<TId>,
@@ -42,12 +44,13 @@ internal static partial class RestActors
         where TRouteModel : class, IEntityModel<TId>
         where TApiModel : class
         where TId : IEquatable<TId>
+        where TGuildIdentity : class?, GuildIdentity?
     {
         return RestEnumerableIndexableActor.Create<TActor, TId, TRestEntity, TCoreEntity, TApiModel, TRouteModel>(
             client,
-            id => TActor.Factory(client, guild.Identity,
-                IIdentifiableEntityOrModel<TId, TRestEntity, TModel>.Of(id)),
-            models => models.OfType<TModel>().Select(model => (TRestEntity)TRestEntity.Construct(client, guild.Identity, model)),
+            id => TActor.Factory(client, (TGuildIdentity)guild.Identity,
+                IIdentifiable<TId, TRestEntity, TActor, TModel>.Of(id)),
+            models => models.OfType<TModel>().Select(model => (TRestEntity)TRestEntity.Construct(client, (TGuildIdentity)guild.Identity, model)),
             route,
             transform
         );
@@ -70,8 +73,9 @@ internal static partial class RestActors
             RestGuildActor guild
         )
         where TActor :
+            class,
             IRestActor<TId, TRestEntity, TIdentity>,
-            IFactory<TActor, DiscordRestClient, TGuildIdentity, IIdentifiableEntityOrModel<TId, TRestEntity, TModel>>
+            IFactory<TActor, DiscordRestClient, TGuildIdentity, IIdentifiable<TId, TRestEntity, TActor, TModel>>
         where TRestEntity :
             RestEntity<TId>,
             TCoreEntity,
@@ -89,7 +93,7 @@ internal static partial class RestActors
         return RestEnumerableIndexableActor.Create<TActor, TId, TRestEntity, TCoreEntity, TRouteModel>(
             client,
             id => TActor.Factory(client, (TGuildIdentity)guild.Identity,
-                IIdentifiableEntityOrModel<TId, TRestEntity, TModel>.Of(id)),
+                IIdentifiable<TId, TRestEntity, TActor, TModel>.Of(id)),
             models => models.OfType<TModel>().Select(model => (TRestEntity)TRestEntity.Construct(client, (TGuildIdentity)guild.Identity, model)),
             TCoreEntity.FetchManyRoute(guild)
         );

@@ -2,6 +2,7 @@ using Discord.Models;
 using Discord.Rest.Channels;
 using Discord.Rest.Extensions;
 using Discord.Rest.Guilds;
+using Discord.Rest.Messages;
 
 namespace Discord.Rest.Webhooks;
 
@@ -9,13 +10,17 @@ namespace Discord.Rest.Webhooks;
 public partial class RestWebhookActor(
     DiscordRestClient client,
     WebhookIdentity webhook
-) :
+):
     RestActor<ulong, RestWebhook, WebhookIdentity>(client, webhook),
     IWebhookActor
 {
     [SourceOfTruth]
     internal virtual RestWebhook CreateEntity(IWebhookModel model)
         => RestWebhook.Construct(Client, model);
+
+    [SourceOfTruth]
+    internal RestWebhookMessage CreateEntity(IMessageModel model)
+        => RestWebhookMessage.Construct(Client, new(Webhook: Identity.MostSpecific(this)), model);
 }
 
 public partial class RestWebhook :

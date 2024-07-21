@@ -78,7 +78,7 @@ public static class RestEnumerableIndexableActor
         CancellationToken token)
         where TModel : class, IEntityModel
     {
-        return client.ApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token);
+        return client.RestApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token);
     }
 }
 
@@ -106,7 +106,7 @@ internal sealed class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, 
         RequestOptions? options,
         CancellationToken token)
     {
-        var model = await client.ApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token);
+        var model = await client.RestApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token);
 
         return model is not null ? transform(model) : null;
     }

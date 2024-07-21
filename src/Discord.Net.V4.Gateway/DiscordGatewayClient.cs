@@ -260,7 +260,7 @@ namespace Discord.Gateway
                 return;
 
             await ConnectInternalAsync(new Uri(
-                _resumeUrl ?? (_gatewayUrl ??= (await Rest.ApiClient.GetGatewayAsync(token)).Url)),
+                _resumeUrl ?? (_gatewayUrl ??= (await Rest.RestApiClient.GetGatewayAsync(token)).Url)),
                 token
             );
         }

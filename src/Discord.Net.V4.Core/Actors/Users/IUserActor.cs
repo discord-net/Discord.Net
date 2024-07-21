@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 
@@ -5,7 +6,8 @@ namespace Discord;
 
 [Loadable(nameof(Routes.GetUser))]
 public partial interface IUserActor :
-    IActor<ulong, IUser>
+    IActor<ulong, IUser>,
+    IEntityProvider<IDMChannel, IDMChannelModel>
 {
     async Task<IDMChannel> CreateDMAsync(RequestOptions? options = null, CancellationToken token = default)
     {
@@ -15,6 +17,6 @@ public partial interface IUserActor :
             token
         );
 
-        return Client.CreateEntity(model);
+        return CreateEntity(model);
     }
 }

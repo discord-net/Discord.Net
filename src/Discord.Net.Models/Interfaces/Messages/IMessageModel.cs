@@ -7,6 +7,7 @@ public partial interface IMessageModel : IEntityModel<ulong>
 {
     ulong AuthorId { get; }
     ulong ChannelId { get; }
+    ulong? WebhookId { get; }
     string? Content { get; }
     DateTimeOffset Timestamp { get; }
     DateTimeOffset? EditedTimestamp { get; }

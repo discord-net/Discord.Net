@@ -10,36 +10,35 @@ namespace Discord.Rest.Invites;
 public sealed partial class RestInviteActor(
     DiscordRestClient client,
     InviteIdentity invite,
-    GuildIdentity? guild = null
-) :
+    GuildIdentity? guild = null,
+    GuildChannelIdentity? channel = null
+):
     RestActor<string, RestInvite, InviteIdentity>(client, invite),
     IInviteActor
 {
     [SourceOfTruth]
     internal RestInvite CreateEntity(IInviteModel model)
-        => RestInvite.Construct(Client, guild, model);
+        => RestInvite.Construct(Client, new(guild, channel), model);
 }
 
 public sealed partial class RestInvite :
     RestEntity<string>,
     IInvite,
-    IContextConstructable<RestInvite, IInviteModel, GuildIdentity?, DiscordRestClient>
+    IContextConstructable<RestInvite, IInviteModel, RestInvite.Context, DiscordRestClient>
 {
+    public readonly record struct Context(GuildIdentity? Guild = null, GuildChannelIdentity? Channel = null);
+
     public InviteType Type => (InviteType)Model.Type;
 
-    [SourceOfTruth]
-    public RestGuildActor? Guild { get; private set; }
+    [SourceOfTruth] public RestGuildActor? Guild { get; private set; }
 
-    [SourceOfTruth]
-    public RestChannelActor? Channel { get; private set; }
+    [SourceOfTruth] public RestGuildChannelActor? Channel { get; private set; }
 
-    [SourceOfTruth]
-    public RestUserActor? Inviter { get; private set; }
+    [SourceOfTruth] public RestUserActor? Inviter { get; private set; }
 
     public InviteTargetType? TargetType => (InviteTargetType?)Model.TargetType;
 
-    [SourceOfTruth]
-    public RestUserActor? TargetUser { get; private set; }
+    [SourceOfTruth] public RestUserActor? TargetUser { get; private set; }
 
     public int? ApproximatePresenceCount => Model.ApproximatePresenceCount;
 
@@ -47,32 +46,35 @@ public sealed partial class RestInvite :
 
     public DateTimeOffset? ExpiresAt => Model.ExpiresAt;
 
-    [SourceOfTruth]
-    public RestGuildScheduledEventActor? GuildScheduledEvent { get; private set; }
+    [SourceOfTruth] public RestGuildScheduledEventActor? GuildScheduledEvent { get; private set; }
 
-    [ProxyInterface(typeof(IInviteActor))]
-    internal RestInviteActor Actor { get; }
+    [ProxyInterface(typeof(IInviteActor))] internal RestInviteActor Actor { get; }
 
     internal IInviteModel Model { get; private set; }
 
     public RestInvite(
         DiscordRestClient client,
         IInviteModel model,
-        GuildIdentity? guild = null
+        GuildIdentity? guild = null,
+        GuildChannelIdentity? channel = null
     ) : base(client, model.Id)
     {
         Actor = new(client, InviteIdentity.Of(this), guild);
         Model = model;
 
-        Guild = model.GuildId.Map(
+        Guild = guild?.Actor ?? model.GuildId.Map(
             static (id, client, guild) => RestGuildActor.Factory(client, guild ?? GuildIdentity.Of(id)),
             client,
             guild
         );
 
-        Channel = model.ChannelId.Map(
-            static (id, client) => RestChannelActor.Factory(client, ChannelIdentity.Of(id)),
-            client
+        Channel = channel?.Actor ?? model.ChannelId.Map(
+            static (id, client, guild, identity) => guild is not null
+                ? new RestGuildChannelActor(client, guild, identity ?? GuildChannelIdentity.Of(id))
+                : null,
+            client,
+            Guild?.Identity,
+            channel
         );
 
         Inviter = model.InviterId.Map(
@@ -86,8 +88,8 @@ public sealed partial class RestInvite :
         );
     }
 
-    public static RestInvite Construct(DiscordRestClient client, GuildIdentity? guild, IInviteModel model)
-        => new(client, model, guild);
+    public static RestInvite Construct(DiscordRestClient client, Context context, IInviteModel model)
+        => new(client, model, guild: context.Guild, channel: context.Channel);
 
     public ValueTask UpdateAsync(IInviteModel model, CancellationToken token = default)
     {
@@ -99,8 +101,12 @@ public sealed partial class RestInvite :
 
         Channel = Channel.UpdateFrom(
             model.ChannelId,
-            RestChannelActor.Factory,
-            Client
+            static (client, guild, channel) =>
+                guild is not null
+                    ? RestGuildChannelActor.Factory(client, guild, channel)
+                    : null!,
+            Client,
+            Guild?.Identity
         );
 
         Inviter = Inviter.UpdateFrom(

@@ -1,16 +1,32 @@
 using Discord.Models;
 using Discord.Rest.Actors;
+using Discord.Rest.Channels;
+using Discord.Rest.Webhooks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Text.Json;
 
 namespace Discord.Rest;
 
-public sealed class DiscordRestClient : IDiscordClient
+public sealed partial class DiscordRestClient : IDiscordClient
 {
-    public ApiClient ApiClient { get; }
+    [SourceOfTruth]
+    public RestSelfUserActor SelfUser { get; }
 
-    public IWebhookActor Webhook(ulong id, string? token = null) => throw new NotImplementedException();
+    public IPagedIndexableActor<IGuildActor, ulong, IGuild, IPartialGuild, PageUserGuildsParams> Guilds => throw new NotImplementedException();
+
+    [SourceOfTruth]
+    public RestIndexableActor<RestChannelActor, ulong, RestChannel> Channels { get; }
+
+    [SourceOfTruth]
+    public RestIndexableActor<RestUserActor, ulong, RestUser> Users { get; }
+
+    [SourceOfTruth]
+    public RestIndexableActor<RestWebhookActor, ulong, RestWebhook> Webhooks { get; }
+
+
+    [SourceOfTruth]
+    public RestApiClient RestApiClient { get; }
 
     public DiscordConfig Config { get; }
 
@@ -31,11 +47,15 @@ public sealed class DiscordRestClient : IDiscordClient
 
     public DiscordRestClient(DiscordConfig config, ILogger<DiscordRestClient> logger)
     {
-        ApiClient = new(this, config.Token);
+        RestApiClient = new(this, config.Token);
         Config = config;
         RateLimiter = new();
         Logger = logger;
 
+        SelfUser = new RestSelfUserActor(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
+        Channels = new(id => new RestChannelActor(this, ChannelIdentity.Of(id)));
+        Users = new(id => new RestUserActor(this, UserIdentity.Of(id)));
+        Webhooks = new(id => new RestWebhookActor(this, WebhookIdentity.Of(id)));
         CurrentUserThreadMemberIdentity = ThreadMemberIdentity.Of(SelfUser.Id);
     }
 
@@ -50,33 +70,4 @@ public sealed class DiscordRestClient : IDiscordClient
 
         return ValueTask.CompletedTask;
     }
-
-    #region Entity Providers
-    public IMessage CreateEntity(IMessageModel model) => throw new NotImplementedException();
-    public IPartialGuild CreateEntity(IPartialGuildModel model) => throw new NotImplementedException();
-
-    public IGuildMember CreateEntity(IMemberModel model) => throw new NotImplementedException();
-
-    public IDMChannel CreateEntity(IDMChannelModel model) => throw new NotImplementedException();
-
-    public IStageInstance CreateEntity(IStageInstanceModel model) => throw new NotImplementedException();
-
-    public IGuildChannel CreateEntity(IGuildChannelModel model) => throw new NotImplementedException();
-
-    public IInvite CreateEntity(IInviteModel model) => throw new NotImplementedException();
-
-    public IUser CreateEntity(IUserModel model) => throw new NotImplementedException();
-
-    #endregion
-
-    public ISelfUserActor SelfUser => throw new NotImplementedException();
-
-    public IPagedIndexableActor<IGuildActor, ulong, IGuild, IPartialGuild, PageUserGuildsParams> Guilds => throw new NotImplementedException();
-
-    public IIndexableActor<IChannelActor, ulong, IChannel> Channels => throw new NotImplementedException();
-
-    public IIndexableActor<IUserActor, ulong, IUser> Users => throw new NotImplementedException();
-
-    IRestApiClient IDiscordClient.RestApiClient => ApiClient;
-    IDiscordClient IClientProvider.Client => this;
 }

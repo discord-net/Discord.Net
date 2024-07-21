@@ -135,7 +135,7 @@ public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TMod
         if (options?.AllowCached ?? false)
             return Values;
 
-        var models = await _client.ApiClient.ExecuteAsync(_route, options ?? _client.DefaultRequestOptions, token);
+        var models = await _client.RestApiClient.ExecuteAsync(_route, options ?? _client.DefaultRequestOptions, token);
 
         if (models is null)
             return [];
