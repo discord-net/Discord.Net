@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.15.3] - 2024-07-21
+
+### Added
+- #2963 Application Emojis (26bb789)
+- [EXPERIMENTAL] #2931 Member search v2 (e18915a)
+- #2952 add `IsAvailable` to `GuildEmote` (cb79f04)
+- #2965 Add team member `Role` property (6e531a2)
+
+### Fixed
+- #2958 crash when poll is null in RestMessageComponent (24c7605)
+- #2962 incomplete validation when ChannelFlags.RequireTag is true (f5fdfb2)
+- #2948 Fix IndexOf bug in CreateBucketId (ec0ba49)
+- #2959 Fix automod related events in the sharded client (8b6be64)
+- #2966 Fix `CustomSticker.DeleteAsync()` (359f6db)
+
+### Misc
+- #2951 Update for the breaking change discord has made + v3 is cringe (8afea2c)
+- #2953 longer polls (ae49794)
+- #2956 Add missing role tags (6b691b1)
+- #2957 Longer MaxCustomBlockMessageLength (bae7861)
+
+
 ## [3.15.2] - 2024-06-18
 ### Hotfix
 - fix `AutocompleteAttribute` with empty constructor
