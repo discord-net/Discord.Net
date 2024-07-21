@@ -21,26 +21,26 @@ A poll is part of a message; to send one you need to pass a [PollProperties] obj
 [!code-csharp[Creating polls](samples/create-poll.cs)]
 
 > [!WARNING]
-> Due to limitations of the Discord API it's not possible to send attachments in a messages with a poll.
+> Due to limitations set by the Discord API, it's not possible to send both an attachment and a poll in the same message.
 
 > [!NOTE]
-> It is not possible to modify polls after them being created.
+> It is not possible to modify polls after they are created.
 
 
 ## Managing polls
 
 ### Ending polls
-You can expire polls early by calling `EndPollAsync` on an [IUserMessage] with a poll.
+You can end a poll early by calling `EndPollAsync` on an [IUserMessage] that has a poll.
 
 [!code-csharp[Ending polls](samples/end-poll.cs)]
 
-### Getting poll answer voters
+### Getting a poll answer's voters
 To get voters for a specific answer call `GetPollAnswerVotersAsync(answerId)` on an [IUserMessage] with a poll.
 
 [!code-csharp[Getting poll answer voters](samples/get-poll-voters.cs)]
 
 ### Retrieving poll results
-You can get results of a poll by simply getting an [IUserMessage] and checking the `IUserMessage.Poll.Results` property. Alteratively you can check the results on a `MessageUpdated` gateway event.
+You can get results of a poll by simply getting an [IUserMessage] and checking the `IUserMessage.Poll.Results` property. Alternatively, you can check the results on a `MessageUpdated` gateway event.
 
 
 ## Gateway events
@@ -51,7 +51,7 @@ You can receive information about poll votes live using following events:
 - `PollVoteRemoved`
 
 > [!NOTE]
-> These events are only sent if the client has `GatewayIntents.GuildMessagePolls` or `GatewayIntents.DirectMessagePolls` intents enabled. It will receive events for polls in guild or dm channels respectively.
+> These events are only sent if the client has the `GatewayIntents.GuildMessagePolls` or `GatewayIntents.DirectMessagePolls` intents enabled. It will receive events for polls in guild or DM channels respectively.
 
 ### Poll expiry
 On poll expiry the `MessageUpdated` event is fired.
