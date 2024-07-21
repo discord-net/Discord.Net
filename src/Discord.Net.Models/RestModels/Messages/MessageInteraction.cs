@@ -29,8 +29,8 @@ public sealed class MessageInteractionMetadata :
     public Optional<MessageInteractionMetadata> TriggeringInteractionMetadata { get; set; }
 
 
-    ulong? IMessageInteractionMetadataModel.OriginalResponseMessageId => OriginalResponseMessageId;
-    ulong? IMessageInteractionMetadataModel.InteractedMessageId => InteractedMessageId;
+    ulong? IMessageInteractionMetadataModel.OriginalResponseMessageId => ~OriginalResponseMessageId;
+    ulong? IMessageInteractionMetadataModel.InteractedMessageId => ~InteractedMessageId;
 
     IMessageInteractionMetadataModel? IMessageInteractionMetadataModel.TriggeringInteractionMetadata =>
         ~TriggeringInteractionMetadata;

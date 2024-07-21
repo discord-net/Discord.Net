@@ -27,9 +27,9 @@ public abstract class ThreadChannelModelBase : GuildChannelModelBase, IThreadCha
 
     ulong[] IThreadChannelModel.AppliedTags => AppliedTags | [];
 
-    bool? IThreadChannelModel.IsInvitable => Metadata.Invitable;
+    bool? IThreadChannelModel.IsInvitable => ~Metadata.Invitable;
 
-    DateTimeOffset? IThreadChannelModel.CreatedAt => Metadata.CreatedAt;
+    DateTimeOffset? IThreadChannelModel.CreatedAt => ~Metadata.CreatedAt;
 
     ulong IThreadChannelModel.ParentId => ParentId.Value!.Value;
 
@@ -39,13 +39,13 @@ public abstract class ThreadChannelModelBase : GuildChannelModelBase, IThreadCha
 
     DateTimeOffset IThreadChannelModel.ArchiveTimestamp => Metadata.ArchiveTimestamp;
 
-    bool IThreadChannelModel.IsLocked => Metadata.Locked;
+    bool IThreadChannelModel.IsLocked => ~Metadata.Locked;
 
-    bool IThreadChannelModel.IsNsfw => Nsfw;
+    bool IThreadChannelModel.IsNsfw => ~Nsfw;
 
-    string? IThreadChannelModel.Topic => Topic;
+    string? IThreadChannelModel.Topic => ~Topic;
 
-    int IThreadChannelModel.RatelimitPerUser => RatelimitPerUser;
+    int IThreadChannelModel.RatelimitPerUser => ~RatelimitPerUser;
 
     bool IThreadChannelModel.HasJoined => Member.IsSpecified;
 

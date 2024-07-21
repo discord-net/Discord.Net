@@ -24,11 +24,11 @@ public sealed class ButtonComponent : MessageComponent, IModelSource, IButtonCom
     [JsonPropertyName("disabled")]
     public Optional<bool> IsDisabled { get; set; }
 
-    string? IButtonComponentModel.Label => Label;
+    string? IButtonComponentModel.Label => ~Label;
     IEmoteModel? IButtonComponentModel.Emote => ~Emote;
-    string? IButtonComponentModel.CustomId => CustomId;
-    string? IButtonComponentModel.Url => Url;
-    bool? IButtonComponentModel.IsDisabled => IsDisabled;
+    string? IButtonComponentModel.CustomId => ~CustomId;
+    string? IButtonComponentModel.Url => ~Url;
+    bool? IButtonComponentModel.IsDisabled => ~IsDisabled;
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

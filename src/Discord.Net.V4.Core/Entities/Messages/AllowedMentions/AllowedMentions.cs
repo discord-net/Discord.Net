@@ -73,6 +73,6 @@ public readonly struct AllowedMentions(
             new AllowedMentionTypes(model.Parse | []),
             ~model.Roles,
             ~model.Users,
-            model.RepliedUser
+            ~model.RepliedUser
         );
 }

@@ -2,7 +2,15 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Webhook : IWebhookModel, IModelSource, IModelSourceOf<IUserModel?>, IModelSourceOf<IChannelModel?>
+public sealed class WebhookSourceChannel
+{
+    [JsonPropertyName("id")]
+    public ulong Id { get; set; }
+    [JsonPropertyName("name")]
+    public required string Name { get; set; }
+}
+
+public sealed class Webhook : IWebhookModel, IModelSource, IModelSourceOf<IUserModel?>
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -35,24 +43,24 @@ public sealed class Webhook : IWebhookModel, IModelSource, IModelSourceOf<IUserM
     public Optional<PartialGuild> SourceGuild { get; set; }
 
     [JsonPropertyName("source_channel")]
-    public Optional<ChannelModel> SourceChannel { get; set; }
+    public Optional<WebhookSourceChannel> SourceChannel { get; set; }
 
     [JsonPropertyName("url")]
     public Optional<string> Url { get; set; }
 
-    ulong? IWebhookModel.GuildId => GuildId;
-    ulong? IWebhookModel.SourceGuildId => SourceGuild.Map(v => v.Id);
-    ulong? IWebhookModel.SourceChannelId => SourceChannel.Map(v => v.Id);
-    string? IWebhookModel.Url => Url;
-    ulong? IWebhookModel.UserId => Creator.Map(v => v.Id);
+    ulong? IWebhookModel.GuildId => ~GuildId;
+    ulong? IWebhookModel.SourceGuildId => ~SourceGuild.Map(v => v.Id);
+    string? IWebhookModel.SourceGuildName => ~SourceGuild.Map(v => v.Name);
+    string? IWebhookModel.SourceGuildIcon => ~SourceGuild.Map(v => v.Icon);
+    ulong? IWebhookModel.SourceChannelId => ~SourceChannel.Map(v => v.Id);
+    string? IWebhookModel.SourceChannelName => ~SourceChannel.Map(v => v.Name);
+    string? IWebhookModel.Url => ~Url;
+    ulong? IWebhookModel.UserId => ~Creator.Map(v => v.Id);
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {
-        if (SourceChannel) yield return SourceChannel.Value;
         if (Creator) yield return Creator.Value;
     }
 
     IUserModel? IModelSourceOf<IUserModel?>.Model => ~Creator;
-
-    IChannelModel? IModelSourceOf<IChannelModel?>.Model => ~SourceChannel;
 }

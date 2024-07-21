@@ -10,4 +10,5 @@ namespace Discord;
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IMediaChannelActor :
     IThreadableChannelActor,
+    IIntegrationChannelActor,
     IActor<ulong, IMediaChannel>;

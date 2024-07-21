@@ -76,7 +76,7 @@ public readonly struct Optional<T>
 
     private string DebuggerDisplay => IsSpecified ? _value?.ToString() ?? "<null>" : "<unspecified>";
 
-    public static implicit operator T(Optional<T> value) => value.Value;
+    public static explicit operator T(Optional<T> value) => value.Value;
     public static implicit operator Optional<T>(T value) => new(value);
 
     [return: NotNullIfNotNull(nameof(other))]

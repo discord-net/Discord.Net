@@ -9,6 +9,7 @@ public partial interface IVoiceChannel :
     IMessageChannel,
     IAudioChannel,
     INestedChannel,
+    IIntegrationChannel,
     IVoiceChannelActor
 {
     [SourceOfTruth]

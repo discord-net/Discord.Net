@@ -25,5 +25,5 @@ public partial interface IStageInstance :
     /// <summary>
     ///     Gets the guild scheduled event tied to this stage instance, if any; otherwise <see langword="null" />.
     /// </summary>
-    ILoadableEntity<ulong, IGuildScheduledEvent>? Event { get; }
+    IGuildScheduledEventActor? Event { get; }
 }

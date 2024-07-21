@@ -20,6 +20,10 @@ public partial class RestVoiceChannelActor(
     [ProxyInterface(typeof(IMessageChannelActor))]
     internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
 
+    [ProxyInterface(typeof(IIntegrationChannelActor))]
+    internal RestIntegrationChannelActor IntegrationChannelActor { get; } =
+        new(client, guild, channel);
+    
     [SourceOfTruth]
     [CovariantOverride]
     internal virtual RestVoiceChannel CreateEntity(IGuildVoiceChannelModel model)

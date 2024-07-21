@@ -42,6 +42,7 @@ global using NewsChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Dis
 global using TextChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestTextChannel, Discord.Models.IGuildTextChannelModel>;
 global using StageChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestStageChannel, Discord.Models.IGuildStageChannelModel>;
 global using CategoryChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Channels.RestCategoryChannel, Discord.Models.IGuildCategoryChannelModel>;
+global using IntegrationChannelIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.IIntegrationChannel, Discord.Models.IGuildChannelModel>;
 #endregion
 
 #region Messages
@@ -53,5 +54,17 @@ global using MessageIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord
 #region Invites
 
 global using InviteIdentity = Discord.IIdentifiableEntityOrModel<string, Discord.Rest.Invites.RestInvite, Discord.Models.IInviteModel>;
+
+#endregion
+
+#region Stage
+
+global using StageInstanceIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Stage.RestStageInstance, Discord.Models.IStageInstanceModel>;
+
+#endregion
+
+#region Webhooks
+
+global using WebhookIdentity = Discord.IIdentifiableEntityOrModel<ulong, Discord.Rest.Webhooks.RestWebhook, Discord.Models.IWebhookModel>;
 
 #endregion

@@ -31,28 +31,29 @@ public static class VariableFuncArgs
         ref MethodDeclarationSyntax syntax,
         InvocationExpressionSyntax invocationExpression,
         FunctionGenerator.MethodTarget target,
+        SemanticModel semanticModel,
         Logger logger
     )
     {
         var varargIndex = IndexOfVarArgsParameter(target.MethodSymbol);
 
-        var extraArgs = invocationExpression.ArgumentList.Arguments
-                            .Select((x, i) => (Argument: x, Index: i))
-                            .Count(x =>
-                                x.Index <= varargIndex || x.Argument.NameColon is null
-                            )
-                        - target.MethodSymbol.Parameters.Count(x => !x.IsOptional);
+        var totalExtraArgs = invocationExpression.ArgumentList.Arguments
+                                 .Select((x, i) => (Argument: x, Index: i))
+                                 .Count(x =>
+                                     x.Index <= varargIndex || x.Argument.NameColon is null
+                                 )
+                             - target.MethodSymbol.Parameters.Count(x => !x.IsOptional);
 
         if (target.MethodSymbol.IsExtensionMethod)
-            extraArgs++;
+            totalExtraArgs++;
 
-        if (extraArgs <= 0)
+        if (totalExtraArgs <= 0)
         {
-            logger.Warn("No extra args");
             return;
         }
 
-        string? varargFuncParameterIdentifier = null;
+        var iterationOffset = 0;
+        var varargParameters = new Dictionary<string, (int Size, int Nth, int Offset)>();
 
         var offset = target.MethodSymbol.IsExtensionMethod ? 1 : 0;
 
@@ -62,102 +63,109 @@ public static class VariableFuncArgs
 
             var parameter = target.MethodSymbol.Parameters[index];
 
-            if (parameter.GetAttributes().Any(x =>
-                    x.AttributeClass?.ToDisplayString() == "Discord.VariableFuncArgsAttribute"))
+            var varargsAttribute = parameter.GetAttributes().FirstOrDefault(x =>
+                x.AttributeClass?.ToDisplayString() == "Discord.VariableFuncArgsAttribute");
+
+            if (varargsAttribute is null) continue;
+
+            var funcGenericTypes = parameterNode
+                .DescendantNodes()
+                .OfType<TypeArgumentListSyntax>()
+                .FirstOrDefault()
+                ?.ChildNodes()
+                .OfType<IdentifierNameSyntax>()
+                .Select(x => x.Identifier.ValueText);
+
+            if (funcGenericTypes is null)
             {
-                var funcGenericTypes = parameterNode
-                    .DescendantNodes()
-                    .OfType<TypeArgumentListSyntax>()
-                    .FirstOrDefault()
-                    ?.ChildNodes()
-                    .OfType<IdentifierNameSyntax>()
-                    .Select(x => x.Identifier.ValueText);
+                logger.Log(LogLevel.Error,
+                    $"Somethings really sussy bro: {parameterNode} | {parameter}");
+                return;
+            }
 
-                if (funcGenericTypes is null)
-                {
-                    logger.Log(LogLevel.Error,
-                        $"Somethings really sussy bro: {parameterNode} | {parameter}");
-                    return;
-                }
+            var insertIndex = (varargsAttribute.NamedArguments
+                .FirstOrDefault(x => x.Key == "InsertAt")
+                .Value.Value as int?) ?? 0;
 
-                varargFuncParameterIdentifier = parameterNode.Identifier.ValueText;
+            var size = target.MethodSymbol.Parameters.Length <= index + 1
+                ? invocationExpression.ArgumentList.Arguments.Count - (target.MethodSymbol.Parameters.Length - offset)
+                : invocationExpression.ArgumentList.Arguments
+                    .Skip(index - offset)
+                    .TakeWhile(x => x.NameColon is null)
+                    .Count() - 1;
 
-                var typeArgsList = (parameterNode.Type as GenericNameSyntax)!
-                    .TypeArgumentList
-                    .Arguments
-                    .InsertRange(
-                        0,
-                        Enumerable.Range(0, extraArgs)
-                            .Select(x => SyntaxFactory.IdentifierName($"VARG{x}"))
-                    );
+            var vargOffset = iterationOffset;
+            iterationOffset += size;
 
+            varargParameters.Add(parameterNode.Identifier.ValueText, (size, vargOffset, insertIndex));
+
+            var typeArgsList = (parameterNode.Type as GenericNameSyntax)!
+                .TypeArgumentList
+                .Arguments
+                .InsertRange(
+                    insertIndex,
+                    Enumerable.Range(0, size)
+                        .Select(x => SyntaxFactory.IdentifierName($"VARG{vargOffset + x}"))
+                );
+
+            logger.Log($"Varg parameter: {parameter.Name} > {vargOffset}..{size} : {typeArgsList}");
+
+            syntax = syntax.ReplaceNode(
+                syntax.ParameterList.Parameters.First(x => x.Identifier.IsEquivalentTo(parameterNode.Identifier)),
+                SyntaxFactory.Parameter(
+                    new SyntaxList<AttributeListSyntax>(),
+                    parameterNode.Modifiers,
+                    SyntaxFactory.GenericName(
+                        SyntaxFactory.Identifier("Func"),
+                        SyntaxFactory.TypeArgumentList(typeArgsList)
+                    ),
+                    parameterNode.Identifier,
+                    parameterNode.Default
+                )
+            );
+
+            var newTypeArgs = Enumerable.Range(0, size)
+                .Select(x => SyntaxFactory.TypeParameter($"VARG{vargOffset + x}"));
+
+            if (syntax.TypeParameterList is not null)
+            {
                 syntax = syntax.ReplaceNode(
-                    parameterNode,
-                    SyntaxFactory.Parameter(
-                        new SyntaxList<AttributeListSyntax>(),
-                        parameterNode.Modifiers,
-                        SyntaxFactory.GenericName(
-                            SyntaxFactory.Identifier("Func"),
-                            SyntaxFactory.TypeArgumentList(typeArgsList)
-                        ),
-                        parameterNode.Identifier,
-                        parameterNode.Default
+                    syntax.TypeParameterList,
+                    SyntaxFactory.TypeParameterList(
+                        syntax
+                            .TypeParameterList
+                            .Parameters
+                            .AddRange(newTypeArgs)
                     )
                 );
-
-                var newTypeArgs = Enumerable.Range(0, extraArgs)
-                    .Select(x => SyntaxFactory.TypeParameter($"VARG{x}"));
-
-                if (syntax.TypeParameterList is not null)
-                {
-                    syntax = syntax.ReplaceNode(
-                        syntax.TypeParameterList,
-                        SyntaxFactory.TypeParameterList(
-                            syntax
-                                .TypeParameterList
-                                .Parameters
-                                .AddRange(newTypeArgs)
-                        )
-                    );
-                }
-                else
-                {
-                    syntax =
-                        syntax.WithTypeParameterList(
-                            SyntaxFactory.TypeParameterList(
-                                SyntaxFactory.SeparatedList(newTypeArgs)
-                            )
-                        );
-                }
-
-                var newParameters = SyntaxFactory
-                    .ParameterList(
-                        SyntaxFactory.SeparatedList([
-                            ..syntax.ParameterList.Parameters
-                                .Where(x => x.Default is null),
-                            ..Enumerable.Range(0, extraArgs)
-                                .Select(x => SyntaxFactory.Parameter(
-                                        new SyntaxList<AttributeListSyntax>(),
-                                        new SyntaxTokenList(),
-                                        SyntaxFactory.IdentifierName($"VARG{x}")
-                                            .WithTrailingTrivia(SyntaxFactory.Whitespace(" ")),
-                                        SyntaxFactory.Identifier($"vararg{x}"),
-                                        null
-                                    )
-                                ),
-                            ..syntax.ParameterList.Parameters
-                                .Where(x => x.Default is not null)
-                        ])
-                    );
-
-                syntax = syntax.ReplaceNode(
-                    syntax.ParameterList,
-                    newParameters
+            }
+            else
+            {
+                syntax = syntax.WithTypeParameterList(
+                    SyntaxFactory.TypeParameterList(
+                        SyntaxFactory.SeparatedList(newTypeArgs)
+                    )
                 );
             }
+
+            syntax = syntax.WithParameterList(
+                syntax.ParameterList.WithParameters(syntax.ParameterList.Parameters.InsertRange(
+                    index + 1 + vargOffset,
+                    Enumerable.Range(0, size)
+                        .Select(x => SyntaxFactory.Parameter(
+                                new SyntaxList<AttributeListSyntax>(),
+                                new SyntaxTokenList(),
+                                SyntaxFactory.IdentifierName($"VARG{vargOffset + x}")
+                                    .WithTrailingTrivia(SyntaxFactory.Whitespace(" ")),
+                                SyntaxFactory.Identifier($"vararg{vargOffset + x}"),
+                                null
+                            )
+                        )
+                ))
+            );
         }
 
-        if (varargFuncParameterIdentifier is null) return;
+        if (varargParameters.Count == 0) return;
 
         syntax = syntax.ReplaceNodes(
             syntax.Body!
@@ -165,16 +173,22 @@ public static class VariableFuncArgs
                 .OfType<InvocationExpressionSyntax>()
                 .Where(x =>
                     x.Expression is IdentifierNameSyntax identifierNameSyntax &&
-                    identifierNameSyntax.Identifier.ValueText == varargFuncParameterIdentifier
+                    varargParameters.ContainsKey(identifierNameSyntax.Identifier.ValueText)
                 ),
             (node, _) =>
             {
+                if (node.Expression is not IdentifierNameSyntax identifierNameSyntax)
+                    return node;
+
+                var info = varargParameters[identifierNameSyntax.Identifier.ValueText];
+
                 var newArgFuncList = node.ArgumentList.Arguments
                     .InsertRange(
-                        0,
-                        Enumerable.Range(0, extraArgs)
+                        info.Offset,
+                        Enumerable.Range(0, info.Size)
                             .Select(x => SyntaxFactory.Argument(
-                                SyntaxFactory.IdentifierName($"vararg{x}")
+                                SyntaxFactory.IdentifierName(
+                                    $"vararg{x + info.Nth}")
                             ))
                     );
 

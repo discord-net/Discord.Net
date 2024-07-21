@@ -44,7 +44,7 @@ public sealed class VoiceState : IVoiceStateModel, IModelSource, IModelSourceOf<
     [JsonPropertyName("request_to_speak_timestamp")]
     public DateTimeOffset? RequestToSpeakTimestamp { get; set; }
 
-    ulong? IVoiceStateModel.GuildId => GuildId;
+    ulong? IVoiceStateModel.GuildId => ~GuildId;
     string IEntityModel<string>.Id => SessionId;
 
     public IEnumerable<IEntityModel> GetDefinedModels()

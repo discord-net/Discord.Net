@@ -16,7 +16,7 @@ public sealed class EmbedThumbnail : IEmbedThumbnailModel
     [JsonPropertyName("width")]
     public Optional<int> Width { get; set; }
 
-    string? IEmbedThumbnailModel.ProxyUrl => ProxyUrl;
-    int? IEmbedThumbnailModel.Height => Height;
-    int? IEmbedThumbnailModel.Width => Width;
+    string? IEmbedThumbnailModel.ProxyUrl => ~ProxyUrl;
+    int? IEmbedThumbnailModel.Height => ~Height;
+    int? IEmbedThumbnailModel.Width => ~Width;
 }

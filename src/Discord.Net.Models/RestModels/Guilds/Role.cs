@@ -43,9 +43,9 @@ public sealed class Role : IRoleModel
 
     bool IRoleModel.IsHoisted => Hoist;
 
-    string? IRoleModel.Icon => Icon;
+    string? IRoleModel.Icon => ~Icon;
 
-    string? IRoleModel.UnicodeEmoji => UnicodeEmoji;
+    string? IRoleModel.UnicodeEmoji => ~UnicodeEmoji;
 
     bool IRoleModel.IsManaged => Managed;
 

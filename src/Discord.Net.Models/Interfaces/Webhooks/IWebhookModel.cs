@@ -12,6 +12,9 @@ public partial interface IWebhookModel : IEntityModel<ulong>
     string? Token { get; }
     ulong? ApplicationId { get; }
     ulong? SourceGuildId { get; }
+    string? SourceGuildName { get; }
+    string? SourceGuildIcon { get; }
     ulong? SourceChannelId { get; }
+    string? SourceChannelName { get; }
     string? Url { get; }
 }

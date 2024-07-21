@@ -16,7 +16,7 @@ public sealed class EmbedAuthor : IEmbedAuthorModel
     [JsonPropertyName("proxy_icon_url")]
     public Optional<string> ProxyIconUrl { get; set; }
 
-    string? IEmbedAuthorModel.Url => Url;
-    string? IEmbedAuthorModel.IconUrl => IconUrl;
-    string? IEmbedAuthorModel.ProxyIconUrl => ProxyIconUrl;
+    string? IEmbedAuthorModel.Url => ~Url;
+    string? IEmbedAuthorModel.IconUrl => ~IconUrl;
+    string? IEmbedAuthorModel.ProxyIconUrl => ~ProxyIconUrl;
 }

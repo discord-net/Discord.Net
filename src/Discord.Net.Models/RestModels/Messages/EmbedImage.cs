@@ -16,7 +16,7 @@ public sealed class EmbedImage : IEmbedImageModel
     [JsonPropertyName("width")]
     public Optional<int> Width { get; set; }
 
-    string? IEmbedImageModel.ProxyUrl => ProxyUrl;
-    int? IEmbedImageModel.Height => Height;
-    int? IEmbedImageModel.Width => Width;
+    string? IEmbedImageModel.ProxyUrl => ~ProxyUrl;
+    int? IEmbedImageModel.Height => ~Height;
+    int? IEmbedImageModel.Width => ~Width;
 }

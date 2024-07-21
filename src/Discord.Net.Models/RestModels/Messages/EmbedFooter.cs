@@ -13,6 +13,6 @@ public sealed class EmbedFooter : IEmbedFooterModel
     [JsonPropertyName("proxy_icon_url")]
     public Optional<string> ProxyIconUrl { get; set; }
 
-    string? IEmbedFooterModel.IconUrl => IconUrl;
-    string? IEmbedFooterModel.ProxyIconUrl => ProxyIconUrl;
+    string? IEmbedFooterModel.IconUrl => ~IconUrl;
+    string? IEmbedFooterModel.ProxyIconUrl => ~ProxyIconUrl;
 }

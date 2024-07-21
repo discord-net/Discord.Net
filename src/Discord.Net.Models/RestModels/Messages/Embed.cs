@@ -43,13 +43,13 @@ public sealed class Embed : IEmbedModel
     [JsonPropertyName("fields")]
     public Optional<EmbedField[]> Fields { get; set; }
 
-    uint? IEmbedModel.Color => Color;
-    string? IEmbedModel.Type => Type;
+    uint? IEmbedModel.Color => ~Color;
+    string? IEmbedModel.Type => ~Type;
 
-    string? IEmbedModel.Description => Description;
-    string? IEmbedModel.Url => Url;
+    string? IEmbedModel.Description => ~Description;
+    string? IEmbedModel.Url => ~Url;
 
-    string? IEmbedModel.Title => Title;
+    string? IEmbedModel.Title => ~Title;
 
     IEnumerable<IEmbedFieldModel> IEmbedModel.Fields => Fields | [];
     IEmbedFooterModel? IEmbedModel.Footer => ~Footer;

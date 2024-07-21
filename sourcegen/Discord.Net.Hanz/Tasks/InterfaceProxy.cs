@@ -143,6 +143,8 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
 
         var syntax = SyntaxUtils.CreateSourceGenClone(target.ClassDeclarationSyntax);
 
+        var addedMembers = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+
         foreach (var kvp in target.Properties)
         {
             var property = target.SemanticModel.GetDeclaredSymbol(kvp.Key);
@@ -158,9 +160,17 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
 
             foreach (var targetInterface in targetInterfaces)
             {
-                if (AddProxiedMembers(ref syntax, targetInterface, targetSymbol, property, target.SemanticModel,
-                        logger) == 0)
-                    continue;
+                if (
+                    AddProxiedMembers(
+                        ref syntax,
+                        targetInterface,
+                        targetSymbol,
+                        property,
+                        target.SemanticModel,
+                        logger,
+                        shouldAdd: member => addedMembers.Add(member)
+                    ) == 0
+                ) continue;
 
                 var proxiedInterfaceTypeSyntax = SyntaxFactory.GenericName(
                     SyntaxFactory.Identifier("Discord.IProxied"),
@@ -170,33 +180,37 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                         ])
                     )
                 );
-                syntax = syntax.AddBaseListTypes(
-                    SyntaxFactory.SimpleBaseType(
-                        proxiedInterfaceTypeSyntax
-                    )
-                );
 
-                syntax = syntax.AddMembers(
-                    SyntaxFactory.PropertyDeclaration(
-                        [],
-                        [],
-                        SyntaxFactory.ParseTypeName(targetInterface.ToDisplayString()),
-                        SyntaxFactory.ExplicitInterfaceSpecifier(
-                            proxiedInterfaceTypeSyntax
-                        ),
-                        SyntaxFactory.Identifier("ProxiedValue"),
-                        null,
-                        SyntaxFactory.ArrowExpressionClause(
-                            SyntaxFactory.MemberAccessExpression(
-                                SyntaxKind.SimpleMemberAccessExpression,
-                                SyntaxFactory.ThisExpression(),
-                                SyntaxFactory.IdentifierName(property.Name)
+                if (syntax.BaseList?.Types.All(x => !x.Type.IsEquivalentTo(proxiedInterfaceTypeSyntax)) ?? false)
+                {
+                    syntax = syntax
+                        .AddBaseListTypes(
+                            SyntaxFactory.SimpleBaseType(
+                                proxiedInterfaceTypeSyntax
                             )
-                        ),
-                        null,
-                        SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                    )
-                );
+                        )
+                        .AddMembers(
+                            SyntaxFactory.PropertyDeclaration(
+                                [],
+                                [],
+                                SyntaxFactory.ParseTypeName(targetInterface.ToDisplayString()),
+                                SyntaxFactory.ExplicitInterfaceSpecifier(
+                                    proxiedInterfaceTypeSyntax
+                                ),
+                                SyntaxFactory.Identifier("ProxiedValue"),
+                                null,
+                                SyntaxFactory.ArrowExpressionClause(
+                                    SyntaxFactory.MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        SyntaxFactory.ThisExpression(),
+                                        SyntaxFactory.IdentifierName(property.Name)
+                                    )
+                                ),
+                                null,
+                                SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                            )
+                        );
+                }
             }
 
             var rootProxiedInterfaceTypeSyntax = SyntaxFactory.GenericName(
@@ -234,20 +248,20 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                     SyntaxFactory.Token(SyntaxKind.SemicolonToken)
                 )
             ]);
-
-            context.AddSource(
-                $"InterfaceProxy/{target.ClassDeclarationSyntax.Identifier}_Proxied.g.cs",
-                $$"""
-                  namespace {{ModelExtensions.GetDeclaredSymbol(target.SemanticModel, target.ClassDeclarationSyntax)!.ContainingNamespace}};
-
-                  #nullable enable
-
-                  {{syntax.NormalizeWhitespace()}}
-
-                  #nullable restore
-                  """
-            );
         }
+
+        context.AddSource(
+            $"InterfaceProxy/{target.ClassDeclarationSyntax.Identifier}_Proxied.g.cs",
+            $$"""
+              namespace {{ModelExtensions.GetDeclaredSymbol(target.SemanticModel, target.ClassDeclarationSyntax)!.ContainingNamespace}};
+
+              #nullable enable
+
+              {{syntax.NormalizeWhitespace()}}
+
+              #nullable restore
+              """
+        );
     }
 
     private static bool IsValidMember(ISymbol symbol)
@@ -266,7 +280,9 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
         INamedTypeSymbol targetSymbol,
         IPropertySymbol proxiedTo,
         SemanticModel semanticModel,
-        Logger logger)
+        Logger logger,
+        Action<ISymbol>? onAdd = null,
+        Predicate<ISymbol>? shouldAdd = null)
     {
         var count = 0;
 
@@ -285,6 +301,9 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
 
         foreach (var member in toProxy.GetMembers().Where(IsValidMember))
         {
+            if (!shouldAdd?.Invoke(member) ?? false)
+                continue;
+
             if (
                 targetSymbol.FindImplementationForInterfaceMember(member) is not null ||
                 Hierarchy.GetHierarchy(targetSymbol).Any(x =>
@@ -314,9 +333,15 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                 targetImplementation is not null &&
                 MemberUtils.CanOverride(targetImplementation, member, semanticModel.Compilation);
 
-            var selfHasTargetImplementation = TypeUtils.GetBaseTypesAndThis(targetSymbol)
+            var selfHasTargetImplementation = TypeUtils
+                .GetBaseTypesAndThis(targetSymbol)
                 .Any(typeSymbol =>
-                    typeSymbol.GetMembers().Any(typeSymbolMember => MemberUtils.Conflicts(typeSymbolMember, member)) ||
+                    typeSymbol
+                        .GetMembers()
+                        .Any(typeSymbolMember => MemberUtils
+                            .Conflicts(typeSymbolMember, member)
+                        )
+                    ||
                     (
                         !typeSymbol.Equals(targetSymbol, SymbolEqualityComparer.Default) &&
                         typeSymbol.DeclaringSyntaxReferences.Length > 0 &&
@@ -324,14 +349,17 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                             baseDeclarationSyntax &&
                         ComputeProxiedTypeProperties(
                                 baseDeclarationSyntax,
-                                semanticModel.Compilation.GetSemanticModel(baseDeclarationSyntax.SyntaxTree)
+                                semanticModel.Compilation.GetSemanticModel(baseDeclarationSyntax
+                                    .SyntaxTree)
                             )
                             .Any(baseProxiedProperties =>
                             {
                                 var baseSemantic =
-                                    semanticModel.Compilation.GetSemanticModel(baseDeclarationSyntax.SyntaxTree);
+                                    semanticModel.Compilation.GetSemanticModel(baseDeclarationSyntax
+                                        .SyntaxTree);
 
-                                var baseProperty = baseSemantic.GetDeclaredSymbol(baseProxiedProperties.Key);
+                                var baseProperty =
+                                    baseSemantic.GetDeclaredSymbol(baseProxiedProperties.Key);
 
                                 if (baseProperty is null)
                                 {
@@ -342,7 +370,8 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
 
                                 return GetTargetTypesToProxy(
                                         baseProxiedProperties.Value,
-                                        semanticModel.Compilation.GetSemanticModel(baseDeclarationSyntax.SyntaxTree),
+                                        semanticModel.Compilation.GetSemanticModel(baseDeclarationSyntax
+                                            .SyntaxTree),
                                         baseProperty.Type.AllInterfaces
                                     )
                                     .Any(baseTargetProxyType => baseTargetProxyType
@@ -355,61 +384,77 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                     )
                 );
 
+            var shouldImplementMember = !selfHasTargetImplementation || (targetImplementation?.IsOverride ?? false);
+
             switch (member)
             {
                 case IPropertySymbol property:
                     if (property.ExplicitInterfaceImplementations.Length > 0 || property.IsStatic)
                         break;
 
-                    if (targetImplementation is IPropertySymbol targetProperty && !selfHasTargetImplementation)
+                    if (targetImplementation is IPropertySymbol targetProperty && shouldImplementMember)
                     {
-                        classDeclarationSyntax = classDeclarationSyntax.AddMembers(
-                            SyntaxFactory.PropertyDeclaration(
-                                [],
-                                CreateAccessors(targetProperty.DeclaredAccessibility),
-                                SyntaxFactory.IdentifierName(targetProperty.Type.ToDisplayString()),
-                                null,
-                                SyntaxFactory.Identifier(property.Name),
-                                null,
-                                SyntaxFactory.ArrowExpressionClause(
-                                    SyntaxFactory.Token(SyntaxKind.EqualsGreaterThanToken),
-                                    SyntaxFactory.MemberAccessExpression(
-                                        SyntaxKind.SimpleMemberAccessExpression,
-                                        SyntaxFactory.IdentifierName(proxiedTo.Name),
-                                        SyntaxFactory.IdentifierName(property.Name)
-                                    )
-                                ),
-                                null,
-                                SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                            )
-                        );
-                    }
-
-                    classDeclarationSyntax = classDeclarationSyntax.AddMembers(
-                        SyntaxFactory.PropertyDeclaration(
+                        var propertySyntax = SyntaxFactory.PropertyDeclaration(
                             [],
-                            [],
-                            SyntaxFactory.IdentifierName(property.Type.ToDisplayString()),
-                            SyntaxFactory.ExplicitInterfaceSpecifier(
-                                SyntaxFactory.IdentifierName(toProxy.ToDisplayString())
-                            ),
+                            CreateAccessors(targetProperty.DeclaredAccessibility)
+                                .AddRange(CreateModifiers(targetProperty)),
+                            SyntaxFactory.IdentifierName(targetProperty.Type.ToDisplayString()),
+                            null,
                             SyntaxFactory.Identifier(property.Name),
                             null,
                             SyntaxFactory.ArrowExpressionClause(
                                 SyntaxFactory.Token(SyntaxKind.EqualsGreaterThanToken),
                                 SyntaxFactory.MemberAccessExpression(
                                     SyntaxKind.SimpleMemberAccessExpression,
-                                    canProxyToSelfImplementation
-                                        ? SyntaxFactory.ThisExpression()
-                                        : castedSyntax,
+                                    SyntaxFactory.IdentifierName(proxiedTo.Name),
                                     SyntaxFactory.IdentifierName(property.Name)
                                 )
                             ),
                             null,
                             SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                        )
+                        );
+
+                        if (classDeclarationSyntax.Members.All(x => x.WithLeadingTrivia(null).ToString() != propertySyntax.ToString()))
+                        {
+                            classDeclarationSyntax = classDeclarationSyntax
+                                .AddMembers(
+                                    propertySyntax
+                                        .WithLeadingTrivia(
+                                            SyntaxFactory.Comment($"// {property} through {targetImplementation}")
+                                        )
+                                );
+                        }
+                    }
+
+                    classDeclarationSyntax = classDeclarationSyntax.AddMembers(
+                        SyntaxFactory.PropertyDeclaration(
+                                [],
+                                [],
+                                SyntaxFactory.IdentifierName(property.Type.ToDisplayString()),
+                                SyntaxFactory.ExplicitInterfaceSpecifier(
+                                    SyntaxFactory.IdentifierName(toProxy.ToDisplayString())
+                                ),
+                                SyntaxFactory.Identifier(property.Name),
+                                null,
+                                SyntaxFactory.ArrowExpressionClause(
+                                    SyntaxFactory.Token(SyntaxKind.EqualsGreaterThanToken),
+                                    SyntaxFactory.MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        canProxyToSelfImplementation
+                                            ? SyntaxFactory.ThisExpression()
+                                            : castedSyntax,
+                                        SyntaxFactory.IdentifierName(property.Name)
+                                    )
+                                ),
+                                null,
+                                SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                            )
+                            .WithLeadingTrivia(
+                                SyntaxFactory.Comment($"// {property}")
+                            )
                     );
 
+                    onAdd?.Invoke(property);
                     count++;
                     break;
 
@@ -417,72 +462,14 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                     if (method.IsStatic || method.MethodKind is not MethodKind.Ordinary)
                         break;
 
-                    if (targetImplementation is IMethodSymbol targetMethod && !selfHasTargetImplementation)
+                    if (targetImplementation is IMethodSymbol targetMethod && shouldImplementMember)
                     {
-                        classDeclarationSyntax = classDeclarationSyntax.AddMembers(
-                            SyntaxFactory.MethodDeclaration(
-                                [],
-                                CreateAccessors(targetMethod.DeclaredAccessibility),
-                                SyntaxFactory.IdentifierName(targetMethod.ReturnType.ToDisplayString()),
-                                null,
-                                SyntaxFactory.Identifier(method.Name),
-                                method.TypeParameters.Length > 0
-                                    ? SyntaxFactory.TypeParameterList(
-                                        SyntaxFactory.SeparatedList(
-                                            method.TypeParameters.Select(x =>
-                                                SyntaxFactory.TypeParameter(x.ToDisplayString())
-                                            )
-                                        )
-                                    )
-                                    : null,
-                                SyntaxFactory.ParameterList(
-                                    SyntaxFactory.SeparatedList(
-                                        method.Parameters.Select(x =>
-                                            SyntaxFactory.Parameter(
-                                                new SyntaxList<AttributeListSyntax>(),
-                                                new SyntaxTokenList(),
-                                                SyntaxFactory.IdentifierName(x.Type.ToDisplayString()),
-                                                SyntaxFactory.Identifier(x.Name),
-                                                null
-                                            )
-                                        )
-                                    )
-                                ),
-                                [],
-                                null,
-                                SyntaxFactory.ArrowExpressionClause(
-                                    SyntaxFactory.InvocationExpression(
-                                        SyntaxFactory.MemberAccessExpression(
-                                            SyntaxKind.SimpleMemberAccessExpression,
-                                            SyntaxFactory.IdentifierName(proxiedTo.Name),
-                                            SyntaxFactory.IdentifierName(method.Name)
-                                        ),
-                                        SyntaxFactory.ArgumentList(
-                                            SyntaxFactory.SeparatedList(
-                                                method.Parameters.Select(x =>
-                                                    SyntaxFactory.Argument(
-                                                        null,
-                                                        SyntaxFactory.Token(SyntaxKind.None),
-                                                        SyntaxFactory.IdentifierName(x.Name)
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    )
-                                ),
-                                SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                            )
-                        );
-                    }
-
-                    classDeclarationSyntax = classDeclarationSyntax.AddMembers(
-                        SyntaxFactory.MethodDeclaration(
+                        var methodSyntax = SyntaxFactory.MethodDeclaration(
                             [],
-                            [],
-                            SyntaxFactory.IdentifierName(method.ReturnType.ToDisplayString()),
-                            SyntaxFactory.ExplicitInterfaceSpecifier(
-                                SyntaxFactory.IdentifierName(toProxy.ToDisplayString())
-                            ),
+                            CreateAccessors(targetMethod.DeclaredAccessibility)
+                                .AddRange(CreateModifiers(targetMethod)),
+                            SyntaxFactory.IdentifierName(targetMethod.ReturnType.ToDisplayString()),
+                            null,
                             SyntaxFactory.Identifier(method.Name),
                             method.TypeParameters.Length > 0
                                 ? SyntaxFactory.TypeParameterList(
@@ -512,9 +499,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                                 SyntaxFactory.InvocationExpression(
                                     SyntaxFactory.MemberAccessExpression(
                                         SyntaxKind.SimpleMemberAccessExpression,
-                                        canProxyToSelfImplementation
-                                            ? SyntaxFactory.ThisExpression()
-                                            : castedSyntax,
+                                        SyntaxFactory.IdentifierName(proxiedTo.Name),
                                         SyntaxFactory.IdentifierName(method.Name)
                                     ),
                                     SyntaxFactory.ArgumentList(
@@ -531,14 +516,103 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                                 )
                             ),
                             SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                        )
+                        );
+
+                        if (classDeclarationSyntax.Members.All(x => x.WithLeadingTrivia(null).ToString() != methodSyntax.ToString()))
+                        {
+                            classDeclarationSyntax = classDeclarationSyntax.AddMembers(
+                                methodSyntax
+                                    .WithLeadingTrivia(
+                                        SyntaxFactory.Comment($"// {method} through {targetImplementation}")
+                                    )
+                            );
+                        }
+                    }
+
+                    classDeclarationSyntax = classDeclarationSyntax.AddMembers(
+                        SyntaxFactory.MethodDeclaration(
+                                [],
+                                [],
+                                SyntaxFactory.IdentifierName(method.ReturnType.ToDisplayString()),
+                                SyntaxFactory.ExplicitInterfaceSpecifier(
+                                    SyntaxFactory.IdentifierName(toProxy.ToDisplayString())
+                                ),
+                                SyntaxFactory.Identifier(method.Name),
+                                method.TypeParameters.Length > 0
+                                    ? SyntaxFactory.TypeParameterList(
+                                        SyntaxFactory.SeparatedList(
+                                            method.TypeParameters.Select(x =>
+                                                SyntaxFactory.TypeParameter(x.ToDisplayString())
+                                            )
+                                        )
+                                    )
+                                    : null,
+                                SyntaxFactory.ParameterList(
+                                    SyntaxFactory.SeparatedList(
+                                        method.Parameters.Select(x =>
+                                            SyntaxFactory.Parameter(
+                                                new SyntaxList<AttributeListSyntax>(),
+                                                new SyntaxTokenList(),
+                                                SyntaxFactory.IdentifierName(x.Type.ToDisplayString()),
+                                                SyntaxFactory.Identifier(x.Name),
+                                                null
+                                            )
+                                        )
+                                    )
+                                ),
+                                [],
+                                null,
+                                SyntaxFactory.ArrowExpressionClause(
+                                    SyntaxFactory.InvocationExpression(
+                                        SyntaxFactory.MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            canProxyToSelfImplementation
+                                                ? SyntaxFactory.ThisExpression()
+                                                : castedSyntax,
+                                            SyntaxFactory.IdentifierName(method.Name)
+                                        ),
+                                        SyntaxFactory.ArgumentList(
+                                            SyntaxFactory.SeparatedList(
+                                                method.Parameters.Select(x =>
+                                                    SyntaxFactory.Argument(
+                                                        null,
+                                                        SyntaxFactory.Token(SyntaxKind.None),
+                                                        SyntaxFactory.IdentifierName(x.Name)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                                SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                            )
+                            .WithLeadingTrivia(
+                                SyntaxFactory.Comment($"// {method}")
+                            )
                     );
+
+                    onAdd?.Invoke(method);
                     count++;
                     break;
             }
         }
 
         return count;
+    }
+
+    private static IEnumerable<SyntaxToken> CreateModifiers(ISymbol symbol)
+    {
+        if (symbol.IsVirtual)
+            yield return SyntaxFactory.Token(SyntaxKind.VirtualKeyword);
+
+        if (symbol.IsAbstract)
+            yield return SyntaxFactory.Token(SyntaxKind.AbstractKeyword);
+
+        if (symbol.IsSealed)
+            yield return SyntaxFactory.Token(SyntaxKind.SealedKeyword);
+
+        if (symbol.IsOverride)
+            yield return SyntaxFactory.Token(SyntaxKind.OverrideKeyword);
     }
 
     private static SyntaxTokenList CreateAccessors(Accessibility accessibility)

@@ -54,35 +54,35 @@ public sealed class Activity :
     [JsonPropertyName("buttons")]
     public Optional<ActivityButton[]> Buttons { get; set; }
 
-    string? IActivityModel.Url => Url;
-    string? IActivityModel.Details => Details;
-    string? IActivityModel.State => State;
-    int? IActivityModel.Flags => Flags;
+    string? IActivityModel.Url => ~Url;
+    string? IActivityModel.Details => ~Details;
+    string? IActivityModel.State => ~State;
+    int? IActivityModel.Flags => ~Flags;
     IEmojiModel? IActivityModel.Emoji => ~Emoji;
 
-    ulong? IActivityModel.ApplicationId => ApplicationId;
+    ulong? IActivityModel.ApplicationId => ~ApplicationId;
 
-    string? IActivityModel.LargeImage => Assets.Map(v => v.LargeImage);
+    string? IActivityModel.LargeImage => ~Assets.Map(v => v.LargeImage);
 
-    string? IActivityModel.LargeText => Assets.Map(v => v.LargeText);
+    string? IActivityModel.LargeText => ~Assets.Map(v => v.LargeText);
 
-    string? IActivityModel.SmallImage => Assets.Map(v => v.SmallImage);
+    string? IActivityModel.SmallImage => ~Assets.Map(v => v.SmallImage);
 
-    string? IActivityModel.SmallText => Assets.Map(v => v.SmallText);
+    string? IActivityModel.SmallText => ~Assets.Map(v => v.SmallText);
 
-    string? IActivityModel.PartyId => Party.Map(v => v.Id);
+    string? IActivityModel.PartyId => ~Party.Map(v => v.Id);
 
-    long[]? IActivityModel.PartySize => Party.Map(v => v.Size);
+    long[]? IActivityModel.PartySize => ~Party.Map(v => v.Size);
 
-    string? IActivityModel.JoinSecret => Secrets.Map(v => v.Join);
+    string? IActivityModel.JoinSecret => ~Secrets.Map(v => v.Join);
 
-    string? IActivityModel.SpectateSecret => Secrets.Map(v => v.Spectate);
+    string? IActivityModel.SpectateSecret => ~Secrets.Map(v => v.Spectate);
 
-    string? IActivityModel.MatchSecret => Secrets.Map(v => v.Match);
+    string? IActivityModel.MatchSecret => ~Secrets.Map(v => v.Match);
 
-    DateTimeOffset? IActivityModel.TimestampStart => Timestamps.Map(v => v.Start);
+    DateTimeOffset? IActivityModel.TimestampStart => ~Timestamps.Map(v => v.Start);
 
-    DateTimeOffset? IActivityModel.TimestampEnd => Timestamps.Map(v => v.End);
+    DateTimeOffset? IActivityModel.TimestampEnd => ~Timestamps.Map(v => v.End);
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

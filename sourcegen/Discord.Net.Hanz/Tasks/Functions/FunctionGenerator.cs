@@ -231,7 +231,7 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
     public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         var processed =
-            new Dictionary<string, (TypeDeclarationSyntax Syntax, HashSet<string> Methods, string Usings, string
+            new Dictionary<string, (TypeDeclarationSyntax Syntax, HashSet<string> Methods, IEnumerable<string> Usings, string
                 Namespace)>();
 
         var nonNullTargets = targets
@@ -279,7 +279,6 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
             }
 
             var containingTypeName = targetMethod.Method.MethodSymbol.ContainingType.ToDisplayString();
-            var methodName = targetMethod.Method.MethodSymbol.ToDisplayString();
 
             if (!processed.TryGetValue(containingTypeName, out var type))
                 type = (
@@ -298,9 +297,13 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
                         default
                     ),
                     new(),
-                    targetMethod.Method.MethodSyntax.GetFormattedUsingDirectives(),
+                    targetMethod.Method.MethodSyntax.GetUsingDirectives(),
                     targetMethod.Method.MethodSymbol.ContainingNamespace.ToString()
                 );
+            else
+            {
+                type.Usings = type.Usings.Concat(targetMethod.Method.MethodSyntax.GetUsingDirectives()).Distinct();
+            }
 
             var newFunctionSyntax = targetMethod.Method.MethodSyntax;
             var typeSyntax = type.Syntax;
@@ -311,6 +314,7 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
                     ref newFunctionSyntax,
                     target.InvocationExpression,
                     targetMethod.Method,
+                    target.SemanticModel,
                     targetLogger.GetSubLogger("VariableFuncArgs")
                 );
             }
@@ -350,7 +354,7 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
             context.AddSource(
                 $"GenerativeFunctions/{toGenerate.Key}",
                 $$"""
-                  {{toGenerate.Value.Usings}}
+                  {{string.Join("\n", toGenerate.Value.Usings)}}
 
                   namespace {{toGenerate.Value.Namespace}};
 

@@ -30,12 +30,12 @@ public sealed class GuildEmote : IGuildEmoteModel, IModelSource, IModelSourceOf<
 
     ulong[] IGuildEmoteModel.Roles => RoleIds | [];
 
-    bool IGuildEmoteModel.RequireColons => RequireColons;
-    bool IGuildEmoteModel.IsManaged => Managed;
-    bool IGuildEmoteModel.IsAnimated => Animated;
-    bool IGuildEmoteModel.IsAvailable => Available;
+    bool IGuildEmoteModel.RequireColons => ~RequireColons;
+    bool IGuildEmoteModel.IsManaged => ~Managed;
+    bool IGuildEmoteModel.IsAnimated => ~Animated;
+    bool IGuildEmoteModel.IsAvailable => ~Available;
 
-    ulong? IGuildEmoteModel.UserId => User.Map(v => v.Id);
+    ulong? IGuildEmoteModel.UserId => ~User.Map(v => v.Id);
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

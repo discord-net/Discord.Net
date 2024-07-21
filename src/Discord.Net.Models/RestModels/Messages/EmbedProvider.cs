@@ -10,6 +10,6 @@ public sealed class EmbedProvider : IEmbedProviderModel
     [JsonPropertyName("url")]
     public Optional<string> Url { get; set; }
 
-    string? IEmbedProviderModel.Url => Url;
-    string? IEmbedProviderModel.Name => Name;
+    string? IEmbedProviderModel.Url => ~Url;
+    string? IEmbedProviderModel.Name => ~Name;
 }

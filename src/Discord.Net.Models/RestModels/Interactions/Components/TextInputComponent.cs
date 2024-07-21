@@ -30,9 +30,9 @@ public sealed class TextInputComponent : MessageComponent, ITextInputComponentMo
     [JsonPropertyName("required")]
     public Optional<bool> Required { get; set; }
 
-    int? ITextInputComponentModel.MinLength => MinLength;
-    int? ITextInputComponentModel.MaxLength => MaxLength;
-    bool? ITextInputComponentModel.IsRequired => Required;
-    string? ITextInputComponentModel.Value => Value;
-    string? ITextInputComponentModel.Placeholder => Placeholder;
+    int? ITextInputComponentModel.MinLength => ~MinLength;
+    int? ITextInputComponentModel.MaxLength => ~MaxLength;
+    bool? ITextInputComponentModel.IsRequired => ~Required;
+    string? ITextInputComponentModel.Value => ~Value;
+    string? ITextInputComponentModel.Placeholder => ~Placeholder;
 }

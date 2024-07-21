@@ -19,12 +19,12 @@ public interface ILoadable<TSelf, TId, TEntity, TModel> :
 {
     [return: TypeHeuristic(nameof(CreateEntity))]
     ValueTask<TEntity?> FetchAsync(RequestOptions? options = null, CancellationToken token = default)
-        => FetchInternalAsync(Client, this, TSelf.FetchRoute(this, Id), options, token);
+        => FetchInternalAsync(Client, (TSelf)this, TSelf.FetchRoute(this, Id), options, token);
 
     [return: TypeHeuristic(nameof(CreateEntity))]
     internal static async ValueTask<TEntity?> FetchInternalAsync(
         IDiscordClient client,
-        IEntityProvider<TEntity, TModel> entityProvider,
+        TSelf entityProvider,
         IApiOutRoute<TModel> route,
         RequestOptions? options = null,
         CancellationToken token = default)

@@ -19,11 +19,11 @@ public sealed class SelectMenuOption : IModelSource, ISelectMenuOptionModel, IMo
     [JsonPropertyName("default")]
     public Optional<bool> IsDefault { get; set; }
 
-    string? ISelectMenuOptionModel.Description => Description;
+    string? ISelectMenuOptionModel.Description => ~Description;
 
     IEmoteModel? ISelectMenuOptionModel.Emote => ~Emoji;
 
-    bool? ISelectMenuOptionModel.IsDefault => IsDefault;
+    bool? ISelectMenuOptionModel.IsDefault => ~IsDefault;
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

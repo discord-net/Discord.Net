@@ -15,6 +15,10 @@ public partial class RestForumChannelActor(
 {
     public override ForumChannelIdentity Identity { get; } = channel;
 
+    [ProxyInterface(typeof(IIntegrationChannelActor))]
+    internal RestIntegrationChannelActor IntegrationChannelActor { get; } =
+        new(client, guild, channel);
+
     [CovariantOverride]
     [SourceOfTruth]
     internal RestForumChannel CreateEntity(IGuildForumChannelModel model)

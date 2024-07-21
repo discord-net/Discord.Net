@@ -32,12 +32,12 @@ public sealed class SelectMenuComponent : MessageComponent, ISelectMenuComponent
 
     IEnumerable<ISelectMenuOptionModel> ISelectMenuComponentModel.Options => Options | [];
 
-    int[]? ISelectMenuComponentModel.ChannelTypes => ChannelTypes;
-    string? ISelectMenuComponentModel.Placeholder => Placeholder;
+    int[]? ISelectMenuComponentModel.ChannelTypes => ~ChannelTypes;
+    string? ISelectMenuComponentModel.Placeholder => ~Placeholder;
 
     IEnumerable<ISelectMenuDefaultValueModel> ISelectMenuComponentModel.DefaultValues => DefaultValues | [];
 
-    int? ISelectMenuComponentModel.MinValues => MinValues;
-    int? ISelectMenuComponentModel.MaxValues => MaxValues;
-    bool? ISelectMenuComponentModel.IsDisabled => IsDisabled;
+    int? ISelectMenuComponentModel.MinValues => ~MinValues;
+    int? ISelectMenuComponentModel.MaxValues => ~MaxValues;
+    bool? ISelectMenuComponentModel.IsDisabled => ~IsDisabled;
 }

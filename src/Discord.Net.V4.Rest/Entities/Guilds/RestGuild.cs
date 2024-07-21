@@ -5,6 +5,7 @@ using Discord.Rest.Extensions;
 using Discord.Rest.Guilds.Integrations;
 using Discord.Rest.Invites;
 using Discord.Rest.Stickers;
+using Discord.Rest.Webhooks;
 using System.Globalization;
 
 namespace Discord.Rest.Guilds;
@@ -53,7 +54,10 @@ using EnumerableGuildStickersActor =
 using EnumerableGuildScheduledEventActor =
     RestEnumerableIndexableActor<RestGuildScheduledEventActor, ulong, RestGuildScheduledEvent, IGuildScheduledEvent,
         IEnumerable<IGuildScheduledEventModel>>;
-using EnumerableInviteActor = RestEnumerableIndexableActor<RestInviteActor, string, RestInvite, IInvite, IEnumerable<IInviteModel>>;
+using EnumerableInviteActor =
+    RestEnumerableIndexableActor<RestInviteActor, string, RestInvite, IInvite, IEnumerable<IInviteModel>>;
+using EnumerableWebhookActor =
+    RestEnumerableIndexableActor<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
 
 [ExtendInterfaceDefaults(typeof(IGuildActor))]
 public partial class RestGuildActor :
@@ -91,6 +95,14 @@ public partial class RestGuildActor :
         Stickers = RestActors.GuildRelatedEntity(Template.Of<RestGuildStickerActor>(), client, this);
         ScheduledEvents = RestActors.GuildRelatedEntity(Template.Of<RestGuildScheduledEventActor>(), client, this);
         Invites = RestActors.GuildRelatedEntity(Template.Of<RestInviteActor>(), client, this);
+
+        Webhooks = RestActors.Fetchable(
+            Template.Of<RestWebhookActor>(),
+            client,
+            RestWebhookActor.Factory,
+            RestWebhook.Construct,
+            IWebhook.GetGuildWebhooksRoute(this)
+        );
     }
 
     [SourceOfTruth] public EnumerableMediaChannelActor MediaChannels { get; }
@@ -128,6 +140,8 @@ public partial class RestGuildActor :
     [SourceOfTruth] public EnumerableGuildScheduledEventActor ScheduledEvents { get; }
 
     [SourceOfTruth] public EnumerableInviteActor Invites { get; }
+
+    [SourceOfTruth] public EnumerableWebhookActor Webhooks { get; }
 
     [SourceOfTruth]
     internal RestGuild CreateEntity(IGuildModel model)

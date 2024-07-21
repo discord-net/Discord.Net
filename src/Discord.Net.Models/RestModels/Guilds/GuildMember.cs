@@ -42,15 +42,15 @@ public sealed class GuildMember : IMemberModel, IModelSource, IModelSourceOf<IUs
     [JsonPropertyName("communication_disabled_until")]
     public Optional<DateTimeOffset?> CommunicationsDisabledUntil { get; set; }
 
-    string? IMemberModel.Avatar => Avatar;
+    string? IMemberModel.Avatar => ~Avatar;
 
     ulong[] IMemberModel.RoleIds => RoleIds | [];
-    DateTimeOffset? IMemberModel.JoinedAt => JoinedAt;
-    DateTimeOffset? IMemberModel.PremiumSince => PremiumSince;
-    bool? IMemberModel.IsPending => Pending;
-    DateTimeOffset? IMemberModel.CommunicationsDisabledUntil => CommunicationsDisabledUntil;
-    string? IMemberModel.Nickname => Nick;
-    ulong IEntityModel<ulong>.Id => User.Map(v => v.Id);
+    DateTimeOffset? IMemberModel.JoinedAt => ~JoinedAt;
+    DateTimeOffset? IMemberModel.PremiumSince => ~PremiumSince;
+    bool? IMemberModel.IsPending => ~Pending;
+    DateTimeOffset? IMemberModel.CommunicationsDisabledUntil => ~CommunicationsDisabledUntil;
+    string? IMemberModel.Nickname => ~Nick;
+    ulong IEntityModel<ulong>.Id => ~User.Map(v => v.Id);
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

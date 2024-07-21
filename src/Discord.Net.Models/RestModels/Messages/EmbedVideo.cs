@@ -16,8 +16,8 @@ public sealed class EmbedVideo : IEmbedVideoModel
     [JsonPropertyName("width")]
     public Optional<int> Width { get; set; }
 
-    string? IEmbedVideoModel.ProxyUrl => ProxyUrl;
-    int? IEmbedVideoModel.Height => Height;
-    int? IEmbedVideoModel.Width => Width;
-    string? IEmbedVideoModel.Url => Url;
+    string? IEmbedVideoModel.ProxyUrl => ~ProxyUrl;
+    int? IEmbedVideoModel.Height => ~Height;
+    int? IEmbedVideoModel.Width => ~Width;
+    string? IEmbedVideoModel.Url => ~Url;
 }

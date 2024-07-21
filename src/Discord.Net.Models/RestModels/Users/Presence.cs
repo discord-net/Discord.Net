@@ -20,8 +20,8 @@ public sealed class Presence : IPresenceModel
     public Optional<Activity[]> Activities { get; set; }
 
     ulong IPresenceModel.UserId => User.Id;
-    ulong? IPresenceModel.GuildId => GuildId;
-    string? IPresenceModel.Status => Status;
+    ulong? IPresenceModel.GuildId => ~GuildId;
+    string? IPresenceModel.Status => ~Status;
     IEnumerable<IActivityModel>? IPresenceModel.Activities => Activities | [];
     IDictionary<string, string>? IPresenceModel.ClientStatus => ~ClientStatus;
 }

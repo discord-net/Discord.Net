@@ -109,10 +109,17 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
 
         var producedFiles = new HashSet<string>();
 
-        foreach (var target in targets)
+        foreach (var target in Hierarchy.OrderByHierarchy(
+                     targets,
+                     x => x.InterfaceSymbol,
+                     out var map,
+                     out var bases)
+                )
         {
             if (target is null)
                 continue;
+
+            var targetLogger = logger.WithSemanticContext(target.SemanticModel);
 
             var fromEntitySyntax = entitySyntax
                 .TryGetValue(target.InterfaceSymbol.ToDisplayString(), out var syntax);
@@ -128,7 +135,6 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                     []
                 );
 
-
             foreach (var trait in target.RequestedTraits)
             {
                 try
@@ -138,12 +144,12 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                         trait,
                         target,
                         entitySyntax,
-                        logger
+                        targetLogger
                     );
                 }
                 catch (Exception x)
                 {
-                    logger.Log(LogLevel.Error,
+                    targetLogger.Log(LogLevel.Error,
                         $"Failed on processing {trait} on {target.InterfaceSymbol.Name}: {x}");
                 }
             }
@@ -159,7 +165,13 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
 
             if (!producedFiles.Add($"Traits/{target.InterfaceSymbol.Name}"))
             {
-                logger.Warn($"Attempted to add a second file for {target.InterfaceSymbol}");
+                targetLogger.Warn(
+                    $"Attempted to add a second file for {target.InterfaceSymbol} with the following traits");
+                foreach (var trait in target.RequestedTraits)
+                {
+                    logger.Warn($" - {trait}");
+                }
+
                 continue;
             }
 
@@ -179,14 +191,29 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         {
             var ns = string.Join(".", syntax.Key.Split('.').Take(syntax.Key.Count(x => x is '.')));
 
-            if (!producedFiles.Add($"Traits/{syntax.Value.Identifier}"))
+            var hintName = $"Traits/{syntax.Value.Identifier}";
+
+            if (!producedFiles.Add(hintName))
             {
-                logger.Warn($"Attempted to add a second file for {syntax.Value.Identifier}");
+                logger.Warn(
+                    $"Attempted to add a second file for {syntax.Value.Identifier}:" +
+                    $"Requested: {syntax.Key} : {syntax.Value.Identifier}"
+                );
+
+                foreach (var match in entitySyntax
+                             .Where(x =>
+                                 x.Value.Identifier == syntax.Value.Identifier
+                             )
+                        )
+                {
+                    logger.Warn($"Existing: {match.Key} : {match.Value}");
+                }
+
                 continue;
             }
 
             context.AddSource(
-                $"Traits/{syntax.Value.Identifier}",
+                hintName,
                 $$"""
                   using Discord.Rest;
 
@@ -212,10 +239,11 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         if (target.InterfaceSymbol.AllInterfaces.Any(x => x.ToDisplayString().StartsWith(traitInterface)))
             return;
 
-        var traitAttribute = target.InterfaceSymbol.GetAttributes()
-            .FirstOrDefault(x => x.AttributeClass?.Name == trait);
+        var traitAttributes = target.InterfaceSymbol.GetAttributes()
+            .Where(x => x.AttributeClass?.Name == trait)
+            .ToArray();
 
-        if (traitAttribute is null)
+        if (traitAttributes.Length == 0)
             return;
 
         var traitLogger = logger.GetSubLogger(traitInterface.Split('.')[1]);
@@ -227,7 +255,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                     ref
                     syntax,
                     target,
-                    traitAttribute,
+                    traitAttributes[0],
                     traitLogger
                 );
                 break;
@@ -235,7 +263,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 ModifyTrait.Process(
                     ref syntax,
                     target,
-                    traitAttribute,
+                    traitAttributes[0],
                     entitySyntax,
                     traitLogger
                 );
@@ -244,7 +272,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 RefreshableTrait.Process(
                     ref syntax,
                     target,
-                    traitAttribute,
+                    traitAttributes[0],
                     traitLogger
                 );
                 break;
@@ -252,7 +280,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 FetchableTrait.Process(
                     ref syntax,
                     target,
-                    traitAttribute,
+                    traitAttributes,
                     traitLogger
                 );
                 break;
@@ -260,7 +288,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 LoadableTrait.Process(
                     ref syntax,
                     target,
-                    traitAttribute,
+                    traitAttributes[0],
                     entitySyntax,
                     traitLogger
                 );

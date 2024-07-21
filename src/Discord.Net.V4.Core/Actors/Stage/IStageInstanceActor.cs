@@ -8,4 +8,5 @@ namespace Discord.Stage;
 [Deletable(nameof(Routes.DeleteStageInstance))]
 public partial interface IStageInstanceActor :
     IChannelRelationship<IStageChannelActor, IStageChannel>,
+    IGuildRelationship,
     IActor<ulong, IStageInstance>;

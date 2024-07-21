@@ -96,19 +96,18 @@ public class Guild :
     [JsonPropertyName("safety_alerts_channel_id")]
     public Optional<ulong?> SafetyAlertsChannelId { get; set; }
     public IEnumerable<ulong> RoleIds => Roles.Select(x => x.Id);
-    int? IGuildModel.MaxPresence => MaxPresences;
-    int? IGuildModel.MaxMembers => MaxMembers;
+    int? IGuildModel.MaxPresence => ~MaxPresences;
+    int? IGuildModel.MaxMembers => ~MaxMembers;
     bool IGuildModel.PremiumProgressBarEnabled => PremiumProgressBarEnabled;
-    ulong? IGuildModel.SafetyAlertsChannelId => SafetyAlertsChannelId;
-    int? IGuildModel.MaxVideoChannelUsers => MaxVideoChannelUsers;
-    int? IGuildModel.MaxStageVideoChannelUsers => MaxStageVideoChannelUsers;
+    ulong? IGuildModel.SafetyAlertsChannelId => ~SafetyAlertsChannelId;
+    int? IGuildModel.MaxVideoChannelUsers => ~MaxVideoChannelUsers;
+    int? IGuildModel.MaxStageVideoChannelUsers => ~MaxStageVideoChannelUsers;
     IWelcomeScreenModel? IGuildModel.WelcomeScreen => ~WelcomeScreen;
-    string? IGuildModel.Vanity => VanityUrlCode;
-    bool IGuildModel.WidgetEnabled => WidgetEnabled;
-    ulong? IGuildModel.WidgetChannelId => WidgetChannelId;
-    string? IGuildModel.Icon => Icon;
-
-    string? IGuildModel.Splash => Splash;
+    string? IGuildModel.Vanity => ~VanityUrlCode;
+    bool IGuildModel.WidgetEnabled => ~WidgetEnabled;
+    ulong? IGuildModel.WidgetChannelId => ~WidgetChannelId;
+    string? IGuildModel.Icon => ~Icon;
+    string? IGuildModel.Splash => ~Splash;
 
     IEnumerable<IRoleModel> IModelSourceOfMultiple<IRoleModel>.GetModels() => Roles;
 

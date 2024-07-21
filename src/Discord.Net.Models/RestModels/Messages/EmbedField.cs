@@ -13,5 +13,5 @@ public sealed class EmbedField : IEmbedFieldModel
     [JsonPropertyName("inline")]
     public Optional<bool> Inline { get; set; }
 
-    bool? IEmbedFieldModel.Inline => Inline;
+    bool? IEmbedFieldModel.Inline => ~Inline;
 }

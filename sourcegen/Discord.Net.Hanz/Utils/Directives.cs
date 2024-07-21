@@ -7,6 +7,9 @@ public static class Directives
 {
     public static string GetFormattedUsingDirectives(this SyntaxNode node)
     {
-        return string.Join("\n", node.SyntaxTree.GetRoot().ChildNodes().OfType<UsingDirectiveSyntax>());
+        return string.Join("\n", GetUsingDirectives(node));
     }
+
+    public static IEnumerable<string> GetUsingDirectives(this SyntaxNode node)
+        => node.SyntaxTree.GetRoot().ChildNodes().OfType<UsingDirectiveSyntax>().Select(x => x.ToString());
 }

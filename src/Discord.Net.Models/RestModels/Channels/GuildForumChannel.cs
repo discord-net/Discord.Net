@@ -6,15 +6,15 @@ namespace Discord.Models.Json;
 [ChannelTypeOf(ChannelType.GuildForum)]
 public sealed class GuildForumChannelModel : ThreadableChannelModelBase, IGuildForumChannelModel
 {
-    int IGuildForumChannelModel.DefaultForumLayout => DefaultForumLayout;
+    int IGuildForumChannelModel.DefaultForumLayout => ~DefaultForumLayout;
 
-    int? IGuildForumChannelModel.DefaultSortOrder => DefaultSortOrder;
+    int? IGuildForumChannelModel.DefaultSortOrder => ~DefaultSortOrder;
 
-    bool IGuildForumChannelModel.IsNsfw => Nsfw;
+    bool IGuildForumChannelModel.IsNsfw => ~Nsfw;
 
-    string? IGuildForumChannelModel.Topic => Topic;
+    string? IGuildForumChannelModel.Topic => ~Topic;
 
-    int? IGuildForumChannelModel.RatelimitPerUser => RatelimitPerUser;
+    int? IGuildForumChannelModel.RatelimitPerUser => ~RatelimitPerUser;
 
     IEmoteModel? IGuildForumChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
 

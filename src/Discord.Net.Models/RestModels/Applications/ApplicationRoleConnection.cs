@@ -13,7 +13,7 @@ public sealed class ApplicationRoleConnection : IApplicationRoleConnectionModel
     [JsonPropertyName("metadata")]
     public required Dictionary<string, string> Metadata { get; set; }
 
-    string? IApplicationRoleConnectionModel.PlatformName => PlatformName;
-    string? IApplicationRoleConnectionModel.PlatformUsername => PlatformUsername;
+    string? IApplicationRoleConnectionModel.PlatformName => ~PlatformName;
+    string? IApplicationRoleConnectionModel.PlatformUsername => ~PlatformUsername;
     IDictionary<string, string> IApplicationRoleConnectionModel.Metadata => Metadata;
 }

@@ -55,13 +55,13 @@ public sealed class GuildScheduledEvent :
     [JsonPropertyName("image")]
     public string? Image { get; set; }
 
-    ulong IGuildScheduledEventModel.CreatorId => Creator.Map(v => v.Id);
-    int? IGuildScheduledEventModel.UserCount => UserCount;
+    ulong IGuildScheduledEventModel.CreatorId => ~Creator.Map(v => v.Id);
+    int? IGuildScheduledEventModel.UserCount => ~UserCount;
     int IGuildScheduledEventModel.EntityType => EntityType;
     DateTimeOffset IGuildScheduledEventModel.ScheduledStartTime => ScheduledStartTime;
 
     DateTimeOffset? IGuildScheduledEventModel.ScheduledEndTime => ScheduledEndTime;
-    string? IGuildScheduledEventModel.Location => EntityMetadata?.Location;
+    string? IGuildScheduledEventModel.Location => EntityMetadata?.Location.GetValueOrDefault();
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

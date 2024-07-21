@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using System.Collections.Immutable;
 
 namespace Discord.Net.Hanz.Utils;
 
@@ -10,6 +11,74 @@ public static class Hierarchy
     {
         public readonly int Distance = distance;
         public readonly INamedTypeSymbol Type = type;
+    }
+
+    public static IEnumerable<T> OrderByHierarchy<T>(
+        in ImmutableArray<T?> targets,
+        Func<T, INamedTypeSymbol> typeResolver,
+        out Dictionary<INamedTypeSymbol, T> map,
+        out HashSet<INamedTypeSymbol> bases)
+    {
+        var mapLocal = map = targets
+            .Where(x => x is not null)
+            .OfType<T>()
+            .ToDictionary<T, INamedTypeSymbol, T>(typeResolver, x => x, SymbolEqualityComparer.Default);
+
+        var basesLocal = bases = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+
+        return map.OrderBy(x =>
+        {
+            var count = 0;
+
+            switch (x.Key.TypeKind)
+            {
+                case TypeKind.Interface:
+                    count = x.Key.Interfaces.Max(iface =>
+                    {
+                        var depth = 0;
+                        CalculateInterfaceDepth(iface, ref depth, mapLocal, basesLocal);
+                        return depth;
+                    });
+                    break;
+                default:
+                    var baseType = x.Key.BaseType;
+
+                    if (baseType is null)
+                        return 0;
+
+                    do
+                    {
+                        if (mapLocal.ContainsKey(baseType))
+                        {
+                            basesLocal.Add(baseType);
+                            count++;
+                        }
+                    } while ((baseType = baseType.BaseType) is not null);
+
+                    break;
+            }
+
+            return count;
+        }).Select(x => x.Value);
+    }
+
+    private static void CalculateInterfaceDepth<T>(
+        INamedTypeSymbol type,
+        ref int depth,
+        Dictionary<INamedTypeSymbol, T> map,
+        HashSet<INamedTypeSymbol> bases)
+    {
+        if (map.ContainsKey(type))
+        {
+            depth++;
+            bases.Add(type);
+        }
+
+        foreach (var iface in type.Interfaces)
+        {
+            CalculateInterfaceDepth(iface, ref depth, map, bases);
+        }
+
     }
 
     public static List<SortedHierarchySymbol> GetHierarchy(ITypeSymbol symbol)

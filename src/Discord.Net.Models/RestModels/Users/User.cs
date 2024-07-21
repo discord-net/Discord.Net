@@ -56,13 +56,13 @@ public sealed class User : ISelfUserModel
     [JsonPropertyName("avatar_decoration")]
     public Optional<string?> AvatarDecoration { get; set; }
 
-    bool? IUserModel.IsBot => IsBot;
-    bool? IUserModel.IsSystem => IsSystem;
-    bool? ISelfUserModel.MFAEnabled => MFAEnabled;
-    string? ISelfUserModel.Locale => Locale;
-    bool? ISelfUserModel.Verified => IsVerified;
-    string? ISelfUserModel.Email => Email;
-    int? IUserModel.Flags => Flags;
-    int? ISelfUserModel.PremiumType => PremiumType;
-    int? IUserModel.PublicFlags => PublicFlags;
+    bool? IUserModel.IsBot => ~IsBot;
+    bool? IUserModel.IsSystem => ~IsSystem;
+    bool? ISelfUserModel.MFAEnabled => ~MFAEnabled;
+    string? ISelfUserModel.Locale => ~Locale;
+    bool? ISelfUserModel.Verified => ~IsVerified;
+    string? ISelfUserModel.Email => ~Email;
+    int? IUserModel.Flags => ~Flags;
+    int? ISelfUserModel.PremiumType => ~PremiumType;
+    int? IUserModel.PublicFlags => ~PublicFlags;
 }

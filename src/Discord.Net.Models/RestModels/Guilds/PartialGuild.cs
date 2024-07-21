@@ -46,19 +46,19 @@ public class PartialGuild : IPartialGuildModel
     [JsonPropertyName("approximate_presence_count")]
     public Optional<int> ApproximatePresenceCount { get; set; }
 
-    string? IPartialGuildModel.SplashId => Splash;
+    string? IPartialGuildModel.SplashId => ~Splash;
 
-    string? IPartialGuildModel.BannerId => BannerHash;
+    string? IPartialGuildModel.BannerId => ~BannerHash;
 
-    string? IPartialGuildModel.Description => Description;
+    string? IPartialGuildModel.Description => ~Description;
 
-    string? IPartialGuildModel.IconId => Icon;
+    string? IPartialGuildModel.IconId => ~Icon;
 
-    string[]? IPartialGuildModel.Features => Features;
+    string[]? IPartialGuildModel.Features => ~Features;
     int? IPartialGuildModel.VerificationLevel => VerificationLevel.ToNullable();
-    string? IPartialGuildModel.VanityUrlCode => VanityUrlCode;
-    int? IPartialGuildModel.NsfwLevel => NsfwLevel;
-    int? IPartialGuildModel.PremiumSubscriptionCount => PremiumSubscriptionCount;
-    int? IPartialGuildModel.ApproximateMemberCount => ApproximateMemberCount;
-    int? IPartialGuildModel.ApproximatePresenceCount => ApproximatePresenceCount;
+    string? IPartialGuildModel.VanityUrlCode => ~VanityUrlCode;
+    int? IPartialGuildModel.NsfwLevel => ~NsfwLevel;
+    int? IPartialGuildModel.PremiumSubscriptionCount => ~PremiumSubscriptionCount;
+    int? IPartialGuildModel.ApproximateMemberCount => ~ApproximateMemberCount;
+    int? IPartialGuildModel.ApproximatePresenceCount => ~ApproximatePresenceCount;
 }

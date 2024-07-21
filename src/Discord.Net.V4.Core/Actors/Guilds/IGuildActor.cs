@@ -87,6 +87,10 @@ public partial interface IGuildActor :
     IInviteActor Invite(string code) => Invites[code];
     IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites { get; }
 
+    [return: TypeHeuristic(nameof(Webhooks))]
+    IWebhookActor Webhook(ulong id) => Webhooks[id];
+    IEnumerableIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks { get; }
+
     #region Methods
 
     async Task<IGuildChannel> CreateChannelAsync(
@@ -265,7 +269,7 @@ public partial interface IGuildActor :
             Routes.GetGuildPruneCount(
                 Id,
                 days,
-                includeRoles.Map(v => v.Select(v => v.Id).ToArray())
+                ~includeRoles.Map(v => v.Select(v => v.Id).ToArray())
             ),
             options ?? Client.DefaultRequestOptions,
             token

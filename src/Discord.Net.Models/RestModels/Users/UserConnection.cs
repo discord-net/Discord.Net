@@ -34,7 +34,7 @@ public sealed class UserConnection : IUserConnectionModel, IModelSource, IModelS
     [JsonPropertyName("visibility")]
     public int Visibility { get; set; }
 
-    bool? IUserConnectionModel.Revoked => IsRevoked;
+    bool? IUserConnectionModel.Revoked => ~IsRevoked;
 
     IEnumerable<IIntegrationModel>? IUserConnectionModel.Integrations => Integrations | [];
     bool IUserConnectionModel.FriendSyncEnabled => FriendSync;

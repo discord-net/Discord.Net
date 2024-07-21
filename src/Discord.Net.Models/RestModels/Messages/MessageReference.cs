@@ -16,7 +16,7 @@ public sealed class MessageReference : IMessageReferenceModel
     [JsonPropertyName("fail_if_not_exists")]
     public Optional<bool> FailIfNotExists { get; set; }
 
-    ulong? IMessageReferenceModel.ChannelId => ChannelId;
-    ulong IMessageReferenceModel.GuildId => GuildId;
-    ulong? IMessageReferenceModel.MessageId => MessageId;
+    ulong? IMessageReferenceModel.ChannelId => ~ChannelId;
+    ulong IMessageReferenceModel.GuildId => ~GuildId;
+    ulong? IMessageReferenceModel.MessageId => ~MessageId;
 }

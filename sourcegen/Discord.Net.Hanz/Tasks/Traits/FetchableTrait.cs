@@ -68,7 +68,7 @@ public static class FetchableTrait
             TypeArgumentList(
                 SeparatedList(new TypeSyntax[]
                 {
-                    fetchMethod == "FetchManyRoute"
+                    fetchableType == "Discord.IFetchableOfMany"
                         ? GenericName(
                             Identifier("IEnumerable"),
                             TypeArgumentList(
@@ -88,9 +88,9 @@ public static class FetchableTrait
             Token(SyntaxKind.StaticKeyword)
         );
 
-        if (extraParameters.Count > 0 && !(
+        if (fetchMethod is not "FetchRoute" and not "FetchManyRoute" || extraParameters.Count > 0 && !(
                 targetInterface.AllInterfaces.Any(IsFetchableTarget) ||
-                (targetInterface.AllInterfaces.Any(LoadableTrait.IsLoadable) && fetchMethod == "FetchRoute")
+                (targetInterface.AllInterfaces.Any(LoadableTrait.IsLoadable) && fetchableType == "Discord.IFetchable")
             ))
         {
             modifiers = modifiers.RemoveAt(modifiers.IndexOf(SyntaxKind.NewKeyword));
@@ -113,7 +113,7 @@ public static class FetchableTrait
                             Identifier("path"),
                             null
                         ),
-                        ..fetchMethod == "FetchRoute"
+                        ..fetchableType == "Discord.IFetchable"
                             ? (ParameterSyntax[])
                             [
                                 Parameter(
@@ -151,7 +151,7 @@ public static class FetchableTrait
             ArgumentList(
                 SeparatedList([
                     Argument(IdentifierName("path")),
-                    ..fetchMethod == "FetchRoute"
+                    ..fetchableType == "Discord.IFetchable"
                         ? (ArgumentSyntax[]) [Argument(IdentifierName("id"))]
                         : [],
                     ..extraParameters.Select(x =>
@@ -165,51 +165,63 @@ public static class FetchableTrait
             )
         );
 
-        syntax = syntax
-            .AddBaseListTypes(
-                SimpleBaseType(fetchableInterface)
-            )
-            .AddMembers(
-                MethodDeclaration(
-                    [],
-                    TokenList(
-                        Token(SyntaxKind.StaticKeyword)
-                    ),
-                    apiOutInterface,
-                    ExplicitInterfaceSpecifier(fetchableInterface),
-                    Identifier(fetchMethod),
-                    null,
-                    ParameterList(
-                        SeparatedList([
-                            Parameter(
-                                [],
-                                [],
-                                IdentifierName("Discord.IPathable"),
-                                Identifier("path"),
-                                null
-                            ),
-                            ..fetchMethod == "FetchRoute"
-                                ? (ParameterSyntax[])
-                                [
-                                    Parameter(
-                                        [],
-                                        [],
-                                        ParseTypeName(idType.ToDisplayString()),
-                                        Identifier("id"),
-                                        null
-                                    )
-                                ]
-                                : [],
-                        ])
-                    ),
-                    [],
-                    null,
-                    ArrowExpressionClause(
-                        routeAccessBody
-                    ),
-                    Token(SyntaxKind.SemicolonToken)
+        // update 'fetchMethod' to point to the interface method since it can be anything provided by the callee, future
+        // use of it should point to the interface method.
+        fetchMethod = fetchableType switch
+        {
+            "Discord.IFetchable" => "FetchRoute",
+            "Discord.IFetchableOfMany" => "FetchManyRoute",
+            _ => null!
+        };
+
+        if (syntax.BaseList?.Types.All(x => !x.Type.IsEquivalentTo(fetchableInterface)) ?? true)
+        {
+            syntax = syntax
+                .AddBaseListTypes(
+                    SimpleBaseType(fetchableInterface)
                 )
-            );
+                .AddMembers(
+                    MethodDeclaration(
+                        [],
+                        TokenList(
+                            Token(SyntaxKind.StaticKeyword)
+                        ),
+                        apiOutInterface,
+                        ExplicitInterfaceSpecifier(fetchableInterface),
+                        Identifier(fetchMethod),
+                        null,
+                        ParameterList(
+                            SeparatedList([
+                                Parameter(
+                                    [],
+                                    [],
+                                    IdentifierName("Discord.IPathable"),
+                                    Identifier("path"),
+                                    null
+                                ),
+                                ..fetchMethod == "FetchRoute"
+                                    ? (ParameterSyntax[])
+                                    [
+                                        Parameter(
+                                            [],
+                                            [],
+                                            ParseTypeName(idType.ToDisplayString()),
+                                            Identifier("id"),
+                                            null
+                                        )
+                                    ]
+                                    : [],
+                            ])
+                        ),
+                        [],
+                        null,
+                        ArrowExpressionClause(
+                            routeAccessBody
+                        ),
+                        Token(SyntaxKind.SemicolonToken)
+                    )
+                );
+        }
 
         var implementedBases = new HashSet<ITypeSymbol>([modelType], SymbolEqualityComparer.Default);
 
@@ -316,64 +328,70 @@ public static class FetchableTrait
     public static void Process(
         ref InterfaceDeclarationSyntax syntax,
         EntityTraits.GenerationTarget target,
-        AttributeData traitAttribute,
+        AttributeData[] traitsAttribute,
         Logger logger)
     {
-        if (traitAttribute.ConstructorArguments.Length != 1)
-            return;
-
-        // refreshable/loadable implements fetchable
-        if ((IsRefreshable(target.InterfaceSymbol) || LoadableTrait.IsLoadable(target.InterfaceSymbol)) &&
-            traitAttribute.AttributeClass?.ToDisplayString() == "Discord.Fetchable")
-            return;
-
-        var entityInterface = EntityTraits.GetEntityInterface(target.InterfaceSymbol);
-
-        if (entityInterface is null)
-            return;
-
-        var entityOfInterface = EntityTraits.GetEntityModelOfInterface(target.InterfaceSymbol);
-
-        if (entityOfInterface is null)
-            return;
-
-        if (EntityTraits.GetNameOfArgument(traitAttribute) is not MemberAccessExpressionSyntax routeMemberAccess)
-            return;
-
-        var route = EntityTraits.GetRouteSymbol(routeMemberAccess, target.SemanticModel);
-
-        if (route is null) return;
-
-        var idType = entityInterface.TypeArguments[0];
-
-        var fetchableType = traitAttribute.AttributeClass?.Name switch
+        foreach (var traitAttribute in traitsAttribute)
         {
-            "FetchableAttribute" => "Discord.IFetchable",
-            "FetchableOfManyAttribute" => "Discord.IFetchableOfMany",
-            _ => null
-        };
+            if (traitAttribute.ConstructorArguments.Length != 1)
+                return;
 
-        var fetchMethod = fetchableType switch
-        {
-            "Discord.IFetchable" => "FetchRoute",
-            "Discord.IFetchableOfMany" => "FetchManyRoute",
-            _ => null
-        };
+            // refreshable/loadable implements fetchable
+            if ((IsRefreshable(target.InterfaceSymbol) || LoadableTrait.IsLoadable(target.InterfaceSymbol)) &&
+                traitAttribute.AttributeClass?.ToDisplayString() == "Discord.Fetchable")
+                return;
 
-        if (fetchableType is null || fetchMethod is null) return;
+            var entityInterface = EntityTraits.GetEntityInterface(target.InterfaceSymbol);
 
-        DefineFetchableRoute(
-            ref syntax,
-            target,
-            idType,
-            entityOfInterface.TypeArguments[0],
-            route,
-            routeMemberAccess,
-            fetchableType,
-            fetchMethod,
-            logger,
-            out _
-        );
+            if (entityInterface is null)
+                return;
+
+            var entityOfInterface = EntityTraits.GetEntityModelOfInterface(target.InterfaceSymbol);
+
+            if (entityOfInterface is null)
+                return;
+
+            if (EntityTraits.GetNameOfArgument(traitAttribute) is not MemberAccessExpressionSyntax routeMemberAccess)
+                return;
+
+            var route = EntityTraits.GetRouteSymbol(routeMemberAccess, target.SemanticModel);
+
+            if (route is null) return;
+
+            var idType = entityInterface.TypeArguments[0];
+
+            var fetchableType = traitAttribute.AttributeClass?.Name switch
+            {
+                "FetchableAttribute" => "Discord.IFetchable",
+                "FetchableOfManyAttribute" => "Discord.IFetchableOfMany",
+                _ => null
+            };
+
+            var fetchMethod =
+                traitsAttribute.Length > 1
+                    ? $"{route.Name}Route"
+                    : fetchableType switch
+                    {
+                        "Discord.IFetchable" => "FetchRoute",
+                        "Discord.IFetchableOfMany" => "FetchManyRoute",
+                        _ => null
+                    };
+
+            if (fetchableType is null || fetchMethod is null) return;
+
+            DefineFetchableRoute(
+                ref syntax,
+                target,
+                idType,
+                entityOfInterface.TypeArguments[0],
+                route,
+                routeMemberAccess,
+                fetchableType,
+                fetchMethod,
+                logger,
+                out _
+            );
+        }
     }
 
     public static bool WillBeFetchableTarget(ITypeSymbol interfaceSymbol)

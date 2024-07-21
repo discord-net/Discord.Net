@@ -17,6 +17,10 @@ public partial class RestMediaChannelActor(
 {
     public override MediaChannelIdentity Identity { get; } = channel;
 
+    [ProxyInterface(typeof(IIntegrationChannelActor))]
+    internal RestIntegrationChannelActor IntegrationChannelActor { get; } =
+        new(client, guild, channel);
+
     [CovariantOverride]
     [SourceOfTruth]
     internal RestMediaChannel CreateEntity(IGuildMediaChannelModel model)

@@ -43,18 +43,18 @@ public sealed class Attachment : IAttachmentModel
     [JsonPropertyName("flags")]
     public Optional<int> Flags { get; set; }
 
-    int? IAttachmentModel.Height => Height;
+    int? IAttachmentModel.Height => ~Height;
 
-    int? IAttachmentModel.Width => Width;
+    int? IAttachmentModel.Width => ~Width;
 
-    bool IAttachmentModel.Ephemeral => Ephemeral;
+    bool IAttachmentModel.Ephemeral => ~Ephemeral;
 
-    string? IAttachmentModel.Description => Description;
+    string? IAttachmentModel.Description => ~Description;
 
-    string? IAttachmentModel.ContentType => ContentType;
+    string? IAttachmentModel.ContentType => ~ContentType;
 
-    float? IAttachmentModel.Duration => DurationSeconds;
+    float? IAttachmentModel.Duration => ~DurationSeconds;
 
-    string? IAttachmentModel.Waveform => Waveform;
-    int? IAttachmentModel.Flags => Flags;
+    string? IAttachmentModel.Waveform => ~Waveform;
+    int? IAttachmentModel.Flags => ~Flags;
 }

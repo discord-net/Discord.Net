@@ -6,7 +6,7 @@ namespace Discord;
 [AttributeUsage(AttributeTargets.Interface)]
 internal sealed class FetchableAttribute(string route) : Attribute;
 
-[AttributeUsage(AttributeTargets.Interface)]
+[AttributeUsage(AttributeTargets.Interface, AllowMultiple = true)]
 internal sealed class FetchableOfManyAttribute(string route) : Attribute;
 #pragma warning restore CS9113 // Parameter is unread.
 

@@ -52,27 +52,27 @@ public sealed class Integration : IIntegrationModel, IModelSource, IModelSourceO
     [JsonPropertyName("scopes")]
     public Optional<string[]> Scopes { get; set; }
 
-    bool? IIntegrationModel.IsSyncing => IsSyncing;
-    ulong? IIntegrationModel.RoleId => RoleId;
-    bool? IIntegrationModel.EnableEmoticons => EnableEmoticons;
-    int? IIntegrationModel.ExpireBehavior => ExpireBehavior;
-    int? IIntegrationModel.ExpireGracePeriod => ExpireGracePeriod;
+    bool? IIntegrationModel.IsSyncing => ~IsSyncing;
+    ulong? IIntegrationModel.RoleId => ~RoleId;
+    bool? IIntegrationModel.EnableEmoticons => ~EnableEmoticons;
+    int? IIntegrationModel.ExpireBehavior => ~ExpireBehavior;
+    int? IIntegrationModel.ExpireGracePeriod => ~ExpireGracePeriod;
 
-    ulong? IIntegrationModel.UserId => User.Map(v => v.Id);
+    ulong? IIntegrationModel.UserId => ~User.Map(v => v.Id);
 
-    string? IIntegrationModel.AccountId => Account.Map(v => v.Id);
+    string? IIntegrationModel.AccountId => ~Account.Map(v => v.Id);
 
-    string? IIntegrationModel.AccountName => Account.Map(v => v.Name);
+    string? IIntegrationModel.AccountName => ~Account.Map(v => v.Name);
 
-    DateTimeOffset? IIntegrationModel.SyncedAt => SyncedAt;
+    DateTimeOffset? IIntegrationModel.SyncedAt => ~SyncedAt;
 
-    int? IIntegrationModel.SubscriberCount => SubscriberAccount;
+    int? IIntegrationModel.SubscriberCount => ~SubscriberAccount;
 
-    bool? IIntegrationModel.IsRevoked => Revoked;
+    bool? IIntegrationModel.IsRevoked => ~Revoked;
 
     IApplicationModel? IIntegrationModel.Application => ~Application;
 
-    string[]? IIntegrationModel.Scopes => Scopes;
+    string[]? IIntegrationModel.Scopes => ~Scopes;
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

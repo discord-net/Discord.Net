@@ -70,7 +70,7 @@ public abstract class GuildChannelModelBase : ChannelModel, IGuildChannelModel, 
     [JsonPropertyName("default_forum_layout")]
     public Optional<int> DefaultForumLayout { get; set; }
 
-    ulong? IGuildChannelModel.ParentId => ParentId;
+    ulong? IGuildChannelModel.ParentId => ~ParentId;
 
     IEnumerable<IOverwriteModel> IGuildChannelModel.Permissions => PermissionOverwrites.Or([]);
 

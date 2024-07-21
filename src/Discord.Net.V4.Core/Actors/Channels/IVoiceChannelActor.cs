@@ -10,5 +10,5 @@ namespace Discord;
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IVoiceChannelActor :
     IMessageChannelActor,
-    IGuildChannelActor,
+    IIntegrationChannelActor,
     IActor<ulong, IVoiceChannel>;

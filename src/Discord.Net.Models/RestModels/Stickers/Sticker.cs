@@ -40,13 +40,13 @@ public sealed class Sticker :
     [JsonPropertyName("sort_value")]
     public int? SortValue { get; set; }
 
-    ulong? IStickerModel.PackId => PackId;
+    ulong? IStickerModel.PackId => ~PackId;
 
-    bool? IGuildStickerModel.Available => IsAvailable;
+    bool? IGuildStickerModel.Available => ~IsAvailable;
 
-    ulong IGuildStickerModel.GuildId => GuildId;
+    ulong IGuildStickerModel.GuildId => ~GuildId;
 
-    ulong? IGuildStickerModel.AuthorId => User.Map(v => v.Id);
+    ulong? IGuildStickerModel.AuthorId => ~User.Map(v => v.Id);
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

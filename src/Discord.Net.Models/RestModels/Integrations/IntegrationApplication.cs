@@ -19,7 +19,7 @@ public sealed class IntegrationApplication : IApplicationModel, IModelSource, IM
     [JsonPropertyName("bot")]
     public Optional<User> Bot { get; set; }
 
-    ulong? IApplicationModel.BotId => Bot.Map(v => v.Id);
+    ulong? IApplicationModel.BotId => ~Bot.Map(v => v.Id);
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

@@ -1,7 +1,5 @@
 using Discord.Models;
-using Discord.Models.Json;
-using Discord.Rest.Guilds;
-using Discord.Stage;
+using Discord.Rest.Stage;
 
 namespace Discord.Rest.Channels;
 
@@ -18,7 +16,9 @@ public partial class RestStageChannelActor(
 {
     public override StageChannelIdentity Identity { get; } = channel;
 
-    public IStageInstanceActor StageInstance => throw new NotImplementedException();
+    [SourceOfTruth]
+    public RestStageInstanceActor StageInstance { get; }
+        = new(client, guild, channel, StageInstanceIdentity.Of(channel.Id));
 
     [SourceOfTruth]
     public RestStageChannel CreateEntity(IGuildStageChannelModel model)

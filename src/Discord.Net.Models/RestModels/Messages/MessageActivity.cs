@@ -10,5 +10,5 @@ public sealed class MessageActivity : IMessageActivityModel
     [JsonPropertyName("party_id")]
     public Optional<string> PartyId { get; set; }
 
-    string? IMessageActivityModel.PartyId => PartyId;
+    string? IMessageActivityModel.PartyId => ~PartyId;
 }

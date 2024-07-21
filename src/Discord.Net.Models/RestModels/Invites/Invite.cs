@@ -46,25 +46,25 @@ public class Invite :
     [JsonPropertyName("guild_scheduled_event")]
     public Optional<GuildScheduledEvent> ScheduledEvent { get; set; }
 
-    ulong? IInviteModel.GuildId => Guild.Map(v => v.Id);
+    ulong? IInviteModel.GuildId => ~Guild.Map(v => v.Id);
 
     ulong? IInviteModel.ChannelId => Channel?.Id;
 
-    ulong? IInviteModel.InviterId => Inviter.Map(v => v.Id);
+    ulong? IInviteModel.InviterId => ~Inviter.Map(v => v.Id);
 
-    int? IInviteModel.TargetType => TargetType;
+    int? IInviteModel.TargetType => ~TargetType;
 
-    ulong? IInviteModel.TargetUserId => TargetUser.Map(v => v.Id);
+    ulong? IInviteModel.TargetUserId => ~TargetUser.Map(v => v.Id);
 
     IApplicationModel? IInviteModel.TargetApplication => ~TargetApplication;
 
-    int? IInviteModel.ApproximatePresenceCount => ApproximatePresenceCount;
+    int? IInviteModel.ApproximatePresenceCount => ~ApproximatePresenceCount;
 
-    int? IInviteModel.ApproximateMemberCount => ApproximateMemberCount;
+    int? IInviteModel.ApproximateMemberCount => ~ApproximateMemberCount;
 
-    DateTimeOffset? IInviteModel.ExpiresAt => ExpiresAt;
+    DateTimeOffset? IInviteModel.ExpiresAt => ~ExpiresAt;
 
-    ulong? IInviteModel.ScheduledEventId => ScheduledEvent.Map(v => v.Id);
+    ulong? IInviteModel.ScheduledEventId => ~ScheduledEvent.Map(v => v.Id);
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

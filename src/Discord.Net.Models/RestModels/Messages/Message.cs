@@ -114,8 +114,8 @@ public sealed class Message :
     IMessageReferenceModel? IMessageModel.MessageReference => ~Reference;
     IMessageInteractionMetadataModel? IMessageModel.InteractionMetadata => ~Interaction;
 
-    ulong IMessageModel.AuthorId => Author.Map(v => v.Id);
-    string? IMessageModel.Content => Content;
+    ulong IMessageModel.AuthorId => ~Author.Map(v => v.Id);
+    string? IMessageModel.Content => ~Content;
     bool IMessageModel.IsTTS => TTS;
     IMessageActivityModel? IMessageModel.Activity => ~Activity;
 
@@ -132,17 +132,17 @@ public sealed class Message :
     IEnumerable<IReactionModel> IMessageModel.Reactions => Reactions | [];
     bool IMessageModel.IsWebhook => WebhookId.IsSpecified;
 
-    int IMessageModel.Flags => Flags;
+    int IMessageModel.Flags => ~Flags;
 
-    ulong? IMessageModel.ThreadId => Thread.Map(v => v.Id);
-    ulong? IMessageModel.ThreadGuildId => Thread.Map(v => (v as GuildChannelModelBase)?.GuildId);
+    ulong? IMessageModel.ThreadId => ~Thread.Map(v => v.Id);
+    ulong? IMessageModel.ThreadGuildId => ~Thread.Map(v => (v as GuildChannelModelBase)?.GuildId);
 
 
     IEnumerable<MessageComponent> IMessageModel.Components => Components | [];
 
     IEnumerable<IStickerItemModel> IMessageModel.Stickers => StickerItems | [];
 
-    int? IMessageModel.Position => Position;
+    int? IMessageModel.Position => ~Position;
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

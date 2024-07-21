@@ -73,7 +73,7 @@ public sealed class Application : IApplicationModel, IModelSourceOfMultiple<IUse
     [JsonPropertyName("redirect_uris")]
     public Optional<string[]> RedirectUris { get; set; }
 
-    ulong? IApplicationModel.BotId => Bot.Map(v => v.Id);
+    ulong? IApplicationModel.BotId => ~Bot.Map(v => v.Id);
 
     IEnumerable<IUserModel> IModelSourceOfMultiple<IUserModel>.GetModels()
     {

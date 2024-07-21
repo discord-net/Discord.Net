@@ -19,8 +19,8 @@ public sealed class ThreadMember : IThreadMemberModel, IModelSource, IModelSourc
     [JsonPropertyName("member")]
     public Optional<GuildMember> GuildMember { get; set; }
 
-    ulong? IThreadMemberModel.UserId => UserId;
-    ulong IEntityModel<ulong>.Id => Id;
+    ulong? IThreadMemberModel.UserId => ~UserId;
+    ulong IEntityModel<ulong>.Id => ~Id;
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {
