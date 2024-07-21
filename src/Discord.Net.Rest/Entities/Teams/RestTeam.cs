@@ -34,7 +34,7 @@ namespace Discord.Rest
                 _iconId = model.Icon.Value;
             Name = model.Name;
             OwnerUserId = model.OwnerUserId;
-            TeamMembers = model.TeamMembers.Select(x => new RestTeamMember(Discord, x)).ToImmutableArray();
+            TeamMembers = model.TeamMembers.Select(x => new RestTeamMember(Discord, x, model)).ToImmutableArray();
         }
     }
 }
