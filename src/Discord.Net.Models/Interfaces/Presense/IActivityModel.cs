@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IActivityModel
+[ModelEquality]
+public partial interface IActivityModel : IEntityModel
 {
     string? Url { get; }
     string Name { get; }

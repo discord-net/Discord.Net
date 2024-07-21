@@ -163,7 +163,8 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
         return VariableFuncArgs.IsTargetMethod(method) || TransitiveFill.IsTargetMethod(method);
     }
 
-    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger,
+        CancellationToken token)
     {
         switch (context.Node)
         {
@@ -227,7 +228,7 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
         return invocation.Expression.ToString().EndsWith(method.MethodSymbol.Name);
     }
 
-    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         var processed =
             new Dictionary<string, (TypeDeclarationSyntax Syntax, HashSet<string> Methods, string Usings, string
@@ -240,7 +241,7 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
 
         if (nonNullTargets.Length == 0)
         {
-            Hanz.Logger.Log("No non-null targets found.");
+            logger.Log("No non-null targets found.");
             return;
         }
 
@@ -250,12 +251,14 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
 
         if (methods.Length == 0)
         {
-            Hanz.Logger.Log("No methods found.");
+            logger.Log("No methods found.");
             return;
         }
 
         foreach (var target in targets.OfType<InvocationGenerationTarget>())
         {
+            var targetLogger = logger.WithSemanticContext(target.SemanticModel);
+
             var targetMethod =
                 target.TargetMethod is not null
                     ? methods.FirstOrDefault(x =>
@@ -272,15 +275,8 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
 
             if (targetMethod?.Method.MethodSyntax.Parent is not TypeDeclarationSyntax methodContainingTypeSyntax)
             {
-                // Hanz.Logger.Log(
-                //     $"Failed to resolve method declaration for {target.InvocationExpression.Expression}\n" +
-                //     $"Methods:\n- {string.Join("\n - ", methods.Select(x => x.Method.MethodSymbol.ToDisplayString()))}\n" +
-                //     $"Target method?: {target.TargetMethod?.ToDisplayString() ?? "null"}\n" +
-                //     $"Target reduced from?: {target.TargetMethod?.ReducedFrom?.ToDisplayString() ?? "null"}");
                 continue;
             }
-
-            //Hanz.Logger.Log($"Successfully processing target {targetMethod.Method.MethodSymbol.ToDisplayString()}");
 
             var containingTypeName = targetMethod.Method.MethodSymbol.ContainingType.ToDisplayString();
             var methodName = targetMethod.Method.MethodSymbol.ToDisplayString();
@@ -314,7 +310,8 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
                 VariableFuncArgs.Apply(
                     ref newFunctionSyntax,
                     target.InvocationExpression,
-                    targetMethod.Method
+                    targetMethod.Method,
+                    targetLogger.GetSubLogger("VariableFuncArgs")
                 );
             }
 
@@ -324,14 +321,15 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
                     ref newFunctionSyntax,
                     target.InvocationExpression,
                     targetMethod.Method,
-                    target.SemanticModel
+                    target.SemanticModel,
+                    targetLogger.GetSubLogger("TransitiveFill")
                 );
             }
 
             if (newFunctionSyntax.IsEquivalentTo(targetMethod.Method.MethodSyntax) &&
                 typeSyntax.IsEquivalentTo(type.Syntax))
             {
-                Hanz.Logger.Warn(
+                targetLogger.Warn(
                     $"No structural changes found for {targetMethod.Method.MethodSymbol.ToDisplayString()}");
                 continue;
             }

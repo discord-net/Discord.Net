@@ -12,19 +12,22 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
     public class GenerationTarget(
         SemanticModel semantic,
         TypeDeclarationSyntax typeDeclarationSyntax,
-        MemberDeclarationSyntax memberDeclarationSyntax
+        MemberDeclarationSyntax memberDeclarationSyntax,
+        ITypeSymbol typeSymbol
     ) : IEquatable<GenerationTarget>
     {
         public SemanticModel Semantic { get; } = semantic;
         public TypeDeclarationSyntax TypeDeclarationSyntax { get; } = typeDeclarationSyntax;
         public MemberDeclarationSyntax MemberDeclarationSyntax { get; } = memberDeclarationSyntax;
+        public ITypeSymbol TypeSymbol { get; } = typeSymbol;
 
         public bool Equals(GenerationTarget? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return TypeDeclarationSyntax.IsEquivalentTo(other.TypeDeclarationSyntax) &&
-                   MemberDeclarationSyntax.IsEquivalentTo(other.MemberDeclarationSyntax);
+                   MemberDeclarationSyntax.IsEquivalentTo(other.MemberDeclarationSyntax) &&
+                   TypeSymbol.Equals(other.TypeSymbol, SymbolEqualityComparer.Default);
         }
 
         public override bool Equals(object? obj)
@@ -39,7 +42,9 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
         {
             unchecked
             {
-                return (TypeDeclarationSyntax.GetHashCode() * 397) ^ MemberDeclarationSyntax.GetHashCode();
+                var hashcode = TypeDeclarationSyntax.GetHashCode();
+                hashcode = (hashcode * 397) ^ (MemberDeclarationSyntax?.GetHashCode() ?? 0);
+                return (hashcode * 397) ^ SymbolEqualityComparer.Default.GetHashCode(TypeSymbol);
             }
         }
 
@@ -57,17 +62,19 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
         };
     }
 
-    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger,
+        CancellationToken token)
     {
         if (context.Node is not MemberDeclarationSyntax member) return null;
         if (member.Parent is not TypeDeclarationSyntax type) return null;
 
         var symbol = context.SemanticModel.GetDeclaredSymbol(member, token);
+        var typeSymbol = context.SemanticModel.GetDeclaredSymbol(type, token);
 
-        if (symbol is null || !IsTarget(symbol))
+        if (symbol is null || !IsTarget(symbol) || typeSymbol is null)
             return null;
 
-        return new GenerationTarget(context.SemanticModel, type, member);
+        return new GenerationTarget(context.SemanticModel, type, member, typeSymbol);
     }
 
     public static bool IsTarget(ISymbol symbol)
@@ -82,7 +89,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
         public TypeDeclarationSyntax Syntax { get; set; } = syntax;
     }
 
-    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         var toGenerate = new Dictionary<string, GenerationResult>();
 
@@ -90,7 +97,6 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
         {
             if (target is null) continue;
 
-            var symbol = ModelExtensions.GetDeclaredSymbol(target.Semantic, target.TypeDeclarationSyntax);
             var sourceOfTruthType = (target.MemberDeclarationSyntax switch
             {
                 MethodDeclarationSyntax method => ModelExtensions.GetTypeInfo(target.Semantic, method.ReturnType),
@@ -109,9 +115,31 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
 
             if (sourceOfTruthName is null) continue;
 
-            if (symbol is not INamedTypeSymbol typeSymbol) continue;
+            if (target.TypeSymbol is not INamedTypeSymbol typeSymbol) continue;
 
             List<ISymbol> validTargets = new();
+
+            var proxied = target.TypeDeclarationSyntax is ClassDeclarationSyntax cls
+                ? TypeUtils.GetBaseTypesAndThis(typeSymbol)
+                    .SelectMany(type =>
+                    {
+                        if (type is not INamedTypeSymbol namedType)
+                            return [];
+
+                        var syntax = type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
+                        if (syntax is not ClassDeclarationSyntax cls)
+                            return [];
+
+                        return InterfaceProxy.GetProxiedInterfaceMembers(
+                            cls,
+                            namedType,
+                            target.Semantic.Compilation.GetSemanticModel(cls.SyntaxTree)
+                        );
+                    })
+                    .ToImmutableHashSet(SymbolEqualityComparer.Default)
+                : ImmutableHashSet<ISymbol>.Empty;
+
+            // var baseImplementations = TypeUtils.GetBaseTypesAndThis(typeSymbol);
 
             foreach (var iface in typeSymbol.AllInterfaces)
             {
@@ -119,13 +147,19 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
 
                 foreach (var member in targetMembers)
                 {
+                    if (proxied.Contains(member))
+                    {
+                        logger.Log($"Skipping {member} (implemented by interface proxy)");
+                        continue;
+                    }
+
                     switch (member)
                     {
                         case IMethodSymbol method when target.MemberDeclarationSyntax is MethodDeclarationSyntax:
                             if (!target.Semantic.Compilation.HasImplicitConversion(sourceOfTruthType,
                                     method.ReturnType))
                             {
-                                Hanz.Logger.Warn(
+                                logger.Warn(
                                     $"No conversion between {sourceOfTruthType.Name} -> {method.ReturnType.Name}");
                                 break;
                             }
@@ -135,7 +169,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                         case IPropertySymbol property when target.MemberDeclarationSyntax is PropertyDeclarationSyntax:
                             if (!target.Semantic.Compilation.HasImplicitConversion(sourceOfTruthType, property.Type))
                             {
-                                Hanz.Logger.Warn(
+                                logger.Warn(
                                     $"No conversion between {sourceOfTruthType.Name} -> {property.Type.Name}");
                                 break;
                             }
@@ -257,7 +291,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
             }
             catch (Exception x)
             {
-                Hanz.Logger.Log(LogLevel.Error, x.ToString());
+                logger.Log(LogLevel.Error, x.ToString());
             }
         }
 

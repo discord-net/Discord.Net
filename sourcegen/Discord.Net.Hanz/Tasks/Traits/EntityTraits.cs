@@ -66,7 +66,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
     public bool IsValid(SyntaxNode node, CancellationToken token = default)
         => node is InterfaceDeclarationSyntax {AttributeLists.Count: > 0};
 
-    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token = default)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger,
+        CancellationToken token = default)
     {
         if (context.Node is not InterfaceDeclarationSyntax {AttributeLists.Count: > 0} interfaceDeclarationSyntax)
             return null;
@@ -102,7 +103,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         );
     }
 
-    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         var entitySyntax = new Dictionary<string, InterfaceDeclarationSyntax>();
 
@@ -132,11 +133,17 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
             {
                 try
                 {
-                    ProcessTraitRequest(ref syntax, trait, target, entitySyntax);
+                    ProcessTraitRequest(
+                        ref syntax,
+                        trait,
+                        target,
+                        entitySyntax,
+                        logger
+                    );
                 }
                 catch (Exception x)
                 {
-                    Hanz.Logger.Log(LogLevel.Error,
+                    logger.Log(LogLevel.Error,
                         $"Failed on processing {trait} on {target.InterfaceSymbol.Name}: {x}");
                 }
             }
@@ -152,7 +159,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
 
             if (!producedFiles.Add($"Traits/{target.InterfaceSymbol.Name}"))
             {
-                Hanz.Logger.Warn($"Attempted to add a second file for {target.InterfaceSymbol}");
+                logger.Warn($"Attempted to add a second file for {target.InterfaceSymbol}");
                 continue;
             }
 
@@ -174,7 +181,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
 
             if (!producedFiles.Add($"Traits/{syntax.Value.Identifier}"))
             {
-                Hanz.Logger.Warn($"Attempted to add a second file for {syntax.Value.Identifier}");
+                logger.Warn($"Attempted to add a second file for {syntax.Value.Identifier}");
                 continue;
             }
 
@@ -195,7 +202,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         ref InterfaceDeclarationSyntax syntax,
         string trait,
         GenerationTarget target,
-        Dictionary<string, InterfaceDeclarationSyntax> entitySyntax)
+        Dictionary<string, InterfaceDeclarationSyntax> entitySyntax,
+        Logger logger)
     {
         if (!TraitAttributes.TryGetValue(trait, out var traitInterface))
             return;
@@ -210,27 +218,52 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         if (traitAttribute is null)
             return;
 
+        var traitLogger = logger.GetSubLogger(traitInterface.Split('.')[1]);
+
         switch (traitInterface)
         {
             case "Discord.IDeletable":
-                DeleteTrait.Process(ref syntax, target, traitAttribute);
+                DeleteTrait.Process(
+                    ref
+                    syntax,
+                    target,
+                    traitAttribute,
+                    traitLogger
+                );
                 break;
             case "Discord.IModifiable":
                 ModifyTrait.Process(
                     ref syntax,
                     target,
                     traitAttribute,
-                    entitySyntax
+                    entitySyntax,
+                    traitLogger
                 );
                 break;
             case "Discord.IRefreshable":
-                RefreshableTrait.Process(ref syntax, target, traitAttribute);
+                RefreshableTrait.Process(
+                    ref syntax,
+                    target,
+                    traitAttribute,
+                    traitLogger
+                );
                 break;
             case "Discord.IFetchable" or "Discord.IFetchableOfMany":
-                FetchableTrait.Process(ref syntax, target, traitAttribute);
+                FetchableTrait.Process(
+                    ref syntax,
+                    target,
+                    traitAttribute,
+                    traitLogger
+                );
                 break;
             case "Discord.ILoadable":
-                LoadableTrait.Process(ref syntax, target, traitAttribute, entitySyntax);
+                LoadableTrait.Process(
+                    ref syntax,
+                    target,
+                    traitAttribute,
+                    entitySyntax,
+                    traitLogger
+                );
                 break;
         }
     }
@@ -275,6 +308,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
     public static ArgumentListSyntax ParseRouteArguments(
         IMethodSymbol route,
         GenerationTarget target,
+        Logger logger,
         Func<IParameterSymbol, ArgumentSyntax?>? extra = null,
         ExpressionSyntax? pathHolder = null,
         ExpressionSyntax? idParam = null)
@@ -288,7 +322,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 {
                     case "id":
                         return ReturnOwnId(ref hasReturnedId, idParam,
-                            $"{target.InterfaceSymbol}: {x} -> direct 'id' reference");
+                            $"{target.InterfaceSymbol}: {x} -> direct 'id' reference", logger);
                     default:
                         if (x.Type is INamedTypeSymbol paramType &&
                             x.Type.ToDisplayString().StartsWith("Discord.EntityOrId"))
@@ -326,7 +360,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
 
                         if (entityType.Equals(target.InterfaceSymbol, SymbolEqualityComparer.Default))
                             return ReturnOwnId(ref hasReturnedId, idParam,
-                                $"{target.InterfaceSymbol}: {x} is the relation type");
+                                $"{target.InterfaceSymbol}: {x} is the relation type", logger);
 
                         var actorInterface = GetActorInterface(target.InterfaceSymbol);
 
@@ -343,7 +377,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                                 (conversion?.IsImplicit ?? false)
                             ))
                             return ReturnOwnId(ref hasReturnedId, idParam,
-                                $"{target.InterfaceSymbol}: {x} -> common conversion between {actorInterface.TypeArguments[1]} <> {entityType}");
+                                $"{target.InterfaceSymbol}: {x} -> common conversion between {actorInterface.TypeArguments[1]} <> {entityType}",
+                                logger);
 
                         return SyntaxFactory.Argument(
                             SyntaxFactory.InvocationExpression(
@@ -368,11 +403,15 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         );
     }
 
-    private static ArgumentSyntax ReturnOwnId(ref bool hasReturnedThis, ExpressionSyntax? idParam, string source)
+    private static ArgumentSyntax ReturnOwnId(
+        ref bool hasReturnedThis,
+        ExpressionSyntax? idParam,
+        string source,
+        Logger logger)
     {
         if (hasReturnedThis)
         {
-            Hanz.Logger.Warn($"using double id in route parameters: {source}");
+            logger.Warn($"using double id in route parameters: {source}");
             //throw new InvalidOperationException("Cannot return 'id' more than once");
         }
 

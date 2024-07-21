@@ -67,7 +67,8 @@ public class RestModifiable : IGenerationCombineTask<RestModifiable.GenerationTa
     public bool IsValid(SyntaxNode node, CancellationToken token)
         => node is ClassDeclarationSyntax;
 
-    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger,
+        CancellationToken token)
     {
         if (context.Node is not ClassDeclarationSyntax classSyntax) return null;
 
@@ -118,7 +119,7 @@ public class RestModifiable : IGenerationCombineTask<RestModifiable.GenerationTa
         return null;
     }
 
-    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         foreach (var target in targets)
         {
@@ -129,14 +130,15 @@ public class RestModifiable : IGenerationCombineTask<RestModifiable.GenerationTa
                 (x?.ClassSymbol.Equals(target.ClassSymbol.BaseType, SymbolEqualityComparer.Default) ?? false)
             );
 
-            GenerateModifyForClass(context, target, baseTarget);
+            GenerateModifyForClass(context, target, baseTarget, logger);
         }
     }
 
     private static void GenerateModifyForClass(
         SourceProductionContext context,
         GenerationTarget target,
-        GenerationTarget? baseTarget)
+        GenerationTarget? baseTarget,
+        Logger logger)
     {
         var declaration = ClassDeclaration(
             [],
@@ -177,7 +179,7 @@ public class RestModifiable : IGenerationCombineTask<RestModifiable.GenerationTa
                     target.ClassDeclaration.GetLocation(),
                     target.ClassDeclaration.Identifier.ValueText
                 ));
-                Hanz.Logger.Log($"No entity found for actor {target.ClassSymbol.Name}");
+                logger.Log($"No entity found for actor {target.ClassSymbol.Name}");
                 return;
             }
 

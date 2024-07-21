@@ -11,7 +11,8 @@ public static class ModifyTrait
         ref InterfaceDeclarationSyntax syntax,
         EntityTraits.GenerationTarget target,
         AttributeData traitAttribute,
-        Dictionary<string, InterfaceDeclarationSyntax> entitiesSyntax)
+        Dictionary<string, InterfaceDeclarationSyntax> entitiesSyntax,
+        Logger logger)
     {
         var paramsType = traitAttribute.AttributeClass?.TypeArguments.FirstOrDefault();
 
@@ -25,7 +26,7 @@ public static class ModifyTrait
 
         if (actorInterface is null)
         {
-            Hanz.Logger.Warn($"{target.InterfaceSymbol.Name}: Cannot resolve actor interface");
+            logger.Warn($"{target.InterfaceSymbol.Name}: Cannot resolve actor interface");
             return;
         }
 
@@ -36,7 +37,7 @@ public static class ModifyTrait
 
         if (entityPropertiesInterface is null)
         {
-            Hanz.Logger.Warn($"{target.InterfaceSymbol.Name}: Cannot resolve entity properties");
+            logger.Warn($"{target.InterfaceSymbol.Name}: Cannot resolve entity properties");
             return;
         }
 
@@ -44,7 +45,7 @@ public static class ModifyTrait
 
         if (entityModel is null)
         {
-            Hanz.Logger.Warn($"{target.InterfaceSymbol.Name}: Failed to find model");
+            logger.Warn($"{target.InterfaceSymbol.Name}: Failed to find model");
 
             // TODO: resolve direct representation
             return;
@@ -91,7 +92,8 @@ public static class ModifyTrait
             routeMemberAccess,
             routeMethod,
             target,
-            entityPropertiesInterface.TypeArguments[0]
+            entityPropertiesInterface.TypeArguments[0],
+            logger
         );
 
         var entityModifiableInterface = SyntaxFactory.GenericName(
@@ -129,7 +131,8 @@ public static class ModifyTrait
             routeMemberAccess,
             routeMethod,
             target,
-            entityPropertiesInterface.TypeArguments[0]
+            entityPropertiesInterface.TypeArguments[0],
+            logger
         );
 
         entitiesSyntax[entityType.ToDisplayString()] = entitySyntax;
@@ -143,7 +146,8 @@ public static class ModifyTrait
         MemberAccessExpressionSyntax routeMemberAccess,
         IMethodSymbol routeMethod,
         EntityTraits.GenerationTarget target,
-        ITypeSymbol userPropertiesType)
+        ITypeSymbol userPropertiesType,
+        Logger logger)
     {
         syntax = syntax.AddMembers(
             SyntaxFactory.MethodDeclaration(
@@ -193,7 +197,7 @@ public static class ModifyTrait
                 SyntaxFactory.ArrowExpressionClause(
                     SyntaxFactory.InvocationExpression(
                         routeMemberAccess,
-                        EntityTraits.ParseRouteArguments(routeMethod, target, extra =>
+                        EntityTraits.ParseRouteArguments(routeMethod, target, logger, extra =>
                         {
                             if (
                                 extra.Type.Equals(userPropertiesType,
@@ -212,7 +216,7 @@ public static class ModifyTrait
                                 return SyntaxFactory.Argument(SyntaxFactory.IdentifierName("args"));
                             }
 
-                            Hanz.Logger.Warn($"Couldn't resolve route argument type {extra.Type} for {target.InterfaceSymbol.Name}");
+                            logger.Warn($"Couldn't resolve route argument type {extra.Type} for {target.InterfaceSymbol.Name}");
 
                             return null;
                         })

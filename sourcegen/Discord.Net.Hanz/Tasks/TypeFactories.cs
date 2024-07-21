@@ -101,7 +101,8 @@ public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarg
         );
     }
 
-    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger,
+        CancellationToken token)
     {
         if (context.Node is not ClassDeclarationSyntax target)
             return null;
@@ -119,7 +120,7 @@ public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarg
 
             if (parameters is null)
             {
-                Hanz.Logger.Warn("Found type factory with no primary constructor");
+                logger.Warn("Found type factory with no primary constructor");
                 continue;
             }
 
@@ -154,18 +155,18 @@ public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarg
     {
         public readonly string[] Arguments = arguments;
 
-        public bool Equals(FactoryDetails other) => Arguments.Equals(other.Arguments);
+        public bool Equals(FactoryDetails other) => Arguments.Length == other.Arguments.Length;
 
         public override bool Equals(object? obj) => obj is FactoryDetails other && Equals(other);
 
-        public override int GetHashCode() => Arguments.GetHashCode();
+        public override int GetHashCode() => Arguments.Length;
 
         public static bool operator ==(FactoryDetails left, FactoryDetails right) => left.Equals(right);
 
         public static bool operator !=(FactoryDetails left, FactoryDetails right) => !left.Equals(right);
     }
 
-    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         var factoryArgsList = new HashSet<int>();
 
@@ -179,15 +180,18 @@ public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarg
 
             if (target.PrimaryConstructorParameters is not null)
             {
-                foreach (var details in AppendFactory(sb, target.ClassDeclarationSyntax.Identifier.ValueText, target.PrimaryConstructorParameters))
+                foreach (var details in AppendFactory(sb, target.ClassDeclarationSyntax.Identifier.ValueText,
+                             target.PrimaryConstructorParameters))
                     implementedFactories.Add(details);
             }
 
             foreach (var constructor in target.ConstructorDeclarationSyntax)
             {
-                foreach (var details in AppendFactory(sb, target.ClassDeclarationSyntax.Identifier.ValueText, constructor))
+                foreach (var details in AppendFactory(sb, target.ClassDeclarationSyntax.Identifier.ValueText,
+                             constructor))
                     implementedFactories.Add(details);
             }
+
 
             var bases = implementedFactories.Select(x =>
                 $"IFactory<{target.ClassDeclarationSyntax.Identifier}, {string.Join(", ", x.Arguments)}>"
@@ -198,7 +202,7 @@ public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarg
                 $$"""
                   namespace {{target.SemanticModel.GetDeclaredSymbol(target.ClassDeclarationSyntax)!.ContainingNamespace}};
 
-                  public partial class {{target.ClassDeclarationSyntax.Identifier}}{{(bases.Length > 0 ? $" : {string.Join(", ", bases)}"  : "")}}
+                  public partial class {{target.ClassDeclarationSyntax.Identifier}}{{(bases.Length > 0 ? $" : {string.Join(", ", bases)}" : "")}}
                   {
                       {{sb.ToString().Replace("\n", "\n    ")}}
 
@@ -220,20 +224,20 @@ public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarg
         {
             var mapped = factoryArgsList.Select(x =>
                 $$"""
-                internal interface IFactory<TSelf, {{string.Join(", ", Enumerable.Range(0, x).Select(x => $"T{x}"))}}>
-                {
-                    static abstract TSelf Factory({{string.Join(", ", Enumerable.Range(0, x).Select(x => $"T{x} arg{x}"))}});
-                }
-                """
+                  internal interface IFactory<TSelf, {{string.Join(", ", Enumerable.Range(0, x).Select(x => $"T{x}"))}}>
+                  {
+                      static abstract TSelf Factory({{string.Join(", ", Enumerable.Range(0, x).Select(x => $"T{x} arg{x}"))}});
+                  }
+                  """
             );
 
             context.AddSource(
                 "Factories/IFactory",
                 $$"""
-                namespace Discord;
+                  namespace Discord;
 
-                {{string.Join("\n\n", mapped)}}
-                """
+                  {{string.Join("\n\n", mapped)}}
+                  """
             );
         }
     }
@@ -243,26 +247,76 @@ public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarg
         var parameterList = args.Parameters;
         var parameterNames = string.Join(", ", parameterList.Parameters.Select(x => x.Identifier));
 
-        var startList = ReorderToLast(RemoveParameterDefaults(parameterList), args.ShouldBeLastParameter).NormalizeWhitespace();
+        var startList = ReorderToLast(RemoveParameterDefaults(parameterList), args.ShouldBeLastParameter)
+            .NormalizeWhitespace();
         builder.AppendLine(
             $"internal static {name} Factory{startList} => new({parameterNames});"
         );
 
         yield return new FactoryDetails(startList.Parameters.Select(x => x.Type!.ToString()).ToArray());
 
-        foreach (var defaultParam in parameterList.Parameters.Where(x => x.Default is not null))
+        var nonOptionalList = parameterList.RemoveNodes(
+            parameterList.Parameters.Where(x => x.Default is not null),
+            SyntaxRemoveOptions.KeepNoTrivia
+        )!;
+
+        for (int i = 0; i != parameterList.Parameters.Count(x => x.Default is not null); i++)
         {
-            var newList =
-                RemoveParameterDefaults(parameterList.RemoveNode(defaultParam, SyntaxRemoveOptions.KeepNoTrivia) ??
-                                        SyntaxFactory.ParameterList([]));
+            var optionals = parameterList.Parameters
+                .Where(x => x.Default is not null)
+                .Take(i)
+                .ToArray();
+
+            var newList = ReorderToLast(RemoveParameterDefaults(nonOptionalList.AddParameters(optionals)),
+                args.ShouldBeLastParameter);
 
             yield return new FactoryDetails(newList.Parameters.Select(x => x.Type!.ToString()).ToArray());
 
-            parameterNames = string.Join(", ", newList.Parameters.Select(x => x.Identifier));
+            parameterNames = string.Join(
+                ", ",
+                newList.Parameters
+                    .Select(x =>
+                    {
+                        var original =
+                            parameterList.Parameters.First(y => y.Identifier.ValueText == x.Identifier.ValueText);
+                        return (Original: original, New: x);
+                    })
+                    .OrderBy(x => x.Original.Default is not null ? 1 : -1)
+                    .Select(x =>
+                    {
+                        if (x.Original.Default is not null)
+                            return $"{x.New.Identifier}: {x.New.Identifier}";
+
+                        return x.New.Identifier.ValueText;
+                    })
+            );
             builder.AppendLine(
-                $"internal static {name} Factory{ReorderToLast(newList, args.ShouldBeLastParameter).NormalizeWhitespace()} => new({parameterNames});"
+                $"internal static {name} Factory{newList.NormalizeWhitespace()} => new({parameterNames});"
             );
         }
+
+        // foreach (var defaultParam in parameterList.Parameters.Where(x => x.Default is not null))
+        // {
+        //     var newList =
+        //         RemoveParameterDefaults(parameterList.RemoveNode(defaultParam, SyntaxRemoveOptions.KeepNoTrivia) ??
+        //                                 SyntaxFactory.ParameterList([]));
+        //
+        //     yield return new FactoryDetails(newList.Parameters.Select(x => x.Type!.ToString()).ToArray());
+        //
+        //     parameterNames = string.Join(", ", newList.Parameters.Select(x =>
+        //     {
+        //         var original =
+        //             parameterList.Parameters.First(y => y.Identifier.ValueText == x.Identifier.ValueText);
+        //
+        //         if (original.Default is not null)
+        //             return $"{x.Identifier}: {x.Identifier}";
+        //
+        //         return x.Identifier.ValueText;
+        //     }));
+        //     builder.AppendLine(
+        //         $"internal static {name} Factory{ReorderToLast(newList, args.ShouldBeLastParameter).NormalizeWhitespace()} => new({parameterNames});"
+        //     );
+        // }
     }
 
     private static ParameterListSyntax ReorderToLast(ParameterListSyntax list, string? shouldBeLast)
@@ -281,19 +335,12 @@ public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarg
 
     private static ParameterListSyntax RemoveParameterDefaults(ParameterListSyntax list)
     {
-        var newList = list;
-
-        foreach (var parameter in list.Parameters)
-        {
-            if (parameter.Default is not null)
-            {
-                newList = newList.ReplaceNode(
-                    parameter,
-                    parameter.WithDefault(null)
-                );
-            }
-        }
-
-        return newList;
+        return list.RemoveNodes(
+            list.Parameters
+                .Select(x => x.Default)
+                .Where(x => x is not null)
+                .Cast<EqualsValueClauseSyntax>(),
+            SyntaxRemoveOptions.KeepNoTrivia
+        )!;
     }
 }

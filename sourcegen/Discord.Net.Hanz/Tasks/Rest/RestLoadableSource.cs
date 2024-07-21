@@ -53,7 +53,8 @@ public class RestLoadableSource : IGenerationTask<RestLoadableSource.GenerationT
         return property.AttributeLists.Count > 0;
     }
 
-    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger,
+        CancellationToken token)
     {
         if (context.Node is not PropertyDeclarationSyntax property) return null;
 
@@ -82,7 +83,7 @@ public class RestLoadableSource : IGenerationTask<RestLoadableSource.GenerationT
         );
     }
 
-    public void Execute(SourceProductionContext context, GenerationTarget? target)
+    public void Execute(SourceProductionContext context, GenerationTarget? target, Logger logger)
     {
         if (target?.PropertyDeclarationSyntax.Type is not GenericNameSyntax genericPropertyType) return;
 

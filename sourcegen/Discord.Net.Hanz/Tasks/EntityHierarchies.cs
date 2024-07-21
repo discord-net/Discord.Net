@@ -56,7 +56,8 @@ public class EntityHierarchies : IGenerationCombineTask<EntityHierarchies.Genera
     public bool IsValid(SyntaxNode node, CancellationToken token = default)
         => node is ClassDeclarationSyntax {AttributeLists.Count: > 0};
 
-    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger,
+        CancellationToken token)
     {
         if (context.Node is not ClassDeclarationSyntax target) return null;
 
@@ -234,7 +235,7 @@ public class EntityHierarchies : IGenerationCombineTask<EntityHierarchies.Genera
         return exampleCase;
     }
 
-    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         if (targets.Length == 0) return;
 

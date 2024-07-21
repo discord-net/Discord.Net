@@ -4,13 +4,11 @@ namespace Discord.Net.Hanz;
 
 public static class SelfLog
 {
-    private const string FileName = "Hanz.log";
-
     public static void Write(string message)
     {
         try
         {
-            var fullPath = Path.Combine(Path.GetTempPath(), FileName);
+            var fullPath = Path.Combine(Environment.CurrentDirectory, ".hanz", "global.log");
             File.AppendAllText(fullPath, $"[{DateTime.Now:O}] {message}{Environment.NewLine}");
         }
         catch (Exception ex)

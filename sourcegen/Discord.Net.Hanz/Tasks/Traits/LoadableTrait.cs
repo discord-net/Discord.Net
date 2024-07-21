@@ -10,7 +10,8 @@ public static class LoadableTrait
         ref InterfaceDeclarationSyntax syntax,
         EntityTraits.GenerationTarget target,
         AttributeData traitAttribute,
-        Dictionary<string, InterfaceDeclarationSyntax> entitiesSyntax)
+        Dictionary<string, InterfaceDeclarationSyntax> entitiesSyntax,
+        Logger logger)
     {
         if (traitAttribute.ConstructorArguments.Length != 2)
             return;
@@ -19,7 +20,7 @@ public static class LoadableTrait
 
         if (actorInterface is null)
         {
-            Hanz.Logger.Warn($"Cannot find actor interface for {target.InterfaceSymbol}");
+            logger.Warn($"Cannot find actor interface for {target.InterfaceSymbol}");
             return;
         }
 
@@ -27,13 +28,13 @@ public static class LoadableTrait
 
         if (modelType is null)
         {
-            Hanz.Logger.Warn($"Cannot find model interface for {target.InterfaceSymbol}");
+            logger.Warn($"Cannot find model interface for {target.InterfaceSymbol}");
             return;
         }
 
         if (EntityTraits.GetNameOfArgument(traitAttribute) is not MemberAccessExpressionSyntax routeMemberAccess)
         {
-            Hanz.Logger.Warn($"Cannot find route nameof for loadable {target.InterfaceSymbol}");
+            logger.Warn($"Cannot find route nameof for loadable {target.InterfaceSymbol}");
             return;
         }
 
@@ -45,7 +46,7 @@ public static class LoadableTrait
 
         if (route is null)
         {
-            Hanz.Logger.Warn($"Cannot find route for loadable {target.InterfaceSymbol}");
+            logger.Warn($"Cannot find route for loadable {target.InterfaceSymbol}");
             return;
         }
 
@@ -79,6 +80,7 @@ public static class LoadableTrait
             routeMemberAccess,
             "Discord.IFetchable",
             "FetchRoute",
+            logger.GetSubLogger("IFetchable"),
             out var extraParameters
         );
 
@@ -277,6 +279,7 @@ public static class LoadableTrait
             routeMemberAccess,
             "Discord.IFetchable",
             "FetchRoute",
+            logger.GetSubLogger("IFetchable"),
             out _,
             actorInterface.TypeArguments[1]
         );

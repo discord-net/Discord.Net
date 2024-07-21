@@ -56,7 +56,8 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
     public bool IsValid(SyntaxNode node, CancellationToken token)
         => node is MethodDeclarationSyntax {AttributeLists.Count: > 0};
 
-    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger,
+        CancellationToken token)
     {
         if (context.Node is not MethodDeclarationSyntax {AttributeLists.Count: > 0} method)
             return null;
@@ -92,7 +93,7 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
         public ClassDeclarationSyntax Syntax { get; set; } = syntax;
     }
 
-    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         var toGenerate = new Dictionary<string, GenerationResult>();
 
@@ -111,7 +112,7 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
 
                 if (targetReturnType is null)
                 {
-                    Hanz.Logger.Warn(
+                    logger.Warn(
                         $"No return type can be resolved from {target.MethodDeclarationSyntax.ReturnType}");
                     continue;
                 }
@@ -120,7 +121,7 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
                     IMethodSymbol
                     targetMethodSymbol)
                 {
-                    Hanz.Logger.Warn(
+                    logger.Warn(
                         $"No method symbol can be resolved from {target.MethodDeclarationSyntax.Identifier}");
                     continue;
                 }
@@ -130,7 +131,7 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
                     var typeInfo = ModelExtensions.GetTypeInfo(target.SemanticModel, baseType.Type).Type;
                     if (typeInfo is not INamedTypeSymbol namedTypeSymbol)
                     {
-                        Hanz.Logger.Warn($"No type info could be found for {baseType.Type}");
+                        logger.Warn($"No type info could be found for {baseType.Type}");
                         continue;
                     }
 
@@ -145,20 +146,20 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
                         // verify we can override the member
                         if (!member.IsVirtual)
                         {
-                            Hanz.Logger.Warn(
+                            logger.Warn(
                                 $"Member {baseType.Type}.{member.Name} shares the same name, but isn't virtual");
                             continue;
                         }
 
                         if (!IsTypeOrAssignable(target.SemanticModel.Compilation, targetReturnType, member.ReturnType))
                         {
-                            Hanz.Logger.Warn($"{member.ReturnType} is not assignable to {targetReturnType}");
+                            logger.Warn($"{member.ReturnType} is not assignable to {targetReturnType}");
                             continue;
                         }
 
                         if (member.Parameters.Length != targetMethodSymbol.Parameters.Length)
                         {
-                            Hanz.Logger.Warn(
+                            logger.Warn(
                                 $"{member} has mismatch parameter count {member.Parameters.Length} <> {targetMethodSymbol.Parameters.Length}");
                             continue;
                         }
@@ -181,7 +182,7 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
                             if (parameter.Source.Type.Equals(parameter.Target.Type, SymbolEqualityComparer.Default))
                                 continue;
 
-                            Hanz.Logger.Warn($"{parameter.Target} is not assignable to {parameter.Source}");
+                            logger.Warn($"{parameter.Target} is not assignable to {parameter.Source}");
                             goto end_member;
                         }
 
@@ -307,7 +308,7 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
         }
         catch (Exception x)
         {
-            Hanz.Logger.Log(LogLevel.Error, x.ToString());
+            logger.Log(LogLevel.Error, x.ToString());
         }
     }
 

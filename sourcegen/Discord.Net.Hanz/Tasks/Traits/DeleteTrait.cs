@@ -11,7 +11,8 @@ public static class DeleteTrait
     public static void Process(
         ref InterfaceDeclarationSyntax syntax,
         EntityTraits.GenerationTarget target,
-        AttributeData traitAttribute)
+        AttributeData traitAttribute,
+        Logger logger)
     {
         if (traitAttribute.ConstructorArguments.Length != 1)
             return;
@@ -34,7 +35,7 @@ public static class DeleteTrait
         {
             IMethodSymbol methodSymbol => SyntaxFactory.InvocationExpression(
                 routeMemberAccess,
-                EntityTraits.ParseRouteArguments(methodSymbol, target)
+                EntityTraits.ParseRouteArguments(methodSymbol, target, logger)
             ),
             IPropertySymbol or IFieldSymbol => routeMemberAccess,
             _ => null

@@ -2,6 +2,7 @@ using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace Discord.Net.Hanz.Tasks;
@@ -54,7 +55,8 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
         return classDeclarationSyntax.Members.Any(x => x is PropertyDeclarationSyntax {AttributeLists.Count: > 0});
     }
 
-    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger,
+        CancellationToken token)
     {
         if (context.Node is not ClassDeclarationSyntax target) return null;
 
@@ -70,6 +72,16 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
         }
 
         return null;
+    }
+
+    public static ImmutableHashSet<ISymbol> GetProxiedInterfaceMembers(ClassDeclarationSyntax syntax,
+        INamedTypeSymbol symbol, SemanticModel semanticModel)
+    {
+        var proxiedProperties = ComputeProxiedTypeProperties(syntax, semanticModel);
+        return proxiedProperties
+            .SelectMany(kvp => GetTargetTypesToProxy(kvp.Value, semanticModel, symbol.Interfaces))
+            .SelectMany(x => x.GetMembers().Where(IsValidMember))
+            .ToImmutableHashSet(SymbolEqualityComparer.Default);
     }
 
     private static Dictionary<PropertyDeclarationSyntax, List<TypeOfExpressionSyntax>> ComputeProxiedTypeProperties(
@@ -121,7 +133,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
             .OfType<INamedTypeSymbol>();
     }
 
-    public void Execute(SourceProductionContext context, GenerationTarget? target)
+    public void Execute(SourceProductionContext context, GenerationTarget? target, Logger logger)
     {
         if (target is null) return;
 
@@ -146,7 +158,8 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
 
             foreach (var targetInterface in targetInterfaces)
             {
-                if (AddProxiedMembers(ref syntax, targetInterface, targetSymbol, property, target.SemanticModel) == 0)
+                if (AddProxiedMembers(ref syntax, targetInterface, targetSymbol, property, target.SemanticModel,
+                        logger) == 0)
                     continue;
 
                 var proxiedInterfaceTypeSyntax = SyntaxFactory.GenericName(
@@ -163,7 +176,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                     )
                 );
 
-                syntax = syntax.AddMembers([
+                syntax = syntax.AddMembers(
                     SyntaxFactory.PropertyDeclaration(
                         [],
                         [],
@@ -183,7 +196,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                         null,
                         SyntaxFactory.Token(SyntaxKind.SemicolonToken)
                     )
-                ]);
+                );
             }
 
             var rootProxiedInterfaceTypeSyntax = SyntaxFactory.GenericName(
@@ -237,12 +250,23 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
         }
     }
 
+    private static bool IsValidMember(ISymbol symbol)
+    {
+        return symbol switch
+        {
+            IPropertySymbol {IsStatic: false, ExplicitInterfaceImplementations.Length: 0} => true,
+            IMethodSymbol {IsStatic: false, MethodKind: MethodKind.Ordinary} => true,
+            _ => false
+        };
+    }
+
     private static int AddProxiedMembers(
         ref ClassDeclarationSyntax classDeclarationSyntax,
         INamedTypeSymbol toProxy,
         INamedTypeSymbol targetSymbol,
         IPropertySymbol proxiedTo,
-        SemanticModel semanticModel)
+        SemanticModel semanticModel,
+        Logger logger)
     {
         var count = 0;
 
@@ -259,7 +283,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
             .Distinct(SymbolEqualityComparer.Default)
             .ToArray();
 
-        foreach (var member in toProxy.GetMembers())
+        foreach (var member in toProxy.GetMembers().Where(IsValidMember))
         {
             if (
                 targetSymbol.FindImplementationForInterfaceMember(member) is not null ||
@@ -274,7 +298,8 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                         (
                             x is IMethodSymbol fromMethod &&
                             member is IMethodSymbol toMethod &&
-                            TypeUtils.TypeIsOfProvidedOrDescendant(fromMethod.ReturnType, toMethod.ReturnType, semanticModel)
+                            TypeUtils.TypeIsOfProvidedOrDescendant(fromMethod.ReturnType, toMethod.ReturnType,
+                                semanticModel)
                         )
                         ||
                         (
@@ -284,6 +309,10 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                         )
                     )
                 );
+
+            var canProxyToSelfImplementation =
+                targetImplementation is not null &&
+                MemberUtils.CanOverride(targetImplementation, member, semanticModel.Compilation);
 
             var selfHasTargetImplementation = TypeUtils.GetBaseTypesAndThis(targetSymbol)
                 .Any(typeSymbol =>
@@ -306,7 +335,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
 
                                 if (baseProperty is null)
                                 {
-                                    Hanz.Logger.Warn(
+                                    logger.Warn(
                                         $"Couldn't find base semantic property {baseProxiedProperties.Key.Identifier} for {typeSymbol} ({targetSymbol})");
                                     return false;
                                 }
@@ -370,7 +399,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                                 SyntaxFactory.Token(SyntaxKind.EqualsGreaterThanToken),
                                 SyntaxFactory.MemberAccessExpression(
                                     SyntaxKind.SimpleMemberAccessExpression,
-                                    targetImplementation is not null
+                                    canProxyToSelfImplementation
                                         ? SyntaxFactory.ThisExpression()
                                         : castedSyntax,
                                     SyntaxFactory.IdentifierName(property.Name)
@@ -483,7 +512,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                                 SyntaxFactory.InvocationExpression(
                                     SyntaxFactory.MemberAccessExpression(
                                         SyntaxKind.SimpleMemberAccessExpression,
-                                        targetImplementation is not null
+                                        canProxyToSelfImplementation
                                             ? SyntaxFactory.ThisExpression()
                                             : castedSyntax,
                                         SyntaxFactory.IdentifierName(method.Name)

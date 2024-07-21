@@ -8,40 +8,6 @@ namespace Discord.Rest;
 
 internal static partial class RestActors
 {
-    // public static RestEnumerableIndexableActor<TChannelActor, ulong, TRestChannel, TCoreChannel,
-    //         IEnumerable<IChannelModel>>
-    //     GuildChannels<
-    //         [TransitiveFill] TChannelActor,
-    //         TRestChannel,
-    //         [Not(nameof(TRestChannel)), Interface] TCoreChannel,
-    //         TChannelModel,
-    //         TIdentity
-    //     >(
-    //         DiscordRestClient client,
-    //         GuildIdentity guild,
-    //         IApiOutRoute<IEnumerable<TChannelModel>>? route = null)
-    //     where TChannelActor :
-    //     RestGuildChannelActor,
-    //     IRestActor<ulong, TRestChannel, TIdentity>,
-    //     IFactory<TChannelActor, DiscordRestClient, GuildIdentity,
-    //         IIdentifiableEntityOrModel<ulong, TRestChannel, TChannelModel>>
-    //     where TRestChannel :
-    //     RestGuildChannel,
-    //     TCoreChannel,
-    //     IEntityOf<TChannelModel>,
-    //     IContextConstructable<TRestChannel, TChannelModel, GuildIdentity, DiscordRestClient>
-    //     where TCoreChannel : class, IGuildChannel
-    //     where TChannelModel : class, IGuildChannelModel
-    // {
-    //     return RestEnumerableIndexableActor.Create<TChannelActor, ulong, TRestChannel, TCoreChannel, IChannelModel>(
-    //         client,
-    //         id => TChannelActor.Factory(client, guild,
-    //             IIdentifiableEntityOrModel<ulong, TRestChannel, TChannelModel>.Of(id)),
-    //         models => models.OfType<TChannelModel>().Select(model => TRestChannel.Construct(client, guild, model)),
-    //         route ?? (IApiOutRoute<IEnumerable<IChannelModel>>)Routes.GetGuildChannels(guild.Id)
-    //     );
-    // }
-
     public static RestEnumerableIndexableActor<TActor, TId, TRestEntity, TCoreEntity,
             IEnumerable<TRouteModel>>
         GuildRelatedEntityWithTransform<
@@ -54,6 +20,7 @@ internal static partial class RestActors
             TIdentity,
             TId
         >(
+            Template<TActor> template,
             DiscordRestClient client,
             RestGuildActor guild,
             IApiOutRoute<TApiModel> route,
@@ -95,18 +62,20 @@ internal static partial class RestActors
             TModel,
             TRouteModel,
             TIdentity,
-            TId
+            TId,
+            TGuildIdentity
         >(
+            Template<TActor> template,
             DiscordRestClient client,
             RestGuildActor guild
         )
         where TActor :
             IRestActor<TId, TRestEntity, TIdentity>,
-            IFactory<TActor, DiscordRestClient, GuildIdentity, IIdentifiableEntityOrModel<TId, TRestEntity, TModel>>
+            IFactory<TActor, DiscordRestClient, TGuildIdentity, IIdentifiableEntityOrModel<TId, TRestEntity, TModel>>
         where TRestEntity :
             RestEntity<TId>,
             TCoreEntity,
-            IContextConstructable<TRestEntity, TModel, GuildIdentity, DiscordRestClient>
+            IContextConstructable<TRestEntity, TModel, TGuildIdentity, DiscordRestClient>
         where TCoreEntity :
             class,
             IEntity<TId>,
@@ -115,35 +84,16 @@ internal static partial class RestActors
         where TModel : class, TRouteModel
         where TRouteModel : class, IEntityModel<TId>
         where TId : IEquatable<TId>
+        where TGuildIdentity : class?, GuildIdentity?
     {
         return RestEnumerableIndexableActor.Create<TActor, TId, TRestEntity, TCoreEntity, TRouteModel>(
             client,
-            id => TActor.Factory(client, guild.Identity,
+            id => TActor.Factory(client, (TGuildIdentity)guild.Identity,
                 IIdentifiableEntityOrModel<TId, TRestEntity, TModel>.Of(id)),
-            models => models.OfType<TModel>().Select(model => TRestEntity.Construct(client, guild.Identity, model)),
+            models => models.OfType<TModel>().Select(model => (TRestEntity)TRestEntity.Construct(client, (TGuildIdentity)guild.Identity, model)),
             TCoreEntity.FetchManyRoute(guild)
         );
     }
-
-    public static RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IIntegration,
-            IEnumerable<IIntegrationModel>>
-        Integrations(
-            DiscordRestClient client,
-            GuildIdentity guild)
-    {
-        return new RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IIntegration,
-            IEnumerable<IIntegrationModel>>(
-            client,
-            integrationId => new RestIntegrationActor(client, guild, IntegrationIdentity.Of(integrationId)),
-            model => model.Select(x => RestIntegration.Construct(client, guild, x)),
-            Routes.GetGuildIntegrations(guild.Id)
-        );
-    }
-
-    public static RestIndexableActor<RestThreadChannelActor, ulong, RestThreadChannel> Threads(
-        DiscordRestClient client,
-        GuildIdentity guild
-    ) => new(threadId => new(client, guild, ThreadIdentity.Of(threadId)));
 
     public static
         RestPagedIndexableActor<RestGuildMemberActor, ulong, RestGuildMember, IEnumerable<IMemberModel>,
@@ -213,11 +163,5 @@ internal static partial class RestActors
                 );
             }
         );
-
-        // return new RestPagedIndexableActor<RestBanActor, ulong, RestBan, IBanModel>(
-        //     client,
-        //     banId => new RestBanActor(client, guildId, banId),
-        //     Routes.GetGuildBans()
-        // );
     }
 }

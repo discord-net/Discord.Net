@@ -16,6 +16,7 @@ public static class FetchableTrait
         MemberAccessExpressionSyntax routeMemberAccess,
         string fetchableType,
         string fetchMethod,
+        Logger logger,
         out Dictionary<IParameterSymbol, ParameterSyntax> extraParameters,
         ITypeSymbol? targetInterface = null)
     {
@@ -28,7 +29,7 @@ public static class FetchableTrait
         {
             IMethodSymbol methodSymbol => InvocationExpression(
                 routeMemberAccess,
-                EntityTraits.ParseRouteArguments(methodSymbol, target, extra =>
+                EntityTraits.ParseRouteArguments(methodSymbol, target, logger, extra =>
                 {
                     if (!extra.IsOptional)
                         return null;
@@ -315,7 +316,8 @@ public static class FetchableTrait
     public static void Process(
         ref InterfaceDeclarationSyntax syntax,
         EntityTraits.GenerationTarget target,
-        AttributeData traitAttribute)
+        AttributeData traitAttribute,
+        Logger logger)
     {
         if (traitAttribute.ConstructorArguments.Length != 1)
             return;
@@ -369,6 +371,7 @@ public static class FetchableTrait
             routeMemberAccess,
             fetchableType,
             fetchMethod,
+            logger,
             out _
         );
     }

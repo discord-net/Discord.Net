@@ -30,7 +30,8 @@ public static class VariableFuncArgs
     public static void Apply(
         ref MethodDeclarationSyntax syntax,
         InvocationExpressionSyntax invocationExpression,
-        FunctionGenerator.MethodTarget target
+        FunctionGenerator.MethodTarget target,
+        Logger logger
     )
     {
         var varargIndex = IndexOfVarArgsParameter(target.MethodSymbol);
@@ -47,7 +48,7 @@ public static class VariableFuncArgs
 
         if (extraArgs <= 0)
         {
-            Hanz.Logger.Warn("No extra args");
+            logger.Warn("No extra args");
             return;
         }
 
@@ -74,7 +75,7 @@ public static class VariableFuncArgs
 
                 if (funcGenericTypes is null)
                 {
-                    Hanz.Logger.Log(LogLevel.Error,
+                    logger.Log(LogLevel.Error,
                         $"Somethings really sussy bro: {parameterNode} | {parameter}");
                     return;
                 }

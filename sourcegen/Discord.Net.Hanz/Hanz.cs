@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Reflection;
 
@@ -10,9 +11,11 @@ namespace Discord.Net.Hanz;
 [Generator]
 public sealed class Hanz : IIncrementalGenerator
 {
-    internal static ILogger Logger = NullLogger.Instance;
+    public static LoggingOptions LoggerOptions { get; private set; } = new(LogLevel.Information);
 
-    public record struct LoggingOptions(string FilePath, LogLevel Level);
+    private static Logger _rootLogger = new(LogLevel.Information, Path.Combine(Logger.LogDirectory, "root.log"));
+
+    public record struct LoggingOptions(LogLevel Level);
 
     private readonly MethodInfo _registerTaskMethod = typeof(Hanz).GetMethods(BindingFlags.Static | BindingFlags.Public)
         .First(x => x.Name.StartsWith("RegisterTask"));
@@ -20,31 +23,97 @@ public sealed class Hanz : IIncrementalGenerator
     private readonly MethodInfo _registerCombineTaskMethod = typeof(Hanz)
         .GetMethods(BindingFlags.Static | BindingFlags.Public).First(x => x.Name.StartsWith("RegisterCombineTask"));
 
+    private readonly struct TransformWrapper<T>(Logger logger, T? value) where T : class, IEquatable<T>
+    {
+        public readonly Logger Logger = logger;
+        public readonly T? Value = value;
+
+        public bool Equals(TransformWrapper<T> other) =>
+            Value is null
+                ? other.Value is null
+                : other.Value is not null && Value.Equals(other.Value);
+
+        public readonly override int GetHashCode() => Value is null ? 0 : EqualityComparer<T>.Default.GetHashCode(Value);
+    }
+
     public static void RegisterTask<T>(IncrementalGeneratorInitializationContext context, IGenerationTask<T> task)
         where T : class, IEquatable<T>
     {
+        var assemblyLoggers = new ConcurrentDictionary<string, Logger>();
+
         var provider = context.SyntaxProvider.CreateSyntaxProvider(
             predicate: task.IsValid,
-            transform: task.GetTargetForGeneration
+            transform: (syntaxContext, token) =>
+            {
+                try
+                {
+                    var logger = assemblyLoggers.GetOrAdd(
+                        syntaxContext.SemanticModel.Compilation.Assembly.Name,
+                        assembly => Logger.CreateSemanticRunForTask(assembly, task.GetType().Name));
+                    return new TransformWrapper<T>(logger, task.GetTargetForGeneration(syntaxContext, logger, token));
+                }
+                catch (Exception ex)
+                {
+                    _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
+                    throw;
+                }
+            }
         );
 
-        context.RegisterSourceOutput(provider, task.Execute);
+        context.RegisterSourceOutput(provider, (context, wrapper) =>
+        {
+            try
+            {
+                wrapper.Logger.Clean();
+                task.Execute(context, wrapper.Value, wrapper.Logger);
+            }
+            catch (Exception ex)
+            {
+                _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
+                throw;
+            }
+        });
 
-        Logger.Log($"Registered {task.GetType().Name} task");
+        _rootLogger.Log($"Registered {task.GetType().Name} task");
     }
 
     public static void RegisterCombineTask<T>(IncrementalGeneratorInitializationContext context,
         IGenerationCombineTask<T> task)
         where T : class, IEquatable<T>
     {
+        var logger = Logger.CreateForTask(task.GetType().Name);
+
         var provider = context.SyntaxProvider.CreateSyntaxProvider(
             predicate: task.IsValid,
-            transform: task.GetTargetForGeneration
+            transform: (syntaxContext, token) =>
+            {
+                try
+                {
+                    return task.GetTargetForGeneration(syntaxContext, logger, token);
+                }
+                catch (Exception ex)
+                {
+                    _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
+                    throw;
+                }
+            }
         ).Collect();
 
-        context.RegisterSourceOutput(provider, task.Execute);
+        context.RegisterSourceOutput(provider, (productionContext, array) =>
+        {
+            try
+            {
+                logger.Clean();
+                task.Execute(productionContext, array, logger);
+            }
+            catch (Exception ex)
+            {
+                _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
+                throw;
+            }
+        });
 
-        Logger.Log($"Registered {task.GetType().Name} task");
+        _rootLogger.Log($"Registered {task.GetType().Name} task");
     }
 
     private static bool IsGenerationTask(Type type)
@@ -57,28 +126,37 @@ public sealed class Hanz : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var options = context.AnalyzerConfigOptionsProvider.Select((options, _) => GetLoggingOptions(options));
-
-        SetupLogger(context, options);
-
-        var generationTasks = typeof(Hanz).Assembly.GetTypes()
-            .Where(x => x
-                .GetInterfaces()
-                .Any(IsGenerationTask)
-            );
-
-        foreach (var task in generationTasks)
+        try
         {
-            var generationInterface = task.GetInterfaces().FirstOrDefault(IsGenerationTask);
+            _rootLogger.DeleteLogFile();
 
-            if (generationInterface is null) continue;
+            var options = context.AnalyzerConfigOptionsProvider.Select((options, _) => GetLoggingOptions(options));
 
-            if (generationInterface.GetGenericTypeDefinition() == typeof(IGenerationTask<>))
-                _registerTaskMethod.MakeGenericMethod(generationInterface.GenericTypeArguments[0])
-                    .Invoke(null, [context, Activator.CreateInstance(task)]);
-            else if (generationInterface.GetGenericTypeDefinition() == typeof(IGenerationCombineTask<>))
-                _registerCombineTaskMethod.MakeGenericMethod(generationInterface.GenericTypeArguments[0])
-                    .Invoke(null, [context, Activator.CreateInstance(task)]);
+            SetupLogger(context, options);
+
+            var generationTasks = typeof(Hanz).Assembly.GetTypes()
+                .Where(x => x
+                    .GetInterfaces()
+                    .Any(IsGenerationTask)
+                );
+
+            foreach (var task in generationTasks)
+            {
+                var generationInterface = task.GetInterfaces().FirstOrDefault(IsGenerationTask);
+
+                if (generationInterface is null) continue;
+
+                if (generationInterface.GetGenericTypeDefinition() == typeof(IGenerationTask<>))
+                    _registerTaskMethod.MakeGenericMethod(generationInterface.GenericTypeArguments[0])
+                        .Invoke(null, [context, Activator.CreateInstance(task)]);
+                else if (generationInterface.GetGenericTypeDefinition() == typeof(IGenerationCombineTask<>))
+                    _registerCombineTaskMethod.MakeGenericMethod(generationInterface.GenericTypeArguments[0])
+                        .Invoke(null, [context, Activator.CreateInstance(task)]);
+            }
+        }
+        catch (Exception x)
+        {
+            SelfLog.Write($"Failed to initialize {x}");
         }
     }
 
@@ -89,11 +167,7 @@ public sealed class Hanz : IIncrementalGenerator
         var logging = optionsProvider
             .Select((options, _) =>
             {
-                Logger = options is null
-                    ? NullLogger.Instance
-                    : new Logger(options.Value.Level,
-                        options.Value.FilePath);
-
+                if(options is not null) LoggerOptions = options.Value;
                 return 0;
             })
             .SelectMany((_, _) => ImmutableArray<int>.Empty);
@@ -103,15 +177,6 @@ public sealed class Hanz : IIncrementalGenerator
 
     private static LoggingOptions? GetLoggingOptions(AnalyzerConfigOptionsProvider options)
     {
-        if (!options.GlobalOptions.TryGetValue("build_property.HanzLogFilePath",
-                out var logFilePath))
-            return null;
-
-        if (string.IsNullOrWhiteSpace(logFilePath))
-            return null;
-
-        logFilePath = logFilePath.Trim();
-
         if (!options.GlobalOptions.TryGetValue("build_property.HanzLogLevel",
                 out var logLevelValue)
             || !Enum.TryParse(logLevelValue, true, out LogLevel logLevel))
@@ -119,6 +184,17 @@ public sealed class Hanz : IIncrementalGenerator
             logLevel = LogLevel.Information;
         }
 
-        return new LoggingOptions(logFilePath, logLevel);
+        if (options.GlobalOptions.TryGetValue("build_property.projectdir", out var dir))
+        {
+            var split = dir.Split(Path.DirectorySeparatorChar);
+
+            if (split.Length >= 2)
+            {
+                _rootLogger = new Logger(logLevel, Path.Combine(Logger.LogDirectory, split[split.Length - 2], "global.log"));
+                _rootLogger.DeleteLogFile();
+            }
+        }
+
+        return new LoggingOptions(logLevel);
     }
 }

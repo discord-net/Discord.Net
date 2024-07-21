@@ -5,25 +5,26 @@ using Discord.Rest.Guilds;
 
 namespace Discord.Rest.Invites;
 
+[method: TypeFactory(LastParameter = nameof(invite))]
+[ExtendInterfaceDefaults]
 public sealed partial class RestInviteActor(
     DiscordRestClient client,
-    GuildIdentity guild,
-    InviteIdentity invite
+    InviteIdentity invite,
+    GuildIdentity? guild = null
 ) :
-    RestActor<string, RestInvite, InviteIdentity>,
+    RestActor<string, RestInvite, InviteIdentity>(client, invite),
     IInviteActor
 {
-    public IInvite CreateEntity(IInviteModel model)
-    {
-
-    }
+    [SourceOfTruth]
+    internal RestInvite CreateEntity(IInviteModel model)
+        => RestInvite.Construct(Client, guild, model);
 }
 
 public sealed partial class RestInvite :
     RestEntity<string>,
-    IInvite
+    IInvite,
+    IContextConstructable<RestInvite, IInviteModel, GuildIdentity?, DiscordRestClient>
 {
-
     public InviteType Type => (InviteType)Model.Type;
 
     [SourceOfTruth]
@@ -56,17 +57,17 @@ public sealed partial class RestInvite :
 
     public RestInvite(
         DiscordRestClient client,
-        GuildIdentity guild,
-        IInviteModel model
+        IInviteModel model,
+        GuildIdentity? guild = null
     ) : base(client, model.Id)
     {
-        Actor = new(client, guild, InviteIdentity.Of(this));
+        Actor = new(client, InviteIdentity.Of(this), guild);
         Model = model;
 
-
         Guild = model.GuildId.Map(
-            static (id, client) => RestGuildActor.Factory(client, GuildIdentity.Of(id)),
-            client
+            static (id, client, guild) => RestGuildActor.Factory(client, guild ?? GuildIdentity.Of(id)),
+            client,
+            guild
         );
 
         Channel = model.ChannelId.Map(
@@ -85,13 +86,39 @@ public sealed partial class RestInvite :
         );
     }
 
+    public static RestInvite Construct(DiscordRestClient client, GuildIdentity? guild, IInviteModel model)
+        => new(client, model, guild);
+
     public ValueTask UpdateAsync(IInviteModel model, CancellationToken token = default)
     {
+        Guild = Guild.UpdateFrom(
+            model.GuildId,
+            RestGuildActor.Factory,
+            Client
+        );
+
         Channel = Channel.UpdateFrom(
             model.ChannelId,
+            RestChannelActor.Factory,
+            Client
+        );
 
-        )
+        Inviter = Inviter.UpdateFrom(
+            model.InviterId,
+            RestUserActor.Factory,
+            Client
+        );
+
+        TargetUser = TargetUser.UpdateFrom(
+            model.TargetUserId,
+            RestUserActor.Factory,
+            Client
+        );
+
+        Model = model;
+
+        return ValueTask.CompletedTask;
     }
 
-    public IInviteModel GetModel() => throw new NotImplementedException();
+    public IInviteModel GetModel() => Model;
 }

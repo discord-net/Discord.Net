@@ -9,7 +9,8 @@ public static class RefreshableTrait
     public static void Process(
         ref InterfaceDeclarationSyntax syntax,
         EntityTraits.GenerationTarget target,
-        AttributeData traitAttribute)
+        AttributeData traitAttribute,
+        Logger logger)
     {
         if (traitAttribute.ConstructorArguments.Length != 1)
             return;
@@ -19,7 +20,7 @@ public static class RefreshableTrait
 
         if (entityInterface is null)
         {
-            Hanz.Logger.Warn($"{target.InterfaceSymbol.Name}: Cannot find IEntity interface.");
+            logger.Warn($"{target.InterfaceSymbol.Name}: Cannot find IEntity interface.");
             return;
         }
 
@@ -27,7 +28,7 @@ public static class RefreshableTrait
 
         if (entityOfInterface is null)
         {
-            Hanz.Logger.Warn($"{target.InterfaceSymbol.Name}: Cannot find IEntityOf interface.");
+            logger.Warn($"{target.InterfaceSymbol.Name}: Cannot find IEntityOf interface.");
             return;
         }
 
@@ -44,7 +45,7 @@ public static class RefreshableTrait
         {
             IMethodSymbol methodSymbol => InvocationExpression(
                 routeMemberAccess,
-                EntityTraits.ParseRouteArguments(methodSymbol, target, extra =>
+                EntityTraits.ParseRouteArguments(methodSymbol, target, logger, extra =>
                 {
                     if (!extra.IsOptional)
                         return null;
@@ -185,6 +186,7 @@ public static class RefreshableTrait
                                             EntityTraits.ParseRouteArguments(
                                                 routeMethod,
                                                 target,
+                                                logger,
                                                 extra =>
                                                 {
                                                     if (extraParameters.TryGetValue(extra, out var extraSyntax))
@@ -229,6 +231,7 @@ public static class RefreshableTrait
             routeMemberAccess,
             "Discord.IFetchable",
             "FetchRoute",
+            logger.GetSubLogger("IFetchable"),
             out _
         );
             //AddRefreshRouteMethod(ref syntax, idType, modelType, routeAccessBody, refreshableInterface);

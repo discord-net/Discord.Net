@@ -52,15 +52,31 @@ public static class TypeUtils
             //     return null;
             // }
 
-            var pairImpl = Hierarchy.GetHierarchy(toPair)
-                .FirstOrDefault(x =>
-                    x.Type.IsGenericType &&
-                    x.Type.ConstructUnboundGenericType()
-                        .Equals(
-                            namedToWalk.ConstructUnboundGenericType(),
-                            SymbolEqualityComparer.Default
-                        )
-                ).Type;
+            INamedTypeSymbol pairImpl;
+
+            if (
+                toPair.IsGenericType &&
+                toPair.ConstructUnboundGenericType()
+                    .Equals(
+                        namedToWalk.ConstructUnboundGenericType(),
+                        SymbolEqualityComparer.Default
+                    )
+            )
+            {
+                pairImpl = toPair;
+            }
+            else
+            {
+                pairImpl = Hierarchy.GetHierarchy(toPair)
+                    .FirstOrDefault(x =>
+                        x.Type.IsGenericType &&
+                        x.Type.ConstructUnboundGenericType()
+                            .Equals(
+                                namedToWalk.ConstructUnboundGenericType(),
+                                SymbolEqualityComparer.Default
+                            )
+                    ).Type;
+            }
 
             if (pairImpl is null)
             {

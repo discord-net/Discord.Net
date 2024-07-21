@@ -50,7 +50,8 @@ public class ModelEquality : IGenerationTask<ModelEquality.GenerationTarget>
         return node is TypeDeclarationSyntax {AttributeLists.Count: > 0, BaseList: not null};
     }
 
-    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token)
+    public GenerationTarget? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger,
+        CancellationToken token)
     {
         if (context.Node is not TypeDeclarationSyntax {AttributeLists.Count: > 0, BaseList: not null} type) return null;
 
@@ -71,7 +72,7 @@ public class ModelEquality : IGenerationTask<ModelEquality.GenerationTarget>
         return new GenerationTarget(context.SemanticModel, typeSymbol, type);
     }
 
-    public void Execute(SourceProductionContext context, GenerationTarget? target)
+    public void Execute(SourceProductionContext context, GenerationTarget? target, Logger logger)
     {
         if (target is null) return;
 
@@ -145,7 +146,7 @@ public class ModelEquality : IGenerationTask<ModelEquality.GenerationTarget>
 
             if (equalsMethod is null)
             {
-                Hanz.Logger.Warn(
+                logger.Warn(
                     $"No properties exist on {target.TypeSymbol.ToDisplayString()} that can be used for equality");
                 return;
             }
@@ -310,7 +311,7 @@ public class ModelEquality : IGenerationTask<ModelEquality.GenerationTarget>
         }
         catch (Exception x)
         {
-            Hanz.Logger.Log(LogLevel.Error, x.ToString());
+            logger.Log(LogLevel.Error, x.ToString());
         }
     }
 

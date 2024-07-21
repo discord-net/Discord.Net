@@ -6,4 +6,6 @@ public interface IEntityModel<out T> : IEntityModel
 }
 
 public interface IEntityModel : IEquatable<IEntityModel>
-{ }
+{
+    bool IEquatable<IEntityModel>.Equals(IEntityModel? other) => Equals(this, other);
+}

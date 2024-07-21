@@ -3,6 +3,7 @@ using Discord.Models.Json;
 using Discord.Rest.Channels;
 using Discord.Rest.Extensions;
 using Discord.Rest.Guilds.Integrations;
+using Discord.Rest.Invites;
 using Discord.Rest.Stickers;
 using System.Globalization;
 
@@ -49,9 +50,10 @@ using EnumerableRolesActor =
 using EnumerableGuildStickersActor =
     RestEnumerableIndexableActor<RestGuildStickerActor, ulong, RestGuildSticker, IGuildSticker,
         IEnumerable<IGuildStickerModel>>;
-using EnumerableGuildScheduledEvent =
+using EnumerableGuildScheduledEventActor =
     RestEnumerableIndexableActor<RestGuildScheduledEventActor, ulong, RestGuildScheduledEvent, IGuildScheduledEvent,
         IEnumerable<IGuildScheduledEventModel>>;
+using EnumerableInviteActor = RestEnumerableIndexableActor<RestInviteActor, string, RestInvite, IInvite, IEnumerable<IInviteModel>>;
 
 [ExtendInterfaceDefaults(typeof(IGuildActor))]
 public partial class RestGuildActor :
@@ -64,29 +66,31 @@ public partial class RestGuildActor :
         GuildIdentity guild
     ) : base(client, guild)
     {
-        MediaChannels = RestActors.GuildRelatedEntity<RestMediaChannelActor>(client, this);
-        Channels = RestActors.GuildRelatedEntity<RestGuildChannelActor>(client, this);
-        TextChannels = RestActors.GuildRelatedEntity<RestTextChannelActor>(client, this);
-        VoiceChannels = RestActors.GuildRelatedEntity<RestVoiceChannelActor>(client, this);
-        CategoryChannels = RestActors.GuildRelatedEntity<RestCategoryChannelActor>(client, this);
-        AnnouncementChannels = RestActors.GuildRelatedEntity<RestNewsChannelActor>(client, this);
-        ThreadChannels = RestActors.GuildRelatedEntity<RestThreadChannelActor>(client, this);
-        StageChannels = RestActors.GuildRelatedEntity<RestStageChannelActor>(client, this);
-        ForumChannels = RestActors.GuildRelatedEntity<RestForumChannelActor>(client, this);
+        MediaChannels = RestActors.GuildRelatedEntity(Template.Of<RestMediaChannelActor>(), client, this);
+        Channels = RestActors.GuildRelatedEntity(Template.Of<RestGuildChannelActor>(), client, this);
+        TextChannels = RestActors.GuildRelatedEntity(Template.Of<RestTextChannelActor>(), client, this);
+        VoiceChannels = RestActors.GuildRelatedEntity(Template.Of<RestVoiceChannelActor>(), client, this);
+        CategoryChannels = RestActors.GuildRelatedEntity(Template.Of<RestCategoryChannelActor>(), client, this);
+        AnnouncementChannels = RestActors.GuildRelatedEntity(Template.Of<RestNewsChannelActor>(), client, this);
+        ThreadChannels = RestActors.GuildRelatedEntity(Template.Of<RestThreadChannelActor>(), client, this);
+        StageChannels = RestActors.GuildRelatedEntity(Template.Of<RestStageChannelActor>(), client, this);
+        ForumChannels = RestActors.GuildRelatedEntity(Template.Of<RestForumChannelActor>(), client, this);
         ActiveThreadChannels =
-            RestActors.GuildRelatedEntityWithTransform<RestThreadChannelActor, ListActiveGuildThreadsResponse>(
+            RestActors.GuildRelatedEntityWithTransform(
+                Template.Of<RestThreadChannelActor>(),
                 client,
                 this,
                 Routes.ListActiveGuildThreads(guild.Id),
                 api => api.Threads
             );
-        Integrations = RestActors.GuildRelatedEntity<RestIntegrationActor>(client, this);
+        Integrations = RestActors.GuildRelatedEntity(Template.Of<RestIntegrationActor>(), client, this);
         Bans = RestActors.Bans(client, guild);
         Members = RestActors.Members(client, guild);
-        Emotes = RestActors.GuildRelatedEntity<RestGuildEmoteActor>(client, this);
-        Roles = RestActors.GuildRelatedEntity<RestRoleActor>(client, this);
-        Stickers = RestActors.GuildRelatedEntity<RestGuildStickerActor>(client, this);
-        ScheduledEvents = RestActors.GuildRelatedEntity<RestGuildScheduledEventActor>(client, this);
+        Emotes = RestActors.GuildRelatedEntity(Template.Of<RestGuildEmoteActor>(), client, this);
+        Roles = RestActors.GuildRelatedEntity(Template.Of<RestRoleActor>(), client, this);
+        Stickers = RestActors.GuildRelatedEntity(Template.Of<RestGuildStickerActor>(), client, this);
+        ScheduledEvents = RestActors.GuildRelatedEntity(Template.Of<RestGuildScheduledEventActor>(), client, this);
+        Invites = RestActors.GuildRelatedEntity(Template.Of<RestInviteActor>(), client, this);
     }
 
     [SourceOfTruth] public EnumerableMediaChannelActor MediaChannels { get; }
@@ -121,10 +125,9 @@ public partial class RestGuildActor :
 
     [SourceOfTruth] public EnumerableGuildStickersActor Stickers { get; }
 
-    [SourceOfTruth] public EnumerableGuildScheduledEvent ScheduledEvents { get; }
+    [SourceOfTruth] public EnumerableGuildScheduledEventActor ScheduledEvents { get; }
 
-    public IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public EnumerableInviteActor Invites { get; }
 
     [SourceOfTruth]
     internal RestGuild CreateEntity(IGuildModel model)
@@ -149,8 +152,6 @@ public sealed partial class RestGuild :
     [SourceOfTruth] public RestTextChannelActor? PublicUpdatesChannel { get; private set; }
 
     [SourceOfTruth] public RestGuildMemberActor Owner { get; private set; }
-
-    //public RestManagedEnumerableActor<RestRoleActor,>
 
     public int AFKTimeout => Model.AFKTimeout;
 

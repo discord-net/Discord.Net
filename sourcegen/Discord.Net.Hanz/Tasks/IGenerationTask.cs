@@ -8,16 +8,16 @@ public interface IGenerationTask<T>
 {
     bool IsValid(SyntaxNode node, CancellationToken token = default);
 
-    T? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token = default);
+    T? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger, CancellationToken token = default);
 
-    void Execute(SourceProductionContext context, T? target);
+    void Execute(SourceProductionContext context, T? target, Logger logger);
 }
 
 public interface IGenerationCombineTask<T> where T : class, IEquatable<T>
 {
     bool IsValid(SyntaxNode node, CancellationToken token = default);
 
-    T? GetTargetForGeneration(GeneratorSyntaxContext context, CancellationToken token = default);
+    T? GetTargetForGeneration(GeneratorSyntaxContext context, Logger logger, CancellationToken token = default);
 
-    void Execute(SourceProductionContext context, ImmutableArray<T?> targets);
+    void Execute(SourceProductionContext context, ImmutableArray<T?> targets, Logger logger);
 }
