@@ -22,7 +22,7 @@ global using MemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Guilds.R
 global using UserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestUser, Discord.Rest.RestUserActor, Discord.Models.IUserModel>;
 global using ThreadMemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadMember, Discord.Rest.RestThreadMemberActor, Discord.Models.IThreadMemberModel>;
 global using SelfUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestSelfUser, Discord.Rest.RestSelfUserActor, Discord.Models.ISelfUserModel>;
-global using GuildScheduledEventIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Guilds.RestGuildScheduledEvent, Discord.Rest.Guilds.RestGuildScheduledEventActor, Discord.Models.IGuildScheduledEventModel>;
+global using GuildScheduledEventUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Entities.Users.RestGuildScheduledEventUser, Discord.Rest.Entities.Users.RestGuildScheduledEventUserActor, Discord.Models.IGuildScheduledEventUserModel>;
 
 #endregion
 
@@ -60,6 +60,12 @@ global using InviteIdentity = Discord.IIdentifiable<string, Discord.Rest.Invites
 #region Stage
 
 global using StageInstanceIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Stage.RestStageInstance, Discord.Rest.Stage.RestStageInstanceActor, Discord.Models.IStageInstanceModel>;
+
+#endregion
+
+#region Events
+
+global using GuildScheduledEventIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Guilds.RestGuildScheduledEvent, Discord.Rest.Guilds.RestGuildScheduledEventActor, Discord.Models.IGuildScheduledEventModel>;
 
 #endregion
 

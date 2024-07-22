@@ -20,6 +20,16 @@ public static class TypeUtils
         }
     }
 
+    public static IEnumerable<ITypeSymbol> GetBaseTypes(ITypeSymbol type)
+    {
+        var current = type.BaseType;
+        while (current is not null)
+        {
+            yield return current;
+            current = current.BaseType;
+        }
+    }
+
     public static INamedTypeSymbol? PairedWalkTypeSymbolForMatch(
         ITypeSymbol toFind,
         ITypeSymbol toWalk,

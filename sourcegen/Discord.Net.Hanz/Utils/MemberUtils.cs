@@ -14,7 +14,7 @@ public static class MemberUtils
         public int GetHashCode(ISymbol obj) => SymbolEqualityComparer.Default.GetHashCode(obj);
     }
 
-    private static string GetMemberName<T>(T symbol, Func<T, ImmutableArray<T>> getExplicitInterfaces) where T : ISymbol
+    public static string GetMemberName<T>(T symbol, Func<T, ImmutableArray<T>> getExplicitInterfaces) where T : ISymbol
     {
         while (true)
         {

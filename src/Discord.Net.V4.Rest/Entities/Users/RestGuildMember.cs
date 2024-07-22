@@ -14,6 +14,7 @@ public partial class RestGuildMemberActor(
     RestActor<ulong, RestGuildMember, MemberIdentity>(client, member),
     IGuildMemberActor
 {
+
     public override MemberIdentity Identity { get; } = member;
 
     [SourceOfTruth]

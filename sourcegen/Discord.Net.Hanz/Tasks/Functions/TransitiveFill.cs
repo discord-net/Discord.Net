@@ -10,7 +10,8 @@ public static class TransitiveFill
 {
     private static readonly string[] TypeBlacklists =
     [
-        "IFactory"
+        "IFactory",
+        "Discord.IProxied"
     ];
 
     public static bool IsTargetMethod(IMethodSymbol methodSymbol)
@@ -347,7 +348,7 @@ public static class TransitiveFill
                 return;
             }
 
-            if (!CanSubstitute(typeParameter, fillType))
+            if (!CanSubstitute(typeParameter, fillType, logger))
             {
                 logger.Warn($"Cannot substitute {typeParameter} to {fillType}");
                 return;
@@ -403,7 +404,7 @@ public static class TransitiveFill
         logger.LogWithDepth($"Processing {type} : {filledType}", depth);
 
         if (type is ITypeParameterSymbol constraintTypeParameter &&
-            CanSubstitute(constraintTypeParameter, filledType))
+            CanSubstitute(constraintTypeParameter, filledType, logger, depth: depth))
         {
             var notConstraint = GetNotConstraint(constraintTypeParameter);
             var interfaceConstraint = GetInterfaceConstraint(constraintTypeParameter);
@@ -422,7 +423,7 @@ public static class TransitiveFill
                     var newFillType = Hierarchy
                         .GetHierarchy(filledType)
                         .FirstOrDefault(x =>
-                            (!shouldResubstitute || CanSubstitute(constraintTypeParameter, x.Type)) &&
+                            (!shouldResubstitute || CanSubstitute(constraintTypeParameter, x.Type, logger, depth: depth)) &&
                             (!interfaceConstraint || x.Type.TypeKind is TypeKind.Interface)
                         ).Type;
 
@@ -525,7 +526,7 @@ public static class TransitiveFill
 
         if (source is ITypeParameterSymbol constraint)
         {
-            var canSubstitute = CanSubstitute(constraint, candidate);
+            var canSubstitute = CanSubstitute(constraint, candidate, logger, depth: depth);
             logger.LogWithDepth($"{source}: Can substitute? {canSubstitute}", depth);
             return canSubstitute;
         }
@@ -619,8 +620,12 @@ public static class TransitiveFill
         }).Type;
     }
 
-    private static bool CanSubstitute(ITypeParameterSymbol parameter, ITypeSymbol requested,
-        HashSet<ITypeSymbol>? checkedType = null)
+    private static bool CanSubstitute(
+        ITypeParameterSymbol parameter,
+        ITypeSymbol requested,
+        Logger logger,
+        HashSet<ITypeSymbol>? checkedType = null,
+        int depth = 0)
     {
         checkedType ??= new(SymbolEqualityComparer.Default);
 
@@ -636,13 +641,16 @@ public static class TransitiveFill
             if (checkedType.Contains(constraintType))
                 continue;
 
-            if (!CanSubstituteConstraint(requested, constraintType, checkedType))
+            if (!CanSubstituteConstraint(requested, constraintType, logger, checkedType, depth + 1))
             {
-                // check for IFactory
+                // check for blacklisted
                 if (TypeBlacklists.Any(x => constraintType.ToDisplayString().StartsWith(x)))
                 {
+                    logger.LogWithDepth($"Blacklisted constraint type {constraintType}, ignoring", depth);
                     continue;
                 }
+
+                logger.LogWithDepth($"type {requested} doesn't satisfy constraint {constraintType}", depth);
 
                 return false;
             }
@@ -653,8 +661,12 @@ public static class TransitiveFill
         return true;
     }
 
-    private static bool CanSubstituteConstraint(ITypeSymbol requested, ITypeSymbol constraint,
-        HashSet<ITypeSymbol>? checkedType = null)
+    private static bool CanSubstituteConstraint(
+        ITypeSymbol requested,
+        ITypeSymbol constraint,
+        Logger logger,
+        HashSet<ITypeSymbol>? checkedType = null,
+        int depth = 0)
     {
         checkedType ??= new(SymbolEqualityComparer.Default);
 
@@ -663,7 +675,7 @@ public static class TransitiveFill
 
         var result = constraint switch
         {
-            ITypeParameterSymbol constraintParameter => CanSubstitute(constraintParameter, requested, checkedType),
+            ITypeParameterSymbol constraintParameter => CanSubstitute(constraintParameter, requested, logger, checkedType, depth + 1),
             INamedTypeSymbol named =>
                 TryMatchTo(requested, named, matched =>
                     checkedType.Contains(matched) ||
@@ -671,7 +683,7 @@ public static class TransitiveFill
                     named.TypeArguments
                         .Select((x, i) => (Type: x, Index: i))
                         .All(x =>
-                            CanSubstituteConstraint(matched.TypeArguments[x.Index], x.Type, checkedType)
+                            CanSubstituteConstraint(matched.TypeArguments[x.Index], x.Type, logger, checkedType, depth + 1)
                         )
                 ) is not null,
             _ => true

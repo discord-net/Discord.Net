@@ -1,4 +1,5 @@
 using Discord.Models;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 

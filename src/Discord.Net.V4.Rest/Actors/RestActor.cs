@@ -1,3 +1,5 @@
+using Discord.Models;
+
 namespace Discord.Rest;
 
 public abstract class RestActor<TId, TEntity, TIdentity>(DiscordRestClient client, TIdentity identity) :

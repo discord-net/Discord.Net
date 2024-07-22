@@ -270,10 +270,15 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
         for (var index = 0; index < hierarchyOrder.Length; index++)
         {
             var target = hierarchyOrder[index];
+
             if (target is null)
             {
                 continue;
             }
+
+            var targetLogger = logger.WithSemanticContext(target.SemanticModel);
+
+            var willHaveFetchMethods = RestLoadable.WillHaveFetchMethods(target.ClassSymbol);
 
             var declaration = SyntaxFactory.ClassDeclaration(
                 [],
@@ -315,6 +320,15 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
 
                     if (implemented.Any(x => MemberUtils.Conflicts(x, member)) || !implemented.Add(member))
                         continue;
+
+                    if (
+                        willHaveFetchMethods &&
+                        member is IMethodSymbol memberMethod &&
+                        MemberUtils.GetMemberName(
+                            memberMethod,
+                            x => x.ExplicitInterfaceImplementations
+                        ) == "FetchAsync"
+                    ) continue;
 
                     var baseImplementation = baseTreeMembers
                         .FirstOrDefault(y =>

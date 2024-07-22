@@ -16,6 +16,7 @@ public partial class RestThreadChannelActor :
     IThreadChannelActor,
     IRestActor<ulong, RestThreadChannel, ThreadIdentity>
 {
+
     [method: TypeFactory]
     public RestThreadChannelActor(DiscordRestClient client,
         GuildIdentity guild,

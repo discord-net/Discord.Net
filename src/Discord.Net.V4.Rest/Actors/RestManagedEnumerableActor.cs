@@ -9,66 +9,51 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Rest;
 
-public static class RestManagedEnumerableActor
+internal static partial class RestManagedEnumerableActor
 {
-    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> Create<TActor, TId, TEntity, TCore,
-        TModel>(
+    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> Create<
+        [TransitiveFill]TActor,
+        TId,
+        TEntity,
+        [Not(nameof(TEntity)), Interface]TCore,
+        TModel,
+        [TransitiveFill] TIdentity
+    >(
+        Template<TActor> template,
         DiscordRestClient client,
         IEnumerable<TModel> models,
-        Func<TId, TActor> actorFactory,
-        IApiOutRoute<IEnumerable<TModel>> route)
-        where TActor : IRestActor<TId, TEntity>
+        [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, TIdentity, TActor> actorFactory,
+        [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, TModel, TEntity> entityFactory,
+        IApiOutRoute<IEnumerable<TModel>> route
+    )
+        where TActor :
+            class,
+            IRestActor<TId, TEntity, TIdentity>
         where TEntity :
             RestEntity<TId>,
             TCore,
             IProxied<TActor>,
-            IEntityOf<TModel>,
-            IConstructable<TEntity, TModel, DiscordRestClient>
+            IEntityOf<TModel>
         where TId : IEquatable<TId>
         where TCore : class, IEntity<TId>
         where TModel : class, IEntityModel<TId>
+        where TIdentity : IIdentifiable<TId, TEntity, TActor, TModel>
     {
         return new RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel>(
             client,
             models,
-            actorFactory,
-            model => TEntity.Construct(client, model),
-            route
-        );
-    }
-
-    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> Create<TActor, TId, TEntity, TCore,
-        TModel, TContext>(
-        DiscordRestClient client,
-        IEnumerable<TModel> models,
-        Func<TId, TActor> actorFactory,
-        IApiOutRoute<IEnumerable<TModel>> route,
-        TContext context)
-        where TActor : IRestActor<TId, TEntity>
-        where TEntity :
-        RestEntity<TId>,
-        TCore,
-        IProxied<TActor>,
-        IEntityOf<TModel>,
-        IContextConstructable<TEntity, TModel, TContext, DiscordRestClient>
-        where TId : IEquatable<TId>
-        where TCore : class, IEntity<TId>
-        where TModel : class, IEntityModel<TId>
-    {
-        return new RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel>(
-            client,
-            models,
-            actorFactory,
-            model => TEntity.Construct(client, context, model),
+            id => actorFactory(client, (TIdentity)IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
+            model => entityFactory(client, model),
             route
         );
     }
 }
 
 public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> :
+    RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>>,
     IDefinedEnumerableActor<TActor, TId, TCore>,
     IReadOnlyDictionary<TId, TEntity>
-    where TActor : IRestActor<TId, TEntity>
+    where TActor : class, IRestActor<TId, TEntity>
     where TEntity : RestEntity<TId>, TCore, IProxied<TActor>, IEntityOf<TModel>
     where TId : IEquatable<TId>
     where TCore : class, IEntity<TId>
@@ -86,30 +71,39 @@ public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TMod
 
     public int Count => All.Count;
 
-    private IEnumerable<TModel> _models;
-    private IReadOnlyCollection<TId>? _keys;
-    private IReadOnlyCollection<TEntity>? _values;
+    private ImmutableArray<TId>? _keys;
+    private ImmutableArray<TEntity>? _values;
 
-    private readonly DiscordRestClient _client;
     private readonly RestIndexableActor<TActor, TId, TEntity> _indexableActor;
     private readonly Func<TModel, TEntity> _entityFactory;
-    private readonly IApiOutRoute<IEnumerable<TModel>> _route;
 
     public RestManagedEnumerableActor(
         DiscordRestClient client,
         IEnumerable<TModel> models,
         Func<TId, TActor> actorFactory,
         Func<TModel, TEntity> entityFactory,
-        IApiOutRoute<IEnumerable<TModel>> route)
+        IApiOutRoute<IEnumerable<TModel>> route
+    ) : base(
+        actorFactory,
+        models => models.Select(entityFactory),
+        (options, token) => client.RestApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token)
+    )
     {
-        var x =
-            _client = client;
-        _models = models;
         _indexableActor = new(actorFactory);
         _entityFactory = entityFactory;
-        _route = route;
 
-        All = _models.ToImmutableDictionary(x => x.Id, _entityFactory);
+        All = models.ToImmutableDictionary(x => x.Id, _entityFactory);
+    }
+
+    internal void Update(IEnumerable<TEntity> entities)
+    {
+        var immutableEntities = entities as TEntity[] ?? entities.ToArray();
+
+        lock (this)
+        {
+            if (Values.SequenceEqual(immutableEntities))
+                All = immutableEntities.ToImmutableDictionary(x => x.Id);
+        }
     }
 
     internal void Update(IEnumerable<TModel> models)
@@ -117,31 +111,26 @@ public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TMod
         lock (this)
         {
             var entityModels = models as TModel[] ?? models.ToArray();
-
-            if (entityModels.SequenceEqual(_models))
-                return;
-
-            All = (_models = entityModels).ToImmutableDictionary(x => x.Id, _entityFactory);
-            _keys = null;
-            _values = null;
+            All = entityModels.ToImmutableDictionary(x => x.Id, _entityFactory);
         }
     }
 
+    public override TActor Specifically(TId id)
+        => All.GetValueOrDefault(id)?.ProxiedValue ?? base.Specifically(id);
+
     public bool Contains(TId id) => All.ContainsKey(id);
 
-    async ValueTask<IReadOnlyCollection<TCore>> IEnumerableActor<TId, TCore>.AllAsync(RequestOptions? options,
-        CancellationToken token)
+    public override async ValueTask<IReadOnlyCollection<TEntity>> AllAsync(RequestOptions? options = null,
+        CancellationToken token = default)
     {
-        if (options?.AllowCached ?? false)
-            return Values;
+        if ((options?.AllowCached ?? false) && _values is not null)
+            return _values;
 
-        var models = await _client.RestApiClient.ExecuteAsync(_route, options ?? _client.DefaultRequestOptions, token);
+        var entities = await base.AllAsync(options, token);
 
-        if (models is null)
-            return [];
+        Update(entities);
 
-        Update(models);
-        return Values;
+        return entities;
     }
 
     IEnumerable<TActor> IDefinedEnumerableActor<TActor, TId, TCore>.Specifically(IEnumerable<TId> ids)

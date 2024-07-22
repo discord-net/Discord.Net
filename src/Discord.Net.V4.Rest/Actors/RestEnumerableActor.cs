@@ -126,11 +126,11 @@ public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TModel>(
 {
     internal RestIndexableActor<TActor, TId, TEntity> IndexableActor { get; } = new(actorFactory);
 
-    public async ValueTask<IReadOnlyCollection<TEntity>> AllAsync(RequestOptions? options = null,
+    public virtual async ValueTask<IReadOnlyCollection<TEntity>> AllAsync(
+        RequestOptions? options = null,
         CancellationToken token = default)
     {
-        var model = await fetch(options,
-            token); //await client.ApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token);
+        var model = await fetch(options, token);
 
         if (model is null)
             return [];
@@ -138,7 +138,7 @@ public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TModel>(
         return factory(model).ToImmutableArray();
     }
 
-    public TActor Specifically(TId id) => IndexableActor.Specifically(id);
+    public virtual TActor Specifically(TId id) => IndexableActor.Specifically(id);
 
     async ValueTask<IReadOnlyCollection<TCore>> IEnumerableActor<TId, TCore>.AllAsync(
         RequestOptions? options,

@@ -9,7 +9,7 @@ public class Guild :
     IModelSource,
     IModelSourceOfMultiple<IRoleModel>,
     IModelSourceOfMultiple<IGuildEmoteModel>,
-    IModelSourceOfMultiple<IStickerModel>
+    IModelSourceOfMultiple<IGuildStickerModel>
 {
     [JsonPropertyName("icon_hash")]
     public Optional<string?> IconHash { get; set; }
@@ -113,7 +113,7 @@ public class Guild :
 
     IEnumerable<IGuildEmoteModel> IModelSourceOfMultiple<IGuildEmoteModel>.GetModels() => Emojis;
 
-    IEnumerable<IStickerModel> IModelSourceOfMultiple<IStickerModel>.GetModels() => Stickers | [];
+    IEnumerable<IGuildStickerModel> IModelSourceOfMultiple<IGuildStickerModel>.GetModels() => Stickers | [];
 
     public virtual IEnumerable<IEntityModel> GetDefinedModels()
     {

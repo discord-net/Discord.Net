@@ -172,45 +172,45 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                     ) == 0
                 ) continue;
 
-                var proxiedInterfaceTypeSyntax = SyntaxFactory.GenericName(
-                    SyntaxFactory.Identifier("Discord.IProxied"),
-                    SyntaxFactory.TypeArgumentList(
-                        SyntaxFactory.SeparatedList([
-                            SyntaxFactory.ParseTypeName(targetInterface.ToDisplayString())
-                        ])
-                    )
-                );
+                // var proxiedInterfaceTypeSyntax = SyntaxFactory.GenericName(
+                //     SyntaxFactory.Identifier("Discord.IProxied"),
+                //     SyntaxFactory.TypeArgumentList(
+                //         SyntaxFactory.SeparatedList([
+                //             SyntaxFactory.ParseTypeName(targetInterface.ToDisplayString())
+                //         ])
+                //     )
+                // );
 
-                if (syntax.BaseList?.Types.All(x => !x.Type.IsEquivalentTo(proxiedInterfaceTypeSyntax)) ?? false)
-                {
-                    syntax = syntax
-                        .AddBaseListTypes(
-                            SyntaxFactory.SimpleBaseType(
-                                proxiedInterfaceTypeSyntax
-                            )
-                        )
-                        .AddMembers(
-                            SyntaxFactory.PropertyDeclaration(
-                                [],
-                                [],
-                                SyntaxFactory.ParseTypeName(targetInterface.ToDisplayString()),
-                                SyntaxFactory.ExplicitInterfaceSpecifier(
-                                    proxiedInterfaceTypeSyntax
-                                ),
-                                SyntaxFactory.Identifier("ProxiedValue"),
-                                null,
-                                SyntaxFactory.ArrowExpressionClause(
-                                    SyntaxFactory.MemberAccessExpression(
-                                        SyntaxKind.SimpleMemberAccessExpression,
-                                        SyntaxFactory.ThisExpression(),
-                                        SyntaxFactory.IdentifierName(property.Name)
-                                    )
-                                ),
-                                null,
-                                SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                            )
-                        );
-                }
+                // if (syntax.BaseList?.Types.All(x => !x.Type.IsEquivalentTo(proxiedInterfaceTypeSyntax)) ?? false)
+                // {
+                //     syntax = syntax
+                //         .AddBaseListTypes(
+                //             SyntaxFactory.SimpleBaseType(
+                //                 proxiedInterfaceTypeSyntax
+                //             )
+                //         )
+                //         .AddMembers(
+                //             SyntaxFactory.PropertyDeclaration(
+                //                 [],
+                //                 [],
+                //                 SyntaxFactory.ParseTypeName(targetInterface.ToDisplayString()),
+                //                 SyntaxFactory.ExplicitInterfaceSpecifier(
+                //                     proxiedInterfaceTypeSyntax
+                //                 ),
+                //                 SyntaxFactory.Identifier("ProxiedValue"),
+                //                 null,
+                //                 SyntaxFactory.ArrowExpressionClause(
+                //                     SyntaxFactory.MemberAccessExpression(
+                //                         SyntaxKind.SimpleMemberAccessExpression,
+                //                         SyntaxFactory.ThisExpression(),
+                //                         SyntaxFactory.IdentifierName(property.Name)
+                //                     )
+                //                 ),
+                //                 null,
+                //                 SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                //             )
+                //         );
+                // }
             }
 
             var rootProxiedInterfaceTypeSyntax = SyntaxFactory.GenericName(
@@ -269,10 +269,15 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
         return symbol switch
         {
             IPropertySymbol {IsStatic: false, ExplicitInterfaceImplementations.Length: 0} => true,
-            IMethodSymbol {IsStatic: false, MethodKind: MethodKind.Ordinary} => true,
+            IMethodSymbol
+            {
+                IsStatic: false, MethodKind: MethodKind.Ordinary or MethodKind.ExplicitInterfaceImplementation
+            } => true,
             _ => false
         };
     }
+
+    //private static bool
 
     private static int AddProxiedMembers(
         ref ClassDeclarationSyntax classDeclarationSyntax,
@@ -294,6 +299,8 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
             )
         );
 
+        var willHaveFetchMethods = RestLoadable.WillHaveFetchMethods(targetSymbol);
+
         var implementedMembers = TypeUtils.GetBaseTypesAndThis(proxiedTo.Type)
             .SelectMany(x => x.GetMembers())
             .Distinct(SymbolEqualityComparer.Default)
@@ -304,11 +311,50 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
             if (!shouldAdd?.Invoke(member) ?? false)
                 continue;
 
+            var targetExplicitImplementation = targetSymbol.FindImplementationForInterfaceMember(member);
+            var proxiedTypeExplicitImplementation = proxiedTo.Type.FindImplementationForInterfaceMember(member);
+
+            var proxyHasUniqueImplementation = !proxiedTypeExplicitImplementation?.ContainingType.Equals(
+                member.ContainingType,
+                SymbolEqualityComparer.Default
+            ) ?? false;
+
+            var targetHasUniqueImplementation = !targetExplicitImplementation?.ContainingType.Equals(
+                member.ContainingType,
+                SymbolEqualityComparer.Default
+            ) ?? false;
+
+            if (targetHasUniqueImplementation && !proxyHasUniqueImplementation)
+            {
+                logger.Warn($"{targetSymbol}: Skipping {member}, unique implementation");
+                continue;
+            }
+
             if (
-                targetSymbol.FindImplementationForInterfaceMember(member) is not null ||
-                Hierarchy.GetHierarchy(targetSymbol).Any(x =>
-                    x.Type.FindImplementationForInterfaceMember(member) is not null)
-            ) continue;
+                member.IsVirtual &&
+                !targetHasUniqueImplementation &&
+                !proxyHasUniqueImplementation
+            )
+            {
+                logger.Warn(
+                    $"{targetSymbol}: Skipping {member}, implemented in {targetExplicitImplementation} and {proxiedTypeExplicitImplementation}"
+                );
+                continue;
+            }
+
+            if (willHaveFetchMethods &&
+                member is IMethodSymbol memberMethod &&
+                MemberUtils.GetMemberName(memberMethod, x => x.ExplicitInterfaceImplementations) == "FetchAsync")
+            {
+                // only proxy if the result of fetch async isn't assignable to this but assignable to the proxies
+                var restEntity = RestLoadable.GetRestEntity(targetSymbol, semanticModel);
+
+                if(restEntity is null || memberMethod.ReturnType is not INamedTypeSymbol {Name: "ValueTask"} returnType)
+                    continue;
+
+                if (semanticModel.Compilation.HasImplicitConversion(restEntity, returnType.TypeArguments[0]))
+                    continue;
+            }
 
             var targetImplementation = implementedMembers
                 .FirstOrDefault(x =>
@@ -330,6 +376,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                 );
 
             var canProxyToSelfImplementation =
+                !proxyHasUniqueImplementation &&
                 targetImplementation is not null &&
                 MemberUtils.CanOverride(targetImplementation, member, semanticModel.Compilation);
 
@@ -384,7 +431,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                     )
                 );
 
-            var shouldImplementMember = !selfHasTargetImplementation || (targetImplementation?.IsOverride ?? false);
+            var shouldImplementMember = !proxyHasUniqueImplementation && (!selfHasTargetImplementation || (targetImplementation?.IsOverride ?? false));
 
             switch (member)
             {
@@ -414,7 +461,8 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                             SyntaxFactory.Token(SyntaxKind.SemicolonToken)
                         );
 
-                        if (classDeclarationSyntax.Members.All(x => x.WithLeadingTrivia(null).ToString() != propertySyntax.ToString()))
+                        if (classDeclarationSyntax.Members.All(x =>
+                                x.WithLeadingTrivia(null).ToString() != propertySyntax.ToString()))
                         {
                             classDeclarationSyntax = classDeclarationSyntax
                                 .AddMembers(
@@ -518,7 +566,8 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                             SyntaxFactory.Token(SyntaxKind.SemicolonToken)
                         );
 
-                        if (classDeclarationSyntax.Members.All(x => x.WithLeadingTrivia(null).ToString() != methodSyntax.ToString()))
+                        if (classDeclarationSyntax.Members.All(x =>
+                                x.WithLeadingTrivia(null).ToString() != methodSyntax.ToString()))
                         {
                             classDeclarationSyntax = classDeclarationSyntax.AddMembers(
                                 methodSyntax

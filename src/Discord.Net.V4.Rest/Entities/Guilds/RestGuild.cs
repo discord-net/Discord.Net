@@ -58,9 +58,15 @@ using EnumerableInviteActor =
     RestEnumerableIndexableActor<RestInviteActor, string, RestInvite, IInvite, IEnumerable<IInviteModel>>;
 using EnumerableWebhookActor =
     RestEnumerableIndexableActor<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
+using ManagedRolesActor =
+    RestManagedEnumerableActor<RestRoleActor, ulong, RestRole, IRole, IRoleModel>;
+using ManagedEmotesActor =
+    RestManagedEnumerableActor<RestGuildEmoteActor, ulong, RestGuildEmote, IGuildEmote, IGuildEmoteModel>;
+using ManagedStickersActor =
+    RestManagedEnumerableActor<RestGuildStickerActor, ulong, RestGuildSticker, IGuildSticker, IGuildStickerModel>;
 
 [ExtendInterfaceDefaults(typeof(IGuildActor))]
-public partial class RestGuildActor :
+public sealed partial class RestGuildActor :
     RestActor<ulong, RestGuild, GuildIdentity>,
     IGuildActor
 {
@@ -94,9 +100,20 @@ public partial class RestGuildActor :
         Integrations = RestActors.GuildRelatedEntity(Template.Of<RestIntegrationActor>(), client, this);
         Bans = RestActors.Bans(client, guild);
         Members = RestActors.Members(client, guild);
-        Emotes = RestActors.GuildRelatedEntity(Template.Of<RestGuildEmoteActor>(), client, this);
-        Roles = RestActors.GuildRelatedEntity(Template.Of<RestRoleActor>(), client, this);
-        Stickers = RestActors.GuildRelatedEntity(Template.Of<RestGuildStickerActor>(), client, this);
+
+        if (guild.Detail is IdentityDetail.Entity && guild.Entity is not null)
+        {
+            Roles = guild.Entity.Roles;
+            Stickers = guild.Entity.Stickers;
+            Emotes = guild.Entity.Emotes;
+        }
+        else
+        {
+            Emotes = RestActors.GuildRelatedEntity(Template.Of<RestGuildEmoteActor>(), client, this);
+            Roles = RestActors.GuildRelatedEntity(Template.Of<RestRoleActor>(), client, this);
+            Stickers = RestActors.GuildRelatedEntity(Template.Of<RestGuildStickerActor>(), client, this);
+        }
+
         ScheduledEvents = RestActors.GuildRelatedEntity(Template.Of<RestGuildScheduledEventActor>(), client, this);
 
         Invites = RestActors.Fetchable(
@@ -188,6 +205,10 @@ public sealed partial class RestGuild :
 
     [SourceOfTruth] public RestGuildMemberActor Owner { get; private set; }
 
+    [SourceOfTruth] public ManagedRolesActor Roles { get; }
+    [SourceOfTruth] public ManagedEmotesActor Emotes { get; }
+    [SourceOfTruth] public ManagedStickersActor Stickers { get; }
+
     public int AFKTimeout => Model.AFKTimeout;
 
     public bool IsWidgetEnabled => Model.WidgetEnabled;
@@ -250,10 +271,52 @@ public sealed partial class RestGuild :
     ) : base(client, model)
     {
         _model = model;
-        Actor = actor ?? new(client, GuildIdentity.Of(this));
 
-        if (model is not IModelSourceOfMultiple<IRoleModel> roles)
-            throw new ArgumentException($"{nameof(model)} must provide a collection of {nameof(IRoleModel)}.");
+        if (
+            model is not (
+            IModelSourceOfMultiple<IRoleModel> roles and
+            IModelSourceOfMultiple<IGuildStickerModel> stickers and
+            IModelSourceOfMultiple<IGuildEmoteModel> emotes
+            )
+        ) throw new ArgumentException($"{nameof(model)} must provide a collection of roles, stickers, and emotes.");
+
+        var identity = GuildIdentity.Of(this);
+
+        Emotes = RestManagedEnumerableActor.Create(
+            Template.Of<RestGuildEmoteActor>(),
+            client,
+            emotes.GetModels(),
+            RestGuildEmoteActor.Factory,
+            identity,
+            entityFactory: RestGuildEmote.Construct,
+            identity,
+            IGuildEmote.FetchManyRoute(this)
+        );
+
+        Stickers = RestManagedEnumerableActor.Create(
+            Template.Of<RestGuildStickerActor>(),
+            client,
+            stickers.GetModels(),
+            RestGuildStickerActor.Factory,
+            identity,
+            entityFactory: RestGuildSticker.Construct,
+            identity,
+            IGuildSticker.FetchManyRoute(this)
+        );
+
+        Roles = RestManagedEnumerableActor.Create(
+            Template.Of<RestRoleActor>(),
+            client,
+            roles.GetModels(),
+            RestRoleActor.Factory,
+            identity,
+            entityFactory: RestRole.Construct,
+            identity,
+            IRole.FetchManyRoute(this)
+        );
+
+        Actor = actor ?? new(client, identity);
+
 
         // Roles = RestManagedEnumerableActor.Create<RestRoleActor, ulong, RestRole, IRole, IRoleModel, GuildIdentity>(
         //     client,
@@ -337,6 +400,9 @@ public sealed partial class RestGuild :
 
     public ValueTask UpdateAsync(IGuildModel model, CancellationToken token = default)
     {
+        if (model is IModelSourceOfMultiple<IRoleModel> roles)
+            Roles.Update(roles.GetModels());
+
         AFKChannel = AFKChannel.UpdateFrom(
             model.AFKChannelId,
             RestVoiceChannelActor.Factory,
