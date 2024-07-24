@@ -1,6 +1,7 @@
 using Discord.Models;
 using Discord.Rest.Actors;
 using Discord.Rest.Channels;
+using Discord.Rest.Guilds;
 using Discord.Rest.Webhooks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -8,12 +9,17 @@ using System.Text.Json;
 
 namespace Discord.Rest;
 
+using GuildsPager = RestPagedIndexableActor<RestGuildActor, ulong, RestGuild, RestPartialGuild, IEnumerable<IPartialGuildModel>, PageUserGuildsParams>;
+
 public sealed partial class DiscordRestClient : IDiscordClient
 {
-    [SourceOfTruth]
-    public RestSelfUserActor SelfUser { get; }
+    //[SourceOfTruth]
+    public RestSelfUserActor CurrentUser { get; }
 
-    public IPagedIndexableActor<IGuildActor, ulong, IGuild, IPartialGuild, PageUserGuildsParams> Guilds => throw new NotImplementedException();
+    ISelfUserActor IDiscordClient.CurrentUser => CurrentUser;
+
+    [SourceOfTruth]
+    public GuildsPager Guilds { get; }
 
     [SourceOfTruth]
     public RestIndexableActor<RestChannelActor, ulong, RestChannel> Channels { get; }
@@ -47,16 +53,19 @@ public sealed partial class DiscordRestClient : IDiscordClient
 
     public DiscordRestClient(DiscordConfig config, ILogger<DiscordRestClient> logger)
     {
-        RestApiClient = new(this, config.Token);
         Config = config;
+        Config.JsonSerializerOptions.MakeReadOnly(true);
+
+        RestApiClient = new(this, config.Token);
         RateLimiter = new();
         Logger = logger;
 
-        SelfUser = new RestSelfUserActor(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
+        CurrentUser = new RestSelfUserActor(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
         Channels = new(id => new RestChannelActor(this, ChannelIdentity.Of(id)));
         Users = new(id => new RestUserActor(this, UserIdentity.Of(id)));
         Webhooks = new(id => new RestWebhookActor(this, WebhookIdentity.Of(id)));
-        CurrentUserThreadMemberIdentity = ThreadMemberIdentity.Of(SelfUser.Id);
+        CurrentUserThreadMemberIdentity = ThreadMemberIdentity.Of(CurrentUser.Id);
+        Guilds = RestActors.PagedGuilds(this);
     }
 
     public void Dispose()

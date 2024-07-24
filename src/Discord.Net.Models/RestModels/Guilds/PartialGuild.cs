@@ -14,7 +14,7 @@ public class PartialGuild : IPartialGuildModel
     public Optional<string?> Splash { get; set; }
 
     [JsonPropertyName("banner")]
-    public Optional<string?> BannerHash { get; set; }
+    public Optional<string?> Banner { get; set; }
 
     [JsonPropertyName("description")]
     public Optional<string?> Description { get; set; }
@@ -48,7 +48,7 @@ public class PartialGuild : IPartialGuildModel
 
     string? IPartialGuildModel.SplashId => ~Splash;
 
-    string? IPartialGuildModel.BannerId => ~BannerHash;
+    string? IPartialGuildModel.BannerId => ~Banner;
 
     string? IPartialGuildModel.Description => ~Description;
 

@@ -27,7 +27,7 @@ public partial class RestThreadChannelActor :
 
         MessageChannelActor = new RestMessageChannelActor(client, thread);
 
-        currentThreadMember ??= ThreadMemberIdentity.Of(client.SelfUser.Id);
+        currentThreadMember ??= ThreadMemberIdentity.Of(client.CurrentUser.Id);
 
         CurrentThreadMember = currentThreadMember.Actor ?? new(
             client,
@@ -172,11 +172,11 @@ public partial class RestThreadChannel :
         IThreadChannelModel? model)
     {
         return ThreadMemberIdentity.OfNullable(
-            model?.GetReferencedEntityModel<ulong, IThreadMemberModel>(client.SelfUser.Id),
+            model?.GetReferencedEntityModel<ulong, IThreadMemberModel>(client.CurrentUser.Id),
             model => RestThreadMember.Construct(client, new RestThreadMember.Context(
                 guild,
                 thread
             ), model)
-        ) ?? ThreadMemberIdentity.Of(client.SelfUser.Id);
+        ) ?? ThreadMemberIdentity.Of(client.CurrentUser.Id);
     }
 }

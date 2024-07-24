@@ -7,6 +7,8 @@ namespace Discord.Converters;
 
 public sealed class EmoteConverter : JsonConverter<IEmoteModel>
 {
+    public static readonly EmoteConverter Instance = new();
+
     public override IEmoteModel? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var doc = JsonDocument.ParseValue(ref reader).RootElement;

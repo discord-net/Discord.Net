@@ -1,9 +1,10 @@
+using Discord.Converters;
 using Discord.Models;
 using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class User : ISelfUserModel
+public sealed class User :  ISelfUserModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -12,7 +13,7 @@ public sealed class User : ISelfUserModel
     public required string Username { get; set; }
 
     [JsonPropertyName("discriminator")]
-    public required ushort Discriminator { get; set; }
+    public required string Discriminator { get; set; }
 
     [JsonPropertyName("global_name")]
     public string? GlobalName { get; set; }

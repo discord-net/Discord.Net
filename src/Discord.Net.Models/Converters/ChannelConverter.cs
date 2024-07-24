@@ -15,6 +15,8 @@ public sealed class ChannelTypeOfAttribute(uint type) : Attribute
 
 public class ChannelConverter : TypeUnionConverter<ChannelModel, uint>
 {
+    public static readonly ChannelConverter Instance = new();
+
     protected override bool UseGenericAsDefault => true;
     protected override string UnionDelimiterName => "type";
 

@@ -171,46 +171,6 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                         shouldAdd: member => addedMembers.Add(member)
                     ) == 0
                 ) continue;
-
-                // var proxiedInterfaceTypeSyntax = SyntaxFactory.GenericName(
-                //     SyntaxFactory.Identifier("Discord.IProxied"),
-                //     SyntaxFactory.TypeArgumentList(
-                //         SyntaxFactory.SeparatedList([
-                //             SyntaxFactory.ParseTypeName(targetInterface.ToDisplayString())
-                //         ])
-                //     )
-                // );
-
-                // if (syntax.BaseList?.Types.All(x => !x.Type.IsEquivalentTo(proxiedInterfaceTypeSyntax)) ?? false)
-                // {
-                //     syntax = syntax
-                //         .AddBaseListTypes(
-                //             SyntaxFactory.SimpleBaseType(
-                //                 proxiedInterfaceTypeSyntax
-                //             )
-                //         )
-                //         .AddMembers(
-                //             SyntaxFactory.PropertyDeclaration(
-                //                 [],
-                //                 [],
-                //                 SyntaxFactory.ParseTypeName(targetInterface.ToDisplayString()),
-                //                 SyntaxFactory.ExplicitInterfaceSpecifier(
-                //                     proxiedInterfaceTypeSyntax
-                //                 ),
-                //                 SyntaxFactory.Identifier("ProxiedValue"),
-                //                 null,
-                //                 SyntaxFactory.ArrowExpressionClause(
-                //                     SyntaxFactory.MemberAccessExpression(
-                //                         SyntaxKind.SimpleMemberAccessExpression,
-                //                         SyntaxFactory.ThisExpression(),
-                //                         SyntaxFactory.IdentifierName(property.Name)
-                //                     )
-                //                 ),
-                //                 null,
-                //                 SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                //             )
-                //         );
-                // }
             }
 
             var rootProxiedInterfaceTypeSyntax = SyntaxFactory.GenericName(
@@ -277,8 +237,6 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
         };
     }
 
-    //private static bool
-
     private static int AddProxiedMembers(
         ref ClassDeclarationSyntax classDeclarationSyntax,
         INamedTypeSymbol toProxy,
@@ -339,6 +297,12 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                 logger.Warn(
                     $"{targetSymbol}: Skipping {member}, implemented in {targetExplicitImplementation} and {proxiedTypeExplicitImplementation}"
                 );
+                continue;
+            }
+
+            if (targetHasUniqueImplementation && member.IsAbstract)
+            {
+                logger.Log($"{targetSymbol}: Skipping {member}, abstract implementation in target");
                 continue;
             }
 

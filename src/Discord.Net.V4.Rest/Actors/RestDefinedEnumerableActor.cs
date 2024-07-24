@@ -11,27 +11,25 @@ public static partial class RestDefinedEnumerableActor
         TEntity,
         [Not(nameof(TEntity)), Interface]TCoreEntity,
         TModel,
-        TIdentity,
         [TransitiveFill] TSource
     >(
         TSource source,
         IEnumerable<TId> ids,
-        [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, TIdentity, TActor> actorFactory,
+        [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, IIdentifiable<TId, TEntity, TActor, TModel>, TActor> actorFactory,
         [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, TModel, TEntity> entityFactory
      )
         where TSource : IRestClientProvider, IPathable
         where TActor :
             class,
-            IRestActor<TId, TEntity, TIdentity>
+            IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>>
         where TId : IEquatable<TId>
         where TEntity : RestEntity<TId>, TCoreEntity
         where TCoreEntity : class, IEntity<TId>, IEntityOf<TModel>, IFetchableOfMany<TId, TModel>
         where TModel : class, IEntityModel<TId>
-        where TIdentity : IIdentifiable<TId, TEntity, TActor, TModel>
     {
         return new RestDefinedEnumerableActor<TActor, TId, TEntity, TCoreEntity, IEnumerable<TModel>>(
             ids,
-            id => actorFactory(source.Client, (TIdentity)IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
+            id => actorFactory(source.Client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
             models => models.Select(model => entityFactory(source.Client, model)),
             (options, token) => source.Client.RestApiClient.ExecuteAsync(
                 TCoreEntity.FetchManyRoute(source),

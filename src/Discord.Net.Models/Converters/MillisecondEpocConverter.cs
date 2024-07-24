@@ -5,6 +5,8 @@ namespace Discord.Converters;
 
 public sealed class MillisecondEpocConverter : JsonConverter<DateTimeOffset>
 {
+    public static readonly MillisecondEpocConverter Instance = new();
+
     public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return reader.TokenType is JsonTokenType.Null

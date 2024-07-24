@@ -74,6 +74,9 @@ public sealed class Logger : ILogger, IEquatable<Logger>
 
     public void DeleteLogFile()
     {
+        if (_logFilePath.Contains("roslyn"))
+            return;
+
         if (File.Exists(_logFilePath))
             File.Delete(_logFilePath);
     }
@@ -86,6 +89,9 @@ public sealed class Logger : ILogger, IEquatable<Logger>
     public void Log(LogLevel logLevel, string message)
     {
         if (!IsEnabled(logLevel))
+            return;
+
+        if (_logFilePath.Contains("roslyn"))
             return;
 
         try

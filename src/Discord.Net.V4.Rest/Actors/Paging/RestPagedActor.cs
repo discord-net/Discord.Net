@@ -6,6 +6,26 @@ using Discord.Rest.Channels;
 
 namespace Discord.Rest;
 
+public sealed class RestPagedIndexableActor<TActor, TId, TEntity, TPagedEntity, TModel, TParams>(
+    DiscordRestClient client,
+    Func<TId, TActor> actorFactory,
+    Func<TParams?, IApiOutRoute<TModel>> initial,
+    Func<EntityPager<TPagedEntity, TModel>, TModel, IEnumerable<TPagedEntity>> factory,
+    Func<EntityPager<TPagedEntity, TModel>, TModel, TParams?, IApiOutRoute<TModel>?> nextPage,
+    int? defaultPageSize = null
+):
+    RestPagedActor<TId, TPagedEntity, TModel, TParams>(client, initial, factory, nextPage, defaultPageSize),
+    IPagedIndexableActor<TActor, TId, TEntity, TPagedEntity, TParams>
+    where TActor : IActor<TId, TEntity>
+    where TId : IEquatable<TId>
+    where TEntity : RestEntity<TId>
+    where TPagedEntity : RestEntity<TId>
+    where TModel : class
+    where TParams : IPagingParams
+{
+    public TActor Specifically(TId id) => actorFactory(id);
+}
+
 public sealed class RestPagedIndexableActor<TActor, TId, TEntity, TModel, TParams>(
     DiscordRestClient client,
     Func<TId, TActor> actorFactory,

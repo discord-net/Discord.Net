@@ -15,7 +15,7 @@ public interface IDiscordClient :
     /// <summary>
     ///     Gets the currently logged-in user.
     /// </summary>
-    ISelfUserActor SelfUser { get; }
+    ISelfUserActor CurrentUser { get; }
 
     IPagedIndexableActor<IGuildActor, ulong, IGuild, IPartialGuild, PageUserGuildsParams> Guilds { get; }
 

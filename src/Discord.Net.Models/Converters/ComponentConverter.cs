@@ -12,6 +12,8 @@ public sealed class ComponentTypeAttribute(uint type) : Attribute
 
 public sealed class ComponentConverter : TypeUnionConverter<MessageComponent, uint>
 {
+    public static readonly ComponentConverter Instance = new();
+
     private static readonly Dictionary<uint, Type> ComponentTypes;
     protected override bool UseGenericAsDefault { get; } = false;
     protected override string UnionDelimiterName { get; } = "type";

@@ -1,3 +1,6 @@
+using Discord.Models.Json;
+using System.Text.Json.Serialization;
+
 namespace Discord.Models;
 
 [ModelEquality]

@@ -7,10 +7,27 @@ public static class Hierarchy
 {
     private static readonly Dictionary<ITypeSymbol, List<SortedHierarchySymbol>> _cache = new(SymbolEqualityComparer.Default);
 
-    public readonly struct SortedHierarchySymbol(int distance, INamedTypeSymbol type)
+    public readonly struct SortedHierarchySymbol(int distance, INamedTypeSymbol type) : IEquatable<SortedHierarchySymbol>
     {
         public readonly int Distance = distance;
         public readonly INamedTypeSymbol Type = type;
+
+        public bool Equals(SortedHierarchySymbol other)
+            => Distance == other.Distance && Type.Equals(other.Type, SymbolEqualityComparer.Default);
+
+        public override bool Equals(object? obj) => obj is SortedHierarchySymbol other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Distance * 397) ^ SymbolEqualityComparer.Default.GetHashCode(Type);
+            }
+        }
+
+        public static bool operator ==(SortedHierarchySymbol left, SortedHierarchySymbol right) => left.Equals(right);
+
+        public static bool operator !=(SortedHierarchySymbol left, SortedHierarchySymbol right) => !left.Equals(right);
     }
 
     public static IEnumerable<T> OrderByHierarchy<T>(

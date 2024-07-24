@@ -10,7 +10,7 @@ public abstract class RestActor<TId, TEntity, TIdentity>(DiscordRestClient clien
 {
     public DiscordRestClient Client { get; } = client;
 
-    public TId Id => Identity.Id;
+    public TId Id { get; } = identity.Id;
 
     public virtual TIdentity Identity { get; } = identity;
 

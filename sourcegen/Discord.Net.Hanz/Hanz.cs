@@ -33,7 +33,8 @@ public sealed class Hanz : IIncrementalGenerator
                 ? other.Value is null
                 : other.Value is not null && Value.Equals(other.Value);
 
-        public readonly override int GetHashCode() => Value is null ? 0 : EqualityComparer<T>.Default.GetHashCode(Value);
+        public readonly override int GetHashCode() =>
+            Value is null ? 0 : EqualityComparer<T>.Default.GetHashCode(Value);
     }
 
     public static void RegisterTask<T>(IncrementalGeneratorInitializationContext context, IGenerationTask<T> task)
@@ -153,6 +154,32 @@ public sealed class Hanz : IIncrementalGenerator
                     _registerCombineTaskMethod.MakeGenericMethod(generationInterface.GenericTypeArguments[0])
                         .Invoke(null, [context, Activator.CreateInstance(task)]);
             }
+
+            var jsonTaskLogger = Logger.CreateForTask("JsonModels");
+
+            context.RegisterSourceOutput(
+                context.SyntaxProvider
+                    .CreateSyntaxProvider(
+                        (node, _) => node is ClassDeclarationSyntax,
+                        (context, _) => JsonModels.GetTarget(context)
+                    )
+                    .Collect()
+                    .Combine(context.CompilationProvider)
+                    .Combine(context.AnalyzerConfigOptionsProvider.Select((options, _) =>
+                    {
+                        TryGetProjectName(options, out var projectName);
+                        options.GlobalOptions.TryGetValue("build_property.RootNamespace", out var rootNameSpace);
+                        return (ProjectName: projectName, RootNameSpace: rootNameSpace);
+                    })),
+                (productionContext, data) =>
+                {
+                    var logger = jsonTaskLogger;
+                    if (data.Right.ProjectName is not null)
+                        logger = logger.GetSubLogger(data.Right.ProjectName).WithCleanLogFile();
+
+                    JsonModels.Execute(productionContext, data, logger);
+                }
+            );
         }
         catch (Exception x)
         {
@@ -167,7 +194,7 @@ public sealed class Hanz : IIncrementalGenerator
         var logging = optionsProvider
             .Select((options, _) =>
             {
-                if(options is not null) LoggerOptions = options.Value;
+                if (options is not null) LoggerOptions = options.Value;
                 return 0;
             })
             .SelectMany((_, _) => ImmutableArray<int>.Empty);
@@ -184,17 +211,30 @@ public sealed class Hanz : IIncrementalGenerator
             logLevel = LogLevel.Information;
         }
 
+        if (TryGetProjectName(options, out var projectName) && projectName is not null)
+        {
+            _rootLogger = new Logger(logLevel,
+                Path.Combine(Logger.LogDirectory, projectName, "global.log"));
+            _rootLogger.DeleteLogFile();
+        }
+
+        return new LoggingOptions(logLevel);
+    }
+
+    private static bool TryGetProjectName(AnalyzerConfigOptionsProvider options, out string? project)
+    {
+        project = null;
+
         if (options.GlobalOptions.TryGetValue("build_property.projectdir", out var dir))
         {
             var split = dir.Split(Path.DirectorySeparatorChar);
 
-            if (split.Length >= 2)
+            if (split.Length >= 2 && split[split.Length - 2].Contains("Discord"))
             {
-                _rootLogger = new Logger(logLevel, Path.Combine(Logger.LogDirectory, split[split.Length - 2], "global.log"));
-                _rootLogger.DeleteLogFile();
+                project = split[split.Length - 2];
             }
         }
 
-        return new LoggingOptions(logLevel);
+        return project is not null;
     }
 }

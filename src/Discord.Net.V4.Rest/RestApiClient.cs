@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Discord.Rest;
 
@@ -12,6 +13,7 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
 {
     private readonly DiscordRestClient _restClient;
     private readonly HttpClient _httpClient;
+
     internal RestApiClient(DiscordRestClient client, DiscordToken token)
     {
         _restClient = client;
@@ -20,11 +22,34 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
             BaseAddress = new Uri(client.Config.APIUrl),
             DefaultRequestHeaders =
             {
-                { "Authorization", $"{token.Type} {token.Value}" },
-                { "User-Agent",    DiscordConfig.UserAgent       }
+                {"Authorization", $"{token.Type} {token.Value}"}, {"User-Agent", DiscordConfig.UserAgent}
             }
         };
     }
+
+    // private async ValueTask<JsonTypeInfo> GetJsonTypeInfoAsync<T>()
+    // {
+    //
+    //     // var type = typeof(T);
+    //     //
+    //     // if (type.IsInterface)
+    //     // {
+    //     //     if (!Models.ModelInterfaceJsonMap.Map.TryGetValue(type, out type))
+    //     //         throw new NotSupportedException($"Couldn't find json type info for {type}");
+    //     // }
+    //     //
+    //     // var context = await Models.ModelInterfaceJsonMap.GetContextForTypeAsync(
+    //     //     type,
+    //     //     _restClient.Config.JsonSerializerOptions
+    //     // ) ?? throw new NotSupportedException($"Couldn't find json type info for {type}");
+    //     //
+    //     // return context.GetTypeInfo(type) ?? throw new NotSupportedException($"Couldn't find json type info for {type} ({typeof(T)})");
+    //
+    //     // if(!Models.ModelInterfaceJsonMap.JsonTypeInfoMap.TryGetValue(type, out var infoFactory))
+    //     //     throw new NotSupportedException($"Couldn't find json type info for {type}");
+    //     //
+    //     // return infoFactory();
+    // }
 
     public Task ExecuteAsync(IApiRoute route, RequestOptions options, CancellationToken token)
         => SendAsync(
@@ -40,7 +65,7 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
     public async Task<T?> ExecuteAsync<T>(IApiOutRoute<T> outRoute, RequestOptions options, CancellationToken token)
         where T : class
     {
-         var result = await SendAsync(
+        var result = await SendAsync(
             outRoute,
             new HttpRequestMessage(
                 ToHttpMethod(outRoute.Method),
@@ -48,12 +73,16 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
             ),
             options,
             token
-         );
+        );
 
-         if (result is null)
-             return null;
+        if (result is null)
+            return null;
 
-         return await JsonSerializer.DeserializeAsync<T>(result, _restClient.Config.JsonSerializerOptions, token);
+        return await JsonSerializer.DeserializeAsync<T>(
+            result,
+            _restClient.Config.JsonSerializerOptions,
+            token
+        );
     }
 
     public Task ExecuteAsync<T>(IApiInRoute<T> route, RequestOptions options, CancellationToken token)
@@ -62,26 +91,31 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
         var request = new HttpRequestMessage(
             ToHttpMethod(route.Method),
             route.Endpoint
-        ) { Content = EncodeBodyContent(route.RequestBody, route.ContentType) };
+        ) {Content = EncodeBodyContent(route.RequestBody, route.ContentType)};
 
         return SendAsync(route, request, options, token);
     }
 
-    public async Task<U?> ExecuteAsync<T, U>(IApiInOutRoute<T, U> route, RequestOptions options, CancellationToken token)
+    public async Task<U?> ExecuteAsync<T, U>(IApiInOutRoute<T, U> route, RequestOptions options,
+        CancellationToken token)
         where T : class
         where U : class
     {
         var request = new HttpRequestMessage(
             ToHttpMethod(route.Method),
             route.Endpoint
-        ) { Content = EncodeBodyContent(route.RequestBody, route.ContentType) };
+        ) {Content = EncodeBodyContent(route.RequestBody, route.ContentType)};
 
         var result = await SendAsync(route, request, options, token);
 
         if (result is null)
             return null;
 
-        return await JsonSerializer.DeserializeAsync<U>(result, _restClient.Config.JsonSerializerOptions, token);
+        return await JsonSerializer.DeserializeAsync<U>(
+            result,
+            _restClient.Config.JsonSerializerOptions,
+            token
+        );
     }
 
     private async Task<Stream?> SendAsync(
@@ -90,7 +124,7 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
         RequestOptions options,
         CancellationToken token = default)
     {
-        if(options.AuditLogReason is not null)
+        if (options.AuditLogReason is not null)
             request.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(options.AuditLogReason));
 
         _restClient.Logger.LogDebug("Acquiring a bucket ratelimit contract for {}", route);
@@ -203,11 +237,12 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
                 if (body is not IDictionary<string, object?> parts)
                     throw new InvalidCastException("Cannot convert multipart data to dictionary");
 
-                var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
+                var content =
+                    new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
 
                 foreach (var part in parts)
                 {
-                    if(part.Value is null)
+                    if (part.Value is null)
                         continue;
 
                     HttpContent partContent = part.Value switch

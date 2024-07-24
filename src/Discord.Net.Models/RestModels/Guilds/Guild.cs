@@ -69,9 +69,6 @@ public class Guild :
     [JsonPropertyName("max_members")]
     public Optional<int> MaxMembers { get; set; }
 
-    [JsonPropertyName("banner")]
-    public string? Banner { get; set; }
-
     [JsonPropertyName("premium_tier")]
     public int PremiumTier { get; set; }
 
@@ -95,9 +92,11 @@ public class Guild :
 
     [JsonPropertyName("safety_alerts_channel_id")]
     public Optional<ulong?> SafetyAlertsChannelId { get; set; }
+
     public IEnumerable<ulong> RoleIds => Roles.Select(x => x.Id);
     int? IGuildModel.MaxPresence => ~MaxPresences;
     int? IGuildModel.MaxMembers => ~MaxMembers;
+    string? IGuildModel.Banner => Banner.GetValueOrDefault();
     bool IGuildModel.PremiumProgressBarEnabled => PremiumProgressBarEnabled;
     ulong? IGuildModel.SafetyAlertsChannelId => ~SafetyAlertsChannelId;
     int? IGuildModel.MaxVideoChannelUsers => ~MaxVideoChannelUsers;

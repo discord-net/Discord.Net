@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.API.Gateway
 {
-    internal sealed class ExtendedGuild : Guild
+    public sealed class ExtendedGuild : Guild
     {
         [JsonPropertyName("unavailable")]
         public bool? Unavailable { get; set; }

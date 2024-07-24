@@ -16,19 +16,18 @@ internal static partial class RestManagedEnumerableActor
         TId,
         TEntity,
         [Not(nameof(TEntity)), Interface]TCore,
-        TModel,
-        [TransitiveFill] TIdentity
+        TModel
     >(
         Template<TActor> template,
         DiscordRestClient client,
         IEnumerable<TModel> models,
-        [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, TIdentity, TActor> actorFactory,
+        [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, IIdentifiable<TId, TEntity, TActor, TModel>, TActor> actorFactory,
         [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, TModel, TEntity> entityFactory,
         IApiOutRoute<IEnumerable<TModel>> route
     )
         where TActor :
             class,
-            IRestActor<TId, TEntity, TIdentity>
+            IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>>
         where TEntity :
             RestEntity<TId>,
             TCore,
@@ -37,12 +36,11 @@ internal static partial class RestManagedEnumerableActor
         where TId : IEquatable<TId>
         where TCore : class, IEntity<TId>
         where TModel : class, IEntityModel<TId>
-        where TIdentity : IIdentifiable<TId, TEntity, TActor, TModel>
     {
         return new RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel>(
             client,
             models,
-            id => actorFactory(client, (TIdentity)IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
+            id => actorFactory(client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
             model => entityFactory(client, model),
             route
         );

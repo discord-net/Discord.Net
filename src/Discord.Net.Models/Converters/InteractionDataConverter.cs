@@ -12,8 +12,9 @@ public sealed class InteractionDataTypeAttribute(uint type) : Attribute
 
 public sealed class InteractionDataConverter : TypeUnionConverter<InteractionData, uint>
 {
-    private static readonly Dictionary<uint, Type> InteractionDataTypes;
+    public static readonly InteractionDataConverter Instance = new();
 
+    private static readonly Dictionary<uint, Type> InteractionDataTypes;
     protected override bool UseGenericAsDefault => false;
     protected override string UnionDelimiterName => "type";
 

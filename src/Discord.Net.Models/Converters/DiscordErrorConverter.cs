@@ -9,6 +9,8 @@ namespace Discord.Converters;
 
 public sealed class DiscordErrorConverter : JsonConverter<DiscordError>
 {
+    public static readonly DiscordErrorConverter Instance = new();
+
     public override DiscordError? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var obj = JsonDocument.ParseValue(ref reader).RootElement;

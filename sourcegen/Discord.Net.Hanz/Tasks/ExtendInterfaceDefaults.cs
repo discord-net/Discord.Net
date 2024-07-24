@@ -112,7 +112,8 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
             {
                 return x switch
                 {
-                    IPropertySymbol prop => prop is {IsVirtual: true, ExplicitInterfaceImplementations.Length: 0},
+                    IPropertySymbol prop => prop is {ExplicitInterfaceImplementations.Length: 0} &&
+                                            (prop.IsVirtual || prop is {IsVirtual: false, IsAbstract: false}),
                     IMethodSymbol method => method is
                     {
                         IsVirtual: true, IsAsync: false, MethodKind: MethodKind.Ordinary,

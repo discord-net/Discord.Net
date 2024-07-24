@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <EnablePreviewFeatures>True</EnablePreviewFeatures>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Discord.Net.V4.Core\Discord.Net.V4.Core.csproj" />
+      <ProjectReference Include="..\..\src\Discord.Net.V4.Rest\Discord.Net.V4.Rest.csproj" />
+    </ItemGroup>
+
+</Project>

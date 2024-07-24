@@ -21,7 +21,6 @@ public partial class RestRoleActor(
         => RestRole.Construct(Client, Guild.Identity, model);
 }
 
-
 [ExtendInterfaceDefaults]
 public sealed partial class RestRole :
     RestEntity<ulong>,

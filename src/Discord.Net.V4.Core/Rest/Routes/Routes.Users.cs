@@ -24,14 +24,15 @@ public static partial class Routes
         new ApiInOutRoute<ModifyCurrentUserParams, User>(nameof(ModifyCurrentUser), RequestMethod.Patch, "users/@me",
             body);
 
-    public static IApiOutRoute<IEnumerable<PartialGuild>> GetCurrentUserGuilds(ulong? before = null,
+    public static IApiOutRoute<IEnumerable<PartialGuild>> GetCurrentUserGuilds(
+        ulong? before = null,
         ulong? after = null, int? limit = null,
-        bool? withCounts = null)
-        => new ApiOutRoute<IEnumerable<PartialGuild>>(
-            nameof(GetCurrentUserGuilds),
-            RequestMethod.Get,
-            $"users/@me/guilds{RouteUtils.GetUrlEncodedQueryParams(("before", before), ("after", after), ("limit", limit), ("with_counts", withCounts))}"
-        );
+        bool? withCounts = null
+    ) => new ApiOutRoute<IEnumerable<PartialGuild>>(
+        nameof(GetCurrentUserGuilds),
+        RequestMethod.Get,
+        $"users/@me/guilds{RouteUtils.GetUrlEncodedQueryParams(("before", before), ("after", after), ("limit", limit), ("with_counts", withCounts))}"
+    );
 
     public static IApiOutRoute<GuildMember> GetCurrentUserGuildMember([IdHeuristic<IGuild>] ulong guildId)
         => new ApiOutRoute<GuildMember>(nameof(GetCurrentUserGuildMember),

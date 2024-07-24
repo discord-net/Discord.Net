@@ -68,8 +68,7 @@ public partial interface IRole :
     /// <returns>
     ///     An image url of the icon role.
     /// </returns>
-    string? IconUrl
-        => CDN.GetGuildRoleIconUrl(Client.Config, Id, IconId);
+    sealed string? IconUrl => CDN.GetGuildRoleIconUrl(Client.Config, Id, IconId);
 
     /// <summary>
     ///     Gets the unicode emoji of this role.

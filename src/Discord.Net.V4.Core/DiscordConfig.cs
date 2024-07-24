@@ -1,3 +1,4 @@
+using Discord.Converters;
 using System.Reflection;
 using System.Text.Json;
 
@@ -185,7 +186,7 @@ public class DiscordConfig
     /// </returns>
     public string InviteUrl { get; set; } = "https://discord.gg/";
 
-    public JsonSerializerOptions? JsonSerializerOptions { get; set; }
+    public JsonSerializerOptions JsonSerializerOptions { get; set; } = Models.ModelJsonContext.Default.Options;
 
     /// <summary>
     ///     Gets or sets how a request should act in the case of an error, by default.

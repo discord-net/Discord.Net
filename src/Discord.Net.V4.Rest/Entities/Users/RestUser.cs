@@ -29,7 +29,7 @@ public partial class RestUser :
 {
     public string? AvatarId => Model.Avatar;
 
-    public ushort Discriminator => Model.Discriminator;
+    public ushort Discriminator => ushort.Parse(Model.Discriminator);
 
     public string Username => Model.Username;
 

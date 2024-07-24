@@ -4,7 +4,7 @@ namespace Discord.Models;
 public partial interface IUserModel : IEntityModel<ulong>
 {
     string Username { get; }
-    ushort Discriminator { get; }
+    string Discriminator { get; }
     string? GlobalName { get; }
     string? Avatar { get; }
     bool? IsBot { get; }

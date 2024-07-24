@@ -12,7 +12,7 @@ file sealed class CastedIdentifiable<
     TDestinationModel,
     TDestinationEntity>(
     IIdentifiable<TId, TSourceEntity, TSourceModel> source
-):
+) :
     IIdentifiable<TId, TDestinationEntity, TDestinationModel>
     where TId : IEquatable<TId>
     where TSourceEntity : class, IEntity<TId>, IEntityOf<TSourceModel>
@@ -52,7 +52,7 @@ file sealed class CastedIdentifiable<
     TDestinationActor,
     TDestinationEntity>(
     IIdentifiable<TId, TSourceEntity, TSourceActor, TSourceModel> source
-):
+) :
     IIdentifiable<TId, TDestinationEntity, TDestinationActor, TDestinationModel>
     where TId : IEquatable<TId>
     where TSourceEntity : class, IEntity<TId>, IEntityOf<TSourceModel>
@@ -73,7 +73,7 @@ file sealed class CastedIdentifiable<
             if (actor is null)
                 return null;
 
-            if(actor is not TDestinationActor destinationActor)
+            if (actor is not TDestinationActor destinationActor)
                 throw new InvalidOperationException(
                     $"Expected an actor of type {typeof(TDestinationActor).Name}, but got {actor.GetType().Name}"
                 );
@@ -282,16 +282,28 @@ public interface IIdentifiable<TId, out TEntity, out TModel> :
         IEntityModel model,
         TId id,
         TClient client)
-        where TConstruct : class, TEntity, IConstructable<TConstruct, TModel, TClient>
+        where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
         where TClient : IDiscordClient
-        => FromReferenced(model, id, model => TConstruct.Construct(client, model));
+        => FromReferenced(
+            model,
+            id,
+            model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
+                $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
+            )
+        );
 
     static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct>(
         IEntityModel model,
         TId id,
         IDiscordClient client)
-        where TConstruct : class, TEntity, IConstructable<TConstruct, TModel>
-        => FromReferenced(model, id, model => TConstruct.Construct(client, model));
+        where TConstruct : class, IConstructable<TConstruct, TModel>
+        => FromReferenced(
+            model,
+            id,
+            model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
+                $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
+            )
+        );
 
     static IIdentifiable<TId, TEntity, TModel> FromReferenced(
         IEntityModel model,
@@ -336,16 +348,28 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
         IEntityModel model,
         TId id,
         TClient client)
-        where TConstruct : class, TEntity, IConstructable<TConstruct, TModel, TClient>
+        where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
         where TClient : IDiscordClient
-        => FromReferenced(model, id, model => TConstruct.Construct(client, model));
+        => FromReferenced(
+            model,
+            id,
+            model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
+                $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
+            )
+        );
 
     new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct>(
         IEntityModel model,
         TId id,
         IDiscordClient client)
-        where TConstruct : class, TEntity, IConstructable<TConstruct, TModel>
-        => FromReferenced(model, id, model => TConstruct.Construct(client, model));
+        where TConstruct : class, IConstructable<TConstruct, TModel>
+        => FromReferenced(
+            model,
+            id,
+            model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
+                $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
+            )
+        );
 
     new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced(
         IEntityModel model,
