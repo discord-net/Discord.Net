@@ -316,11 +316,14 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
                 {
                     if (target.ClassSymbol.GetMembers(member.Name).Length > 0)
                     {
+                        targetLogger.Log($"{target.ClassSymbol}: Skipping {member} (first-party implementation)");
                         continue;
                     }
 
                     if (implemented.Any(x => MemberUtils.Conflicts(x, member)) || !implemented.Add(member))
-                        continue;
+                    {
+                        targetLogger.Log($"{target.ClassSymbol}: Skipping {member} (conflicting member)");
+                    }
 
                     if (
                         willHaveFetchMethods &&
@@ -329,14 +332,21 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
                             memberMethod,
                             x => x.ExplicitInterfaceImplementations
                         ) == "FetchAsync"
-                    ) continue;
+                    )
+                    {
+                        targetLogger.Log($"{target.ClassSymbol}: Skipping {member} (fetch async target)");
+                        continue;
+                    }
 
-                    var baseImplementation = baseTreeMembers
+                    targetLogger.Log($"{target.ClassSymbol}: Adding {member}");
+
+                    var baseOverridableImplementation = baseTreeMembers
                         .FirstOrDefault(y =>
+                            MemberUtils.Conflicts(member, y) &&
                             MemberUtils.CanOverride(member, y, target.SemanticModel.Compilation)
                         );
 
-                    var shouldBeNew = baseImplementation is null &&
+                    var shouldBeNew = baseOverridableImplementation is null &&
                                       baseTreeMembers
                                           .Any(x =>
                                               MemberUtils.Conflicts(x, member)
@@ -346,19 +356,23 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
                         SyntaxFactory.Token(SyntaxKind.PublicKeyword)
                     );
 
-                    if (bases.Contains(target.ClassSymbol) && baseImplementation is null)
+                    if (bases.Contains(target.ClassSymbol) && baseOverridableImplementation is null)
+                    {
+                        targetLogger.Log($"{target.ClassSymbol}: {member} -> virtual");
                         modifiers = modifiers.Add(SyntaxFactory.Token(SyntaxKind.VirtualKeyword));
+                    }
 
-                    if (baseImplementation is not null &&
-                        MemberUtils.CanOverride(
-                            member,
-                            baseImplementation,
-                            target.SemanticModel.Compilation
-                        ))
+                    if (baseOverridableImplementation is not null)
+                    {
+                        targetLogger.Log($"{target.ClassSymbol}: {member} -> override ({baseOverridableImplementation})");
                         modifiers = modifiers.Add(SyntaxFactory.Token(SyntaxKind.OverrideKeyword));
+                    }
 
                     if (shouldBeNew)
+                    {
+                        targetLogger.Log($"{target.ClassSymbol}: {member} -> new");
                         modifiers = modifiers.Add(SyntaxFactory.Token(SyntaxKind.NewKeyword));
+                    }
 
                     switch (member)
                     {
@@ -394,9 +408,7 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
                                     SyntaxFactory.Comment($"// {property}")
                                 )
                             );
-
                             break;
-
                         case IMethodSymbol methodSymbol:
                             var methodName = methodSymbol.ExplicitInterfaceImplementations.Length > 0
                                 ? methodSymbol.ExplicitInterfaceImplementations[0].Name

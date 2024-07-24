@@ -124,6 +124,7 @@ public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TModel>(
     where TActor : IActor<TId, TEntity>
     where TCore : class, IEntity<TId>
 {
+    public TActor this[TId id] => Specifically(id);
     internal RestIndexableActor<TActor, TId, TEntity> IndexableActor { get; } = new(actorFactory);
 
     public virtual async ValueTask<IReadOnlyCollection<TEntity>> AllAsync(

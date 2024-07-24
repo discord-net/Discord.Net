@@ -31,9 +31,13 @@ public static class MemberUtils
             IPropertySymbol propA when b is IPropertySymbol propB =>
                 GetMemberName(propA, x => x.ExplicitInterfaceImplementations) ==
                 GetMemberName(propB, x => x.ExplicitInterfaceImplementations) ||
-                propA.Type.Equals(
-                    propB.Type,
-                    SymbolEqualityComparer.Default
+                (
+                    GetMemberName(propA, x => x.ExplicitInterfaceImplementations) ==
+                    GetMemberName(propB, x => x.ExplicitInterfaceImplementations) &&
+                    propA.Type.Equals(
+                        propB.Type,
+                        SymbolEqualityComparer.Default
+                    )
                 ),
             IMethodSymbol methodA when b is IMethodSymbol methodB =>
                 GetMemberName(methodA, x => x.ExplicitInterfaceImplementations) ==
@@ -51,8 +55,8 @@ public static class MemberUtils
     {
         return targetSymbol switch
         {
-            IPropertySymbol propA when baseSymbol is IPropertySymbol propB
-                => propA.Type.Equals(
+            IPropertySymbol propA when baseSymbol is IPropertySymbol propB =>
+                propA.Type.Equals(
                     propB.Type,
                     SymbolEqualityComparer.Default
                 ) || compilation.HasImplicitConversion(propA.Type, propB.Type),

@@ -186,6 +186,7 @@ public sealed partial class RestGuildActor :
         => RestGuildMember.Construct(Client, Identity, model);
 }
 
+[ExtendInterfaceDefaults]
 public sealed partial class RestGuild :
     RestPartialGuild,
     IGuild,

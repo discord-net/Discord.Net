@@ -68,7 +68,7 @@ public partial interface IGuild :
     /// <returns>
     ///     A URL pointing to the guild's icon; <see langword="null" /> if none is set.
     /// </returns>
-    string? IconUrl => CDN.GetGuildIconUrl(Client.Config, Id, IconId);
+    sealed string? IconUrl => CDN.GetGuildIconUrl(Client.Config, Id, IconId);
 
     /// <summary>
     ///     Gets the URL of this guild's splash image.
@@ -76,7 +76,7 @@ public partial interface IGuild :
     /// <returns>
     ///     A URL pointing to the guild's splash image; <see langword="null" /> if none is set.
     /// </returns>
-    string? SplashUrl => CDN.GetGuildSplashUrl(Client.Config, Id, SplashId);
+    sealed string? SplashUrl => CDN.GetGuildSplashUrl(Client.Config, Id, SplashId);
 
     /// <summary>
     ///     Gets the ID of this guild's discovery splash image.
@@ -92,7 +92,7 @@ public partial interface IGuild :
     /// <returns>
     ///     A URL pointing to the guild's discovery splash image; <see langword="null" /> if none is set.
     /// </returns>
-    string? DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Client.Config, Id, DiscoverySplashId);
+    sealed string? DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Client.Config, Id, DiscoverySplashId);
 
     IVoiceChannelActor? AFKChannel { get; }
     ITextChannelActor? WidgetChannel { get; }
@@ -120,7 +120,7 @@ public partial interface IGuild :
     /// <returns>
     ///     A URL pointing to the guild's banner image; <see langword="null" /> if none is set.
     /// </returns>
-    string? BannerUrl => CDN.GetGuildBannerUrl(Client.Config, Id, BannerId, ImageFormat.Auto);
+    sealed string? BannerUrl => CDN.GetGuildBannerUrl(Client.Config, Id, BannerId, ImageFormat.Auto);
 
     /// <summary>
     ///     Gets the flags for the types of system channel messages that are disabled.
@@ -201,7 +201,7 @@ public partial interface IGuild :
     /// <returns>
     ///     A <see cref="int" /> representing the maximum bitrate value allowed by Discord in this guild.
     /// </returns>
-    int MaxBitrate
+    sealed int MaxBitrate
         => PremiumTier switch
         {
             PremiumTier.Tier1 => 128000,
@@ -247,7 +247,7 @@ public partial interface IGuild :
     /// <summary>
     ///     Gets the upload limit in bytes for this guild. This number is dependent on the guild's boost status.
     /// </summary>
-    ulong MaxUploadLimit
+    sealed ulong MaxUploadLimit
         => (ulong)(PremiumTier switch
         {
             PremiumTier.Tier2 => 50,

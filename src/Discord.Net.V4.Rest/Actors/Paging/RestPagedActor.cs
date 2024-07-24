@@ -6,7 +6,7 @@ using Discord.Rest.Channels;
 
 namespace Discord.Rest;
 
-public sealed class RestPagedIndexableActor<TActor, TId, TEntity, TPagedEntity, TModel, TParams>(
+public sealed partial class RestPagedIndexableActor<TActor, TId, TEntity, TPagedEntity, TModel, TParams>(
     DiscordRestClient client,
     Func<TId, TActor> actorFactory,
     Func<TParams?, IApiOutRoute<TModel>> initial,
@@ -23,6 +23,8 @@ public sealed class RestPagedIndexableActor<TActor, TId, TEntity, TPagedEntity, 
     where TModel : class
     where TParams : IPagingParams
 {
+    public TActor this[TId id] => Specifically(id);
+
     public TActor Specifically(TId id) => actorFactory(id);
 }
 

@@ -2,6 +2,7 @@ using Discord.Models;
 
 namespace Discord.Rest.Guilds;
 
+[ExtendInterfaceDefaults]
 public class RestPartialGuild(DiscordRestClient client, IPartialGuildModel model) :
     RestEntity<ulong>(client, model.Id),
     IPartialGuild,

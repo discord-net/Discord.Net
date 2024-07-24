@@ -138,6 +138,7 @@ public partial interface IGuildActor :
         return result.Select(CreateEntity).ToImmutableArray();
     }
 
+    [return: TypeHeuristic(nameof(IEntityProvider<IGuildMember, IMemberModel>.CreateEntity))]
     async Task<IGuildMember> AddGuildMemberAsync(
         EntityOrId<ulong, IUser> user,
         string accessToken,
