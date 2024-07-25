@@ -44,6 +44,7 @@ public sealed class RestPagedIndexableActor<TActor, TId, TEntity, TModel, TParam
     where TModel : class
     where TParams : IPagingParams
 {
+    public TActor this[TId id] => Specifically(id);
     internal RestIndexableActor<TActor, TId, TEntity> IndexerActor { get; } = new(actorFactory);
     public TActor Specifically(TId id) => IndexerActor.Specifically(id);
 }

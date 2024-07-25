@@ -3,6 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Determines whether the object is mentionable or not.
 /// </summary>
+[TemplateExtension]
 public interface IMentionable
 {
     /// <summary>

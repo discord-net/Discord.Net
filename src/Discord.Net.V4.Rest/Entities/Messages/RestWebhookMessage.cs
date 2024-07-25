@@ -14,7 +14,13 @@ public partial class RestWebhookMessageActor(
     RestMessageActor(client, channel, message, guild),
     IWebhookMessageActor
 {
+    internal GuildIdentity? GuildIdentity { get; } = guild;
+
     [SourceOfTruth] public RestWebhookActor Webhook { get; } = webhook.Actor ?? new(client, webhook);
+
+    [SourceOfTruth]
+    internal override RestWebhookMessage CreateEntity(IMessageModel model)
+        => RestWebhookMessage.Construct(Client, new(GuildIdentity, Channel.MessageChannelIdentity, Webhook.Identity), model);
 }
 
 public sealed partial class RestWebhookMessage :

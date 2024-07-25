@@ -7,6 +7,7 @@ namespace Discord;
 internal sealed class RefreshableAttribute(string route) : Attribute;
 #pragma warning restore CS9113 // Parameter is unread.
 
+[TemplateExtension]
 public interface IRefreshable<in TSelf, TId, TModel> :
     IFetchable<TId, TModel>,
     IUpdatable<TModel>,

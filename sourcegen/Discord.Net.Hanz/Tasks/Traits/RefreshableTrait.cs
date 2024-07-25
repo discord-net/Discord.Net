@@ -136,7 +136,9 @@ public static class RefreshableTrait
                 ),
                 MethodDeclaration(
                     [],
-                    [],
+                    TokenList(
+                        Token(SyntaxKind.SealedKeyword)
+                    ),
                     IdentifierName("Task"),
                     null,
                     Identifier("RefreshAsync"),

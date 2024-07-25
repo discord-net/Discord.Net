@@ -66,7 +66,17 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
         if (symbol is null)
             return null;
 
-        var targetInterfaces = GetTargetInterfaces(symbol);
+        var targetInterfaces = GetTargetInterfaces(symbol, logger);
+
+        logger.Log($"{symbol} has {targetInterfaces?.Length} targets");
+
+        if (targetInterfaces.HasValue)
+        {
+            foreach (var iface in targetInterfaces.Value)
+            {
+                logger.Log($" - {iface}");
+            }
+        }
 
         if (targetInterfaces is null)
             return null;
@@ -79,159 +89,373 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
         );
     }
 
-    private static ImmutableArray<ITypeSymbol>? GetTargetInterfaces(ITypeSymbol symbol)
+    private static bool IsTemplateExtensionInterface(INamedTypeSymbol symbol)
+    {
+        return symbol
+            .GetAttributes()
+            .Any(y => y.AttributeClass?.ToDisplayString() == "Discord.TemplateExtensionAttribute");
+    }
+
+    public static HashSet<INamedTypeSymbol> CorrectTemplateExtensionInterfaces(IEnumerable<INamedTypeSymbol> elements)
+    {
+        var rootSet = new HashSet<INamedTypeSymbol>(elements, SymbolEqualityComparer.Default);
+        var templates = rootSet
+            .Where(IsTemplateExtensionInterface)
+            .ToImmutableHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+        // we only want to return the lower-order version of the template extension, this computation isn't fast but
+        // it works.
+        foreach (var element in templates)
+        {
+            if (templates.Any(x => x.AllInterfaces.Contains(element, SymbolEqualityComparer.Default)))
+            {
+                rootSet.Remove(element);
+            }
+
+            // take precedence into effect
+            var attribute = element.GetAttributes().First(x =>
+                x.AttributeClass?.ToDisplayString() == "Discord.TemplateExtensionAttribute"
+            );
+
+            var precedenceOverType = attribute.NamedArguments
+                .FirstOrDefault(x => x.Key == "TakesPrecedenceOver")
+                .Value.Value;
+
+            if (precedenceOverType is INamedTypeSymbol namedType)
+            {
+                foreach (var toRemove in templates.Where(x => TypeUtils.TypeLooselyEquals(x, namedType)))
+                {
+                    rootSet.Remove(toRemove);
+                }
+            }
+        }
+
+        return rootSet;
+    }
+
+    public static HashSet<INamedTypeSymbol> GetTemplateExtensionInterfaces(
+        ITypeSymbol symbol)
+    {
+        return CorrectTemplateExtensionInterfaces(
+            symbol.AllInterfaces
+                .Where(IsTemplateExtensionInterface)
+        );
+    }
+
+    public static ImmutableArray<ITypeSymbol>? GetTargetInterfaces(
+        ITypeSymbol symbol,
+        Logger logger)
     {
         var attribute = symbol.GetAttributes().FirstOrDefault(x =>
             x.AttributeClass?.ToDisplayString() == "Discord.ExtendInterfaceDefaultsAttribute"
         );
 
-        if (attribute?.ConstructorArguments.Length != 1)
-        {
+        if (attribute is null)
             return null;
-        }
 
-        if (attribute.ConstructorArguments[0].Values.Length == 0)
+        if (
+            attribute.ConstructorArguments.Length == 0 ||
+            attribute.ConstructorArguments[0].Values.Length == 0)
         {
             return
                 attribute.NamedArguments
                     .FirstOrDefault(x => x.Key == "ExtendAll")
                     .Value.Value as bool? ?? false
                     ? symbol.AllInterfaces.CastArray<ITypeSymbol>()
-                    : symbol.Interfaces.CastArray<ITypeSymbol>();
+                    : symbol.Interfaces.CastArray<ITypeSymbol>()
+                        .AddRange(GetTemplateExtensionInterfaces(symbol));
         }
 
-        return attribute.ConstructorArguments[0].Values.Select(x => x.Value).OfType<ITypeSymbol>().ToImmutableArray();
+        return attribute.ConstructorArguments[0].Values
+            .Select(x => x.Value)
+            .OfType<ITypeSymbol>()
+            .Concat(GetTemplateExtensionInterfaces(symbol))
+            .ToImmutableArray();
     }
 
-    private static IEnumerable<ISymbol> GetTargetMembersForImplementation(IEnumerable<ITypeSymbol> symbols)
-        => symbols.SelectMany(GetTargetMembersForImplementation);
+    public static IEnumerable<ISymbol> GetTargetMembersForImplementation(
+        IEnumerable<ITypeSymbol> symbols,
+        ITypeSymbol classSymbol)
+        => symbols.SelectMany(x => GetTargetMembersForImplementation(x, classSymbol));
 
-    private static IEnumerable<ISymbol> GetTargetMembersForImplementation(ITypeSymbol symbols)
+    public static IEnumerable<ISymbol> GetTargetMembersForImplementation(
+        ITypeSymbol interfaceSymbol,
+        ITypeSymbol classSymbol)
     {
-        return symbols.GetMembers().Where(x =>
-            {
-                return x switch
+        var willHaveFetchMethods = RestLoadable.WillHaveFetchMethods(classSymbol);
+        var isTemplateExtensionInterface =
+            interfaceSymbol is INamedTypeSymbol namedInterfaceSymbol &&
+            IsTemplateExtensionInterface(namedInterfaceSymbol);
+
+        return interfaceSymbol.GetMembers()
+            .Where(x =>
                 {
-                    IPropertySymbol prop => prop is {ExplicitInterfaceImplementations.Length: 0} &&
-                                            (prop.IsVirtual || prop is {IsVirtual: false, IsAbstract: false}),
-                    IMethodSymbol method => method is
+                    if (willHaveFetchMethods &&
+                        x is IMethodSymbol memberMethod &&
+                        MemberUtils.GetMemberName(
+                            memberMethod,
+                            x => x.ExplicitInterfaceImplementations
+                        ) == "FetchAsync")
+                        return false;
+
+                    if (
+                        isTemplateExtensionInterface &&
+                        (
+                            !classSymbol.FindImplementationForInterfaceMember(x)
+                                ?.ContainingType
+                                .Equals(x.ContainingType, SymbolEqualityComparer.Default) ?? false
+                        )
+                    )
                     {
-                        IsVirtual: true, IsAsync: false, MethodKind: MethodKind.Ordinary,
-                        ExplicitInterfaceImplementations.Length: 0
-                    },
-                    _ => false
-                };
-            }
-        );
+                        // template has a different definition, don't include this member
+                        return false;
+                    }
+
+                    return x switch
+                    {
+                        IPropertySymbol prop => prop is
+                                                {
+                                                    IsStatic: false, ExplicitInterfaceImplementations.Length: 0
+                                                } &&
+                                                (prop.IsVirtual || prop is {IsVirtual: false, IsAbstract: false}),
+                        IMethodSymbol method => method is
+                        {
+                            MethodKind: MethodKind.Ordinary,
+                            ExplicitInterfaceImplementations.Length: 0,
+                            IsStatic: false,
+                        } && (method.IsVirtual || method is {IsVirtual: false, IsAbstract: false}),
+                        _ => false
+                    };
+                }
+            );
     }
 
-    private static ITypeSymbol UnAsyncType(ITypeSymbol type)
+    private static ITypeSymbol ReplaceTypeReference(
+        ITypeSymbol toReplaceIn,
+        ITypeSymbol toReplace,
+        ITypeSymbol replacement)
     {
-        return type is INamedTypeSymbol
+        if (toReplaceIn.Equals(toReplace, SymbolEqualityComparer.Default))
+            return replacement;
+
+        if (toReplaceIn is not INamedTypeSymbol {IsGenericType: true} namedToReplaceIn) return toReplaceIn;
+
+        foreach (var typeArg in namedToReplaceIn.TypeArguments)
         {
-            IsGenericType: true,
-            Name: "ValueTask" or "Task"
-        } asyncType
-            ? asyncType.TypeArguments[0]
-            : type;
+            if (typeArg is not INamedTypeSymbol namedTypeArg) continue;
+
+            var replaced = ReplaceTypeReference(namedTypeArg, toReplace, replacement);
+
+            if (!replaced.Equals(namedTypeArg, SymbolEqualityComparer.Default))
+            {
+                toReplaceIn = namedToReplaceIn
+                    .ConstructedFrom
+                    .Construct(
+                        namedToReplaceIn.TypeArguments.Replace(namedTypeArg, replaced).ToArray()
+                    );
+            }
+        }
+
+        return toReplaceIn;
     }
 
-    private static ITypeSymbol GetTargetTypeForImplementation(
+    public static ITypeSymbol GetTargetTypeForImplementation(
         ISymbol targetMember,
         ITypeSymbol exampleCase,
         INamedTypeSymbol target,
-        SemanticModel semanticModel)
+        SemanticModel semanticModel,
+        Logger logger)
     {
         var heuristic = (
                 targetMember is IMethodSymbol method
                     ? method.GetReturnTypeAttributes()
                     : target.GetAttributes()
             )
-            .FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "Discord.TypeHeuristicAttribute");
+            .FirstOrDefault(x =>
+                x.AttributeClass?.ToDisplayString().StartsWith("Discord.TypeHeuristicAttribute") ?? false);
+
+        if (heuristic is null)
+            return exampleCase;
+
+        logger.Log($"{targetMember}: Found heuristic data {heuristic}");
 
         if (heuristic?.ConstructorArguments.FirstOrDefault().Value is not string memberName)
-            return exampleCase;
-
-        if (UnAsyncType(exampleCase) is not INamedTypeSymbol unAsyncType)
-            return exampleCase;
-
-        foreach (var element in Hierarchy.GetHierarchy(targetMember.ContainingType)
-                     .Select(x => x.Type)
-                     .Prepend(targetMember.ContainingType))
         {
-            var member = element
-                .GetMembers()
-                .FirstOrDefault(x => x.Name == memberName);
+            logger.Log($"{targetMember}: no heuristic member name supplied");
+            return exampleCase;
+        }
 
-            if (member is null)
+        var targetMemberType = MemberUtils.GetMemberType(targetMember);
+
+        if (targetMemberType is null)
+        {
+            logger.Log($"{targetMember}: no target member type supplied");
+            return exampleCase;
+        }
+
+        ISymbol? heuristicMember = null;
+
+        // also need to lookup type if it's there
+        if (heuristic.AttributeClass?.IsGenericType ?? false)
+        {
+            var genericType = heuristic.AttributeClass.TypeArguments[0];
+
+            // make sure the target type implements the interface
+            if (!semanticModel.Compilation.HasImplicitConversion(target, genericType))
             {
-                continue;
+                logger.Warn($"{targetMember}: Heuristic type {genericType} is not implemented by {target}");
+                return exampleCase;
             }
 
-            var implementation = target.FindImplementationForInterfaceMember(member);
+            heuristicMember = genericType.GetMembers(memberName).FirstOrDefault();
+        }
+        else
+        {
+            // otherwise we do a search for the heuristic member and find the first match by name
 
-            // impl can be source of truth'd
-            if (implementation is null)
+            foreach (var element in Hierarchy.GetHierarchy(targetMember.ContainingType)
+                         .Select(x => x.Type)
+                         .Prepend(targetMember.ContainingType))
             {
-                foreach (var targetSymbol in TypeUtils.GetBaseTypesAndThis(target))
+                var member = element
+                    .GetMembers()
+                    .FirstOrDefault(x => x.Name == memberName);
+
+                if (member is null)
+                    continue;
+
+                heuristicMember = member;
+            }
+        }
+
+        if (heuristicMember is null)
+        {
+            logger.Warn($"{targetMember}: Heuristic attributes' member couldn't be resolved");
+            return exampleCase;
+        }
+
+        var heuristicMemberType = MemberUtils.GetMemberType(heuristicMember);
+
+        if (heuristicMemberType is null)
+        {
+            logger.Warn($"{targetMember}: Heuristics' type couldn't be resolved");
+            return exampleCase;
+        }
+
+        logger.Log($"{targetMember}: found heuristic {heuristicMember}: ({heuristicMemberType} -> {targetMemberType})");
+
+        var implementation = target.FindImplementationForInterfaceMember(heuristicMember);
+
+        // impl can be source of truth'd
+        if (implementation is null)
+        {
+            foreach (var targetSymbol in TypeUtils.GetBaseTypesAndThis(target))
+            {
+                var searchMembers = targetSymbol.GetMembers(memberName);
+
+                foreach (var searchMember in searchMembers)
                 {
-                    var searchMember = targetSymbol.GetMembers(memberName).FirstOrDefault();
-                    if (searchMember is null || member.Kind != searchMember.Kind ||
+                    if (searchMember is null || heuristicMember.Kind != searchMember.Kind ||
                         !SourceOfTruth.IsTarget(searchMember))
                         continue;
+
+                    var searchMemberType = MemberUtils.GetMemberType(searchMember);
+
+                    if (searchMemberType is null)
+                    {
+                        logger.Warn($"{targetMember}: no result type can be pulled for {searchMember}");
+                        continue;
+                    }
+
+                    if (!TypeUtils.CanBeMisleadinglyAssigned(searchMemberType, heuristicMemberType, semanticModel))
+                    {
+                        logger.Log(
+                            $"{targetMember}: no result conversion between candidate {searchMember} -> {heuristicMemberType}");
+                        continue;
+                    }
 
                     implementation = searchMember;
                     break;
                 }
+
+                if (implementation is not null)
+                    break;
             }
+        }
 
-            if (implementation is null)
-            {
-                continue;
-            }
+        if (implementation is null)
+        {
+            logger.Warn($"{targetMember}: Heuristic attributes' implementation couldn't be resolved");
+            return exampleCase;
+        }
 
-            // resolve the type for the heuristic
-            var heuristicType = member switch
-            {
-                IPropertySymbol {Type: INamedTypeSymbol sourceType} when
-                    implementation is IPropertySymbol {Type: INamedTypeSymbol pairType}
-                    => TypeUtils.PairedWalkTypeSymbolForMatch(
-                        unAsyncType,
-                        sourceType,
-                        pairType,
-                        semanticModel
-                    ),
-                IMethodSymbol {ReturnType: INamedTypeSymbol sourceType} when
-                    implementation is IMethodSymbol {ReturnType: INamedTypeSymbol pairType} &&
-                    UnAsyncType(pairType) is INamedTypeSymbol unAsyncPairType
-                    => TypeUtils.PairedWalkTypeSymbolForMatch(
-                        unAsyncType,
-                        sourceType,
-                        unAsyncPairType,
-                        semanticModel
-                    ),
-                _ => null
-            };
+        var implementationType = MemberUtils.GetMemberType(implementation);
 
-            if (heuristicType is null)
-            {
-                break;
-            }
+        logger.Log($"{targetMember}: Found heuristic implementation {implementation} ({implementationType})");
 
-            //correct async
+        if (implementationType is null)
+        {
+            logger.Warn($"{targetMember}: Heuristic attributes' implementation type couldn't be resolved");
+            return exampleCase;
+        }
+
+        // the 'exampleCase' type could be apart of the heuristic
+        if (TypeUtils.TypeContainsOtherAsGeneric(exampleCase, heuristicMemberType, out _))
+        {
+            logger.Log(
+                $"{targetMember}: Doing type substitution:\n" +
+                $"Template: {exampleCase}\n" +
+                $"ToReplace: {heuristicMemberType}\n" +
+                $"Replacement: {implementationType}"
+            );
+
+            return ReplaceTypeReference(exampleCase, heuristicMemberType, implementationType);
+        }
+
+        if (heuristicMemberType is INamedTypeSymbol {IsGenericType: true} namedHeuristic &&
+            TypeUtils.TypeContainsOtherAsGeneric(heuristicMemberType, exampleCase, out _))
+        {
             if (
-                heuristicType is not {IsGenericType: true, Name: "ValueTask" or "Task"} &&
-                exampleCase is INamedTypeSymbol {IsGenericType: true, Name: "ValueTask" or "Task"} asyncType
+                Hierarchy.GetHierarchy(implementationType)
+                    .Select(x => x.Type)
+                    .Prepend(implementation)
+                    .FirstOrDefault(x =>
+                        x is INamedTypeSymbol {IsGenericType: true} generic &&
+                        generic.ConstructUnboundGenericType().Equals(
+                            namedHeuristic.ConstructUnboundGenericType(),
+                            SymbolEqualityComparer.Default
+                        )
+                    )
+                is not INamedTypeSymbol match
             )
             {
-                return asyncType
-                    .ConstructedFrom
-                    .Construct(heuristicType.WithNullableAnnotation(asyncType.TypeArguments[0]
-                        .NullableAnnotation));
+                logger.Warn($"{targetMember}: Unable to find implementation of {namedHeuristic} on {implementation}");
+                return exampleCase;
             }
 
-            return heuristicType;
+            logger.Log(
+                $"{targetMember}: Performing paired walk for type match:\n" +
+                $"ToFind: {exampleCase}\n" +
+                $"ToWalk: {heuristicMemberType}\n" +
+                $"ToPair: {match}"
+            );
+
+            var walked = TypeUtils.PairedWalkTypeSymbolForMatch(
+                exampleCase,
+                heuristicMemberType,
+                match,
+                semanticModel
+            );
+
+            if (walked is null)
+            {
+                logger.Warn($"{targetMember}: Failed to find match after walk");
+                return exampleCase;
+            }
+
+            return walked;
         }
+
+        logger.Warn($"{targetMember}: no heuristic implementation was resolved, using default case");
 
         return exampleCase;
     }
@@ -279,7 +503,12 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
 
             var targetLogger = logger.WithSemanticContext(target.SemanticModel);
 
-            var willHaveFetchMethods = RestLoadable.WillHaveFetchMethods(target.ClassSymbol);
+            targetLogger.Log($"Processing {target.ClassSymbol}:");
+
+            foreach (var item in GetTemplateExtensionInterfaces(target.ClassSymbol))
+            {
+                targetLogger.Log($" - {item}");
+            }
 
             var declaration = SyntaxFactory.ClassDeclaration(
                 [],
@@ -301,40 +530,28 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
                 [
                     ..x.GetMembers(),
                     ..map.TryGetValue(x, out var baseTarget)
-                        ? GetTargetMembersForImplementation(baseTarget.TargetInterfaces)
+                        ? GetTargetMembersForImplementation(baseTarget.TargetInterfaces, baseTarget.ClassSymbol)
                         : []
                 ]
             ).ToArray();
 
             foreach (var targetInterface in target.TargetInterfaces)
             {
-                var toImplement = GetTargetMembersForImplementation(targetInterface);
+                var toImplement = GetTargetMembersForImplementation(
+                        targetInterface, target.ClassSymbol
+                    )
+                    .Where(x =>
+                        !InterfaceProxy.WillHaveProxiedMemberFor(target.ClassDeclarationSyntax, target.ClassSymbol,
+                            target.SemanticModel, x)
+                    );
 
                 var implemented = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
 
                 foreach (var member in toImplement)
                 {
-                    if (target.ClassSymbol.GetMembers(member.Name).Length > 0)
-                    {
-                        targetLogger.Log($"{target.ClassSymbol}: Skipping {member} (first-party implementation)");
-                        continue;
-                    }
-
                     if (implemented.Any(x => MemberUtils.Conflicts(x, member)) || !implemented.Add(member))
                     {
                         targetLogger.Log($"{target.ClassSymbol}: Skipping {member} (conflicting member)");
-                    }
-
-                    if (
-                        willHaveFetchMethods &&
-                        member is IMethodSymbol memberMethod &&
-                        MemberUtils.GetMemberName(
-                            memberMethod,
-                            x => x.ExplicitInterfaceImplementations
-                        ) == "FetchAsync"
-                    )
-                    {
-                        targetLogger.Log($"{target.ClassSymbol}: Skipping {member} (fetch async target)");
                         continue;
                     }
 
@@ -342,6 +559,7 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
 
                     var baseOverridableImplementation = baseTreeMembers
                         .FirstOrDefault(y =>
+                            y.ContainingType.TypeKind is not TypeKind.Interface &&
                             MemberUtils.Conflicts(member, y) &&
                             MemberUtils.CanOverride(member, y, target.SemanticModel.Compilation)
                         );
@@ -364,7 +582,8 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
 
                     if (baseOverridableImplementation is not null)
                     {
-                        targetLogger.Log($"{target.ClassSymbol}: {member} -> override ({baseOverridableImplementation})");
+                        targetLogger.Log(
+                            $"{target.ClassSymbol}: {member} -> override ({baseOverridableImplementation})");
                         modifiers = modifiers.Add(SyntaxFactory.Token(SyntaxKind.OverrideKeyword));
                     }
 
@@ -381,11 +600,19 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
                                 ? property.ExplicitInterfaceImplementations[0].Name
                                 : property.Name;
 
+                            var propertyType = GetTargetTypeForImplementation(
+                                property,
+                                property.Type,
+                                target.ClassSymbol,
+                                target.SemanticModel,
+                                targetLogger
+                            );
+
                             declaration = declaration.AddMembers(
                                 SyntaxFactory.PropertyDeclaration(
                                     [],
                                     modifiers,
-                                    SyntaxFactory.ParseTypeName(property.Type.ToDisplayString()),
+                                    SyntaxFactory.ParseTypeName(propertyType.ToDisplayString()),
                                     null,
                                     SyntaxFactory.Identifier(propName),
                                     null,
@@ -439,8 +666,11 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
                                 methodSymbol,
                                 methodSymbol.ReturnType,
                                 target.ClassSymbol,
-                                target.SemanticModel
+                                target.SemanticModel,
+                                targetLogger
                             );
+
+                            targetLogger.Log($"Chose return type {returnType}");
 
                             var hasDifferentReturnType =
                                 !returnType.Equals(methodSymbol.ReturnType, SymbolEqualityComparer.Default);

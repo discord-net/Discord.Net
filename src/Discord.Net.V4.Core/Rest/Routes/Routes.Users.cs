@@ -5,8 +5,8 @@ namespace Discord.Rest;
 
 public static partial class Routes
 {
-    public static readonly IApiOutRoute<User> GetCurrentUser
-        = new ApiOutRoute<User>(nameof(GetCurrentUser),
+    public static readonly IApiOutRoute<SelfUser> GetCurrentUser
+        = new ApiOutRoute<SelfUser>(nameof(GetCurrentUser),
             RequestMethod.Get,
             "users/@me");
 
@@ -20,8 +20,8 @@ public static partial class Routes
             RequestMethod.Get,
             $"users/{userId}");
 
-    public static IApiInOutRoute<ModifyCurrentUserParams, User> ModifyCurrentUser(ModifyCurrentUserParams body) =>
-        new ApiInOutRoute<ModifyCurrentUserParams, User>(nameof(ModifyCurrentUser), RequestMethod.Patch, "users/@me",
+    public static IApiInOutRoute<ModifyCurrentUserParams, SelfUser> ModifyCurrentUser(ModifyCurrentUserParams body) =>
+        new ApiInOutRoute<ModifyCurrentUserParams, SelfUser>(nameof(ModifyCurrentUser), RequestMethod.Patch, "users/@me",
             body);
 
     public static IApiOutRoute<IEnumerable<PartialGuild>> GetCurrentUserGuilds(

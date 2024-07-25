@@ -90,29 +90,6 @@ public static class JsonModels
             contextAttributes.UnionWith(attributes);
 
             modelTypesForContext.Add(target.TypeSymbol);
-
-//             var source = SourceText.From(
-//                 $$"""
-//                   namespace {{target.TypeSymbol.ContainingNamespace}};
-//
-//                   {{string.Join("\n", attributes)}}
-//                   public sealed partial class {{target.TypeSymbol.Name}}JsonContext : System.Text.Json.Serialization.JsonSerializerContext;
-//                   """,
-//                 Encoding.UTF8
-//             );
-//
-//             if (!generatedText.Add(source))
-//             {
-//                 logger.Warn($"Skipping {hintName}: already generated source text");
-//                 continue;
-//             }
-//
-//             context.AddSource(
-//                 $"Json/{hintName}",
-//                 source
-//             );
-//
-//             modelTypesForContext.Add(target.TypeSymbol);
         }
 
         if (modelTypesForContext.Count == 0)
@@ -176,17 +153,11 @@ public static class JsonModels
             []
         );
 
-        // if (!AddLookupTables(ref resolverSyntax, modelTypesForContext, lowestDistanceInterfaceMap))
-        // {
-        //     logger.Warn("Failed to add lookup tables");
-        //     return;
-        // }
-        //
-        // if (!AddJsonTypeInfoResolvers(ref resolverSyntax))
-        // {
-        //     logger.Warn("Failed to add context resolvers map");
-        //     return;
-        // }
+        if (!AddUserTypeInfoFactory(ref resolverSyntax))
+        {
+            logger.Warn("Failed to add user type info factory");
+            return;
+        }
 
         var options = GenerateOptions(modelTypesForContext, lowestDistanceInterfaceMap, out var extra);
 
@@ -214,186 +185,38 @@ public static class JsonModels
             generated
         );
 
+
         RunSTJSourceGenerator(context, compilation, generated, logger);
     }
 
-    public const string ModelToContextTable = "ModelToContextInfo";
-    public const string InterfaceToContextTable = "InterfaceToContextInfo";
-    public const string EnumerableModelToContextTable = "EnumerableModelToContextInfo";
-    public const string EnumerableInterfaceToContextTable = "EnumerableInterfaceToContextInfo";
-
-    private static bool AddLookupTables(
-        ref ClassDeclarationSyntax syntax,
-        HashSet<ITypeSymbol> models,
-        Dictionary<ITypeSymbol, (int Distance, ITypeSymbol Symbol)> map)
-    {
-//         var entrySyntax = SyntaxFactory.ParseMemberDeclaration(
-//             """
-//             public sealed class ContextInfo(JsonSerializerContext context, Func<JsonSerializerOptions, JsonSerializerContext> factory)
-//             {
-//                 public readonly JsonSerializerContext Default = context;
-//                 public readonly Func<JsonSerializerOptions, JsonSerializerContext> Factory = factory;
-//
-//                 private readonly Dictionary<JsonSerializerOptions, JsonSerializerContext> _contexts = new();
-//
-//                 private readonly object _syncRoot = new();
-//
-//                 public JsonSerializerContext GetContextForOptions(JsonSerializerOptions options)
-//                 {
-//                     if(Default.Options == options)
-//                         return Default;
-//
-//                     lock(_syncRoot)
-//                     {
-//                         if(_contexts.TryGetValue(options, out var result))
-//                             return result;
-//
-//                         return _contexts[options] = Factory(options);
-//                     }
-//                 }
-//             }
-//             """
-//         );
-
-        var mainTable = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              public static readonly Dictionary<Type, Func<ModelJsonContext, JsonTypeInfo>> {{ModelToContextTable}} = new()
-              {
-                  {{
-                      string.Join(
-                          ",\n",
-                          models.Select(x =>
-                              $"{{ typeof({x.ToDisplayString()}), (self) => self.{x.Name} }}"
-                          )
-                      )
-                  }}
-              };
-              """
-        );
-
-        var interfaceTable = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              public static readonly Dictionary<Type, Func<ModelJsonContext, JsonTypeInfo>> {{InterfaceToContextTable}} = new()
-              {
-                  {{
-                      string.Join(
-                          ",\n",
-                          map.Select(x =>
-                              $"{{ typeof({x.Key}), (self) => self.{x.Value.Symbol.Name}}}"
-                          )
-                      )
-                  }}
-              };
-              """
-        );
-
-        var enumerableModelTable = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              public static readonly Dictionary<Type, Func<ModelJsonContext, JsonTypeInfo>> {{EnumerableModelToContextTable}} = new()
-              {
-                  {{
-                      string.Join(
-                          ",\n",
-                          models.Select(x =>
-                              $"{{ typeof(IEnumerable<{x}>), (self) => self.IEnumerable{x.Name}}}"
-                          )
-                      )
-                  }}
-              };
-              """
-        );
-
-        var enumerableInterfaceTable = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              public static readonly Dictionary<Type, Func<ModelJsonContext, JsonTypeInfo>> {{EnumerableInterfaceToContextTable}} = new()
-              {
-                  {{
-                      string.Join(
-                          ",\n",
-                          map.Select(x =>
-                              $"{{ typeof(IEnumerable<{x.Key}>), (self) => self.IEnumerable{x.Value.Symbol}}}"
-                          )
-                      )
-                  }}
-              };
-              """
-        );
-
-        if (mainTable is null || interfaceTable is null || enumerableInterfaceTable is null ||
-            enumerableModelTable is null)
-            return false;
-
-        syntax = syntax.AddMembers(
-            mainTable,
-            interfaceTable,
-            enumerableModelTable,
-            enumerableInterfaceTable
-        );
-
-        return true;
-    }
-
-    private static bool AddJsonTypeInfoResolvers(
+    private static bool AddUserTypeInfoFactory(
         ref ClassDeclarationSyntax syntax)
     {
-        const string resolverType = "System.Text.Json.Serialization.Metadata.JsonTypeInfoResolver";
-        const string resolverTypeInterface = "System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver";
+        var method = SyntaxFactory.ParseMemberDeclaration(
+            """
+            internal global::System.Text.Json.Serialization.Metadata.JsonTypeInfo<global::Discord.Models.Json.User> CreateUserTypeInfoNoConverter(global::System.Text.Json.JsonSerializerOptions options)
+            {
+                var objectInfo = new global::System.Text.Json.Serialization.Metadata.JsonObjectInfoValues<global::Discord.Models.Json.User>
+                {
+                    ObjectCreator = null,
+                    ObjectWithParameterizedConstructorCreator = static args => new global::Discord.Models.Json.User(){ Username = (string)args[0], Discriminator = (string)args[1] },
+                    PropertyMetadataInitializer = _ => UserPropInit(options),
+                    ConstructorParameterMetadataInitializer = UserCtorParamInit,
+                    SerializeHandler = UserSerializeHandler
+                };
 
-        var interfaceResolver = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              private sealed class InterfaceResolver : System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver
-              {
-                  public static readonly InterfaceResolver Instance = new();
-
-                  public System.Text.Json.Serialization.Metadata.JsonTypeInfo? GetTypeInfo(Type type, System.Text.Json.JsonSerializerOptions options)
-                  {
-                      if(!type.IsInterface)
-                          return null;
-
-                      if({{InterfaceToContextTable}}.TryGetValue(type, out var info))
-                          return info.GetContextForOptions(options).GetTypeInfo(type);
-
-                      if({{EnumerableInterfaceToContextTable}}.TryGetValue(type, out info))
-                          return info.GetContextForOptions(options).GetTypeInfo(type);
-
-                      if({{EnumerableModelToContextTable}}.TryGetValue(type, out info))
-                          return info.GetContextForOptions(options).GetTypeInfo(type);
-
-                      return null;
-                  }
-              }
-              """
+                var jsonTypeInfo = global::System.Text.Json.Serialization.Metadata.JsonMetadataServices.CreateObjectInfo<global::Discord.Models.Json.User>(options, objectInfo);
+                jsonTypeInfo.NumberHandling = null;
+                jsonTypeInfo.OriginatingResolver = this;
+                return jsonTypeInfo;
+            }
+            """
         );
 
-        var modelResolver = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              private sealed class ModelResolver : System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver
-              {
-                  public static readonly ModelResolver Instance = new();
-
-                  public System.Text.Json.Serialization.Metadata.JsonTypeInfo? GetTypeInfo(Type type, System.Text.Json.JsonSerializerOptions options)
-                  {
-                      if({{ModelToContextTable}}.TryGetValue(type, out var info))
-                          return info.GetContextForOptions(options).GetTypeInfo(type);
-
-                      return null;
-                  }
-              }
-              """
-        );
-
-        if (interfaceResolver is null || modelResolver is null)
+        if (method is null)
             return false;
 
-        var mainResolver = SyntaxFactory.ParseMemberDeclaration(
-            $"public static readonly {resolverTypeInterface} Resolver = {resolverType}.Combine(InterfaceResolver.Instance, ModelResolver.Instance);"
-        );
-
-        if (mainResolver is null)
-            return false;
-
-        syntax = syntax.AddMembers(interfaceResolver, modelResolver, mainResolver);
-
+        syntax = syntax.AddMembers(method);
         return true;
     }
 
@@ -405,7 +228,8 @@ public static class JsonModels
         var converters = new HashSet<string>()
         {
             "Discord.Converters.SnowflakeConverter",
-            "Discord.Converters.BigIntegerConverter"
+            "Discord.Converters.BigIntegerConverter",
+            "Discord.Converters.UserConverter"
         };
 
         additionalSerializables = new HashSet<string>();

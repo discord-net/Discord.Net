@@ -8,8 +8,13 @@ public interface IRelationship<out TActor, out TId, out TEntity> :
 {
     internal TActor RelationshipActor { get; }
 
-    TId IIdentifiable<TId>.Id => RelationshipActor.Id;
+    TId IRelation<TId, TEntity> .RelationshipId => RelationshipActor.Id;
 }
 
 public interface IRelation<out TId, out TEntity> : IIdentifiable<TId>
-    where TId : IEquatable<TId>;
+    where TId : IEquatable<TId>
+{
+    TId RelationshipId { get; }
+
+    TId IIdentifiable<TId>.Id => RelationshipId;
+}

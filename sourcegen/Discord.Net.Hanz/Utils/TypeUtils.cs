@@ -4,6 +4,104 @@ namespace Discord.Net.Hanz.Utils;
 
 public static class TypeUtils
 {
+    public static bool TypeLooselyEquals(ITypeSymbol first, ITypeSymbol second)
+    {
+        if (first.Equals(second, SymbolEqualityComparer.Default))
+            return true;
+
+        if (first is INamedTypeSymbol {IsGenericType: true} namedFirst &&
+            second is INamedTypeSymbol {IsGenericType: true} namedSecond)
+        {
+            return
+                (
+                    namedFirst.IsUnboundGenericType &&
+                    !namedSecond.IsUnboundGenericType &&
+                    namedSecond.ConstructUnboundGenericType().Equals(namedFirst, SymbolEqualityComparer.Default)
+                )
+                ||
+                (
+                    !namedFirst.IsUnboundGenericType &&
+                    namedSecond.IsUnboundGenericType &&
+                    namedFirst.ConstructUnboundGenericType().Equals(namedSecond, SymbolEqualityComparer.Default)
+                )
+                ||
+                (
+                    !namedFirst.IsUnboundGenericType &&
+                    !namedSecond.IsUnboundGenericType &&
+                    namedFirst.ConstructUnboundGenericType().Equals(
+                        namedSecond.ConstructUnboundGenericType(),
+                        SymbolEqualityComparer.Default
+                    )
+                );
+        }
+
+        return false;
+    }
+
+    public static bool TypeContainsOtherAsGeneric(
+        ITypeSymbol root,
+        ITypeSymbol toFind,
+        out ITypeSymbol? containedAt,
+        HashSet<ITypeSymbol>? visited = null)
+    {
+        visited ??= new(SymbolEqualityComparer.Default);
+
+        if (visited.Contains(root))
+        {
+            containedAt = null;
+            return false;
+        }
+
+        visited.Add(root);
+
+        if (root.Equals(toFind, SymbolEqualityComparer.Default))
+        {
+            containedAt = root;
+            return true;
+        }
+
+        if (root is INamedTypeSymbol {IsGenericType: true} namedRoot)
+        {
+            foreach (var typeArg in namedRoot.TypeArguments)
+            {
+                if (!TypeContainsOtherAsGeneric(typeArg, toFind, out var container, visited)) continue;
+
+                containedAt = container?.Equals(toFind, SymbolEqualityComparer.Default) ?? false ? typeArg : container;
+                return true;
+            }
+        }
+
+        foreach (var iface in root.AllInterfaces)
+        {
+            if (!TypeContainsOtherAsGeneric(iface, toFind, out var container, visited)) continue;
+            containedAt = container?.Equals(toFind, SymbolEqualityComparer.Default) ?? false ? iface : container;
+            return true;
+        }
+
+        containedAt = null;
+        return false;
+    }
+
+    public static bool CanBeMisleadinglyAssigned(ITypeSymbol from, ITypeSymbol to, SemanticModel model)
+    {
+        if (model.Compilation.HasImplicitConversion(from, to))
+            return true;
+
+        // ensure all generics match
+        if (
+            from is INamedTypeSymbol {IsGenericType: true} namedFrom &&
+            to is INamedTypeSymbol {IsGenericType: true} namedTo &&
+            namedFrom.TypeArguments.Length == namedTo.TypeArguments.Length)
+        {
+            return !namedTo.TypeArguments
+                .Where((t, i) =>
+                    !CanBeMisleadinglyAssigned(namedFrom.TypeArguments[i], t, model)
+                ).Any();
+        }
+
+        return false;
+    }
+
     public static bool TypeIsOfProvidedOrDescendant(ITypeSymbol from, ITypeSymbol to, SemanticModel model)
     {
         return from.Equals(to, SymbolEqualityComparer.Default) ||

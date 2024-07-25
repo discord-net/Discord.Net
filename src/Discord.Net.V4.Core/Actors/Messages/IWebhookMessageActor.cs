@@ -1,12 +1,19 @@
+using Discord.Models;
 using Discord.Rest;
 
 namespace Discord;
 
-public interface IWebhookMessageActor :
+public partial interface IWebhookMessageActor :
     IMessageActor,
     IWebhookRelationship,
-    IActor<ulong, IWebhookMessage>
+    IActor<ulong, IWebhookMessage>,
+    IEntityProvider<IWebhookMessage, IMessageModel>
 {
+    [SourceOfTruth]
+    internal new IWebhookMessage CreateEntity(IMessageModel model);
+    [SourceOfTruth]
+    internal new sealed IWebhookMessage? CreateNullableEntity(IMessageModel? model) => model is null ? null : CreateEntity(model);
+
     Task DeleteAsync(
         string webhookToken,
         EntityOrId<ulong, IThreadChannel>? thread = null,
@@ -19,7 +26,8 @@ public interface IWebhookMessageActor :
         token
     );
 
-    Task ModifyAsync(
+    //[return: TypeHeuristic(nameof(CreateEntity))]
+    async Task<IWebhookMessage> ModifyAsync(
         string webhookToken,
         Action<ModifyWebhookMessageProperties> func,
         EntityOrId<ulong, IThreadChannel>? thread = null,
@@ -28,7 +36,8 @@ public interface IWebhookMessageActor :
     {
         var args = new ModifyWebhookMessageProperties();
         func(args);
-        return Client.RestApiClient.ExecuteAsync(
+
+        var message = await Client.RestApiClient.ExecuteRequiredAsync(
             Routes.ModifyWebhookMessage(
                 Webhook.Id,
                 webhookToken,
@@ -39,5 +48,7 @@ public interface IWebhookMessageActor :
             options ?? Client.DefaultRequestOptions,
             token
         );
+
+        return (IWebhookMessage)CreateEntity(message);
     }
 }

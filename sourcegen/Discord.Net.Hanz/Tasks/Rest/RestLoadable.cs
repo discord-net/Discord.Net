@@ -70,7 +70,7 @@ public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContex
     public bool IsValid(SyntaxNode node, CancellationToken token = default)
         => node is ClassDeclarationSyntax cls && cls.Identifier.ValueText.EndsWith("Actor");
 
-    public static bool WillHaveFetchMethods(INamedTypeSymbol type)
+    public static bool WillHaveFetchMethods(ITypeSymbol type)
     {
         if (!type.Name.StartsWith("Rest") || !type.Name.EndsWith("Actor"))
             return false;

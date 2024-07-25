@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Models;
 using Discord.Rest;
+using FeatureSamples;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 
@@ -16,7 +17,7 @@ try
 
     var client = new DiscordRestClient(token);
 
-    var guild = await client.Guilds.Specifically(915079505557721090).FetchAsync();
+    await Guilds.RunAsync(client);
 }
 catch (Exception x)
 {

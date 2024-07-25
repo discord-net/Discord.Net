@@ -5,6 +5,7 @@ namespace Discord;
 internal sealed class DeletableAttribute(string route) : Attribute;
 #pragma warning restore CS9113 // Parameter is unread.
 
+[TemplateExtension]
 public interface IDeletable<TId, out TSelf> :
     IIdentifiable<TId>,
     IPathable,
@@ -12,7 +13,7 @@ public interface IDeletable<TId, out TSelf> :
     where TSelf : IDeletable<TId, TSelf>, IIdentifiable<TId>, IPathable
     where TId : IEquatable<TId>
 {
-    Task DeleteAsync(RequestOptions? options = null, CancellationToken token = default)
+    sealed Task DeleteAsync(RequestOptions? options = null, CancellationToken token = default)
         => DeleteAsync(Client, TSelf.DeleteRoute(this, Id), options, token);
 
     internal static Task DeleteAsync(

@@ -18,7 +18,7 @@ public interface IPathable
         {
             TEntity entity => entity.Id,
             IActor<TId, TEntity> actor => actor.Id,
-            IRelation<TId, TEntity> relationship => relationship.Id,
+            IRelation<TId, TEntity> relationship => relationship.RelationshipId,
             _ => throw new KeyNotFoundException($"Cannot find path from {GetType().Name} to {typeof(TEntity).Name}")
         };
     }

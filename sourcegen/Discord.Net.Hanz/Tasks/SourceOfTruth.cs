@@ -92,6 +92,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
     public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         var toGenerate = new Dictionary<string, GenerationResult>();
+        var addedMembers = new Dictionary<ITypeSymbol, HashSet<ISymbol>>(SymbolEqualityComparer.Default);
 
         foreach (var target in targets)
         {
@@ -119,7 +120,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
 
             if (target.TypeSymbol is not INamedTypeSymbol typeSymbol) continue;
 
-            List<ISymbol> validTargets = new();
+            HashSet<ISymbol> validTargets = new(SymbolEqualityComparer.Default);
 
             var proxied = target.TypeDeclarationSyntax is ClassDeclarationSyntax cls
                 ? TypeUtils.GetBaseTypesAndThis(typeSymbol)
@@ -213,6 +214,17 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
 
                 foreach (var validTarget in validTargets)
                 {
+                    if (!addedMembers.TryGetValue(target.TypeSymbol, out var members))
+                        addedMembers[target.TypeSymbol] = members = new(SymbolEqualityComparer.Default);
+
+                    if (!members.Add(validTarget))
+                    {
+                        targetLogger.Log($"{target.TypeSymbol}: Skipping {validTarget} (signature already added)");
+                        continue;
+                    }
+
+                    targetLogger.Log($"{target.TypeSymbol}: Adding {validTarget.ToDisplayString()}");
+
                     switch (validTarget)
                     {
                         case IPropertySymbol property:
@@ -229,6 +241,9 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                                     ),
                                     null,
                                     SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                                )
+                                .WithLeadingTrivia(
+                                    SyntaxFactory.Comment($"// {property.ToDisplayString()}")
                                 )
                             );
                             break;
@@ -283,6 +298,9 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                                         )
                                     ),
                                     SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                                )
+                                .WithLeadingTrivia(
+                                    SyntaxFactory.Comment($"// {method.ToDisplayString()}")
                                 )
                             );
                             break;

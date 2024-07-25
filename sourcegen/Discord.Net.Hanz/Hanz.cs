@@ -51,7 +51,10 @@ public sealed class Hanz : IIncrementalGenerator
                     var logger = assemblyLoggers.GetOrAdd(
                         syntaxContext.SemanticModel.Compilation.Assembly.Name,
                         assembly => Logger.CreateSemanticRunForTask(assembly, task.GetType().Name));
-                    return new TransformWrapper<T>(logger, task.GetTargetForGeneration(syntaxContext, logger, token));
+
+                    return new TransformWrapper<T>(logger,
+                        task.GetTargetForGeneration(syntaxContext, logger.GetSubLogger("transform").WithCleanLogFile(),
+                            token));
                 }
                 catch (Exception ex)
                 {
@@ -65,8 +68,9 @@ public sealed class Hanz : IIncrementalGenerator
         {
             try
             {
-                wrapper.Logger.Clean();
-                task.Execute(context, wrapper.Value, wrapper.Logger);
+                //wrapper.Logger.Clean();
+
+                task.Execute(context, wrapper.Value, wrapper.Logger.GetSubLogger("execute").WithCleanLogFile());
             }
             catch (Exception ex)
             {
@@ -90,7 +94,11 @@ public sealed class Hanz : IIncrementalGenerator
             {
                 try
                 {
-                    return task.GetTargetForGeneration(syntaxContext, logger, token);
+                    return task.GetTargetForGeneration(
+                        syntaxContext,
+                        logger.WithSemanticContext(syntaxContext.SemanticModel),
+                        token
+                    );
                 }
                 catch (Exception ex)
                 {

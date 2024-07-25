@@ -1,12 +1,15 @@
 using Discord.Models;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
 #pragma warning disable CS9113 // Parameter is unread.
 [AttributeUsage(AttributeTargets.Interface)]
+[SuppressMessage("ReSharper", "UnusedTypeParameter")]
 internal sealed class ModifiableAttribute<TParams>(string route) : Attribute;
 #pragma warning restore CS9113 // Parameter is unread.
 
+[TemplateExtension(TakesPrecedenceOver = typeof(IModifiable<,,,,,>))]
 public interface IModifiable<TId, in TSelf, out TParams, TApi, in TModel> :
     IModifiable<TId, TSelf, TParams, TApi>,
     IUpdatable<TModel>
@@ -19,7 +22,7 @@ public interface IModifiable<TId, in TSelf, out TParams, TApi, in TModel> :
     where TApi : class
     where TModel : class, IEntityModel<TId>
 {
-    new Task ModifyAsync(Action<TParams> func, RequestOptions? options = null, CancellationToken token = default)
+    new sealed Task ModifyAsync(Action<TParams> func, RequestOptions? options = null, CancellationToken token = default)
         => ModifyAsync(Client, (TSelf)this, Id, func, options, token);
 
     internal new static async Task ModifyAsync(
@@ -65,6 +68,7 @@ public interface IModifiable<TId, in TSelf, out TParams, TApi, in TModel> :
         => TSelf.ModifyRoute(path, id, args);
 }
 
+[TemplateExtension]
 public interface IModifiable<TId, in TSelf, out TParams, TApi, TEntity, in TModel> :
     IModifiable<TId, TSelf, TParams, TApi>,
     IEntityProvider<TEntity, TModel>
@@ -79,7 +83,7 @@ public interface IModifiable<TId, in TSelf, out TParams, TApi, TEntity, in TMode
     where TModel : class, IEntityModel<TId>
 {
     [return: TypeHeuristic(nameof(CreateEntity))]
-    new Task<TEntity> ModifyAsync(Action<TParams> func, RequestOptions? options = null,
+    new sealed Task<TEntity> ModifyAsync(Action<TParams> func, RequestOptions? options = null,
         CancellationToken token = default)
         => ModifyAsync(Client, (TSelf)this, Id, func, options, token);
 
@@ -140,6 +144,7 @@ public interface IModifiable<TId, in TSelf, out TParams, TApi, TEntity, in TMode
         => TSelf.ModifyRoute(path, id, args);
 }
 
+[TemplateExtension]
 public interface IModifiable<TId, in TSelf, out TParams, TApi> :
     IIdentifiable<TId>,
     IClientProvider,

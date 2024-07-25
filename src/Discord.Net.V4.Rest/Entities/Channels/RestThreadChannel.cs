@@ -16,7 +16,6 @@ public partial class RestThreadChannelActor :
     IThreadChannelActor,
     IRestActor<ulong, RestThreadChannel, ThreadIdentity>
 {
-
     [method: TypeFactory]
     public RestThreadChannelActor(DiscordRestClient client,
         GuildIdentity guild,
@@ -106,12 +105,7 @@ public partial class RestThreadChannel :
 
     public DateTimeOffset CreatedAt => Model.CreatedAt ?? SnowflakeUtils.FromSnowflake(Id);
 
-    [ProxyInterface(
-        typeof(IThreadChannelActor),
-        typeof(IThreadMemberRelationship),
-        typeof(IMessageChannelActor),
-        typeof(IEntityProvider<IThreadChannel, IThreadChannelModel>)
-    )]
+    [ProxyInterface(typeof(IThreadChannelActor))]
     internal override RestThreadChannelActor Actor { get; }
 
     internal override IThreadChannelModel Model => _model;

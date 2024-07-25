@@ -95,6 +95,7 @@ public partial interface IGuildActor :
 
     #region Methods
 
+    [return: TypeHeuristic<IEntityProvider<IGuildChannel, IGuildChannelModel>>(nameof(CreateEntity))]
     async Task<IGuildChannel> CreateChannelAsync(
         CreateGuildChannelProperties args, RequestOptions? options = null, CancellationToken token = default)
     {
@@ -123,6 +124,7 @@ public partial interface IGuildActor :
         token
     );
 
+    [return: TypeHeuristic<IEntityProvider<IGuildMember, IMemberModel>>(nameof(CreateEntity))]
     async Task<IReadOnlyCollection<IGuildMember>> SearchGuildMembersAsync(
         string query,
         int limit = 1000,
@@ -138,7 +140,7 @@ public partial interface IGuildActor :
         return result.Select(CreateEntity).ToImmutableArray();
     }
 
-    [return: TypeHeuristic(nameof(IEntityProvider<IGuildMember, IMemberModel>.CreateEntity))]
+    [return: TypeHeuristic<IEntityProvider<IGuildMember, IMemberModel>>(nameof(CreateEntity))]
     async Task<IGuildMember> AddGuildMemberAsync(
         EntityOrId<ulong, IUser> user,
         string accessToken,

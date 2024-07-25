@@ -7,6 +7,25 @@ public static class MemberUtils
 {
     public static readonly ConflictEqualityComparer ConflictEquality = new();
 
+    public static bool IsExplicitInterfaceImplementation(ISymbol symbol)
+    {
+        return symbol switch
+        {
+            IPropertySymbol {ExplicitInterfaceImplementations.Length: > 0} => true,
+            IMethodSymbol {ExplicitInterfaceImplementations.Length: > 0} => true,
+            _ => false
+        };
+    }
+
+    public static bool CanImplementMemberExplicitly(ISymbol symbol)
+    {
+        return
+            symbol.ContainingType.TypeKind is TypeKind.Interface &&
+            (
+                symbol.IsVirtual || symbol.IsAbstract
+            );
+    }
+
     public class ConflictEqualityComparer : IEqualityComparer<ISymbol>
     {
         public bool Equals(ISymbol x, ISymbol y) => Conflicts(x, y) || SymbolEqualityComparer.Default.Equals(x, y);
@@ -22,6 +41,16 @@ public static class MemberUtils
             symbol = getExplicitInterfaces(symbol)[0];
             continue;
         }
+    }
+
+    public static ITypeSymbol? GetMemberType(ISymbol member)
+    {
+        return member switch
+        {
+            IPropertySymbol prop => prop.Type,
+            IMethodSymbol method => method.ReturnType,
+            _ => null
+        };
     }
 
     public static bool Conflicts(ISymbol a, ISymbol b)

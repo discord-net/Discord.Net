@@ -65,7 +65,7 @@ public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TMod
     public IReadOnlyCollection<TEntity> Values
         => _values ??= All.Values.ToImmutableArray();
 
-    public TEntity this[TId key] => All[key];
+    public new TEntity this[TId key] => All[key];
 
     public int Count => All.Count;
 

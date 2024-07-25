@@ -65,7 +65,7 @@ using ManagedEmotesActor =
 using ManagedStickersActor =
     RestManagedEnumerableActor<RestGuildStickerActor, ulong, RestGuildSticker, IGuildSticker, IGuildStickerModel>;
 
-[ExtendInterfaceDefaults(typeof(IGuildActor))]
+[ExtendInterfaceDefaults]
 public sealed partial class RestGuildActor :
     RestActor<ulong, RestGuild, GuildIdentity>,
     IGuildActor
@@ -317,7 +317,6 @@ public sealed partial class RestGuild :
         );
 
         Actor = actor ?? new(client, identity);
-
 
         // Roles = RestManagedEnumerableActor.Create<RestRoleActor, ulong, RestRole, IRole, IRoleModel, GuildIdentity>(
         //     client,

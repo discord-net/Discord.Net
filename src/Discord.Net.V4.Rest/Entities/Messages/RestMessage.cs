@@ -23,7 +23,7 @@ public partial class RestMessageActor(
     [SourceOfTruth] public RestMessageChannelActor Channel { get; } = new(client, channel, guild);
 
     [SourceOfTruth]
-    internal RestMessage CreateEntity(IMessageModel model)
+    internal virtual RestMessage CreateEntity(IMessageModel model)
         => RestMessage.Construct(Client, new(guild, channel), model);
 }
 
