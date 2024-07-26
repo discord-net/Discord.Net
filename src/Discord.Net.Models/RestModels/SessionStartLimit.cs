@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Discord.API.Rest;
+namespace Discord.Models.Json;
 
 public sealed class SessionStartLimit
 {

@@ -1,33 +1,42 @@
+using Discord.API.Gateway;
 using System;
 using System.Text.Json.Serialization;
 
-namespace Discord.API.Gateway
-{
-    public sealed record IdentityPayload(
-        [property: JsonPropertyName("token")]
-        string Token,
-        [property: JsonPropertyName("properties")]
-        IdentityConnectionProperties Properties,
-        [property: JsonPropertyName("intents")]
-        int Intents,
-        [property: JsonPropertyName("compress")]
-        Optional<bool> Compress = default,
-        [property: JsonPropertyName("large_threshold")]
-        Optional<int> LargeThreashold = default,
-        [property: JsonPropertyName("shard")]
-        Optional<int[]> Shard = default,
-        [property: JsonPropertyName("presence")]
-        Optional<UpdatePresencePayload> Presence = default
-    );
+namespace Discord.Models.Json;
 
-    public sealed record IdentityConnectionProperties(
-        [property: JsonPropertyName("os")]
-        string OS,
-        [property: JsonPropertyName("browser")]
-        string Browser,
-        [property: JsonPropertyName("device")]
-        string Device
-    );
+public sealed class IdentityPayload : IGatewayPayloadData
+{
+    [JsonPropertyName("token")]
+    public required string Token { get; set; }
+
+    [JsonPropertyName("properties")]
+    public required IdentityConnectionProperties Properties { get; set; }
+
+    [JsonPropertyName("intents")]
+    public ulong Intents { get; set; }
+
+    [JsonPropertyName("compress")]
+    public Optional<bool> Compress { get; set; }
+
+    [JsonPropertyName("large_threshold")]
+    public Optional<int> LargeThreshold { get; set; }
+
+    [JsonPropertyName("shard")]
+    public Optional<int[]> Shard { get; set; }
+
+    [JsonPropertyName("presence")]
+    public Optional<UpdatePresencePayload> Presence { get; set; }
 
 }
 
+public sealed class IdentityConnectionProperties
+{
+    [JsonPropertyName("os")]
+    public required string OS { get; init; }
+
+    [JsonPropertyName("browser")]
+    public required string Browser { get; init; }
+
+    [JsonPropertyName("device")]
+    public required string Device { get; init; }
+}

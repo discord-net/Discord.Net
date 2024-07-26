@@ -10,7 +10,9 @@ namespace Discord.Gateway
         DiscordGatewayConfig config
     );
 
-    public sealed class DiscordGatewayConfig : DiscordRestConfig
+    public delegate IGatewayEncoding GatewayEncodingFactory(DiscordGatewayClient client);
+
+    public sealed class DiscordGatewayConfig : DiscordConfig
     {
         public GatewayIntents Intents { get; set; }
 
@@ -20,7 +22,7 @@ namespace Discord.Gateway
 
         public ICacheProvider CacheProvider { get; set; } = new ConcurrentCacheProvider();
         public GatewayConnectionFactory GatewayConnection { get; set; } = WebSocketGatewayConnection.Factory;
-        public IGatewayEncoding Encoding { get; set; } = new JsonEncoding();
+        public GatewayEncodingFactory Encoding { get; set; } = JsonEncoding.Factory;
         public ArrayPool<byte> BufferPool { get; set; } = ArrayPool<byte>.Shared;
 
         public int MaxClientMessageTimeout { get; set; } = 120000;

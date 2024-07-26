@@ -3,10 +3,10 @@ namespace Discord.Gateway
 {
     public interface IGatewayEncoding
     {
-        T? Decode<T>(Stream data);
-        ReadOnlyMemory<byte> Encode<T>(T value);
+        string Identifier { get; }
 
-        T? ToObject<T>(object? obj);
+        ValueTask<T?> DecodeAsync<T>(Stream data, CancellationToken token = default);
+        ValueTask EncodeAsync<T>(Stream stream, T value, CancellationToken token = default);
     }
 }
 

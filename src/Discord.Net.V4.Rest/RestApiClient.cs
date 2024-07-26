@@ -27,30 +27,6 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
         };
     }
 
-    // private async ValueTask<JsonTypeInfo> GetJsonTypeInfoAsync<T>()
-    // {
-    //
-    //     // var type = typeof(T);
-    //     //
-    //     // if (type.IsInterface)
-    //     // {
-    //     //     if (!Models.ModelInterfaceJsonMap.Map.TryGetValue(type, out type))
-    //     //         throw new NotSupportedException($"Couldn't find json type info for {type}");
-    //     // }
-    //     //
-    //     // var context = await Models.ModelInterfaceJsonMap.GetContextForTypeAsync(
-    //     //     type,
-    //     //     _restClient.Config.JsonSerializerOptions
-    //     // ) ?? throw new NotSupportedException($"Couldn't find json type info for {type}");
-    //     //
-    //     // return context.GetTypeInfo(type) ?? throw new NotSupportedException($"Couldn't find json type info for {type} ({typeof(T)})");
-    //
-    //     // if(!Models.ModelInterfaceJsonMap.JsonTypeInfoMap.TryGetValue(type, out var infoFactory))
-    //     //     throw new NotSupportedException($"Couldn't find json type info for {type}");
-    //     //
-    //     // return infoFactory();
-    // }
-
     public Task ExecuteAsync(IApiRoute route, RequestOptions options, CancellationToken token)
         => SendAsync(
             route,

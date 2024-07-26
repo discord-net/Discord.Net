@@ -3,26 +3,18 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Discord.Gateway
+namespace Discord.Gateway;
+
+[method: TypeFactory]
+public sealed partial class JsonEncoding(DiscordGatewayClient client) : IGatewayEncoding
 {
-    public sealed class JsonEncoding : IGatewayEncoding
-    {
-        public T? Decode<T>(Stream data)
-            => JsonSerializer.Deserialize<T>(data);
+    public string Identifier => "json";
 
-        public ReadOnlyMemory<byte> Encode<T>(T value)
-            => Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value));
+    private readonly JsonSerializerOptions _options = client.Config.JsonSerializerOptions;
 
-        public T? ToObject<T>(object? obj)
-        {
-            if (obj is null)
-                return default;
+    public ValueTask<T?> DecodeAsync<T>(Stream data, CancellationToken token = default)
+        => JsonSerializer.DeserializeAsync<T>(data, _options, token);
 
-            if (obj is JsonDocument jdoc)
-                return jdoc.Deserialize<T>();
-
-            throw new ArgumentException($"Unknown object type {obj.GetType().Name}", nameof(obj));
-        }
-    }
+    public async ValueTask EncodeAsync<T>(Stream stream, T value, CancellationToken token = default)
+        => await JsonSerializer.SerializeAsync(stream, value, _options, token);
 }
-

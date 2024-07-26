@@ -1,18 +1,19 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace Discord.API.Gateway
-{
-    public sealed class GatewayPayload
-    {
-        [JsonPropertyName("op")]
-        public GatewayOpCode Operation { get; set; }
-        [JsonPropertyName("t")]
-        public string? Type { get; set; }
-        [JsonPropertyName("s")]
-        public int? Sequence { get; set; }
-        [JsonPropertyName("d")]
-        public object? Payload { get; set; }
-    }
-}
+namespace Discord.Models.Json;
 
+public sealed class GatewayMessage : IGatewayMessage
+{
+    [JsonPropertyName("op")]
+    public GatewayOpCode OpCode { get; set; }
+
+    [JsonPropertyName("t")]
+    public string? EventName { get; set; }
+
+    [JsonPropertyName("s")]
+    public int? Sequence { get; set; }
+
+    [JsonPropertyName("d")]
+    public IGatewayPayloadData? Payload { get; set; }
+}
