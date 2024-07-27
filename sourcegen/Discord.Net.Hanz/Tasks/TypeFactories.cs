@@ -197,12 +197,14 @@ public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarg
                 $"IFactory<{target.ClassDeclarationSyntax.Identifier}, {string.Join(", ", x.Arguments)}>"
             ).ToArray();
 
+            var modifiers = string.Join(" ", target.ClassDeclarationSyntax.Modifiers);
+
             context.AddSource(
                 $"Factories/{target.ClassDeclarationSyntax.Identifier}",
                 $$"""
                   namespace {{target.SemanticModel.GetDeclaredSymbol(target.ClassDeclarationSyntax)!.ContainingNamespace}};
 
-                  public partial class {{target.ClassDeclarationSyntax.Identifier}}{{(bases.Length > 0 ? $" : {string.Join(", ", bases)}" : "")}}
+                  {{modifiers}} class {{target.ClassDeclarationSyntax.Identifier}}{{(bases.Length > 0 ? $" : {string.Join(", ", bases)}" : "")}}
                   {
                       {{sb.ToString().Replace("\n", "\n    ")}}
 

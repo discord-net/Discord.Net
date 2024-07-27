@@ -1,6 +1,10 @@
+using Discord.Gateway.Cache;
+using Discord.Gateway.Events;
+using Discord.Gateway.State;
 using Discord.Rest;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using System.Threading.Channels;
 
 namespace Discord.Gateway;
 
@@ -27,6 +31,10 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
 
     internal IGatewayEncoding Encoding { get; }
 
+    internal ICacheProvider CacheProvider { get; }
+
+    internal StateController StateController { get; }
+
     public DiscordGatewayClient(
         DiscordGatewayConfig config,
         ILoggerFactory? loggerFactory = null)
@@ -35,7 +43,23 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
 
         LoggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         Rest = new DiscordRestClient(config, LoggerFactory.CreateLogger<DiscordRestClient>());
-        Encoding = config.Encoding(this);
+        Encoding = config.Encoding(this, Config);
+        CacheProvider = config.CacheProvider(this, config);
+
+        _heartbeatSignal = Channel.CreateBounded<HeartbeatSignal>(
+            new BoundedChannelOptions(2)
+            {
+                FullMode = BoundedChannelFullMode.DropOldest,
+                SingleReader = true,
+                SingleWriter = true,
+                AllowSynchronousContinuations = false
+            },
+            HandleHeartbeatSignalDropped
+        );
+
+        _dispatchQueue = Config.DispatchQueue(this, Config);
+
+        StateController = new(this, LoggerFactory.CreateLogger<StateController>());
     }
 
     public void Dispose()

@@ -1,36 +1,40 @@
 using Discord.Gateway.Cache;
+using Discord.Gateway.Events;
 using Discord.Rest;
 using System;
 using System.Buffers;
 
-namespace Discord.Gateway
+namespace Discord.Gateway;
+
+// public delegate IGatewayConnection GatewayConnectionFactory(
+//     DiscordGatewayClient client,
+//     DiscordGatewayConfig config
+// );
+//
+// public delegate IGatewayEncoding GatewayEncodingFactory(DiscordGatewayClient client);
+
+public delegate T GatewayConfiguredObject<T>(DiscordGatewayClient client, DiscordGatewayConfig config);
+
+public sealed class DiscordGatewayConfig : DiscordConfig
 {
-    public delegate IGatewayConnection GatewayConnectionFactory(
-        DiscordGatewayClient client,
-        DiscordGatewayConfig config
-    );
+    public GatewayIntents Intents { get; set; }
 
-    public delegate IGatewayEncoding GatewayEncodingFactory(DiscordGatewayClient client);
+    public string? CustomGatewayUrl { get; set; }
 
-    public sealed class DiscordGatewayConfig : DiscordConfig
-    {
-        public GatewayIntents Intents { get; set; }
+    public sbyte GatewayVersion { get; set; } = 10;
 
-        public string? CustomGatewayUrl { get; set; }
+    public GatewayConfiguredObject<ICacheProvider> CacheProvider { get; set; } = ConcurrentCacheProvider.Factory;
+    public GatewayConfiguredObject<IGatewayConnection> GatewayConnection { get; set; } = WebSocketGatewayConnection.Factory;
+    public GatewayConfiguredObject<IGatewayEncoding> Encoding { get; set; } = JsonEncoding.Factory;
 
-        public sbyte GatewayVersion { get; set; } = 10;
+    public GatewayConfiguredObject<IGatewayDispatchQueue> DispatchQueue { get; set; } =
+        ConcurrentGatewayDispatchQueue.Factory;
+    public ArrayPool<byte> BufferPool { get; set; } = ArrayPool<byte>.Shared;
 
-        public ICacheProvider CacheProvider { get; set; } = new ConcurrentCacheProvider();
-        public GatewayConnectionFactory GatewayConnection { get; set; } = WebSocketGatewayConnection.Factory;
-        public GatewayEncodingFactory Encoding { get; set; } = JsonEncoding.Factory;
-        public ArrayPool<byte> BufferPool { get; set; } = ArrayPool<byte>.Shared;
+    public int MaxClientMessageTimeout { get; set; } = 120000;
+    public byte MaxUnacknowledgedHeartbeats { get; set; } = 3;
 
-        public int MaxClientMessageTimeout { get; set; } = 120000;
-        public byte MaxUnacknowledgedHeartbeats { get; set; } = 3;
-
-        public DiscordGatewayConfig(DiscordToken token)
-            : base(token)
-        { }
-    }
+    public DiscordGatewayConfig(DiscordToken token)
+        : base(token)
+    { }
 }
-

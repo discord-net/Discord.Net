@@ -6,11 +6,12 @@ using System.Text.Json.Serialization;
 namespace Discord.Gateway;
 
 [method: TypeFactory]
-public sealed partial class JsonEncoding(DiscordGatewayClient client) : IGatewayEncoding
+public sealed partial class JsonEncoding(DiscordGatewayClient client, DiscordGatewayConfig config) : IGatewayEncoding
 {
+    public DiscordGatewayClient Client { get; } = client;
     public string Identifier => "json";
 
-    private readonly JsonSerializerOptions _options = client.Config.JsonSerializerOptions;
+    private readonly JsonSerializerOptions _options = config.JsonSerializerOptions;
 
     public ValueTask<T?> DecodeAsync<T>(Stream data, CancellationToken token = default)
         => JsonSerializer.DeserializeAsync<T>(data, _options, token);

@@ -6,15 +6,28 @@ namespace Discord.Gateway;
 
 public sealed partial class DiscordGatewayClient
 {
+    private enum HeartbeatSignal
+    {
+        Requested,
+        ReceivedAck
+    }
+
     public bool IsConnected { get; private set; }
 
     private IGatewayConnection? _connection;
     private Task _eventProcessorTask;
     private CancellationTokenSource _eventProcessorCancellationTokenSource = new();
     private int _sequence;
-    private TaskCompletionSource _heartbeatAckPromise = new();
+
+    private readonly Channel<HeartbeatSignal> _heartbeatSignal;
 
     private readonly SemaphoreSlim _connectionSemaphore = new(1, 1);
+
+    private void HandleHeartbeatSignalDropped(HeartbeatSignal signal)
+    {
+        // TODO: the heartbeat task has choked and we need to reconnect
+        _eventProcessorCancellationTokenSource.Cancel();
+    }
 
     private async Task StartEventProcessorAsync()
     {
@@ -115,6 +128,13 @@ public sealed partial class DiscordGatewayClient
                 },
                 _eventProcessorCancellationTokenSource.Token
             );
+
+            while (!_eventProcessorCancellationTokenSource.IsCancellationRequested)
+            {
+                await ProcessMessageAsync(
+                    await ReceiveGatewayMessageAsync(_eventProcessorCancellationTokenSource.Token)
+                );
+            }
         }
         catch (Exception x) when (x is not OperationCanceledException)
         {
@@ -132,52 +152,105 @@ public sealed partial class DiscordGatewayClient
         }
     }
 
+    private async Task ProcessMessageAsync(IGatewayMessage message, CancellationToken token)
+    {
+        switch (message.OpCode)
+        {
+            case GatewayOpCode.Dispatch:
+
+                break;
+            case GatewayOpCode.Heartbeat:
+                await _heartbeatSignal.Writer.WriteAsync(HeartbeatSignal.Requested, token);
+                break;
+            case GatewayOpCode.HeartbeatAck:
+                await _heartbeatSignal.Writer.WriteAsync(HeartbeatSignal.ReceivedAck, token);
+                break;
+            case GatewayOpCode.Reconnect:
+                // TODO
+                break;
+            case GatewayOpCode.InvalidSession:
+                // TODO
+                break;
+        }
+    }
+
     private async Task HeartbeatLoopAsync(int interval, CancellationToken token)
     {
         var jitter = true;
 
-        while (!token.IsCancellationRequested)
+        try
         {
-            var heartbeatDelay = interval;
-
-            if (jitter)
+            while (!token.IsCancellationRequested)
             {
-                heartbeatDelay = (int)Math.Floor(heartbeatDelay * Random.Shared.NextSingle());
-                jitter = false;
+                var heartbeatDelay = interval;
+
+                if (jitter)
+                {
+                    heartbeatDelay = (int)Math.Floor(heartbeatDelay * Random.Shared.NextSingle());
+                    jitter = false;
+                }
+
+                using (var heartbeatWaitCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(token))
+                using (var heartbeatTimeoutTask = Task.Delay(heartbeatDelay, heartbeatWaitCancellationToken.Token))
+                using (var heartbeatSignalTask =
+                       _heartbeatSignal.Reader.ReadAsync(heartbeatWaitCancellationToken.Token).AsTask())
+                {
+                    // wait for either the delay or a heartbeat signal
+                    // TODO: I don't like this '.AsTask' allocation
+                    await Task.WhenAny(
+                        heartbeatTimeoutTask,
+                        heartbeatSignalTask
+                    );
+
+                    // cancel any remaining parts
+                    await heartbeatWaitCancellationToken.CancelAsync();
+                }
+
+                var attempts = 0;
+
+                while (true)
+                {
+                    if (attempts == 3)
+                        throw new DiscordException("Heartbeat wasn't acknowledged");
+
+                    await SendMessageAsync(new GatewayMessage {OpCode = GatewayOpCode.Heartbeat, Sequence = _sequence},
+                        token);
+
+                    using var heartbeatWaitCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(token);
+                    using var heartbeatTimeoutTask = Task.Delay(3000, heartbeatWaitCancellationToken.Token);
+                    using var heartbeatSignalTask =
+                        _heartbeatSignal.Reader.ReadAsync(heartbeatWaitCancellationToken.Token).AsTask();
+
+                    var completingTask = await Task.WhenAny(heartbeatTimeoutTask, heartbeatTimeoutTask);
+
+                    if (token.IsCancellationRequested)
+                        return;
+
+                    if (
+                        completingTask == heartbeatSignalTask &&
+                        heartbeatSignalTask.Result is HeartbeatSignal.ReceivedAck)
+                    {
+                        break;
+                    }
+
+                    attempts++;
+                }
             }
-
-            await Task.Delay(heartbeatDelay, token);
-
-            var attempts = 0;
-
-            while (true)
-            {
-                if (attempts == 3)
-                    throw new DiscordException("Heartbeat wasn't acknowledged");
-
-                await SendMessageAsync(new GatewayMessage {OpCode = GatewayOpCode.Heartbeat, Sequence = _sequence},
-                    token);
-
-                var timeout = Task.Delay(3000, token);
-
-                // try 3 times if we don't receive a response
-                var completingTask = await Task.WhenAny(timeout, _heartbeatAckPromise.Task);
-
-                if (_eventProcessorCancellationTokenSource.IsCancellationRequested)
-                    return;
-
-                if (completingTask == _heartbeatAckPromise.Task)
-                    break;
-
-                attempts++;
-            }
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            await IndicateGatewayFailureAsync(exception);
+            throw;
         }
     }
 
-    private static ValueTask IndicateGatewayFailureAsync(Exception exception)
+    private ValueTask IndicateGatewayFailureAsync(Exception exception)
     {
         // TODO:
         // invoke a 'GatewayError' event in user-code land to indicate that something went wrong
+        if (!_eventProcessorCancellationTokenSource.IsCancellationRequested)
+            _eventProcessorCancellationTokenSource.Cancel();
+
         return ValueTask.CompletedTask;
     }
 

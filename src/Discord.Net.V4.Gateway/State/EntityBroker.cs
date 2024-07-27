@@ -1,214 +1,201 @@
 using Discord.Gateway.Cache;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
-namespace Discord.Gateway.State
+namespace Discord.Gateway.State;
+
+internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TEntity, TModel>
+    where TEntity :
+    class,
+    ICacheableEntity<TEntity, TId, TModel>,
+    IContextConstructable<TEntity, TModel, IPathable, DiscordGatewayClient>
+    where TModel : class, IEntityModel<TId>
+    where TId : IEquatable<TId>
 {
-    internal sealed class EntityBroker<TId, TEntity, TModel> : EntityBroker<TId, TEntity, TModel, object?>
-        where TEntity : class, ICacheableEntity<TId, TModel>
-        where TModel : IEntityModel<TId>
-        where TId : IEquatable<TId>
+    private sealed class EntityReference(
+        EntityBroker<TId, TEntity, TModel> broker,
+        TId id,
+        TEntity entity,
+        params IEntityHandle<TId, TEntity>[] handles)
     {
-        public EntityBroker(StateController controller,
-            StoreFactory getStore,
-            EntityFactory factory)
-            : base(controller, getStore, factory, (_, __, ___) => ValueTask.FromResult<object?>(null))
-        {}
+        public bool IsAlive => Handles.Count > 0 || WeakReference.TryGetTarget(out _);
+
+        public TId Id { get; } = id;
+
+        public WeakReference<TEntity> WeakReference { get; } = new(entity);
+
+        public List<IEntityHandle<TId, TEntity>> Handles { get; } = handles.ToList();
+
+        public IEntityHandle<TId, TEntity>? AllocateHandle()
+        {
+            if (!WeakReference.TryGetTarget(out var entity))
+                return null;
+
+            var handle = new EntityHandle<TId, TEntity>(broker, Id, entity);
+            Handles.Add(handle);
+            return handle;
+        }
     }
 
-    internal class EntityBroker<TId, TEntity, TModel, TFactoryArgs> : IEntityBroker<TId, TEntity>
-        where TEntity : class, ICacheableEntity<TId, TModel>
-        where TModel : IEntityModel<TId>
-        where TId : IEquatable<TId>
+    private readonly DiscordGatewayClient _client;
+    private readonly StateController _controller;
+    private readonly Dictionary<TId, EntityReference> _references;
+    private readonly KeyedSemaphoreSlim<IIdentifiable<TId, TEntity, TModel>> _keyedSemaphore;
+    private readonly SemaphoreSlim _enumerationSemaphore = new(1, 1);
+
+    private readonly ILogger<EntityBroker<TId, TEntity, TModel>> _logger;
+
+    public EntityBroker(
+        DiscordGatewayClient client,
+        StateController stateController)
     {
-        public delegate ValueTask<TFactoryArgs> CreateEntityFactoryArguments(Optional<TId> id, Optional<TId> parent, CancellationToken token);
-        public delegate ValueTask<TEntity> EntityFactory(TFactoryArgs? args, Optional<TId> parent, TModel model, CancellationToken token);
-        public delegate ValueTask<IEntityStore<TId>> StoreFactory(Optional<TId> parent, CancellationToken token);
+        _keyedSemaphore = new(1, 1);
+        _client = client;
+        _controller = stateController;
+        _logger = client.LoggerFactory.CreateLogger<EntityBroker<TId, TEntity, TModel>>();
+        _references = new();
+    }
 
-        private readonly StoreFactory _getStore;
-        private readonly StateController _controller;
-        private readonly EntityFactory _factory;
-        private readonly CreateEntityFactoryArguments _argsFactory;
+    private void RemoveDeadReference(EntityReference reference)
+    {
+        if (reference.IsAlive) return;
 
-        private readonly SemaphoreSlim _cleanupSemaphore;
+        _references.Remove(reference.Id);
+    }
 
-        public EntityBroker(
-            StateController controller,
-            StoreFactory getStore,
-            EntityFactory factory,
-            CreateEntityFactoryArguments? argsFactory = null)
+    private EntityHandle<TId, TEntity> CreateReferenceAndHandle(
+        IPathable path,
+        IIdentifiable<TId, TEntity, TModel> identity,
+        TModel model)
+    {
+        var entity = TEntity.Construct(_client, path, model);
+
+        var handle = new EntityHandle<TId, TEntity>(this, identity.Id, entity);
+
+        _references.Add(identity.Id, new EntityReference(this, identity.Id, entity, handle));
+
+        return handle;
+    }
+
+    public async ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(
+        IPathable path,
+        IIdentifiable<TId, TEntity, TModel> identity,
+        IEntityModelStore<TId, TModel> store,
+        CancellationToken token = default)
+    {
+        using var scope = _keyedSemaphore.Get(identity, out var semaphoreSlim);
+
+        await semaphoreSlim.WaitAsync(token);
+
+        try
         {
-            _cleanupSemaphore = new(1, 1);
-            _getStore = getStore;
-            _controller = controller;
-            _factory = factory;
-            _argsFactory = argsFactory ?? NullArgumentFactory;
-        }
-
-        private static ValueTask<TFactoryArgs> NullArgumentFactory(Optional<TId> _, Optional<TId> __, CancellationToken ___)
-            => ValueTask.FromResult<TFactoryArgs>(default!);
-
-        public bool TryGetReferenced(TId id, [NotNullWhen(true)] out TEntity? entity)
-        {
-            if(_controller.TryGetReference(id, out var entityRef))
+            if (_references.TryGetValue(identity.Id, out var reference))
             {
-                if(entityRef.Reference.IsAlive && entityRef.Reference.Target is not null)
-                {
-                    entity = (TEntity)entityRef.Reference.Target!;
-                    return true;
-                }
+                var handle = reference.AllocateHandle();
+
+                if (handle is not null)
+                    return handle;
+
+                // if we couldn't allocate a handle, remove the dead reference
+                RemoveDeadReference(reference);
             }
 
-            entity = null;
-            return false;
-        }
-
-        #region CreateAsync
-        public async ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(TModel model, CancellationToken token = default)
-            => await CreateAsync(model, await _argsFactory(model.Id, Optional<TId>.Unspecified, token), Optional<TId>.Unspecified, token);
-
-        public async ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(TModel model, Optional<TId> parent, CancellationToken token = default)
-            => await CreateAsync(model, await _argsFactory(model.Id, parent, token), parent, token);
-
-        public ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(TModel model, TFactoryArgs factoryArgs, CancellationToken token = default)
-            => CreateAsync(model, factoryArgs, Optional<TId>.Unspecified, token);
-
-        public async ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(TModel model, TFactoryArgs factoryArgs, Optional<TId> parent, CancellationToken token = default)
-        {
-            var store = await _getStore(parent, token);
-
-            // if we have the entity in scope already, get it, create a new handle, and update the entity
-            if(TryGetReferenced(model.Id, out var existing))
-            {
-                var handle = _controller.AllocateHandle(store, existing);
-                _controller.UpdateActiveEntities<TId, TModel>(CacheOperation.Update, model);
-                return handle;
-            }
-
-            await store.AddOrUpdateAsync(model, token);
-            return await CreateAndAllocateHandle(store, parent, factoryArgs, model, token);
-        }
-        #endregion
-
-        #region GetAsync
-        public async ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TId id, CancellationToken token = default)
-            => await GetAsync(id, Optional<TId>.Unspecified, await _argsFactory(id, Optional<TId>.Unspecified, token), token);
-
-        public async ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TId id, Optional<TId> parent, CancellationToken token = default)
-            => await GetAsync(id, parent, await _argsFactory(id, parent, token), token);
-
-        public ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TId id, TFactoryArgs args, CancellationToken token = default)
-            => GetAsync(id, Optional<TId>.Unspecified, args, token);
-
-        public async ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TId id, Optional<TId> parent, TFactoryArgs args, CancellationToken token = default)
-        {
-            var store = await _getStore(parent, token);
-
-            if(TryGetReferenced(id, out var existing))
-            {
-                return _controller.AllocateHandle(store, existing);
-            }
-
-            var model = await store.GetAsync(id, token);
-
-            if(model is not TModel entityModel)
-            {
-                throw new InvalidCastException("The returned entity model is not applicable for the target entity");
-            }
+            // fetch from the cache
+            var model = await store.GetAsync(identity.Id, token);
 
             if (model is null)
                 return null;
 
-            return await CreateAndAllocateHandle(store, parent, args, entityModel, token);
+            return CreateReferenceAndHandle(path, identity, model);
         }
-        #endregion
-
-        #region GetAllAsync
-        public async ValueTask<IAsyncEnumerable<IEntityHandle<TId, TEntity>>> GetAllAsync(CancellationToken token = default)
-            => await GetAllAsync(Optional<TId>.Unspecified, await _argsFactory(Optional<TId>.Unspecified, Optional<TId>.Unspecified, token), token);
-
-        public async ValueTask<IAsyncEnumerable<IEntityHandle<TId, TEntity>>> GetAllAsync(Optional<TId> parent, CancellationToken token = default)
-            => await GetAllAsync(parent, await _argsFactory(Optional<TId>.Unspecified, parent, token), token);
-
-        public ValueTask<IAsyncEnumerable<IEntityHandle<TId, TEntity>>> GetAllAsync(TFactoryArgs args, CancellationToken token = default)
-            => GetAllAsync(Optional<TId>.Unspecified, args, token);
-
-        public async ValueTask<IAsyncEnumerable<IEntityHandle<TId, TEntity>>> GetAllAsync(Optional<TId> parent, TFactoryArgs args, CancellationToken token = default)
+        finally
         {
-            var store = await _getStore(parent, token);
-
-            return store.GetAllAsync(token)
-                .Select(VerifyCorrectModel)
-                .SelectAwait(entity => CreateAndAllocateHandle(store, parent, args, entity, token));
+            semaphoreSlim.Release();
         }
-        #endregion
+    }
 
-        #region GetAllIdsAsync
-        public ValueTask<IAsyncEnumerable<TId>> GetAllIdsAsync(CancellationToken token = default)
-            => GetAllIdsAsync(Optional<TId>.Unspecified, token);
 
-        public async ValueTask<IAsyncEnumerable<TId>> GetAllIdsAsync(Optional<TId> parent, CancellationToken token = default)
+    public async ValueTask<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllAsync(
+        IPathable path,
+        IEntityModelStore<TId, TModel> store,
+        CancellationToken token = default)
+    {
+        await _enumerationSemaphore.WaitAsync(token);
+
+        var result = new List<IEntityHandle<TId, TEntity>>();
+
+        try
         {
-            var store = await _getStore(parent, token);
-
-            return store.GetAllIdsAsync(token);
-        }
-        #endregion
-
-        private TModel VerifyCorrectModel(IEntityModel<TId> raw)
-        {
-            if (raw is not TModel entityModel)
+            await foreach (var model in store.GetAllAsync(token))
             {
-                throw new InvalidCastException("The returned entity model is not applicable for the target entity");
+                if (_references.TryGetValue(model.Id, out var reference))
+                {
+                    var handle = reference.AllocateHandle();
+
+                    if (handle is null)
+                    {
+                        RemoveDeadReference(reference);
+                        goto construct_entity;
+                    }
+
+                    await handle.Entity.UpdateAsync(model, false, token);
+
+                    result.Add(handle);
+                    continue;
+                }
+
+                construct_entity:
+                result.Add(CreateReferenceAndHandle(path, IIdentifiable<TId, TEntity, TModel>.Of(model.Id), model));
             }
 
-            return entityModel;
+            return result.AsReadOnly();
         }
-
-        private async ValueTask<IEntityHandle<TId, TEntity>> CreateAndAllocateHandle(IEntityStore<TId> store, Optional<TId> parent, TFactoryArgs? args, TModel model, CancellationToken token = default)
+        finally
         {
-            var handle = _controller.AllocateHandle(store, await _factory(args, parent, model, token));
-
-            _controller.AddOrUpdateReference(
-                model.Id,
-                () => CreateTrackedReference(model.Id, handle),
-                old => old.Handles.Add(handle.HandleId)
-            );
-
-            return handle;
-        }
-
-        private EntityReference CreateTrackedReference(TId id, IEntityHandle<TId, TEntity> handle)
-        {
-            var entity = handle.Entity ?? throw new NullReferenceException("Entity was null from a fresh handle");
-
-            var reference = new EntityReference(entity, this);
-
-            reference.RegisterHandle(handle);
-
-            return reference;
+            _enumerationSemaphore.Release();
         }
     }
 
-    internal interface IEntityBroker<TId, TEntity> : IEntityBroker
-        where TEntity : class, ICacheableEntity<TId>
-        where TId : IEquatable<TId>
+    public async ValueTask<IReadOnlyCollection<TId>> GetAllIdsAsync(IEntityModelStore<TId, TModel> store, CancellationToken token = default)
     {
-        bool TryGetReferenced(TId id, [NotNullWhen(true)] out TEntity? entity);
+        var result = await store.GetAllIdsAsync(token).ToListAsync(token);
 
-        ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(TId id, Optional<TId> parent = default, CancellationToken token = default);
-
-        ValueTask<IAsyncEnumerable<TId>> GetAllIdsAsync(Optional<TId> parent = default, CancellationToken token = default);
-
-        ValueTask<IAsyncEnumerable<IEntityHandle<TId, TEntity>>> GetAllAsync(Optional<TId> parent = default, CancellationToken token = default);
+        return result.AsReadOnly();
     }
+}
 
-    internal interface IEntityBroker
-    {
-    }
+internal interface IEntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TEntity>
+    where TEntity :
+    class,
+    ICacheableEntity<TEntity, TId, TModel>,
+    IContextConstructable<TEntity, TModel, IPathable, DiscordGatewayClient>
+    where TId : IEquatable<TId>
+    where TModel : class, IEntityModel<TId>
+{
+    ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(
+        IPathable path,
+        IIdentifiable<TId, TEntity, TModel> identity,
+        IEntityModelStore<TId, TModel> store,
+        CancellationToken token = default
+    );
+
+    ValueTask<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllAsync(
+        IPathable path,
+        IEntityModelStore<TId, TModel> store,
+        CancellationToken token = default);
+
+    ValueTask<IReadOnlyCollection<TId>> GetAllIdsAsync(IEntityModelStore<TId, TModel> store, CancellationToken token = default);
+}
+
+internal interface IEntityBroker<in TId, TEntity> : IEntityBroker<TId>
+    where TId : IEquatable<TId>
+    where TEntity : class, ICacheableEntity<TId>
+{
+    Type IEntityBroker.EntityType => typeof(TEntity);
+}
+
+internal interface IEntityBroker<in TId> : IEntityBroker;
+
+internal interface IEntityBroker
+{
+    Type EntityType { get; }
 }

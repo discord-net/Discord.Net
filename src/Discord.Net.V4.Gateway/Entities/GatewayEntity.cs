@@ -4,20 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.Gateway
+namespace Discord.Gateway;
+
+public abstract class GatewayEntity<T> : IEntity<T>
+    where T : IEquatable<T>
 {
-    public abstract class GatewayEntity<T> : IEntity<T>
-        where T : IEquatable<T>
+    protected DiscordGatewayClient Client { get; }
+
+    /// <inheritdoc />
+    public T Id { get; }
+
+    internal GatewayEntity(DiscordGatewayClient discord, T id)
     {
-        internal DiscordGatewayClient Discord { get; }
-
-        /// <inheritdoc />
-        public T Id { get; }
-
-        internal GatewayEntity(DiscordGatewayClient discord, T id)
-        {
-            Discord = discord;
-            Id = id;
-        }
+        Client = discord;
+        Id = id;
     }
+
+    IDiscordClient IClientProvider.Client => Client;
 }

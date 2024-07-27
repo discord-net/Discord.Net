@@ -3,19 +3,22 @@ namespace Discord;
 /// <summary>
 ///     Represents options that should be used when sending a request.
 /// </summary>
-public sealed record RequestOptions
+public class RequestOptions
 {
     /// <summary>
     ///     Initializes a new <see cref="RequestOptions" /> class with the default request timeout set in
     ///     <see cref="DiscordConfig" />.
     /// </summary>
-    public RequestOptions(int? timeout = null, bool? useSystemClock = null, string? auditLogReason = null,
+    public RequestOptions(
+        int? timeout = null,
+        bool? useSystemClock = null,
+        string? auditLogReason = null,
         RetryMode? retryMode = null)
     {
         UseSystemClock = useSystemClock;
         AuditLogReason = auditLogReason;
         RetryMode = retryMode;
-        Timeout = DiscordConfig.DefaultRequestTimeout;
+        Timeout = timeout ?? DiscordConfig.DefaultRequestTimeout;
     }
 
     /// <summary>
