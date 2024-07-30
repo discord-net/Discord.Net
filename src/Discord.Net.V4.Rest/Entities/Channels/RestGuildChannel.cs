@@ -58,6 +58,8 @@ public partial class RestGuildChannel :
     IGuildChannel,
     IContextConstructable<RestGuildChannel, IGuildChannelModel, GuildIdentity, DiscordRestClient>
 {
+    public string Name => Model.Name;
+    
     public int Position => Model.Position;
 
     public ChannelFlags Flags => (ChannelFlags?)Model.Flags ?? ChannelFlags.None;
