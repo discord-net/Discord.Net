@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 using System.Threading.Channels;
@@ -15,7 +16,7 @@ public sealed partial class DiscordGatewayClient
     public bool IsConnected { get; private set; }
 
     private IGatewayConnection? _connection;
-    private Task _eventProcessorTask;
+    private Task? _eventProcessorTask;
     private CancellationTokenSource _eventProcessorCancellationTokenSource = new();
     private int _sequence;
 
@@ -32,9 +33,11 @@ public sealed partial class DiscordGatewayClient
     private async Task StartEventProcessorAsync()
     {
         await _eventProcessorCancellationTokenSource.CancelAsync();
-        await _eventProcessorTask;
 
-        _eventProcessorTask.Dispose();
+        if(_eventProcessorTask is not null)
+            await _eventProcessorTask;
+
+        _eventProcessorTask?.Dispose();
 
         _eventProcessorCancellationTokenSource.Dispose();
         _eventProcessorCancellationTokenSource = new();
@@ -132,7 +135,8 @@ public sealed partial class DiscordGatewayClient
             while (!_eventProcessorCancellationTokenSource.IsCancellationRequested)
             {
                 await ProcessMessageAsync(
-                    await ReceiveGatewayMessageAsync(_eventProcessorCancellationTokenSource.Token)
+                    await ReceiveGatewayMessageAsync(_eventProcessorCancellationTokenSource.Token),
+                    _eventProcessorCancellationTokenSource.Token
                 );
             }
         }
@@ -156,8 +160,8 @@ public sealed partial class DiscordGatewayClient
     {
         switch (message.OpCode)
         {
-            case GatewayOpCode.Dispatch:
-
+            case GatewayOpCode.Dispatch when message.EventName is not null:
+                await ProcessDispatchAsync(message.EventName, message.Payload);
                 break;
             case GatewayOpCode.Heartbeat:
                 await _heartbeatSignal.Writer.WriteAsync(HeartbeatSignal.Requested, token);

@@ -1,6 +1,8 @@
+using Discord.Models;
+
 namespace Discord.Gateway.Events;
 
 public interface IGatewayDispatchQueue
 {
-    Task AcceptAsync(string dispatchType, IGatewayPayloadData payload);
+    Task AcceptAsync(string dispatchType, IGatewayPayloadData? payload);
 }

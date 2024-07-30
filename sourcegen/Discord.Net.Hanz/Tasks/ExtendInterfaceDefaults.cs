@@ -1,3 +1,4 @@
+using Discord.Net.Hanz.Tasks.Gateway;
 using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -181,7 +182,7 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
         ITypeSymbol interfaceSymbol,
         ITypeSymbol classSymbol)
     {
-        var willHaveFetchMethods = RestLoadable.WillHaveFetchMethods(classSymbol);
+        var willHaveFetchMethods = RestLoadable.WillHaveFetchMethods(classSymbol) || GatewayLoadable.WillHaveFetchMethods(classSymbol);
         var isTemplateExtensionInterface =
             interfaceSymbol is INamedTypeSymbol namedInterfaceSymbol &&
             IsTemplateExtensionInterface(namedInterfaceSymbol);

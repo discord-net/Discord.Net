@@ -5,15 +5,16 @@ internal sealed class KeyedSemaphoreSlim<TKey>(int initial, int maximum)
 {
     private sealed class KeyedSemaphoreScope(TKey key, KeyedSemaphoreSlim<TKey> owner, SemaphoreSlim semaphore) : IDisposable
     {
-        public readonly SemaphoreSlim Semaphore = semaphore;
+        public SemaphoreSlim Semaphore = semaphore;
         public int Window = 1;
 
         public void Dispose()
         {
-            if(Interlocked.Decrement(ref Window) <= 0)
-                owner.OnScopeRelease(key);
+            if (Interlocked.Decrement(ref Window) > 0) return;
 
-            // TODO release managed resources here
+            owner.OnScopeRelease(key);
+            Semaphore.Dispose();
+            Semaphore = null!;
         }
     }
 

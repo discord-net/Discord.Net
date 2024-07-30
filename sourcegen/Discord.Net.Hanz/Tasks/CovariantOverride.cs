@@ -146,7 +146,7 @@ public class CovariantOverride : IGenerationCombineTask<CovariantOverride.Genera
                     foreach (var member in members)
                     {
                         // verify we can override the member
-                        if (!member.IsVirtual)
+                        if (!member.IsVirtual && !member.IsOverride)
                         {
                             targetLogger.Warn(
                                 $"Member {baseType.Type}.{member.Name} shares the same name, but isn't virtual");

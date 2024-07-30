@@ -7,6 +7,7 @@
         <Nullable>enable</Nullable>
         <WarningLevel>9999</WarningLevel>
         <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+        <EnablePreviewFeatures>True</EnablePreviewFeatures>
         <IsAotCompatible>false</IsAotCompatible>
         <RootNamespace>Discord.Gateway</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

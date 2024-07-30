@@ -1,3 +1,4 @@
+using Discord.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway.Cache;
 
-public interface IEntityModelStore<TId, TModel>
+public interface IEntityModelStore<TId, TModel> : IEntityModelStore
     where TModel : class, IEntityModel<TId>
     where TId : IEquatable<TId>
 {
-    ValueTask<IEntityModelStore<TSubStoreId, TSubStoreModel>> GetStoreAsync<TSubStoreId, TSubStoreModel>(
+    ValueTask<IEntityModelStore<TSubStoreId, TSubStoreModel>> GetSubStoreAsync<TSubStoreId, TSubStoreModel>(
         TId id,
         CancellationToken token = default)
         where TSubStoreId : IEquatable<TSubStoreId>
@@ -28,4 +29,12 @@ public interface IEntityModelStore<TId, TModel>
 
     IAsyncEnumerable<TModel> QueryAsync(TId from, Direction direction, int limit);
 
+    Type IEntityModelStore.IdType => typeof(TId);
+    Type IEntityModelStore.ModelType => typeof(TModel);
+}
+
+public interface IEntityModelStore
+{
+    Type IdType { get; }
+    Type ModelType { get; }
 }

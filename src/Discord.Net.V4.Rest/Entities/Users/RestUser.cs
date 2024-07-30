@@ -20,6 +20,7 @@ public partial class RestUserActor(
 
     public IDMChannel CreateEntity(IDMChannelModel model)
         => RestDMChannel.Construct(Client, Identity.MostSpecific(this), model);
+
 }
 
 public partial class RestUser :
@@ -49,7 +50,11 @@ public partial class RestUser :
 
     private IUserModel _model;
 
-    internal RestUser(DiscordRestClient client, IUserModel model, RestUserActor? actor = null) : base(client, model.Id)
+    internal RestUser(
+        DiscordRestClient client,
+        IUserModel model,
+        RestUserActor? actor = null
+    ) : base(client, model.Id)
     {
         Actor = actor ?? new(client, UserIdentity.Of(this));
         _model = model;

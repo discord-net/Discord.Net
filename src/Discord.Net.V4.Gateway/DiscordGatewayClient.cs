@@ -20,9 +20,11 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
 
     public IIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks => throw new NotImplementedException();
 
-    public RequestOptions DefaultRequestOptions => Rest.DefaultRequestOptions;
+    public GatewayRequestOptions DefaultRequestOptions { get; }
 
     public DiscordRestClient Rest { get; }
+
+    internal RestApiClient RestApiClient => Rest.RestApiClient;
 
     [SourceOfTruth]
     internal DiscordGatewayConfig Config { get; }
@@ -33,13 +35,15 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
 
     internal ICacheProvider CacheProvider { get; }
 
-    internal StateController StateController { get; }
+    internal StateController? StateController { get; private set; }
 
     public DiscordGatewayClient(
         DiscordGatewayConfig config,
         ILoggerFactory? loggerFactory = null)
     {
         Config = config;
+
+        DefaultRequestOptions = new();
 
         LoggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         Rest = new DiscordRestClient(config, LoggerFactory.CreateLogger<DiscordRestClient>());
@@ -58,8 +62,6 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
         );
 
         _dispatchQueue = Config.DispatchQueue(this, Config);
-
-        StateController = new(this, LoggerFactory.CreateLogger<StateController>());
     }
 
     public void Dispose()
@@ -72,5 +74,6 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
         // TODO release managed resources here
     }
 
-    IRestApiClient IDiscordClient.RestApiClient => Rest.RestApiClient;
+    IRestApiClient IDiscordClient.RestApiClient => RestApiClient;
+    RequestOptions IDiscordClient.DefaultRequestOptions => DefaultRequestOptions;
 }

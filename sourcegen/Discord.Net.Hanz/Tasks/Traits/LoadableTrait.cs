@@ -287,6 +287,14 @@ public static class LoadableTrait
         entitiesSyntax[entityType.ToDisplayString()] = entitySyntax;
     }
 
+    // private static void CreateOverloadToGetAsync(
+    //     ref InterfaceDeclarationSyntax syntax,
+    //     GenericNameSyntax returnType,
+    //     NameSyntax interfaceToOverload)
+    // {
+    //
+    // }
+
     private static void CreateOverloadToFetchAsync(
         ref InterfaceDeclarationSyntax syntax,
         GenericNameSyntax returnType,

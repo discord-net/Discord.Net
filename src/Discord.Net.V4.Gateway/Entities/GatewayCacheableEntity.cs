@@ -1,4 +1,6 @@
 using Discord.Gateway.Cache;
+using Discord.Gateway.State;
+using Discord.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,23 +13,34 @@ public abstract class GatewayCacheableEntity<TSelf, TId, TModel, TIdentity> :
     GatewayEntity<TId>,
     ICacheableEntity<TSelf, TId, TModel>
     where TId : IEquatable<TId>
-    where TModel : IEntityModel<TId>
+    where TModel : class, IEntityModel<TId>
     where TSelf :
         GatewayCacheableEntity<TSelf, TId, TModel, TIdentity>,
-        IContextConstructable<TSelf, TModel, IPathable, DiscordGatewayClient>
+        IStoreProvider<TId, TModel>,
+        IContextConstructable<TSelf, TModel, ICacheConstructionContext<TId, TSelf>, DiscordGatewayClient>
 {
-    public void Dispose()
+    private IEntityHandle<TId, TSelf>? _implicitHandle;
+
+    ~GatewayCacheableEntity()
     {
-        // TODO release managed resources here
+        Client.StateController.EnqueueEntityDestruction<TId, TSelf, TModel>(Id);
     }
 
     public async ValueTask DisposeAsync()
     {
-        // TODO release managed resources here
+        if (_implicitHandle is not null)
+            await _implicitHandle.DisposeAsync();
+
+        _implicitHandle = null;
     }
 
-    protected GatewayCacheableEntity(DiscordGatewayClient discord, TId id) : base(discord, id)
+    protected GatewayCacheableEntity(
+        DiscordGatewayClient discord,
+        TId id,
+        IEntityHandle<TId, TSelf>? implicitHandle
+        ) : base(discord, id)
     {
+        _implicitHandle = implicitHandle;
     }
 
 

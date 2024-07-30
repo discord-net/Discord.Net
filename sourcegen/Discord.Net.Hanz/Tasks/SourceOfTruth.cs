@@ -82,6 +82,17 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
         return symbol.GetAttributes().Any(x => x.AttributeClass?.ToDisplayString() == "Discord.SourceOfTruthAttribute");
     }
 
+    public static ISymbol? GetSourceOfTruthMember(ITypeSymbol type, ISymbol member)
+    {
+        return type
+            .GetMembers()
+            .FirstOrDefault(x =>
+                IsTarget(x) &&
+                MemberUtils.GetMemberName(x) == MemberUtils.GetMemberName(member) &&
+                x.Kind == member.Kind
+            );
+    }
+
     private class GenerationResult(string ns, string usingDirectives, TypeDeclarationSyntax syntax)
     {
         public string Namespace { get; } = ns;
@@ -230,78 +241,78 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                         case IPropertySymbol property:
                             targetTypeDeclaration.Syntax = targetTypeDeclaration.Syntax.AddMembers(
                                 SyntaxFactory.PropertyDeclaration([], [],
-                                    SyntaxFactory.IdentifierName(property.Type.ToDisplayString()),
-                                    SyntaxFactory.ExplicitInterfaceSpecifier(
-                                        SyntaxFactory.IdentifierName(property.ContainingType.ToDisplayString())),
-                                    SyntaxFactory.Identifier(property.Name),
-                                    null,
-                                    SyntaxFactory.ArrowExpressionClause(
-                                        SyntaxFactory.Token(SyntaxKind.EqualsGreaterThanToken),
-                                        SyntaxFactory.IdentifierName(property.Name)
-                                    ),
-                                    null,
-                                    SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                                )
-                                .WithLeadingTrivia(
-                                    SyntaxFactory.Comment($"// {property.ToDisplayString()}")
-                                )
+                                        SyntaxFactory.IdentifierName(property.Type.ToDisplayString()),
+                                        SyntaxFactory.ExplicitInterfaceSpecifier(
+                                            SyntaxFactory.IdentifierName(property.ContainingType.ToDisplayString())),
+                                        SyntaxFactory.Identifier(property.Name),
+                                        null,
+                                        SyntaxFactory.ArrowExpressionClause(
+                                            SyntaxFactory.Token(SyntaxKind.EqualsGreaterThanToken),
+                                            SyntaxFactory.IdentifierName(property.Name)
+                                        ),
+                                        null,
+                                        SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                                    )
+                                    .WithLeadingTrivia(
+                                        SyntaxFactory.Comment($"// {property.ToDisplayString()}")
+                                    )
                             );
                             break;
                         case IMethodSymbol method:
                             targetTypeDeclaration.Syntax = targetTypeDeclaration.Syntax.AddMembers(
                                 SyntaxFactory.MethodDeclaration(
-                                    [],
-                                    [],
-                                    SyntaxFactory.IdentifierName(method.ReturnType.ToDisplayString()),
-                                    SyntaxFactory.ExplicitInterfaceSpecifier(
-                                        SyntaxFactory.IdentifierName(method.ContainingType.ToDisplayString())
-                                    ),
-                                    SyntaxFactory.Identifier(method.Name),
-                                    method.TypeParameters.Length > 0
-                                        ? SyntaxFactory.TypeParameterList(
-                                            SyntaxFactory.SeparatedList(
-                                                method.TypeParameters.Select(x =>
-                                                    SyntaxFactory.TypeParameter(x.ToDisplayString())
-                                                )
-                                            )
-                                        )
-                                        : null,
-                                    SyntaxFactory.ParameterList(
-                                        SyntaxFactory.SeparatedList(
-                                            method.Parameters.Select(x =>
-                                                SyntaxFactory.Parameter(
-                                                    new SyntaxList<AttributeListSyntax>(),
-                                                    new SyntaxTokenList(),
-                                                    SyntaxFactory.IdentifierName(x.Type.ToDisplayString()),
-                                                    SyntaxFactory.Identifier(x.Name),
-                                                    null
-                                                )
-                                            )
-                                        )
-                                    ),
-                                    new SyntaxList<TypeParameterConstraintClauseSyntax>(),
-                                    null,
-                                    SyntaxFactory.ArrowExpressionClause(
-                                        SyntaxFactory.InvocationExpression(
-                                            SyntaxFactory.IdentifierName(method.Name),
-                                            SyntaxFactory.ArgumentList(
+                                        [],
+                                        [],
+                                        SyntaxFactory.IdentifierName(method.ReturnType.ToDisplayString()),
+                                        SyntaxFactory.ExplicitInterfaceSpecifier(
+                                            SyntaxFactory.IdentifierName(method.ContainingType.ToDisplayString())
+                                        ),
+                                        SyntaxFactory.Identifier(method.Name),
+                                        method.TypeParameters.Length > 0
+                                            ? SyntaxFactory.TypeParameterList(
                                                 SyntaxFactory.SeparatedList(
-                                                    method.Parameters.Select(x =>
-                                                        SyntaxFactory.Argument(
-                                                            null,
-                                                            SyntaxFactory.Token(SyntaxKind.None),
-                                                            SyntaxFactory.IdentifierName(x.Name)
+                                                    method.TypeParameters.Select(x =>
+                                                        SyntaxFactory.TypeParameter(x.ToDisplayString())
+                                                    )
+                                                )
+                                            )
+                                            : null,
+                                        SyntaxFactory.ParameterList(
+                                            SyntaxFactory.SeparatedList(
+                                                method.Parameters.Select(x =>
+                                                    SyntaxFactory.Parameter(
+                                                        new SyntaxList<AttributeListSyntax>(),
+                                                        new SyntaxTokenList(),
+                                                        SyntaxFactory.IdentifierName(x.Type.ToDisplayString()),
+                                                        SyntaxFactory.Identifier(x.Name),
+                                                        null
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        new SyntaxList<TypeParameterConstraintClauseSyntax>(),
+                                        null,
+                                        SyntaxFactory.ArrowExpressionClause(
+                                            SyntaxFactory.InvocationExpression(
+                                                SyntaxFactory.IdentifierName(method.Name),
+                                                SyntaxFactory.ArgumentList(
+                                                    SyntaxFactory.SeparatedList(
+                                                        method.Parameters.Select(x =>
+                                                            SyntaxFactory.Argument(
+                                                                null,
+                                                                SyntaxFactory.Token(SyntaxKind.None),
+                                                                SyntaxFactory.IdentifierName(x.Name)
+                                                            )
                                                         )
                                                     )
                                                 )
                                             )
-                                        )
-                                    ),
-                                    SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                                )
-                                .WithLeadingTrivia(
-                                    SyntaxFactory.Comment($"// {method.ToDisplayString()}")
-                                )
+                                        ),
+                                        SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                                    )
+                                    .WithLeadingTrivia(
+                                        SyntaxFactory.Comment($"// {method.ToDisplayString()}")
+                                    )
                             );
                             break;
                     }

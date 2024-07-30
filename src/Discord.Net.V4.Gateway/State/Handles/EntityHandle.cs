@@ -14,7 +14,9 @@ internal sealed class EntityHandle<TId, TEntity> : IEntityHandle<TId, TEntity>
     public TId Id { get; }
     public TEntity Entity { get; private set; }
 
-    private readonly IEntityBroker<TId, TEntity> _broker;
+    private IEntityBroker<TId, TEntity>? _broker;
+
+    private bool _disposed;
 
     public EntityHandle(IEntityBroker<TId, TEntity> broker, TId id, TEntity entity)
     {
@@ -25,7 +27,18 @@ internal sealed class EntityHandle<TId, TEntity> : IEntityHandle<TId, TEntity>
 
     public async ValueTask DisposeAsync()
     {
-        // notify broker that we've released the handle
+        if (_disposed)
+            return;
 
+        _disposed = true;
+
+        Entity = null!;
+
+        if (_broker is null) return;
+
+        // notify broker that we've released the handle
+        await _broker.ReleaseHandleAsync(this);
+
+        _broker = null;
     }
 }

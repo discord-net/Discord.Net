@@ -68,7 +68,9 @@ public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContex
     }
 
     public bool IsValid(SyntaxNode node, CancellationToken token = default)
-        => node is ClassDeclarationSyntax cls && cls.Identifier.ValueText.EndsWith("Actor");
+        => node is ClassDeclarationSyntax cls &&
+           cls.Identifier.ValueText.EndsWith("Actor") &&
+           cls.Identifier.ValueText.StartsWith("Rest");
 
     public static bool WillHaveFetchMethods(ITypeSymbol type)
     {
@@ -232,12 +234,12 @@ public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContex
                 continue;
             }
 
-            if (!AddFetchMethodOverrides(
+            if (!AddLoadableMethodOverrides(
                     ref syntax,
                     target.SemanticModel,
                     target.CoreActor,
                     target.RestEntitySymbol,
-                    logger
+                    targetLogger
                 ))
             {
                 continue;
@@ -266,7 +268,7 @@ public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContex
             .FirstOrDefault();
     }
 
-    public static IEnumerable<IMethodSymbol> GetFetchMethods(ITypeSymbol type)
+    public static IEnumerable<IMethodSymbol> GetLoadableMethods(ITypeSymbol type)
     {
         return Hierarchy.GetHierarchy(type)
             .Select(x => x.Type)
@@ -276,12 +278,12 @@ public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContex
                 MemberUtils.GetMemberName(
                     x,
                     x => x.ExplicitInterfaceImplementations
-                ) == "FetchAsync"
+                ) is "FetchAsync" or "GetAsync"
             )
             .OrderByDescending(x => x.Parameters.Length);
     }
 
-    private static bool AddFetchMethodOverrides(
+    private static bool AddLoadableMethodOverrides(
         ref ClassDeclarationSyntax syntax,
         SemanticModel semanticModel,
         INamedTypeSymbol coreActor,
@@ -291,27 +293,45 @@ public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContex
     {
         var addedOverloads = new HashSet<string>();
 
-        foreach (var member in GetFetchMethods(coreActor))
+        foreach (var member in GetLoadableMethods(coreActor))
         {
-            if (!addedOverloads.Add(member.ContainingType.ToString()))
+            logger.Log($"{restEntity}: Processing {member}");
+
+            if (!addedOverloads.Add(member.ContainingType.ToDisplayString() + MemberUtils.GetMemberName(member)))
+            {
+                logger.Log($"{restEntity}: Skipping {member}: already added overload");
                 continue;
+            }
 
             if (
                 member.ReturnType is INamedTypeSymbol {Name: "ValueTask"} valueTask &&
                 !semanticModel.Compilation.HasImplicitConversion(restEntity, valueTask.TypeArguments[0])
-            ) continue;
+            )
+            {
+                logger.Warn($"{restEntity}: no implicit conversion exists for {restEntity} -> {valueTask.TypeArguments[0]}");
+                continue;
+            }
 
-            var parameterList = CreateParameterList(member, false);
+            var parameterList = MemberUtils.CreateParameterList(member, false).NormalizeWhitespace();
 
-            var memberSyntax = SyntaxFactory.ParseMemberDeclaration(
-                $"async {member.ReturnType} {member.ContainingType}.FetchAsync{parameterList.NormalizeWhitespace()} => await this.FetchAsync({
-                    string.Join(", ", parameterList.Parameters.Select(x => $"{x.Identifier.ValueText}: {x.Identifier.ValueText}"))
-                });"
-            );
+            var methodName = MemberUtils.GetMemberName(member);
+
+            var parameterReferenceList = string.Join(", ",
+                parameterList.Parameters.Select(x => $"{x.Identifier.ValueText}: {x.Identifier.ValueText}"));
+
+            var memberSyntax = methodName switch
+            {
+                "FetchAsync" => SyntaxFactory.ParseMemberDeclaration(
+                    $"async {member.ReturnType} {member.ContainingType}.FetchAsync{parameterList} => await this.FetchAsync({parameterReferenceList});"),
+                "GetAsync" => SyntaxFactory.ParseMemberDeclaration(
+                    $"async {member.ReturnType} {member.ContainingType}.GetAsync{parameterList} => await this.GetAsync({parameterReferenceList});"
+                ),
+                _ => null
+            };
 
             if (memberSyntax is null)
             {
-                logger.Warn($"Failed to declare fetch override for {member}");
+                logger.Warn($"Failed to declare override for {member}");
                 return false;
             }
 
@@ -332,7 +352,7 @@ public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContex
     {
         var modifier = shouldOverride ? " new" : string.Empty;
 
-        var parameters = CreateParameterList(bestMatch);
+        var parameters = MemberUtils.CreateParameterList(bestMatch);
 
         var extraArgs = parameters.Parameters.Count > 2
             ? ", " + string.Join(
@@ -342,7 +362,7 @@ public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContex
                     .Select(x => x.Identifier.ValueText))
             : string.Empty;
 
-        var method = SyntaxFactory.ParseMemberDeclaration(
+        var fetchMethod = SyntaxFactory.ParseMemberDeclaration(
             $$"""
               public{{modifier}} async ValueTask<{{restEntityType}}?> FetchAsync{{parameters.NormalizeWhitespace()}}
               {
@@ -360,40 +380,30 @@ public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContex
               """
         );
 
-        if (method is null)
+        if (fetchMethod is null)
         {
             logger.Warn("Failed to declare fetch method");
             return false;
         }
 
-        syntax = syntax.AddMembers(method);
+        var getMethod = SyntaxFactory.ParseMemberDeclaration(
+            $$"""
+            public{{modifier}} ValueTask<{{restEntityType}}?> GetAsync(CancellationToken token = default)
+            {
+                return ValueTask.FromResult(CachedValue);
+            }
+            """
+        );
+
+        if (getMethod is null)
+        {
+            logger.Warn("Failed to declare get method");
+            return false;
+        }
+
+        syntax = syntax.AddMembers(fetchMethod, getMethod);
 
         return true;
-    }
-
-    private static ParameterListSyntax CreateParameterList(IMethodSymbol? method, bool withDefaults = true)
-    {
-        return method is null
-            ? SyntaxFactory.ParseParameterList(
-                "(RequestOptions? options = null, CancellationToken token = default)"
-            )
-            : SyntaxFactory.ParameterList(
-                SyntaxFactory.SeparatedList(
-                    method.Parameters.Select(x =>
-                        SyntaxFactory.Parameter(
-                            [],
-                            [],
-                            SyntaxFactory.ParseTypeName(x.Type.ToDisplayString()),
-                            SyntaxFactory.Identifier(x.Name),
-                            x.HasExplicitDefaultValue && withDefaults
-                                ? SyntaxFactory.EqualsValueClause(
-                                    SyntaxUtils.CreateLiteral(x.Type, x.ExplicitDefaultValue)
-                                )
-                                : null
-                        )
-                    )
-                )
-            );
     }
 
     private static bool TryGetIdentityEntityType(ITypeSymbol identityType, out INamedTypeSymbol? entityType)

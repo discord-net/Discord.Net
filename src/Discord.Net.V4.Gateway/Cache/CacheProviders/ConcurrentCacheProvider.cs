@@ -1,3 +1,4 @@
+using Discord.Models;
 using System;
 using System.Collections.Concurrent;
 
@@ -8,7 +9,8 @@ public sealed class ConcurrentCacheProvider : ICacheProvider
     private readonly ConcurrentDictionary<Type, IStore> _cache = new();
 
     public ValueTask<IEntityModelStore<TId, TModel>> GetStoreAsync<TId, TModel>(CancellationToken token = default)
-        where TId : IEquatable<TId> where TModel : class, IEntityModel<TId>
+        where TModel : class, IEntityModel<TId>
+        where TId : IEquatable<TId>
     {
         if (
             _cache.GetOrAdd(typeof(TModel), _ => new Store<TId, TModel>())
@@ -35,7 +37,7 @@ public sealed class ConcurrentCacheProvider : ICacheProvider
         private readonly ConcurrentDictionary<TId, IStore> _subStoreCache = new();
 
         public ValueTask<IEntityModelStore<TSubStoreId, TSubStoreModel>>
-            GetStoreAsync<TSubStoreId, TSubStoreModel>(
+            GetSubStoreAsync<TSubStoreId, TSubStoreModel>(
                 TId id,
                 CancellationToken token = default
             )

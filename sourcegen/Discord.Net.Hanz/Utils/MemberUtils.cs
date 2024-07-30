@@ -1,4 +1,6 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
 
 namespace Discord.Net.Hanz.Utils;
@@ -6,6 +8,31 @@ namespace Discord.Net.Hanz.Utils;
 public static class MemberUtils
 {
     public static readonly ConflictEqualityComparer ConflictEquality = new();
+
+    public static ParameterListSyntax CreateParameterList(IMethodSymbol? method, bool withDefaults = true)
+    {
+        return method is null
+            ? SyntaxFactory.ParseParameterList(
+                "(RequestOptions? options = null, CancellationToken token = default)"
+            )
+            : SyntaxFactory.ParameterList(
+                SyntaxFactory.SeparatedList(
+                    method.Parameters.Select(x =>
+                        SyntaxFactory.Parameter(
+                            [],
+                            [],
+                            SyntaxFactory.ParseTypeName(x.Type.ToDisplayString()),
+                            SyntaxFactory.Identifier(x.Name),
+                            x.HasExplicitDefaultValue && withDefaults
+                                ? SyntaxFactory.EqualsValueClause(
+                                    SyntaxUtils.CreateLiteral(x.Type, x.ExplicitDefaultValue)
+                                )
+                                : null
+                        )
+                    )
+                )
+            );
+    }
 
     public static bool IsExplicitInterfaceImplementation(ISymbol symbol)
     {
@@ -31,6 +58,16 @@ public static class MemberUtils
         public bool Equals(ISymbol x, ISymbol y) => Conflicts(x, y) || SymbolEqualityComparer.Default.Equals(x, y);
 
         public int GetHashCode(ISymbol obj) => SymbolEqualityComparer.Default.GetHashCode(obj);
+    }
+
+    public static string GetMemberName(ISymbol symbol)
+    {
+        return symbol switch
+        {
+            IPropertySymbol prop => GetMemberName(prop, x => x.ExplicitInterfaceImplementations),
+            IMethodSymbol method => GetMemberName(method, x => x.ExplicitInterfaceImplementations),
+            _ => null!
+        };
     }
 
     public static string GetMemberName<T>(T symbol, Func<T, ImmutableArray<T>> getExplicitInterfaces) where T : ISymbol

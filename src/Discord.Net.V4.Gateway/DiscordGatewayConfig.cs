@@ -13,7 +13,7 @@ namespace Discord.Gateway;
 //
 // public delegate IGatewayEncoding GatewayEncodingFactory(DiscordGatewayClient client);
 
-public delegate T GatewayConfiguredObject<T>(DiscordGatewayClient client, DiscordGatewayConfig config);
+public delegate T GatewayConfiguredObject<out T>(DiscordGatewayClient client, DiscordGatewayConfig config);
 
 public sealed class DiscordGatewayConfig : DiscordConfig
 {

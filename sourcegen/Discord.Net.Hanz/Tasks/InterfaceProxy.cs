@@ -507,7 +507,11 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                 (
                     targetImplementation is null ||
                     !MemberUtils.IsExplicitInterfaceImplementation(targetImplementation)
-                );
+                )
+                &&
+                member.ContainingType
+                    .GetAttributes()
+                    .All(x => x.AttributeClass?.ToDisplayString() != "Discord.NoExposureAttribute");
 
             var canImplementExplicitSelector = MemberUtils.CanImplementMemberExplicitly(member);
 

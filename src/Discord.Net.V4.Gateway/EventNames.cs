@@ -4,6 +4,9 @@ namespace Discord.Gateway;
 
 public static class DispatchEventNames
 {
+    public const string Ready = "READY";
+    public const string Hello = "HELLO";
+
     #region Interactions
     public const string ApplicationCommandPermissionUpdate = "APPLICATION_COMMAND_PERMISSIONS_UPDATE";
     public const string InteractionCreate = "INTERACTION_CREATE";

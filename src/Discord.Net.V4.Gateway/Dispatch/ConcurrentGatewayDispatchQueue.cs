@@ -1,3 +1,5 @@
+using Discord.Models;
+
 namespace Discord.Gateway.Events;
 
 
@@ -9,8 +11,8 @@ public sealed partial class ConcurrentGatewayDispatchQueue : IGatewayDispatchQue
 
     }
 
-    public Task AcceptAsync(string dispatchType, IGatewayPayloadData payload)
+    public Task AcceptAsync(string dispatchType, IGatewayPayloadData? payload)
     {
-        
+
     }
 }

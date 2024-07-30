@@ -7,7 +7,7 @@ internal sealed class CachePathable : IPathable, IReadOnlyDictionary<Type, objec
 {
     public static readonly IPathable Default = new CachePathable();
 
-    private readonly LinkedList<IIdentifiable<TId, TEntity, TModel>>
+    //private readonly LinkedList<IIdentifiable<TId, TEntity, TModel>>
     private readonly SortedDictionary<Type, object> _path = [];
 
     public void Push<TId, TEntity, TModel>(IIdentifiable<TId, TEntity, TModel> identity)
@@ -18,7 +18,7 @@ internal sealed class CachePathable : IPathable, IReadOnlyDictionary<Type, objec
         if (_path.ContainsKey(typeof(TEntity)))
             throw new ArgumentException($"path already contains a definition for {typeof(TEntity)}");
 
-        _path[typeof(TEntity)] = id;
+        _path[typeof(TEntity)] = identity.Id;
     }
 
     public TId Require<TId, TEntity>() where TId : IEquatable<TId> where TEntity : class, IEntity<TId>
