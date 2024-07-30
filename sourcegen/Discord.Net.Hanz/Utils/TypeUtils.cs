@@ -4,6 +4,11 @@ namespace Discord.Net.Hanz.Utils;
 
 public static class TypeUtils
 {
+    public static IEnumerable<INamedTypeSymbol> AllDirectInterfaces(ITypeSymbol symbol)
+    {
+        return symbol.Interfaces.SelectMany(x => (INamedTypeSymbol[])[x, ..x.AllInterfaces]);
+    }
+
     public static bool TypeLooselyEquals(ITypeSymbol first, ITypeSymbol second)
     {
         if (first.Equals(second, SymbolEqualityComparer.Default))

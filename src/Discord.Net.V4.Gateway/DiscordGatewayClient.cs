@@ -35,7 +35,7 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
 
     internal ICacheProvider CacheProvider { get; }
 
-    internal StateController? StateController { get; private set; }
+    internal StateController StateController { get; private set; }
 
     public DiscordGatewayClient(
         DiscordGatewayConfig config,
@@ -62,6 +62,8 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
         );
 
         _dispatchQueue = Config.DispatchQueue(this, Config);
+
+        StateController = new(this, LoggerFactory.CreateLogger<StateController>());
     }
 
     public void Dispose()

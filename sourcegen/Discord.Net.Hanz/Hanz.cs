@@ -87,6 +87,7 @@ public sealed class Hanz : IIncrementalGenerator
         where T : class, IEquatable<T>
     {
         var logger = Logger.CreateForTask(task.GetType().Name);
+        var transformLogger = Logger.CreateForTask(task.GetType().Name);
 
         var provider = context.SyntaxProvider.CreateSyntaxProvider(
             predicate: task.IsValid,
@@ -96,7 +97,10 @@ public sealed class Hanz : IIncrementalGenerator
                 {
                     return task.GetTargetForGeneration(
                         syntaxContext,
-                        logger.WithSemanticContext(syntaxContext.SemanticModel),
+                        transformLogger
+                            .WithSemanticContext(syntaxContext.SemanticModel)
+                            .GetSubLogger("transform")
+                            .WithCleanLogFile(),
                         token
                     );
                 }

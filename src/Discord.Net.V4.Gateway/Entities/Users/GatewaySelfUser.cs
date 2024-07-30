@@ -33,6 +33,7 @@ public sealed partial class GatewaySelfUser :
     GatewayUser,
     ISelfUser,
     IStoreProvider<ulong, ISelfUserModel>,
+    IBrokerProvider<ulong, GatewaySelfUser, ISelfUserModel>,
     ICacheableEntity<GatewaySelfUser, ulong, ISelfUserModel>,
     IContextConstructable<GatewaySelfUser, ISelfUserModel, ICacheConstructionContext<ulong, GatewaySelfUser>,
         DiscordGatewayClient>
@@ -49,7 +50,7 @@ public sealed partial class GatewaySelfUser :
 
     public PremiumType PremiumType => (PremiumType?)Model.PremiumType ?? PremiumType.None;
 
-    [ProxyInterface(typeof(ISelfUserActor), typeof(IStoreProvider<ulong, ISelfUserModel>))]
+    [ProxyInterface]
     internal override GatewaySelfUserActor Actor { get; }
 
     internal override ISelfUserModel Model => _model;
@@ -76,7 +77,7 @@ public sealed partial class GatewaySelfUser :
     [CovariantOverride]
     public ValueTask UpdateAsync(ISelfUserModel model, bool updateCache = true, CancellationToken token = default)
     {
-        // TODO: cache
+        if(updateCache) return UpdateCacheAsync(this, model, token);
 
         _model = model;
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway.Cache;
 
-public interface ICacheableEntity<out TSelf, TId, TModel> :
+public interface ICacheableEntity<out TSelf, out TId, TModel> :
     ICacheableEntity<TId>,
     IEntityOf<TModel>,
     IUpdatable<TModel>
@@ -16,6 +16,7 @@ public interface ICacheableEntity<out TSelf, TId, TModel> :
     where TModel : class, IEntityModel<TId>
     where TSelf : class,
     IStoreProvider<TId, TModel>,
+    IBrokerProvider<TId, TSelf, TModel>,
     ICacheableEntity<TSelf, TId, TModel>,
     IContextConstructable<TSelf, TModel, ICacheConstructionContext<TId, TSelf>, DiscordGatewayClient>
 {

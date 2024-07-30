@@ -17,10 +17,4 @@ internal static class EntityHandleExtensions
         await handle.DisposeAsync();
         return entity;
     }
-
-    public static IEntityHandle<TId, TNew> Transform<TId, TOld, TNew>(this IEntityHandle<TId, TOld> old)
-        where TId : IEquatable<TId>
-        where TNew : class, IEntity<TId>, TOld
-        where TOld : class, IEntity<TId>
-        => new TransformativeHandle<TId, TOld, TNew>(old);
 }

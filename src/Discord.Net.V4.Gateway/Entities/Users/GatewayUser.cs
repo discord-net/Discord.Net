@@ -26,8 +26,9 @@ public partial class GatewayUserActor(
 [ExtendInterfaceDefaults]
 public partial class GatewayUser :
     GatewayCacheableEntity<GatewayUser, ulong, IUserModel, UserIdentity>,
-    IStoreProvider<ulong, IUserModel>,
     IUser,
+    IStoreProvider<ulong, IUserModel>,
+    IBrokerProvider<ulong, GatewayUser, IUserModel>,
     IContextConstructable<GatewayUser, IUserModel, ICacheConstructionContext<ulong, GatewayUser>, DiscordGatewayClient>
 {
     public string? AvatarId => Model.Avatar;
@@ -37,7 +38,7 @@ public partial class GatewayUser :
     public bool IsBot => Model.IsBot ?? false;
     public UserFlags PublicFlags => (UserFlags?)Model.PublicFlags ?? UserFlags.None;
 
-    [ProxyInterface(typeof(IUserActor), typeof(IStoreProvider<ulong, IUserModel>))]
+    [ProxyInterface]
     internal virtual GatewayUserActor Actor { get; }
     internal virtual IUserModel Model => _model;
 
@@ -75,7 +76,7 @@ public partial class GatewayUser :
 
     public override ValueTask UpdateAsync(IUserModel model, bool updateCache = true, CancellationToken token = default)
     {
-        // TODO: cache
+        if(updateCache) return UpdateCacheAsync(this, model, token);
 
         _model = model;
 

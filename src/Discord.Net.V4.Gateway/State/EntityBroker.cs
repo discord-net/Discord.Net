@@ -11,6 +11,7 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
     class,
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreProvider<TId, TModel>,
+    IBrokerProvider<TId, TEntity, TModel>,
     IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
     where TModel : class, IEntityModel<TId>
     where TId : IEquatable<TId>
@@ -103,7 +104,20 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
             return;
 
         if (userModel is ISelfUserModel selfUserModel)
-            _controller.SelfUserModel.SelfUserModelPart = selfUserModel;
+        {
+            if (_controller.SelfUserModel is null)
+                _controller.SelfUserModel = new(selfUserModel);
+            else
+            {
+                _controller.SelfUserModel.SelfUserModelPart = selfUserModel;
+                _controller.SelfUserModel.UserModelPart = selfUserModel;
+            }
+        }
+        else
+        {
+            if (_controller.SelfUserModel is null)
+                return;
+        }
 
         _controller.SelfUserModel.UserModelPart = userModel;
 
@@ -387,6 +401,7 @@ internal interface IEntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TEnt
     class,
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreProvider<TId, TModel>,
+    IBrokerProvider<TId, TEntity, TModel>,
     IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>

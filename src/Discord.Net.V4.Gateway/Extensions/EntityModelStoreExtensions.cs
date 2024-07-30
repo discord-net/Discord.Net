@@ -1,4 +1,5 @@
 using Discord.Gateway.Cache;
+using Discord.Models;
 
 namespace Discord.Gateway;
 

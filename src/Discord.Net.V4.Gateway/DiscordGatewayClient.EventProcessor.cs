@@ -161,7 +161,7 @@ public sealed partial class DiscordGatewayClient
         switch (message.OpCode)
         {
             case GatewayOpCode.Dispatch when message.EventName is not null:
-                await ProcessDispatchAsync(message.EventName, message.Payload);
+                await ProcessDispatchAsync(message.EventName, message.Payload, token);
                 break;
             case GatewayOpCode.Heartbeat:
                 await _heartbeatSignal.Writer.WriteAsync(HeartbeatSignal.Requested, token);

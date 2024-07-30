@@ -104,6 +104,37 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             .FirstOrDefault() as INamedTypeSymbol;
     }
 
+    public static bool TryGetBrokerTypes(
+        ITypeSymbol type,
+        out ITypeSymbol idType,
+        out ITypeSymbol entityType,
+        out ITypeSymbol modelType)
+    {
+        idType = null!;
+        entityType = null!;
+        modelType = null!;
+
+        if (!WillHaveFetchMethods(type)) return false;
+
+        var hierarchy = Hierarchy.GetHierarchy(type);
+
+        if (hierarchy.All(x => !LoadableTrait.IsLoadable(x.Type)))
+            return false;
+
+        var gatewayCacheableActor = hierarchy.FirstOrDefault(x =>
+            x.Type.ToDisplayString().StartsWith("Discord.Gateway.IGatewayCachedActor<")
+        ).Type;
+
+        if (gatewayCacheableActor is null || gatewayCacheableActor.TypeArguments.Length != 4)
+            return false;
+
+        idType = gatewayCacheableActor.TypeArguments[0];
+        entityType = gatewayCacheableActor.TypeArguments[1];
+        modelType = gatewayCacheableActor.TypeArguments[3];
+
+        return true;
+    }
+
     public GenerationContext? GetTargetForGeneration(
         GeneratorSyntaxContext context,
         Logger logger,
@@ -234,7 +265,10 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                 : null;
             var hasChild = bases.Contains(target.ClassSymbol);
 
-            if (!CreateLoadableSources(ref syntax, target, targetLogger))
+            if (!CreateLoadableSources(
+                    ref syntax,
+                    target,
+                    targetLogger))
                 continue;
 
             if (!CreateGatewayLoadable(
@@ -319,7 +353,6 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
             syntax = syntax.AddMembers(methodSyntax);
         }
-
     }
 
     private bool CreateLoadableSources(
@@ -330,6 +363,16 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         var idType = target.IdType.ToDisplayString();
         var entityType = target.GatewayEntitySymbol.ToDisplayString();
         var modelType = target.ModelType.ToDisplayString();
+
+        var interfaceBrokerOverload = SyntaxFactory.ParseMemberDeclaration(
+            $"async ValueTask<IEntityBroker<{idType}, {entityType}, {modelType}>> IBrokerProvider<{idType}, {entityType}, {modelType}>.GetBrokerAsync(CancellationToken token) => (await GetOrCreateBrokerAsync(token)).Value;"
+        );
+
+        if (interfaceBrokerOverload is null)
+        {
+            logger.Warn($"{target.ClassSymbol}: failed to create broker overload");
+            return false;
+        }
 
         var store = SyntaxFactory.ParseMemberDeclaration(
             $"private Discord.Gateway.Cache.IEntityModelStore<{idType}, {modelType}>? _store;"
@@ -424,13 +467,20 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             return false;
         }
 
-        syntax = syntax.AddMembers(
-            store,
-            broker,
-            disposeMethod,
-            getOrCreateStore,
-            getOrCreateBroker
-        );
+        syntax = syntax
+            .AddBaseListTypes(
+                SyntaxFactory.SimpleBaseType(
+                    SyntaxFactory.ParseTypeName($"IBrokerProvider<{idType}, {entityType}, {modelType}>")
+                )
+            )
+            .AddMembers(
+                interfaceBrokerOverload,
+                store,
+                broker,
+                disposeMethod,
+                getOrCreateStore,
+                getOrCreateBroker
+            );
 
         return true;
     }

@@ -12,7 +12,7 @@ namespace Discord.Gateway.State;
 
 internal sealed partial class StateController : IDisposable
 {
-    internal MutableSelfUserModel SelfUserModel { get; set; }
+    internal MutableSelfUserModel? SelfUserModel { get; set; }
 
     private ICacheProvider CacheProvider => _client.CacheProvider;
 
@@ -31,13 +31,11 @@ internal sealed partial class StateController : IDisposable
 
     public StateController(
         DiscordGatewayClient client,
-        ILogger<StateController> logger,
-        ISelfUserModel selfUserModel)
+        ILogger<StateController> logger)
     {
         _client = client;
         _logger = logger;
         _backgroundTokenSource = new();
-        SelfUserModel = new(selfUserModel);
     }
 
     public async ValueTask StartBackgroundProcessing(CancellationToken token)
@@ -88,6 +86,7 @@ internal sealed partial class StateController : IDisposable
         class,
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreProvider<TId, TModel>,
+        IBrokerProvider<TId, TEntity, TModel>,
         IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
@@ -127,6 +126,7 @@ internal sealed partial class StateController : IDisposable
         class,
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreProvider<TId, TModel>,
+        IBrokerProvider<TId, TEntity, TModel>,
         IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
@@ -155,6 +155,7 @@ internal sealed partial class StateController : IDisposable
         class,
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreProvider<TId, TModel>,
+        IBrokerProvider<TId, TEntity, TModel>,
         IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
@@ -178,6 +179,7 @@ internal sealed partial class StateController : IDisposable
         class,
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreProvider<TId, TModel>,
+        IBrokerProvider<TId, TEntity, TModel>,
         IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
@@ -212,6 +214,7 @@ internal sealed partial class StateController : IDisposable
         class,
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreProvider<TId, TModel>,
+        IBrokerProvider<TId, TEntity, TModel>,
         IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>

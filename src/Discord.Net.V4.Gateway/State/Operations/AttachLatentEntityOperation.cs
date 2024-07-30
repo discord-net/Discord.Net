@@ -14,6 +14,7 @@ internal sealed record AttachLatentEntityOperation<TId, TEntity, TModel>(
     class,
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreProvider<TId, TModel>,
+    IBrokerProvider<TId, TEntity, TModel>,
     IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>

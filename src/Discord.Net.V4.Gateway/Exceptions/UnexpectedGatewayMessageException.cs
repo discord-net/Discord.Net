@@ -1,3 +1,5 @@
+using Discord.Models;
+
 namespace Discord.Gateway;
 
 public sealed class UnexpectedGatewayMessageException : DiscordException

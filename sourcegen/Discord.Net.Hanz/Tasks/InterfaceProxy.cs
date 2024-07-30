@@ -1,3 +1,4 @@
+using Discord.Net.Hanz.Tasks.Gateway;
 using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -144,10 +145,19 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
 
     private static HashSet<INamedTypeSymbol> CorrectTargetList(
         INamedTypeSymbol targetType,
+        ITypeSymbol propertyType,
         HashSet<INamedTypeSymbol> currentTypesTemplateTargets,
         IEnumerable<INamedTypeSymbol> targetInterfaces,
+        SemanticModel semanticModel,
         Logger logger)
     {
+        if (
+            GatewayLoadable.TryGetBrokerTypes(propertyType, out var id, out var entity, out var model) &&
+            semanticModel.Compilation.GetTypeByMetadataName("Discord.Gateway.IBrokerProvider`3") is {} brokerType)
+        {
+            targetInterfaces = targetInterfaces.Prepend(brokerType.Construct(id, entity, model));
+        }
+
         var iteratedTargetInterfaces = targetInterfaces.ToArray();
 
         foreach (var targets in iteratedTargetInterfaces)
@@ -170,7 +180,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
         correctedTargetInterfaces.IntersectWith(iteratedTargetInterfaces);
 
         // finally, only include interfaces present on the type itself
-        correctedTargetInterfaces.IntersectWith(targetType.AllInterfaces);
+        correctedTargetInterfaces.IntersectWith(TypeUtils.AllDirectInterfaces(targetType));
 
         foreach (var targets in correctedTargetInterfaces)
         {
@@ -213,6 +223,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
 
             var correctedTargetInterfaces = CorrectTargetList(
                 targetSymbol,
+                property.Type,
                 templateTargets,
                 GetTargetTypesToProxy(
                         kvp.Value,
@@ -220,6 +231,7 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
                         property.Type.AllInterfaces
                     )
                     .Concat(extendedTarget.OfType<INamedTypeSymbol>()),
+                target.SemanticModel,
                 logger
             );
 
@@ -445,7 +457,9 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
             var canProxyToSelfImplementation =
                 !proxyHasUniqueImplementation &&
                 targetImplementation is not null &&
-                MemberUtils.CanOverride(targetImplementation, member, semanticModel.Compilation);
+                MemberUtils.CanOverride(targetImplementation, member, semanticModel.Compilation) &&
+                TypeUtils.GetBaseTypesAndThis(targetSymbol)
+                    .Contains(targetImplementation.ContainingType, SymbolEqualityComparer.Default);
 
             var selfHasTargetImplementation = TypeUtils
                 .GetBaseTypesAndThis(targetSymbol)

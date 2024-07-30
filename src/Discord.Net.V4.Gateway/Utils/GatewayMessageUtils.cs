@@ -1,3 +1,5 @@
+using Discord.Models;
+
 namespace Discord.Gateway;
 
 public static class GatewayMessageUtils
