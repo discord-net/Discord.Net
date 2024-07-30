@@ -1,6 +1,5 @@
 using Discord.Models;
-using Discord.Rest.Channels;
-using Discord.Rest.Webhooks;
+using Discord.Rest;
 
 namespace Discord.Rest;
 

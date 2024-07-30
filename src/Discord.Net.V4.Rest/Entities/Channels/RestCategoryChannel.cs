@@ -1,6 +1,6 @@
 using Discord.Models;
 
-namespace Discord.Rest.Channels;
+namespace Discord.Rest;
 
 [method: TypeFactory]
 public partial class RestCategoryChannelActor(

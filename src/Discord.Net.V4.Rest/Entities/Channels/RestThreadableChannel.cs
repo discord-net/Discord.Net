@@ -1,9 +1,9 @@
 using Discord.Models;
 using Discord.Models.Json;
-using Discord.Rest.Channels;
+using Discord.Rest;
 using Discord.Rest.Extensions;
 
-namespace Discord.Rest.Channels;
+namespace Discord.Rest;
 
 using ThreadsPagedActor = RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams>;
 

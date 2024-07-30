@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.Gateway.Cache;
+namespace Discord.Gateway;
 
 public interface IEntityModelStore<TId, TModel> : IEntityModelStore
     where TModel : class, IEntityModel<TId>

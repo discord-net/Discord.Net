@@ -11,7 +11,10 @@ public static class TransitiveFill
     private static readonly string[] TypeBlacklists =
     [
         "IFactory",
-        "Discord.IProxied"
+        "Discord.IProxied",
+        "Discord.Gateway.IStoreProvider",
+        "Discord.Gateway.IBrokerProvider",
+        "Discord.IContextConstructable"
     ];
 
     public static bool IsTargetMethod(IMethodSymbol methodSymbol)

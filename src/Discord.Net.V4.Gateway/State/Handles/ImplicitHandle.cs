@@ -1,15 +1,16 @@
-using Discord.Gateway.Cache;
+using Discord.Gateway;
 using Discord.Models;
 
 namespace Discord.Gateway.State.Handles;
 
-internal sealed class ImplicitHandle<TId, TEntity, TModel> : IEntityHandle<TId, TEntity>
+internal sealed class ImplicitHandle<TId, TEntity, TActor, TModel> : IEntityHandle<TId, TEntity>
     where TEntity :
     class,
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
     IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
+    where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
     where TModel : class, IEntityModel<TId>
     where TId : IEquatable<TId>
 {
@@ -25,11 +26,16 @@ internal sealed class ImplicitHandle<TId, TEntity, TModel> : IEntityHandle<TId, 
         IEntityBroker<TId, TEntity> broker,
         IPathable path,
         TId id,
-        TModel model)
+        TModel model,
+        TActor? actor)
     {
+        ICacheConstructionContext<TId, TEntity> context = actor is not null
+            ? new CacheConstructionContext<TId, TEntity, TActor>(actor, path, this)
+            : new CacheConstructionContext<TId, TEntity>(path, this);
+
         _broker = broker;
         Id = id;
-        Entity = TEntity.Construct(client, new CacheConstructionContext<TId, TEntity>(path, this), model);
+        Entity = TEntity.Construct(client, context, model);
     }
 
     public async ValueTask DisposeAsync()

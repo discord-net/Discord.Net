@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.Gateway.Cache;
+namespace Discord.Gateway;
 
 public interface ICacheableEntity<out TSelf, out TId, TModel> :
     ICacheableEntity<TId>,

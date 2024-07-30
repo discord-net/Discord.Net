@@ -2,11 +2,17 @@ using Discord.Models;
 using System;
 using System.Collections.Concurrent;
 
-namespace Discord.Gateway.Cache;
+namespace Discord.Gateway;
 
-public sealed class ConcurrentCacheProvider : ICacheProvider
+public sealed partial class ConcurrentCacheProvider : ICacheProvider
 {
     private readonly ConcurrentDictionary<Type, IStore> _cache = new();
+
+    [TypeFactory]
+    public ConcurrentCacheProvider(DiscordGatewayClient client, DiscordGatewayConfig config)
+    {
+
+    }
 
     public ValueTask<IEntityModelStore<TId, TModel>> GetStoreAsync<TId, TModel>(CancellationToken token = default)
         where TModel : class, IEntityModel<TId>

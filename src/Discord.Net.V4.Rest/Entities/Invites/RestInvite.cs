@@ -1,9 +1,8 @@
 using Discord.Models;
-using Discord.Rest.Channels;
+using Discord.Rest;
 using Discord.Rest.Extensions;
-using Discord.Rest.Guilds;
 
-namespace Discord.Rest.Invites;
+namespace Discord.Rest;
 
 [method: TypeFactory(LastParameter = nameof(invite))]
 [ExtendInterfaceDefaults]

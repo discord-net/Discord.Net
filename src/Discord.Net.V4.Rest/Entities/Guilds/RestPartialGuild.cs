@@ -1,6 +1,6 @@
 using Discord.Models;
 
-namespace Discord.Rest.Guilds;
+namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public class RestPartialGuild(DiscordRestClient client, IPartialGuildModel model) :

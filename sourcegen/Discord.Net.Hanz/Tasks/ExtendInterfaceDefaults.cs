@@ -182,7 +182,8 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
         ITypeSymbol interfaceSymbol,
         ITypeSymbol classSymbol)
     {
-        var willHaveFetchMethods = RestLoadable.WillHaveFetchMethods(classSymbol) || GatewayLoadable.WillHaveFetchMethods(classSymbol);
+        var willHaveFetchMethods = RestLoadable.WillHaveFetchMethods(classSymbol) ||
+                                   GatewayLoadable.WillHaveFetchMethods(classSymbol);
         var isTemplateExtensionInterface =
             interfaceSymbol is INamedTypeSymbol namedInterfaceSymbol &&
             IsTemplateExtensionInterface(namedInterfaceSymbol);
@@ -465,38 +466,15 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
     {
         if (targets.Length == 0) return;
 
-        var map = targets
-            .Where(x => x is not null)
-            .OfType<GenerationTarget>()
-            .ToDictionary(x => x.ClassSymbol, SymbolEqualityComparer.Default);
 
-        var bases = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
-
-        var hierarchyOrder = map.Values.OrderBy(x =>
+        foreach
+            (var target in Hierarchy.OrderByHierarchy(
+                targets,
+                x => x.ClassSymbol,
+                out var map,
+                out var bases)
+            )
         {
-            var baseType = x.ClassSymbol.BaseType;
-
-            if (baseType is null)
-                return 0;
-
-            var count = 0;
-
-            do
-            {
-                if (map.ContainsKey(baseType))
-                {
-                    bases.Add(baseType);
-                    count++;
-                }
-            } while ((baseType = baseType.BaseType) is not null);
-
-            return count;
-        }).ToArray();
-
-        for (var index = 0; index < hierarchyOrder.Length; index++)
-        {
-            var target = hierarchyOrder[index];
-
             if (target is null)
             {
                 continue;

@@ -2,7 +2,7 @@ using Discord.Models;
 using Discord.Models.Json;
 using Discord.Paging;
 using Discord.Rest.Actors;
-using Discord.Rest.Channels;
+using Discord.Rest;
 
 namespace Discord.Rest;
 

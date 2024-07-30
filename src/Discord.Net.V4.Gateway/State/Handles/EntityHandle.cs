@@ -1,4 +1,4 @@
-using Discord.Gateway.Cache;
+using Discord.Gateway;
 using System;
 using System.Collections.Generic;
 using System.Linq;

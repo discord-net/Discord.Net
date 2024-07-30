@@ -1,7 +1,7 @@
 using Discord.Models;
 using System.ComponentModel;
 
-namespace Discord.Rest.Guilds.Integrations;
+namespace Discord.Rest;
 
 [method: TypeFactory]
 public sealed partial class RestIntegrationActor(

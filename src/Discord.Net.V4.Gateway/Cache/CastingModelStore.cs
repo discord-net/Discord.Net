@@ -1,6 +1,6 @@
 using Discord.Models;
 
-namespace Discord.Gateway.Cache;
+namespace Discord.Gateway;
 
 internal sealed class CastingModelStore<TId, TRootModel, TExpectedModel>(IEntityModelStore<TId, TRootModel> store)
     : IEntityModelStore<TId, TExpectedModel>

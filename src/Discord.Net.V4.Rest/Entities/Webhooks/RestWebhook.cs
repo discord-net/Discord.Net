@@ -1,10 +1,8 @@
 using Discord.Models;
-using Discord.Rest.Channels;
+using Discord.Rest;
 using Discord.Rest.Extensions;
-using Discord.Rest.Guilds;
-using Discord.Rest.Messages;
 
-namespace Discord.Rest.Webhooks;
+namespace Discord.Rest;
 
 [method: TypeFactory]
 public partial class RestWebhookActor(

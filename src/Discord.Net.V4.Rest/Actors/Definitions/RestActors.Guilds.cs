@@ -1,8 +1,4 @@
 using Discord.Models;
-using Discord.Rest.Actors;
-using Discord.Rest.Channels;
-using Discord.Rest.Guilds;
-using Discord.Rest.Guilds.Integrations;
 
 namespace Discord.Rest;
 

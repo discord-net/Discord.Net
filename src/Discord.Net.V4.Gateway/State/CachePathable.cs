@@ -1,3 +1,4 @@
+using Discord.Models;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 

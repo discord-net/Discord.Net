@@ -1,7 +1,7 @@
 using Discord.Models;
 using System.ComponentModel;
 
-namespace Discord.Rest.Channels;
+namespace Discord.Rest;
 
 [method: TypeFactory]
 public partial class RestDMChannelActor(

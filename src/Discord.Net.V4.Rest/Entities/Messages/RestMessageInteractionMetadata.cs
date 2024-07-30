@@ -3,7 +3,7 @@ using Discord.Rest.Extensions;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Discord.Rest.Messages;
+namespace Discord.Rest;
 
 public sealed partial class RestMessageInteractionMetadata(
     DiscordRestClient client,

@@ -10,6 +10,7 @@ public partial interface IGuildChannel :
     IChannel,
     IGuildChannelActor
 {
+    string Name { get; }
 
     [SourceOfTruth]
     new IGuildChannelModel GetModel();

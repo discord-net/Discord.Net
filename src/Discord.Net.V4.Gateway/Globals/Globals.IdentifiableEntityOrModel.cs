@@ -8,6 +8,10 @@ global using SelfUserIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.Use
 #region Channels
 
 global using ChannelIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayChannel, Discord.Gateway.GatewayChannelActor, Discord.Models.IChannelModel>;
+global using DMChannelIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayDMChannel, Discord.Gateway.GatewayDMChannelActor, Discord.Models.IDMChannelModel>;
+global using MessageChannelIdentity = Discord.IIdentifiable<ulong, Discord.IMessageChannel, Discord.IMessageChannelActor, Discord.Models.IChannelModel>;
+global using GuildChannelIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayGuildChannel, Discord.Gateway.GatewayGuildChannelActor, Discord.Models.IGuildChannelModel>;
+global using CategoryChannelIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayCategoryChannel, Discord.Gateway.GatewayCategoryChannelActor, Discord.Models.IGuildCategoryChannelModel>;
 
 #endregion
 

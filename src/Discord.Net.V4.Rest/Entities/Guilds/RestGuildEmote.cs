@@ -2,7 +2,7 @@ using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Extensions;
 
-namespace Discord.Rest.Guilds;
+namespace Discord.Rest;
 
 [method: TypeFactory]
 [ExtendInterfaceDefaults(typeof(IGuildEmoteActor))]

@@ -143,6 +143,43 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
             .OfType<INamedTypeSymbol>();
     }
 
+    private static void AddImplicitTargetInterfaces(
+        INamedTypeSymbol type,
+        ref IEnumerable<INamedTypeSymbol> interfaces,
+        SemanticModel semanticModel
+    )
+    {
+        var enumerated = interfaces as INamedTypeSymbol[] ?? interfaces.ToArray();
+
+        var cacheableInterface =
+            enumerated.FirstOrDefault(x =>
+                x.ToDisplayString().StartsWith("Discord.Gateway.ICacheableEntity<")
+            )
+            ??
+            type.BaseType?
+                .Interfaces
+                .FirstOrDefault(x =>
+                    x.ToDisplayString().StartsWith("Discord.Gateway.ICacheableEntity<")
+                );
+
+        if (cacheableInterface is not null)
+        {
+            var storeInterface = semanticModel.Compilation.GetTypeByMetadataName("Discord.Gateway.IStoreProvider`2");
+            var brokerInterface = semanticModel.Compilation.GetTypeByMetadataName("Discord.Gateway.IBrokerProvider`3");
+
+            if (storeInterface is null || brokerInterface is null) return;
+
+            interfaces = enumerated.Concat([
+                storeInterface.Construct(cacheableInterface.TypeArguments[1], cacheableInterface.TypeArguments[2]),
+                brokerInterface.Construct(
+                    cacheableInterface.TypeArguments[1],
+                    cacheableInterface.TypeArguments[0],
+                    cacheableInterface.TypeArguments[2]
+                )
+            ]);
+        }
+    }
+
     private static HashSet<INamedTypeSymbol> CorrectTargetList(
         INamedTypeSymbol targetType,
         ITypeSymbol propertyType,
@@ -153,10 +190,15 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
     {
         if (
             GatewayLoadable.TryGetBrokerTypes(propertyType, out var id, out var entity, out var model) &&
-            semanticModel.Compilation.GetTypeByMetadataName("Discord.Gateway.IBrokerProvider`3") is {} brokerType)
+            semanticModel.Compilation.GetTypeByMetadataName("Discord.Gateway.IBrokerProvider`3") is { } brokerType &&
+            semanticModel.Compilation.GetTypeByMetadataName("Discord.Gateway.IStoreProvider`2") is { } storeType)
         {
-            targetInterfaces = targetInterfaces.Prepend(brokerType.Construct(id, entity, model));
+            targetInterfaces = targetInterfaces
+                .Prepend(brokerType.Construct(id, entity, model))
+                .Prepend(storeType.Construct(id, model));
         }
+
+        AddImplicitTargetInterfaces(targetType, ref targetInterfaces, semanticModel);
 
         var iteratedTargetInterfaces = targetInterfaces.ToArray();
 
@@ -180,7 +222,10 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
         correctedTargetInterfaces.IntersectWith(iteratedTargetInterfaces);
 
         // finally, only include interfaces present on the type itself
-        correctedTargetInterfaces.IntersectWith(TypeUtils.AllDirectInterfaces(targetType));
+        var directTargetInterfaces = TypeUtils.AllDirectInterfaces(targetType);
+        AddImplicitTargetInterfaces(targetType, ref directTargetInterfaces, semanticModel);
+
+        correctedTargetInterfaces.IntersectWith(directTargetInterfaces);
 
         foreach (var targets in correctedTargetInterfaces)
         {

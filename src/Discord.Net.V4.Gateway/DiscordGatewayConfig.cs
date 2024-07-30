@@ -1,8 +1,10 @@
-using Discord.Gateway.Cache;
+using Discord.Gateway;
 using Discord.Gateway.Events;
+using Discord.Gateway.Users;
 using Discord.Rest;
 using System;
 using System.Buffers;
+using System.Collections.Immutable;
 
 namespace Discord.Gateway;
 
@@ -22,6 +24,9 @@ public sealed class DiscordGatewayConfig : DiscordConfig
     public string? CustomGatewayUrl { get; set; }
 
     public sbyte GatewayVersion { get; set; } = 10;
+
+    public bool CreateStoreForEveryEntity { get; set; } = false;
+    public ImmutableHashSet<Type> ExtendedStoreTypes { get; set; }
 
     public GatewayConfiguredObject<ICacheProvider> CacheProvider { get; set; } = ConcurrentCacheProvider.Factory;
     public GatewayConfiguredObject<IGatewayConnection> GatewayConnection { get; set; } = WebSocketGatewayConnection.Factory;

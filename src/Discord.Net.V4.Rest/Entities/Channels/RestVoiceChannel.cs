@@ -3,7 +3,7 @@ using Discord.Models.Json;
 using Discord.Rest.Actors;
 using Discord.Rest.Extensions;
 
-namespace Discord.Rest.Channels;
+namespace Discord.Rest;
 
 [method: TypeFactory]
 public partial class RestVoiceChannelActor(

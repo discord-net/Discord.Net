@@ -1,12 +1,11 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Extensions;
-using Discord.Rest.Guilds;
-using Discord.Rest.Invites;
+using Discord.Rest;
 using System.Collections.Immutable;
 using System.ComponentModel;
 
-namespace Discord.Rest.Channels;
+namespace Discord.Rest;
 
 using EnumerableInvitesActor = RestEnumerableIndexableActor<RestInviteActor, string, RestInvite, IInvite, IEnumerable<IInviteModel>>;
 

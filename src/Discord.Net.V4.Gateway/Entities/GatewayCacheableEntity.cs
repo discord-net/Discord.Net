@@ -1,4 +1,4 @@
-using Discord.Gateway.Cache;
+using Discord.Gateway;
 using Discord.Gateway.State;
 using Discord.Models;
 using System;
@@ -43,10 +43,10 @@ public abstract class GatewayCacheableEntity<TSelf, TId, TModel, TIdentity> :
     }
 
     protected GatewayCacheableEntity(
-        DiscordGatewayClient discord,
+        DiscordGatewayClient client,
         TId id,
         IEntityHandle<TId, TSelf>? implicitHandle = null
-        ) : base(discord, id)
+        ) : base(client, id)
     {
         _implicitHandle = implicitHandle;
     }

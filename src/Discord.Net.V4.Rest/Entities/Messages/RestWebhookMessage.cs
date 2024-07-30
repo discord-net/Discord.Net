@@ -1,7 +1,7 @@
 using Discord.Models;
-using Discord.Rest.Webhooks;
+using Discord.Rest;
 
-namespace Discord.Rest.Messages;
+namespace Discord.Rest;
 
 [ExtendInterfaceDefaults(typeof(IWebhookMessageActor))]
 public partial class RestWebhookMessageActor(

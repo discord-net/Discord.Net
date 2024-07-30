@@ -1,7 +1,7 @@
 using Discord.Models;
-using Discord.Rest.Guilds;
+using Discord.Rest;
 
-namespace Discord.Rest.Entities.Users;
+namespace Discord.Rest;
 
 public sealed partial class RestGuildScheduledEventUserActor(
     DiscordRestClient client,

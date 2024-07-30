@@ -1,9 +1,9 @@
 using Discord.Models;
 using Discord.Models.Json;
-using Discord.Rest.Guilds;
+using Discord.Rest;
 using System.Collections.Immutable;
 
-namespace Discord.Rest.Channels;
+namespace Discord.Rest;
 
 [method: TypeFactory]
 public partial class RestMediaChannelActor(

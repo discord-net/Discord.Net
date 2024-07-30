@@ -1,14 +1,10 @@
 using Discord.Models;
 using Discord.Models.Json;
-using Discord.Rest.Channels;
+using Discord.Rest;
 using Discord.Rest.Extensions;
-using Discord.Rest.Guilds.Integrations;
-using Discord.Rest.Invites;
-using Discord.Rest.Stickers;
-using Discord.Rest.Webhooks;
 using System.Globalization;
 
-namespace Discord.Rest.Guilds;
+namespace Discord.Rest;
 
 using BansPager = RestPagedIndexableActor<RestBanActor, ulong, RestBan, IEnumerable<IBanModel>, PageGuildBansParams>;
 using MembersPager = RestPagedIndexableActor<RestGuildMemberActor, ulong, RestGuildMember, IEnumerable<IMemberModel>,

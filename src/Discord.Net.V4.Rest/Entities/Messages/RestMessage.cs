@@ -1,14 +1,12 @@
 using Discord.Models;
 using Discord.Models.Json;
-using Discord.Rest.Channels;
+using Discord.Rest;
 using Discord.Rest.Extensions;
-using Discord.Rest.Guilds;
-using Discord.Rest.Stickers;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Discord.Rest.Messages;
+namespace Discord.Rest;
 
 [method: TypeFactory(LastParameter = nameof(message))]
 public partial class RestMessageActor(

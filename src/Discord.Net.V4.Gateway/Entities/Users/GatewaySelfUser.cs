@@ -1,10 +1,11 @@
-using Discord.Gateway.Cache;
+using Discord.Gateway;
 using Discord.Gateway.State;
 using Discord.Models;
 using Discord.Rest;
 
 namespace Discord.Gateway.Users;
 
+[ExtendInterfaceDefaults]
 public sealed partial class GatewaySelfUserActor(
     DiscordGatewayClient client,
     SelfUserIdentity identity
@@ -13,7 +14,8 @@ public sealed partial class GatewaySelfUserActor(
     ISelfUserActor,
     IGatewayCachedActor<ulong, GatewaySelfUser, SelfUserIdentity, ISelfUserModel>
 {
-    public override SelfUserIdentity Identity { get; } = identity;
+    [SourceOfTruth]
+    internal override SelfUserIdentity Identity { get; } = identity;
 
     public IPartialGuild CreateEntity(IPartialGuildModel model) => throw new NotImplementedException();
 
@@ -21,22 +23,13 @@ public sealed partial class GatewaySelfUserActor(
 
     [SourceOfTruth]
     internal GatewaySelfUser CreateEntity(ISelfUserModel model)
-        => Client.StateController.CreateLatent<ulong, GatewaySelfUser, ISelfUserModel>(this, model);
-
-    [SourceOfTruth]
-    private new async ValueTask<IEntityModelStore<ulong, ISelfUserModel>> GetStoreAsync(
-        CancellationToken token = default
-    ) => (await base.GetStoreAsync(token)).Cast(Template.Of<ISelfUserModel>());
+        => Client.StateController.CreateLatent(this, model);
 }
 
 public sealed partial class GatewaySelfUser :
     GatewayUser,
     ISelfUser,
-    IStoreProvider<ulong, ISelfUserModel>,
-    IBrokerProvider<ulong, GatewaySelfUser, ISelfUserModel>,
-    ICacheableEntity<GatewaySelfUser, ulong, ISelfUserModel>,
-    IContextConstructable<GatewaySelfUser, ISelfUserModel, ICacheConstructionContext<ulong, GatewaySelfUser>,
-        DiscordGatewayClient>
+    ICacheableEntity<GatewaySelfUser, ulong, ISelfUserModel>
 {
     public string Locale => Model.Locale!;
 
@@ -64,14 +57,18 @@ public sealed partial class GatewaySelfUser :
         IEntityHandle<ulong, GatewaySelfUser>? implicitHandle = null
     ) : base(client, model, actor, implicitHandle)
     {
-        Actor = actor ??= new(client, SelfUserIdentity.Of(this));
+        Actor = actor ?? new(client, SelfUserIdentity.Of(this));
         _model = model;
     }
 
     public static GatewaySelfUser Construct(DiscordGatewayClient client,
         ICacheConstructionContext<ulong, GatewaySelfUser> context, ISelfUserModel model)
     {
-        return new GatewaySelfUser(client, model, implicitHandle: context.ImplicitHandle);
+        return new GatewaySelfUser(
+            client,
+            model,
+            context.TryGetActor(Template.Of<GatewaySelfUserActor>()),
+            implicitHandle: context.ImplicitHandle);
     }
 
     [CovariantOverride]

@@ -1,9 +1,8 @@
 using Discord.Entities.Channels.Threads;
 using Discord.Models;
 using Discord.Models.Json;
-using Discord.Rest.Channels;
+using Discord.Rest;
 using Discord.Rest.Extensions;
-using Discord.Rest.Guilds;
 using System.Collections.Immutable;
 
 namespace Discord.Rest;

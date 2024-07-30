@@ -1,4 +1,4 @@
-using Discord.Gateway.Cache;
+using Discord.Gateway;
 using Discord.Models;
 
 namespace Discord.Gateway.State.Operations;

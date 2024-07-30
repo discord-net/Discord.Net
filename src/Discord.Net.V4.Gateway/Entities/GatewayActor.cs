@@ -1,4 +1,5 @@
-using Discord.Gateway.Cache;
+using Discord.Gateway;
+using Discord.Gateway.State;
 using Discord.Models;
 using Discord.Rest;
 
@@ -18,8 +19,6 @@ public abstract class GatewayCachedActor<TId, TEntity, TIdentity, TModel>(
 {
     protected readonly SemaphoreSlim StateSemaphore = new(1, 1);
 
-    internal abstract ValueTask<IEntityModelStore<TId, TModel>> GetStoreAsync(CancellationToken token = default);
-
     private LinkedList<Func<ValueTask>>? _disposeTasks;
 
     protected void RegisterDisposeTask(Func<ValueTask> task)
@@ -37,17 +36,17 @@ public abstract class GatewayCachedActor<TId, TEntity, TIdentity, TModel>(
             }
         }
     }
-
-    ValueTask<IEntityModelStore<TId, TModel>> IStoreProvider<TId, TModel>.GetStoreAsync(
-        CancellationToken token
-    ) => GetStoreAsync(token);
 }
 
 public interface IGatewayCachedActor<TId, out TEntity, out TIdentity, TModel> :
-    IGatewayActor<TId, TEntity, TIdentity>,
-    IStoreProvider<TId, TModel>
+    IGatewayActor<TId, TEntity, TIdentity>
     where TId : IEquatable<TId>
-    where TEntity : GatewayEntity<TId>
+    where TEntity :
+    class,
+    ICacheableEntity<TEntity, TId, TModel>,
+    IStoreProvider<TId, TModel>,
+    IBrokerProvider<TId, TEntity, TModel>,
+    IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
     where TIdentity : IIdentifiable<TId>
     where TModel : class, IEntityModel<TId>;
 
@@ -64,7 +63,9 @@ public abstract class GatewayActor<TId, TEntity, TIdentity>(
 
     public TId Id { get; } = identity.Id;
 
-    public virtual TIdentity Identity { get; } = identity;
+    internal virtual TIdentity Identity { get; } = identity;
+
+    TIdentity IGatewayActor<TId, TEntity, TIdentity>.Identity => Identity;
 
     public static implicit operator TIdentity(GatewayActor<TId, TEntity, TIdentity> actor) => actor.Identity;
 }

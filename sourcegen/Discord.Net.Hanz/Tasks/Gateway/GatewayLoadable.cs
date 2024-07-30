@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
+using System.Text;
 
 namespace Discord.Net.Hanz.Tasks.Gateway;
 
@@ -355,6 +356,19 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         }
     }
 
+    private static bool TryGetStoreRoot(ITypeSymbol type, out IPropertySymbol root)
+    {
+        root = type.GetMembers()
+            .OfType<IPropertySymbol>()
+            .FirstOrDefault(x => x
+                .GetAttributes()
+                .Any(x => x.AttributeClass?.ToDisplayString() == "Discord.Gateway.StoreRootAttribute")
+            )!;
+
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        return root is not null;
+    }
+
     private bool CreateLoadableSources(
         ref ClassDeclarationSyntax syntax,
         GenerationContext target,
@@ -374,8 +388,18 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             return false;
         }
 
+        var interfaceStoreOverload = SyntaxFactory.ParseMemberDeclaration(
+            $"ValueTask<IEntityModelStore<{idType}, {modelType}>> IStoreProvider<{idType}, {modelType}>.GetStoreAsync(CancellationToken token) => GetOrCreateStoreAsync(token);"
+        );
+
+        if (interfaceStoreOverload is null)
+        {
+            logger.Warn($"{target.ClassSymbol}: failed to create broker overload");
+            return false;
+        }
+
         var store = SyntaxFactory.ParseMemberDeclaration(
-            $"private Discord.Gateway.Cache.IEntityModelStore<{idType}, {modelType}>? _store;"
+            $"private Discord.Gateway.IEntityModelStore<{idType}, {modelType}>? _store;"
         );
 
         if (store is null)
@@ -410,9 +434,63 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             return false;
         }
 
+        Func<ITypeSymbol, ITypeSymbol, string> storeInitializer = (idType, modelType) =>
+        {
+            var store = $"await Client.CacheProvider.GetStoreAsync<{idType}, {modelType}>(token)";
+
+            if (!target.ModelType.Equals(modelType, SymbolEqualityComparer.Default))
+                store = $"({store}).Cast(Template.Of<{target.ModelType}>())";
+
+            return store;
+        };
+
+        if (
+            TryGetStoreRoot(target.ClassSymbol, out var storeRoot) &&
+            TryGetBrokerTypes(
+                storeRoot.Type,
+                out var storeRootId,
+                out _,
+                out var storeRootModel)
+            )
+        {
+
+            storeInitializer = (idType, modelType) =>
+            {
+                var store =
+                    $"await (this.{storeRoot.Name} as IStoreProvider<{storeRootId}, {storeRootModel}>).GetStoreAsync(token).Chain<{storeRootId}, {storeRootModel}, {idType}, {modelType}>({storeRoot.Name}.Id)";
+
+                if (!target.ModelType.Equals(modelType, SymbolEqualityComparer.Default))
+                    store = $"({store}).Cast(Template.Of<{target.ModelType}>())";
+
+                return store;
+            };
+        }
+
+        var storeBuilder = new StringBuilder();
+
+        foreach (var type in TypeUtils.GetBaseTypesAndThis(target.GatewayEntitySymbol))
+        {
+            if(!GatewayCacheableEntity.TryGetCacheableType(type, out var cacheable))
+                continue;
+
+            // only thing exempt here is self user
+            if(cacheable!.TypeArguments[2].ToDisplayString() == "Discord.Models.ISelfUserModel")
+                continue;
+
+            if (type.BaseType?.IsAbstract ?? true)
+            {
+                storeBuilder.AppendLine($"return _store = {storeInitializer(cacheable.TypeArguments[1], cacheable.TypeArguments[2])};");
+                break;
+            }
+
+            storeBuilder
+                .AppendLine($"if (Client.StateController.CanUseStoreType<{cacheable.TypeArguments[0].ToDisplayString()}>())")
+                .AppendLine($"return _store = {storeInitializer(cacheable!.TypeArguments[1], cacheable.TypeArguments[2])};");
+        }
+
         var getOrCreateStore = SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              private async ValueTask<Discord.Gateway.Cache.IEntityModelStore<{{idType}}, {{modelType}}>> GetOrCreateStoreAsync(CancellationToken token)
+              private async ValueTask<Discord.Gateway.IEntityModelStore<{{idType}}, {{modelType}}>> GetOrCreateStoreAsync(CancellationToken token)
               {
                   if (_store is not null)
                       return _store;
@@ -421,7 +499,8 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                   {
                       if (_store is not null)
                           return _store;
-                      return _store = await (this as {{target.GatewayActorInterface.ToDisplayString()}}).GetStoreAsync(token);
+
+                      {{storeBuilder}}
                   }
                   finally
                   {
@@ -471,10 +550,14 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             .AddBaseListTypes(
                 SyntaxFactory.SimpleBaseType(
                     SyntaxFactory.ParseTypeName($"IBrokerProvider<{idType}, {entityType}, {modelType}>")
+                ),
+                SyntaxFactory.SimpleBaseType(
+                    SyntaxFactory.ParseTypeName($"IStoreProvider<{idType}, {modelType}>")
                 )
             )
             .AddMembers(
                 interfaceBrokerOverload,
+                interfaceStoreOverload,
                 store,
                 broker,
                 disposeMethod,

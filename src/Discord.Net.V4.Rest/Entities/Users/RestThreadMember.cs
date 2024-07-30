@@ -1,6 +1,5 @@
 using Discord.Models;
-using Discord.Rest.Channels;
-using Discord.Rest.Guilds;
+using Discord.Rest;
 
 namespace Discord.Rest;
 

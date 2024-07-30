@@ -1,7 +1,7 @@
 using Discord.Models;
-using Discord.Rest.Stage;
+using Discord.Rest;
 
-namespace Discord.Rest.Channels;
+namespace Discord.Rest;
 
 [method: TypeFactory]
 [ExtendInterfaceDefaults(typeof(IStageChannelActor))]

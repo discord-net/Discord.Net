@@ -347,7 +347,8 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
     new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct, TClient>(
         IEntityModel model,
         TId id,
-        TClient client)
+        TClient client
+    )
         where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
         where TClient : IDiscordClient
         => FromReferenced(

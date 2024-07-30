@@ -1,10 +1,9 @@
 using Discord.Models;
-using Discord.Rest.Channels;
+using Discord.Rest;
 using Discord.Rest.Extensions;
-using Discord.Rest.Guilds;
 using Discord.Stage;
 
-namespace Discord.Rest.Stage;
+namespace Discord.Rest;
 
 public sealed partial class RestStageInstanceActor(
     DiscordRestClient client,

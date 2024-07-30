@@ -1,7 +1,7 @@
 using Discord.Models;
 using System.Collections.Immutable;
 
-namespace Discord.Rest.Channels;
+namespace Discord.Rest;
 
 [method: TypeFactory]
 public partial class RestForumChannelActor(

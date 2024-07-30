@@ -1,7 +1,7 @@
 using Discord.Models;
 using Discord.Models.Json;
 
-namespace Discord.Rest.Stickers;
+namespace Discord.Rest;
 
 public sealed partial class RestStickerItem(DiscordRestClient client, IStickerItemModel model) :
     RestEntity<ulong>(client, model.Id),

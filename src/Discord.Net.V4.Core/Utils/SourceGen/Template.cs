@@ -1,7 +1,10 @@
+using System.Runtime.CompilerServices;
+
 namespace Discord;
 
 internal static class Template
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Template<T> Of<T>() => default;
 }
 

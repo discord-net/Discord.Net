@@ -1,7 +1,7 @@
 using Discord.Models;
 using Discord.Models.Json;
 
-namespace Discord.Rest.Guilds;
+namespace Discord.Rest;
 
 [ExtendInterfaceDefaults(typeof(IBanActor))]
 public sealed partial class RestBanActor(

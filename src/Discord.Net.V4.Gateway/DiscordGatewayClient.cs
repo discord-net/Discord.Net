@@ -1,4 +1,4 @@
-using Discord.Gateway.Cache;
+using Discord.Gateway;
 using Discord.Gateway.Events;
 using Discord.Gateway.State;
 using Discord.Rest;

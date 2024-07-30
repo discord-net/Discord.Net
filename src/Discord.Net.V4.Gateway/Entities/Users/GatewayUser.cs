@@ -1,4 +1,4 @@
-using Discord.Gateway.Cache;
+using Discord.Gateway;
 using Discord.Gateway.State;
 using Discord.Models;
 using Discord.Rest;
@@ -15,21 +15,15 @@ public partial class GatewayUserActor(
 {
     [SourceOfTruth]
     internal GatewayUser CreateEntity(IUserModel model)
-        => Client.StateController.CreateLatent<ulong, GatewayUser, IUserModel>(this, model);
+        => Client.StateController.CreateLatent(this, model);
 
     public IDMChannel CreateEntity(IDMChannelModel model) => throw new NotImplementedException();
-
-    internal override ValueTask<IEntityModelStore<ulong, IUserModel>> GetStoreAsync(CancellationToken token = default)
-        => Client.CacheProvider.GetStoreAsync<ulong, IUserModel>(token);
 }
 
 [ExtendInterfaceDefaults]
 public partial class GatewayUser :
     GatewayCacheableEntity<GatewayUser, ulong, IUserModel, UserIdentity>,
-    IUser,
-    IStoreProvider<ulong, IUserModel>,
-    IBrokerProvider<ulong, GatewayUser, IUserModel>,
-    IContextConstructable<GatewayUser, IUserModel, ICacheConstructionContext<ulong, GatewayUser>, DiscordGatewayClient>
+    IUser
 {
     public string? AvatarId => Model.Avatar;
     public ushort Discriminator => ushort.Parse(Model.Discriminator);
@@ -38,8 +32,7 @@ public partial class GatewayUser :
     public bool IsBot => Model.IsBot ?? false;
     public UserFlags PublicFlags => (UserFlags?)Model.PublicFlags ?? UserFlags.None;
 
-    [ProxyInterface]
-    internal virtual GatewayUserActor Actor { get; }
+    [ProxyInterface] internal virtual GatewayUserActor Actor { get; }
     internal virtual IUserModel Model => _model;
 
     private IUserModel _model;
@@ -71,12 +64,17 @@ public partial class GatewayUser :
             return GatewaySelfUser.Construct(client, selfUserContext, selfUser);
         }
 
-        return new GatewayUser(client, model, implicitHandle: context.ImplicitHandle);
+        return new GatewayUser(
+            client,
+            model,
+            context.TryGetActor(Template.Of<GatewayUserActor>()),
+            implicitHandle: context.ImplicitHandle
+        );
     }
 
     public override ValueTask UpdateAsync(IUserModel model, bool updateCache = true, CancellationToken token = default)
     {
-        if(updateCache) return UpdateCacheAsync(this, model, token);
+        if (updateCache) return UpdateCacheAsync(this, model, token);
 
         _model = model;
 

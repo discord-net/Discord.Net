@@ -2,10 +2,10 @@ using Discord.Models;
 using Discord.Models.Json;
 using Discord.Models.Json.Stickers;
 using Discord.Rest.Extensions;
-using Discord.Rest.Guilds;
+using Discord.Rest;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Discord.Rest.Stickers;
+namespace Discord.Rest;
 
 [method: TypeFactory]
 [ExtendInterfaceDefaults(typeof(IGuildStickerActor))]

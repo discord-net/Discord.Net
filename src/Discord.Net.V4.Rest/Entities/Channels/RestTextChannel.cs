@@ -1,9 +1,9 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest.Actors;
-using Discord.Rest.Guilds;
+using Discord.Rest;
 
-namespace Discord.Rest.Channels;
+namespace Discord.Rest;
 
 [method: TypeFactory]
 [ExtendInterfaceDefaults(

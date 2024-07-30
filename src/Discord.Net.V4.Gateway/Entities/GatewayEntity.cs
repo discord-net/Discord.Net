@@ -14,9 +14,9 @@ public abstract class GatewayEntity<T> : IEntity<T>
     /// <inheritdoc />
     public T Id { get; }
 
-    internal GatewayEntity(DiscordGatewayClient discord, T id)
+    internal GatewayEntity(DiscordGatewayClient client, T id)
     {
-        Client = discord;
+        Client = client;
         Id = id;
     }
 

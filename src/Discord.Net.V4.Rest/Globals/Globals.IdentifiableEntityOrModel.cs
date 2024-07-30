@@ -1,76 +1,76 @@
 
 #region Guilds
 
-global using GuildIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Guilds.RestGuild, Discord.Rest.Guilds.RestGuildActor, Discord.Models.IGuildModel>;
-global using RoleIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Guilds.RestRole, Discord.Rest.Guilds.RestRoleActor, Discord.Models.IRoleModel>;
-global using GuildEmoteIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Guilds.RestGuildEmote, Discord.Rest.Guilds.RestGuildEmoteActor, Discord.Models.IGuildEmoteModel>;
-global using BanIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Guilds.RestBan, Discord.Rest.Guilds.RestBanActor, Discord.Models.IBanModel>;
-global using IntegrationIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Guilds.Integrations.RestIntegration, Discord.Rest.Guilds.Integrations.RestIntegrationActor, Discord.Models.IIntegrationModel>;
+global using GuildIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuild, Discord.Rest.RestGuildActor, Discord.Models.IGuildModel>;
+global using RoleIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestRole, Discord.Rest.RestRoleActor, Discord.Models.IRoleModel>;
+global using GuildEmoteIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildEmote, Discord.Rest.RestGuildEmoteActor, Discord.Models.IGuildEmoteModel>;
+global using BanIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestBan, Discord.Rest.RestBanActor, Discord.Models.IBanModel>;
+global using IntegrationIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestIntegration, Discord.Rest.RestIntegrationActor, Discord.Models.IIntegrationModel>;
 
 #endregion
 
 #region Stickers
 
-global using GuildStickerIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Stickers.RestGuildSticker, Discord.Rest.Stickers.RestGuildStickerActor, Discord.Models.IGuildStickerModel>;
-global using StickerIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Stickers.RestSticker, Discord.Models.IStickerModel>;
+global using GuildStickerIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildSticker, Discord.Rest.RestGuildStickerActor, Discord.Models.IGuildStickerModel>;
+global using StickerIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestSticker, Discord.Models.IStickerModel>;
 
 #endregion
 
 #region Users
 
-global using MemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Guilds.RestGuildMember, Discord.Rest.Guilds.RestGuildMemberActor, Discord.Models.IMemberModel>;
+global using MemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildMember, Discord.Rest.RestGuildMemberActor, Discord.Models.IMemberModel>;
 global using UserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestUser, Discord.Rest.RestUserActor, Discord.Models.IUserModel>;
 global using ThreadMemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadMember, Discord.Rest.RestThreadMemberActor, Discord.Models.IThreadMemberModel>;
 global using SelfUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestSelfUser, Discord.Rest.RestSelfUserActor, Discord.Models.ISelfUserModel>;
-global using GuildScheduledEventUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Entities.Users.RestGuildScheduledEventUser, Discord.Rest.Entities.Users.RestGuildScheduledEventUserActor, Discord.Models.IGuildScheduledEventUserModel>;
+global using GuildScheduledEventUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildScheduledEventUser, Discord.Rest.RestGuildScheduledEventUserActor, Discord.Models.IGuildScheduledEventUserModel>;
 
 #endregion
 
 #region Channels
 
-global using DMChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestDMChannel, Discord.Rest.Channels.RestDMChannelActor, Discord.Models.IDMChannelModel>;
-global using GroupChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestGroupChannel, Discord.Rest.Channels.RestGroupChannelActor, Discord.Models.IGroupDMChannelModel>;
+global using DMChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestDMChannel, Discord.Rest.RestDMChannelActor, Discord.Models.IDMChannelModel>;
+global using GroupChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGroupChannel, Discord.Rest.RestGroupChannelActor, Discord.Models.IGroupDMChannelModel>;
 global using ThreadIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadChannel, Discord.Rest.RestThreadChannelActor, Discord.Models.IThreadChannelModel>;
-global using ChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestChannel, Discord.Rest.Channels.RestChannelActor, Discord.Models.IChannelModel>;
+global using ChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestChannel, Discord.Rest.RestChannelActor, Discord.Models.IChannelModel>;
 global using MessageChannelIdentity = Discord.IIdentifiable<ulong, Discord.IMessageChannel, Discord.IMessageChannelActor, Discord.Models.IChannelModel>;
-global using GuildChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestGuildChannel, Discord.Rest.Channels.RestGuildChannelActor, Discord.Models.IGuildChannelModel>;
-global using ThreadableChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestThreadableChannel, Discord.Rest.Channels.RestThreadableChannelActor, Discord.Models.IThreadableChannelModel>;
-global using VoiceChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestVoiceChannel, Discord.Rest.Channels.RestVoiceChannelActor, Discord.Models.IGuildVoiceChannelModel>;
-global using ForumChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestForumChannel, Discord.Rest.Channels.RestForumChannelActor, Discord.Models.IGuildForumChannelModel>;
-global using MediaChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestMediaChannel, Discord.Rest.Channels.RestMediaChannelActor, Discord.Models.IGuildMediaChannelModel>;
-global using NewsChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestNewsChannel, Discord.Rest.Channels.RestNewsChannelActor, Discord.Models.IGuildNewsChannelModel>;
-global using TextChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestTextChannel, Discord.Rest.Channels.RestTextChannelActor, Discord.Models.IGuildTextChannelModel>;
-global using StageChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestStageChannel, Discord.Rest.Channels.RestStageChannelActor, Discord.Models.IGuildStageChannelModel>;
-global using CategoryChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Channels.RestCategoryChannel, Discord.Rest.Channels.RestCategoryChannelActor, Discord.Models.IGuildCategoryChannelModel>;
+global using GuildChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildChannel, Discord.Rest.RestGuildChannelActor, Discord.Models.IGuildChannelModel>;
+global using ThreadableChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadableChannel, Discord.Rest.RestThreadableChannelActor, Discord.Models.IThreadableChannelModel>;
+global using VoiceChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestVoiceChannel, Discord.Rest.RestVoiceChannelActor, Discord.Models.IGuildVoiceChannelModel>;
+global using ForumChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestForumChannel, Discord.Rest.RestForumChannelActor, Discord.Models.IGuildForumChannelModel>;
+global using MediaChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestMediaChannel, Discord.Rest.RestMediaChannelActor, Discord.Models.IGuildMediaChannelModel>;
+global using NewsChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestNewsChannel, Discord.Rest.RestNewsChannelActor, Discord.Models.IGuildNewsChannelModel>;
+global using TextChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestTextChannel, Discord.Rest.RestTextChannelActor, Discord.Models.IGuildTextChannelModel>;
+global using StageChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestStageChannel, Discord.Rest.RestStageChannelActor, Discord.Models.IGuildStageChannelModel>;
+global using CategoryChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestCategoryChannel, Discord.Rest.RestCategoryChannelActor, Discord.Models.IGuildCategoryChannelModel>;
 global using IntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IIntegrationChannelActor, Discord.Models.IGuildChannelModel>;
 #endregion
 
 #region Messages
 
-global using MessageIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Messages.RestMessage, Discord.Rest.Messages.RestMessageActor, Discord.Models.IMessageModel>;
+global using MessageIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestMessage, Discord.Rest.RestMessageActor, Discord.Models.IMessageModel>;
 
 #endregion
 
 #region Invites
 
-global using InviteIdentity = Discord.IIdentifiable<string, Discord.Rest.Invites.RestInvite, Discord.Rest.Invites.RestInviteActor, Discord.Models.IInviteModel>;
+global using InviteIdentity = Discord.IIdentifiable<string, Discord.Rest.RestInvite, Discord.Rest.RestInviteActor, Discord.Models.IInviteModel>;
 
 #endregion
 
 #region Stage
 
-global using StageInstanceIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Stage.RestStageInstance, Discord.Rest.Stage.RestStageInstanceActor, Discord.Models.IStageInstanceModel>;
+global using StageInstanceIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestStageInstance, Discord.Rest.RestStageInstanceActor, Discord.Models.IStageInstanceModel>;
 
 #endregion
 
 #region Events
 
-global using GuildScheduledEventIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Guilds.RestGuildScheduledEvent, Discord.Rest.Guilds.RestGuildScheduledEventActor, Discord.Models.IGuildScheduledEventModel>;
+global using GuildScheduledEventIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildScheduledEvent, Discord.Rest.RestGuildScheduledEventActor, Discord.Models.IGuildScheduledEventModel>;
 
 #endregion
 
 #region Webhooks
 
-global using WebhookIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Webhooks.RestWebhook, Discord.Rest.Webhooks.RestWebhookActor, Discord.Models.IWebhookModel>;
+global using WebhookIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestWebhook, Discord.Rest.RestWebhookActor, Discord.Models.IWebhookModel>;
 
 #endregion

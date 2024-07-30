@@ -2,7 +2,7 @@ using Discord.Models;
 using System.Collections.Immutable;
 using System.ComponentModel;
 
-namespace Discord.Rest.Stickers;
+namespace Discord.Rest;
 
 public partial class RestSticker :
     RestEntity<ulong>,

@@ -1,4 +1,4 @@
-using Discord.Gateway.Cache;
+using Discord.Gateway;
 using Discord.Gateway.State;
 using Discord.Models;
 
@@ -8,31 +8,22 @@ namespace Discord.Gateway;
 public partial class GatewayChannelActor(
     DiscordGatewayClient client,
     ChannelIdentity channel
-):
+) :
     GatewayCachedActor<ulong, GatewayChannel, ChannelIdentity, IChannelModel>(client, channel),
     IChannelActor
 {
-
     [SourceOfTruth]
     internal GatewayChannel CreateEntity(IChannelModel model)
-        => Client.StateController.CreateLatent<ulong, GatewayChannel, IChannelModel>(this, model);
-
-    internal override ValueTask<IEntityModelStore<ulong, IChannelModel>> GetStoreAsync(
-        CancellationToken token = default
-    ) => Client.StateController.GetStoreAsync(Template.Of<ChannelIdentity>(), token);
+        => Client.StateController.CreateLatent(this, model);
 }
 
 public partial class GatewayChannel :
     GatewayCacheableEntity<GatewayChannel, ulong, IChannelModel, ChannelIdentity>,
-    IChannel,
-    IStoreProvider<ulong, IChannelModel>,
-    IBrokerProvider<ulong, GatewayChannel, IChannelModel>,
-    IContextConstructable<GatewayChannel, IChannelModel, ICacheConstructionContext<ulong, GatewayChannel>, DiscordGatewayClient>
+    IChannel
 {
     public ChannelType Type => (ChannelType)Model.Type;
 
-    [ProxyInterface]
-    internal virtual GatewayChannelActor Actor { get; }
+    [ProxyInterface] internal virtual GatewayChannelActor Actor { get; }
 
     internal virtual IChannelModel Model => _model;
 
@@ -41,14 +32,38 @@ public partial class GatewayChannel :
     public GatewayChannel(
         DiscordGatewayClient client,
         IChannelModel model,
-        GatewayChannelActor? actor = null
-    ) : base(client, model.Id)
+        GatewayChannelActor? actor = null,
+        IEntityHandle<ulong, GatewayChannel>? implicitHandle = null
+    ) : base(client, model.Id, implicitHandle)
     {
         _model = model;
         Actor = actor ?? new(client, ChannelIdentity.Of(this));
     }
 
-    public static GatewayChannel Construct(DiscordGatewayClient client, ICacheConstructionContext<ulong, GatewayChannel> context, IChannelModel model) => throw new NotImplementedException();
+    public static GatewayChannel Construct(
+        DiscordGatewayClient client,
+        ICacheConstructionContext<ulong, GatewayChannel> context,
+        IChannelModel model)
+    {
+        // TODO: switch channel model type
+        switch (model)
+        {
+            case IDMChannelModel dmChannelModel
+                when context is ICacheConstructionContext<ulong, GatewayDMChannel> dmChannelContext:
+                return GatewayDMChannel.Construct(client, dmChannelContext, dmChannelModel);
+            case IGroupDMChannelModel groupDMChannelModel:
+                throw new NotImplementedException();
+            case IGuildChannelModel guildChannelModel
+                when context is ICacheConstructionContext<ulong, GatewayGuildChannel> guildChannelContext:
+                return GatewayGuildChannel.Construct(client, guildChannelContext, guildChannelModel);
+            default:
+                return new GatewayChannel(
+                    client,
+                    model,
+                    context.TryGetActor(Template.Of<GatewayChannelActor>()),
+                    implicitHandle: context.ImplicitHandle);
+        }
+    }
 
     public override ValueTask UpdateAsync(
         IChannelModel model,
@@ -63,5 +78,4 @@ public partial class GatewayChannel :
     }
 
     public override IChannelModel GetModel() => Model;
-
 }

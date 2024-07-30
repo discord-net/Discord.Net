@@ -5,9 +5,11 @@ namespace Discord.Net.Hanz.Utils;
 
 public static class Hierarchy
 {
-    private static readonly Dictionary<ITypeSymbol, List<SortedHierarchySymbol>> _cache = new(SymbolEqualityComparer.Default);
+    private static readonly Dictionary<ITypeSymbol, List<SortedHierarchySymbol>> _cache =
+        new(SymbolEqualityComparer.Default);
 
-    public readonly struct SortedHierarchySymbol(int distance, INamedTypeSymbol type) : IEquatable<SortedHierarchySymbol>
+    public readonly struct SortedHierarchySymbol(int distance, INamedTypeSymbol type)
+        : IEquatable<SortedHierarchySymbol>
     {
         public readonly int Distance = distance;
         public readonly INamedTypeSymbol Type = type;
@@ -31,11 +33,20 @@ public static class Hierarchy
     }
 
     public static IEnumerable<T> OrderByHierarchy<T>(
-        in ImmutableArray<T?> targets,
+        ImmutableArray<T?> targets,
         Func<T, INamedTypeSymbol> typeResolver,
         out Dictionary<INamedTypeSymbol, T> map,
         out HashSet<INamedTypeSymbol> bases)
     {
+        var targetsCopy = targets;
+        targets = targets
+            .Where(x =>
+                x is not null && targetsCopy.Count(y =>
+                    y is not null && typeResolver(y).Equals(typeResolver(x), SymbolEqualityComparer.Default)
+                ) == 1
+            )
+            .ToImmutableArray();
+
         var mapLocal = map = targets
             .Where(x => x is not null)
             .OfType<T>()
@@ -95,7 +106,6 @@ public static class Hierarchy
         {
             CalculateInterfaceDepth(iface, ref depth, map, bases);
         }
-
     }
 
     public static List<SortedHierarchySymbol> GetHierarchy(ITypeSymbol symbol)

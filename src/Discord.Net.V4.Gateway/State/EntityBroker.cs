@@ -1,4 +1,4 @@
-using Discord.Gateway.Cache;
+using Discord.Gateway;
 using Discord.Gateway.State.Handles;
 using Discord.Models;
 using Microsoft.Extensions.Logging;
@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Gateway.State;
 
-internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TEntity, TModel>
+internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker<TId, TEntity, TActor, TModel>
     where TEntity :
     class,
     ICacheableEntity<TEntity, TId, TModel>,
@@ -14,6 +14,7 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
     IBrokerProvider<TId, TEntity, TModel>,
     IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
     where TModel : class, IEntityModel<TId>
+    where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
     where TId : IEquatable<TId>
 {
     private sealed class LatentEntityPromise(IDisposable scope, SemaphoreSlim semaphore) : IDisposable
@@ -26,7 +27,7 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
     }
 
     private sealed class EntityReference(
-        EntityBroker<TId, TEntity, TModel> broker,
+        EntityBroker<TId, TEntity, TActor, TModel> broker,
         TId id,
         TEntity entity,
         params IEntityHandle<TId, TEntity>[] handles
@@ -82,7 +83,7 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
     private readonly KeyedSemaphoreSlim<TId> _keyedSemaphore;
     private readonly SemaphoreSlim _enumerationSemaphore = new(1, 1);
 
-    private readonly ILogger<EntityBroker<TId, TEntity, TModel>> _logger;
+    private readonly ILogger<EntityBroker<TId, TEntity, TActor, TModel>> _logger;
 
     public EntityBroker(
         DiscordGatewayClient client,
@@ -91,7 +92,7 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
         _keyedSemaphore = new(1, 1);
         _client = client;
         _controller = stateController;
-        _logger = client.LoggerFactory.CreateLogger<EntityBroker<TId, TEntity, TModel>>();
+        _logger = client.LoggerFactory.CreateLogger<EntityBroker<TId, TEntity, TActor, TModel>>();
         _references = new();
     }
 
@@ -174,9 +175,14 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
     private EntityHandle<TId, TEntity> CreateReferenceAndHandle(
         IPathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
-        TModel model)
+        TModel model,
+        TActor? actor = null)
     {
-        var entity = TEntity.Construct(_client, new CacheConstructionContext<TId, TEntity>(path), model);
+        ICacheConstructionContext<TId, TEntity> context = actor is not null
+            ? new CacheConstructionContext<TId, TEntity, TActor>(actor, path)
+            : new CacheConstructionContext<TId, TEntity>(path);
+
+        var entity = TEntity.Construct(_client, context, model);
 
         var handle = new EntityHandle<TId, TEntity>(this, identity.Id, entity);
 
@@ -188,9 +194,10 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
     private TEntity CreateReferenceAndImplicitHandle(
         IPathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
-        TModel model)
+        TModel model,
+        TActor? actor = null)
     {
-        var handle = new ImplicitHandle<TId, TEntity, TModel>(_client, this, path, identity.Id, model);
+        var handle = new ImplicitHandle<TId, TEntity, TActor, TModel>(_client, this, path, identity.Id, model, actor);
 
         _references.Add(identity.Id, new EntityReference(this, identity.Id, handle.Entity, handle));
 
@@ -277,6 +284,7 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
         IPathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         IEntityModelStore<TId, TModel> store,
+        TActor? actor = null,
         CancellationToken token = default)
     {
         using var scope = _keyedSemaphore.Get(identity.Id, out var semaphoreSlim);
@@ -300,7 +308,7 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
             if (model is null)
                 return null;
 
-            return CreateReferenceAndImplicitHandle(path, identity, model);
+            return CreateReferenceAndImplicitHandle(path, identity, model, actor);
         }
         finally
         {
@@ -312,6 +320,7 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
         IPathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         IEntityModelStore<TId, TModel> store,
+        TActor? actor = null,
         CancellationToken token = default)
     {
         using var scope = _keyedSemaphore.Get(identity.Id, out var semaphoreSlim);
@@ -337,7 +346,7 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
             if (model is null)
                 return null;
 
-            return CreateReferenceAndHandle(path, identity, model);
+            return CreateReferenceAndHandle(path, identity, model, actor);
         }
         finally
         {
@@ -394,6 +403,47 @@ internal sealed class EntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TE
 
         return result.AsReadOnly();
     }
+}
+
+internal interface IEntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker<TId, TEntity, TModel>
+    where TEntity :
+    class,
+    ICacheableEntity<TEntity, TId, TModel>,
+    IStoreProvider<TId, TModel>,
+    IBrokerProvider<TId, TEntity, TModel>,
+    IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
+    where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
+    where TId : IEquatable<TId>
+    where TModel : class, IEntityModel<TId>
+{
+    ValueTask<TEntity?> GetImplicitAsync(
+        IPathable path,
+        IIdentifiable<TId, TEntity, TModel> identity,
+        IEntityModelStore<TId, TModel> store,
+        TActor? actor = null,
+        CancellationToken token = default);
+
+    ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(
+        IPathable path,
+        IIdentifiable<TId, TEntity, TModel> identity,
+        IEntityModelStore<TId, TModel> store,
+        TActor? actor = null,
+        CancellationToken token = default
+    );
+
+    ValueTask<TEntity?> IEntityBroker<TId, TEntity, TModel>.GetImplicitAsync(
+        IPathable path,
+        IIdentifiable<TId, TEntity, TModel> identity,
+        IEntityModelStore<TId, TModel> store,
+        CancellationToken token
+    ) => GetImplicitAsync(path, identity, store, null, token);
+
+    ValueTask<IEntityHandle<TId, TEntity>?> IEntityBroker<TId, TEntity, TModel>.GetAsync(
+        IPathable path,
+        IIdentifiable<TId, TEntity, TModel> identity,
+        IEntityModelStore<TId, TModel> store,
+        CancellationToken token
+    ) => GetAsync(path, identity, store, null, token);
 }
 
 internal interface IEntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TEntity>

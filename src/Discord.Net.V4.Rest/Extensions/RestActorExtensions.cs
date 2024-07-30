@@ -1,6 +1,6 @@
 using Discord.Models;
 using Discord.Rest.Actors;
-using Discord.Rest.Channels;
+using Discord.Rest;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Rest.Extensions;
