@@ -35,7 +35,7 @@ public partial class RestThreadChannelActor :
         );
 
         ThreadMembers = RestActors.Fetchable(
-            Template.Of<RestThreadMemberActor>(),
+            Template.T<RestThreadMemberActor>(),
             client,
             RestThreadMemberActor.Factory,
             guild,

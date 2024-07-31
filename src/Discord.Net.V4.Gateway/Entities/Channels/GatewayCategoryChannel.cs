@@ -1,5 +1,6 @@
 using Discord.Gateway.State;
 using Discord.Models;
+using static Discord.Template;
 
 namespace Discord.Gateway;
 
@@ -49,14 +50,13 @@ public sealed partial class GatewayCategoryChannel :
         IGuildCategoryChannelModel model
     ) => new(
         client,
-        context.TryGetActor(
-            Template.Of<GatewayCategoryChannelActor>()
-        )?.Guild.Identity ?? GuildIdentity.Of(model.GuildId),
+        context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
         model,
-        context.TryGetActor(Template.Of<GatewayCategoryChannelActor>()),
+        context.TryGetActor(T<GatewayCategoryChannelActor>()),
         context.ImplicitHandle
     );
 
+    [CovariantOverride]
     public ValueTask UpdateAsync(
         IGuildCategoryChannelModel model,
         bool updateCache = true,
@@ -66,7 +66,7 @@ public sealed partial class GatewayCategoryChannel :
 
         _model = model;
 
-        return ValueTask.CompletedTask;
+        return base.UpdateAsync(model, false, token);
     }
 
     public override IGuildCategoryChannelModel GetModel() => Model;

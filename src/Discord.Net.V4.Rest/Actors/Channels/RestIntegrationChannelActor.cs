@@ -24,7 +24,7 @@ public sealed partial class RestIntegrationChannelActor :
         IntegrationChannelIdentity = channel;
 
         Webhooks = RestActors.Fetchable(
-            Template.Of<RestWebhookActor>(),
+            Template.T<RestWebhookActor>(),
             client,
             RestWebhookActor.Factory,
             RestWebhook.Construct,
@@ -32,7 +32,7 @@ public sealed partial class RestIntegrationChannelActor :
         );
 
         IncomingWebhooks = RestActors.Fetchable(
-            Template.Of<RestIncomingWebhookActor>(),
+            Template.T<RestIncomingWebhookActor>(),
             client,
             RestIncomingWebhookActor.Factory,
             guild,
@@ -43,7 +43,7 @@ public sealed partial class RestIntegrationChannelActor :
         );
 
         ChannelFollowerWebhooks = RestActors.Fetchable(
-            Template.Of<RestChannelFollowerWebhookActor>(),
+            Template.T<RestChannelFollowerWebhookActor>(),
             client,
             RestChannelFollowerWebhookActor.Factory,
             guild,

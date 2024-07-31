@@ -5,29 +5,30 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-public sealed partial class GatewayForumChannelActor(
+public sealed partial class GatewayMediaChannelActor(
     DiscordGatewayClient client,
     GuildIdentity guild,
-    ForumChannelIdentity channel
+    MediaChannelIdentity channel
 ) :
     GatewayThreadableChannelActor(client, guild, channel),
-    IForumChannelActor,
-    IGatewayCachedActor<ulong, GatewayForumChannel, ForumChannelIdentity, IGuildForumChannelModel>
+    IMediaChannelActor,
+    IGatewayCachedActor<ulong, GatewayMediaChannel, MediaChannelIdentity, IGuildMediaChannelModel>
 {
-    [SourceOfTruth] internal override ForumChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] internal override MediaChannelIdentity Identity { get; } = channel;
 
-    [ProxyInterface(typeof(IIntegrationChannelActor))]
+    [ProxyInterface]
     internal GatewayIntegrationChannelActor IntegrationChannelActor { get; } = new(client, guild, channel);
 
     [SourceOfTruth]
-    internal GatewayForumChannel CreateEntity(IGuildForumChannelModel model)
+    internal GatewayMediaChannel CreateEntity(IGuildMediaChannelModel model)
         => Client.StateController.CreateLatent(this, model);
 }
 
-public sealed partial class GatewayForumChannel :
+[ExtendInterfaceDefaults]
+public sealed partial class GatewayMediaChannel :
     GatewayThreadableChannel,
-    IForumChannel,
-    ICacheableEntity<GatewayForumChannel, ulong, IGuildForumChannelModel>
+    IMediaChannel,
+    ICacheableEntity<GatewayMediaChannel, ulong, IGuildMediaChannelModel>
 {
     public bool IsNsfw => Model.IsNsfw;
 
@@ -43,53 +44,50 @@ public sealed partial class GatewayForumChannel :
 
     public SortOrder? DefaultSortOrder => (SortOrder?)Model.DefaultSortOrder;
 
-    public ForumLayout DefaultLayout => (ForumLayout)Model.DefaultForumLayout;
-
     [ProxyInterface]
-    internal override GatewayForumChannelActor Actor { get; }
+    internal override GatewayMediaChannelActor Actor { get; }
 
-    internal override IGuildForumChannelModel Model => _model;
+    internal override IGuildMediaChannelModel Model => _model;
 
-    private IGuildForumChannelModel _model;
+    private IGuildMediaChannelModel _model;
 
-    public GatewayForumChannel(
+    public GatewayMediaChannel(
         DiscordGatewayClient client,
         GuildIdentity guild,
-        IGuildForumChannelModel model,
-        GatewayForumChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayForumChannel>? implicitHandle = null
+        IGuildMediaChannelModel model,
+        GatewayMediaChannelActor? actor = null,
+        IEntityHandle<ulong, GatewayMediaChannel>? implicitHandle = null
     ) : base(client, guild, model, actor, implicitHandle)
     {
         _model = model;
-
-        Actor = actor ?? new(client, guild, ForumChannelIdentity.Of(this));
+        Actor = actor ?? new(client, guild, MediaChannelIdentity.Of(this));
 
         AvailableTags = model.AvailableTags
             .Select(x => ForumTag.Construct(client, new(guild.Id), x))
             .ToImmutableList();
     }
 
-    public static GatewayForumChannel Construct(
+    public static GatewayMediaChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayForumChannel> context,
-        IGuildForumChannelModel model
+        ICacheConstructionContext<ulong, GatewayMediaChannel> context,
+        IGuildMediaChannelModel model
     ) => new(
         client,
         context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
         model,
-        context.TryGetActor(T<GatewayForumChannelActor>()),
+        context.TryGetActor(T<GatewayMediaChannelActor>()),
         context.ImplicitHandle
     );
 
     [CovariantOverride]
     public ValueTask UpdateAsync(
-        IGuildForumChannelModel model,
+        IGuildMediaChannelModel model,
         bool updateCache = true,
         CancellationToken token = default)
     {
         if (updateCache) return UpdateCacheAsync(this, model, token);
 
-        if (!Model.AvailableTags.SequenceEqual(model.AvailableTags))
+        if(!Model.AvailableTags.SequenceEqual(model.AvailableTags))
             AvailableTags = model.AvailableTags
                 .Select(x => ForumTag.Construct(Client, new(Guild.Id), x))
                 .ToImmutableList();
@@ -99,5 +97,5 @@ public sealed partial class GatewayForumChannel :
         return base.UpdateAsync(model, false, token);
     }
 
-    public override IGuildForumChannelModel GetModel() => Model;
+    public override IGuildMediaChannelModel GetModel() => Model;
 }

@@ -1,7 +1,7 @@
 using Discord.Gateway;
 using Discord.Gateway.State;
-using Discord.Gateway.Users;
 using Discord.Models;
+using static Discord.Template;
 
 namespace Discord.Gateway;
 
@@ -16,8 +16,7 @@ public sealed partial class GatewayDMChannelActor(
 {
     [SourceOfTruth] public GatewayUserActor Recipient { get; } = new(client, recipient);
 
-    [SourceOfTruth]
-    internal override DMChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] internal override DMChannelIdentity Identity { get; } = channel;
 
     [ProxyInterface(typeof(IMessageChannelActor))]
     internal GatewayMessageChannelActor MessageChannelActor { get; } = new(client, channel);
@@ -32,8 +31,7 @@ public sealed partial class GatewayDMChannel :
     IDMChannel,
     ICacheableEntity<GatewayDMChannel, ulong, IDMChannelModel>
 {
-    [SourceOfTruth]
-    public GatewayUserActor Recipient { get; private set; }
+    [SourceOfTruth] public GatewayUserActor Recipient { get; private set; }
 
     [ProxyInterface] internal override GatewayDMChannelActor Actor { get; }
 
@@ -44,13 +42,14 @@ public sealed partial class GatewayDMChannel :
     internal GatewayDMChannel(
         DiscordGatewayClient client,
         IDMChannelModel model,
+        UserIdentity recipient,
         GatewayDMChannelActor? actor = null,
         IEntityHandle<ulong, GatewayChannel>? implicitHandle = null
     ) : base(client, model, actor, implicitHandle)
     {
         _model = model;
 
-        Recipient = new(client, UserIdentity.Of(model.Id));
+        Recipient = recipient.Actor ?? new(client, recipient);
 
         Actor = actor ?? new(client, DMChannelIdentity.Of(this), UserIdentity.Of(Recipient));
     }
@@ -58,15 +57,24 @@ public sealed partial class GatewayDMChannel :
     public static GatewayDMChannel Construct(
         DiscordGatewayClient client,
         ICacheConstructionContext<ulong, GatewayDMChannel> context,
-        IDMChannelModel model)
-    {
-        return new GatewayDMChannel(client, model, implicitHandle: context.ImplicitHandle);
-    }
+        IDMChannelModel model
+    ) => new(
+        client,
+        model,
+        context.Path.GetIdentity(T<UserIdentity>(), model.RecipientId),
+        implicitHandle: context.ImplicitHandle
+    );
 
-    public ValueTask UpdateAsync(IDMChannelModel model, bool updateCache = true, CancellationToken token = default) =>
-        throw new NotImplementedException();
+    [CovariantOverride]
+    public ValueTask UpdateAsync(IDMChannelModel model, bool updateCache = true, CancellationToken token = default)
+    {
+        if (updateCache) return UpdateCacheAsync(this, model, token);
+
+        _model = model;
+
+        return base.UpdateAsync(model, false, token);
+    }
 
 
     public override IDMChannelModel GetModel() => Model;
-
 }

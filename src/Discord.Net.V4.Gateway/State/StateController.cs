@@ -92,12 +92,17 @@ internal sealed partial class StateController : IDisposable
         IStoreProvider<TId, TModel>,
         IBrokerProvider<TId, TEntity, TModel>,
         IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
-        where TActor : class, IPathable, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
+        where TActor : class, IPathable,
+        IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
-        => CreateLatent<TId, TEntity, TActor, TModel>(actor, actor, model);
+        => CreateLatent<TId, TEntity, TActor, TModel>(model, new() {actor}, actor);
 
-    public TEntity CreateLatent<TId, TEntity, TActor, TModel>(TActor actor, IPathable path, TModel model)
+    public TEntity CreateLatent<TId, TEntity, TActor, TModel>(
+        TModel model,
+        CachePathable? path = null,
+        TActor? actor = null
+    )
         where TEntity :
         class,
         ICacheableEntity<TEntity, TId, TModel>,
@@ -109,7 +114,7 @@ internal sealed partial class StateController : IDisposable
         where TModel : class, IEntityModel<TId>
     {
         if (TryGetCachedBroker<TId, TEntity, TModel>(out var broker))
-            return CreateLatentFromBroker(broker, path, model);
+            return CreateLatentFromBroker(broker, path ?? CachePathable.Default, model, actor);
 
         // TODO: sync lock here, I don't like it
         using var scope = _brokerSemaphore.Get(typeof(TEntity), out var semaphoreSlim);
@@ -119,14 +124,14 @@ internal sealed partial class StateController : IDisposable
         try
         {
             if (TryGetCachedBroker(out broker))
-                return CreateLatentFromBroker(broker, path, model);
+                return CreateLatentFromBroker(broker, path ?? CachePathable.Default, model, actor);
 
             broker = new RefCounted<IEntityBroker<TId, TEntity, TModel>>(
                 new EntityBroker<TId, TEntity, TActor, TModel>(_client, this)
             );
             _brokers[typeof(TEntity)] = broker;
 
-            return CreateLatentFromBroker(broker, path, model);
+            return CreateLatentFromBroker(broker, path ?? CachePathable.Default, model, actor);
         }
         finally
         {
@@ -134,10 +139,11 @@ internal sealed partial class StateController : IDisposable
         }
     }
 
-    private TEntity CreateLatentFromBroker<TId, TEntity, TModel>(
+    private TEntity CreateLatentFromBroker<TId, TEntity, TModel, TActor>(
         IRefCounted<IEntityBroker<TId, TEntity, TModel>> broker,
-        IPathable path,
-        TModel model
+        CachePathable path,
+        TModel model,
+        TActor? actor
     )
         where TEntity :
         class,
@@ -147,6 +153,7 @@ internal sealed partial class StateController : IDisposable
         IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
+        where TActor : IActor<TId, TEntity>
     {
         if (!broker.Value.TryCreateLatentHandle(model, out var entity, out var handle,
                 _backgroundTokenSource.Token))
@@ -158,7 +165,11 @@ internal sealed partial class StateController : IDisposable
             return entity;
         }
 
-        var latentEntity = TEntity.Construct(_client, new CacheConstructionContext<TId, TEntity>(path), model);
+        ICacheConstructionContext<TId, TEntity> context = actor is not null
+            ? new CacheConstructionContext<TId, TEntity, TActor>(actor, path)
+            : new CacheConstructionContext<TId, TEntity>(path);
+
+        var latentEntity = TEntity.Construct(_client, context, model);
 
         _operationChannel.Writer.TryWrite(
             new AttachLatentEntityOperation<TId, TEntity, TModel>(latentEntity, model, handle, broker)
@@ -189,7 +200,8 @@ internal sealed partial class StateController : IDisposable
     }
 
     [MustDisposeResource]
-    public async ValueTask<IRefCounted<IEntityBroker<TId, TEntity, TActor, TModel>>> GetBrokerAsync<TId, TEntity, TActor, TModel>(
+    public async ValueTask<IRefCounted<IEntityBroker<TId, TEntity, TActor, TModel>>> GetBrokerAsync<TId, TEntity,
+        TActor, TModel>(
         CancellationToken token = default
     )
         where TEntity :

@@ -7,7 +7,6 @@ namespace Discord;
 ///     Represents a generic Discord client.
 /// </summary>
 public interface IDiscordClient :
-    IDisposable,
     IAsyncDisposable
 {
     IRestApiClient RestApiClient { get; }

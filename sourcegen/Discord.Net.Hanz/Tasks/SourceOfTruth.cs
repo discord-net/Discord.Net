@@ -137,7 +137,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                 ? TypeUtils.GetBaseTypesAndThis(typeSymbol)
                     .SelectMany(type =>
                     {
-                        if (type is not INamedTypeSymbol namedType)
+                        if (type is not { } namedType)
                             return [];
 
                         var syntax = type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
@@ -153,6 +153,15 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                     .ToImmutableHashSet(SymbolEqualityComparer.Default)
                 : ImmutableHashSet<ISymbol>.Empty;
 
+            if (proxied.Count > 0)
+            {
+                targetLogger.Log($"{target.TypeSymbol}: Proxied members:");
+                foreach (var item in proxied)
+                {
+                    targetLogger.Log($" - {item}");
+                }
+            }
+
             // var baseImplementations = TypeUtils.GetBaseTypesAndThis(typeSymbol);
 
             foreach (var iface in typeSymbol.AllInterfaces)
@@ -163,7 +172,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                 {
                     if (proxied.Contains(member))
                     {
-                        targetLogger.Log($"Skipping {member} (implemented by interface proxy)");
+                        targetLogger.Log($"{target.TypeSymbol}: Skipping {member} (implemented by interface proxy)");
                         continue;
                     }
 
@@ -174,7 +183,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                                     method.ReturnType))
                             {
                                 targetLogger.Warn(
-                                    $"No conversion between {sourceOfTruthType.Name} -> {method.ReturnType.Name}");
+                                    $"{target.TypeSymbol}: No conversion between {sourceOfTruthType.Name} -> {method.ReturnType.Name}");
                                 break;
                             }
 
@@ -184,7 +193,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                             if (!target.Semantic.Compilation.HasImplicitConversion(sourceOfTruthType, property.Type))
                             {
                                 targetLogger.Warn(
-                                    $"No conversion between {sourceOfTruthType.Name} -> {property.Type.Name}");
+                                    $"{target.TypeSymbol}: No conversion between {sourceOfTruthType.Name} -> {property.Type.Name}");
                                 break;
                             }
 

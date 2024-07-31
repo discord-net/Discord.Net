@@ -1,6 +1,6 @@
 using Discord.Gateway.Events;
 using Discord.Gateway.State;
-using Discord.Gateway.Users;
+using Discord.Gateway;
 using Discord.Models;
 using Discord.Models.Dispatch;
 using Microsoft.Extensions.Logging;
@@ -36,7 +36,7 @@ public sealed partial class DiscordGatewayClient
             StateController.SelfUserModel.SelfUserModelPart = readyPayload.User;
         }
 
-        var store = await StateController.GetStoreAsync(Template.Of<UserIdentity>(), token);
+        var store = await StateController.GetStoreAsync(Template.T<UserIdentity>(), token);
         using var broker = await StateController.GetBrokerAsync<ulong, GatewayUser, IUserModel>(token);
         await broker.Value.UpdateAsync(StateController.SelfUserModel, store, token);
 

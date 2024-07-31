@@ -60,7 +60,7 @@ public partial class GatewayChannel :
                 return new GatewayChannel(
                     client,
                     model,
-                    context.TryGetActor(Template.Of<GatewayChannelActor>()),
+                    context.TryGetActor(Template.T<GatewayChannelActor>()),
                     implicitHandle: context.ImplicitHandle);
         }
     }

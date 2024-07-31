@@ -12,7 +12,7 @@ public sealed partial class GatewayMessageChannelActor(
     IMessageChannelActor
 {
     internal MessageChannelIdentity MessageChannelIdentity { get; } = channel;
-    
+
     public IIndexableActor<IMessageActor, ulong, IMessage> Messages => throw new NotImplementedException();
 
     IMessageChannel IEntityProvider<IMessageChannel, IChannelModel>.CreateEntity(IChannelModel model)

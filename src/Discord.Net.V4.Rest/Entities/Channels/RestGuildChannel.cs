@@ -25,7 +25,7 @@ public partial class RestGuildChannelActor :
         Guild = guild.Actor ?? new RestGuildActor(client, guild);
 
         Invites = RestActors.Fetchable(
-            Template.Of<RestInviteActor>(),
+            Template.T<RestInviteActor>(),
             Client,
             RestInviteActor.Factory,
             guild,

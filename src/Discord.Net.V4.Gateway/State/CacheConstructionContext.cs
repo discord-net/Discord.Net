@@ -1,7 +1,7 @@
 namespace Discord.Gateway.State;
 
 public sealed record CacheConstructionContext<TId, TEntity>(
-    IPathable Path,
+    CachePathable Path,
     IEntityHandle<TId, TEntity>? ImplicitHandle = null
 ) : ICacheConstructionContext<TId, TEntity>
     where TEntity : class, IEntity<TId>
@@ -9,7 +9,7 @@ public sealed record CacheConstructionContext<TId, TEntity>(
 
 public sealed record CacheConstructionContext<TId, TEntity, TActor>(
     TActor Actor,
-    IPathable Path,
+    CachePathable Path,
     IEntityHandle<TId, TEntity>? ImplicitHandle = null
 ) : ICacheConstructionContext<TId, TEntity, TActor>
     where TActor : IActor<TId, TEntity>
@@ -29,7 +29,7 @@ public interface ICacheConstructionContext<out TId, out TEntity>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
 {
-    IPathable Path { get; }
+    CachePathable Path { get; }
     IEntityHandle<TId, TEntity>? ImplicitHandle { get; }
 }
 

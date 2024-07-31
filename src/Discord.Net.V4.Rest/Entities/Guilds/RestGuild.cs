@@ -76,24 +76,24 @@ public sealed partial class RestGuildActor :
     {
         guild = Identity = guild.MostSpecific(this);
 
-        MediaChannels = RestActors.GuildRelatedEntity(Template.Of<RestMediaChannelActor>(), client, this);
-        Channels = RestActors.GuildRelatedEntity(Template.Of<RestGuildChannelActor>(), client, this);
-        TextChannels = RestActors.GuildRelatedEntity(Template.Of<RestTextChannelActor>(), client, this);
-        VoiceChannels = RestActors.GuildRelatedEntity(Template.Of<RestVoiceChannelActor>(), client, this);
-        CategoryChannels = RestActors.GuildRelatedEntity(Template.Of<RestCategoryChannelActor>(), client, this);
-        AnnouncementChannels = RestActors.GuildRelatedEntity(Template.Of<RestNewsChannelActor>(), client, this);
-        ThreadChannels = RestActors.GuildRelatedEntity(Template.Of<RestThreadChannelActor>(), client, this);
-        StageChannels = RestActors.GuildRelatedEntity(Template.Of<RestStageChannelActor>(), client, this);
-        ForumChannels = RestActors.GuildRelatedEntity(Template.Of<RestForumChannelActor>(), client, this);
+        MediaChannels = RestActors.GuildRelatedEntity(Template.T<RestMediaChannelActor>(), client, this);
+        Channels = RestActors.GuildRelatedEntity(Template.T<RestGuildChannelActor>(), client, this);
+        TextChannels = RestActors.GuildRelatedEntity(Template.T<RestTextChannelActor>(), client, this);
+        VoiceChannels = RestActors.GuildRelatedEntity(Template.T<RestVoiceChannelActor>(), client, this);
+        CategoryChannels = RestActors.GuildRelatedEntity(Template.T<RestCategoryChannelActor>(), client, this);
+        AnnouncementChannels = RestActors.GuildRelatedEntity(Template.T<RestNewsChannelActor>(), client, this);
+        ThreadChannels = RestActors.GuildRelatedEntity(Template.T<RestThreadChannelActor>(), client, this);
+        StageChannels = RestActors.GuildRelatedEntity(Template.T<RestStageChannelActor>(), client, this);
+        ForumChannels = RestActors.GuildRelatedEntity(Template.T<RestForumChannelActor>(), client, this);
         ActiveThreadChannels =
             RestActors.GuildRelatedEntityWithTransform(
-                Template.Of<RestThreadChannelActor>(),
+                Template.T<RestThreadChannelActor>(),
                 client,
                 this,
                 Routes.ListActiveGuildThreads(guild.Id),
                 api => api.Threads
             );
-        Integrations = RestActors.GuildRelatedEntity(Template.Of<RestIntegrationActor>(), client, this);
+        Integrations = RestActors.GuildRelatedEntity(Template.T<RestIntegrationActor>(), client, this);
         Bans = RestActors.Bans(client, guild);
         Members = RestActors.Members(client, guild);
 
@@ -105,15 +105,15 @@ public sealed partial class RestGuildActor :
         }
         else
         {
-            Emotes = RestActors.GuildRelatedEntity(Template.Of<RestGuildEmoteActor>(), client, this);
-            Roles = RestActors.GuildRelatedEntity(Template.Of<RestRoleActor>(), client, this);
-            Stickers = RestActors.GuildRelatedEntity(Template.Of<RestGuildStickerActor>(), client, this);
+            Emotes = RestActors.GuildRelatedEntity(Template.T<RestGuildEmoteActor>(), client, this);
+            Roles = RestActors.GuildRelatedEntity(Template.T<RestRoleActor>(), client, this);
+            Stickers = RestActors.GuildRelatedEntity(Template.T<RestGuildStickerActor>(), client, this);
         }
 
-        ScheduledEvents = RestActors.GuildRelatedEntity(Template.Of<RestGuildScheduledEventActor>(), client, this);
+        ScheduledEvents = RestActors.GuildRelatedEntity(Template.T<RestGuildScheduledEventActor>(), client, this);
 
         Invites = RestActors.Fetchable(
-            Template.Of<RestInviteActor>(),
+            Template.T<RestInviteActor>(),
             Client,
             RestInviteActor.Factory,
             guild,
@@ -123,7 +123,7 @@ public sealed partial class RestGuildActor :
         );
 
         Webhooks = RestActors.Fetchable(
-            Template.Of<RestWebhookActor>(),
+            Template.T<RestWebhookActor>(),
             client,
             RestWebhookActor.Factory,
             RestWebhook.Construct,
@@ -280,7 +280,7 @@ public sealed partial class RestGuild :
         var identity = GuildIdentity.Of(this);
 
         Emotes = RestManagedEnumerableActor.Create(
-            Template.Of<RestGuildEmoteActor>(),
+            Template.T<RestGuildEmoteActor>(),
             client,
             emotes.GetModels(),
             RestGuildEmoteActor.Factory,
@@ -291,7 +291,7 @@ public sealed partial class RestGuild :
         );
 
         Stickers = RestManagedEnumerableActor.Create(
-            Template.Of<RestGuildStickerActor>(),
+            Template.T<RestGuildStickerActor>(),
             client,
             stickers.GetModels(),
             RestGuildStickerActor.Factory,
@@ -302,7 +302,7 @@ public sealed partial class RestGuild :
         );
 
         Roles = RestManagedEnumerableActor.Create(
-            Template.Of<RestRoleActor>(),
+            Template.T<RestRoleActor>(),
             client,
             roles.GetModels(),
             RestRoleActor.Factory,

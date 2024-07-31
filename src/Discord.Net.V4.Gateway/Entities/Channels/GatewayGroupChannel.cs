@@ -1,27 +1,34 @@
 using Discord.Gateway.State;
 using Discord.Models;
+using static Discord.Template;
 
 namespace Discord.Gateway;
 
 public sealed partial class GatewayGroupChannelActor(
     DiscordGatewayClient client,
     GroupChannelIdentity channel
-):
+) :
     GatewayChannelActor(client, channel),
     IGroupChannelActor,
     IGatewayCachedActor<ulong, GatewayGroupChannel, GroupChannelIdentity, IGroupDMChannelModel>
 {
+    [SourceOfTruth] internal override GroupChannelIdentity Identity { get; } = channel;
 
+    [ProxyInterface] internal GatewayMessageChannelActor MessageChannelActor { get; } = new(client, channel);
+
+    [SourceOfTruth]
+    internal GatewayGroupChannel CreateEntity(IGroupDMChannelModel model)
+        => Client.StateController.CreateLatent(this, model);
 }
-
 
 public sealed partial class GatewayGroupChannel :
     GatewayChannel,
     IGroupChannel,
     ICacheableEntity<GatewayGroupChannel, ulong, IGroupDMChannelModel>
 {
-    [ProxyInterface]
-    internal override GatewayGroupChannelActor Actor { get; }
+    public IDefinedLoadableEntityEnumerable<ulong, IUser> Recipients => throw new NotImplementedException();
+
+    [ProxyInterface] internal override GatewayGroupChannelActor Actor { get; }
 
     internal override IGroupDMChannelModel Model => _model;
 
@@ -29,20 +36,35 @@ public sealed partial class GatewayGroupChannel :
 
     public GatewayGroupChannel(
         DiscordGatewayClient client,
-        IChannelModel model,
-        GatewayChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayChannel>? implicitHandle = null
-        ) : base(client, model, actor, implicitHandle)
+        IGroupDMChannelModel model,
+        GatewayGroupChannelActor? actor = null,
+        IEntityHandle<ulong, GatewayGroupChannel>? implicitHandle = null
+    ) : base(client, model, actor, implicitHandle)
     {
+        _model = model;
+        Actor = actor ?? new(client, GroupChannelIdentity.Of(this));
     }
 
-    public IDefinedLoadableEntityEnumerable<ulong, IUser> Recipients => throw new NotImplementedException();
+    public static GatewayGroupChannel Construct(
+        DiscordGatewayClient client,
+        ICacheConstructionContext<ulong, GatewayGroupChannel> context,
+        IGroupDMChannelModel model
+    ) => new(
+        client,
+        model,
+        context.TryGetActor(T<GatewayGroupChannelActor>()),
+        context.ImplicitHandle
+    );
 
-    public IGroupDMChannelModel GetModel() => throw new NotImplementedException();
+    [CovariantOverride]
+    public ValueTask UpdateAsync(IGroupDMChannelModel model, bool updateCache = true, CancellationToken token = default)
+    {
+        if (updateCache) return UpdateCacheAsync(this, model, token);
 
-    public ValueTask UpdateAsync(IGroupDMChannelModel model, bool updateCache = true, CancellationToken token = default) => throw new NotImplementedException();
+        _model = model;
 
-    public static GatewayGroupChannel Construct(DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayGroupChannel> context, IGroupDMChannelModel model) =>
-        throw new NotImplementedException();
+        return base.UpdateAsync(model, false, token);
+    }
+
+    public override IGroupDMChannelModel GetModel() => Model;
 }

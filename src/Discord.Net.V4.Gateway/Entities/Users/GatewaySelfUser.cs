@@ -3,7 +3,7 @@ using Discord.Gateway.State;
 using Discord.Models;
 using Discord.Rest;
 
-namespace Discord.Gateway.Users;
+namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
 public sealed partial class GatewaySelfUserActor(
@@ -67,7 +67,7 @@ public sealed partial class GatewaySelfUser :
         return new GatewaySelfUser(
             client,
             model,
-            context.TryGetActor(Template.Of<GatewaySelfUserActor>()),
+            context.TryGetActor(Template.T<GatewaySelfUserActor>()),
             implicitHandle: context.ImplicitHandle);
     }
 

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
+public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTarget>
 {
     public sealed class GenerationTarget(
         SemanticModel semanticModel,
@@ -89,7 +89,12 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
     {
         var proxiedProperties = ComputeProxiedTypeProperties(syntax, semanticModel);
         return proxiedProperties
-            .SelectMany(kvp => GetTargetTypesToProxy(kvp.Value, semanticModel, symbol.Interfaces))
+            .SelectMany(kvp =>
+                GetTargetTypesToProxy(
+                    kvp.Value,
+                    semanticModel,
+                    semanticModel.GetDeclaredSymbol(kvp.Key)!.Type.Interfaces)
+            )
             .SelectMany(x => x.GetMembers().Where(IsValidMember))
             .ToImmutableHashSet(SymbolEqualityComparer.Default);
     }
@@ -235,116 +240,142 @@ public class InterfaceProxy : IGenerationTask<InterfaceProxy.GenerationTarget>
         return correctedTargetInterfaces;
     }
 
-    public void Execute(SourceProductionContext context, GenerationTarget? target, Logger logger)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
-        if (target is null) return;
+        if (targets.Length == 0) return;
 
-        if (ModelExtensions.GetDeclaredSymbol(target.SemanticModel, target.ClassDeclarationSyntax) is not
-            INamedTypeSymbol targetSymbol)
-            return;
+        var generated = new Dictionary<string, (ClassDeclarationSyntax Syntax, GenerationTarget Target)>();
 
-        var templateTargets = ExtendInterfaceDefaults.GetTemplateExtensionInterfaces(targetSymbol);
-
-        var syntax = SyntaxUtils.CreateSourceGenClone(target.ClassDeclarationSyntax);
-
-        var addedMembers = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
-
-        foreach (var kvp in target.Properties)
+        foreach (var target in targets)
         {
-            var property = target.SemanticModel.GetDeclaredSymbol(kvp.Key);
+            if (target is null) continue;
 
-            if (property is null)
-                continue;
-
-            var extendedMembers =
-                ExtendInterfaceDefaults.GetTargetInterfaces(property.Type, logger) is { } extendedTarget
-                    ? ExtendInterfaceDefaults.GetTargetMembersForImplementation(
-                        extendedTarget,
-                        property.Type
-                    ).ToImmutableHashSet(SymbolEqualityComparer.Default)
-                    : ImmutableHashSet<ISymbol>.Empty;
-
-            logger.Log($"{targetSymbol}: Processing {property.Type} {property.Name}");
-
-            var correctedTargetInterfaces = CorrectTargetList(
-                targetSymbol,
-                property.Type,
-                templateTargets,
-                GetTargetTypesToProxy(
-                        kvp.Value,
-                        target.SemanticModel,
-                        property.Type.AllInterfaces
-                    )
-                    .Concat(extendedTarget.OfType<INamedTypeSymbol>()),
-                target.SemanticModel,
-                logger
-            );
-
-            foreach (var targetInterface in correctedTargetInterfaces)
+            if (generated.TryGetValue(target.ClassDeclarationSyntax.Identifier.ValueText, out var other))
             {
-                if (
-                    AddProxiedMembers(
-                        ref syntax,
-                        targetInterface,
-                        targetSymbol,
-                        property,
-                        extendedMembers,
-                        target.SemanticModel,
-                        logger,
-                        shouldAdd: member => addedMembers.Add(member)
-                    ) == 0
-                ) continue;
+                logger.Warn(
+                    $"{target.ClassDeclarationSyntax.Identifier}: Already generated!\n" +
+                    $"Ours:\n" +
+                    $" - Properties:\n" +
+                    $"{string.Join("\n", target.Properties.Select(x => $"   - {x.Key.Identifier}: {x.Value.Count}"))}\n" +
+                    $"Theirs:\n" +
+                    $" - Properties:\n" +
+                    $"{string.Join("\n", other.Target.Properties.Select(x => $"   - {x.Key.Identifier}: {x.Value.Count}"))}\n"
+                );
+                continue;
             }
 
-            var rootProxiedInterfaceTypeSyntax = SyntaxFactory.GenericName(
-                SyntaxFactory.Identifier("Discord.IProxied"),
-                SyntaxFactory.TypeArgumentList(
-                    SyntaxFactory.SeparatedList([
-                        SyntaxFactory.ParseTypeName(property.Type.ToDisplayString())
-                    ])
-                )
-            );
-            syntax = syntax.AddBaseListTypes(
-                SyntaxFactory.SimpleBaseType(
-                    rootProxiedInterfaceTypeSyntax
-                )
-            );
+            if (ModelExtensions.GetDeclaredSymbol(target.SemanticModel, target.ClassDeclarationSyntax) is not
+                INamedTypeSymbol targetSymbol)
+                continue;
 
-            syntax = syntax.AddMembers([
-                SyntaxFactory.PropertyDeclaration(
-                    [],
-                    [],
-                    SyntaxFactory.ParseTypeName(property.Type.ToDisplayString()),
-                    SyntaxFactory.ExplicitInterfaceSpecifier(
-                        rootProxiedInterfaceTypeSyntax
-                    ),
-                    SyntaxFactory.Identifier("ProxiedValue"),
-                    null,
-                    SyntaxFactory.ArrowExpressionClause(
-                        SyntaxFactory.MemberAccessExpression(
-                            SyntaxKind.SimpleMemberAccessExpression,
-                            SyntaxFactory.ThisExpression(),
-                            SyntaxFactory.IdentifierName(property.Name)
+            var templateTargets = ExtendInterfaceDefaults.GetTemplateExtensionInterfaces(targetSymbol);
+
+            var syntax = SyntaxUtils.CreateSourceGenClone(target.ClassDeclarationSyntax);
+
+            var addedMembers = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+
+            foreach (var kvp in target.Properties)
+            {
+                var property = target.SemanticModel.GetDeclaredSymbol(kvp.Key);
+
+                if (property is null)
+                    continue;
+
+                var extendedMembers =
+                    ExtendInterfaceDefaults.GetTargetInterfaces(property.Type, logger) is { } extendedTarget
+                        ? ExtendInterfaceDefaults.GetTargetMembersForImplementation(
+                            extendedTarget,
+                            property.Type
+                        ).ToImmutableHashSet(SymbolEqualityComparer.Default)
+                        : ImmutableHashSet<ISymbol>.Empty;
+
+                logger.Log($"{targetSymbol}: Processing {property.Type} {property.Name}");
+
+                var correctedTargetInterfaces = CorrectTargetList(
+                    targetSymbol,
+                    property.Type,
+                    templateTargets,
+                    GetTargetTypesToProxy(
+                            kvp.Value,
+                            target.SemanticModel,
+                            property.Type.AllInterfaces
                         )
-                    ),
-                    null,
-                    SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                )
-            ]);
+                        .Concat(extendedTarget.OfType<INamedTypeSymbol>()),
+                    target.SemanticModel,
+                    logger
+                );
+
+                foreach (var targetInterface in correctedTargetInterfaces)
+                {
+                    if (
+                        AddProxiedMembers(
+                            ref syntax,
+                            targetInterface,
+                            targetSymbol,
+                            property,
+                            extendedMembers,
+                            target.SemanticModel,
+                            logger,
+                            shouldAdd: member => addedMembers.Add(member)
+                        ) == 0
+                    ) continue;
+                }
+
+                var rootProxiedInterfaceTypeSyntax = SyntaxFactory.GenericName(
+                    SyntaxFactory.Identifier("Discord.IProxied"),
+                    SyntaxFactory.TypeArgumentList(
+                        SyntaxFactory.SeparatedList([
+                            SyntaxFactory.ParseTypeName(property.Type.ToDisplayString())
+                        ])
+                    )
+                );
+                syntax = syntax.AddBaseListTypes(
+                    SyntaxFactory.SimpleBaseType(
+                        rootProxiedInterfaceTypeSyntax
+                    )
+                );
+
+                syntax = syntax.AddMembers([
+                    SyntaxFactory.PropertyDeclaration(
+                        [],
+                        [],
+                        SyntaxFactory.ParseTypeName(property.Type.ToDisplayString()),
+                        SyntaxFactory.ExplicitInterfaceSpecifier(
+                            rootProxiedInterfaceTypeSyntax
+                        ),
+                        SyntaxFactory.Identifier("ProxiedValue"),
+                        null,
+                        SyntaxFactory.ArrowExpressionClause(
+                            SyntaxFactory.MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                SyntaxFactory.ThisExpression(),
+                                SyntaxFactory.IdentifierName(property.Name)
+                            )
+                        ),
+                        null,
+                        SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                    )
+                ]);
+            }
+
+            generated.Add(target.ClassDeclarationSyntax.Identifier.ValueText, (syntax, target));
         }
 
-        context.AddSource(
-            $"InterfaceProxy/{target.ClassDeclarationSyntax.Identifier}_Proxied.g.cs",
-            $$"""
-              namespace {{ModelExtensions.GetDeclaredSymbol(target.SemanticModel, target.ClassDeclarationSyntax)!.ContainingNamespace}};
+        foreach (var item in generated)
+        {
+            context.AddSource(
+                $"InterfaceProxy/{item.Key}.g.cs",
+                $$"""
+                  namespace {{ModelExtensions.GetDeclaredSymbol(item.Value.Target.SemanticModel, item.Value.Target.ClassDeclarationSyntax)!.ContainingNamespace}};
 
-              #nullable enable
+                  #nullable enable
 
-              {{syntax.NormalizeWhitespace()}}
+                  {{item.Value.Syntax.NormalizeWhitespace()}}
 
-              #nullable restore
-              """
-        );
+                  #nullable restore
+                  """
+            );
+        }
     }
 
     private static bool IsValidMember(ISymbol symbol)

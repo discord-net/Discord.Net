@@ -1,4 +1,4 @@
-namespace Discord.Gateway.SourceGen;
+namespace Discord.Gateway;
 
 
 [AttributeUsage(AttributeTargets.Property)]

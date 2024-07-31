@@ -1,10 +1,12 @@
-using Discord.Gateway.Guilds;
+using Discord.Gateway;
 using Discord.Gateway.State;
 using Discord.Models;
 using System.Collections.Immutable;
+using static Discord.Template;
 
 namespace Discord.Gateway;
 
+[method: TypeFactory]
 public partial class GatewayGuildChannelActor(
     DiscordGatewayClient client,
     GuildIdentity guild,
@@ -17,7 +19,10 @@ public partial class GatewayGuildChannelActor(
     [SourceOfTruth]
     internal override GuildChannelIdentity Identity { get; } = channel;
 
-    [SourceOfTruth] public GatewayGuildActor Guild { get; } = guild.Actor ?? new GatewayGuildActor(client, guild);
+    [SourceOfTruth]
+    [StoreRoot]
+    public GatewayGuildActor Guild { get; } = guild.Actor ?? new GatewayGuildActor(client, guild);
+
     public IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites => throw new NotImplementedException();
 
     public IInvite CreateEntity(IInviteModel model) => throw new NotImplementedException();
@@ -90,11 +95,9 @@ public partial class GatewayGuildChannel :
             default:
                 return new GatewayGuildChannel(
                     client,
-                    context.TryGetActor(
-                        Template.Of<GatewayGuildChannelActor>()
-                    )?.Guild.Identity ?? GuildIdentity.Of(model.GuildId),
+                    context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
                     model,
-                    context.TryGetActor(Template.Of<GatewayGuildChannelActor>()),
+                    context.TryGetActor(T<GatewayGuildChannelActor>()),
                     context.ImplicitHandle
                 );
         }
@@ -113,7 +116,7 @@ public partial class GatewayGuildChannel :
 
         _model = model;
 
-        return ValueTask.CompletedTask;
+        return base.UpdateAsync(model, false, token);
     }
 
     public override IGuildChannelModel GetModel() => Model;

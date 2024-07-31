@@ -21,10 +21,10 @@ internal sealed record AttachLatentEntityOperation<TId, TEntity, TModel>(
 {
     public async ValueTask AttachAsync(StateController controller, CancellationToken token)
     {
-        var broker = Broker ?? await controller.GetBrokerAsync<TId, TEntity, TModel>(token);
+        var broker = Broker?.Value ?? await Entity.GetBrokerAsync(token);
 
         var store = await Entity.GetStoreAsync(token);
-        await broker.Value.AttachLatentEntityAsync(Model.Id, Entity, store, token);
+        await broker.AttachLatentEntityAsync(Model.Id, Entity, store, token);
     }
 
     public void Dispose()

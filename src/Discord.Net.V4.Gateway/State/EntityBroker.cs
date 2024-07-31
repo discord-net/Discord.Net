@@ -173,7 +173,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     }
 
     private EntityHandle<TId, TEntity> CreateReferenceAndHandle(
-        IPathable path,
+        CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         TModel model,
         TActor? actor = null)
@@ -192,16 +192,24 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     }
 
     private TEntity CreateReferenceAndImplicitHandle(
-        IPathable path,
+        CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         TModel model,
         TActor? actor = null)
     {
-        var handle = new ImplicitHandle<TId, TEntity, TActor, TModel>(_client, this, path, identity.Id, model, actor);
+        var handle = new ImplicitHandle<TId, TEntity, TActor, TModel>(
+            _client,
+            this,
+            path,
+            identity.Id,
+            model,
+            actor,
+            out var entity
+        );
 
-        _references.Add(identity.Id, new EntityReference(this, identity.Id, handle.Entity, handle));
+        _references.Add(identity.Id, new EntityReference(this, identity.Id, entity, handle));
 
-        return handle.Entity;
+        return entity;
     }
 
     public async Task DestroyReferenceAsync(TId id, CancellationToken token)
@@ -230,7 +238,8 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         return ValueTask.CompletedTask;
     }
 
-    public async ValueTask AttachLatentEntityAsync(TId id, TEntity entity, IEntityModelStore<TId, TModel> store, CancellationToken token)
+    public async ValueTask AttachLatentEntityAsync(TId id, TEntity entity, IEntityModelStore<TId, TModel> store,
+        CancellationToken token)
     {
         using var scope = _keyedSemaphore.Get(id, out var semaphoreSlim);
 
@@ -281,7 +290,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     }
 
     public async ValueTask<TEntity?> GetImplicitAsync(
-        IPathable path,
+        CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         IEntityModelStore<TId, TModel> store,
         TActor? actor = null,
@@ -317,7 +326,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     }
 
     public async ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(
-        IPathable path,
+        CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         IEntityModelStore<TId, TModel> store,
         TActor? actor = null,
@@ -356,7 +365,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
 
 
     public async ValueTask<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllAsync(
-        IPathable path,
+        CachePathable path,
         IEntityModelStore<TId, TModel> store,
         CancellationToken token = default)
     {
@@ -417,14 +426,14 @@ internal interface IEntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker<T
     where TModel : class, IEntityModel<TId>
 {
     ValueTask<TEntity?> GetImplicitAsync(
-        IPathable path,
+        CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         IEntityModelStore<TId, TModel> store,
         TActor? actor = null,
         CancellationToken token = default);
 
     ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(
-        IPathable path,
+        CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         IEntityModelStore<TId, TModel> store,
         TActor? actor = null,
@@ -432,14 +441,14 @@ internal interface IEntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker<T
     );
 
     ValueTask<TEntity?> IEntityBroker<TId, TEntity, TModel>.GetImplicitAsync(
-        IPathable path,
+        CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         IEntityModelStore<TId, TModel> store,
         CancellationToken token
     ) => GetImplicitAsync(path, identity, store, null, token);
 
     ValueTask<IEntityHandle<TId, TEntity>?> IEntityBroker<TId, TEntity, TModel>.GetAsync(
-        IPathable path,
+        CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         IEntityModelStore<TId, TModel> store,
         CancellationToken token
@@ -456,7 +465,9 @@ internal interface IEntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TEnt
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
-    ValueTask AttachLatentEntityAsync(TId id, TEntity entity, IEntityModelStore<TId, TModel> store, CancellationToken token);
+    ValueTask AttachLatentEntityAsync(TId id, TEntity entity, IEntityModelStore<TId, TModel> store,
+        CancellationToken token);
+
     bool TryCreateLatentHandle(
         TModel model,
         [MaybeNullWhen(true)] out TEntity entity,
@@ -471,20 +482,20 @@ internal interface IEntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TEnt
     ValueTask UpdateAsync(TModel model, IEntityModelStore<TId, TModel> store, CancellationToken token);
 
     ValueTask<TEntity?> GetImplicitAsync(
-        IPathable path,
+        CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         IEntityModelStore<TId, TModel> store,
         CancellationToken token = default);
 
     ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(
-        IPathable path,
+        CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
         IEntityModelStore<TId, TModel> store,
         CancellationToken token = default
     );
 
     ValueTask<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllAsync(
-        IPathable path,
+        CachePathable path,
         IEntityModelStore<TId, TModel> store,
         CancellationToken token = default);
 

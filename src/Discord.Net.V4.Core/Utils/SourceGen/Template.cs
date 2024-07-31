@@ -5,6 +5,9 @@ namespace Discord;
 internal static class Template
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Template<T> T<T>() => default;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Template<T> Of<T>() => default;
 }
 

@@ -369,6 +369,66 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         return root is not null;
     }
 
+    private readonly struct StoreRootPath(
+        ITypeSymbol actor,
+        IPropertySymbol property,
+        ITypeSymbol idType,
+        ITypeSymbol entityType,
+        ITypeSymbol modelType)
+    {
+        public readonly ITypeSymbol Actor = actor;
+        public readonly IPropertySymbol Property = property;
+        public readonly ITypeSymbol IdType = idType;
+        public readonly ITypeSymbol EntityType = entityType;
+        public readonly ITypeSymbol ModelType = modelType;
+
+        public string Format()
+        {
+            return $"(this.{Property.Name} as IStoreProvider<{IdType}, {ModelType}>).GetStoreAsync(token)";
+        }
+    }
+
+    private static bool TryGetStoreRootMap(ITypeSymbol type, out List<StoreRootPath> map)
+    {
+        map = new();
+
+        var checkingType = type;
+
+        while (checkingType is not null && !checkingType.IsAbstract)
+        {
+            if(TryGetStoreRoot(checkingType, out var root) && TryGetBrokerTypes(root.Type, out var id, out var entity, out var model))
+                map.Add(new(checkingType, root, id, entity, model));
+
+            checkingType = checkingType.BaseType;
+        }
+
+        map.Reverse();
+
+        return map.Count > 0;
+    }
+
+    private static string FormatRootChain(List<StoreRootPath> map)
+    {
+        if (map.Count < 1)
+            throw new InvalidOperationException("store root map must contain atleast 1 element");
+
+        var sb = new StringBuilder();
+
+        sb.Append(map[0].Format());
+
+        for (var i = 1; i < map.Count; i++)
+        {
+            var prev = map[i - 1];
+            var path = map[i];
+
+            //.Chain<{storeRootId}, {storeRootModel}, {idType}, {modelType}>({storeRoot.Name}.Id)
+            sb.Append(
+                $".Chain<{prev.IdType}, {prev.ModelType}, {path.IdType}, {path.ModelType}>({prev.Property.Name}.Id)");
+        }
+
+        return sb.ToString();
+    }
+
     private bool CreateLoadableSources(
         ref ClassDeclarationSyntax syntax,
         GenerationContext target,
@@ -377,6 +437,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         var idType = target.IdType.ToDisplayString();
         var entityType = target.GatewayEntitySymbol.ToDisplayString();
         var modelType = target.ModelType.ToDisplayString();
+        var actorType = target.ClassSymbol.ToDisplayString();
 
         var interfaceBrokerOverload = SyntaxFactory.ParseMemberDeclaration(
             $"async ValueTask<IEntityBroker<{idType}, {entityType}, {modelType}>> IBrokerProvider<{idType}, {entityType}, {modelType}>.GetBrokerAsync(CancellationToken token) => (await GetOrCreateBrokerAsync(token)).Value;"
@@ -445,19 +506,18 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         };
 
         if (
-            TryGetStoreRoot(target.ClassSymbol, out var storeRoot) &&
-            TryGetBrokerTypes(
-                storeRoot.Type,
-                out var storeRootId,
-                out _,
-                out var storeRootModel)
-            )
+            TryGetStoreRootMap(target.ClassSymbol, out var storeRootMap)
+        )
         {
+            logger.Log($"{target.ClassSymbol}: Store root found: {storeRootMap.Count} roots");
 
             storeInitializer = (idType, modelType) =>
             {
+                var formatted = FormatRootChain(storeRootMap);
+                var lastRoot = storeRootMap.Last();
+
                 var store =
-                    $"await (this.{storeRoot.Name} as IStoreProvider<{storeRootId}, {storeRootModel}>).GetStoreAsync(token).Chain<{storeRootId}, {storeRootModel}, {idType}, {modelType}>({storeRoot.Name}.Id)";
+                    $"await {formatted}.Chain<{lastRoot.IdType}, {lastRoot.ModelType}, {idType}, {modelType}>({lastRoot.Property.Name}.Id)";
 
                 if (!target.ModelType.Equals(modelType, SymbolEqualityComparer.Default))
                     store = $"({store}).Cast(Template.Of<{target.ModelType}>())";
@@ -465,27 +525,41 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                 return store;
             };
         }
+        else
+        {
+            logger.Log($"{target.ClassSymbol}: Flat store found: {target.GatewayEntitySymbol}");
+        }
 
         var storeBuilder = new StringBuilder();
 
-        foreach (var type in TypeUtils.GetBaseTypesAndThis(target.GatewayEntitySymbol))
+        foreach
+            (var (type, actor) in TypeUtils
+                .GetBaseTypesAndThis(target.GatewayEntitySymbol)
+                .Zip(
+                    TypeUtils.GetBaseTypesAndThis(target.ClassSymbol),
+                    (x, y) => (x, y)
+                )
+            )
         {
-            if(!GatewayCacheableEntity.TryGetCacheableType(type, out var cacheable))
+            if (!GatewayCacheableEntity.TryGetCacheableType(type, out var cacheable))
                 continue;
 
             // only thing exempt here is self user
-            if(cacheable!.TypeArguments[2].ToDisplayString() == "Discord.Models.ISelfUserModel")
+            if (cacheable!.TypeArguments[2].ToDisplayString() == "Discord.Models.ISelfUserModel")
                 continue;
 
-            if (type.BaseType?.IsAbstract ?? true)
+            if ((type.BaseType?.IsAbstract ?? true) || TryGetStoreRoot(actor, out _))
             {
-                storeBuilder.AppendLine($"return _store = {storeInitializer(cacheable.TypeArguments[1], cacheable.TypeArguments[2])};");
+                storeBuilder.AppendLine(
+                    $"return _store = {storeInitializer(cacheable.TypeArguments[1], cacheable.TypeArguments[2])};");
                 break;
             }
 
             storeBuilder
-                .AppendLine($"if (Client.StateController.CanUseStoreType<{cacheable.TypeArguments[0].ToDisplayString()}>())")
-                .AppendLine($"return _store = {storeInitializer(cacheable!.TypeArguments[1], cacheable.TypeArguments[2])};");
+                .AppendLine(
+                    $"if (Client.StateController.CanUseStoreType<{cacheable.TypeArguments[0].ToDisplayString()}>())")
+                .AppendLine(
+                    $"return _store = {storeInitializer(cacheable!.TypeArguments[1], cacheable.TypeArguments[2])};");
         }
 
         var getOrCreateStore = SyntaxFactory.ParseMemberDeclaration(
@@ -528,7 +602,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                   {
                       if (_broker is not null)
                           return _broker;
-                      var broker = await Client.StateController.GetBrokerAsync<{{idType}}, {{entityType}}, {{modelType}}>(token);
+                      var broker = await Client.StateController.GetBrokerAsync<{{idType}}, {{entityType}}, {{actorType}}, {{modelType}}>(token);
                       RegisterDisposeTask(DisposeLoadableResources);
                       return _broker = broker;
                   }

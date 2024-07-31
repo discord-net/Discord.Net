@@ -7,21 +7,21 @@ using System.Text;
 
 namespace Discord.Net.Hanz.Tasks.Gateway;
 
-public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCacheableEntity.GenerationContext>
+public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCacheableEntity.GenerationTarget>
 {
-    public sealed class GenerationContext(
+    public sealed class GenerationTarget(
         ClassDeclarationSyntax syntax,
         INamedTypeSymbol symbol,
         ITypeSymbol idType,
         ITypeSymbol modelType
-    ) : IEquatable<GenerationContext>
+    ) : IEquatable<GenerationTarget>
     {
         public ClassDeclarationSyntax Syntax { get; } = syntax;
         public INamedTypeSymbol Symbol { get; } = symbol;
         public ITypeSymbol IdType { get; } = idType;
         public ITypeSymbol ModelType { get; } = modelType;
 
-        public bool Equals(GenerationContext? other)
+        public bool Equals(GenerationTarget? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -32,7 +32,7 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
                 ModelType.Equals(other.ModelType, SymbolEqualityComparer.Default);
         }
 
-        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is GenerationContext other && Equals(other);
+        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is GenerationTarget other && Equals(other);
 
         public override int GetHashCode()
         {
@@ -46,9 +46,9 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
             }
         }
 
-        public static bool operator ==(GenerationContext? left, GenerationContext? right) => Equals(left, right);
+        public static bool operator ==(GenerationTarget? left, GenerationTarget? right) => Equals(left, right);
 
-        public static bool operator !=(GenerationContext? left, GenerationContext? right) => !Equals(left, right);
+        public static bool operator !=(GenerationTarget? left, GenerationTarget? right) => !Equals(left, right);
     }
 
     public bool IsValid(SyntaxNode node, CancellationToken token = default)
@@ -68,7 +68,7 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
         return cacheable is not null;
     }
 
-    public GenerationContext? GetTargetForGeneration(
+    public GenerationTarget? GetTargetForGeneration(
         GeneratorSyntaxContext context,
         Logger logger,
         CancellationToken token = default)
@@ -83,7 +83,7 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
         if (!TryGetCacheableType(symbol, out var cacheable))
             return null;
 
-        return new GenerationContext(
+        return new GenerationTarget(
             syntax,
             symbol,
             cacheable!.TypeArguments[1],
@@ -91,14 +91,22 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
         );
     }
 
-    public void Execute(SourceProductionContext context, ImmutableArray<GenerationContext?> targets, Logger logger)
+    public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         if (targets.Length == 0) return;
+
+        var generated = new Dictionary<string, (ClassDeclarationSyntax Syntax, GenerationTarget Target)>();
 
         foreach (var target in targets)
         {
             if (target is null)
                 continue;
+
+            if (generated.TryGetValue(target.Symbol.Name, out var other))
+            {
+                logger.Warn($"{target.Symbol}: Already generated sources");
+                continue;
+            }
 
             var syntax = SyntaxUtils.CreateSourceGenClone(target.Syntax);
 
@@ -112,14 +120,19 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
                 SyntaxFactory.SimpleBaseType(contextConstructSyntax)
             );
 
+            generated.Add(target.Symbol.Name, (syntax, target));
+        }
+
+        foreach (var item in generated)
+        {
             context.AddSource(
-                $"CacheableEntities/{target.Symbol.Name}",
+                $"CacheableEntities/{item.Key}",
                 $$"""
-                  {{target.Syntax.GetFormattedUsingDirectives()}}
+                  {{item.Value.Target.Syntax.GetFormattedUsingDirectives()}}
 
-                  namespace {{target.Symbol.ContainingNamespace}};
+                  namespace {{item.Value.Target.Symbol.ContainingNamespace}};
 
-                  {{syntax.NormalizeWhitespace()}}
+                  {{item.Value.Syntax.NormalizeWhitespace()}}
                   """
             );
         }

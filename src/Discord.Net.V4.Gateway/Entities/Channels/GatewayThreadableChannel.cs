@@ -1,6 +1,7 @@
 using Discord.Gateway.State;
 using Discord.Models;
 using Discord.Rest.Extensions;
+using static Discord.Template;
 
 namespace Discord.Gateway;
 
@@ -70,15 +71,14 @@ public partial class GatewayThreadableChannel :
         IThreadableChannelModel model
     ) => new(
         client,
-        context.TryGetActor(
-            Template.Of<GatewayThreadableChannelActor>()
-        )?.Guild.Identity ?? GuildIdentity.Of(model.GuildId),
+        context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
         model,
-        context.TryGetActor(Template.Of<GatewayThreadableChannelActor>()),
+        context.TryGetActor(T<GatewayThreadableChannelActor>()),
         context.ImplicitHandle
     );
 
-    public ValueTask UpdateAsync(
+    [CovariantOverride]
+    public virtual ValueTask UpdateAsync(
         IThreadableChannelModel model,
         bool updateCache = true,
         CancellationToken token = default)
@@ -94,7 +94,7 @@ public partial class GatewayThreadableChannel :
 
         _model = model;
 
-        return ValueTask.CompletedTask;
+        return base.UpdateAsync(model, false, token);
     }
 
     public override IThreadableChannelModel GetModel() => Model;

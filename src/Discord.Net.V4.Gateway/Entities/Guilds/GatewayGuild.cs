@@ -3,7 +3,7 @@ using Discord.Gateway.State;
 using Discord.Models;
 using System.Globalization;
 
-namespace Discord.Gateway.Guilds;
+namespace Discord.Gateway;
 
 public sealed partial class GatewayGuildActor :
     GatewayCachedActor<ulong, GatewayGuild, GuildIdentity, IGuildModel>,
@@ -172,7 +172,7 @@ public sealed partial class GatewayGuild :
         return new GatewayGuild(
             client,
             model,
-            context.TryGetActor(Template.Of<GatewayGuildActor>()),
+            context.TryGetActor(Template.T<GatewayGuildActor>()),
             context.ImplicitHandle
         );
     }

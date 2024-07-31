@@ -1,6 +1,5 @@
 using Discord.Gateway;
 using Discord.Gateway.Events;
-using Discord.Gateway.Users;
 using Discord.Rest;
 using System;
 using System.Buffers;

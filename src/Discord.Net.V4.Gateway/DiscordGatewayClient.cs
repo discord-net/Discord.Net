@@ -12,14 +12,6 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
 {
     public ISelfUserActor CurrentUser => throw new NotImplementedException();
 
-    public IPagedIndexableActor<IGuildActor, ulong, IGuild, IPartialGuild, PageUserGuildsParams> Guilds => throw new NotImplementedException();
-
-    public IIndexableActor<IChannelActor, ulong, IChannel> Channels => throw new NotImplementedException();
-
-    public IIndexableActor<IUserActor, ulong, IUser> Users => throw new NotImplementedException();
-
-    public IIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks => throw new NotImplementedException();
-
     public GatewayRequestOptions DefaultRequestOptions { get; }
 
     public DiscordRestClient Rest { get; }
@@ -64,16 +56,16 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
         _dispatchQueue = Config.DispatchQueue(this, Config);
 
         StateController = new(this, LoggerFactory.CreateLogger<StateController>());
+
+        Channels = new(id => new GatewayChannelActor(this, ChannelIdentity.Of(id)));
+        Guilds = GatewayActors.PageGuilds(this);
+        Users = new(id => new GatewayUserActor(this, UserIdentity.Of(id)));
     }
 
-    public void Dispose()
+    public ValueTask DisposeAsync()
     {
         // TODO release managed resources here
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        // TODO release managed resources here
+        return ValueTask.CompletedTask;
     }
 
     IRestApiClient IDiscordClient.RestApiClient => RestApiClient;

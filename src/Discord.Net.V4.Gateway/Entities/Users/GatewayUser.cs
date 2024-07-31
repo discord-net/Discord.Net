@@ -3,7 +3,7 @@ using Discord.Gateway.State;
 using Discord.Models;
 using Discord.Rest;
 
-namespace Discord.Gateway.Users;
+namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
 public partial class GatewayUserActor(
@@ -17,7 +17,12 @@ public partial class GatewayUserActor(
     internal GatewayUser CreateEntity(IUserModel model)
         => Client.StateController.CreateLatent(this, model);
 
-    public IDMChannel CreateEntity(IDMChannelModel model) => throw new NotImplementedException();
+    [SourceOfTruth]
+    internal GatewayDMChannel CreateEntity(IDMChannelModel model)
+        => Client.StateController.CreateLatent<ulong, GatewayDMChannel, GatewayDMChannelActor, IDMChannelModel>(
+            model,
+            new() { Identity | this }
+        );
 }
 
 [ExtendInterfaceDefaults]
@@ -67,7 +72,7 @@ public partial class GatewayUser :
         return new GatewayUser(
             client,
             model,
-            context.TryGetActor(Template.Of<GatewayUserActor>()),
+            context.TryGetActor(Template.T<GatewayUserActor>()),
             implicitHandle: context.ImplicitHandle
         );
     }

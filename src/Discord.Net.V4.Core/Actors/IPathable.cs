@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Discord;
 
 public interface IPathable
@@ -23,7 +25,7 @@ public interface IPathable
         };
     }
 
-    bool TryGet<TId, TEntity>(out TId? id)
+    bool TryGet<TId, TEntity>([MaybeNullWhen(false)]out TId id)
         where TEntity : class, IEntity<TId>
         where TId : IEquatable<TId>
     {

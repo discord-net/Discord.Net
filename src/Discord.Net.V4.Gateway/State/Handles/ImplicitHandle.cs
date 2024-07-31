@@ -16,26 +16,33 @@ internal sealed class ImplicitHandle<TId, TEntity, TActor, TModel> : IEntityHand
 {
     public TId Id { get; }
 
-    public TEntity Entity { get; private set; }
+    public TEntity Entity =>
+        _weakReference?.TryGetTarget(out var target) ?? false
+            ? target
+            : throw new InvalidOperationException("The implicit handle was disposed of");
 
+    private WeakReference<TEntity>? _weakReference;
     private IEntityBroker<TId, TEntity>? _broker;
     private bool _disposed;
 
     public ImplicitHandle(
         DiscordGatewayClient client,
         IEntityBroker<TId, TEntity> broker,
-        IPathable path,
+        CachePathable path,
         TId id,
         TModel model,
-        TActor? actor)
+        TActor? actor,
+        out TEntity entity)
     {
+        _broker = broker;
+        Id = id;
+
         ICacheConstructionContext<TId, TEntity> context = actor is not null
             ? new CacheConstructionContext<TId, TEntity, TActor>(actor, path, this)
             : new CacheConstructionContext<TId, TEntity>(path, this);
 
-        _broker = broker;
-        Id = id;
-        Entity = TEntity.Construct(client, context, model);
+        entity = TEntity.Construct(client, context, model);
+        _weakReference = new(entity);
     }
 
     public async ValueTask DisposeAsync()
@@ -45,7 +52,7 @@ internal sealed class ImplicitHandle<TId, TEntity, TActor, TModel> : IEntityHand
 
         _disposed = true;
 
-        Entity = null!;
+        _weakReference = null!;
 
         if (_broker is null) return;
 

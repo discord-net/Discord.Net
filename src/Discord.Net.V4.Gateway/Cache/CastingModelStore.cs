@@ -14,7 +14,7 @@ internal sealed class CastingModelStore<TId, TRootModel, TExpectedModel>(IEntity
         => store.GetSubStoreAsync<TSubStoreId, TSubStoreModel>(id, token);
 
     public ValueTask<TExpectedModel?> GetAsync(TId id, CancellationToken token = default)
-        => store.GetAsync(id, token).CastDownAsync(Template.Of<TExpectedModel>());
+        => store.GetAsync(id, token).CastDownAsync(Template.T<TExpectedModel>());
 
     public IAsyncEnumerable<TExpectedModel> GetAllAsync(CancellationToken token = default)
         => store.GetAllAsync(token).Cast<TExpectedModel>();

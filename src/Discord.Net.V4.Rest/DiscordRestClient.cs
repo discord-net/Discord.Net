@@ -66,11 +66,6 @@ public sealed partial class DiscordRestClient : IDiscordClient
         Guilds = RestActors.PagedGuilds(this);
     }
 
-    public void Dispose()
-    {
-        // TODO release managed resources here
-    }
-
     public ValueTask DisposeAsync()
     {
         // TODO release managed resources here
