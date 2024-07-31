@@ -23,7 +23,6 @@ public sealed partial class GatewayThreadChannelActor :
     public GatewayThreadChannelActor(
         DiscordGatewayClient client,
         GuildIdentity guild,
-        ThreadableChannelIdentity parent,
         ThreadChannelIdentity thread
     ) : base(client, guild, thread)
     {
@@ -82,10 +81,10 @@ public sealed partial class GatewayThreadChannel :
     ) : base(client, guild, model, actor, implicitHandle)
     {
         _model = model;
-        Actor = actor ?? new(client, guild, parent, ThreadChannelIdentity.Of(this));
+        Actor = actor ?? new(client, guild, ThreadChannelIdentity.Of(this));
 
         Creator = client.Users[model.OwnerId];
-        
+
         AppliedTags = model.AppliedTags.ToImmutableList();
     }
 

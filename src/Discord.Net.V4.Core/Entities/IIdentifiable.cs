@@ -355,19 +355,19 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
     TActor? Actor { get; }
 
     public static IIdentifiable<TId, TEntity, TActor, TModel> operator |(
-        IIdentifiable<TId, TEntity, TActor, TModel> left,
+        IIdentifiable<TId, TEntity, TActor, TModel>? left,
         IIdentifiable<TId, TEntity, TActor, TModel> right
-    ) => left.MostSpecific(right);
+    ) => left?.MostSpecific(right) ?? right;
 
     public static IIdentifiable<TId, TEntity, TActor, TModel> operator |(
-        IIdentifiable<TId, TEntity, TActor, TModel> left,
+        IIdentifiable<TId, TEntity, TActor, TModel>? left,
         TEntity right
-    ) => left.MostSpecific(right);
+    ) => left?.MostSpecific(right) ?? Of(right);
 
     public static IIdentifiable<TId, TEntity, TActor, TModel> operator |(
-        IIdentifiable<TId, TEntity, TActor, TModel> left,
+        IIdentifiable<TId, TEntity, TActor, TModel>? left,
         TActor right
-    ) => left.MostSpecific(right);
+    ) => left?.MostSpecific(right) ?? Of(right);
 
     new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct, TClient>(
         IEntityModel model,

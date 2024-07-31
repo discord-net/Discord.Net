@@ -42,7 +42,23 @@ public sealed partial class CachePathable : IPathable, IReadOnlyDictionary<Type,
         return false;
     }
 
-    internal TIdentity GetIdentity<[TransitiveFill] TIdentity, TId, TEntity, TModel>(Template<TIdentity> template, TId fallback)
+    [return: NotNullIfNotNull(nameof(fallback))]
+    internal TIdentity? GetIdentity<[TransitiveFill] TIdentity, TId, TEntity, TModel>(Template<TIdentity> template, TId? fallback = default)
+        where TIdentity : class, IIdentifiable<TId, TEntity, TModel>
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>, IEntityOf<TModel>
+        where TModel : class, IEntityModel<TId>
+    {
+        if (TryGetIdentity<TId, TEntity>(out var value) && value is TIdentity identity)
+            return identity;
+
+        if(fallback is not null)
+            return (TIdentity)IIdentifiable<TId, TEntity, TModel>.Of(fallback);
+
+        return null;
+    }
+
+    internal TIdentity RequireIdentity<[TransitiveFill] TIdentity, TId, TEntity, TModel>(Template<TIdentity> template)
         where TIdentity : IIdentifiable<TId, TEntity, TModel>
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
@@ -51,7 +67,7 @@ public sealed partial class CachePathable : IPathable, IReadOnlyDictionary<Type,
         if (TryGetIdentity<TId, TEntity>(out var value) && value is TIdentity identity)
             return identity;
 
-        return (TIdentity)IIdentifiable<TId, TEntity, TModel>.Of(fallback);
+        throw new KeyNotFoundException($"Couldn't find an identity for '{typeof(TEntity)}'");
     }
 
     public void Add(IPathable pathable)

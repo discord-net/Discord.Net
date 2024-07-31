@@ -2,6 +2,10 @@
 
 global using UserIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayUser, Discord.Gateway.GatewayUserActor, Discord.Models.IUserModel>;
 global using SelfUserIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewaySelfUser, Discord.Gateway.GatewaySelfUserActor, Discord.Models.ISelfUserModel>;
+global using MemberIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayMember, Discord.Gateway.GatewayMemberActor, Discord.Models.IMemberModel>;
+global using GuildScheduledEventUserIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayGuildScheduledEventUser, Discord.Gateway.GatewayGuildScheduledEventUserActor, Discord.Models.IGuildScheduledEventUserModel>;
+global using ThreadMemberIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayThreadMember, Discord.Gateway.GatewayThreadMemberActor, Discord.Models.IThreadMemberModel>;
+
 
 #endregion
 
