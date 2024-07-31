@@ -3,11 +3,12 @@ using Discord.Models;
 
 namespace Discord.Gateway;
 
+[method: TypeFactory]
 public sealed partial class GatewayCategoryChannelActor(
     DiscordGatewayClient client,
     GuildIdentity guild,
     CategoryChannelIdentity channel
-):
+) :
     GatewayGuildChannelActor(client, guild, channel),
     ICategoryChannelActor,
     IGatewayCachedActor<ulong, GatewayCategoryChannel, CategoryChannelIdentity, IGuildCategoryChannelModel>
@@ -17,17 +18,14 @@ public sealed partial class GatewayCategoryChannelActor(
     [SourceOfTruth]
     internal GatewayCategoryChannel CreateEntity(IGuildCategoryChannelModel model)
         => Client.StateController.CreateLatent(this, model);
-
 }
-
 
 public sealed partial class GatewayCategoryChannel :
     GatewayGuildChannel,
     ICategoryChannel,
     ICacheableEntity<GatewayCategoryChannel, ulong, IGuildCategoryChannelModel>
 {
-    [ProxyInterface]
-    internal override GatewayCategoryChannelActor Actor { get; }
+    [ProxyInterface] internal override GatewayCategoryChannelActor Actor { get; }
 
     internal override IGuildCategoryChannelModel Model => _model;
 
@@ -39,17 +37,37 @@ public sealed partial class GatewayCategoryChannel :
         IGuildCategoryChannelModel model,
         GatewayCategoryChannelActor? actor = null,
         IEntityHandle<ulong, GatewayCategoryChannel>? implicitHandle = null
-        ) : base(client, guild, model, actor, implicitHandle)
+    ) : base(client, guild, model, actor, implicitHandle)
     {
         _model = model;
         Actor = actor ?? new(client, guild, CategoryChannelIdentity.Of(this));
     }
 
-    public static GatewayCategoryChannel Construct(DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayCategoryChannel> context, IGuildCategoryChannelModel model) =>
-        throw new NotImplementedException();
+    public static GatewayCategoryChannel Construct(
+        DiscordGatewayClient client,
+        ICacheConstructionContext<ulong, GatewayCategoryChannel> context,
+        IGuildCategoryChannelModel model
+    ) => new(
+        client,
+        context.TryGetActor(
+            Template.Of<GatewayCategoryChannelActor>()
+        )?.Guild.Identity ?? GuildIdentity.Of(model.GuildId),
+        model,
+        context.TryGetActor(Template.Of<GatewayCategoryChannelActor>()),
+        context.ImplicitHandle
+    );
 
-    public IGuildCategoryChannelModel GetModel() => throw new NotImplementedException();
+    public ValueTask UpdateAsync(
+        IGuildCategoryChannelModel model,
+        bool updateCache = true,
+        CancellationToken token = default)
+    {
+        if (updateCache) return UpdateCacheAsync(this, model, token);
 
-    public ValueTask UpdateAsync(IGuildCategoryChannelModel model, bool updateCache = true, CancellationToken token = default) => throw new NotImplementedException();
+        _model = model;
+
+        return ValueTask.CompletedTask;
+    }
+
+    public override IGuildCategoryChannelModel GetModel() => Model;
 }

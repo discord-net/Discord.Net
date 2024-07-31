@@ -32,6 +32,8 @@ public partial class GatewayGuildChannel :
     IGuildChannel,
     ICacheableEntity<GatewayGuildChannel, ulong, IGuildChannelModel>
 {
+    public string Name => Model.Name;
+
     public int Position => Model.Position;
 
     public ChannelFlags Flags => (ChannelFlags?)Model.Flags ?? ChannelFlags.None;
@@ -113,8 +115,6 @@ public partial class GatewayGuildChannel :
 
         return ValueTask.CompletedTask;
     }
-
-    public string Name => Model.na;
 
     public override IGuildChannelModel GetModel() => Model;
 }

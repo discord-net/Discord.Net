@@ -13,7 +13,12 @@ public abstract class GatewayCachedActor<TId, TEntity, TIdentity, TModel>(
     IGatewayCachedActor<TId, TEntity, TIdentity, TModel>,
     IAsyncDisposable
     where TId : IEquatable<TId>
-    where TEntity : GatewayEntity<TId>
+    where TEntity :
+    GatewayEntity<TId>,
+    ICacheableEntity<TEntity, TId, TModel>,
+    IStoreProvider<TId, TModel>,
+    IBrokerProvider<TId, TEntity, TModel>,
+    IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
     where TIdentity : IIdentifiable<TId>
     where TModel : class, IEntityModel<TId>
 {
