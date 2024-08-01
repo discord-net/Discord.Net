@@ -21,7 +21,7 @@ public sealed partial class GatewayMediaChannelActor(
 
     [SourceOfTruth]
     internal GatewayMediaChannel CreateEntity(IGuildMediaChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 [ExtendInterfaceDefaults]

@@ -23,7 +23,7 @@ public sealed partial class GatewayStageInstanceActor(
 
     [SourceOfTruth]
     internal GatewayStageInstance CreateEntity(IStageInstanceModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public sealed partial class GatewayStageInstance :

@@ -234,7 +234,7 @@ public partial interface IGuild :
     /// <returns>
     ///     The preferred culture information of this guild.
     /// </returns>
-    CultureInfo PreferredCulture { get; }
+    sealed CultureInfo PreferredCulture => CultureInfo.GetCultureInfoByIetfLanguageTag(PreferredLocale);
 
     /// <summary>
     ///     Gets whether the guild has the boost progress bar enabled.

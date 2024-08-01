@@ -5,8 +5,15 @@ namespace Discord;
 /// <summary>
 ///     A Unicode emoji.
 /// </summary>
-public readonly struct Emoji : IEmote, IEquatable<Emoji>, IIdentifiable<string>, IConstructable<Emoji, IEmojiModel>
+public readonly struct Emoji :
+    IEmote,
+    IEquatable<Emoji>,
+    IIdentifiable<string>,
+    IConstructable<Emoji, IEmojiModel>
 {
+    /// <inheritdoc />
+    public string Name { get; }
+
     /// <summary>
     ///     Initializes a new <see cref="Emoji" /> class with the provided Unicode.
     /// </summary>
@@ -19,13 +26,11 @@ public readonly struct Emoji : IEmote, IEquatable<Emoji>, IIdentifiable<string>,
     public static Emoji Construct(IDiscordClient client, IEmojiModel model)
         => new(model.Name!);
 
-    /// <inheritdoc />
-    public string Name { get; }
-
     public IEmoteModel ToApiModel(IEmoteModel? existing = default) =>
         existing ?? new Models.Json.Emoji {Name = Name};
 
     string IIdentifiable<string>.Id => Name;
+    IdentityDetail IIdentifiable<string>.Detail => IdentityDetail.Entity;
 
     /// <summary>
     ///     Gets the Unicode representation of this emoji.

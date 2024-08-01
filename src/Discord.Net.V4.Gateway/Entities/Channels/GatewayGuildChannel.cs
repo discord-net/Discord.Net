@@ -29,7 +29,7 @@ public partial class GatewayGuildChannelActor(
 
     [SourceOfTruth]
     internal GatewayGuildChannel CreateEntity(IGuildChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public partial class GatewayGuildChannel :

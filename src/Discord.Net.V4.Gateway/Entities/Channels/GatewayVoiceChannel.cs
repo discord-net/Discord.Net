@@ -22,7 +22,7 @@ public partial class GatewayVoiceChannelActor(
 
     [SourceOfTruth]
     internal GatewayVoiceChannel CreateEntity(IGuildVoiceChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public partial class GatewayVoiceChannel :

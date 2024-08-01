@@ -21,7 +21,7 @@ public partial class GatewayUserActor(
     internal GatewayDMChannel CreateEntity(IDMChannelModel model)
         => Client.StateController.CreateLatent<ulong, GatewayDMChannel, GatewayDMChannelActor, IDMChannelModel>(
             model,
-            new() { Identity | this }
+            CachePath
         );
 }
 

@@ -1,6 +1,6 @@
 namespace Discord.Gateway;
 
-public sealed class GatewayIndexableActor<TActor, TId, TEntity>(Func<TId, TActor> factory) :
+public class GatewayIndexableActor<TActor, TId, TEntity>(Func<TId, TActor> factory) :
     IIndexableActor<TActor, TId, TEntity>
     where TActor : class, IGatewayActor<TId, TEntity, IIdentifiable<TId>>
     where TId : IEquatable<TId>

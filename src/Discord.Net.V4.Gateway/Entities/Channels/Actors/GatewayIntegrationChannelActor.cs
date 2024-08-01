@@ -12,7 +12,7 @@ public sealed partial class GatewayIntegrationChannelActor :
 
     public IEnumerableIndexableActor<IChannelFollowerWebhookActor, ulong, IChannelFollowerWebhook> ChannelFollowerWebhooks => throw new NotImplementedException();
 
-    internal IntegrationChannelIdentity IntegrationChannelIdentity { get; }
+    internal new IntegrationChannelIdentity Identity { get; }
 
     public GatewayIntegrationChannelActor(
         DiscordGatewayClient client,
@@ -20,7 +20,6 @@ public sealed partial class GatewayIntegrationChannelActor :
         IntegrationChannelIdentity channel
     ) : base(client, guild, channel.Cast<GatewayGuildChannel, GatewayGuildChannelActor, IGuildChannelModel>())
     {
-        IntegrationChannelIdentity = channel;
-
+        Identity = channel;
     }
 }

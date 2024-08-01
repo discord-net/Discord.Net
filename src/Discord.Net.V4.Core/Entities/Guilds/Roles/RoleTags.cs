@@ -5,7 +5,9 @@ namespace Discord;
 /// <summary>
 ///     Provides tags related to a discord role.
 /// </summary>
-public readonly struct RoleTags : IConstructable<RoleTags, IRoleTagsModel>
+public readonly struct RoleTags :
+    IConstructable<RoleTags, IRoleTagsModel>,
+    IEquatable<RoleTags>
 {
     /// <summary>
     ///     Gets the identifier of the bot that this role belongs to, if it does.
@@ -71,4 +73,14 @@ public readonly struct RoleTags : IConstructable<RoleTags, IRoleTagsModel>
             model.IsGuildConnection
         );
     }
+
+    public bool Equals(RoleTags other) => BotId == other.BotId && IntegrationId == other.IntegrationId && IsPremiumSubscriberRole == other.IsPremiumSubscriberRole && SubscriptionListingId == other.SubscriptionListingId && AvailableForPurchase == other.AvailableForPurchase && GuildConnections == other.GuildConnections;
+
+    public override bool Equals(object? obj) => obj is RoleTags other && Equals(other);
+
+    public override int GetHashCode() => HashCode.Combine(BotId, IntegrationId, IsPremiumSubscriberRole, SubscriptionListingId, AvailableForPurchase, GuildConnections);
+
+    public static bool operator ==(RoleTags left, RoleTags right) => left.Equals(right);
+
+    public static bool operator !=(RoleTags left, RoleTags right) => !left.Equals(right);
 }

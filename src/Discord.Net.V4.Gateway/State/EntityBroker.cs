@@ -364,7 +364,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     }
 
 
-    public async ValueTask<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllAsync(
+    public async ValueTask<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllHandlesAsync(
         CachePathable path,
         IEntityModelStore<TId, TModel> store,
         CancellationToken token = default)
@@ -405,6 +405,41 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         }
     }
 
+    public async ValueTask<IReadOnlyCollection<TEntity>> GetAllImplicitAsync(
+        CachePathable path,
+        IEntityModelStore<TId, TModel> store,
+        CancellationToken token = default)
+    {
+        await _enumerationSemaphore.WaitAsync(token);
+
+        var result = new List<TEntity>();
+
+        try
+        {
+            await foreach (var model in store.GetAllAsync(token))
+            {
+                if (_references.TryGetValue(model.Id, out var reference))
+                {
+                    if (reference.WeakReference.TryGetTarget(out var entity))
+                    {
+                        result.Add(entity);
+                        continue;
+                    }
+
+                    RemoveDeadReference(reference);
+                }
+
+                result.Add(CreateReferenceAndImplicitHandle(path, IIdentifiable<TId, TEntity, TModel>.Of(model.Id), model));
+            }
+
+            return result.AsReadOnly();
+        }
+        finally
+        {
+            _enumerationSemaphore.Release();
+        }
+    }
+
     public async ValueTask<IReadOnlyCollection<TId>> GetAllIdsAsync(IEntityModelStore<TId, TModel> store,
         CancellationToken token = default)
     {
@@ -414,7 +449,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     }
 }
 
-internal interface IEntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker<TId, TEntity, TModel>
+internal interface IEntityBroker<TId, TEntity, in TActor, TModel> : IEntityBroker<TId, TEntity, TModel>
     where TEntity :
     class,
     ICacheableEntity<TEntity, TId, TModel>,
@@ -480,6 +515,8 @@ internal interface IEntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TEnt
     Task DestroyReferenceAsync(TId id, CancellationToken token);
 
     ValueTask UpdateAsync(TModel model, IEntityModelStore<TId, TModel> store, CancellationToken token);
+    ValueTask BatchUpdateAsync(IEnumerable<TModel> model, IEntityModelStore<TId, TModel> store, CancellationToken token);
+
 
     ValueTask<TEntity?> GetImplicitAsync(
         CachePathable path,
@@ -494,7 +531,12 @@ internal interface IEntityBroker<TId, TEntity, TModel> : IEntityBroker<TId, TEnt
         CancellationToken token = default
     );
 
-    ValueTask<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllAsync(
+    ValueTask<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllHandlesAsync(
+        CachePathable path,
+        IEntityModelStore<TId, TModel> store,
+        CancellationToken token = default);
+
+    ValueTask<IReadOnlyCollection<TEntity>> GetAllImplicitAsync(
         CachePathable path,
         IEntityModelStore<TId, TModel> store,
         CancellationToken token = default);

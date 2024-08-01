@@ -30,7 +30,7 @@ public sealed partial class GatewayThreadMemberActor :
 
     [SourceOfTruth]
     internal GatewayThreadMember CreateEntity(IThreadMemberModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public sealed partial class GatewayThreadMember :

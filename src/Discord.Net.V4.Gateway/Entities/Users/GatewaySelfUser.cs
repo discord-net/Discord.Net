@@ -23,7 +23,7 @@ public sealed partial class GatewaySelfUserActor(
 
     [SourceOfTruth]
     internal GatewaySelfUser CreateEntity(ISelfUserModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public sealed partial class GatewaySelfUser :

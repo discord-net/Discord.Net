@@ -18,7 +18,7 @@ public sealed partial class GatewayCategoryChannelActor(
 
     [SourceOfTruth]
     internal GatewayCategoryChannel CreateEntity(IGuildCategoryChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public sealed partial class GatewayCategoryChannel :

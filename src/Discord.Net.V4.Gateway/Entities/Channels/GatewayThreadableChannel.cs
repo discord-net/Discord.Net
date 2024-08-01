@@ -25,7 +25,7 @@ public partial class GatewayThreadableChannelActor(
 
     [SourceOfTruth]
     internal GatewayThreadableChannel CreateEntity(IThreadableChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public partial class GatewayThreadableChannel :

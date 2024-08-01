@@ -19,7 +19,7 @@ public sealed partial class GatewayNewsChannelActor(
     [SourceOfTruth]
     [CovariantOverride]
     internal GatewayNewsChannel CreateEntity(IGuildNewsChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 [ExtendInterfaceDefaults]

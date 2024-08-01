@@ -14,6 +14,7 @@ public sealed partial class GatewayDMChannelActor(
     IDMChannelActor,
     IGatewayCachedActor<ulong, GatewayDMChannel, DMChannelIdentity, IDMChannelModel>
 {
+
     [SourceOfTruth] public GatewayUserActor Recipient { get; } = new(client, recipient);
 
     [SourceOfTruth] internal override DMChannelIdentity Identity { get; } = channel;
@@ -23,7 +24,7 @@ public sealed partial class GatewayDMChannelActor(
 
     [SourceOfTruth]
     internal GatewayDMChannel CreateEntity(IDMChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public sealed partial class GatewayDMChannel :

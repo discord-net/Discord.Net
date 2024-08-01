@@ -99,7 +99,6 @@ public struct PermissionSet(ulong lower, ulong upper) : IEquatable<PermissionSet
     }
 #endif
 
-
     public static unsafe implicit operator BigInteger(PermissionSet set)
         => new(MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<PermissionSet, byte>(ref set), sizeof(PermissionSet)));
 

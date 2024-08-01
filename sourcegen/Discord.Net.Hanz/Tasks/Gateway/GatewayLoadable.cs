@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Discord.Net.Hanz.Tasks.Gateway;
@@ -155,11 +156,11 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
         var hierarchy = Hierarchy.GetHierarchy(classSymbol);
 
-        if (hierarchy.All(x => !LoadableTrait.IsLoadable(x.Type)))
-        {
-            logger.Warn($"Ignoring {classDeclarationSyntax.Identifier}: not loadable");
-            return null;
-        }
+        // if (hierarchy.All(x => !LoadableTrait.IsLoadable(x.Type)))
+        // {
+        //     logger.Warn($"Ignoring {classDeclarationSyntax.Identifier}: not loadable");
+        //     return null;
+        // }
 
         var gatewayCacheableActor = hierarchy.FirstOrDefault(x =>
             x.Type.ToDisplayString().StartsWith("Discord.Gateway.IGatewayCachedActor<")
@@ -201,8 +202,6 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             logger.Warn($"Ignoring {classDeclarationSyntax.Identifier}: cannot resolve rest entity type");
             return null;
         }
-
-        //logger.Log($"{classSymbol}: Got rest entity type {restEntity} ({actorType})");
 
         if (entityType is not INamedTypeSymbol entityNamedType)
         {
@@ -256,8 +255,6 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
             var targetLogger = logger.WithSemanticContext(target.SemanticModel);
 
-            targetLogger.Log($"{target.ClassSymbol}: Rest entity: {target.RestEntitySymbol}");
-
             var syntax = SyntaxUtils.CreateSourceGenClone(target.Syntax);
 
             var root = TypeUtils.GetBaseTypes(target.ClassSymbol).LastOrDefault(bases.Contains);
@@ -278,12 +275,22 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                     root is not null,
                     hasChild,
                     rootTarget?.GatewayEntitySymbol,
-                    rootTarget?.RestEntitySymbol,
                     targetLogger)
                ) continue;
 
-            CreateOverloadsAsync(ref syntax, target, targetLogger);
+            if (
+                LoadableTrait.IsLoadable(target.CoreActor) &&
+                !CreateLoadableTraitMethods(
+                    ref syntax,
+                    target,
+                    root is not null,
+                    hasChild,
+                    rootTarget?.RestEntitySymbol,
+                    targetLogger
+                )
+            ) continue;
 
+            CreateOverloadsAsync(ref syntax, target, targetLogger);
 
             context.AddSource(
                 $"GatewayLoadable/{target.ClassSymbol.Name}",
@@ -396,7 +403,8 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
         while (checkingType is not null && !checkingType.IsAbstract)
         {
-            if(TryGetStoreRoot(checkingType, out var root) && TryGetBrokerTypes(root.Type, out var id, out var entity, out var model))
+            if (TryGetStoreRoot(checkingType, out var root) &&
+                TryGetBrokerTypes(root.Type, out var id, out var entity, out var model))
                 map.Add(new(checkingType, root, id, entity, model));
 
             checkingType = checkingType.BaseType;
@@ -440,7 +448,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         var actorType = target.ClassSymbol.ToDisplayString();
 
         var interfaceBrokerOverload = SyntaxFactory.ParseMemberDeclaration(
-            $"async ValueTask<IEntityBroker<{idType}, {entityType}, {modelType}>> IBrokerProvider<{idType}, {entityType}, {modelType}>.GetBrokerAsync(CancellationToken token) => (await GetOrCreateBrokerAsync(token)).Value;"
+            $"async ValueTask<IEntityBroker<{idType}, {entityType}, {actorType}, {modelType}>> IBrokerProvider<{idType}, {entityType}, {actorType}, {modelType}>.GetBrokerAsync(CancellationToken token) => (await GetOrCreateBrokerAsync(token)).Value;"
         );
 
         if (interfaceBrokerOverload is null)
@@ -470,7 +478,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         }
 
         var broker = SyntaxFactory.ParseMemberDeclaration(
-            $"private Discord.Gateway.IRefCounted<Discord.Gateway.State.IEntityBroker<{idType}, {entityType}, {modelType}>>? _broker;"
+            $"private Discord.Gateway.IRefCounted<Discord.Gateway.State.IEntityBroker<{idType}, {entityType}, {actorType}, {modelType}>>? _broker;"
         );
 
         if (broker is null)
@@ -592,7 +600,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
         var getOrCreateBroker = SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              private async ValueTask<Discord.Gateway.IRefCounted<Discord.Gateway.State.IEntityBroker<{{idType}}, {{entityType}}, {{modelType}}>>> GetOrCreateBrokerAsync(
+              private async ValueTask<Discord.Gateway.IRefCounted<Discord.Gateway.State.IEntityBroker<{{idType}}, {{entityType}}, {{actorType}}, {{modelType}}>>> GetOrCreateBrokerAsync(
                   CancellationToken token)
               {
                   if (_broker is not null)
@@ -623,7 +631,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         syntax = syntax
             .AddBaseListTypes(
                 SyntaxFactory.SimpleBaseType(
-                    SyntaxFactory.ParseTypeName($"IBrokerProvider<{idType}, {entityType}, {modelType}>")
+                    SyntaxFactory.ParseTypeName($"IBrokerProvider<{idType}, {entityType}, {actorType}, {modelType}>")
                 ),
                 SyntaxFactory.SimpleBaseType(
                     SyntaxFactory.ParseTypeName($"IStoreProvider<{idType}, {modelType}>")
@@ -642,102 +650,22 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         return true;
     }
 
-    private bool CreateGatewayLoadable(
+    private static bool CreateLoadableTraitMethods(
         ref ClassDeclarationSyntax syntax,
         GenerationContext target,
         bool hasParent,
         bool hasChild,
-        INamedTypeSymbol? rootEntityType,
         INamedTypeSymbol? rootRestEntityType,
         Logger logger
     )
     {
-        var idType = target.IdType.ToDisplayString();
-        var entityType = target.GatewayEntitySymbol.ToDisplayString();
-        var modelType = target.ModelType.ToDisplayString();
         var coreEntityType = target.CoreEntity.ToDisplayString();
         var restEntityType = target.RestEntitySymbol.ToDisplayString();
         var coreActorType = target.CoreActor.ToDisplayString();
 
-        var logicalEntityType = rootEntityType?.ToDisplayString() ?? entityType;
         var logicalRestEntityType = rootRestEntityType?.ToDisplayString() ?? restEntityType;
 
-
-        var getHandleInternal = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              protected async ValueTask<Discord.Gateway.IEntityHandle<{{idType}}, {{logicalEntityType}}>?> GetHandleInternalAsync(CancellationToken token = default)
-              {
-                  var store = await GetOrCreateStoreAsync(token);
-                  var broker = await GetOrCreateBrokerAsync(token);
-                  return await broker.Value.GetAsync(this, Identity, store, token);
-              }
-              """
-        );
-
-        if (getHandleInternal is null)
-        {
-            logger.Warn($"{target.ClassSymbol}: failed to create GetHandleInternal method");
-            return false;
-        }
-
-        if (hasParent)
-            getHandleInternal = getHandleInternal.AddModifiers(SyntaxFactory.Token(SyntaxKind.OverrideKeyword));
-        else if (hasChild)
-            getHandleInternal = getHandleInternal.AddModifiers(SyntaxFactory.Token(SyntaxKind.VirtualKeyword));
-
-        var getHandle = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              public async ValueTask<Discord.Gateway.IEntityHandle<{{idType}}, {{entityType}}>?> GetHandleAsync(CancellationToken token = default)
-                  => await GetHandleInternalAsync(token) as IEntityHandle<{{idType}}, {{entityType}}>;
-              """
-        );
-
-        if (getHandle is null)
-        {
-            logger.Warn($"{target.ClassSymbol}: failed to create GetHandle method");
-            return false;
-        }
-
-        if (hasParent)
-            getHandle = getHandle.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
-
-        var getMethodInternal = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              protected async ValueTask<{{logicalEntityType}}?> GetInternalAsync(CancellationToken token = default)
-              {
-                  var store = await GetOrCreateStoreAsync(token);
-                  var broker = await GetOrCreateBrokerAsync(token);
-                  return await broker.Value.GetImplicitAsync(this, Identity, store, token);
-              }
-              """
-        );
-
-        if (getMethodInternal is null)
-        {
-            logger.Warn($"{target.ClassSymbol}: failed to create getMethodInternal method");
-            return false;
-        }
-
-        if (hasParent)
-            getMethodInternal = getMethodInternal.AddModifiers(SyntaxFactory.Token(SyntaxKind.OverrideKeyword));
-        else if (hasChild)
-            getMethodInternal = getMethodInternal.AddModifiers(SyntaxFactory.Token(SyntaxKind.VirtualKeyword));
-
-        var getMethod = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              public async ValueTask<{{entityType}}?> GetAsync(CancellationToken token = default)
-                  => await GetInternalAsync(token) as {{entityType}};
-              """
-        );
-
-        if (getMethod is null)
-        {
-            logger.Warn($"{target.ClassSymbol}: failed to create get method");
-            return false;
-        }
-
-        if (hasParent)
-            getMethod = getMethod.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
+        var internalModifier = target.ClassSymbol.IsSealed && !hasParent && !hasChild ? "private" : "protected";
 
         var getOrFetch = SyntaxFactory.ParseMemberDeclaration(
             $$"""
@@ -762,7 +690,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
         var fetchInternalMethod = SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              protected async Task<{{logicalRestEntityType}}?> FetchInternalAsync(Discord.Gateway.GatewayRequestOptions? options = null, System.Threading.CancellationToken token = default)
+              {{internalModifier}} async Task<{{logicalRestEntityType}}?> FetchInternalAsync(Discord.Gateway.GatewayRequestOptions? options = null, System.Threading.CancellationToken token = default)
               {
                   var model = await Client.RestApiClient.ExecuteAsync(
                       {{coreActorType}}.FetchRoute(this, Id),
@@ -810,13 +738,174 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             fetchMethod = fetchMethod.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
 
         syntax = syntax.AddMembers(
-            getHandle,
-            getHandleInternal,
-            getMethod,
-            getMethodInternal,
             getOrFetch,
             fetchMethod,
             fetchInternalMethod
+        );
+
+        return true;
+    }
+
+    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
+    private static bool TryGetGatewayActor(ITypeSymbol type, out INamedTypeSymbol actor)
+    {
+        actor = (TypeUtils.GetBaseTypesAndThis(type)
+                .FirstOrDefault(x => x.ToDisplayString().StartsWith("Discord.Gateway.GatewayActor"))
+            as INamedTypeSymbol)!;
+
+        return actor is not null;
+    }
+
+    private static IEnumerable<string> GetCachePathEntries(ITypeSymbol type) =>
+        type.GetMembers()
+            .OfType<IPropertySymbol>()
+            .Where(x => TryGetGatewayActor(x.Type, out _))
+            .Select(x => $"{x.Name}.Identity | {x.Name}");
+
+    private bool CreateGatewayLoadable(
+        ref ClassDeclarationSyntax syntax,
+        GenerationContext target,
+        bool hasParent,
+        bool hasChild,
+        INamedTypeSymbol? rootEntityType,
+        Logger logger
+    )
+    {
+        var idType = target.IdType.ToDisplayString();
+        var entityType = target.GatewayEntitySymbol.ToDisplayString();
+        var logicalEntityType = rootEntityType?.ToDisplayString() ?? entityType;
+
+        var internalModifier = target.ClassSymbol.IsSealed && !hasParent && !hasChild ? "private" : "protected";
+
+        var cachePathMap = TypeUtils
+            .GetBaseTypesAndThis(target.ClassSymbol)
+            .Where(x => !x.IsAbstract)
+            .ToDictionary<
+                INamedTypeSymbol,
+                INamedTypeSymbol,
+                IEnumerable<string>
+            >(
+                x => x,
+                GetCachePathEntries,
+                SymbolEqualityComparer.Default
+            );
+
+        var cachePathEntries = cachePathMap
+            .SelectMany(x => x.Value)
+            .Prepend("Identity | this")
+            .ToArray();
+
+        var cachePathField = SyntaxFactory.ParseMemberDeclaration(
+            "private CachePathable? _cachePath;"
+        );
+
+        var cachePathProperty = SyntaxFactory.ParseMemberDeclaration(
+            $"internal CachePathable CachePath => _cachePath ??= new() {{ {string.Join(", ", cachePathEntries)} }};"
+        );
+
+        if (cachePathProperty is null || cachePathField is null)
+        {
+            logger.Warn($"{target.ClassSymbol}: failed to create cache paths");
+            return false;
+        }
+
+        var hasCachePathParent =
+            cachePathMap.Skip(1).Sum(x => x.Value.Count()) > 0 ||
+            cachePathMap.Skip(1).Any(x => TryGetGatewayActor(x.Key, out _));
+
+        if (hasCachePathParent)
+            cachePathProperty = cachePathProperty.AddModifiers(SyntaxFactory.Token(SyntaxKind.OverrideKeyword));
+        else if (hasChild)
+            cachePathProperty = cachePathProperty.AddModifiers(SyntaxFactory.Token(SyntaxKind.VirtualKeyword));
+
+        syntax = syntax.AddMembers(
+            cachePathField,
+            cachePathProperty
+        );
+
+        var cachePathAccess = cachePathEntries.Length == 0 ? "CachePathable.Default" : "CachePath";
+
+        var getHandleInternal = SyntaxFactory.ParseMemberDeclaration(
+            $$"""
+              {{internalModifier}} async ValueTask<Discord.Gateway.IEntityHandle<{{idType}}, {{logicalEntityType}}>?> GetHandleInternalAsync(CancellationToken token = default)
+              {
+                  var store = await GetOrCreateStoreAsync(token);
+                  var broker = await GetOrCreateBrokerAsync(token);
+                  return await broker.Value.GetAsync({{cachePathAccess}}, Identity, store, this, token);
+              }
+              """
+        );
+
+        if (getHandleInternal is null)
+        {
+            logger.Warn($"{target.ClassSymbol}: failed to create GetHandleInternal method");
+            return false;
+        }
+
+        if (hasParent)
+            getHandleInternal = getHandleInternal.AddModifiers(SyntaxFactory.Token(SyntaxKind.OverrideKeyword));
+        else if (hasChild)
+            getHandleInternal = getHandleInternal.AddModifiers(SyntaxFactory.Token(SyntaxKind.VirtualKeyword));
+
+        var getHandle = SyntaxFactory.ParseMemberDeclaration(
+            $$"""
+              public async ValueTask<Discord.Gateway.IEntityHandle<{{idType}}, {{entityType}}>?> GetHandleAsync(CancellationToken token = default)
+                  => await GetHandleInternalAsync(token) as IEntityHandle<{{idType}}, {{entityType}}>;
+              """
+        );
+
+        if (getHandle is null)
+        {
+            logger.Warn($"{target.ClassSymbol}: failed to create GetHandle method");
+            return false;
+        }
+
+        if (hasParent)
+            getHandle = getHandle.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
+
+        var getMethodInternal = SyntaxFactory.ParseMemberDeclaration(
+            $$"""
+              {{internalModifier}} async ValueTask<{{logicalEntityType}}?> GetInternalAsync(CancellationToken token = default)
+              {
+                  var store = await GetOrCreateStoreAsync(token);
+                  var broker = await GetOrCreateBrokerAsync(token);
+                  return await broker.Value.GetImplicitAsync({{cachePathAccess}}, Identity, store, this, token);
+              }
+              """
+        );
+
+        if (getMethodInternal is null)
+        {
+            logger.Warn($"{target.ClassSymbol}: failed to create getMethodInternal method");
+            return false;
+        }
+
+        if (hasParent)
+            getMethodInternal = getMethodInternal.AddModifiers(SyntaxFactory.Token(SyntaxKind.OverrideKeyword));
+        else if (hasChild)
+            getMethodInternal = getMethodInternal.AddModifiers(SyntaxFactory.Token(SyntaxKind.VirtualKeyword));
+
+        var getMethod = SyntaxFactory.ParseMemberDeclaration(
+            $$"""
+              public async ValueTask<{{entityType}}?> GetAsync(CancellationToken token = default)
+                  => await GetInternalAsync(token) as {{entityType}};
+              """
+        );
+
+        if (getMethod is null)
+        {
+            logger.Warn($"{target.ClassSymbol}: failed to create get method");
+            return false;
+        }
+
+        if (hasParent)
+            getMethod = getMethod.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
+
+        syntax = syntax.AddMembers(
+            getHandle,
+            getHandleInternal,
+            getMethod,
+            getMethodInternal
         );
 
         return true;

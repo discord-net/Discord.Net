@@ -15,7 +15,7 @@ public class Guild :
     public Optional<string?> IconHash { get; set; }
 
     [JsonPropertyName("discovery_splash")]
-    public string? DiscoverySplash { get; set; }
+    public string? DiscoverySplashId { get; set; }
 
     [JsonPropertyName("owner_id")]
     public ulong OwnerId { get; set; }
@@ -96,17 +96,13 @@ public class Guild :
     public IEnumerable<ulong> RoleIds => Roles.Select(x => x.Id);
     int? IGuildModel.MaxPresence => ~MaxPresences;
     int? IGuildModel.MaxMembers => ~MaxMembers;
-    string? IGuildModel.Banner => Banner.GetValueOrDefault();
     bool IGuildModel.PremiumProgressBarEnabled => PremiumProgressBarEnabled;
     ulong? IGuildModel.SafetyAlertsChannelId => ~SafetyAlertsChannelId;
     int? IGuildModel.MaxVideoChannelUsers => ~MaxVideoChannelUsers;
     int? IGuildModel.MaxStageVideoChannelUsers => ~MaxStageVideoChannelUsers;
     IWelcomeScreenModel? IGuildModel.WelcomeScreen => ~WelcomeScreen;
-    string? IGuildModel.Vanity => ~VanityUrlCode;
     bool IGuildModel.WidgetEnabled => ~WidgetEnabled;
     ulong? IGuildModel.WidgetChannelId => ~WidgetChannelId;
-    string? IGuildModel.Icon => ~Icon;
-    string? IGuildModel.Splash => ~Splash;
 
     IEnumerable<IRoleModel> IModelSourceOfMultiple<IRoleModel>.GetModels() => Roles;
 

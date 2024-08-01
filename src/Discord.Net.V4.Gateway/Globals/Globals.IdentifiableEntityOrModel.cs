@@ -33,6 +33,9 @@ global using ThreadChannelIdentity = Discord.IIdentifiable<ulong, Discord.Gatewa
 
 global using GuildIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayGuild, Discord.Gateway.GatewayGuildActor, Discord.Models.IGuildModel>;
 global using GuildScheduledEventIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayGuildScheduledEvent, Discord.Gateway.GatewayGuildScheduledEventActor, Discord.Models.IGuildScheduledEventModel>;
+global using BanIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayBan, Discord.Gateway.GatewayBanActor, Discord.Models.IBanModel>;
+global using RoleIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayRole, Discord.Gateway.GatewayRoleActor, Discord.Models.IRoleModel>;
+global using GuildEmoteIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayGuildEmote, Discord.Gateway.GatewayGuildEmoteActor, Discord.Models.IGuildEmoteModel>;
 
 
 #endregion

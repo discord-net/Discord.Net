@@ -9,39 +9,55 @@ public sealed partial class GatewayGuildActor :
     GatewayCachedActor<ulong, GatewayGuild, GuildIdentity, IGuildModel>,
     IGuildActor
 {
-     public IEnumerableIndexableActor<IGuildChannelActor, ulong, IGuildChannel> Channels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IGuildChannelActor, ulong, IGuildChannel> Channels =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<ITextChannelActor, ulong, ITextChannel> TextChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ITextChannelActor, ulong, ITextChannel> TextChannels =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IVoiceChannelActor, ulong, IVoiceChannel> VoiceChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IVoiceChannelActor, ulong, IVoiceChannel> VoiceChannels =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<ICategoryChannelActor, ulong, ICategoryChannel> CategoryChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<ICategoryChannelActor, ulong, ICategoryChannel> CategoryChannels =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<INewsChannelActor, ulong, INewsChannel> AnnouncementChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<INewsChannelActor, ulong, INewsChannel> AnnouncementChannels =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IThreadChannelActor, ulong, IThreadChannel> ThreadChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IThreadChannelActor, ulong, IThreadChannel> ThreadChannels =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IThreadChannelActor, ulong, IThreadChannel> ActiveThreadChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IThreadChannelActor, ulong, IThreadChannel> ActiveThreadChannels =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IStageChannelActor, ulong, IStageChannel> StageChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IStageChannelActor, ulong, IStageChannel> StageChannels =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IForumChannelActor, ulong, IForumChannel> ForumChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IForumChannelActor, ulong, IForumChannel> ForumChannels =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IMediaChannelActor, ulong, IMediaChannel> MediaChannels => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IMediaChannelActor, ulong, IMediaChannel> MediaChannels =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations =>
+        throw new NotImplementedException();
 
-    public IPagedIndexableActor<IBanActor, ulong, IBan, PageGuildBansParams> Bans => throw new NotImplementedException();
+    public IPagedIndexableActor<IBanActor, ulong, IBan, PageGuildBansParams> Bans =>
+        throw new NotImplementedException();
 
-    public IPagedIndexableActor<IGuildMemberActor, ulong, IGuildMember, PageGuildMembersParams> Members => throw new NotImplementedException();
+    public IPagedIndexableActor<IGuildMemberActor, ulong, IGuildMember, PageGuildMembersParams> Members =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IGuildEmoteActor, ulong, IGuildEmote> Emotes => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IGuildEmoteActor, ulong, IGuildEmote> Emotes =>
+        throw new NotImplementedException();
 
     public IEnumerableIndexableActor<IRoleActor, ulong, IRole> Roles => throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IGuildStickerActor, ulong, IGuildSticker> Stickers => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IGuildStickerActor, ulong, IGuildSticker> Stickers =>
+        throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents => throw new NotImplementedException();
+    public IEnumerableIndexableActor<IGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents =>
+        throw new NotImplementedException();
 
     public IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites => throw new NotImplementedException();
 
@@ -54,7 +70,7 @@ public sealed partial class GatewayGuildActor :
 
     [SourceOfTruth]
     internal GatewayGuild CreateEntity(IGuildModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 
     [SourceOfTruth]
     internal IGuildChannel CreateEntity(IGuildChannelModel model) => throw new NotImplementedException();
@@ -67,78 +83,76 @@ public sealed partial class GatewayGuild :
     GatewayCacheableEntity<GatewayGuild, ulong, IGuildModel, GuildIdentity>,
     IGuild
 {
-    public string Name => throw new NotImplementedException();
+    public string Name => Model.Name;
 
-    public string? SplashId => throw new NotImplementedException();
+    public string? SplashId => Model.SplashId;
 
-    public string? BannerId => throw new NotImplementedException();
+    public string? BannerId => Model.BannerId;
 
-    public string? Description => throw new NotImplementedException();
+    public string? Description => Model.Description;
 
-    public string? IconId => throw new NotImplementedException();
+    public string? IconId => Model.IconId;
 
-    public string? VanityUrlCode => throw new NotImplementedException();
+    public string? VanityUrlCode => Model.VanityUrlCode;
 
-    public int AFKTimeout => throw new NotImplementedException();
+    public int AFKTimeout => Model.AFKTimeout;
 
-    public bool IsWidgetEnabled => throw new NotImplementedException();
+    public bool IsWidgetEnabled => Model.WidgetEnabled;
 
-    public DefaultMessageNotifications DefaultMessageNotifications => throw new NotImplementedException();
+    public DefaultMessageNotifications DefaultMessageNotifications =>
+        (DefaultMessageNotifications)Model.DefaultMessageNotifications;
 
-    public MfaLevel MfaLevel => throw new NotImplementedException();
+    public MfaLevel MfaLevel => (MfaLevel)Model.MFALevel;
 
-    public GuildFeatures Features => throw new NotImplementedException();
+    public GuildFeatures Features { get; private set; }
 
-    public PremiumTier PremiumTier => throw new NotImplementedException();
+    public PremiumTier PremiumTier => (PremiumTier)Model.PremiumTier;
 
-    public SystemChannelFlags SystemChannelFlags => throw new NotImplementedException();
+    public SystemChannelFlags SystemChannelFlags => (SystemChannelFlags)Model.SystemChannelFlags;
 
-    public NsfwLevel NsfwLevel => throw new NotImplementedException();
+    public NsfwLevel NsfwLevel => (NsfwLevel?)Model.NsfwLevel ?? NsfwLevel.Default;
 
-    public CultureInfo PreferredCulture => throw new NotImplementedException();
+    public bool IsBoostProgressBarEnabled => Model.PremiumProgressBarEnabled;
 
-    public bool IsBoostProgressBarEnabled => throw new NotImplementedException();
+    public int PremiumSubscriptionCount => Model.PremiumSubscriptionCount ?? 0;
 
-    public int PremiumSubscriptionCount => throw new NotImplementedException();
+    public int? MaxPresences => Model.MaxPresence;
 
-    public int? MaxPresences => throw new NotImplementedException();
+    public int? MaxMembers => Model.MaxMembers;
 
-    public int? MaxMembers => throw new NotImplementedException();
+    public int? MaxVideoChannelUsers => Model.MaxVideoChannelUsers;
 
-    public int? MaxVideoChannelUsers => throw new NotImplementedException();
+    public int? MaxStageVideoChannelUsers => Model.MaxStageVideoChannelUsers;
 
-    public int? MaxStageVideoChannelUsers => throw new NotImplementedException();
+    public int? ApproximateMemberCount => Model.ApproximateMemberCount;
 
-    public int? ApproximateMemberCount => throw new NotImplementedException();
+    public int? ApproximatePresenceCount => Model.ApproximatePresenceCount;
 
-    public int? ApproximatePresenceCount => throw new NotImplementedException();
+    public string PreferredLocale => Model.PreferredLocale;
 
-    public string PreferredLocale => throw new NotImplementedException();
+    public VerificationLevel VerificationLevel => (VerificationLevel?)Model.VerificationLevel ?? VerificationLevel.None;
 
-    public VerificationLevel VerificationLevel => throw new NotImplementedException();
+    public ExplicitContentFilterLevel ExplicitContentFilter => (ExplicitContentFilterLevel)Model.ExplicitContentFilter;
 
-    public ExplicitContentFilterLevel ExplicitContentFilter => throw new NotImplementedException();
+    public string? DiscoverySplashId => Model.DiscoverySplashId;
 
-    public string? DiscoverySplashId => throw new NotImplementedException();
+    [SourceOfTruth] public GatewayVoiceChannelActor? AFKChannel { get; private set; }
 
-    public IVoiceChannelActor? AFKChannel => throw new NotImplementedException();
+    [SourceOfTruth] public GatewayTextChannelActor? WidgetChannel { get; private set; }
 
-    public ITextChannelActor? WidgetChannel => throw new NotImplementedException();
+    [SourceOfTruth] public GatewayTextChannelActor? SafetyAlertsChannel { get; private set; }
 
-    public ITextChannelActor? SafetyAlertsChannel => throw new NotImplementedException();
+    [SourceOfTruth] public GatewayTextChannelActor? SystemChannel { get; private set; }
 
-    public ITextChannelActor? SystemChannel => throw new NotImplementedException();
+    [SourceOfTruth] public GatewayTextChannelActor? RulesChannel { get; private set; }
 
-    public ITextChannelActor? RulesChannel => throw new NotImplementedException();
+    [SourceOfTruth] public GatewayTextChannelActor? PublicUpdatesChannel { get; private set; }
 
-    public ITextChannelActor? PublicUpdatesChannel => throw new NotImplementedException();
+    [SourceOfTruth] public GatewayMemberActor Owner { get; private set; }
 
-    public IGuildMemberActor Owner => throw new NotImplementedException();
+    public ulong? ApplicationId => Model.ApplicationId;
 
-    public ulong? ApplicationId => throw new NotImplementedException();
-
-    [ProxyInterface]
-    internal GatewayGuildActor Actor { get; }
+    [ProxyInterface] internal GatewayGuildActor Actor { get; }
 
     internal IGuildModel Model { get; private set; }
 
@@ -151,6 +165,15 @@ public sealed partial class GatewayGuild :
     {
         Model = model;
         Actor = actor ?? new(client, GuildIdentity.Of(this));
+    }
+
+    private void UpdateComputeds(IGuildModel model)
+    {
+        AFKChannel = model.AFKChannelId.Map(
+            static (id, client, guild) => client.Guilds[guild.Id].VoiceChannels[id],
+            Client,
+            Actor.Identity
+        )
     }
 
     public override IGuildModel GetModel() => Model;

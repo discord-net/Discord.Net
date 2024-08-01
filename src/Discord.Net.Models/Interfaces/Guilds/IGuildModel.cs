@@ -3,9 +3,7 @@ namespace Discord.Models;
 [ModelEquality]
 public partial interface IGuildModel : IPartialGuildModel, IEntityModel<ulong>
 {
-    string? Icon { get; }
-    string? Splash { get; }
-    string? DiscoverySplash { get; }
+    string? DiscoverySplashId { get; }
     ulong OwnerId { get; }
     ulong? AFKChannelId { get; }
     int AFKTimeout { get; }
@@ -20,8 +18,6 @@ public partial interface IGuildModel : IPartialGuildModel, IEntityModel<ulong>
     ulong? RulesChannelId { get; }
     int? MaxPresence { get; }
     int? MaxMembers { get; }
-    string? Vanity { get; }
-    string? Banner { get; }
     int PremiumTier { get; }
     string PreferredLocale { get; }
     ulong? PublicUpdatesChannelId { get; }

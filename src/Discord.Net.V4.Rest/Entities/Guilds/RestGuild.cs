@@ -247,7 +247,7 @@ public sealed partial class RestGuild :
 
     public ExplicitContentFilterLevel ExplicitContentFilter => (ExplicitContentFilterLevel)Model.ExplicitContentFilter;
 
-    public string? DiscoverySplashId => Model.DiscoverySplash;
+    public string? DiscoverySplashId => Model.DiscoverySplashId;
 
     public ulong? ApplicationId => Model.ApplicationId;
 

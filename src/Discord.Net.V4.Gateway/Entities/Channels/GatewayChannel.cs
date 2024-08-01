@@ -14,7 +14,7 @@ public partial class GatewayChannelActor(
 {
     [SourceOfTruth]
     internal GatewayChannel CreateEntity(IChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public partial class GatewayChannel :

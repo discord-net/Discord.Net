@@ -21,7 +21,7 @@ public sealed partial class GatewayForumChannelActor(
 
     [SourceOfTruth]
     internal GatewayForumChannel CreateEntity(IGuildForumChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public sealed partial class GatewayForumChannel :

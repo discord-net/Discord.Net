@@ -29,7 +29,7 @@ public sealed partial class GatewayStageChannelActor(
         => Client.StateController
             .CreateLatent<ulong, GatewayStageInstance, GatewayStageInstanceActor, IStageInstanceModel>(
                 model,
-                new() {Identity | this, Guild.Identity | Guild}
+                CachePath
             );
 }
 

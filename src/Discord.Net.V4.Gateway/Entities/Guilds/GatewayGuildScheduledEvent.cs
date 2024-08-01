@@ -13,14 +13,14 @@ public sealed partial class GatewayGuildScheduledEventActor(
     GatewayCachedActor<ulong, GatewayGuildScheduledEvent, GuildScheduledEventIdentity, IGuildScheduledEventModel>(client, scheduledEvent),
     IGuildScheduledEventActor
 {
-    [StoreRoot] [SourceOfTruth] public GatewayGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [StoreRoot, SourceOfTruth] public GatewayGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
 
     public IEnumerableIndexableActor<IGuildScheduledEventUserActor, ulong, IGuildScheduledEventUser> RSVPs =>
         throw new NotImplementedException();
 
     [SourceOfTruth]
     internal GatewayGuildScheduledEvent CreateEntity(IGuildScheduledEventModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public sealed partial class GatewayGuildScheduledEvent :

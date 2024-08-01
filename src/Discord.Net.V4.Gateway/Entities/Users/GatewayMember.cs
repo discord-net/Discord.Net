@@ -24,7 +24,7 @@ public sealed partial class GatewayMemberActor(
 
     [SourceOfTruth]
     internal GatewayMember CreateEntity(IMemberModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public sealed partial class GatewayMember :

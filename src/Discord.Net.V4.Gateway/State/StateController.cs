@@ -85,7 +85,7 @@ internal sealed partial class StateController : IDisposable
         }
     }
 
-    public TEntity CreateLatent<TId, TEntity, [TransitiveFill] TActor, TModel>(TActor actor, TModel model)
+    public TEntity CreateLatent<TId, TEntity, [TransitiveFill] TActor, TModel>(TActor actor, TModel model, CachePathable? path = null)
         where TEntity :
         class,
         ICacheableEntity<TEntity, TId, TModel>,
@@ -96,7 +96,7 @@ internal sealed partial class StateController : IDisposable
         IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
-        => CreateLatent<TId, TEntity, TActor, TModel>(model, new() {actor}, actor);
+        => CreateLatent<TId, TEntity, TActor, TModel>(model, path ?? new() {actor}, actor);
 
     public TEntity CreateLatent<TId, TEntity, TActor, TModel>(
         TModel model,

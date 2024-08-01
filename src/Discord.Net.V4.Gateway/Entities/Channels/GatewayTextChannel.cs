@@ -24,7 +24,7 @@ public partial class GatewayTextChannelActor(
 
     [SourceOfTruth]
     internal GatewayTextChannel CreateEntity(IGuildTextChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public partial class GatewayTextChannel :

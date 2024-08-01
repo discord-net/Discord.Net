@@ -11,7 +11,7 @@ public sealed partial class GatewayMessageChannelActor(
     GatewayChannelActor(client, channel.Cast<GatewayChannel, GatewayChannelActor, IChannelModel>()),
     IMessageChannelActor
 {
-    internal MessageChannelIdentity MessageChannelIdentity { get; } = channel;
+    internal new MessageChannelIdentity Identity { get; } = channel;
 
     public IIndexableActor<IMessageActor, ulong, IMessage> Messages => throw new NotImplementedException();
 

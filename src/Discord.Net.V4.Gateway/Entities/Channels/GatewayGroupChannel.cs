@@ -18,7 +18,7 @@ public sealed partial class GatewayGroupChannelActor(
 
     [SourceOfTruth]
     internal GatewayGroupChannel CreateEntity(IGroupDMChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public sealed partial class GatewayGroupChannel :
