@@ -16,9 +16,9 @@ public abstract class GatewayCachedActor<TId, TEntity, TIdentity, TModel>(
     where TEntity :
     GatewayEntity<TId>,
     ICacheableEntity<TEntity, TId, TModel>,
-    IStoreProvider<TId, TModel>,
+    IStoreInfoProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
+    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
     where TIdentity : IIdentifiable<TId>
     where TModel : class, IEntityModel<TId>
 {
@@ -43,7 +43,7 @@ public abstract class GatewayCachedActor<TId, TEntity, TIdentity, TModel>(
     }
 }
 
-public interface IGatewayCachedActor<TId, out TEntity, out TIdentity, TModel> :
+public interface IGatewayCachedActor<out TId, out TEntity, out TIdentity, TModel> :
     IGatewayActor<TId, TEntity, TIdentity>
     where TId : IEquatable<TId>
     where TEntity :
@@ -51,7 +51,7 @@ public interface IGatewayCachedActor<TId, out TEntity, out TIdentity, TModel> :
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
+    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
     where TIdentity : IIdentifiable<TId>
     where TModel : class, IEntityModel<TId>;
 

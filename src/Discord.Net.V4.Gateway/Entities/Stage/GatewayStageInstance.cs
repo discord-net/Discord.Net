@@ -15,11 +15,9 @@ public sealed partial class GatewayStageInstanceActor(
     GatewayCachedActor<ulong, GatewayStageInstance, StageInstanceIdentity, IStageInstanceModel>(client, instance),
     IStageInstanceActor
 {
-    [SourceOfTruth]
-    public GatewayStageChannelActor Channel { get; } = channel.Actor ?? new(client, guild, channel);
+    [SourceOfTruth] public GatewayStageChannelActor Channel { get; } = channel.Actor ?? new(client, guild, channel);
 
-    [SourceOfTruth]
-    public GatewayGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [SourceOfTruth] public GatewayGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
 
     [SourceOfTruth]
     internal GatewayStageInstance CreateEntity(IStageInstanceModel model)
@@ -27,7 +25,7 @@ public sealed partial class GatewayStageInstanceActor(
 }
 
 public sealed partial class GatewayStageInstance :
-    GatewayCacheableEntity<GatewayStageInstance, ulong, IStageInstanceModel, StageInstanceIdentity>,
+    GatewayCacheableEntity<GatewayStageInstance, ulong, IStageInstanceModel>,
     IStageInstance
 {
     public string Topic => Model.Topic;
@@ -45,9 +43,8 @@ public sealed partial class GatewayStageInstance :
         GuildIdentity guild,
         StageChannelIdentity channel,
         IStageInstanceModel model,
-        GatewayStageInstanceActor? actor = null,
-        IEntityHandle<ulong, GatewayStageInstance>? implicitHandle = null
-    ) : base(client, model.Id, implicitHandle)
+        GatewayStageInstanceActor? actor = null
+    ) : base(client, model.Id)
     {
         Model = model;
         Actor = actor ?? new(client, guild, channel, StageInstanceIdentity.Of(this));
@@ -55,16 +52,15 @@ public sealed partial class GatewayStageInstance :
 
     public static GatewayStageInstance Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayStageInstance> context,
+        ICacheConstructionContext context,
         IStageInstanceModel model
     ) => new(
-            client,
-            context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
-            context.Path.GetIdentity(T<StageChannelIdentity>(), model.ChannelId),
-            model,
-            context.TryGetActor(T<GatewayStageInstanceActor>()),
-            context.ImplicitHandle
-        );
+        client,
+        context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
+        context.Path.GetIdentity(T<StageChannelIdentity>(), model.ChannelId),
+        model,
+        context.TryGetActor<GatewayStageInstanceActor>()
+    );
 
     public override ValueTask UpdateAsync(
         IStageInstanceModel model,

@@ -55,9 +55,8 @@ public sealed partial class GatewayMediaChannel :
         DiscordGatewayClient client,
         GuildIdentity guild,
         IGuildMediaChannelModel model,
-        GatewayMediaChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayMediaChannel>? implicitHandle = null
-    ) : base(client, guild, model, actor, implicitHandle)
+        GatewayMediaChannelActor? actor = null
+    ) : base(client, guild, model, actor)
     {
         _model = model;
         Actor = actor ?? new(client, guild, MediaChannelIdentity.Of(this));
@@ -69,14 +68,13 @@ public sealed partial class GatewayMediaChannel :
 
     public static GatewayMediaChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayMediaChannel> context,
+        ICacheConstructionContext context,
         IGuildMediaChannelModel model
     ) => new(
         client,
         context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
         model,
-        context.TryGetActor(T<GatewayMediaChannelActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayMediaChannelActor>()
     );
 
     [CovariantOverride]

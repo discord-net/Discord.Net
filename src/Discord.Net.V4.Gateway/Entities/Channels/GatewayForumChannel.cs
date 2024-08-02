@@ -56,9 +56,8 @@ public sealed partial class GatewayForumChannel :
         DiscordGatewayClient client,
         GuildIdentity guild,
         IGuildForumChannelModel model,
-        GatewayForumChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayForumChannel>? implicitHandle = null
-    ) : base(client, guild, model, actor, implicitHandle)
+        GatewayForumChannelActor? actor = null
+    ) : base(client, guild, model, actor)
     {
         _model = model;
 
@@ -71,14 +70,13 @@ public sealed partial class GatewayForumChannel :
 
     public static GatewayForumChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayForumChannel> context,
+        ICacheConstructionContext context,
         IGuildForumChannelModel model
     ) => new(
         client,
         context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
         model,
-        context.TryGetActor(T<GatewayForumChannelActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayForumChannelActor>()
     );
 
     [CovariantOverride]

@@ -52,9 +52,8 @@ public partial class GatewayVoiceChannel :
         DiscordGatewayClient client,
         GuildIdentity guild,
         IGuildVoiceChannelModel model,
-        GatewayVoiceChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayVoiceChannel>? implicitHandle = null
-    ) : base(client, guild, model, actor, implicitHandle)
+        GatewayVoiceChannelActor? actor = null
+    ) : base(client, guild, model, actor)
     {
         _model = model;
         Actor = actor ?? new(client, guild, VoiceChannelIdentity.Of(this));
@@ -68,21 +67,20 @@ public partial class GatewayVoiceChannel :
 
     public static GatewayVoiceChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayVoiceChannel> context,
+        ICacheConstructionContext context,
         IGuildVoiceChannelModel model)
     {
         switch (model)
         {
             case IGuildStageChannelModel guildStageChannelModel
-                when context is ICacheConstructionContext<ulong, GatewayStageChannel> guildStageChannelContext:
+                when context is ICacheConstructionContext guildStageChannelContext:
                 return GatewayStageChannel.Construct(client, guildStageChannelContext, guildStageChannelModel);
             default:
                 return new GatewayVoiceChannel(
                     client,
                     context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
                     model,
-                    context.TryGetActor(T<GatewayVoiceChannelActor>()),
-                    context.ImplicitHandle
+                    context.TryGetActor<GatewayVoiceChannelActor>()
                 );
         }
     }

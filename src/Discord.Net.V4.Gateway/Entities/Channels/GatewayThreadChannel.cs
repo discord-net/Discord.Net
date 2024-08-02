@@ -76,9 +76,8 @@ public sealed partial class GatewayThreadChannel :
         GuildIdentity guild,
         ThreadableChannelIdentity parent,
         IThreadChannelModel model,
-        GatewayThreadChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayThreadChannel>? implicitHandle = null
-    ) : base(client, guild, model, actor, implicitHandle)
+        GatewayThreadChannelActor? actor = null
+    ) : base(client, guild, model, actor)
     {
         _model = model;
         Actor = actor ?? new(client, guild, ThreadChannelIdentity.Of(this));
@@ -103,15 +102,14 @@ public sealed partial class GatewayThreadChannel :
 
     public static GatewayThreadChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayThreadChannel> context,
+        ICacheConstructionContext context,
         IThreadChannelModel model
     ) => new(
         client,
         context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
         context.Path.GetIdentity(T<ThreadableChannelIdentity>(), model.ParentId),
         model,
-        context.TryGetActor(T<GatewayThreadChannelActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayThreadChannelActor>()
     );
 
     public override IThreadChannelModel GetModel() => Model;

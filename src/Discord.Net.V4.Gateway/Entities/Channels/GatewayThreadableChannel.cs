@@ -50,9 +50,8 @@ public partial class GatewayThreadableChannel :
         DiscordGatewayClient client,
         GuildIdentity guild,
         IThreadableChannelModel model,
-        GatewayThreadableChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayThreadableChannel>? implicitHandle = null
-    ) : base(client, guild, model, actor, implicitHandle)
+        GatewayThreadableChannelActor? actor = null
+    ) : base(client, guild, model, actor)
     {
         _model = model;
 
@@ -67,14 +66,13 @@ public partial class GatewayThreadableChannel :
 
     public static GatewayThreadableChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayThreadableChannel> context,
+        ICacheConstructionContext context,
         IThreadableChannelModel model
     ) => new(
         client,
         context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
         model,
-        context.TryGetActor(T<GatewayThreadableChannelActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayThreadableChannelActor>()
     );
 
     [CovariantOverride]

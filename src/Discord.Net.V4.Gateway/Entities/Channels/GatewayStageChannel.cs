@@ -49,9 +49,8 @@ public sealed partial class GatewayStageChannel :
         DiscordGatewayClient client,
         GuildIdentity guild,
         IGuildStageChannelModel model,
-        GatewayStageChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayStageChannel>? implicitHandle = null
-    ) : base(client, guild, model, actor, implicitHandle)
+        GatewayStageChannelActor? actor = null
+    ) : base(client, guild, model, actor)
     {
         _model = model;
         Actor = actor ?? new(client, guild, StageChannelIdentity.Of(this));
@@ -59,14 +58,13 @@ public sealed partial class GatewayStageChannel :
 
     public static GatewayStageChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayStageChannel> context,
+        ICacheConstructionContext context,
         IGuildStageChannelModel model
     ) => new(
         client,
         context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
         model,
-        context.TryGetActor(T<GatewayStageChannelActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayStageChannelActor>()
     );
 
     [SourceOfTruth]

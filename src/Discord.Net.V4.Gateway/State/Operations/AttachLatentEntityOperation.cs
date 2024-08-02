@@ -7,29 +7,28 @@ internal sealed record AttachLatentEntityOperation<TId, TEntity, TModel>(
     TEntity Entity,
     TModel Model,
     IDisposable Handle,
-    IRefCounted<IEntityBroker<TId, TEntity, TModel>>? Broker = null
+    IEntityBroker<TId, TEntity, TModel>? Broker = null
 ):
     IAttachLatentEntityOperation
     where TEntity :
     class,
     ICacheableEntity<TEntity, TId, TModel>,
-    IStoreProvider<TId, TModel>,
+    IStoreInfoProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
+    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
     public async ValueTask AttachAsync(StateController controller, CancellationToken token)
     {
-        var broker = Broker?.Value ?? await Entity.GetBrokerAsync(token);
+        var broker = Broker ?? await Entity.GetBrokerAsync(token);
 
-        var store = await Entity.GetStoreAsync(token);
+        var store = await Entity.GetStoreInfoAsync(token);
         await broker.AttachLatentEntityAsync(Model.Id, Entity, store, token);
     }
 
     public void Dispose()
     {
-        Broker?.Dispose();
         Handle.Dispose();
     }
 }

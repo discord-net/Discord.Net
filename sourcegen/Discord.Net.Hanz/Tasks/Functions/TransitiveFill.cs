@@ -13,6 +13,7 @@ public static class TransitiveFill
         "IFactory",
         "Discord.IProxied",
         "Discord.Gateway.IStoreProvider",
+        "Discord.Gateway.IStoreInfoProvider",
         "Discord.Gateway.IBrokerProvider",
         "Discord.IContextConstructable"
     ];
@@ -385,14 +386,15 @@ public static class TransitiveFill
             );
     }
 
-    private static string? GetNotConstraint(ITypeParameterSymbol parameter)
+    private static string?[] GetNotConstraints(ITypeParameterSymbol parameter)
     {
         return parameter
             .GetAttributes()
-            .FirstOrDefault(x =>
+            .Where(x =>
                 x.AttributeClass?.ToDisplayString() == "Discord.NotAttribute"
             )
-            ?.ConstructorArguments[0].Value as string;
+            .Select(x => x.ConstructorArguments[0].Value as string)
+            .ToArray();
     }
 
     private static bool WalkTypeForConstraints(
@@ -409,17 +411,17 @@ public static class TransitiveFill
         if (type is ITypeParameterSymbol constraintTypeParameter &&
             CanSubstitute(constraintTypeParameter, filledType, logger, depth: depth))
         {
-            var notConstraint = GetNotConstraint(constraintTypeParameter);
+            var notConstraints = GetNotConstraints(constraintTypeParameter);
             var interfaceConstraint = GetInterfaceConstraint(constraintTypeParameter);
 
-            if (notConstraint is not null)
+            if (notConstraints.Length > 0)
             {
-                var notGeneric = resolved
-                    .FirstOrDefault(x => x.Key.Name == notConstraint)
-                    .Value;
+                var notGenerics = resolved
+                    .Where(x => notConstraints.Contains(x.Key.Name))
+                    .SelectMany(x => x.Value)
+                    .ToArray();
 
-                var shouldResubstitute = notGeneric is not null &&
-                                         notGeneric.Any(x => x.Equals(filledType, SymbolEqualityComparer.Default));
+                var shouldResubstitute = notGenerics.Any(x => x.Equals(filledType, SymbolEqualityComparer.Default));
 
                 if (shouldResubstitute || (interfaceConstraint && filledType.TypeKind is not TypeKind.Interface))
                 {
@@ -432,7 +434,7 @@ public static class TransitiveFill
 
                     if (newFillType is null)
                     {
-                        logger.LogWithDepth($"Couldn't resolve 'NOT' case for {filledType} ({notConstraint})", depth,
+                        logger.LogWithDepth($"Couldn't resolve 'NOT' case for {filledType} ({string.Join(" | ", notConstraints)})", depth,
                             LogLevel.Warning);
                         return false;
                     }

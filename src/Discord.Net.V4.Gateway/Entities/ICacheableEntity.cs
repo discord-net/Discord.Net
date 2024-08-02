@@ -18,12 +18,14 @@ public interface ICacheableEntity<out TSelf, out TId, TModel> :
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TSelf, TModel>,
     ICacheableEntity<TSelf, TId, TModel>,
-    IContextConstructable<TSelf, TModel, ICacheConstructionContext<TId, TSelf>, DiscordGatewayClient>
+    IContextConstructable<TSelf, TModel, ICacheConstructionContext, DiscordGatewayClient>
 {
     ValueTask UpdateAsync(TModel model, bool updateCache = true, CancellationToken token = default);
 
     ValueTask IUpdatable<TModel>.UpdateAsync(TModel model, CancellationToken token) => UpdateAsync(model, token: token);
 }
 
-public interface ICacheableEntity<out TId> : IEntity<TId>, IAsyncDisposable
+public interface ICacheableEntity<out TId> : IEntity<TId>, ICacheableEntity
     where TId : IEquatable<TId>;
+
+public interface ICacheableEntity;

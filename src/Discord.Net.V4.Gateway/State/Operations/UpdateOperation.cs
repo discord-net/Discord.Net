@@ -6,29 +6,27 @@ namespace Discord.Gateway.State.Operations;
 internal sealed record UpdateOperation<TId, TEntity, TModel>(
     TEntity Entity,
     TModel Model,
-    IRefCounted<IEntityBroker<TId, TEntity, TModel>> Broker
+    IEntityBroker<TId, TEntity, TModel> Broker
 ) :
     IUpdateOperation
     where TEntity :
     class,
     ICacheableEntity<TEntity, TId, TModel>,
-    IStoreProvider<TId, TModel>,
+    IStoreInfoProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
+    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
     public async ValueTask UpdateAsync(CancellationToken token)
     {
-        var store = await Entity.GetStoreAsync(token);
+        var store = await Entity.GetStoreInfoAsync(token);
 
-        await Broker.Value.UpdateAsync(Model, store, token);
+        await Broker.UpdateAsync(Model, store, token);
     }
-
-    public void Dispose() => Broker.Dispose();
 }
 
-internal interface IUpdateOperation : IStateOperation, IDisposable
+internal interface IUpdateOperation : IStateOperation
 {
     ValueTask UpdateAsync(CancellationToken token);
 }

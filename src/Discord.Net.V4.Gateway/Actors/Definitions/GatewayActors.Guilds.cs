@@ -1,3 +1,4 @@
+using Discord.Gateway.State;
 using Discord.Models;
 using Discord.Rest;
 
@@ -8,6 +9,49 @@ using GuildsPager = GatewayPagedIndexableActor<GatewayGuildActor, ulong, Gateway
 
 internal static partial class GatewayActors
 {
+    public static GatewayEnumerableIndexableActor<
+        TActor,
+        TId,
+        TEntity,
+        TRestEntity,
+        TCoreEntity,
+        TModel
+    > GuildRelatedEntity<
+        [TransitiveFill] TActor,
+        TId,
+        TEntity,
+        TRestEntity,
+        [Not(nameof(TRestEntity)), Not(nameof(TEntity)), Interface]TCoreEntity,
+        TModel
+    >(
+        Template<TActor> template,
+        DiscordGatewayClient client,
+        GuildIdentity guild
+    )
+        where TActor :
+        class,
+        IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>,
+        IFactory<TActor, DiscordGatewayClient, GuildIdentity, IIdentifiable<TId, TEntity, TActor, TModel>>,
+        IStoreProvider<TId, TModel>
+        where TId : IEquatable<TId>
+        where TEntity :
+        GatewayEntity<TId>,
+        ICacheableEntity<TEntity, TId, TModel>,
+        IStoreProvider<TId, TModel>,
+        IBrokerProvider<TId, TEntity, TModel>,
+        IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>,
+        TCoreEntity
+        where TRestEntity : RestEntity<TId>, TCoreEntity
+        where TCoreEntity : class, IEntity<TId>
+        where TModel : class, IEntityModel<TId>
+    {
+        return new GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel>(
+            client,
+            id => TActor.Factory(client, guild, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
+
+        );
+    }
+
     public static GuildsPager PageGuilds(DiscordGatewayClient client)
     {
         return new GuildsPager(

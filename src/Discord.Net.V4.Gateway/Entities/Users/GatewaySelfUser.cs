@@ -14,8 +14,7 @@ public sealed partial class GatewaySelfUserActor(
     ISelfUserActor,
     IGatewayCachedActor<ulong, GatewaySelfUser, SelfUserIdentity, ISelfUserModel>
 {
-    [SourceOfTruth]
-    internal override SelfUserIdentity Identity { get; } = identity;
+    [SourceOfTruth] internal override SelfUserIdentity Identity { get; } = identity;
 
     public IPartialGuild CreateEntity(IPartialGuildModel model) => throw new NotImplementedException();
 
@@ -43,8 +42,7 @@ public sealed partial class GatewaySelfUser :
 
     public PremiumType PremiumType => (PremiumType?)Model.PremiumType ?? PremiumType.None;
 
-    [ProxyInterface]
-    internal override GatewaySelfUserActor Actor { get; }
+    [ProxyInterface] internal override GatewaySelfUserActor Actor { get; }
 
     internal override ISelfUserModel Model => _model;
 
@@ -53,28 +51,27 @@ public sealed partial class GatewaySelfUser :
     public GatewaySelfUser(
         DiscordGatewayClient client,
         ISelfUserModel model,
-        GatewaySelfUserActor? actor = null,
-        IEntityHandle<ulong, GatewaySelfUser>? implicitHandle = null
-    ) : base(client, model, actor, implicitHandle)
+        GatewaySelfUserActor? actor = null
+    ) : base(client, model, actor)
     {
         Actor = actor ?? new(client, SelfUserIdentity.Of(this));
         _model = model;
     }
 
     public static GatewaySelfUser Construct(DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewaySelfUser> context, ISelfUserModel model)
+        ICacheConstructionContext context, ISelfUserModel model)
     {
         return new GatewaySelfUser(
             client,
             model,
-            context.TryGetActor(Template.T<GatewaySelfUserActor>()),
-            implicitHandle: context.ImplicitHandle);
+            context.TryGetActor<GatewaySelfUserActor>()
+        );
     }
 
     [CovariantOverride]
     public ValueTask UpdateAsync(ISelfUserModel model, bool updateCache = true, CancellationToken token = default)
     {
-        if(updateCache) return UpdateCacheAsync(this, model, token);
+        if (updateCache) return UpdateCacheAsync(this, model, token);
 
         _model = model;
 

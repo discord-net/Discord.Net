@@ -27,7 +27,7 @@ public partial class GatewayUserActor(
 
 [ExtendInterfaceDefaults]
 public partial class GatewayUser :
-    GatewayCacheableEntity<GatewayUser, ulong, IUserModel, UserIdentity>,
+    GatewayCacheableEntity<GatewayUser, ulong, IUserModel>,
     IUser
 {
     public string? AvatarId => Model.Avatar;
@@ -45,9 +45,8 @@ public partial class GatewayUser :
     internal GatewayUser(
         DiscordGatewayClient client,
         IUserModel model,
-        GatewayUserActor? actor = null,
-        IEntityHandle<ulong, GatewayUser>? implicitHandle = null
-    ) : base(client, model.Id, implicitHandle)
+        GatewayUserActor? actor = null
+    ) : base(client, model.Id)
     {
         Actor = actor ?? new(client, UserIdentity.Of(this));
         _model = model;
@@ -60,20 +59,15 @@ public partial class GatewayUser :
     }
 
     public static GatewayUser Construct(DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayUser> context, IUserModel model)
+        ICacheConstructionContext context, IUserModel model)
     {
-        if (
-            model is ISelfUserModel selfUser &&
-            context is ICacheConstructionContext<ulong, GatewaySelfUser> selfUserContext)
-        {
-            return GatewaySelfUser.Construct(client, selfUserContext, selfUser);
-        }
+        if (model is ISelfUserModel selfUser)
+            return GatewaySelfUser.Construct(client, context, selfUser);
 
         return new GatewayUser(
             client,
             model,
-            context.TryGetActor(Template.T<GatewayUserActor>()),
-            implicitHandle: context.ImplicitHandle
+            context.TryGetActor<GatewayUserActor>()
         );
     }
 

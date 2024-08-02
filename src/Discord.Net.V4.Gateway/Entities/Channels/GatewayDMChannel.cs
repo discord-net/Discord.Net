@@ -14,7 +14,6 @@ public sealed partial class GatewayDMChannelActor(
     IDMChannelActor,
     IGatewayCachedActor<ulong, GatewayDMChannel, DMChannelIdentity, IDMChannelModel>
 {
-
     [SourceOfTruth] public GatewayUserActor Recipient { get; } = new(client, recipient);
 
     [SourceOfTruth] internal override DMChannelIdentity Identity { get; } = channel;
@@ -44,9 +43,8 @@ public sealed partial class GatewayDMChannel :
         DiscordGatewayClient client,
         IDMChannelModel model,
         UserIdentity recipient,
-        GatewayDMChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayChannel>? implicitHandle = null
-    ) : base(client, model, actor, implicitHandle)
+        GatewayDMChannelActor? actor = null
+    ) : base(client, model, actor)
     {
         _model = model;
 
@@ -57,13 +55,13 @@ public sealed partial class GatewayDMChannel :
 
     public static GatewayDMChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayDMChannel> context,
+        ICacheConstructionContext context,
         IDMChannelModel model
     ) => new(
         client,
         model,
         context.Path.GetIdentity(T<UserIdentity>(), model.RecipientId),
-        implicitHandle: context.ImplicitHandle
+        context.TryGetActor<GatewayDMChannelActor>()
     );
 
     [CovariantOverride]

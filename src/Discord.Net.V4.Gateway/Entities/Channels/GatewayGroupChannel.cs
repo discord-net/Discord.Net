@@ -37,9 +37,8 @@ public sealed partial class GatewayGroupChannel :
     public GatewayGroupChannel(
         DiscordGatewayClient client,
         IGroupDMChannelModel model,
-        GatewayGroupChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayGroupChannel>? implicitHandle = null
-    ) : base(client, model, actor, implicitHandle)
+        GatewayGroupChannelActor? actor = null
+    ) : base(client, model, actor)
     {
         _model = model;
         Actor = actor ?? new(client, GroupChannelIdentity.Of(this));
@@ -47,13 +46,12 @@ public sealed partial class GatewayGroupChannel :
 
     public static GatewayGroupChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayGroupChannel> context,
+        ICacheConstructionContext context,
         IGroupDMChannelModel model
     ) => new(
         client,
         model,
-        context.TryGetActor(T<GatewayGroupChannelActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayGroupChannelActor>()
     );
 
     [CovariantOverride]

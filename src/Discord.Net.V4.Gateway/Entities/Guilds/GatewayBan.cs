@@ -23,7 +23,7 @@ public sealed partial class GatewayBanActor(
 }
 
 public sealed partial class GatewayBan :
-    GatewayCacheableEntity<GatewayBan, ulong, IBanModel, BanIdentity>,
+    GatewayCacheableEntity<GatewayBan, ulong, IBanModel>,
     IBan
 {
     public string? Reason => Model.Reason;
@@ -37,9 +37,8 @@ public sealed partial class GatewayBan :
         GuildIdentity guild,
         IBanModel model,
         UserIdentity? user = null,
-        GatewayBanActor? actor = null,
-        IEntityHandle<ulong, GatewayBan>? implicitHandle = null
-    ) : base(client, model.Id, implicitHandle)
+        GatewayBanActor? actor = null
+    ) : base(client, model.Id)
     {
         Model = model;
         Actor = actor ?? new(client, guild, BanIdentity.Of(this), user);
@@ -47,15 +46,14 @@ public sealed partial class GatewayBan :
 
     public static GatewayBan Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayBan> context,
+        ICacheConstructionContext context,
         IBanModel model
     ) => new(
         client,
         context.Path.RequireIdentity(T<GuildIdentity>()),
         model,
         context.Path.GetIdentity(T<UserIdentity>()),
-        context.TryGetActor(T<GatewayBanActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayBanActor>()
     );
 
     public override ValueTask UpdateAsync(

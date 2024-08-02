@@ -5,7 +5,21 @@ namespace Discord.Gateway;
 
 internal static class EntityModelStoreExtensions
 {
-    public static IEntityModelStore<TId, TNewModel> Cast<TId, TModel, TNewModel>(
+    public static IEntityModelStore<TId, TNewModel> CastUp<TId, TModel, TNewModel>(
+        this IEntityModelStore<TId, TModel> store,
+        Template<TNewModel> template
+    )
+        where TModel : class, TNewModel, IEntityModel<TId>
+        where TNewModel : class, IEntityModel<TId>
+        where TId : IEquatable<TId>
+    {
+        if(typeof(TNewModel) == typeof(TModel))
+            return (store as IEntityModelStore<TId, TNewModel>)!;
+
+        return new CastUpModelStore<TId, TModel, TNewModel>(store);
+    }
+
+    public static IEntityModelStore<TId, TNewModel> CastDown<TId, TModel, TNewModel>(
         this IEntityModelStore<TId, TModel> store,
         Template<TNewModel> template
     )
@@ -13,7 +27,10 @@ internal static class EntityModelStoreExtensions
         where TNewModel : class, TModel
         where TId : IEquatable<TId>
     {
-        return new CastingModelStore<TId, TModel, TNewModel>(store);
+        if(typeof(TNewModel) == typeof(TModel))
+            return (store as IEntityModelStore<TId, TNewModel>)!;
+
+        return new CastDownModelStore<TId, TModel, TNewModel>(store);
     }
 
     public static async ValueTask<IEntityModelStore<TNextId, TNextModel>> Chain<TId, TModel, TNextId, TNextModel>(

@@ -54,9 +54,8 @@ public partial class GatewayGuildChannel :
         DiscordGatewayClient client,
         GuildIdentity guild,
         IGuildChannelModel model,
-        GatewayGuildChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayGuildChannel>? implicitHandle = null
-    ) : base(client, model, actor, implicitHandle)
+        GatewayGuildChannelActor? actor = null
+    ) : base(client, model, actor)
     {
         _model = model;
 
@@ -69,36 +68,35 @@ public partial class GatewayGuildChannel :
 
     public static GatewayGuildChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayGuildChannel> context,
+        ICacheConstructionContext context,
         IGuildChannelModel model)
     {
         switch (model)
         {
             case IGuildCategoryChannelModel guildCategoryChannelModel:
-                throw new NotImplementedException();
+                return GatewayCategoryChannel.Construct(client, context, guildCategoryChannelModel);
             case IGuildForumChannelModel guildForumChannelModel:
-                throw new NotImplementedException();
+                return GatewayForumChannel.Construct(client, context, guildForumChannelModel);
             case IGuildMediaChannelModel guildMediaChannelModel:
-                throw new NotImplementedException();
+                return GatewayMediaChannel.Construct(client, context, guildMediaChannelModel);
             case IGuildNewsChannelModel guildNewsChannelModel:
-                throw new NotImplementedException();
+                return GatewayNewsChannel.Construct(client, context, guildNewsChannelModel);
             case IGuildStageChannelModel guildStageChannelModel:
-                throw new NotImplementedException();
+                return GatewayStageChannel.Construct(client, context, guildStageChannelModel);
             case IGuildTextChannelModel guildTextChannelModel:
-                throw new NotImplementedException();
+                return GatewayTextChannel.Construct(client, context, guildTextChannelModel);
             case IGuildVoiceChannelModel guildVoiceChannelModel:
-                throw new NotImplementedException();
+                return GatewayVoiceChannel.Construct(client, context, guildVoiceChannelModel);
             case IThreadableChannelModel threadableChannelModel:
-                throw new NotImplementedException();
+                return GatewayThreadableChannel.Construct(client, context, threadableChannelModel);
             case IThreadChannelModel threadChannelModel:
-                throw new NotImplementedException();
+                return GatewayThreadChannel.Construct(client, context, threadChannelModel);
             default:
                 return new GatewayGuildChannel(
                     client,
                     context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
                     model,
-                    context.TryGetActor(T<GatewayGuildChannelActor>()),
-                    context.ImplicitHandle
+                    context.TryGetActor<GatewayGuildChannelActor>()
                 );
         }
     }

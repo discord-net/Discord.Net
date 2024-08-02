@@ -34,7 +34,7 @@ public sealed partial class GatewayThreadMemberActor :
 }
 
 public sealed partial class GatewayThreadMember :
-    GatewayCacheableEntity<GatewayThreadMember, ulong, IThreadMemberModel, ThreadMemberIdentity>,
+    GatewayCacheableEntity<GatewayThreadMember, ulong, IThreadMemberModel>,
     IThreadMember
 {
     public DateTimeOffset JoinedAt => Model.JoinTimestamp;
@@ -50,9 +50,8 @@ public sealed partial class GatewayThreadMember :
         IThreadMemberModel model,
         MemberIdentity? member = null,
         UserIdentity? user = null,
-        GatewayThreadMemberActor? actor = null,
-        IEntityHandle<ulong, GatewayThreadMember>? implicitHandle = null
-    ) : base(client, model.Id, implicitHandle)
+        GatewayThreadMemberActor? actor = null
+    ) : base(client, model.Id)
     {
         Model = model;
         Actor = actor ?? new(client, guild, thread, ThreadMemberIdentity.Of(this), member, user);
@@ -60,7 +59,7 @@ public sealed partial class GatewayThreadMember :
 
     public static GatewayThreadMember Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayThreadMember> context,
+        ICacheConstructionContext context,
         IThreadMemberModel model
     ) => new(
         client,
@@ -69,8 +68,7 @@ public sealed partial class GatewayThreadMember :
         model,
         context.Path.GetIdentity(T<MemberIdentity>()),
         context.Path.GetIdentity(T<UserIdentity>()),
-        context.TryGetActor(T<GatewayThreadMemberActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayThreadMemberActor>()
     );
 
     public override ValueTask UpdateAsync(

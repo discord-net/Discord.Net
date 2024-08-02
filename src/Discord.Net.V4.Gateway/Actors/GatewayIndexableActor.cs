@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Discord.Gateway;
 
 public class GatewayIndexableActor<TActor, TId, TEntity>(Func<TId, TActor> factory) :
@@ -12,4 +14,8 @@ public class GatewayIndexableActor<TActor, TId, TEntity>(Func<TId, TActor> facto
 
     public TActor Specifically(TId id)
         => _cache.GetOrAdd(id, factory);
+
+    [return: NotNullIfNotNull(nameof(defaultValue))]
+    internal TActor? FirstOrDefault(TActor? defaultValue = null)
+        => _cache.FirstOrDefault(defaultValue);
 }

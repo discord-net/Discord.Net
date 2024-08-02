@@ -8,15 +8,6 @@ internal sealed partial class WeakDictionary<TKey, TValue>
     where TKey : notnull
     where TValue : class
 {
-#if NET8_0_OR_GREATER
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "UnsafeGetTargetAndDependent")]
-    private static extern object? UnsafeGetTargetAndDependent(ref DependentHandle handle);
-#else
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe object? UnsafeGetTargetAndDependent(ref DependentHandle handle)
-        => Unsafe.As<IntPtr, object>(ref *(IntPtr*)Unsafe.As<DependentHandle, IntPtr>(ref handle));
-#endif
-
     private sealed class ValueHolder
     {
         private readonly WeakDictionary<TKey, TValue> _dictionary;
@@ -25,7 +16,7 @@ internal sealed partial class WeakDictionary<TKey, TValue>
 
         public bool TryGetValue([MaybeNullWhen(false)] out TValue value)
         {
-            value = Unsafe.As<TValue>(UnsafeGetTargetAndDependent(ref _handle));
+            value = Unsafe.As<TValue>(DependantHandleUtils.UnsafeGetTargetAndDependent(ref _handle));
 
             if (value is not null) return true;
 
@@ -45,6 +36,10 @@ internal sealed partial class WeakDictionary<TKey, TValue>
             _dictionary.Remove(_key);
         }
     }
+
+    // ReSharper disable once InconsistentlySynchronizedField
+    public int Count => _dictionary.Count;
+
 
     private readonly Dictionary<TKey, WeakReference<ValueHolder>> _dictionary = new();
     private readonly object _syncRoot = new();
@@ -111,6 +106,30 @@ internal sealed partial class WeakDictionary<TKey, TValue>
         lock (_syncRoot)
         {
             return _dictionary.Remove(key);
+        }
+    }
+
+    [return: NotNullIfNotNull(nameof(defaultValue))]
+    public TValue? FirstOrDefault(TValue? defaultValue = null)
+    {
+        if (Count == 0)
+            return defaultValue;
+
+        lock (_syncRoot)
+        {
+            if (Count == 0)
+                return defaultValue;
+
+            // TODO: FirstOrDefault compared to copy out
+            var valueHolder = new WeakReference<ValueHolder>[1];
+            _dictionary.Values.CopyTo(valueHolder, 0);
+
+            if (valueHolder[0].TryGetTarget(out var holder) && holder.TryGetValue(out var value))
+                return value;
+
+            GC.KeepAlive(this);
+
+            return defaultValue;
         }
     }
 

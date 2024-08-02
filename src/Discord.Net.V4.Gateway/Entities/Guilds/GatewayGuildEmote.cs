@@ -20,7 +20,7 @@ public sealed partial class GatewayGuildEmoteActor(
 }
 
 public sealed partial class GatewayGuildEmote :
-    GatewayCacheableEntity<GatewayGuildEmote, ulong, IGuildEmoteModel, GuildEmoteIdentity>,
+    GatewayCacheableEntity<GatewayGuildEmote, ulong, IGuildEmoteModel>,
     IGuildEmote
 {
     public string? Name => Model.Name;
@@ -46,9 +46,8 @@ public sealed partial class GatewayGuildEmote :
         DiscordGatewayClient client,
         GuildIdentity guild,
         IGuildEmoteModel model,
-        GatewayGuildEmoteActor? actor = null,
-        IEntityHandle<ulong, GatewayGuildEmote>? implicitHandle = null
-    ) : base(client, model.Id, implicitHandle)
+        GatewayGuildEmoteActor? actor = null
+    ) : base(client, model.Id)
     {
         Model = model;
         Actor = actor ?? new(client, guild, GuildEmoteIdentity.Of(this));
@@ -61,14 +60,13 @@ public sealed partial class GatewayGuildEmote :
 
     public static GatewayGuildEmote Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayGuildEmote> context,
+        ICacheConstructionContext context,
         IGuildEmoteModel model
     ) => new(
         client,
         context.Path.RequireIdentity(T<GuildIdentity>()),
         model,
-        context.TryGetActor(T<GatewayGuildEmoteActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayGuildEmoteActor>()
     );
 
     public override ValueTask UpdateAsync(

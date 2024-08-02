@@ -9,105 +9,30 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway;
 
-public abstract class GatewayCacheableEntity<TSelf, TId, TModel, TIdentity> :
-    GatewayEntity<TId>,
+public abstract class GatewayCacheableEntity<TSelf, TId, TModel>(
+    DiscordGatewayClient client,
+    TId id
+) :
+    GatewayEntity<TId>(client, id),
     ICacheableEntity<TSelf, TId, TModel>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
     where TSelf :
-        GatewayCacheableEntity<TSelf, TId, TModel, TIdentity>,
-        IStoreProvider<TId, TModel>,
-        IBrokerProvider<TId, TSelf, TModel>,
-        IContextConstructable<TSelf, TModel, ICacheConstructionContext<TId, TSelf>, DiscordGatewayClient>
+    GatewayCacheableEntity<TSelf, TId, TModel>,
+    IStoreProvider<TId, TModel>,
+    IStoreInfoProvider<TId, TModel>,
+    IBrokerProvider<TId, TSelf, TModel>,
+    IContextConstructable<TSelf, TModel, ICacheConstructionContext, DiscordGatewayClient>
 {
-    private IEntityHandle<TId, TSelf>? _implicitHandle;
-
-    ~GatewayCacheableEntity()
-    {
-        Client.StateController.EnqueueEntityDestruction<TId, TSelf, TModel>(Id);
-    }
-
     protected async ValueTask UpdateCacheAsync(TSelf self, TModel model, CancellationToken token)
     {
-        var store = await self.GetStoreAsync(token);
+        var store = await self.GetStoreInfoAsync(token);
         var broker = await self.GetBrokerAsync(token);
+
         await broker.UpdateAsync(model, store, token);
     }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_implicitHandle is not null)
-            await _implicitHandle.DisposeAsync();
-
-        _implicitHandle = null;
-    }
-
-    protected GatewayCacheableEntity(
-        DiscordGatewayClient client,
-        TId id,
-        IEntityHandle<TId, TSelf>? implicitHandle = null
-        ) : base(client, id)
-    {
-        _implicitHandle = implicitHandle;
-    }
-
 
     public abstract TModel GetModel();
 
     public abstract ValueTask UpdateAsync(TModel model, bool updateCache = true, CancellationToken token = default);
 }
-
-// public abstract class GatewayCacheableEntity<TId> : GatewayEntity<TId>, ICacheableEntity<TId>
-//     where TId : IEquatable<TId>
-// {
-//     internal readonly HashSet<IEntityHandle> Handles;
-//
-//     internal GatewayCacheableEntity(DiscordGatewayClient discord, TId id)
-//         : base(discord, id)
-//     {
-//         Handles = new();
-//     }
-//
-//     internal void AcceptHandle(IEntityHandle handle)
-//         => Handles.Add(handle);
-//
-//     internal void DereferenceHandle(IEntityHandle handle)
-//         => Handles.Remove(handle);
-//
-//     ~GatewayCacheableEntity()
-//     {
-//         Dispose();
-//     }
-//
-//     public void Dispose()
-//     {
-//         GC.SuppressFinalize(this);
-//
-//         foreach (var handle in Handles)
-//         {
-//             handle.Dispose();
-//         }
-//     }
-//
-//     public async ValueTask DisposeAsync()
-//     {
-//         GC.SuppressFinalize(this);
-//
-//         foreach (var handle in Handles)
-//         {
-//             await handle.DisposeAsync();
-//         }
-//     }
-//
-//     internal abstract object Clone();
-//     internal abstract void DisposeClone();
-//     internal abstract IEntityModel<TId> GetGenericModel();
-//     internal abstract void Update(IEntityModel<TId> model);
-//
-//     IEntityModel<TId> ICacheableEntity<TId>.GetModel() => GetModel();
-//     void ICacheableEntity<TId>.Update(IEntityModel<TId> model) => Update(model);
-//     void ICacheableEntity<TId>.AcceptHandle(IEntityHandle handle) => AcceptHandle(handle);
-//     void ICacheableEntity<TId>.DereferenceHandle(IEntityHandle handle) => DereferenceHandle(handle);
-//     void IScopedClonable.DisposeClone() => DisposeClone();
-//     object ICloneable.Clone() => Clone();
-// }

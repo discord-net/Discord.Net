@@ -8,8 +8,7 @@ using BaseActorType =
     GatewayCachedActor<ulong, GatewayGuildScheduledEventUser, GuildScheduledEventUserIdentity,
         IGuildScheduledEventUserModel>;
 using BaseEntityType =
-    GatewayCacheableEntity<GatewayGuildScheduledEventUser, ulong, IGuildScheduledEventUserModel,
-        GuildScheduledEventUserIdentity>;
+    GatewayCacheableEntity<GatewayGuildScheduledEventUser, ulong, IGuildScheduledEventUserModel>;
 
 public sealed partial class GatewayGuildScheduledEventUserActor :
     BaseActorType,
@@ -54,9 +53,8 @@ public sealed partial class GatewayGuildScheduledEventUser :
         IGuildScheduledEventUserModel model,
         UserIdentity? user = null,
         MemberIdentity? member = null,
-        GatewayGuildScheduledEventUserActor? actor = null,
-        IEntityHandle<ulong, GatewayGuildScheduledEventUser>? implicitHandle = null
-    ) : base(client, model.Id, implicitHandle)
+        GatewayGuildScheduledEventUserActor? actor = null
+    ) : base(client, model.Id)
     {
         Model = model;
         Actor = actor ?? new(client, guild, scheduledEvent, GuildScheduledEventUserIdentity.Of(this), user, member);
@@ -64,7 +62,7 @@ public sealed partial class GatewayGuildScheduledEventUser :
 
     public static GatewayGuildScheduledEventUser Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayGuildScheduledEventUser> context,
+        ICacheConstructionContext context,
         IGuildScheduledEventUserModel model
     ) => new(
         client,
@@ -73,8 +71,7 @@ public sealed partial class GatewayGuildScheduledEventUser :
         model,
         context.Path.GetIdentity(T<UserIdentity>()),
         context.Path.GetIdentity(T<MemberIdentity>()),
-        context.TryGetActor(T<GatewayGuildScheduledEventUserActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayGuildScheduledEventUserActor>()
     );
 
     public override ValueTask UpdateAsync(

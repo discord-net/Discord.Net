@@ -2,7 +2,7 @@ namespace Discord.Gateway;
 
 internal static class ValueTaskExtensions
 {
-    public static async ValueTask<T?> CastUpAsync<T, U>(this ValueTask<U?> valueTask)
+    public static async ValueTask<T?> CastUpAsync<T, U>(this ValueTask<U?> valueTask,  Template<T> template)
         where U : T
         => await valueTask;
 

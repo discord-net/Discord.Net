@@ -18,7 +18,7 @@ public partial class GatewayChannelActor(
 }
 
 public partial class GatewayChannel :
-    GatewayCacheableEntity<GatewayChannel, ulong, IChannelModel, ChannelIdentity>,
+    GatewayCacheableEntity<GatewayChannel, ulong, IChannelModel>,
     IChannel
 {
     public ChannelType Type => (ChannelType)Model.Type;
@@ -32,9 +32,8 @@ public partial class GatewayChannel :
     public GatewayChannel(
         DiscordGatewayClient client,
         IChannelModel model,
-        GatewayChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayChannel>? implicitHandle = null
-    ) : base(client, model.Id, implicitHandle)
+        GatewayChannelActor? actor = null
+    ) : base(client, model.Id)
     {
         _model = model;
         Actor = actor ?? new(client, ChannelIdentity.Of(this));
@@ -42,27 +41,19 @@ public partial class GatewayChannel :
 
     public static GatewayChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayChannel> context,
+        ICacheConstructionContext context,
         IChannelModel model)
     {
-        // TODO: switch channel model type
-        switch (model)
+        return model switch
         {
-            case IDMChannelModel dmChannelModel
-                when context is ICacheConstructionContext<ulong, GatewayDMChannel> dmChannelContext:
-                return GatewayDMChannel.Construct(client, dmChannelContext, dmChannelModel);
-            case IGroupDMChannelModel groupDMChannelModel:
-                throw new NotImplementedException();
-            case IGuildChannelModel guildChannelModel
-                when context is ICacheConstructionContext<ulong, GatewayGuildChannel> guildChannelContext:
-                return GatewayGuildChannel.Construct(client, guildChannelContext, guildChannelModel);
-            default:
-                return new GatewayChannel(
-                    client,
-                    model,
-                    context.TryGetActor(Template.T<GatewayChannelActor>()),
-                    implicitHandle: context.ImplicitHandle);
-        }
+            IDMChannelModel dmChannelModel
+                => GatewayDMChannel.Construct(client, context, dmChannelModel),
+            IGroupDMChannelModel groupDMChannelModel
+                => GatewayGroupChannel.Construct(client, context,groupDMChannelModel),
+            IGuildChannelModel guildChannelModel
+                => GatewayGuildChannel.Construct(client, context, guildChannelModel),
+            _ => new GatewayChannel(client, model, context.TryGetActor<GatewayChannelActor>())
+        };
     }
 
     public override ValueTask UpdateAsync(

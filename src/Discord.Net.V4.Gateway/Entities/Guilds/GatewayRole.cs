@@ -20,7 +20,7 @@ public sealed partial class GatewayRoleActor(
 }
 
 public sealed partial class GatewayRole :
-    GatewayCacheableEntity<GatewayRole, ulong, IRoleModel, RoleIdentity>,
+    GatewayCacheableEntity<GatewayRole, ulong, IRoleModel>,
     IRole
 {
     public Color Color => Model.Color;
@@ -53,9 +53,8 @@ public sealed partial class GatewayRole :
         DiscordGatewayClient client,
         GuildIdentity guild,
         IRoleModel model,
-        GatewayRoleActor? actor = null,
-        IEntityHandle<ulong, GatewayRole>? implicitHandle = null
-    ) : base(client, model.Id, implicitHandle)
+        GatewayRoleActor? actor = null
+    ) : base(client, model.Id)
     {
         Model = model;
         Actor = actor ?? new(client, guild, RoleIdentity.Of(this));
@@ -73,14 +72,13 @@ public sealed partial class GatewayRole :
 
     public static GatewayRole Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayRole> context,
+        ICacheConstructionContext context,
         IRoleModel model
     ) => new(
         client,
         context.Path.RequireIdentity(T<GuildIdentity>()),
         model,
-        context.TryGetActor(T<GatewayRoleActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayRoleActor>()
     );
 
     public override ValueTask UpdateAsync(

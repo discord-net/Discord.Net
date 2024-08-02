@@ -11,7 +11,7 @@ public interface IBrokerProvider<TId, TEntity, TActor, TModel> : IBrokerProvider
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
+    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
     where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
@@ -31,9 +31,30 @@ public interface IBrokerProvider<TId, TEntity, TModel>
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext<TId, TEntity>, DiscordGatewayClient>
+    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
     internal ValueTask<IEntityBroker<TId, TEntity, TModel>> GetBrokerAsync(CancellationToken token = default);
+
+    internal static abstract ValueTask<IManageableEntityBroker<TId, TEntity, TModel>> GetBrokerForModelAsync(
+        DiscordGatewayClient client,
+        Type modelType,
+        CancellationToken token = default
+    );
+
+    internal static abstract IReadOnlyCollection<BrokerProviderDelegate<TId, TEntity, TModel>> GetBrokerHierarchy();
 }
+
+internal delegate ValueTask<IManageableEntityBroker<TId, TEntity, TModel>> BrokerProviderDelegate<TId, TEntity, TModel>(
+    DiscordGatewayClient client,
+    CancellationToken token = default
+)
+    where TEntity :
+    class,
+    ICacheableEntity<TEntity, TId, TModel>,
+    IStoreProvider<TId, TModel>,
+    IBrokerProvider<TId, TEntity, TModel>,
+    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+    where TId : IEquatable<TId>
+    where TModel : class, IEntityModel<TId>;

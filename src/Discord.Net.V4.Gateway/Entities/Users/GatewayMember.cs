@@ -28,7 +28,7 @@ public sealed partial class GatewayMemberActor(
 }
 
 public sealed partial class GatewayMember :
-    GatewayCacheableEntity<GatewayMember, ulong, IMemberModel, MemberIdentity>,
+    GatewayCacheableEntity<GatewayMember, ulong, IMemberModel>,
     IGuildMember
 {
     public IDefinedLoadableEntityEnumerable<ulong, IRole> Roles => throw new NotImplementedException();
@@ -56,9 +56,8 @@ public sealed partial class GatewayMember :
         GuildIdentity guild,
         IMemberModel model,
         UserIdentity? user = null,
-        GatewayMemberActor? actor = null,
-        IEntityHandle<ulong, GatewayMember>? implicitHandle = null
-    ) : base(client, model.Id, implicitHandle)
+        GatewayMemberActor? actor = null
+    ) : base(client, model.Id)
     {
         Model = model;
         Actor = actor ?? new(client, guild, MemberIdentity.Of(this), user);
@@ -66,15 +65,14 @@ public sealed partial class GatewayMember :
 
     public static GatewayMember Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayMember> context,
+        ICacheConstructionContext context,
         IMemberModel model
     ) => new(
         client,
         context.Path.RequireIdentity(T<GuildIdentity>()),
         model,
         context.Path.GetIdentity(T<UserIdentity>(), model.Id),
-        context.TryGetActor(T<GatewayMemberActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayMemberActor>()
     );
 
     public override ValueTask UpdateAsync(IMemberModel model, bool updateCache = true,

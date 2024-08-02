@@ -49,9 +49,8 @@ public partial class GatewayTextChannel :
         DiscordGatewayClient client,
         GuildIdentity guild,
         IGuildTextChannelModel model,
-        GatewayTextChannelActor? actor = null,
-        IEntityHandle<ulong, GatewayTextChannel>? implicitHandle = null
-    ) : base(client, guild, model, actor, implicitHandle)
+        GatewayTextChannelActor? actor = null
+    ) : base(client, guild, model, actor)
     {
         _model = model;
 
@@ -60,14 +59,13 @@ public partial class GatewayTextChannel :
 
     public static GatewayTextChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayTextChannel> context,
+        ICacheConstructionContext context,
         IGuildTextChannelModel model
     ) => new(
         client,
         context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
         model,
-        context.TryGetActor(T<GatewayTextChannelActor>()),
-        context.ImplicitHandle
+        context.TryGetActor<GatewayTextChannelActor>()
     );
 
     [CovariantOverride]

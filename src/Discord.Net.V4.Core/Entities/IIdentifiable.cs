@@ -41,6 +41,10 @@ file sealed class CastedIdentifiable<
     }
 
     public IdentityDetail Detail => source.Detail;
+
+    Type IIdentifiable<TId, TDestinationEntity, TDestinationModel>.EntityType => typeof(TSourceEntity);
+
+    Type IIdentifiable<TId, TDestinationEntity, TDestinationModel>.ModelType => typeof(TSourceModel);
 }
 
 file sealed class CastedIdentifiable<
@@ -101,6 +105,10 @@ file sealed class CastedIdentifiable<
     }
 
     public IdentityDetail Detail => source.Detail;
+
+    Type IIdentifiable<TId, TDestinationEntity, TDestinationModel>.EntityType => typeof(TSourceEntity);
+
+    Type IIdentifiable<TId, TDestinationEntity, TDestinationModel>.ModelType => typeof(TSourceModel);
 }
 
 #endregion
@@ -185,6 +193,10 @@ file sealed class Identifiable<TId, TEntity, TActor, TModel> :
 
     public static implicit operator Identifiable<TId, TEntity, TActor, TModel>(TId id) => new(id);
     public static implicit operator Identifiable<TId, TEntity, TActor, TModel>(TEntity entity) => new(entity);
+
+    Type IIdentifiable<TId, TEntity, TModel>.EntityType => typeof(TEntity);
+
+    Type IIdentifiable<TId, TEntity, TModel>.ModelType => typeof(TModel);
 }
 
 file sealed class Identifiable<TId, TEntity, TModel> :
@@ -247,6 +259,10 @@ file sealed class Identifiable<TId, TEntity, TModel> :
 
     public static implicit operator Identifiable<TId, TEntity, TModel>(TId id) => new(id);
     public static implicit operator Identifiable<TId, TEntity, TModel>(TEntity entity) => new(entity);
+
+    Type IIdentifiable<TId, TEntity, TModel>.EntityType => typeof(TEntity);
+
+    Type IIdentifiable<TId, TEntity, TModel>.ModelType => typeof(TModel);
 }
 
 #endregion
@@ -276,6 +292,9 @@ public interface IIdentifiable<TId, out TEntity, out TModel> :
     where TEntity : class, IEntity<TId>, IEntityOf<TModel>
     where TModel : class, IEntityModel<TId>
 {
+    Type EntityType { get; }
+    Type ModelType { get; }
+
     TEntity? Entity { get; }
 
     public static IIdentifiable<TId, TEntity, TModel> operator |(

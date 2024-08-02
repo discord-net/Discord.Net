@@ -80,7 +80,7 @@ public sealed partial class GatewayGuildActor :
 }
 
 public sealed partial class GatewayGuild :
-    GatewayCacheableEntity<GatewayGuild, ulong, IGuildModel, GuildIdentity>,
+    GatewayCacheableEntity<GatewayGuild, ulong, IGuildModel>,
     IGuild
 {
     public string Name => Model.Name;
@@ -159,9 +159,8 @@ public sealed partial class GatewayGuild :
     public GatewayGuild(
         DiscordGatewayClient client,
         IGuildModel model,
-        GatewayGuildActor? actor = null,
-        IEntityHandle<ulong, GatewayGuild>? implicitHandle = null
-    ) : base(client, model.Id, implicitHandle)
+        GatewayGuildActor? actor = null
+    ) : base(client, model.Id)
     {
         Model = model;
         Actor = actor ?? new(client, GuildIdentity.Of(this));
@@ -189,14 +188,13 @@ public sealed partial class GatewayGuild :
 
     public static GatewayGuild Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext<ulong, GatewayGuild> context,
+        ICacheConstructionContext context,
         IGuildModel model)
     {
         return new GatewayGuild(
             client,
             model,
-            context.TryGetActor(Template.T<GatewayGuildActor>()),
-            context.ImplicitHandle
+            context.TryGetActor<GatewayGuildActor>()
         );
     }
 }

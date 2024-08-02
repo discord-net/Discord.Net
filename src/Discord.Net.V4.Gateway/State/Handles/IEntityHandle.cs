@@ -8,10 +8,14 @@ using System.Threading.Tasks;
 namespace Discord.Gateway;
 
 public interface IEntityHandle<out TId, out TEntity> :
-    IIdentifiable<TId>,
-    IAsyncDisposable
+    IEntityHandle<TId>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
 {
     TEntity Entity { get; }
 }
+
+public interface IEntityHandle<out TId> :
+    IIdentifiable<TId>,
+    IDisposable
+    where TId : IEquatable<TId>;
