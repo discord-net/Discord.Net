@@ -147,12 +147,27 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
             syntax = syntax.AddMembers(
                 SyntaxFactory.ParseMemberDeclaration(
                     $$"""
-                    async ValueTask<IStoreInfo<{{target.IdType}}, {{target.ModelType}}>> IStoreInfoProvider<{{target.IdType}}, {{target.ModelType}}>.GetStoreInfoAsync(CancellationToken token)
-                    {
-                        var store = await (Actor as IStoreProvider<{{target.IdType}}, {{target.ModelType}}>)!.GetStoreAsync(token);
-                        return store{{storeToInfo}}
-                    }
+                    static ValueTask<IStoreInfo<{{target.IdType}}, {{target.ModelType}}>> IStoreInfoProvider<{{target.IdType}}, {{target.ModelType}}>.GetStoreInfoAsync(DiscordGatewayClient client, IPathable path, CancellationToken token)
+                        => {{target.ActorType}}.GetStoreInfoAsync(client, path, token);
                     """
+                )!,
+                SyntaxFactory.ParseMemberDeclaration(
+                    $$"""
+                      ValueTask<IStoreInfo<{{target.IdType}}, {{target.ModelType}}>> IStoreInfoProvider<{{target.IdType}}, {{target.ModelType}}>.GetStoreInfoAsync(CancellationToken token)
+                          => Actor.GetStoreInfoAsync(token);
+                      """
+                )!,
+                SyntaxFactory.ParseMemberDeclaration(
+                    $$"""
+                      static ValueTask<IEntityModelStore<{{target.IdType}}, {{target.ModelType}}>> IStoreProvider<{{target.IdType}}, {{target.ModelType}}>.GetStoreAsync(DiscordGatewayClient client, IPathable path, CancellationToken token)
+                          => {{target.ActorType}}.GetStoreAsync(client, path, token);
+                      """
+                )!,
+                SyntaxFactory.ParseMemberDeclaration(
+                    $$"""
+                      static ValueTask<IEntityBroker<{{target.IdType}}, {{target.Symbol}}, {{target.ModelType}}>> IBrokerProvider<{{target.IdType}}, {{target.Symbol}}, {{target.ModelType}}>.GetBrokerAsync(DiscordGatewayClient client, CancellationToken token)
+                          => {{target.ActorType}}.GetBrokerAsync(client, token);
+                      """
                 )!,
                 SyntaxFactory.ParseMemberDeclaration(
                     $$"""

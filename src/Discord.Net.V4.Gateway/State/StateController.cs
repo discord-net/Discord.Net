@@ -188,8 +188,12 @@ internal sealed partial class StateController : IDisposable
         return latentEntity;
     }
 
-    public async ValueTask<IEntityBroker<TId, TEntity, TActor, TModel>> GetBrokerAsync<TId, TEntity,
-        TActor, TModel>(
+    public async ValueTask<IEntityBroker<TId, TEntity, TActor, TModel>> GetBrokerAsync<
+        TId,
+        TEntity,
+        TActor,
+        TModel
+    >(
         CancellationToken token = default
     )
         where TEntity :

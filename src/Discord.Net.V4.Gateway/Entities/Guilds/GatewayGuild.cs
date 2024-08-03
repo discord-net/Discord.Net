@@ -1,71 +1,169 @@
 using Discord.Gateway;
 using Discord.Gateway.State;
 using Discord.Models;
+using Discord.Rest;
 using System.Globalization;
+using static Discord.Gateway.GatewayActors;
+using static Discord.Template;
 
 namespace Discord.Gateway;
+
+using GatewayGuildChannels = GatewayEnumerableIndexableActor<
+    GatewayGuildChannelActor,
+    ulong,
+    GatewayGuildChannel,
+    RestGuildChannel,
+    IGuildChannel,
+    IGuildChannelModel
+>;
+using GatewayTextChannels = GatewayEnumerableIndexableActor<
+    GatewayTextChannelActor,
+    ulong,
+    GatewayTextChannel,
+    RestTextChannel,
+    ITextChannel,
+    IGuildTextChannelModel,
+    IGuildChannelModel
+>;
+using GatewayVoiceChannels = GatewayEnumerableIndexableActor<
+    GatewayVoiceChannelActor,
+    ulong,
+    GatewayVoiceChannel,
+    RestVoiceChannel,
+    IVoiceChannel,
+    IGuildVoiceChannelModel,
+    IGuildChannelModel
+>;
+using GatewayCategoryChannels = GatewayEnumerableIndexableActor<
+    GatewayCategoryChannelActor,
+    ulong,
+    GatewayCategoryChannel,
+    RestCategoryChannel,
+    ICategoryChannel,
+    IGuildCategoryChannelModel,
+    IGuildChannelModel
+>;
+using GatewayNewsChannels = GatewayEnumerableIndexableActor<
+    GatewayNewsChannelActor,
+    ulong,
+    GatewayNewsChannel,
+    RestNewsChannel,
+    INewsChannel,
+    IGuildNewsChannelModel,
+    IGuildChannelModel
+>;
+using GatewayThreadChannels = GatewayEnumerableIndexableActor<
+    GatewayThreadChannelActor,
+    ulong,
+    GatewayThreadChannel,
+    RestThreadChannel,
+    IThreadChannel,
+    IThreadChannelModel,
+    IGuildChannelModel
+>;
+using GatewayStageChannels = GatewayEnumerableIndexableActor<
+    GatewayStageChannelActor,
+    ulong,
+    GatewayStageChannel,
+    RestStageChannel,
+    IStageChannel,
+    IGuildStageChannelModel,
+    IGuildChannelModel
+>;
+using GatewayForumChannels = GatewayEnumerableIndexableActor<
+    GatewayForumChannelActor,
+    ulong,
+    GatewayForumChannel,
+    RestForumChannel,
+    IForumChannel,
+    IGuildForumChannelModel,
+    IGuildChannelModel
+>;
+using GatewayMediaChannels = GatewayEnumerableIndexableActor<
+    GatewayMediaChannelActor,
+    ulong,
+    GatewayMediaChannel,
+    RestMediaChannel,
+    IMediaChannel,
+    IGuildMediaChannelModel,
+    IGuildChannelModel
+>;
+
+using GatewayBans = GatewayPagedIndexableActor<
+    GatewayBanActor,
+    ulong,
+    GatewayBan,
+
+>;
 
 public sealed partial class GatewayGuildActor :
     GatewayCachedActor<ulong, GatewayGuild, GuildIdentity, IGuildModel>,
     IGuildActor
 {
-    public IEnumerableIndexableActor<IGuildChannelActor, ulong, IGuildChannel> Channels =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public GatewayGuildChannels Channels { get; }
 
-    public IEnumerableIndexableActor<ITextChannelActor, ulong, ITextChannel> TextChannels =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public GatewayTextChannels TextChannels { get; }
 
-    public IEnumerableIndexableActor<IVoiceChannelActor, ulong, IVoiceChannel> VoiceChannels =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public GatewayVoiceChannels VoiceChannels { get; }
 
-    public IEnumerableIndexableActor<ICategoryChannelActor, ulong, ICategoryChannel> CategoryChannels =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public GatewayCategoryChannels CategoryChannels { get; }
 
-    public IEnumerableIndexableActor<INewsChannelActor, ulong, INewsChannel> AnnouncementChannels =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public GatewayNewsChannels AnnouncementChannels { get; }
 
-    public IEnumerableIndexableActor<IThreadChannelActor, ulong, IThreadChannel> ThreadChannels =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public GatewayThreadChannels ThreadChannels { get; }
 
-    public IEnumerableIndexableActor<IThreadChannelActor, ulong, IThreadChannel> ActiveThreadChannels =>
-        throw new NotImplementedException();
+    [SourceOfTruth]
+    public IEnumerableIndexableActor<IThreadChannelActor, ulong, IThreadChannel> ActiveThreadChannels { get; }
 
-    public IEnumerableIndexableActor<IStageChannelActor, ulong, IStageChannel> StageChannels =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public GatewayStageChannels StageChannels { get; }
 
-    public IEnumerableIndexableActor<IForumChannelActor, ulong, IForumChannel> ForumChannels =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public GatewayForumChannels ForumChannels { get; }
 
-    public IEnumerableIndexableActor<IMediaChannelActor, ulong, IMediaChannel> MediaChannels =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public GatewayMediaChannels MediaChannels { get; }
 
-    public IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations { get; }
 
-    public IPagedIndexableActor<IBanActor, ulong, IBan, PageGuildBansParams> Bans =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public IPagedIndexableActor<IBanActor, ulong, IBan, PageGuildBansParams> Bans { get; }
 
+    [SourceOfTruth]
     public IPagedIndexableActor<IGuildMemberActor, ulong, IGuildMember, PageGuildMembersParams> Members =>
         throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IGuildEmoteActor, ulong, IGuildEmote> Emotes =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public IEnumerableIndexableActor<IGuildEmoteActor, ulong, IGuildEmote> Emotes { get; }
 
-    public IEnumerableIndexableActor<IRoleActor, ulong, IRole> Roles => throw new NotImplementedException();
+    [SourceOfTruth] public IEnumerableIndexableActor<IRoleActor, ulong, IRole> Roles { get; }
 
-    public IEnumerableIndexableActor<IGuildStickerActor, ulong, IGuildSticker> Stickers =>
-        throw new NotImplementedException();
+    [SourceOfTruth] public IEnumerableIndexableActor<IGuildStickerActor, ulong, IGuildSticker> Stickers { get; }
 
-    public IEnumerableIndexableActor<IGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents =>
-        throw new NotImplementedException();
+    [SourceOfTruth]
+    public IEnumerableIndexableActor<IGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents { get; }
 
-    public IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites => throw new NotImplementedException();
+    [SourceOfTruth] public IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites { get; }
 
-    public IEnumerableIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks => throw new NotImplementedException();
+    [SourceOfTruth] public IEnumerableIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks { get; }
 
     public GatewayGuildActor(DiscordGatewayClient client, GuildIdentity guild)
         : base(client, guild)
     {
+        var identity = guild | this;
+
+        Channels = GuildRelatedEntity<RestGuildChannel>(Of<GatewayGuildChannelActor>(), client, identity, CachePath);
+        TextChannels = GuildRelatedEntity<RestTextChannel>(Of<GatewayTextChannelActor>(), client, identity, CachePath);
+        VoiceChannels = GuildRelatedEntity<RestVoiceChannel>(T<GatewayVoiceChannelActor>(), client, identity, CachePath);
+        CategoryChannels = GuildRelatedEntity<RestCategoryChannel>(T<GatewayCategoryChannelActor>(), client, identity, CachePath);
+        AnnouncementChannels = GuildRelatedEntity<RestNewsChannel>(T<GatewayNewsChannelActor>(), client, identity, CachePath);
+        ThreadChannels = GuildRelatedEntity<RestThreadChannel>(
+                T<GatewayThreadChannelActor>(),
+                client,
+                identity,
+                CachePath,
+                static guild => new RestThreadChannel.Context(
+                    IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>.Of(guild.Id)
+                )
+            );
+        StageChannels = GuildRelatedEntity<RestStageChannel>(T<GatewayStageChannelActor>(), client, identity, CachePath);
+        ForumChannels = GuildRelatedEntity<RestForumChannel>(T<GatewayForumChannelActor>(), client, identity, CachePath);
+        MediaChannels = GuildRelatedEntity<RestMediaChannel>(T<GatewayMediaChannelActor>(), client, identity, CachePath);
     }
 
     [SourceOfTruth]

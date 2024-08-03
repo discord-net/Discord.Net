@@ -282,7 +282,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
 
         semaphoreSlim.Wait(token);
 
-        if (_references.TryGetValue(model.Id, out var reference) && reference.TryGetReference(out entity))
+        if (TryGetFromReference(model.Id, out entity))
         {
             semaphoreSlim.Release();
             scope.Dispose();

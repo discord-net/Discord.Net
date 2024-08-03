@@ -5,6 +5,8 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+[ExtendInterfaceDefaults]
+[method: TypeFactory]
 public sealed partial class GatewayStageChannelActor(
     DiscordGatewayClient client,
     GuildIdentity guild,
@@ -22,7 +24,7 @@ public sealed partial class GatewayStageChannelActor(
 
     [SourceOfTruth]
     internal GatewayStageChannel CreateEntity(IGuildStageChannelModel model)
-        => Client.StateController.CreateLatent(this, model);
+        => Client.StateController.CreateLatent(this, model, CachePath);
 
     [SourceOfTruth]
     internal GatewayStageInstance CreateEntity(IStageInstanceModel model)

@@ -6,6 +6,13 @@ namespace Discord.Net.Hanz.Utils;
 
 public static class SyntaxUtils
 {
+    public static SyntaxNode GetMemberTargetOrSelf(SyntaxNode node)
+    {
+        if (node is MemberAccessExpressionSyntax memberAccess)
+            return GetMemberTargetOrSelf(memberAccess.Name);
+        return node;
+    }
+
     public static ClassDeclarationSyntax CreateSourceGenClone(ClassDeclarationSyntax classDeclarationSyntax)
     {
         return SyntaxFactory.ClassDeclaration(

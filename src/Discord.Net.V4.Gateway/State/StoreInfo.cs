@@ -56,7 +56,7 @@ file abstract class BaseStoreInfo<TId, TModel>(
 
     private IReadOnlyDictionary<Type, StoreProviderInfo<TId, TModel>>? _hierarchyStoreMap;
     private IReadOnlyList<StoreProviderInfo<TId, TModel>>? _enabledHierarchyStores;
-    private Dictionary<Type, IEntityModelStore<TId, TModel>> _computedStores = [];
+    private readonly Dictionary<Type, IEntityModelStore<TId, TModel>> _computedStores = [];
     private readonly KeyedSemaphoreSlim<Type> _keyedSemaphore = new(1, 1);
 
     public async ValueTask<IEntityModelStore<TId, TModel>> GetOrComputeStoreAsync(

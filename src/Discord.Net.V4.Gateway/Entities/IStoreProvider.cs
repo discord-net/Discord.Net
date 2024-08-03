@@ -9,6 +9,12 @@ public interface IStoreInfoProvider<TId, TModel> : IStoreProvider<TId, TModel>
     where TModel : class, IEntityModel<TId>
     where TId : IEquatable<TId>
 {
+    internal static abstract ValueTask<IStoreInfo<TId, TModel>> GetStoreInfoAsync(
+        DiscordGatewayClient client,
+        IPathable path,
+        CancellationToken token = default
+    );
+
     internal ValueTask<IStoreInfo<TId, TModel>> GetStoreInfoAsync(CancellationToken token = default);
 }
 
@@ -17,6 +23,12 @@ public interface IStoreProvider<TId, TModel>
     where TModel : class, IEntityModel<TId>
     where TId : IEquatable<TId>
 {
+    internal static abstract ValueTask<IEntityModelStore<TId, TModel>> GetStoreAsync(
+        DiscordGatewayClient client,
+        IPathable path,
+        CancellationToken token = default
+    );
+
     internal ValueTask<IEntityModelStore<TId, TModel>> GetStoreAsync(CancellationToken token = default);
 
     internal ValueTask<IEntityModelStore<TId, TSubModel>?> GetStoreForModelAsync<TSubModel>(

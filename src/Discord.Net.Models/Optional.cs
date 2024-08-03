@@ -64,6 +64,10 @@ public readonly struct Optional<T>
     public override int GetHashCode() => IsSpecified ? _value?.GetHashCode() ?? 0 : 0;
     public override string? ToString() => IsSpecified ? _value?.ToString() : null;
 
+    public U? Map<U>(U value)
+        where U : struct
+        => IsSpecified ? value : null;
+
     public Optional<U> Map<U>(Func<T, U> func)
     {
         return IsSpecified ? Optional.Some(func(_value)) : Optional<U>.Unspecified;

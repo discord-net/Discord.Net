@@ -6,6 +6,8 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+[ExtendInterfaceDefaults]
+[method: TypeFactory]
 public sealed partial class GatewayThreadChannelActor :
     GatewayGuildChannelActor,
     IThreadChannelActor,

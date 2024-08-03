@@ -4,6 +4,7 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+[method: TypeFactory]
 public partial class GatewayTextChannelActor(
     DiscordGatewayClient client,
     GuildIdentity guild,
@@ -55,6 +56,8 @@ public partial class GatewayTextChannel :
         _model = model;
 
         Actor = actor ?? new(client, guild, TextChannelIdentity.Of(this));
+
+        IFetchableOfMany<ulong, IGuildChannelModel> a = this;
     }
 
     public static GatewayTextChannel Construct(

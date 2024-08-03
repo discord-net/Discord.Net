@@ -36,4 +36,6 @@ public readonly struct EntityOrId<TId, TEntity>
 
     public static implicit operator EntityOrId<TId, TEntity>(TId id) => new(id);
     public static implicit operator EntityOrId<TId, TEntity>(TEntity entity) => new(entity);
+
+    public static implicit operator TId(EntityOrId<TId, TEntity> entityOrId) => entityOrId.Id;
 }

@@ -32,6 +32,83 @@ public static class Hierarchy
         public static bool operator !=(SortedHierarchySymbol left, SortedHierarchySymbol right) => !left.Equals(right);
     }
 
+    public static HashSet<ITypeSymbol> GetHierarchyBetween(
+        ITypeSymbol child,
+        ITypeSymbol root,
+        bool includeRoot = true,
+        bool includeChild = true,
+        bool searchBaseClasses = true,
+        bool searchAllPaths = true)
+    {
+        var path = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
+
+        HasParent(
+            child,
+            root,
+            new(SymbolEqualityComparer.Default),
+            path,
+            searchBaseClasses,
+            searchAllPaths
+        );
+
+        if (!includeChild)
+            path.Remove(child);
+
+        if (!includeRoot)
+            path.Remove(root);
+
+        return path;
+
+        static bool HasParent(
+            ITypeSymbol child,
+            ITypeSymbol root,
+            HashSet<ITypeSymbol> visited,
+            HashSet<ITypeSymbol> path,
+            bool searchBaseClasses,
+            bool searchAllPaths)
+        {
+            if (child.TypeKind is TypeKind.Class && root.TypeKind is TypeKind.Class)
+            {
+                if (child.BaseType?.Equals(root, SymbolEqualityComparer.Default) ?? false)
+                {
+                    path.Add(root);
+                    return true;
+                }
+            }
+
+            var result = false;
+
+            if (searchBaseClasses && child.TypeKind is TypeKind.Class && child.BaseType is not null)
+            {
+                result = HasParent(child.BaseType, root, visited, path, searchBaseClasses, searchAllPaths);
+            }
+
+            if (root.TypeKind is TypeKind.Interface)
+            {
+                if (child.Interfaces.Contains(root, SymbolEqualityComparer.Default))
+                {
+                    path.Add(root);
+                    return true;
+                }
+
+                foreach (var iface in child.Interfaces.Where(x => !visited.Contains(x)))
+                {
+                    result |= HasParent(iface, root, visited, path, searchBaseClasses, searchAllPaths);
+
+                    if (result && !searchAllPaths)
+                        break;
+
+                    visited.Add(iface);
+                }
+            }
+
+            if(result)
+                path.Add(child);
+
+            return result;
+        }
+    }
+
     public static IEnumerable<T> OrderByHierarchy<T>(
         ImmutableArray<T?> targets,
         Func<T, INamedTypeSymbol> typeResolver,

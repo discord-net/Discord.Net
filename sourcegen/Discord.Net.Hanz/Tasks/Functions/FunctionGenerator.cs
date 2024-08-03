@@ -108,19 +108,21 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
 
     public sealed class InvocationGenerationTarget(
         InvocationExpressionSyntax invocationExpression,
-        IMethodSymbol? targetMethod,
+        IEnumerable<IMethodSymbol> candidateMethods,
         SemanticModel semanticModel
     ) : GenerationTarget(semanticModel), IEquatable<InvocationGenerationTarget>
     {
         public InvocationExpressionSyntax InvocationExpression { get; } = invocationExpression;
-        public IMethodSymbol? TargetMethod { get; } = targetMethod;
+        public IEnumerable<IMethodSymbol> TargetMethods { get; } = candidateMethods;
 
         public bool Equals(InvocationGenerationTarget? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return InvocationExpression.IsEquivalentTo(other.InvocationExpression) &&
-                   SymbolEqualityComparer.Default.Equals(TargetMethod, other.TargetMethod);
+
+            return
+                InvocationExpression.IsEquivalentTo(other.InvocationExpression) &&
+                TargetMethods.SequenceEqual(other.TargetMethods, SymbolEqualityComparer.Default);
         }
 
         public override bool Equals(GenerationTarget other) =>
@@ -133,9 +135,8 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
         {
             unchecked
             {
-                return (InvocationExpression.GetHashCode() * 397) ^ (TargetMethod != null
-                    ? SymbolEqualityComparer.Default.GetHashCode(TargetMethod)
-                    : 0);
+                return
+                    (InvocationExpression.GetHashCode() * 397) ^ TargetMethods.GetHashCode();
             }
         }
 
@@ -184,20 +185,15 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
 
                 if (symbolInfo.Symbol is IMethodSymbol target && IsTargetMethod(target))
                 {
-                    return new InvocationGenerationTarget(invocation, target, context.SemanticModel);
+                    return new InvocationGenerationTarget(invocation, [target], context.SemanticModel);
                 }
 
-                var candidate =
-                    symbolInfo.CandidateSymbols.FirstOrDefault(x =>
+                var candidates =
+                    symbolInfo.CandidateSymbols.Where(x =>
                         x is IMethodSymbol target && IsTargetMethod(target));
 
-                if (candidate is IMethodSymbol candidateTarget)
-                    return new InvocationGenerationTarget(invocation, candidateTarget, context.SemanticModel);
-
-                if (symbolInfo.Symbol is null && symbolInfo.CandidateSymbols.Length == 0)
-                    return new InvocationGenerationTarget(invocation, null, context.SemanticModel);
-
-                return null;
+                return new InvocationGenerationTarget(invocation, candidates.OfType<IMethodSymbol>(),
+                    context.SemanticModel);
         }
 
         return null;
@@ -214,7 +210,9 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
         }
     }
 
-    private static bool IsSpeculativeInvocationTarget(MethodTarget method, InvocationExpressionSyntax invocation,
+    private static bool IsSpeculativeInvocationTarget(
+        MethodTarget method,
+        InvocationExpressionSyntax invocation,
         SemanticModel semantic)
     {
         var target = GetInvocationTarget(invocation, semantic);
@@ -231,8 +229,10 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
     public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         var processed =
-            new Dictionary<string, (TypeDeclarationSyntax Syntax, HashSet<string> Methods, IEnumerable<string> Usings, string
-                Namespace)>();
+            new Dictionary<
+                string,
+                (TypeDeclarationSyntax Syntax, HashSet<string> Methods, IEnumerable<string> Usings, string Namespace)
+            >();
 
         var nonNullTargets = targets
             .Where(x => x is not null)
@@ -255,98 +255,124 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
             return;
         }
 
+        foreach (var methodTarget in methods)
+        {
+            var methodLogger = logger.WithSemanticContext(methodTarget.SemanticModel);
+
+            methodLogger.Log($"Candidate method: {methodTarget.Method.MethodSymbol}");
+        }
+
         foreach (var target in targets.OfType<InvocationGenerationTarget>())
         {
             var targetLogger = logger.WithSemanticContext(target.SemanticModel);
 
-            var targetMethod =
-                target.TargetMethod is not null
-                    ? methods.FirstOrDefault(x =>
-                        x.Method.MethodSymbol.Equals(target.TargetMethod, SymbolEqualityComparer.Default) ||
-                        (
-                            target.TargetMethod.ReducedFrom is not null &&
-                            x.Method.MethodSymbol.Equals(target.TargetMethod.ReducedFrom,
-                                SymbolEqualityComparer.Default)
-                        )
-                    )
-                    : methods.FirstOrDefault(x =>
+            var targetMethods = methods
+                .Where(x =>
+                    target.TargetMethods.Contains(x.Method.MethodSymbol, SymbolEqualityComparer.Default))
+                .ToArray();
+
+            if (targetMethods.Length == 0)
+            {
+                targetMethods = methods
+                    .Where(x =>
                         IsSpeculativeInvocationTarget(x.Method, target.InvocationExpression, target.SemanticModel)
-                    );
-
-            if (targetMethod?.Method.MethodSyntax.Parent is not TypeDeclarationSyntax methodContainingTypeSyntax)
-            {
-                continue;
+                    )
+                    .ToArray();
             }
 
-            var containingTypeName = targetMethod.Method.MethodSymbol.ContainingType.ToDisplayString();
-
-            if (!processed.TryGetValue(containingTypeName, out var type))
-                type = (
-                    SyntaxFactory.TypeDeclaration(
-                        methodContainingTypeSyntax.Kind(),
-                        [],
-                        methodContainingTypeSyntax.Modifiers,
-                        methodContainingTypeSyntax.Keyword,
-                        methodContainingTypeSyntax.Identifier,
-                        methodContainingTypeSyntax.TypeParameterList,
-                        null,
-                        methodContainingTypeSyntax.ConstraintClauses,
-                        SyntaxFactory.Token(SyntaxKind.OpenBraceToken),
-                        [],
-                        SyntaxFactory.Token(SyntaxKind.CloseBraceToken),
-                        default
-                    ),
-                    new(),
-                    targetMethod.Method.MethodSyntax.GetUsingDirectives(),
-                    targetMethod.Method.MethodSymbol.ContainingNamespace.ToString()
-                );
-            else
-            {
-                type.Usings = type.Usings.Concat(targetMethod.Method.MethodSyntax.GetUsingDirectives()).Distinct();
-            }
-
-            var newFunctionSyntax = targetMethod.Method.MethodSyntax;
-            var typeSyntax = type.Syntax;
-
-            if (VariableFuncArgs.IsTargetMethod(targetMethod.Method.MethodSymbol))
-            {
-                VariableFuncArgs.Apply(
-                    ref newFunctionSyntax,
-                    target.InvocationExpression,
-                    targetMethod.Method,
-                    target.SemanticModel,
-                    targetLogger.GetSubLogger("VariableFuncArgs")
-                );
-            }
-
-            if (TransitiveFill.IsTargetMethod(targetMethod.Method.MethodSymbol))
-            {
-                TransitiveFill.Apply(
-                    ref newFunctionSyntax,
-                    target.InvocationExpression,
-                    targetMethod.Method,
-                    target.SemanticModel,
-                    targetLogger.GetSubLogger("TransitiveFill")
-                );
-            }
-
-            if (newFunctionSyntax.IsEquivalentTo(targetMethod.Method.MethodSyntax) &&
-                typeSyntax.IsEquivalentTo(type.Syntax))
-            {
-                targetLogger.Warn(
-                    $"No structural changes found for {targetMethod.Method.MethodSymbol.ToDisplayString()}");
-                continue;
-            }
-
-            if(!type.Methods.Add(newFunctionSyntax.ToString()))
+            if(targetMethods.Length == 0)
                 continue;
 
-            processed[containingTypeName] = (
-                typeSyntax.AddMembers(newFunctionSyntax),
-                type.Methods,
-                type.Usings,
-                type.Namespace
+            targetLogger.Log(
+                $"Found {targetMethods.Length} candidate methods for {target.InvocationExpression.NormalizeWhitespace()}"
             );
+
+            foreach (var method in targetMethods)
+            {
+                targetLogger.Log($" - {method.Method.MethodSymbol}");
+            }
+
+            foreach (var targetMethod in targetMethods)
+            {
+                if (targetMethod?.Method.MethodSyntax.Parent is not TypeDeclarationSyntax methodContainingTypeSyntax)
+                {
+                    continue;
+                }
+
+                var containingTypeName = targetMethod.Method.MethodSymbol.ContainingType.ToDisplayString();
+
+                if (!processed.TryGetValue(containingTypeName, out var type))
+                    type = (
+                        SyntaxFactory.TypeDeclaration(
+                            methodContainingTypeSyntax.Kind(),
+                            [],
+                            methodContainingTypeSyntax.Modifiers,
+                            methodContainingTypeSyntax.Keyword,
+                            methodContainingTypeSyntax.Identifier,
+                            methodContainingTypeSyntax.TypeParameterList,
+                            null,
+                            methodContainingTypeSyntax.ConstraintClauses,
+                            SyntaxFactory.Token(SyntaxKind.OpenBraceToken),
+                            [],
+                            SyntaxFactory.Token(SyntaxKind.CloseBraceToken),
+                            default
+                        ),
+                        new(),
+                        targetMethod.Method.MethodSyntax.GetUsingDirectives(),
+                        targetMethod.Method.MethodSymbol.ContainingNamespace.ToString()
+                    );
+                else
+                {
+                    type.Usings = type.Usings.Concat(targetMethod.Method.MethodSyntax.GetUsingDirectives()).Distinct();
+                }
+
+                var newFunctionSyntax = targetMethod.Method.MethodSyntax;
+                var typeSyntax = type.Syntax;
+
+                if (VariableFuncArgs.IsTargetMethod(targetMethod.Method.MethodSymbol))
+                {
+                    VariableFuncArgs.Apply(
+                        ref newFunctionSyntax,
+                        target.InvocationExpression,
+                        targetMethod.Method,
+                        target.SemanticModel,
+                        targetLogger.GetSubLogger("VariableFuncArgs")
+                    );
+                }
+
+                if (TransitiveFill.IsTargetMethod(targetMethod.Method.MethodSymbol))
+                {
+                    TransitiveFill.Apply(
+                        ref newFunctionSyntax,
+                        target.InvocationExpression,
+                        targetMethod.Method,
+                        target.SemanticModel,
+                        targetLogger.GetSubLogger("TransitiveFill")
+                    );
+                }
+
+                if (newFunctionSyntax.IsEquivalentTo(targetMethod.Method.MethodSyntax) &&
+                    typeSyntax.IsEquivalentTo(type.Syntax))
+                {
+                    targetLogger.Warn(
+                        $"No structural changes found for {targetMethod.Method.MethodSymbol.ToDisplayString()}");
+                    continue;
+                }
+
+                if (!type.Methods.Add(newFunctionSyntax.ToString()))
+                {
+                    targetLogger.Warn($"Skipping {targetMethod.Method.MethodSymbol}: Syntax equivalent exists");
+                    continue;
+                }
+
+                processed[containingTypeName] = (
+                    typeSyntax.AddMembers(newFunctionSyntax),
+                    type.Methods,
+                    type.Usings,
+                    type.Namespace
+                );
+                break;
+            }
         }
 
         foreach (var toGenerate in processed)

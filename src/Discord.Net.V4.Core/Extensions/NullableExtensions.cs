@@ -4,6 +4,12 @@ namespace Discord;
 
 public static class NullableExtensions
 {
+    [return: NotNullIfNotNull(nameof(nullable))]
+    public static T? Map<T, U>(this U? nullable, T value)
+        where U : struct
+        where T : struct
+        => nullable.HasValue ? value : null;
+
     public static T? Map<T, U>(this U? nullable, Func<U, T> map)
         where U : struct
     {

@@ -5,6 +5,8 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+[ExtendInterfaceDefaults]
+[method: TypeFactory]
 public sealed partial class GatewayForumChannelActor(
     DiscordGatewayClient client,
     GuildIdentity guild,

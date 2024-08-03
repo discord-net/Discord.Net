@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
+using System.Text;
 
 namespace Discord.Net.Hanz.Tasks;
 
@@ -11,12 +12,174 @@ public static class TransitiveFill
     private static readonly string[] TypeBlacklists =
     [
         "IFactory",
+        "Discord.IFactory",
         "Discord.IProxied",
         "Discord.Gateway.IStoreProvider",
         "Discord.Gateway.IStoreInfoProvider",
         "Discord.Gateway.IBrokerProvider",
         "Discord.IContextConstructable"
     ];
+
+    private sealed class Context
+    {
+        public Dictionary<ITypeParameterSymbol, ParsedTypeParameter> TypeParameters { get; }
+
+        public Dictionary<ITypeParameterSymbol, HashSet<ITypeSymbol>> Resolved { get; }
+            = new(SymbolEqualityComparer.Default);
+
+        public Dictionary<ITypeParameterSymbol, HashSet<ITypeSymbol>> AdditionalChecks { get; }
+            = new(SymbolEqualityComparer.Default);
+
+        public SemanticModel SemanticModel { get; }
+
+        public IMethodSymbol Method { get; }
+
+        public InvocationExpressionSyntax Invocation { get; }
+
+        public Logger Logger { get; }
+
+        public Context(SemanticModel model, IMethodSymbol method, InvocationExpressionSyntax invocation, Logger logger)
+        {
+            SemanticModel = model;
+            Method = method;
+            Invocation = invocation;
+            Logger = logger;
+
+            TypeParameters = method.TypeParameters
+                .ToDictionary(
+                    x => x,
+                    x => new ParsedTypeParameter(this, x)
+                );
+        }
+
+        public void RemoveCandidate(ITypeParameterSymbol parameter, ITypeSymbol candidate)
+        {
+            if (!Resolved.TryGetValue(parameter, out var candidates))
+                return;
+
+            candidates.Remove(candidate);
+
+            if (candidates.Count == 0)
+                Resolved.Remove(parameter);
+        }
+
+        public bool PassesAdditionalChecks(ITypeParameterSymbol parameter, ITypeSymbol substitute)
+        {
+            return
+                !AdditionalChecks.TryGetValue(parameter, out var checks)
+                ||
+                checks.All(x => SemanticModel.Compilation.HasImplicitConversion(substitute, x));
+        }
+
+        public void AddAdditionalConstraints(ITypeParameterSymbol symbol, params ITypeSymbol[] constraints)
+        {
+            if (!AdditionalChecks.TryGetValue(symbol, out var constraintsSet))
+                AdditionalChecks[symbol] = constraintsSet = new(SymbolEqualityComparer.Default);
+
+            constraintsSet.UnionWith(constraints);
+        }
+
+        public void PickSubstitute(
+            ITypeParameterSymbol parameter,
+            params ITypeSymbol[] type)
+        {
+            if (!TypeParameters.TryGetValue(parameter, out var typeParameter))
+            {
+                Logger.Warn($"Unknown type parameter '{parameter}' attempted to be substituted for {Method}");
+                return;
+            }
+
+            if (typeParameter.Ignored)
+                return;
+
+            if (!Resolved.TryGetValue(parameter, out var existing))
+                existing = Resolved[parameter] = new(SymbolEqualityComparer.Default);
+
+            existing.UnionWith(type);
+        }
+    }
+
+    private sealed class ParsedTypeParameter
+    {
+        public ITypeParameterSymbol Parameter { get; }
+
+        public bool TransitiveFilled { get; }
+        public bool Ignored { get; }
+        public bool Shrink { get; }
+        public bool Expand { get; }
+        public bool ShouldBeInterface { get; }
+        public bool RequiredToBeResolve { get; }
+        public HashSet<ITypeParameterSymbol> Not { get; }
+
+        public ParsedTypeParameter(Context context, ITypeParameterSymbol symbol)
+        {
+            Parameter = symbol;
+            Not = new HashSet<ITypeParameterSymbol>(SymbolEqualityComparer.Default);
+
+            foreach (var attribute in symbol.GetAttributes())
+            {
+                switch (attribute.AttributeClass?.ToDisplayString())
+                {
+                    case "Discord.InterfaceAttribute":
+                        ShouldBeInterface = true;
+                        break;
+                    case "Discord.NotAttribute" when attribute.ConstructorArguments.Length > 0:
+                        var notTarget = context.Method.TypeParameters
+                            .FirstOrDefault(x =>
+                                x.Name == attribute.ConstructorArguments[0].Value as string
+                            );
+                        if (notTarget is not null)
+                            Not.Add(notTarget);
+                        break;
+                    case "Discord.RequireResolveAttribute":
+                        RequiredToBeResolve = true;
+                        break;
+                    case "Discord.IgnoreAttribute":
+                        Ignored = true;
+                        break;
+                    case "Discord.ShrinkAttribute":
+                        Shrink = true;
+                        break;
+                    case "Discord.TransitiveFillAttribute":
+                        TransitiveFilled = true;
+                        break;
+                    case "Discord.ExpandAttribute":
+                        Expand = true;
+                        break;
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            if (TransitiveFilled)
+                sb.Append("Transitive ");
+
+            if (Ignored)
+                sb.Append("Ignored ");
+
+            if (Shrink)
+                sb.Append("Shrunk ");
+
+            if (Expand)
+                sb.Append("Expanded ");
+
+            if (ShouldBeInterface)
+                sb.Append("Interface ");
+
+            if (RequiredToBeResolve)
+                sb.Append("Required ");
+
+            if (Not.Count > 0)
+                sb.Append($"Not({string.Join(" | ", Not.Select(x => x.Name))}) ");
+
+            sb.Append(Parameter.Name);
+
+            return sb.ToString();
+        }
+    }
 
     public static bool IsTargetMethod(IMethodSymbol methodSymbol)
     {
@@ -61,49 +224,106 @@ public static class TransitiveFill
         SemanticModel semantic,
         Logger logger)
     {
-        var resolvedGenerics =
-            new Dictionary<ITypeParameterSymbol, HashSet<ITypeSymbol>>(SymbolEqualityComparer.Default);
+        logger.Log($"Executing TransitiveFill on {target.MethodSymbol}");
+
+        if (
+            invocationExpression.ArgumentList.Arguments.Count
+            !=
+            target.MethodSymbol.Parameters.Length - (target.MethodSymbol.IsExtensionMethod ? 1 : 0)
+        )
+        {
+            logger.Log("Skipping this method, mismatch argument count");
+            return;
+        }
+
+        var context = new Context(semantic, target.MethodSymbol, invocationExpression, logger);
 
         foreach (var typeParameter in target.MethodSymbol.TypeParameters.Where(TypeParameterIsTransitiveFill))
         {
             ResolveGenericForTypeParameter(
-                target.MethodSymbol,
                 typeParameter,
-                invocationExpression,
-                resolvedGenerics,
-                semantic,
+                context,
                 logger
             );
 
-            if (resolvedGenerics.Count == target.MethodSymbol.TypeParameters.Length)
+            if (context.Resolved.Count == target.MethodSymbol.TypeParameters.Length)
                 break;
         }
 
-        if (resolvedGenerics.Count != target.MethodSymbol.TypeParameters.Length)
+        if (context.Resolved.Count != target.MethodSymbol.TypeParameters.Length)
         {
             foreach (var parameter in target.MethodSymbol.Parameters.Where(ParameterIsTransitiveFill))
             {
                 ResolveGenericForParameter(
-                    target.MethodSymbol,
+                    context,
                     parameter,
-                    invocationExpression,
-                    resolvedGenerics,
-                    semantic,
                     logger
                 );
 
-                if (resolvedGenerics.Count == target.MethodSymbol.TypeParameters.Length)
+                if (context.Resolved.Count == target.MethodSymbol.TypeParameters.Length)
                     break;
             }
         }
 
-        if (resolvedGenerics.Count == 0)
+        if (context.Resolved.Count == 0)
         {
             logger.Warn($"No generics could be resolved for {target.MethodSymbol}");
             return;
         }
 
-        var generics = FlattenResults(target.MethodSymbol, resolvedGenerics, semantic, logger);
+        // do a check for any remaining generics specified by the user
+        if (
+            context.Resolved.Count < target.MethodSymbol.TypeParameters.Length &&
+            SyntaxUtils.GetMemberTargetOrSelf(invocationExpression.Expression) is GenericNameSyntax genericNameSyntax
+        )
+        {
+            var remainingParameters = new Queue<ITypeParameterSymbol>(
+                target.MethodSymbol.TypeParameters
+                    .Where(x =>
+                        !context.Resolved.ContainsKey(x)
+                    )
+            );
+
+            logger.Log("User supplied generics and we've got unresolved:");
+
+            foreach (var generic in remainingParameters)
+            {
+                logger.Log($" - {generic}");
+            }
+
+            for (var i = 0; i != genericNameSyntax.TypeArgumentList.Arguments.Count; i++)
+            {
+                var typeInfo = semantic.GetTypeInfo(genericNameSyntax.TypeArgumentList.Arguments[i]).Type;
+
+                if (typeInfo is null)
+                {
+                    logger.Warn(
+                        $"Could not resolve user-specified generic argument {genericNameSyntax.TypeArgumentList.Arguments[i]}");
+                    continue;
+                }
+
+                if (remainingParameters.Count == 0)
+                    break;
+
+                var typeParameter = remainingParameters.Dequeue();
+
+                if (WalkTypeForConstraints(context, typeParameter, typeInfo, logger))
+                {
+                    // update the references to the substituted parameter
+                }
+            }
+        }
+
+        var generics = FlattenResults(context, logger);
+
+        foreach (var required in context.TypeParameters.Values.Where(x => x.RequiredToBeResolve))
+        {
+            if (!generics.ContainsKey(required.Parameter))
+            {
+                logger.Warn($"Missing required generic '{required}'");
+                return;
+            }
+        }
 
         // we want to keep the [TransitiveFill] generic IF it's not explicitly used in the parameters
         var toKeep = generics.FirstOrDefault(x =>
@@ -194,107 +414,146 @@ public static class TransitiveFill
     }
 
     private static Dictionary<ITypeParameterSymbol, ITypeSymbol> FlattenResults(
-        IMethodSymbol method,
-        Dictionary<ITypeParameterSymbol, HashSet<ITypeSymbol>> filled,
-        SemanticModel semanticModel,
+        Context context,
         Logger logger)
     {
-        return filled.ToDictionary<
-            KeyValuePair<ITypeParameterSymbol, HashSet<ITypeSymbol>>,
-            ITypeParameterSymbol,
-            ITypeSymbol
-        >(
-            x => x.Key,
-            filledTypeParameter =>
+        var result = new Dictionary<ITypeParameterSymbol, ITypeSymbol>(SymbolEqualityComparer.Default);
+
+        foreach (
+            var filledTypeParameter in context.Resolved
+                .Where(x => x.Value.Count > 0))
+        {
+            logger.Log($"{filledTypeParameter.Key}");
+
+            foreach (var filled in filledTypeParameter.Value)
+                logger.Log($" - {filled}");
+
+            var parsed = context.TypeParameters[filledTypeParameter.Key];
+
+            // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
+            var annotation = filledTypeParameter.Key
+                .ConstraintNullableAnnotations
+                .Aggregate((a, b) => a | b);
+
+            annotation = (NullableAnnotation)Math.Min((byte)annotation, (byte)NullableAnnotation.Annotated);
+
+            if (filledTypeParameter.Value.Count == 1)
             {
-                logger.Log($"{filledTypeParameter.Key}");
-                foreach (var filled in filledTypeParameter.Value)
-                {
-                    logger.Log($" - {filled}");
-                }
+                result.Add(
+                    filledTypeParameter.Key,
+                    ApplyMinimumNullableAnnotation(filledTypeParameter.Value.First(), annotation)
+                );
+                continue;
+            }
 
-                // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
-                var annotation = filledTypeParameter.Key
-                    .ConstraintNullableAnnotations
-                    .Aggregate((a, b) => a | b);
+            var references = context.Method.TypeParameters
+                .Where(x => x
+                        .ConstraintTypes
+                        .Any(y =>
+                            HasReferenceToOtherConstraint(y, filledTypeParameter.Key)
+                        ) && context.Resolved.TryGetValue(x, out var resolved) && resolved.Count == 1
+                )
+                .ToArray();
 
-                annotation = (NullableAnnotation)Math.Min((byte)annotation, (byte)NullableAnnotation.Annotated);
-
-                if (filledTypeParameter.Value.Count == 1)
-                    return ApplyMinimumNullableAnnotation(filledTypeParameter.Value.First(), annotation);
-
-                var references = method.TypeParameters
-                    .Where(x => x
+            var candidates = filledTypeParameter.Value
+                .Where(candidate => references
+                    .All(x => context.Resolved[x]
+                        .OfType<INamedTypeSymbol>()
+                        .Any(filledNamed => x
                             .ConstraintTypes
-                            .Any(y =>
+                            .Where(y =>
                                 HasReferenceToOtherConstraint(y, filledTypeParameter.Key)
-                            ) && filled.TryGetValue(x, out var resolved) && resolved.Count == 1
-                    )
-                    .ToArray();
-
-                foreach (var candidate in filledTypeParameter.Value)
-                {
-                    if (
-                        references.All(x => filled[x]
-                            .OfType<INamedTypeSymbol>()
-                            .Any(filledNamed => x
-                                .ConstraintTypes
-                                .Where(y =>
-                                    HasReferenceToOtherConstraint(y, filledTypeParameter.Key)
-                                )
-                                .All(constraintType =>
-                                {
-                                    ITypeSymbol searchTarget = filledTypeParameter.Key;
-
-                                    if (constraintType is ITypeParameterSymbol typeParameter)
-                                    {
-                                        if (typeParameter.Equals(filledTypeParameter.Key,
-                                                SymbolEqualityComparer.Default))
-                                        {
-                                            constraintType = filledNamed;
-                                            searchTarget = candidate;
-                                        }
-                                        else
-                                        {
-                                            constraintType = filled[typeParameter].First();
-                                        }
-                                    }
-
-                                    var paired = TypeUtils.PairedWalkTypeSymbolForMatch(
-                                        searchTarget,
-                                        constraintType,
-                                        filledNamed,
-                                        semanticModel
-                                    );
-
-                                    return paired?.Equals(
-                                        candidate,
-                                        SymbolEqualityComparer.Default
-                                    ) ?? false;
-                                })
                             )
+                            .All(constraintType =>
+                            {
+                                ITypeSymbol searchTarget = filledTypeParameter.Key;
+
+                                if (constraintType is ITypeParameterSymbol typeParameter)
+                                {
+                                    if (typeParameter.Equals(filledTypeParameter.Key,
+                                            SymbolEqualityComparer.Default))
+                                    {
+                                        constraintType = filledNamed;
+                                        searchTarget = candidate;
+                                    }
+                                    else
+                                    {
+                                        constraintType = context.Resolved[typeParameter].First();
+                                    }
+                                }
+
+                                var paired = TypeUtils.PairedWalkTypeSymbolForMatch(
+                                    searchTarget,
+                                    constraintType,
+                                    filledNamed,
+                                    context.SemanticModel
+                                );
+
+                                return paired?.Equals(
+                                    candidate,
+                                    SymbolEqualityComparer.Default
+                                ) ?? false;
+                            })
                         )
                     )
+                )
+                .ToArray();
+
+            if (candidates.Length <= 1)
+            {
+                result.Add(
+                    filledTypeParameter.Key,
+                    ApplyMinimumNullableAnnotation(
+                        candidates.FirstOrDefault() ?? filledTypeParameter.Value.First(),
+                        annotation
+                    )
+                );
+                continue;
+            }
+
+            if (parsed.Shrink || parsed.Expand)
+            {
+                var descendantReference = references
+                    .FirstOrDefault(x =>
+                        x.ConstraintTypes.Contains(filledTypeParameter.Key) &&
+                        result.ContainsKey(x)
+                    );
+
+                if (descendantReference is null)
+                {
+                    logger.Warn($"Failed to find references that inherit '{filledTypeParameter.Key}'");
+                    foreach (var reference in references)
                     {
-                        return ApplyMinimumNullableAnnotation(candidate, annotation);
+                        logger.Warn($" - {reference} : {result.ContainsKey(reference)}");
                     }
+
+                    goto add_default;
                 }
 
-                return ApplyMinimumNullableAnnotation(filledTypeParameter.Value.First(), annotation);
-            },
-            SymbolEqualityComparer.Default);
-    }
+                var hierarchy = Hierarchy.GetHierarchy(result[descendantReference])
+                    .Where(x => candidates.Contains(x.Type, SymbolEqualityComparer.Default));
 
-    private static void PickSubstitute(
-        ITypeParameterSymbol parameter,
-        ITypeSymbol type,
-        Dictionary<ITypeParameterSymbol, HashSet<ITypeSymbol>> resolved)
-    {
-        if (!resolved.TryGetValue(parameter, out var existing))
-            existing = resolved[parameter] = new(SymbolEqualityComparer.Default);
+                var chosen = parsed.Shrink
+                    ? hierarchy.First()
+                    : hierarchy.Last();
 
-        //Hanz.Logger.Log($"picked {parameter} : {type}");
-        existing.Add(type);
+                logger.Log($"Chose {chosen.Type} for {parsed}");
+
+                result.Add(
+                    filledTypeParameter.Key,
+                    ApplyMinimumNullableAnnotation(chosen.Type, annotation)
+                );
+                continue;
+            }
+
+            add_default:
+            result.Add(
+                filledTypeParameter.Key,
+                ApplyMinimumNullableAnnotation(filledTypeParameter.Value.First(), annotation)
+            );
+        }
+
+        return result;
     }
 
     private static bool HasReferenceToOtherConstraint(ITypeSymbol type, ITypeParameterSymbol toCheck)
@@ -309,14 +568,12 @@ public static class TransitiveFill
     }
 
     private static void ResolveGenericForTypeParameter(
-        IMethodSymbol method,
         ITypeParameterSymbol parameter,
-        InvocationExpressionSyntax invocation,
-        Dictionary<ITypeParameterSymbol, HashSet<ITypeSymbol>> resolved,
-        SemanticModel semantic,
+        Context context,
         Logger logger)
     {
-        var fillType = GetGenericFillType(method, method.TypeArguments.IndexOf(parameter), invocation, semantic, logger);
+        var fillType =
+            GetGenericFillType(context.Method.TypeArguments.IndexOf(parameter), context, logger);
 
         if (fillType is null)
         {
@@ -326,25 +583,22 @@ public static class TransitiveFill
 
         logger.Log($"Walking generic {parameter} : {fillType}");
 
-        WalkTypeForConstraints(method, parameter, fillType, semantic, resolved, logger);
+        WalkTypeForConstraints(context, parameter, fillType, logger);
     }
 
     private static void ResolveGenericForParameter(
-        IMethodSymbol method,
+        Context context,
         IParameterSymbol parameter,
-        InvocationExpressionSyntax invocation,
-        Dictionary<ITypeParameterSymbol, HashSet<ITypeSymbol>> resolved,
-        SemanticModel semantic,
         Logger logger)
     {
-        var fillType = GetFillType(method, method.Parameters.IndexOf(parameter), invocation, semantic, logger);
+        var fillType = GetFillType(context.Method.Parameters.IndexOf(parameter), context, logger);
 
         if (fillType is null)
         {
             return;
         }
 
-        if (method.Parameters.IndexOf(parameter) == 0)
+        if (context.Method.Parameters.IndexOf(parameter) == 0)
         {
             if (parameter.Type is not ITypeParameterSymbol typeParameter)
             {
@@ -352,19 +606,19 @@ public static class TransitiveFill
                 return;
             }
 
-            if (!CanSubstitute(typeParameter, fillType, logger))
+            if (!CanSubstitute(typeParameter, fillType, context, logger))
             {
                 logger.Warn($"Cannot substitute {typeParameter} to {fillType}");
                 return;
             }
 
             // we've resolved the 'this' parameter to 'fillType'
-            PickSubstitute(typeParameter, fillType, resolved);
+            context.PickSubstitute(typeParameter, fillType);
 
             // check for any generics within the constraints
             foreach (var constraintType in typeParameter.ConstraintTypes)
             {
-                if (!WalkTypeForConstraints(method, constraintType, fillType, semantic, resolved, logger))
+                if (!WalkTypeForConstraints(context, constraintType, fillType, logger))
                 {
                     logger.Warn($"Cannot substitute constraint {constraintType} to {fillType}");
                     return;
@@ -373,7 +627,7 @@ public static class TransitiveFill
         }
         else
         {
-            WalkTypeForConstraints(method, parameter.Type, fillType, semantic, resolved, logger);
+            WalkTypeForConstraints(context, parameter.Type, fillType, logger);
         }
     }
 
@@ -397,88 +651,184 @@ public static class TransitiveFill
             .ToArray();
     }
 
+    private static IEnumerable<ITypeSymbol> WeakResolveGenerics(ITypeSymbol source, ITypeSymbol toResolve,
+        Context context)
+    {
+        if (toResolve is ITypeParameterSymbol typeParameter)
+        {
+            return context.Resolved.TryGetValue(typeParameter, out var resolved)
+                ? resolved
+                : [source];
+        }
+
+        if (toResolve is INamedTypeSymbol {IsGenericType: true} named)
+        {
+            return source.AllInterfaces
+                .Where(x =>
+                    x.IsGenericType &&
+                    x.ConstructedFrom.Equals(named.ConstructedFrom, SymbolEqualityComparer.Default)
+                );
+        }
+
+        return [toResolve];
+    }
+
     private static bool WalkTypeForConstraints(
-        IMethodSymbol method,
+        Context context,
         ITypeSymbol type,
         ITypeSymbol filledType,
-        SemanticModel semanticModel,
-        Dictionary<ITypeParameterSymbol, HashSet<ITypeSymbol>> resolved,
         Logger logger,
         int depth = 0)
     {
         logger.LogWithDepth($"Processing {type} : {filledType}", depth);
 
-        if (type is ITypeParameterSymbol constraintTypeParameter &&
-            CanSubstitute(constraintTypeParameter, filledType, logger, depth: depth))
+        if (
+            type is ITypeParameterSymbol constraintTypeParameter &&
+            CanSubstitute(constraintTypeParameter, filledType, context, logger, depth: depth))
         {
-            var notConstraints = GetNotConstraints(constraintTypeParameter);
-            var interfaceConstraint = GetInterfaceConstraint(constraintTypeParameter);
+            var parsedParameter = context.TypeParameters[constraintTypeParameter];
 
-            if (notConstraints.Length > 0)
+            if (parsedParameter.Not.Count > 0)
             {
-                var notGenerics = resolved
-                    .Where(x => notConstraints.Contains(x.Key.Name))
-                    .SelectMany(x => x.Value)
-                    .ToArray();
+                var shouldResubstitute =
+                    parsedParameter.ShouldBeInterface && filledType.TypeKind is not TypeKind.Interface
+                    ||
+                    parsedParameter
+                        .Not
+                        .SelectMany(x =>
+                            context.Resolved.TryGetValue(x, out var value)
+                                ? value
+                                : []
+                        )
+                        .Any(x =>
+                            x.Equals(filledType, SymbolEqualityComparer.Default)
+                        );
 
-                var shouldResubstitute = notGenerics.Any(x => x.Equals(filledType, SymbolEqualityComparer.Default));
 
-                if (shouldResubstitute || (interfaceConstraint && filledType.TypeKind is not TypeKind.Interface))
+                if (shouldResubstitute)
                 {
-                    var newFillType = Hierarchy
-                        .GetHierarchy(filledType)
-                        .FirstOrDefault(x =>
-                            (!shouldResubstitute || CanSubstitute(constraintTypeParameter, x.Type, logger, depth: depth)) &&
-                            (!interfaceConstraint || x.Type.TypeKind is TypeKind.Interface)
-                        ).Type;
+                    logger.LogWithDepth(
+                        $"{constraintTypeParameter}: Computing substitution for {type} : {filledType}",
+                        depth
+                    );
 
-                    if (newFillType is null)
+                    var constraintSubstitutions = constraintTypeParameter.ConstraintTypes
+                        .SelectMany(x =>
+                        {
+                            var resolved = WeakResolveGenerics(filledType, x, context)
+                                .ToArray();
+
+                            logger.LogWithDepth($"{constraintTypeParameter}: Weak resolved constraints:", depth);
+                            foreach (var resolvedConstraint in resolved)
+                            {
+                                logger.LogWithDepth($" - {filledType} -> {x} -> {resolvedConstraint}", depth);
+                            }
+
+                            return resolved;
+                        })
+                        .SelectMany(x =>
+                        {
+                            var hierarchy = Hierarchy
+                                .GetHierarchyBetween(
+                                    filledType,
+                                    x,
+                                    false,
+                                    false,
+                                    !parsedParameter.ShouldBeInterface
+                                );
+
+                            logger.LogWithDepth(
+                                $"{constraintTypeParameter}: Hierarchy for {filledType} -> {x}:",
+                                depth
+                            );
+
+                            foreach (var element in hierarchy)
+                            {
+                                logger.LogWithDepth($" - {element}", depth);
+                            }
+
+                            return hierarchy;
+                        })
+                        .Distinct<ITypeSymbol>(SymbolEqualityComparer.Default)
+                        .Where(x =>
+                            WalkTypeForConstraints(context, type, x, logger, depth + 1)
+                        )
+                        .ToArray();
+
+                    if (constraintSubstitutions.Length == 0)
                     {
-                        logger.LogWithDepth($"Couldn't resolve 'NOT' case for {filledType} ({string.Join(" | ", notConstraints)})", depth,
-                            LogLevel.Warning);
+                        logger.LogWithDepth(
+                            $"{constraintTypeParameter}: Couldn't resolve 'NOT' case for {filledType} ({string.Join(" | ", parsedParameter.Not)})",
+                            depth,
+                            LogLevel.Warning
+                        );
                         return false;
                     }
 
-                    filledType = newFillType;
+                    logger.LogWithDepth(
+                        $"{constraintTypeParameter}: {constraintSubstitutions.Length} valid candidates:",
+                        depth
+                    );
+
+                    foreach (var element in constraintSubstitutions)
+                        logger.LogWithDepth($"- {element}", depth);
+
+                    context.PickSubstitute(constraintTypeParameter, constraintSubstitutions);
+                    return true;
                 }
             }
 
-            var hasWalked = resolved.ContainsKey(constraintTypeParameter);
-
-            PickSubstitute(constraintTypeParameter, filledType, resolved);
-            logger.LogWithDepth($"Picked {filledType} for {constraintTypeParameter}", depth);
-
+            var hasWalked = context.Resolved.ContainsKey(constraintTypeParameter);
             if (hasWalked) return true;
 
             logger.LogWithDepth(
                 $"Walking {constraintTypeParameter.ConstraintTypes.Length} constraints for {filledType}",
-                depth);
+                depth
+            );
+
+            // prevent recursion
+            context.PickSubstitute(constraintTypeParameter, filledType);
+
             foreach (var constraints in constraintTypeParameter.ConstraintTypes)
             {
-                WalkTypeForConstraints(
-                    method,
-                    constraints,
-                    filledType,
-                    semanticModel,
-                    resolved,
-                    logger,
-                    depth + 1
+                if (WalkTypeForConstraints(context, constraints, filledType, logger, depth + 1))
+                    continue;
+
+                logger.LogWithDepth(
+                    $"{filledType} doesn't match constraint {constraintTypeParameter} on {constraints}",
+                    depth
                 );
+
+                context.RemoveCandidate(constraintTypeParameter, filledType);
+
+                return false;
             }
+
+            logger.LogWithDepth($"Picked {filledType} for {constraintTypeParameter}", depth);
 
             return true;
         }
 
         if (type is INamedTypeSymbol namedConstraint)
         {
-            var expectedSubstitute = TryMatchTo(filledType, namedConstraint, candidate =>
-                FurtherClassifyCandidate(namedConstraint, candidate, semanticModel, logger, depth: depth)
-            );
+            var processed = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default)
+            {
+                filledType
+            };
 
+            var expectedSubstitute = TryMatchTo(filledType, namedConstraint, candidate =>
+                FurtherClassifyCandidate(context, namedConstraint, candidate, logger, processed, depth: depth)
+            );
 
             // 'fillType' doesn't implement the type
             if (expectedSubstitute is null)
             {
+                if (TypeBlacklists.Any(x => namedConstraint.ToDisplayString().StartsWith(x)))
+                {
+                    logger.LogWithDepth($"Skipping {namedConstraint}, blacklisted type", depth);
+                    return true;
+                }
+
                 logger.LogWithDepth($"{filledType} doesn't implement {namedConstraint}", depth);
                 return false;
             }
@@ -487,16 +837,22 @@ public static class TransitiveFill
 
             if (namedConstraint.IsGenericType)
             {
-                logger.LogWithDepth($"Walking {namedConstraint.TypeArguments.Length} type arguments for {filledType}", depth);
+                logger.LogWithDepth($"Walking {namedConstraint.TypeArguments.Length} type arguments for {filledType}",
+                    depth);
 
                 for (var i = 0; i < namedConstraint.TypeArguments.Length; i++)
                 {
+                    if (processed.Contains(namedConstraint.TypeArguments[i]) ||
+                        processed.Contains(expectedSubstitute.TypeArguments[i]))
+                    {
+                        logger.LogWithDepth($"Skipping {namedConstraint.TypeArguments[i]}: precompute", depth);
+                        continue;
+                    }
+
                     WalkTypeForConstraints(
-                        method,
+                        context,
                         namedConstraint.TypeArguments[i],
                         expectedSubstitute.TypeArguments[i],
-                        semanticModel,
-                        resolved,
                         logger,
                         depth + 1
                     );
@@ -512,9 +868,9 @@ public static class TransitiveFill
 
 
     private static bool FurtherClassifyCandidate(
+        Context context,
         ITypeSymbol source,
         ITypeSymbol candidate,
-        SemanticModel semantic,
         Logger logger,
         HashSet<ITypeSymbol>? processed = null,
         int depth = 0)
@@ -531,7 +887,38 @@ public static class TransitiveFill
 
         if (source is ITypeParameterSymbol constraint)
         {
-            var canSubstitute = CanSubstitute(constraint, candidate, logger, depth: depth);
+            var canSubstitute = CanSubstitute(constraint, candidate, context, logger, depth: depth);
+
+            if (
+                canSubstitute &&
+                context.Resolved.TryGetValue(constraint, out var candidates))
+            {
+                context.AddAdditionalConstraints(constraint, candidate);
+                var hasMatching = false;
+
+                logger.LogWithDepth($"{source}: Checking {candidates.Count} existing candidates for {candidate}",
+                    depth);
+
+                foreach (var existingCandidate in candidates.ToArray())
+                {
+                    var hasConversion =
+                        context.SemanticModel.Compilation.HasImplicitConversion(candidate, existingCandidate);
+
+                    hasMatching |= hasConversion;
+
+                    logger.LogWithDepth(
+                        $"{source}: {candidate} can comply with existing substitute {existingCandidate}?: {hasConversion}",
+                        depth
+                    );
+
+                    // if (!hasConversion)
+                    //     context.RemoveCandidate(constraint, existingCandidate);
+                }
+
+                if (!hasMatching)
+                    return false;
+            }
+
             logger.LogWithDepth($"{source}: Can substitute? {canSubstitute}", depth);
             return canSubstitute;
         }
@@ -551,9 +938,9 @@ public static class TransitiveFill
             for (int i = 0; i < namedSource.TypeParameters.Length; i++)
             {
                 if (!FurtherClassifyCandidate(
+                        context,
                         namedSource.TypeArguments[i],
                         namedCandidate.TypeArguments[i],
-                        semantic,
                         logger,
                         processed,
                         depth + 1
@@ -571,7 +958,7 @@ public static class TransitiveFill
 
         var isValid =
             source.Equals(candidate, SymbolEqualityComparer.Default) ||
-            semantic.Compilation.HasImplicitConversion(candidate, source);
+            context.SemanticModel.Compilation.HasImplicitConversion(candidate, source);
 
         logger.LogWithDepth($"{source}: Valid? {isValid}", depth);
 
@@ -609,25 +996,29 @@ public static class TransitiveFill
             return namedFillType;
         }
 
-        var fillTypeHierarchy = Hierarchy.GetHierarchy(fillType);
+        var fillTypeHierarchy = Hierarchy
+            .GetHierarchy(fillType)
+            .Select(x => x.Type)
+            .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default);
 
         return fillTypeHierarchy.FirstOrDefault(x =>
         {
-            var isMatch = x.Type.IsGenericType && toMatchTo.IsGenericType
-                ? x.Type.ConstructUnboundGenericType()
+            var isMatch = x.IsGenericType && toMatchTo.IsGenericType
+                ? x.ConstructUnboundGenericType()
                     .Equals(
                         toMatchTo.ConstructUnboundGenericType(),
                         SymbolEqualityComparer.Default
                     )
-                : x.Type.Equals(toMatchTo, SymbolEqualityComparer.Default);
+                : x.Equals(toMatchTo, SymbolEqualityComparer.Default);
 
-            return isMatch && (additionalPredicate?.Invoke(x.Type) ?? true);
-        }).Type;
+            return isMatch && (additionalPredicate?.Invoke(x) ?? true);
+        });
     }
 
     private static bool CanSubstitute(
         ITypeParameterSymbol parameter,
         ITypeSymbol requested,
+        Context context,
         Logger logger,
         HashSet<ITypeSymbol>? checkedType = null,
         int depth = 0)
@@ -641,12 +1032,19 @@ public static class TransitiveFill
         if (parameter.HasValueTypeConstraint && !requested.IsValueType) return false;
         if (parameter.HasUnmanagedTypeConstraint && !requested.IsUnmanagedType) return false;
 
+        if (!context.PassesAdditionalChecks(parameter, requested))
+        {
+            logger.LogWithDepth($"{requested} does not meet the additional checks for {parameter}", depth);
+            checkedType.Add(parameter);
+            return false;
+        }
+
         foreach (var constraintType in parameter.ConstraintTypes)
         {
             if (checkedType.Contains(constraintType))
                 continue;
 
-            if (!CanSubstituteConstraint(requested, constraintType, logger, checkedType, depth + 1))
+            if (!CanSubstituteConstraint(requested, constraintType, context, logger, checkedType, depth + 1))
             {
                 // check for blacklisted
                 if (TypeBlacklists.Any(x => constraintType.ToDisplayString().StartsWith(x)))
@@ -660,6 +1058,8 @@ public static class TransitiveFill
                 return false;
             }
 
+            logger.LogWithDepth($"{requested} satisfies constraint {constraintType}", depth);
+
             checkedType.Add(constraintType);
         }
 
@@ -669,6 +1069,7 @@ public static class TransitiveFill
     private static bool CanSubstituteConstraint(
         ITypeSymbol requested,
         ITypeSymbol constraint,
+        Context context,
         Logger logger,
         HashSet<ITypeSymbol>? checkedType = null,
         int depth = 0)
@@ -680,7 +1081,14 @@ public static class TransitiveFill
 
         var result = constraint switch
         {
-            ITypeParameterSymbol constraintParameter => CanSubstitute(constraintParameter, requested, logger, checkedType, depth + 1),
+            ITypeParameterSymbol constraintParameter => CanSubstitute(
+                constraintParameter,
+                requested,
+                context,
+                logger,
+                checkedType,
+                depth + 1
+            ),
             INamedTypeSymbol named =>
                 TryMatchTo(requested, named, matched =>
                     checkedType.Contains(matched) ||
@@ -688,7 +1096,14 @@ public static class TransitiveFill
                     named.TypeArguments
                         .Select((x, i) => (Type: x, Index: i))
                         .All(x =>
-                            CanSubstituteConstraint(matched.TypeArguments[x.Index], x.Type, logger, checkedType, depth + 1)
+                            CanSubstituteConstraint(
+                                matched.TypeArguments[x.Index],
+                                x.Type,
+                                context,
+                                logger,
+                                checkedType,
+                                depth + 1
+                            )
                         )
                 ) is not null,
             _ => true
@@ -701,62 +1116,39 @@ public static class TransitiveFill
     }
 
     private static ITypeSymbol? GetGenericFillType(
-        IMethodSymbol method,
         int index,
-        InvocationExpressionSyntax invocation,
-        SemanticModel semantic,
+        Context context,
         Logger logger)
     {
-        var syntax = invocation.Expression as GenericNameSyntax;
+        var typeConstraint = context.Method.TypeParameters[index];
 
-        if (syntax is null)
+        // look at the parameters
+        var candidateParameter = context.Method.Parameters.FirstOrDefault(x =>
+            HasReferenceToOtherConstraint(x.Type, typeConstraint)
+        );
+
+        if (candidateParameter is null)
         {
-            syntax = invocation.Expression switch
-            {
-                MemberAccessExpressionSyntax memberAccess => memberAccess.Name as GenericNameSyntax,
-                _ => syntax
-            };
+            logger.Warn(
+                $"No fill type for {context.Invocation.Expression} through both type parameters and supplied arguments");
+            return null;
         }
 
-        if (syntax is null)
-        {
-            var typeConstraint = method.TypeParameters[index];
-            // look at the parameters
-            var candidateParameter = method.Parameters.FirstOrDefault(x =>
-                HasReferenceToOtherConstraint(x.Type, typeConstraint)
-            );
-
-            if (candidateParameter is null)
-            {
-                logger.Warn(
-                    $"No fill type for {invocation.Expression} through both type parameters and supplied arguments");
-                return null;
-            }
-
-
-            if (GetFillType(method, method.Parameters.IndexOf(candidateParameter), invocation, semantic, logger) is not
-                INamedTypeSymbol candidateFillType)
-                return null;
-
-            return TypeUtils.PairedWalkTypeSymbolForMatch(
-                typeConstraint,
-                candidateParameter.Type,
-                candidateFillType,
-                semantic
-            );
-        }
-
-        if (syntax.TypeArgumentList.Arguments.Count <= index)
+        if (GetFillType(context.Method.Parameters.IndexOf(candidateParameter), context, logger) is not
+            INamedTypeSymbol candidateFillType)
             return null;
 
-        return semantic.GetTypeInfo(syntax.TypeArgumentList.Arguments[index]).Type;
+        return TypeUtils.PairedWalkTypeSymbolForMatch(
+            typeConstraint,
+            candidateParameter.Type,
+            candidateFillType,
+            context.SemanticModel
+        );
     }
 
     private static ITypeSymbol? GetFillType(
-        IMethodSymbol symbol,
         int index,
-        InvocationExpressionSyntax invocation,
-        SemanticModel semantic,
+        Context context,
         Logger logger)
     {
         switch (index)
@@ -764,14 +1156,15 @@ public static class TransitiveFill
             case -1:
                 logger.Warn("Cannot pull parameter: -1 index");
                 return null;
-            case 0 when symbol.IsExtensionMethod:
-                return FunctionGenerator.GetInvocationTarget(invocation, semantic);
-            case >= 0 when invocation.ArgumentList.Arguments.Count > index - (symbol.IsExtensionMethod ? 1 : 0):
-                if (symbol.IsExtensionMethod)
+            case 0 when context.Method.IsExtensionMethod:
+                return FunctionGenerator.GetInvocationTarget(context.Invocation, context.SemanticModel);
+            case >= 0 when context.Invocation.ArgumentList.Arguments.Count >
+                           index - (context.Method.IsExtensionMethod ? 1 : 0):
+                if (context.Method.IsExtensionMethod)
                     index = -1;
 
-                var expression = invocation.ArgumentList.Arguments[index].Expression;
-                var type = ModelExtensions.GetTypeInfo(semantic, expression).Type;
+                var expression = context.Invocation.ArgumentList.Arguments[index].Expression;
+                var type = ModelExtensions.GetTypeInfo(context.SemanticModel, expression).Type;
 
                 if (type is null)
                     logger.Warn($"Couldn't resolve type for expression {expression}");

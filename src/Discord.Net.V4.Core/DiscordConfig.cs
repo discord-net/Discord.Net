@@ -39,6 +39,8 @@ public class DiscordConfig
     /// </returns>
     public const int DefaultRequestTimeout = 15000;
 
+    public const int MaxThreadsPerBatch = 100;
+
     /// <summary>
     ///     Returns the max length for a Discord message.
     /// </summary>
@@ -85,7 +87,7 @@ public class DiscordConfig
     /// <returns>
     ///     The maximum number of guilds that can be gotten per-batch.
     /// </returns>
-    public const int MaxGuildsPerBatch = 100;
+    public const int MaxUsersGuildsPerBatch = 200;
 
     /// <summary>
     ///     Returns the max user reactions allowed to be in a request.

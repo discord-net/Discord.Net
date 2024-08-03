@@ -27,7 +27,7 @@ public interface IEntityModelStore<TId, TModel> : IEntityModelStore
     ValueTask RemoveAsync(TId id, CancellationToken token = default);
     ValueTask PurgeAllAsync(CancellationToken token = default);
 
-    IAsyncEnumerable<TModel> QueryAsync(TId from, Direction direction, int limit);
+    IAsyncEnumerable<TModel> QueryAsync(TId from, Direction direction, int? limit, CancellationToken token = default);
 
     Type IEntityModelStore.IdType => typeof(TId);
     Type IEntityModelStore.ModelType => typeof(TModel);

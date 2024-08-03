@@ -19,6 +19,11 @@ public interface IBrokerProvider<TId, TEntity, TActor, TModel> : IBrokerProvider
     internal new ValueTask<IEntityBroker<TId, TEntity, TActor, TModel>> GetBrokerAsync(
         CancellationToken token = default);
 
+    internal new static abstract ValueTask<IEntityBroker<TId, TEntity, TActor, TModel>> GetBrokerAsync(
+        DiscordGatewayClient client,
+        CancellationToken token = default
+    );
+
     async ValueTask<IEntityBroker<TId, TEntity, TModel>> IBrokerProvider<TId, TEntity, TModel>.GetBrokerAsync(
         CancellationToken token
     ) => await GetBrokerAsync(token);
@@ -35,6 +40,11 @@ public interface IBrokerProvider<TId, TEntity, TModel>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
+    internal static abstract ValueTask<IEntityBroker<TId, TEntity, TModel>> GetBrokerAsync(
+        DiscordGatewayClient client,
+        CancellationToken token = default
+    );
+
     internal ValueTask<IEntityBroker<TId, TEntity, TModel>> GetBrokerAsync(CancellationToken token = default);
 
     internal static abstract ValueTask<IManageableEntityBroker<TId, TEntity, TModel>> GetBrokerForModelAsync(
