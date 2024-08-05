@@ -48,7 +48,7 @@ internal static partial class RestActors
         GuildRelatedEntityWithTransform<
             [TransitiveFill] TActor,
             TRestEntity,
-            [Not(nameof(TRestEntity)), Interface] TCoreEntity,
+            [Not(nameof(TRestEntity)), Interface, Shrink] TCoreEntity,
             TModel,
             TRouteModel,
             TApiModel,
@@ -93,7 +93,7 @@ internal static partial class RestActors
         GuildRelatedEntity<
             [TransitiveFill] TActor,
             TRestEntity,
-            [Not(nameof(TRestEntity)), Interface] TCoreEntity,
+            [Not(nameof(TRestEntity)), Interface, Shrink] TCoreEntity,
             TModel,
             TRouteModel,
             TId

@@ -9,6 +9,7 @@ public partial interface IUserActor :
     IActor<ulong, IUser>,
     IEntityProvider<IDMChannel, IDMChannelModel>
 {
+    [return: TypeHeuristic(nameof(CreateEntity))]
     async Task<IDMChannel> CreateDMAsync(RequestOptions? options = null, CancellationToken token = default)
     {
         var model = await Client.RestApiClient.ExecuteRequiredAsync(

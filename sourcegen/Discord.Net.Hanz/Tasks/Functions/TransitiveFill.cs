@@ -217,28 +217,47 @@ public static class TransitiveFill
             .Any(x => x.AttributeClass?.ToDisplayString() == "Discord.TransitiveFillAttribute");
     }
 
+    private static bool InvocationArgumentsAreInRange(IMethodSymbol method, InvocationExpressionSyntax expression)
+    {
+        var upper = method.Parameters.Length;
+        var lower = upper;
+
+        if (method.IsExtensionMethod)
+            lower--;
+
+        lower -= Math.Max(0, method.Parameters.Count(x => x.IsOptional));
+
+        return
+            expression.ArgumentList.Arguments.Count >= lower
+            &&
+            (
+                VariableFuncArgs.IsTargetMethod(method)
+                ||
+                expression.ArgumentList.Arguments.Count <= upper
+            );
+    }
+
     public static void Apply(
         ref MethodDeclarationSyntax methodSyntax,
         InvocationExpressionSyntax invocationExpression,
-        FunctionGenerator.MethodTarget target,
+        IMethodSymbol method,
         SemanticModel semantic,
         Logger logger)
     {
-        logger.Log($"Executing TransitiveFill on {target.MethodSymbol}");
+        logger.Log($"Executing TransitiveFill on {method}");
 
-        if (
-            invocationExpression.ArgumentList.Arguments.Count
-            !=
-            target.MethodSymbol.Parameters.Length - (target.MethodSymbol.IsExtensionMethod ? 1 : 0)
-        )
+        if (!InvocationArgumentsAreInRange(method, invocationExpression))
         {
-            logger.Log("Skipping this method, mismatch argument count");
+            logger.Log($"Skipping this method, mismatch argument count:\n" +
+                       $"Expression: {invocationExpression.ArgumentList.Arguments.Count}\n" +
+                       $"Symbol: {method.Parameters.Length}\n" +
+                       $"IsExtension?: {method.IsExtensionMethod}");
             return;
         }
 
-        var context = new Context(semantic, target.MethodSymbol, invocationExpression, logger);
+        var context = new Context(semantic, method, invocationExpression, logger);
 
-        foreach (var typeParameter in target.MethodSymbol.TypeParameters.Where(TypeParameterIsTransitiveFill))
+        foreach (var typeParameter in method.TypeParameters.Where(TypeParameterIsTransitiveFill))
         {
             ResolveGenericForTypeParameter(
                 typeParameter,
@@ -246,13 +265,13 @@ public static class TransitiveFill
                 logger
             );
 
-            if (context.Resolved.Count == target.MethodSymbol.TypeParameters.Length)
+            if (context.Resolved.Count == method.TypeParameters.Length)
                 break;
         }
 
-        if (context.Resolved.Count != target.MethodSymbol.TypeParameters.Length)
+        if (context.Resolved.Count != method.TypeParameters.Length)
         {
-            foreach (var parameter in target.MethodSymbol.Parameters.Where(ParameterIsTransitiveFill))
+            foreach (var parameter in method.Parameters.Where(ParameterIsTransitiveFill))
             {
                 ResolveGenericForParameter(
                     context,
@@ -260,25 +279,25 @@ public static class TransitiveFill
                     logger
                 );
 
-                if (context.Resolved.Count == target.MethodSymbol.TypeParameters.Length)
+                if (context.Resolved.Count == method.TypeParameters.Length)
                     break;
             }
         }
 
         if (context.Resolved.Count == 0)
         {
-            logger.Warn($"No generics could be resolved for {target.MethodSymbol}");
+            logger.Warn($"No generics could be resolved for {method}");
             return;
         }
 
         // do a check for any remaining generics specified by the user
         if (
-            context.Resolved.Count < target.MethodSymbol.TypeParameters.Length &&
+            context.Resolved.Count < method.TypeParameters.Length &&
             SyntaxUtils.GetMemberTargetOrSelf(invocationExpression.Expression) is GenericNameSyntax genericNameSyntax
         )
         {
             var remainingParameters = new Queue<ITypeParameterSymbol>(
-                target.MethodSymbol.TypeParameters
+                method.TypeParameters
                     .Where(x =>
                         !context.Resolved.ContainsKey(x)
                     )
@@ -328,7 +347,7 @@ public static class TransitiveFill
         // we want to keep the [TransitiveFill] generic IF it's not explicitly used in the parameters
         var toKeep = generics.FirstOrDefault(x =>
             TypeParameterIsTransitiveFill(x.Key) &&
-            target.MethodSymbol.Parameters.All(y => HasReferenceToOtherConstraint(y.Type, x.Key))
+            method.Parameters.All(y => HasReferenceToOtherConstraint(y.Type, x.Key))
         ).Key;
 
         if (toKeep is not null)
@@ -340,7 +359,7 @@ public static class TransitiveFill
             x => x.Key.Name,
             x => x.Value.ToDisplayString());
 
-        logger.Log($"Computed {genericLookupTable.Count} filled generics for {target.MethodSymbol}");
+        logger.Log($"Computed {genericLookupTable.Count} filled generics for {method}");
         foreach (var entry in genericLookupTable)
         {
             logger.Log($". {entry.Key} -> {entry.Value}");
@@ -811,10 +830,7 @@ public static class TransitiveFill
 
         if (type is INamedTypeSymbol namedConstraint)
         {
-            var processed = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default)
-            {
-                filledType
-            };
+            var processed = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default) {filledType};
 
             var expectedSubstitute = TryMatchTo(filledType, namedConstraint, candidate =>
                 FurtherClassifyCandidate(context, namedConstraint, candidate, logger, processed, depth: depth)

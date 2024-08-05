@@ -18,9 +18,9 @@ public partial class RestUserActor(
     internal virtual RestUser CreateEntity(IUserModel model)
         => RestUser.Construct(Client, model);
 
-    public IDMChannel CreateEntity(IDMChannelModel model)
-        => RestDMChannel.Construct(Client, Identity.MostSpecific(this), model);
-
+    [SourceOfTruth]
+    internal RestDMChannel CreateEntity(IDMChannelModel model)
+        => RestDMChannel.Construct(Client, Identity | this, model);
 }
 
 public partial class RestUser :

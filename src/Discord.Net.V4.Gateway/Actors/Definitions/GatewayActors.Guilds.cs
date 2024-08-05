@@ -23,7 +23,7 @@ internal static partial class GatewayActors
         TId,
         TEntity,
         [Ignore] TRestEntity,
-        [Not(nameof(TRestEntity)), Not(nameof(TEntity)), Interface] [RequireResolve]
+        [Not(nameof(TRestEntity)), Not(nameof(TEntity)), Interface, RequireResolve]
         TCoreEntity,
         TModel
     >(

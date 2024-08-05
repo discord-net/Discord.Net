@@ -223,8 +223,6 @@ public sealed partial class RestGuild :
 
     public new NsfwLevel NsfwLevel => base.NsfwLevel ?? NsfwLevel.Default;
 
-    public CultureInfo PreferredCulture => CultureInfo.GetCultureInfoByIetfLanguageTag(Model.PreferredLocale);
-
     public bool IsBoostProgressBarEnabled => Model.PremiumProgressBarEnabled;
 
     public new int PremiumSubscriptionCount => base.PremiumSubscriptionCount ?? 0;

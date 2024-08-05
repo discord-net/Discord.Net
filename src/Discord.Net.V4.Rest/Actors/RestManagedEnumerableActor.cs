@@ -15,7 +15,7 @@ internal static partial class RestManagedEnumerableActor
         [TransitiveFill]TActor,
         TId,
         TEntity,
-        [Not(nameof(TEntity)), Interface]TCore,
+        [Not(nameof(TEntity)), Interface, Shrink]TCore,
         TModel
     >(
         Template<TActor> template,
