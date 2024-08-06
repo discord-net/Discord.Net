@@ -6,24 +6,27 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-[method: TypeFactory]
-public partial class GatewayGuildChannelActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    GuildChannelIdentity channel
-) :
-    GatewayChannelActor(client, channel),
+public partial class GatewayGuildChannelActor :
+    GatewayChannelActor,
     IGuildChannelActor,
     IGatewayCachedActor<ulong, GatewayGuildChannel, GuildChannelIdentity, IGuildChannelModel>
 {
-    [SourceOfTruth]
-    internal override GuildChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] internal override GuildChannelIdentity Identity { get; }
 
-    [SourceOfTruth]
-    [StoreRoot]
-    public GatewayGuildActor Guild { get; } = guild.Actor ?? new GatewayGuildActor(client, guild);
+    [SourceOfTruth] [StoreRoot] public GatewayGuildActor Guild { get; }
 
     public IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites => throw new NotImplementedException();
+
+    [TypeFactory]
+    public GatewayGuildChannelActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        GuildChannelIdentity channel
+    ) : base(client, channel)
+    {
+        Identity = channel | this;
+        Guild = client.Guilds >> guild;
+    }
 
     public IInvite CreateEntity(IInviteModel model) => throw new NotImplementedException();
 
@@ -68,7 +71,7 @@ public partial class GatewayGuildChannel :
 
     public static GatewayGuildChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGuildChannelModel model)
     {
         switch (model)

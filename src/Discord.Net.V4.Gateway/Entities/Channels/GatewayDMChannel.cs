@@ -5,21 +5,28 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-public sealed partial class GatewayDMChannelActor(
-    DiscordGatewayClient client,
-    DMChannelIdentity channel,
-    UserIdentity recipient
-) :
-    GatewayChannelActor(client, channel),
+public sealed partial class GatewayDMChannelActor :
+    GatewayChannelActor,
     IDMChannelActor,
     IGatewayCachedActor<ulong, GatewayDMChannel, DMChannelIdentity, IDMChannelModel>
 {
-    [SourceOfTruth] public GatewayUserActor Recipient { get; } = new(client, recipient);
+    [SourceOfTruth] public GatewayUserActor Recipient { get; }
 
-    [SourceOfTruth] internal override DMChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] internal override DMChannelIdentity Identity { get; }
 
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal GatewayMessageChannelActor MessageChannelActor { get; } = new(client, channel);
+    internal GatewayMessageChannelActor MessageChannelActor { get; }
+
+    public GatewayDMChannelActor(
+        DiscordGatewayClient client,
+        DMChannelIdentity channel,
+        UserIdentity recipient
+    ) : base(client, channel)
+    {
+        Identity = channel | this;
+        Recipient = client.Users >> recipient;
+        MessageChannelActor = new GatewayMessageChannelActor(client, channel);
+    }
 
     [SourceOfTruth]
     internal GatewayDMChannel CreateEntity(IDMChannelModel model)
@@ -55,7 +62,7 @@ public sealed partial class GatewayDMChannel :
 
     public static GatewayDMChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IDMChannelModel model
     ) => new(
         client,

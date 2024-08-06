@@ -45,7 +45,7 @@ public sealed partial class GatewayCategoryChannel :
 
     public static GatewayCategoryChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGuildCategoryChannelModel model
     ) => new(
         client,

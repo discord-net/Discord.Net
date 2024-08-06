@@ -5,13 +5,20 @@ using Discord.Models;
 namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
-public partial class GatewayChannelActor(
-    DiscordGatewayClient client,
-    ChannelIdentity channel
-) :
-    GatewayCachedActor<ulong, GatewayChannel, ChannelIdentity, IChannelModel>(client, channel),
+public partial class GatewayChannelActor :
+    GatewayCachedActor<ulong, GatewayChannel, ChannelIdentity, IChannelModel>,
     IChannelActor
 {
+    internal override ChannelIdentity Identity { get; }
+
+    public GatewayChannelActor(
+        DiscordGatewayClient client,
+        ChannelIdentity channel
+    ) : base(client, channel)
+    {
+        Identity = channel | this;
+    }
+
     [SourceOfTruth]
     internal GatewayChannel CreateEntity(IChannelModel model)
         => Client.StateController.CreateLatent(this, model, CachePath);
@@ -41,7 +48,7 @@ public partial class GatewayChannel :
 
     public static GatewayChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IChannelModel model)
     {
         return model switch
@@ -49,7 +56,7 @@ public partial class GatewayChannel :
             IDMChannelModel dmChannelModel
                 => GatewayDMChannel.Construct(client, context, dmChannelModel),
             IGroupDMChannelModel groupDMChannelModel
-                => GatewayGroupChannel.Construct(client, context,groupDMChannelModel),
+                => GatewayGroupChannel.Construct(client, context, groupDMChannelModel),
             IGuildChannelModel guildChannelModel
                 => GatewayGuildChannel.Construct(client, context, guildChannelModel),
             _ => new GatewayChannel(client, model, context.TryGetActor<GatewayChannelActor>())

@@ -14,7 +14,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+    IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
     where TModel : class, IEntityModel<TId>
     where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
     where TId : IEquatable<TId>
@@ -141,34 +141,18 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
                 $"the model to be of type {typeof(TModel)}"
             );
 
-        if (TryGetFromReference(model.Id, out var entity))
+        if (TryGetReference(model.Id, out var reference) && reference.TryGetReference(out var entity))
             await entity.UpdateAsync(model, false, token);
     }
 
     public async ValueTask UpdateInReferenceEntitiesAsync(IEnumerable<TModel> models, CancellationToken token)
-    {
-        foreach (var model in models)
-        {
-            // sanity
-            if (model.GetType() != typeof(TModel))
-                throw new InvalidOperationException(
-                    $"Attempted to update an entity in reference with the model {model.GetType()}, but this broker expects " +
-                    $"the model to be of type {typeof(TModel)}"
-
-                );
-            if (TryGetFromReference(model.Id, out var entity))
-                await entity.UpdateAsync(model, false, token);
-        }
-    }
+        => await Parallel.ForEachAsync(models, token, UpdateInReferenceEntityAsync);
 
     public async ValueTask<IEntityHandle<TId>> TransferConstructionOfEntity(
         TModel model,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         CancellationToken token)
     {
-        IEntityHandle<TId, TEntity>? handle;
-        EntityReference? reference;
-
         // sanity
         if (model.GetType() != typeof(TModel))
         {
@@ -183,18 +167,8 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
             );
         }
 
-        bool hasReference;
-
-        lock (_syncRoot)
-            hasReference = _references.TryGetValue(model.Id, out reference);
-
-        if (hasReference)
-        {
-            handle = reference!.AllocateHandle();
-
-            if (handle is not null)
-                return handle;
-        }
+        if (TryGetHandleFromReference(model.Id, out var handle))
+            return handle;
 
         using var scope = _keyedSemaphore.Get(model.Id, out var semaphoreSlim);
 
@@ -202,16 +176,8 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
 
         try
         {
-            lock (_syncRoot)
-                hasReference = _references.TryGetValue(model.Id, out reference);
-
-            if (hasReference)
-            {
-                handle = reference!.AllocateHandle();
-
-                if (handle is not null)
-                    return handle;
-            }
+            if (TryGetHandleFromReference(model.Id, out handle))
+                return handle;
 
             var entity = TEntity.Construct(_client, context, model);
 
@@ -282,33 +248,19 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
 
         semaphoreSlim.Wait(token);
 
-        if (TryGetFromReference(model.Id, out entity))
+        if (TryGetHandleFromReference(model.Id, out var entityHandle))
         {
             semaphoreSlim.Release();
             scope.Dispose();
             handle = null;
+            entity = entityHandle.Entity;
+            entityHandle.Dispose();
             return false;
         }
 
         handle = new LatentEntityPromise(scope, semaphoreSlim);
         entity = null;
         return true;
-    }
-
-    private async ValueTask<IEntityHandle<TId>?> ValidateBrokerForModel(
-        TModel model,
-        ICacheConstructionContext context,
-        CancellationToken token)
-    {
-        if (model.GetType() == typeof(TModel))
-            return null;
-
-        var broker = await TEntity.GetBrokerForModelAsync(_client, model.GetType(), token);
-
-        if (broker != this)
-            return await broker.TransferConstructionOfEntity(model, context, token);
-
-        return null;
     }
 
     private async ValueTask<IEntityHandle<TId, TEntity>> CreateReferenceAndHandleAsync(
@@ -318,45 +270,35 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         TActor? actor = null,
         CancellationToken token = default)
     {
-        ICacheConstructionContext context = actor is not null
-            ? new CacheConstructionContext<TActor>(actor, path)
-            : new CacheConstructionContext(path);
+        IGatewayConstructionContext context = actor is not null
+            ? new GatewayConstructionContext<TActor>(actor, path)
+            : new GatewayConstructionContext(path);
 
-        if (await ValidateBrokerForModel(model, context, token) is IEntityHandle<TId, TEntity> handle)
-            return handle;
+        if (model.GetType() != typeof(TModel))
+        {
+            var broker = await TEntity.GetBrokerForModelAsync(_client, model.GetType(), token);
+
+            if (broker != this)
+            {
+                if (
+                    await broker.TransferConstructionOfEntity(model, context, token)
+                    is IEntityHandle<TId, TEntity> transferredHandle)
+                {
+                    return transferredHandle;
+                }
+
+                // TODO: error state
+            }
+        }
 
         var entity = TEntity.Construct(_client, context, model);
 
-        handle = new EntityHandle<TId, TEntity, TModel>(this, id, entity);
+        var handle = new EntityHandle<TId, TEntity, TModel>(this, id, entity);
 
         lock (_syncRoot)
             _references[id] = new EntityReference(this, id, entity, handle);
 
         return handle;
-    }
-
-    private async ValueTask<TEntity> CreateReferenceAndImplicitHandleAsync(
-        CachePathable path,
-        TId id,
-        TModel model,
-        TActor? actor = null,
-        CancellationToken token = default)
-    {
-        ICacheConstructionContext context = actor is not null
-            ? new CacheConstructionContext<TActor>(actor, path)
-            : new CacheConstructionContext(path);
-
-        using var handle = await ValidateBrokerForModel(model, context, token) as IEntityHandle<TId, TEntity>;
-
-        if (handle is not null)
-            return handle.Entity;
-
-        var entity = TEntity.Construct(_client, context, model);
-
-        lock (_syncRoot)
-            _references[id] = new(this, id, entity);
-
-        return entity;
     }
 
     public void ReleaseHandle(IEntityHandle<TId, TEntity> handle)
@@ -388,7 +330,10 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
 
         try
         {
-            if (TryGetFromReference(id, out var existing) && existing != entity)
+            if (
+                TryGetReference(id, out var reference) &&
+                reference.TryGetReference(out var existing) &&
+                existing != entity)
             {
                 // TODO: this is an error state, mainly caused by a race condition
                 // in the time that it took from constructing 'entity' and then registering it,
@@ -467,16 +412,23 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
 
         if (storeInfo is not null)
         {
-            foreach (var grouping in entityModels.GroupBy(x => x.GetType()))
+            if (!storeInfo.HasHierarchicStores)
             {
-                if (!storeInfo.HierarchyStoreMap.TryGetValue(grouping.Key, out var storeProviderInfo))
-                    throw new InvalidOperationException(
-                        $"No store info exists for the model type {grouping.Key} under the {typeof(TModel)} broker"
-                    );
+                await storeInfo.Store.AddOrUpdateBatchAsync(entityModels, token);
+            }
+            else
+            {
+                foreach (var grouping in entityModels.GroupBy(x => x.GetType()))
+                {
+                    if (!storeInfo.HierarchyStoreMap.TryGetValue(grouping.Key, out var storeProviderInfo))
+                        throw new InvalidOperationException(
+                            $"No store info exists for the model type {grouping.Key} under the {typeof(TModel)} broker"
+                        );
 
-                var store = await storeInfo.GetOrComputeStoreAsync(storeProviderInfo, token);
+                    var store = await storeInfo.GetOrComputeStoreAsync(storeProviderInfo, token);
 
-                await store.AddOrUpdateBatchAsync(grouping, token);
+                    await store.AddOrUpdateBatchAsync(grouping, token);
+                }
             }
         }
 
@@ -522,43 +474,6 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         return results.ToImmutableList();
     }
 
-    public async ValueTask<TEntity?> GetImplicitAsync(
-        CachePathable path,
-        IIdentifiable<TId, TEntity, TModel> identity,
-        IStoreInfo<TId, TModel> storeInfo,
-        TActor? actor = null,
-        CancellationToken token = default)
-    {
-        using var scope = _keyedSemaphore.Get(identity.Id, out var semaphoreSlim);
-
-        await semaphoreSlim.WaitAsync(token);
-
-        try
-        {
-            if (TryGetFromReference(identity.Id, out var entity))
-                return entity;
-
-            TModel? model = null;
-
-            await foreach (var store in storeInfo.EnumerateAllAsync(token))
-            {
-                model = await store.GetAsync(identity.Id, token);
-
-                if (model is not null)
-                    break;
-            }
-
-            if (model is null)
-                return null;
-
-            return await CreateReferenceAndImplicitHandleAsync(path, identity.Id, model, actor, token);
-        }
-        finally
-        {
-            semaphoreSlim.Release();
-        }
-    }
-
     public async ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(
         CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,
@@ -577,12 +492,28 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
 
             TModel? model = null;
 
-            await foreach (var store in storeInfo.EnumerateAllAsync(token))
-            {
-                model = await store.GetAsync(identity.Id, token);
+            var stores = await storeInfo.GetAllStoresAsync(token);
 
-                if (model is not null)
+            switch (stores.Length)
+            {
+                case 0:
+                    return null;
+                case 1:
+                    model = await stores[0].GetAsync(identity.Id, token);
                     break;
+                default:
+                {
+                    using var searchTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
+
+                    await Parallel.ForEachAsync(stores, searchTokenSource.Token, async (store, token) =>
+                    {
+                        model = await store.GetAsync(identity.Id, token);
+
+                        if (model is not null)
+                            searchTokenSource.Cancel();
+                    });
+                    break;
+                }
             }
 
             if (model is null)
@@ -596,306 +527,140 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         }
     }
 
-
-    public async ValueTask<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllHandlesAsync(
+    public async IAsyncEnumerable<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllAsync(
         CachePathable path,
         IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token = default)
+        [EnumeratorCancellation] CancellationToken token = default)
     {
         await _enumerationSemaphore.WaitAsync(token);
 
-        var result = new List<IEntityHandle<TId, TEntity>>();
-
         try
         {
-            await foreach (var store in storeInfo.EnumerateAllAsync(token))
-            await foreach (var model in store.GetAllAsync(token))
-            {
-                if (TryGetHandleFromReference(model.Id, out var handle))
-                {
-                    result.Add(handle);
-                    continue;
-                }
+            var stores = await storeInfo.GetAllStoresAsync(token);
 
-                result.Add(
-                    await CreateReferenceAndHandleAsync(
-                        path,
-                        model.Id,
-                        model,
-                        token: token
-                    )
-                );
-            }
+            if (stores.Length == 0)
+                yield break;
 
-            return result.AsReadOnly();
-        }
-        finally
-        {
-            _enumerationSemaphore.Release();
-        }
-    }
-
-    public async ValueTask<IReadOnlyCollection<TEntity>> GetAllImplicitAsync(
-        CachePathable path,
-        IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token = default)
-    {
-        await _enumerationSemaphore.WaitAsync(token);
-
-        var result = new List<TEntity>();
-
-        try
-        {
-            await foreach (var store in storeInfo.EnumerateAllAsync(token))
-            await foreach (var model in store.GetAllAsync(token))
-            {
-                if (TryGetFromReference(model.Id, out var entity))
-                {
-                    result.Add(entity);
-                    continue;
-                }
-
-                result.Add(
-                    await CreateReferenceAndImplicitHandleAsync(
-                        path,
-                        model.Id,
-                        model,
-                        token: token
-                    )
-                );
-            }
-
-            return result.AsReadOnly();
-        }
-        finally
-        {
-            _enumerationSemaphore.Release();
-        }
-    }
-
-    public async ValueTask<IReadOnlyCollection<TId>> GetAllIdsAsync(IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token = default)
-    {
-        return
-            (
-                await EnumerateOnAllStoresAsync(
-                    storeInfo,
-                    async (store, token) => await store.GetAllIdsAsync(token).ToArrayAsync(token),
-                    token
+            await foreach
+                (var batch in AsyncEnumeratorUtils.JoinAsync(
+                    stores,
+                    static (store, token) => store.GetAllAsync(token),
+                    token)
                 )
-            )
-            .SelectMany(x => x)
-            .ToImmutableList();
-    }
-
-    private static async ValueTask<IEnumerable<T>> EnumerateOnAllStoresAsync<T>(
-        IStoreInfo<TId, TModel> storeInfo,
-        Func<IEntityModelStore<TId, TModel>, CancellationToken, ValueTask<T>> func,
-        CancellationToken token = default)
-    {
-        if (storeInfo.EnabledStoresForHierarchy.Count == 0)
-            return [await func(storeInfo.Store, token)];
-
-        var results = new T[storeInfo.EnabledStoresForHierarchy.Count + 1];
-
-        await Parallel.ForAsync(0, results.Length, token, async (i, token) =>
-        {
-            if (i == 0)
-                results[i] = await func(storeInfo.Store, token);
-            else
             {
-                results[i] = await func(
-                    await storeInfo.GetOrComputeStoreAsync(storeInfo.EnabledStoresForHierarchy[i - 1], token),
-                    token
-                );
-            }
-        });
+                // TODO: might be another performant solution
+                yield return (await Task.WhenAll(
+                    batch.Select(async model =>
+                    {
+                        if (TryGetHandleFromReference(model.Id, out var handle))
+                            return handle;
 
-        return results;
+                        return await CreateReferenceAndHandleAsync(
+                            path,
+                            model.Id,
+                            model,
+                            token: token
+                        );
+                    })
+                )).ToImmutableList();
+            }
+        }
+        finally
+        {
+            _enumerationSemaphore.Release();
+        }
     }
 
-    private bool TryGetFromReference(TId id, [MaybeNullWhen(false)] out TEntity entity)
+    public async IAsyncEnumerable<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> QueryAsync(
+        CachePathable path,
+        IStoreInfo<TId, TModel> storeInfo,
+        TId from,
+        Optional<TId> to,
+        Direction direction,
+        int? limit = null,
+        [EnumeratorCancellation] CancellationToken token = default)
     {
-        EntityReference? reference;
+        await _enumerationSemaphore.WaitAsync(token);
 
+        try
+        {
+            var stores = await storeInfo.GetAllStoresAsync(token);
+
+            if (stores.Length == 0)
+                yield break;
+
+            await foreach
+                (var batch in AsyncEnumeratorUtils.JoinAsync(
+                    stores,
+                    static (from, to, direction, limit, store, token) => store.QueryAsync(
+                        from,
+                        to,
+                        direction,
+                        limit,
+                        token
+                    ),
+                    from,
+                    to,
+                    direction,
+                    limit,
+                    token)
+                )
+            {
+                // TODO: might be another performant solution
+                yield return (await Task.WhenAll(
+                    batch.Select(async model =>
+                    {
+                        if (TryGetHandleFromReference(model.Id, out var handle))
+                            return handle;
+
+                        return await CreateReferenceAndHandleAsync(
+                            path,
+                            model.Id,
+                            model,
+                            token: token
+                        );
+                    })
+                )).ToImmutableList();
+            }
+        }
+        finally
+        {
+            _enumerationSemaphore.Release();
+        }
+    }
+
+    public async IAsyncEnumerable<IReadOnlyCollection<TId>> GetAllIdsAsync(
+        IStoreInfo<TId, TModel> storeInfo,
+        [EnumeratorCancellation] CancellationToken token = default)
+    {
+        // we don't have to lock since we're not accessing the reference cache
+        var stores = await storeInfo.GetAllStoresAsync(token);
+
+        if (stores.Length == 0)
+            yield break;
+
+        await foreach
+            (var batch in AsyncEnumeratorUtils.JoinAsync(
+                stores,
+                static (store, token) => store.GetAllIdsAsync(token),
+                token)
+            )
+        {
+            yield return batch.ToImmutableList();
+        }
+    }
+
+    private bool TryGetReference(TId id, [MaybeNullWhen(false)] out EntityReference reference)
+    {
         lock (_syncRoot)
-            _references.TryGetValue(id, out reference);
-
-        if (reference?.TryGetReference(out entity) ?? false)
-            return true;
-
-        entity = null;
-        return false;
+            return _references.TryGetValue(id, out reference);
     }
 
     private bool TryGetHandleFromReference(TId id, [MaybeNullWhen(false)] out IEntityHandle<TId, TEntity> handle)
     {
-        EntityReference? reference;
+        if (TryGetReference(id, out var reference)) return (handle = reference.AllocateHandle()) is not null;
 
-        lock (_syncRoot)
-            _references.TryGetValue(id, out reference);
-
-        handle = reference?.AllocateHandle();
-        return handle is not null;
+        handle = null;
+        return false;
     }
-}
-
-internal interface IEntityReference<out TId>
-{
-    TId Id { get; }
-}
-
-internal interface IEntityReference<out TId, out TEntity> : IEntityReference<TId>
-    where TEntity : class, IEntity<TId>
-    where TId : IEquatable<TId>
-{
-    TEntity? GetReference(out bool isSuccess);
-    IEntityHandle<TId, TEntity>? AllocateHandle();
-}
-
-internal interface IEntityBroker<TId, TEntity, in TActor, TModel> : IEntityBroker<TId, TEntity, TModel>
-    where TEntity :
-    class,
-    ICacheableEntity<TEntity, TId, TModel>,
-    IStoreProvider<TId, TModel>,
-    IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
-    where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
-    where TId : IEquatable<TId>
-    where TModel : class, IEntityModel<TId>
-{
-    ValueTask<TEntity?> GetImplicitAsync(
-        CachePathable path,
-        IIdentifiable<TId, TEntity, TModel> identity,
-        IStoreInfo<TId, TModel> storeInfo,
-        TActor? actor = null,
-        CancellationToken token = default);
-
-    ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(
-        CachePathable path,
-        IIdentifiable<TId, TEntity, TModel> identity,
-        IStoreInfo<TId, TModel> storeInfo,
-        TActor? actor = null,
-        CancellationToken token = default
-    );
-
-    ValueTask<TEntity?> IEntityBroker<TId, TEntity, TModel>.GetImplicitAsync(
-        CachePathable path,
-        IIdentifiable<TId, TEntity, TModel> identity,
-        IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token
-    ) => GetImplicitAsync(path, identity, storeInfo, null, token);
-
-    ValueTask<IEntityHandle<TId, TEntity>?> IEntityBroker<TId, TEntity, TModel>.GetAsync(
-        CachePathable path,
-        IIdentifiable<TId, TEntity, TModel> identity,
-        IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token
-    ) => GetAsync(path, identity, storeInfo, null, token);
-}
-
-internal interface IEntityBroker<TId, TEntity, TModel> : IManageableEntityBroker<TId, TEntity, TModel>
-    where TEntity :
-    class,
-    ICacheableEntity<TEntity, TId, TModel>,
-    IStoreProvider<TId, TModel>,
-    IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
-    where TId : IEquatable<TId>
-    where TModel : class, IEntityModel<TId>
-{
-    ValueTask AttachLatentEntityAsync(TId id, TEntity entity, IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token);
-
-    bool TryCreateLatentHandle(
-        TModel model,
-        [MaybeNullWhen(true)] out TEntity entity,
-        [MaybeNullWhen(false)] out IDisposable handle,
-        CancellationToken token
-    );
-
-    ValueTask UpdateAsync(TModel model, IStoreInfo<TId, TModel> storeInfo, CancellationToken token);
-
-    ValueTask BatchUpdateAsync(IEnumerable<TModel> model, IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token);
-
-    ValueTask<IEnumerable<IEntityHandle<TId, TEntity>>> BatchCreateOrUpdateAsync(
-        CachePathable path,
-        IEnumerable<TModel> models,
-        IStoreInfo<TId, TModel>? store = null,
-        CancellationToken token = default
-    );
-
-    async ValueTask<IEnumerable<TEntity>> BatchCreateOrUpdateImplicitAsync(
-        CachePathable path,
-        IEnumerable<TModel> models,
-        IStoreInfo<TId, TModel>? store = null,
-        CancellationToken token = default
-    )
-    {
-        // TODO: this seems ugly
-        return
-            (await BatchCreateOrUpdateAsync(path, models, store, token) as IList<IEntityHandle<TId, TEntity>>)!
-            .AsParallel()
-            .Select((x, i) =>
-            {
-                var entity = x.Entity;
-                x.Dispose();
-                return entity;
-            })
-            .ToImmutableList();
-    }
-
-    ValueTask<TEntity?> GetImplicitAsync(
-        CachePathable path,
-        IIdentifiable<TId, TEntity, TModel> identity,
-        IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token = default);
-
-    ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(
-        CachePathable path,
-        IIdentifiable<TId, TEntity, TModel> identity,
-        IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token = default
-    );
-
-    ValueTask<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllHandlesAsync(
-        CachePathable path,
-        IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token = default);
-
-    ValueTask<IReadOnlyCollection<TEntity>> GetAllImplicitAsync(
-        CachePathable path,
-        IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token = default);
-
-    ValueTask<IReadOnlyCollection<TId>> GetAllIdsAsync(IStoreInfo<TId, TModel> storeInfo,
-        CancellationToken token = default);
-}
-
-internal interface IManageableEntityBroker<TId, in TEntity, in TModel> : IEntityBroker<TId>
-    where TId : IEquatable<TId>
-    where TEntity : class, ICacheableEntity<TId>, IEntityOf<TModel>
-    where TModel : IEntityModel<TId>
-{
-    void ReleaseHandle(IEntityHandle<TId, TEntity> handle);
-
-    ValueTask<IEntityHandle<TId>> TransferConstructionOfEntity(
-        TModel model,
-        ICacheConstructionContext context,
-        CancellationToken token
-    );
-
-    ValueTask UpdateInReferenceEntityAsync(TModel models, CancellationToken token);
-
-    ValueTask UpdateInReferenceEntitiesAsync(IEnumerable<TModel> models, CancellationToken token);
-
-    Type IEntityBroker.EntityType => typeof(TEntity);
-}
-
-internal interface IEntityBroker<in TId> : IEntityBroker;
-
-internal interface IEntityBroker
-{
-    Type EntityType { get; }
 }

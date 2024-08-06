@@ -22,7 +22,7 @@ public abstract class GatewayCacheableEntity<TSelf, TId, TModel>(
     IStoreProvider<TId, TModel>,
     IStoreInfoProvider<TId, TModel>,
     IBrokerProvider<TId, TSelf, TModel>,
-    IContextConstructable<TSelf, TModel, ICacheConstructionContext, DiscordGatewayClient>
+    IContextConstructable<TSelf, TModel, IGatewayConstructionContext, DiscordGatewayClient>
 {
     protected async ValueTask UpdateCacheAsync(TSelf self, TModel model, CancellationToken token)
     {

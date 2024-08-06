@@ -1,5 +1,4 @@
 namespace Discord;
-#pragma warning disable CA2252
 
 public interface IConstructable<out TSelf, in TModel> : IConstructable<TSelf, TModel, IDiscordClient>
     where TSelf : IConstructable<TSelf, TModel>;
@@ -21,5 +20,3 @@ public interface IContextConstructable<out TSelf, in TModel, in TContext, in TCl
 {
     static abstract TSelf Construct(TClient client, TContext context, TModel model);
 }
-
-#pragma warning restore CA2252

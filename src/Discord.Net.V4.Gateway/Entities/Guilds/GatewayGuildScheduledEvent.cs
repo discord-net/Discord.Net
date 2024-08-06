@@ -5,18 +5,26 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-public sealed partial class GatewayGuildScheduledEventActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    GuildScheduledEventIdentity scheduledEvent
-) :
-    GatewayCachedActor<ulong, GatewayGuildScheduledEvent, GuildScheduledEventIdentity, IGuildScheduledEventModel>(client, scheduledEvent),
+public sealed partial class GatewayGuildScheduledEventActor :
+    GatewayCachedActor<ulong, GatewayGuildScheduledEvent, GuildScheduledEventIdentity, IGuildScheduledEventModel>,
     IGuildScheduledEventActor
 {
-    [StoreRoot, SourceOfTruth] public GatewayGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [StoreRoot, SourceOfTruth] public GatewayGuildActor Guild { get; }
 
     public IEnumerableIndexableActor<IGuildScheduledEventUserActor, ulong, IGuildScheduledEventUser> RSVPs =>
         throw new NotImplementedException();
+
+    internal override GuildScheduledEventIdentity Identity { get; }
+
+    public GatewayGuildScheduledEventActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        GuildScheduledEventIdentity scheduledEvent
+    ) : base(client, scheduledEvent)
+    {
+        Identity = scheduledEvent | this;
+        Guild = client.Guilds >> guild;
+    }
 
     [SourceOfTruth]
     internal GatewayGuildScheduledEvent CreateEntity(IGuildScheduledEventModel model)
@@ -27,11 +35,9 @@ public sealed partial class GatewayGuildScheduledEvent :
     GatewayCacheableEntity<GatewayGuildScheduledEvent, ulong, IGuildScheduledEventModel>,
     IGuildScheduledEvent
 {
-    [SourceOfTruth]
-    public GatewayGuildChannelActor? Channel { get; private set; }
+    [SourceOfTruth] public GatewayGuildChannelActor? Channel { get; private set; }
 
-    [SourceOfTruth]
-    public GatewayUserActor Creator { get; }
+    [SourceOfTruth] public GatewayUserActor Creator { get; }
 
     public string Name => Model.Name;
 
@@ -55,8 +61,7 @@ public sealed partial class GatewayGuildScheduledEvent :
 
     public int? UserCount => Model.UserCount;
 
-    [ProxyInterface]
-    internal GatewayGuildScheduledEventActor Actor { get; }
+    [ProxyInterface] internal GatewayGuildScheduledEventActor Actor { get; }
 
     internal IGuildScheduledEventModel Model { get; private set; }
 
@@ -81,7 +86,7 @@ public sealed partial class GatewayGuildScheduledEvent :
 
     public static GatewayGuildScheduledEvent Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGuildScheduledEventModel model
     ) => new(
         client,

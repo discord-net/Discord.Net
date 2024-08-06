@@ -12,11 +12,16 @@ public partial interface IIntegrationModel : IEntityModel<ulong>
     int? ExpireBehavior { get; }
     int? ExpireGracePeriod { get; }
     ulong? UserId { get; }
-    string? AccountId { get; }
-    string? AccountName { get; }
+    IIntegrationAccountModel? Account { get; }
     DateTimeOffset? SyncedAt { get; }
     int? SubscriberCount { get; }
     bool? IsRevoked { get; }
     IApplicationModel? Application { get; }
     string[]? Scopes { get; }
+}
+
+[ModelEquality]
+public partial interface IIntegrationAccountModel : IEntityModel<string>
+{
+    string Name { get; }
 }

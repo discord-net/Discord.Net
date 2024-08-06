@@ -88,7 +88,11 @@ public static class Hierarchy
                 if (child.Interfaces.Contains(root, SymbolEqualityComparer.Default))
                 {
                     path.Add(root);
-                    return true;
+
+                    if (!searchAllPaths)
+                        return true;
+
+                    result = true;
                 }
 
                 foreach (var iface in child.Interfaces.Where(x => !visited.Contains(x)))

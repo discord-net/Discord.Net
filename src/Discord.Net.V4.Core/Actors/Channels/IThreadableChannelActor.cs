@@ -12,7 +12,7 @@ public partial interface IThreadableChannelActor :
     IGuildChannelActor,
     IActor<ulong, IThreadableChannel>
 {
-    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> PublicArchivedThreads { get; }
-    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> PrivateArchivedThreads { get; }
-    IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> JoinedPrivateArchivedThreads { get; }
+    IPagedIndexableActor<IThreadChannelActor, ulong, IThreadChannel, PagePublicArchivedThreadsParams> PublicArchivedThreads { get; }
+    IPagedIndexableActor<IThreadChannelActor, ulong, IThreadChannel, PagePrivateArchivedThreadsParams> PrivateArchivedThreads { get; }
+    IPagedIndexableActor<IThreadChannelActor, ulong, IThreadChannel, PageJoinedPrivateArchivedThreadsParams> JoinedPrivateArchivedThreads { get; }
 }

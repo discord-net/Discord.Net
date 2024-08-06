@@ -14,6 +14,8 @@ public sealed class Hanz : IIncrementalGenerator
     public static LoggingOptions LoggerOptions { get; private set; } = new(LogLevel.Information);
 
     private static Logger _rootLogger = new(LogLevel.Information, Path.Combine(Logger.LogDirectory, "root.log"));
+    private static Logger _perfLogger = new(LogLevel.Information, Path.Combine(Logger.LogDirectory, "perf.log"));
+
 
     public record struct LoggingOptions(LogLevel Level);
 
@@ -23,10 +25,11 @@ public sealed class Hanz : IIncrementalGenerator
     private readonly MethodInfo _registerCombineTaskMethod = typeof(Hanz)
         .GetMethods(BindingFlags.Static | BindingFlags.Public).First(x => x.Name.StartsWith("RegisterCombineTask"));
 
-    private readonly struct TransformWrapper<T>(Logger logger, T? value) where T : class, IEquatable<T>
+    private readonly struct TransformWrapper<T>(Logger logger, T? value, string assembly) where T : class, IEquatable<T>
     {
         public readonly Logger Logger = logger;
         public readonly T? Value = value;
+        public readonly string Assembly = assembly;
 
         public bool Equals(TransformWrapper<T> other) =>
             Value is null
@@ -35,6 +38,25 @@ public sealed class Hanz : IIncrementalGenerator
 
         public readonly override int GetHashCode() =>
             Value is null ? 0 : EqualityComparer<T>.Default.GetHashCode(Value);
+    }
+
+    private static readonly Dictionary<string, TimeSpan> _perfTable = [];
+
+    private static void UpdatePerfTable(string task, TimeSpan delta)
+    {
+        lock (_perfTable)
+        {
+            _perfTable[task] = delta;
+
+            var logger = _perfLogger.WithCleanLogFile();
+
+            foreach (var entry in _perfTable)
+            {
+                logger.Log($"{entry.Key}: {entry.Value:c}");
+            }
+
+            logger.Flush();
+        }
     }
 
     public static void RegisterTask<T>(IncrementalGeneratorInitializationContext context, IGenerationTask<T> task)
@@ -46,36 +68,52 @@ public sealed class Hanz : IIncrementalGenerator
             predicate: task.IsValid,
             transform: (syntaxContext, token) =>
             {
+                var logger = assemblyLoggers.GetOrAdd(
+                    syntaxContext.SemanticModel.Compilation.Assembly.Name,
+                    assembly => Logger.CreateSemanticRunForTask(assembly, task.GetType().Name));
+
                 try
                 {
-                    var logger = assemblyLoggers.GetOrAdd(
-                        syntaxContext.SemanticModel.Compilation.Assembly.Name,
-                        assembly => Logger.CreateSemanticRunForTask(assembly, task.GetType().Name));
-
-                    return new TransformWrapper<T>(logger,
-                        task.GetTargetForGeneration(syntaxContext, logger.GetSubLogger("transform").WithCleanLogFile(),
-                            token));
+                    return new TransformWrapper<T>(
+                        logger,
+                        task.GetTargetForGeneration(
+                            syntaxContext,
+                            logger.GetSubLogger("transform").WithCleanLogFile(),
+                            token
+                        ),
+                        syntaxContext.SemanticModel.Compilation.Assembly.Name
+                    );
                 }
                 catch (Exception ex)
                 {
                     _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
                     throw;
                 }
+                finally
+                {
+                    logger.Flush();
+                }
             }
         );
 
         context.RegisterSourceOutput(provider, (context, wrapper) =>
         {
+            var logger = wrapper.Logger.GetSubLogger("execute").WithCleanLogFile();
+            var startTime = DateTimeOffset.UtcNow;
             try
             {
-                //wrapper.Logger.Clean();
-
-                task.Execute(context, wrapper.Value, wrapper.Logger.GetSubLogger("execute").WithCleanLogFile());
+                task.Execute(context, wrapper.Value, logger);
             }
             catch (Exception ex)
             {
                 _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
                 throw;
+            }
+            finally
+            {
+                var delta = DateTimeOffset.UtcNow - startTime;
+                UpdatePerfTable($"{task.GetType().Name}:{wrapper.Assembly}", delta);
+                logger.Flush();
             }
         });
 
@@ -93,14 +131,16 @@ public sealed class Hanz : IIncrementalGenerator
             predicate: task.IsValid,
             transform: (syntaxContext, token) =>
             {
+                var logger = transformLogger
+                    .WithSemanticContext(syntaxContext.SemanticModel)
+                    .GetSubLogger("transform")
+                    .WithCleanLogFile();
+
                 try
                 {
                     return task.GetTargetForGeneration(
                         syntaxContext,
-                        transformLogger
-                            .WithSemanticContext(syntaxContext.SemanticModel)
-                            .GetSubLogger("transform")
-                            .WithCleanLogFile(),
+                        logger,
                         token
                     );
                 }
@@ -109,11 +149,16 @@ public sealed class Hanz : IIncrementalGenerator
                     _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
                     throw;
                 }
+                finally
+                {
+                    logger.Flush();
+                }
             }
         ).Collect();
 
         context.RegisterSourceOutput(provider, (productionContext, array) =>
         {
+            var startTime = DateTimeOffset.UtcNow;
             try
             {
                 logger.Clean();
@@ -123,6 +168,12 @@ public sealed class Hanz : IIncrementalGenerator
             {
                 _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
                 throw;
+            }
+            finally
+            {
+                var delta = DateTimeOffset.UtcNow - startTime;
+                UpdatePerfTable(task.GetType().Name, delta);
+                logger.Flush();
             }
         });
 
@@ -192,6 +243,8 @@ public sealed class Hanz : IIncrementalGenerator
                     JsonModels.Execute(productionContext, data, logger);
                 }
             );
+
+            _rootLogger.Flush();
         }
         catch (Exception x)
         {

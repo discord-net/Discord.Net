@@ -1,41 +1,43 @@
-namespace Discord.Gateway.State;
+using Discord.Gateway.State;
 
-public sealed record CacheConstructionContext(
+namespace Discord.Gateway;
+
+public sealed record GatewayConstructionContext(
     CachePathable Path
-) : ICacheConstructionContext;
+) : IGatewayConstructionContext;
 
-public sealed record CacheConstructionContext<TActor>(
+public sealed record GatewayConstructionContext<TActor>(
     TActor Actor,
     CachePathable Path
-) : ICacheConstructionContext<TActor>
+) : IGatewayConstructionContext<TActor>
     where TActor : class;
 
-public interface ICacheConstructionContext<out TActor> :
-    ICacheConstructionContext
+public interface IGatewayConstructionContext<out TActor> :
+    IGatewayConstructionContext
     where TActor : class
 {
     TActor Actor { get; }
 }
 
-public interface ICacheConstructionContext
+public interface IGatewayConstructionContext
 {
     CachePathable Path { get; }
 }
 
-internal static class CacheConstructionContextExtensions
+internal static class GatewayConstructionContextExtensions
 {
     public static TActor? TryGetActor<TActor>(
-        this ICacheConstructionContext context
+        this IGatewayConstructionContext context
     )
         where TActor : class
     {
-        if (context is ICacheConstructionContext<TActor> actorContext)
+        if (context is IGatewayConstructionContext<TActor> actorContext)
             return actorContext.Actor;
         return null;
     }
 
     public static T? TryMapActor<TId, TEntity, TActor, T>(
-        this ICacheConstructionContext context,
+        this IGatewayConstructionContext context,
         Template<TActor> template,
         Func<TActor, T> mapper
     )
@@ -44,7 +46,7 @@ internal static class CacheConstructionContextExtensions
         where TActor : class, IActor<TId, TEntity>
         where T : class
     {
-        if (context is ICacheConstructionContext<TActor> actorContext)
+        if (context is IGatewayConstructionContext<TActor> actorContext)
             return mapper(actorContext.Actor);
         return null;
     }

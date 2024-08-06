@@ -1,3 +1,4 @@
+using Discord.Models;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Gateway;
@@ -6,7 +7,7 @@ public class GatewayIndexableActor<TActor, TId, TEntity>(Func<TId, TActor> facto
     IIndexableActor<TActor, TId, TEntity>
     where TActor : class, IGatewayActor<TId, TEntity, IIdentifiable<TId>>
     where TId : IEquatable<TId>
-    where TEntity : GatewayEntity<TId>
+    where TEntity : GatewayEntity<TId>, IEntityOf<IEntityModel<TId>>
 {
     private readonly WeakDictionary<TId, TActor> _cache = new();
 
@@ -18,4 +19,9 @@ public class GatewayIndexableActor<TActor, TId, TEntity>(Func<TId, TActor> facto
     [return: NotNullIfNotNull(nameof(defaultValue))]
     internal TActor? FirstOrDefault(TActor? defaultValue = null)
         => _cache.FirstOrDefault(defaultValue);
+
+    public static TActor operator >>(
+        GatewayIndexableActor<TActor, TId, TEntity> source,
+        IIdentifiable<TId, TEntity, TActor, IEntityModel<TId>> identity
+    ) => identity.Actor ?? source[identity.Id];
 }

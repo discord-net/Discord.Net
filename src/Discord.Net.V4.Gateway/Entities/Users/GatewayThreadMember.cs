@@ -14,6 +14,8 @@ public sealed partial class GatewayThreadMemberActor :
 
     [SourceOfTruth] public GatewayUserActor User { get; }
 
+    internal override ThreadMemberIdentity Identity { get; }
+
     public GatewayThreadMemberActor(
         DiscordGatewayClient client,
         GuildIdentity guild,
@@ -23,9 +25,11 @@ public sealed partial class GatewayThreadMemberActor :
         UserIdentity? user = null
     ) : base(client, threadMember)
     {
-        User = user?.Actor ?? new GatewayUserActor(client, user ?? UserIdentity.Of(threadMember.Id));
-        Member = member?.Actor ?? new(client, guild, member ?? MemberIdentity.Of(threadMember.Id), user | User);
-        Thread = thread.Actor ?? new(client, guild, thread);
+        Identity = threadMember | this;
+
+        Thread = (client.Guilds >> guild).ThreadChannels >> thread;
+        User = client.Users >> (user | threadMember);
+        Member = Thread.Guild.Members >> (member | User | threadMember);
     }
 
     [SourceOfTruth]
@@ -59,7 +63,7 @@ public sealed partial class GatewayThreadMember :
 
     public static GatewayThreadMember Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IThreadMemberModel model
     ) => new(
         client,

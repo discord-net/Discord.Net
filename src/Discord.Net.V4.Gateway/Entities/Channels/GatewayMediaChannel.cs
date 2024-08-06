@@ -6,20 +6,25 @@ using static Discord.Template;
 namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
-[method: TypeFactory]
-public sealed partial class GatewayMediaChannelActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    MediaChannelIdentity channel
-) :
-    GatewayThreadableChannelActor(client, guild, channel),
+public sealed partial class GatewayMediaChannelActor :
+    GatewayThreadableChannelActor,
     IMediaChannelActor,
     IGatewayCachedActor<ulong, GatewayMediaChannel, MediaChannelIdentity, IGuildMediaChannelModel>
 {
-    [SourceOfTruth] internal override MediaChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] internal override MediaChannelIdentity Identity { get; }
 
-    [ProxyInterface]
-    internal GatewayIntegrationChannelActor IntegrationChannelActor { get; } = new(client, guild, channel);
+    [ProxyInterface] internal GatewayIntegrationChannelActor IntegrationChannelActor { get; }
+
+    [method: TypeFactory]
+    public GatewayMediaChannelActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        MediaChannelIdentity channel
+    ) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+        IntegrationChannelActor = new GatewayIntegrationChannelActor(client, guild, channel);
+    }
 
     [SourceOfTruth]
     internal GatewayMediaChannel CreateEntity(IGuildMediaChannelModel model)
@@ -46,8 +51,7 @@ public sealed partial class GatewayMediaChannel :
 
     public SortOrder? DefaultSortOrder => (SortOrder?)Model.DefaultSortOrder;
 
-    [ProxyInterface]
-    internal override GatewayMediaChannelActor Actor { get; }
+    [ProxyInterface] internal override GatewayMediaChannelActor Actor { get; }
 
     internal override IGuildMediaChannelModel Model => _model;
 
@@ -70,7 +74,7 @@ public sealed partial class GatewayMediaChannel :
 
     public static GatewayMediaChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGuildMediaChannelModel model
     ) => new(
         client,
@@ -87,7 +91,7 @@ public sealed partial class GatewayMediaChannel :
     {
         if (updateCache) return UpdateCacheAsync(this, model, token);
 
-        if(!Model.AvailableTags.SequenceEqual(model.AvailableTags))
+        if (!Model.AvailableTags.SequenceEqual(model.AvailableTags))
             AvailableTags = model.AvailableTags
                 .Select(x => ForumTag.Construct(Client, new(Guild.Id), x))
                 .ToImmutableList();

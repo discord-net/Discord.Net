@@ -6,15 +6,20 @@ using Discord.Rest;
 namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
-public sealed partial class GatewaySelfUserActor(
-    DiscordGatewayClient client,
-    SelfUserIdentity identity
-) :
-    GatewayUserActor(client, identity),
+public sealed partial class GatewaySelfUserActor :
+    GatewayUserActor,
     ISelfUserActor,
     IGatewayCachedActor<ulong, GatewaySelfUser, SelfUserIdentity, ISelfUserModel>
 {
-    [SourceOfTruth] internal override SelfUserIdentity Identity { get; } = identity;
+    [SourceOfTruth] internal override SelfUserIdentity Identity { get; }
+
+    public GatewaySelfUserActor(
+        DiscordGatewayClient client,
+        SelfUserIdentity user
+    ) : base(client, user)
+    {
+        Identity = user | this;
+    }
 
     public IPartialGuild CreateEntity(IPartialGuildModel model) => throw new NotImplementedException();
 
@@ -59,7 +64,7 @@ public sealed partial class GatewaySelfUser :
     }
 
     public static GatewaySelfUser Construct(DiscordGatewayClient client,
-        ICacheConstructionContext context, ISelfUserModel model)
+        IGatewayConstructionContext context, ISelfUserModel model)
     {
         return new GatewaySelfUser(
             client,

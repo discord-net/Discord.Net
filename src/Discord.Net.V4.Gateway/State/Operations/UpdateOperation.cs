@@ -14,7 +14,7 @@ internal sealed record UpdateOperation<TId, TEntity, TModel>(
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreInfoProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+    IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {

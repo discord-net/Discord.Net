@@ -6,18 +6,28 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-public sealed partial class GatewayStageInstanceActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    StageChannelIdentity channel,
-    StageInstanceIdentity instance
-) :
-    GatewayCachedActor<ulong, GatewayStageInstance, StageInstanceIdentity, IStageInstanceModel>(client, instance),
+public sealed partial class GatewayStageInstanceActor :
+    GatewayCachedActor<ulong, GatewayStageInstance, StageInstanceIdentity, IStageInstanceModel>,
     IStageInstanceActor
 {
-    [SourceOfTruth] public GatewayStageChannelActor Channel { get; } = channel.Actor ?? new(client, guild, channel);
+    [SourceOfTruth, StoreRoot] public GatewayStageChannelActor Channel { get; }
 
-    [SourceOfTruth] public GatewayGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [SourceOfTruth] public GatewayGuildActor Guild { get; }
+
+    internal override StageInstanceIdentity Identity { get; }
+
+    public GatewayStageInstanceActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        StageChannelIdentity channel,
+        StageInstanceIdentity instance
+    ) : base(client, instance)
+    {
+        Identity = instance | this;
+
+        Guild = client.Guilds >> guild;
+        Channel = Guild.StageChannels >> channel;
+    }
 
     [SourceOfTruth]
     internal GatewayStageInstance CreateEntity(IStageInstanceModel model)
@@ -52,7 +62,7 @@ public sealed partial class GatewayStageInstance :
 
     public static GatewayStageInstance Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IStageInstanceModel model
     ) => new(
         client,

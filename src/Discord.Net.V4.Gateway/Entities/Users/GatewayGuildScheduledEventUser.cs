@@ -22,6 +22,8 @@ public sealed partial class GatewayGuildScheduledEventUserActor :
 
     [SourceOfTruth] public GatewayGuildActor Guild { get; }
 
+    internal override GuildScheduledEventUserIdentity Identity { get; }
+
     public GatewayGuildScheduledEventUserActor(
         DiscordGatewayClient client,
         GuildIdentity guild,
@@ -31,9 +33,11 @@ public sealed partial class GatewayGuildScheduledEventUserActor :
         MemberIdentity? member = null
     ) : base(client, eventUser)
     {
-        Guild = guild.Actor ?? new(client, guild);
-        User = user?.Actor ?? new(client, user ?? UserIdentity.Of(eventUser.Id));
-        Member = member?.Actor ?? new(client, guild, member ?? MemberIdentity.Of(eventUser.Id), user | User);
+        Identity = eventUser | this;
+
+        Guild = client.Guilds >> guild;
+        User = client.Users >> (user | eventUser);
+        Member = Guild.Members >> (member | User | eventUser);
         GuildScheduledEvent = scheduledEvent.Actor ?? new(client, guild | Guild, scheduledEvent);
     }
 }
@@ -62,7 +66,7 @@ public sealed partial class GatewayGuildScheduledEventUser :
 
     public static GatewayGuildScheduledEventUser Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGuildScheduledEventUserModel model
     ) => new(
         client,

@@ -4,11 +4,6 @@ using Discord.Rest;
 
 namespace Discord.Gateway;
 
-using GuildsPager = GatewayPagedIndexableActor<GatewayGuildActor, ulong, GatewayGuild, RestPartialGuild,
-    PageUserGuildsParams, IEnumerable<IPartialGuildModel>>;
-
-using BansPager = GatewayPagedIndexableActor<GatewayBanActor, ulong, GatewayBan, PageGuildBansParams, IEnumerable<IBanModel>>;
-
 internal static partial class GatewayActors
 {
     public static GatewayEnumerableIndexableActor<
@@ -23,7 +18,7 @@ internal static partial class GatewayActors
         TId,
         TEntity,
         [Ignore] TRestEntity,
-        [Not(nameof(TRestEntity)), Not(nameof(TEntity)), Interface, RequireResolve]
+        [Not(nameof(TRestEntity)), Not(nameof(TEntity)), Interface, RequireResolve, Shrink]
         TCoreEntity,
         TModel
     >(
@@ -43,7 +38,7 @@ internal static partial class GatewayActors
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreInfoProvider<TId, TModel>,
         IBrokerProvider<TId, TEntity, TModel>,
-        IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>,
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>,
         TCoreEntity
         where TRestEntity :
         RestEntity<TId>,
@@ -73,7 +68,7 @@ internal static partial class GatewayActors
         TRestEntity,
         TCoreEntity,
         TModel,
-        TApi
+        IEnumerable<TApi>
     > GuildRelatedEntity<
         [TransitiveFill] TActor,
         TId,
@@ -100,7 +95,7 @@ internal static partial class GatewayActors
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreInfoProvider<TId, TModel>,
         IBrokerProvider<TId, TEntity, TModel>,
-        IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>,
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>,
         TCoreEntity
         where TRestEntity :
         RestEntity<TId>,
@@ -111,7 +106,8 @@ internal static partial class GatewayActors
         where TModel : class, TApi
         where TApi : class, IEntityModel<TId>
     {
-        return new GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel, TApi>(
+        return new GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel,
+            IEnumerable<TApi>>(
             client,
             id => TActor.Factory(client, guild, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
             model => TRestEntity.Construct(
@@ -120,7 +116,8 @@ internal static partial class GatewayActors
                 model
             ),
             path,
-            TCoreEntity.FetchManyRoute(path)
+            TCoreEntity.FetchManyRoute(path),
+            api => api.OfType<TModel>()
         );
     }
 
@@ -131,7 +128,7 @@ internal static partial class GatewayActors
         TRestEntity,
         TCoreEntity,
         TModel,
-        TApi
+        IEnumerable<TApi>
     > GuildRelatedEntity<
         [TransitiveFill] TActor,
         TId,
@@ -140,7 +137,7 @@ internal static partial class GatewayActors
         [Not(nameof(TRestEntity)), Not(nameof(TEntity)), Interface] [RequireResolve, Shrink]
         TCoreEntity,
         TModel,
-        [Not(nameof(TModel))] TApi,
+        [Not(nameof(TModel)), Shrink] TApi,
         TContext
     >(
         Template<TActor> template,
@@ -160,7 +157,7 @@ internal static partial class GatewayActors
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreInfoProvider<TId, TModel>,
         IBrokerProvider<TId, TEntity, TModel>,
-        IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>,
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>,
         TCoreEntity
         where TRestEntity :
         RestEntity<TId>,
@@ -169,6 +166,69 @@ internal static partial class GatewayActors
         where TCoreEntity : class, IEntity<TId>, IFetchableOfMany<TId, TApi>
         where TModel : class, TApi
         where TApi : class, IEntityModel<TId>
+    {
+        return new GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel,
+            IEnumerable<TApi>>(
+            client,
+            id => TActor.Factory(client, guild, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
+            model => TRestEntity.Construct(
+                client.Rest,
+                context(guild),
+                model
+            ),
+            path,
+            TCoreEntity.FetchManyRoute(path),
+            api => api.OfType<TModel>()
+        );
+    }
+
+    public static GatewayEnumerableIndexableActor<
+        TActor,
+        TId,
+        TEntity,
+        TRestEntity,
+        TCoreEntity,
+        TModel,
+        TApi
+    > GuildRelatedEntity<
+        [TransitiveFill] TActor,
+        TId,
+        TEntity,
+        [Ignore] TRestEntity,
+        [Not(nameof(TRestEntity)), Not(nameof(TEntity)), Interface] [RequireResolve, Shrink]
+        TCoreEntity,
+        TModel,
+        [Not(nameof(TModel)), Shrink] TApi,
+        TContext
+    >(
+        Template<TActor> template,
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        CachePathable path,
+        Func<GuildIdentity, TContext> context,
+        IApiOutRoute<TApi> route,
+        Func<TApi, IEnumerable<TModel>> transform
+    )
+        where TActor :
+        class,
+        IFactory<TActor, DiscordGatewayClient, GuildIdentity, IIdentifiable<TId, TEntity, TActor, TModel>>,
+        IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>,
+        IStoreProvider<TId, TModel>
+        where TId : IEquatable<TId>
+        where TEntity :
+        GatewayEntity<TId>,
+        ICacheableEntity<TEntity, TId, TModel>,
+        IStoreInfoProvider<TId, TModel>,
+        IBrokerProvider<TId, TEntity, TModel>,
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>,
+        TCoreEntity
+        where TRestEntity :
+        RestEntity<TId>,
+        TCoreEntity,
+        IContextConstructable<TRestEntity, TModel, TContext, DiscordRestClient>
+        where TCoreEntity : class, IEntity<TId>
+        where TModel : class, IEntityModel<TId>
+        where TApi : class
     {
         return new GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel, TApi>(
             client,
@@ -179,55 +239,46 @@ internal static partial class GatewayActors
                 model
             ),
             path,
-            TCoreEntity.FetchManyRoute(path)
+            route,
+            transform
         );
     }
 
-    public static BansPager PageBans(DiscordGatewayClient client, GuildIdentity guild)
-    {
-        return new BansPager(
+    public static BansPager PageBans(DiscordGatewayClient client, GuildIdentity guild, CachePathable path)
+        => GatewayPagedIndexableActor.Create<RestBan, PageGuildBansParams>(
+            Template.Of<GatewayBanActor>(),
             client,
-            banId => new(client, guild, BanIdentity.Of(banId)),
-            args => Routes.GetGuildBans(guild.Id, args.PageSize, args.Before?.Id, args.After?.Id),
-            (_, models) => models.Select(x => RestBan.Construct(client.Rest, guild, x)),
+            id => new GatewayBanActor(client, guild, BanIdentity.Of(id)),
+            path,
+            api => api,
+            (model, _) => RestBan.Construct(
+                client.Rest,
+                IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>.Of(guild.Id),
+                model
+            )
         );
-    }
 
     public static GuildsPager PageGuilds(DiscordGatewayClient client)
-    {
-        return new GuildsPager(
+        => GatewayPagedIndexableActor.CreatePartial<RestPartialGuild, PageUserGuildsParams>(
+            Template.Of<GatewayGuildActor>(),
             client,
+            CachePathable.Default,
             id => new GatewayGuildActor(client, GuildIdentity.Of(id)),
-            pageParams =>
-                Routes.GetCurrentUserGuilds(pageParams.Before?.Id, pageParams.After?.Id, pageParams.PageSize, true),
-            (_, models) => models.Select(x => RestPartialGuild.Construct(client.Rest, x)),
-            (_, models, args) =>
-            {
-                ulong? nextId;
-
-                if (args.After.HasValue)
-                {
-                    nextId = models?.MaxBy(x => x.Id)?.Id;
-
-                    if (!nextId.HasValue)
-                        return null;
-
-                    return Routes.GetCurrentUserGuilds(
-                        limit: args.PageSize,
-                        after: nextId
-                    );
-                }
-
-                nextId = models.MinBy(x => x.Id)?.Id;
-
-                if (!nextId.HasValue)
-                    return null;
-
-                return Routes.GetCurrentUserGuilds(
-                    limit: args.PageSize,
-                    before: nextId
-                );
-            }
+            api => api,
+            (model, _) => RestPartialGuild.Construct(client.Rest, model)
         );
-    }
+
+    public static MembersPager PageMembers(DiscordGatewayClient client, GuildIdentity guild, CachePathable path)
+        => GatewayPagedIndexableActor.Create<RestGuildMember, PageGuildMembersParams>(
+            Template.Of<GatewayMemberActor>(),
+            client,
+            id => new GatewayMemberActor(client, guild, MemberIdentity.Of(id)),
+            path,
+            api => api,
+            (model, _) => RestGuildMember.Construct(
+                client.Rest,
+                IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>.Of(guild.Id),
+                model
+            )
+        );
 }

@@ -22,8 +22,12 @@ internal sealed partial class StateController : IDisposable
     private readonly DiscordGatewayClient _client;
     private readonly ILogger<StateController> _logger;
 
+    private readonly Dictionary<Type, IStoreInfo> _rootStores = [];
+    private readonly KeyedSemaphoreSlim<Type> _rootStoreSemaphores = new(1, 1);
+
+
     private readonly Dictionary<Type, IEntityBroker> _brokers = [];
-    private readonly KeyedSemaphoreSlim<Type> _brokerSemaphore = new(1, 1);
+    private readonly KeyedSemaphoreSlim<Type> _brokerSemaphores = new(1, 1);
 
     private readonly Channel<IStateOperation> _operationChannel = Channel.CreateUnbounded<IStateOperation>(
         new UnboundedChannelOptions {SingleReader = true, AllowSynchronousContinuations = false}
@@ -95,7 +99,7 @@ internal sealed partial class StateController : IDisposable
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreInfoProvider<TId, TModel>,
         IBrokerProvider<TId, TEntity, TModel>,
-        IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
         where TActor :
         class,
         IPathable,
@@ -114,7 +118,7 @@ internal sealed partial class StateController : IDisposable
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreInfoProvider<TId, TModel>,
         IBrokerProvider<TId, TEntity, TModel>,
-        IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
         where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
@@ -123,7 +127,7 @@ internal sealed partial class StateController : IDisposable
             return CreateLatentFromBroker(broker, path ?? CachePathable.Default, model, actor);
 
         // TODO: sync lock here, I don't like it
-        using var scope = _brokerSemaphore.Get(typeof(TEntity), out var semaphoreSlim);
+        using var scope = _brokerSemaphores.Get(typeof(TEntity), out var semaphoreSlim);
 
         semaphoreSlim.Wait(_backgroundTokenSource.Token);
 
@@ -154,7 +158,7 @@ internal sealed partial class StateController : IDisposable
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreInfoProvider<TId, TModel>,
         IBrokerProvider<TId, TEntity, TModel>,
-        IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
         where TActor : class, IActor<TId, TEntity>
@@ -175,9 +179,9 @@ internal sealed partial class StateController : IDisposable
             return entity;
         }
 
-        ICacheConstructionContext context = actor is not null
-            ? new CacheConstructionContext<TActor>(actor, path)
-            : new CacheConstructionContext(path);
+        IGatewayConstructionContext context = actor is not null
+            ? new GatewayConstructionContext<TActor>(actor, path)
+            : new GatewayConstructionContext(path);
 
         var latentEntity = TEntity.Construct(_client, context, model);
 
@@ -201,7 +205,7 @@ internal sealed partial class StateController : IDisposable
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreProvider<TId, TModel>,
         IBrokerProvider<TId, TEntity, TModel>,
-        IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
         where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
@@ -209,7 +213,7 @@ internal sealed partial class StateController : IDisposable
         if (TryGetCachedBroker<TId, TEntity, TActor, TModel>(out var broker))
             return broker;
 
-        using var scope = _brokerSemaphore.Get(typeof(TEntity), out var semaphoreSlim);
+        using var scope = _brokerSemaphores.Get(typeof(TEntity), out var semaphoreSlim);
 
         await semaphoreSlim.WaitAsync(token);
 
@@ -235,7 +239,7 @@ internal sealed partial class StateController : IDisposable
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreProvider<TId, TModel>,
         IBrokerProvider<TId, TEntity, TModel>,
-        IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
     {
@@ -257,7 +261,7 @@ internal sealed partial class StateController : IDisposable
         ICacheableEntity<TEntity, TId, TModel>,
         IStoreProvider<TId, TModel>,
         IBrokerProvider<TId, TEntity, TModel>,
-        IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
         where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
@@ -273,23 +277,52 @@ internal sealed partial class StateController : IDisposable
         return broker is not null;
     }
 
-    public async ValueTask<IEntityModelStore<TId, TModel>> GetStoreAsync<
-        [TransitiveFill] TIdentity,
-        TId,
-        TEntity,
-        TActor,
-        TModel
-    >(
-        Template<TIdentity> template,
+    public async ValueTask<IStoreInfo<TId, TModel>> GetRootStoreAsync<TProvider, TId, TModel>(
         CancellationToken token = default
     )
-        where TIdentity : IIdentifiable<TId, TEntity, TActor, TModel>
-        where TId : IEquatable<TId>
-        where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-        where TActor : class, IActor<TId, TEntity>
+        where TProvider : IRootStoreProvider<TId, TModel>
         where TModel : class, IEntityModel<TId>
+        where TId : IEquatable<TId>
     {
-        return await CacheProvider.GetStoreAsync<TId, TModel>(token);
+        if (TryGetRootStore<TModel>(out var store))
+        {
+            if (store is IStoreInfo<TId, TModel> storeInfo)
+                return storeInfo;
+
+            _logger.LogWarning(
+                "Unexpected root store info found: Expecting {Model}, but got {Actual}",
+                typeof(TModel),
+                store.ModelType
+            );
+
+            lock(_rootStoreSemaphores)
+                _rootStores.Remove(typeof(TModel));
+        }
+
+        using var scope = _rootStoreSemaphores.Get(typeof(TModel), out var semaphoreSlim);
+
+        await semaphoreSlim.WaitAsync(token);
+
+        try
+        {
+            var info = (await TProvider.GetStoreAsync(_client, CachePathable.Default, token))
+                .ToInfo(_client, Template.Of<TProvider>());
+
+            lock (_rootStoreSemaphores)
+                _rootStores[typeof(TModel)] = info;
+
+            return info;
+        }
+        finally
+        {
+            semaphoreSlim.Release();
+        }
+    }
+
+    private bool TryGetRootStore<TModel>([MaybeNullWhen(false)] out IStoreInfo info)
+    {
+        lock (_rootStoreSemaphores)
+            return _rootStores.TryGetValue(typeof(TModel), out info);
     }
 
     public void Dispose()

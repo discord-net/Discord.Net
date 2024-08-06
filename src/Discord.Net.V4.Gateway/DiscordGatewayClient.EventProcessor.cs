@@ -32,7 +32,7 @@ public sealed partial class DiscordGatewayClient
 
     private async Task StartEventProcessorAsync()
     {
-        await _eventProcessorCancellationTokenSource.CancelAsync();
+        _eventProcessorCancellationTokenSource.Cancel();
 
         if(_eventProcessorTask is not null)
             await _eventProcessorTask;
@@ -148,7 +148,7 @@ public sealed partial class DiscordGatewayClient
         catch
         {
             if (!_eventProcessorCancellationTokenSource.IsCancellationRequested)
-                await _eventProcessorCancellationTokenSource.CancelAsync();
+                _eventProcessorCancellationTokenSource.Cancel();
 
             // wait for heartbeat to stop
             if (heartbeatTask is not null)
@@ -207,7 +207,7 @@ public sealed partial class DiscordGatewayClient
                     );
 
                     // cancel any remaining parts
-                    await heartbeatWaitCancellationToken.CancelAsync();
+                    heartbeatWaitCancellationToken.Cancel();
                 }
 
                 var attempts = 0;

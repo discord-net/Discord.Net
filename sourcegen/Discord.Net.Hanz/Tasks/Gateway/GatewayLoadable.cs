@@ -341,8 +341,8 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
     private static string GetStoreForTarget(GenerationTarget target, bool hasStoreRoots)
     {
         return hasStoreRoots
-            ? $"await parentStore.GetSubStoreAsync<{target.IdType}, {target.ModelType}>(parentId)"
-            : $"await client.CacheProvider.GetStoreAsync<{target.IdType}, {target.ModelType}>";
+            ? $"await parentStore.GetSubStoreAsync<{target.IdType}, {target.ModelType}>(parentId, token)"
+            : $"await client.CacheProvider.GetStoreAsync<{target.IdType}, {target.ModelType}>(token)";
     }
 
     private static ITypeSymbol GetCoreEntityType(ITypeSymbol entity)
@@ -1494,7 +1494,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
               {
                   var store = {{storeAccessor}}
                   var broker = await GetOrCreateBrokerAsync(token);
-                  return await broker.GetImplicitAsync({{cachePathAccess}}, Identity, store, this, token);
+                  return (await broker.GetAsync({{cachePathAccess}}, Identity, store, this, token)).ConsumeAsReference();
               }
               """
         );

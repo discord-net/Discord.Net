@@ -5,17 +5,22 @@ using static Discord.Template;
 namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
-[method: TypeFactory]
-public sealed partial class GatewayNewsChannelActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    NewsChannelIdentity channel
-) :
-    GatewayTextChannelActor(client, guild, channel),
+public sealed partial class GatewayNewsChannelActor :
+    GatewayTextChannelActor,
     INewsChannelActor,
     IGatewayCachedActor<ulong, GatewayNewsChannel, NewsChannelIdentity, IGuildNewsChannelModel>
 {
-    [SourceOfTruth] internal override NewsChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] internal override NewsChannelIdentity Identity { get; }
+
+    [method: TypeFactory]
+    public GatewayNewsChannelActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        NewsChannelIdentity channel
+    ) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+    }
 
     [SourceOfTruth]
     [CovariantOverride]
@@ -47,7 +52,7 @@ public sealed partial class GatewayNewsChannel :
 
     public static GatewayNewsChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGuildNewsChannelModel model
     ) => new(
         client,

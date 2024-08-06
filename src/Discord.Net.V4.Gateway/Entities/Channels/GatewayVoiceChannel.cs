@@ -5,22 +5,28 @@ using static Discord.Template;
 namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
-[method: TypeFactory]
-public partial class GatewayVoiceChannelActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    VoiceChannelIdentity channel
-) :
-    GatewayGuildChannelActor(client, guild, channel),
+public partial class GatewayVoiceChannelActor :
+    GatewayGuildChannelActor,
     IVoiceChannelActor,
     IGatewayCachedActor<ulong, GatewayVoiceChannel, VoiceChannelIdentity, IGuildVoiceChannelModel>
 {
-    [SourceOfTruth] internal override VoiceChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] internal override VoiceChannelIdentity Identity { get; }
 
-    [ProxyInterface] internal GatewayMessageChannelActor MessageChannelActor { get; } = new(client, channel, guild);
+    [ProxyInterface] internal GatewayMessageChannelActor MessageChannelActor { get; }
 
     [ProxyInterface]
-    internal GatewayIntegrationChannelActor IntegrationChannelActor { get; } = new(client, guild, channel);
+    internal GatewayIntegrationChannelActor IntegrationChannelActor { get; }
+
+    [TypeFactory]
+    public GatewayVoiceChannelActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        VoiceChannelIdentity channel) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+        MessageChannelActor = new GatewayMessageChannelActor(client, channel, guild);
+        IntegrationChannelActor = new GatewayIntegrationChannelActor(client, guild, channel);
+    }
 
     [SourceOfTruth]
     internal GatewayVoiceChannel CreateEntity(IGuildVoiceChannelModel model)
@@ -69,14 +75,13 @@ public partial class GatewayVoiceChannel :
 
     public static GatewayVoiceChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGuildVoiceChannelModel model)
     {
         switch (model)
         {
-            case IGuildStageChannelModel guildStageChannelModel
-                when context is ICacheConstructionContext guildStageChannelContext:
-                return GatewayStageChannel.Construct(client, guildStageChannelContext, guildStageChannelModel);
+            case IGuildStageChannelModel guildStageChannelModel:
+                return GatewayStageChannel.Construct(client, context, guildStageChannelModel);
             default:
                 return new GatewayVoiceChannel(
                     client,

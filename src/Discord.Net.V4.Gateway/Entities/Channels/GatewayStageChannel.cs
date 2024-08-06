@@ -6,21 +6,24 @@ using static Discord.Template;
 namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
-[method: TypeFactory]
-public sealed partial class GatewayStageChannelActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    StageChannelIdentity channel
-) :
-    GatewayVoiceChannelActor(client, guild, channel),
+public sealed partial class GatewayStageChannelActor :
+    GatewayVoiceChannelActor,
     IStageChannelActor,
     IGatewayCachedActor<ulong, GatewayStageChannel, StageChannelIdentity, IGuildStageChannelModel>
 {
-    [SourceOfTruth] internal override StageChannelIdentity Identity { get; } = channel;
-
     [SourceOfTruth]
     public GatewayStageInstanceActor StageInstance { get; }
-        = new(client, guild, channel, StageInstanceIdentity.Of(channel.Id));
+
+    [SourceOfTruth] internal override StageChannelIdentity Identity { get; }
+
+    [TypeFactory]
+    public GatewayStageChannelActor(DiscordGatewayClient client,
+        GuildIdentity guild,
+        StageChannelIdentity channel) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+        StageInstance = new GatewayStageInstanceActor(client, guild, channel, StageInstanceIdentity.Of(channel.Id));
+    }
 
     [SourceOfTruth]
     internal GatewayStageChannel CreateEntity(IGuildStageChannelModel model)
@@ -60,7 +63,7 @@ public sealed partial class GatewayStageChannel :
 
     public static GatewayStageChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGuildStageChannelModel model
     ) => new(
         client,

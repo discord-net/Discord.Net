@@ -4,15 +4,24 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-public sealed partial class GatewayRoleActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    RoleIdentity role
-) :
-    GatewayCachedActor<ulong, GatewayRole, RoleIdentity, IRoleModel>(client, role),
+public sealed partial class GatewayRoleActor :
+    GatewayCachedActor<ulong, GatewayRole, RoleIdentity, IRoleModel>,
     IRoleActor
 {
-    [SourceOfTruth, StoreRoot] public GatewayGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [SourceOfTruth, StoreRoot] public GatewayGuildActor Guild { get; }
+
+    internal override RoleIdentity Identity { get; }
+
+    [TypeFactory]
+    public GatewayRoleActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        RoleIdentity role
+    ) : base(client, role)
+    {
+        Identity = role | this;
+        Guild = client.Guilds >> guild;
+    }
 
     [SourceOfTruth]
     internal GatewayRole CreateEntity(IRoleModel model)
@@ -72,7 +81,7 @@ public sealed partial class GatewayRole :
 
     public static GatewayRole Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IRoleModel model
     ) => new(
         client,
@@ -88,15 +97,15 @@ public sealed partial class GatewayRole :
     {
         if (updateCache) return UpdateCacheAsync(this, model, token);
 
-        if(!Model.Permissions.Equals(model.Permissions))
+        if (!Model.Permissions.Equals(model.Permissions))
             Permissions = model.Permissions;
 
-        if(Model.UnicodeEmoji != model.UnicodeEmoji)
+        if (Model.UnicodeEmoji != model.UnicodeEmoji)
             Emoji = model.UnicodeEmoji is not null
                 ? new Emoji(model.UnicodeEmoji)
                 : null;
 
-        if(!Model.Tags?.Equals(model.Tags) ?? model.Tags is not null)
+        if (!Model.Tags?.Equals(model.Tags) ?? model.Tags is not null)
             Tags = model.Tags is not null
                 ? RoleTags.Construct(Client, model.Tags)
                 : null;

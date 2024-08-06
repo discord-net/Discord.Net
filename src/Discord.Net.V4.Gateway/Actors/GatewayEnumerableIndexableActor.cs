@@ -11,13 +11,14 @@ public sealed class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestE
     Func<TModel, TRestEntity> restFactory,
     CachePathable path,
     IApiOutRoute<IEnumerable<TModel>> apiRoute
-):
-    GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCore, TModel, TModel>(
+) :
+    GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCore, TModel, IEnumerable<TModel>>(
         client,
         factory,
         restFactory,
         path,
-        apiRoute
+        apiRoute,
+        api => api
     )
     where TActor :
     class,
@@ -29,7 +30,7 @@ public sealed class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestE
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreInfoProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>,
+    IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>,
     TCore
     where TRestEntity : RestEntity<TId>, TCore
     where TCore : class, IEntity<TId>
@@ -48,12 +49,12 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreInfoProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>,
+    IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>,
     TCore
     where TRestEntity : RestEntity<TId>, TCore
     where TCore : class, IEntity<TId>
-    where TModel : class, TApi
-    where TApi : class, IEntityModel<TId>
+    where TModel : class, IEntityModel<TId>
+    where TApi : class
 {
     private IEntityBroker<TId, TEntity, TModel>? _broker;
     private IStoreInfo<TId, TModel>? _storeInfo;
@@ -61,20 +62,23 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
     private readonly DiscordGatewayClient _client;
     private readonly Func<TModel, TRestEntity> _restFactory;
     private readonly CachePathable _path;
-    private readonly IApiOutRoute<IEnumerable<TApi>> _apiRoute;
+    private readonly IApiOutRoute<TApi> _apiRoute;
+    private readonly Func<TApi, IEnumerable<TModel>> _transformer;
 
     internal GatewayEnumerableIndexableActor(
         DiscordGatewayClient client,
         Func<TId, TActor> factory,
         Func<TModel, TRestEntity> restFactory,
         CachePathable path,
-        IApiOutRoute<IEnumerable<TApi>> apiRoute
+        IApiOutRoute<TApi> apiRoute,
+        Func<TApi, IEnumerable<TModel>> transformer
     ) : base(factory)
     {
         _client = client;
         _restFactory = restFactory;
         _path = path;
         _apiRoute = apiRoute;
+        _transformer = transformer;
     }
 
     private async ValueTask<IEntityBroker<TId, TEntity, TModel>> GetBrokerAsync(CancellationToken token)
@@ -87,40 +91,43 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
         CancellationToken token = default)
     {
         var broker = await GetBrokerAsync(token);
-        return await broker.GetAllHandlesAsync(
-            _path,
-            await GetStoreInfoAsync(token),
-            token
-        );
+        var store = await GetStoreInfoAsync(token);
+
+        var result = new List<IEntityHandle<TId, TEntity>>();
+
+        await foreach (var batch in broker.GetAllAsync(_path, store, token))
+            result.AddRange(batch);
+
+        return result.AsReadOnly();
     }
 
     public async ValueTask<IReadOnlyCollection<TEntity>> GetAllAsync(
         CancellationToken token = default)
     {
         var broker = await GetBrokerAsync(token);
-        return await broker.GetAllImplicitAsync(
-            _path,
-            await GetStoreInfoAsync(token),
-            token
-        );
+        var storeInfo = await GetStoreInfoAsync(token);
+
+        return await broker
+            .GetAllAsync(_path, storeInfo, token)
+            .ConsumeAsReferenceAndFlattenAsync();
     }
 
     public async Task<IReadOnlyCollection<TRestEntity>> FetchAllAsync(
         GatewayRequestOptions? options = null,
         CancellationToken token = default)
     {
-        var models = await _client.RestApiClient.ExecuteAsync(
+        var apiResult = await _client.RestApiClient.ExecuteAsync(
             _apiRoute,
             options ?? _client.DefaultRequestOptions,
             token
         );
 
-        if (models is null)
+        if (apiResult is null)
             return [];
 
-        var modelsEnumerated = models.OfType<TModel>().ToArray();
+        var models = _transformer(apiResult).ToArray();
 
-        if (modelsEnumerated.Length == 0)
+        if (models.Length == 0)
             return [];
 
         if (options?.UpdateCache ?? false)
@@ -128,13 +135,13 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
             var broker = await GetBrokerAsync(token);
 
             await broker.BatchUpdateAsync(
-                modelsEnumerated,
+                models,
                 await GetStoreInfoAsync(token),
                 token
             );
         }
 
-        return modelsEnumerated.Select(_restFactory).ToImmutableList();
+        return models.Select(_restFactory).ToImmutableList();
     }
 
     public async ValueTask<IReadOnlyCollection<TCore>> AllAsync(

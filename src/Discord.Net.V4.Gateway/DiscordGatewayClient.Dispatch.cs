@@ -36,9 +36,9 @@ public sealed partial class DiscordGatewayClient
             StateController.SelfUserModel.SelfUserModelPart = readyPayload.User;
         }
 
-        var store = await StateController.GetStoreAsync(Template.T<UserIdentity>(), token);
-        using var broker = await StateController.GetBrokerAsync<ulong, GatewayUser, IUserModel>(token);
-        await broker.Value.UpdateAsync(StateController.SelfUserModel, store, token);
+        var store = await StateController.GetRootStoreAsync<GatewayUserActor, ulong, IUserModel>(token);
+        var broker = await StateController.GetBrokerAsync<ulong, GatewayUser, GatewayUserActor, IUserModel>(token);
+        await broker.UpdateAsync(StateController.SelfUserModel, store, token);
 
 
         // TODO: shards, resume, session

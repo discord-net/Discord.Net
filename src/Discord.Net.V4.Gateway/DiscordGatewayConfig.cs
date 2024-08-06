@@ -25,7 +25,7 @@ public sealed class DiscordGatewayConfig : DiscordConfig
     public sbyte GatewayVersion { get; set; } = 10;
 
     public bool CreateStoreForEveryEntity { get; set; } = false;
-    public ImmutableHashSet<Type> ExtendedStoreTypes { get; set; }
+    public ImmutableHashSet<Type> ExtendedStoreTypes { get; set; } = [];
 
     public GatewayConfiguredObject<ICacheProvider> CacheProvider { get; set; } = ConcurrentCacheProvider.Factory;
     public GatewayConfiguredObject<IGatewayConnection> GatewayConnection { get; set; } = WebSocketGatewayConnection.Factory;

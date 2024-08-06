@@ -1,15 +1,20 @@
+using Discord.Models;
+
 namespace Discord;
 
-public readonly struct IntegrationAccount(string id, string name) :
-    IEntityProperties<Models.Json.IntegrationAccount>,
-    IConstructable<IntegrationAccount, Models.Json.IntegrationAccount>
+public readonly struct IntegrationAccount(
+    string id,
+    string name
+):
+    IEntityProperties<IIntegrationAccountModel>,
+    IConstructable<IntegrationAccount, IIntegrationAccountModel>
 {
     public readonly string Id = id;
     public readonly string Name = name;
 
-    public Models.Json.IntegrationAccount ToApiModel(Models.Json.IntegrationAccount? existing = default)
-        => new() {Id = Id, Name = Name};
+    public IIntegrationAccountModel ToApiModel(IIntegrationAccountModel? existing = default)
+        => new Models.Json.IntegrationAccount {Id = Id, Name = Name};
 
-    public static IntegrationAccount Construct(IDiscordClient client, Models.Json.IntegrationAccount model)
+    public static IntegrationAccount Construct(IDiscordClient client, IIntegrationAccountModel model)
         => new(model.Id, model.Name);
 }

@@ -6,20 +6,26 @@ using static Discord.Template;
 namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
-[method: TypeFactory]
-public sealed partial class GatewayForumChannelActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    ForumChannelIdentity channel
-) :
-    GatewayThreadableChannelActor(client, guild, channel),
+public sealed partial class GatewayForumChannelActor :
+    GatewayThreadableChannelActor,
     IForumChannelActor,
     IGatewayCachedActor<ulong, GatewayForumChannel, ForumChannelIdentity, IGuildForumChannelModel>
 {
-    [SourceOfTruth] internal override ForumChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] internal override ForumChannelIdentity Identity { get; }
 
     [ProxyInterface(typeof(IIntegrationChannelActor))]
-    internal GatewayIntegrationChannelActor IntegrationChannelActor { get; } = new(client, guild, channel);
+    internal GatewayIntegrationChannelActor IntegrationChannelActor { get; }
+
+    [TypeFactory]
+    public GatewayForumChannelActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        ForumChannelIdentity channel
+    ) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+        IntegrationChannelActor = new GatewayIntegrationChannelActor(client, guild, channel);
+    }
 
     [SourceOfTruth]
     internal GatewayForumChannel CreateEntity(IGuildForumChannelModel model)
@@ -47,8 +53,7 @@ public sealed partial class GatewayForumChannel :
 
     public ForumLayout DefaultLayout => (ForumLayout)Model.DefaultForumLayout;
 
-    [ProxyInterface]
-    internal override GatewayForumChannelActor Actor { get; }
+    [ProxyInterface] internal override GatewayForumChannelActor Actor { get; }
 
     internal override IGuildForumChannelModel Model => _model;
 
@@ -72,7 +77,7 @@ public sealed partial class GatewayForumChannel :
 
     public static GatewayForumChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGuildForumChannelModel model
     ) => new(
         client,

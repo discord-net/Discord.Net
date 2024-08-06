@@ -124,7 +124,7 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
             var syntax = SyntaxUtils.CreateSourceGenClone(target.Syntax);
 
             var contextConstructSyntax = SyntaxFactory.ParseTypeName(
-                $"IContextConstructable<{target.Symbol}, {target.ModelType}, ICacheConstructionContext, DiscordGatewayClient>"
+                $"IContextConstructable<{target.Symbol}, {target.ModelType}, IGatewayConstructionContext, DiscordGatewayClient>"
             );
 
             syntax = syntax.AddBaseListTypes(

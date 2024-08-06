@@ -1,27 +1,37 @@
 using Discord.Gateway.State;
 using Discord.Models;
+using Discord.Rest;
 using Discord.Rest.Extensions;
 using static Discord.Template;
 
 namespace Discord.Gateway;
 
-public partial class GatewayThreadableChannelActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    ThreadableChannelIdentity channel
-) :
-    GatewayGuildChannelActor(client, guild, channel),
+public partial class GatewayThreadableChannelActor :
+    GatewayGuildChannelActor,
     IThreadableChannelActor,
     IGatewayCachedActor<ulong, GatewayThreadableChannel, ThreadableChannelIdentity, IThreadableChannelModel>
 {
-    [SourceOfTruth]
-    internal override ThreadableChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] public PublicArchivedThreadsPager PublicArchivedThreads { get; }
 
-    public IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> PublicArchivedThreads => throw new NotImplementedException();
+    [SourceOfTruth] public PrivateArchivedThreadsPager PrivateArchivedThreads { get; }
 
-    public IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> PrivateArchivedThreads => throw new NotImplementedException();
+    [SourceOfTruth] public JoinedPrivateArchivedThreadsPager JoinedPrivateArchivedThreads { get; }
 
-    public IPagedActor<ulong, IThreadChannel, PageThreadChannelsParams> JoinedPrivateArchivedThreads => throw new NotImplementedException();
+    [SourceOfTruth] internal override ThreadableChannelIdentity Identity { get; }
+
+    public GatewayThreadableChannelActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        ThreadableChannelIdentity channel) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+
+        // ReSharper disable VirtualMemberCallInConstructor
+        PublicArchivedThreads = GatewayActors.PublicArchivedThreads(client, Guild.Identity, CachePath);
+        PrivateArchivedThreads = GatewayActors.PrivateArchivedThreads(client, Guild.Identity, CachePath);
+        JoinedPrivateArchivedThreads = GatewayActors.JoinedPrivateArchivedThreads(client, Guild.Identity, CachePath);
+        // ReSharper restore VirtualMemberCallInConstructor
+    }
 
     [SourceOfTruth]
     internal GatewayThreadableChannel CreateEntity(IThreadableChannelModel model)
@@ -33,8 +43,7 @@ public partial class GatewayThreadableChannel :
     IThreadableChannel,
     ICacheableEntity<GatewayThreadableChannel, ulong, IThreadableChannelModel>
 {
-    [SourceOfTruth]
-    public GatewayCategoryChannelActor? Category { get; private set; }
+    [SourceOfTruth] public GatewayCategoryChannelActor? Category { get; private set; }
 
     public int? DefaultThreadSlowmode => Model.DefaultThreadRateLimitPerUser;
 
@@ -58,7 +67,8 @@ public partial class GatewayThreadableChannel :
         Actor = actor ?? new(client, guild, ThreadableChannelIdentity.Of(this));
 
         Category = model.ParentId.Map(
-            static (id, client, guild) => new GatewayCategoryChannelActor(client, guild, CategoryChannelIdentity.Of(id)),
+            static (id, client, guild) =>
+                new GatewayCategoryChannelActor(client, guild, CategoryChannelIdentity.Of(id)),
             client,
             guild
         );
@@ -66,7 +76,7 @@ public partial class GatewayThreadableChannel :
 
     public static GatewayThreadableChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IThreadableChannelModel model
     ) => new(
         client,

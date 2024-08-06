@@ -6,13 +6,21 @@ using Discord.Rest;
 namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
-public partial class GatewayUserActor(
-    DiscordGatewayClient client,
-    UserIdentity user
-) :
-    GatewayCachedActor<ulong, GatewayUser, UserIdentity, IUserModel>(client, user),
+public partial class GatewayUserActor :
+    GatewayCachedActor<ulong, GatewayUser, UserIdentity, IUserModel>,
     IUserActor
 {
+    internal override UserIdentity Identity { get; }
+
+    [method: TypeFactory]
+    public GatewayUserActor(
+        DiscordGatewayClient client,
+        UserIdentity user
+    ) : base(client, user)
+    {
+        Identity = user | this;
+    }
+
     [SourceOfTruth]
     internal GatewayUser CreateEntity(IUserModel model)
         => Client.StateController.CreateLatent(this, model);
@@ -59,7 +67,7 @@ public partial class GatewayUser :
     }
 
     public static GatewayUser Construct(DiscordGatewayClient client,
-        ICacheConstructionContext context, IUserModel model)
+        IGatewayConstructionContext context, IUserModel model)
     {
         if (model is ISelfUserModel selfUser)
             return GatewaySelfUser.Construct(client, context, selfUser);

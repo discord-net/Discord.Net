@@ -7,7 +7,6 @@ using static Discord.Template;
 namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
-[method: TypeFactory]
 public sealed partial class GatewayThreadChannelActor :
     GatewayGuildChannelActor,
     IThreadChannelActor,
@@ -22,13 +21,14 @@ public sealed partial class GatewayThreadChannelActor :
 
     [ProxyInterface] internal GatewayMessageChannelActor MessageChannelActor { get; }
 
+    [TypeFactory]
     public GatewayThreadChannelActor(
         DiscordGatewayClient client,
         GuildIdentity guild,
         ThreadChannelIdentity thread
     ) : base(client, guild, thread)
     {
-        Identity = thread;
+        Identity = thread | this;
         MessageChannelActor = new(client, thread, guild);
     }
 
@@ -76,7 +76,6 @@ public sealed partial class GatewayThreadChannel :
     public GatewayThreadChannel(
         DiscordGatewayClient client,
         GuildIdentity guild,
-        ThreadableChannelIdentity parent,
         IThreadChannelModel model,
         GatewayThreadChannelActor? actor = null
     ) : base(client, guild, model, actor)
@@ -88,6 +87,17 @@ public sealed partial class GatewayThreadChannel :
 
         AppliedTags = model.AppliedTags.ToImmutableList();
     }
+
+    public static GatewayThreadChannel Construct(
+        DiscordGatewayClient client,
+        IGatewayConstructionContext context,
+        IThreadChannelModel model
+    ) => new(
+        client,
+        context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
+        model,
+        context.TryGetActor<GatewayThreadChannelActor>()
+    );
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IThreadChannelModel model, bool updateCache = true, CancellationToken token = default)
@@ -101,18 +111,6 @@ public sealed partial class GatewayThreadChannel :
 
         return base.UpdateAsync(model, false, token);
     }
-
-    public static GatewayThreadChannel Construct(
-        DiscordGatewayClient client,
-        ICacheConstructionContext context,
-        IThreadChannelModel model
-    ) => new(
-        client,
-        context.Path.GetIdentity(T<GuildIdentity>(), model.GuildId),
-        context.Path.GetIdentity(T<ThreadableChannelIdentity>(), model.ParentId),
-        model,
-        context.TryGetActor<GatewayThreadChannelActor>()
-    );
 
     public override IThreadChannelModel GetModel() => Model;
 }

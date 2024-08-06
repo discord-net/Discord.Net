@@ -313,6 +313,16 @@ public interface IIdentifiable<TId, out TEntity, out TModel> :
         TClient client)
         where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
         where TClient : IDiscordClient
+        => model is IModelSource source
+            ? FromReferenced<TConstruct, TClient>(source, id, client)
+            : Of(id);
+
+    static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct, TClient>(
+        IModelSource model,
+        TId id,
+        TClient client)
+        where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
+        where TClient : IDiscordClient
         => FromReferenced(
             model,
             id,
@@ -326,6 +336,15 @@ public interface IIdentifiable<TId, out TEntity, out TModel> :
         TId id,
         IDiscordClient client)
         where TConstruct : class, IConstructable<TConstruct, TModel>
+        => model is IModelSource source
+            ? FromReferenced<TConstruct>(source, id, client)
+            : Of(id);
+
+    static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct>(
+        IModelSource model,
+        TId id,
+        IDiscordClient client)
+        where TConstruct : class, IConstructable<TConstruct, TModel>
         => FromReferenced(
             model,
             id,
@@ -336,6 +355,14 @@ public interface IIdentifiable<TId, out TEntity, out TModel> :
 
     static IIdentifiable<TId, TEntity, TModel> FromReferenced(
         IEntityModel model,
+        TId id,
+        Func<TModel, TEntity> factory)
+        => model is IModelSource source
+            ? FromReferenced(source, id, factory)
+            : Of(id);
+
+    static IIdentifiable<TId, TEntity, TModel> FromReferenced(
+        IModelSource model,
         TId id,
         Func<TModel, TEntity> factory)
     {
@@ -375,6 +402,11 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
 
     public static IIdentifiable<TId, TEntity, TActor, TModel> operator |(
         IIdentifiable<TId, TEntity, TActor, TModel>? left,
+        IIdentifiable<TId> right
+    ) => left?.MostSpecific(right) ?? Of(right.Id);
+
+    public static IIdentifiable<TId, TEntity, TActor, TModel> operator |(
+        IIdentifiable<TId, TEntity, TActor, TModel>? left,
         IIdentifiable<TId, TEntity, TActor, TModel> right
     ) => left?.MostSpecific(right) ?? right;
 
@@ -395,6 +427,17 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
     )
         where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
         where TClient : IDiscordClient
+        => model is IModelSource source
+            ? FromReferenced<TConstruct, TClient>(source, id, client)
+            : Of(id);
+
+    new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct, TClient>(
+        IModelSource model,
+        TId id,
+        TClient client
+    )
+        where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
+        where TClient : IDiscordClient
         => FromReferenced(
             model,
             id,
@@ -408,6 +451,15 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
         TId id,
         IDiscordClient client)
         where TConstruct : class, IConstructable<TConstruct, TModel>
+        => model is IModelSource source
+            ? FromReferenced<TConstruct>(source, id, client)
+            : Of(id);
+
+    new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct>(
+        IModelSource model,
+        TId id,
+        IDiscordClient client)
+        where TConstruct : class, IConstructable<TConstruct, TModel>
         => FromReferenced(
             model,
             id,
@@ -418,6 +470,14 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
 
     new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced(
         IEntityModel model,
+        TId id,
+        Func<TModel, TEntity> factory)
+        => model is IModelSource source
+            ? FromReferenced(source, id, factory)
+            : Of(id);
+
+    new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced(
+        IModelSource model,
         TId id,
         Func<TModel, TEntity> factory)
     {
@@ -456,6 +516,20 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
 
 public static class IIdentifiableExtensions
 {
+    public static IIdentifiable<TId, TEntity, TActor, TModel> MostSpecific<TId, TEntity, TActor, TModel>(
+        this IIdentifiable<TId, TEntity, TActor, TModel> self,
+        IIdentifiable<TId> other
+    )
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>, IEntityOf<TModel>
+        where TModel : class, IEntityModel<TId>
+        where TActor : class, IActor<TId, TEntity>
+    {
+        if (self.Detail < other.Detail)
+            return IIdentifiable<TId, TEntity, TActor, TModel>.Of(other.Id);
+        return self;
+    }
+
     public static IIdentifiable<TId, TEntity, TActor, TModel> MostSpecific<TId, TEntity, TActor, TModel>(
         this IIdentifiable<TId, TEntity, TActor, TModel> self,
         IIdentifiable<TId, TEntity, TActor, TModel> other
@@ -523,7 +597,6 @@ public static class IIdentifiableExtensions
             return IIdentifiable<TId, TEntity, TModel>.Of(other);
         return self;
     }
-
 }
 
 #endregion

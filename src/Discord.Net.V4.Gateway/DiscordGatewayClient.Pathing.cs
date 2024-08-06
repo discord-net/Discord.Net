@@ -5,8 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Gateway;
 
-using GuildsPager = GatewayPagedIndexableActor<GatewayGuildActor, ulong, GatewayGuild, RestPartialGuild, PageUserGuildsParams, IEnumerable<IPartialGuildModel>>;
-
 public partial class DiscordGatewayClient
 {
     [SourceOfTruth]

@@ -6,71 +6,49 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-public sealed partial class RestPagedIndexableActor<TActor, TId, TEntity, TPagedEntity, TModel, TParams>(
+public sealed class RestPagedIndexableActor<TActor, TId, TEntity, TModel, TApiModel, TParams>(
     DiscordRestClient client,
     Func<TId, TActor> actorFactory,
-    Func<TParams?, IApiOutRoute<TModel>> initial,
-    Func<EntityPager<TPagedEntity, TModel>, TModel, IEnumerable<TPagedEntity>> factory,
-    Func<EntityPager<TPagedEntity, TModel>, TModel, TParams?, IApiOutRoute<TModel>?> nextPage,
-    int? defaultPageSize = null
+    IPathable path,
+    Func<TApiModel, IEnumerable<TModel>> modelsMapper,
+    Func<TModel, TEntity> entityFactory
 ):
-    RestPagedActor<TId, TPagedEntity, TModel, TParams>(client, initial, factory, nextPage, defaultPageSize),
-    IPagedIndexableActor<TActor, TId, TEntity, TPagedEntity, TParams>
-    where TActor : IActor<TId, TEntity>
-    where TId : IEquatable<TId>
-    where TEntity : RestEntity<TId>
-    where TPagedEntity : RestEntity<TId>
-    where TModel : class
-    where TParams : IPagingParams
-{
-    public TActor this[TId id] => Specifically(id);
-
-    public TActor Specifically(TId id) => actorFactory(id);
-}
-
-public sealed class RestPagedIndexableActor<TActor, TId, TEntity, TModel, TParams>(
-    DiscordRestClient client,
-    Func<TId, TActor> actorFactory,
-    Func<TParams?, IApiOutRoute<TModel>> initial,
-    Func<EntityPager<TEntity, TModel>, TModel, IEnumerable<TEntity>> factory,
-    Func<EntityPager<TEntity, TModel>, TModel, TParams?, IApiOutRoute<TModel>?> nextPage,
-    int? defaultPageSize = null
-):
-    RestPagedActor<TId, TEntity, TModel, TParams>(client, initial, factory, nextPage, defaultPageSize),
+    RestPagedActor<TId, TEntity, TModel, TApiModel, TParams>(client, path, modelsMapper, entityFactory),
     IPagedIndexableActor<TActor, TId, TEntity, TParams>
     where TActor : IActor<TId, TEntity>
     where TId : IEquatable<TId>
-    where TEntity : RestEntity<TId>
-    where TModel : class
-    where TParams : IPagingParams
+    where TEntity : RestEntity<TId>, IEntityOf<TModel>
+    where TModel : class, IEntityModel<TId>
+    where TApiModel : class
+    where TParams : class, IPagingParams<TParams, TApiModel>
 {
     public TActor this[TId id] => Specifically(id);
     internal RestIndexableActor<TActor, TId, TEntity> IndexerActor { get; } = new(actorFactory);
     public TActor Specifically(TId id) => IndexerActor.Specifically(id);
 }
 
-public class RestPagedActor<TId, TEntity, TModel, TParams>(
+public class RestPagedActor<TId, TEntity, TModel, TApiModel, TParams>(
     DiscordRestClient client,
-    Func<TParams?, IApiOutRoute<TModel>> initial,
-    Func<EntityPager<TEntity, TModel>, TModel, IEnumerable<TEntity>> factory,
-    Func<EntityPager<TEntity, TModel>, TModel, TParams?, IApiOutRoute<TModel>?> nextPage,
-    int? defaultPageSize = null
+    IPathable path,
+    Func<TApiModel, IEnumerable<TModel>> modelsMapper,
+    Func<TModel, TEntity> entityFactory
 ):
     IPagedActor<TId, TEntity, TParams>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>
     where TModel : class
-    where TParams : IPagingParams
+    where TApiModel : class
+    where TParams : class, IPagingParams<TParams, TApiModel>
 {
-
     public IAsyncPaged<TEntity> PagedAsync(TParams? pagingParams = default, RequestOptions? options = null)
-        => new EntityPager<TEntity, TModel>(
+    {
+        return new RestPager<TId, TEntity, TModel, TApiModel, TParams>(
             client,
-            pagingParams?.PageSize ?? defaultPageSize,
-            pagingParams?.Total,
-            initial(pagingParams),
-            factory,
-            (pager, model) => nextPage(pager, model, pagingParams),
-            options
-       );
+            path,
+            options ?? client.DefaultRequestOptions,
+            modelsMapper,
+            entityFactory,
+            pagingParams
+        );
+    }
 }

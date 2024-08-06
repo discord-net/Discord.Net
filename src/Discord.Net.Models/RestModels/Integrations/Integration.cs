@@ -60,9 +60,7 @@ public sealed class Integration : IIntegrationModel, IModelSource, IModelSourceO
 
     ulong? IIntegrationModel.UserId => ~User.Map(v => v.Id);
 
-    string? IIntegrationModel.AccountId => ~Account.Map(v => v.Id);
-
-    string? IIntegrationModel.AccountName => ~Account.Map(v => v.Name);
+    IIntegrationAccountModel? IIntegrationModel.Account => ~Account;
 
     DateTimeOffset? IIntegrationModel.SyncedAt => ~SyncedAt;
 

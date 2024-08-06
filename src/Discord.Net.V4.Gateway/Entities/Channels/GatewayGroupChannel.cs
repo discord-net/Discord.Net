@@ -4,17 +4,21 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-public sealed partial class GatewayGroupChannelActor(
-    DiscordGatewayClient client,
-    GroupChannelIdentity channel
-) :
-    GatewayChannelActor(client, channel),
+public sealed partial class GatewayGroupChannelActor :
+    GatewayChannelActor,
     IGroupChannelActor,
     IGatewayCachedActor<ulong, GatewayGroupChannel, GroupChannelIdentity, IGroupDMChannelModel>
 {
-    [SourceOfTruth] internal override GroupChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] internal override GroupChannelIdentity Identity { get; }
 
-    [ProxyInterface] internal GatewayMessageChannelActor MessageChannelActor { get; } = new(client, channel);
+    [ProxyInterface] internal GatewayMessageChannelActor MessageChannelActor { get; }
+
+    public GatewayGroupChannelActor(DiscordGatewayClient client,
+        GroupChannelIdentity channel) : base(client, channel)
+    {
+        Identity = channel | this;
+        MessageChannelActor = new GatewayMessageChannelActor(client, channel);
+    }
 
     [SourceOfTruth]
     internal GatewayGroupChannel CreateEntity(IGroupDMChannelModel model)
@@ -46,7 +50,7 @@ public sealed partial class GatewayGroupChannel :
 
     public static GatewayGroupChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGroupDMChannelModel model
     ) => new(
         client,

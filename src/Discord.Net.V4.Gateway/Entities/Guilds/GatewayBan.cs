@@ -4,18 +4,29 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-public sealed partial class GatewayBanActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    BanIdentity ban,
-    UserIdentity? user = null
-) :
-    GatewayCachedActor<ulong, GatewayBan, BanIdentity, IBanModel>(client, ban),
+public sealed partial class GatewayBanActor :
+    GatewayCachedActor<ulong, GatewayBan, BanIdentity, IBanModel>,
     IBanActor
 {
-    [SourceOfTruth, StoreRoot] public GatewayGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [SourceOfTruth, StoreRoot] public GatewayGuildActor Guild { get; }
 
-    [SourceOfTruth] public GatewayUserActor User { get; } = user?.Actor ?? new(client, user ?? UserIdentity.Of(ban.Id));
+    [SourceOfTruth] public GatewayUserActor User { get; }
+
+    internal override BanIdentity Identity { get; }
+
+    public GatewayBanActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        BanIdentity ban,
+        UserIdentity? user = null
+    ) : base(client, ban)
+    {
+        Identity = ban | this;
+
+        Guild = client.Guilds >> guild;
+        User = client.Users >> (user | ban);
+    }
+
 
     [SourceOfTruth]
     internal GatewayBan CreateEntity(IBanModel model)
@@ -46,7 +57,7 @@ public sealed partial class GatewayBan :
 
     public static GatewayBan Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IBanModel model
     ) => new(
         client,

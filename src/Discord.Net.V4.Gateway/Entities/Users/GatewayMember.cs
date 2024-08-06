@@ -4,23 +4,30 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-public sealed partial class GatewayMemberActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    MemberIdentity member,
-    UserIdentity? user = null
-) :
-    GatewayCachedActor<ulong, GatewayMember, MemberIdentity, IMemberModel>(client, member),
+
+public sealed partial class GatewayMemberActor :
+    GatewayCachedActor<ulong, GatewayMember, MemberIdentity, IMemberModel>,
     IGuildMemberActor,
     IGatewayCachedActor<ulong, GatewayMember, MemberIdentity, IMemberModel>
 {
-    [StoreRoot, SourceOfTruth] public GatewayGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [StoreRoot, SourceOfTruth] public GatewayGuildActor Guild { get; }
 
     [SourceOfTruth, ProxyInterface]
-    public GatewayUserActor User { get; } =
-        user?.Actor ?? new(client, user ?? member.Cast<GatewayUser, GatewayUserActor, IUserModel>());
+    public GatewayUserActor User { get; }
 
-    [SourceOfTruth] internal new MemberIdentity Identity { get; } = member;
+    [SourceOfTruth] internal new MemberIdentity Identity { get; }
+
+    [method: TypeFactory(LastParameter = nameof(member))]
+    public GatewayMemberActor(DiscordGatewayClient client,
+        GuildIdentity guild,
+        MemberIdentity member,
+        UserIdentity? user = null) : base(client, member)
+    {
+        Identity = member | this;
+
+        Guild = client.Guilds >> guild;
+        User = client.Users >> (user ?? member.Cast<GatewayUser, GatewayUserActor, IUserModel>());
+    }
 
     [SourceOfTruth]
     internal GatewayMember CreateEntity(IMemberModel model)
@@ -65,7 +72,7 @@ public sealed partial class GatewayMember :
 
     public static GatewayMember Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IMemberModel model
     ) => new(
         client,

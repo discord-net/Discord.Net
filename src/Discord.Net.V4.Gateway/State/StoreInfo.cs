@@ -84,10 +84,12 @@ file abstract class BaseStoreInfo<TId, TModel>(
     protected abstract IReadOnlyDictionary<Type, StoreProviderInfo<TId, TModel>> GetStoreMap();
 }
 
-internal interface IStoreInfo<TId, TModel>
+internal interface IStoreInfo<TId, TModel> : IStoreInfo
     where TModel : class, IEntityModel<TId>
     where TId : IEquatable<TId>
 {
+    bool HasHierarchicStores => EnabledStoresForHierarchy.Count > 0;
+
     IEntityModelStore<TId, TModel> Store { get; }
 
     IReadOnlyDictionary<Type, StoreProviderInfo<TId, TModel>> HierarchyStoreMap { get; }
@@ -98,12 +100,33 @@ internal interface IStoreInfo<TId, TModel>
         CancellationToken token = default
     );
 
-    async IAsyncEnumerable<IEntityModelStore<TId, TModel>> EnumerateAllAsync([EnumeratorCancellation] CancellationToken token = default)
+    async IAsyncEnumerable<IEntityModelStore<TId, TModel>> EnumerateAllAsync(
+        [EnumeratorCancellation] CancellationToken token = default)
     {
         yield return Store;
 
         foreach (var storeInfo in EnabledStoresForHierarchy)
             yield return await GetOrComputeStoreAsync(storeInfo, token);
+    }
+
+    async ValueTask<IEntityModelStore<TId, TModel>[]> GetAllStoresAsync(CancellationToken token = default)
+    {
+        if (EnabledStoresForHierarchy.Count == 0)
+            return [Store];
+
+        var result = new IEntityModelStore<TId, TModel>[EnabledStoresForHierarchy.Count + 1];
+        result[0] = Store;
+
+        // TODO: investigate this perf.
+        await Parallel.ForEachAsync(
+            EnabledStoresForHierarchy.Select((x, i) => (Store: x, Index: i)),
+            token, async (info, token) =>
+            {
+                result[info.Index + 1] = await GetOrComputeStoreAsync(info.Store, token);
+            }
+        );
+
+        return result;
     }
 
     async ValueTask<IEntityModelStore<TId, TModel>> GetStoreForModelType(Type type, CancellationToken token = default)
@@ -118,6 +141,15 @@ internal interface IStoreInfo<TId, TModel>
 
         return Store;
     }
+
+    Type IStoreInfo.IdType => typeof(TId);
+    Type IStoreInfo.ModelType => typeof(TModel);
+}
+
+internal interface IStoreInfo
+{
+    Type IdType { get; }
+    Type ModelType { get; }
 }
 
 internal static class StoreInfo

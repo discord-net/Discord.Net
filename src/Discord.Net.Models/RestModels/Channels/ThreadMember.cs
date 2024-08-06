@@ -5,7 +5,7 @@ namespace Discord.Models.Json;
 public sealed class ThreadMember : IThreadMemberModel, IModelSource, IModelSourceOf<IMemberModel?>
 {
     [JsonPropertyName("id")]
-    public Optional<ulong> Id { get; set; }
+    public Optional<ulong> ThreadId { get; set; }
 
     [JsonPropertyName("user_id")]
     public Optional<ulong> UserId { get; set; }
@@ -20,7 +20,7 @@ public sealed class ThreadMember : IThreadMemberModel, IModelSource, IModelSourc
     public Optional<GuildMember> GuildMember { get; set; }
 
     ulong? IThreadMemberModel.UserId => ~UserId;
-    ulong IEntityModel<ulong>.Id => ~Id;
+    ulong? IThreadMemberModel.ThreadId => ~ThreadId;
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

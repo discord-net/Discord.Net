@@ -11,7 +11,7 @@ public interface IBrokerProvider<TId, TEntity, TActor, TModel> : IBrokerProvider
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+    IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
     where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
@@ -36,7 +36,7 @@ public interface IBrokerProvider<TId, TEntity, TModel>
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+    IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
@@ -65,6 +65,6 @@ internal delegate ValueTask<IManageableEntityBroker<TId, TEntity, TModel>> Broke
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, ICacheConstructionContext, DiscordGatewayClient>
+    IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>;

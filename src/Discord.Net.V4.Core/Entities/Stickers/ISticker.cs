@@ -8,7 +8,8 @@ namespace Discord;
 /// </summary>
 [Refreshable(nameof(Routes.GetSticker))]
 public partial interface ISticker :
-    ISnowflakeEntity<IStickerModel>
+    ISnowflakeEntity<IStickerModel>,
+    IStickerActor
 {
     /// <summary>
     ///     The name of the sticker.

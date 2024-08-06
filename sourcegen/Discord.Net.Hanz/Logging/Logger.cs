@@ -5,16 +5,23 @@ namespace Discord.Net.Hanz;
 
 public sealed class Logger : ILogger, IEquatable<Logger>
 {
+    public const int MAX_UNFLUSHED_LOGS = 2500;
+
     public static readonly string LogDirectory = Path.Combine(Environment.CurrentDirectory, ".hanz");
     private readonly ConcurrentDictionary<string, Logger> _subLoggers = [];
 
     private readonly LogLevel _logLevel;
     private readonly string _logFilePath;
 
+    private readonly LinkedList<string> _logs;
+
+    private readonly object _syncRoot = new();
+
     public Logger(
         LogLevel logLevel,
         string logFilePath)
     {
+        _logs = new();
         _logLevel = logLevel;
         _logFilePath = logFilePath;
 
@@ -77,8 +84,11 @@ public sealed class Logger : ILogger, IEquatable<Logger>
         if (_logFilePath.ToLowerInvariant().Contains("roslyn"))
             return;
 
-        if (File.Exists(_logFilePath))
-            File.Delete(_logFilePath);
+        lock (_syncRoot)
+        {
+            if (File.Exists(_logFilePath))
+                File.Delete(_logFilePath);
+        }
     }
 
     public bool IsEnabled(LogLevel logLevel)
@@ -96,13 +106,45 @@ public sealed class Logger : ILogger, IEquatable<Logger>
 
         try
         {
-            File.AppendAllText(_logFilePath,
-                $"[{DateTime.Now:O} | {logLevel}] {message}{Environment.NewLine}");
+            lock (_syncRoot)
+            {
+                _logs.AddLast($"[{DateTime.Now:O} | {logLevel}] {message}");
+
+                if(_logs.Count >= MAX_UNFLUSHED_LOGS)
+                    NoLockFlush();
+            }
         }
         catch (Exception ex)
         {
             SelfLog.Write(ex.ToString());
         }
+    }
+
+    public void Flush()
+    {
+        lock (_syncRoot)
+        {
+            NoLockFlush();
+        }
+    }
+
+    private void NoLockFlush()
+    {
+        if (_logs.Count >= 0)
+        {
+            using (var writer = File.AppendText(_logFilePath))
+            {
+                foreach (var log in _logs)
+                    writer.WriteLine(log);
+
+                writer.Flush();
+            }
+
+            _logs.Clear();
+        }
+
+        foreach (var subLogger in _subLoggers)
+            subLogger.Value.Flush();
     }
 
     public static Logger CreateSemanticRun(string assembly)

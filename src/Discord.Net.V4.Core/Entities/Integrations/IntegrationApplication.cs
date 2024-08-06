@@ -1,9 +1,14 @@
 namespace Discord;
 
-public readonly struct IntegrationApplication(ulong id, string name, string? icon, string description, IUserActor? bot)
-    :
-        IIdentifiable<ulong>,
-        IConstructable<IntegrationApplication, Models.IApplicationModel>
+public readonly struct IntegrationApplication(
+    ulong id,
+    string name,
+    string? icon,
+    string description,
+    IUserActor? bot
+) :
+    IIdentifiable<ulong>,
+    IConstructable<IntegrationApplication, Models.IApplicationModel>
 {
     public readonly ulong Id = id;
     public readonly string Name = name;
@@ -37,4 +42,5 @@ public readonly struct IntegrationApplication(ulong id, string name, string? ico
         );
 
     ulong IIdentifiable<ulong>.Id => Id;
+    IdentityDetail IIdentifiable<ulong>.Detail => IdentityDetail.Entity;
 }

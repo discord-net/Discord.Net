@@ -271,7 +271,7 @@ public static class TransitiveFill
 
         if (context.Resolved.Count != method.TypeParameters.Length)
         {
-            foreach (var parameter in method.Parameters.Where(ParameterIsTransitiveFill))
+            foreach (var parameter in method.Parameters)
             {
                 ResolveGenericForParameter(
                     context,
@@ -470,7 +470,7 @@ public static class TransitiveFill
                         .ConstraintTypes
                         .Any(y =>
                             HasReferenceToOtherConstraint(y, filledTypeParameter.Key)
-                        ) && context.Resolved.TryGetValue(x, out var resolved) && resolved.Count == 1
+                        ) && context.Resolved.ContainsKey(x)
                 )
                 .ToArray();
 
@@ -520,6 +520,8 @@ public static class TransitiveFill
 
             if (candidates.Length <= 1)
             {
+                logger.Log($"{filledTypeParameter.Key}: Candidates: {candidates.Length}");
+
                 result.Add(
                     filledTypeParameter.Key,
                     ApplyMinimumNullableAnnotation(
@@ -572,6 +574,8 @@ public static class TransitiveFill
             );
         }
 
+
+
         return result;
     }
 
@@ -614,6 +618,7 @@ public static class TransitiveFill
 
         if (fillType is null)
         {
+            logger.Log($"{parameter}: Skipping, no fill type resolved.");
             return;
         }
 
@@ -621,13 +626,13 @@ public static class TransitiveFill
         {
             if (parameter.Type is not ITypeParameterSymbol typeParameter)
             {
-                logger.Warn($"parameter type is not a type parameter for 'this' arg");
+                logger.Warn($"{parameter}: Parameter type is not a type parameter for 'this' arg");
                 return;
             }
 
             if (!CanSubstitute(typeParameter, fillType, context, logger))
             {
-                logger.Warn($"Cannot substitute {typeParameter} to {fillType}");
+                logger.Warn($"{parameter}: Cannot substitute {typeParameter} to {fillType}");
                 return;
             }
 
@@ -646,6 +651,7 @@ public static class TransitiveFill
         }
         else
         {
+            logger.Log($"{parameter}: Walking fill type {fillType}");
             WalkTypeForConstraints(context, parameter.Type, fillType, logger);
         }
     }

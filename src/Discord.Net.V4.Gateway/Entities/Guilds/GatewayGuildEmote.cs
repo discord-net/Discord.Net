@@ -4,15 +4,23 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-public sealed partial class GatewayGuildEmoteActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    GuildEmoteIdentity emote
-) :
-    GatewayCachedActor<ulong, GatewayGuildEmote, GuildEmoteIdentity, IGuildEmoteModel>(client, emote),
+public sealed partial class GatewayGuildEmoteActor :
+    GatewayCachedActor<ulong, GatewayGuildEmote, GuildEmoteIdentity, IGuildEmoteModel>,
     IGuildEmoteActor
 {
-    [SourceOfTruth, StoreRoot] public GatewayGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [SourceOfTruth, StoreRoot] public GatewayGuildActor Guild { get; }
+
+    internal override GuildEmoteIdentity Identity { get; }
+
+    public GatewayGuildEmoteActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        GuildEmoteIdentity emote
+    ) : base(client, emote)
+    {
+        Identity = emote | this;
+        Guild = client.Guilds >> guild;
+    }
 
     [SourceOfTruth]
     internal GatewayGuildEmote CreateEntity(IGuildEmoteModel model)
@@ -35,8 +43,7 @@ public sealed partial class GatewayGuildEmote :
 
     public IDefinedLoadableEntityEnumerable<ulong, IRole> Roles => throw new NotImplementedException();
 
-    [SourceOfTruth]
-    public GatewayUserActor? Creator { get; private set; }
+    [SourceOfTruth] public GatewayUserActor? Creator { get; private set; }
 
     [ProxyInterface] internal GatewayGuildEmoteActor Actor { get; }
 
@@ -60,7 +67,7 @@ public sealed partial class GatewayGuildEmote :
 
     public static GatewayGuildEmote Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGuildEmoteModel model
     ) => new(
         client,

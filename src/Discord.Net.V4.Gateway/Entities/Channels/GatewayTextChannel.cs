@@ -4,24 +4,30 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-[method: TypeFactory]
-public partial class GatewayTextChannelActor(
-    DiscordGatewayClient client,
-    GuildIdentity guild,
-    TextChannelIdentity channel
-) :
-    GatewayThreadableChannelActor(client, guild, channel),
+
+public partial class GatewayTextChannelActor :
+    GatewayThreadableChannelActor,
     ITextChannelActor,
     IGatewayCachedActor<ulong, GatewayTextChannel, TextChannelIdentity, IGuildTextChannelModel>
 {
     [SourceOfTruth]
-    internal override TextChannelIdentity Identity { get; } = channel;
+    internal override TextChannelIdentity Identity { get; }
 
     [ProxyInterface]
-    internal GatewayMessageChannelActor MessageChannelActor { get; } = new(client, channel, guild);
+    internal GatewayMessageChannelActor MessageChannelActor { get; }
 
     [ProxyInterface]
-    internal GatewayIntegrationChannelActor IntegrationChannelActor { get; } = new(client, guild, channel);
+    internal GatewayIntegrationChannelActor IntegrationChannelActor { get; }
+
+    [method: TypeFactory]
+    public GatewayTextChannelActor(DiscordGatewayClient client,
+        GuildIdentity guild,
+        TextChannelIdentity channel) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+        MessageChannelActor = new GatewayMessageChannelActor(client, channel, guild);
+        IntegrationChannelActor = new GatewayIntegrationChannelActor(client, guild, channel);
+    }
 
     [SourceOfTruth]
     internal GatewayTextChannel CreateEntity(IGuildTextChannelModel model)
@@ -62,7 +68,7 @@ public partial class GatewayTextChannel :
 
     public static GatewayTextChannel Construct(
         DiscordGatewayClient client,
-        ICacheConstructionContext context,
+        IGatewayConstructionContext context,
         IGuildTextChannelModel model
     ) => new(
         client,
