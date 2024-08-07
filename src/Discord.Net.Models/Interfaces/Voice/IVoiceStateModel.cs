@@ -1,8 +1,9 @@
 namespace Discord.Models;
 
 [ModelEquality]
-public partial interface IVoiceStateModel : IEntityModel<string>
+public partial interface IVoiceStateModel : IEntityModel<ulong>
 {
+    string SessionId { get; }
     ulong UserId { get; }
     ulong? ChannelId { get; }
     ulong? GuildId { get; }
@@ -14,4 +15,6 @@ public partial interface IVoiceStateModel : IEntityModel<string>
     bool SelfVideo { get; }
     bool Suppress { get; }
     DateTimeOffset? RequestToSpeakTimestamp { get; }
+
+    ulong IEntityModel<ulong>.Id => UserId;
 }

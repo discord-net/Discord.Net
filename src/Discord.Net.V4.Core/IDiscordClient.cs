@@ -24,6 +24,10 @@ public interface IDiscordClient :
 
     IIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks { get; }
 
+    IEnumerableIndexableActor<IStickerPackActor, ulong, IStickerPack> StickerPacks { get; }
+
+    IIndexableActor<IStickerActor, ulong, ISticker> Stickers { get; }
+
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }
 

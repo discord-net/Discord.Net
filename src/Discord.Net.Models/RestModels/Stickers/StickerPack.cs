@@ -2,7 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class StickerPack : IModelSourceOfMultiple<IStickerModel>
+public sealed class StickerPack :
+    IStickerPackModel,
+    IModelSourceOfMultiple<IStickerModel>
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -24,6 +26,10 @@ public sealed class StickerPack : IModelSourceOfMultiple<IStickerModel>
 
     [JsonPropertyName("banner_asset_id")]
     public Optional<ulong> BannerAssetId { get; set; }
+
+    IEnumerable<IStickerModel> IStickerPackModel.Stickers => Stickers;
+    ulong? IStickerPackModel.CoverStickerId => CoverStickerId.ToNullable();
+    ulong? IStickerPackModel.BannerAssetId => BannerAssetId.ToNullable();
 
     IEnumerable<IStickerModel> IModelSourceOfMultiple<IStickerModel>.GetModels() => Stickers;
 

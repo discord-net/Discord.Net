@@ -26,6 +26,8 @@ internal sealed class MutableSelfUserModel(ISelfUserModel model) : ISelfUserMode
 
     int? IUserModel.PublicFlags => UserModelPart.PublicFlags;
 
+    IAvatarDecorationDataModel? IUserModel.AvatarDecoration => SelfUserModelPart.AvatarDecoration ?? UserModelPart.AvatarDecoration;
+
     int? ISelfUserModel.PremiumType => SelfUserModelPart.PremiumType;
 
     string? ISelfUserModel.Email => SelfUserModelPart.Email;

@@ -218,16 +218,4 @@ public partial class Routes
     // TODO: add
     //public static string GuildOnboarding([IdHeuristic<IGuild>] ulong guildId)
     //        => $"guilds/{guildId}/onboarding";
-
-    public static IApiInRoute<ModifyCurrentUserVoiceState> ModifyCurrentUserVoiceState(
-        [IdHeuristic<IGuild>] ulong guildId,
-        ModifyCurrentUserVoiceState body) =>
-        new ApiInRoute<ModifyCurrentUserVoiceState>(nameof(ModifyCurrentUserVoiceState), RequestMethod.Patch,
-            $"guilds/{guildId}/voice-states/@me", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
-
-    public static IApiInRoute<ModifyUserVoiceState> ModifyUserVoiceState([IdHeuristic<IGuild>] ulong guildId,
-        [IdHeuristic<IGuildMember>] ulong userId,
-        ModifyUserVoiceState body) =>
-        new ApiInRoute<ModifyUserVoiceState>(nameof(ModifyUserVoiceState), RequestMethod.Patch,
-            $"guilds/{guildId}/voice-states/{userId}", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
 }

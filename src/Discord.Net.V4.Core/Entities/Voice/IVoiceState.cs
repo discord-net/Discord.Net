@@ -1,14 +1,16 @@
+using Discord.Models;
+
 namespace Discord;
 
-public interface IVoiceState
+public partial interface IVoiceState :
+    IVoiceStateActor,
+    ISnowflakeEntity<IVoiceStateModel>
 {
-    ILoadableEntity<ulong, IVoiceChannel> VoiceChannel { get; }
-
-    string VoiceSessionId { get; }
+    IVoiceChannelActor Channel { get; }
 
     DateTimeOffset? RequestToSpeakTimestamp { get; }
 
-    VoiceStateFlags Flags { get; }
+    string SessionId { get; }
 
     /// <summary>
     ///     Gets a value that indicates whether this user is deafened by the guild.
@@ -17,8 +19,7 @@ public interface IVoiceState
     ///     <see langword="true" /> if the user is deafened (i.e. not permitted to listen to or speak to others) by the guild;
     ///     otherwise <see langword="false" />.
     /// </returns>
-    bool IsDeafened
-        => Flags.HasFlag(VoiceStateFlags.Deafened);
+    bool IsDeafened { get; }
 
     /// <summary>
     ///     Gets a value that indicates whether this user is muted (i.e. not permitted to speak via voice) by the
@@ -27,8 +28,7 @@ public interface IVoiceState
     /// <returns>
     ///     <see langword="true" /> if this user is muted by the guild; otherwise <see langword="false" />.
     /// </returns>
-    bool IsMuted
-        => Flags.HasFlag(VoiceStateFlags.Muted);
+    bool IsMuted { get; }
 
     /// <summary>
     ///     Gets a value that indicates whether this user has marked themselves as deafened.
@@ -37,8 +37,7 @@ public interface IVoiceState
     ///     <see langword="true" /> if this user has deafened themselves (i.e. not permitted to listen to or speak to others);
     ///     otherwise <see langword="false" />.
     /// </returns>
-    bool IsSelfDeafened
-        => Flags.HasFlag(VoiceStateFlags.SelfDeafened);
+    bool IsSelfDeafened { get; }
 
     /// <summary>
     ///     Gets a value that indicates whether this user has marked themselves as muted (i.e. not permitted to
@@ -47,8 +46,7 @@ public interface IVoiceState
     /// <returns>
     ///     <see langword="true" /> if this user has muted themselves; otherwise <see langword="false" />.
     /// </returns>
-    bool IsSelfMuted
-        => Flags.HasFlag(VoiceStateFlags.SelfMuted);
+    bool IsSelfMuted { get; }
 
     /// <summary>
     ///     Gets a value that indicates whether the user is muted by the current user.
@@ -57,8 +55,7 @@ public interface IVoiceState
     ///     <see langword="true" /> if the guild is temporarily blocking audio to/from this user; otherwise
     ///     <see langword="false" />.
     /// </returns>
-    bool IsSuppressed
-        => Flags.HasFlag(VoiceStateFlags.Suppressed);
+    bool IsSuppressed { get; }
 
     /// <summary>
     ///     Gets a value that indicates if this user is streaming in a voice channel.
@@ -66,8 +63,7 @@ public interface IVoiceState
     /// <returns>
     ///     <see langword="true" /> if the user is streaming; otherwise <see langword="false" />.
     /// </returns>
-    bool IsStreaming
-        => Flags.HasFlag(VoiceStateFlags.Streaming);
+    bool IsStreaming { get; }
 
     /// <summary>
     ///     Gets a value that indicates if the user is videoing in a voice channel.
@@ -75,6 +71,5 @@ public interface IVoiceState
     /// <returns>
     ///     <see langword="true" /> if the user has their camera turned on; otherwise <see langword="false" />.
     /// </returns>
-    bool IsVideoing
-        => Flags.HasFlag(VoiceStateFlags.Videoing);
+    bool IsVideoing { get; }
 }

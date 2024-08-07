@@ -1,6 +1,3 @@
 namespace Discord.Models;
 
-public interface IUserUpdatedPayloadData : IGatewayPayloadData, ISelfUserModel
-{
-
-}
+public interface IUserUpdatedPayloadData : IGatewayPayloadData, ISelfUserModel;

@@ -11,10 +11,8 @@ public interface IRelationship<out TActor, out TId, out TEntity> :
     TId IRelation<TId, TEntity> .RelationshipId => RelationshipActor.Id;
 }
 
-public interface IRelation<out TId, out TEntity> : IIdentifiable<TId>
+public interface IRelation<out TId, out TEntity>
     where TId : IEquatable<TId>
 {
     TId RelationshipId { get; }
-
-    TId IIdentifiable<TId>.Id => RelationshipId;
 }

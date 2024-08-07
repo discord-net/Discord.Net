@@ -21,13 +21,7 @@ public partial interface ISticker :
     /// </summary>
     StickerFormatType Format { get; }
 
-    /// <summary>
-    ///     Gets the ID of the pack of this sticker.
-    /// </summary>
-    /// <returns>
-    ///     A snowflake ID associated with the pack of this sticker.
-    /// </returns>
-    ulong? PackId { get; }
+    IStickerPackActor? Pack { get; }
 
     /// <summary>
     ///     Gets the description of this sticker.

@@ -8,6 +8,9 @@ public static partial class Routes
     public static readonly IApiOutRoute<StickerPack[]> ListStickerPacks
         = new ApiOutRoute<StickerPack[]>(nameof(ListStickerPacks), RequestMethod.Get, "sticker-packs");
 
+    public static IApiOutRoute<StickerPack> GetStickerPack([IdHeuristic<IStickerPack>]ulong packId) =>
+        new ApiOutRoute<StickerPack>(nameof(GetStickerPack), RequestMethod.Get, $"sticker-packs/{packId}");
+
     public static IApiOutRoute<Sticker> GetSticker([IdHeuristic<ISticker>] ulong stickerId) =>
         new ApiOutRoute<Sticker>(nameof(GetSticker), RequestMethod.Get, $"stickers/{stickerId}");
 

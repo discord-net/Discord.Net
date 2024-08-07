@@ -14,6 +14,8 @@ public partial interface IGuildMemberActor :
     IUserRelationship,
     IActor<ulong, IGuildMember>
 {
+    IVoiceStateActor VoiceState { get; }
+
     Task AddRoleAsync(
         EntityOrId<ulong, IRole> role,
         RequestOptions? options = null,
