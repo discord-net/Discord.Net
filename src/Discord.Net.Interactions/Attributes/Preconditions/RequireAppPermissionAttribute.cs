@@ -60,7 +60,7 @@ public class RequireAppPermissionAttribute : PreconditionAttribute
         {
             if (context.Interaction.GuildId is null)
                 return Task.FromResult(PreconditionResult.FromError(NotAGuildErrorMessage ?? "Command must be used in a guild channel."));
-            if (context.Interaction.Permissions.Has(GuildPermission.Value))
+            if (!context.Interaction.Permissions.Has(GuildPermission.Value))
                 return Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"Bot requires guild permission {GuildPermission.Value}."));
         }
 
