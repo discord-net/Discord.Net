@@ -236,11 +236,20 @@ public sealed class Hanz : IIncrementalGenerator
                     })),
                 (productionContext, data) =>
                 {
-                    var logger = jsonTaskLogger;
-                    if (data.Right.ProjectName is not null)
-                        logger = logger.GetSubLogger(data.Right.ProjectName).WithCleanLogFile();
+                    var friendlyName = data.Right.ProjectName ?? data.Right.RootNameSpace;
 
-                    JsonModels.Execute(productionContext, data, logger);
+                    var logger = friendlyName is not null
+                        ? jsonTaskLogger.GetSubLogger(friendlyName)
+                        : jsonTaskLogger;
+
+                    JsonModels.Execute(
+                        productionContext,
+                        data.Left,
+                        data.Right.ProjectName,
+                        data.Right.RootNameSpace,
+                        logger.WithCleanLogFile()
+                    );
+                    logger.Flush();
                 }
             );
 

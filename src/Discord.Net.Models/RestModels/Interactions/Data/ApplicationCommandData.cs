@@ -3,8 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-[InteractionDataType(InteractionDataTypes.ApplicationCommand)]
-public sealed class ApplicationCommandData : InteractionData
+public sealed class ApplicationCommandData : InteractionData, IApplicationCommandDataModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -19,11 +18,16 @@ public sealed class ApplicationCommandData : InteractionData
     public Optional<InteractionDataResolved> Resolved { get; set; }
 
     [JsonPropertyName("options")]
-    public Optional<ApplicationCommandInteractionDataOption> Options { get; set; }
+    public Optional<ApplicationCommandInteractionDataOption[]> Options { get; set; }
 
     [JsonPropertyName("guild_id")]
     public Optional<ulong> GuildId { get; set; }
 
     [JsonPropertyName("target_id")]
     public Optional<ulong> TargetId { get; set; }
+
+    IResolvedDataModel? IApplicationCommandDataModel.Resolved => ~Resolved;
+    IEnumerable<IApplicationCommandOptionModel>? IApplicationCommandDataModel.Options => ~Options;
+    ulong? IApplicationCommandDataModel.GuildId => GuildId.ToNullable();
+    ulong? IApplicationCommandDataModel.TargetId => TargetId.ToNullable();
 }

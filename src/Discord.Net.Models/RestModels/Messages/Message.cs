@@ -91,7 +91,7 @@ public sealed class Message :
     public Optional<MessageInteractionMetadata> Interaction { get; set; }
 
     [JsonPropertyName("thread")]
-    public Optional<ThreadChannelModelBase> Thread { get; set; }
+    public Optional<ThreadChannelBase> Thread { get; set; }
 
     [JsonPropertyName("components")]
     public Optional<MessageComponent[]> Components { get; set; }
@@ -136,7 +136,7 @@ public sealed class Message :
     int IMessageModel.Flags => ~Flags;
 
     ulong? IMessageModel.ThreadId => ~Thread.Map(v => v.Id);
-    ulong? IMessageModel.ThreadGuildId => ~Thread.Map(v => (v as GuildChannelModelBase)?.GuildId);
+    ulong? IMessageModel.ThreadGuildId => ~Thread.Map(v => (v as GuildChannelBase)?.GuildId);
 
 
     IEnumerable<MessageComponent> IMessageModel.Components => Components | [];

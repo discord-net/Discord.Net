@@ -12,8 +12,6 @@ public enum GatewayOpCode : byte
     PresenceUpdate = 3,
     /// <summary> C→S - Used to join a particular voice channel. </summary>
     VoiceStateUpdate = 4,
-    /// <summary> C→S - Used to ensure the guild's voice server is alive. </summary>
-    VoiceServerPing = 5,
     /// <summary> C→S - Used to resume a connection after a redirect occurs. </summary>
     Resume = 6,
     /// <summary> C←S - Used to notify a client that they must reconnect to another gateway. </summary>
@@ -26,6 +24,4 @@ public enum GatewayOpCode : byte
     Hello = 10,
     /// <summary> C←S - Used to reply to a client's heartbeat. </summary>
     HeartbeatAck = 11,
-    /// <summary> C→S - Used to request presence updates from particular guilds. </summary>
-    GuildSync = 12
 }

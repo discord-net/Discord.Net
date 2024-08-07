@@ -1,6 +1,6 @@
 namespace Discord.Models.Json;
 
-public class ThreadableChannelModelBase : GuildChannelModelBase, IThreadableChannelModel
+public class ThreadableChannelBase : GuildChannelBase, IThreadableChannelModel
 {
     int IThreadableChannelModel.DefaultAutoArchiveDuration => ~DefaultAutoArchiveDuration;
 

@@ -3,12 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-[JsonConverter(typeof(ChannelConverter))]
-public class ChannelModel : IChannelModel
+[DiscriminatedUnionRootType(nameof(Type))]
+public class Channel : IChannelModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
 
     [JsonPropertyName("type")]
-    public int Type { get; set; }
+    public uint Type { get; set; }
 }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public abstract class GuildChannelModelBase : ChannelModel, IGuildChannelModel, IModelSource, IModelSourceOf<IEmojiModel?>
+public abstract class GuildChannelBase : Channel, IGuildChannelModel, IModelSource, IModelSourceOf<IEmojiModel?>
 {
     [JsonPropertyName("last_pin_timestamp")]
     public Optional<DateTimeOffset?> LastPinTimestamp { get; set; }

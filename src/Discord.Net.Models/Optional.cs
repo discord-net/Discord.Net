@@ -1,6 +1,7 @@
 using Discord.Converters;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 namespace Discord;
@@ -114,6 +115,7 @@ public static class Optional
     public static Optional<T> Some<T>() => Optional<T>.Unspecified;
     public static Optional<T> Some<T>(T value) => new(value);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T? ToNullable<T>(this Optional<T> val)
         where T : struct
         => val.IsSpecified ? val.Value : null;

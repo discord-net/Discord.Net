@@ -93,8 +93,9 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
             );
     }
 
-    private class GenerationResult(string ns, string usingDirectives, TypeDeclarationSyntax syntax)
+    private class GenerationResult(string ns, string usingDirectives, TypeDeclarationSyntax syntax, ITypeSymbol typeSymbol)
     {
+        public ITypeSymbol TypeSymbol { get; } = typeSymbol;
         public string Namespace { get; } = ns;
         public string UsingDirectives { get; } = usingDirectives;
         public TypeDeclarationSyntax Syntax { get; set; } = syntax;
@@ -229,7 +230,8 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                             [],
                             target.TypeDeclarationSyntax.CloseBraceToken,
                             target.TypeDeclarationSyntax.SemicolonToken
-                        )
+                        ),
+                        target.TypeSymbol
                     );
 
                 foreach (var validTarget in validTargets)
@@ -338,7 +340,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
         foreach (var target in toGenerate)
         {
             context.AddSource(
-                $"SourceOfTruths/{target.Key}",
+                $"SourceOfTruths/{target.Value.TypeSymbol.Name}",
                 $$"""
                   {{target.Value.UsingDirectives}}
 

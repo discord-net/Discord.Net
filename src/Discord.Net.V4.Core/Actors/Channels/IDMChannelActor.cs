@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetChannel), typeof(DMChannelModel))]
+[Loadable(nameof(Routes.GetChannel), typeof(DMChannel))]
 [Deletable(nameof(Routes.DeleteChannel))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IDMChannelActor :

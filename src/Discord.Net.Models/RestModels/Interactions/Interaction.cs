@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 public sealed class Interaction :
+    IInteractionModel,
     IModelSource,
     IModelSourceOf<IChannelModel?>,
     IModelSourceOf<IUserModel?>,
@@ -15,11 +16,22 @@ public sealed class Interaction :
 
     [JsonPropertyName("type")] public int Type { get; set; }
 
-    [JsonPropertyName("data")] public Optional<InteractionData> Data { get; set; }
+    [
+        JsonIgnore,
+        JsonPropertyName("data"),
+        DiscriminatedUnion(nameof(Type)),
+        DiscriminatedUnionEntry<ApplicationCommandData>(
+            InteractionDataTypes.ApplicationCommand,
+            InteractionDataTypes.ApplicationCommandAutocomplete
+        ),
+        DiscriminatedUnionEntry<MessageComponentData>(InteractionDataTypes.MessageComponent),
+        DiscriminatedUnionEntry<ModalSubmitData>(InteractionDataTypes.ModalSubmit),
+    ]
+    public Optional<InteractionData> Data { get; set; }
 
     [JsonPropertyName("guild_id")] public Optional<ulong> GuildId { get; set; }
 
-    [JsonPropertyName("channel")] public Optional<ChannelModel> Channel { get; set; }
+    [JsonPropertyName("channel")] public Optional<Channel> Channel { get; set; }
 
     [JsonPropertyName("channel_id")] public Optional<ulong> ChannelId { get; set; }
 
@@ -33,11 +45,32 @@ public sealed class Interaction :
 
     [JsonPropertyName("message")] public Optional<Message> Message { get; set; }
 
-    [JsonPropertyName("app_permissions")] public Optional<ulong> AppPermission { get; set; }
+    [JsonPropertyName("app_permissions")] public Optional<string> AppPermission { get; set; }
 
     [JsonPropertyName("locale")] public Optional<string> UserLocale { get; set; }
 
     [JsonPropertyName("guild_locale")] public Optional<string> GuildLocale { get; set; }
+
+    [JsonPropertyName("entitlements")]
+    public required Entitlement[] Entitlements { get; set; }
+
+    [JsonPropertyName("authorizing_integration_owners")]
+    public required ApplicationIntegrationTypes AuthorizingIntegrationOwners { get; set; }
+
+    [JsonPropertyName("context")]
+    public int Context { get; set; }
+
+    IInteractionDataModel? IInteractionModel.Data => ~Data;
+    ulong? IInteractionModel.GuildId => GuildId.ToNullable();
+    ulong? IInteractionModel.ChannelId => ChannelId.ToNullable();
+    ulong? IInteractionModel.UserId => User.Map(v => v.Id).ToNullable();
+    ulong? IInteractionModel.MessageId => Message.Map(v => v.Id).ToNullable();
+    string? IInteractionModel.AppPermissions => ~AppPermission;
+    string? IInteractionModel.Locale => ~UserLocale;
+    string? IInteractionModel.GuildLocale => ~GuildLocale;
+    IEnumerable<IEntitlementModel> IInteractionModel.Entitlements => Entitlements;
+    IApplicationIntegrationTypes? IInteractionModel.AuthorizingIntegrationOwners => AuthorizingIntegrationOwners;
+    int IInteractionModel.Context => Context;
 
     public IEnumerable<IEntityModel> GetDefinedModels()
     {

@@ -21,6 +21,8 @@ public class RequestOptions
         Timeout = timeout ?? DiscordConfig.DefaultRequestTimeout;
     }
 
+    public bool ThrowOn404 { get; set; }
+
     /// <summary>
     ///     Gets or sets the maximum time to wait for this request to complete.
     /// </summary>

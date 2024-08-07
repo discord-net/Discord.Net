@@ -3,6 +3,5 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-[JsonConverter(typeof(InteractionDataConverter))]
-public abstract class InteractionData
+public abstract class InteractionData : IInteractionDataModel
 {}

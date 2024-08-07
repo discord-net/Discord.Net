@@ -6,9 +6,9 @@ namespace Discord.Rest;
 
 public static partial class Routes
 {
-    public static IApiOutRoute<ChannelModel> GetChannel(
+    public static IApiOutRoute<Channel> GetChannel(
         [IdHeuristic<IChannel>] ulong channelId
-    ) => new ApiOutRoute<ChannelModel>(
+    ) => new ApiOutRoute<Channel>(
         nameof(GetChannel),
         RequestMethod.Get,
         $"/channels/{channelId}",
@@ -16,14 +16,14 @@ public static partial class Routes
     );
 
     public static IApiOutRoute<T> GetChannel<T>([IdHeuristic<IChannel>] ulong channelId)
-        where T : ChannelModel
+        where T : Channel
         => new ApiOutRoute<T>(nameof(GetChannel), RequestMethod.Get, $"/channels/{channelId}",
             (ScopeType.Channel, channelId));
 
-    public static IApiInOutRoute<TArgs, ChannelModel> ModifyChannel<TArgs>([IdHeuristic<IChannel>] ulong channelId,
+    public static IApiInOutRoute<TArgs, Channel> ModifyChannel<TArgs>([IdHeuristic<IChannel>] ulong channelId,
         TArgs body)
         where TArgs : ModifyChannelParams =>
-        new ApiInOutRoute<TArgs, ChannelModel>(nameof(ModifyChannel), RequestMethod.Patch, $"/channels/{channelId}",
+        new ApiInOutRoute<TArgs, Channel>(nameof(ModifyChannel), RequestMethod.Patch, $"/channels/{channelId}",
             body,
             ContentType.JsonBody, (ScopeType.Channel, channelId));
 
@@ -161,22 +161,22 @@ public static partial class Routes
         new ApiInRoute<GroupDmAddRecipientParams>(nameof(GroupDmAddRecipient), RequestMethod.Put,
             $"/channels/{channelId}/recipients/{userId}", body, ContentType.JsonBody, (ScopeType.Channel, channelId));
 
-    public static IApiInOutRoute<StartThreadFromMessageParams, ChannelModel> StartThreadFromMessage([IdHeuristic<IThreadableChannel>] ulong channelId,
+    public static IApiInOutRoute<StartThreadFromMessageParams, Channel> StartThreadFromMessage([IdHeuristic<IThreadableChannel>] ulong channelId,
         [IdHeuristic<IMessage>] ulong messageId, StartThreadFromMessageParams body) =>
-        new ApiInOutRoute<StartThreadFromMessageParams, ChannelModel>(nameof(StartThreadFromMessage),
+        new ApiInOutRoute<StartThreadFromMessageParams, Channel>(nameof(StartThreadFromMessage),
             RequestMethod.Post,
             $"/channels/{channelId}/messages/{messageId}/threads", body, ContentType.JsonBody,
             (ScopeType.Channel, channelId));
 
-    public static IApiInOutRoute<StartThreadParams, ChannelModel> StartThreadWithoutMessage([IdHeuristic<IThreadableChannel>] ulong channelId,
+    public static IApiInOutRoute<StartThreadParams, Channel> StartThreadWithoutMessage([IdHeuristic<IThreadableChannel>] ulong channelId,
         StartThreadParams body) =>
-        new ApiInOutRoute<StartThreadParams, ChannelModel>(nameof(StartThreadWithoutMessage), RequestMethod.Post,
+        new ApiInOutRoute<StartThreadParams, Channel>(nameof(StartThreadWithoutMessage), RequestMethod.Post,
             $"/channels/{channelId}/threads", body, ContentType.JsonBody, (ScopeType.Channel, channelId));
 
     //TODO: add support for files
-    public static IApiInOutRoute<StartThreadInForumParams, ChannelModel> StartThreadInForum([IdHeuristic<IForumChannel>] ulong channelId,
+    public static IApiInOutRoute<StartThreadInForumParams, Channel> StartThreadInForum([IdHeuristic<IForumChannel>] ulong channelId,
         StartThreadInForumParams body) =>
-        new ApiInOutRoute<StartThreadInForumParams, ChannelModel>(nameof(StartThreadInForum), RequestMethod.Post,
+        new ApiInOutRoute<StartThreadInForumParams, Channel>(nameof(StartThreadInForum), RequestMethod.Post,
             $"/channels/{channelId}/threads", body, ContentType.JsonBody, (ScopeType.Channel, channelId));
 
     public static IApiRoute JoinThread([IdHeuristic<IThreadChannel>] ulong channelId) =>

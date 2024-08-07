@@ -2,8 +2,8 @@ using Discord.Converters;
 
 namespace Discord.Models.Json;
 
-[ChannelTypeOf(ChannelType.GuildText)]
-public class GuildTextChannelModel : ThreadableChannelModelBase, IGuildTextChannelModel
+[DiscriminatedUnionType(nameof(Type), ChannelType.GuildText)]
+public class GuildTextChannel : ThreadableChannelBase, IGuildTextChannelModel
 {
     bool IGuildTextChannelModel.IsNsfw => ~Nsfw;
 

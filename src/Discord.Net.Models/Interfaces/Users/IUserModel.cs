@@ -11,4 +11,5 @@ public partial interface IUserModel : IEntityModel<ulong>
     bool? IsSystem { get; }
     int? Flags { get; } // todo: int64?
     int? PublicFlags { get; }
+    IAvatarDecorationDataModel? AvatarDecoration { get; }
 }

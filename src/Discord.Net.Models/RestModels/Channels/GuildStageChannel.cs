@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-[ChannelTypeOf(ChannelType.GuildStageVoice)]
-public sealed class GuildStageChannelModel : GuildVoiceChannelModel, IGuildStageChannelModel
+[DiscriminatedUnionType(nameof(Type), ChannelType.GuildStageVoice)]
+public sealed class GuildStageChannel : GuildVoiceChannel, IGuildStageChannelModel
 {
     string? IAudioChannelModel.RTCRegion => ~RTCRegion;
     int? IAudioChannelModel.VideoQualityMode => ~VideoQualityMode;

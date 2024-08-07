@@ -117,7 +117,7 @@ public sealed partial class DiscordGatewayClient
                 new GatewayMessage
                 {
                     OpCode = GatewayOpCode.Identify,
-                    Payload = new IdentityPayload()
+                    Payload = new IdentityPayloadData()
                     {
                         Token = Config.Token.Value,
                         Properties = new IdentityConnectionProperties

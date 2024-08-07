@@ -6,7 +6,6 @@ namespace Discord.Models.Json;
 public class Guild :
     PartialGuild,
     IGuildModel,
-    IModelSource,
     IModelSourceOfMultiple<IRoleModel>,
     IModelSourceOfMultiple<IGuildEmoteModel>,
     IModelSourceOfMultiple<IGuildStickerModel>

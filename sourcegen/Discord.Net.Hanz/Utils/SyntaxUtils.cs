@@ -13,16 +13,22 @@ public static class SyntaxUtils
         return node;
     }
 
-    public static ClassDeclarationSyntax CreateSourceGenClone(ClassDeclarationSyntax classDeclarationSyntax)
+    public static T CreateSourceGenClone<T>(T syntax)
+        where T : TypeDeclarationSyntax
     {
-        return SyntaxFactory.ClassDeclaration(
+        return (T)SyntaxFactory.TypeDeclaration(
+            syntax.Kind(),
             [],
-            classDeclarationSyntax.Modifiers,
-            classDeclarationSyntax.Identifier,
-            classDeclarationSyntax.TypeParameterList,
+            syntax.Modifiers,
+            syntax.Keyword,
+            syntax.Identifier,
+            syntax.TypeParameterList,
             null,
-            classDeclarationSyntax.ConstraintClauses,
-            []
+            syntax.ConstraintClauses,
+            SyntaxFactory.Token(SyntaxKind.OpenBraceToken),
+            [],
+            SyntaxFactory.Token(SyntaxKind.CloseBraceToken),
+            default
         );
     }
 

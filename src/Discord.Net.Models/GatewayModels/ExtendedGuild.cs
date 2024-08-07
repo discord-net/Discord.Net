@@ -1,59 +1,51 @@
-using Discord.Models;
-using Discord.Models.Json;
 using System.Text.Json.Serialization;
 
-namespace Discord.API.Gateway
+namespace Discord.Models.Json;
+
+[DiscriminatedUnionType(nameof(Unavailable), false)]
+public sealed partial class ExtendedGuild : GuildCreated, IExtendedGuild
 {
-    public sealed class ExtendedGuild : Guild
-    {
-        [JsonPropertyName("unavailable")]
-        public bool? Unavailable { get; set; }
+    [JsonIgnore, JsonExtend]
+    public required Guild Guild { get; set; }
 
-        [JsonPropertyName("member_count")]
-        public int MemberCount { get; set; }
+    [JsonPropertyName("joined_at")]
+    public DateTimeOffset JoinedAt { get; set; }
 
-        [JsonPropertyName("large")]
-        public bool Large { get; set; }
+    [JsonPropertyName("large")]
+    public bool IsLarge { get; set; }
 
-        [JsonPropertyName("presences")]
-        public Presence[]? Presences { get; set; }
+    [JsonPropertyName("member_count")]
+    public int MemberCount { get; set; }
 
-        [JsonPropertyName("members")]
-        public GuildMember[]? Members { get; set; }
+    [JsonPropertyName("voice_states")]
+    public required VoiceState[] VoiceStates { get; set; }
 
-        [JsonPropertyName("channels")]
-        public ChannelModel[]? Channels { get; set; }
+    [JsonPropertyName("members")]
+    public required GuildMember[] Members { get; set; }
 
-        [JsonPropertyName("joined_at")]
-        public DateTimeOffset JoinedAt { get; set; }
+    [JsonPropertyName("channels")]
+    public required GuildChannelBase[] Channels { get; set; }
 
-        [JsonPropertyName("guild_scheduled_events")]
-        public GuildScheduledEvent[]? GuildScheduledEvents { get; set; }
+    [JsonPropertyName("threads")]
+    public required ThreadChannelBase[] Threads { get; set; }
 
-        [JsonPropertyName("stage_instances")]
-        public StageInstance[]? StageInstances { get; set; }
+    [JsonPropertyName("presences")]
+    public required Presence[] Presences { get; set; }
 
-        public override IEnumerable<IEntityModel> GetDefinedModels()
-        {
-            var entities = base.GetDefinedModels();
+    [JsonPropertyName("stage_instances")]
+    public required StageInstance[] StageInstances { get; set; }
 
-            if (Presences is not null)
-                entities = entities.Concat(Presences);
+    [JsonPropertyName("guild_scheduled_events")]
+    public required GuildScheduledEvent[] GuildScheduledEvents { get; set; }
 
-            if (Members is not null)
-                entities = entities.Concat(Members);
+    IEnumerable<IVoiceStateModel> IExtendedGuild.VoiceStates => VoiceStates;
+    IEnumerable<IMemberModel> IExtendedGuild.Members => Members;
 
-            if (Channels is not null)
-                entities = entities.Concat(Channels);
+    IEnumerable<IGuildChannelModel> IExtendedGuild.Channels => Channels;
 
-            if (GuildScheduledEvents is not null)
-                entities = entities.Concat(GuildScheduledEvents);
+    IEnumerable<IThreadChannelModel> IExtendedGuild.Threads => Threads;
 
-            if (StageInstances is not null)
-                entities = entities.Concat(StageInstances);
-
-            return entities;
-        }
-    }
+    IEnumerable<IPresenceModel> IExtendedGuild.Presences => Presences;
+    IEnumerable<IStageInstanceModel> IExtendedGuild.StageInstances => StageInstances;
+    IEnumerable<IGuildScheduledEventModel> IExtendedGuild.GuildScheduledEvents => GuildScheduledEvents;
 }
-

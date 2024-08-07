@@ -2,5 +2,5 @@ using Discord.Converters;
 
 namespace Discord.Models.Json;
 
-[ChannelTypeOf(ChannelType.GuildDirectory)]
-public sealed class GuildDirectoryChannelModel : GuildChannelModelBase, IGuildDirectoryChannel;
+[DiscriminatedUnionType(nameof(Type), ChannelType.GuildDirectory)]
+public sealed class GuildDirectoryChannel : GuildChannelBase, IGuildDirectoryChannel;

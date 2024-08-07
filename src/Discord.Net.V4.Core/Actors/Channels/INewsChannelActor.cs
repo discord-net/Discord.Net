@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetChannel), typeof(GuildAnnouncementChannelModel))]
+[Loadable(nameof(Routes.GetChannel), typeof(GuildAnnouncementChannel))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface INewsChannelActor :
     ITextChannelActor,

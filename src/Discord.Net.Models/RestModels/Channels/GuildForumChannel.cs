@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-[ChannelTypeOf(ChannelType.GuildForum)]
-public sealed class GuildForumChannelModel : ThreadableChannelModelBase, IGuildForumChannelModel
+[DiscriminatedUnionType(nameof(Type), ChannelType.GuildForum)]
+public sealed class GuildForumChannel : ThreadableChannelBase, IGuildForumChannelModel
 {
     int IGuildForumChannelModel.DefaultForumLayout => ~DefaultForumLayout;
 

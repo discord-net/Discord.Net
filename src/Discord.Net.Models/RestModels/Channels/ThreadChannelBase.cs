@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public abstract class ThreadChannelModelBase : GuildChannelModelBase, IThreadChannelModel, IModelSourceOf<IThreadMemberModel?>
+public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel, IModelSourceOf<IThreadMemberModel?>
 {
     [JsonPropertyName("owner_id")]
     public ulong OwnerId { get; set; }

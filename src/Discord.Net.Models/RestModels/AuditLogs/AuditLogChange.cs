@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class AuditLogChange
+public sealed class AuditLogChange : IAuditLogChangeModel
 {
     [JsonPropertyName("key")]
     public required string ChangedProperty { get; set; }

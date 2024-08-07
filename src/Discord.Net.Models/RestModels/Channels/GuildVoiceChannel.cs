@@ -2,8 +2,8 @@ using Discord.Converters;
 
 namespace Discord.Models.Json;
 
-[ChannelTypeOf(ChannelType.GuildVoice)]
-public class GuildVoiceChannelModel : GuildChannelModelBase, IGuildVoiceChannelModel
+[DiscriminatedUnionType(nameof(Type), ChannelType.GuildVoice)]
+public class GuildVoiceChannel : GuildChannelBase, IGuildVoiceChannelModel
 {
     string? IAudioChannelModel.RTCRegion => ~RTCRegion;
 

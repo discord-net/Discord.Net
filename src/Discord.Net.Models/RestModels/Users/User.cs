@@ -39,8 +39,10 @@ public class User : IUserModel
     [JsonPropertyName("public_flags")]
     public Optional<int> PublicFlags { get; set; }
 
-    [JsonPropertyName("avatar_decoration")]
-    public Optional<string?> AvatarDecoration { get; set; }
+    [JsonPropertyName("avatar_decoration_data")]
+    public Optional<AvatarDecorationData?> AvatarDecoration { get; set; }
+
+    IAvatarDecorationDataModel? IUserModel.AvatarDecoration => ~AvatarDecoration;
     bool? IUserModel.IsBot => ~IsBot;
     bool? IUserModel.IsSystem => ~IsSystem;
     int? IUserModel.Flags => ~Flags;

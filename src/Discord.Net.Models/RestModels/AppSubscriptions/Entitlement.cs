@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public class Entitlement
+public sealed class Entitlement : IEntitlementModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -23,11 +23,23 @@ public class Entitlement
     public int Type { get; set; }
 
     [JsonPropertyName("consumed")]
-    public bool IsConsumed { get; set; }
+    public Optional<bool> IsConsumed { get; set; }
+
+    [JsonPropertyName("deleted")]
+    public bool IsDeleted { get; set; }
 
     [JsonPropertyName("starts_at")]
     public Optional<DateTimeOffset> StartsAt { get; set; }
 
     [JsonPropertyName("ends_at")]
     public Optional<DateTimeOffset> EndsAt { get; set; }
+
+    ulong? IEntitlementModel.UserId => UserId.ToNullable();
+    DateTimeOffset? IEntitlementModel.EndsAt => EndsAt.ToNullable();
+
+    ulong? IEntitlementModel.GuildId => GuildId.ToNullable();
+
+    bool? IEntitlementModel.Consumed => IsConsumed.ToNullable();
+    DateTimeOffset? IEntitlementModel.StartsAt => StartsAt.ToNullable();
+
 }

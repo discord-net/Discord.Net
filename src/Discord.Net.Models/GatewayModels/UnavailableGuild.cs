@@ -1,12 +1,7 @@
+using Discord.Models.Json;
 using System.Text.Json.Serialization;
 
-namespace Discord.Models.GatewayModels;
+namespace Discord.Models.Json;
 
-public sealed class UnavailableGuild : IUnavailableGuild
-{
-    [JsonPropertyName("id")]
-    public ulong Id { get; set; }
-
-    [JsonPropertyName("unavailable")]
-    public bool Unavailable { get; set; }
-}
+[DiscriminatedUnionType(nameof(Unavailable), true)]
+public sealed class UnavailableGuild : GuildCreated, IUnavailableGuild;

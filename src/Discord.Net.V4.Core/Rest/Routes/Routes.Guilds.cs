@@ -24,15 +24,15 @@ public partial class Routes
     public static IApiRoute DeleteGuild([IdHeuristic<IGuild>] ulong guildId) =>
         new ApiRoute(nameof(DeleteGuild), RequestMethod.Delete, $"guilds/{guildId}", (ScopeType.Guild, guildId));
 
-    public static IApiOutRoute<IEnumerable<GuildChannelModelBase>> GetGuildChannels([IdHeuristic<IGuild>] ulong guildId) =>
-        new ApiOutRoute<GuildChannelModelBase[]>(nameof(GetGuildChannels), RequestMethod.Get,
+    public static IApiOutRoute<IEnumerable<GuildChannelBase>> GetGuildChannels([IdHeuristic<IGuild>] ulong guildId) =>
+        new ApiOutRoute<GuildChannelBase[]>(nameof(GetGuildChannels), RequestMethod.Get,
             $"guilds/{guildId}/channels",
             (ScopeType.Guild, guildId));
 
-    public static IApiInOutRoute<CreateGuildChannelParams, GuildChannelModelBase> CreateGuildChannel(
+    public static IApiInOutRoute<CreateGuildChannelParams, GuildChannelBase> CreateGuildChannel(
         [IdHeuristic<IGuild>] ulong guildId,
         CreateGuildChannelParams body) =>
-        new ApiInOutRoute<CreateGuildChannelParams, GuildChannelModelBase>(nameof(CreateGuildChannel),
+        new ApiInOutRoute<CreateGuildChannelParams, GuildChannelBase>(nameof(CreateGuildChannel),
             RequestMethod.Post,
             $"guilds/{guildId}/channels", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
 

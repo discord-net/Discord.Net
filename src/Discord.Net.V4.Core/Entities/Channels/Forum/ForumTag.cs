@@ -9,9 +9,11 @@ public sealed class ForumTag(
     string name,
     bool isModerated,
     IGuildEmoteActor? emote,
-    string? emoji)
-    : ISnowflakeEntity, IEntityProperties<Models.Json.ForumTag>,
-        IContextConstructable<ForumTag, ITagModel, ForumTag.Context>
+    string? emoji
+):
+    ISnowflakeEntity<ITagModel>,
+    IEntityProperties<Models.Json.ForumTag>,
+    IContextConstructable<ForumTag, ITagModel, ForumTag.Context>
 {
     public string Name { get; } = name;
     public bool IsModerated { get; } = isModerated;
@@ -49,4 +51,6 @@ public sealed class ForumTag(
     IDiscordClient IClientProvider.Client => client;
 
     public readonly record struct Context(ulong GuildId);
+
+    public ITagModel GetModel() => ToApiModel();
 }

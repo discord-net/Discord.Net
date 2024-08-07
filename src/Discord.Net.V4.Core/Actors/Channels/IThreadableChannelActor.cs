@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetChannel), typeof(ThreadableChannelModelBase))]
+[Loadable(nameof(Routes.GetChannel), typeof(ThreadableChannelBase))]
 [Modifiable<ModifyThreadableChannelProperties>(nameof(Routes.ModifyChannel))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IThreadableChannelActor :

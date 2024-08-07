@@ -3,5 +3,5 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-[ChannelTypeOf(ChannelType.AnnouncementThread)]
-public sealed class AnnouncementThreadChannelModel : ThreadChannelModelBase;
+[DiscriminatedUnionType(nameof(Type), ChannelType.AnnouncementThread)]
+public sealed class AnnouncementThreadChannel : ThreadChannelBase;

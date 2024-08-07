@@ -128,6 +128,8 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
             {
                 case >= (HttpStatusCode)200 and < (HttpStatusCode)300:
                     return await response.Content.ReadAsStreamAsync(token);
+                case HttpStatusCode.NotFound when !options.ThrowOn404:
+                    return null;
                 case HttpStatusCode.TooManyRequests:
                     contract.Cancel();
                     // retry the request

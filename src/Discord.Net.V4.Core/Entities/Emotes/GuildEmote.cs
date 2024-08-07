@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 namespace Discord;
 
 public sealed class GuildEmote :
-    IEntity<ulong>,
+    ISnowflakeEntity<IGuildEmoteModel>,
     IEmote,
     IEntityProperties<Models.Json.GuildEmote>,
     IConstructable<GuildEmote, IGuildEmoteModel>
@@ -37,9 +37,6 @@ public sealed class GuildEmote :
     public string Name { get; }
 
 
-    public IEmoteModel ToApiModel(IEmoteModel? existing = default)
-        => ToApiModel(null);
-
     public ulong Id { get; }
 
     public IDiscordClient Client { get; }
@@ -57,4 +54,7 @@ public sealed class GuildEmote :
 
         return existing;
     }
+
+    public IGuildEmoteModel GetModel() => ToApiModel();
+    IEmoteModel IEntityProperties<IEmoteModel>.ToApiModel(IEmoteModel? existing) => ToApiModel();
 }

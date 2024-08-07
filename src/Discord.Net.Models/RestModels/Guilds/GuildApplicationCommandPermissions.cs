@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildApplicationCommandPermission
+public sealed class GuildApplicationCommandPermission : IGuildApplicationCommandPermissionsModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -15,4 +15,6 @@ public sealed class GuildApplicationCommandPermission
 
     [JsonPropertyName("permissions")]
     public required ApplicationCommandPermissions[] Permissions { get; set; }
+
+    IEnumerable<IApplicationCommandPermission> IGuildApplicationCommandPermissionsModel.Permissions => Permissions;
 }

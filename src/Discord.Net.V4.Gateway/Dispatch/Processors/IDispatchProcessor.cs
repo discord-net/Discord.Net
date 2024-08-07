@@ -1,6 +1,9 @@
+using Discord.Models;
+
 namespace Discord.Gateway.Events.Processors;
 
-public interface IDispatchProcessor
+public interface IDispatchProcessor<in TPayload> where TPayload : class, IGatewayPayloadData
 {
-    ValueTask
+    string DispatchName { get; }
+    ValueTask ProcessAsync(TPayload payload, CancellationToken cancellationToken = default);
 }

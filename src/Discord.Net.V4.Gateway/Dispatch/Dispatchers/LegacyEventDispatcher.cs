@@ -8,7 +8,8 @@ namespace Discord.Gateway;
 
 internal sealed class LegacyEventDispatcher : IEventDispatcher
 {
-    public async ValueTask DispatchAsync<T>(string eventName, HashSet<T> handlers, CancellationToken token) where T : ITransientDispatchHandler
+    public async ValueTask DispatchAsync<T>(string eventName, HashSet<T> handlers, CancellationToken token)
+        where T : ITransientDispatchHandler
     {
         token.ThrowIfCancellationRequested();
 

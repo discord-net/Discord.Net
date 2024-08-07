@@ -5,7 +5,7 @@ namespace Discord.Models.Json;
 public sealed class ChannelThreads : IModelSource, IModelSourceOfMultiple<IThreadChannelModel>, IModelSourceOfMultiple<IThreadMemberModel>
 {
     [JsonPropertyName("threads")]
-    public required ThreadChannelModelBase[] Threads { get; set; }
+    public required ThreadChannelBase[] Threads { get; set; }
 
     [JsonPropertyName("members")]
     public required ThreadMember[] Members { get; set; }

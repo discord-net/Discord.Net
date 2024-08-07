@@ -45,13 +45,13 @@ public static partial class Routes
         new ApiRoute(nameof(LeaveGuild), RequestMethod.Delete, $"users/@me/guilds/{guildId}",
             (ScopeType.Guild, guildId));
 
-    public static IApiInOutRoute<CreateDMChannelParams, DMChannelModel> CreateDm(CreateDMChannelParams body) =>
-        new ApiInOutRoute<CreateDMChannelParams, DMChannelModel>(nameof(CreateDm), RequestMethod.Post,
+    public static IApiInOutRoute<CreateDMChannelParams, DMChannel> CreateDm(CreateDMChannelParams body) =>
+        new ApiInOutRoute<CreateDMChannelParams, DMChannel>(nameof(CreateDm), RequestMethod.Post,
             "users/@me/channels", body);
 
-    public static IApiInOutRoute<CreateGroupDMChannelParams, GroupDMChannelModel> CreateGroupDm(
+    public static IApiInOutRoute<CreateGroupDMChannelParams, GroupDMChannel> CreateGroupDm(
         CreateGroupDMChannelParams body) =>
-        new ApiInOutRoute<CreateGroupDMChannelParams, GroupDMChannelModel>(nameof(CreateGroupDm), RequestMethod.Post,
+        new ApiInOutRoute<CreateGroupDMChannelParams, GroupDMChannel>(nameof(CreateGroupDm), RequestMethod.Post,
             "users/@me/channels", body);
 
     public static IApiOutRoute<ApplicationRoleConnection> GetUserApplicationRoleConnection(ulong applicationId)

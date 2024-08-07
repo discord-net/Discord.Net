@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetChannel), typeof(GuildStageChannelModel))]
+[Loadable(nameof(Routes.GetChannel), typeof(GuildStageChannel))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IStageChannelActor :
     IVoiceChannelActor,

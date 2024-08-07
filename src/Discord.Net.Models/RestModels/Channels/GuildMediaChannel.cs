@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-[ChannelTypeOf(ChannelType.GuildMedia)]
-public sealed class GuildMediaChannelModel : ThreadableChannelModelBase, IGuildMediaChannelModel
+[DiscriminatedUnionType(nameof(Type), ChannelType.GuildMedia)]
+public sealed class GuildMediaChannel : ThreadableChannelBase, IGuildMediaChannelModel
 {
     bool IGuildMediaChannelModel.IsNsfw => ~Nsfw;
 

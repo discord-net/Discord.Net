@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class ApplicationCommandInteractionDataOption
+public sealed class ApplicationCommandInteractionDataOption : IApplicationCommandOptionModel
 {
     [JsonPropertyName("name")]
     public required string Name { get; set; }
@@ -15,4 +15,11 @@ public sealed class ApplicationCommandInteractionDataOption
 
     [JsonPropertyName("options")]
     public Optional<ApplicationCommandInteractionDataOption[]> Options { get; set; }
+
+    [JsonPropertyName("focused")]
+    public bool IsFocused { get; set; }
+
+    object? IApplicationCommandOptionModel.Value => ~Value;
+    IEnumerable<IApplicationCommandOptionModel>? IApplicationCommandOptionModel.Options => ~Options;
+    bool? IApplicationCommandOptionModel.IsFocused => IsFocused;
 }

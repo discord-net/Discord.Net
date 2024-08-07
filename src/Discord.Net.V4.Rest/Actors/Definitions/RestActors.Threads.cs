@@ -42,7 +42,7 @@ internal static partial class RestActors
                     return null;
 
                 var timestamp = model.Threads
-                    .OfType<ThreadChannelModelBase>()
+                    .OfType<ThreadChannelBase>()
                     .MinBy(x => x.Metadata.ArchiveTimestamp)?
                     .Metadata
                     .ArchiveTimestamp;

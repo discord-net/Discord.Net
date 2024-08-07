@@ -51,9 +51,9 @@ public partial class RestChannel :
     {
         return model switch
         {
-            DMChannelModel dmChannelModel => RestDMChannel.Construct(client, dmChannelModel),
-            GroupDMChannelModel groupDMChannel => RestGroupChannel.Construct(client, groupDMChannel),
-            GuildChannelModelBase guildChannelBase => Construct(client,
+            DMChannel dmChannelModel => RestDMChannel.Construct(client, dmChannelModel),
+            GroupDMChannel groupDMChannel => RestGroupChannel.Construct(client, groupDMChannel),
+            GuildChannelBase guildChannelBase => Construct(client,
                 GuildIdentity.Of(guildChannelBase.GuildId), model),
             _ => new RestChannel(client, model)
         };

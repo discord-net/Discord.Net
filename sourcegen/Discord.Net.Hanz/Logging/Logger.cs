@@ -132,12 +132,14 @@ public sealed class Logger : ILogger, IEquatable<Logger>
     {
         if (_logs.Count >= 0)
         {
-            using (var writer = File.AppendText(_logFilePath))
+            using (var fs = File.Open(_logFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write))
+            using (var writer = new StreamWriter(fs))
             {
                 foreach (var log in _logs)
                     writer.WriteLine(log);
 
                 writer.Flush();
+                fs.Flush();
             }
 
             _logs.Clear();

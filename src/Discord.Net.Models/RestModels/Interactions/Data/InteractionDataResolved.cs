@@ -2,9 +2,14 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class InteractionDataResolved : IModelSource, IModelSourceOfMultiple<IUserModel>,
-    IModelSourceOfMultiple<IMemberModel>, IModelSourceOfMultiple<IRoleModel>, IModelSourceOfMultiple<IChannelModel>,
-    IModelSourceOfMultiple<IMessageModel>, IModelSourceOfMultiple<IAttachmentModel>
+public sealed class InteractionDataResolved :
+    IResolvedDataModel,
+    IModelSourceOfMultiple<IUserModel>,
+    IModelSourceOfMultiple<IMemberModel>,
+    IModelSourceOfMultiple<IRoleModel>,
+    IModelSourceOfMultiple<IChannelModel>,
+    IModelSourceOfMultiple<IMessageModel>,
+    IModelSourceOfMultiple<IAttachmentModel>
 {
     [JsonPropertyName("users")] public Optional<Dictionary<string, User>> Users { get; set; }
 
@@ -12,11 +17,23 @@ public sealed class InteractionDataResolved : IModelSource, IModelSourceOfMultip
 
     [JsonPropertyName("roles")] public Optional<Dictionary<string, Role>> Roles { get; set; }
 
-    [JsonPropertyName("channels")] public Optional<Dictionary<string, ChannelModel>> Channels { get; set; }
+    [JsonPropertyName("channels")] public Optional<Dictionary<string, Channel>> Channels { get; set; }
 
     [JsonPropertyName("messages")] public Optional<Dictionary<string, Message>> Messages { get; set; }
 
     [JsonPropertyName("attachments")] public Optional<Dictionary<string, Attachment>> Attachments { get; set; }
+
+    IEnumerable<string>? IResolvedDataModel.Members => ~Members.Map(v => v.Keys);
+
+    IEnumerable<string>? IResolvedDataModel.Roles =>  ~Roles.Map(v => v.Keys);
+
+    IEnumerable<string>? IResolvedDataModel.Channels =>  ~Channels.Map(v => v.Keys);
+
+    IEnumerable<string>? IResolvedDataModel.Messages =>  ~Messages.Map(v => v.Keys);
+
+    IEnumerable<string>? IResolvedDataModel.Attachments =>  ~Attachments.Map(v => v.Keys);
+
+    IEnumerable<string>? IResolvedDataModel.Users =>  ~Users.Map(v => v.Keys);
 
     IEnumerable<IUserModel> IModelSourceOfMultiple<IUserModel>.GetModels()
         => Users.Map(v => (IEnumerable<IUserModel>)v.Values) | [];

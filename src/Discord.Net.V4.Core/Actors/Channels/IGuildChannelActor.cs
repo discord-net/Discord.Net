@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetChannel), typeof(GuildChannelModelBase))]
+[Loadable(nameof(Routes.GetChannel), typeof(GuildChannelBase))]
 [Modifiable<ModifyGuildChannelProperties>(nameof(Routes.ModifyChannel))]
 [Deletable(nameof(Routes.DeleteChannel))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]

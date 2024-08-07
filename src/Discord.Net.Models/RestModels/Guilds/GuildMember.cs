@@ -42,8 +42,11 @@ public sealed class GuildMember : IMemberModel, IModelSource, IModelSourceOf<IUs
     [JsonPropertyName("communication_disabled_until")]
     public Optional<DateTimeOffset?> CommunicationsDisabledUntil { get; set; }
 
-    string? IMemberModel.Avatar => ~Avatar;
+    [JsonPropertyName("avatar_decoration_data")]
+    public Optional<AvatarDecorationData?> AvatarDecoration { get; set; }
 
+    IAvatarDecorationDataModel? IMemberModel.AvatarDecoration => ~AvatarDecoration;
+    string? IMemberModel.Avatar => ~Avatar;
     ulong[] IMemberModel.RoleIds => RoleIds | [];
     DateTimeOffset? IMemberModel.JoinedAt => ~JoinedAt;
     DateTimeOffset? IMemberModel.PremiumSince => ~PremiumSince;

@@ -11,4 +11,5 @@ public partial interface IMemberModel : IEntityModel<ulong>
     DateTimeOffset? PremiumSince { get;}
     bool? IsPending { get;}
     DateTimeOffset? CommunicationsDisabledUntil { get; }
+    IAvatarDecorationDataModel? AvatarDecoration { get; }
 }
