@@ -269,13 +269,13 @@ internal static partial class GatewayActors
         );
 
     public static MembersPager PageMembers(DiscordGatewayClient client, GuildIdentity guild, CachePathable path)
-        => GatewayPagedIndexableActor.Create<RestGuildMember, PageGuildMembersParams>(
+        => GatewayPagedIndexableActor.Create<RestMember, PageGuildMembersParams>(
             Template.Of<GatewayMemberActor>(),
             client,
             id => new GatewayMemberActor(client, guild, MemberIdentity.Of(id)),
             path,
             api => api,
-            (model, _) => RestGuildMember.Construct(
+            (model, _) => RestMember.Construct(
                 client.Rest,
                 IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>.Of(guild.Id),
                 model

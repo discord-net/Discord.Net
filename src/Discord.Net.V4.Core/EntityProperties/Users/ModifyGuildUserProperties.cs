@@ -3,9 +3,9 @@ using Discord.Models.Json;
 namespace Discord;
 
 /// <summary>
-///     Properties that are used to modify an <see cref="IGuildMember" /> with the following parameters.
+///     Properties that are used to modify an <see cref="IMember" /> with the following parameters.
 /// </summary>
-/// <seealso cref="IGuildMember.ModifyAsync" />
+/// <seealso cref="IMember.ModifyAsync" />
 public sealed class ModifyGuildUserProperties : IEntityProperties<ModifyGuildMemberParams>
 {
     /// <summary>

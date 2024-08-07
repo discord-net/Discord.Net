@@ -18,7 +18,7 @@ public sealed partial class RestGuildScheduledEventUserActor(
     public RestUserActor User { get; } = user?.Actor ?? new(client, user ?? UserIdentity.Of(eventUser.Id));
 
     [SourceOfTruth]
-    public RestGuildMemberActor Member { get; } =
+    public RestMemberActor Member { get; } =
         member?.Actor ?? new(client, guild, member ?? MemberIdentity.Of(eventUser.Id));
 
     [SourceOfTruth]
@@ -50,7 +50,7 @@ public sealed partial class RestGuildScheduledEventUser :
             scheduledEvent,
             GuildScheduledEventUserIdentity.Of(this),
             UserIdentity.FromReferenced(model, model.Id, model => RestUser.Construct(client, model)),
-            MemberIdentity.FromReferenced(model, model.Id, model => RestGuildMember.Construct(client, guild, model))
+            MemberIdentity.FromReferenced(model, model.Id, model => RestMember.Construct(client, guild, model))
         );
 
         Model = model;

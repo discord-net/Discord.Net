@@ -9,7 +9,7 @@ namespace Discord.Gateway;
 using RestThreadIdentity = IIdentifiable<ulong, RestThreadChannel, RestThreadChannelActor, IThreadChannelModel>;
 using RestGuildIdentity = IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>;
 using RestThreadMemberIdentity = IIdentifiable<ulong, RestThreadMember, RestThreadMemberActor, IThreadMemberModel>;
-using RestMemberIdentity = IIdentifiable<ulong, RestGuildMember, RestGuildMemberActor, IMemberModel>;
+using RestMemberIdentity = IIdentifiable<ulong, RestMember, RestMemberActor, IMemberModel>;
 
 internal static partial class GatewayActors
 {
@@ -116,7 +116,7 @@ internal static partial class GatewayActors
                     RestMemberIdentity.FromReferenced(
                         model,
                         client.CurrentUser.Id,
-                        model => RestGuildMember.Construct(client, guild, model)
+                        model => RestMember.Construct(client, guild, model)
                     )
                 ),
                 model

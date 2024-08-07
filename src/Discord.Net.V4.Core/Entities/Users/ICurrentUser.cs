@@ -14,10 +14,10 @@ namespace Discord;
     "PossibleInterfaceMemberAmbiguity",
     Justification = "Source generator overloads the ambiguous APIs"
 )]
-public partial interface ISelfUser :
+public partial interface ICurrentUser :
     ISnowflakeEntity<ISelfUserModel>,
     IUser,
-    ISelfUserActor
+    ICurrentUserActor
 {
     [SourceOfTruth]
     new ISelfUserModel GetModel();

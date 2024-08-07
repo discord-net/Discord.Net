@@ -21,7 +21,7 @@ public sealed partial class RestThreadMemberActor(
         thread.Actor ?? new(client, guild, thread, threadMember);
 
     [SourceOfTruth]
-    public RestGuildMemberActor Member { get; } =
+    public RestMemberActor Member { get; } =
         member?.Actor ?? new(client, guild, member ?? MemberIdentity.Of(threadMember.Id));
 
     [SourceOfTruth]

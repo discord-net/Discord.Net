@@ -6,33 +6,33 @@ namespace Discord.Rest;
 
 [method: TypeFactory]
 [ExtendInterfaceDefaults(
-    typeof(ISelfUserActor)
+    typeof(ICurrentUserActor)
 )]
-public partial class RestSelfUserActor(
+public partial class RestCurrentUserActor(
     DiscordRestClient client,
     SelfUserIdentity user
 ) :
     RestUserActor(client, user),
-    ISelfUserActor
+    ICurrentUserActor
 {
     [CovariantOverride]
     [SourceOfTruth]
-    internal RestSelfUser CreateEntity(ISelfUserModel model)
-        => RestSelfUser.Construct(Client, model);
+    internal RestCurrentUser CreateEntity(ISelfUserModel model)
+        => RestCurrentUser.Construct(Client, model);
 
     [SourceOfTruth]
     internal RestPartialGuild CreateEntity(IPartialGuildModel model)
         => RestPartialGuild.Construct(Client, model);
 
     [SourceOfTruth]
-    internal RestGuildMember CreateEntity(IMemberModel model, ulong guildId)
-        => RestGuildMember.Construct(Client, GuildIdentity.Of(guildId), model);
+    internal RestMember CreateEntity(IMemberModel model, ulong guildId)
+        => RestMember.Construct(Client, GuildIdentity.Of(guildId), model);
 }
 
-public partial class RestSelfUser :
+public partial class RestCurrentUser :
     RestUser,
-    ISelfUser,
-    IConstructable<RestSelfUser, ISelfUserModel, DiscordRestClient>
+    ICurrentUser,
+    IConstructable<RestCurrentUser, ISelfUserModel, DiscordRestClient>
 {
     public string Email => Model.Email!;
 
@@ -47,26 +47,26 @@ public partial class RestSelfUser :
     public string Locale => Model.Locale!;
 
     [ProxyInterface(
-        typeof(ISelfUserActor),
-        typeof(IEntityProvider<ISelfUser, ISelfUserModel>)
+        typeof(ICurrentUserActor),
+        typeof(IEntityProvider<ICurrentUser, ISelfUserModel>)
     )]
-    internal override RestSelfUserActor Actor { get; }
+    internal override RestCurrentUserActor Actor { get; }
 
     internal override ISelfUserModel Model => _model;
 
     private ISelfUserModel _model;
 
-    internal RestSelfUser(
+    internal RestCurrentUser(
         DiscordRestClient client,
         ISelfUserModel model,
-        RestSelfUserActor? actor = null
+        RestCurrentUserActor? actor = null
     ) : base(client, model)
     {
         Actor = actor ?? new(client, SelfUserIdentity.Of(this));
         _model = model;
     }
 
-    public static RestSelfUser Construct(DiscordRestClient client, ISelfUserModel model) => new(client, model);
+    public static RestCurrentUser Construct(DiscordRestClient client, ISelfUserModel model) => new(client, model);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(ISelfUserModel model, CancellationToken token = default)

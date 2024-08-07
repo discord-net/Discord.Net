@@ -6,9 +6,9 @@ namespace Discord;
 
 [FetchableOfMany(nameof(Routes.ListGuildMembers))]
 [Refreshable(nameof(Routes.GetGuildMember))]
-public partial interface IGuildMember :
+public partial interface IMember :
     ISnowflakeEntity<IMemberModel>,
-    IGuildMemberActor
+    IMemberActor
 {
     IDefinedLoadableEntityEnumerable<ulong, IRole> Roles { get; }
 

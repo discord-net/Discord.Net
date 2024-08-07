@@ -5,15 +5,15 @@ namespace Discord.Rest;
 
 [method: TypeFactory(LastParameter = nameof(member))]
 [ExtendInterfaceDefaults]
-public partial class RestGuildMemberActor(
+public partial class RestMemberActor(
     DiscordRestClient client,
     GuildIdentity guild,
     MemberIdentity member,
     UserIdentity? user = null
 ):
     RestUserActor(client, user ?? member.Cast<RestUser, RestUserActor, IUserModel>()),
-    IGuildMemberActor,
-    IRestActor<ulong, RestGuildMember, MemberIdentity>
+    IMemberActor,
+    IRestActor<ulong, RestMember, MemberIdentity>
 {
     public new MemberIdentity Identity { get; } = member;
 
@@ -21,16 +21,16 @@ public partial class RestGuildMemberActor(
     public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
 
     [SourceOfTruth]
-    internal RestGuildMember CreateEntity(IMemberModel model)
-        => RestGuildMember.Construct(Client, Guild.Identity, model);
+    internal RestMember CreateEntity(IMemberModel model)
+        => RestMember.Construct(Client, Guild.Identity, model);
 
     IUserActor IUserRelationship.User => this;
 }
 
-public sealed partial class RestGuildMember :
+public sealed partial class RestMember :
     RestUser,
-    IGuildMember,
-    IContextConstructable<RestGuildMember, IMemberModel, GuildIdentity, DiscordRestClient>
+    IMember,
+    IContextConstructable<RestMember, IMemberModel, GuildIdentity, DiscordRestClient>
 {
     public IDefinedLoadableEntityEnumerable<ulong, IRole> Roles => throw new NotImplementedException();
 
@@ -48,17 +48,17 @@ public sealed partial class RestGuildMember :
 
     public GuildMemberFlags Flags => (GuildMemberFlags)Model.Flags;
 
-    [ProxyInterface(typeof(IGuildMemberActor))]
-    internal override RestGuildMemberActor Actor { get; }
+    [ProxyInterface(typeof(IMemberActor))]
+    internal override RestMemberActor Actor { get; }
 
     internal new IMemberModel Model { get; private set; }
 
-    internal RestGuildMember(
+    internal RestMember(
         DiscordRestClient client,
         GuildIdentity guild,
         IMemberModel model,
         IUserModel userModel,
-        RestGuildMemberActor? actor = null
+        RestMemberActor? actor = null
     ) : base(client, userModel)
     {
         Actor = actor ?? new(
@@ -70,7 +70,7 @@ public sealed partial class RestGuildMember :
         Model = model;
     }
 
-    public static RestGuildMember Construct(DiscordRestClient client, GuildIdentity guild, IMemberModel model)
+    public static RestMember Construct(DiscordRestClient client, GuildIdentity guild, IMemberModel model)
     {
         if(model is not IModelSourceOf<IUserModel?> userModelSource)
             throw new ArgumentException($"Expected {model.GetType()} to be a {typeof(IModelSourceOf<IUserModel?>)}", nameof(model));
@@ -78,7 +78,7 @@ public sealed partial class RestGuildMember :
         if (userModelSource.Model is null)
             throw new ArgumentNullException(nameof(userModelSource), "Expected 'user' to be a non-null model");
 
-        return new RestGuildMember(client, guild, model, userModelSource.Model);
+        return new RestMember(client, guild, model, userModelSource.Model);
     }
 
     public ValueTask UpdateAsync(IMemberModel model, CancellationToken token = default)
@@ -93,7 +93,7 @@ public sealed partial class RestGuildMember :
 
     public override ValueTask UpdateAsync(IUserModel model, CancellationToken token = default)
         => throw new InvalidOperationException(
-            $"Cannot update a {nameof(RestGuildMember)} with a plain {nameof(IUserModel)}");
+            $"Cannot update a {nameof(RestMember)} with a plain {nameof(IUserModel)}");
 
     public new IMemberModel GetModel() => Model;
 }

@@ -12,9 +12,9 @@ using GuildsPager = RestPagedIndexableActor<RestGuildActor, ulong, RestGuild, Re
 public sealed partial class DiscordRestClient : IDiscordClient
 {
     //[SourceOfTruth]
-    public RestSelfUserActor CurrentUser { get; }
+    public RestCurrentUserActor CurrentUser { get; }
 
-    ISelfUserActor IDiscordClient.CurrentUser => CurrentUser;
+    ICurrentUserActor IDiscordClient.CurrentUser => CurrentUser;
 
     [SourceOfTruth]
     public GuildsPager Guilds { get; }
@@ -58,7 +58,7 @@ public sealed partial class DiscordRestClient : IDiscordClient
         RateLimiter = new();
         Logger = logger;
 
-        CurrentUser = new RestSelfUserActor(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
+        CurrentUser = new RestCurrentUserActor(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
         Channels = new(id => new RestChannelActor(this, ChannelIdentity.Of(id)));
         Users = new(id => new RestUserActor(this, UserIdentity.Of(id)));
         Webhooks = new(id => new RestWebhookActor(this, WebhookIdentity.Of(id)));

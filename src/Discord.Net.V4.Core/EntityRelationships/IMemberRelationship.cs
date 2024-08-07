@@ -1,10 +1,10 @@
 namespace Discord;
 
 public interface IMemberRelationship :
-    IRelationship<IGuildMemberActor, ulong, IGuildMember>
+    IRelationship<IMemberActor, ulong, IMember>
 {
-    IGuildMemberActor Member { get; }
+    IMemberActor Member { get; }
 
-    IGuildMemberActor IRelationship<IGuildMemberActor, ulong, IGuildMember>.RelationshipActor
+    IMemberActor IRelationship<IMemberActor, ulong, IMember>.RelationshipActor
         => Member;
 }

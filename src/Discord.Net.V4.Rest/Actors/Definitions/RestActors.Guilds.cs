@@ -129,7 +129,7 @@ internal static partial class RestActors
     }
 
     public static
-        RestPagedIndexableActor<RestGuildMemberActor, ulong, RestGuildMember, IEnumerable<IMemberModel>,
+        RestPagedIndexableActor<RestMemberActor, ulong, RestMember, IEnumerable<IMemberModel>,
             PageGuildMembersParams> Members(DiscordRestClient client, GuildIdentity guild)
     {
         return new(
@@ -138,7 +138,7 @@ internal static partial class RestActors
             args => Routes.ListGuildMembers(guild.Id, args.PageSize, args.After?.Id),
             (_, models) => models
                 .Select(x =>
-                    RestGuildMember.Construct(client, guild, x)
+                    RestMember.Construct(client, guild, x)
                 ),
             (_, models, args) =>
             {

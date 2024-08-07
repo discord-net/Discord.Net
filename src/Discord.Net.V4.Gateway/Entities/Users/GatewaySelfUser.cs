@@ -6,14 +6,14 @@ using Discord.Rest;
 namespace Discord.Gateway;
 
 [ExtendInterfaceDefaults]
-public sealed partial class GatewaySelfUserActor :
+public sealed partial class GatewayCurrentUserActor :
     GatewayUserActor,
-    ISelfUserActor,
-    IGatewayCachedActor<ulong, GatewaySelfUser, SelfUserIdentity, ISelfUserModel>
+    ICurrentUserActor,
+    IGatewayCachedActor<ulong, GatewayCurrentUser, SelfUserIdentity, ISelfUserModel>
 {
     [SourceOfTruth] internal override SelfUserIdentity Identity { get; }
 
-    public GatewaySelfUserActor(
+    public GatewayCurrentUserActor(
         DiscordGatewayClient client,
         SelfUserIdentity user
     ) : base(client, user)
@@ -23,17 +23,17 @@ public sealed partial class GatewaySelfUserActor :
 
     public IPartialGuild CreateEntity(IPartialGuildModel model) => throw new NotImplementedException();
 
-    public IGuildMember CreateEntity(IMemberModel model, ulong context) => throw new NotImplementedException();
+    public IMember CreateEntity(IMemberModel model, ulong context) => throw new NotImplementedException();
 
     [SourceOfTruth]
-    internal GatewaySelfUser CreateEntity(ISelfUserModel model)
+    internal GatewayCurrentUser CreateEntity(ISelfUserModel model)
         => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
-public sealed partial class GatewaySelfUser :
+public sealed partial class GatewayCurrentUser :
     GatewayUser,
-    ISelfUser,
-    ICacheableEntity<GatewaySelfUser, ulong, ISelfUserModel>
+    ICurrentUser,
+    ICacheableEntity<GatewayCurrentUser, ulong, ISelfUserModel>
 {
     public string Locale => Model.Locale!;
 
@@ -47,29 +47,29 @@ public sealed partial class GatewaySelfUser :
 
     public PremiumType PremiumType => (PremiumType?)Model.PremiumType ?? PremiumType.None;
 
-    [ProxyInterface] internal override GatewaySelfUserActor Actor { get; }
+    [ProxyInterface] internal override GatewayCurrentUserActor Actor { get; }
 
     internal override ISelfUserModel Model => _model;
 
     private ISelfUserModel _model;
 
-    public GatewaySelfUser(
+    public GatewayCurrentUser(
         DiscordGatewayClient client,
         ISelfUserModel model,
-        GatewaySelfUserActor? actor = null
+        GatewayCurrentUserActor? actor = null
     ) : base(client, model, actor)
     {
         Actor = actor ?? new(client, SelfUserIdentity.Of(this));
         _model = model;
     }
 
-    public static GatewaySelfUser Construct(DiscordGatewayClient client,
+    public static GatewayCurrentUser Construct(DiscordGatewayClient client,
         IGatewayConstructionContext context, ISelfUserModel model)
     {
-        return new GatewaySelfUser(
+        return new GatewayCurrentUser(
             client,
             model,
-            context.TryGetActor<GatewaySelfUserActor>()
+            context.TryGetActor<GatewayCurrentUserActor>()
         );
     }
 

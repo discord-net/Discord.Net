@@ -26,7 +26,7 @@ public partial interface IGuildSticker :
     /// <summary>
     ///     Gets the user that uploaded the guild sticker.
     /// </summary>
-    IGuildMemberActor? Author { get; }
+    IMemberActor? Author { get; }
 
     /// <summary>
     ///     Gets whether this guild sticker can be used, may be false due to loss of Server Boosts.

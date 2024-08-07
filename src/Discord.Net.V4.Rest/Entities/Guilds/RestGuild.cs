@@ -7,7 +7,7 @@ using System.Globalization;
 namespace Discord.Rest;
 
 using BansPager = RestPagedIndexableActor<RestBanActor, ulong, RestBan, IEnumerable<IBanModel>, PageGuildBansParams>;
-using MembersPager = RestPagedIndexableActor<RestGuildMemberActor, ulong, RestGuildMember, IEnumerable<IMemberModel>,
+using MembersPager = RestPagedIndexableActor<RestMemberActor, ulong, RestMember, IEnumerable<IMemberModel>,
     PageGuildMembersParams>;
 using EnumerableGuildChannelActor =
     RestEnumerableIndexableActor<RestGuildChannelActor, ulong, RestGuildChannel, IGuildChannel,
@@ -178,8 +178,8 @@ public sealed partial class RestGuildActor :
         => RestGuildChannel.Construct(Client, Identity, model);
 
     [SourceOfTruth]
-    internal RestGuildMember CreateEntity(IMemberModel model)
-        => RestGuildMember.Construct(Client, Identity, model);
+    internal RestMember CreateEntity(IMemberModel model)
+        => RestMember.Construct(Client, Identity, model);
 }
 
 [ExtendInterfaceDefaults]
@@ -200,7 +200,7 @@ public sealed partial class RestGuild :
 
     [SourceOfTruth] public RestTextChannelActor? PublicUpdatesChannel { get; private set; }
 
-    [SourceOfTruth] public RestGuildMemberActor Owner { get; private set; }
+    [SourceOfTruth] public RestMemberActor Owner { get; private set; }
 
     [SourceOfTruth] public ManagedRolesActor Roles { get; }
     [SourceOfTruth] public ManagedEmotesActor Emotes { get; }
@@ -441,7 +441,7 @@ public sealed partial class RestGuild :
 
         Owner = Owner.UpdateFrom(
             model.OwnerId,
-            RestGuildMemberActor.Factory,
+            RestMemberActor.Factory,
             Client,
             Actor.Identity
         );

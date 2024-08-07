@@ -13,8 +13,8 @@ global using MembersPager = Discord.Gateway.GatewayPagedIndexableActor<
     Discord.Gateway.GatewayMemberActor,
     ulong,
     Discord.Gateway.GatewayMember,
-    Discord.Rest.RestGuildMember,
-    Discord.IGuildMember,
+    Discord.Rest.RestMember,
+    Discord.IMember,
     Discord.Models.IMemberModel,
     System.Collections.Generic.IEnumerable<Discord.Models.IMemberModel>,
     Discord.PageGuildMembersParams

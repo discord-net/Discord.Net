@@ -3,9 +3,9 @@ using Discord.Models.Json;
 namespace Discord;
 
 /// <summary>
-///     Properties that are used to modify the <see cref="ISelfUser" /> with the specified changes.
+///     Properties that are used to modify the <see cref="ICurrentUser" /> with the specified changes.
 /// </summary>
-/// <seealso cref="ISelfUser.ModifyAsync" />
+/// <seealso cref="ICurrentUser.ModifyAsync" />
 public sealed class ModifySelfUserProperties : IEntityProperties<ModifyCurrentUserParams>
 {
     /// <summary>

@@ -11,7 +11,7 @@ namespace Discord;
 public partial interface IGuildActor :
     IActor<ulong, IGuild>,
     IEntityProvider<IGuildChannel, IGuildChannelModel>,
-    IEntityProvider<IGuildMember, IMemberModel>
+    IEntityProvider<IMember, IMemberModel>
 {
     #region Channels
 
@@ -66,8 +66,8 @@ public partial interface IGuildActor :
     IPagedIndexableActor<IBanActor, ulong, IBan, PageGuildBansParams> Bans { get; }
 
     [return: TypeHeuristic(nameof(Members))]
-    IGuildMemberActor Member(ulong id) => Members[id];
-    IPagedIndexableActor<IGuildMemberActor, ulong, IGuildMember, PageGuildMembersParams> Members { get; }
+    IMemberActor Member(ulong id) => Members[id];
+    IPagedIndexableActor<IMemberActor, ulong, IMember, PageGuildMembersParams> Members { get; }
 
     [return: TypeHeuristic(nameof(Emotes))]
     IGuildEmoteActor Emote(ulong id) => Emotes[id];
@@ -124,8 +124,8 @@ public partial interface IGuildActor :
         token
     );
 
-    [return: TypeHeuristic<IEntityProvider<IGuildMember, IMemberModel>>(nameof(CreateEntity))]
-    async Task<IReadOnlyCollection<IGuildMember>> SearchGuildMembersAsync(
+    [return: TypeHeuristic<IEntityProvider<IMember, IMemberModel>>(nameof(CreateEntity))]
+    async Task<IReadOnlyCollection<IMember>> SearchGuildMembersAsync(
         string query,
         int limit = 1000,
         RequestOptions? options = null,
@@ -140,8 +140,8 @@ public partial interface IGuildActor :
         return result.Select(CreateEntity).ToImmutableArray();
     }
 
-    [return: TypeHeuristic<IEntityProvider<IGuildMember, IMemberModel>>(nameof(CreateEntity))]
-    async Task<IGuildMember> AddGuildMemberAsync(
+    [return: TypeHeuristic<IEntityProvider<IMember, IMemberModel>>(nameof(CreateEntity))]
+    async Task<IMember> AddGuildMemberAsync(
         EntityOrId<ulong, IUser> user,
         string accessToken,
         string? nickname = null,

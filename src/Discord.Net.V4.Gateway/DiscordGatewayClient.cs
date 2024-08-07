@@ -10,7 +10,7 @@ namespace Discord.Gateway;
 
 public sealed partial class DiscordGatewayClient : IDiscordClient
 {
-    public ISelfUserActor CurrentUser => throw new NotImplementedException();
+    public ICurrentUserActor CurrentUser => throw new NotImplementedException();
 
     public GatewayRequestOptions DefaultRequestOptions { get; }
 

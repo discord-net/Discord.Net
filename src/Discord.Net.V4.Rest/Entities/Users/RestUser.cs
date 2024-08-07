@@ -11,7 +11,7 @@ public partial class RestUserActor(
     DiscordRestClient client,
     UserIdentity user
 ) :
-    RestActor<ulong, RestSelfUser, UserIdentity>(client, user),
+    RestActor<ulong, RestCurrentUser, UserIdentity>(client, user),
     IUserActor
 {
     [SourceOfTruth]
@@ -64,7 +64,7 @@ public partial class RestUser :
     {
         return model switch
         {
-            ISelfUserModel selfUserModel => RestSelfUser.Construct(client, selfUserModel),
+            ISelfUserModel selfUserModel => RestCurrentUser.Construct(client, selfUserModel),
             _ => new RestUser(client, model)
         };
     }

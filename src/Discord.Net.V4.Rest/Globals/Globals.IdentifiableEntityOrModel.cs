@@ -18,10 +18,10 @@ global using StickerIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestSti
 
 #region Users
 
-global using MemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildMember, Discord.Rest.RestGuildMemberActor, Discord.Models.IMemberModel>;
+global using MemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestMember, Discord.Rest.RestMemberActor, Discord.Models.IMemberModel>;
 global using UserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestUser, Discord.Rest.RestUserActor, Discord.Models.IUserModel>;
 global using ThreadMemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadMember, Discord.Rest.RestThreadMemberActor, Discord.Models.IThreadMemberModel>;
-global using SelfUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestSelfUser, Discord.Rest.RestSelfUserActor, Discord.Models.ISelfUserModel>;
+global using SelfUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestCurrentUser, Discord.Rest.RestCurrentUserActor, Discord.Models.ISelfUserModel>;
 global using GuildScheduledEventUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildScheduledEventUser, Discord.Rest.RestGuildScheduledEventUserActor, Discord.Models.IGuildScheduledEventUserModel>;
 
 #endregion

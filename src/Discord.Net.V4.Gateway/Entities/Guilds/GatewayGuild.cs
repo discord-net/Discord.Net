@@ -117,7 +117,7 @@ public sealed partial class GatewayGuildActor :
     internal IGuildChannel CreateEntity(IGuildChannelModel model) => throw new NotImplementedException();
 
     [SourceOfTruth]
-    internal IGuildMember CreateEntity(IMemberModel model) => throw new NotImplementedException();
+    internal IMember CreateEntity(IMemberModel model) => throw new NotImplementedException();
 }
 
 public sealed partial class GatewayGuild :

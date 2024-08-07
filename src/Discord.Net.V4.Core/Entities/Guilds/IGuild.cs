@@ -100,7 +100,7 @@ public partial interface IGuild :
     ITextChannelActor? SystemChannel { get; }
     ITextChannelActor? RulesChannel { get; }
     ITextChannelActor? PublicUpdatesChannel { get; }
-    IGuildMemberActor Owner { get; }
+    IMemberActor Owner { get; }
 
     ulong? ApplicationId { get; }
 

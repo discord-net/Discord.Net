@@ -12,7 +12,7 @@ global using UserIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayUser, Discord.Gateway.GatewayUserActor,
         Discord.Models.IUserModel>;
 global using SelfUserIdentity =
-    Discord.IIdentifiable<ulong, Discord.Gateway.GatewaySelfUser, Discord.Gateway.GatewaySelfUserActor,
+    Discord.IIdentifiable<ulong, Discord.Gateway.GatewayCurrentUser, Discord.Gateway.GatewayCurrentUserActor,
         Discord.Models.ISelfUserModel>;
 global using MemberIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayMember, Discord.Gateway.GatewayMemberActor,

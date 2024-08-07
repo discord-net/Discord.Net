@@ -6,7 +6,7 @@ namespace Discord;
 public sealed record PageGuildMembersParams(
     int? PageSize = DiscordConfig.MaxUsersPerBatch,
     int? Total = null,
-    EntityOrId<ulong, IGuildMember>? After = null
+    EntityOrId<ulong, IMember>? After = null
 ) : IDirectionalPagingParams<ulong>, IPagingParams<PageGuildMembersParams, IEnumerable<IMemberModel>>
 {
     public static int MaxPageSize => DiscordConfig.MaxUsersPerBatch;

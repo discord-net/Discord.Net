@@ -70,7 +70,7 @@ public partial class GatewayUser :
         IGatewayConstructionContext context, IUserModel model)
     {
         if (model is ISelfUserModel selfUser)
-            return GatewaySelfUser.Construct(client, context, selfUser);
+            return GatewayCurrentUser.Construct(client, context, selfUser);
 
         return new GatewayUser(
             client,

@@ -9,11 +9,11 @@ namespace Discord;
 [Loadable(nameof(Routes.GetCurrentUser))]
 [Modifiable<ModifySelfUserProperties>(nameof(Routes.ModifyCurrentUser))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
-public partial interface ISelfUserActor :
+public partial interface ICurrentUserActor :
     IUserActor,
-    IActor<ulong, ISelfUser>,
+    IActor<ulong, ICurrentUser>,
     IEntityProvider<IPartialGuild, IPartialGuildModel>,
-    IEntityProvider<IGuildMember, IMemberModel, ulong>
+    IEntityProvider<IMember, IMemberModel, ulong>
 {
     // TODO:
     // - https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection
@@ -36,7 +36,7 @@ public partial interface ISelfUserActor :
         return result?.Select(CreateEntity);
     }
 
-    async Task<IGuildMember?> GetCurrentGuildMemberAsync(
+    async Task<IMember?> GetCurrentGuildMemberAsync(
         EntityOrId<ulong, IPartialGuild> guild,
         RequestOptions? options = null,
         CancellationToken token = default)

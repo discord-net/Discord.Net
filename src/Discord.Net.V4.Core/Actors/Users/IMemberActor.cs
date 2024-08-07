@@ -8,11 +8,11 @@ namespace Discord;
 [Loadable(nameof(Routes.GetGuildMember))]
 [Modifiable<ModifyGuildUserProperties>(nameof(Routes.ModifyGuildMember))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
-public partial interface IGuildMemberActor :
+public partial interface IMemberActor :
     IUserActor,
     IGuildRelationship,
     IUserRelationship,
-    IActor<ulong, IGuildMember>
+    IActor<ulong, IMember>
 {
     IVoiceStateActor VoiceState { get; }
 

@@ -39,7 +39,7 @@ public static partial class Routes
     );
 
     public static IApiInRoute<ModifyUserVoiceStateParams> ModifyUserVoiceState([IdHeuristic<IGuild>] ulong guildId,
-        [IdHeuristic<IGuildMember>] ulong userId,
+        [IdHeuristic<IMember>] ulong userId,
         ModifyUserVoiceStateParams body
     ) => new ApiInRoute<ModifyUserVoiceStateParams>(
         nameof(ModifyUserVoiceState),

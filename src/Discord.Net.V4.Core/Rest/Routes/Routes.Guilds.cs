@@ -48,13 +48,13 @@ public partial class Routes
             $"guilds/{guildId}/threads/active", (ScopeType.Guild, guildId));
 
     public static IApiOutRoute<GuildMember> GetGuildMember([IdHeuristic<IGuild>] ulong guildId,
-        [IdHeuristic<IGuildMember>] ulong userId) =>
+        [IdHeuristic<IMember>] ulong userId) =>
         new ApiOutRoute<GuildMember>(nameof(GetGuildMember), RequestMethod.Get, $"guilds/{guildId}/members/{userId}",
             (ScopeType.Guild, guildId));
 
     public static IApiOutRoute<GuildMember[]> ListGuildMembers([IdHeuristic<IGuild>] ulong guildId,
         int? limit = default,
-        EntityOrId<ulong, IGuildMember>? after = default) =>
+        EntityOrId<ulong, IMember>? after = default) =>
         new ApiOutRoute<GuildMember[]>(nameof(ListGuildMembers), RequestMethod.Get,
             $"guilds/{guildId}/members{RouteUtils.GetUrlEncodedQueryParams(("limit", limit), ("after", after?.Id))}",
             (ScopeType.Guild, guildId));
@@ -72,7 +72,7 @@ public partial class Routes
             $"guilds/{guildId}/members/{userId}", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
 
     public static IApiInOutRoute<ModifyGuildMemberParams, GuildMember> ModifyGuildMember(
-        [IdHeuristic<IGuild>] ulong guildId, [IdHeuristic<IGuildMember>] ulong userId,
+        [IdHeuristic<IGuild>] ulong guildId, [IdHeuristic<IMember>] ulong userId,
         ModifyGuildMemberParams body) =>
         new ApiInOutRoute<ModifyGuildMemberParams, GuildMember>(nameof(ModifyGuildMember), RequestMethod.Patch,
             $"guilds/{guildId}/members/{userId}", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
@@ -84,17 +84,17 @@ public partial class Routes
             $"guilds/{guildId}/members/@me", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
 
     public static IApiRoute AddGuildMemberRole([IdHeuristic<IGuild>] ulong guildId,
-        [IdHeuristic<IGuildMember>] ulong userId, [IdHeuristic<IRole>] ulong roleId) =>
+        [IdHeuristic<IMember>] ulong userId, [IdHeuristic<IRole>] ulong roleId) =>
         new ApiRoute(nameof(AddGuildMemberRole), RequestMethod.Put,
             $"guilds/{guildId}/members/{userId}/roles/{roleId}", (ScopeType.Guild, guildId));
 
     public static IApiRoute RemoveGuildMemberRole([IdHeuristic<IGuild>] ulong guildId,
-        [IdHeuristic<IGuildMember>] ulong userId, [IdHeuristic<IRole>] ulong roleId) =>
+        [IdHeuristic<IMember>] ulong userId, [IdHeuristic<IRole>] ulong roleId) =>
         new ApiRoute(nameof(RemoveGuildMemberRole), RequestMethod.Delete,
             $"guilds/{guildId}/members/{userId}/roles/{roleId}", (ScopeType.Guild, guildId));
 
     public static IApiRoute RemoveGuildMember([IdHeuristic<IGuild>] ulong guildId,
-        [IdHeuristic<IGuildMember>] ulong userId) =>
+        [IdHeuristic<IMember>] ulong userId) =>
         new ApiRoute(nameof(RemoveGuildMember), RequestMethod.Delete, $"guilds/{guildId}/members/{userId}",
             (ScopeType.Guild, guildId));
 

@@ -31,7 +31,7 @@ public sealed partial class RestGuildSticker :
     IContextConstructable<RestGuildSticker, IGuildStickerModel, GuildIdentity, DiscordRestClient>
 {
     [SourceOfTruth]
-    public RestGuildMemberActor? Author { get; private set; }
+    public RestMemberActor? Author { get; private set; }
 
     public bool? IsAvailable => Model.Available;
 
@@ -59,7 +59,7 @@ public sealed partial class RestGuildSticker :
 
         Author = model.AuthorId.Map(
             static (id, client, guild, model)
-                => new RestGuildMemberActor(
+                => new RestMemberActor(
                     client,
                     guild,
                     MemberIdentity.Of(id),
@@ -79,7 +79,7 @@ public sealed partial class RestGuildSticker :
     {
         Author = Author.UpdateFrom(
             model.AuthorId,
-            RestGuildMemberActor.Factory,
+            RestMemberActor.Factory,
             Client,
             Actor.Guild.Identity,
             model.AuthorId.Map(

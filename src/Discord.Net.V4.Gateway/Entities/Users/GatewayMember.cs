@@ -7,7 +7,7 @@ namespace Discord.Gateway;
 
 public sealed partial class GatewayMemberActor :
     GatewayCachedActor<ulong, GatewayMember, MemberIdentity, IMemberModel>,
-    IGuildMemberActor,
+    IMemberActor,
     IGatewayCachedActor<ulong, GatewayMember, MemberIdentity, IMemberModel>
 {
     [StoreRoot, SourceOfTruth] public GatewayGuildActor Guild { get; }
@@ -36,7 +36,7 @@ public sealed partial class GatewayMemberActor :
 
 public sealed partial class GatewayMember :
     GatewayCacheableEntity<GatewayMember, ulong, IMemberModel>,
-    IGuildMember
+    IMember
 {
     public IDefinedLoadableEntityEnumerable<ulong, IRole> Roles => throw new NotImplementedException();
 
