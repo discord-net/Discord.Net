@@ -28,7 +28,7 @@ internal static partial class RestActors
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
         where TActor : class, IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>>
-        where TCore : class, IEntity<TId>, IEntityOf<TModel>, IFetchableOfMany<TId, TModel>
+        where TCore : class, IEntity<TId, TModel>, IFetchableOfMany<TId, TModel>
     {
         return Fetchable<TActor, TId, TEntity, TCore, TModel>(
             actor,
@@ -43,7 +43,7 @@ internal static partial class RestActors
         [TransitiveFill] TActor,
         TId,
         TEntity,
-        [Not(nameof(TEntity)), Interface] TCore,
+        [Not(nameof(TEntity)), Interface, Shrink] TCore,
         TModel
     >(
         Template<TActor> actor,
@@ -57,7 +57,7 @@ internal static partial class RestActors
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
         where TActor : class, IRestActor<TId, TEntity>
-        where TCore : class, IEntity<TId>, IEntityOf<TModel>
+        where TCore : class, IEntity<TId, TModel>
     {
         return new RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>>(
             (id) => actorFactory(client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),

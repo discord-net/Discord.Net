@@ -3,18 +3,26 @@ using Discord.Models.Json;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-[ExtendInterfaceDefaults(typeof(IRoleActor))]
-public partial class RestRoleActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    RoleIdentity role
-):
-    RestActor<ulong, RestRole, RoleIdentity>(client, role),
+[ExtendInterfaceDefaults]
+public partial class RestRoleActor :
+    RestActor<ulong, RestRole, RoleIdentity>,
     IRoleActor
 {
-    [SourceOfTruth]
-    public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [SourceOfTruth] public RestGuildActor Guild { get; }
+
+    internal override RoleIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestRoleActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        RoleIdentity role
+    ) : base(client, role)
+    {
+        Identity = role | this;
+
+        Guild = guild.Actor ?? new(client, guild);
+    }
 
     [SourceOfTruth]
     internal RestRole CreateEntity(IRoleModel model)

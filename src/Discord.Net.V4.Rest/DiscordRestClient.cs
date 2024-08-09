@@ -7,7 +7,24 @@ using System.Text.Json;
 
 namespace Discord.Rest;
 
-using GuildsPager = RestPagedIndexableActor<RestGuildActor, ulong, RestGuild, RestPartialGuild, IEnumerable<IPartialGuildModel>, PageUserGuildsParams>;
+using GuildsPager = RestPartialPagedIndexableActor<
+    RestGuildActor,
+    ulong,
+    RestGuild,
+    RestPartialGuild,
+    IPartialGuildModel,
+    IEnumerable<IPartialGuildModel>,
+    PageUserGuildsParams
+>;
+
+using Stickers = RestIndexableActor<RestStickerActor, ulong, RestSticker>;
+using StickerPacks = RestEnumerableIndexableActor<
+    RestStickerPackActor,
+    ulong,
+    RestStickerPack,
+    IStickerPack,
+    IEnumerable<IStickerPackModel>
+>;
 
 public sealed partial class DiscordRestClient : IDiscordClient
 {
@@ -16,21 +33,19 @@ public sealed partial class DiscordRestClient : IDiscordClient
 
     ICurrentUserActor IDiscordClient.CurrentUser => CurrentUser;
 
-    [SourceOfTruth]
-    public GuildsPager Guilds { get; }
+    [SourceOfTruth] public GuildsPager Guilds { get; }
 
-    [SourceOfTruth]
-    public RestIndexableActor<RestChannelActor, ulong, RestChannel> Channels { get; }
+    [SourceOfTruth] public RestIndexableActor<RestChannelActor, ulong, RestChannel> Channels { get; }
 
-    [SourceOfTruth]
-    public RestIndexableActor<RestUserActor, ulong, RestUser> Users { get; }
+    [SourceOfTruth] public RestIndexableActor<RestUserActor, ulong, RestUser> Users { get; }
 
-    [SourceOfTruth]
-    public RestIndexableActor<RestWebhookActor, ulong, RestWebhook> Webhooks { get; }
+    [SourceOfTruth] public RestIndexableActor<RestWebhookActor, ulong, RestWebhook> Webhooks { get; }
 
+    [SourceOfTruth] public StickerPacks StickerPacks { get; }
 
-    [SourceOfTruth]
-    public RestApiClient RestApiClient { get; }
+    [SourceOfTruth] public Stickers Stickers { get; }
+
+    [SourceOfTruth] public RestApiClient RestApiClient { get; }
 
     public DiscordConfig Config { get; }
 
@@ -44,10 +59,12 @@ public sealed partial class DiscordRestClient : IDiscordClient
 
     public DiscordRestClient(DiscordToken token)
         : this(new DiscordConfig(token), NullLogger<DiscordRestClient>.Instance)
-    { }
+    {
+    }
 
     public DiscordRestClient(DiscordConfig config) : this(config, NullLogger<DiscordRestClient>.Instance)
-    { }
+    {
+    }
 
     public DiscordRestClient(DiscordConfig config, ILogger<DiscordRestClient> logger)
     {
@@ -58,12 +75,21 @@ public sealed partial class DiscordRestClient : IDiscordClient
         RateLimiter = new();
         Logger = logger;
 
-        CurrentUser = new RestCurrentUserActor(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
+        CurrentUser =
+            new RestCurrentUserActor(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
         Channels = new(id => new RestChannelActor(this, ChannelIdentity.Of(id)));
         Users = new(id => new RestUserActor(this, UserIdentity.Of(id)));
         Webhooks = new(id => new RestWebhookActor(this, WebhookIdentity.Of(id)));
         CurrentUserThreadMemberIdentity = ThreadMemberIdentity.Of(CurrentUser.Id);
         Guilds = RestActors.PagedGuilds(this);
+        StickerPacks = RestActors.Fetchable(
+            Template.T<RestStickerPackActor>(),
+            this,
+            RestStickerPackActor.Factory,
+            RestStickerPack.Construct,
+            IStickerPack.FetchManyRoute(IPathable.Empty)
+        );
+        Stickers = new(id => new RestStickerActor(this, StickerIdentity.Of(id)));
     }
 
     public ValueTask DisposeAsync()

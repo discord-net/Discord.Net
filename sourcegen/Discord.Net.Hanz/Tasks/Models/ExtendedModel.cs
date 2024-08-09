@@ -36,9 +36,9 @@ public static class ExtendedModel
             return;
         }
 
-        JsonModels.AddNoConverterMethod(symbol, jsonContext);
+        jsonContext.RequestedNoConverterTypeInfos.Add(symbol);
 
-        if (!jsonContext.AdditionalConverters.Add($"Extended{symbol.Name}Converter"))
+        if (!jsonContext.AdditionalConverters.Add($"Discord.Converters.Extended{symbol.Name}Converter"))
         {
             logger.Warn($"{symbol}: converter already exists");
             return;

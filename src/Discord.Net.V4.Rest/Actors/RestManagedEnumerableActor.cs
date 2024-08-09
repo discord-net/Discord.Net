@@ -34,7 +34,7 @@ internal static partial class RestManagedEnumerableActor
             IProxied<TActor>,
             IEntityOf<TModel>
         where TId : IEquatable<TId>
-        where TCore : class, IEntity<TId>
+        where TCore : class, IEntity<TId, TModel>
         where TModel : class, IEntityModel<TId>
     {
         return new RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel>(
@@ -54,7 +54,7 @@ public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TMod
     where TActor : class, IRestActor<TId, TEntity>
     where TEntity : RestEntity<TId>, TCore, IProxied<TActor>, IEntityOf<TModel>
     where TId : IEquatable<TId>
-    where TCore : class, IEntity<TId>
+    where TCore : class, IEntity<TId, TModel>
     where TModel : class, IEntityModel<TId>
 {
     public IReadOnlyDictionary<TId, TEntity> All { get; private set; }

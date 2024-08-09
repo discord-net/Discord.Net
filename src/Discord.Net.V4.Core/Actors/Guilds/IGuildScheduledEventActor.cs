@@ -4,7 +4,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-using RSVPType = IEnumerableIndexableActor<IGuildScheduledEventUserActor, ulong, IGuildScheduledEventUser>;
+using RSVPType = IPagedActor<ulong, IGuildScheduledEventUser, PageGuildScheduledEventUsersParams>;
 
 [Loadable(nameof(Routes.GetGuildScheduledEvent))]
 [Deletable(nameof(Routes.DeleteGuildScheduledEvent))]
@@ -13,6 +13,5 @@ public partial interface IGuildScheduledEventActor :
     IGuildRelationship,
     IActor<ulong, IGuildScheduledEvent>
 {
-    // TODO: make this paged
     RSVPType RSVPs { get; }
 }

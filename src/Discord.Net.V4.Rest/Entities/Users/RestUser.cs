@@ -5,15 +5,22 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-[ExtendInterfaceDefaults(typeof(IUserActor))]
-public partial class RestUserActor(
-    DiscordRestClient client,
-    UserIdentity user
-) :
-    RestActor<ulong, RestCurrentUser, UserIdentity>(client, user),
+[ExtendInterfaceDefaults]
+public partial class RestUserActor :
+    RestActor<ulong, RestCurrentUser, UserIdentity>,
     IUserActor
 {
+    internal override UserIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestUserActor(
+        DiscordRestClient client,
+        UserIdentity user
+    ) : base(client, user)
+    {
+        Identity = user | this;
+    }
+
     [SourceOfTruth]
     internal virtual RestUser CreateEntity(IUserModel model)
         => RestUser.Construct(Client, model);
@@ -23,6 +30,7 @@ public partial class RestUserActor(
         => RestDMChannel.Construct(Client, Identity | this, model);
 }
 
+[ExtendInterfaceDefaults]
 public partial class RestUser :
     RestEntity<ulong>,
     IUser,

@@ -68,7 +68,7 @@ public sealed class DiscriminatedUnion
             []
         );
 
-        JsonModels.AddNoConverterMethod(root, jsonContext);
+        jsonContext.RequestedNoConverterTypeInfos.Add(root);
 
         if (!JsonModels.AddGetTypeInfoToConverter(ref syntax, root))
             return;
@@ -141,7 +141,7 @@ public sealed class DiscriminatedUnion
         if (read is null || write is null)
             return;
 
-        if (!jsonContext.AdditionalConverters.Add($"Discord.Converters.{root.Name}Union"))
+        if (!jsonContext.AdditionalConverters.Add($"Discord.Converters.{root.Name}UnionConverter"))
             return;
 
         syntax = syntax
@@ -254,7 +254,7 @@ public sealed class DiscriminatedUnion
         if (converter is null)
             return;
 
-        JsonModels.AddNoConverterMethod(root, jsonContext);
+        jsonContext.RequestedNoConverterTypeInfos.Add(root);
 
         if (!jsonContext.AdditionalConverters.Add($"Discord.Converters.{converter.Identifier.ValueText}"))
             return;
@@ -303,7 +303,7 @@ public sealed class DiscriminatedUnion
             if (!jsonContext.AdditionalConverters.Add($"Discord.Converters.{extraConverter.Identifier.ValueText}"))
                 continue;
 
-            JsonModels.AddNoConverterMethod(extraBase, jsonContext);
+            jsonContext.RequestedNoConverterTypeInfos.Add(extraBase);
 
             context.AddSource(
                 $"GeneratedConverters/{extraBase.Name}Union",

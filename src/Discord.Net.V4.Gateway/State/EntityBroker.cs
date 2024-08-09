@@ -474,6 +474,30 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         return results.ToImmutableList();
     }
 
+    public async ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(
+        TModel model,
+        CachePathable path,
+        TActor? actor = null,
+        CancellationToken token = default
+    )
+    {
+        if (TryGetHandleFromReference(model.Id, out var handle))
+            return handle;
+
+        using var scope = _keyedSemaphore.Get(model.Id, out var semaphoreSlim);
+
+        await semaphoreSlim.WaitAsync(token);
+
+        try
+        {
+            return await CreateReferenceAndHandleAsync(path, model.Id, model, actor, token);
+        }
+        finally
+        {
+            semaphoreSlim.Release();
+        }
+    }
+
     public async ValueTask<IEntityHandle<TId, TEntity>?> GetAsync(
         CachePathable path,
         IIdentifiable<TId, TEntity, TModel> identity,

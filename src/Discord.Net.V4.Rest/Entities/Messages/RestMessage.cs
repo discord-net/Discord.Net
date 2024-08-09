@@ -8,21 +8,35 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Rest;
 
-[method: TypeFactory(LastParameter = nameof(message))]
-public partial class RestMessageActor(
-    DiscordRestClient client,
-    MessageChannelIdentity channel,
-    MessageIdentity message,
-    GuildIdentity? guild = null
-) :
-    RestActor<ulong, RestMessage, MessageIdentity>(client, message),
+[ExtendInterfaceDefaults]
+public partial class RestMessageActor :
+    RestActor<ulong, RestMessage, MessageIdentity>,
     IMessageActor
 {
-    [SourceOfTruth] public RestMessageChannelActor Channel { get; } = new(client, channel, guild);
+    [SourceOfTruth] public RestMessageChannelActor Channel { get; }
+
+    internal override MessageIdentity Identity { get; }
+
+    protected readonly GuildIdentity? GuildIdentity;
+
+    [TypeFactory(LastParameter = nameof(message))]
+    public RestMessageActor(
+        DiscordRestClient client,
+        MessageChannelIdentity channel,
+        MessageIdentity message,
+        GuildIdentity? guild = null
+    ) : base(client, message)
+    {
+        Identity = message | this;
+
+        GuildIdentity = guild;
+
+        Channel = new RestMessageChannelActor(client, channel, guild);
+    }
 
     [SourceOfTruth]
     internal virtual RestMessage CreateEntity(IMessageModel model)
-        => RestMessage.Construct(Client, new(guild, channel), model);
+        => RestMessage.Construct(Client, new(GuildIdentity, Channel.Identity), model);
 }
 
 public partial class RestMessage :
@@ -111,10 +125,11 @@ public partial class RestMessage :
 
         Author = new(
             client,
-            UserIdentity.OfNullable(
-                model.GetReferencedEntityModel<ulong, IUserModel>(model.AuthorId),
-                model => RestUser.Construct(client, model)
-            ) ?? UserIdentity.Of(model.AuthorId)
+            UserIdentity.FromReferenced<RestUser, DiscordRestClient>(
+                model,
+                model.AuthorId,
+                client
+            )
         );
         Thread = model is {ThreadId: not null, ThreadGuildId: not null}
             ? CreateThreadLoadable(client, model, guild)
@@ -201,7 +216,6 @@ public partial class RestMessage :
 
         threadModel = model.GetReferencedEntityModel<ulong, IThreadChannelModel>(model.ThreadId.Value);
 
-
         return ThreadIdentity.OfNullable(
             threadModel,
             model => RestThreadChannel.Construct(client, new RestThreadChannel.Context(
@@ -256,7 +270,7 @@ public partial class RestMessage :
             model.InteractionMetadata,
             RestMessageInteractionMetadata.Construct,
             Client,
-            new RestMessageInteractionMetadata.Context(Channel.MessageChannelIdentity, _guildIdentity),
+            new RestMessageInteractionMetadata.Context(Channel.Identity, _guildIdentity),
             token: token
         );
 

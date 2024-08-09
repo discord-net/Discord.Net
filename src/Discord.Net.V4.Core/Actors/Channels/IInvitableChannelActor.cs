@@ -10,8 +10,8 @@ public interface IInvitableChannelActor :
     IEntityProvider<IInvite, IInviteModel>
 {
     [return: TypeHeuristic(nameof(Invites))]
-    IInviteActor Invite(string code) => Invites[code];
-    IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites { get; }
+    IGuildChannelInviteActor Invite(string code) => Invites[code];
+    IEnumerableIndexableActor<IGuildChannelInviteActor, string, IInvite> Invites { get; }
 
     async Task<IInvite> CreateInviteAsync(
         CreateChannelInviteProperties args,

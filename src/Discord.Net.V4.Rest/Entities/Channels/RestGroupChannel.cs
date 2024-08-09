@@ -3,22 +3,24 @@ using Discord.Models.Json;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-[ExtendInterfaceDefaults(
-    typeof(IGroupChannelActor)
-)]
-public partial class RestGroupChannelActor(
-    DiscordRestClient client,
-    GroupChannelIdentity channel
-) :
-    RestChannelActor(client, channel),
+[ExtendInterfaceDefaults]
+public partial class RestGroupChannelActor :
+    RestChannelActor,
     IGroupChannelActor,
     IRestActor<ulong, RestGroupChannel, GroupChannelIdentity>
 {
-    public override GroupChannelIdentity Identity { get; } = channel;
-
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
+    internal RestMessageChannelActor MessageChannelActor { get; }
+
+    [SourceOfTruth] internal sealed override GroupChannelIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestGroupChannelActor(DiscordRestClient client,
+        GroupChannelIdentity channel) : base(client, channel)
+    {
+        Identity = channel | this;
+        MessageChannelActor = new RestMessageChannelActor(client, Identity);
+    }
 
     [SourceOfTruth]
     internal RestGroupChannel CreateEntity(IGroupDMChannelModel model)

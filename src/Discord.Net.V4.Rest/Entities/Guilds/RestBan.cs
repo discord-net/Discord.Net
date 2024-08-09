@@ -3,19 +3,29 @@ using Discord.Models.Json;
 
 namespace Discord.Rest;
 
-[ExtendInterfaceDefaults(typeof(IBanActor))]
-public sealed partial class RestBanActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    BanIdentity ban,
-    UserIdentity? user = null
-) :
-    RestActor<ulong, RestBan, BanIdentity>(client, ban),
+[ExtendInterfaceDefaults]
+public sealed partial class RestBanActor :
+    RestActor<ulong, RestBan, BanIdentity>,
     IBanActor
 {
-    [SourceOfTruth] public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [SourceOfTruth] public RestGuildActor Guild { get; }
 
-    [SourceOfTruth] public RestUserActor User { get; } = user?.Actor ?? new(client, user ?? UserIdentity.Of(ban.Id));
+    [SourceOfTruth] public RestUserActor User { get; }
+
+    internal override BanIdentity Identity { get; }
+
+    public RestBanActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        BanIdentity ban,
+        UserIdentity? user = null
+    ) : base(client, ban)
+    {
+        Identity = ban | this;
+
+        Guild = guild.Actor ?? new(client, guild);
+        User = user?.Actor ?? new(client, user ?? UserIdentity.Of(ban.Id));
+    }
 
     [SourceOfTruth]
     internal RestBan CreateEntity(IBanModel model)

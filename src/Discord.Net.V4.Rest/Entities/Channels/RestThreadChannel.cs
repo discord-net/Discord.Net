@@ -7,7 +7,9 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
-using EnumerableThreadMembers = RestEnumerableIndexableActor<RestThreadMemberActor, ulong, RestThreadMember, IThreadMember, IEnumerable<IThreadMemberModel>>;
+using EnumerableThreadMembers =
+    RestEnumerableIndexableActor<RestThreadMemberActor, ulong, RestThreadMember, IThreadMember,
+        IEnumerable<IThreadMemberModel>>;
 
 [ExtendInterfaceDefaults]
 public partial class RestThreadChannelActor :
@@ -15,17 +17,28 @@ public partial class RestThreadChannelActor :
     IThreadChannelActor,
     IRestActor<ulong, RestThreadChannel, ThreadIdentity>
 {
-    [method: TypeFactory]
-    public RestThreadChannelActor(DiscordRestClient client,
+    [ProxyInterface(typeof(IMessageChannelActor))]
+    internal RestMessageChannelActor MessageChannelActor { get; }
+
+    [SourceOfTruth] public RestThreadMemberActor CurrentThreadMember { get; }
+
+    [SourceOfTruth] public EnumerableThreadMembers ThreadMembers { get; }
+
+    [SourceOfTruth] internal override ThreadIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestThreadChannelActor(
+        DiscordRestClient client,
         GuildIdentity guild,
         ThreadIdentity thread,
-        ThreadMemberIdentity? currentThreadMember = null) : base(client, guild, thread)
+        ThreadMemberIdentity? currentThreadMember = null
+    ) : base(client, guild, thread)
     {
-        thread = Identity = thread.MostSpecific(this);
+        thread = Identity = thread | this;
 
         MessageChannelActor = new RestMessageChannelActor(client, thread);
 
-        currentThreadMember ??= ThreadMemberIdentity.Of(client.CurrentUser.Id);
+        currentThreadMember |= client.CurrentUser;
 
         CurrentThreadMember = currentThreadMember.Actor ?? new(
             client,
@@ -38,25 +51,13 @@ public partial class RestThreadChannelActor :
             Template.T<RestThreadMemberActor>(),
             client,
             RestThreadMemberActor.Factory,
-            guild,
+            Guild.Identity,
             thread,
             entityFactory: RestThreadMember.Construct,
-            new RestThreadMember.Context(guild, thread),
+            new RestThreadMember.Context(Guild.Identity, thread),
             IThreadMember.FetchManyRoute(this)
         );
     }
-
-    public override ThreadIdentity Identity { get; }
-
-    [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; }
-
-    [SourceOfTruth]
-    public RestThreadMemberActor CurrentThreadMember { get; }
-
-    [SourceOfTruth]
-    public EnumerableThreadMembers ThreadMembers { get; }
-
 
     [SourceOfTruth]
     [CovariantOverride]

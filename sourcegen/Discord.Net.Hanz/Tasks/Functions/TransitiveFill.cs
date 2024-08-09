@@ -16,6 +16,8 @@ public static class TransitiveFill
         "Discord.IProxied",
         "Discord.Gateway.IStoreProvider",
         "Discord.Gateway.IStoreInfoProvider",
+        "Discord.Gateway.IRootStoreProvider",
+        "Discord.Gateway.ISubStoreProvider",
         "Discord.Gateway.IBrokerProvider",
         "Discord.IContextConstructable"
     ];
@@ -28,6 +30,9 @@ public static class TransitiveFill
             = new(SymbolEqualityComparer.Default);
 
         public Dictionary<ITypeParameterSymbol, HashSet<ITypeSymbol>> AdditionalChecks { get; }
+            = new(SymbolEqualityComparer.Default);
+
+        public Dictionary<ITypeParameterSymbol, HashSet<ITypeSymbol>> NotAllowed { get; }
             = new(SymbolEqualityComparer.Default);
 
         public SemanticModel SemanticModel { get; }
@@ -96,6 +101,17 @@ public static class TransitiveFill
                 existing = Resolved[parameter] = new(SymbolEqualityComparer.Default);
 
             existing.UnionWith(type);
+        }
+
+        public void MarkAsIllegal(ITypeParameterSymbol parameter, params ITypeSymbol[] symbols)
+        {
+            if (NotAllowed.TryGetValue(parameter, out var already) && symbols.All(already.Contains))
+                return;
+
+            if (!NotAllowed.TryGetValue(parameter, out var existing))
+                existing = NotAllowed[parameter] = new(SymbolEqualityComparer.Default);
+
+            existing.UnionWith(symbols);
         }
     }
 
@@ -575,7 +591,6 @@ public static class TransitiveFill
         }
 
 
-
         return result;
     }
 
@@ -654,26 +669,6 @@ public static class TransitiveFill
             logger.Log($"{parameter}: Walking fill type {fillType}");
             WalkTypeForConstraints(context, parameter.Type, fillType, logger);
         }
-    }
-
-    private static bool GetInterfaceConstraint(ITypeParameterSymbol parameter)
-    {
-        return parameter
-            .GetAttributes()
-            .Any(x =>
-                x.AttributeClass?.ToDisplayString() == "Discord.InterfaceAttribute"
-            );
-    }
-
-    private static string?[] GetNotConstraints(ITypeParameterSymbol parameter)
-    {
-        return parameter
-            .GetAttributes()
-            .Where(x =>
-                x.AttributeClass?.ToDisplayString() == "Discord.NotAttribute"
-            )
-            .Select(x => x.ConstructorArguments[0].Value as string)
-            .ToArray();
     }
 
     private static IEnumerable<ITypeSymbol> WeakResolveGenerics(ITypeSymbol source, ITypeSymbol toResolve,
@@ -787,6 +782,7 @@ public static class TransitiveFill
                             depth,
                             LogLevel.Warning
                         );
+                        context.MarkAsIllegal(constraintTypeParameter, filledType);
                         return false;
                     }
 
@@ -814,22 +810,67 @@ public static class TransitiveFill
             // prevent recursion
             context.PickSubstitute(constraintTypeParameter, filledType);
 
-            foreach (var constraints in constraintTypeParameter.ConstraintTypes)
+            var otherCandidates = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
+            foreach (var constraint in constraintTypeParameter.ConstraintTypes)
             {
-                if (WalkTypeForConstraints(context, constraints, filledType, logger, depth + 1))
+                var temp = WeakResolveGenerics(
+                        filledType,
+                        constraint,
+                        context
+                    )
+                    .SelectMany(x => Hierarchy
+                        .GetHierarchyBetween(
+                            filledType,
+                            x,
+                            includeRoot: false,
+                            includeChild: false
+                        )
+                    );
+
+                otherCandidates.UnionWith(temp);
+
+                if (WalkTypeForConstraints(context, constraint, filledType, logger, depth + 1))
                     continue;
 
                 logger.LogWithDepth(
-                    $"{filledType} doesn't match constraint {constraintTypeParameter} on {constraints}",
+                    $"{filledType} doesn't match constraint {constraintTypeParameter} on {constraint}",
                     depth
                 );
 
                 context.RemoveCandidate(constraintTypeParameter, filledType);
-
+                context.MarkAsIllegal(constraintTypeParameter, filledType);
                 return false;
             }
 
             logger.LogWithDepth($"Picked {filledType} for {constraintTypeParameter}", depth);
+
+            if (otherCandidates.Count > 0)
+            {
+                logger.LogWithDepth(
+                    $"Possible other candidates found in hierarchy between {filledType} -> {type}:",
+                    depth
+                );
+
+                foreach (var candidate in otherCandidates)
+                    logger.LogWithDepth($" - {candidate}", depth);
+
+                // context.PickSubstitute(constraintTypeParameter, otherCandidates.ToArray());
+
+                foreach (var candidate in otherCandidates)
+                {
+                    if (WalkTypeForConstraints(context, constraintTypeParameter, candidate, logger, depth + 1))
+                    {
+                        logger.LogWithDepth($"Picked additional fill type {candidate} for {constraintTypeParameter}", depth);
+                        context.PickSubstitute(constraintTypeParameter, candidate);
+                    }
+                    else
+                    {
+                        context.RemoveCandidate(constraintTypeParameter, candidate);
+                        context.MarkAsIllegal(constraintTypeParameter, candidate);
+                    }
+                }
+            }
+
 
             return true;
         }
@@ -929,12 +970,15 @@ public static class TransitiveFill
                     hasMatching |= hasConversion;
 
                     logger.LogWithDepth(
-                        $"{source}: {candidate} can comply with existing substitute {existingCandidate}?: {hasConversion}",
-                        depth
+                        $"{source}: can comply with existing substitute {existingCandidate}?: {hasConversion}",
+                        depth + 1
                     );
 
-                    // if (!hasConversion)
-                    //     context.RemoveCandidate(constraint, existingCandidate);
+                    if (!hasConversion)
+                    {
+                        context.RemoveCandidate(constraint, existingCandidate);
+                        context.MarkAsIllegal(constraint, existingCandidate);
+                    }
                 }
 
                 if (!hasMatching)
@@ -1045,6 +1089,9 @@ public static class TransitiveFill
         HashSet<ITypeSymbol>? checkedType = null,
         int depth = 0)
     {
+        if (context.NotAllowed.TryGetValue(parameter, out var already) && already.Contains(requested))
+            return false;
+
         checkedType ??= new(SymbolEqualityComparer.Default);
 
         if (checkedType.Contains(parameter))
@@ -1080,7 +1127,7 @@ public static class TransitiveFill
                 return false;
             }
 
-            logger.LogWithDepth($"{requested} satisfies constraint {constraintType}", depth);
+            logger.LogWithDepth($"{requested} vaguely satisfies constraint {constraintType}", depth);
 
             checkedType.Add(constraintType);
         }

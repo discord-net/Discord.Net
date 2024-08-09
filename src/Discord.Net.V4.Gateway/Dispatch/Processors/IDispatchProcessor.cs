@@ -1,9 +1,9 @@
 using Discord.Models;
 
-namespace Discord.Gateway.Events.Processors;
+namespace Discord.Gateway.Processors;
 
 public interface IDispatchProcessor<in TPayload> where TPayload : class, IGatewayPayloadData
 {
-    string DispatchName { get; }
-    ValueTask ProcessAsync(TPayload payload, CancellationToken cancellationToken = default);
+    static abstract string DispatchEventType { get; }
+    static abstract ValueTask ProcessAsync(DiscordGatewayClient client, TPayload payload, CancellationToken token = default);
 }

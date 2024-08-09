@@ -144,7 +144,7 @@ public interface IModifiable<TId, in TSelf, out TParams, TApi, TEntity, in TMode
         => TSelf.ModifyRoute(path, id, args);
 }
 
-[TemplateExtension]
+[TemplateExtension, NoExposure]
 public interface IModifiable<TId, in TSelf, out TParams, TApi> :
     IIdentifiable<TId>,
     IClientProvider,

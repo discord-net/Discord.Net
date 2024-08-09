@@ -169,10 +169,14 @@ public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarg
     public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         var factoryArgsList = new HashSet<int>();
+        var generated = new HashSet<string>();
 
         foreach (var target in targets)
         {
             if (target is null) continue;
+
+            if(!generated.Add(target.ClassDeclarationSyntax.Identifier.ValueText))
+                continue;
 
             var sb = new StringBuilder();
 

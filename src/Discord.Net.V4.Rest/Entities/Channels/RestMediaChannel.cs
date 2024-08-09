@@ -5,21 +5,28 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-public partial class RestMediaChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    MediaChannelIdentity channel
-) :
-    RestThreadableChannelActor(client, guild, channel),
+[ExtendInterfaceDefaults]
+public sealed partial class RestMediaChannelActor :
+    RestThreadableChannelActor,
     IMediaChannelActor,
     IRestActor<ulong, RestMediaChannel, MediaChannelIdentity>
 {
-    public override MediaChannelIdentity Identity { get; } = channel;
-
     [ProxyInterface(typeof(IIntegrationChannelActor))]
-    internal RestIntegrationChannelActor IntegrationChannelActor { get; } =
-        new(client, guild, channel);
+    internal RestIntegrationChannelActor IntegrationChannelActor { get; }
+
+    [SourceOfTruth] internal override MediaChannelIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestMediaChannelActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        MediaChannelIdentity channel
+    ) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+
+        IntegrationChannelActor = new RestIntegrationChannelActor(client, Guild.Identity, Identity);
+    }
 
     [CovariantOverride]
     [SourceOfTruth]

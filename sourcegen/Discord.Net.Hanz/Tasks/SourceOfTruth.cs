@@ -136,21 +136,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
 
             var proxied = target.TypeDeclarationSyntax is ClassDeclarationSyntax cls
                 ? TypeUtils.GetBaseTypesAndThis(typeSymbol)
-                    .SelectMany(type =>
-                    {
-                        if (type is not { } namedType)
-                            return [];
-
-                        var syntax = type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
-                        if (syntax is not ClassDeclarationSyntax cls)
-                            return [];
-
-                        return InterfaceProxy.GetProxiedInterfaceMembers(
-                            cls,
-                            namedType,
-                            target.Semantic.Compilation.GetSemanticModel(cls.SyntaxTree)
-                        );
-                    })
+                    .SelectMany(InterfaceProxy.GetProxiedInterfaceMembers)
                     .ToImmutableHashSet(SymbolEqualityComparer.Default)
                 : ImmutableHashSet<ISymbol>.Empty;
 
@@ -165,9 +151,16 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
 
             // var baseImplementations = TypeUtils.GetBaseTypesAndThis(typeSymbol);
 
-            foreach (var iface in typeSymbol.AllInterfaces)
+            var interfaces = typeSymbol.AllInterfacesWrtVariance(target.Semantic, targetLogger);
+
+            foreach (var iface in interfaces)
             {
                 var targetMembers = iface.GetMembers(sourceOfTruthName);
+
+                if (targetMembers.Length > 0)
+                {
+                    targetLogger.Log($"{target.TypeSymbol}: {targetMembers.Length} candidate members for {iface} ({interfaces.Count} interfaces total)");
+                }
 
                 foreach (var member in targetMembers)
                 {
@@ -188,7 +181,8 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                                 break;
                             }
 
-                            validTargets.Add(member);
+                            if(validTargets.Add(member))
+                                targetLogger.Log($"{target.TypeSymbol}: adding target {member} ({iface})");
                             break;
                         case IPropertySymbol property when target.MemberDeclarationSyntax is PropertyDeclarationSyntax:
                             if (!target.Semantic.Compilation.HasImplicitConversion(sourceOfTruthType, property.Type))
@@ -198,7 +192,8 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                                 break;
                             }
 
-                            validTargets.Add(member);
+                            if(validTargets.Add(member))
+                                targetLogger.Log($"{target.TypeSymbol}: adding target {member} ({iface})");
                             break;
                     }
                 }

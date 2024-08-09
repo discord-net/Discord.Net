@@ -4,30 +4,43 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-public sealed partial class RestChannelFollowerWebhookActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    IntegrationChannelIdentity channel,
-    WebhookIdentity webhook
-) :
-    RestWebhookActor(client, webhook),
+[ExtendInterfaceDefaults]
+public sealed partial class RestChannelFollowerWebhookActor :
+    RestWebhookActor,
     IChannelFollowerWebhookActor,
     IRestActor<ulong, RestChannelFollowerWebhook, WebhookIdentity>
 {
-    [SourceOfTruth] public RestGuildActor Guild { get; } = new(client, guild);
+    [SourceOfTruth] public RestGuildActor Guild { get; }
 
-    [SourceOfTruth] public RestIntegrationChannelActor Channel { get; } = new(client, guild, channel);
+    [SourceOfTruth] public RestIntegrationChannelActor Channel { get; }
+
+    [SourceOfTruth]
+    internal override WebhookIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestChannelFollowerWebhookActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        IntegrationChannelIdentity channel,
+        WebhookIdentity webhook
+    ) : base(client, webhook)
+    {
+        Identity = webhook | this;
+
+        Guild = new RestGuildActor(client, guild);
+        Channel = new RestIntegrationChannelActor(client, guild, channel);
+    }
 
     [SourceOfTruth]
     internal override RestChannelFollowerWebhook CreateEntity(IWebhookModel model)
-        => RestChannelFollowerWebhook.Construct(Client, new(Guild.Identity, Channel.IntegrationChannelIdentity), model);
+        => RestChannelFollowerWebhook.Construct(Client, new(Guild.Identity, Channel.Identity), model);
 }
 
 public sealed partial class RestChannelFollowerWebhook :
     RestWebhook,
     IChannelFollowerWebhook,
-    IContextConstructable<RestChannelFollowerWebhook, IWebhookModel, RestChannelFollowerWebhook.Context, DiscordRestClient>
+    IContextConstructable<RestChannelFollowerWebhook, IWebhookModel, RestChannelFollowerWebhook.Context,
+        DiscordRestClient>
 {
     public readonly record struct Context(GuildIdentity Guild, IntegrationChannelIdentity Channel);
 

@@ -27,10 +27,11 @@ public sealed partial class RestMessageInteractionMetadata(
     public RestUserActor User { get; }
         = new(
             client,
-            UserIdentity.OfNullable(
-                model.GetReferencedEntityModel<ulong, IUserModel>(model.UserId),
-                model => RestUser.Construct(client, model)
-            ) ?? UserIdentity.Of(model.UserId)
+            UserIdentity.FromReferenced<RestUser, DiscordRestClient>(
+                model,
+                model.UserId,
+                client
+            )
         );
 
     public IReadOnlyDictionary<ApplicationIntegrationType, ulong> AuthorizingIntegrationOwners { get; private set; }
@@ -73,7 +74,8 @@ public sealed partial class RestMessageInteractionMetadata(
 
     public ValueTask UpdateAsync(IMessageInteractionMetadataModel model, CancellationToken token = default)
     {
-        if (!DictEquality<int, ulong>.Instance.Equals(Model.AuthorizingIntegrationOwners, model.AuthorizingIntegrationOwners))
+        if (!DictEquality<int, ulong>.Instance.Equals(Model.AuthorizingIntegrationOwners,
+                model.AuthorizingIntegrationOwners))
             AuthorizingIntegrationOwners = Model.AuthorizingIntegrationOwners
                 .ToImmutableDictionary(
                     x => (ApplicationIntegrationType)x.Key,

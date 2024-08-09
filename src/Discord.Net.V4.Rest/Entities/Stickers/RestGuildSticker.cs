@@ -7,18 +7,27 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
 [ExtendInterfaceDefaults(typeof(IGuildStickerActor))]
-public partial class RestGuildStickerActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    GuildStickerIdentity sticker
-) :
-    RestActor<ulong, RestGuildSticker, GuildStickerIdentity>(client, sticker),
-    IGuildStickerActor
+public partial class RestGuildStickerActor :
+    RestStickerActor,
+    IGuildStickerActor,
+    IRestActor<ulong, RestGuildSticker, GuildStickerIdentity>
 {
+    [SourceOfTruth] public RestGuildActor Guild { get; }
+
     [SourceOfTruth]
-    public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    internal override GuildStickerIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestGuildStickerActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        GuildStickerIdentity sticker
+    ) : base(client, sticker)
+    {
+        Identity = sticker | this;
+        Guild = guild.Actor ?? new(client, guild);
+    }
 
     [SourceOfTruth]
     internal RestGuildSticker CreateEntity(IGuildStickerModel model)
@@ -30,8 +39,7 @@ public sealed partial class RestGuildSticker :
     IGuildSticker,
     IContextConstructable<RestGuildSticker, IGuildStickerModel, GuildIdentity, DiscordRestClient>
 {
-    [SourceOfTruth]
-    public RestMemberActor? Author { get; private set; }
+    [SourceOfTruth] public RestMemberActor? Author { get; private set; }
 
     public bool? IsAvailable => Model.Available;
 
@@ -42,7 +50,7 @@ public sealed partial class RestGuildSticker :
         typeof(IGuildRelationship),
         typeof(IEntityProvider<IGuildSticker, IGuildStickerModel>)
     )]
-    internal RestGuildStickerActor Actor { get; }
+    internal override RestGuildStickerActor Actor { get; }
 
     private IGuildStickerModel _model;
 

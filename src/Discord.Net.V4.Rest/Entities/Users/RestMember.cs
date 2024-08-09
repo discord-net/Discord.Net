@@ -3,31 +3,48 @@ using Discord.Models.Json;
 
 namespace Discord.Rest;
 
-[method: TypeFactory(LastParameter = nameof(member))]
 [ExtendInterfaceDefaults]
-public partial class RestMemberActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    MemberIdentity member,
-    UserIdentity? user = null
-):
-    RestUserActor(client, user ?? member.Cast<RestUser, RestUserActor, IUserModel>()),
+public partial class RestMemberActor :
+    RestUserActor,
     IMemberActor,
     IRestActor<ulong, RestMember, MemberIdentity>
 {
-    public new MemberIdentity Identity { get; } = member;
+    [SourceOfTruth] public RestGuildActor Guild { get; }
+
+    [SourceOfTruth] public virtual RestVoiceStateActor VoiceState { get; }
+
+    [SourceOfTruth] internal new virtual MemberIdentity Identity { get; }
+
+    [TypeFactory(LastParameter = nameof(member))]
+    public RestMemberActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        MemberIdentity member,
+        UserIdentity? user = null,
+        VoiceStateIdentity? voiceState = null
+    ) : base(client, user ?? member.Cast<RestUser, RestUserActor, IUserModel>())
+    {
+        member = Identity = member | this;
+
+        Guild = guild.Actor ?? new(client, guild);
+
+        VoiceState = voiceState?.Actor ?? new(
+            client,
+            Guild.Identity,
+            voiceState ?? VoiceStateIdentity.Of(member.Id),
+            member
+        );
+    }
 
     [SourceOfTruth]
-    public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
-
-    [SourceOfTruth]
-    internal RestMember CreateEntity(IMemberModel model)
+    internal virtual RestMember CreateEntity(IMemberModel model)
         => RestMember.Construct(Client, Guild.Identity, model);
 
     IUserActor IUserRelationship.User => this;
 }
 
-public sealed partial class RestMember :
+[ExtendInterfaceDefaults]
+public partial class RestMember :
     RestUser,
     IMember,
     IContextConstructable<RestMember, IMemberModel, GuildIdentity, DiscordRestClient>
@@ -48,8 +65,7 @@ public sealed partial class RestMember :
 
     public GuildMemberFlags Flags => (GuildMemberFlags)Model.Flags;
 
-    [ProxyInterface(typeof(IMemberActor))]
-    internal override RestMemberActor Actor { get; }
+    [ProxyInterface(typeof(IMemberActor))] internal override RestMemberActor Actor { get; }
 
     internal new IMemberModel Model { get; private set; }
 
@@ -72,8 +88,12 @@ public sealed partial class RestMember :
 
     public static RestMember Construct(DiscordRestClient client, GuildIdentity guild, IMemberModel model)
     {
-        if(model is not IModelSourceOf<IUserModel?> userModelSource)
-            throw new ArgumentException($"Expected {model.GetType()} to be a {typeof(IModelSourceOf<IUserModel?>)}", nameof(model));
+        if(model.Id == client.CurrentUser.Id)
+            return RestCurrentMember.Construct(client, guild, model);
+
+        if (model is not IModelSourceOf<IUserModel?> userModelSource)
+            throw new ArgumentException($"Expected {model.GetType()} to be a {typeof(IModelSourceOf<IUserModel?>)}",
+                nameof(model));
 
         if (userModelSource.Model is null)
             throw new ArgumentNullException(nameof(userModelSource), "Expected 'user' to be a non-null model");

@@ -8,6 +8,9 @@ namespace Discord.Gateway;
 
 public interface IEventDispatcher
 {
-    ValueTask DispatchAsync<T>(string eventName, HashSet<T> handlers, CancellationToken token)
-        where T : ITransientDispatchHandler;
+    ValueTask DispatchAsync(
+        string eventName,
+        IEnumerable<PreparedInvocableEventHandle> handlers,
+        CancellationToken token
+    );
 }

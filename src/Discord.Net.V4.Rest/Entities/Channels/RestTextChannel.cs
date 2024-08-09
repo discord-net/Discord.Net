@@ -5,27 +5,34 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
 [ExtendInterfaceDefaults(
     typeof(ITextChannelActor)
 )]
-public partial class RestTextChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    TextChannelIdentity channel
-):
-    RestThreadableChannelActor(client, guild, channel),
+public partial class RestTextChannelActor :
+    RestThreadableChannelActor,
     ITextChannelActor,
     IRestActor<ulong, RestTextChannel, TextChannelIdentity>
 {
-    public override TextChannelIdentity Identity { get; } = channel;
-
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
+    internal RestMessageChannelActor MessageChannelActor { get; }
 
     [ProxyInterface(typeof(IIntegrationChannelActor))]
-    internal RestIntegrationChannelActor IntegrationChannelActor { get; } =
-        new(client, guild, channel);
+    internal RestIntegrationChannelActor IntegrationChannelActor { get; }
+
+    [SourceOfTruth] internal override TextChannelIdentity Identity { get; }
+
+    [method: TypeFactory]
+    public RestTextChannelActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        TextChannelIdentity channel
+    ) : base(client, guild, channel)
+    {
+        channel = Identity = channel | this;
+
+        MessageChannelActor = new RestMessageChannelActor(client, channel);
+        IntegrationChannelActor = new RestIntegrationChannelActor(client, Guild.Identity, channel);
+    }
 
     [SourceOfTruth]
     [CovariantOverride]

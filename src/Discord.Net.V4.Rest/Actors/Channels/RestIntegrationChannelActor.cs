@@ -3,25 +3,28 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-using EnumerableWebhookActor = RestEnumerableIndexableActor<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
-
+using EnumerableWebhookActor =
+    RestEnumerableIndexableActor<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
 using EnumerableIncomingWebhookActor =
     RestEnumerableIndexableActor<RestIncomingWebhookActor, ulong, RestIncomingWebhook, IIncomingWebhook,
         IEnumerable<IWebhookModel>>;
 using EnumerableChannelFollowerWebhookActor =
     RestEnumerableIndexableActor<RestChannelFollowerWebhookActor, ulong, RestChannelFollowerWebhook,
         IChannelFollowerWebhook, IEnumerable<IWebhookModel>>;
+
 public sealed partial class RestIntegrationChannelActor :
     RestGuildChannelActor,
     IIntegrationChannelActor
 {
-    internal IntegrationChannelIdentity IntegrationChannelIdentity { get; }
-    public RestIntegrationChannelActor(DiscordRestClient client,
+    internal new IntegrationChannelIdentity Identity { get; }
+
+    public RestIntegrationChannelActor(
+        DiscordRestClient client,
         GuildIdentity guild,
         IntegrationChannelIdentity channel
     ) : base(client, guild, channel.Cast<RestGuildChannel, RestGuildChannelActor, IGuildChannelModel>())
     {
-        IntegrationChannelIdentity = channel;
+        Identity = channel | this;
 
         Webhooks = RestActors.Fetchable(
             Template.T<RestWebhookActor>(),
@@ -54,12 +57,9 @@ public sealed partial class RestIntegrationChannelActor :
         );
     }
 
-    [SourceOfTruth]
-    public EnumerableWebhookActor Webhooks { get; }
+    [SourceOfTruth] public EnumerableWebhookActor Webhooks { get; }
 
-    [SourceOfTruth]
-    public EnumerableIncomingWebhookActor IncomingWebhooks { get; }
+    [SourceOfTruth] public EnumerableIncomingWebhookActor IncomingWebhooks { get; }
 
-    [SourceOfTruth]
-    public EnumerableChannelFollowerWebhookActor ChannelFollowerWebhooks { get; }
+    [SourceOfTruth] public EnumerableChannelFollowerWebhookActor ChannelFollowerWebhooks { get; }
 }

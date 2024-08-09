@@ -7,14 +7,52 @@ using System.Collections.Immutable;
 
 namespace Discord.Gateway;
 
-// public delegate IGatewayConnection GatewayConnectionFactory(
-//     DiscordGatewayClient client,
-//     DiscordGatewayConfig config
-// );
-//
-// public delegate IGatewayEncoding GatewayEncodingFactory(DiscordGatewayClient client);
+public struct GatewayConfiguredObject<T>
+{
+    public delegate T Factory(DiscordGatewayClient client, DiscordGatewayConfig config);
 
-public delegate T GatewayConfiguredObject<out T>(DiscordGatewayClient client, DiscordGatewayConfig config);
+    private T? _value;
+    private readonly Factory? _factory;
+
+    public GatewayConfiguredObject(T value)
+    {
+        _value = value;
+        _factory = null;
+    }
+
+    public GatewayConfiguredObject(Factory factory)
+    {
+        _factory = factory;
+        _value = default;
+    }
+
+    public GatewayConfiguredObject(Func<DiscordGatewayClient, T> factory)
+    {
+        _factory = (client, _) => factory(client);
+        _value = default;
+    }
+
+    public GatewayConfiguredObject(Func<DiscordGatewayConfig, T> factory)
+    {
+        _factory = (_, config) => factory(config);
+        _value = default;
+    }
+
+    public T Get(DiscordGatewayClient client)
+    {
+        if (_value is null && _factory is null)
+            throw new NullReferenceException($"One of '{nameof(_factory)}' or {nameof(_value)} must be set");
+
+        return _value ??= _factory!(client, client.Config);
+    }
+
+    public static implicit operator GatewayConfiguredObject<T>(T value) => new(value);
+    public static implicit operator GatewayConfiguredObject<T>(Factory factory) => new(factory);
+    public static implicit operator GatewayConfiguredObject<T>(Func<DiscordGatewayClient, T> factory)
+        => new(factory);
+    public static implicit operator GatewayConfiguredObject<T>(Func<DiscordGatewayConfig, T> factory)
+        => new(factory);
+}
 
 public sealed class DiscordGatewayConfig : DiscordConfig
 {
@@ -27,12 +65,18 @@ public sealed class DiscordGatewayConfig : DiscordConfig
     public bool CreateStoreForEveryEntity { get; set; } = false;
     public ImmutableHashSet<Type> ExtendedStoreTypes { get; set; } = ImmutableHashSet<Type>.Empty;
 
-    public GatewayConfiguredObject<ICacheProvider> CacheProvider { get; set; } = ConcurrentCacheProvider.Factory;
-    public GatewayConfiguredObject<IGatewayConnection> GatewayConnection { get; set; } = WebSocketGatewayConnection.Factory;
-    public GatewayConfiguredObject<IGatewayEncoding> Encoding { get; set; } = JsonEncoding.Factory;
-
+    public GatewayConfiguredObject<ICacheProvider> CacheProvider { get; set; } = new(ConcurrentCacheProvider.Factory);
+    public GatewayConfiguredObject<IGatewayConnection> GatewayConnection { get; set; } = new(WebSocketGatewayConnection.Factory);
+    public GatewayConfiguredObject<IGatewayEncoding> Encoding { get; set; } = new(JsonEncoding.Factory);
     public GatewayConfiguredObject<IGatewayDispatchQueue> DispatchQueue { get; set; } =
-        ConcurrentGatewayDispatchQueue.Factory;
+        new(ConcurrentGatewayDispatchQueue.Factory);
+
+    public GatewayConfiguredObject<IEventDispatcher> DefaultEventDispatcher { get; set; } =
+        LegacyEventDispatcher.Instance;
+
+    public ImmutableDictionary<string, IEventDispatcher> EventDispatchers { get; set; }
+        = ImmutableDictionary<string, IEventDispatcher>.Empty;
+
     public ArrayPool<byte> BufferPool { get; set; } = ArrayPool<byte>.Shared;
 
     public int MaxClientMessageTimeout { get; set; } = 120000;

@@ -62,6 +62,19 @@ internal interface IEntityBroker<TId, TEntity, in TActor, TModel> : IEntityBroke
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
+    ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(
+        TModel model,
+        CachePathable path,
+        TActor? actor = null,
+        CancellationToken token = default
+    );
+
+    ValueTask<IEntityHandle<TId, TEntity>> IEntityBroker<TId, TEntity, TModel>.CreateAsync(
+        TModel model,
+        CachePathable path,
+        CancellationToken token
+    ) => CreateAsync(model, path, token: token);
+
     /// <summary>
     ///     Gets a handle to an entity, given its identity, from either the reference cache or the underlying
     ///     <see cref="ICacheProvider"/>.
@@ -108,6 +121,12 @@ internal interface IEntityBroker<TId, TEntity, TModel> : IManageableEntityBroker
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
+    ValueTask<IEntityHandle<TId, TEntity>> CreateAsync(
+        TModel model,
+        CachePathable path,
+        CancellationToken token = default
+    );
+
     /// <summary>
     ///     Attaches a latent entity to the broker and underlying <see cref="ICacheProvider"/>, ensuring that the entity
     ///     is kept up-to-date with the cache and gateway.

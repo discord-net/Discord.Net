@@ -10,8 +10,6 @@ namespace Discord.Gateway;
 
 public sealed partial class DiscordGatewayClient : IDiscordClient
 {
-    public ICurrentUserActor CurrentUser => throw new NotImplementedException();
-
     public GatewayRequestOptions DefaultRequestOptions { get; }
 
     public DiscordRestClient Rest { get; }
@@ -29,6 +27,9 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
 
     internal StateController StateController { get; private set; }
 
+    public DiscordGatewayClient(DiscordToken token, ILoggerFactory? loggerFactory = null)
+        : this(new DiscordGatewayConfig(token), loggerFactory){}
+
     public DiscordGatewayClient(
         DiscordGatewayConfig config,
         ILoggerFactory? loggerFactory = null)
@@ -39,8 +40,8 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
 
         LoggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         Rest = new DiscordRestClient(config, LoggerFactory.CreateLogger<DiscordRestClient>());
-        Encoding = config.Encoding(this, Config);
-        CacheProvider = config.CacheProvider(this, config);
+        Encoding = config.Encoding.Get(this);
+        CacheProvider = config.CacheProvider.Get(this);
 
         _heartbeatSignal = Channel.CreateBounded<HeartbeatSignal>(
             new BoundedChannelOptions(2)
@@ -53,13 +54,15 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
             HandleHeartbeatSignalDropped
         );
 
-        _dispatchQueue = Config.DispatchQueue(this, Config);
+        _dispatchQueue = Config.DispatchQueue.Get(this);
 
         StateController = new(this, LoggerFactory.CreateLogger<StateController>());
 
         Channels = new(id => new GatewayChannelActor(this, ChannelIdentity.Of(id)));
         Guilds = GatewayActors.PageGuilds(this);
         Users = new(id => new GatewayUserActor(this, UserIdentity.Of(id)));
+
+        InitializeEvents();
     }
 
     public ValueTask DisposeAsync()

@@ -13,6 +13,8 @@ public partial interface IGuildActor :
     IEntityProvider<IGuildChannel, IGuildChannelModel>,
     IEntityProvider<IMember, IMemberModel>
 {
+    ICurrentMemberActor CurrentMember { get; }
+
     #region Channels
 
     [return: TypeHeuristic(nameof(Channels))]
@@ -86,8 +88,8 @@ public partial interface IGuildActor :
     IEnumerableIndexableActor<IGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents { get; }
 
     [return: TypeHeuristic(nameof(Invites))]
-    IInviteActor Invite(string code) => Invites[code];
-    IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites { get; }
+    IGuildInviteActor Invite(string code) => Invites[code];
+    IEnumerableIndexableActor<IGuildInviteActor, string, IInvite> Invites { get; }
 
     [return: TypeHeuristic(nameof(Webhooks))]
     IWebhookActor Webhook(ulong id) => Webhooks[id];

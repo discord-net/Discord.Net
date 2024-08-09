@@ -71,7 +71,7 @@ public sealed partial class DiscordGatewayClient
             if (_connection is not null)
                 await _connection.DisconnectAsync(token);
 
-            _connection ??= Config.GatewayConnection(this, Config);
+            _connection ??= Config.GatewayConnection.Get(this);
 
             var gatewayUri = await GetGatewayUriAsync(token);
 
@@ -161,7 +161,7 @@ public sealed partial class DiscordGatewayClient
         switch (message.OpCode)
         {
             case GatewayOpCode.Dispatch when message.EventName is not null:
-                await ProcessDispatchAsync(message.EventName, message.Payload, token);
+                await HandleDispatchAsync(message.EventName, message.Payload, token);
                 break;
             case GatewayOpCode.Heartbeat:
                 await _heartbeatSignal.Writer.WriteAsync(HeartbeatSignal.Requested, token);

@@ -167,6 +167,7 @@ public sealed class Hanz : IIncrementalGenerator
             catch (Exception ex)
             {
                 _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
+                logger.Flush();
                 throw;
             }
             finally

@@ -4,18 +4,24 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-[ExtendInterfaceDefaults(typeof(INewsChannelActor))]
-public partial class RestNewsChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    NewsChannelIdentity channel
-) :
-    RestTextChannelActor(client, guild, channel),
+[ExtendInterfaceDefaults]
+public partial class RestNewsChannelActor :
+    RestTextChannelActor,
     INewsChannelActor,
     IRestActor<ulong, RestNewsChannel, NewsChannelIdentity>
 {
-    public override NewsChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth]
+    internal override NewsChannelIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestNewsChannelActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        NewsChannelIdentity channel
+    ) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+    }
 
     [SourceOfTruth]
     [CovariantOverride]

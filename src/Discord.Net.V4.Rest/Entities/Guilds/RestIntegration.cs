@@ -3,17 +3,25 @@ using System.ComponentModel;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-public sealed partial class RestIntegrationActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    IntegrationIdentity integration
-) :
-    RestActor<ulong, RestIntegration, IntegrationIdentity>(client, integration),
+[ExtendInterfaceDefaults]
+public sealed partial class RestIntegrationActor :
+    RestActor<ulong, RestIntegration, IntegrationIdentity>,
     IIntegrationActor
 {
-    [SourceOfTruth]
-    public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [SourceOfTruth] public RestGuildActor Guild { get; }
+
+    internal override IntegrationIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestIntegrationActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        IntegrationIdentity integration
+    ) : base(client, integration)
+    {
+        Identity = integration | this;
+        Guild = guild.Actor ?? new(client, guild);
+    }
 }
 
 public sealed partial class RestIntegration :
@@ -82,8 +90,8 @@ public sealed partial class RestIntegration :
                 model
             );
 
-        Account = model is {AccountId: not null, AccountName: not null}
-            ? new IntegrationAccount(model.AccountId, model.AccountName)
+        Account = model.Account is not null
+            ? IntegrationAccount.Construct(client, model.Account)
             : null;
 
         Application = model.Application is not null

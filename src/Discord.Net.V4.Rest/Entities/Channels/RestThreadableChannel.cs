@@ -5,31 +5,61 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-using ThreadsPagedActor = RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams>;
+using PublicThreadsPagedActor = RestPagedIndexableActor<
+    RestThreadChannelActor,
+    ulong,
+    RestThreadChannel,
+    IThreadChannelModel,
+    ChannelThreads,
+    PagePublicArchivedThreadsParams
+>;
 
-[method: TypeFactory]
-public partial class RestThreadableChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    ThreadableChannelIdentity channel
-) :
-    RestGuildChannelActor(client, guild, channel),
+using PrivateThreadsPagedActor = RestPagedIndexableActor<
+    RestThreadChannelActor,
+    ulong,
+    RestThreadChannel,
+    IThreadChannelModel,
+    ChannelThreads,
+    PagePrivateArchivedThreadsParams
+>;
+using JoinedPrivateThreadsPagedActor = RestPagedIndexableActor<
+    RestThreadChannelActor,
+    ulong,
+    RestThreadChannel,
+    IThreadChannelModel,
+    ChannelThreads,
+    PageJoinedPrivateArchivedThreadsParams
+>;
+
+[ExtendInterfaceDefaults]
+public partial class RestThreadableChannelActor :
+    RestGuildChannelActor,
     IThreadableChannelActor,
     IRestActor<ulong, RestThreadableChannel, ThreadableChannelIdentity>
 {
-    public override ThreadableChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth]
+    public PublicThreadsPagedActor PublicArchivedThreads { get; }
 
     [SourceOfTruth]
-    public ThreadsPagedActor PublicArchivedThreads { get; }
-        = RestActors.PublicArchivedThreads(client, guild, channel);
+    public PrivateThreadsPagedActor PrivateArchivedThreads { get; }
 
     [SourceOfTruth]
-    public ThreadsPagedActor PrivateArchivedThreads { get; }
-        = RestActors.PrivateArchivedThreads(client, guild, channel);
+    public JoinedPrivateThreadsPagedActor JoinedPrivateArchivedThreads { get; }
 
     [SourceOfTruth]
-    public ThreadsPagedActor JoinedPrivateArchivedThreads { get; }
-        = RestActors.JoinedPrivateArchivedThreads(client, guild, channel);
+    internal override ThreadableChannelIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestThreadableChannelActor(DiscordRestClient client,
+        GuildIdentity guild,
+        ThreadableChannelIdentity channel) : base(client, guild, channel)
+    {
+        channel = Identity = channel | this;
+
+        PublicArchivedThreads = RestActors.PublicArchivedThreads(client, guild, channel);
+        PrivateArchivedThreads = RestActors.PrivateArchivedThreads(client, guild, channel);
+        JoinedPrivateArchivedThreads = RestActors.JoinedPrivateArchivedThreads(client, guild, channel);
+    }
 
     [SourceOfTruth]
     [CovariantOverride]

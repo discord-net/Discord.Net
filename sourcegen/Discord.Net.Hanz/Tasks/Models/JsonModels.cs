@@ -52,7 +52,7 @@ public static class JsonModels
         HashSet<ITypeSymbol> modelTypesForContext,
         HashSet<string> additionalConverters,
         JsonModelTarget[] targets
-        )
+    )
     {
         public ClassDeclarationSyntax Resolver = resolver;
         public HashSet<string> ContextAttributes { get; } = contextAttributes;
@@ -61,6 +61,8 @@ public static class JsonModels
         public JsonModelTarget[] Targets { get; } = targets;
 
         public HashSet<string> NoContextTypeInfos = new();
+
+        public HashSet<ITypeSymbol> RequestedNoConverterTypeInfos = new();
     }
 
     public static void Execute(
@@ -236,7 +238,83 @@ public static class JsonModels
             generated
         );
 
-        RunSTJSourceGenerator(context, compilation, generated, logger);
+        var stjResult = RunSTJSourceGenerator(context, compilation, generated, logger).ToArray();
+
+        if (jsonContext.RequestedNoConverterTypeInfos.Count == 0)
+            return;
+
+        var getTypeInfosSyntax = SyntaxUtils.CreateSourceGenClone(jsonContext.Resolver);
+
+        foreach (var typeInfo in jsonContext.RequestedNoConverterTypeInfos.ToArray())
+        {
+            foreach (var result in stjResult.SelectMany(x => x.GeneratedSources))
+            {
+                var body = GetTypeInfoInit(typeInfo, result.SyntaxTree);
+
+                if (body is null) continue;
+
+                getTypeInfosSyntax = getTypeInfosSyntax
+                    .AddMembers(
+                        SyntaxFactory.ParseMemberDeclaration(
+                            $$"""
+                              internal global::System.Text.Json.Serialization.Metadata.JsonTypeInfo<global::{{typeInfo.ToDisplayString()}}> Create{{typeInfo.Name}}TypeInfoNoConverter(global::System.Text.Json.JsonSerializerOptions options)
+                              {
+                                  global::System.Text.Json.Serialization.Metadata.JsonTypeInfo<global::{{typeInfo.ToDisplayString()}}> jsonTypeInfo;
+
+                                  {{
+                                      string.Join(
+                                          "\n",
+                                          body.Statements.Select(x => x.ToString())
+                                      )
+                                  }}
+
+                                  jsonTypeInfo.OriginatingResolver = this;
+                                  return jsonTypeInfo;
+                              }
+                              """
+                        )!
+                    );
+
+                jsonContext.RequestedNoConverterTypeInfos.Remove(typeInfo);
+            }
+        }
+
+        foreach (var remaining in jsonContext.RequestedNoConverterTypeInfos)
+        {
+            logger.Warn($"Could not resolve the create type info method for {remaining}");
+        }
+
+        if (getTypeInfosSyntax.Members.Count > 0)
+        {
+            context.AddSource(
+                "Json/ModelInfos",
+                $$"""
+                  using System.Text.Json;
+                  using System.Text.Json.Serialization;
+                  using System.Text.Json.Serialization.Metadata;
+
+                  namespace {{rootNamespace ?? projectName}};
+
+                  {{getTypeInfosSyntax.NormalizeWhitespace()}}
+                  """
+            );
+        }
+    }
+
+    private static BlockSyntax? GetTypeInfoInit(ITypeSymbol target, SyntaxTree tree)
+    {
+        var method = tree.GetRoot().DescendantNodes()
+            .OfType<MethodDeclarationSyntax>()
+            .FirstOrDefault(x => x.Identifier.ValueText == $"Create_{target.Name}");
+
+        if (method is null) return null;
+
+        return method.DescendantNodes()
+            .OfType<IfStatementSyntax>()
+            .FirstOrDefault()
+            ?.ChildNodes()
+            .OfType<BlockSyntax>()
+            .FirstOrDefault();
     }
 
     public static bool AddGetTypeInfoToConverter(
@@ -276,42 +354,6 @@ public static class JsonModels
         return true;
     }
 
-    public static bool AddNoConverterMethod(
-        ITypeSymbol symbol,
-        Context context)
-    {
-        if (!context.NoContextTypeInfos.Add(symbol.ToDisplayString()))
-            return true;
-
-        var typeName = symbol.ToDisplayString();
-
-        var method = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              internal global::System.Text.Json.Serialization.Metadata.JsonTypeInfo<global::{{typeName}}> Create{{symbol.Name}}TypeInfoNoConverter(global::System.Text.Json.JsonSerializerOptions options)
-              {
-                  var objectInfo = new global::System.Text.Json.Serialization.Metadata.JsonObjectInfoValues<global::{{typeName}}>
-                  {
-                      ObjectCreator = () => new global::{{typeName}}(),
-                      ObjectWithParameterizedConstructorCreator = null,
-                      PropertyMetadataInitializer = _ => {{symbol.Name}}PropInit(options),
-                      ConstructorParameterMetadataInitializer = null,
-                      SerializeHandler = {{symbol.Name}}SerializeHandler
-                  };
-                  jsonTypeInfo = global::System.Text.Json.Serialization.Metadata.JsonMetadataServices.CreateObjectInfo<global::{{typeName}}>(options, objectInfo);
-                  jsonTypeInfo.NumberHandling = null;
-                  return jsonTypeInfo;
-              }
-              """
-        );
-
-        if (method is null)
-            return false;
-
-        context.Resolver = context.Resolver.AddMembers(method);
-
-        return true;
-    }
-
     private static bool AddGatewayMessageTypeInfoFactory(
         ref ClassDeclarationSyntax syntax)
     {
@@ -328,8 +370,9 @@ public static class JsonModels
                     SerializeHandler = GatewayMessageSerializeHandler
                 };
 
-                jsonTypeInfo = global::System.Text.Json.Serialization.Metadata.JsonMetadataServices.CreateObjectInfo<global::Discord.Models.Json.GatewayMessage>(options, objectInfo);
+                var jsonTypeInfo = global::System.Text.Json.Serialization.Metadata.JsonMetadataServices.CreateObjectInfo<global::Discord.Models.Json.GatewayMessage>(options, objectInfo);
                 jsonTypeInfo.NumberHandling = null;
+                jsonTypeInfo.OriginatingResolver = this;
                 return jsonTypeInfo;
             }
             """
@@ -446,7 +489,7 @@ public static class JsonModels
             );
     }
 
-    private static void RunSTJSourceGenerator(
+    private static IEnumerable<GeneratorRunResult> RunSTJSourceGenerator(
         SourceProductionContext context,
         Compilation compilation,
         SourceText toRunAgainst,
@@ -473,7 +516,7 @@ public static class JsonModels
         if (stjSourceGenerator is null)
         {
             logger.Log(LogLevel.Error, "Unable to find System.Text.Json generator");
-            return;
+            yield break;
         }
 
         var jsonGenerator = ((IIncrementalGenerator)Activator.CreateInstance(stjSourceGenerator)).AsSourceGenerator();
@@ -489,6 +532,8 @@ public static class JsonModels
             {
                 context.AddSource("GeneratedSTJ/" + source.HintName, source.SourceText);
             }
+
+            yield return result;
         }
     }
 

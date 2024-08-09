@@ -4,14 +4,22 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-public partial class RestWebhookActor(
-    DiscordRestClient client,
-    WebhookIdentity webhook
-):
-    RestActor<ulong, RestWebhook, WebhookIdentity>(client, webhook),
+[ExtendInterfaceDefaults]
+public partial class RestWebhookActor :
+    RestActor<ulong, RestWebhook, WebhookIdentity>,
     IWebhookActor
 {
+    internal override WebhookIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestWebhookActor(
+        DiscordRestClient client,
+        WebhookIdentity webhook
+    ) : base(client, webhook)
+    {
+        Identity = webhook | this;
+    }
+
     [SourceOfTruth]
     internal virtual RestWebhook CreateEntity(IWebhookModel model)
         => RestWebhook.Construct(Client, model);

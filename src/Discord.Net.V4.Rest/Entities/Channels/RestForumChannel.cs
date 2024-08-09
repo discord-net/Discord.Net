@@ -3,21 +3,28 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-public partial class RestForumChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    ForumChannelIdentity channel
-) :
-    RestThreadableChannelActor(client, guild, channel),
+[ExtendInterfaceDefaults]
+public sealed partial class RestForumChannelActor :
+    RestThreadableChannelActor,
     IForumChannelActor,
     IRestActor<ulong, RestForumChannel, ForumChannelIdentity>
 {
-    public override ForumChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth]
+    internal override ForumChannelIdentity Identity { get; }
 
     [ProxyInterface(typeof(IIntegrationChannelActor))]
-    internal RestIntegrationChannelActor IntegrationChannelActor { get; } =
-        new(client, guild, channel);
+    internal RestIntegrationChannelActor IntegrationChannelActor { get; }
+
+    [method: TypeFactory]
+    public RestForumChannelActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        ForumChannelIdentity channel
+    ) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+        IntegrationChannelActor = new RestIntegrationChannelActor(client, Guild.Identity, Identity);
+    }
 
     [CovariantOverride]
     [SourceOfTruth]

@@ -12,17 +12,21 @@ global using IntegrationIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Res
 #region Stickers
 
 global using GuildStickerIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildSticker, Discord.Rest.RestGuildStickerActor, Discord.Models.IGuildStickerModel>;
-global using StickerIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestSticker, Discord.Models.IStickerModel>;
+global using StickerIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestSticker, Discord.Rest.RestStickerActor, Discord.Models.IStickerModel>;
+global using StickerPackIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestStickerPack, Discord.Rest.RestStickerPackActor, Discord.Models.IStickerPackModel>;
 
 #endregion
 
 #region Users
 
 global using MemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestMember, Discord.Rest.RestMemberActor, Discord.Models.IMemberModel>;
+global using CurrentMemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestCurrentMember, Discord.Rest.RestCurrentMemberActor, Discord.Models.IMemberModel>;
 global using UserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestUser, Discord.Rest.RestUserActor, Discord.Models.IUserModel>;
-global using ThreadMemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadMember, Discord.Rest.RestThreadMemberActor, Discord.Models.IThreadMemberModel>;
 global using SelfUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestCurrentUser, Discord.Rest.RestCurrentUserActor, Discord.Models.ISelfUserModel>;
+global using ThreadMemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadMember, Discord.Rest.RestThreadMemberActor, Discord.Models.IThreadMemberModel>;
 global using GuildScheduledEventUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildScheduledEventUser, Discord.Rest.RestGuildScheduledEventUserActor, Discord.Models.IGuildScheduledEventUserModel>;
+global using VoiceStateIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestVoiceState, Discord.Rest.RestVoiceStateActor, Discord.Models.IVoiceStateModel>;
+global using CurrentUserVoiceStateIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestCurrentUserVoiceState, Discord.Rest.RestCurrentUserVoiceStateActor, Discord.Models.IVoiceStateModel>;
 
 #endregion
 

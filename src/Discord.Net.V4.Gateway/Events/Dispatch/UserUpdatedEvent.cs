@@ -1,29 +1,34 @@
 using Discord.Gateway.Events.Processors;
+using Discord.Gateway.State;
 using Discord.Models;
 
 namespace Discord.Gateway.Dispatch;
 
-file sealed class UserUpdatedEventPackage
+public sealed partial class UserUpdatedEventPackage : IDispatchPackage;
+
+public delegate ValueTask UserUpdatedDelegate(
+    [Supports(EventParameterDegree.All)]
+    GatewayCurrentUser user
+);
+
+[Subscribable<UserUpdatedDelegate>]
+[DispatchEvent(DispatchEventNames.UserUpdated)]
+public sealed partial class UserUpdatedEvent(DiscordGatewayClient client) :
+    DispatchEvent<UserUpdatedEventPackage, IUserUpdatedPayloadData>(client)
 {
+    public GatewayCurrentUserActor GetUserActor(IUserUpdatedPayloadData payload) => Client.CurrentUser;
 
-}
+    public async ValueTask<IEntityHandle<ulong, GatewayCurrentUser>> GetUserHandleAsync(
+        IUserUpdatedPayloadData payload,
+        CancellationToken token)
+    {
+        var broker = await GatewayCurrentUserActor.GetBrokerAsync(Client, token);
 
-public delegate ValueTask UserUpdatedDelegate(GatewayUser user);
+        return await broker.CreateAsync(payload, CachePathable.Default, Client.CurrentUser, token);
+    }
 
-public sealed class UserUpdatedEvent :
-    IGatewayEvent<UserUpdatedDelegate>,
-    IDispatchProcessor<IUserModel>
-{
-    public IReadOnlyCollection<IInvocableEventHandler> Handlers => throw new NotImplementedException();
-
-
-
-    public void Subscribe(UserUpdatedDelegate handler) => throw new NotImplementedException();
-
-    public void Unsubscribe(UserUpdatedDelegate handler) => throw new NotImplementedException();
-
-    // userid
-    // user actor
-    // IEntityHandle<ulong, GatewayUser>
-    // GatewayUser
+    public override ValueTask<UserUpdatedEventPackage?> PackageAsync(
+        IUserUpdatedPayloadData? payload,
+        CancellationToken token = default
+    ) => ValueTask.FromResult(payload is not null ? new UserUpdatedEventPackage(this, payload) : null);
 }

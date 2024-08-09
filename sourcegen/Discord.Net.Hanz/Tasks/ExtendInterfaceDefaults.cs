@@ -265,7 +265,7 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
         ITypeSymbol exampleCase,
         INamedTypeSymbol target,
         SemanticModel semanticModel,
-        Logger logger)
+        Logger? logger = null)
     {
         var heuristic = (
                 targetMember is IMethodSymbol method
@@ -278,11 +278,11 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
         if (heuristic is null)
             return exampleCase;
 
-        logger.Log($"{targetMember}: Found heuristic data {heuristic}");
+        logger?.Log($"{targetMember}: Found heuristic data {heuristic}");
 
-        if (heuristic?.ConstructorArguments.FirstOrDefault().Value is not string memberName)
+        if (heuristic.ConstructorArguments.FirstOrDefault().Value is not string memberName)
         {
-            logger.Log($"{targetMember}: no heuristic member name supplied");
+            logger?.Log($"{targetMember}: no heuristic member name supplied");
             return exampleCase;
         }
 
@@ -290,7 +290,7 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
 
         if (targetMemberType is null)
         {
-            logger.Log($"{targetMember}: no target member type supplied");
+            logger?.Log($"{targetMember}: no target member type supplied");
             return exampleCase;
         }
 
@@ -304,7 +304,7 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
             // make sure the target type implements the interface
             if (!semanticModel.Compilation.HasImplicitConversion(target, genericType))
             {
-                logger.Warn($"{targetMember}: Heuristic type {genericType} is not implemented by {target}");
+                logger?.Warn($"{targetMember}: Heuristic type {genericType} is not implemented by {target}");
                 return exampleCase;
             }
 
@@ -331,7 +331,7 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
 
         if (heuristicMember is null)
         {
-            logger.Warn($"{targetMember}: Heuristic attributes' member couldn't be resolved");
+            logger?.Warn($"{targetMember}: Heuristic attributes' member couldn't be resolved");
             return exampleCase;
         }
 
@@ -339,11 +339,12 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
 
         if (heuristicMemberType is null)
         {
-            logger.Warn($"{targetMember}: Heuristics' type couldn't be resolved");
+            logger?.Warn($"{targetMember}: Heuristics' type couldn't be resolved");
             return exampleCase;
         }
 
-        logger.Log($"{targetMember}: found heuristic {heuristicMember}: ({heuristicMemberType} -> {targetMemberType})");
+        logger?.Log(
+            $"{targetMember}: found heuristic {heuristicMember}: ({heuristicMemberType} -> {targetMemberType})");
 
         var implementation = target.FindImplementationForInterfaceMember(heuristicMember);
 
@@ -364,13 +365,13 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
 
                     if (searchMemberType is null)
                     {
-                        logger.Warn($"{targetMember}: no result type can be pulled for {searchMember}");
+                        logger?.Warn($"{targetMember}: no result type can be pulled for {searchMember}");
                         continue;
                     }
 
                     if (!TypeUtils.CanBeMisleadinglyAssigned(searchMemberType, heuristicMemberType, semanticModel))
                     {
-                        logger.Log(
+                        logger?.Log(
                             $"{targetMember}: no result conversion between candidate {searchMember} -> {heuristicMemberType}");
                         continue;
                     }
@@ -386,24 +387,24 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
 
         if (implementation is null)
         {
-            logger.Warn($"{targetMember}: Heuristic attributes' implementation couldn't be resolved");
+            logger?.Warn($"{targetMember}: Heuristic attributes' implementation couldn't be resolved");
             return exampleCase;
         }
 
         var implementationType = MemberUtils.GetMemberType(implementation);
 
-        logger.Log($"{targetMember}: Found heuristic implementation {implementation} ({implementationType})");
+        logger?.Log($"{targetMember}: Found heuristic implementation {implementation} ({implementationType})");
 
         if (implementationType is null)
         {
-            logger.Warn($"{targetMember}: Heuristic attributes' implementation type couldn't be resolved");
+            logger?.Warn($"{targetMember}: Heuristic attributes' implementation type couldn't be resolved");
             return exampleCase;
         }
 
         // the 'exampleCase' type could be apart of the heuristic
         if (TypeUtils.TypeContainsOtherAsGeneric(exampleCase, heuristicMemberType, out _))
         {
-            logger.Log(
+            logger?.Log(
                 $"{targetMember}: Doing type substitution:\n" +
                 $"Template: {exampleCase}\n" +
                 $"ToReplace: {heuristicMemberType}\n" +
@@ -430,11 +431,11 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
                 is not INamedTypeSymbol match
             )
             {
-                logger.Warn($"{targetMember}: Unable to find implementation of {namedHeuristic} on {implementation}");
+                logger?.Warn($"{targetMember}: Unable to find implementation of {namedHeuristic} on {implementation}");
                 return exampleCase;
             }
 
-            logger.Log(
+            logger?.Log(
                 $"{targetMember}: Performing paired walk for type match:\n" +
                 $"ToFind: {exampleCase}\n" +
                 $"ToWalk: {heuristicMemberType}\n" +
@@ -450,14 +451,14 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
 
             if (walked is null)
             {
-                logger.Warn($"{targetMember}: Failed to find match after walk");
+                logger?.Warn($"{targetMember}: Failed to find match after walk");
                 return exampleCase;
             }
 
             return walked;
         }
 
-        logger.Warn($"{targetMember}: no heuristic implementation was resolved, using default case");
+        logger?.Warn($"{targetMember}: no heuristic implementation was resolved, using default case");
 
         return exampleCase;
     }
@@ -514,20 +515,40 @@ public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDef
                 ]
             ).ToArray();
 
+            var proxiedMembers = InterfaceProxy.GetProxiedMembers(
+                target.ClassSymbol,
+                target.SemanticModel
+            );
+
+            targetLogger.Log($"{target.ClassSymbol}: {proxiedMembers.Count} proxied members:");
+
+            foreach (var member in proxiedMembers)
+            {
+                targetLogger.Log($" - {member.Symbol}");
+            }
+
+            var implemented = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+
             foreach (var targetInterface in target.TargetInterfaces)
             {
                 var toImplement = GetTargetMembersForImplementation(
-                        targetInterface, target.ClassSymbol
-                    )
-                    .Where(x =>
-                        !InterfaceProxy.WillHaveProxiedMemberFor(target.ClassDeclarationSyntax, target.ClassSymbol,
-                            target.SemanticModel, x)
-                    );
-
-                var implemented = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+                    targetInterface, target.ClassSymbol
+                );
 
                 foreach (var member in toImplement)
                 {
+                    if (
+                        InterfaceProxy.WillHaveConflictingMemberFor(
+                            target.ClassSymbol,
+                            member,
+                            target.SemanticModel,
+                            ref proxiedMembers)
+                    )
+                    {
+                        targetLogger.Log($"{target.ClassSymbol} Skipping {member} (implemented by proxy)");
+                        continue;
+                    }
+
                     if (implemented.Any(x => MemberUtils.Conflicts(x, member)) || !implemented.Add(member))
                     {
                         targetLogger.Log($"{target.ClassSymbol}: Skipping {member} (conflicting member)");

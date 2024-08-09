@@ -11,6 +11,6 @@ public class Guilds
     {
         var member = await client.Guilds[915079505557721090].Members[259053800755691520].FetchAsync();
 
-        Console.WriteLine(member?.Id);
+        Console.WriteLine(member.Id);
     }
 }

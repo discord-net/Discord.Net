@@ -1,26 +1,35 @@
 using Discord.Models;
-using Discord.Rest;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-public sealed partial class RestIncomingWebhookActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    IntegrationChannelIdentity channel,
-    WebhookIdentity webhook
-):
-    RestWebhookActor(client, webhook),
+[ExtendInterfaceDefaults]
+public sealed partial class RestIncomingWebhookActor :
+    RestWebhookActor,
     IIncomingWebhookActor,
     IRestActor<ulong, RestIncomingWebhook, WebhookIdentity>
 {
-    [SourceOfTruth] public RestGuildActor Guild { get; } = new(client, guild);
+    [SourceOfTruth] public RestGuildActor Guild { get; }
 
-    [SourceOfTruth] public RestIntegrationChannelActor Channel { get; } = new(client, guild, channel);
+    [SourceOfTruth] public RestIntegrationChannelActor Channel { get; }
+
+    [SourceOfTruth] internal override WebhookIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestIncomingWebhookActor(DiscordRestClient client,
+        GuildIdentity guild,
+        IntegrationChannelIdentity channel,
+        WebhookIdentity webhook
+    ) : base(client, webhook)
+    {
+        Identity = webhook | this;
+
+        Guild = new RestGuildActor(client, guild);
+        Channel = new RestIntegrationChannelActor(client, guild, channel);
+    }
 
     [SourceOfTruth]
     internal override RestIncomingWebhook CreateEntity(IWebhookModel model)
-        => RestIncomingWebhook.Construct(Client, new(Guild.Identity, Channel.IntegrationChannelIdentity), model);
+        => RestIncomingWebhook.Construct(Client, new(Guild.Identity, Channel.Identity), model);
 }
 
 public sealed partial class RestIncomingWebhook :

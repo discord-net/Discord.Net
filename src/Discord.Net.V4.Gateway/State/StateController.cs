@@ -277,6 +277,16 @@ internal sealed partial class StateController : IDisposable
         return broker is not null;
     }
 
+    public ValueTask<IStoreInfo<TId, TModel>> GetRootStoreAsync<[TransitiveFill]TProvider, TId, TEntity, TModel>(
+        Template<TProvider> template,
+        CancellationToken token = default)
+        where TProvider :
+        IRootStoreProvider<TId, TModel>, IActor<TId, TEntity>
+        where TEntity : class, IEntityOf<TModel>, IEntity<TId>
+        where TModel : class, IEntityModel<TId>
+        where TId : IEquatable<TId>
+        => GetRootStoreAsync<TProvider, TId, TModel>(token);
+
     public async ValueTask<IStoreInfo<TId, TModel>> GetRootStoreAsync<TProvider, TId, TModel>(
         CancellationToken token = default
     )

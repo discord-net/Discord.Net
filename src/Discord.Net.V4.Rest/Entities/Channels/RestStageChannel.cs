@@ -3,22 +3,26 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-[ExtendInterfaceDefaults(typeof(IStageChannelActor))]
-public partial class RestStageChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    StageChannelIdentity channel
-):
-    RestVoiceChannelActor(client, guild, channel),
+[ExtendInterfaceDefaults]
+public sealed partial class RestStageChannelActor :
+    RestVoiceChannelActor,
     IStageChannelActor,
     IRestActor<ulong, RestStageChannel, StageChannelIdentity>
 {
-    public override StageChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] public RestStageInstanceActor StageInstance { get; }
 
-    [SourceOfTruth]
-    public RestStageInstanceActor StageInstance { get; }
-        = new(client, guild, channel, StageInstanceIdentity.Of(channel.Id));
+    [SourceOfTruth] internal override StageChannelIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestStageChannelActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        StageChannelIdentity channel
+    ) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+        StageInstance = new RestStageInstanceActor(client, Guild.Identity, Identity, StageInstanceIdentity.Of(channel.Id));
+    }
 
     [SourceOfTruth]
     public RestStageChannel CreateEntity(IGuildStageChannelModel model)

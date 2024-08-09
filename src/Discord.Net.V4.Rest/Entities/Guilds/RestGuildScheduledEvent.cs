@@ -5,21 +5,44 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-[ExtendInterfaceDefaults(typeof(IGuildScheduledEventActor))]
-public partial class RestGuildScheduledEventActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    GuildScheduledEventIdentity scheduledEvent
-) :
-    RestActor<ulong, RestGuildScheduledEvent, GuildScheduledEventIdentity>(client, scheduledEvent),
+using RSVPType = RestPagedActor<
+    ulong,
+    RestGuildScheduledEventUser,
+    IGuildScheduledEventUserModel,
+    IEnumerable<IGuildScheduledEventUserModel>,
+    PageGuildScheduledEventUsersParams
+>;
+
+[ExtendInterfaceDefaults]
+public partial class RestGuildScheduledEventActor :
+    RestActor<ulong, RestGuildScheduledEvent, GuildScheduledEventIdentity>,
     IGuildScheduledEventActor
 {
     [SourceOfTruth]
-    public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    public RestGuildActor Guild { get; }
 
-    public IEnumerableIndexableActor<IGuildScheduledEventUserActor, ulong,
-        IGuildScheduledEventUser> RSVPs => throw new NotImplementedException();
+    [SourceOfTruth]
+    public RSVPType RSVPs { get; }
+
+    internal override GuildScheduledEventIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestGuildScheduledEventActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        GuildScheduledEventIdentity scheduledEvent
+        ) : base(client, scheduledEvent)
+    {
+        Identity = scheduledEvent | this;
+
+        Guild = guild.Actor ?? new(client, guild);
+        RSVPs = new(
+            client,
+            this,
+            x => x,
+            (model, _) => RestGuildScheduledEventUser.Construct(client, new(Guild.Identity, Identity), model)
+        );
+    }
 
     [SourceOfTruth]
     internal RestGuildScheduledEvent CreateEntity(

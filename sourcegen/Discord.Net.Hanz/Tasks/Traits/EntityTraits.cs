@@ -381,32 +381,39 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                             );
                         }
 
-                        var entityType = GetParameterRelationType(target, x);
+                        var entityTypes = GetParameterRelationType(target, x)
+                            .Where(x => x is not null)
+                            .OfType<INamedTypeSymbol>()
+                            .ToImmutableHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
 
-                        if (entityType is null)
+                        if (entityTypes.Count == 0)
                             break;
 
-                        if (entityType.Equals(target.InterfaceSymbol, SymbolEqualityComparer.Default))
-                            return ReturnOwnId(ref hasReturnedId, idParam,
-                                $"{target.InterfaceSymbol}: {x} is the relation type", logger);
+                        foreach (var entityType in entityTypes)
+                        {
+                            if (entityType.Equals(target.InterfaceSymbol, SymbolEqualityComparer.Default))
+                                return ReturnOwnId(ref hasReturnedId, idParam,
+                                    $"{target.InterfaceSymbol}: {x} is the relation type", logger);
 
-                        var actorInterface = GetActorInterface(target.InterfaceSymbol);
+                            var actorInterface = GetActorInterface(target.InterfaceSymbol);
 
-                        CommonConversion? conversion = actorInterface is not null
-                            ? target.SemanticModel.Compilation.ClassifyCommonConversion(
-                                actorInterface.TypeArguments[1],
-                                entityType
-                            )
-                            : null;
+                            CommonConversion? conversion = actorInterface is not null
+                                ? target.SemanticModel.Compilation.ClassifyCommonConversion(
+                                    actorInterface.TypeArguments[1],
+                                    entityType
+                                )
+                                : null;
 
-                        if (actorInterface is not null &&
-                            (
-                                actorInterface.TypeArguments[1].Equals(entityType, SymbolEqualityComparer.Default) ||
-                                (conversion?.IsImplicit ?? false)
-                            ))
-                            return ReturnOwnId(ref hasReturnedId, idParam,
-                                $"{target.InterfaceSymbol}: {x} -> common conversion between {actorInterface.TypeArguments[1]} <> {entityType}",
-                                logger);
+                            if (actorInterface is not null &&
+                                (
+                                    actorInterface.TypeArguments[1]
+                                        .Equals(entityType, SymbolEqualityComparer.Default) ||
+                                    (conversion?.IsImplicit ?? false)
+                                ))
+                                return ReturnOwnId(ref hasReturnedId, idParam,
+                                    $"{target.InterfaceSymbol}: {x} -> common conversion between {actorInterface.TypeArguments[1]} <> {entityType}",
+                                    logger);
+                        }
 
                         return SyntaxFactory.Argument(
                             SyntaxFactory.InvocationExpression(
@@ -417,7 +424,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                                         SyntaxFactory.Identifier("Require"),
                                         SyntaxFactory.TypeArgumentList(
                                             SyntaxFactory.SeparatedList([
-                                                SyntaxFactory.ParseTypeName(entityType.ToDisplayString())
+                                                SyntaxFactory.ParseTypeName(entityTypes.First().ToDisplayString())
                                             ])
                                         )
                                     )
@@ -448,29 +455,31 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         return SyntaxFactory.Argument(idParam ?? SyntaxFactory.IdentifierName("id"));
     }
 
-    private static ITypeSymbol? GetParameterRelationType(GenerationTarget target, IParameterSymbol parameterSymbol)
+    private static IEnumerable<ITypeSymbol?> GetParameterRelationType(GenerationTarget target,
+        IParameterSymbol parameterSymbol)
     {
-        var heuristic = parameterSymbol.GetAttributes()
-            .FirstOrDefault(x =>
+        var heuristics = parameterSymbol.GetAttributes()
+            .Where(x =>
                 x.AttributeClass?.ToDisplayString().StartsWith("Discord.IdHeuristicAttribute") ?? false
-            );
+            )
+            .ToArray();
 
-        if (heuristic?.AttributeClass is not null)
-            return heuristic.AttributeClass.TypeArguments[0];
+        if (heuristics.Length > 0)
+            return heuristics.Select(x => x.AttributeClass!.TypeArguments[0]);
 
         if (!parameterSymbol.Name.EndsWith("Id"))
-            return null;
+            return [];
 
         var type = parameterSymbol.Name.Remove(parameterSymbol.Name.Length - 2, 2);
         type = $"{char.ToUpper(type[0])}{type.Remove(0, 1)}";
 
         // if it's for the actor type, we can return 'id'
         if (target.InterfaceSymbol.Name == $"I{type}Actor")
-            return target.InterfaceSymbol;
+            return [target.InterfaceSymbol];
 
         var entityTypeName = $"Discord.I{type}";
 
-        return target.SemanticModel.Compilation.GetTypeByMetadataName(entityTypeName);
+        return [target.SemanticModel.Compilation.GetTypeByMetadataName(entityTypeName)];
     }
 
     public static ITypeSymbol? GetModelInterface(INamedTypeSymbol symbol)

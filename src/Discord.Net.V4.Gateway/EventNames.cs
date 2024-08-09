@@ -6,6 +6,9 @@ public static class DispatchEventNames
 {
     public const string Ready = "READY";
     public const string Hello = "HELLO";
+    public const string Resumed = "RESUMED";
+    public const string Reconnect = "RECONNECT";
+    public const string InvalidSession = "INVALID_SESSION";
 
     #region Interactions
     public const string ApplicationCommandPermissionUpdate = "APPLICATION_COMMAND_PERMISSIONS_UPDATE";
@@ -24,7 +27,7 @@ public static class DispatchEventNames
     public const string ChannelUpdate = "CHANNEL_UPDATE";
     public const string ChannelDelete = "CHANNEL_DELETE";
 
-    public const string ChannelPinsUpdated = "CHANNEL_PINS_UPDATED";
+    public const string ChannelPinsUpdated = "CHANNEL_PINS_UPDATE";
     #endregion
 
     #region Threads
@@ -103,7 +106,7 @@ public static class DispatchEventNames
     #endregion
 
     #region User
-    public const string UserUpdated = "USER_UPDATED";
+    public const string UserUpdated = "USER_UPDATE";
     #endregion
 
     #region Voice
@@ -113,5 +116,12 @@ public static class DispatchEventNames
 
     #region Webhook
     public const string WebhooksUpdate = "WEBHOOKS_UPDATE";
+    #endregion
+
+    #region Message Polls
+
+    public const string MessagePollVoteAdd = "MESSAGE_POLL_VOTE_ADD";
+    public const string MessagePollVoteRemove = "MESSAGE_POLL_VOTE_REMOVE";
+
     #endregion
 }

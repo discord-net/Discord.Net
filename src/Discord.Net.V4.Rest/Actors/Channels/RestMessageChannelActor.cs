@@ -13,7 +13,7 @@ public partial class RestMessageChannelActor(
     RestChannelActor(client, channel.Cast<RestChannel, RestChannelActor, IChannelModel>()),
     IMessageChannelActor
 {
-    internal MessageChannelIdentity MessageChannelIdentity { get; } = channel;
+    internal new MessageChannelIdentity Identity { get; } = channel;
 
     [SourceOfTruth]
     public RestIndexableActor<RestMessageActor, ulong, RestMessage> Messages { get; } =

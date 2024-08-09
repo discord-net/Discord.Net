@@ -2,6 +2,15 @@ namespace Discord.Models;
 
 public static class ModelUtils
 {
+    public static TModel? GetReferencedEntityModel<TId, TModel>(this IEntityModel model, TId id)
+        where TModel : class, IEntityModel<TId>
+        where TId : IEquatable<TId>
+    {
+        return model is IModelSource source
+            ? source.GetReferencedEntityModel<TId, TModel>(id)
+            : null;
+    }
+
     public static TModel? GetReferencedEntityModel<TId, TModel>(this IModelSource model, TId id)
         where TModel : class, IEntityModel<TId>
         where TId : IEquatable<TId>

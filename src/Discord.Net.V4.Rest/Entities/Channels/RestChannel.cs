@@ -4,15 +4,22 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-[ExtendInterfaceDefaults(typeof(IChannelActor))]
-public partial class RestChannelActor(
-    DiscordRestClient client,
-    ChannelIdentity channel
-) :
-    RestActor<ulong, RestChannel, ChannelIdentity>(client, channel),
+[ExtendInterfaceDefaults]
+public partial class RestChannelActor :
+    RestActor<ulong, RestChannel, ChannelIdentity>,
     IChannelActor
 {
+    internal override ChannelIdentity Identity { get; }
+
+    [method: TypeFactory]
+    public RestChannelActor(
+        DiscordRestClient client,
+        ChannelIdentity channel
+    ) : base(client, channel)
+    {
+        Identity = channel | this;
+    }
+
     [SourceOfTruth]
     internal virtual RestChannel CreateEntity(IChannelModel model)
         => RestChannel.Construct(Client, model);
@@ -77,7 +84,8 @@ public partial class RestChannel :
         {
             IGuildChannelModel guildChannel => guildChannel switch
             {
-                IGuildNewsChannelModel guildAnnouncementChannel => RestNewsChannel.Construct(client, guild, guildAnnouncementChannel),
+                IGuildNewsChannelModel guildAnnouncementChannel => RestNewsChannel.Construct(client, guild,
+                    guildAnnouncementChannel),
                 IGuildCategoryChannelModel guildCategoryChannel => RestCategoryChannel.Construct(client,
                     guild, guildCategoryChannel),
                 IGuildDirectoryChannel guildDirectoryChannel => RestGuildChannel.Construct(client,
@@ -86,7 +94,8 @@ public partial class RestChannel :
                     guild, guildForumChannel),
                 IGuildMediaChannelModel guildMediaChannel => RestMediaChannel.Construct(client,
                     guild, guildMediaChannel),
-                IGuildStageChannelModel guildStageVoiceChannel => RestStageChannel.Construct(client, guild, guildStageVoiceChannel),
+                IGuildStageChannelModel guildStageVoiceChannel => RestStageChannel.Construct(client, guild,
+                    guildStageVoiceChannel),
                 IGuildVoiceChannelModel guildVoiceChannel => RestVoiceChannel.Construct(client,
                     guild, guildVoiceChannel),
                 IThreadChannelModel threadChannel => RestThreadChannel.Construct(client, new(guild), threadChannel),

@@ -336,34 +336,32 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
 
                 if (VariableFuncArgs.IsTargetMethod(targetMethod.Method.MethodSymbol))
                 {
+                    var taskLogger = targetLogger.GetSubLogger("VariableFuncArgs");
+
                     VariableFuncArgs.Apply(
                         ref newFunctionSyntax,
                         target.InvocationExpression,
                         targetMethod.Method,
                         target.SemanticModel,
-                        targetLogger.GetSubLogger("VariableFuncArgs")
+                        taskLogger
                     );
+
+                    taskLogger.Flush();
                 }
 
                 if (TransitiveFill.IsTargetMethod(targetMethod.Method.MethodSymbol))
                 {
-                    // UpdateContexts(
-                    //     ref semantic,
-                    //     ref methodInfo,
-                    //     in methodSyntax,
-                    //     ref newFunctionSyntax,
-                    //     type,
-                    //     targetLogger,
-                    //     false
-                    // );
+                    var taskLogger = targetLogger.GetSubLogger("TransitiveFill");
 
                     TransitiveFill.Apply(
                         ref newFunctionSyntax,
                         target.InvocationExpression,
                         targetMethod.Method.MethodSymbol,
                         target.SemanticModel,
-                        targetLogger.GetSubLogger("TransitiveFill")
+                        taskLogger
                     );
+
+                    taskLogger.Flush();
                 }
 
                 if (newFunctionSyntax.IsEquivalentTo(targetMethod.Method.MethodSyntax) &&

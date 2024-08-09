@@ -5,25 +5,33 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-public partial class RestVoiceChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    VoiceChannelIdentity channel
-) :
-    RestGuildChannelActor(client, guild, channel),
+[ExtendInterfaceDefaults]
+public partial class RestVoiceChannelActor :
+    RestGuildChannelActor,
     IVoiceChannelActor,
     IRestActor<ulong, RestVoiceChannel, VoiceChannelIdentity>
 {
-    public override VoiceChannelIdentity Identity { get; } = channel;
-
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
+    internal RestMessageChannelActor MessageChannelActor { get; }
 
     [ProxyInterface(typeof(IIntegrationChannelActor))]
-    internal RestIntegrationChannelActor IntegrationChannelActor { get; } =
-        new(client, guild, channel);
-    
+    internal RestIntegrationChannelActor IntegrationChannelActor { get; }
+
+    [SourceOfTruth] internal override VoiceChannelIdentity Identity { get; }
+
+    [method: TypeFactory]
+    public RestVoiceChannelActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        VoiceChannelIdentity channel
+    ) : base(client, guild, channel)
+    {
+        channel = Identity = channel | this;
+
+        MessageChannelActor = new RestMessageChannelActor(client, channel);
+        IntegrationChannelActor = new RestIntegrationChannelActor(client, Guild.Identity, channel);
+    }
+
     [SourceOfTruth]
     [CovariantOverride]
     internal virtual RestVoiceChannel CreateEntity(IGuildVoiceChannelModel model)

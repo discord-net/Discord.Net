@@ -86,6 +86,7 @@ public sealed class Logger : ILogger, IEquatable<Logger>
 
         lock (_syncRoot)
         {
+            _logs.Clear();
             if (File.Exists(_logFilePath))
                 File.Delete(_logFilePath);
         }
@@ -132,7 +133,7 @@ public sealed class Logger : ILogger, IEquatable<Logger>
     {
         if (_logs.Count >= 0)
         {
-            using (var fs = File.Open(_logFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write))
+            using (var fs = File.Open(_logFilePath, FileMode.Append, FileAccess.Write, FileShare.Write))
             using (var writer = new StreamWriter(fs))
             {
                 foreach (var log in _logs)

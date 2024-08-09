@@ -5,18 +5,29 @@ using Discord.Stage;
 
 namespace Discord.Rest;
 
-public sealed partial class RestStageInstanceActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    StageChannelIdentity channel,
-    StageInstanceIdentity instance
-) :
-    RestActor<ulong, RestStageInstance, StageInstanceIdentity>(client, instance),
+[ExtendInterfaceDefaults]
+public sealed partial class RestStageInstanceActor :
+    RestActor<ulong, RestStageInstance, StageInstanceIdentity>,
     IStageInstanceActor
 {
-    [SourceOfTruth] public RestStageChannelActor Channel { get; } = channel.Actor ?? new(client, guild, channel);
+    [SourceOfTruth] public RestStageChannelActor Channel { get; }
 
-    [SourceOfTruth] public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [SourceOfTruth] public RestGuildActor Guild { get; }
+
+    internal override StageInstanceIdentity Identity { get; }
+
+    public RestStageInstanceActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        StageChannelIdentity channel,
+        StageInstanceIdentity instance
+    ) : base(client, instance)
+    {
+        Identity = instance | this;
+
+        Guild = guild.Actor ?? new(client, guild);
+        Channel = channel.Actor ?? new(client, Guild.Identity, channel);
+    }
 
     [SourceOfTruth]
     internal RestStageInstance CreateEntity(IStageInstanceModel model)

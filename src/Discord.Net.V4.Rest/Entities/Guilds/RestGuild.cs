@@ -6,9 +6,11 @@ using System.Globalization;
 
 namespace Discord.Rest;
 
-using BansPager = RestPagedIndexableActor<RestBanActor, ulong, RestBan, IEnumerable<IBanModel>, PageGuildBansParams>;
-using MembersPager = RestPagedIndexableActor<RestMemberActor, ulong, RestMember, IEnumerable<IMemberModel>,
-    PageGuildMembersParams>;
+using BansPager =
+    RestPagedIndexableActor<RestBanActor, ulong, RestBan, IBanModel, IEnumerable<IBanModel>, PageGuildBansParams>;
+using MembersPager =
+    RestPagedIndexableActor<RestMemberActor, ulong, RestMember, IMemberModel, IEnumerable<IMemberModel>,
+        PageGuildMembersParams>;
 using EnumerableGuildChannelActor =
     RestEnumerableIndexableActor<RestGuildChannelActor, ulong, RestGuildChannel, IGuildChannel,
         IEnumerable<IGuildChannelModel>>;
@@ -51,7 +53,7 @@ using EnumerableGuildScheduledEventActor =
     RestEnumerableIndexableActor<RestGuildScheduledEventActor, ulong, RestGuildScheduledEvent, IGuildScheduledEvent,
         IEnumerable<IGuildScheduledEventModel>>;
 using EnumerableInviteActor =
-    RestEnumerableIndexableActor<RestInviteActor, string, RestInvite, IInvite, IEnumerable<IInviteModel>>;
+    RestEnumerableIndexableActor<RestGuildInviteActor, string, RestInvite, IInvite, IEnumerable<IInviteModel>>;
 using EnumerableWebhookActor =
     RestEnumerableIndexableActor<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
 using ManagedRolesActor =
@@ -66,71 +68,6 @@ public sealed partial class RestGuildActor :
     RestActor<ulong, RestGuild, GuildIdentity>,
     IGuildActor
 {
-    public override GuildIdentity Identity { get; }
-
-    [TypeFactory]
-    public RestGuildActor(
-        DiscordRestClient client,
-        GuildIdentity guild
-    ) : base(client, guild)
-    {
-        guild = Identity = guild.MostSpecific(this);
-
-        MediaChannels = RestActors.GuildRelatedEntity(Template.T<RestMediaChannelActor>(), client, this);
-        Channels = RestActors.GuildRelatedEntity(Template.T<RestGuildChannelActor>(), client, this);
-        TextChannels = RestActors.GuildRelatedEntity(Template.T<RestTextChannelActor>(), client, this);
-        VoiceChannels = RestActors.GuildRelatedEntity(Template.T<RestVoiceChannelActor>(), client, this);
-        CategoryChannels = RestActors.GuildRelatedEntity(Template.T<RestCategoryChannelActor>(), client, this);
-        AnnouncementChannels = RestActors.GuildRelatedEntity(Template.T<RestNewsChannelActor>(), client, this);
-        ThreadChannels = RestActors.GuildRelatedEntity(Template.T<RestThreadChannelActor>(), client, this);
-        StageChannels = RestActors.GuildRelatedEntity(Template.T<RestStageChannelActor>(), client, this);
-        ForumChannels = RestActors.GuildRelatedEntity(Template.T<RestForumChannelActor>(), client, this);
-        ActiveThreadChannels =
-            RestActors.GuildRelatedEntityWithTransform(
-                Template.T<RestThreadChannelActor>(),
-                client,
-                this,
-                Routes.ListActiveGuildThreads(guild.Id),
-                api => api.Threads
-            );
-        Integrations = RestActors.GuildRelatedEntity(Template.T<RestIntegrationActor>(), client, this);
-        Bans = RestActors.Bans(client, guild);
-        Members = RestActors.Members(client, guild);
-
-        if (guild.Detail is IdentityDetail.Entity && guild.Entity is not null)
-        {
-            Roles = guild.Entity.Roles;
-            Stickers = guild.Entity.Stickers;
-            Emotes = guild.Entity.Emotes;
-        }
-        else
-        {
-            Emotes = RestActors.GuildRelatedEntity(Template.T<RestGuildEmoteActor>(), client, this);
-            Roles = RestActors.GuildRelatedEntity(Template.T<RestRoleActor>(), client, this);
-            Stickers = RestActors.GuildRelatedEntity(Template.T<RestGuildStickerActor>(), client, this);
-        }
-
-        ScheduledEvents = RestActors.GuildRelatedEntity(Template.T<RestGuildScheduledEventActor>(), client, this);
-
-        Invites = RestActors.Fetchable(
-            Template.T<RestInviteActor>(),
-            Client,
-            RestInviteActor.Factory,
-            guild,
-            entityFactory: RestInvite.Construct,
-            new RestInvite.Context(guild),
-            IInvite.GetGuildInvitesRoute(this)
-        );
-
-        Webhooks = RestActors.Fetchable(
-            Template.T<RestWebhookActor>(),
-            client,
-            RestWebhookActor.Factory,
-            RestWebhook.Construct,
-            IWebhook.GetGuildWebhooksRoute(this)
-        );
-    }
-
     [SourceOfTruth] public EnumerableMediaChannelActor MediaChannels { get; }
 
     [SourceOfTruth] public EnumerableGuildChannelActor Channels { get; }
@@ -168,6 +105,81 @@ public sealed partial class RestGuildActor :
     [SourceOfTruth] public EnumerableInviteActor Invites { get; }
 
     [SourceOfTruth] public EnumerableWebhookActor Webhooks { get; }
+
+    [SourceOfTruth] public RestCurrentMemberActor CurrentMember { get; }
+
+    internal override GuildIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestGuildActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        CurrentMemberIdentity? currentMember = null
+    ) : base(client, guild)
+    {
+        Identity = guild | this;
+
+        CurrentMember = currentMember?.Actor ?? new(
+            client,
+            Identity,
+            currentMember ?? CurrentMemberIdentity.Of(client.CurrentUser.Id)
+        );
+
+        MediaChannels = RestActors.GuildRelatedEntity(Template.T<RestMediaChannelActor>(), client, this);
+        Channels = RestActors.GuildRelatedEntity(Template.T<RestGuildChannelActor>(), client, this);
+        TextChannels = RestActors.GuildRelatedEntity(Template.T<RestTextChannelActor>(), client, this);
+        VoiceChannels = RestActors.GuildRelatedEntity(Template.T<RestVoiceChannelActor>(), client, this);
+        CategoryChannels = RestActors.GuildRelatedEntity(Template.T<RestCategoryChannelActor>(), client, this);
+        AnnouncementChannels = RestActors.GuildRelatedEntity(Template.T<RestNewsChannelActor>(), client, this);
+        ThreadChannels = RestActors.GuildRelatedEntity(Template.T<RestThreadChannelActor>(), client, this);
+        StageChannels = RestActors.GuildRelatedEntity(Template.T<RestStageChannelActor>(), client, this);
+        ForumChannels = RestActors.GuildRelatedEntity(Template.T<RestForumChannelActor>(), client, this);
+        ActiveThreadChannels =
+            RestActors.GuildRelatedEntityWithTransform(
+                Template.T<RestThreadChannelActor>(),
+                client,
+                this,
+                Routes.ListActiveGuildThreads(Identity.Id),
+                api => api.Threads
+            );
+
+        Integrations = RestActors.GuildRelatedEntity(Template.T<RestIntegrationActor>(), client, this);
+        Bans = RestActors.Bans(client, this);
+        Members = RestActors.Members(client, this);
+
+        if (Identity.Detail is IdentityDetail.Entity && Identity.Entity is not null)
+        {
+            Roles = Identity.Entity.Roles;
+            Stickers = Identity.Entity.Stickers;
+            Emotes = Identity.Entity.Emotes;
+        }
+        else
+        {
+            Emotes = RestActors.GuildRelatedEntity(Template.T<RestGuildEmoteActor>(), client, this);
+            Roles = RestActors.GuildRelatedEntity(Template.T<RestRoleActor>(), client, this);
+            Stickers = RestActors.GuildRelatedEntity(Template.T<RestGuildStickerActor>(), client, this);
+        }
+
+        ScheduledEvents = RestActors.GuildRelatedEntity(Template.T<RestGuildScheduledEventActor>(), client, this);
+
+        Invites = RestActors.Fetchable(
+            Template.T<RestGuildInviteActor>(),
+            Client,
+            RestGuildInviteActor.Factory,
+            Identity,
+            entityFactory: RestInvite.Construct,
+            new RestInvite.Context(Identity),
+            IInvite.GetGuildInvitesRoute(this)
+        );
+
+        Webhooks = RestActors.Fetchable(
+            Template.T<RestWebhookActor>(),
+            client,
+            RestWebhookActor.Factory,
+            RestWebhook.Construct,
+            IWebhook.GetGuildWebhooksRoute(this)
+        );
+    }
 
     [SourceOfTruth]
     internal RestGuild CreateEntity(IGuildModel model)
@@ -251,10 +263,7 @@ public sealed partial class RestGuild :
 
     internal override IGuildModel Model => _model;
 
-    [ProxyInterface(
-        typeof(IGuildActor),
-        typeof(IEntityProvider<IGuild, IGuildModel>)
-    )]
+    [ProxyInterface]
     internal RestGuildActor Actor { get; }
 
     private IGuildModel _model;

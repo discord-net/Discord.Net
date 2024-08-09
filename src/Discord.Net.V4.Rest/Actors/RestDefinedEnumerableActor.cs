@@ -24,7 +24,7 @@ public static partial class RestDefinedEnumerableActor
             IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>>
         where TId : IEquatable<TId>
         where TEntity : RestEntity<TId>, TCoreEntity
-        where TCoreEntity : class, IEntity<TId>, IEntityOf<TModel>, IFetchableOfMany<TId, TModel>
+        where TCoreEntity : class, IEntity<TId, TModel>, IFetchableOfMany<TId, TModel>
         where TModel : class, IEntityModel<TId>
     {
         return new RestDefinedEnumerableActor<TActor, TId, TEntity, TCoreEntity, IEnumerable<TModel>>(
@@ -40,14 +40,14 @@ public static partial class RestDefinedEnumerableActor
     }
 }
 
-public class RestDefinedEnumerableActor<TActor, TId, TEntity, TCoreEntity, TModel> :
-    RestEnumerableIndexableActor<TActor, TId, TEntity, TCoreEntity, TModel>,
+public class RestDefinedEnumerableActor<TActor, TId, TEntity, TCoreEntity, TApi> :
+    RestEnumerableIndexableActor<TActor, TId, TEntity, TCoreEntity, TApi>,
     IDefinedEnumerableActor<TActor, TId, TEntity>
     where TActor : class, IRestActor<TId, TEntity>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>, TCoreEntity
-    where TCoreEntity : class, IEntity<TId>
-    where TModel : class
+    where TCoreEntity : class, IEntity<TId, IEntityModel<TId>>
+    where TApi : class
 {
     public IReadOnlyCollection<TId> Ids => _ids;
 
@@ -56,8 +56,8 @@ public class RestDefinedEnumerableActor<TActor, TId, TEntity, TCoreEntity, TMode
     internal RestDefinedEnumerableActor(
         IEnumerable<TId> ids,
         Func<TId, TActor> actorFactory,
-        Func<TModel, IEnumerable<TEntity>> factory,
-        Func<RequestOptions?, CancellationToken, Task<TModel?>> fetch
+        Func<TApi, IEnumerable<TEntity>> factory,
+        Func<RequestOptions?, CancellationToken, Task<TApi?>> fetch
     ) : base(actorFactory, factory, fetch)
     {
         _ids = ids.ToImmutableArray();

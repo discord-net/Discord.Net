@@ -2,17 +2,23 @@ using Discord.Models;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-public partial class RestCategoryChannelActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    CategoryChannelIdentity channel
-) :
-    RestGuildChannelActor(client, guild, channel),
+[ExtendInterfaceDefaults]
+public sealed partial class RestCategoryChannelActor :
+    RestGuildChannelActor,
     ICategoryChannelActor,
     IRestActor<ulong, RestCategoryChannel, CategoryChannelIdentity>
 {
-    public override CategoryChannelIdentity Identity { get; } = channel;
+    [SourceOfTruth] internal override CategoryChannelIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestCategoryChannelActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        CategoryChannelIdentity channel
+    ) : base(client, guild, channel)
+    {
+        Identity = channel | this;
+    }
 
     [SourceOfTruth]
     [CovariantOverride]
@@ -54,6 +60,4 @@ public sealed partial class RestCategoryChannel :
     }
 
     public override IGuildCategoryChannelModel GetModel() => Model;
-
-
 }

@@ -38,8 +38,8 @@ public static class RestEnumerableIndexableActor
         where TEntity : RestEntity<TId>, TCore
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
-        where TActor : IActor<TId, TEntity>
-        where TCore : class, IEntity<TId>
+        where TActor : class, IActor<TId, TEntity>
+        where TCore : class, IEntity<TId, TModel>
         where TApiModel : class
     {
         return new RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApiModel, IEnumerable<TModel>>(
@@ -61,8 +61,8 @@ public static class RestEnumerableIndexableActor
         where TEntity : RestEntity<TId>, TCore
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
-        where TActor : IActor<TId, TEntity>
-        where TCore : class, IEntity<TId>
+        where TActor : class, IActor<TId, TEntity>
+        where TCore : class, IEntity<TId, TModel>
     {
         return new RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>>(
             actorFactory,
@@ -82,27 +82,29 @@ public static class RestEnumerableIndexableActor
     }
 }
 
-internal sealed class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApiModel, TModel>(
+internal sealed class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApiModel, TApi>(
     DiscordRestClient client,
     Func<TId, TActor> actorFactory,
-    Func<TModel, IEnumerable<TEntity>> factory,
+    Func<TApi, IEnumerable<TEntity>> factory,
     IApiOutRoute<TApiModel> route,
-    Func<TApiModel, TModel> transform
-):
-    RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TModel>(actorFactory,
+    Func<TApiModel, TApi> transform
+) :
+    RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApi>(
+        actorFactory,
         factory,
-        (options, token) => FetchAsync(client, route, transform, options, token))
+        (options, token) => FetchAsync(client, route, transform, options, token)
+    )
     where TEntity : RestEntity<TId>, TCore
     where TId : IEquatable<TId>
-    where TModel : class
-    where TActor : IActor<TId, TEntity>
-    where TCore : class, IEntity<TId>
+    where TApi : class
+    where TActor : class, IActor<TId, TEntity>
+    where TCore : class, IEntity<TId, IEntityModel<TId>>
     where TApiModel : class
 {
-    private static async Task<TModel?> FetchAsync(
+    private static async Task<TApi?> FetchAsync(
         DiscordRestClient client,
         IApiOutRoute<TApiModel> route,
-        Func<TApiModel, TModel> transform,
+        Func<TApiModel, TApi> transform,
         RequestOptions? options,
         CancellationToken token)
     {
@@ -112,17 +114,17 @@ internal sealed class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, 
     }
 }
 
-public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TModel>(
+public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApi>(
     Func<TId, TActor> actorFactory,
-    Func<TModel, IEnumerable<TEntity>> factory,
-    Func<RequestOptions?, CancellationToken, Task<TModel?>> fetch
+    Func<TApi, IEnumerable<TEntity>> factory,
+    Func<RequestOptions?, CancellationToken, Task<TApi?>> fetch
 ) :
     IEnumerableIndexableActor<TActor, TId, TCore>
     where TEntity : RestEntity<TId>, TCore
     where TId : IEquatable<TId>
-    where TModel : class
-    where TActor : IActor<TId, TEntity>
-    where TCore : class, IEntity<TId>
+    where TApi : class
+    where TActor : class, IActor<TId, TEntity>
+    where TCore : class, IEntity<TId, IEntityModel<TId>>
 {
     public TActor this[TId id] => Specifically(id);
     internal RestIndexableActor<TActor, TId, TEntity> IndexableActor { get; } = new(actorFactory);

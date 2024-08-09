@@ -6,7 +6,7 @@ public partial interface IVoiceState :
     IVoiceStateActor,
     ISnowflakeEntity<IVoiceStateModel>
 {
-    IVoiceChannelActor Channel { get; }
+    IVoiceChannelActor? Channel { get; }
 
     DateTimeOffset? RequestToSpeakTimestamp { get; }
 

@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Discord.Net.Hanz.Utils;
@@ -7,6 +8,158 @@ public static class Hierarchy
 {
     private static readonly Dictionary<ITypeSymbol, List<SortedHierarchySymbol>> _cache =
         new(SymbolEqualityComparer.Default);
+
+    public static HashSet<INamedTypeSymbol> AllInterfacesWrtVariance(
+        this ITypeSymbol seed,
+        SemanticModel model,
+        Logger? logger = null)
+    {
+        var result = new HashSet<INamedTypeSymbol>(seed.AllInterfaces, SymbolEqualityComparer.Default);
+
+        var variance = seed.AllInterfaces
+            .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default)
+            .Where(x =>
+                x.TypeKind is TypeKind.Interface &&
+                x.IsGenericType &&
+                x.ConstructedFrom.TypeParameters
+                    .Any(x => x.Variance > 0)
+            );
+
+        var processed = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+
+        foreach (var variantInterface in variance)
+        {
+            if (!result.Contains(variantInterface) || processed.Contains(variantInterface.ConstructedFrom))
+                goto end_iter;
+
+            var implementations = seed.AllInterfaces
+                .Where(x =>
+                    x.ConstructedFrom
+                        .Equals(variantInterface.ConstructedFrom, SymbolEqualityComparer.Default) &&
+                    x.TypeParameters
+                        .Select((x, i) => (Parameter: x, Index: i))
+                        .All(arg =>
+                            arg.Parameter.Variance > 0
+                            ||
+                            variantInterface.TypeArguments[arg.Index]
+                                .Equals(
+                                    x.TypeArguments[arg.Index],
+                                    SymbolEqualityComparer.Default
+                                )
+                        )
+                )
+                .Where(x => result.Contains(x))
+                .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default)
+                .ToList();
+
+            if (implementations.Count <= 1)
+                goto end_iter;
+
+            logger?.Log($"{seed}: Computing lowest variant for {variantInterface.ConstructedFrom}");
+
+            var lowestOrderBuckets = new List<INamedTypeSymbol>();
+
+            for
+            (
+                var typeParameterIndex = 0;
+                typeParameterIndex != variantInterface.TypeParameters.Length;
+                typeParameterIndex++
+            )
+            {
+                if (variantInterface.TypeParameters[typeParameterIndex].Variance == 0) continue;
+
+                for
+                (
+                    var implementationIndex = 0;
+                    implementationIndex < implementations.Count;
+                    implementationIndex++
+                )
+                {
+                    var implementation = implementations[implementationIndex];
+
+                    if (lowestOrderBuckets.Count == 0)
+                    {
+                        lowestOrderBuckets.Add(implementation);
+                        continue;
+                    }
+
+                    var bucketMissCount = 0;
+
+                    for (var bucketIndex = 0; bucketIndex < lowestOrderBuckets.Count; bucketIndex++)
+                    {
+                        var lowestOrder = lowestOrderBuckets[bucketIndex];
+                        var implementationArg = implementation.TypeArguments[typeParameterIndex];
+                        var ourArg = lowestOrder.TypeArguments[typeParameterIndex];
+
+                        if (implementationArg.Equals(ourArg, SymbolEqualityComparer.Default)) continue;
+
+                        var isLower = model.Compilation.HasImplicitConversion(
+                            implementationArg,
+                            ourArg
+                        );
+
+                        var isUpper = model.Compilation.HasImplicitConversion(
+                            ourArg,
+                            implementationArg
+                        );
+
+                        if (isUpper && !isLower)
+                        {
+                            logger?.Log(
+                                $"{variantInterface.ConstructedFrom}: Lower order exists for {variantInterface}, skipping");
+                            continue;
+                        }
+
+                        if (!isLower && !isUpper)
+                        {
+                            bucketMissCount++;
+                            logger?.Log($"{variantInterface.ConstructedFrom}: Miss #{bucketMissCount} {bucketIndex + 1}/{lowestOrderBuckets.Count}: {ourArg} <> {implementationArg}");
+                            continue;
+                        }
+
+                        if (isLower)
+                        {
+                            logger?.Log(
+                                $"{variantInterface.ConstructedFrom}: favouring argument {implementationArg} over {ourArg}");
+
+                            lowestOrderBuckets[bucketIndex] = implementation;
+                            break;
+                        }
+                    }
+
+                    if (
+                        bucketMissCount == lowestOrderBuckets.Count &&
+                        !lowestOrderBuckets.Contains(implementation, SymbolEqualityComparer.Default))
+                    {
+                        logger?.Log($"{variantInterface.ConstructedFrom}: New bucket {implementation}");
+                        lowestOrderBuckets.Add(implementation);
+                    }
+                }
+            }
+
+            if (implementations.Count == lowestOrderBuckets.Count) goto end_iter;
+
+
+            logger?.Log(
+                $"{seed}: reduced {implementations.Count - lowestOrderBuckets.Count} implementations of {variantInterface.ConstructedFrom}"
+            );
+
+            foreach (var toRemove in implementations.Where(x => !lowestOrderBuckets.Contains(x)))
+            {
+                logger?.Log($" - yeet {toRemove}?: {result.Remove(toRemove)}");
+            }
+
+            foreach (var type in lowestOrderBuckets)
+            {
+                logger?.Log($" - kept {type}");
+            }
+
+            end_iter:
+            processed.Add(variantInterface.ConstructedFrom);
+        }
+
+        return result;
+    }
 
     public readonly struct SortedHierarchySymbol(int distance, INamedTypeSymbol type)
         : IEquatable<SortedHierarchySymbol>
@@ -106,7 +259,7 @@ public static class Hierarchy
                 }
             }
 
-            if(result)
+            if (result)
                 path.Add(child);
 
             return result;

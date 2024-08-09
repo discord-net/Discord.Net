@@ -4,23 +4,34 @@ using Discord.Rest;
 namespace Discord.Rest;
 
 [ExtendInterfaceDefaults(typeof(IWebhookMessageActor))]
-public partial class RestWebhookMessageActor(
-    DiscordRestClient client,
-    MessageChannelIdentity channel,
-    MessageIdentity message,
-    WebhookIdentity webhook,
-    GuildIdentity? guild = null
-):
-    RestMessageActor(client, channel, message, guild),
+public partial class RestWebhookMessageActor :
+    RestMessageActor,
     IWebhookMessageActor
 {
-    internal GuildIdentity? GuildIdentity { get; } = guild;
+    [SourceOfTruth] public RestWebhookActor Webhook { get; }
 
-    [SourceOfTruth] public RestWebhookActor Webhook { get; } = webhook.Actor ?? new(client, webhook);
+    internal override MessageIdentity Identity { get; }
+
+    public RestWebhookMessageActor(
+        DiscordRestClient client,
+        MessageChannelIdentity channel,
+        MessageIdentity message,
+        WebhookIdentity webhook,
+        GuildIdentity? guild = null
+    ) : base(client, channel, message, guild)
+    {
+        Identity = message | this;
+
+        Webhook = webhook.Actor ?? new(client, webhook);
+    }
 
     [SourceOfTruth]
     internal override RestWebhookMessage CreateEntity(IMessageModel model)
-        => RestWebhookMessage.Construct(Client, new(GuildIdentity, Channel.MessageChannelIdentity, Webhook.Identity), model);
+        => RestWebhookMessage.Construct(
+            Client,
+            new(GuildIdentity, Channel.Identity, Webhook.Identity),
+            model
+        );
 }
 
 public sealed partial class RestWebhookMessage :

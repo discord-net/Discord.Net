@@ -4,22 +4,29 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-[ExtendInterfaceDefaults(typeof(IGuildEmoteActor))]
-public partial class RestGuildEmoteActor(
-    DiscordRestClient client,
-    GuildIdentity guild,
-    GuildEmoteIdentity emote
-):
-    RestActor<ulong, RestGuildEmote, GuildEmoteIdentity>(client, emote),
+[ExtendInterfaceDefaults]
+public partial class RestGuildEmoteActor :
+    RestActor<ulong, RestGuildEmote, GuildEmoteIdentity>,
     IGuildEmoteActor
 {
-    [SourceOfTruth]
-    public RestGuildActor Guild { get; } = guild.Actor ?? new(client, guild);
+    [SourceOfTruth] public RestGuildActor Guild { get; }
+
+    internal override GuildEmoteIdentity Identity { get; }
+
+    [method: TypeFactory]
+    public RestGuildEmoteActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        GuildEmoteIdentity emote
+    ) : base(client, emote)
+    {
+        Identity = emote | this;
+        Guild = guild.Actor ?? new(client, guild);
+    }
 
     [SourceOfTruth]
     internal RestGuildEmote CreateEntity(IGuildEmoteModel model)
-        => RestGuildEmote.Construct(Client, guild, model);
+        => RestGuildEmote.Construct(Client, Guild.Identity, model);
 }
 
 public sealed partial class RestGuildEmote :
@@ -29,8 +36,7 @@ public sealed partial class RestGuildEmote :
 {
     public IDefinedLoadableEntityEnumerable<ulong, IRole> Roles => throw new NotImplementedException();
 
-    [SourceOfTruth]
-    public RestUserActor? Creator { get; private set; }
+    [SourceOfTruth] public RestUserActor? Creator { get; private set; }
 
     public string? Name => Model.Name;
 
@@ -79,5 +85,4 @@ public sealed partial class RestGuildEmote :
     }
 
     public IGuildEmoteModel GetModel() => Model;
-
 }

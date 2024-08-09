@@ -18,7 +18,7 @@ public static partial class Routes
 
     public static IApiOutRoute<VoiceState> GetUserVoiceState(
         [IdHeuristic<IGuild>] ulong guildId,
-        [IdHeuristic<IUser>] ulong userId
+        [IdHeuristic<IUser>, IdHeuristic<IVoiceState>] ulong userId
     ) => new ApiOutRoute<VoiceState>(
         nameof(GetCurrentUserVoiceState),
         RequestMethod.Get,

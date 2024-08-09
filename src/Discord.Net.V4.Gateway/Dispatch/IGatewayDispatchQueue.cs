@@ -4,5 +4,5 @@ namespace Discord.Gateway.Events;
 
 public interface IGatewayDispatchQueue
 {
-    ValueTask AcceptAsync(string dispatchType, IGatewayPayloadData? payload, CancellationToken token);
+    ValueTask AcceptAsync(string eventName, IDispatchEvent? dispatchEvent, IGatewayPayloadData? payload, CancellationToken token);
 }

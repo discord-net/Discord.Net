@@ -23,20 +23,28 @@ public partial class Routes
             (ScopeType.Guild, guildId));
 
     public static IApiInOutRoute<ModifyGuildScheduledEventParams, GuildScheduledEvent> ModifyGuildScheduledEvent(
-        [IdHeuristic<IGuild>] ulong guildId, [IdHeuristic<IGuildScheduledEvent>] ulong eventId, ModifyGuildScheduledEventParams body) =>
+        [IdHeuristic<IGuild>] ulong guildId, [IdHeuristic<IGuildScheduledEvent>] ulong eventId,
+        ModifyGuildScheduledEventParams body) =>
         new ApiInOutRoute<ModifyGuildScheduledEventParams, GuildScheduledEvent>(nameof(ModifyGuildScheduledEvent),
             RequestMethod.Patch, $"/guilds/{guildId}/scheduled-events/{eventId}", body, ContentType.JsonBody,
             (ScopeType.Guild, guildId));
 
-    public static IApiRoute DeleteGuildScheduledEvent([IdHeuristic<IGuild>] ulong guildId, [IdHeuristic<IGuildScheduledEvent>] ulong eventId) =>
+    public static IApiRoute DeleteGuildScheduledEvent([IdHeuristic<IGuild>] ulong guildId,
+        [IdHeuristic<IGuildScheduledEvent>] ulong eventId) =>
         new ApiRoute(nameof(DeleteGuildScheduledEvent), RequestMethod.Delete,
             $"/guilds/{guildId}/scheduled-events/{eventId}", (ScopeType.Guild, guildId));
 
     public static IApiOutRoute<GuildScheduledEventUser[]> GetGuildScheduledEventUsers(
-        [IdHeuristic<IGuild>] ulong guildId, [IdHeuristic<IGuildScheduledEvent>] ulong eventId,
+        [IdHeuristic<IGuild>] ulong guildId,
+        [IdHeuristic<IGuildScheduledEvent>] ulong eventId,
         int? limit = default,
-        bool? withMember = default, ulong? beforeId = default, ulong? afterId = default) =>
-        new ApiOutRoute<GuildScheduledEventUser[]>(nameof(GetGuildScheduledEventUsers), RequestMethod.Get,
-            $"/guilds/{guildId}/scheduled-events/{eventId}/users{RouteUtils.GetUrlEncodedQueryParams(("limit", limit), ("with_member", withMember), ("before", beforeId), ("after", afterId))}",
-            (ScopeType.Guild, guildId));
+        bool? withMembers = default,
+        ulong? beforeId = default,
+        ulong? afterId = default
+    ) => new ApiOutRoute<GuildScheduledEventUser[]>(
+        nameof(GetGuildScheduledEventUsers),
+        RequestMethod.Get,
+        $"/guilds/{guildId}/scheduled-events/{eventId}/users{RouteUtils.GetUrlEncodedQueryParams(("limit", limit), ("with_member", withMembers), ("before", beforeId), ("after", afterId))}",
+        (ScopeType.Guild, guildId)
+    );
 }

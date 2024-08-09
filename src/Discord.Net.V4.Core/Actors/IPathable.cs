@@ -2,8 +2,15 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
+file sealed class EmptyPath : IPathable
+{
+    public static readonly EmptyPath Instance = new();
+}
+
 public interface IPathable
 {
+    static IPathable Empty => EmptyPath.Instance;
+
     ulong Require<TEntity>()
         where TEntity : class, IEntity<ulong>
         => Require<ulong, TEntity>();
@@ -38,7 +45,7 @@ public interface IPathable
                 id = actor.Id;
                 return true;
             case IRelation<TId, TEntity> relationship:
-                id = relationship.Id;
+                id = relationship.RelationshipId;
                 return true;
             default:
                 id = default;

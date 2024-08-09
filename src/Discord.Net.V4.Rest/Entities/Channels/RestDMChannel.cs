@@ -3,22 +3,31 @@ using System.ComponentModel;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-public partial class RestDMChannelActor(
-    DiscordRestClient client,
-    DMChannelIdentity channel,
-    UserIdentity recipient
-) :
-    RestChannelActor(client, channel),
+[ExtendInterfaceDefaults]
+public partial class RestDMChannelActor :
+    RestChannelActor,
     IDMChannelActor,
     IRestActor<ulong, RestDMChannel, DMChannelIdentity>
 {
-    public override DMChannelIdentity Identity { get; } = channel;
-
-    [SourceOfTruth] public RestUserActor Recipient { get; } = recipient.Actor ?? new(client, recipient);
+    [SourceOfTruth] public RestUserActor Recipient { get; }
 
     [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; } = new(client, channel);
+    internal RestMessageChannelActor MessageChannelActor { get; }
+
+    [SourceOfTruth] internal sealed override DMChannelIdentity Identity { get; }
+
+    [method: TypeFactory]
+    public RestDMChannelActor(
+        DiscordRestClient client,
+        DMChannelIdentity channel,
+        UserIdentity recipient
+    ) : base(client, channel)
+    {
+        Identity = channel | this;
+
+        Recipient = recipient.Actor ?? new(client, recipient);
+        MessageChannelActor = new RestMessageChannelActor(client, Identity);
+    }
 
     [SourceOfTruth]
     [CovariantOverride]

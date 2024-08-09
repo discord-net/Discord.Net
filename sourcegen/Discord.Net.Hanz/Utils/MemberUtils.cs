@@ -80,7 +80,7 @@ public static class MemberUtils
         }
     }
 
-    public static ITypeSymbol? GetMemberType(ISymbol member)
+    public static ITypeSymbol? GetMemberType(ISymbol? member)
     {
         return member switch
         {
@@ -95,23 +95,17 @@ public static class MemberUtils
         return a switch
         {
             IPropertySymbol propA when b is IPropertySymbol propB =>
-                GetMemberName(propA, x => x.ExplicitInterfaceImplementations) ==
-                GetMemberName(propB, x => x.ExplicitInterfaceImplementations) ||
-                (
-                    GetMemberName(propA, x => x.ExplicitInterfaceImplementations) ==
-                    GetMemberName(propB, x => x.ExplicitInterfaceImplementations) &&
-                    propA.Type.Equals(
-                        propB.Type,
-                        SymbolEqualityComparer.Default
-                    )
-                ),
+                GetMemberName(propA) == GetMemberName(propB),
             IMethodSymbol methodA when b is IMethodSymbol methodB =>
-                GetMemberName(methodA, x => x.ExplicitInterfaceImplementations) ==
-                GetMemberName(methodB, x => x.ExplicitInterfaceImplementations) &&
-                methodA.Parameters.Length == methodB.Parameters.Length &&
+                GetMemberName(methodA) == GetMemberName(methodB)
+                &&
+                methodA.Parameters.Length == methodB.Parameters.Length
+                &&
                 methodA.Parameters
                     .Select((x, i) => (Parameter: x, Index: i))
-                    .All(x => methodB.Parameters[x.Index].Type
+                    .All(x => methodB
+                        .Parameters[x.Index]
+                        .Type
                         .Equals(x.Parameter.Type, SymbolEqualityComparer.Default)),
             _ => false
         };
@@ -122,25 +116,61 @@ public static class MemberUtils
         return targetSymbol switch
         {
             IPropertySymbol propA when baseSymbol is IPropertySymbol propB =>
-                propA.Type.Equals(
-                    propB.Type,
-                    SymbolEqualityComparer.Default
-                ) || compilation.HasImplicitConversion(propA.Type, propB.Type),
+                CanOverrideProperty(
+                    propA.Type, propA.Name,
+                    propB.Type, propB.Name,
+                    compilation
+                ),
             IMethodSymbol methodA when baseSymbol is IMethodSymbol methodB =>
-                (
-                    methodA.ReturnType.Equals(
-                        methodB.ReturnType,
-                        SymbolEqualityComparer.Default
-                    )
-                    ||
-                    compilation.HasImplicitConversion(methodA.ReturnType, methodB.ReturnType)
-                ) &&
-                methodA.Parameters.Length == methodB.Parameters.Length &&
-                methodA.Parameters
-                    .Select((x, i) => (Parameter: x, Index: i))
-                    .All(x => methodB.Parameters[x.Index].Type
-                        .Equals(x.Parameter.Type, SymbolEqualityComparer.Default)),
+                CanOverrideMethod(
+                    methodA.ReturnType, methodA.Name, methodA.Parameters,
+                    methodB.ReturnType, methodB.Name, methodB.Parameters,
+                    compilation
+                ),
             _ => false
         };
+    }
+
+    public static bool CanOverrideProperty(
+        ITypeSymbol propertyTypeA, string nameA,
+        ITypeSymbol propertyTypeB, string nameB,
+        Compilation compilation
+    )
+    {
+        return
+            nameA == nameB
+            &&
+            (
+                propertyTypeA.Equals(
+                    propertyTypeB,
+                    SymbolEqualityComparer.Default
+                )
+                || compilation.HasImplicitConversion(propertyTypeA, propertyTypeB)
+            );
+    }
+
+    public static bool CanOverrideMethod(
+        ITypeSymbol returnTypeA, string nameA, IList<IParameterSymbol> parametersA,
+        ITypeSymbol returnTypeB, string nameB, IList<IParameterSymbol> parametersB,
+        Compilation compilation)
+    {
+        return
+            nameA == nameB
+            &&
+            (
+                returnTypeA.Equals(
+                    returnTypeB,
+                    SymbolEqualityComparer.Default
+                )
+                ||
+                compilation.HasImplicitConversion(returnTypeA, returnTypeB)
+            )
+            &&
+            parametersA.Count == parametersB.Count &&
+            parametersA
+                .Select((x, i) => (Parameter: x, Index: i))
+                .All(x => parametersB[x.Index].Type
+                    .Equals(x.Parameter.Type, SymbolEqualityComparer.Default)
+                );
     }
 }

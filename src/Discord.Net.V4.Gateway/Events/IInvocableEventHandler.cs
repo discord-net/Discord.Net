@@ -1,6 +1,4 @@
 namespace Discord.Gateway;
 
-public interface IInvocableEventHandler
-{
-    ValueTask InvokeAsync(CancellationToken token = default);
-}
+public delegate ValueTask PreparedInvocableEventHandle(CancellationToken token);
+public delegate ValueTask InvocableEventHandler<in TPackage>(TPackage package, CancellationToken token);

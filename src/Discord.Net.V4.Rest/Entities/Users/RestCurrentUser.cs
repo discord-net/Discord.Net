@@ -4,17 +4,24 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-[method: TypeFactory]
-[ExtendInterfaceDefaults(
-    typeof(ICurrentUserActor)
-)]
-public partial class RestCurrentUserActor(
-    DiscordRestClient client,
-    SelfUserIdentity user
-) :
-    RestUserActor(client, user),
-    ICurrentUserActor
+[ExtendInterfaceDefaults]
+public partial class RestCurrentUserActor :
+    RestUserActor,
+    ICurrentUserActor,
+    IRestActor<ulong, RestCurrentUser, SelfUserIdentity>
 {
+    [SourceOfTruth]
+    internal override SelfUserIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestCurrentUserActor(
+        DiscordRestClient client,
+        SelfUserIdentity user
+        ) : base(client, user)
+    {
+        Identity = user | this;
+    }
+
     [CovariantOverride]
     [SourceOfTruth]
     internal RestCurrentUser CreateEntity(ISelfUserModel model)
@@ -29,6 +36,7 @@ public partial class RestCurrentUserActor(
         => RestMember.Construct(Client, GuildIdentity.Of(guildId), model);
 }
 
+[ExtendInterfaceDefaults]
 public partial class RestCurrentUser :
     RestUser,
     ICurrentUser,

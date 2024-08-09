@@ -150,21 +150,26 @@ public static class ModifyTrait
                ) continue;
 
             // base is modifiable, we should override its method if its parameters are assignable from ours
-
         }
+
+        var hasModelResult = routeMethod.ReturnType.Name.Contains("Out");
+
+        var modifiableGenerics = SyntaxFactory.SeparatedList([
+            idType,
+            SyntaxFactory.IdentifierName(target.InterfaceSymbol.Name),
+            userPropertiesType,
+            apiParamsType
+        ]);
+
+        if (hasModelResult)
+            modifiableGenerics = modifiableGenerics.AddRange([
+                entityTypeSyntax,
+                modelType
+            ]);
 
         var actorModifiableInterface = SyntaxFactory.GenericName(
             SyntaxFactory.Identifier("Discord.IModifiable"),
-            SyntaxFactory.TypeArgumentList(
-                SyntaxFactory.SeparatedList([
-                    idType,
-                    SyntaxFactory.IdentifierName(target.InterfaceSymbol.Name),
-                    userPropertiesType,
-                    apiParamsType,
-                    entityTypeSyntax,
-                    modelType
-                ])
-            )
+            SyntaxFactory.TypeArgumentList(modifiableGenerics)
         );
 
         syntax = syntax
@@ -184,17 +189,22 @@ public static class ModifyTrait
             logger
         );
 
+        // exit early since if there's no result we don't need to add updatable version to the entity.
+        //if (!hasModelResult) return;
+
+        modifiableGenerics = SyntaxFactory.SeparatedList([
+            idType,
+            entityTypeSyntax,
+            userPropertiesType,
+            apiParamsType
+        ]);
+
+        if (hasModelResult)
+            modifiableGenerics = modifiableGenerics.Add(modelType);
+
         var entityModifiableInterface = SyntaxFactory.GenericName(
             SyntaxFactory.Identifier("Discord.IModifiable"),
-            SyntaxFactory.TypeArgumentList(
-                SyntaxFactory.SeparatedList([
-                    idType,
-                    entityTypeSyntax,
-                    userPropertiesType,
-                    apiParamsType,
-                    modelType
-                ])
-            )
+            SyntaxFactory.TypeArgumentList(modifiableGenerics)
         );
 
         if (!entitiesSyntax.TryGetValue(entityType.ToDisplayString(), out var entitySyntax))
@@ -207,6 +217,8 @@ public static class ModifyTrait
                            ?.WithMembers([])
                            .WithBaseList(null)
                            .WithAttributeLists([])
+                           .WithOpenBraceToken(SyntaxFactory.Token(SyntaxKind.OpenBraceToken))
+                           .WithCloseBraceToken(SyntaxFactory.Token(SyntaxKind.CloseBraceToken))
                            ?? throw new KeyNotFoundException($"Couldn't find entity syntax for {entityType}");
 
         entitySyntax = entitySyntax.AddBaseListTypes(SyntaxFactory.SimpleBaseType(entityModifiableInterface));
@@ -237,6 +249,8 @@ public static class ModifyTrait
         ITypeSymbol userPropertiesType,
         Logger logger)
     {
+        var hasModelResult = routeMethod.ReturnType.Name.Contains("Out");
+
         syntax = syntax.AddMembers(
             SyntaxFactory.MethodDeclaration(
                 [],
@@ -244,12 +258,17 @@ public static class ModifyTrait
                     SyntaxFactory.Token(SyntaxKind.StaticKeyword)
                 ),
                 SyntaxFactory.GenericName(
-                    SyntaxFactory.Identifier("Discord.IApiInOutRoute"),
+                    SyntaxFactory.Identifier($"Discord.{routeMethod.ReturnType.Name}"),
                     SyntaxFactory.TypeArgumentList(
-                        SyntaxFactory.SeparatedList([
-                            apiParamsType,
-                            SyntaxFactory.IdentifierName("Discord.Models.IEntityModel")
-                        ])
+                        SyntaxFactory.SeparatedList(
+                            hasModelResult
+                                ? (TypeSyntax[])
+                                [
+                                    apiParamsType,
+                                    SyntaxFactory.IdentifierName("Discord.Models.IEntityModel")
+                                ]
+                                : [apiParamsType]
+                        )
                     )
                 ),
                 SyntaxFactory.ExplicitInterfaceSpecifier(modifiableInterface),

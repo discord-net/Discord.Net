@@ -7,41 +7,49 @@ using System.ComponentModel;
 
 namespace Discord.Rest;
 
-using EnumerableInvitesActor = RestEnumerableIndexableActor<RestInviteActor, string, RestInvite, IInvite, IEnumerable<IInviteModel>>;
+using EnumerableInvitesActor = RestEnumerableIndexableActor<
+    RestGuildChannelInviteActor,
+    string,
+    RestInvite,
+    IInvite,
+    IEnumerable<IInviteModel>
+>;
 
-[ExtendInterfaceDefaults(typeof(IGuildChannelActor))]
+[ExtendInterfaceDefaults]
 public partial class RestGuildChannelActor :
     RestChannelActor,
     IGuildChannelActor,
     IRestActor<ulong, RestGuildChannel, GuildChannelIdentity>
 {
-    [method: TypeFactory]
-    public RestGuildChannelActor(DiscordRestClient client,
+    [SourceOfTruth] public RestGuildActor Guild { get; }
+
+    [SourceOfTruth] public EnumerableInvitesActor Invites { get; }
+
+    [SourceOfTruth]
+    internal override GuildChannelIdentity Identity { get; }
+
+    [TypeFactory]
+    public RestGuildChannelActor(
+        DiscordRestClient client,
         GuildIdentity guild,
-        GuildChannelIdentity channel) : base(client, channel)
+        GuildChannelIdentity channel
+    ) : base(client, channel)
     {
-        channel = Identity = channel.MostSpecific(this);
+        channel = Identity = channel | this;
 
         Guild = guild.Actor ?? new RestGuildActor(client, guild);
 
         Invites = RestActors.Fetchable(
-            Template.T<RestInviteActor>(),
+            Template.T<RestGuildChannelInviteActor>(),
             Client,
-            RestInviteActor.Factory,
+            RestGuildChannelInviteActor.Factory,
             guild,
+            channel,
             entityFactory: RestInvite.Construct,
             new RestInvite.Context(guild, channel),
             IInvite.GetChannelInvitesRoute(this)
         );
     }
-
-    public override GuildChannelIdentity Identity { get; }
-
-    [SourceOfTruth]
-    public RestGuildActor Guild { get; }
-
-    [SourceOfTruth]
-    public EnumerableInvitesActor Invites { get; }
 
     [SourceOfTruth]
     [CovariantOverride]
@@ -130,5 +138,6 @@ public partial class RestGuildChannel :
 
         return base.UpdateAsync(model, token);
     }
+
     public override IGuildChannelModel GetModel() => Model;
 }

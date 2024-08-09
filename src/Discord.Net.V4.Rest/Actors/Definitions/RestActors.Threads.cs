@@ -6,54 +6,81 @@ namespace Discord.Rest;
 
 internal static partial class RestActors
 {
-    public static RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams> PublicArchivedThreads(
+    public static RestPagedIndexableActor<
+        RestThreadChannelActor,
+        ulong,
+        RestThreadChannel,
+        IThreadChannelModel,
+        ChannelThreads,
+        PagePublicArchivedThreadsParams
+    > PublicArchivedThreads(
         DiscordRestClient client,
         GuildIdentity guild,
         ThreadableChannelIdentity channel
-    ) => ListThreads(client, guild, channel, Routes.ListPublicArchivedThreads);
+    ) => ListThreads<PagePublicArchivedThreadsParams>(client, guild, channel);
 
-    public static RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams> PrivateArchivedThreads(
+    public static RestPagedIndexableActor<
+        RestThreadChannelActor,
+        ulong,
+        RestThreadChannel,
+        IThreadChannelModel,
+        ChannelThreads,
+        PagePrivateArchivedThreadsParams
+    > PrivateArchivedThreads(
         DiscordRestClient client,
         GuildIdentity guild,
         ThreadableChannelIdentity channel
-    ) => ListThreads(client, guild, channel, Routes.ListPrivateArchivedThreads);
+    ) => ListThreads<PagePrivateArchivedThreadsParams>(client, guild, channel);
 
-    public static RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams> JoinedPrivateArchivedThreads(
+    public static RestPagedIndexableActor<
+        RestThreadChannelActor,
+        ulong,
+        RestThreadChannel,
+        IThreadChannelModel,
+        ChannelThreads,
+        PageJoinedPrivateArchivedThreadsParams
+    > JoinedPrivateArchivedThreads(
         DiscordRestClient client,
         GuildIdentity guild,
         ThreadableChannelIdentity channel
-    ) => ListThreads(client, guild, channel, Routes.ListJoinedPrivateArchivedThreads);
+    ) => ListThreads<PageJoinedPrivateArchivedThreadsParams>(client, guild, channel);
 
-    private static RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams> ListThreads(
+    private static RestPagedIndexableActor<
+        RestThreadChannelActor,
+        ulong,
+        RestThreadChannel,
+        IThreadChannelModel,
+        ChannelThreads,
+        TParams
+    > ListThreads<TParams>(
         DiscordRestClient client,
         GuildIdentity guild,
-        ThreadableChannelIdentity channel,
-        Func<ulong, DateTimeOffset?, int?, IApiOutRoute<ChannelThreads>> route)
+        ThreadableChannelIdentity channel)
+        where TParams : class, IPagingParams<TParams, ChannelThreads>
     {
-        return new RestPagedActor<ulong, RestThreadChannel, ChannelThreads, PageThreadChannelsParams>(
+        return new RestPagedIndexableActor<RestThreadChannelActor, ulong, RestThreadChannel, IThreadChannelModel,
+            ChannelThreads, TParams>(
             client,
-            args => route(channel.Id, args.Before, args.PageSize),
-            (_, model) => model.Threads
-                .OfType<IThreadChannelModel>()
-                .Select(x => RestThreadChannel.Construct(client, new(guild), x)),
-            (_, model, args) =>
+            id => new RestThreadChannelActor(client, guild, ThreadIdentity.Of(id)),
+            IPathable.Empty,
+            api => api.Threads,
+            (model, api) =>
             {
-                if (!model.HasMore)
-                    return null;
-
-                var timestamp = model.Threads
-                    .OfType<ThreadChannelBase>()
-                    .MinBy(x => x.Metadata.ArchiveTimestamp)?
-                    .Metadata
-                    .ArchiveTimestamp;
-
-                if (timestamp is null)
-                    return null;
-
-                return route(
-                    channel.Id,
-                    timestamp,
-                    args.PageSize
+                return RestThreadChannel.Construct(
+                    client,
+                    new(
+                        guild,
+                        ThreadMemberIdentity.OfNullable(
+                            api.Members.FirstOrDefault(x => x.ThreadId == model.Id),
+                            model => RestThreadMember.Construct(
+                                client,
+                                new(guild, ThreadIdentity.Of(model.ThreadId!.Value)),
+                                model
+                            )
+                        ),
+                        channel
+                    ),
+                    model
                 );
             }
         );
