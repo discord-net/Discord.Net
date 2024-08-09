@@ -38,6 +38,9 @@ internal class Application
     [JsonProperty("approximate_guild_count")]
     public Optional<int> ApproximateGuildCount { get; set; }
 
+    [JsonProperty("approximate_user_install_count")]
+    public Optional<int> ApproximateUserInstallCount { get; set; }
+
     [JsonProperty("guild")]
     public Optional<PartialGuild> PartialGuild { get; set; }
 
