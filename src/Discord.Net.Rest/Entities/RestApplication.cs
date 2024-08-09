@@ -154,7 +154,7 @@ public class RestApplication : RestEntity<ulong>, IApplication
         if (model.RedirectUris.IsSpecified)
             RedirectUris = model.RedirectUris.Value.ToImmutableArray();
 
-        ApproximateGuildCount       = model.ApproximateGuildCount.IsSpecified ? model.ApproximateGuildCount.Value : null;
+        ApproximateGuildCount = model.ApproximateGuildCount.IsSpecified ? model.ApproximateGuildCount.Value : null;
         ApproximateUserInstallCount = model.ApproximateUserInstallCount.IsSpecified ? model.ApproximateUserInstallCount.Value : null;
 
         DiscoverabilityState = model.DiscoverabilityState.GetValueOrDefault(ApplicationDiscoverabilityState.None);
