@@ -56,6 +56,9 @@ public class RestApplication : RestEntity<ulong>, IApplication
     public int? ApproximateGuildCount { get; private set; }
 
     /// <inheritdoc />
+    public int? ApproximateUserInstallCount { get; private set; }
+
+    /// <inheritdoc />
     public IReadOnlyCollection<string> RedirectUris { get; private set; }
 
     /// <inheritdoc />
@@ -152,6 +155,7 @@ public class RestApplication : RestEntity<ulong>, IApplication
             RedirectUris = model.RedirectUris.Value.ToImmutableArray();
 
         ApproximateGuildCount = model.ApproximateGuildCount.IsSpecified ? model.ApproximateGuildCount.Value : null;
+        ApproximateUserInstallCount = model.ApproximateUserInstallCount.IsSpecified ? model.ApproximateUserInstallCount.Value : null;
 
         DiscoverabilityState = model.DiscoverabilityState.GetValueOrDefault(ApplicationDiscoverabilityState.None);
         DiscoveryEligibilityFlags = model.DiscoveryEligibilityFlags.GetValueOrDefault(DiscoveryEligibilityFlags.None);
@@ -168,7 +172,7 @@ public class RestApplication : RestEntity<ulong>, IApplication
         RpcState = model.RpcState.GetValueOrDefault(ApplicationRpcState.Disabled);
         StoreState = model.StoreState.GetValueOrDefault(ApplicationStoreState.None);
         VerificationState = model.VerificationState.GetValueOrDefault(ApplicationVerificationState.Ineligible);
-            
+
         var dict = new Dictionary<ApplicationIntegrationType, ApplicationInstallParams>();
         if (model.IntegrationTypesConfig.IsSpecified)
         {
