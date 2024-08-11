@@ -10,21 +10,22 @@ public sealed partial class RestIncomingWebhookActor :
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
 
-    [SourceOfTruth] public RestIntegrationChannelActor Channel { get; }
+    [SourceOfTruth] public RestIncomingIntegrationChannelTrait Channel { get; }
 
     [SourceOfTruth] internal override WebhookIdentity Identity { get; }
 
     [TypeFactory]
-    public RestIncomingWebhookActor(DiscordRestClient client,
+    public RestIncomingWebhookActor(
+        DiscordRestClient client,
         GuildIdentity guild,
-        IntegrationChannelIdentity channel,
+        IncomingIntegrationChannelIdentity channel,
         WebhookIdentity webhook
     ) : base(client, webhook)
     {
         Identity = webhook | this;
 
         Guild = new RestGuildActor(client, guild);
-        Channel = new RestIntegrationChannelActor(client, guild, channel);
+        Channel = new RestIncomingIntegrationChannelTrait(client, Guild.Channels[channel.Id], channel);
     }
 
     [SourceOfTruth]
@@ -37,7 +38,7 @@ public sealed partial class RestIncomingWebhook :
     IIncomingWebhook,
     IContextConstructable<RestIncomingWebhook, IWebhookModel, RestIncomingWebhook.Context, DiscordRestClient>
 {
-    public readonly record struct Context(GuildIdentity Guild, IntegrationChannelIdentity Channel);
+    public readonly record struct Context(GuildIdentity Guild, IncomingIntegrationChannelIdentity Channel);
 
     public string? Token => Model.Token;
 
@@ -49,7 +50,7 @@ public sealed partial class RestIncomingWebhook :
     internal RestIncomingWebhook(
         DiscordRestClient client,
         GuildIdentity guild,
-        IntegrationChannelIdentity channel,
+        IncomingIntegrationChannelIdentity channel,
         IWebhookModel model,
         RestIncomingWebhookActor? actor = null
     ) : base(client, model, actor)

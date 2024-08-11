@@ -1,3 +1,4 @@
+using Discord.Net.Hanz.Tasks.Traits;
 using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -149,9 +150,8 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                 }
             }
 
-            // var baseImplementations = TypeUtils.GetBaseTypesAndThis(typeSymbol);
-
             var interfaces = typeSymbol.AllInterfacesWrtVariance(target.Semantic, targetLogger);
+
 
             foreach (var iface in interfaces)
             {
@@ -204,7 +204,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                 var fullTypeName = target.Semantic.Compilation
                     .GetSemanticModel(target.TypeDeclarationSyntax.SyntaxTree)
                     .GetDeclaredSymbol(target.TypeDeclarationSyntax)!
-                    .ToDisplayString();
+                    .ToFullMetadataName();
 
                 if (!toGenerate.TryGetValue(fullTypeName, out var targetTypeDeclaration))
                     targetTypeDeclaration = new GenerationResult(
@@ -335,7 +335,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
         foreach (var target in toGenerate)
         {
             context.AddSource(
-                $"SourceOfTruths/{target.Value.TypeSymbol.Name}",
+                $"SourceOfTruths/{target.Key}",
                 $$"""
                   {{target.Value.UsingDirectives}}
 

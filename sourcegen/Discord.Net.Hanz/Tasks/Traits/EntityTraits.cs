@@ -104,6 +104,43 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         );
     }
 
+    public static IEnumerable<INamedTypeSymbol> GetAllTraits(
+        ITypeSymbol symbol,
+        SemanticModel model,
+        Logger logger)
+    {
+        var collection = symbol
+            .AllInterfaces
+            .Prepend(symbol)
+            .ToArray();
+
+        return collection
+            .Where(x =>
+                x.AllInterfaces.Any(x =>
+                    x.ToDisplayString().StartsWith("Discord.IActor") ||
+                    x.ToDisplayString().StartsWith("Discord.IEntity<")
+                )
+            )
+            .Distinct(SymbolEqualityComparer.Default)
+            .SelectMany(x => x!
+                .GetAttributes()
+                .Where(x => x.AttributeClass is not null)
+                .Select(x =>
+                    TraitAttributes.TryGetValue(x.AttributeClass!.Name, out var trait)
+                        ? trait
+                        : null
+                )
+                .Where(x => x is not null)
+            )
+            .Select(x =>
+            {
+                logger.Log($"{symbol}: Trait found: {x}");
+                return x!;
+            })
+            .SelectMany(x => model.Compilation.GetSymbolsWithName(x.EndsWith, SymbolFilter.Type))
+            .OfType<INamedTypeSymbol>();
+    }
+
     public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
         var entitySyntax = new Dictionary<string, InterfaceDeclarationSyntax>();
@@ -512,7 +549,10 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
     public static INamedTypeSymbol? GetActorInterface(INamedTypeSymbol actor)
     {
         return Hierarchy.GetHierarchy(actor)
-            .FirstOrDefault(x => x.Type.ToDisplayString().StartsWith("Discord.IActor<"))
+            .FirstOrDefault(x =>
+                x.Type.ToDisplayString().StartsWith("Discord.IActor<") ||
+                x.Type.ToDisplayString().StartsWith("Discord.IActorTrait<")
+            )
             .Type;
     }
 

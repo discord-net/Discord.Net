@@ -17,9 +17,7 @@ public static class InvitableTrait
         if (traitAttribute.AttributeClass is null || traitAttribute.ConstructorArguments.Length != 1)
             return;
 
-        var actorInterface = Hierarchy.GetHierarchy(target.InterfaceSymbol)
-            .FirstOrDefault(x => x.Type.ToDisplayString().StartsWith("Discord.IActor"))
-            .Type;
+        var actorInterface = EntityTraits.GetActorInterface(target.InterfaceSymbol);
 
         if (actorInterface is null)
             return;
@@ -162,17 +160,27 @@ public static class InvitableTrait
                 )!,
                 SyntaxFactory.ParseMemberDeclaration(
                     $$"""
+                      [return: TypeHeuristic<IEntityProvider<{{inviteType}}, Discord.Models.IInviteModel>>(nameof(CreateEntity))]
+                      new Task<{{inviteType}}> CreateInviteAsync(
+                          {{paramsType}} args,
+                          RequestOptions? options = null,
+                          CancellationToken token = default)
+                          => {{invitableInterfaceName}}.CreateInviteInternalAsync(
+                              Client,
+                              CreateInviteRoute(this, Id, args.ToApiModel()),
+                              this,
+                              options,
+                              token
+                          );
+                      """
+                )!,
+                SyntaxFactory.ParseMemberDeclaration(
+                    $$"""
                       async Task<Discord.IInvite> IInvitable<{{paramsType}}>.CreateInviteAsync(
                         {{paramsType}} args,
                         RequestOptions? options,
                         CancellationToken token
-                      ) => await {{invitableInterfaceName}}.CreateInviteInternalAsync(
-                          Client,
-                          CreateInviteRoute(this, Id, args.ToApiModel()),
-                          this,
-                          options,
-                          token
-                      );
+                      ) => await CreateInviteAsync(args, options, token);
                       """
                 )!
             );

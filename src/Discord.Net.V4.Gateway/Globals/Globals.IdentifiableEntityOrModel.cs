@@ -1,3 +1,10 @@
+#region Webhooks
+
+global using WebhookIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayWebhook,Discord.Gateway.GatewayWebhookActor, Discord.Models.IWebhookModel>;
+global using IncomingWebhookIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayIncomingWebhook,Discord.Gateway.GatewayIncomingWebhookActor, Discord.Models.IWebhookModel>;
+
+#endregion
+
 #region Invites
 
 global using InviteIdentity = Discord.IIdentifiable<string, Discord.Gateway.GatewayInvite, Discord.Gateway.GatewayInviteActor, Discord.Models.IInviteModel>;
@@ -64,7 +71,7 @@ global using GroupChannelIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayGroupChannel, Discord.Gateway.GatewayGroupChannelActor,
         Discord.Models.IGroupDMChannelModel>;
 global using MessageChannelIdentity =
-    Discord.IIdentifiable<ulong, Discord.IMessageChannel, Discord.IMessageChannelActor, Discord.Models.IChannelModel>;
+    Discord.IIdentifiable<ulong, Discord.IMessageChannel, Discord.IMessageChannelTrait, Discord.Models.IChannelModel>;
 global using GuildChannelIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayGuildChannel, Discord.Gateway.GatewayGuildChannelActor,
         Discord.Models.IGuildChannelModel>;
@@ -78,7 +85,7 @@ global using ForumChannelIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayForumChannel, Discord.Gateway.GatewayForumChannelActor,
         Discord.Models.IGuildForumChannelModel>;
 global using IntegrationChannelIdentity =
-    Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IIntegrationChannelActor,
+    Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IIntegrationChannelTrait,
         Discord.Models.IGuildChannelModel>;
 global using MediaChannelIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayMediaChannel, Discord.Gateway.GatewayMediaChannelActor,

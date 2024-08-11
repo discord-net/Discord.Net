@@ -9,6 +9,9 @@ public static class TypeUtils
         return symbol.Interfaces.SelectMany(x => (INamedTypeSymbol[])[x, ..x.AllInterfaces]);
     }
 
+    public static string ToFullMetadataName(this ISymbol symbol)
+        => $"{symbol.ContainingNamespace}.{symbol.MetadataName}";
+
     public static bool TypeLooselyEquals(ITypeSymbol first, ITypeSymbol second)
     {
         if (first.Equals(second, SymbolEqualityComparer.Default))

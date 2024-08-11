@@ -9,6 +9,7 @@ namespace Discord;
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IStageChannelActor :
     IVoiceChannelActor,
+    IChannelFollowerIntegrationChannelTrait,
     IStageInstanceRelationship,
     IActor<ulong, IStageChannel>,
     IEntityProvider<IStageInstance, IStageInstanceModel>

@@ -14,10 +14,10 @@ public partial class GatewayTextChannelActor :
     internal override TextChannelIdentity Identity { get; }
 
     [ProxyInterface]
-    internal GatewayMessageChannelActor MessageChannelActor { get; }
+    internal GatewayMessageChannelTrait MessageChannelActor { get; }
 
     [ProxyInterface]
-    internal GatewayIntegrationChannelActor IntegrationChannelActor { get; }
+    internal GatewayIntegrationChannelTrait IntegrationChannelActor { get; }
 
     [method: TypeFactory]
     public GatewayTextChannelActor(DiscordGatewayClient client,
@@ -25,8 +25,8 @@ public partial class GatewayTextChannelActor :
         TextChannelIdentity channel) : base(client, guild, channel)
     {
         Identity = channel | this;
-        MessageChannelActor = new GatewayMessageChannelActor(client, channel, guild);
-        IntegrationChannelActor = new GatewayIntegrationChannelActor(client, guild, channel);
+        MessageChannelActor = new GatewayMessageChannelTrait(client, channel, guild);
+        IntegrationChannelActor = new GatewayIntegrationChannelTrait(client, guild, channel);
     }
 
     [SourceOfTruth]

@@ -36,7 +36,7 @@ global using DMChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestD
 global using GroupChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGroupChannel, Discord.Rest.RestGroupChannelActor, Discord.Models.IGroupDMChannelModel>;
 global using ThreadIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadChannel, Discord.Rest.RestThreadChannelActor, Discord.Models.IThreadChannelModel>;
 global using ChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestChannel, Discord.Rest.RestChannelActor, Discord.Models.IChannelModel>;
-global using MessageChannelIdentity = Discord.IIdentifiable<ulong, Discord.IMessageChannel, Discord.IMessageChannelActor, Discord.Models.IChannelModel>;
+global using MessageChannelIdentity = Discord.IIdentifiable<ulong, Discord.IMessageChannel, Discord.IMessageChannelTrait, Discord.Models.IChannelModel>;
 global using GuildChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildChannel, Discord.Rest.RestGuildChannelActor, Discord.Models.IGuildChannelModel>;
 global using ThreadableChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadableChannel, Discord.Rest.RestThreadableChannelActor, Discord.Models.IThreadableChannelModel>;
 global using VoiceChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestVoiceChannel, Discord.Rest.RestVoiceChannelActor, Discord.Models.IGuildVoiceChannelModel>;
@@ -46,7 +46,11 @@ global using NewsChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Res
 global using TextChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestTextChannel, Discord.Rest.RestTextChannelActor, Discord.Models.IGuildTextChannelModel>;
 global using StageChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestStageChannel, Discord.Rest.RestStageChannelActor, Discord.Models.IGuildStageChannelModel>;
 global using CategoryChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestCategoryChannel, Discord.Rest.RestCategoryChannelActor, Discord.Models.IGuildCategoryChannelModel>;
-global using IntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IIntegrationChannelActor, Discord.Models.IGuildChannelModel>;
+
+global using IntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
+global using IncomingIntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IIncomingIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
+global using ChannelFollowerIntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IChannelFollowerIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
+
 #endregion
 
 #region Messages

@@ -13,7 +13,7 @@ public sealed partial class GatewayMediaChannelActor :
 {
     [SourceOfTruth] internal override MediaChannelIdentity Identity { get; }
 
-    [ProxyInterface] internal GatewayIntegrationChannelActor IntegrationChannelActor { get; }
+    [ProxyInterface] internal GatewayIntegrationChannelTrait IntegrationChannelActor { get; }
 
     [method: TypeFactory]
     public GatewayMediaChannelActor(
@@ -23,7 +23,7 @@ public sealed partial class GatewayMediaChannelActor :
     ) : base(client, guild, channel)
     {
         Identity = channel | this;
-        IntegrationChannelActor = new GatewayIntegrationChannelActor(client, guild, channel);
+        IntegrationChannelActor = new GatewayIntegrationChannelTrait(client, guild, channel);
     }
 
     [SourceOfTruth]

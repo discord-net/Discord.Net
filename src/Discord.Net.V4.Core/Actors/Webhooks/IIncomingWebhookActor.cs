@@ -9,5 +9,5 @@ namespace Discord;
 public partial interface IIncomingWebhookActor :
     IWebhookActor,
     IGuildRelationship,
-    IChannelRelationship<IIntegrationChannelActor, IIntegrationChannel>,
+    IChannelRelationship<IIntegrationChannelTrait, IIntegrationChannel>,
     IActor<ulong, IIncomingWebhook>;

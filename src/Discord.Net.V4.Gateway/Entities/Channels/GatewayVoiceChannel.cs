@@ -12,10 +12,10 @@ public partial class GatewayVoiceChannelActor :
 {
     [SourceOfTruth] internal override VoiceChannelIdentity Identity { get; }
 
-    [ProxyInterface] internal GatewayMessageChannelActor MessageChannelActor { get; }
+    [ProxyInterface] internal GatewayMessageChannelTrait MessageChannelActor { get; }
 
     [ProxyInterface]
-    internal GatewayIntegrationChannelActor IntegrationChannelActor { get; }
+    internal GatewayIntegrationChannelTrait IntegrationChannelActor { get; }
 
     [TypeFactory]
     public GatewayVoiceChannelActor(
@@ -24,8 +24,8 @@ public partial class GatewayVoiceChannelActor :
         VoiceChannelIdentity channel) : base(client, guild, channel)
     {
         Identity = channel | this;
-        MessageChannelActor = new GatewayMessageChannelActor(client, channel, guild);
-        IntegrationChannelActor = new GatewayIntegrationChannelActor(client, guild, channel);
+        MessageChannelActor = new GatewayMessageChannelTrait(client, channel, guild);
+        IntegrationChannelActor = new GatewayIntegrationChannelTrait(client, guild, channel);
     }
 
     [SourceOfTruth]

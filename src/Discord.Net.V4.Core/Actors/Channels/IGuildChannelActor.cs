@@ -12,7 +12,7 @@ namespace Discord;
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IGuildChannelActor :
     IGuildRelationship,
-    IInvitableChannelActor,
+    IInvitableChannelTrait,
     IActor<ulong, IGuildChannel>
 {
     [return: TypeHeuristic(nameof(Invites))]

@@ -14,8 +14,8 @@ public sealed partial class GatewayDMChannelActor :
 
     [SourceOfTruth] internal override DMChannelIdentity Identity { get; }
 
-    [ProxyInterface(typeof(IMessageChannelActor))]
-    internal GatewayMessageChannelActor MessageChannelActor { get; }
+    [ProxyInterface(typeof(IMessageChannelTrait))]
+    internal GatewayMessageChannelTrait MessageChannelActor { get; }
 
     public GatewayDMChannelActor(
         DiscordGatewayClient client,
@@ -25,7 +25,7 @@ public sealed partial class GatewayDMChannelActor :
     {
         Identity = channel | this;
         Recipient = client.Users >> recipient;
-        MessageChannelActor = new GatewayMessageChannelActor(client, channel);
+        MessageChannelActor = new GatewayMessageChannelTrait(client, channel);
     }
 
     [SourceOfTruth]

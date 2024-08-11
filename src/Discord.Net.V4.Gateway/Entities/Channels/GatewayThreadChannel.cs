@@ -19,7 +19,7 @@ public sealed partial class GatewayThreadChannelActor :
 
     [SourceOfTruth] internal override ThreadChannelIdentity Identity { get; }
 
-    [ProxyInterface] internal GatewayMessageChannelActor MessageChannelActor { get; }
+    [ProxyInterface] internal GatewayMessageChannelTrait MessageChannelActor { get; }
 
     [TypeFactory]
     public GatewayThreadChannelActor(

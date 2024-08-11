@@ -53,13 +53,16 @@ public partial class GatewayGuildInvite :
         IInviteModel model)
     {
         if (model.ChannelId.HasValue)
-        {
-
-        }
+            return GatewayGuildChannelInvite.Construct(client, context, model);
 
         return new GatewayGuildInvite(
             client,
-            context.Path.RequireIdentity(Template.Of<GuildIdentity>()),
+            context.Path.GetIdentity(Template.Of<GuildIdentity>()) ??
+            (
+                model.GuildId.HasValue
+                    ? GuildIdentity.Of(model.GuildId!.Value)
+                    : throw new ArgumentException("Expected a guild either on the model or in the context")
+            ),
             model,
             context.TryGetActor<GatewayGuildInviteActor>()
         );

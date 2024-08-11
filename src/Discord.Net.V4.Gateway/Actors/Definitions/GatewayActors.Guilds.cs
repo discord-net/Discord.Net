@@ -247,6 +247,24 @@ internal static partial class GatewayActors
         );
     }
 
+    public static GatewayGuildInvites GuildInvites(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        CachePathable path
+    ) => new(
+        client,
+        id => new GatewayGuildInviteActor(client, guild, GuildInviteIdentity.Of(id)),
+        model => RestGuildInvite.Construct(
+            client.Rest,
+            new RestGuildInvite.Context(
+                IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>.Of(guild.Id)
+            ),
+            model
+        ),
+        path,
+        IGuildInvite.FetchManyRoute(path)
+    );
+
     public static GatewayGuildChannelInvites ChannelInvites(
         DiscordGatewayClient client,
         GuildIdentity guild,

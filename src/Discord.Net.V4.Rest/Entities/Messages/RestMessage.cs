@@ -13,7 +13,7 @@ public partial class RestMessageActor :
     RestActor<ulong, RestMessage, MessageIdentity>,
     IMessageActor
 {
-    [SourceOfTruth] public RestMessageChannelActor Channel { get; }
+    [SourceOfTruth] public RestMessageChannelTrait Channel { get; }
 
     internal override MessageIdentity Identity { get; }
 
@@ -31,7 +31,11 @@ public partial class RestMessageActor :
 
         GuildIdentity = guild;
 
-        Channel = new RestMessageChannelActor(client, channel, guild);
+        Channel = new RestMessageChannelTrait(
+            client,
+            channel.Actor as RestChannelActor ?? client.Channels[channel.Id],
+            channel
+        );
     }
 
     [SourceOfTruth]

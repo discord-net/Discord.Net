@@ -260,11 +260,16 @@ public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContex
 
     private static IMethodSymbol? FindBestFetchMethod(INamedTypeSymbol coreActor)
     {
-        return coreActor
-            .GetMembers()
-            .OfType<IMethodSymbol>()
-            .Where(x => x.Name == "FetchAsync")
-            .OrderByDescending(x => x.Parameters.Length)
+        return Hierarchy.GetHierarchy(coreActor)
+            .Select(x => x.Type)
+            .Prepend(coreActor)
+            .Where(LoadableTrait.IsLoadable)
+            .SelectMany(x => x
+                .GetMembers()
+                .OfType<IMethodSymbol>()
+                .Where(x => x is {Name: "FetchAsync", ExplicitInterfaceImplementations.Length: 0})
+            )
+            //.OrderByDescending(x => x.Parameters.Length)
             .FirstOrDefault();
     }
 
@@ -364,6 +369,7 @@ public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContex
 
         var fetchMethod = SyntaxFactory.ParseMemberDeclaration(
             $$"""
+              // {{bestMatch?.ToDisplayString() ?? "Default Implementation"}}
               public{{modifier}} async ValueTask<{{restEntityType}}?> FetchAsync{{parameters.NormalizeWhitespace()}}
               {
                   if ((options?.AllowCached ?? true) && CachedValue is not null)

@@ -11,13 +11,13 @@ public sealed partial class GatewayGroupChannelActor :
 {
     [SourceOfTruth] internal override GroupChannelIdentity Identity { get; }
 
-    [ProxyInterface] internal GatewayMessageChannelActor MessageChannelActor { get; }
+    [ProxyInterface] internal GatewayMessageChannelTrait MessageChannelActor { get; }
 
     public GatewayGroupChannelActor(DiscordGatewayClient client,
         GroupChannelIdentity channel) : base(client, channel)
     {
         Identity = channel | this;
-        MessageChannelActor = new GatewayMessageChannelActor(client, channel);
+        MessageChannelActor = new GatewayMessageChannelTrait(client, channel);
     }
 
     [SourceOfTruth]

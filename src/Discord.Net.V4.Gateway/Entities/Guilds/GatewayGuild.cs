@@ -64,6 +64,8 @@ public sealed partial class GatewayGuildActor :
             CurrentMemberIdentity.Of(Client.CurrentUser.Id)
         );
 
+        Invites = GuildInvites(client, Identity, CachePath);
+
         Channels =
             GuildRelatedEntity<RestGuildChannel>(Of<GatewayGuildChannelActor>(), client, Identity, CachePath);
         TextChannels =

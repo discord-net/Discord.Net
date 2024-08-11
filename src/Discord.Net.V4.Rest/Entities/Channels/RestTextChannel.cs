@@ -5,19 +5,25 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-[ExtendInterfaceDefaults(
-    typeof(ITextChannelActor)
-)]
+using MessageChannelTrait = RestMessageChannelTrait<RestTextChannelActor, TextChannelIdentity>;
+using IncomingIntegrationChannelTrait = RestIncomingIntegrationChannelTrait<RestTextChannelActor, RestTextChannel, TextChannelIdentity>;
+using ChannelFollowerIntegrationChannelTrait = RestChannelFollowerIntegrationChannelTrait<RestTextChannelActor, RestTextChannel, TextChannelIdentity>;
+
+
+[ExtendInterfaceDefaults]
 public partial class RestTextChannelActor :
     RestThreadableChannelActor,
     ITextChannelActor,
     IRestActor<ulong, RestTextChannel, TextChannelIdentity>
 {
-    [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; }
+    [ProxyInterface(typeof(IMessageChannelTrait))]
+    internal MessageChannelTrait MessageChannelTrait { get; }
 
-    [ProxyInterface(typeof(IIntegrationChannelActor))]
-    internal RestIntegrationChannelActor IntegrationChannelActor { get; }
+    [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
+    internal IncomingIntegrationChannelTrait IncomingIntegrationChannelTrait { get; }
+
+    [ProxyInterface(typeof(IChannelFollowerIntegrationChannelTrait))]
+    internal ChannelFollowerIntegrationChannelTrait ChannelFollowerIntegrationChannelTrait { get; }
 
     [SourceOfTruth] internal override TextChannelIdentity Identity { get; }
 
@@ -30,8 +36,10 @@ public partial class RestTextChannelActor :
     {
         channel = Identity = channel | this;
 
-        MessageChannelActor = new RestMessageChannelActor(client, channel);
-        IntegrationChannelActor = new RestIntegrationChannelActor(client, Guild.Identity, channel);
+        MessageChannelTrait = new MessageChannelTrait(client, this, channel);
+
+        IncomingIntegrationChannelTrait = new(client, this, channel);
+        ChannelFollowerIntegrationChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]
@@ -53,7 +61,7 @@ public partial class RestTextChannel :
 
     [ProxyInterface(
         typeof(ITextChannelActor),
-        typeof(IMessageChannelActor),
+        typeof(IMessageChannelTrait),
         typeof(IEntityProvider<ITextChannel, IGuildTextChannelModel>)
     )]
     internal override RestTextChannelActor Actor { get; }

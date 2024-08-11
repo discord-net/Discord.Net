@@ -3,6 +3,9 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
+using ChannelFollowerIntegrationChannelTrait =
+    RestChannelFollowerIntegrationChannelTrait<RestStageChannelActor, RestStageChannel, StageChannelIdentity>;
+
 [ExtendInterfaceDefaults]
 public sealed partial class RestStageChannelActor :
     RestVoiceChannelActor,
@@ -10,6 +13,9 @@ public sealed partial class RestStageChannelActor :
     IRestActor<ulong, RestStageChannel, StageChannelIdentity>
 {
     [SourceOfTruth] public RestStageInstanceActor StageInstance { get; }
+
+    [ProxyInterface(typeof(IChannelFollowerIntegrationChannelTrait))]
+    internal ChannelFollowerIntegrationChannelTrait ChannelFollowerIntegrationChannelTrait {  get; }
 
     [SourceOfTruth] internal override StageChannelIdentity Identity { get; }
 
@@ -22,6 +28,8 @@ public sealed partial class RestStageChannelActor :
     {
         Identity = channel | this;
         StageInstance = new RestStageInstanceActor(client, Guild.Identity, Identity, StageInstanceIdentity.Of(channel.Id));
+
+        ChannelFollowerIntegrationChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]

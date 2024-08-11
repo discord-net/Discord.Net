@@ -133,12 +133,18 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
 
             if (attribute is null) continue;
 
+
             var types = attribute.ConstructorArguments
                 .FirstOrDefault()
                 .Values
                 .Select(x => x.Value as INamedTypeSymbol)
                 .OfType<INamedTypeSymbol>()
                 .ToList();
+
+            if (types.Count == 0 && property.Type is ITypeParameterSymbol typeParameter)
+            {
+                types.AddRange(typeParameter.ConstraintTypes.OfType<INamedTypeSymbol>());
+            }
 
             result.Add(property, types);
         }
@@ -327,16 +333,6 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
                 }
             }
 
-            // var target = conflicting.Aggregate(potential, (a, b) =>
-            // {
-            //     if (model.Compilation.HasImplicitConversion(a.MemberReturnType, b.MemberReturnType))
-            //         return a;
-            //     else if(model.Compilation.HasImplicitConversion(b.MemberReturnType, a.MemberReturnType))
-            //         return b;
-            //
-            //     return a;
-            // });
-
             logger.Log($"picked {buckets.Count} from the following conflicting members:");
 
             foreach (var conflict in (ProxiedMember[]) [potential, ..conflicting])
@@ -422,7 +418,7 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
 
         foreach (var target in prepared)
         {
-            if (generated.ContainsKey(target.Key.ToDisplayString()))
+            if (generated.ContainsKey(target.Key.ToFullMetadataName()))
                 continue;
 
             var targetLogger = logger.WithSemanticContext(target.Value.Target.SemanticModel);
@@ -461,8 +457,16 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
 
             var syntax = SyntaxUtils.CreateSourceGenClone(target.Value.Target.ClassDeclarationSyntax);
 
+            var generatedMembers = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+
             foreach (var member in target.Value.Members)
             {
+                if (!generatedMembers.Add(member.Symbol))
+                {
+                    targetLogger.Log($"{target.Key}: Skipping {member.Symbol} (already implemented)");
+                    continue;
+                }
+
                 AddProxiedMember(
                     ref syntax,
                     member,
@@ -514,21 +518,21 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
                 ]);
             }
 
-            generated.Add(target.Key.ToDisplayString(), (syntax, target.Value.Target));
+            generated.Add(target.Key.ToFullMetadataName(), (syntax, target.Value.Target));
         }
 
         foreach (var item in generated)
         {
+            logger.Log($"Generating {item.Key}");
+
             context.AddSource(
-                $"InterfaceProxy/{item.Key}.g.cs",
+                $"InterfaceProxy/{item.Key}",
                 $$"""
+                  {{item.Value.Target.ClassDeclarationSyntax.GetFormattedUsingDirectives()}}
+
                   namespace {{ModelExtensions.GetDeclaredSymbol(item.Value.Target.SemanticModel, item.Value.Target.ClassDeclarationSyntax)!.ContainingNamespace}};
 
-                  #nullable enable
-
                   {{item.Value.Syntax.NormalizeWhitespace()}}
-
-                  #nullable restore
                   """
             );
         }

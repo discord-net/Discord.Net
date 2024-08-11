@@ -12,7 +12,7 @@ public sealed partial class RestChannelFollowerWebhookActor :
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
 
-    [SourceOfTruth] public RestIntegrationChannelActor Channel { get; }
+    [SourceOfTruth] public RestChannelFollowerIntegrationChannelTrait Channel { get; }
 
     [SourceOfTruth]
     internal override WebhookIdentity Identity { get; }
@@ -21,14 +21,14 @@ public sealed partial class RestChannelFollowerWebhookActor :
     public RestChannelFollowerWebhookActor(
         DiscordRestClient client,
         GuildIdentity guild,
-        IntegrationChannelIdentity channel,
+        ChannelFollowerIntegrationChannelIdentity channel,
         WebhookIdentity webhook
     ) : base(client, webhook)
     {
         Identity = webhook | this;
 
         Guild = new RestGuildActor(client, guild);
-        Channel = new RestIntegrationChannelActor(client, guild, channel);
+        Channel = new(client, Guild.Channels[channel.Id], channel);
     }
 
     [SourceOfTruth]
@@ -42,7 +42,7 @@ public sealed partial class RestChannelFollowerWebhook :
     IContextConstructable<RestChannelFollowerWebhook, IWebhookModel, RestChannelFollowerWebhook.Context,
         DiscordRestClient>
 {
-    public readonly record struct Context(GuildIdentity Guild, IntegrationChannelIdentity Channel);
+    public readonly record struct Context(GuildIdentity Guild, ChannelFollowerIntegrationChannelIdentity Channel);
 
     [SourceOfTruth] public RestGuildActor? SourceGuild { get; private set; }
 
@@ -60,7 +60,7 @@ public sealed partial class RestChannelFollowerWebhook :
     internal RestChannelFollowerWebhook(
         DiscordRestClient client,
         GuildIdentity guild,
-        IntegrationChannelIdentity channel,
+        ChannelFollowerIntegrationChannelIdentity channel,
         IWebhookModel model,
         RestChannelFollowerWebhookActor? actor = null
     ) : base(client, model, actor)

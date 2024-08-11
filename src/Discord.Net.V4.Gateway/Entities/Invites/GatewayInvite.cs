@@ -62,7 +62,8 @@ public partial class GatewayInvite :
         IGatewayConstructionContext context,
         IInviteModel model)
     {
-        // TODO: switch invite guild/channel
+        if(model.GuildId.HasValue)
+            return GatewayGuildInvite.Construct(client, context, model);
 
         return new GatewayInvite(
             client,

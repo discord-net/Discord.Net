@@ -9,5 +9,5 @@ public partial interface IGuildChannelInviteActor :
     [SourceOfTruth]
     new IGuildChannelActor Channel { get; }
 
-    IInvitableChannelActor IChannelRelationship<IInvitableChannelActor, IInvitableChannel>.Channel => Channel;
+    IInvitableChannelTrait IChannelRelationship<IInvitableChannelTrait, IInvitableChannel>.Channel => Channel;
 }

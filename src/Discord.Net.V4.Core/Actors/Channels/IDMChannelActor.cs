@@ -9,7 +9,7 @@ namespace Discord;
 [Deletable(nameof(Routes.DeleteChannel))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IDMChannelActor :
-    IMessageChannelActor,
+    IMessageChannelTrait,
     IUserRelationship,
     IActor<ulong, IDMChannel>
 {

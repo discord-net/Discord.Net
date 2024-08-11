@@ -10,7 +10,7 @@ namespace Discord;
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IThreadChannelActor :
     IGuildChannelActor,
-    IMessageChannelActor,
+    IMessageChannelTrait,
     IThreadMemberRelationship,
     IActor<ulong, IThreadChannel>
 {

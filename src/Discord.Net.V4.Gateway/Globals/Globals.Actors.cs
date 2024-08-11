@@ -226,3 +226,14 @@ global using GatewayMediaChannels = Discord.Gateway.GatewayEnumerableIndexableAc
     Discord.Models.IGuildMediaChannelModel,
     System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
 >;
+
+global using GatewayIntegrationChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
+    Discord.Gateway.GatewayIntegrationChannelTrait,
+    ulong,
+    Discord.Gateway.GatewayIntegration,
+    Discord.Rest.RestMediaChannel,
+    Discord.IMediaChannel,
+    Discord.Models.IGuildMediaChannelModel,
+    System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
+>;
+

@@ -9,6 +9,6 @@ namespace Discord;
 [Modifiable<ModifyVoiceChannelProperties>(nameof(Routes.ModifyChannel))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IVoiceChannelActor :
-    IMessageChannelActor,
-    IIntegrationChannelActor,
+    IMessageChannelTrait,
+    IIncomingIntegrationChannelTrait,
     IActor<ulong, IVoiceChannel>;

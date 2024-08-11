@@ -342,9 +342,9 @@ public static class Hierarchy
         }
     }
 
-    public static List<SortedHierarchySymbol> GetHierarchy(ITypeSymbol symbol)
+    public static List<SortedHierarchySymbol> GetHierarchy(ITypeSymbol symbol, bool cache = true)
     {
-        return _cache.TryGetValue(symbol, out var cached)
+        return cache && _cache.TryGetValue(symbol, out var cached)
             ? cached
             : _cache[symbol] = CreateHierarchyMap(symbol);
     }

@@ -56,9 +56,7 @@ public static class ModifyTrait
         if (traitAttribute.ConstructorArguments.Length != 1)
             return false;
 
-        var actorInterface = Hierarchy.GetHierarchy(symbol)
-            .FirstOrDefault(x => x.Type.ToDisplayString().StartsWith("Discord.IActor"))
-            .Type;
+        var actorInterface = EntityTraits.GetActorInterface(symbol);
 
         if (actorInterface is null)
         {

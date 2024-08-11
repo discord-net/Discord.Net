@@ -2,9 +2,9 @@ using Discord.Models;
 
 namespace Discord.Gateway;
 
-public sealed partial class GatewayIntegrationChannelActor :
+public sealed partial class GatewayIntegrationChannelTrait :
     GatewayGuildChannelActor,
-    IIntegrationChannelActor
+    IIntegrationChannelTrait
 {
     public IEnumerableIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks => throw new NotImplementedException();
 
@@ -14,12 +14,13 @@ public sealed partial class GatewayIntegrationChannelActor :
 
     internal new IntegrationChannelIdentity Identity { get; }
 
-    public GatewayIntegrationChannelActor(
+    public GatewayIntegrationChannelTrait(
         DiscordGatewayClient client,
         GuildIdentity guild,
         IntegrationChannelIdentity channel
     ) : base(client, guild, channel.Cast<GatewayGuildChannel, GatewayGuildChannelActor, IGuildChannelModel>())
     {
         Identity = channel;
+
     }
 }

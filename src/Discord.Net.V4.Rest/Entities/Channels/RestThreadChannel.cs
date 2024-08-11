@@ -11,14 +11,16 @@ using EnumerableThreadMembers =
     RestEnumerableIndexableActor<RestThreadMemberActor, ulong, RestThreadMember, IThreadMember,
         IEnumerable<IThreadMemberModel>>;
 
+using MessageChannelTrait = RestMessageChannelTrait<RestThreadChannelActor, ThreadIdentity>;
+
 [ExtendInterfaceDefaults]
 public partial class RestThreadChannelActor :
     RestGuildChannelActor,
     IThreadChannelActor,
     IRestActor<ulong, RestThreadChannel, ThreadIdentity>
 {
-    [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; }
+    [ProxyInterface(typeof(IMessageChannelTrait))]
+    internal MessageChannelTrait MessageChannelTrait { get; }
 
     [SourceOfTruth] public RestThreadMemberActor CurrentThreadMember { get; }
 
@@ -36,7 +38,7 @@ public partial class RestThreadChannelActor :
     {
         thread = Identity = thread | this;
 
-        MessageChannelActor = new RestMessageChannelActor(client, thread);
+        MessageChannelTrait = new(client, this, thread);
 
         currentThreadMember |= client.CurrentUser;
 

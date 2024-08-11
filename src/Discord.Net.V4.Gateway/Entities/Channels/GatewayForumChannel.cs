@@ -13,8 +13,8 @@ public sealed partial class GatewayForumChannelActor :
 {
     [SourceOfTruth] internal override ForumChannelIdentity Identity { get; }
 
-    [ProxyInterface(typeof(IIntegrationChannelActor))]
-    internal GatewayIntegrationChannelActor IntegrationChannelActor { get; }
+    [ProxyInterface(typeof(IIntegrationChannelTrait))]
+    internal GatewayIntegrationChannelTrait IntegrationChannelActor { get; }
 
     [TypeFactory]
     public GatewayForumChannelActor(
@@ -24,7 +24,7 @@ public sealed partial class GatewayForumChannelActor :
     ) : base(client, guild, channel)
     {
         Identity = channel | this;
-        IntegrationChannelActor = new GatewayIntegrationChannelActor(client, guild, channel);
+        IntegrationChannelActor = new GatewayIntegrationChannelTrait(client, guild, channel);
     }
 
     [SourceOfTruth]

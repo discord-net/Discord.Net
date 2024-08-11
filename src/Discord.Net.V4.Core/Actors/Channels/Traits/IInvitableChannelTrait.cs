@@ -3,7 +3,8 @@ using Discord.Rest;
 
 namespace Discord;
 
-public interface IInvitableChannelActor :
+[Trait]
+public interface IInvitableChannelTrait :
     IChannelActor,
-    IActor<ulong, IInvitableChannel>,
+    IActorTrait<ulong, IInvitableChannel>,
     IInvitable<CreateChannelInviteProperties>;

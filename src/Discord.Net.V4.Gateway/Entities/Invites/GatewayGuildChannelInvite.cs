@@ -50,8 +50,18 @@ public sealed partial class GatewayGuildChannelInvite :
         IInviteModel model
     ) => new(
         client,
-        context.Path.RequireIdentity(Template.T<GuildIdentity>()),
-        context.Path.RequireIdentity(Template.T<GuildChannelIdentity>()),
+        context.Path.GetIdentity(Template.T<GuildIdentity>()) ??
+        (
+            model.GuildId.HasValue
+                ? GuildIdentity.Of(model.GuildId!.Value)
+                : throw new ArgumentException("Expected a guild either on the model or in the context")
+        ),
+        context.Path.GetIdentity(Template.T<GuildChannelIdentity>()) ??
+        (
+            model.ChannelId.HasValue
+                ? GuildChannelIdentity.Of(model.ChannelId!.Value)
+                : throw new ArgumentException("Expected a guild either on the model or in the context")
+        ),
         model,
         context.TryGetActor<GatewayGuildChannelInviteActor>()
     );

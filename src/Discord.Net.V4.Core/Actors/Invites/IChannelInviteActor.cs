@@ -1,5 +1,5 @@
 namespace Discord;
 
 public interface IChannelInviteActor :
-    IChannelRelationship<IInvitableChannelActor, IInvitableChannel>,
+    IChannelRelationship<IInvitableChannelTrait, IInvitableChannel>,
     IActor<string, IChannelInvite>;

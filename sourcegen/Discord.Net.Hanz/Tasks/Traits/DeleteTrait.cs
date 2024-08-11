@@ -18,8 +18,7 @@ public static class DeleteTrait
             return;
 
         // get the id type
-        var actorInterface = target.InterfaceSymbol.AllInterfaces
-            .FirstOrDefault(x => x.ToDisplayString().StartsWith("Discord.IActor"));
+        var actorInterface = EntityTraits.GetActorInterface(target.InterfaceSymbol);
 
         if (actorInterface is null)
             return;

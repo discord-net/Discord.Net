@@ -5,14 +5,16 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
+using IncomingIntegrationChannelTrait = RestIncomingIntegrationChannelTrait<RestMediaChannelActor, RestMediaChannel, MediaChannelIdentity>;
+
 [ExtendInterfaceDefaults]
 public sealed partial class RestMediaChannelActor :
     RestThreadableChannelActor,
     IMediaChannelActor,
     IRestActor<ulong, RestMediaChannel, MediaChannelIdentity>
 {
-    [ProxyInterface(typeof(IIntegrationChannelActor))]
-    internal RestIntegrationChannelActor IntegrationChannelActor { get; }
+    [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
+    internal IncomingIntegrationChannelTrait IntegrationChannelActor { get; }
 
     [SourceOfTruth] internal override MediaChannelIdentity Identity { get; }
 
@@ -25,7 +27,7 @@ public sealed partial class RestMediaChannelActor :
     {
         Identity = channel | this;
 
-        IntegrationChannelActor = new RestIntegrationChannelActor(client, Guild.Identity, Identity);
+        IntegrationChannelActor = new(client, this, channel);
     }
 
     [CovariantOverride]

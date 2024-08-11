@@ -5,4 +5,4 @@ namespace Discord;
 /// </summary>
 public partial interface IMessageChannel :
     IChannel,
-    IMessageChannelActor;
+    IMessageChannelTrait;

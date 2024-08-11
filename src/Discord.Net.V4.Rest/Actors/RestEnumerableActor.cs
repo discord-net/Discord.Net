@@ -3,30 +3,45 @@ using Discord.Rest.Actors;
 using System.Collections.Immutable;
 
 namespace Discord.Rest;
-//
-// public class RestEnumerableActor<TId, TEntity, TModel>(
-//     DiscordRestClient client,
-//     Func<TModel, IEnumerable<TEntity>> factory,
-//     IApiOutRoute<TModel> route
-// ):
-//     IEnumerableActor<TId, TEntity>
-//     where TEntity : class, IEntity<TId>
-//     where TId : IEquatable<TId>
-//     where TModel : class
-// {
-//     public async ValueTask<IReadOnlyCollection<TEntity>> AllAsync(RequestOptions? options = null, CancellationToken token = default)
-//     {
-//         var model = await client.ApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token);
-//
-//         if (model is null)
-//             return [];
-//
-//         return factory(model).ToImmutableArray();
-//     }
-// }
 
 public static class RestEnumerableIndexableActor
 {
+    public static RestEnumerableIndexableActor<
+        TTraitActor,
+        TId,
+        TEntity,
+        TCore,
+        IEnumerable<TModel>
+    > CreateTrait<
+        TTraitActor,
+        TId,
+        TEntity,
+        TCore,
+        TApiModel,
+        TModel
+    >(
+        DiscordRestClient client,
+        Func<TId, TTraitActor> actorFactory,
+        Func<IEnumerable<TModel>, IEnumerable<TEntity>> factory,
+        IApiOutRoute<TApiModel> route,
+        Func<TApiModel, IEnumerable<TModel>> transform
+    )
+        where TEntity : RestEntity<TId>, IEntity<TId, TModel>
+        where TId : IEquatable<TId>
+        where TModel : class, IEntityModel<TId>
+        where TTraitActor : class, IRestTrait<TId, TEntity>, IActor<TId, TCore>
+        where TCore : class, IEntity<TId, TModel>
+        where TApiModel : class
+    {
+        return new RestEnumerableIndexableActor<TTraitActor, TId, TEntity, TCore, TApiModel, IEnumerable<TModel>>(
+            client,
+            actorFactory,
+            factory,
+            route,
+            transform
+        );
+    }
+
     public static RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>>
         Create<TActor, TId, TEntity, TCore, TApiModel, TModel>(
             DiscordRestClient client,
@@ -38,7 +53,7 @@ public static class RestEnumerableIndexableActor
         where TEntity : RestEntity<TId>, TCore
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
-        where TActor : class, IActor<TId, TEntity>
+        where TActor : class, IRestActor<TId, TEntity>, IActor<TId, TCore>
         where TCore : class, IEntity<TId, TModel>
         where TApiModel : class
     {
@@ -61,7 +76,7 @@ public static class RestEnumerableIndexableActor
         where TEntity : RestEntity<TId>, TCore
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
-        where TActor : class, IActor<TId, TEntity>
+        where TActor : class, IRestActor<TId, TEntity>, IActor<TId, TCore>
         where TCore : class, IEntity<TId, TModel>
     {
         return new RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>>(
@@ -94,10 +109,10 @@ internal sealed class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, 
         factory,
         (options, token) => FetchAsync(client, route, transform, options, token)
     )
-    where TEntity : RestEntity<TId>, TCore
+    where TEntity : RestEntity<TId>, IEntity<TId, IEntityModel<TId>>
     where TId : IEquatable<TId>
     where TApi : class
-    where TActor : class, IActor<TId, TEntity>
+    where TActor : class, IRestActor<TId, TEntity>, IActor<TId, TCore>
     where TCore : class, IEntity<TId, IEntityModel<TId>>
     where TApiModel : class
 {
@@ -120,10 +135,10 @@ public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApi>(
     Func<RequestOptions?, CancellationToken, Task<TApi?>> fetch
 ) :
     IEnumerableIndexableActor<TActor, TId, TCore>
-    where TEntity : RestEntity<TId>, TCore
+    where TEntity : RestEntity<TId>, IEntity<TId, IEntityModel<TId>>
     where TId : IEquatable<TId>
     where TApi : class
-    where TActor : class, IActor<TId, TEntity>
+    where TActor : class, IRestActor<TId, TEntity>, IActor<TId, TCore>
     where TCore : class, IEntity<TId, IEntityModel<TId>>
 {
     public TActor this[TId id] => Specifically(id);
@@ -145,6 +160,12 @@ public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApi>(
 
     async ValueTask<IReadOnlyCollection<TCore>> IEnumerableActor<TId, TCore>.AllAsync(
         RequestOptions? options,
-        CancellationToken token
-    ) => await AllAsync(options, token);
+        CancellationToken token)
+    {
+        var result = await AllAsync(options, token);
+
+        if (result is IReadOnlyCollection<TCore> core) return core;
+
+        return result.OfType<TCore>().ToList().AsReadOnly();
+    }
 }

@@ -3,28 +3,36 @@ using Discord.Models.Json;
 
 namespace Discord.Rest;
 
+using MessageChannelTrait = RestMessageChannelTrait<RestGroupChannelActor, GroupChannelIdentity>;
+
 [ExtendInterfaceDefaults]
 public partial class RestGroupChannelActor :
     RestChannelActor,
     IGroupChannelActor,
     IRestActor<ulong, RestGroupChannel, GroupChannelIdentity>
 {
-    [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; }
+    [ProxyInterface(typeof(IMessageChannelTrait))]
+    internal MessageChannelTrait MessageChannelTrait { get; }
 
     [SourceOfTruth] internal sealed override GroupChannelIdentity Identity { get; }
 
     [TypeFactory]
-    public RestGroupChannelActor(DiscordRestClient client,
-        GroupChannelIdentity channel) : base(client, channel)
+    public RestGroupChannelActor(
+        DiscordRestClient client,
+        GroupChannelIdentity channel
+    ) : base(client, channel)
     {
         Identity = channel | this;
-        MessageChannelActor = new RestMessageChannelActor(client, Identity);
+        MessageChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]
     internal RestGroupChannel CreateEntity(IGroupDMChannelModel model)
         => RestGroupChannel.Construct(Client, model);
+
+    [SourceOfTruth]
+    internal virtual RestInvite CreateEntity(IInviteModel model)
+        => RestInvite.Construct(Client, model);
 }
 
 public partial class RestGroupChannel :
@@ -37,7 +45,7 @@ public partial class RestGroupChannel :
 
     [ProxyInterface(
         typeof(IGroupChannelActor),
-        typeof(IMessageChannelActor),
+        typeof(IMessageChannelTrait),
         typeof(IEntityProvider<IGroupChannel, IGroupDMChannelModel>)
     )]
     internal override RestGroupChannelActor Actor { get; }

@@ -5,17 +5,20 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
+using MessageChannelTrait = RestMessageChannelTrait<RestVoiceChannelActor, VoiceChannelIdentity>;
+using IncomingIntegrationChannelTrait = RestIncomingIntegrationChannelTrait<RestVoiceChannelActor, RestVoiceChannel, VoiceChannelIdentity>;
+
 [ExtendInterfaceDefaults]
 public partial class RestVoiceChannelActor :
     RestGuildChannelActor,
     IVoiceChannelActor,
     IRestActor<ulong, RestVoiceChannel, VoiceChannelIdentity>
 {
-    [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; }
+    [ProxyInterface(typeof(IMessageChannelTrait))]
+    internal MessageChannelTrait MessageChannelTrait { get; }
 
-    [ProxyInterface(typeof(IIntegrationChannelActor))]
-    internal RestIntegrationChannelActor IntegrationChannelActor { get; }
+    [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
+    internal IncomingIntegrationChannelTrait IncomingIntegrationChannelTrait { get; }
 
     [SourceOfTruth] internal override VoiceChannelIdentity Identity { get; }
 
@@ -28,8 +31,8 @@ public partial class RestVoiceChannelActor :
     {
         channel = Identity = channel | this;
 
-        MessageChannelActor = new RestMessageChannelActor(client, channel);
-        IntegrationChannelActor = new RestIntegrationChannelActor(client, Guild.Identity, channel);
+        MessageChannelTrait = new(client, this, channel);
+        IncomingIntegrationChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]
@@ -57,7 +60,7 @@ public partial class RestVoiceChannel :
 
     [ProxyInterface(
         typeof(IVoiceChannelActor),
-        typeof(IMessageChannelActor),
+        typeof(IMessageChannelTrait),
         typeof(IEntityProvider<IVoiceChannel, IGuildVoiceChannelModel>)
     )]
     internal override RestVoiceChannelActor Actor { get; }

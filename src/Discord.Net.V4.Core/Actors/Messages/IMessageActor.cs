@@ -8,5 +8,5 @@ namespace Discord;
 [Deletable(nameof(Routes.DeleteMessage))]
 [Modifiable<ModifyMessageProperties>(nameof(Routes.ModifyMessage))]
 public partial interface IMessageActor :
-    IChannelRelationship<IMessageChannelActor, IMessageChannel>,
+    IChannelRelationship<IMessageChannelTrait, IMessageChannel>,
     IActor<ulong, IMessage>;

@@ -11,8 +11,8 @@ public partial class RestDMChannelActor :
 {
     [SourceOfTruth] public RestUserActor Recipient { get; }
 
-    [ProxyInterface(typeof(IMessageChannelActor))]
-    internal RestMessageChannelActor MessageChannelActor { get; }
+    [ProxyInterface(typeof(IMessageChannelTrait))]
+    internal RestMessageChannelTrait<RestDMChannelActor, DMChannelIdentity> MessageChannelTrait { get; }
 
     [SourceOfTruth] internal sealed override DMChannelIdentity Identity { get; }
 
@@ -26,7 +26,7 @@ public partial class RestDMChannelActor :
         Identity = channel | this;
 
         Recipient = recipient.Actor ?? new(client, recipient);
-        MessageChannelActor = new RestMessageChannelActor(client, Identity);
+        MessageChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]

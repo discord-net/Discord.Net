@@ -35,6 +35,13 @@ using EnumerableCategoryChannelActor =
 using EnumerableAnnouncementChannelActor =
     RestEnumerableIndexableActor<RestNewsChannelActor, ulong, RestNewsChannel, INewsChannel,
         IEnumerable<IGuildChannelModel>>;
+using EnumerableIntegrationChannelActor = RestEnumerableIndexableActor<
+    RestIntegrationChannelTrait,
+    ulong,
+    RestGuildChannel,
+    IIntegrationChannel,
+    IEnumerable<IGuildChannelModel>
+>;
 using EnumerableThreadChannelActor =
     RestEnumerableIndexableActor<RestThreadChannelActor, ulong, RestThreadChannel, IThreadChannel,
         IEnumerable<IGuildChannelModel>>;
@@ -53,7 +60,8 @@ using EnumerableGuildScheduledEventActor =
     RestEnumerableIndexableActor<RestGuildScheduledEventActor, ulong, RestGuildScheduledEvent, IGuildScheduledEvent,
         IEnumerable<IGuildScheduledEventModel>>;
 using EnumerableInviteActor =
-    RestEnumerableIndexableActor<RestGuildInviteActor, string, RestGuildInvite, IGuildInvite, IEnumerable<IInviteModel>>;
+    RestEnumerableIndexableActor<RestGuildInviteActor, string, RestGuildInvite, IGuildInvite,
+        IEnumerable<IInviteModel>>;
 using EnumerableWebhookActor =
     RestEnumerableIndexableActor<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
 using ManagedRolesActor =
@@ -68,8 +76,6 @@ public sealed partial class RestGuildActor :
     RestActor<ulong, RestGuild, GuildIdentity>,
     IGuildActor
 {
-    [SourceOfTruth] public EnumerableMediaChannelActor MediaChannels { get; }
-
     [SourceOfTruth] public EnumerableGuildChannelActor Channels { get; }
 
     [SourceOfTruth] public EnumerableTextChannelActor TextChannels { get; }
@@ -86,11 +92,15 @@ public sealed partial class RestGuildActor :
 
     [SourceOfTruth] public EnumerableThreadChannelActor ActiveThreadChannels { get; }
 
+    [SourceOfTruth] public EnumerableForumChannelActor ForumChannels { get; }
+
+    [SourceOfTruth] public EnumerableMediaChannelActor MediaChannels { get; }
+
+    [SourceOfTruth] public EnumerableIntegrationChannelActor IntegrationChannels { get; }
+
     [SourceOfTruth] public EnumerableIntegrationActor Integrations { get; }
 
     [SourceOfTruth] public BansPager Bans { get; }
-
-    [SourceOfTruth] public EnumerableForumChannelActor ForumChannels { get; }
 
     [SourceOfTruth] public MembersPager Members { get; }
 
@@ -141,6 +151,15 @@ public sealed partial class RestGuildActor :
                 this,
                 Routes.ListActiveGuildThreads(Identity.Id),
                 api => api.Threads
+            );
+        IntegrationChannels =
+            RestActors.GuildRelatedTrait(
+                Template.T<RestIntegrationChannelTrait>(),
+                Template.T<RestGuildChannelActor>(),
+                client,
+                this,
+                IGuildChannel.FetchManyRoute(this),
+                model => IIntegrationChannelTrait.ImplementsTraitByModel(model.GetType())
             );
 
         Integrations = RestActors.GuildRelatedEntity(Template.T<RestIntegrationActor>(), client, this);
@@ -263,8 +282,7 @@ public sealed partial class RestGuild :
 
     internal override IGuildModel Model => _model;
 
-    [ProxyInterface]
-    internal RestGuildActor Actor { get; }
+    [ProxyInterface] internal RestGuildActor Actor { get; }
 
     private IGuildModel _model;
 

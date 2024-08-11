@@ -9,6 +9,7 @@ public class GatewayEvents
         client.UserUpdated += OnUserUpdateAsync;
         client.UserUpdatedEvent.Subscribe(OnUserUpdate);
 
+
     }
 
     public static async ValueTask OnUserUpdateAsync(GatewayCurrentUser user)

@@ -57,6 +57,10 @@ public partial interface IGuildActor :
     IMediaChannelActor MediaChannel(ulong id) => MediaChannels[id];
     IEnumerableIndexableActor<IMediaChannelActor, ulong, IMediaChannel> MediaChannels { get; }
 
+    [return: TypeHeuristic(nameof(IntegrationChannels))]
+    IIntegrationChannelTrait IntegrationChannel(ulong id) => IntegrationChannels[id];
+    IEnumerableIndexableActor<IIntegrationChannelTrait, ulong, IIntegrationChannel> IntegrationChannels { get; }
+
     #endregion
 
     [return: TypeHeuristic(nameof(Integrations))]

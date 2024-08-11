@@ -9,7 +9,7 @@ namespace Discord;
 [Invitable<CreateChannelInviteProperties>(nameof(Routes.CreateChannelInvite))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IGroupChannelActor :
-    IMessageChannelActor,
+    IMessageChannelTrait,
     IActor<ulong, IGroupChannel>
 {
     // TODO: invites

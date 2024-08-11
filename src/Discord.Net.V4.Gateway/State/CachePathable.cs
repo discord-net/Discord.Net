@@ -9,7 +9,6 @@ public sealed partial class CachePathable : IPathable, IReadOnlyDictionary<Type,
 {
     public static readonly CachePathable Empty = new CachePathable().MakeReadOnly();
 
-    //private readonly LinkedList<IIdentifiable<TId, TEntity, TModel>>
     private IDictionary<Type, object> _identities = new Dictionary<Type, object>();
 
     private IList<IPathable> _pathables = new List<IPathable>();
@@ -24,6 +23,11 @@ public sealed partial class CachePathable : IPathable, IReadOnlyDictionary<Type,
 
         return this;
     }
+
+    public bool Contains<TId, TEntity>(TId id)
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>
+        => TryGet<TId, TEntity>(out var existing) && id.Equals(existing);
 
     private bool TryGetIdentity<TId, TEntity>([MaybeNullWhen(false)]out IIdentifiable<TId> identity)
         where TId : IEquatable<TId>
@@ -98,7 +102,9 @@ public sealed partial class CachePathable : IPathable, IReadOnlyDictionary<Type,
         throw new KeyNotFoundException($"No entry exists for {typeof(TEntity)}");
     }
 
-    public bool TryGet<TId, TEntity>([MaybeNullWhen(false)] out TId id) where TId : IEquatable<TId> where TEntity : class, IEntity<TId>
+    public bool TryGet<TId, TEntity>([MaybeNullWhen(false)] out TId id)
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>
     {
         id = default;
 

@@ -36,10 +36,13 @@ public static partial class Routes
         ulong? aroundId = default,
         ulong? beforeId = default,
         ulong? afterId = default,
-        int? limit = default) =>
-        new ApiOutRoute<Message[]>(nameof(GetChannelMessages), RequestMethod.Get,
-            $"/channels/{channelId}/messages{RouteUtils.GetUrlEncodedQueryParams(("around", aroundId), ("before", beforeId), ("after", afterId), ("limit", limit))}",
-            (ScopeType.Channel, channelId));
+        int? limit = default
+    ) => new ApiOutRoute<Message[]>(
+        nameof(GetChannelMessages),
+        RequestMethod.Get,
+        $"/channels/{channelId}/messages{RouteUtils.GetUrlEncodedQueryParams(("around", aroundId), ("before", beforeId), ("after", afterId), ("limit", limit))}",
+        (ScopeType.Channel, channelId)
+    );
 
     public static IApiOutRoute<Message> GetChannelMessage([IdHeuristic<IChannel>] ulong channelId,
         [IdHeuristic<IMessage>] ulong messageId) =>
@@ -148,33 +151,39 @@ public static partial class Routes
         new ApiOutRoute<Message[]>(nameof(GetPinnedMessages), RequestMethod.Get, $"/channels/{channelId}/pins",
             (ScopeType.Channel, channelId));
 
-    public static IApiRoute PinMessage([IdHeuristic<IChannel>] ulong channelId, [IdHeuristic<IMessage>] ulong messageId) =>
+    public static IApiRoute PinMessage([IdHeuristic<IChannel>] ulong channelId,
+        [IdHeuristic<IMessage>] ulong messageId) =>
         new ApiRoute(nameof(PinMessage), RequestMethod.Put, $"/channels/{channelId}/pins/{messageId}",
             (ScopeType.Channel, channelId));
 
-    public static IApiRoute UnpinMessage([IdHeuristic<IChannel>] ulong channelId, [IdHeuristic<IMessage>] ulong messageId) =>
+    public static IApiRoute UnpinMessage([IdHeuristic<IChannel>] ulong channelId,
+        [IdHeuristic<IMessage>] ulong messageId) =>
         new ApiRoute(nameof(UnpinMessage), RequestMethod.Delete, $"/channels/{channelId}/pins/{messageId}",
             (ScopeType.Channel, channelId));
 
-    public static IApiInRoute<GroupDmAddRecipientParams> GroupDmAddRecipient([IdHeuristic<IGroupChannel>] ulong channelId, [IdHeuristic<IUser>] ulong userId,
+    public static IApiInRoute<GroupDmAddRecipientParams> GroupDmAddRecipient(
+        [IdHeuristic<IGroupChannel>] ulong channelId, [IdHeuristic<IUser>] ulong userId,
         GroupDmAddRecipientParams body) =>
         new ApiInRoute<GroupDmAddRecipientParams>(nameof(GroupDmAddRecipient), RequestMethod.Put,
             $"/channels/{channelId}/recipients/{userId}", body, ContentType.JsonBody, (ScopeType.Channel, channelId));
 
-    public static IApiInOutRoute<StartThreadFromMessageParams, Channel> StartThreadFromMessage([IdHeuristic<IThreadableChannel>] ulong channelId,
+    public static IApiInOutRoute<StartThreadFromMessageParams, Channel> StartThreadFromMessage(
+        [IdHeuristic<IThreadableChannel>] ulong channelId,
         [IdHeuristic<IMessage>] ulong messageId, StartThreadFromMessageParams body) =>
         new ApiInOutRoute<StartThreadFromMessageParams, Channel>(nameof(StartThreadFromMessage),
             RequestMethod.Post,
             $"/channels/{channelId}/messages/{messageId}/threads", body, ContentType.JsonBody,
             (ScopeType.Channel, channelId));
 
-    public static IApiInOutRoute<StartThreadParams, Channel> StartThreadWithoutMessage([IdHeuristic<IThreadableChannel>] ulong channelId,
+    public static IApiInOutRoute<StartThreadParams, Channel> StartThreadWithoutMessage(
+        [IdHeuristic<IThreadableChannel>] ulong channelId,
         StartThreadParams body) =>
         new ApiInOutRoute<StartThreadParams, Channel>(nameof(StartThreadWithoutMessage), RequestMethod.Post,
             $"/channels/{channelId}/threads", body, ContentType.JsonBody, (ScopeType.Channel, channelId));
 
     //TODO: add support for files
-    public static IApiInOutRoute<StartThreadInForumParams, Channel> StartThreadInForum([IdHeuristic<IForumChannel>] ulong channelId,
+    public static IApiInOutRoute<StartThreadInForumParams, Channel> StartThreadInForum(
+        [IdHeuristic<IForumChannel>] ulong channelId,
         StartThreadInForumParams body) =>
         new ApiInOutRoute<StartThreadInForumParams, Channel>(nameof(StartThreadInForum), RequestMethod.Post,
             $"/channels/{channelId}/threads", body, ContentType.JsonBody, (ScopeType.Channel, channelId));
@@ -196,30 +205,35 @@ public static partial class Routes
             $"/channels/{channelId}/thread-members/{id}", (ScopeType.Channel, channelId));
 
     public static IApiOutRoute<ThreadMember>
-        GetThreadMember([IdHeuristic<IThreadChannel>] ulong channelId, [IdHeuristic<IThreadMember>] ulong userId, bool? withMember = default) =>
+        GetThreadMember([IdHeuristic<IThreadChannel>] ulong channelId, [IdHeuristic<IThreadMember>] ulong userId,
+            bool? withMember = default) =>
         new ApiOutRoute<ThreadMember>(nameof(GetThreadMember), RequestMethod.Get,
             $"/channels/{channelId}/thread-members/{userId}{RouteUtils.GetUrlEncodedQueryParams(("with_member", withMember))}",
             (ScopeType.Channel, channelId));
 
-    public static IApiOutRoute<ThreadMember[]> ListThreadMembers([IdHeuristic<IThreadChannel>] ulong channelId, bool? withMember = default,
+    public static IApiOutRoute<ThreadMember[]> ListThreadMembers([IdHeuristic<IThreadChannel>] ulong channelId,
+        bool? withMember = default,
         ulong? afterId = default, int? limit = default) =>
         new ApiOutRoute<ThreadMember[]>(nameof(ListThreadMembers), RequestMethod.Get,
             $"/channels/{channelId}/thread-members{RouteUtils.GetUrlEncodedQueryParams(("with_member", withMember), ("after", afterId), ("limit", limit))}",
             (ScopeType.Channel, channelId));
 
-    public static IApiOutRoute<ChannelThreads> ListPublicArchivedThreads([IdHeuristic<IThreadableChannel>] ulong channelId,
+    public static IApiOutRoute<ChannelThreads> ListPublicArchivedThreads(
+        [IdHeuristic<IThreadableChannel>] ulong channelId,
         DateTimeOffset? beforeId = default, int? limit = default) =>
         new ApiOutRoute<ChannelThreads>(nameof(ListPublicArchivedThreads), RequestMethod.Get,
             $"/channels/{channelId}/threads/archived/public{RouteUtils.GetUrlEncodedQueryParams(("before", beforeId), ("limit", limit))}",
             (ScopeType.Channel, channelId));
 
-    public static IApiOutRoute<ChannelThreads> ListPrivateArchivedThreads([IdHeuristic<IThreadableChannel>] ulong channelId,
+    public static IApiOutRoute<ChannelThreads> ListPrivateArchivedThreads(
+        [IdHeuristic<IThreadableChannel>] ulong channelId,
         DateTimeOffset? beforeId = default, int? limit = default) =>
         new ApiOutRoute<ChannelThreads>(nameof(ListPrivateArchivedThreads), RequestMethod.Get,
             $"/channels/{channelId}/threads/archived/private{RouteUtils.GetUrlEncodedQueryParams(("before", beforeId), ("limit", limit))}",
             (ScopeType.Channel, channelId));
 
-    public static IApiOutRoute<ChannelThreads> ListJoinedPrivateArchivedThreads([IdHeuristic<IThreadableChannel>] ulong channelId,
+    public static IApiOutRoute<ChannelThreads> ListJoinedPrivateArchivedThreads(
+        [IdHeuristic<IThreadableChannel>] ulong channelId,
         DateTimeOffset? beforeId = default, int? limit = default) =>
         new ApiOutRoute<ChannelThreads>(nameof(ListJoinedPrivateArchivedThreads), RequestMethod.Get,
             $"/channels/{channelId}/users/@me/threads/archived/private{RouteUtils.GetUrlEncodedQueryParams(("before", beforeId), ("limit", limit))}",

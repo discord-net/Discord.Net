@@ -12,7 +12,6 @@ public partial interface ITextChannel :
     IThreadableChannel,
     IMessageChannel,
     IMentionable,
-    INestedChannel,
     IIntegrationChannel,
     ITextChannelActor
 {
