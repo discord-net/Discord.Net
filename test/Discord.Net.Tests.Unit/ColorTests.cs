@@ -74,6 +74,25 @@ namespace Discord
             Assert.Throws<ArgumentOutOfRangeException>(() => new Color(2.0f, 2.0f, 2.0f));
         }
         [Fact]
+        public void Color_FromRgb_String_CssHexColor()
+        {
+            Assert.Equal(0xFF0000u, new Color("#F00", ColorType.CssHexColor).RawValue);
+            Assert.Equal(0xFF0000u, new Color("F000", ColorType.CssHexColor).RawValue);
+            Assert.Equal(0xFF0000u, new Color("FF0000", ColorType.CssHexColor).RawValue);
+            Assert.Equal(0xFF0000u, new Color("#FF000000", ColorType.CssHexColor).RawValue);
+        }
+        [Fact]
+        public void Color_FromRgb_String_Invalid()
+        {
+            Assert.Throws<ArgumentNullException>(() => new Color(" ", ColorType.CssHexColor));
+            Assert.Throws<ArgumentNullException>(() => new Color(null, ColorType.CssHexColor));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Color("#F"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Color("F0", ColorType.CssHexColor));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Color("FF000"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Color("FF00000"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Color("FF0000000"));
+        }
+        [Fact]
         public void Color_Red()
         {
             Assert.Equal(0xAF, new Color(0xAF1390).R);

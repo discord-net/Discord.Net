@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using StandardColor = System.Drawing.Color;
 
 namespace Discord
@@ -186,6 +187,26 @@ namespace Discord
             RawValue = ((uint)(r * 255.0f) << 16)
                      | ((uint)(g * 255.0f) << 8)
                      | (uint)(b * 255.0f);
+        }
+
+        public Color(string rawValue, ColorType colorType = ColorType.CssHexColor)
+        {
+            if (string.IsNullOrWhiteSpace(rawValue))
+                throw new ArgumentNullException(nameof(rawValue), "Value must not be null or an empty space");
+
+            if (rawValue[0] == '#')
+                rawValue = rawValue.Substring(1);
+            
+            RawValue = (rawValue.Length, colorType) switch
+            {
+                (3 or 4, ColorType.CssHexColor) => (Convert.ToUInt32(new string(rawValue[0], 2), 16) << 16)
+                     | (Convert.ToUInt32(new string(rawValue[1], 2), 16) << 8)
+                     | Convert.ToUInt32(new string(rawValue[2], 2), 16),
+                (6 or 8, ColorType.CssHexColor) => (Convert.ToUInt32(rawValue.Substring(0, 2), 16) << 16)
+                     | (Convert.ToUInt32(rawValue.Substring(2, 2), 16) << 8)
+                     | Convert.ToUInt32(rawValue.Substring(4, 2), 16),
+                _ => throw new ArgumentOutOfRangeException(nameof(rawValue), "Value must be of valid length - matching the specified ColorType"),
+            };
         }
 
         public static bool operator ==(Color lhs, Color rhs)
