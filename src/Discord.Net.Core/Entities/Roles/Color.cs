@@ -200,6 +200,13 @@ namespace Discord
         public static implicit operator uint(Color color)
             => color.RawValue;
 
+        /// <summary>
+        /// Converts the string representation of a color to a Color object.
+        /// </summary>
+        /// <param name="rawValue">String to be parsed to a color</param>
+        /// <param name="colorType">Color format of the string</param>
+        /// <returns>A Color object with a color value parsed from a string</returns>
+        /// <exception cref="ArgumentOutOfRangeException">The argument is not a number or of incorrect length</exception>
         public static Color Parse(string rawValue, ColorType colorType = ColorType.CssHexColor)
         {
             if (TryParse(rawValue, out var color, colorType))
@@ -208,6 +215,13 @@ namespace Discord
             throw new ArgumentOutOfRangeException(nameof(rawValue), "Value must be a number of valid length - matching the specified ColorType");
         }
 
+        /// <summary>
+        /// Converts the string representation of a color to a Color object. The return value indicates whether the conversion succeeded.
+        /// </summary>
+        /// <param name="rawValue">String to be parsed to a color</param>
+        /// <param name="color">When this method returns true, contains a Color that represents the parsed string.</param>
+        /// <param name="colorType">Color format of the string</param>
+        /// <returns>true if the conversion succeeded; false otherwise.</returns>
         public static bool TryParse(string rawValue, out Color color, ColorType colorType = ColorType.CssHexColor)
         {
             color = new Color();
