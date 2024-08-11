@@ -77,27 +77,34 @@ public static class VariableFuncArgs
         InvocationExpressionSyntax invocationExpression,
         FunctionGenerator.MethodTarget target,
         SemanticModel semanticModel,
-        Logger logger
+        Logger logger,
+        out Dictionary<int, int> result
     )
     {
+        result = new();
+
         var varargIndexes = IndexesOfVarArgsParameter(target.MethodSymbol).ToArray();
 
-        var totalExtraArgs = invocationExpression.ArgumentList.Arguments
-                                 .Select((x, i) => (Argument: x, Index: i))
-                                 .Count(x =>
-                                     x.Index <= varargIndexes.Min() || x.Argument.NameColon is null
-                                 )
-                             - target.MethodSymbol.Parameters.Count(x => !x.IsOptional);
+        var expectedArgsCount = target.MethodSymbol.Parameters.Count(x =>
+            !x.IsOptional ||
+            invocationExpression.ArgumentList.Arguments.Any(y =>
+                y.NameColon?.Name.Identifier.ValueText == x.Name
+            )
+        );
+
+        var totalExtraArgs =
+            invocationExpression.ArgumentList.Arguments.Count - expectedArgsCount;
 
         if (target.MethodSymbol.IsExtensionMethod)
             totalExtraArgs++;
 
         if (totalExtraArgs <= 0)
         {
+            logger.Log($"Skipping {target.MethodSymbol}, {totalExtraArgs} extra args ({expectedArgsCount} <> {invocationExpression.ArgumentList.Arguments.Count})");
             return;
         }
 
-        logger.Log($"Processing {target.MethodSymbol} with {totalExtraArgs}");
+        logger.Log($"Processing {target.MethodSymbol} with {totalExtraArgs} extra args ({expectedArgsCount} <> {invocationExpression.ArgumentList.Arguments.Count})");
 
         var iterationOffset = 0;
         var varargParameters = new Dictionary<string, (int Size, int Nth, int Offset)>();
@@ -141,19 +148,17 @@ public static class VariableFuncArgs
                 varargIndexes,
                 invocationExpression
             );
-            // var size = target.MethodSymbol.Parameters.Length <= index + 1
-            //     ? invocationExpression.ArgumentList.Arguments.Count - (target.MethodSymbol.Parameters.Length - offset)
-            //     : invocationExpression.ArgumentList.Arguments
-            //         .Skip(index - offset)
-            //         .TakeWhile(x => x.NameColon is null)
-            //         .Count() - 1;
+
+            if(size == 0) continue;
+
+            result[index] = size;
 
             var vargOffset = iterationOffset;
             iterationOffset += size;
 
             varargParameters.Add(parameterNode.Identifier.ValueText, (size, vargOffset, insertIndex));
 
-            logger.Log($"Varg parameter: {parameter.Name} > {vargOffset}..{size}\n");
+            logger.Log($"Varg parameter: {parameter.Name} > {vargOffset}..{size}");
 
             var typeArgsList = (parameterNode.Type as GenericNameSyntax)!
                 .TypeArgumentList

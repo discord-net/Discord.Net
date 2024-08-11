@@ -41,13 +41,21 @@ public static class TransitiveFill
 
         public InvocationExpressionSyntax Invocation { get; }
 
+        public Dictionary<int, int> VariableFuncArgsMap { get; }
+
         public Logger Logger { get; }
 
-        public Context(SemanticModel model, IMethodSymbol method, InvocationExpressionSyntax invocation, Logger logger)
+        public Context(
+            SemanticModel model,
+            IMethodSymbol method,
+            InvocationExpressionSyntax invocation,
+            Dictionary<int, int> variableFuncArgsMap,
+            Logger logger)
         {
             SemanticModel = model;
             Method = method;
             Invocation = invocation;
+            VariableFuncArgsMap = variableFuncArgsMap;
             Logger = logger;
 
             TypeParameters = method.TypeParameters
@@ -63,6 +71,8 @@ public static class TransitiveFill
                 return;
 
             candidates.Remove(candidate);
+
+            Logger.Log($"{parameter} -= {candidate}");
 
             if (candidates.Count == 0)
                 Resolved.Remove(parameter);
@@ -86,7 +96,7 @@ public static class TransitiveFill
 
         public void PickSubstitute(
             ITypeParameterSymbol parameter,
-            params ITypeSymbol[] type)
+            params ITypeSymbol[] types)
         {
             if (!TypeParameters.TryGetValue(parameter, out var typeParameter))
             {
@@ -100,11 +110,17 @@ public static class TransitiveFill
             if (!Resolved.TryGetValue(parameter, out var existing))
                 existing = Resolved[parameter] = new(SymbolEqualityComparer.Default);
 
-            existing.UnionWith(type);
+            existing.UnionWith(types);
+
+            foreach (var type in types)
+                Logger.Log($"{parameter} += {type}");
         }
 
         public void MarkAsIllegal(ITypeParameterSymbol parameter, params ITypeSymbol[] symbols)
         {
+            foreach (var type in symbols)
+                RemoveCandidate(parameter, type);
+
             if (NotAllowed.TryGetValue(parameter, out var already) && symbols.All(already.Contains))
                 return;
 
@@ -112,6 +128,8 @@ public static class TransitiveFill
                 existing = NotAllowed[parameter] = new(SymbolEqualityComparer.Default);
 
             existing.UnionWith(symbols);
+            foreach (var type in symbols)
+                Logger.Log($"{parameter} can no longer be {type}");
         }
     }
 
@@ -258,9 +276,14 @@ public static class TransitiveFill
         InvocationExpressionSyntax invocationExpression,
         IMethodSymbol method,
         SemanticModel semantic,
-        Logger logger)
+        Logger logger,
+        Dictionary<int, int> variableFuncArgsMap)
     {
         logger.Log($"Executing TransitiveFill on {method}");
+        logger.Log($"Variable function map length: {variableFuncArgsMap.Count}");
+
+        foreach (var entry in variableFuncArgsMap)
+            logger.Log($" - {entry.Key}:{entry.Value}");
 
         if (!InvocationArgumentsAreInRange(method, invocationExpression))
         {
@@ -271,7 +294,7 @@ public static class TransitiveFill
             return;
         }
 
-        var context = new Context(semantic, method, invocationExpression, logger);
+        var context = new Context(semantic, method, invocationExpression, variableFuncArgsMap, logger);
 
         foreach (var typeParameter in method.TypeParameters.Where(TypeParameterIsTransitiveFill))
         {
@@ -771,8 +794,19 @@ public static class TransitiveFill
                         })
                         .Distinct<ITypeSymbol>(SymbolEqualityComparer.Default)
                         .Where(x =>
-                            WalkTypeForConstraints(context, type, x, logger, depth + 1)
-                        )
+                        {
+                            var result = WalkTypeForConstraints(
+                                context,
+                                constraintTypeParameter,
+                                x,
+                                logger,
+                                depth + 1
+                            );
+
+                            if (!result) context.MarkAsIllegal(constraintTypeParameter, x);
+
+                            return result;
+                        })
                         .ToArray();
 
                     if (constraintSubstitutions.Length == 0)
@@ -783,6 +817,7 @@ public static class TransitiveFill
                             LogLevel.Warning
                         );
                         context.MarkAsIllegal(constraintTypeParameter, filledType);
+
                         return false;
                     }
 
@@ -860,7 +895,8 @@ public static class TransitiveFill
                 {
                     if (WalkTypeForConstraints(context, constraintTypeParameter, candidate, logger, depth + 1))
                     {
-                        logger.LogWithDepth($"Picked additional fill type {candidate} for {constraintTypeParameter}", depth);
+                        logger.LogWithDepth($"Picked additional fill type {candidate} for {constraintTypeParameter}",
+                            depth);
                         context.PickSubstitute(constraintTypeParameter, candidate);
                     }
                     else
@@ -1123,7 +1159,6 @@ public static class TransitiveFill
                 }
 
                 logger.LogWithDepth($"type {requested} doesn't satisfy constraint {constraintType}", depth);
-
                 return false;
             }
 
@@ -1220,6 +1255,16 @@ public static class TransitiveFill
         Context context,
         Logger logger)
     {
+        foreach (
+            var vargParameter in context.VariableFuncArgsMap
+                .Where(x => x.Key < index)
+        )
+        {
+            logger.Log($"Offsetting {index} by {vargParameter.Value} (vararg at index {vargParameter.Key})");
+            //index += vargParameter.Value;
+        }
+
+
         switch (index)
         {
             case -1:
@@ -1229,18 +1274,33 @@ public static class TransitiveFill
                 return FunctionGenerator.GetInvocationTarget(context.Invocation, context.SemanticModel);
             case >= 0 when context.Invocation.ArgumentList.Arguments.Count >
                            index - (context.Method.IsExtensionMethod ? 1 : 0):
+
                 if (context.Method.IsExtensionMethod)
-                    index = -1;
+                    index--;
 
                 var expression = context.Invocation.ArgumentList.Arguments[index].Expression;
+
                 var type = ModelExtensions.GetTypeInfo(context.SemanticModel, expression).Type;
 
+                if (type is null && expression is InvocationExpressionSyntax invocation)
+                {
+                    var symbolInfo = context.SemanticModel.GetSymbolInfo(invocation.Expression);
+
+                    logger.Log(
+                        $"Symbol info: {symbolInfo.Symbol}, {symbolInfo.CandidateReason}, {symbolInfo.CandidateSymbols.Length}");
+
+                    if (symbolInfo.Symbol is IMethodSymbol methodSymbol)
+                        type = methodSymbol.ReturnType;
+                }
+
                 if (type is null)
-                    logger.Warn($"Couldn't resolve type for expression {expression}");
+                    logger.Warn($"Couldn't resolve type for expression {expression} (index {index})");
 
                 return type;
             default:
-                logger.Warn($"Cannot pull parameter: not enough arguments for index {index}");
+                logger.Warn(
+                    $"Cannot pull parameter: not enough arguments for index {index} ({context.Invocation.ArgumentList.Arguments.Count} arguments total)"
+                );
                 return null;
         }
     }

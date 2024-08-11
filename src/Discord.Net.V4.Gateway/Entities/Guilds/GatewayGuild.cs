@@ -12,6 +12,7 @@ public sealed partial class GatewayGuildActor :
     GatewayCachedActor<ulong, GatewayGuild, GuildIdentity, IGuildModel>,
     IGuildActor
 {
+    [SourceOfTruth] public GatewayCurrentMemberActor CurrentMember { get; }
     [SourceOfTruth] public GatewayGuildChannels Channels { get; }
 
     [SourceOfTruth] public GatewayTextChannels TextChannels { get; }
@@ -42,11 +43,11 @@ public sealed partial class GatewayGuildActor :
 
     [SourceOfTruth] public GatewayRoles Roles { get; }
 
-    [SourceOfTruth] public IEnumerableIndexableActor<IGuildStickerActor, ulong, IGuildSticker> Stickers { get; }
+    [SourceOfTruth] public GatewayGuildStickers Stickers { get; }
 
     [SourceOfTruth] public GatewayGuildScheduledEvents ScheduledEvents { get; }
 
-    [SourceOfTruth] public IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites { get; }
+    [SourceOfTruth] public GatewayGuildInvites Invites { get; }
 
     [SourceOfTruth] public IEnumerableIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks { get; }
 
@@ -56,6 +57,12 @@ public sealed partial class GatewayGuildActor :
         : base(client, guild)
     {
         Identity = guild | this;
+
+        CurrentMember = new GatewayCurrentMemberActor(
+            client,
+            Identity,
+            CurrentMemberIdentity.Of(Client.CurrentUser.Id)
+        );
 
         Channels =
             GuildRelatedEntity<RestGuildChannel>(Of<GatewayGuildChannelActor>(), client, Identity, CachePath);
@@ -82,6 +89,7 @@ public sealed partial class GatewayGuildActor :
                 IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>.Of(guild.Id)
             )
         );
+
         ActiveThreadChannels = GuildRelatedEntity<RestThreadChannel>(
             T<GatewayThreadChannelActor>(),
             client,
@@ -102,6 +110,8 @@ public sealed partial class GatewayGuildActor :
             Identity,
             CachePath
         );
+
+        Stickers = GuildRelatedEntity<RestGuildSticker>(T<GatewayGuildStickerActor>(), client, Identity, CachePath);
         Emotes = GuildRelatedEntity<RestGuildEmote>(T<GatewayGuildEmoteActor>(), client, Identity, CachePath);
         Roles = GuildRelatedEntity<RestRole>(T<GatewayRoleActor>(), client, Identity, CachePath);
 
@@ -213,9 +223,10 @@ public sealed partial class GatewayGuild :
             static (id, client, guild) => client.Guilds[guild.Id].VoiceChannels[id],
             Client,
             Actor.Identity
-        )
+        );
     }
 
+    [SourceOfTruth]
     public override IGuildModel GetModel() => Model;
 
     public override ValueTask UpdateAsync(IGuildModel model, bool updateCache = true, CancellationToken token = default)
@@ -238,4 +249,6 @@ public sealed partial class GatewayGuild :
             context.TryGetActor<GatewayGuildActor>()
         );
     }
+
+    //IPartialGuildModel IEntityOf<IPartialGuildModel>.GetModel() => GetModel();
 }

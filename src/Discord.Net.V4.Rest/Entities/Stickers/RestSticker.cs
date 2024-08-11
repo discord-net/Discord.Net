@@ -11,6 +11,7 @@ public partial class RestStickerActor :
 {
     internal override StickerIdentity Identity { get; }
 
+    [TypeFactory]
     public RestStickerActor(
         DiscordRestClient client,
         StickerIdentity sticker
@@ -72,7 +73,7 @@ public partial class RestSticker :
 
     public static RestSticker Construct(DiscordRestClient client, IStickerModel model)
         => Construct(client, null, model);
-    
+
     public static RestSticker Construct(DiscordRestClient client, StickerPackIdentity? pack, IStickerModel model)
     {
         return model switch

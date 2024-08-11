@@ -11,28 +11,149 @@ namespace Discord.Rest;
 
 internal static partial class RestManagedEnumerableActor
 {
-    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> Create<
-        [TransitiveFill]TActor,
+    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TApi> CreateWithMapper<
+        [TransitiveFill] TActor,
         TId,
         TEntity,
-        [Not(nameof(TEntity)), Interface, Shrink]TCore,
+        [Not(nameof(TEntity)), Interface, Shrink]
+        TCore,
+        TModel,
+        TApi
+    >(
+        Template<TActor> template,
+        DiscordRestClient client,
+        IEnumerable<TModel> models,
+        [VariableFuncArgs(InsertAt = 1)]
+        Func<DiscordRestClient, IIdentifiable<TId, TEntity, TActor, TModel>, TActor> actorFactory,
+        [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, TModel, TEntity> entityFactory,
+        IApiOutRoute<TApi> route,
+        Func<TApi, IEnumerable<TModel>> mapper
+    )
+        where TActor :
+        class,
+        IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>>
+        where TEntity :
+        RestEntity<TId>,
+        TCore,
+        IProxied<TActor>,
+        IEntityOf<TModel>
+        where TId : IEquatable<TId>
+        where TCore : class, IEntity<TId, TModel>
+        where TModel : class, IEntityModel<TId>
+        where TApi : class
+    {
+        return new RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TApi>(
+            client,
+            models,
+            id => actorFactory(client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
+            model => entityFactory(client, model),
+            route,
+            mapper
+        );
+    }
+
+    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TApi> CreateWithMapper<
+        [TransitiveFill] TActor,
+        TId,
+        TEntity,
+        [Not(nameof(TEntity)), Interface, Shrink]
+        TCore,
+        TModel,
+        TApi
+    >(
+        Template<TActor> template,
+        DiscordRestClient client,
+        IEnumerable<TId> ids,
+        [VariableFuncArgs(InsertAt = 1)]
+        Func<DiscordRestClient, IIdentifiable<TId, TEntity, TActor, TModel>, TActor> actorFactory,
+        [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, TModel, TEntity> entityFactory,
+        IApiOutRoute<TApi> route,
+        Func<TApi, IEnumerable<TModel>> mapper
+    )
+        where TActor :
+        class,
+        IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>>
+        where TEntity :
+        RestEntity<TId>,
+        TCore,
+        IProxied<TActor>,
+        IEntityOf<TModel>
+        where TId : IEquatable<TId>
+        where TCore : class, IEntity<TId, TModel>
+        where TModel : class, IEntityModel<TId>
+        where TApi : class
+    {
+        return new RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TApi>(
+            client,
+            ids,
+            id => actorFactory(client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
+            model => entityFactory(client, model),
+            route,
+            mapper
+        );
+    }
+
+    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> Create<
+        [TransitiveFill] TActor,
+        TId,
+        TEntity,
+        [Not(nameof(TEntity)), Interface, Shrink]
+        TCore,
+        TModel
+    >(
+        Template<TActor> template,
+        DiscordRestClient client,
+        IEnumerable<TId> ids,
+        [VariableFuncArgs(InsertAt = 1)]
+        Func<DiscordRestClient, IIdentifiable<TId, TEntity, TActor, TModel>, TActor> actorFactory,
+        [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, TModel, TEntity> entityFactory,
+        IApiOutRoute<IEnumerable<TModel>> route
+    )
+        where TActor :
+        class,
+        IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>>
+        where TEntity :
+        RestEntity<TId>,
+        TCore,
+        IProxied<TActor>,
+        IEntityOf<TModel>
+        where TId : IEquatable<TId>
+        where TCore : class, IEntity<TId, TModel>
+        where TModel : class, IEntityModel<TId>
+    {
+        return new RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel>(
+            client,
+            ids,
+            id => actorFactory(client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
+            model => entityFactory(client, model),
+            route
+        );
+    }
+
+    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> Create<
+        [TransitiveFill] TActor,
+        TId,
+        TEntity,
+        [Not(nameof(TEntity)), Interface, Shrink]
+        TCore,
         TModel
     >(
         Template<TActor> template,
         DiscordRestClient client,
         IEnumerable<TModel> models,
-        [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, IIdentifiable<TId, TEntity, TActor, TModel>, TActor> actorFactory,
+        [VariableFuncArgs(InsertAt = 1)]
+        Func<DiscordRestClient, IIdentifiable<TId, TEntity, TActor, TModel>, TActor> actorFactory,
         [VariableFuncArgs(InsertAt = 1)] Func<DiscordRestClient, TModel, TEntity> entityFactory,
         IApiOutRoute<IEnumerable<TModel>> route
     )
         where TActor :
-            class,
-            IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>>
+        class,
+        IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>>
         where TEntity :
-            RestEntity<TId>,
-            TCore,
-            IProxied<TActor>,
-            IEntityOf<TModel>
+        RestEntity<TId>,
+        TCore,
+        IProxied<TActor>,
+        IEntityOf<TModel>
         where TId : IEquatable<TId>
         where TCore : class, IEntity<TId, TModel>
         where TModel : class, IEntityModel<TId>
@@ -48,6 +169,42 @@ internal static partial class RestManagedEnumerableActor
 }
 
 public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> :
+    RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, IEnumerable<TModel>>
+    where TActor : class, IRestActor<TId, TEntity>
+    where TEntity : RestEntity<TId>, TCore, IProxied<TActor>, IEntityOf<TModel>
+    where TId : IEquatable<TId>
+    where TCore : class, IEntity<TId, TModel>
+    where TModel : class, IEntityModel<TId>
+{
+    public RestManagedEnumerableActor(
+        DiscordRestClient client,
+        IEnumerable<TModel> models,
+        Func<TId, TActor> actorFactory,
+        Func<TModel, TEntity> entityFactory,
+        IApiOutRoute<IEnumerable<TModel>> route
+    ) : base(
+        client,
+        models,
+        actorFactory,
+        entityFactory,
+        route,
+        x => x
+    )
+    {
+    }
+
+    public RestManagedEnumerableActor(
+        DiscordRestClient client,
+        IEnumerable<TId> ids,
+        Func<TId, TActor> actorFactory,
+        Func<TModel, TEntity> entityFactory,
+        IApiOutRoute<IEnumerable<TModel>> route
+    ) : base(client, ids, actorFactory, entityFactory, route, x => x)
+    {
+    }
+}
+
+public class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TApi> :
     RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>>,
     IDefinedEnumerableActor<TActor, TId, TCore>,
     IReadOnlyDictionary<TId, TEntity>
@@ -56,21 +213,22 @@ public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TMod
     where TId : IEquatable<TId>
     where TCore : class, IEntity<TId, TModel>
     where TModel : class, IEntityModel<TId>
+    where TApi : class
 {
     public IReadOnlyDictionary<TId, TEntity> All { get; private set; }
 
     public IReadOnlyCollection<TId> Ids
-        => _keys ??= All.Keys.ToImmutableArray();
+        => _keys ??= All.Keys.ToImmutableList();
 
     public IReadOnlyCollection<TEntity> Values
-        => _values ??= All.Values.ToImmutableArray();
+        => _values ??= All.Values.ToImmutableList();
 
     public new TEntity this[TId key] => All[key];
 
     public int Count => All.Count;
 
-    private ImmutableArray<TId>? _keys;
-    private ImmutableArray<TEntity>? _values;
+    private IReadOnlyCollection<TId>? _keys;
+    private IReadOnlyCollection<TEntity>? _values;
 
     private readonly RestIndexableActor<TActor, TId, TEntity> _indexableActor;
     private readonly Func<TModel, TEntity> _entityFactory;
@@ -80,17 +238,44 @@ public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TMod
         IEnumerable<TModel> models,
         Func<TId, TActor> actorFactory,
         Func<TModel, TEntity> entityFactory,
-        IApiOutRoute<IEnumerable<TModel>> route
+        IApiOutRoute<TApi> route,
+        Func<TApi, IEnumerable<TModel>> mapper
     ) : base(
         actorFactory,
         models => models.Select(entityFactory),
-        (options, token) => client.RestApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token)
+        async (options, token) =>
+            await client.RestApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token) is { } data
+                ? mapper(data)
+                : []
     )
     {
         _indexableActor = new(actorFactory);
         _entityFactory = entityFactory;
 
         All = models.ToImmutableDictionary(x => x.Id, _entityFactory);
+    }
+
+    public RestManagedEnumerableActor(
+        DiscordRestClient client,
+        IEnumerable<TId> ids,
+        Func<TId, TActor> actorFactory,
+        Func<TModel, TEntity> entityFactory,
+        IApiOutRoute<TApi> route,
+        Func<TApi, IEnumerable<TModel>> mapper
+    ) : base(
+        actorFactory,
+        models => models.Select(entityFactory),
+        async (options, token) =>
+            await client.RestApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token) is { } data
+                ? mapper(data)
+                : []
+    )
+    {
+        _indexableActor = new(actorFactory);
+        _entityFactory = entityFactory;
+
+        All = ImmutableDictionary<TId, TEntity>.Empty;
+        _keys = ids.ToList().AsReadOnly();
     }
 
     internal void Update(IEnumerable<TEntity> entities)

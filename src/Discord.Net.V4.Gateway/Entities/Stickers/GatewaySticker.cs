@@ -32,7 +32,7 @@ public partial class GatewaySticker :
 
     public StickerFormatType Format => (StickerFormatType)Model.FormatType;
 
-    public ulong? PackId => Model.PackId;
+    [SourceOfTruth] public GatewayStickerPackActor? Pack { get; }
 
     public string? Description => Model.Description;
 
@@ -51,13 +51,20 @@ public partial class GatewaySticker :
     public GatewaySticker(
         DiscordGatewayClient client,
         IStickerModel model,
-        GatewayStickerActor? actor = null
+        GatewayStickerActor? actor = null,
+        StickerPackIdentity? pack = null
     ) : base(client, model.Id)
     {
         _model = model;
         Actor = actor ?? new(client, StickerIdentity.Of(this));
 
         Tags = model.Tags.Split(',').ToImmutableList();
+
+        Pack = pack is not null
+            ? Client.StickerPacks[pack]
+            : model.PackId.HasValue
+                ? client.StickerPacks[model.PackId.Value]
+                : null;
     }
 
     public static GatewaySticker Construct(
@@ -68,7 +75,12 @@ public partial class GatewaySticker :
         return model switch
         {
             IGuildStickerModel guildStickerModel => GatewayGuildSticker.Construct(client, context, guildStickerModel),
-            _ => new GatewaySticker(client, model, context.TryGetActor<GatewayStickerActor>())
+            _ => new GatewaySticker(
+                client,
+                model,
+                context.TryGetActor<GatewayStickerActor>(),
+                context.Path.GetIdentity(Template.Of<StickerPackIdentity>())
+            )
         };
     }
 

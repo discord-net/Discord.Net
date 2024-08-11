@@ -116,6 +116,8 @@ public static class JsonModels
 
         foreach (var target in targets)
         {
+            logger.Log($"Processing model {target.TypeSymbol}");
+
             HashSet<Hierarchy.SortedHierarchySymbol>? interfaces = null;
 
             foreach (var modelInterface in GetModelInterfaces(target.TypeSymbol))
@@ -549,7 +551,8 @@ public static class JsonModels
             .Any(x => x
                 .GetAttributes()
                 .Any(x =>
-                    x.AttributeClass?.ToDisplayString() is "System.Text.Json.Serialization.JsonPropertyNameAttribute"
+                    x.AttributeClass?.ToDisplayString()
+                        is "System.Text.Json.Serialization.JsonPropertyNameAttribute"
                         or ExtendedModel.ExtendedAttributeName
                 )
             );

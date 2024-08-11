@@ -13,6 +13,9 @@ public class GatewayIndexableActor<TActor, TId, TEntity>(Func<TId, TActor> facto
 
     public TActor this[TId id] => Specifically(id);
 
+    public TActor this[IIdentifiable<TId, TEntity, TActor, IEntityModel<TId>> identity]
+            => identity.Actor ?? Specifically(identity.Id);
+
     public TActor Specifically(TId id)
         => _cache.GetOrAdd(id, factory);
 

@@ -4,6 +4,9 @@ using Discord.Rest;
 
 namespace Discord.Gateway;
 
+using RestGuildIdentity = IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>;
+using RestGuildChannelIdentity = IIdentifiable<ulong, RestGuildChannel, RestGuildChannelActor, IGuildChannelModel>;
+
 internal static partial class GatewayActors
 {
     public static GatewayEnumerableIndexableActor<
@@ -45,7 +48,7 @@ internal static partial class GatewayActors
         TCoreEntity,
         IContextConstructable<TRestEntity, TModel, IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>,
             DiscordRestClient>
-        where TCoreEntity : class, IEntity<TId>, IFetchableOfMany<TId, TModel>
+        where TCoreEntity : class, IEntity<TId, TModel>, IFetchableOfMany<TId, TModel>
         where TModel : class, IEntityModel<TId>
     {
         return new GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel>(
@@ -102,7 +105,7 @@ internal static partial class GatewayActors
         TCoreEntity,
         IContextConstructable<TRestEntity, TModel, IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>,
             DiscordRestClient>
-        where TCoreEntity : class, IEntity<TId>, IFetchableOfMany<TId, TApi>
+        where TCoreEntity : class, IEntity<TId, TModel>, IFetchableOfMany<TId, TApi>
         where TModel : class, TApi
         where TApi : class, IEntityModel<TId>
     {
@@ -163,7 +166,7 @@ internal static partial class GatewayActors
         RestEntity<TId>,
         TCoreEntity,
         IContextConstructable<TRestEntity, TModel, TContext, DiscordRestClient>
-        where TCoreEntity : class, IEntity<TId>, IFetchableOfMany<TId, TApi>
+        where TCoreEntity : class, IEntity<TId, TModel>, IFetchableOfMany<TId, TApi>
         where TModel : class, TApi
         where TApi : class, IEntityModel<TId>
     {
@@ -226,7 +229,7 @@ internal static partial class GatewayActors
         RestEntity<TId>,
         TCoreEntity,
         IContextConstructable<TRestEntity, TModel, TContext, DiscordRestClient>
-        where TCoreEntity : class, IEntity<TId>
+        where TCoreEntity : class, IEntity<TId, TModel>
         where TModel : class, IEntityModel<TId>
         where TApi : class
     {
@@ -241,6 +244,28 @@ internal static partial class GatewayActors
             path,
             route,
             transform
+        );
+    }
+
+    public static GatewayGuildChannelInvites ChannelInvites(
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        GuildChannelIdentity channel,
+        CachePathable path)
+    {
+        return new GatewayGuildChannelInvites(
+            client,
+            id => client.Guilds[guild].Channels[channel].Invites[id],
+            model => RestGuildChannelInvite.Construct(
+                client.Rest,
+                new RestGuildChannelInvite.Context(
+                    RestGuildIdentity.Of(guild.Id),
+                    RestGuildChannelIdentity.Of(channel.Id)
+                ),
+                model
+            ),
+            path,
+            IGuildChannelInvite.FetchManyRoute(path)
         );
     }
 
@@ -262,7 +287,7 @@ internal static partial class GatewayActors
         => GatewayPagedIndexableActor.CreatePartial<RestPartialGuild, PageUserGuildsParams>(
             Template.Of<GatewayGuildActor>(),
             client,
-            CachePathable.Default,
+            CachePathable.Empty,
             id => new GatewayGuildActor(client, GuildIdentity.Of(id)),
             api => api,
             (model, _) => RestPartialGuild.Construct(client.Rest, model)

@@ -53,7 +53,7 @@ using EnumerableGuildScheduledEventActor =
     RestEnumerableIndexableActor<RestGuildScheduledEventActor, ulong, RestGuildScheduledEvent, IGuildScheduledEvent,
         IEnumerable<IGuildScheduledEventModel>>;
 using EnumerableInviteActor =
-    RestEnumerableIndexableActor<RestGuildInviteActor, string, RestInvite, IInvite, IEnumerable<IInviteModel>>;
+    RestEnumerableIndexableActor<RestGuildInviteActor, string, RestGuildInvite, IGuildInvite, IEnumerable<IInviteModel>>;
 using EnumerableWebhookActor =
     RestEnumerableIndexableActor<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
 using ManagedRolesActor =
@@ -167,9 +167,9 @@ public sealed partial class RestGuildActor :
             Client,
             RestGuildInviteActor.Factory,
             Identity,
-            entityFactory: RestInvite.Construct,
-            new RestInvite.Context(Identity),
-            IInvite.GetGuildInvitesRoute(this)
+            entityFactory: RestGuildInvite.Construct,
+            new RestGuildInvite.Context(Identity),
+            IGuildInvite.FetchManyRoute(this)
         );
 
         Webhooks = RestActors.Fetchable(
@@ -320,14 +320,6 @@ public sealed partial class RestGuild :
         );
 
         Actor = actor ?? new(client, identity);
-
-        // Roles = RestManagedEnumerableActor.Create<RestRoleActor, ulong, RestRole, IRole, IRoleModel, GuildIdentity>(
-        //     client,
-        //     roles.GetModels(),
-        //     id => new(client, Actor.Identity, RoleIdentity.Of(id)),
-        //     Routes.GetGuildRoles(model.Id),
-        //     Actor.Identity
-        // );
 
         AFKChannel = model.AFKChannelId
             .Map(

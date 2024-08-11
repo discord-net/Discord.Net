@@ -16,7 +16,7 @@ public partial interface IStickerPack :
     /// <summary>
     ///     Gets a collection of the stickers in the pack.
     /// </summary>
-    IReadOnlyCollection<ISticker> Stickers { get; }
+    IDefinedIndexableActor<IStickerActor, ulong, ISticker> Stickers { get; }
 
     /// <summary>
     ///     Gets the id of the pack's SKU.
@@ -26,7 +26,7 @@ public partial interface IStickerPack :
     /// <summary>
     ///     Gets the sticker in the pack which is shown as the pack's icon.
     /// </summary>
-    ISticker? CoverSticker { get; }
+    IStickerActor? CoverSticker { get; }
 
     /// <summary>
     ///     Gets the description of the sticker pack.

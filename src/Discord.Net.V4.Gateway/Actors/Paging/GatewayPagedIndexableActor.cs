@@ -147,6 +147,7 @@ public sealed class GatewayPartialPagedIndexableActor<
     where TId : IEquatable<TId>
     where TGatewayEntity :
     GatewayEntity<TId>,
+    IEntity<TId, TModel>,
     ICacheableEntity<TGatewayEntity, TId, TModel>,
     IStoreInfoProvider<TId, TModel>,
     IBrokerProvider<TId, TGatewayEntity, TModel>,
@@ -163,6 +164,8 @@ public sealed class GatewayPartialPagedIndexableActor<
         _pagedActor = new(client, path, modelMapper, restEntityFactory);
 
     public TActor this[TId id] => _indexableActor[id];
+    public TActor this[IIdentifiable<TId, TGatewayEntity, TActor, TModel> identity] => _indexableActor[identity];
+
     public TActor Specifically(TId id) => _indexableActor.Specifically(id);
 
     public IAsyncPaged<TPartialRestEntity> PageRestAsync(TParams? args = default, GatewayRequestOptions? options = null)
@@ -230,6 +233,7 @@ public sealed class GatewayPagedIndexableActor<
         _pagedActor = new(client, path, modelMapper, restEntityFactory, onRestPage);
 
     public TActor this[TId id] => _indexableActor[id];
+    public TActor this[IIdentifiable<TId, TGatewayEntity, TActor, TModel> identity] => _indexableActor[identity];
 
     public TActor Specifically(TId id) => _indexableActor.Specifically(id);
 

@@ -11,7 +11,7 @@ public sealed partial class GatewayGuildScheduledEventActor :
 {
     [StoreRoot, SourceOfTruth] public GatewayGuildActor Guild { get; }
 
-    public IEnumerableIndexableActor<IGuildScheduledEventUserActor, ulong, IGuildScheduledEventUser> RSVPs =>
+    public IPagedActor<ulong, IGuildScheduledEventUser, PageGuildScheduledEventUsersParams> RSVPs =>
         throw new NotImplementedException();
 
     internal override GuildScheduledEventIdentity Identity { get; }

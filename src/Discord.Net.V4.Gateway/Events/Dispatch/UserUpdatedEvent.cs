@@ -1,4 +1,3 @@
-using Discord.Gateway.Events.Processors;
 using Discord.Gateway.State;
 using Discord.Models;
 
@@ -13,7 +12,9 @@ public delegate ValueTask UserUpdatedDelegate(
 
 [Subscribable<UserUpdatedDelegate>]
 [DispatchEvent(DispatchEventNames.UserUpdated)]
-public sealed partial class UserUpdatedEvent(DiscordGatewayClient client) :
+public sealed partial class UserUpdatedEvent(
+    DiscordGatewayClient client
+) :
     DispatchEvent<UserUpdatedEventPackage, IUserUpdatedPayloadData>(client)
 {
     public GatewayCurrentUserActor GetUserActor(IUserUpdatedPayloadData payload) => Client.CurrentUser;
@@ -24,7 +25,7 @@ public sealed partial class UserUpdatedEvent(DiscordGatewayClient client) :
     {
         var broker = await GatewayCurrentUserActor.GetBrokerAsync(Client, token);
 
-        return await broker.CreateAsync(payload, CachePathable.Default, Client.CurrentUser, token);
+        return await broker.CreateAsync(payload, CachePathable.Empty, Client.CurrentUser, token);
     }
 
     public override ValueTask<UserUpdatedEventPackage?> PackageAsync(

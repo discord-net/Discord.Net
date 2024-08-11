@@ -21,15 +21,9 @@ public partial class DiscordGatewayClient
 
     public IIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks => throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IStickerPackActor, ulong, IStickerPack> StickerPacks
-    {
-        get => throw new NotImplementedException();
-        set => throw new NotImplementedException();
-    }
+    [SourceOfTruth]
+    public StickerPacks StickerPacks { get; }
 
-    public IIndexableActor<IStickerActor, ulong, ISticker> Stickers
-    {
-        get => throw new NotImplementedException();
-        set => throw new NotImplementedException();
-    }
+    [SourceOfTruth]
+    public GatewayIndexableActor<GatewayStickerActor, ulong, GatewaySticker> Stickers { get; }
 }

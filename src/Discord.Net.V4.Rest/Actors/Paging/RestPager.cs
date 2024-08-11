@@ -10,7 +10,7 @@ internal sealed class RestPager<TId, TEntity, TModel, TPagingModel, TParams>(
     Func<TPagingModel, IEnumerable<TModel>> modelsMapper,
     Func<TModel, TPagingModel, TEntity> entityFactory,
     TParams? pagingParams,
-    Func<TModel[], CancellationToken, ValueTask>? onBatch = null,
+    Func<IEnumerable<TModel>, CancellationToken, ValueTask>? onBatch = null,
     Func<TPagingModel, RequestOptions, CancellationToken, ValueTask>? onPage = null
 ):
     IAsyncPaged<TEntity>
@@ -23,7 +23,7 @@ internal sealed class RestPager<TId, TEntity, TModel, TPagingModel, TParams>(
     public int? PageSize => pagingParams?.PageSize;
     public int? Total => pagingParams?.Total;
 
-    public async IAsyncEnumerator<IReadOnlyCollection<TEntity>> GetAsyncEnumerator(CancellationToken token = default)
+    public async IAsyncEnumerator<TEntity> GetAsyncEnumerator(CancellationToken token = default)
     {
         var amountFetched = 0;
         TPagingModel? lastRequest = null;
@@ -49,18 +49,14 @@ internal sealed class RestPager<TId, TEntity, TModel, TPagingModel, TParams>(
 
             var batchModels = modelsMapper(request).ToArray();
 
-            if (onBatch is not null)
-                await onBatch(batchModels, token);
+            if (onBatch is not null) await onBatch(batchModels, token);
 
-            // TODO: 'AsParallel' may not be performant in this case.
-            var batch = batchModels
-                .AsParallel()
-                .Select(model => entityFactory(model, request))
-                .ToImmutableList();
+            amountFetched += batchModels.Length;
 
-            amountFetched += batch.Count;
-
-            yield return batch;
+            foreach (var model in batchModels)
+            {
+                yield return entityFactory(model, request);
+            }
         }
     }
 }

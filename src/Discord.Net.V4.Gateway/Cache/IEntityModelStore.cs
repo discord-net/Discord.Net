@@ -19,8 +19,8 @@ public interface IEntityModelStore<TId, TModel> : IEntityModelStore
         where TSubStoreModel : class, IEntityModel<TSubStoreId>;
 
     ValueTask<TModel?> GetAsync(TId id, CancellationToken token = default);
-    IAsyncEnumerable<IEnumerable<TModel>> GetAllAsync(CancellationToken token = default);
-    IAsyncEnumerable<IEnumerable<TId>> GetAllIdsAsync(CancellationToken token = default);
+    IAsyncEnumerable<TModel> GetAllAsync(CancellationToken token = default);
+    IAsyncEnumerable<TId> GetAllIdsAsync(CancellationToken token = default);
 
     ValueTask AddOrUpdateAsync(TModel model, CancellationToken token = default);
     ValueTask AddOrUpdateBatchAsync(IEnumerable<TModel> models, CancellationToken token = default);
@@ -28,7 +28,7 @@ public interface IEntityModelStore<TId, TModel> : IEntityModelStore
     ValueTask RemoveAsync(TId id, CancellationToken token = default);
     ValueTask PurgeAllAsync(CancellationToken token = default);
 
-    IAsyncEnumerable<IEnumerable<TModel>> QueryAsync(
+    IAsyncEnumerable<TModel> QueryAsync(
         TId from,
         Optional<TId> to,
         Direction direction,

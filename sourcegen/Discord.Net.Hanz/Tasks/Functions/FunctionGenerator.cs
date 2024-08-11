@@ -334,8 +334,14 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
                 var typeSyntax = type.Syntax;
                 var newFunctionSyntax = targetMethod.Method.MethodSyntax;
 
+                var variableFuncArgsResult = new Dictionary<int, int>();
+
+                targetLogger.Log($"Processing {targetMethod.Method.MethodSymbol}");
+
                 if (VariableFuncArgs.IsTargetMethod(targetMethod.Method.MethodSymbol))
                 {
+                    targetLogger.Log(" - Running VariableFuncArgs");
+
                     var taskLogger = targetLogger.GetSubLogger("VariableFuncArgs");
 
                     VariableFuncArgs.Apply(
@@ -343,7 +349,8 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
                         target.InvocationExpression,
                         targetMethod.Method,
                         target.SemanticModel,
-                        taskLogger
+                        taskLogger,
+                        out variableFuncArgsResult
                     );
 
                     taskLogger.Flush();
@@ -351,6 +358,8 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
 
                 if (TransitiveFill.IsTargetMethod(targetMethod.Method.MethodSymbol))
                 {
+                    targetLogger.Log(" - Running TransitiveFill");
+
                     var taskLogger = targetLogger.GetSubLogger("TransitiveFill");
 
                     TransitiveFill.Apply(
@@ -358,7 +367,8 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
                         target.InvocationExpression,
                         targetMethod.Method.MethodSymbol,
                         target.SemanticModel,
-                        taskLogger
+                        taskLogger,
+                        variableFuncArgsResult
                     );
 
                     taskLogger.Flush();
@@ -384,7 +394,6 @@ public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator
                     type.Usings,
                     type.Namespace
                 );
-                break;
             }
         }
 

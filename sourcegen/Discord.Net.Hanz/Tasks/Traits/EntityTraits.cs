@@ -16,7 +16,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         {"RefreshableAttribute", "Discord.IRefreshable"},
         {"FetchableAttribute", "Discord.IFetchable"},
         {"FetchableOfManyAttribute", "Discord.IFetchableOfMany"},
-        {"LoadableAttribute", "Discord.ILoadable"}
+        {"LoadableAttribute", "Discord.ILoadable"},
+        {"InvitableAttribute", "Discord.IInvitable"},
     };
 
     public class GenerationTarget(
@@ -236,7 +237,10 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
             return;
 
         // if it already implements the trait interface, do nothing
-        if (target.InterfaceSymbol.AllInterfaces.Any(x => x.ToDisplayString().StartsWith(traitInterface)))
+        if (
+            traitInterface != "Discord.IInvitable" &&
+            target.InterfaceSymbol.AllInterfaces.Any(x => x.ToDisplayString().StartsWith(traitInterface))
+        )
             return;
 
         var traitAttributes = target.InterfaceSymbol.GetAttributes()
@@ -286,6 +290,15 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 break;
             case "Discord.ILoadable":
                 LoadableTrait.Process(
+                    ref syntax,
+                    target,
+                    traitAttributes[0],
+                    entitySyntax,
+                    traitLogger
+                );
+                break;
+            case "Discord.IInvitable":
+                InvitableTrait.Process(
                     ref syntax,
                     target,
                     traitAttributes[0],

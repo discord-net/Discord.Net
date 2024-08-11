@@ -551,7 +551,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         }
     }
 
-    public async IAsyncEnumerable<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllAsync(
+    public async IAsyncEnumerable<IEntityHandle<TId, TEntity>> GetAllAsync(
         CachePathable path,
         IStoreInfo<TId, TModel> storeInfo,
         [EnumeratorCancellation] CancellationToken token = default)
@@ -566,27 +566,21 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
                 yield break;
 
             await foreach
-                (var batch in AsyncEnumeratorUtils.JoinAsync(
+                (var model in AsyncEnumeratorUtils.JoinAsync(
                     stores,
                     static (store, token) => store.GetAllAsync(token),
                     token)
                 )
             {
-                // TODO: might be another performant solution
-                yield return (await Task.WhenAll(
-                    batch.Select(async model =>
-                    {
-                        if (TryGetHandleFromReference(model.Id, out var handle))
-                            return handle;
+                if (TryGetHandleFromReference(model.Id, out var handle))
+                    yield return handle;
 
-                        return await CreateReferenceAndHandleAsync(
-                            path,
-                            model.Id,
-                            model,
-                            token: token
-                        );
-                    })
-                )).ToImmutableList();
+                yield return await CreateReferenceAndHandleAsync(
+                    path,
+                    model.Id,
+                    model,
+                    token: token
+                );
             }
         }
         finally
@@ -595,7 +589,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         }
     }
 
-    public async IAsyncEnumerable<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> QueryAsync(
+    public async IAsyncEnumerable<IEntityHandle<TId, TEntity>> QueryAsync(
         CachePathable path,
         IStoreInfo<TId, TModel> storeInfo,
         TId from,
@@ -614,7 +608,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
                 yield break;
 
             await foreach
-                (var batch in AsyncEnumeratorUtils.JoinAsync(
+                (var model in AsyncEnumeratorUtils.JoinAsync(
                     stores,
                     static (from, to, direction, limit, store, token) => store.QueryAsync(
                         from,
@@ -630,21 +624,15 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
                     token)
                 )
             {
-                // TODO: might be another performant solution
-                yield return (await Task.WhenAll(
-                    batch.Select(async model =>
-                    {
-                        if (TryGetHandleFromReference(model.Id, out var handle))
-                            return handle;
+                if (TryGetHandleFromReference(model.Id, out var handle))
+                    yield return handle;
 
-                        return await CreateReferenceAndHandleAsync(
-                            path,
-                            model.Id,
-                            model,
-                            token: token
-                        );
-                    })
-                )).ToImmutableList();
+                yield return await CreateReferenceAndHandleAsync(
+                    path,
+                    model.Id,
+                    model,
+                    token: token
+                );
             }
         }
         finally
@@ -653,7 +641,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         }
     }
 
-    public async IAsyncEnumerable<IReadOnlyCollection<TId>> GetAllIdsAsync(
+    public async IAsyncEnumerable<TId> GetAllIdsAsync(
         IStoreInfo<TId, TModel> storeInfo,
         [EnumeratorCancellation] CancellationToken token = default)
     {
@@ -664,13 +652,13 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
             yield break;
 
         await foreach
-            (var batch in AsyncEnumeratorUtils.JoinAsync(
+            (var id in AsyncEnumeratorUtils.JoinAsync(
                 stores,
                 static (store, token) => store.GetAllIdsAsync(token),
                 token)
             )
         {
-            yield return batch.ToImmutableList();
+            yield return id;
         }
     }
 

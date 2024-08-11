@@ -1,8 +1,6 @@
-using System.Collections.Immutable;
-
 namespace Discord.Paging;
 
-public interface IAsyncPaged<out T> : IAsyncEnumerable<IReadOnlyCollection<T>>
+public interface IAsyncPaged<out T> : IAsyncEnumerable<T>
 {
     int? PageSize { get; }
 }

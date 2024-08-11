@@ -1,8 +1,31 @@
+#region Invites
+
+global using InviteIdentity = Discord.IIdentifiable<string, Discord.Gateway.GatewayInvite, Discord.Gateway.GatewayInviteActor, Discord.Models.IInviteModel>;
+global using GuildInviteIdentity = Discord.IIdentifiable<string, Discord.Gateway.GatewayGuildInvite, Discord.Gateway.GatewayGuildInviteActor, Discord.Models.IInviteModel>;
+global using GuildChannelInviteIdentity = Discord.IIdentifiable<string, Discord.Gateway.GatewayGuildChannelInvite, Discord.Gateway.GatewayGuildChannelInviteActor, Discord.Models.IInviteModel>;
+
+#endregion
+
+#region Voice
+
+global using VoiceStateIdentity =
+    Discord.IIdentifiable<ulong, Discord.Gateway.GatewayVoiceState, Discord.Gateway.GatewayVoiceStateActor,
+        Discord.Models.IVoiceStateModel>;
+global using CurrentUserVoiceStateIdentity =
+    Discord.IIdentifiable<ulong, Discord.Gateway.GatewayCurrentUserVoiceState,
+        Discord.Gateway.GatewayCurrentUserVoiceStateActor,
+        Discord.Models.IVoiceStateModel>;
+
+#endregion
+
 #region Stickers
 
 global using StickerIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewaySticker, Discord.Gateway.GatewayStickerActor,
         Discord.Models.IStickerModel>;
+global using StickerPackIdentity =
+    Discord.IIdentifiable<ulong, Discord.Gateway.GatewayStickerPack, Discord.Gateway.GatewayStickerPackActor,
+        Discord.Models.IStickerPackModel>;
 
 #endregion
 
@@ -16,6 +39,9 @@ global using SelfUserIdentity =
         Discord.Models.ISelfUserModel>;
 global using MemberIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayMember, Discord.Gateway.GatewayMemberActor,
+        Discord.Models.IMemberModel>;
+global using CurrentMemberIdentity =
+    Discord.IIdentifiable<ulong, Discord.Gateway.GatewayCurrentMember, Discord.Gateway.GatewayCurrentMemberActor,
         Discord.Models.IMemberModel>;
 global using GuildScheduledEventUserIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayGuildScheduledEventUser,

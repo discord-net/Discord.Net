@@ -2,6 +2,8 @@ using Discord.Models;
 
 namespace Discord.Rest;
 
+using StickersActor = RestManagedIndexableActor<RestStickerActor, ulong, RestSticker, ISticker, IStickerModel>;
+
 [ExtendInterfaceDefaults]
 public sealed partial class RestStickerPackActor :
     RestActor<ulong, RestStickerPack, StickerPackIdentity>,
@@ -32,12 +34,11 @@ public sealed partial class RestStickerPack :
     public string Name => Model.Name;
 
     [SourceOfTruth]
-    public IReadOnlyCollection<RestSticker> Stickers { get; }
+    public StickersActor Stickers { get; }
 
     public ulong SkuId => Model.SkuId;
 
-    [SourceOfTruth]
-    public RestSticker? CoverSticker { get; }
+    [SourceOfTruth] public RestStickerActor? CoverSticker { get; }
 
     public string Description => Model.Description;
 
@@ -56,19 +57,19 @@ public sealed partial class RestStickerPack :
         Model = model;
         Actor = actor ?? new(client, StickerPackIdentity.Of(this));
 
-        var stickers = new List<RestSticker>();
+        if (model is not IModelSourceOfMultiple<IStickerModel> stickersSource)
+            throw new ArgumentException($"Expected {model.GetType()} to provide sticker models");
 
-        foreach (var stickerModel in model.Stickers)
-        {
-            var sticker = RestSticker.Construct(client, Actor.Identity, stickerModel);
+        Stickers = RestManagedIndexableActor.Create(
+            Template.Of<RestStickerActor>(),
+            client,
+            stickersSource.GetModels(),
+            RestSticker.Construct,
+            Client.Stickers
+        );
 
-            if (stickerModel.Id == model.CoverStickerId)
-                CoverSticker = sticker;
-
-            stickers.Add(sticker);
-        }
-
-        Stickers = stickers.AsReadOnly();
+        if(model.CoverStickerId.HasValue)
+            CoverSticker = client.Stickers[model.CoverStickerId.Value];
     }
 
     public IStickerPackModel GetModel() => Model;

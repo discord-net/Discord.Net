@@ -124,7 +124,7 @@ internal sealed partial class StateController : IDisposable
         where TModel : class, IEntityModel<TId>
     {
         if (TryGetCachedBroker<TId, TEntity, TModel>(out var broker))
-            return CreateLatentFromBroker(broker, path ?? CachePathable.Default, model, actor);
+            return CreateLatentFromBroker(broker, path ?? CachePathable.Empty, model, actor);
 
         // TODO: sync lock here, I don't like it
         using var scope = _brokerSemaphores.Get(typeof(TEntity), out var semaphoreSlim);
@@ -134,12 +134,12 @@ internal sealed partial class StateController : IDisposable
         try
         {
             if (TryGetCachedBroker(out broker))
-                return CreateLatentFromBroker(broker, path ?? CachePathable.Default, model, actor);
+                return CreateLatentFromBroker(broker, path ?? CachePathable.Empty, model, actor);
 
             broker = new EntityBroker<TId, TEntity, TActor, TModel>(_client, this);
             _brokers[typeof(TEntity)] = broker;
 
-            return CreateLatentFromBroker(broker, path ?? CachePathable.Default, model, actor);
+            return CreateLatentFromBroker(broker, path ?? CachePathable.Empty, model, actor);
         }
         finally
         {
@@ -315,7 +315,7 @@ internal sealed partial class StateController : IDisposable
 
         try
         {
-            var info = (await TProvider.GetStoreAsync(_client, CachePathable.Default, token))
+            var info = (await TProvider.GetStoreAsync(_client, CachePathable.Empty, token))
                 .ToInfo(_client, Template.Of<TProvider>());
 
             lock (_rootStoreSemaphores)

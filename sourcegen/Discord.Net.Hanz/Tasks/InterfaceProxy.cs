@@ -414,11 +414,17 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
 
             DedupeInstanceMemberConflicts(members, target.SemanticModel, targetLogger);
 
-            prepared.Add(target.Symbol, (target, members));
+            if (prepared.TryGetValue(target.Symbol, out var existing))
+                existing.Members.AddRange(members);
+            else
+                prepared.Add(target.Symbol, (target, members));
         }
 
         foreach (var target in prepared)
         {
+            if (generated.ContainsKey(target.Key.ToDisplayString()))
+                continue;
+
             var targetLogger = logger.WithSemanticContext(target.Value.Target.SemanticModel);
 
             var children = prepared
@@ -1055,7 +1061,18 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
                                 SyntaxFactory.MemberAccessExpression(
                                     SyntaxKind.SimpleMemberAccessExpression,
                                     SyntaxFactory.IdentifierName(member.ProxiedProperty.Name),
-                                    SyntaxFactory.IdentifierName(method.Name)
+                                    method.IsGenericMethod
+                                        ? SyntaxFactory.GenericName(
+                                            SyntaxFactory.Identifier(method.Name),
+                                            SyntaxFactory.TypeArgumentList(
+                                                SyntaxFactory.SeparatedList<TypeSyntax>(
+                                                    method.TypeParameters.Select(x =>
+                                                        SyntaxFactory.IdentifierName(x.Name)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                        : SyntaxFactory.IdentifierName(method.Name)
                                 ),
                                 SyntaxFactory.ArgumentList(
                                     SyntaxFactory.SeparatedList(
@@ -1093,7 +1110,18 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
                             member.CanProxyToSelfImplementation
                                 ? SyntaxFactory.ThisExpression()
                                 : castedSyntax,
-                            SyntaxFactory.IdentifierName(method.Name)
+                            method.IsGenericMethod
+                                ? SyntaxFactory.GenericName(
+                                    SyntaxFactory.Identifier(method.Name),
+                                    SyntaxFactory.TypeArgumentList(
+                                        SyntaxFactory.SeparatedList<TypeSyntax>(
+                                            method.TypeParameters.Select(x =>
+                                                SyntaxFactory.IdentifierName(x.Name)
+                                            )
+                                        )
+                                    )
+                                )
+                                : SyntaxFactory.IdentifierName(method.Name)
                         ),
                         SyntaxFactory.ArgumentList(
                             SyntaxFactory.SeparatedList(

@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace Discord.Gateway;
 
-public abstract class DispatchEvent<TPackage, TPayload> :
+public abstract class DispatchEvent<TPackage, TPayload>(DiscordGatewayClient client) :
     IDispatchEvent,
     IDispatchEventPackager<TPackage, TPayload>
     where TPackage : IDispatchPackage
@@ -18,19 +18,12 @@ public abstract class DispatchEvent<TPackage, TPayload> :
     public bool HasSubscribers => _handlers.Count > 0;
     public bool RequiresPreparation => _deferredOperations.Count > 0;
 
-    protected DiscordGatewayClient Client { get; }
+    protected DiscordGatewayClient Client { get; } = client;
 
-    private readonly Dictionary<Delegate, InvocableEventHandler<TPackage>> _handlers;
-    private readonly Queue<DeferredOperation> _deferredOperations;
+    private readonly Dictionary<Delegate, InvocableEventHandler<TPackage>> _handlers = new();
+    private readonly Queue<DeferredOperation> _deferredOperations = new();
 
-    public DispatchEvent(DiscordGatewayClient client)
-    {
-        Client = client;
-        _handlers = new();
-        _deferredOperations = new();
-    }
-
-    public void Prepare()
+    public virtual void Prepare()
     {
         while (_deferredOperations.TryDequeue(out var operation))
         {
@@ -63,7 +56,6 @@ public abstract class DispatchEvent<TPackage, TPayload> :
     protected void AddSubscriber<T>(T key, InvocableEventHandler<TPackage> handler)
         where T : Delegate
         => _deferredOperations.Enqueue(new(key, handler));
-
 
     protected void RemoveSubscriber<T>(T key)
         where T : Delegate

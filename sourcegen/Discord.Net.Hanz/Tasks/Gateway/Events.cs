@@ -66,23 +66,41 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
             !Equals(left, right);
     }
 
-    public sealed class EventGenerationTarget(
-        SemanticModel semanticModel,
-        ClassDeclarationSyntax eventClassSyntax,
-        INamedTypeSymbol eventClass,
-        INamedTypeSymbol package,
-        INamedTypeSymbol payload,
-        INamedTypeSymbol[] delegates,
-        string dispatchName
-    ) : GenerationTarget, IEquatable<EventGenerationTarget>
+    public sealed class EventGenerationTarget : GenerationTarget, IEquatable<EventGenerationTarget>
     {
-        public SemanticModel SemanticModel { get; } = semanticModel;
-        public ClassDeclarationSyntax EventClassSyntax { get; } = eventClassSyntax;
-        public INamedTypeSymbol EventClass { get; } = eventClass;
-        public INamedTypeSymbol Package { get; } = package;
-        public INamedTypeSymbol Payload { get; } = payload;
-        public INamedTypeSymbol[] Delegates { get; } = delegates;
-        public string DispatchName { get; } = dispatchName;
+        public SemanticModel SemanticModel { get; }
+        public ClassDeclarationSyntax EventClassSyntax { get; }
+        public INamedTypeSymbol EventClass { get; }
+        public INamedTypeSymbol Package { get; }
+        public INamedTypeSymbol Payload { get; }
+        public INamedTypeSymbol PackagePayload { get; }
+        public Dictionary<AttributeData, INamedTypeSymbol> SubscribableAttributes { get; }
+        public string DispatchName { get; }
+
+        public EventGenerationTarget(
+            SemanticModel semanticModel,
+            ClassDeclarationSyntax eventClassSyntax,
+            INamedTypeSymbol eventClass,
+            INamedTypeSymbol package,
+            INamedTypeSymbol payload,
+            Dictionary<AttributeData, INamedTypeSymbol> subscribableAttributes,
+            string dispatchName)
+        {
+            SemanticModel = semanticModel;
+            EventClassSyntax = eventClassSyntax;
+            EventClass = eventClass;
+            Package = package;
+            Payload = payload;
+            SubscribableAttributes = subscribableAttributes;
+            DispatchName = dispatchName;
+
+            PackagePayload = Package
+                    .Interfaces
+                    .FirstOrDefault(x => x.Name == "IDispatchPackage")
+                is {IsGenericType: true} dispatchPackageInterface
+                ? (INamedTypeSymbol)dispatchPackageInterface.TypeArguments[0]
+                : Payload;
+        }
 
         public bool Equals(EventGenerationTarget? other)
         {
@@ -141,7 +159,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
 
         if (symbol.Interfaces.FirstOrDefault(x =>
                 x.ToDisplayString().StartsWith("Discord.Gateway.Processors.IDispatchProcessor<"))
-            is {} processor)
+            is { } processor)
         {
             return new ProcessorGenerationTarget(
                 context.SemanticModel,
@@ -160,15 +178,13 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
         ) return null;
 
 
-        var delegates = symbol.GetAttributes()
+        var subscribableEvents = symbol.GetAttributes()
             .Where(x =>
                 x.AttributeClass?.ToDisplayString().StartsWith("Discord.SubscribableAttribute") ?? false
             )
-            .Select(x => x.AttributeClass!.TypeArguments[0])
-            .OfType<INamedTypeSymbol>()
-            .ToArray();
+            .ToDictionary(x => x, x => (INamedTypeSymbol)x.AttributeClass!.TypeArguments[0]);
 
-        if (delegates.Length == 0) return null;
+        if (subscribableEvents.Count == 0) return null;
 
         if (
             dispatchEvent.TypeArguments[0] is not INamedTypeSymbol package ||
@@ -182,7 +198,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
             symbol,
             package,
             payload,
-            delegates,
+            subscribableEvents,
             dispatchName
         );
     }
@@ -218,63 +234,90 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
             []
         );
 
+        var processedSymbols = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
+
         foreach (var target in processorGenerationTargets)
         {
+            if (!processedSymbols.Add(target.Symbol))
+                continue;
+
             var companionSyntax = SyntaxUtils.CreateSourceGenClone(target.Syntax)
                 .AddMembers(
                     SyntaxFactory.ParseMemberDeclaration(
-                        $"public static string DispatchEventType => \"{target.DispatchName}\";"
+                        $"public string DispatchEventType => \"{target.DispatchName}\";"
                     )!
                 );
 
             context.AddSource(
                 $"EventProcessors/{target.Symbol.Name}",
                 $$"""
-                {{target.Syntax.GetFormattedUsingDirectives()}}
+                  {{target.Syntax.GetFormattedUsingDirectives()}}
 
-                namespace {{target.Symbol.ContainingNamespace}};
+                  namespace {{target.Symbol.ContainingNamespace}};
 
-                {{companionSyntax.NormalizeWhitespace()}}
-                """
+                  {{companionSyntax.NormalizeWhitespace()}}
+                  """
             );
         }
 
         clientClassSyntax = clientClassSyntax.AddMembers(
             SyntaxFactory.ParseMemberDeclaration(
-                $$"""
-                private ValueTask ProcessDispatchAsync(string name, IGatewayPayloadData? payload, CancellationToken token)
-                {
-                    return name switch
-                    {
-                        {{
-                            string.Join(
-                                "\n",
-                                processorGenerationTargets.Select(x =>
-                                    $"\"{x.DispatchName}\"{(
-                                        x.Payload.NullableAnnotation is NullableAnnotation.Annotated
-                                        ? $" => {x.Symbol}.ProcessAsync(this, payload as {x.Payload}, token),"
-                                        : $" when payload is {x.Payload} payload{x.Symbol.Name} => {x.Symbol}.ProcessAsync(this, payload{x.Symbol.Name}, token),"
-                                    )}"
-                                )
-                            )
-                        }}
-                        _ => ValueTask.CompletedTask
-                    };
-                }
                 """
+                internal Dictionary<string, HashSet<IDispatchProcessor>> DispatchProcessors
+                    => _dispatchProcessors ??= CreateProcessorsMap();
+                """
+            )!,
+            SyntaxFactory.ParseMemberDeclaration(
+                "private Dictionary<string, HashSet<IDispatchProcessor>>? _dispatchProcessors;"
+            )!,
+            SyntaxFactory.ParseMemberDeclaration(
+                """
+                internal HashSet<IDispatchProcessor> GetProcessors(string eventName)
+                    => DispatchProcessors.TryGetValue(eventName, out var set) ? set : [];
+                """
+            )!,
+            SyntaxFactory.ParseMemberDeclaration(
+                $$"""
+                  private Dictionary<string, HashSet<IDispatchProcessor>> CreateProcessorsMap()
+                  {
+                      var map = new Dictionary<string, HashSet<IDispatchProcessor>>()
+                      {
+                          {{
+                              string.Join(
+                                  ",\n",
+                                  processorGenerationTargets.Select(x =>
+                                      $$"""
+                                        { "{{x.DispatchName}}", [new {{x.Symbol}}(this)] }
+                                        """
+                                  )
+                              )
+                          }}
+                      };
+
+                      foreach(var userProcessor in Config.EventProcessors)
+                      {
+                          var instance = userProcessor.Get(this);
+
+                          if(!map.TryGetValue(instance.DispatchEventType, out var set))
+                              map[instance.DispatchEventType] = set = new();
+
+                          set.Add(instance);
+                      }
+                  }
+                  """
             )!
         );
 
         context.AddSource(
             "EventProcessors/Client",
             $$"""
-            using Discord.Gateway.Processors;
-            using Discord.Models;
+              using Discord.Gateway.Processors;
+              using Discord.Models;
 
-            namespace Discord.Gateway;
+              namespace Discord.Gateway;
 
-            {{clientClassSyntax.NormalizeWhitespace()}}
-            """
+              {{clientClassSyntax.NormalizeWhitespace()}}
+              """
         );
     }
 
@@ -288,6 +331,8 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
         if (eventGeneratorTargets.Length == 0) return;
 
         var generatedEvents = new List<EventGenerationTarget>();
+
+        var addedEvents = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
 
         foreach (var target in eventGeneratorTargets)
         {
@@ -305,10 +350,10 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
             packageSyntax = SyntaxUtils.CreateSourceGenClone(packageSyntax)
                 .AddMembers(
                     SyntaxFactory.ParseMemberDeclaration($"public {target.EventClass} Handler {{ get; }}")!,
-                    SyntaxFactory.ParseMemberDeclaration($"public {target.Payload} Payload {{ get; }}")!,
+                    SyntaxFactory.ParseMemberDeclaration($"public {target.PackagePayload} Payload {{ get; }}")!,
                     SyntaxFactory.ParseMemberDeclaration(
                         $$"""
-                          public {{target.Package.Name}}({{target.EventClass}} handler, {{target.Payload}} payload)
+                          public {{target.Package.Name}}({{target.EventClass}} handler, {{target.PackagePayload}} payload)
                           {
                               Handler = handler;
                               Payload = payload;
@@ -339,7 +384,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                     )!
                 );
 
-            foreach (var eventDelegate in target.Delegates
+            foreach (var eventDelegate in target.SubscribableAttributes.Values
                          .Where(x => x.DelegateInvokeMethod is not null))
             {
                 targetLogger.Log($"{target.EventClass}: Adding {eventDelegate} delegate");
@@ -359,6 +404,9 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                     targetLogger
                 );
             }
+
+            if (!addedEvents.Add(target.EventClass))
+                continue;
 
             context.AddSource(
                 $"Events/{target.EventClass.Name}",
@@ -394,7 +442,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
             []
         );
 
-        var eventMap = new Dictionary<string, string>();
+        var eventMap = new Dictionary<string, HashSet<string>>();
 
         foreach (var generated in generatedEvents)
         {
@@ -414,7 +462,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                 )!,
                 SyntaxFactory.ParseMemberDeclaration(
                     $$"""
-                      public event {{generated.Delegates[0]}} {{eventName}}
+                      public event {{generated.SubscribableAttributes.Values.First()}} {{eventName}}
                       {
                           add => {{propName}}.Subscribe(value);
                           remove => {{propName}}.Unsubscribe(value);
@@ -423,20 +471,25 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                 )!
             );
 
-            eventMap.Add(generated.DispatchName, propName);
+            if (!eventMap.TryGetValue(generated.DispatchName, out var set))
+                eventMap[generated.DispatchName] = set = new HashSet<string>();
+
+            set.Add(propName);
         }
 
         clientClassSyntax = clientClassSyntax.AddMembers(
             SyntaxFactory.ParseMemberDeclaration(
                 $$"""
-                  public IDispatchEvent? GetDispatchEvent(string eventName)
+                  public HashSet<IDispatchEvent>? GetDispatchEvents(string eventName)
                   {
                       return eventName switch
                       {
                           {{
                               string.Join(
                                   "\n",
-                                  eventMap.Select(x => $"\"{x.Key}\" => this.{x.Value},")
+                                  eventMap.Select(x =>
+                                      $"\"{x.Key}\" => [{string.Join(", ", x.Value.Select(x => $"this.{x}"))}],"
+                                  )
                               )
                           }}
                           _ => null
@@ -446,13 +499,23 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
             )!,
             SyntaxFactory.ParseMemberDeclaration(
                 $$"""
-                  [{{string.Join(",", eventMap.Values.Select(x => $"MemberNotNull(nameof({x}))"))}}]
+                  [{{
+                      string.Join(
+                          ",",
+                          eventMap.Values
+                              .SelectMany(x => x
+                                  .Select(x => $"MemberNotNull(nameof({x}))")
+                              )
+                      )
+                  }}]
                   private void InitializeEvents()
                   {
                       {{
                           string.Join(
                               "\n",
-                              eventMap.Values.Select(x => $"this.{x} ??= new(this);")
+                              eventMap.Values.SelectMany(x => x
+                                  .Select(x => $"this.{x} ??= new(this);")
+                              )
                           )
                       }}
                   }
@@ -510,12 +573,6 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
         EventGenerationTarget target,
         Logger logger)
     {
-        packageSyntax = packageSyntax.AddMembers(
-            SyntaxFactory.ParseMemberDeclaration(
-                "private readonly object _syncRoot = new();"
-            )!
-        );
-
         var parsedParameters = delegateMethod.Parameters
             .ToDictionary<IParameterSymbol, Parameter, IParameterSymbol>(
                 x => x,
@@ -553,7 +610,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                     case EventParameterDegree.Id when
                         TryGetModelType(parameter.Type, out var modelType) &&
                         target.SemanticModel.Compilation.HasImplicitConversion(
-                            target.Payload,
+                            target.PackagePayload,
                             modelType
                         ):
                         mapping.Add(EventParameterDegree.Id, "package.Payload.Id");
@@ -565,7 +622,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                     case EventParameterDegree.Model when
                         TryGetModelType(parameter.Type, out var modelType) &&
                         target.SemanticModel.Compilation.HasImplicitConversion(
-                            target.Payload,
+                            target.PackagePayload,
                             modelType
                         ):
                         mapping.Add(EventParameterDegree.Model, "package.Payload");
@@ -613,14 +670,13 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                     $" - Adding get method for {mapping.Parameter.Name}: {requiredDegree} ({mapping.ResolveDegree})"
                 );
 
-
                 AddEventParameter(
                     ref handlerInterface,
                     ref packageSyntax,
                     parsedParameters[mapping.Parameter],
                     type,
                     requiredDegree,
-                    target.Payload,
+                    target.PackagePayload,
                     logger
                 );
             }

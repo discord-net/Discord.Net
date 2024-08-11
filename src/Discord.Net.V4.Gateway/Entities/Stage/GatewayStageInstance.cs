@@ -25,8 +25,8 @@ public sealed partial class GatewayStageInstanceActor :
     {
         Identity = instance | this;
 
-        Guild = client.Guilds >> guild;
-        Channel = Guild.StageChannels >> channel;
+        Guild = client.Guilds[guild];
+        Channel = Guild.StageChannels[channel];
     }
 
     [SourceOfTruth]

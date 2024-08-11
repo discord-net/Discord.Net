@@ -25,7 +25,11 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
 
     internal ICacheProvider CacheProvider { get; }
 
-    internal StateController StateController { get; private set; }
+    internal IGatewayCompression? GatewayCompression { get; }
+
+    internal StateController StateController { get; }
+
+    private readonly ILogger<DiscordGatewayClient> _logger;
 
     public DiscordGatewayClient(DiscordToken token, ILoggerFactory? loggerFactory = null)
         : this(new DiscordGatewayConfig(token), loggerFactory){}
@@ -39,9 +43,13 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
         DefaultRequestOptions = new();
 
         LoggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+
+        _logger = LoggerFactory.CreateLogger<DiscordGatewayClient>();
+
         Rest = new DiscordRestClient(config, LoggerFactory.CreateLogger<DiscordRestClient>());
         Encoding = config.Encoding.Get(this);
         CacheProvider = config.CacheProvider.Get(this);
+        GatewayCompression = config.GatewayCompression?.Get(this);
 
         _heartbeatSignal = Channel.CreateBounded<HeartbeatSignal>(
             new BoundedChannelOptions(2)
@@ -61,6 +69,14 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
         Channels = new(id => new GatewayChannelActor(this, ChannelIdentity.Of(id)));
         Guilds = GatewayActors.PageGuilds(this);
         Users = new(id => new GatewayUserActor(this, UserIdentity.Of(id)));
+        StickerPacks = new(
+            this,
+            id => new GatewayStickerPackActor(this, StickerPackIdentity.Of(id)),
+            model => RestStickerPack.Construct(Rest, model),
+            CachePathable.Empty,
+            IStickerPack.FetchManyRoute(IPathable.Empty)
+        );
+        Stickers = new(id => new GatewayStickerActor(this, StickerIdentity.Of(id)));
 
         InitializeEvents();
     }

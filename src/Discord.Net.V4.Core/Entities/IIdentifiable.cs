@@ -402,6 +402,11 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
 
     public static IIdentifiable<TId, TEntity, TActor, TModel> operator |(
         IIdentifiable<TId, TEntity, TActor, TModel>? left,
+        TId right
+    ) => left?.MostSpecific(right) ?? Of(right);
+
+    public static IIdentifiable<TId, TEntity, TActor, TModel> operator |(
+        IIdentifiable<TId, TEntity, TActor, TModel>? left,
         IIdentifiable<TId> right
     ) => left?.MostSpecific(right) ?? Of(right.Id);
 
@@ -588,6 +593,33 @@ public static class IIdentifiableExtensions
     public static IIdentifiable<TId, TEntity, TModel> MostSpecific<TId, TEntity, TModel>(
         this IIdentifiable<TId, TEntity, TModel> self,
         TEntity other
+    )
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>, IEntityOf<TModel>
+        where TModel : class, IEntityModel<TId>
+    {
+        if (self.Detail < IdentityDetail.Entity)
+            return IIdentifiable<TId, TEntity, TModel>.Of(other);
+        return self;
+    }
+
+    public static IIdentifiable<TId, TEntity, TActor, TModel> MostSpecific<TId, TEntity, TActor, TModel>(
+        this IIdentifiable<TId, TEntity, TActor, TModel> self,
+        TId other
+    )
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>, IEntityOf<TModel>
+        where TModel : class, IEntityModel<TId>
+        where TActor : class, IActor<TId, TEntity>
+    {
+        if (self.Detail < IdentityDetail.Entity)
+            return IIdentifiable<TId, TEntity, TActor, TModel>.Of(other);
+        return self;
+    }
+
+    public static IIdentifiable<TId, TEntity, TModel> MostSpecific<TId, TEntity, TModel>(
+        this IIdentifiable<TId, TEntity, TModel> self,
+        TId other
     )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>

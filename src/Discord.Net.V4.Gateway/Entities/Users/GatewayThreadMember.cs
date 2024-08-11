@@ -27,9 +27,9 @@ public sealed partial class GatewayThreadMemberActor :
     {
         Identity = threadMember | this;
 
-        Thread = (client.Guilds >> guild).ThreadChannels >> thread;
-        User = client.Users >> (user | threadMember);
-        Member = Thread.Guild.Members >> (member | User | threadMember);
+        Thread = client.Guilds[guild].ThreadChannels[thread];
+        User = client.Users[user | threadMember];
+        Member = Thread.Guild.Members[member | User | threadMember];
     }
 
     [SourceOfTruth]

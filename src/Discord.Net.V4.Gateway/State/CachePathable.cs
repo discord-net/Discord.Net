@@ -7,7 +7,7 @@ namespace Discord.Gateway.State;
 
 public sealed partial class CachePathable : IPathable, IReadOnlyDictionary<Type, object>, IDisposable
 {
-    public static readonly CachePathable Default = new CachePathable().MakeReadOnly();
+    public static readonly CachePathable Empty = new CachePathable().MakeReadOnly();
 
     //private readonly LinkedList<IIdentifiable<TId, TEntity, TModel>>
     private IDictionary<Type, object> _identities = new Dictionary<Type, object>();

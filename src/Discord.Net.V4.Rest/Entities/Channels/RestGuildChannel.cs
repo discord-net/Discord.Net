@@ -10,8 +10,8 @@ namespace Discord.Rest;
 using EnumerableInvitesActor = RestEnumerableIndexableActor<
     RestGuildChannelInviteActor,
     string,
-    RestInvite,
-    IInvite,
+    RestGuildChannelInvite,
+    IGuildChannelInvite,
     IEnumerable<IInviteModel>
 >;
 
@@ -45,9 +45,9 @@ public partial class RestGuildChannelActor :
             RestGuildChannelInviteActor.Factory,
             guild,
             channel,
-            entityFactory: RestInvite.Construct,
-            new RestInvite.Context(guild, channel),
-            IInvite.GetChannelInvitesRoute(this)
+            entityFactory: RestGuildChannelInvite.Construct,
+            new RestGuildChannelInvite.Context(guild, channel),
+            IGuildChannelInvite.FetchManyRoute(this)
         );
     }
 
@@ -57,8 +57,8 @@ public partial class RestGuildChannelActor :
         => RestGuildChannel.Construct(Client, Guild.Identity, model);
 
     [SourceOfTruth]
-    internal RestInvite CreateEntity(IInviteModel model)
-        => RestInvite.Construct(Client, new(Guild.Identity, Identity), model);
+    internal RestGuildChannelInvite CreateEntity(IInviteModel model)
+        => RestGuildChannelInvite.Construct(Client, new(Guild.Identity, Identity), model);
 }
 
 public partial class RestGuildChannel :

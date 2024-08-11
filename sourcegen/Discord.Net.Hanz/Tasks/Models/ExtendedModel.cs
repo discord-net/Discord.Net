@@ -26,7 +26,10 @@ public static class ExtendedModel
             .ToArray();
 
         if (extendedMembers.Length == 0)
+        {
+            logger.Log($"{symbol}: No extended json members");
             return;
+        }
 
         var converter = CreateConverterSyntax(symbol, extendedMembers, semanticModel);
 
@@ -61,6 +64,8 @@ public static class ExtendedModel
         );
 
         AddProxiesIfNeeded(symbol, extendedMembers, context);
+
+        logger.Log($"{symbol}: Generated extended converter");
     }
 
     private static void AddProxiesIfNeeded(

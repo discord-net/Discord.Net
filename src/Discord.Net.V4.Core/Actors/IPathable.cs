@@ -19,6 +19,11 @@ public interface IPathable
         where TEntity : class, IEntity<ulong>
         => TryGet<ulong, TEntity>(out var id) ? id : null;
 
+    TId? Optionally<TId, TEntity>()
+        where TEntity : class, IEntity<TId>
+        where TId : struct, IEquatable<TId>
+        => TryGet<TId, TEntity>(out var id) ? id : null;
+
     TId Require<TId, TEntity>()
         where TEntity : class, IEntity<TId>
         where TId : IEquatable<TId>

@@ -20,91 +20,24 @@ public partial class RestInviteActor :
         Identity = invite | this;
     }
 
-    internal static RestInviteActor Create(
-        DiscordRestClient client,
-        InviteIdentity invite,
-        GuildIdentity? guild = null,
-        GuildChannelIdentity? channel = null)
-    {
-        if (channel is not null && guild is not null)
-            return new RestGuildChannelInviteActor(client, guild, channel, invite);
-
-        if (guild is not null)
-            return new RestGuildInviteActor(client, guild, invite);
-
-        return new RestInviteActor(client, invite);
-    }
-
     [SourceOfTruth]
     internal virtual RestInvite CreateEntity(IInviteModel model)
         => RestInvite.Construct(Client, model);
 }
 
-[ExtendInterfaceDefaults]
-public partial class RestGuildInviteActor :
-    RestInviteActor,
-    IGuildInviteActor
-{
-    [SourceOfTruth] public RestGuildActor Guild { get; }
-
-    internal override InviteIdentity Identity { get; }
-
-    [TypeFactory(LastParameter = nameof(invite))]
-    public RestGuildInviteActor(
-        DiscordRestClient client,
-        GuildIdentity guild,
-        InviteIdentity invite
-    ) : base(client, invite)
-    {
-        Identity = invite | this;
-
-        Guild = guild.Actor ?? new(client, guild);
-    }
-
-    internal override RestInvite CreateEntity(IInviteModel model)
-        => RestInvite.Construct(Client, new(Guild.Identity), model);
-}
-
-[ExtendInterfaceDefaults]
-public sealed partial class RestGuildChannelInviteActor :
-    RestGuildInviteActor,
-    IGuildChannelInviteActor
-{
-    [SourceOfTruth]
-    public RestGuildChannelActor Channel { get; }
-
-    internal override InviteIdentity Identity { get; }
-
-    [TypeFactory(LastParameter = nameof(invite))]
-    public RestGuildChannelInviteActor(
-        DiscordRestClient client,
-        GuildIdentity guild,
-        GuildChannelIdentity channel,
-        InviteIdentity invite
-    ) : base(client, guild, invite)
-    {
-        Identity = invite | this;
-
-        Channel = channel.Actor ?? new(client, guild, channel);
-    }
-
-    internal override RestInvite CreateEntity(IInviteModel model)
-        => RestInvite.Construct(Client, new(Guild.Identity, Channel.Identity), model);
-}
-
-public sealed partial class RestInvite :
+public partial class RestInvite :
     RestEntity<string>,
     IInvite,
     IConstructable<RestInvite, IInviteModel, DiscordRestClient>,
     IContextConstructable<RestInvite, IInviteModel, RestInvite.Context, DiscordRestClient>
 {
-    public readonly record struct Context(GuildIdentity? Guild = null, GuildChannelIdentity? Channel = null);
+    public readonly record struct Context(
+        GuildIdentity? Guild = null,
+        GuildChannelIdentity? Channel = null,
+        GuildScheduledEventIdentity? ScheduledEvent = null
+    );
 
     public InviteType Type => (InviteType)Model.Type;
-
-    [SourceOfTruth] public RestGuildActor? Guild { get; }
-
-    [SourceOfTruth] public RestGuildChannelActor? Channel { get; }
 
     [SourceOfTruth] public RestUserActor? Inviter { get; private set; }
 
@@ -118,9 +51,7 @@ public sealed partial class RestInvite :
 
     public DateTimeOffset? ExpiresAt => Model.ExpiresAt;
 
-    [SourceOfTruth] public RestGuildScheduledEventActor? GuildScheduledEvent { get; private set; }
-
-    [ProxyInterface(typeof(IInviteActor))] internal RestInviteActor Actor { get; }
+    [ProxyInterface(typeof(IInviteActor))] internal virtual RestInviteActor Actor { get; }
 
     internal IInviteModel Model { get; private set; }
 
@@ -134,16 +65,7 @@ public sealed partial class RestInvite :
     {
         Model = model;
 
-        if (guild is null && model.GuildId.HasValue)
-            guild = GuildIdentity.Of(model.GuildId.Value);
-
-        if (channel is null && model.ChannelId.HasValue)
-            channel = GuildChannelIdentity.Of(model.ChannelId.Value);
-
-        Actor = actor ?? RestInviteActor.Create(client, InviteIdentity.Of(this), guild, channel);
-
-        Guild = Actor is RestGuildInviteActor guildActor ? guildActor.Guild : null;
-        Channel = Actor is RestGuildChannelInviteActor guildChannelActor ? guildChannelActor.Channel : null;
+        Actor = actor ?? new(client, InviteIdentity.Of(this));
 
         Inviter = model.InviterId.Map(
             static (id, client) => RestUserActor.Factory(client, UserIdentity.Of(id)),
@@ -160,7 +82,20 @@ public sealed partial class RestInvite :
         => Construct(client, default, model);
 
     public static RestInvite Construct(DiscordRestClient client, Context context, IInviteModel model)
-        => new(client, model, guild: context.Guild, channel: context.Channel);
+    {
+        if(context.Guild is not null || model.GuildId.HasValue)
+            return RestGuildInvite.Construct(
+                client,
+                new RestGuildInvite.Context(
+                    context.Guild | model.GuildId!.Value,
+                    context.Channel,
+                    context.ScheduledEvent
+                ),
+                model
+            );
+
+        return new(client, model, guild: context.Guild, channel: context.Channel);
+    }
 
     public ValueTask UpdateAsync(IInviteModel model, CancellationToken token = default)
     {

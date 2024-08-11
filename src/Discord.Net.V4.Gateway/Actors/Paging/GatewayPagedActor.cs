@@ -123,7 +123,7 @@ public sealed class GatewayPagedActor<TId, TGatewayEntity, TRestEntity, TCore, T
             _onRestPage
         );
 
-    private async ValueTask AddModelsToCacheAsync(TModel[] models, CancellationToken token)
+    private async ValueTask AddModelsToCacheAsync(IEnumerable<TModel> models, CancellationToken token)
     {
         _broker ??= await TGatewayEntity.GetBrokerAsync(_client, token);
         _storeInfo ??= await TGatewayEntity.GetStoreInfoAsync(_client, _path, token);

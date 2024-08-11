@@ -7,7 +7,7 @@ public static class Directives
 {
     public static string GetFormattedUsingDirectives(this SyntaxNode node, params string[] extras)
     {
-        return string.Join("\n", GetUsingDirectives(node).Concat(extras.Select(x => $"using {x};")));
+        return string.Join("\n", GetUsingDirectives(node).Concat(extras.Select(x => $"using {x};")).Distinct());
     }
 
     public static IEnumerable<string> GetUsingDirectives(this SyntaxNode node)

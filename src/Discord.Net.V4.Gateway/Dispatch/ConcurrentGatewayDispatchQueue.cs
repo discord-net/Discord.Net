@@ -17,42 +17,51 @@ public sealed partial class ConcurrentGatewayDispatchQueue : IGatewayDispatchQue
 
     public async ValueTask AcceptAsync(
         string eventName,
-        IDispatchEvent? dispatchEvent,
+        HashSet<IDispatchEvent>? dispatchEvents,
         IGatewayPayloadData? payload,
         CancellationToken token)
     {
-        if (dispatchEvent is null)
+        if (dispatchEvents is null)
         {
             _logger.LogWarning(
-                "Received dispatch {Event}, but no dispatch event exists for that event type",
+                "Received dispatch {Event}, but no dispatch event emitters exists for that event type",
                 eventName
             );
             return;
         }
 
-        if (dispatchEvent.RequiresPreparation)
-        {
-            _logger.LogDebug("Preparing dispatch event {Event}", eventName);
-            dispatchEvent.Prepare();
-        }
+        var preparedHandlers = new List<PreparedInvocableEventHandle>();
 
-        if (!dispatchEvent.HasSubscribers)
+        foreach (var dispatchEvent in dispatchEvents)
         {
-            _logger.LogDebug("Exiting early, {Event} has no subscribers", eventName);
-            return;
+            if (dispatchEvent.RequiresPreparation)
+            {
+                _logger.LogDebug("Preparing dispatch event {Event}", eventName);
+                dispatchEvent.Prepare();
+            }
+
+            if (!dispatchEvent.HasSubscribers)
+            {
+                _logger.LogDebug("Exiting early, {Event} has no subscribers", eventName);
+                return;
+            }
+
+            var handlers = await dispatchEvent.GetHandlersAsync(payload, token);
+
+            if (handlers is null)
+                continue;
+
+            preparedHandlers.AddRange(handlers);
         }
 
         var dispatcher = _client.GetDispatcher(eventName);
 
-        var handlers = await dispatchEvent.GetHandlersAsync(payload, token);
+        _logger.LogInformation(
+            "Dispatching {Event} to {SubscriberCount} subscribers",
+            eventName,
+            preparedHandlers.Count
+        );
 
-        if (handlers is null)
-        {
-            _logger.LogDebug("Dispatch event {Event} returned no handlers", eventName);
-            return;
-        }
-
-        _logger.LogInformation("Dispatching {Event}", eventName);
-        await dispatcher.DispatchAsync(eventName, handlers, token);
+        await dispatcher.DispatchAsync(eventName, preparedHandlers, token);
     }
 }

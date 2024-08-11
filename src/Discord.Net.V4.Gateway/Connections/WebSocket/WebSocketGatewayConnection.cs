@@ -1,20 +1,19 @@
-using Discord.API.Gateway;
-using System;
-using System.Buffers;
-using System.Drawing;
 using System.IO.Compression;
 using System.Net.WebSockets;
 
 namespace Discord.Gateway;
 
 [method: TypeFactory]
-internal sealed partial class WebSocketGatewayConnection(DiscordGatewayClient client, DiscordGatewayConfig config)
-    : IGatewayConnection
+internal sealed partial class WebSocketGatewayConnection(
+    DiscordGatewayClient client,
+    DiscordGatewayConfig config
+) : IGatewayConnection
 {
     public const int FRAME_SIZE = 2048;
 
     private readonly DiscordGatewayConfig _config = config;
     private readonly DiscordGatewayClient _client = client;
+
     private readonly ClientWebSocket _socket = new();
 
     private readonly RentedArray<byte> _readBuffer = config.BufferPool.RentHandle(FRAME_SIZE);
@@ -64,14 +63,12 @@ internal sealed partial class WebSocketGatewayConnection(DiscordGatewayClient cl
         }
     }
 
-    public async ValueTask<Stream> ReadAsync(CancellationToken token = default)
+    public async ValueTask<GatewayCloseStatus?> ReadAsync(Stream stream, CancellationToken token = default)
     {
         await _readSemaphore.WaitAsync(token);
 
         try
         {
-            var memoryStream = new MemoryStream(FRAME_SIZE);
-            var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress, false);
             var readComplete = false;
 
             while (!readComplete)
@@ -83,54 +80,24 @@ internal sealed partial class WebSocketGatewayConnection(DiscordGatewayClient cl
                 switch (result.MessageType)
                 {
                     case WebSocketMessageType.Binary:
-                        await memoryStream.WriteAsync(_readBuffer.Array[..result.Count], token);
+                        await stream.WriteAsync(_readBuffer.Array.AsMemory()[..result.Count], token);
                         break;
                     case WebSocketMessageType.Close:
-                        // TODO
-                        break;
+                        var closeCode = result.CloseStatus.HasValue
+                            ? (GatewayCloseCode)(ushort)result.CloseStatus.Value
+                            : GatewayCloseCode.Unspecified;
+                        return new GatewayCloseStatus(closeCode, result.CloseStatusDescription);
                     case WebSocketMessageType.Text:
                         throw new InvalidDataException("Expected binary only message");
                 }
             }
 
-            return gzipStream;
+            return null;
         }
         finally
         {
             _readSemaphore.Release();
         }
-
-
-        // var buffers = new List<FrameStream.BufferSource>();
-        //
-        // var activeBuffer = _config.BufferPool.RentHandle(FRAME_SIZE);
-        //
-        // var fullMessage = false;
-        // var size = 0;
-        // while (!fullMessage)
-        // {
-        //     var result = await _socket.ReceiveAsync(activeBuffer.Array, token);
-        //
-        //     switch (result.MessageType)
-        //     {
-        //         case WebSocketMessageType.Binary:
-        //             buffers.Add(new FrameStream.BufferSource(activeBuffer, result.Count));
-        //
-        //             if (!result.EndOfMessage)
-        //                 activeBuffer = _config.BufferPool.RentHandle(FRAME_SIZE);
-        //             break;
-        //         case WebSocketMessageType.Close:
-        //             // TODO
-        //             break;
-        //         case WebSocketMessageType.Text:
-        //             throw new InvalidDataException("Expected binary only message");
-        //     }
-        //
-        //     fullMessage = result.EndOfMessage;
-        //     size += result.Count;
-        // }
-        //
-        // return new GZipStream(new FrameStream(buffers, size), CompressionMode.Decompress, false);
     }
 
     public async ValueTask DisposeAsync()

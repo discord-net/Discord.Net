@@ -255,12 +255,12 @@ internal interface IEntityBroker<TId, TEntity, TModel> : IManageableEntityBroker
     ///     provided <paramref name="storeInfo"/> contains multiple stores, their pages will be combined in the batched
     ///     <see cref="IReadOnlyCollection{T}"/>.
     /// </returns>
-    IAsyncEnumerable<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> GetAllAsync(
+    IAsyncEnumerable<IEntityHandle<TId, TEntity>> GetAllAsync(
         CachePathable path,
         IStoreInfo<TId, TModel> storeInfo,
         CancellationToken token = default);
 
-    IAsyncEnumerable<IReadOnlyCollection<IEntityHandle<TId, TEntity>>> QueryAsync(
+    IAsyncEnumerable<IEntityHandle<TId, TEntity>> QueryAsync(
         CachePathable path,
         IStoreInfo<TId, TModel> storeInfo,
         TId from,
@@ -279,7 +279,7 @@ internal interface IEntityBroker<TId, TEntity, TModel> : IManageableEntityBroker
     ///     <paramref name="storeInfo"/> contains multiple stores, their pages will be combined in the batched
     ///     <see cref="IReadOnlyCollection{T}"/>.
     /// </returns>
-    IAsyncEnumerable<IReadOnlyCollection<TId>> GetAllIdsAsync(IStoreInfo<TId, TModel> storeInfo,
+    IAsyncEnumerable<TId> GetAllIdsAsync(IStoreInfo<TId, TModel> storeInfo,
         CancellationToken token = default);
 }
 

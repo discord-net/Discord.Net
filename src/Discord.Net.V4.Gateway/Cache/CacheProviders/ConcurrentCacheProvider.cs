@@ -95,7 +95,12 @@ public sealed partial class ConcurrentCacheProvider : ICacheProvider
             return ValueTask.CompletedTask;
         }
 
-        public IAsyncEnumerable<TModel> QueryAsync(TId from, Direction direction, int limit)
+        public IAsyncEnumerable<TModel> QueryAsync(
+            TId from,
+            Optional<TId> to,
+            Direction direction,
+            int? limit,
+            CancellationToken token = default)
         {
             // TODO
             return null!;

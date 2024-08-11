@@ -4,37 +4,41 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-
-public sealed partial class GatewayMemberActor :
+public partial class GatewayMemberActor :
     GatewayCachedActor<ulong, GatewayMember, MemberIdentity, IMemberModel>,
     IMemberActor,
     IGatewayCachedActor<ulong, GatewayMember, MemberIdentity, IMemberModel>
 {
     [StoreRoot, SourceOfTruth] public GatewayGuildActor Guild { get; }
 
-    [SourceOfTruth, ProxyInterface]
-    public GatewayUserActor User { get; }
+    [SourceOfTruth, ProxyInterface] public virtual GatewayUserActor User { get; }
 
-    [SourceOfTruth] internal new MemberIdentity Identity { get; }
+    [SourceOfTruth]
+    public virtual GatewayVoiceStateActor VoiceState { get; }
+
+    [SourceOfTruth] internal new virtual MemberIdentity Identity { get; }
 
     [method: TypeFactory(LastParameter = nameof(member))]
-    public GatewayMemberActor(DiscordGatewayClient client,
+    public GatewayMemberActor(
+        DiscordGatewayClient client,
         GuildIdentity guild,
         MemberIdentity member,
-        UserIdentity? user = null) : base(client, member)
+        UserIdentity? user = null
+    ) : base(client, member)
     {
-        Identity = member | this;
+        member = Identity = member | this;
 
         Guild = client.Guilds >> guild;
         User = client.Users >> (user ?? member.Cast<GatewayUser, GatewayUserActor, IUserModel>());
+        VoiceState = new(client, guild | Guild, VoiceStateIdentity.Of(member.Id), member);
     }
 
     [SourceOfTruth]
-    internal GatewayMember CreateEntity(IMemberModel model)
+    internal virtual GatewayMember CreateEntity(IMemberModel model)
         => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
-public sealed partial class GatewayMember :
+public partial class GatewayMember :
     GatewayCacheableEntity<GatewayMember, ulong, IMemberModel>,
     IMember
 {
@@ -54,7 +58,7 @@ public sealed partial class GatewayMember :
 
     public GuildMemberFlags Flags => (GuildMemberFlags)Model.Flags;
 
-    [ProxyInterface] internal GatewayMemberActor Actor { get; }
+    [ProxyInterface] internal virtual GatewayMemberActor Actor { get; }
 
     internal IMemberModel Model { get; private set; }
 
@@ -62,8 +66,8 @@ public sealed partial class GatewayMember :
         DiscordGatewayClient client,
         GuildIdentity guild,
         IMemberModel model,
-        UserIdentity? user = null,
-        GatewayMemberActor? actor = null
+        GatewayMemberActor? actor = null,
+        UserIdentity? user = null
     ) : base(client, model.Id)
     {
         Model = model;
@@ -78,8 +82,8 @@ public sealed partial class GatewayMember :
         client,
         context.Path.RequireIdentity(T<GuildIdentity>()),
         model,
-        context.Path.GetIdentity(T<UserIdentity>(), model.Id),
-        context.TryGetActor<GatewayMemberActor>()
+        context.TryGetActor<GatewayMemberActor>(),
+        context.Path.GetIdentity(T<UserIdentity>(), model.Id)
     );
 
     public override ValueTask UpdateAsync(IMemberModel model, bool updateCache = true,

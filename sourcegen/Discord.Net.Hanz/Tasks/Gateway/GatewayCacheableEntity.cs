@@ -191,7 +191,7 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
             context.AddSource(
                 $"CacheableEntities/{item.Key}",
                 $$"""
-                  {{item.Value.Target.Syntax.GetFormattedUsingDirectives()}}
+                  {{item.Value.Target.Syntax.GetFormattedUsingDirectives("Discord.Gateway.State")}}
 
                   namespace {{item.Value.Target.Symbol.ContainingNamespace}};
 

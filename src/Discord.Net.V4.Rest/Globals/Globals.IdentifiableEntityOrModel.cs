@@ -58,6 +58,8 @@ global using MessageIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestMes
 #region Invites
 
 global using InviteIdentity = Discord.IIdentifiable<string, Discord.Rest.RestInvite, Discord.Rest.RestInviteActor, Discord.Models.IInviteModel>;
+global using GuildInviteIdentity = Discord.IIdentifiable<string, Discord.Rest.RestGuildInvite, Discord.Rest.RestGuildInviteActor, Discord.Models.IInviteModel>;
+global using GuildChannelInviteIdentity = Discord.IIdentifiable<string, Discord.Rest.RestGuildChannelInvite, Discord.Rest.RestGuildChannelInviteActor, Discord.Models.IInviteModel>;
 
 #endregion
 

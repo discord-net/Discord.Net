@@ -10,7 +10,7 @@ public partial class RestVoiceStateActor :
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
 
-    [SourceOfTruth] public RestMemberActor Member { get; }
+    [SourceOfTruth] public virtual RestMemberActor Member { get; }
 
     internal override VoiceStateIdentity Identity { get; }
 
@@ -84,7 +84,7 @@ public partial class RestVoiceState :
     {
         return model.UserId == client.CurrentUser.Id
             ? RestCurrentUserVoiceState.Construct(client, context, model)
-            : new(client, context.Guild, model, member: context.Member);
+            : new RestVoiceState(client, context.Guild, model, member: context.Member);
     }
 
     public ValueTask UpdateAsync(IVoiceStateModel model, CancellationToken token = default)

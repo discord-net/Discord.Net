@@ -15,7 +15,7 @@ internal sealed class CachePager<TId, TEntity, TModel, TParams> : IAsyncPaged<TE
     ICacheableEntity<TEntity, TId, TModel>,
     IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
     where TModel : class, IEntityModel<TId>
-    where TParams : IPagingParams
+    where TParams : class, IPagingParams
 {
     public int? PageSize => _pageSize;
 
@@ -56,7 +56,7 @@ internal sealed class CachePager<TId, TEntity, TModel, TParams> : IAsyncPaged<TE
         _total = pageParams?.Total;
     }
 
-    public async IAsyncEnumerator<IReadOnlyCollection<TEntity>> GetAsyncEnumerator(CancellationToken token = default)
+    public async IAsyncEnumerator<TEntity> GetAsyncEnumerator(CancellationToken token = default)
     {
         _storeInfo ??= await TEntity.GetStoreInfoAsync(_client, _path, token);
         _broker ??= await TEntity.GetBrokerAsync(_client, token);
@@ -76,16 +76,7 @@ internal sealed class CachePager<TId, TEntity, TModel, TParams> : IAsyncPaged<TE
                 token);
 
 
-        await foreach(var page in enumerator.WithCancellation(token))
-        {
-            yield return page
-                .Select(x =>
-                {
-                    var entity = x.Entity;
-                    x.Dispose();
-                    return entity;
-                })
-                .ToImmutableList();
-        }
+        await foreach(var handle in enumerator.WithCancellation(token))
+            yield return handle.ConsumeAsReference();
     }
 }

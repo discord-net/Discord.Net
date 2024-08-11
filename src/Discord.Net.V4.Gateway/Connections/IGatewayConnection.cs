@@ -9,5 +9,5 @@ public interface IGatewayConnection : IAsyncDisposable
     Task DisconnectAsync(CancellationToken token = default);
 
     ValueTask SendAsync(Stream stream, CancellationToken token = default);
-    ValueTask<Stream> ReadAsync(CancellationToken token = default);
+    ValueTask<GatewayCloseStatus?> ReadAsync(Stream stream, CancellationToken token = default);
 }

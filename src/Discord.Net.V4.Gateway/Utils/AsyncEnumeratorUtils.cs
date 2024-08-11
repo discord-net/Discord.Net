@@ -4,19 +4,19 @@ namespace Discord.Gateway;
 
 internal static partial class AsyncEnumeratorUtils
 {
-    public static IAsyncEnumerable<IEnumerable<T>> JoinAsync<T, U>(
+    public static IAsyncEnumerable<T> JoinAsync<T, U>(
         U[] sources,
-        [VariableFuncArgs] Func<U, CancellationToken, IAsyncEnumerable<IEnumerable<T>>> mapper,
+        [VariableFuncArgs] Func<U, CancellationToken, IAsyncEnumerable<T>> mapper,
         CancellationToken token)
     {
         switch (sources.Length)
         {
             case 0:
-                return AsyncEnumerable.Empty<IEnumerable<T>>();
+                return AsyncEnumerable.Empty<T>();
             case 1:
                 return mapper(sources[0], token);
             default:
-                var asyncEnumerables = new IAsyncEnumerable<IEnumerable<T>>[sources.Length];
+                var asyncEnumerables = new IAsyncEnumerable<T>[sources.Length];
                 for (int i = 0; i < sources.Length; i++)
                     asyncEnumerables[i] = mapper(sources[i], token);
                 return JoinInternal(token, asyncEnumerables);
@@ -35,16 +35,14 @@ internal static partial class AsyncEnumeratorUtils
         };
     }
 
-    private static async IAsyncEnumerable<IEnumerable<T>> JoinInternal<T>(
+    private static async IAsyncEnumerable<T> JoinInternal<T>(
         [EnumeratorCancellation] CancellationToken token = default,
-        params IAsyncEnumerable<IEnumerable<T>>[] sources)
+        params IAsyncEnumerable<T>[] sources)
     {
-        var enumerators = new List<IAsyncEnumerator<IEnumerable<T>>>(sources.Length);
+        var enumerators = new List<IAsyncEnumerator<T>>(sources.Length);
 
         for (var i = 0; i != sources.Length; i++)
             enumerators.Insert(i, sources[i].GetAsyncEnumerator(token));
-
-        var window = new List<T>();
 
         try
         {
@@ -66,15 +64,8 @@ internal static partial class AsyncEnumeratorUtils
                         goto startLoop;
                     }
 
-                    window.AddRange(enumerator.Current);
+                    yield return enumerator.Current;
                 }
-
-                if (window.Count == 0)
-                    yield break;
-
-                yield return window;
-
-                window.Clear();
             }
         }
         finally

@@ -11,18 +11,24 @@ namespace Discord.Gateway;
 public interface ICacheableEntity<out TSelf, out TId, TModel> :
     ICacheableEntity<TId>,
     IEntityOf<TModel>,
-    IUpdatable<TModel>
+    IUpdatable<TModel>,
+    ICacheUpdatable<TId, TModel>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
     where TSelf : class,
+    ICacheUpdatable<TId, TModel>,
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TSelf, TModel>,
     ICacheableEntity<TSelf, TId, TModel>,
     IContextConstructable<TSelf, TModel, IGatewayConstructionContext, DiscordGatewayClient>
 {
-    ValueTask UpdateAsync(TModel model, bool updateCache = true, CancellationToken token = default);
+    ValueTask IUpdatable<TModel>.UpdateAsync(TModel model, CancellationToken token) => UpdateAsync(model, true, token: token);
+}
 
-    ValueTask IUpdatable<TModel>.UpdateAsync(TModel model, CancellationToken token) => UpdateAsync(model, token: token);
+public interface ICacheUpdatable<out TId, in TModel>
+    where TModel : class, IEntityModel<TId>
+{
+    ValueTask UpdateAsync(TModel model, bool updateCache = true, CancellationToken token = default);
 }
 
 public interface ICacheableEntity<out TId> : IEntity<TId>, ICacheableEntity

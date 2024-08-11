@@ -1,8 +1,8 @@
 using Discord.Models.Json;
 
-namespace Discord.Invites;
+namespace Discord;
 
-public class CreateChannelInviteProperties : IEntityProperties<CreateChannelInviteParams>
+public sealed class CreateChannelInviteProperties : IEntityProperties<CreateChannelInviteParams>
 {
     public Optional<TimeSpan> MaxAge { get; set; }
     public Optional<int> MaxUses { get; set; }

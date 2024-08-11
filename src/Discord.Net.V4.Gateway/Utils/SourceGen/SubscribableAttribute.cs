@@ -1,5 +1,9 @@
 namespace Discord;
 
-[AttributeUsage(AttributeTargets.Class)]
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 internal sealed class SubscribableAttribute<T> : Attribute
-    where T : Delegate;
+    where T : Delegate
+{
+    public SubscribableAttribute(){}
+    public SubscribableAttribute(string name) { }
+}

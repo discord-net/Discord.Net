@@ -4,7 +4,11 @@ using Discord.Paging;
 
 namespace Discord.Gateway;
 
-public class CachedPagedActor<TId, TEntity, TModel, TParams> : IPagedActor<TId, TEntity, TParams>
+public class CachedPagedActor<TId, TEntity, TModel, TParams>(
+    DiscordGatewayClient client,
+    CachePathable path
+) :
+    IPagedActor<TId, TEntity, TParams>
     where TId : IEquatable<TId>
     where TEntity :
     class,
@@ -13,19 +17,8 @@ public class CachedPagedActor<TId, TEntity, TModel, TParams> : IPagedActor<TId, 
     ICacheableEntity<TEntity, TId, TModel>,
     IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
     where TModel : class, IEntityModel<TId>
-    where TParams : IPagingParams
+    where TParams : class, IPagingParams
 {
-    private readonly DiscordGatewayClient _client;
-    private readonly CachePathable _path;
-
-    public CachedPagedActor(
-        DiscordGatewayClient client,
-        CachePathable path)
-    {
-        _client = client;
-        _path = path;
-    }
-
     public IAsyncPaged<TEntity> PagedAsync(TParams? args = default, RequestOptions? options = null)
-        => new CachePager<TId, TEntity, TModel, TParams>(_client, _path, args);
+        => new CachePager<TId, TEntity, TModel, TParams>(client, path, args);
 }

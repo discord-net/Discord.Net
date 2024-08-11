@@ -1,3 +1,12 @@
+global using StickerPacks = Discord.Gateway.GatewayEnumerableIndexableActor<
+    Discord.Gateway.GatewayStickerPackActor,
+    ulong,
+    Discord.Gateway.GatewayStickerPack,
+    Discord.Rest.RestStickerPack,
+    Discord.IStickerPack,
+    Discord.Models.IStickerPackModel
+>;
+
 global using GuildsPager = Discord.Gateway.GatewayPartialPagedIndexableActor<
     Discord.Gateway.GatewayGuildActor,
     ulong,
@@ -89,6 +98,33 @@ global using GatewayGuildEmotes = Discord.Gateway.GatewayEnumerableIndexableActo
     Discord.Rest.RestGuildEmote,
     Discord.IGuildEmote,
     Discord.Models.IGuildEmoteModel
+>;
+
+global using GatewayGuildStickers = Discord.Gateway.GatewayEnumerableIndexableActor<
+    Discord.Gateway.GatewayGuildStickerActor,
+    ulong,
+    Discord.Gateway.GatewayGuildSticker,
+    Discord.Rest.RestGuildSticker,
+    Discord.IGuildSticker,
+    Discord.Models.IGuildStickerModel
+>;
+
+global using GatewayGuildInvites = Discord.Gateway.GatewayEnumerableIndexableActor<
+    Discord.Gateway.GatewayGuildInviteActor,
+    string,
+    Discord.Gateway.GatewayGuildInvite,
+    Discord.Rest.RestGuildInvite,
+    Discord.IGuildInvite,
+    Discord.Models.IInviteModel
+>;
+
+global using GatewayGuildChannelInvites = Discord.Gateway.GatewayEnumerableIndexableActor<
+    Discord.Gateway.GatewayGuildChannelInviteActor,
+    string,
+    Discord.Gateway.GatewayGuildChannelInvite,
+    Discord.Rest.RestGuildChannelInvite,
+    Discord.IGuildChannelInvite,
+    Discord.Models.IInviteModel
 >;
 
 global using GatewayGuildScheduledEvents = Discord.Gateway.GatewayEnumerableIndexableActor<

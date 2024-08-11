@@ -10,6 +10,8 @@ namespace Discord.Gateway;
 
 public sealed partial class DiscordGatewayClient
 {
+    internal HashSet<ulong> UnavailableGuilds { get; } = new(2500);
+
     private readonly IGatewayDispatchQueue _dispatchQueue;
 
     private async Task HandleDispatchAsync(string type, IGatewayPayloadData? payload, CancellationToken token)
@@ -20,15 +22,29 @@ public sealed partial class DiscordGatewayClient
                 await HandleReadyAsync(readyPayload, token);
                 break;
             default:
-                await ProcessDispatchAsync(type, payload, token);
+                if (payload is not null)
+                {
+                    foreach (var processor in GetProcessors(type))
+                        await processor.ProcessAsync(payload, token);
+                }
+
                 break;
         }
 
-        await _dispatchQueue.AcceptAsync(type, GetDispatchEvent(type), payload, token);
+        await _dispatchQueue.AcceptAsync(type, GetDispatchEvents(type), payload, token);
     }
 
     private async Task HandleReadyAsync(IReadyPayloadData readyPayloadData, CancellationToken token)
     {
+        _sessionId = readyPayloadData.SessionId;
+        _resumeGatewayUrl = readyPayloadData.ResumeGatewayUrl;
+
+        if (readyPayloadData.Shard is not null)
+        {
+            ShardId = readyPayloadData.Shard[0];
+            TotalShards = readyPayloadData.Shard[1];
+        }
+
         if (StateController.SelfUserModel is null)
             StateController.SelfUserModel = new(readyPayloadData.User);
         else
@@ -37,11 +53,14 @@ public sealed partial class DiscordGatewayClient
             StateController.SelfUserModel.SelfUserModelPart = readyPayloadData.User;
         }
 
-        var store = await StateController.GetRootStoreAsync<GatewayUserActor, ulong, IUserModel>(token);
-        var broker = await StateController.GetBrokerAsync<ulong, GatewayUser, GatewayUserActor, IUserModel>(token);
+        var store = await StateController.GetRootStoreAsync(Template.Of<GatewayCurrentUserActor>(), token);
+        var broker = await GatewayCurrentUserActor.GetBrokerAsync(this, token);
+
         await broker.UpdateAsync(StateController.SelfUserModel, store, token);
 
+        UnavailableGuilds.Clear();
+        UnavailableGuilds.UnionWith(readyPayloadData.Guilds.Select(x => x.Id));
 
-        // TODO: shards, resume, session
+        // TODO: application
     }
 }

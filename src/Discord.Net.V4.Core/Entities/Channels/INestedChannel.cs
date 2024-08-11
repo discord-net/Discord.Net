@@ -4,7 +4,7 @@ namespace Discord;
 ///     Represents a type of guild channel that can be nested within a category.
 /// </summary>
 public interface INestedChannel :
-    IInvitableChannel
+    IGuildChannel
 {
     /// <summary>
     ///     Gets the parent (category) of this channel in the guild's channel list.

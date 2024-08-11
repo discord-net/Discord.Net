@@ -1,5 +1,6 @@
 using Discord.Gateway;
 using Discord.Gateway.Events;
+using Discord.Gateway.Processors;
 using Discord.Rest;
 using System;
 using System.Buffers;
@@ -68,6 +69,10 @@ public sealed class DiscordGatewayConfig : DiscordConfig
     public GatewayConfiguredObject<ICacheProvider> CacheProvider { get; set; } = new(ConcurrentCacheProvider.Factory);
     public GatewayConfiguredObject<IGatewayConnection> GatewayConnection { get; set; } = new(WebSocketGatewayConnection.Factory);
     public GatewayConfiguredObject<IGatewayEncoding> Encoding { get; set; } = new(JsonEncoding.Factory);
+
+    public GatewayConfiguredObject<IGatewayCompression>? GatewayCompression { get; set; } =
+        new(IGatewayCompression.ZLib);
+
     public GatewayConfiguredObject<IGatewayDispatchQueue> DispatchQueue { get; set; } =
         new(ConcurrentGatewayDispatchQueue.Factory);
 
@@ -76,6 +81,8 @@ public sealed class DiscordGatewayConfig : DiscordConfig
 
     public ImmutableDictionary<string, IEventDispatcher> EventDispatchers { get; set; }
         = ImmutableDictionary<string, IEventDispatcher>.Empty;
+
+    public ImmutableArray<GatewayConfiguredObject<IDispatchProcessor>> EventProcessors { get; set; }
 
     public ArrayPool<byte> BufferPool { get; set; } = ArrayPool<byte>.Shared;
 

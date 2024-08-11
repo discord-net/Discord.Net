@@ -20,7 +20,7 @@ public sealed partial class GatewayStickerItem(
     [SourceOfTruth]
     internal GatewaySticker CreateEntity(IStickerModel model)
     {
-        var path = CachePathable.Default;
+        var path = CachePathable.Empty;
 
         if (model is IGuildStickerModel guildStickerModel)
             path = new CachePathable {Client.Guilds[guildStickerModel.GuildId]};

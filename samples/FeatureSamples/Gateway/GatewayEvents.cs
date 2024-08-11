@@ -6,11 +6,12 @@ public class GatewayEvents
 {
     public static async Task RunAsync(DiscordGatewayClient client)
     {
-        client.UserUpdated.Subscribe(OnUserUpdateAsync);
-        client.UserUpdated.Subscribe(OnUserUpdate);
+        client.UserUpdated += OnUserUpdateAsync;
+        client.UserUpdatedEvent.Subscribe(OnUserUpdate);
+
     }
 
-    public static async Task OnUserUpdateAsync(GatewayCurrentUser user)
+    public static async ValueTask OnUserUpdateAsync(GatewayCurrentUser user)
     {
 
     }

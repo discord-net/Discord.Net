@@ -27,7 +27,7 @@ public sealed class StickerPack :
     [JsonPropertyName("banner_asset_id")]
     public Optional<ulong> BannerAssetId { get; set; }
 
-    IEnumerable<IStickerModel> IStickerPackModel.Stickers => Stickers;
+    IEnumerable<ulong> IStickerPackModel.StickerIds => Stickers.Select(x => x.Id);
     ulong? IStickerPackModel.CoverStickerId => CoverStickerId.ToNullable();
     ulong? IStickerPackModel.BannerAssetId => BannerAssetId.ToNullable();
 

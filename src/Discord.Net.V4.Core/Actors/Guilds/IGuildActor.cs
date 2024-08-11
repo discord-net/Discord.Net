@@ -89,7 +89,7 @@ public partial interface IGuildActor :
 
     [return: TypeHeuristic(nameof(Invites))]
     IGuildInviteActor Invite(string code) => Invites[code];
-    IEnumerableIndexableActor<IGuildInviteActor, string, IInvite> Invites { get; }
+    IEnumerableIndexableActor<IGuildInviteActor, string, IGuildInvite> Invites { get; }
 
     [return: TypeHeuristic(nameof(Webhooks))]
     IWebhookActor Webhook(ulong id) => Webhooks[id];

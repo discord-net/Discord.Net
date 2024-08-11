@@ -1,7 +1,9 @@
 using Discord.Gateway;
 using Discord.Gateway.State;
 using Discord.Models;
+using Discord.Rest;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using static Discord.Template;
 
 namespace Discord.Gateway;
@@ -15,9 +17,11 @@ public partial class GatewayGuildChannelActor :
 
     [SourceOfTruth] [StoreRoot] public GatewayGuildActor Guild { get; }
 
-    public IEnumerableIndexableActor<IInviteActor, string, IInvite> Invites => throw new NotImplementedException();
+    [SourceOfTruth]
+    public GatewayGuildChannelInvites Invites { get; }
 
     [TypeFactory]
+    [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
     public GatewayGuildChannelActor(
         DiscordGatewayClient client,
         GuildIdentity guild,
@@ -26,6 +30,8 @@ public partial class GatewayGuildChannelActor :
     {
         Identity = channel | this;
         Guild = client.Guilds >> guild;
+
+        Invites = GatewayActors.ChannelInvites(client, guild, channel, CachePath);
     }
 
     public IInvite CreateEntity(IInviteModel model) => throw new NotImplementedException();
