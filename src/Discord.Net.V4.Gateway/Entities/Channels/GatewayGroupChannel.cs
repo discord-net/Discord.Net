@@ -4,6 +4,9 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+using MessageChannelTrait =
+    GatewayMessageChannelTrait<GatewayGroupChannelActor, GatewayGroupChannel, GroupChannelIdentity>;
+
 public sealed partial class GatewayGroupChannelActor :
     GatewayChannelActor,
     IGroupChannelActor,
@@ -11,18 +14,25 @@ public sealed partial class GatewayGroupChannelActor :
 {
     [SourceOfTruth] internal override GroupChannelIdentity Identity { get; }
 
-    [ProxyInterface] internal GatewayMessageChannelTrait MessageChannelActor { get; }
+    [ProxyInterface(typeof(IMessageChannelTrait))]
+    internal MessageChannelTrait MessageChannelTrait { get; }
 
-    public GatewayGroupChannelActor(DiscordGatewayClient client,
-        GroupChannelIdentity channel) : base(client, channel)
+    public GatewayGroupChannelActor(
+        DiscordGatewayClient client,
+        GroupChannelIdentity channel
+    ) : base(client, channel)
     {
         Identity = channel | this;
-        MessageChannelActor = new GatewayMessageChannelTrait(client, channel);
+        MessageChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]
     internal GatewayGroupChannel CreateEntity(IGroupDMChannelModel model)
         => Client.StateController.CreateLatent(this, model, CachePath);
+
+    [SourceOfTruth]
+    internal GatewayInvite CreateEntity(IInviteModel model)
+        => Client.StateController.CreateLatent(Client.Invites[model.Id], model, CachePath);
 }
 
 public sealed partial class GatewayGroupChannel :

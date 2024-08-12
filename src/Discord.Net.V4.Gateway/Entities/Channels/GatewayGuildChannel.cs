@@ -34,7 +34,9 @@ public partial class GatewayGuildChannelActor :
         Invites = GatewayActors.ChannelInvites(client, guild, channel, CachePath);
     }
 
-    public IInvite CreateEntity(IInviteModel model) => throw new NotImplementedException();
+    [SourceOfTruth]
+    internal GatewayGuildChannelInvite CreateEntity(IInviteModel model)
+        => Client.StateController.CreateLatent(Invites[model.Id], model, CachePath);
 
     [SourceOfTruth]
     internal GatewayGuildChannel CreateEntity(IGuildChannelModel model)

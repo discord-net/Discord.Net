@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Collections.ObjectModel;
 
 namespace Discord;
@@ -12,6 +13,9 @@ public static class ReadOnlyExtensions
 
     public static ReadOnlyCollection<T> AsReadOnly<T>(this IList<T> list)
         => new(list);
+
+    public static IReadOnlySet<T> AsReadOnly<T>(this ISet<T> set)
+        => set.ToFrozenSet();
 }
 
 #endif

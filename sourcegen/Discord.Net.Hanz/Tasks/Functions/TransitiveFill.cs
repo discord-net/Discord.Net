@@ -70,9 +70,8 @@ public static class TransitiveFill
             if (!Resolved.TryGetValue(parameter, out var candidates))
                 return;
 
-            candidates.Remove(candidate);
-
-            Logger.Log($"{parameter} -= {candidate}");
+            if (candidates.Remove(candidate))
+                Logger.Log($"{parameter} -= {candidate}");
 
             if (candidates.Count == 0)
                 Resolved.Remove(parameter);
@@ -110,10 +109,10 @@ public static class TransitiveFill
             if (!Resolved.TryGetValue(parameter, out var existing))
                 existing = Resolved[parameter] = new(SymbolEqualityComparer.Default);
 
-            existing.UnionWith(types);
-
-            foreach (var type in types)
+            foreach (var type in types.Except(existing, SymbolEqualityComparer.Default))
                 Logger.Log($"{parameter} += {type}");
+
+            existing.UnionWith(types);
         }
 
         public void MarkAsIllegal(ITypeParameterSymbol parameter, params ITypeSymbol[] symbols)
@@ -127,9 +126,10 @@ public static class TransitiveFill
             if (!NotAllowed.TryGetValue(parameter, out var existing))
                 existing = NotAllowed[parameter] = new(SymbolEqualityComparer.Default);
 
-            existing.UnionWith(symbols);
-            foreach (var type in symbols)
+            foreach (var type in symbols.Except(existing))
                 Logger.Log($"{parameter} can no longer be {type}");
+
+            existing.UnionWith(symbols);
         }
     }
 
@@ -360,10 +360,23 @@ public static class TransitiveFill
                     continue;
                 }
 
+                try_resolve:
+
                 if (remainingParameters.Count == 0)
                     break;
 
                 var typeParameter = remainingParameters.Dequeue();
+
+                if (context.Resolved.TryGetValue(typeParameter, out var matched))
+                {
+                    logger.Log($"Post-resolved {typeParameter}:");
+                    foreach (var match in matched)
+                    {
+                        logger.Log($" - {match}");
+                    }
+
+                    goto try_resolve;
+                }
 
                 if (WalkTypeForConstraints(context, typeParameter, typeInfo, logger))
                 {
@@ -834,7 +847,9 @@ public static class TransitiveFill
                 }
             }
 
-            var hasWalked = context.Resolved.ContainsKey(constraintTypeParameter);
+            var hasWalked = context.Resolved.TryGetValue(constraintTypeParameter, out var set) &&
+                            set.Contains(filledType);
+
             if (hasWalked) return true;
 
             logger.LogWithDepth(
@@ -948,13 +963,20 @@ public static class TransitiveFill
                         continue;
                     }
 
-                    WalkTypeForConstraints(
+                    var result = WalkTypeForConstraints(
                         context,
                         namedConstraint.TypeArguments[i],
                         expectedSubstitute.TypeArguments[i],
                         logger,
                         depth + 1
                     );
+
+                    logger.LogWithDepth(
+                        $"{namedConstraint}: {expectedSubstitute.TypeArguments[i]} : {namedConstraint.TypeArguments[i]}?: {result}",
+                        depth
+                    );
+
+                    if (!result) return false;
                 }
             }
 
@@ -1009,17 +1031,28 @@ public static class TransitiveFill
                         $"{source}: can comply with existing substitute {existingCandidate}?: {hasConversion}",
                         depth + 1
                     );
-
-                    if (!hasConversion)
-                    {
-                        context.RemoveCandidate(constraint, existingCandidate);
-                        context.MarkAsIllegal(constraint, existingCandidate);
-                    }
                 }
 
                 if (!hasMatching)
+                {
                     return false;
+                }
+
+                // only remove candidates that don't match when this type can be used
+                // foreach (
+                //     var existing in candidates
+                //         .Where(x =>
+                //             !context.SemanticModel.Compilation.HasImplicitConversion(candidate, x)
+                //         )
+                //         .ToArray()
+                // )
+                // {
+                //     context.RemoveCandidate(constraint, existing);
+                //     context.MarkAsIllegal(constraint, existing);
+                // }
             }
+
+            //if(canSubstitute) context.PickSubstitute(constraint, candidate);
 
             logger.LogWithDepth($"{source}: Can substitute? {canSubstitute}", depth);
             return canSubstitute;

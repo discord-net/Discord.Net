@@ -126,7 +126,7 @@ public class ModifyGuildProperties : IEntityProperties<ModifyGuildParams>
         existing.SystemChannelFlags = SystemChannelFlags.Map(v => (int)v);
         existing.PreferredLocale = PreferredCulture.Map(v => v.Name) | PreferredLocale;
         existing.PremiumProgressBarEnabled = IsBoostProgressBarEnabled;
-        existing.Features = Features.Map(v => v.RawValue);
+        existing.Features = Features.Map(v => v.ToArray());
         existing.SafetyAlertsChannelId = SafetyAlertsChannelId.Map(v => v?.Id);
 
         return existing;

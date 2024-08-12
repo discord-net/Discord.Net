@@ -4,6 +4,17 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+using MessageChannelTrait = GatewayMessageChannelTrait<
+    GatewayVoiceChannelActor,
+    GatewayVoiceChannel,
+    VoiceChannelIdentity
+>;
+using IncomingIntegrationChannelTrait = GatewayIncomingIntegrationChannelTrait<
+    GatewayVoiceChannelActor,
+    GatewayVoiceChannel,
+    VoiceChannelIdentity
+>;
+
 [ExtendInterfaceDefaults]
 public partial class GatewayVoiceChannelActor :
     GatewayGuildChannelActor,
@@ -12,10 +23,11 @@ public partial class GatewayVoiceChannelActor :
 {
     [SourceOfTruth] internal override VoiceChannelIdentity Identity { get; }
 
-    [ProxyInterface] internal GatewayMessageChannelTrait MessageChannelActor { get; }
+    [ProxyInterface(typeof(IMessageChannelTrait))]
+    internal MessageChannelTrait MessageChannelTrait { get; }
 
-    [ProxyInterface]
-    internal GatewayIntegrationChannelTrait IntegrationChannelActor { get; }
+    [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
+    internal IncomingIntegrationChannelTrait IncomingIntegrationChannelTrait { get; }
 
     [TypeFactory]
     public GatewayVoiceChannelActor(
@@ -24,8 +36,8 @@ public partial class GatewayVoiceChannelActor :
         VoiceChannelIdentity channel) : base(client, guild, channel)
     {
         Identity = channel | this;
-        MessageChannelActor = new GatewayMessageChannelTrait(client, channel, guild);
-        IntegrationChannelActor = new GatewayIntegrationChannelTrait(client, guild, channel);
+        MessageChannelTrait = new(client, this, channel);
+        IncomingIntegrationChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]
@@ -38,8 +50,7 @@ public partial class GatewayVoiceChannel :
     IVoiceChannel,
     ICacheableEntity<GatewayVoiceChannel, ulong, IGuildVoiceChannelModel>
 {
-    [SourceOfTruth]
-    public GatewayCategoryChannelActor? Category { get; private set; }
+    [SourceOfTruth] public GatewayCategoryChannelActor? Category { get; private set; }
 
     public string? RTCRegion => Model.RTCRegion;
 
@@ -49,8 +60,7 @@ public partial class GatewayVoiceChannel :
 
     public VideoQualityMode VideoQualityMode => (VideoQualityMode?)Model.VideoQualityMode ?? VideoQualityMode.Auto;
 
-    [ProxyInterface]
-    internal override GatewayVoiceChannelActor Actor { get; }
+    [ProxyInterface] internal override GatewayVoiceChannelActor Actor { get; }
 
     internal override IGuildVoiceChannelModel Model => _model;
 

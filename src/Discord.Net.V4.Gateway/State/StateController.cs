@@ -92,8 +92,11 @@ internal sealed partial class StateController : IDisposable
         }
     }
 
-    public TEntity CreateLatent<TId, TEntity, [TransitiveFill] TActor, TModel>(TActor actor, TModel model,
-        CachePathable? path = null)
+    public TEntity CreateLatent<TId, TEntity, [TransitiveFill] TActor, TModel>(
+        TActor actor,
+        TModel model,
+        CachePathable? path = null
+    )
         where TEntity :
         class,
         ICacheableEntity<TEntity, TId, TModel>,
@@ -277,7 +280,7 @@ internal sealed partial class StateController : IDisposable
         return broker is not null;
     }
 
-    public ValueTask<IStoreInfo<TId, TModel>> GetRootStoreAsync<[TransitiveFill]TProvider, TId, TEntity, TModel>(
+    public ValueTask<IStoreInfo<TId, TModel>> GetRootStoreAsync<[TransitiveFill] TProvider, TId, TEntity, TModel>(
         Template<TProvider> template,
         CancellationToken token = default)
         where TProvider :
@@ -305,7 +308,7 @@ internal sealed partial class StateController : IDisposable
                 store.ModelType
             );
 
-            lock(_rootStoreSemaphores)
+            lock (_rootStoreSemaphores)
                 _rootStores.Remove(typeof(TModel));
         }
 

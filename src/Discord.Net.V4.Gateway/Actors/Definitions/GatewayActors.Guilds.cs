@@ -4,11 +4,88 @@ using Discord.Rest;
 
 namespace Discord.Gateway;
 
-using RestGuildIdentity = IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>;
-using RestGuildChannelIdentity = IIdentifiable<ulong, RestGuildChannel, RestGuildChannelActor, IGuildChannelModel>;
-
 internal static partial class GatewayActors
 {
+    public static GatewayEnumerableIndexableActor<
+        TTrait,
+        TId,
+        TEntity,
+        TRestEntity,
+        TCoreEntity,
+        TModel
+    > GuildRelatedTrait<
+        [TransitiveFill] TTrait,
+        TRootActor,
+        TId,
+        TEntity,
+        [Ignore] TRestEntity,
+        [Not(nameof(TRestEntity)), Not(nameof(TEntity)), Interface, RequireResolve]
+        TCoreEntity,
+        TModel
+    >(
+        Template<TTrait> template,
+        Template<TRootActor> rootTemplate,
+        DiscordGatewayClient client,
+        GuildIdentity guild,
+        CachePathable path,
+        Func<TModel, bool> filter
+    )
+        where TRootActor :
+        class,
+        IGatewayCachedActor<TId, TEntity, TModel>,
+        IFactory<
+            TRootActor,
+            DiscordGatewayClient,
+            GuildIdentity,
+            IIdentifiable<TId, TEntity, TRootActor, TModel>
+        >
+        where TTrait :
+        class,
+        IFactory<
+            TTrait,
+            DiscordGatewayClient,
+            TRootActor,
+            IIdentifiable<TId, TCoreEntity, TTrait, TModel>
+        >,
+        IGatewayCachedActor<TId, TEntity, TModel>,
+        IActorTrait<TId, TCoreEntity>
+        where TId : IEquatable<TId>
+        where TEntity :
+        GatewayEntity<TId>,
+        ICacheableEntity<TEntity, TId, TModel>,
+        IStoreInfoProvider<TId, TModel>,
+        IBrokerProvider<TId, TEntity, TModel>,
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>,
+        TCoreEntity
+        where TRestEntity :
+        RestEntity<TId>,
+        IContextConstructable<TRestEntity, TModel, IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>,
+            DiscordRestClient>
+        where TCoreEntity : class, IEntity<TId, TModel>, IFetchableOfMany<TId, TModel>
+        where TModel : class, IEntityModel<TId>
+    {
+        return new GatewayEnumerableIndexableActor<TTrait, TId, TEntity, TRestEntity, TCoreEntity, TModel>(
+            client,
+            id => TTrait.Factory(
+                client,
+                TRootActor.Factory(
+                    client,
+                    guild,
+                    IIdentifiable<TId, TEntity, TRootActor, TModel>.Of(id)
+                ),
+                IIdentifiable<TId, TEntity, TTrait, TModel>.Of(id)
+            ),
+            model => TRestEntity.Construct(
+                client.Rest,
+                IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>.Of(guild.Id),
+                model
+            ),
+            path,
+            TCoreEntity.FetchManyRoute(path),
+            models => models.Where(filter)
+        );
+    }
+
     public static GatewayEnumerableIndexableActor<
         TActor,
         TId,

@@ -1,3 +1,30 @@
+global using Webhooks = Discord.Gateway.GatewayEnumerableIndexableActor<
+    Discord.Gateway.GatewayWebhookActor,
+    ulong,
+    Discord.Gateway.GatewayWebhook,
+    Discord.Rest.RestWebhook,
+    Discord.IWebhook,
+    Discord.Models.IWebhookModel
+>;
+
+global using IncomingWebhooks = Discord.Gateway.GatewayEnumerableIndexableActor<
+    Discord.Gateway.GatewayIncomingWebhookActor,
+    ulong,
+    Discord.Gateway.GatewayIncomingWebhook,
+    Discord.Rest.RestIncomingWebhook,
+    Discord.IIncomingWebhook,
+    Discord.Models.IWebhookModel
+>;
+
+global using ChannelFollowerWebhooks = Discord.Gateway.GatewayEnumerableIndexableActor<
+    Discord.Gateway.GatewayChannelFollowerWebhookActor,
+    ulong,
+    Discord.Gateway.GatewayChannelFollowerWebhook,
+    Discord.Rest.RestChannelFollowerWebhook,
+    Discord.IChannelFollowerWebhook,
+    Discord.Models.IWebhookModel
+>;
+
 global using StickerPacks = Discord.Gateway.GatewayEnumerableIndexableActor<
     Discord.Gateway.GatewayStickerPackActor,
     ulong,
@@ -230,10 +257,10 @@ global using GatewayMediaChannels = Discord.Gateway.GatewayEnumerableIndexableAc
 global using GatewayIntegrationChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
     Discord.Gateway.GatewayIntegrationChannelTrait,
     ulong,
-    Discord.Gateway.GatewayIntegration,
-    Discord.Rest.RestMediaChannel,
-    Discord.IMediaChannel,
-    Discord.Models.IGuildMediaChannelModel,
+    Discord.Gateway.GatewayGuildChannel,
+    Discord.Rest.RestGuildChannel,
+    Discord.IIntegrationChannel,
+    Discord.Models.IGuildChannelModel,
     System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
 >;
 

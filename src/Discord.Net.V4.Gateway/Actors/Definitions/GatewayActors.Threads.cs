@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 namespace Discord.Gateway;
 
 using RestThreadIdentity = IIdentifiable<ulong, RestThreadChannel, RestThreadChannelActor, IThreadChannelModel>;
-using RestGuildIdentity = IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>;
 using RestThreadMemberIdentity = IIdentifiable<ulong, RestThreadMember, RestThreadMemberActor, IThreadMemberModel>;
 using RestMemberIdentity = IIdentifiable<ulong, RestMember, RestMemberActor, IMemberModel>;
 

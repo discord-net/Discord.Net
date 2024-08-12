@@ -2,6 +2,7 @@
 
 global using WebhookIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayWebhook,Discord.Gateway.GatewayWebhookActor, Discord.Models.IWebhookModel>;
 global using IncomingWebhookIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayIncomingWebhook,Discord.Gateway.GatewayIncomingWebhookActor, Discord.Models.IWebhookModel>;
+global using ChannelFollowerWebhookIdentity = Discord.IIdentifiable<ulong, Discord.Gateway.GatewayChannelFollowerWebhook,Discord.Gateway.GatewayChannelFollowerWebhookActor, Discord.Models.IWebhookModel>;
 
 #endregion
 
@@ -61,6 +62,8 @@ global using ThreadMemberIdentity =
 
 #region Channels
 
+global using RestGuildChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildChannel, Discord.Rest.RestGuildChannelActor, Discord.Models.IGuildChannelModel>;
+
 global using ChannelIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayChannel, Discord.Gateway.GatewayChannelActor,
         Discord.Models.IChannelModel>;
@@ -84,9 +87,6 @@ global using ThreadableChannelIdentity =
 global using ForumChannelIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayForumChannel, Discord.Gateway.GatewayForumChannelActor,
         Discord.Models.IGuildForumChannelModel>;
-global using IntegrationChannelIdentity =
-    Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IIntegrationChannelTrait,
-        Discord.Models.IGuildChannelModel>;
 global using MediaChannelIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayMediaChannel, Discord.Gateway.GatewayMediaChannelActor,
         Discord.Models.IGuildMediaChannelModel>;
@@ -105,10 +105,21 @@ global using StageChannelIdentity =
 global using ThreadChannelIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayThreadChannel, Discord.Gateway.GatewayThreadChannelActor,
         Discord.Models.IThreadChannelModel>;
+global using IntegrationChannelIdentity =
+    Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IIntegrationChannelTrait,
+        Discord.Models.IGuildChannelModel>;
+global using IncomingIntegrationChannelIdentity =
+    Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IIncomingIntegrationChannelTrait,
+        Discord.Models.IGuildChannelModel>;
+global using ChannelFollowerIntegrationChannelIdentity =
+    Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IChannelFollowerIntegrationChannelTrait,
+        Discord.Models.IGuildChannelModel>;
 
 #endregion
 
 #region Guilds
+
+global using RestGuildIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuild, Discord.Rest.RestGuildActor, Discord.Models.IGuildModel>;
 
 global using GuildIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayGuild, Discord.Gateway.GatewayGuildActor,

@@ -150,7 +150,11 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                 }
             }
 
-            var interfaces = typeSymbol.AllInterfacesWrtVariance(target.Semantic, targetLogger);
+            var interfaces = typeSymbol.AllInterfaces
+                .ToImmutableHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+
+            foreach (var baseSymbol in TypeUtils.GetBaseTypes(typeSymbol))
+                interfaces = interfaces.Except(baseSymbol.AllInterfaces);
 
 
             foreach (var iface in interfaces)

@@ -19,11 +19,15 @@ public partial class DiscordGatewayClient
     [SourceOfTruth]
     public GatewayIndexableActor<GatewayUserActor, ulong, GatewayUser> Users { get; }
 
-    public IIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks => throw new NotImplementedException();
+    [SourceOfTruth]
+    public GatewayIndexableActor<GatewayWebhookActor, ulong, GatewayWebhook> Webhooks => throw new NotImplementedException();
 
     [SourceOfTruth]
     public StickerPacks StickerPacks { get; }
 
     [SourceOfTruth]
     public GatewayIndexableActor<GatewayStickerActor, ulong, GatewaySticker> Stickers { get; }
+
+    [SourceOfTruth]
+    public GatewayIndexableActor<GatewayInviteActor, string, GatewayInvite> Invites { get; }
 }

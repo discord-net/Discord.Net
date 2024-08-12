@@ -5,6 +5,8 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+using MessageChannelTrait = GatewayMessageChannelTrait<GatewayDMChannelActor, GatewayDMChannel, DMChannelIdentity>;
+
 public sealed partial class GatewayDMChannelActor :
     GatewayChannelActor,
     IDMChannelActor,
@@ -15,7 +17,7 @@ public sealed partial class GatewayDMChannelActor :
     [SourceOfTruth] internal override DMChannelIdentity Identity { get; }
 
     [ProxyInterface(typeof(IMessageChannelTrait))]
-    internal GatewayMessageChannelTrait MessageChannelActor { get; }
+    internal MessageChannelTrait MessageChannelTrait { get; }
 
     public GatewayDMChannelActor(
         DiscordGatewayClient client,
@@ -25,7 +27,7 @@ public sealed partial class GatewayDMChannelActor :
     {
         Identity = channel | this;
         Recipient = client.Users >> recipient;
-        MessageChannelActor = new GatewayMessageChannelTrait(client, channel);
+        MessageChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]

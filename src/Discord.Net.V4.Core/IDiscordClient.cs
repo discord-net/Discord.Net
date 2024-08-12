@@ -27,6 +27,7 @@ public interface IDiscordClient :
     IEnumerableIndexableActor<IStickerPackActor, ulong, IStickerPack> StickerPacks { get; }
 
     IIndexableActor<IStickerActor, ulong, ISticker> Stickers { get; }
+    IIndexableActor<IInviteActor, string, IInvite> Invites { get; }
 
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }

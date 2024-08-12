@@ -21,7 +21,7 @@ internal static partial class GatewayPagedIndexableActor
         TId,
         TGatewayEntity,
         [Ignore]TRestEntity,
-        [Interface, Not(nameof(TGatewayEntity)), Shrink] TCoreEntity,
+        [Interface, Not(nameof(TGatewayEntity)), Not(nameof(TRestEntity)), Shrink, RequireResolve] TCoreEntity,
         TModel,
         [Ignore]TParams,
         TApiModel
@@ -236,6 +236,8 @@ public sealed class GatewayPagedIndexableActor<
     public TActor this[IIdentifiable<TId, TGatewayEntity, TActor, TModel> identity] => _indexableActor[identity];
 
     public TActor Specifically(TId id) => _indexableActor.Specifically(id);
+    public TActor Specifically(IIdentifiable<TId, TGatewayEntity, TActor, TModel> identity)
+        => _indexableActor.Specifically(identity);
 
     public IAsyncPaged<TCoreEntity> PagedAsync(TParams? args = default, GatewayRequestOptions? options = null)
         => _pagedActor.PagedAsync(args, options);

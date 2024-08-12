@@ -133,7 +133,7 @@ public sealed class Logger : ILogger, IEquatable<Logger>
     {
         if (_logs.Count >= 0)
         {
-            using (var fs = File.Open(_logFilePath, FileMode.Append, FileAccess.Write, FileShare.Write))
+            using (var fs = File.Open(_logFilePath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
             using (var writer = new StreamWriter(fs))
             {
                 foreach (var log in _logs)

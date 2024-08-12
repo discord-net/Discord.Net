@@ -16,7 +16,6 @@ using GuildsPager = RestPartialPagedIndexableActor<
     IEnumerable<IPartialGuildModel>,
     PageUserGuildsParams
 >;
-
 using Stickers = RestIndexableActor<RestStickerActor, ulong, RestSticker>;
 using StickerPacks = RestEnumerableIndexableActor<
     RestStickerPackActor,
@@ -40,6 +39,7 @@ public sealed partial class DiscordRestClient : IDiscordClient
     [SourceOfTruth] public RestIndexableActor<RestUserActor, ulong, RestUser> Users { get; }
 
     [SourceOfTruth] public RestIndexableActor<RestWebhookActor, ulong, RestWebhook> Webhooks { get; }
+    [SourceOfTruth] public RestIndexableActor<RestInviteActor, string, RestInvite> Invites { get; }
 
     [SourceOfTruth] public StickerPacks StickerPacks { get; }
 
@@ -90,6 +90,7 @@ public sealed partial class DiscordRestClient : IDiscordClient
             IStickerPack.FetchManyRoute(IPathable.Empty)
         );
         Stickers = new(id => new RestStickerActor(this, StickerIdentity.Of(id)));
+        Invites = new(id => new RestInviteActor(this, InviteIdentity.Of(id)));
     }
 
     public ValueTask DisposeAsync()

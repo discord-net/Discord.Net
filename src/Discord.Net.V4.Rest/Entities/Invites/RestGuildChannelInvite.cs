@@ -10,8 +10,6 @@ public sealed partial class RestGuildChannelInviteActor :
 {
     [SourceOfTruth] public RestGuildChannelActor Channel { get; }
 
-    IInvitableChannelTrait IChannelRelationship<IInvitableChannelTrait, IInvitableChannel>.Channel => Channel;
-
     [SourceOfTruth] internal override GuildChannelInviteIdentity Identity { get; }
 
     [TypeFactory(LastParameter = nameof(invite))]

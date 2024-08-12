@@ -5,6 +5,12 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+using IncomingIntegrationChannelTrait = GatewayIntegrationChannelTrait<
+    GatewayMediaChannelActor,
+    GatewayMediaChannel,
+    MediaChannelIdentity
+>;
+
 [ExtendInterfaceDefaults]
 public sealed partial class GatewayMediaChannelActor :
     GatewayThreadableChannelActor,
@@ -13,7 +19,8 @@ public sealed partial class GatewayMediaChannelActor :
 {
     [SourceOfTruth] internal override MediaChannelIdentity Identity { get; }
 
-    [ProxyInterface] internal GatewayIntegrationChannelTrait IntegrationChannelActor { get; }
+    [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
+    internal IncomingIntegrationChannelTrait IntegrationChannelTrait { get; }
 
     [method: TypeFactory]
     public GatewayMediaChannelActor(
@@ -23,7 +30,7 @@ public sealed partial class GatewayMediaChannelActor :
     ) : base(client, guild, channel)
     {
         Identity = channel | this;
-        IntegrationChannelActor = new GatewayIntegrationChannelTrait(client, guild, channel);
+        IntegrationChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]

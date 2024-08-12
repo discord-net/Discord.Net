@@ -15,14 +15,8 @@ public partial interface IMessageChannelTrait :
     IMessageActor Message(ulong id) => Messages[id];
     IPagedIndexableActor<IMessageActor, ulong, IMessage, PageChannelMessagesParams> Messages { get; }
 
-    internal new IMessageChannel CreateEntity(IChannelModel model);
-
-    internal new IMessageChannel? CreateNullableEntity(IChannelModel? model)
-        => model is null ? null : CreateEntity(model);
-
     IChannel IEntityProvider<IChannel, IChannelModel>.CreateEntity(IChannelModel model)
-        => CreateEntity(model);
+        => (this as IEntityProvider<IMessageChannel, IChannelModel>).CreateEntity(model);
     IChannel? IEntityProvider<IChannel, IChannelModel>.CreateNullableEntity(IChannelModel? model)
-        => CreateNullableEntity(model);
-
+        => (this as IEntityProvider<IMessageChannel, IChannelModel>).CreateNullableEntity(model);
 }

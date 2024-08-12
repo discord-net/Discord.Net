@@ -5,24 +5,35 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+using ChannelFollowerIntegrationChannelTrait = GatewayChannelFollowerIntegrationChannelTrait<
+    GatewayStageChannelActor,
+    GatewayStageChannel,
+    StageChannelIdentity
+>;
+
 [ExtendInterfaceDefaults]
 public sealed partial class GatewayStageChannelActor :
     GatewayVoiceChannelActor,
     IStageChannelActor,
     IGatewayCachedActor<ulong, GatewayStageChannel, StageChannelIdentity, IGuildStageChannelModel>
 {
-    [SourceOfTruth]
-    public GatewayStageInstanceActor StageInstance { get; }
+    [SourceOfTruth] public GatewayStageInstanceActor StageInstance { get; }
 
     [SourceOfTruth] internal override StageChannelIdentity Identity { get; }
 
+    [ProxyInterface(typeof(IChannelFollowerIntegrationChannelTrait))]
+    internal ChannelFollowerIntegrationChannelTrait ChannelFollowerIntegrationChannelTrait { get; }
+
     [TypeFactory]
-    public GatewayStageChannelActor(DiscordGatewayClient client,
+    public GatewayStageChannelActor(
+        DiscordGatewayClient client,
         GuildIdentity guild,
-        StageChannelIdentity channel) : base(client, guild, channel)
+        StageChannelIdentity channel
+    ) : base(client, guild, channel)
     {
         Identity = channel | this;
         StageInstance = new GatewayStageInstanceActor(client, guild, channel, StageInstanceIdentity.Of(channel.Id));
+        ChannelFollowerIntegrationChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]
@@ -31,11 +42,7 @@ public sealed partial class GatewayStageChannelActor :
 
     [SourceOfTruth]
     internal GatewayStageInstance CreateEntity(IStageInstanceModel model)
-        => Client.StateController
-            .CreateLatent<ulong, GatewayStageInstance, GatewayStageInstanceActor, IStageInstanceModel>(
-                model,
-                CachePath
-            );
+        => Client.StateController.CreateLatent(StageInstance, model, CachePath);
 }
 
 public sealed partial class GatewayStageChannel :
@@ -43,8 +50,7 @@ public sealed partial class GatewayStageChannel :
     IStageChannel,
     ICacheableEntity<GatewayStageChannel, ulong, IGuildStageChannelModel>
 {
-    [ProxyInterface]
-    internal override GatewayStageChannelActor Actor { get; }
+    [ProxyInterface] internal override GatewayStageChannelActor Actor { get; }
 
     internal override IGuildStageChannelModel Model => _model;
 

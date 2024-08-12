@@ -4,29 +4,50 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+using MessageChannelTrait = GatewayMessageChannelTrait<
+    GatewayTextChannelActor,
+    GatewayTextChannel,
+    TextChannelIdentity
+>;
+using IncomingIntegrationChannelTrait = GatewayIncomingIntegrationChannelTrait<
+    GatewayTextChannelActor,
+    GatewayTextChannel,
+    TextChannelIdentity
+>;
+using ChannelFollowerIntegrationChannelTrait = GatewayChannelFollowerIntegrationChannelTrait<
+    GatewayTextChannelActor,
+    GatewayTextChannel,
+    TextChannelIdentity
+>;
 
+[ExtendInterfaceDefaults]
 public partial class GatewayTextChannelActor :
     GatewayThreadableChannelActor,
     ITextChannelActor,
     IGatewayCachedActor<ulong, GatewayTextChannel, TextChannelIdentity, IGuildTextChannelModel>
 {
-    [SourceOfTruth]
-    internal override TextChannelIdentity Identity { get; }
+    [SourceOfTruth] internal override TextChannelIdentity Identity { get; }
 
-    [ProxyInterface]
-    internal GatewayMessageChannelTrait MessageChannelActor { get; }
+    [ProxyInterface(typeof(IMessageChannelTrait))]
+    internal MessageChannelTrait MessageChannelTrait { get; }
 
-    [ProxyInterface]
-    internal GatewayIntegrationChannelTrait IntegrationChannelActor { get; }
+    [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
+    internal IncomingIntegrationChannelTrait IncomingIntegrationChannelTrait { get; }
+
+    [ProxyInterface(typeof(IChannelFollowerIntegrationChannelTrait))]
+    internal ChannelFollowerIntegrationChannelTrait ChannelFollowerIntegrationChannelTrait { get; }
 
     [method: TypeFactory]
-    public GatewayTextChannelActor(DiscordGatewayClient client,
+    public GatewayTextChannelActor(
+        DiscordGatewayClient client,
         GuildIdentity guild,
-        TextChannelIdentity channel) : base(client, guild, channel)
+        TextChannelIdentity channel
+    ) : base(client, guild, channel)
     {
         Identity = channel | this;
-        MessageChannelActor = new GatewayMessageChannelTrait(client, channel, guild);
-        IntegrationChannelActor = new GatewayIntegrationChannelTrait(client, guild, channel);
+        MessageChannelTrait = new(client, this, channel);
+        IncomingIntegrationChannelTrait = new(client, this, channel);
+        ChannelFollowerIntegrationChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]
@@ -45,8 +66,7 @@ public partial class GatewayTextChannel :
 
     public int SlowModeInterval => Model.RatelimitPerUser;
 
-    [ProxyInterface]
-    internal override GatewayTextChannelActor Actor { get; }
+    [ProxyInterface] internal override GatewayTextChannelActor Actor { get; }
 
     internal override IGuildTextChannelModel Model => _model;
 

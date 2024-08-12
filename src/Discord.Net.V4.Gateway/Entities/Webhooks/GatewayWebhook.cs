@@ -18,7 +18,10 @@ public partial class GatewayWebhookActor :
     }
 
     public IWebhookMessage CreateEntity(IMessageModel model) => throw new NotImplementedException();
-    public IWebhook CreateEntity(IWebhookModel model) => throw new NotImplementedException();
+
+    [SourceOfTruth]
+    internal virtual GatewayWebhook CreateEntity(IWebhookModel model)
+        => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 [ExtendInterfaceDefaults]
@@ -28,8 +31,7 @@ public partial class GatewayWebhook :
 {
     public WebhookType Type => (WebhookType)Model.Type;
 
-    [SourceOfTruth]
-    public GatewayUserActor? Creator { get; private set; }
+    [SourceOfTruth] public GatewayUserActor? Creator { get; private set; }
 
     public string? Name => Model.Name;
 
@@ -59,10 +61,13 @@ public partial class GatewayWebhook :
     public static GatewayWebhook Construct(
         DiscordGatewayClient client,
         IGatewayConstructionContext context,
-        IWebhookModel model)
+        IWebhookModel model
+    ) => (WebhookType)model.Type switch
     {
-        // TODO: switch type
-    }
+        WebhookType.Incoming => GatewayIncomingWebhook.Construct(client, context, model),
+        WebhookType.ChannelFollower => GatewayChannelFollowerWebhook.Construct(client, context, model),
+        _ => new GatewayWebhook(client, model, context.TryGetActor<GatewayWebhookActor>())
+    };
 
     private void UpdateLinkedActors(IWebhookModel model)
     {
@@ -88,5 +93,4 @@ public partial class GatewayWebhook :
     }
 
     public override IWebhookModel GetModel() => Model;
-
 }

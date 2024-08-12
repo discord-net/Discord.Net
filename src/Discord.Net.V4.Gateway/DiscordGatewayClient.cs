@@ -77,6 +77,7 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
             IStickerPack.FetchManyRoute(IPathable.Empty)
         );
         Stickers = new(id => new GatewayStickerActor(this, StickerIdentity.Of(id)));
+        Invites = new(id => new(this, InviteIdentity.Of(id)));
 
         InitializeEvents();
     }

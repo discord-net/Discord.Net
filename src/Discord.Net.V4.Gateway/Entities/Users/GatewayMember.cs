@@ -6,8 +6,7 @@ namespace Discord.Gateway;
 
 public partial class GatewayMemberActor :
     GatewayCachedActor<ulong, GatewayMember, MemberIdentity, IMemberModel>,
-    IMemberActor,
-    IGatewayCachedActor<ulong, GatewayMember, MemberIdentity, IMemberModel>
+    IMemberActor
 {
     [StoreRoot, SourceOfTruth] public GatewayGuildActor Guild { get; }
 

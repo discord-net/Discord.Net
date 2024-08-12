@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 
 namespace Discord.Gateway;
 
-public abstract class GatewayEntity<T> : IEntity<T>
-    where T : IEquatable<T>
+public abstract class GatewayEntity<TId> : IGatewayEntity<TId>
+    where TId : IEquatable<TId>
 {
-    protected DiscordGatewayClient Client { get; }
+    public DiscordGatewayClient Client { get; }
 
-    /// <inheritdoc />
-    public T Id { get; }
+    public TId Id { get; }
 
-    internal GatewayEntity(DiscordGatewayClient client, T id)
+    internal GatewayEntity(DiscordGatewayClient client, TId id)
     {
         Client = client;
         Id = id;
@@ -22,3 +21,8 @@ public abstract class GatewayEntity<T> : IEntity<T>
 
     IDiscordClient IClientProvider.Client => Client;
 }
+
+public interface IGatewayEntity<out TId> :
+    IEntity<TId>,
+    IGatewayClientProvider
+    where TId : IEquatable<TId>;

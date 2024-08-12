@@ -7,7 +7,7 @@ namespace Discord.Gateway;
 internal static partial class GatewayActorExtensions
 {
     [return: NotNullIfNotNull(nameof(id))]
-    public static TActor? UpdateFrom<TId, TEntity, TModel, TActor>(
+    public static TActor? UpdateFrom<TId, TEntity, [Shrink] TModel, TActor>(
         [TransitiveFill] this TActor? actor,
         TId? id,
         [VariableFuncArgs] Func<IIdentifiable<TId, TEntity, TActor, TModel>, TActor> factory,

@@ -2,12 +2,14 @@ using Discord.Gateway;
 using Discord.Gateway.State;
 using Discord.Models;
 using Discord.Rest;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using static Discord.Gateway.GatewayActors;
 using static Discord.Template;
 
 namespace Discord.Gateway;
 
+[ExtendInterfaceDefaults]
 public sealed partial class GatewayGuildActor :
     GatewayCachedActor<ulong, GatewayGuild, GuildIdentity, IGuildModel>,
     IGuildActor
@@ -33,6 +35,8 @@ public sealed partial class GatewayGuildActor :
 
     [SourceOfTruth] public GatewayMediaChannels MediaChannels { get; }
 
+    [SourceOfTruth] public GatewayIntegrationChannels IntegrationChannels { get; }
+
     [SourceOfTruth] public GatewayIntegrations Integrations { get; }
 
     [SourceOfTruth] public BansPager Bans { get; }
@@ -49,14 +53,24 @@ public sealed partial class GatewayGuildActor :
 
     [SourceOfTruth] public GatewayGuildInvites Invites { get; }
 
-    [SourceOfTruth] public IEnumerableIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks { get; }
+    [SourceOfTruth] public Webhooks Webhooks { get; }
 
     internal override GuildIdentity Identity { get; }
 
-    public GatewayGuildActor(DiscordGatewayClient client, GuildIdentity guild)
-        : base(client, guild)
+    public GatewayGuildActor(
+        DiscordGatewayClient client,
+        GuildIdentity guild
+    ) : base(client, guild)
     {
         Identity = guild | this;
+
+        Webhooks = new(
+            client,
+            client.Webhooks,
+            model => RestWebhook.Construct(client.Rest, model),
+            CachePath,
+            IWebhook.GetGuildWebhooksRoute(this)
+        );
 
         CurrentMember = new GatewayCurrentMemberActor(
             client,
@@ -88,8 +102,16 @@ public sealed partial class GatewayGuildActor :
             Identity,
             CachePath,
             static guild => new RestThreadChannel.Context(
-                IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>.Of(guild.Id)
+                RestGuildIdentity.Of(guild.Id)
             )
+        );
+        IntegrationChannels = GuildRelatedTrait<RestGuildChannel>(
+            T<GatewayIntegrationChannelTrait>(),
+            T<GatewayGuildChannelActor>(),
+            client,
+            Identity,
+            CachePath,
+            model => IIntegrationChannelTrait.ImplementsTraitByModel(model.GetType())
         );
 
         ActiveThreadChannels = GuildRelatedEntity<RestThreadChannel>(
@@ -98,7 +120,7 @@ public sealed partial class GatewayGuildActor :
             Identity,
             CachePath,
             static guild => new RestThreadChannel.Context(
-                IIdentifiable<ulong, RestGuild, RestGuildActor, IGuildModel>.Of(guild.Id)
+                RestGuildIdentity.Of(guild.Id)
             ),
             Routes.ListActiveGuildThreads(Identity.Id),
             api => api.Threads
@@ -126,10 +148,12 @@ public sealed partial class GatewayGuildActor :
         => Client.StateController.CreateLatent(this, model, CachePath);
 
     [SourceOfTruth]
-    internal IGuildChannel CreateEntity(IGuildChannelModel model) => throw new NotImplementedException();
+    internal GatewayGuildChannel CreateEntity(IGuildChannelModel model)
+        => Client.StateController.CreateLatent(Channels[model.Id], model, CachePath);
 
     [SourceOfTruth]
-    internal IMember CreateEntity(IMemberModel model) => throw new NotImplementedException();
+    internal GatewayMember CreateEntity(IMemberModel model)
+        => Client.StateController.CreateLatent(Members[model.Id], model, CachePath);
 }
 
 public sealed partial class GatewayGuild :
@@ -217,27 +241,15 @@ public sealed partial class GatewayGuild :
     {
         Model = model;
         Actor = actor ?? new(client, GuildIdentity.Of(this));
-    }
 
-    private void UpdateComputeds(IGuildModel model)
-    {
-        AFKChannel = model.AFKChannelId.Map(
-            static (id, client, guild) => client.Guilds[guild.Id].VoiceChannels[id],
-            Client,
-            Actor.Identity
+        UpdateLinkedActors(model);
+        UpdateComputed(model);
+
+        Owner ??= Owner.UpdateFrom(
+            model.OwnerId,
+            static (guild, member) => guild.Members[member],
+            this
         );
-    }
-
-    [SourceOfTruth]
-    public override IGuildModel GetModel() => Model;
-
-    public override ValueTask UpdateAsync(IGuildModel model, bool updateCache = true, CancellationToken token = default)
-    {
-        if (updateCache) return UpdateCacheAsync(this, model, token);
-
-        Model = model;
-
-        return ValueTask.CompletedTask;
     }
 
     public static GatewayGuild Construct(
@@ -252,5 +264,69 @@ public sealed partial class GatewayGuild :
         );
     }
 
-    //IPartialGuildModel IEntityOf<IPartialGuildModel>.GetModel() => GetModel();
+    private void UpdateLinkedActors(IGuildModel model)
+    {
+        AFKChannel = AFKChannel.UpdateFrom(
+            model.AFKChannelId,
+            static (guild, channel) => guild.VoiceChannels[channel],
+            this
+        );
+
+        WidgetChannel = WidgetChannel.UpdateFrom(
+            model.WidgetChannelId,
+            static (guild, channel) => guild.TextChannels[channel],
+            this
+        );
+
+        SafetyAlertsChannel = SafetyAlertsChannel.UpdateFrom(
+            model.SafetyAlertsChannelId,
+            static (guild, channel) => guild.TextChannels[channel],
+            this
+        );
+
+        SystemChannel = SystemChannel.UpdateFrom(
+            model.SafetyAlertsChannelId,
+            static (guild, channel) => guild.TextChannels[channel],
+            this
+        );
+
+        RulesChannel = RulesChannel.UpdateFrom(
+            model.SafetyAlertsChannelId,
+            static (guild, channel) => guild.TextChannels[channel],
+            this
+        );
+
+        PublicUpdatesChannel = PublicUpdatesChannel.UpdateFrom(
+            model.SafetyAlertsChannelId,
+            static (guild, channel) => guild.TextChannels[channel],
+            this
+        );
+
+        Owner = Owner.UpdateFrom(
+            model.OwnerId,
+            static (guild, member) => guild.Members[member],
+            this
+        );
+    }
+
+    private void UpdateComputed(IGuildModel model)
+    {
+        if(!Features.Equals(model.Features))
+            Features = new GuildFeatures(model.Features);
+    }
+
+    public override ValueTask UpdateAsync(IGuildModel model, bool updateCache = true, CancellationToken token = default)
+    {
+        if (updateCache) return UpdateCacheAsync(this, model, token);
+
+        UpdateLinkedActors(model);
+        UpdateComputed(model);
+
+        Model = model;
+
+        return ValueTask.CompletedTask;
+    }
+
+    [SourceOfTruth]
+    public override IGuildModel GetModel() => Model;
 }

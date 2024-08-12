@@ -11,6 +11,7 @@
         <IsAotCompatible>false</IsAotCompatible>
         <RootNamespace>Discord.Gateway</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <NoWarn>CS0436</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

@@ -6,6 +6,12 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+using MessageChannelTrait = GatewayMessageChannelTrait<
+    GatewayThreadChannelActor,
+    GatewayThreadChannel,
+    ThreadChannelIdentity
+>;
+
 [ExtendInterfaceDefaults]
 public sealed partial class GatewayThreadChannelActor :
     GatewayGuildChannelActor,
@@ -19,7 +25,7 @@ public sealed partial class GatewayThreadChannelActor :
 
     [SourceOfTruth] internal override ThreadChannelIdentity Identity { get; }
 
-    [ProxyInterface] internal GatewayMessageChannelTrait MessageChannelActor { get; }
+    [ProxyInterface(typeof(IMessageChannelTrait))] internal MessageChannelTrait MessageChannelActor { get; }
 
     [TypeFactory]
     public GatewayThreadChannelActor(
@@ -29,7 +35,7 @@ public sealed partial class GatewayThreadChannelActor :
     ) : base(client, guild, thread)
     {
         Identity = thread | this;
-        MessageChannelActor = new(client, thread, guild);
+        MessageChannelActor = new(client, this, thread);
     }
 
     [SourceOfTruth]
@@ -42,8 +48,7 @@ public sealed partial class GatewayThreadChannel :
     IThreadChannel,
     ICacheableEntity<GatewayThreadChannel, ulong, IThreadChannelModel>
 {
-    [SourceOfTruth]
-    public GatewayUserActor Creator { get; }
+    [SourceOfTruth] public GatewayUserActor Creator { get; }
 
     public new ThreadType Type => (ThreadType)Model.Type;
 
@@ -104,7 +109,7 @@ public sealed partial class GatewayThreadChannel :
     {
         if (updateCache) return UpdateCacheAsync(this, model, token);
 
-        if(!Model.AppliedTags.SequenceEqual(model.AppliedTags))
+        if (!Model.AppliedTags.SequenceEqual(model.AppliedTags))
             AppliedTags = model.AppliedTags.ToImmutableList();
 
         _model = model;

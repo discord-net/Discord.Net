@@ -11,17 +11,16 @@ public sealed class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestE
     GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCore, TModel, IEnumerable<TModel>>
     where TActor :
     class,
-    IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>,
-    IStoreProvider<TId, TModel>
+    IGatewayCachedActor<TId, TEntity, TModel>,
+    IActor<TId, TCore>
     where TId : IEquatable<TId>
     where TEntity :
     GatewayEntity<TId>,
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreInfoProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>,
-    TCore
-    where TRestEntity : RestEntity<TId>, TCore
+    IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
+    where TRestEntity : RestEntity<TId>
     where TCore : class, IEntity<TId, TModel>
     where TModel : class, IEntityModel<TId>
 {
@@ -66,17 +65,16 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
     IEnumerableIndexableActor<TActor, TId, TCore>
     where TActor :
     class,
-    IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>,
-    IStoreProvider<TId, TModel>
+    IGatewayCachedActor<TId, TEntity, TModel>,
+    IActor<TId, TCore>
     where TId : IEquatable<TId>
     where TEntity :
     GatewayEntity<TId>,
     ICacheableEntity<TEntity, TId, TModel>,
     IStoreInfoProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
-    IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>,
-    TCore
-    where TRestEntity : RestEntity<TId>, TCore
+    IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
+    where TRestEntity : RestEntity<TId>
     where TCore : class, IEntity<TId, TModel>
     where TModel : class, IEntityModel<TId>
     where TApi : class
@@ -181,10 +179,9 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
     {
         options ??= _client.DefaultRequestOptions;
 
-        if (options.AllowCached)
-            return (await GetAllAsync(token).ToListAsync(cancellationToken: token)).AsReadOnly();
-
-        return await FetchAllAsync(options, token);
+        return options.AllowCached
+            ? (await GetAllAsync(token).OfType<TCore>().ToListAsync(cancellationToken: token)).AsReadOnly()
+            : (await FetchAllAsync(options, token)).OfType<TCore>().ToList().AsReadOnly();
     }
 
     ValueTask<IReadOnlyCollection<TCore>> IEnumerableActor<TId, TCore>.AllAsync(RequestOptions? options,
