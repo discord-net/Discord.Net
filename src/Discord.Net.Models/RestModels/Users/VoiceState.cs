@@ -14,7 +14,7 @@ public sealed class VoiceState :
     [JsonPropertyName("channel_id")]
     public ulong? ChannelId { get; set; }
 
-    [JsonPropertyName("user_id")]
+    [JsonPropertyName("user_id"), PartialIgnore]
     public ulong UserId { get; set; }
 
     // ALWAYS sent over WebSocket, never on REST

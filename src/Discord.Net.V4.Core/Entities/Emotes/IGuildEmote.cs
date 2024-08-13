@@ -49,7 +49,7 @@ public partial interface IGuildEmote :
             Animated = IsAnimated,
             Available = IsAvailable,
             Managed = IsManaged,
-            Name = Name,
+            Name = Name ?? string.Empty,
             RoleIds = Roles.Ids.ToArray()
         };
 }

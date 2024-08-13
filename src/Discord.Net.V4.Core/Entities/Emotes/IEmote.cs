@@ -13,7 +13,7 @@ public interface IEmote : IEntityProperties<IEmoteModel>, IConstructable<IEmote,
     /// <returns>
     ///     A string representing the display name or the Unicode representation (e.g. <c>🤔</c>) of this emote.
     /// </returns>
-    string? Name { get; }
+    string Name { get; }
 
     static IEmote IConstructable<IEmote, IEmoteModel, IDiscordClient>.Construct(IDiscordClient client,
         IEmoteModel model)

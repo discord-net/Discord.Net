@@ -43,9 +43,8 @@ public sealed class GuildEmote :
 
     public Models.Json.GuildEmote ToApiModel(Models.Json.GuildEmote? existing = default)
     {
-        existing ??= new Models.Json.GuildEmote {Id = Id};
+        existing ??= new Models.Json.GuildEmote {Id = Id, Name = Name};
 
-        existing.Name = Name;
         existing.RoleIds = RoleIds.ToArray();
         existing.RequireColons = RequiresColons;
         existing.Managed = IsManaged;

@@ -7,5 +7,6 @@ namespace Discord.Models;
 [HasPartialVariant]
 public partial interface IEmoteModel : IEntityModel
 {
+    [NullableInPartial]
     string Name { get; }
 }

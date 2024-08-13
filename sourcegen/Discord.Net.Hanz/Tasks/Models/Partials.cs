@@ -67,8 +67,11 @@ public class Partials
 
             var isRequired = IsRequired(property);
 
-            if (!isRequired && propertyType.NullableAnnotation is not NullableAnnotation.Annotated)
-                propertyType = GetNullableType(propertyType, semanticModel);
+            if (
+                (!isRequired && propertyType.NullableAnnotation is not NullableAnnotation.Annotated)
+                ||
+                ShouldBeNullableInPartialForm(property)
+            ) propertyType = GetNullableType(propertyType, semanticModel);
 
             syntax = syntax.AddMembers(
                 propertySyntax.WithType(
@@ -115,7 +118,7 @@ public class Partials
                 GeneratePartialForm(context, targetBase, baseSyntax, semanticModel, logger)
             )
             {
-                name = name.Insert(1, "Partial");
+                name = ToPartialTypeName(targetBase);
             }
 
             syntax = syntax.AddBaseListTypes(
@@ -208,7 +211,10 @@ public class Partials
     {
         var isFromPartial = HasPartialAttribute(property.ContainingType);
 
-        var interfacePropertyType = isFromPartial ? GetNullableType(property.Type, semanticModel) : property.Type;
+        var interfacePropertyType = 
+            isFromPartial || ShouldBeNullableInPartialForm(property) 
+                ? GetNullableType(property.Type, semanticModel) 
+                : property.Type;
 
         var canImplement = implementation.ExplicitInterfaceImplementations.Length == 0;
 
@@ -500,6 +506,9 @@ public class Partials
                 continue;
 
             var propertyType = property.Type;
+
+            if (ShouldBeNullableInPartialForm(property))
+                propertyType = GetNullableType(propertyType, semanticModel);
 
             if (!IsRequired(property) && propertyType.Name is not "Optional")
             {
@@ -873,6 +882,10 @@ public class Partials
         );
     }
 
+    private static bool ShouldBeNullableInPartialForm(IPropertySymbol property)
+        => property.GetAttributes()
+            .Any(x => x.AttributeClass?.ToDisplayString() == "Discord.NullableInPartialAttribute");
+
     private static bool IsModelLinkProperty(IPropertySymbol property)
         => SearchIsModelType(property.Type);
 
@@ -928,9 +941,20 @@ public class Partials
                                 "\n",
                                 optionalProperties
                                     .Select(x =>
-                                        $$"""
-                                          if({{x.Name}}.IsSpecified) model.{{x.Name}} = {{x.Name}}.Value;
-                                          """
+                                        {
+                                            var condition = $"{x.Name}.IsSpecified";
+                                            var setter = $"model.{x.Name} = {x.Name}.Value";
+
+                                            if (ShouldBeNullableInPartialForm(x))
+                                            {
+                                                condition = $"{condition} && {x.Name}.Value is not null";
+                                                setter = x.Type.IsValueType
+                                                    ? $"{setter}.Value"
+                                                    : setter;
+                                            }
+
+                                            return $"if ({condition}) {setter};";
+                                        }
                                     )
                             )
                         }}
