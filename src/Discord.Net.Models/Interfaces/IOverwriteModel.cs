@@ -7,6 +7,6 @@ public partial interface IOverwriteModel : IEntityModel
 {
     ulong TargetId { get; }
     int Type { get; }
-    BigInteger Allow { get; }
-    BigInteger Deny { get; }
+    string Allow { get; }
+    string Deny { get; }
 }

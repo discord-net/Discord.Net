@@ -3,8 +3,5 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace Discord.Models.Json;
 
-public sealed class Emoji : IEmojiModel
-{
-    [JsonPropertyName("name")]
-    public required string Name { get; set; }
-}
+[DiscriminatedUnionType(nameof(GuildEmote.Id), WhenSpecified = false)]
+public sealed class Emoji : Emote, IEmojiModel;

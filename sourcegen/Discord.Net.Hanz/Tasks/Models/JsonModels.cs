@@ -62,7 +62,22 @@ public static class JsonModels
 
         public HashSet<string> NoContextTypeInfos = new();
 
-        public HashSet<ITypeSymbol> RequestedNoConverterTypeInfos = new();
+        public HashSet<ITypeSymbol> RequestedNoConverterTypeInfos = new(SymbolEqualityComparer.Default);
+
+        public Dictionary<string, SourceText> DynamicSources = new();
+    }
+
+    public static string GetJsonPropertyName(IPropertySymbol property)
+    {
+        var nameAttribute = property.GetAttributes()
+            .FirstOrDefault(x =>
+                x.AttributeClass?.ToDisplayString() == "System.Text.Json.Serialization.JsonPropertyNameAttribute"
+            );
+
+        if (nameAttribute is null)
+            return property.Name;
+
+        return (nameAttribute.ConstructorArguments[0].Value as string)!;
     }
 
     public static void Execute(
@@ -153,20 +168,27 @@ public static class JsonModels
                 context,
                 logger
             );
+
+            Partials.ProcessJsonModel(
+                target.TypeSymbol,
+                target.SemanticModel,
+                jsonContext,
+                logger
+            );
         }
 
         if (modelTypesForContext.Count == 0)
             return;
 
-        foreach (var modelInterface in modelInterfaces)
-        {
-            logger.Log($"{modelInterface.Key}:");
-
-            foreach (var value in modelInterface.Value)
-            {
-                logger.Log($"- {value.Distance} : {value.Type}");
-            }
-        }
+        // foreach (var modelInterface in modelInterfaces)
+        // {
+        //     logger.Log($"{modelInterface.Key}:");
+        //
+        //     foreach (var value in modelInterface.Value)
+        //     {
+        //         logger.Log($"- {value.Distance} : {value.Type}");
+        //     }
+        // }
 
         var lowestDistanceInterfaceMap =
             new Dictionary<ITypeSymbol, (int Distance, ITypeSymbol Symbol)>(SymbolEqualityComparer.Default);
@@ -240,7 +262,23 @@ public static class JsonModels
             generated
         );
 
-        var stjResult = RunSTJSourceGenerator(context, compilation, generated, logger).ToArray();
+        foreach (var dynamicSource in jsonContext.DynamicSources)
+        {
+            logger.Log($"Generating dynamic source '{dynamicSource.Key}'");
+            
+            context.AddSource(
+                dynamicSource.Key,
+                dynamicSource.Value
+            );
+        }
+
+        var stjResult = RunSTJSourceGenerator(
+            context,
+            compilation,
+            generated,
+            jsonContext,
+            logger
+        ).ToArray();
 
         if (jsonContext.RequestedNoConverterTypeInfos.Count == 0)
             return;
@@ -262,14 +300,14 @@ public static class JsonModels
                               internal global::System.Text.Json.Serialization.Metadata.JsonTypeInfo<global::{{typeInfo.ToDisplayString()}}> Create{{typeInfo.Name}}TypeInfoNoConverter(global::System.Text.Json.JsonSerializerOptions options)
                               {
                                   global::System.Text.Json.Serialization.Metadata.JsonTypeInfo<global::{{typeInfo.ToDisplayString()}}> jsonTypeInfo;
-
+                              
                                   {{
                                       string.Join(
                                           "\n",
                                           body.Statements.Select(x => x.ToString())
                                       )
                                   }}
-
+                              
                                   jsonTypeInfo.OriginatingResolver = this;
                                   return jsonTypeInfo;
                               }
@@ -336,10 +374,10 @@ public static class JsonModels
               {
                   if(_typeInfo is not null)
                       return _typeInfo;
-
+              
                   if (options.TypeInfoResolver is ModelJsonContext modelJsonContext)
                       return _typeInfo = modelJsonContext.Create{{target.Name}}TypeInfoNoConverter(options);
-
+              
                   return _typeInfo = options.TypeInfoResolverChain
                       .OfType<ModelJsonContext>()
                       .First()
@@ -371,7 +409,7 @@ public static class JsonModels
                     ConstructorParameterMetadataInitializer = null,
                     SerializeHandler = GatewayMessageSerializeHandler
                 };
-
+            
                 var jsonTypeInfo = global::System.Text.Json.Serialization.Metadata.JsonMetadataServices.CreateObjectInfo<global::Discord.Models.Json.GatewayMessage>(options, objectInfo);
                 jsonTypeInfo.NumberHandling = null;
                 jsonTypeInfo.OriginatingResolver = this;
@@ -403,7 +441,7 @@ public static class JsonModels
                     ConstructorParameterMetadataInitializer = UserCtorParamInit,
                     SerializeHandler = UserSerializeHandler
                 };
-
+            
                 var jsonTypeInfo = global::System.Text.Json.Serialization.Metadata.JsonMetadataServices.CreateObjectInfo<global::Discord.Models.Json.User>(options, objectInfo);
                 jsonTypeInfo.NumberHandling = null;
                 jsonTypeInfo.OriginatingResolver = this;
@@ -495,6 +533,7 @@ public static class JsonModels
         SourceProductionContext context,
         Compilation compilation,
         SourceText toRunAgainst,
+        Context jsonContext,
         Logger logger)
     {
         ParseOptions options;
@@ -508,7 +547,13 @@ public static class JsonModels
         }
 
         var syntaxTree = SyntaxFactory.ParseSyntaxTree(toRunAgainst, options);
-        compilation = compilation.AddSyntaxTrees(syntaxTree);
+        compilation = compilation.AddSyntaxTrees([
+            syntaxTree,
+            ..jsonContext.DynamicSources.Values
+                .Select(x =>
+                    SyntaxFactory.ParseSyntaxTree(x, options)
+                )
+        ]);
 
         var assembly = AppDomain.CurrentDomain.GetAssemblies()
             .FirstOrDefault(a => a.FullName.Contains("System.Text.Json.SourceGeneration"));
@@ -521,7 +566,7 @@ public static class JsonModels
             yield break;
         }
 
-        var jsonGenerator = ((IIncrementalGenerator)Activator.CreateInstance(stjSourceGenerator)).AsSourceGenerator();
+        var jsonGenerator = ((IIncrementalGenerator) Activator.CreateInstance(stjSourceGenerator)).AsSourceGenerator();
 
         var driverResult = CSharpGeneratorDriver
             .Create(jsonGenerator)
@@ -548,13 +593,17 @@ public static class JsonModels
     {
         return type.GetMembers()
             .OfType<IPropertySymbol>()
-            .Any(x => x
-                .GetAttributes()
-                .Any(x =>
-                    x.AttributeClass?.ToDisplayString()
-                        is "System.Text.Json.Serialization.JsonPropertyNameAttribute"
-                        or ExtendedModel.ExtendedAttributeName
-                )
+            .Any(IsJsonProperty);
+    }
+
+    public static bool IsJsonProperty(IPropertySymbol symbol)
+    {
+        return symbol
+            .GetAttributes()
+            .Any(x =>
+                x.AttributeClass?.ToDisplayString()
+                    is "System.Text.Json.Serialization.JsonPropertyNameAttribute"
+                    or ExtendedModel.ExtendedAttributeName
             );
     }
 }

@@ -4,6 +4,10 @@
     "V4Core": {
       "commandName": "DebugRoslynComponent",
       "targetProject": "../../src/Discord.Net.V4.Core/Discord.Net.V4.Core.csproj"
+    },
+    "Models": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "../../src/Discord.Net.Models/Discord.Net.Models.csproj"
     }
   }
 }

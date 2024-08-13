@@ -11,7 +11,7 @@ public interface IInviteCreatedPayloadData : IGatewayPayloadData
     int MaxUses { get; }
     int? TargetType { get; }
     IUserModel? TargetUser { get; }
-    IApplicationModel? TargetApplication { get; }
+    IPartialApplicationModel? TargetApplication { get; }
     bool IsTemporary { get; }
     int Uses { get; }
 }

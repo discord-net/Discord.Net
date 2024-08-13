@@ -18,7 +18,7 @@ public sealed partial class ExtendedGuild : GuildCreated, IExtendedGuild
     public int MemberCount { get; set; }
 
     [JsonPropertyName("voice_states")]
-    public required VoiceState[] VoiceStates { get; set; }
+    public required PartialVoiceState[] VoiceStates { get; set; }
 
     [JsonPropertyName("members")]
     public required GuildMember[] Members { get; set; }
@@ -30,7 +30,7 @@ public sealed partial class ExtendedGuild : GuildCreated, IExtendedGuild
     public required ThreadChannelBase[] Threads { get; set; }
 
     [JsonPropertyName("presences")]
-    public required Presence[] Presences { get; set; }
+    public required PartialPresence[] Presences { get; set; }
 
     [JsonPropertyName("stage_instances")]
     public required StageInstance[] StageInstances { get; set; }
@@ -38,14 +38,14 @@ public sealed partial class ExtendedGuild : GuildCreated, IExtendedGuild
     [JsonPropertyName("guild_scheduled_events")]
     public required GuildScheduledEvent[] GuildScheduledEvents { get; set; }
 
-    IEnumerable<IVoiceStateModel> IExtendedGuild.VoiceStates => VoiceStates;
+    IEnumerable<IPartialVoiceStateModel> IExtendedGuild.VoiceStates => VoiceStates;
     IEnumerable<IMemberModel> IExtendedGuild.Members => Members;
 
     IEnumerable<IGuildChannelModel> IExtendedGuild.Channels => Channels;
 
     IEnumerable<IThreadChannelModel> IExtendedGuild.Threads => Threads;
 
-    IEnumerable<IPresenceModel> IExtendedGuild.Presences => Presences;
+    IEnumerable<IPartialPresenceModel> IExtendedGuild.Presences => Presences;
     IEnumerable<IStageInstanceModel> IExtendedGuild.StageInstances => StageInstances;
     IEnumerable<IGuildScheduledEventModel> IExtendedGuild.GuildScheduledEvents => GuildScheduledEvents;
 }

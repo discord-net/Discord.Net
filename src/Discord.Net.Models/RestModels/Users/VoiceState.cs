@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
+[HasPartialVariant]
 public sealed class VoiceState :
     IVoiceStateModel,
     IModelSource,

@@ -29,10 +29,10 @@ public sealed class InviteCreated : IInviteCreatedPayloadData
     public Optional<int> TargetType { get; set; }
 
     [JsonPropertyName("target_user")]
-    public Optional<IUserModel> TargetUser { get; set; }
+    public Optional<User> TargetUser { get; set; }
 
     [JsonPropertyName("target_application")]
-    public Optional<IApplicationModel> TargetApplication { get; set; }
+    public Optional<PartialApplication> TargetApplication { get; set; }
 
     [JsonPropertyName("temporary")]
     public bool IsTemporary { get; set; }
@@ -48,5 +48,5 @@ public sealed class InviteCreated : IInviteCreatedPayloadData
 
     IUserModel? IInviteCreatedPayloadData.TargetUser => ~TargetUser;
 
-    IApplicationModel? IInviteCreatedPayloadData.TargetApplication => ~TargetApplication;
+    IPartialApplicationModel? IInviteCreatedPayloadData.TargetApplication => ~TargetApplication;
 }

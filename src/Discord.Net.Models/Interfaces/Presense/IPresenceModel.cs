@@ -1,8 +1,9 @@
 namespace Discord.Models;
 
-[ModelEquality]
+[ModelEquality, HasPartialVariant]
 public partial interface IPresenceModel : IEntityModel<ulong>
 {
+    [PartialIgnore]
     ulong UserId { get; }
     ulong? GuildId { get; }
     string? Status { get; }

@@ -20,7 +20,7 @@ public sealed class ReactionAdded : IMessageReactionAddedPayload
     public Optional<GuildMember> Member { get; set; }
 
     [JsonPropertyName("emoji")]
-    public required IEmoteModel Emoji { get; set; }
+    public required PartialEmote Emoji { get; set; }
 
     [JsonPropertyName("message_author_id")]
     public Optional<ulong> MessageAuthorId { get; set; }
@@ -34,6 +34,7 @@ public sealed class ReactionAdded : IMessageReactionAddedPayload
     [JsonPropertyName("type")]
     public int Type { get; set; }
 
+    IPartialEmoteModel IMessageReactionAddedPayload.Emoji => Emoji;
     ulong? IMessageReactionAddedPayload.GuildId => GuildId.ToNullable();
     IMemberModel? IMessageReactionAddedPayload.Member => ~Member;
     string[]? IMessageReactionAddedPayload.BurstColors => ~BurstColors;

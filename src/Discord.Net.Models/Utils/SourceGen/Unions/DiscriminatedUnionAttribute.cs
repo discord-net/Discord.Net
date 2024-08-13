@@ -3,7 +3,7 @@ namespace Discord;
 #pragma warning disable CS9113 // Parameter is unread.
 
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class DiscriminatedUnionAttribute(string name) : Attribute;
+public sealed class DiscriminatedUnionAttribute(string propertyName) : Attribute;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public sealed class DiscriminatedUnionEntryAttribute<T>(params object[] value) : Attribute;

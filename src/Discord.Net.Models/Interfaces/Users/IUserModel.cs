@@ -1,6 +1,6 @@
 namespace Discord.Models;
 
-[ModelEquality]
+[ModelEquality, HasPartialVariant]
 public partial interface IUserModel : IEntityModel<ulong>
 {
     string Username { get; }

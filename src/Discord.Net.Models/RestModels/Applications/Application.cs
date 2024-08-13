@@ -2,9 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
+[HasPartialVariant]
 public sealed class Application : IApplicationModel, IModelSourceOfMultiple<IUserModel>
 {
-    [JsonPropertyName("id")]
+    [JsonPropertyName("id"), JsonRequired]
     public ulong Id { get; set; }
 
     [JsonPropertyName("name")]
@@ -73,7 +74,7 @@ public sealed class Application : IApplicationModel, IModelSourceOfMultiple<IUse
     [JsonPropertyName("redirect_uris")]
     public Optional<string[]> RedirectUris { get; set; }
 
-    ulong? IApplicationModel.BotId => ~Bot.Map(v => v.Id);
+    ulong? IApplicationModel.BotId => Bot.Map(v => v.Id).ToNullable();
 
     IEnumerable<IUserModel> IModelSourceOfMultiple<IUserModel>.GetModels()
     {

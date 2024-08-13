@@ -8,4 +8,5 @@ public interface IReadyPayloadData : IGatewayPayloadData
     string SessionId { get; }
     string ResumeGatewayUrl { get; }
     int[]? Shard { get; }
+    IPartialApplicationModel Application { get; }
 }

@@ -1,6 +1,6 @@
 namespace Discord.Models;
 
-[ModelEquality]
+[ModelEquality, HasPartialVariant]
 public partial interface IMemberModel : IEntityModel<ulong>
 {
     int Flags { get; }

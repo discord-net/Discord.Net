@@ -1,10 +1,11 @@
 namespace Discord.Models;
 
-[ModelEquality]
+[ModelEquality, HasPartialVariant]
 public partial interface IVoiceStateModel : IEntityModel<ulong>
 {
-    string SessionId { get; }
+    [PartialIgnore]
     ulong UserId { get; }
+    string SessionId { get; }
     ulong? ChannelId { get; }
     ulong? GuildId { get; }
     bool Deaf { get; }

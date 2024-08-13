@@ -1,6 +1,6 @@
 namespace Discord.Models;
 
-[ModelEquality]
+[ModelEquality, HasPartialVariant]
 public partial interface IGuildEmoteModel : IEmoteModel, IEntityModel<ulong>
 {
     ulong[] Roles { get; }

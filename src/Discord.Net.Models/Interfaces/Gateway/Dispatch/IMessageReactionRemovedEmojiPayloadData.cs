@@ -5,5 +5,5 @@ public interface IMessageReactionRemovedEmojiPayloadData : IGatewayPayloadData
     ulong ChannelId { get; }
     ulong? GuildId { get; }
     ulong MessageId { get; }
-    IEmoteModel Emoji { get; }
+    IPartialEmoteModel Emoji { get; }
 }

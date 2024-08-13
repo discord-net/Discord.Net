@@ -12,8 +12,8 @@ public sealed class Overwrite : IOverwriteModel
     public int Type { get; set; }
 
     [JsonPropertyName("deny")]
-    public BigInteger Deny { get; set; }
+    public required string Deny { get; set; }
 
     [JsonPropertyName("allow")]
-    public BigInteger Allow { get; set; }
+    public required string Allow { get; set; }
 }

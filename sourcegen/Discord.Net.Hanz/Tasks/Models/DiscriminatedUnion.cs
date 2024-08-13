@@ -79,17 +79,17 @@ public sealed class DiscriminatedUnion
               {
                   using var jsonDoc = JsonDocument.ParseValue(ref reader);
                   var element = jsonDoc.RootElement;
-
+              
                   var value = element.Deserialize(GetTypeInfoWithoutConverter(options));
-
+              
                   if(value is null) return null;
-
+              
                   {{
                       string.Join(
                           "\n",
                           propertyInfos.Select(x =>
                               $$"""
-                                if (element.TryGetProperty("{{GetJsonPropertyName(x.Property)}}", out var json{{x.Property.Name}}))
+                                if (element.TryGetProperty("{{JsonModels.GetJsonPropertyName(x.Property)}}", out var json{{x.Property.Name}}))
                                 {
                                     value.{{x.Property.Name}} = {{(
                                         x.IsOptionalType
@@ -101,7 +101,7 @@ public sealed class DiscriminatedUnion
                           )
                       )
                   }}
-
+              
                   return value;
               }
               """
@@ -113,16 +113,16 @@ public sealed class DiscriminatedUnion
               {
                   var jsonNode = JsonSerializer.SerializeToNode(value, GetTypeInfoWithoutConverter(options))
                       as System.Text.Json.Nodes.JsonObject;
-
+              
                   if(jsonNode is null) return;
-
+              
                   {{
                       string.Join(
                           "\n",
                           propertyInfos.Select(x =>
                               $$"""
                                 jsonNode.Add(
-                                    "{{GetJsonPropertyName(x.Property)}}",
+                                    "{{JsonModels.GetJsonPropertyName(x.Property)}}",
                                     JsonSerializer.SerializeToNode(
                                         value.{{x.Property.Name}},
                                         options
@@ -132,7 +132,7 @@ public sealed class DiscriminatedUnion
                           )
                       )
                   }}
-
+              
                   jsonNode.WriteTo(writer, options);
               }
               """
@@ -202,9 +202,9 @@ public sealed class DiscriminatedUnion
                   JsonSerializerOptions options)
               {
                   var delimiter = obj.{{info.Delimiter.Name}};
-
+              
                   {{nullCase}}
-
+              
                   return element.Deserialize(
                       delimiter switch
                       {
@@ -241,18 +241,21 @@ public sealed class DiscriminatedUnion
         SourceProductionContext context,
         Logger logger)
     {
-        if (root.GetMembers(propertyName).FirstOrDefault() is not IPropertySymbol property)
-            return;
-
         var unionTypes = GetUnionTypes(jsonContext.Targets, root, propertyName);
 
         if (unionTypes.Count == 0)
+        {
+            logger.Warn($"Union root {root} has no entry types!");
             return;
+        }
 
-        var converter = CreateRootConverter(root, property, unionTypes);
+        var converter = CreateRootConverter(root, propertyName, unionTypes, logger);
 
         if (converter is null)
+        {
+            logger.Warn($"Failed to create a union converter for {root}");
             return;
+        }
 
         jsonContext.RequestedNoConverterTypeInfos.Add(root);
 
@@ -290,15 +293,19 @@ public sealed class DiscriminatedUnion
         {
             var extraConverter = CreateRootConverter(
                 extraBase,
-                property,
+                propertyName,
                 unionTypes.Where(x => TypeUtils
                     .GetBaseTypes(x.Type)
                     .Contains(extraBase, SymbolEqualityComparer.Default)
-                ).ToList()
+                ).ToList(),
+                logger
             );
 
             if (extraConverter is null)
+            {
+                logger.Warn($"{root}: Failed to create a converter for {extraBase}");
                 continue;
+            }
 
             if (!jsonContext.AdditionalConverters.Add($"Discord.Converters.{extraConverter.Identifier.ValueText}"))
                 continue;
@@ -325,9 +332,25 @@ public sealed class DiscriminatedUnion
 
     private static ClassDeclarationSyntax? CreateRootConverter(
         ITypeSymbol symbol,
-        IPropertySymbol property,
-        List<UnionType> unionTypes)
+        string propertyName,
+        List<UnionType> unionTypes,
+        Logger logger
+    )
     {
+        var property = unionTypes
+            .SelectMany(x => x
+                .Type
+                .GetMembers()
+                .OfType<IPropertySymbol>()
+            )
+            .FirstOrDefault(x => x.Name == propertyName);
+
+        if (property is null)
+        {
+            logger.Warn($"{symbol}: Failed to find a union property with the name '{propertyName}'");
+            return null;
+        }
+
         var typeName = symbol.ToDisplayString();
 
         var syntax = SyntaxFactory.ClassDeclaration(
@@ -353,25 +376,37 @@ public sealed class DiscriminatedUnion
         if (!JsonModels.AddGetTypeInfoToConverter(ref syntax, symbol))
             return null;
 
-        var table = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              private static readonly Dictionary<{{property.Type.ToDisplayString()}}, Type> _lookupTable = new()
-              {
-                  {{
-                      string.Join(
-                          ",\n",
-                          unionTypes
-                              .Where(x => x.Value is not null)
-                              .Select(x =>
-                                  $"{{ {SyntaxUtils.CreateLiteral(property.Type, x.Value)}, typeof({x.Type.ToDisplayString()}) }}"
-                              )
-                      )
-                  }}
-              };
-              """
-        );
-
+        var notNullCases = unionTypes.Where(x => x.Value is not null).ToArray();
         var nullCase = unionTypes.FirstOrDefault(x => x.Value is null);
+        var notPresentCase = unionTypes.FirstOrDefault(x => x.WhenSpecified == false);
+        var presentNoMatchCase = unionTypes.FirstOrDefault(x => x.WhenSpecified == true);
+
+        if (notNullCases.Length == 0 && nullCase is null && presentNoMatchCase is null && notPresentCase is null)
+        {
+            logger.Warn($"{symbol}: Invalid union configuration");
+            return null;
+        }
+
+        var table =
+            notNullCases.Length > 0
+                ? SyntaxFactory.ParseMemberDeclaration(
+                    $$"""
+                      private static readonly Dictionary<{{property.Type.ToDisplayString()}}, Type> _lookupTable = new()
+                      {
+                          {{
+                              string.Join(
+                                  ",\n",
+                                  unionTypes
+                                      .Where(x => x.Value is not null)
+                                      .Select(x =>
+                                          $"{{ {SyntaxUtils.CreateLiteral(property.Type, x.Value)}, typeof({x.Type.ToDisplayString()}) }}"
+                                      )
+                              )
+                          }}
+                      };
+                      """
+                )
+                : null;
 
         var read = SyntaxFactory.ParseMemberDeclaration(
             $$""""
@@ -379,31 +414,44 @@ public sealed class DiscriminatedUnion
               {
                   using var jsonDoc = JsonDocument.ParseValue(ref reader);
                   var root = jsonDoc.RootElement;
-
-                  if(!root.TryGetProperty("{{GetJsonPropertyName(property)}}", out var delimiterElement))
-                      return null;
-
-                  var delimiter = delimiterElement.Deserialize<{{property.Type.ToDisplayString()}}>(options);
-
+              
+                  if(!root.TryGetProperty("{{JsonModels.GetJsonPropertyName(property)}}", out var delimiterElement))
+                      return {{(
+                          notPresentCase is not null
+                              ? $"root.Deserialize<{notPresentCase.Type.ToDisplayString()}>(options)"
+                              : "null"
+                      )}};
+              
                   {{(
-                      property.Type.IsReferenceType || property.Type.NullableAnnotation is NullableAnnotation.Annotated
+                      table is not null
                           ? $$"""
-                              if(delimiter is null)
-                              {
-                                  return {{(
-                                      nullCase is not null
-                                          ? $"root.Deserialize<{nullCase.Type.ToDisplayString()}>()"
-                                          : "null"
-                                  )}};
-                              }
+                              var delimiter = delimiterElement.Deserialize<{{property.Type.ToDisplayString()}}>(options);
+
+                              {{(
+                                  property.Type.IsReferenceType || property.Type.NullableAnnotation is NullableAnnotation.Annotated
+                                      ? $$"""
+                                          if(delimiter is null)
+                                          {
+                                              return {{(
+                                                  nullCase is not null
+                                                      ? $"root.Deserialize<{nullCase.Type.ToDisplayString()}>(options)"
+                                                      : "null"
+                                              )}};
+                                          }
+                                          """
+                                      : string.Empty
+                              )}}
+                              
+                              if (!_lookupTable.TryGetValue(delimiter, out var unionType))
+                              return {{(
+                                  presentNoMatchCase is not null
+                                      ? $"root.Deserialize<{presentNoMatchCase.Type.ToDisplayString()}>(options)"
+                                      : "root.Deserialize(GetTypeInfoWithoutConverter(options))"
+                              )}};
+                              return root.Deserialize(unionType, options) as {{typeName}};
                               """
-                          : string.Empty
+                          : $"return root.Deserialize<{(presentNoMatchCase ?? notPresentCase!).Type.ToDisplayString()}>(options);"
                   )}}
-
-                  if (!_lookupTable.TryGetValue(delimiter, out var unionType))
-                      return root.Deserialize(GetTypeInfoWithoutConverter(options));
-
-                  return root.Deserialize(unionType, options) as {{typeName}};
               }
               """"
         );
@@ -415,29 +463,20 @@ public sealed class DiscriminatedUnion
               """
         );
 
-        if (table is null || read is null || write is null)
+        if (read is null || write is null)
             return null;
 
-        return syntax.AddMembers(table, read, write);
+        if (table is not null)
+            syntax = syntax.AddMembers(table);
+
+        return syntax.AddMembers(read, write);
     }
 
-    private static string GetJsonPropertyName(IPropertySymbol property)
-    {
-        var nameAttribute = property.GetAttributes()
-            .FirstOrDefault(x =>
-                x.AttributeClass?.ToDisplayString() == "System.Text.Json.Serialization.JsonPropertyNameAttribute"
-            );
-
-        if (nameAttribute is null)
-            return property.Name;
-
-        return (nameAttribute.ConstructorArguments[0].Value as string)!;
-    }
-
-    private sealed class UnionType(ITypeSymbol type, object? value)
+    private sealed class UnionType(ITypeSymbol type, object? value, bool? whenSpecified)
     {
         public ITypeSymbol Type { get; } = type;
         public object? Value { get; } = value;
+        public bool? WhenSpecified { get; } = whenSpecified;
     }
 
     private static List<UnionType> GetUnionTypes(
@@ -460,7 +499,13 @@ public sealed class DiscriminatedUnion
                          .Where(x => x.AttributeClass?.ToDisplayString() == UnionTypeAttribute))
             {
                 if (attribute.ConstructorArguments[0].Value is string typeProperty && typeProperty == property)
-                    result.Add(new(candidate.TypeSymbol, attribute.ConstructorArguments[1].Value));
+                    result.Add(
+                        new(
+                            candidate.TypeSymbol,
+                            attribute.ConstructorArguments[1].Value,
+                            (bool?) attribute.NamedArguments.FirstOrDefault(x => x.Key == "WhenSpecified").Value.Value
+                        )
+                    );
             }
         }
 

@@ -7,7 +7,7 @@ public interface IMessageReactionAddedPayload : IGatewayPayloadData
     ulong MessageId { get; }
     ulong? GuildId { get; }
     IMemberModel? Member { get; }
-    IEmoteModel Emoji { get; }
+    IPartialEmoteModel Emoji { get; }
     ulong? MessageAuthorId { get; }
     bool IsBurst { get; }
     string[]? BurstColors { get; }

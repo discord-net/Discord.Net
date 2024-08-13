@@ -14,7 +14,7 @@ public sealed class ReactionRemoved : IMessageReactionRemovedPayloadData
     public Optional<ulong> GuildId { get; set; }
 
     [JsonPropertyName("emoji")]
-    public required IEmoteModel Emoji { get; set; }
+    public required PartialEmote Emoji { get; set; }
 
     [JsonPropertyName("burst")]
     public bool IsBurst { get; set; }
@@ -22,5 +22,6 @@ public sealed class ReactionRemoved : IMessageReactionRemovedPayloadData
     [JsonPropertyName("type")]
     public int Type { get; set; }
 
+    IPartialEmoteModel IMessageReactionRemovedPayloadData.Emoji => Emoji;
     ulong? IMessageReactionRemovedPayloadData.GuildId => GuildId.ToNullable();
 }

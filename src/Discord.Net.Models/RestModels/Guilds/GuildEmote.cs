@@ -2,13 +2,12 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildEmote : IGuildEmoteModel, IModelSource, IModelSourceOf<IUserModel?>
+[HasPartialVariant]
+[DiscriminatedUnionType(nameof(Id), WhenSpecified = true)]
+public sealed class GuildEmote : Emote, IGuildEmoteModel, IModelSource, IModelSourceOf<IUserModel?>
 {
-    [JsonPropertyName("id")]
+    [JsonPropertyName("id"), PartialIgnore]
     public required ulong Id { get; set; }
-
-    [JsonPropertyName("name")]
-    public string? Name { get; set; }
 
     [JsonPropertyName("roles")]
     public Optional<ulong[]> RoleIds { get; set; }

@@ -27,7 +27,6 @@ public static class ExtendedModel
 
         if (extendedMembers.Length == 0)
         {
-            logger.Log($"{symbol}: No extended json members");
             return;
         }
 

@@ -8,7 +8,7 @@ public sealed partial class MentionedUser : IMentionedUser
     public required User User { get; set; }
 
     [JsonPropertyName("member")]
-    public required GuildMember Member { get; set; }
+    public required PartialGuildMember Member { get; set; }
 
-    IMemberModel IMentionedUser.Member => Member;
+    IPartialMemberModel IMentionedUser.Member => Member;
 }

@@ -38,7 +38,7 @@ public abstract class GuildChannelBase : Channel, IGuildChannelModel, IModelSour
     public Optional<int> VideoQualityMode { get; set; }
 
     [JsonPropertyName("permissions")]
-    public Optional<ulong> Permissions { get; set; }
+    public Optional<string> Permissions { get; set; }
 
     [JsonPropertyName("topic")]
     public Optional<string?> Topic { get; set; }

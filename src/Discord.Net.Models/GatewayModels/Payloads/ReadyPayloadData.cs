@@ -23,7 +23,11 @@ public sealed class ReadyPayloadData : IReadyPayloadData
 
     [JsonPropertyName("shard")]
     public int[]? Shard { get; set; }
-
+    
+    [JsonPropertyName("application")]
+    public required PartialApplication Application { get; set; }
+    
+    IPartialApplicationModel IReadyPayloadData.Application => Application;
     ISelfUserModel IReadyPayloadData.User => User;
     IEnumerable<IUnavailableGuild> IReadyPayloadData.Guilds => Guilds;
 }
