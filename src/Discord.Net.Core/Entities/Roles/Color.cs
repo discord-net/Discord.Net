@@ -201,7 +201,7 @@ namespace Discord
             => color.RawValue;
 
         /// <summary>
-        /// Converts the string representation of a color to a Color object.
+        ///     Converts the string representation of a color to a Color object.
         /// </summary>
         /// <param name="rawValue">String to be parsed to a color</param>
         /// <param name="colorType">Color format of the string</param>
@@ -216,7 +216,7 @@ namespace Discord
         }
 
         /// <summary>
-        /// Converts the string representation of a color to a Color object. The return value indicates whether the conversion succeeded.
+        ///     Converts the string representation of a color to a Color object. The return value indicates whether the conversion succeeded.
         /// </summary>
         /// <param name="rawValue">String to be parsed to a color</param>
         /// <param name="color">When this method returns true, contains a Color that represents the parsed string.</param>
