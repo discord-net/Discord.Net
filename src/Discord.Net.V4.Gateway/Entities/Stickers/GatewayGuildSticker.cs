@@ -14,6 +14,7 @@ public sealed partial class GatewayGuildStickerActor :
 
     [SourceOfTruth, StoreRoot] public GatewayGuildActor Guild { get; }
 
+    [TypeFactory]
     public GatewayGuildStickerActor(
         DiscordGatewayClient client,
         GuildIdentity guild,

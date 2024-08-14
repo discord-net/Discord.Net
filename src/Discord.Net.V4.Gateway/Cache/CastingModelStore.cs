@@ -18,6 +18,9 @@ internal sealed class CastUpModelStore<TId, TRootModel, TExpectedModel>(
     public ValueTask<TExpectedModel?> GetAsync(TId id, CancellationToken token = default)
         => store.GetAsync(id, token).CastUpAsync(Template.T<TExpectedModel>());
 
+    public IAsyncEnumerable<TExpectedModel> GetManyAsync(IEnumerable<TId> ids, CancellationToken token = default)
+        => store.GetManyAsync(ids, token).Cast<TExpectedModel>();
+
     public IAsyncEnumerable<TExpectedModel> GetAllAsync(CancellationToken token = default)
         => store.GetAllAsync(token).Cast<TExpectedModel>();
 
@@ -67,6 +70,9 @@ internal sealed class CastDownModelStore<TId, TRootModel, TExpectedModel>(
 
     public ValueTask<TExpectedModel?> GetAsync(TId id, CancellationToken token = default)
         => store.GetAsync(id, token).CastDownAsync(Template.T<TExpectedModel>());
+
+    public IAsyncEnumerable<TExpectedModel> GetManyAsync(IEnumerable<TId> ids, CancellationToken token = default)
+        => store.GetManyAsync(ids, token).Cast<TExpectedModel>();
 
     public IAsyncEnumerable<TExpectedModel> GetAllAsync(CancellationToken token = default)
         => store.GetAllAsync(token).Cast<TExpectedModel>();

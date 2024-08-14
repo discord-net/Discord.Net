@@ -303,6 +303,8 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
 
                           set.Add(instance);
                       }
+                      
+                      return map;
                   }
                   """
             )!
@@ -759,14 +761,14 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
             delegateMethod.ContainingType.ToDisplayString(),
             delegateMapping,
             delegateHasCancelToken,
-            false
+            true
         );
 
         foreach (var mapping in finalizedMapping)
         {
             var genericsParameters = string.Join(", ", mapping.Select(x => x.ParameterType.ToDisplayString()));
 
-            var sigs = new List<(string Delegate, bool HasCancellationToken, bool ShouldAwait)>();
+            var sigs = new List<(string Delegate, bool IsAsync, bool HasCancellationToken)>();
 
             if (delegateMapping == mapping)
             {
@@ -774,12 +776,12 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                     ? "Task"
                     : "ValueTask";
 
-                sigs.Add(($"Func<{genericsParameters}, {counterReturnType}>", false, counterReturnType == "Task"));
+                sigs.Add(($"Func<{genericsParameters}, {counterReturnType}>", true, false));
 
                 if (!delegateHasCancelToken)
                 {
-                    sigs.Add(($"Func<{genericsParameters}, CancellationToken, ValueTask>", true, false));
-                    sigs.Add(($"Func<{genericsParameters}, CancellationToken, Task>", true, false));
+                    sigs.Add(($"Func<{genericsParameters}, CancellationToken, ValueTask>", true, true));
+                    sigs.Add(($"Func<{genericsParameters}, CancellationToken, Task>", true, true));
                 }
 
                 sigs.Add(($"Action<{genericsParameters}>", false, false));
@@ -787,10 +789,10 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
             else
             {
                 sigs.AddRange([
-                    ($"Func<{genericsParameters}, CancellationToken, ValueTask>", true, false),
-                    ($"Func<{genericsParameters}, CancellationToken, Task>", true, true),
-                    ($"Func<{genericsParameters}, ValueTask>", false, false),
-                    ($"Func<{genericsParameters}, Task>", false, true),
+                    ($"Func<{genericsParameters}, CancellationToken, ValueTask>", true, true),
+                    ($"Func<{genericsParameters}, CancellationToken, Task>",true,  true),
+                    ($"Func<{genericsParameters}, ValueTask>", true, false),
+                    ($"Func<{genericsParameters}, Task>", true, false),
                     ($"Action<{genericsParameters}>", false, false)
                 ]);
             }
@@ -803,7 +805,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                     sig.Delegate,
                     mapping,
                     sig.HasCancellationToken,
-                    sig.ShouldAwait
+                    sig.IsAsync
                 );
             }
         }
@@ -815,10 +817,13 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
         string delegateSig,
         ParsedParameter[] mapping,
         bool hasCancelToken,
-        bool shouldAwait)
+        bool isAsync)
     {
-        var shouldBeAsync = shouldAwait || mapping.Any(x => x.Value.Contains("await"));
-
+        var shouldBeAsync = mapping.Any(x => x.Value.Contains("await"));
+        
+        if (!isAsync && shouldBeAsync)
+            return;
+        
         var parameters = string.Join(", ", mapping.Select(x => x.Value));
 
         if (hasCancelToken)
@@ -826,15 +831,11 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
 
         var invokeBody = $"handler({parameters})";
 
-        if (shouldAwait)
+        if (isAsync)
             invokeBody = $"await {invokeBody}";
 
         if (delegateSig.StartsWith("Action"))
-        {
-            invokeBody = shouldBeAsync
-                ? $"{{ {invokeBody}; }}"
-                : $"{{ {invokeBody}; return ValueTask.CompletedTask; }}";
-        }
+            invokeBody = $"{{ {invokeBody}; return ValueTask.CompletedTask; }}";
 
         target = target
             .AddBaseListTypes(
@@ -846,7 +847,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                 SyntaxFactory.ParseMemberDeclaration(
                     $$"""
                       public void Subscribe({{delegateSig}} handler)
-                          => AddSubscriber(handler, {{(shouldBeAsync ? "async " : string.Empty)}}({{package}} package, CancellationToken token) => {{invokeBody}});
+                          => AddSubscriber(handler, {{(isAsync ? "async " : string.Empty)}}({{package}} package, CancellationToken token) => {{invokeBody}});
                       """
                 )!,
                 SyntaxFactory.ParseMemberDeclaration(

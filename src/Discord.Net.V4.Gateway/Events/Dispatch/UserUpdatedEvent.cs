@@ -6,8 +6,7 @@ namespace Discord.Gateway.Dispatch;
 public sealed partial class UserUpdatedEventPackage : IDispatchPackage;
 
 public delegate ValueTask UserUpdatedDelegate(
-    [Supports(EventParameterDegree.All)]
-    GatewayCurrentUser user
+    [Supports(EventParameterDegree.All)] GatewayCurrentUser user
 );
 
 [Subscribable<UserUpdatedDelegate>]
@@ -23,13 +22,16 @@ public sealed partial class UserUpdatedEvent(
         IUserUpdatedPayloadData payload,
         CancellationToken token)
     {
-        var broker = await GatewayCurrentUserActor.GetBrokerAsync(Client, token);
-
+        var broker = await GatewayCurrentUserActor.GetConfiguredBrokerAsync(Client, CachePathable.Empty, token);
         return await broker.CreateAsync(payload, CachePathable.Empty, Client.CurrentUser, token);
     }
 
     public override ValueTask<UserUpdatedEventPackage?> PackageAsync(
         IUserUpdatedPayloadData? payload,
         CancellationToken token = default
-    ) => ValueTask.FromResult(payload is not null ? new UserUpdatedEventPackage(this, payload) : null);
+    ) => ValueTask.FromResult(
+        payload is not null
+            ? new UserUpdatedEventPackage(this, payload)
+            : null
+    );
 }

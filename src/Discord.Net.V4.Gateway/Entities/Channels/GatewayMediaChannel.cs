@@ -5,7 +5,7 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
-using IncomingIntegrationChannelTrait = GatewayIntegrationChannelTrait<
+using IncomingIntegrationChannelTrait = GatewayIncomingIntegrationChannelTrait<
     GatewayMediaChannelActor,
     GatewayMediaChannel,
     MediaChannelIdentity

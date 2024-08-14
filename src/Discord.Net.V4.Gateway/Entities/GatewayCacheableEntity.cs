@@ -27,9 +27,7 @@ public abstract class GatewayCacheableEntity<TSelf, TId, TModel>(
     protected async ValueTask UpdateCacheAsync(TSelf self, TModel model, CancellationToken token)
     {
         var store = await self.GetStoreInfoAsync(token);
-        var broker = await self.GetBrokerAsync(token);
-
-        await broker.UpdateAsync(model, store, token);
+        await self.GetBroker().UpdateAsync(model, store, token);
     }
 
     public abstract TModel GetModel();

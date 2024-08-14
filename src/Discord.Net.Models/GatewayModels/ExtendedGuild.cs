@@ -30,7 +30,7 @@ public sealed partial class ExtendedGuild : GuildCreated, IExtendedGuild
     public required ThreadChannelBase[] Threads { get; set; }
 
     [JsonPropertyName("presences")]
-    public required PartialPresence[] Presences { get; set; }
+    public required Presence[] Presences { get; set; }
 
     [JsonPropertyName("stage_instances")]
     public required StageInstance[] StageInstances { get; set; }
@@ -45,7 +45,7 @@ public sealed partial class ExtendedGuild : GuildCreated, IExtendedGuild
 
     IEnumerable<IThreadChannelModel> IExtendedGuild.Threads => Threads;
 
-    IEnumerable<IPartialPresenceModel> IExtendedGuild.Presences => Presences;
+    IEnumerable<IPresenceModel> IExtendedGuild.Presences => Presences;
     IEnumerable<IStageInstanceModel> IExtendedGuild.StageInstances => StageInstances;
     IEnumerable<IGuildScheduledEventModel> IExtendedGuild.GuildScheduledEvents => GuildScheduledEvents;
 }

@@ -59,7 +59,7 @@ internal sealed class CachePager<TId, TEntity, TModel, TParams> : IAsyncPaged<TE
     public async IAsyncEnumerator<TEntity> GetAsyncEnumerator(CancellationToken token = default)
     {
         _storeInfo ??= await TEntity.GetStoreInfoAsync(_client, _path, token);
-        _broker ??= await TEntity.GetBrokerAsync(_client, token);
+        _broker ??= TEntity.GetBroker(_client);
 
         var enumerator = _lowerBounds.IsSpecified && _direction.HasValue
             ? _broker.QueryAsync(
@@ -69,14 +69,16 @@ internal sealed class CachePager<TId, TEntity, TModel, TParams> : IAsyncPaged<TE
                 _upperBounds,
                 _direction.Value,
                 _total,
-                token)
+                token
+            )
             : _broker.GetAllAsync(
                 _path,
                 _storeInfo,
-                token);
+                token
+            );
 
 
-        await foreach(var handle in enumerator.WithCancellation(token))
+        await foreach (var handle in enumerator.WithCancellation(token))
             yield return handle.ConsumeAsReference();
     }
 }

@@ -8,6 +8,7 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+[ExtendInterfaceDefaults]
 public partial class GatewayGuildChannelActor :
     GatewayChannelActor,
     IGuildChannelActor,
@@ -43,6 +44,7 @@ public partial class GatewayGuildChannelActor :
         => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
+[ExtendInterfaceDefaults]
 public partial class GatewayGuildChannel :
     GatewayChannel,
     IGuildChannel,

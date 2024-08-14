@@ -239,7 +239,7 @@ public static class JsonModels
         );
 
         contextAttributes.UnionWith(extra.Select(x =>
-            $"[System.Text.Json.Serialization.JsonSerializable(typeof({x}))]"
+            $"[System.Text.Json.Serialization.JsonSerializable(typeof({x}))] // extra from GenerateOptions"
         ));
 
         var generated = SourceText.From(
@@ -247,6 +247,8 @@ public static class JsonModels
               using System.Text.Json;
               using System.Text.Json.Serialization;
               using System.Text.Json.Serialization.Metadata;
+              using Discord.Models;
+              using Discord.Models.Json;
 
               namespace {{rootNamespace ?? projectName}};
 

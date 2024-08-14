@@ -15,7 +15,7 @@ public partial class GatewayMemberActor :
     [SourceOfTruth]
     public virtual GatewayVoiceStateActor VoiceState { get; }
 
-    [SourceOfTruth] internal new virtual MemberIdentity Identity { get; }
+    internal override MemberIdentity Identity { get; }
 
     [method: TypeFactory(LastParameter = nameof(member))]
     public GatewayMemberActor(

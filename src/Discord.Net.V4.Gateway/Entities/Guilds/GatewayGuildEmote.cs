@@ -12,6 +12,7 @@ public sealed partial class GatewayGuildEmoteActor :
 
     internal override GuildEmoteIdentity Identity { get; }
 
+    [TypeFactory]
     public GatewayGuildEmoteActor(
         DiscordGatewayClient client,
         GuildIdentity guild,
@@ -31,7 +32,7 @@ public sealed partial class GatewayGuildEmote :
     GatewayCacheableEntity<GatewayGuildEmote, ulong, IGuildEmoteModel>,
     IGuildEmote
 {
-    public string? Name => Model.Name;
+    public string Name => Model.Name;
 
     public bool IsManaged => Model.IsManaged;
 

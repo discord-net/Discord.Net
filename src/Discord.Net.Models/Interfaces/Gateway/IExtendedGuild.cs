@@ -11,7 +11,7 @@ public interface IExtendedGuild : IGuildCreatePayloadData, IGuildModel
     IEnumerable<IMemberModel> Members { get; }
     IEnumerable<IGuildChannelModel> Channels { get; }
     IEnumerable<IThreadChannelModel> Threads { get; }
-    IEnumerable<IPartialPresenceModel> Presences { get; }
+    IEnumerable<IPresenceModel> Presences { get; }
     IEnumerable<IStageInstanceModel> StageInstances { get; }
     IEnumerable<IGuildScheduledEventModel> GuildScheduledEvents { get; }
 }

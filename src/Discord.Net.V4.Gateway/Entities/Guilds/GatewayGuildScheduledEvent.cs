@@ -16,6 +16,7 @@ public sealed partial class GatewayGuildScheduledEventActor :
 
     internal override GuildScheduledEventIdentity Identity { get; }
 
+    [TypeFactory]
     public GatewayGuildScheduledEventActor(
         DiscordGatewayClient client,
         GuildIdentity guild,

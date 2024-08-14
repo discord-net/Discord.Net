@@ -13,6 +13,7 @@ public sealed partial class GatewayIntegrationActor :
 
     internal override IntegrationIdentity Identity { get; }
 
+    [TypeFactory]
     public GatewayIntegrationActor(
         DiscordGatewayClient client,
         GuildIdentity guild,

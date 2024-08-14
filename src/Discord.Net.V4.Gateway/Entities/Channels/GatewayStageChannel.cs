@@ -45,6 +45,7 @@ public sealed partial class GatewayStageChannelActor :
         => Client.StateController.CreateLatent(StageInstance, model, CachePath);
 }
 
+[ExtendInterfaceDefaults]
 public sealed partial class GatewayStageChannel :
     GatewayVoiceChannel,
     IStageChannel,
@@ -78,7 +79,7 @@ public sealed partial class GatewayStageChannel :
         context.TryGetActor<GatewayStageChannelActor>()
     );
 
-    [SourceOfTruth]
+    [CovariantOverride]
     public ValueTask UpdateAsync(
         IGuildStageChannelModel model,
         bool updateCache = true,

@@ -38,7 +38,7 @@ public sealed partial class RestGuildEmote :
 
     [SourceOfTruth] public RestUserActor? Creator { get; private set; }
 
-    public string? Name => Model.Name;
+    public string Name => Model.Name;
 
     public bool IsManaged => Model.IsManaged;
 

@@ -2,11 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-[HasPartialVariant]
 public sealed class Presence : IPresenceModel
 {
     [JsonPropertyName("user")]
-    public required User User { get; set; }
+    public required PartialUser User { get; set; }
 
     [JsonPropertyName("guild_id")]
     public Optional<ulong> GuildId { get; set; }

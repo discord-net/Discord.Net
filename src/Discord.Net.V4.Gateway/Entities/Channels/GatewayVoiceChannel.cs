@@ -45,6 +45,7 @@ public partial class GatewayVoiceChannelActor :
         => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
+[ExtendInterfaceDefaults]
 public partial class GatewayVoiceChannel :
     GatewayGuildChannel,
     IVoiceChannel,

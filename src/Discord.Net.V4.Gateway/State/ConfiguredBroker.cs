@@ -13,7 +13,7 @@ internal readonly struct ConfiguredBroker<TId, TEntity, TActor, TModel>(
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
     IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
-    where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
+    where TActor : class, IGatewayCachedActor<TId, TEntity, TModel>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
@@ -52,9 +52,17 @@ internal readonly struct ConfiguredBroker<TId, TEntity, TActor, TModel>(
 
     public ValueTask UpdateAsync(TModel model, CancellationToken token)
         => broker.UpdateAsync(model, storeInfo, token);
+    
+    public ValueTask UpdateAsync(IPartial<TModel> model, CancellationToken token)
+        => broker.UpdateAsync(model, storeInfo, token);
 
     public ValueTask BatchUpdateAsync(
         IEnumerable<TModel> models,
+        CancellationToken token
+    ) => broker.BatchUpdateAsync(models, storeInfo, token);
+    
+    public ValueTask BatchUpdateAsync(
+        IEnumerable<IPartial<TModel>> models,
         CancellationToken token
     ) => broker.BatchUpdateAsync(models, storeInfo, token);
 

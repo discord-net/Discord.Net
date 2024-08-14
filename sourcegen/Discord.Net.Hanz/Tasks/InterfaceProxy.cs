@@ -647,7 +647,9 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
             logger
         );
 
-        var willHaveFetchMethods = RestLoadable.WillHaveFetchMethods(targetType);
+        var willHaveFetchMethods = 
+            RestLoadable.WillHaveFetchMethods(targetType) ||
+            GatewayLoadable.WillHaveFetchMethods(targetType);
 
         var implementedMembers = TypeUtils.GetBaseTypesAndThis(proxiedProperty.Type)
             .SelectMany(x => x.GetMembers())

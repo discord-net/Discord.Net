@@ -387,7 +387,9 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             .Reverse()
             .ToArray();
 
-        CorrectTargetList(ref children, hasStoreRoot, storeRootMap);
+        var childrenTargets = children as GenerationTarget[] ?? children.ToArray();
+        IEnumerable<GenerationTarget> storesCompliantChildren = childrenTargets.ToList();
+        CorrectTargetList(ref storesCompliantChildren, hasStoreRoot, storeRootMap);
 
         var stringBuilder = new StringBuilder();
 
@@ -457,7 +459,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
               internal static async ValueTask<IStoreInfo<{{target.IdType}}, {{target.ModelType}}>> GetStoreInfoAsync(DiscordGatewayClient client, IPathable path, CancellationToken token = default)
               {
                   {{stringBuilder}}
-
+              
                   return {{
                       ToStoreInfo(
                           hasStoreRoot
@@ -486,19 +488,20 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
         stringBuilder.Clear();
 
-        var childrenTargets = children as GenerationTarget[] ?? children.ToArray();
+        var storesCompliantChildrenTargets =
+            storesCompliantChildren as GenerationTarget[]
+            ?? storesCompliantChildren.ToArray();
 
         var storeDelegateType = $"StoreProviderInfo<{target.IdType}, {target.ModelType}>";
         var storeHierarchyType = $"IReadOnlyDictionary<Type, {storeDelegateType}>";
 
-
-        foreach (var entry in childrenTargets)
+        foreach (var entry in storesCompliantChildrenTargets)
         {
             stringBuilder.AppendLine($"#region {entry.ClassSymbol}");
 
             var bases = TypeUtils.GetBaseTypesAndThis(entry.ClassSymbol);
 
-            var entryTargets = childrenTargets
+            var entryTargets = storesCompliantChildrenTargets
                 .Where(x =>
                     bases.Contains(x.ClassSymbol, SymbolEqualityComparer.Default)
                 )
@@ -565,11 +568,17 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             $$"""
               internal static {{storeHierarchyType}} GetStoreHierarchy(DiscordGatewayClient client{{rootStoreParam}})
               {
-                  var map = new Dictionary<Type, {{storeDelegateType}}>();
+                  {{(
+                      stringBuilder.Length == 0
+                          ? $"return System.Collections.Immutable.ImmutableDictionary<Type, {storeDelegateType}>.Empty;"
+                          : $$"""
+                              var map = new Dictionary<Type, {{storeDelegateType}}>();
 
-                  {{stringBuilder}}
+                              {{stringBuilder}}
 
-                  return map;
+                              return map;
+                              """
+                  )}}
               }
               """
         )!;
@@ -577,32 +586,31 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         if (parentsWithSameRoot.Length > 0)
             getStoreHierarchyMethod = getStoreHierarchyMethod.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
 
-        var brokerDelegateType =
-            $"BrokerProviderDelegate<{target.IdType}, {target.GatewayEntitySymbol}, {target.ModelType}>";
-
         var brokerHierarchyType =
-            $"IReadOnlyCollection<{brokerDelegateType}>";
+            $"IReadOnlyDictionary<Type, IManageableEntityBroker<{target.IdType}, {target.GatewayEntitySymbol}, {target.ModelType}>>";
 
         var getBrokerHierarchyMethod = SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              internal static {{brokerHierarchyType}} GetBrokerHierarchy()
+              internal static {{brokerHierarchyType}} GetBrokerHierarchy(DiscordGatewayClient client)
               {
-                  if (_brokerHierarchy is not null)
-                      return _brokerHierarchy;
-
-                  return _brokerHierarchy = new List<{{brokerDelegateType}}>()
-                  {
-                      {{
-                          string.Join(
-                              ",\n",
-                              childrenTargets
-                                  .Prepend(target)
-                                  .Select(element =>
-                                      $"async (client, token) => (await client.StateController.GetBrokerAsync<{element.IdType}, {element.GatewayEntitySymbol}, {element.ClassSymbol}, {element.ModelType}>(token) as IManageableEntityBroker<{target.IdType}, {target.GatewayEntitySymbol}, {target.ModelType}>)!"
-                                  )
-                          )
-                      }}
-                  }.ToImmutableList();
+                  {{(
+                      childrenTargets.Length == 0
+                          ? $"return System.Collections.Immutable.ImmutableDictionary<Type, IManageableEntityBroker<{target.IdType}, {target.GatewayEntitySymbol}, {target.ModelType}>>.Empty;"
+                          : $$"""
+                              return new Dictionary<Type, IManageableEntityBroker<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ModelType}}>>()
+                              {
+                                  {{
+                                      string.Join(
+                                          ",\n",
+                                          childrenTargets
+                                              .Select(element =>
+                                                  $"{{ typeof({element.ModelType}), (IManageableEntityBroker<{target.IdType}, {target.GatewayEntitySymbol}, {target.ModelType}>){element.ClassSymbol}.GetBroker(client) }}"
+                                              )
+                                      )
+                                  }}  
+                              }.AsReadOnly();
+                              """
+                  )}}
               }
               """
         )!;
@@ -659,7 +667,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                       {
                           return new(
                               await GetStoreInfoAsync(client, path, token),
-                              await GetBrokerAsync(client, token)
+                              GetBroker(client)
                           );
                       }
                       """
@@ -680,12 +688,9 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                 SyntaxFactory.ParseMemberDeclaration(
                     $"ValueTask<IStoreInfo<{target.IdType}, {target.ModelType}>> IStoreInfoProvider<{target.IdType}, {target.ModelType}>.GetStoreInfoAsync(CancellationToken token) => GetStoreInfoAsync(token);"
                 )!,
-                SyntaxFactory.ParseMemberDeclaration(
-                    $"private static {brokerHierarchyType}? _brokerHierarchy;"
-                )!,
                 getBrokerHierarchyMethod,
                 SyntaxFactory.ParseMemberDeclaration(
-                    $"static {brokerHierarchyType} IBrokerProvider<{target.IdType}, {target.GatewayEntitySymbol}, {target.ModelType}>.GetBrokerHierarchy() => GetBrokerHierarchy();"
+                    $"static {brokerHierarchyType} IBrokerProvider<{target.IdType}, {target.GatewayEntitySymbol}, {target.ModelType}>.GetBrokerHierarchy(DiscordGatewayClient client) => GetBrokerHierarchy(client);"
                 )!
             );
     }
@@ -824,40 +829,6 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
         var stringBuilder = new StringBuilder();
 
-        foreach (var element in hierarchy)
-        {
-            stringBuilder
-                .AppendLine($"if (modelType == typeof({element.ModelType}))")
-                .AppendLine(
-                    $"return (await client.StateController.GetBrokerAsync<{target.IdType}, {element.GatewayEntitySymbol}, {element.ClassSymbol}, {element.ModelType}>(token) as IManageableEntityBroker<{target.IdType}, {target.GatewayEntitySymbol}, {target.ModelType}>)!;");
-        }
-
-        stringBuilder
-            .AppendLine(
-                $"return (await client.StateController.GetBrokerAsync<{target.IdType}, {target.GatewayEntitySymbol}, {target.ClassSymbol}, {target.ModelType}>(token) as IManageableEntityBroker<{target.IdType}, {target.GatewayEntitySymbol}, {target.ModelType}>)!;"
-            );
-
-
-        var getBrokerFromModel = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              internal static async ValueTask<IManageableEntityBroker<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ModelType}}>> GetBrokerForModelAsync(DiscordGatewayClient client, Type modelType, CancellationToken token)
-              {
-                  {{stringBuilder}}
-              }
-              """
-        );
-
-        if (getBrokerFromModel is null)
-        {
-            logger.Warn($"{target.ClassSymbol}: Failed to create GetBrokerFromModel method");
-            return false;
-        }
-
-        if (parentTargets.Any())
-            getBrokerFromModel = getBrokerFromModel.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
-
-        stringBuilder.Clear();
-
         stringBuilder
             .AppendLine("switch(model)")
             .AppendLine("{");
@@ -884,10 +855,10 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
               private async ValueTask<IEntityModelStore<{{target.IdType}}, {{target.ModelType}}>?> GetStoreForModelAsync(Type type, CancellationToken token = default)
               {
                   var map = _storeHierarchyMap ??= {{target.ClassSymbol}}.{{fetchMap}};
-
+              
                   if(map.TryGetValue(type, out var storeInfo))
                       return await storeInfo.StoreDelegate(Client, token);
-
+              
                   return null;
               }
               """
@@ -905,10 +876,10 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                   where TSubModel : class, {{target.ModelType}}, IEntityModel<{{target.IdType}}>
               {
                   var map = _storeHierarchyMap ??= {{target.ClassSymbol}}.{{fetchMap}};
-
+              
                   if(map.TryGetValue(typeof(TSubModel), out var storeInfo))
                       return (await storeInfo.StoreDelegate(Client, token)).CastDown(Template.Of<TSubModel>());
-
+              
                   return null;
               }
               """
@@ -940,34 +911,24 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             return false;
         }
 
-        var interfaceGetBrokerFromModelOverload = SyntaxFactory.ParseMemberDeclaration(
-            $"static ValueTask<IManageableEntityBroker<{target.IdType}, {target.GatewayEntitySymbol}, {target.ModelType}>> IBrokerProvider<{target.IdType}, {target.GatewayEntitySymbol}, {target.ModelType}>.GetBrokerForModelAsync(DiscordGatewayClient client, Type modelType, CancellationToken token) => GetBrokerForModelAsync(client, modelType, token);"
-        );
-
-        if (interfaceGetBrokerFromModelOverload is null)
-        {
-            logger.Warn($"{target.ClassSymbol}: failed to create broker from model overload");
-            return false;
-        }
-
         var getBrokerStatic = SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              internal static ValueTask<IEntityBroker<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ClassSymbol}}, {{target.ModelType}}>> GetBrokerAsync(DiscordGatewayClient client, CancellationToken token = default)
-                  => client.StateController.GetBrokerAsync<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ClassSymbol}}, {{target.ModelType}}>(token);
+              internal static IEntityBroker<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ClassSymbol}}, {{target.ModelType}}> GetBroker(DiscordGatewayClient client)
+                  => client.StateController.GetBroker<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ClassSymbol}}, {{target.ModelType}}>();
               """
         )!;
 
         var interfaceGetPartialBrokerStatic = SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              static async ValueTask<IEntityBroker<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ModelType}}>> IBrokerProvider<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ModelType}}>.GetBrokerAsync(DiscordGatewayClient client, CancellationToken token)
-                  => await GetBrokerAsync(client, token);
+              static IEntityBroker<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ModelType}}> IBrokerProvider<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ModelType}}>.GetBroker(DiscordGatewayClient client)
+                  => GetBroker(client);
               """
         )!;
 
         var interfaceGetBrokerStatic = SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              static ValueTask<IEntityBroker<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ClassSymbol}}, {{target.ModelType}}>> IBrokerProvider<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ClassSymbol}}, {{target.ModelType}}>.GetBrokerAsync(DiscordGatewayClient client, CancellationToken token)
-                  => GetBrokerAsync(client, token);
+              static IEntityBroker<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ClassSymbol}}, {{target.ModelType}}> IBrokerProvider<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ClassSymbol}}, {{target.ModelType}}>.GetBroker(DiscordGatewayClient client)
+                  => GetBroker(client);
               """
         )!;
 
@@ -976,18 +937,15 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             getBrokerStatic = getBrokerStatic.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
         }
 
-
         syntax = syntax.AddMembers(
             SyntaxFactory.ParseMemberDeclaration(
                 $"private IReadOnlyDictionary<Type, StoreProviderInfo<{target.IdType}, {target.ModelType}>>? _storeHierarchyMap;"
             )!,
             getStoreForModel,
             dangerousGetStoreForModel,
-            getBrokerFromModel,
             getBrokerStatic,
             interfaceGetPartialBrokerStatic,
             interfaceGetBrokerStatic,
-            interfaceGetBrokerFromModelOverload,
             interfaceDangerousStoreForModelOverload,
             interfaceStoreForModelOverload
         );
@@ -1004,6 +962,9 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
         foreach (var method in GetLoadableMethods(target.ClassSymbol, target.GatewayEntitySymbol, target.SemanticModel))
         {
+            if(method.ReturnType is not INamedTypeSymbol {Name: "Task" or "ValueTask"} returnType)
+                continue;
+            
             var methodPureName = MemberUtils.GetMemberName(method);
 
             if (!addedOverloads.Add($"{method.ContainingType.ToDisplayString()}#{methodPureName}"))
@@ -1023,8 +984,8 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
             var methodSyntax = SyntaxFactory.ParseMemberDeclaration(
                 $$"""
-                  async {{method.ReturnType.ToDisplayString()}} {{method.ContainingType}}.{{methodPureName}}{{parameterList}}
-                      => await {{methodPureName}}({{invocationArguments}});
+                  async {{returnType.ToDisplayString()}} {{method.ContainingType}}.{{methodPureName}}{{parameterList}}
+                      => await this.{{methodPureName}}({{invocationArguments}}) as {{returnType.TypeArguments[0].WithNullableAnnotation(NullableAnnotation.NotAnnotated)}};
                   """
             );
 
@@ -1135,7 +1096,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         var actorType = target.ClassSymbol.ToDisplayString();
 
         var interfaceBrokerOverload = SyntaxFactory.ParseMemberDeclaration(
-            $"async ValueTask<IEntityBroker<{idType}, {entityType}, {actorType}, {modelType}>> IBrokerProvider<{idType}, {entityType}, {actorType}, {modelType}>.GetBrokerAsync(CancellationToken token) => await GetOrCreateBrokerAsync(token);"
+            $"IEntityBroker<{idType}, {entityType}, {actorType}, {modelType}> IBrokerProvider<{idType}, {entityType}, {actorType}, {modelType}>.GetBroker() => GetBroker(Client);"
         );
 
         if (interfaceBrokerOverload is null)
@@ -1161,16 +1122,6 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         if (store is null)
         {
             logger.Warn($"{target.ClassSymbol}: failed to create store field");
-            return false;
-        }
-
-        var broker = SyntaxFactory.ParseMemberDeclaration(
-            $"private Discord.Gateway.State.IEntityBroker<{idType}, {entityType}, {actorType}, {modelType}>? _broker;"
-        );
-
-        if (broker is null)
-        {
-            logger.Warn($"{target.ClassSymbol}: failed to create broker field");
             return false;
         }
 
@@ -1219,7 +1170,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                   {
                       if (_store is not null)
                           return _store;
-
+              
                       {{storeBuilder}}
                   }
                   finally
@@ -1236,34 +1187,6 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             return false;
         }
 
-        var getOrCreateBroker = SyntaxFactory.ParseMemberDeclaration(
-            $$"""
-              private async ValueTask<Discord.Gateway.State.IEntityBroker<{{idType}}, {{entityType}}, {{actorType}}, {{modelType}}>> GetOrCreateBrokerAsync(
-                  CancellationToken token)
-              {
-                  if (_broker is not null)
-                      return _broker;
-                  await StateSemaphore.WaitAsync(token);
-                  try
-                  {
-                      if (_broker is not null)
-                          return _broker;
-                      return _broker = await Client.StateController.GetBrokerAsync<{{idType}}, {{entityType}}, {{actorType}}, {{modelType}}>(token);
-                  }
-                  finally
-                  {
-                      StateSemaphore.Release();
-                  }
-              }
-              """
-        );
-
-        if (getOrCreateBroker is null)
-        {
-            logger.Warn($"{target.ClassSymbol}: failed to create GetOrCreateBroker method");
-            return false;
-        }
-
         syntax = syntax
             .AddBaseListTypes(
                 SyntaxFactory.SimpleBaseType(
@@ -1277,9 +1200,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                 interfaceBrokerOverload,
                 interfaceStoreOverload,
                 store,
-                broker,
-                getOrCreateStore,
-                getOrCreateBroker
+                getOrCreateStore
             );
 
         return true;
@@ -1287,11 +1208,15 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
     private static bool TryCreateRestEntityConstruction(
         INamedTypeSymbol restEntity,
+        ITypeSymbol model,
         Logger logger,
         out string entityConstruction)
     {
         foreach (var methodSymbol in restEntity.GetMembers("Construct").OfType<IMethodSymbol>())
         {
+            if(!methodSymbol.Parameters.Last().Type.Equals(model, SymbolEqualityComparer.Default))
+                continue;
+            
             if (methodSymbol.Parameters.Length == 2)
             {
                 entityConstruction = $"{restEntity}.Construct(Client.Rest, model)";
@@ -1320,8 +1245,8 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                     var context = $"(this as IPathable)!.{pathAccess}<{contextType.TypeArguments[0]}, {coreEntity}>()";
 
                     context = isNullable
-                        ? $"{context} is {{}} context ? {contextType}.Of(context) : null"
-                        : $"{contextType}.Of({context})";
+                        ? $"{context} is {{}} context ? {contextType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)}.Of(context) : null"
+                        : $"{contextType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)}.Of({context})";
 
                     entityConstruction =
                         $"{restEntity}.Construct(Client.Rest, {context}, model)";
@@ -1354,13 +1279,13 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                             pathAccess = isNullable ? "Optionally" : "Require";
 
                             mappedParameters[i] =
-                                $"(this as IPathable)!.{pathAccess}<{identityType.TypeParameters[0]}, {coreEntity}>()";
+                                $"(this as IPathable)!.{pathAccess}<{identityType.TypeArguments[0]}, {coreEntity}>()";
 
                             if (isNullable)
                                 mappedParameters[i] =
-                                    $"{mappedParameters[i]} is {{}} {parameter.Name} ? {identityType}.Of({parameter.Name}) : null";
+                                    $"{mappedParameters[i]} is {{}} {parameter.Name} ? {identityType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)}.Of({parameter.Name}) : null";
                             else
-                                mappedParameters[i] = $"{identityType}.Of({mappedParameters[i]})";
+                                mappedParameters[i] = $"{identityType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)}.Of({mappedParameters[i]})";
                         }
 
                         var isValid = !constructor.Parameters
@@ -1418,14 +1343,31 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
         var internalModifier = target.ClassSymbol.IsSealed && !hasParent && !hasChild ? "private" : "protected";
 
+        var loadableMethods = GetLoadableMethods(target.ClassSymbol, target.GatewayEntitySymbol, target.SemanticModel)
+            .FirstOrDefault(x => x.Name is "FetchAsync");
+
+        var fetchParameterMapping = MemberUtils
+            .CreateParameterList(loadableMethods, requestOptions: "Discord.Gateway.GatewayRequestOptions")
+            .NormalizeWhitespace();
+
+        var nonDefaultParameters =
+            loadableMethods?.Parameters.Length > 2
+                ? $", {string.Join(", ", loadableMethods.Parameters.Take(loadableMethods.Parameters.Length - 2).Select(x => x.Name))}"
+                : string.Empty;
+
+        var fetchArgumentMapping = string.Join(
+            ", ",
+            fetchParameterMapping.Parameters.Select(x => $"{x.Identifier}: {x.Identifier}")
+        );
+        
         var getOrFetch = SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              public async ValueTask<{{coreEntityType}}?> GetOrFetchAsync(GatewayRequestOptions? options = null, CancellationToken token = default)
+              public async ValueTask<{{coreEntityType}}?> GetOrFetchAsync{{fetchParameterMapping}}
               {
-                  var cached = await GetAsync(token);
+                  var cached = await GetInternalAsync(token) as {{target.CoreEntity.WithNullableAnnotation(NullableAnnotation.NotAnnotated)}};
                   if (cached is not null)
                       return cached;
-                  return await FetchAsync(options, token);
+                  return await FetchAsync({{fetchArgumentMapping}});
               }
               """
         );
@@ -1443,18 +1385,18 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             ? $"(await GetOrCreateStoreAsync(token)).ToInfo(Client, await ({storeRootMap.Last().Property.Name} as IStoreProvider<{storeRootMap.Last().IdType}, {storeRootMap.Last().ModelType}>).GetStoreAsync(token), {storeRootMap.Last().Property.Name}.Id, Template.Of<{target.ClassSymbol}>())"
             : $"(await GetOrCreateStoreAsync(token)).ToInfo(Client, Template.Of<{target.ClassSymbol}>())";
 
-        if (!TryCreateRestEntityConstruction(target.RestEntitySymbol, logger, out var restEntityConstruction))
+        if (!TryCreateRestEntityConstruction(target.RestEntitySymbol, target.ModelType, logger, out var restEntityConstruction))
         {
             logger.Warn($"{target.ClassSymbol}: failed to find a way to construct {target.RestEntitySymbol}");
             return false;
         }
-
+        
         var fetchInternalMethod = SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              {{internalModifier}} async Task<{{logicalRestEntityType}}?> FetchInternalAsync(Discord.Gateway.GatewayRequestOptions? options = null, System.Threading.CancellationToken token = default)
+              {{internalModifier}} async Task<{{logicalRestEntityType}}?> FetchInternalAsync{{fetchParameterMapping}}
               {
-                  var model = await Client.RestApiClient.ExecuteAsync(
-                      {{coreActorType}}.FetchRoute(this, Id),
+                  {{target.ModelType.WithNullableAnnotation(NullableAnnotation.Annotated)}} model = await Client.RestApiClient.ExecuteAsync(
+                      {{coreActorType}}.FetchRoute(this, Id{{nonDefaultParameters}}),
                       options ?? Client.DefaultRequestOptions,
                       token
                   );
@@ -1463,7 +1405,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                   if (options?.UpdateCache ?? false)
                   {
                       var store = {{storeAccessor}};
-                      var broker = await GetOrCreateBrokerAsync(token);
+                      var broker = GetBroker(Client);
                       await broker.UpdateAsync(model, store, token);
                   }
                   return {{restEntityConstruction}};
@@ -1484,8 +1426,8 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
         var fetchMethod = SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              public async ValueTask<{{restEntityType}}?> FetchAsync(Discord.Gateway.GatewayRequestOptions? options = null, System.Threading.CancellationToken token = default)
-                  => await FetchInternalAsync(options, token) as {{restEntityType}};
+              public async ValueTask<{{restEntityType}}?> FetchAsync{{fetchParameterMapping}}
+                  => await FetchInternalAsync({{fetchArgumentMapping}}) as {{restEntityType}};
               """
         );
 
@@ -1597,7 +1539,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
               {{internalModifier}} async ValueTask<Discord.Gateway.IEntityHandle<{{idType}}, {{logicalEntityType}}>?> GetHandleInternalAsync(CancellationToken token = default)
               {
                   var store = {{storeAccessor}}
-                  var broker = await GetOrCreateBrokerAsync(token);
+                  var broker = GetBroker(Client);
                   return await broker.GetAsync({{cachePathAccess}}, Identity, store, this, token);
               }
               """
@@ -1635,7 +1577,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
               {{internalModifier}} async ValueTask<{{logicalEntityType}}?> GetInternalAsync(CancellationToken token = default)
               {
                   var store = {{storeAccessor}}
-                  var broker = await GetOrCreateBrokerAsync(token);
+                  var broker = GetBroker(Client);
                   return (await broker.GetAsync({{cachePathAccess}}, Identity, store, this, token)).ConsumeAsReference();
               }
               """

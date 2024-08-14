@@ -18,4 +18,7 @@ public interface IEntityHandle<out TId, out TEntity> :
 public interface IEntityHandle<out TId> :
     IIdentifiable<TId>,
     IDisposable
-    where TId : IEquatable<TId>;
+    where TId : IEquatable<TId>
+{
+    internal IEntityReference<TId> OwningReference { get; }
+}

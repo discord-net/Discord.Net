@@ -116,6 +116,21 @@ public struct PermissionSet(ulong lower, ulong upper) : IEquatable<PermissionSet
         return new PermissionSet(lower, upper);
     }
 
+    public static implicit operator PermissionSet(string str)
+    {
+#if NET7_0_OR_GREATER
+        return Int128.Parse(str);
+#else
+        return BigInteger.Parse(str);
+#endif
+    }
+
     public override string ToString()
-        => ((BigInteger)this).ToString("D");
+    {
+#if NET7_0_OR_GREATER
+        return Unsafe.As<PermissionSet, Int128>(ref this).ToString();
+#else
+        return ((BigInteger)this).ToString("D");
+#endif
+    }
 }

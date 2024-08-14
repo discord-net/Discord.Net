@@ -141,7 +141,7 @@ internal static partial class GatewayActors
     {
         if (options is GatewayRequestOptions {UpdateCache: true})
         {
-            var broker = await GatewayThreadMemberActor.GetBrokerAsync(client, token);
+            var broker = GatewayThreadMemberActor.GetBroker(client);
 
             await Parallel.ForEachAsync(
                 channelThreads.Members.Where(x => x.ThreadId.IsSpecified),

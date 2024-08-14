@@ -26,8 +26,8 @@ internal sealed partial class StateController : IDisposable
     private readonly KeyedSemaphoreSlim<Type> _rootStoreSemaphores = new(1, 1);
 
 
-    private readonly Dictionary<Type, IEntityBroker> _brokers = [];
-    private readonly KeyedSemaphoreSlim<Type> _brokerSemaphores = new(1, 1);
+    private readonly Dictionary<Type, IEntityBroker> _brokers = new();
+    private readonly object _brokersSyncRoot = new();
 
     private readonly Channel<IStateOperation> _operationChannel = Channel.CreateUnbounded<IStateOperation>(
         new UnboundedChannelOptions {SingleReader = true, AllowSynchronousContinuations = false}
@@ -126,28 +126,12 @@ internal sealed partial class StateController : IDisposable
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
     {
-        if (TryGetCachedBroker<TId, TEntity, TModel>(out var broker))
-            return CreateLatentFromBroker(broker, path ?? CachePathable.Empty, model, actor);
-
-        // TODO: sync lock here, I don't like it
-        using var scope = _brokerSemaphores.Get(typeof(TEntity), out var semaphoreSlim);
-
-        semaphoreSlim.Wait(_backgroundTokenSource.Token);
-
-        try
-        {
-            if (TryGetCachedBroker(out broker))
-                return CreateLatentFromBroker(broker, path ?? CachePathable.Empty, model, actor);
-
-            broker = new EntityBroker<TId, TEntity, TActor, TModel>(_client, this);
-            _brokers[typeof(TEntity)] = broker;
-
-            return CreateLatentFromBroker(broker, path ?? CachePathable.Empty, model, actor);
-        }
-        finally
-        {
-            semaphoreSlim.Release();
-        }
+        return CreateLatentFromBroker(
+            GetBroker<TId, TEntity, TActor, TModel>(),
+            path ?? CachePathable.Empty,
+            model,
+            actor
+        );
     }
 
     private TEntity CreateLatentFromBroker<TId, TEntity, TModel, TActor>(
@@ -195,14 +179,7 @@ internal sealed partial class StateController : IDisposable
         return latentEntity;
     }
 
-    public async ValueTask<IEntityBroker<TId, TEntity, TActor, TModel>> GetBrokerAsync<
-        TId,
-        TEntity,
-        TActor,
-        TModel
-    >(
-        CancellationToken token = default
-    )
+    public IEntityBroker<TId, TEntity, TActor, TModel> GetBroker<TId, TEntity, TActor, TModel>()
         where TEntity :
         class,
         ICacheableEntity<TEntity, TId, TModel>,
@@ -213,48 +190,18 @@ internal sealed partial class StateController : IDisposable
         where TId : IEquatable<TId>
         where TModel : class, IEntityModel<TId>
     {
-        if (TryGetCachedBroker<TId, TEntity, TActor, TModel>(out var broker))
-            return broker;
-
-        using var scope = _brokerSemaphores.Get(typeof(TEntity), out var semaphoreSlim);
-
-        await semaphoreSlim.WaitAsync(token);
-
-        try
+        lock (_brokersSyncRoot)
         {
-            if (TryGetCachedBroker(out broker))
+            if (TryGetCachedBroker<TId, TEntity, TActor, TModel>(out var broker))
                 return broker;
 
-            broker = new EntityBroker<TId, TEntity, TActor, TModel>(_client, this);
+            broker = new EntityBroker<TId, TEntity, TActor, TModel>(
+                _client,
+                this
+            );
             _brokers[typeof(TEntity)] = broker;
             return broker;
         }
-        finally
-        {
-            semaphoreSlim.Release();
-        }
-    }
-
-    private bool TryGetCachedBroker<TId, TEntity, TModel>(
-        [MaybeNullWhen(false)] out IEntityBroker<TId, TEntity, TModel> broker)
-        where TEntity :
-        class,
-        ICacheableEntity<TEntity, TId, TModel>,
-        IStoreProvider<TId, TModel>,
-        IBrokerProvider<TId, TEntity, TModel>,
-        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
-        where TId : IEquatable<TId>
-        where TModel : class, IEntityModel<TId>
-    {
-        broker = null;
-
-        if (_brokers.TryGetValue(typeof(TEntity), out var cachedBroker) &&
-            cachedBroker is IEntityBroker<TId, TEntity, TModel> value)
-        {
-            broker = value;
-        }
-
-        return broker is not null;
     }
 
     private bool TryGetCachedBroker<TId, TEntity, TActor, TModel>(

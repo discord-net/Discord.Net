@@ -9,11 +9,14 @@ public static class MemberUtils
 {
     public static readonly ConflictEqualityComparer ConflictEquality = new();
 
-    public static ParameterListSyntax CreateParameterList(IMethodSymbol? method, bool withDefaults = true)
+    public static ParameterListSyntax CreateParameterList(
+        IMethodSymbol? method, 
+        bool withDefaults = true,
+        string requestOptions = "RequestOptions")
     {
         return method is null
             ? SyntaxFactory.ParseParameterList(
-                "(RequestOptions? options = null, CancellationToken token = default)"
+                $"({requestOptions}? options = null, CancellationToken token = default)"
             )
             : SyntaxFactory.ParameterList(
                 SyntaxFactory.SeparatedList(
@@ -21,7 +24,10 @@ public static class MemberUtils
                         SyntaxFactory.Parameter(
                             [],
                             [],
-                            SyntaxFactory.ParseTypeName(x.Type.ToDisplayString()),
+                            SyntaxFactory.ParseTypeName(
+                                x.Type.Name is "RequestOptions" 
+                                    ? $"{requestOptions}?" 
+                                    : x.Type.ToDisplayString()),
                             SyntaxFactory.Identifier(x.Name),
                             x.HasExplicitDefaultValue && withDefaults
                                 ? SyntaxFactory.EqualsValueClause(

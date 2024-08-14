@@ -49,7 +49,7 @@ public sealed class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestE
         CachePathable path,
         IApiOutRoute<IEnumerable<TModel>> apiRoute,
         Func<IEnumerable<TModel>, IEnumerable<TModel>>? transformer = null
-        ) : base(
+    ) : base(
         client,
         indexableActor,
         restFactory,
@@ -121,19 +121,19 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
     {
     }
 
-    private async ValueTask<IEntityBroker<TId, TEntity, TModel>> GetBrokerAsync(CancellationToken token)
-        => _broker ??= await TEntity.GetBrokerAsync(_client, token);
+    private IEntityBroker<TId, TEntity, TModel> GetBroker()
+        => _broker ??= TEntity.GetBroker(_client);
 
-    private async ValueTask<IStoreInfo<TId, TModel>> GetStoreInfoAsync(CancellationToken token)
+    private async ValueTask<IStoreInfo<TId, TModel>> GetStoreInfoAsync(CancellationToken token = default)
         => _storeInfo ??= await TEntity.GetStoreInfoAsync(_client, _path, token);
 
     public async IAsyncEnumerable<IEntityHandle<TId, TEntity>> GetAllHandlesAsync(
         [EnumeratorCancellation] CancellationToken token = default)
     {
-        var broker = await GetBrokerAsync(token);
-        var store = await GetStoreInfoAsync(token);
+        var broker = GetBroker();
+        var storeInfo = await GetStoreInfoAsync(token);
 
-        await foreach (var handle in broker.GetAllAsync(_path, store, token))
+        await foreach (var handle in broker.GetAllAsync(_path, storeInfo, token))
             yield return handle;
     }
 
@@ -161,11 +161,12 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
 
         if (options?.UpdateCache ?? false)
         {
-            var broker = await GetBrokerAsync(token);
-
+            var broker = GetBroker();
+            var storeInfo = await GetStoreInfoAsync(token);
+            
             await broker.BatchUpdateAsync(
                 models,
-                await GetStoreInfoAsync(token),
+                storeInfo,
                 token
             );
         }

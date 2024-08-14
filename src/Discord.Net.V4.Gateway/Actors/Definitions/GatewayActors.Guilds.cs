@@ -73,7 +73,7 @@ internal static partial class GatewayActors
                     guild,
                     IIdentifiable<TId, TEntity, TRootActor, TModel>.Of(id)
                 ),
-                IIdentifiable<TId, TEntity, TTrait, TModel>.Of(id)
+                IIdentifiable<TId, TCoreEntity, TTrait, TModel>.Of(id)
             ),
             model => TRestEntity.Construct(
                 client.Rest,

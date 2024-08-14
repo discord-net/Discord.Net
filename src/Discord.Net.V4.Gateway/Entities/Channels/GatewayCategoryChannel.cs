@@ -4,6 +4,7 @@ using static Discord.Template;
 
 namespace Discord.Gateway;
 
+[ExtendInterfaceDefaults]
 [method: TypeFactory]
 public sealed partial class GatewayCategoryChannelActor(
     DiscordGatewayClient client,

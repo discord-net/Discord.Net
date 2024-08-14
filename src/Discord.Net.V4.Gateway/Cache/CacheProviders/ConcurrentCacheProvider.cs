@@ -61,6 +61,9 @@ public sealed partial class ConcurrentCacheProvider : ICacheProvider
         public ValueTask<TModel?> GetAsync(TId id, CancellationToken token = default)
             => ValueTask.FromResult(_cache.GetValueOrDefault(id));
 
+        public IAsyncEnumerable<TModel> GetManyAsync(IEnumerable<TId> ids, CancellationToken token = default)
+            => ids.Select(x => _cache.GetValueOrDefault(x)).OfType<TModel>().ToAsyncEnumerable();
+
         public IAsyncEnumerable<TModel> GetAllAsync(CancellationToken token = default)
             => _cache.Values.ToAsyncEnumerable();
 

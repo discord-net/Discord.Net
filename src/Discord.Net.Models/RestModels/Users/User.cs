@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [HasPartialVariant]
-public partial class User : IUserModel
+public class User : IUserModel
 {
     [JsonPropertyName("id"), JsonRequired]
     public ulong Id { get; set; }

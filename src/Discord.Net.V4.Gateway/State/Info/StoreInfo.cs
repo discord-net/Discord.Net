@@ -129,7 +129,7 @@ internal interface IStoreInfo<TId, TModel> : IStoreInfo
         return result;
     }
 
-    async ValueTask<IEntityModelStore<TId, TModel>> GetStoreForModelType(Type type, CancellationToken token = default)
+    async ValueTask<IEntityModelStore<TId, TModel>> GetStoreForModelTypeAsync(Type type, CancellationToken token = default)
     {
         if (HierarchyStoreMap.TryGetValue(type, out var storeProviderInfo))
             return await GetOrComputeStoreAsync(storeProviderInfo, token);

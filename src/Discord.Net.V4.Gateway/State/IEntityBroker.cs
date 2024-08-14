@@ -1,6 +1,7 @@
 using Discord.Models;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 
 namespace Discord.Gateway.State;
 
@@ -9,9 +10,12 @@ namespace Discord.Gateway.State;
 ///     still alive in memory, see <see cref="IEntityHandle{TId,TEntity}"/> for that.
 /// </summary>
 /// <typeparam name="TId">The ID type of the entity that this reference represents.</typeparam>
-internal interface IEntityReference<out TId>
-{
-    TId Id { get; }
+internal interface IEntityReference<out TId> :
+    IIdentifiable<TId>
+    where TId : IEquatable<TId>
+{   
+    [MustDisposeResource]
+    ValueTask<IDisposable> GetMutationLockHandleAsync(CancellationToken token = default);
 }
 
 /// <summary>
@@ -20,7 +24,7 @@ internal interface IEntityReference<out TId>
 /// </summary>
 /// <typeparam name="TId">The ID type of the entity that this reference represents.</typeparam>
 /// <typeparam name="TEntity">The type of the entity that this reference represents.</typeparam>
-internal interface IEntityReference<out TId, out TEntity> : IEntityReference<TId>
+internal interface IEntityReference<TId, out TEntity> : IEntityReference<TId>
     where TEntity : class, IEntity<TId>
     where TId : IEquatable<TId>
 {
@@ -42,6 +46,8 @@ internal interface IEntityReference<out TId, out TEntity> : IEntityReference<TId
     ///     <see langword="null"/>.
     /// </returns>
     IEntityHandle<TId, TEntity>? AllocateHandle();
+
+    void ReleaseHandle(IEntityHandle<TId> handle);
 }
 
 /// <summary>
@@ -58,7 +64,7 @@ internal interface IEntityBroker<TId, TEntity, in TActor, TModel> : IEntityBroke
     IStoreProvider<TId, TModel>,
     IBrokerProvider<TId, TEntity, TModel>,
     IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
-    where TActor : class, IGatewayCachedActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
+    where TActor : class, IGatewayCachedActor<TId, TEntity, TModel>
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
@@ -184,6 +190,11 @@ internal interface IEntityBroker<TId, TEntity, TModel> : IManageableEntityBroker
     /// </returns>
     ValueTask UpdateAsync(TModel model, IStoreInfo<TId, TModel> storeInfo, CancellationToken token);
 
+    ValueTask UpdateAsync(
+        IPartial<TModel> model, 
+        IStoreInfo<TId, TModel> storeInfo,
+        CancellationToken token);
+    
     /// <summary>
     ///     Updates the underlying <see cref="ICacheProvider"/> with the given models, as well as the entities that
     ///     are in-reference, if any exists.
@@ -198,6 +209,12 @@ internal interface IEntityBroker<TId, TEntity, TModel> : IManageableEntityBroker
     /// </returns>
     ValueTask BatchUpdateAsync(
         IEnumerable<TModel> models,
+        IStoreInfo<TId, TModel> storeInfo,
+        CancellationToken token
+    );
+    
+    ValueTask BatchUpdateAsync(
+        IEnumerable<IPartial<TModel>> models,
         IStoreInfo<TId, TModel> storeInfo,
         CancellationToken token
     );
@@ -295,12 +312,6 @@ internal interface IManageableEntityBroker<TId, in TEntity, in TModel> : IEntity
     where TModel : IEntityModel<TId>
 {
     /// <summary>
-    ///     Releases a handle for an entity that this broker manages.
-    /// </summary>
-    /// <param name="handle">The handle to release.</param>
-    void ReleaseHandle(IEntityHandle<TId, TEntity> handle);
-
-    /// <summary>
     ///     Transfers the construction of an entity to this broker.
     /// </summary>
     /// <param name="model">The model to construct the entity from.</param>
@@ -343,6 +354,14 @@ internal interface IManageableEntityBroker<TId, in TEntity, in TModel> : IEntity
     /// </returns>
     ValueTask UpdateInReferenceEntitiesAsync(IEnumerable<TModel> models, CancellationToken token);
 
+    bool TryGetHandle(TId id, [MaybeNullWhen(false)] out IEntityHandle<TId> handle);
+    
+    [MustDisposeResource]
+    ValueTask<IDisposable> GetEntityLockHandleAsync(TId id, CancellationToken token = default);
+
+    [MustDisposeResource]
+    ValueTask<IDisposable> GetBatchOperationLockAsync(CancellationToken token = default);
+    
     /// <summary>
     ///     Gets the entity type that this broker represents.
     /// </summary>

@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Discord.Gateway;
 
-internal sealed partial class WeakDictionary<TKey, TValue>
+internal sealed class WeakDictionary<TKey, TValue>
     where TKey : notnull
     where TValue : class
 {

@@ -7,6 +7,7 @@ namespace Discord.Gateway;
 using MessageChannelTrait =
     GatewayMessageChannelTrait<GatewayGroupChannelActor, GatewayGroupChannel, GroupChannelIdentity>;
 
+[ExtendInterfaceDefaults]
 public sealed partial class GatewayGroupChannelActor :
     GatewayChannelActor,
     IGroupChannelActor,

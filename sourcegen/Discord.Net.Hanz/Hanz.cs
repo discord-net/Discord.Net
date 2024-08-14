@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Discord.Net.Hanz;
 
-[Generator]
+[Generator(LanguageNames.CSharp)]
 public sealed class Hanz : IIncrementalGenerator
 {
     public static LoggingOptions LoggerOptions { get; private set; } = new(LogLevel.Information);

@@ -21,7 +21,7 @@ internal sealed record AttachLatentEntityOperation<TId, TEntity, TModel>(
 {
     public async ValueTask AttachAsync(StateController controller, CancellationToken token)
     {
-        var broker = Broker ?? await Entity.GetBrokerAsync(token);
+        var broker = Broker ?? Entity.GetBroker();
 
         var store = await Entity.GetStoreInfoAsync(token);
         await broker.AttachLatentEntityAsync(Model.Id, Entity, store, token);

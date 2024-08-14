@@ -134,7 +134,14 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
                     SyntaxFactory.ParseTypeName($"IStoreInfoProvider<{target.IdType}, {target.ModelType}>")),
                 SyntaxFactory.SimpleBaseType(
                     SyntaxFactory.ParseTypeName(
-                        $"IBrokerProvider<{target.IdType}, {target.Symbol}, {target.ModelType}>")),
+                        $"IBrokerProvider<{target.IdType}, {target.Symbol}, {target.ModelType}>"
+                    )
+                ),
+                SyntaxFactory.SimpleBaseType(
+                    SyntaxFactory.ParseTypeName(
+                        $"IBrokerProvider<{target.IdType}, {target.Symbol}, {target.ActorType}, {target.ModelType}>"
+                    )
+                ),
                 SyntaxFactory.SimpleBaseType(contextConstructSyntax)
             );
 
@@ -147,9 +154,9 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
             syntax = syntax.AddMembers(
                 SyntaxFactory.ParseMemberDeclaration(
                     $$"""
-                    static ValueTask<IStoreInfo<{{target.IdType}}, {{target.ModelType}}>> IStoreInfoProvider<{{target.IdType}}, {{target.ModelType}}>.GetStoreInfoAsync(DiscordGatewayClient client, IPathable path, CancellationToken token)
-                        => {{target.ActorType}}.GetStoreInfoAsync(client, path, token);
-                    """
+                      static ValueTask<IStoreInfo<{{target.IdType}}, {{target.ModelType}}>> IStoreInfoProvider<{{target.IdType}}, {{target.ModelType}}>.GetStoreInfoAsync(DiscordGatewayClient client, IPathable path, CancellationToken token)
+                          => {{target.ActorType}}.GetStoreInfoAsync(client, path, token);
+                      """
                 )!,
                 SyntaxFactory.ParseMemberDeclaration(
                     $$"""
@@ -165,21 +172,27 @@ public sealed class GatewayCacheableEntity : IGenerationCombineTask<GatewayCache
                 )!,
                 SyntaxFactory.ParseMemberDeclaration(
                     $$"""
-                      static ValueTask<IEntityBroker<{{target.IdType}}, {{target.Symbol}}, {{target.ModelType}}>> IBrokerProvider<{{target.IdType}}, {{target.Symbol}}, {{target.ModelType}}>.GetBrokerAsync(DiscordGatewayClient client, CancellationToken token)
-                          => {{target.ActorType}}.GetBrokerAsync(client, token);
+                      static IEntityBroker<{{target.IdType}}, {{target.Symbol}}, {{target.ActorType}}, {{target.ModelType}}> IBrokerProvider<{{target.IdType}}, {{target.Symbol}}, {{target.ActorType}}, {{target.ModelType}}>.GetBroker(DiscordGatewayClient client)
+                          => {{target.ActorType}}.GetBroker(client);
                       """
                 )!,
                 SyntaxFactory.ParseMemberDeclaration(
                     $$"""
-                      static ValueTask<IManageableEntityBroker<{{target.IdType}}, {{target.Symbol}}, {{target.ModelType}}>> IBrokerProvider<{{target.IdType}}, {{target.Symbol}}, {{target.ModelType}}>.GetBrokerForModelAsync(
-                          DiscordGatewayClient client,
-                          Type modelType,
-                          CancellationToken token
-                      ) => {{target.Symbol}}Actor.GetBrokerForModelAsync(client, modelType, token);
+                      static IEntityBroker<{{target.IdType}}, {{target.Symbol}}, {{target.ModelType}}> IBrokerProvider<{{target.IdType}}, {{target.Symbol}}, {{target.ModelType}}>.GetBroker(DiscordGatewayClient client)
+                          => {{target.ActorType}}.GetBroker(client);
                       """
                 )!,
                 SyntaxFactory.ParseMemberDeclaration(
-                    $"static IReadOnlyCollection<BrokerProviderDelegate<{target.IdType}, {target.Symbol}, {target.ModelType}>> IBrokerProvider<{target.IdType}, {target.Symbol}, {target.ModelType}>.GetBrokerHierarchy() => {target.Symbol}Actor.GetBrokerHierarchy();"
+                    $$"""
+                      IEntityBroker<{{target.IdType}}, {{target.Symbol}}, {{target.ActorType}}, {{target.ModelType}}> IBrokerProvider<{{target.IdType}}, {{target.Symbol}}, {{target.ActorType}}, {{target.ModelType}}>.GetBroker()
+                          => {{target.ActorType}}.GetBroker(Client);
+                      """
+                )!,
+                SyntaxFactory.ParseMemberDeclaration(
+                    $$"""
+                      static IReadOnlyDictionary<Type, IManageableEntityBroker<{{target.IdType}}, {{target.Symbol}}, {{target.ModelType}}>> IBrokerProvider<{{target.IdType}}, {{target.Symbol}}, {{target.ModelType}}>.GetBrokerHierarchy(DiscordGatewayClient client)
+                          => {{target.ActorType}}.GetBrokerHierarchy(client);
+                      """
                 )!
             );
 

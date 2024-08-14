@@ -43,6 +43,7 @@ public sealed partial class GatewayThreadChannelActor :
         => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
+[ExtendInterfaceDefaults]
 public sealed partial class GatewayThreadChannel :
     GatewayGuildChannel,
     IThreadChannel,

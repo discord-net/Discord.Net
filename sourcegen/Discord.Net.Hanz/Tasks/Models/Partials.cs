@@ -211,9 +211,9 @@ public class Partials
     {
         var isFromPartial = HasPartialAttribute(property.ContainingType);
 
-        var interfacePropertyType = 
-            isFromPartial || ShouldBeNullableInPartialForm(property) 
-                ? GetNullableType(property.Type, semanticModel) 
+        var interfacePropertyType =
+            isFromPartial || ShouldBeNullableInPartialForm(property)
+                ? GetNullableType(property.Type, semanticModel)
                 : property.Type;
 
         var canImplement = implementation.ExplicitInterfaceImplementations.Length == 0;
@@ -492,7 +492,7 @@ public class Partials
             []
         );
 
-        var optionalProperties = new List<IPropertySymbol>();
+        var optionalProperties = new HashSet<IPropertySymbol>(SymbolEqualityComparer.Default);
 
         foreach
         (
@@ -540,7 +540,8 @@ public class Partials
 
         if (syntax.Members.Count == 0) return;
 
-        AddApplyToMethod(ref syntax, symbol, optionalProperties);
+        AddApplyToMethod(ref syntax, symbol, optionalProperties, jsonContext);
+        AddBasePartialInterfaceImplementation(ref syntax, symbol, optionalProperties, jsonContext);
 
         var generatedOverloads = new HashSet<IPropertySymbol>(SymbolEqualityComparer.Default);
         var implementedInterfaces = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
@@ -798,12 +799,9 @@ public class Partials
                 syntax = syntax.AddMembers(
                     SyntaxFactory.ParseMemberDeclaration(
                         $$"""
-                          void Discord.Models.IPartial<{{modelInterface}}>.ApplyTo({{modelInterface}} model)
-                          {
-                              if(model is {{symbol}} ourModel)
-                                  ApplyTo(ourModel);
-                          }
-                          """
+                           bool Discord.Models.IPartial<{{modelInterface}}>.ApplyTo({{modelInterface}} model)
+                               => model is {{symbol}} ourModel && ApplyTo(ourModel);
+                           """
                     )!
                 );
 
@@ -926,44 +924,157 @@ public class Partials
     private static bool IsModelInterface(INamedTypeSymbol symbol)
         => symbol.Name is "IEntityModel" || symbol.AllInterfaces.Any(x => x.Name is "IEntityModel");
 
+    private static void AddBasePartialInterfaceImplementation(
+        ref ClassDeclarationSyntax syntax,
+        ITypeSymbol model,
+        HashSet<IPropertySymbol> optionalProperties,
+        JsonModels.Context context)
+    {
+        var hasPartialChildren = context.Targets.Any(x =>
+            HasPartialAttribute(x.TypeSymbol) &&
+            TypeUtils.GetBaseTypes(x.TypeSymbol)
+                .Contains(model, SymbolEqualityComparer.Default)
+        );
+
+        var hasPartialParent = TypeUtils.GetBaseTypes(model).Any(HasPartialAttribute);
+
+        var hasCases = model.GetMembers()
+            .OfType<IPropertySymbol>()
+            .Where(JsonModels.IsJsonProperty)
+            .Select(x =>
+                $"\"{x.Name}\" => {(optionalProperties.Contains(x) ? $"{x.Name}.IsSpecified" : "true")},"
+            );
+
+        var hasMethod = SyntaxFactory.ParseMemberDeclaration(
+            $$"""
+              public bool Has(string property)
+              {
+                  return property switch
+                  {
+                      {{
+                          string.Join("\n", hasCases)
+                      }}
+                      _ => {{(
+                          hasPartialParent
+                              ? "base.Has(property)"
+                              : "false"
+                      )}}
+                  };
+              }
+              """
+        )!;
+
+        var tryGetCases = model.GetMembers()
+            .OfType<IPropertySymbol>()
+            .Where(JsonModels.IsJsonProperty)
+            .Select(x =>
+                optionalProperties.Contains(x)
+                    ? $$"""
+                        "{{x.Name}}" when {{x.Name}} is {IsSpecified: true, Value: T val} => (result = val) is T, 
+                        """
+                    : $$"""
+                        "{{x.Name}}" when {{x.Name}} is T val => (result = val) is T,
+                        """
+            );
+        
+        var tryGetMethod = SyntaxFactory.ParseMemberDeclaration(
+            $$"""
+              public bool TryGet<T>(string property, out T result)
+              {
+                  return property switch
+                  {
+                      {{
+                          string.Join("\n", tryGetCases)
+                      }}
+                      _ => {{(
+                          hasPartialParent
+                              ? "base.TryGet<T>(property, out result)"
+                              : "(result = default(T)!) is not T"
+                      )}}
+                  };
+              }
+              """
+        )!;
+        
+        var underlyingModelTypeProp = SyntaxFactory.ParseMemberDeclaration(
+            $"public Type UnderlyingModelType => typeof({model.ToDisplayString()});"
+        )!;
+
+        ApplyPolymorphicModifiers(ref hasMethod, hasPartialParent, hasPartialChildren);
+        ApplyPolymorphicModifiers(ref tryGetMethod, hasPartialParent, hasPartialChildren);
+        ApplyPolymorphicModifiers(ref underlyingModelTypeProp, hasPartialParent, hasPartialChildren);
+        
+        syntax = syntax.AddMembers(
+            underlyingModelTypeProp,
+            hasMethod,
+            tryGetMethod
+        );
+        
+    }
+
     private static void AddApplyToMethod(
         ref ClassDeclarationSyntax syntax,
         ITypeSymbol model,
-        IEnumerable<IPropertySymbol> optionalProperties)
+        IEnumerable<IPropertySymbol> optionalProperties,
+        JsonModels.Context context)
     {
-        syntax = syntax.AddMembers(
-            SyntaxFactory.ParseMemberDeclaration(
-                $$"""
-                    public void ApplyTo({{model.ToDisplayString()}} model)
-                    {  
-                        {{
-                            string.Join(
-                                "\n",
-                                optionalProperties
-                                    .Select(x =>
+        var hasPartialChildren = context.Targets.Any(x =>
+            HasPartialAttribute(x.TypeSymbol) &&
+            TypeUtils.GetBaseTypes(x.TypeSymbol)
+                .Contains(model, SymbolEqualityComparer.Default)
+        );
+
+        var hasPartialParent = TypeUtils.GetBaseTypes(model).Any(HasPartialAttribute);
+
+        var method = SyntaxFactory.ParseMemberDeclaration(
+            $$"""
+                public bool ApplyTo({{model.ToDisplayString()}} model)
+                {  
+                    var result = {{(hasPartialParent ? "base.ApplyTo(model)" : "false")}};
+                    
+                    {{
+                        string.Join(
+                            "\n",
+                            optionalProperties
+                                .Select(x =>
+                                    {
+                                        var condition = $"{x.Name}.IsSpecified";
+                                        var setter = $"model.{x.Name} = {x.Name}.Value";
+
+                                        if (ShouldBeNullableInPartialForm(x))
                                         {
-                                            var condition = $"{x.Name}.IsSpecified";
-                                            var setter = $"model.{x.Name} = {x.Name}.Value";
-
-                                            if (ShouldBeNullableInPartialForm(x))
-                                            {
-                                                condition = $"{condition} && {x.Name}.Value is not null";
-                                                setter = x.Type.IsValueType
-                                                    ? $"{setter}.Value"
-                                                    : setter;
-                                            }
-
-                                            return $"if ({condition}) {setter};";
+                                            condition = $"{condition} && {x.Name}.Value is not null";
+                                            setter = x.Type.IsValueType
+                                                ? $"{setter}.Value"
+                                                : setter;
                                         }
-                                    )
-                            )
-                        }}
-                    }
-                  """
-            )!
+
+                                        return $"if ({condition}) {{ result |= true; {setter}; }}";
+                                    }
+                                )
+                        )
+                    }}
+                    
+                    return result;
+                }
+              """
+        )!;
+
+        //ApplyPolymorphicModifiers(ref method, hasPartialParent, hasPartialChildren);
+        
+        syntax = syntax.AddMembers(
+            method
         );
     }
 
+    private static void ApplyPolymorphicModifiers(ref MemberDeclarationSyntax syntax, bool hasPartialParent, bool hasPartialChildren)
+    {
+        if (hasPartialParent)
+            syntax = syntax.AddModifiers(SyntaxFactory.Token(SyntaxKind.OverrideKeyword));
+        else if (hasPartialChildren)
+            syntax = syntax.AddModifiers(SyntaxFactory.Token(SyntaxKind.VirtualKeyword));
+    }
+    
     private static bool IsIterable(ITypeSymbol symbol)
     {
         return symbol switch

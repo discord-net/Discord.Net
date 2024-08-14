@@ -53,10 +53,9 @@ public sealed partial class DiscordGatewayClient
             StateController.SelfUserModel.SelfUserModelPart = readyPayloadData.User;
         }
 
-        var store = await StateController.GetRootStoreAsync(Template.Of<GatewayCurrentUserActor>(), token);
-        var broker = await GatewayCurrentUserActor.GetBrokerAsync(this, token);
-
-        await broker.UpdateAsync(StateController.SelfUserModel, store, token);
+        var broker = await GatewayCurrentUserActor.GetConfiguredBrokerAsync(this, CachePathable.Empty, token);
+        
+        await broker.UpdateAsync(StateController.SelfUserModel, token);
 
         UnavailableGuilds.Clear();
         UnavailableGuilds.UnionWith(readyPayloadData.Guilds.Select(x => x.Id));

@@ -55,6 +55,7 @@ public partial class GatewayTextChannelActor :
         => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
+[ExtendInterfaceDefaults]
 public partial class GatewayTextChannel :
     GatewayThreadableChannel,
     ITextChannel,

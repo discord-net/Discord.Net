@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Gateway.State;
 
-public sealed partial class CachePathable : IPathable, IReadOnlyDictionary<Type, object>, IDisposable
+public sealed class CachePathable : IPathable, IReadOnlyDictionary<Type, object>, IDisposable
 {
     public static readonly CachePathable Empty = new CachePathable().MakeReadOnly();
 
@@ -29,7 +29,7 @@ public sealed partial class CachePathable : IPathable, IReadOnlyDictionary<Type,
         where TEntity : class, IEntity<TId>
         => TryGet<TId, TEntity>(out var existing) && id.Equals(existing);
 
-    private bool TryGetIdentity<TId, TEntity>([MaybeNullWhen(false)]out IIdentifiable<TId> identity)
+    private bool TryGetIdentity<TId, TEntity>([MaybeNullWhen(false)] out IIdentifiable<TId> identity)
         where TId : IEquatable<TId>
     {
         if (_identities.TryGetValue(typeof(TEntity), out var value))
@@ -38,7 +38,7 @@ public sealed partial class CachePathable : IPathable, IReadOnlyDictionary<Type,
         // slow search
         foreach (var (type, raw) in _identities)
         {
-            if(typeof(TEntity).IsAssignableTo(type))
+            if (typeof(TEntity).IsAssignableTo(type))
                 return (identity = raw as IIdentifiable<TId>) is not null;
         }
 
@@ -47,28 +47,89 @@ public sealed partial class CachePathable : IPathable, IReadOnlyDictionary<Type,
     }
 
     [return: NotNullIfNotNull(nameof(fallback))]
-    internal TIdentity? GetIdentity<[TransitiveFill] TIdentity, TId, TEntity, TModel>(Template<TIdentity> template, TId? fallback = default)
-        where TIdentity : class, IIdentifiable<TId, TEntity, TModel>
+    internal IIdentifiable<TId, TEntity, TActor, TModel>? GetIdentity<TId, TEntity, TActor, TModel>(
+        Template<IIdentifiable<TId, TEntity, TActor, TModel>> template,
+        TId? fallback
+    )
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>, IEntityOf<TModel>
+        where TModel : class, IEntityModel<TId>
+        where TActor : class, IActor<TId, TEntity>
+    {
+        return
+            GetIdentity(Template.Of<IIdentifiable<TId, TEntity, TModel>>())
+                as IIdentifiable<TId, TEntity, TActor, TModel>
+            ?? (
+                fallback is not null
+                    ? IIdentifiable<TId, TEntity, TActor, TModel>.Of(fallback)
+                    : null
+            );
+    }
+
+    internal IIdentifiable<TId, TEntity, TActor, TModel>? GetIdentity<TId, TEntity, TActor, TModel>(
+        Template<IIdentifiable<TId, TEntity, TActor, TModel>> template
+    )
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>, IEntityOf<TModel>
+        where TModel : class, IEntityModel<TId>
+        where TActor : class, IActor<TId, TEntity>
+    {
+        return GetIdentity(Template.Of<IIdentifiable<TId, TEntity, TModel>>())
+            as IIdentifiable<TId, TEntity, TActor, TModel>;
+    }
+
+    [return: NotNullIfNotNull(nameof(fallback))]
+    internal IIdentifiable<TId, TEntity, TModel>? GetIdentity<TId, TEntity, TModel>(
+        Template<IIdentifiable<TId, TEntity, TModel>> template,
+        TId? fallback
+    )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
         where TModel : class, IEntityModel<TId>
     {
-        if (TryGetIdentity<TId, TEntity>(out var value) && value is TIdentity identity)
+        return GetIdentity(template) ?? (
+            fallback is not null    
+                ? IIdentifiable<TId, TEntity, TModel>.Of(fallback)
+                : null
+        );
+    }
+    
+    internal IIdentifiable<TId, TEntity, TModel>? GetIdentity<TId, TEntity, TModel>(
+        Template<IIdentifiable<TId, TEntity, TModel>> template
+    )
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>, IEntityOf<TModel>
+        where TModel : class, IEntityModel<TId>
+    {
+        if (TryGetIdentity<TId, TEntity>(out var value) && value is IIdentifiable<TId, TEntity, TModel> identity)
             return identity;
-
-        if(fallback is not null)
-            return (TIdentity)IIdentifiable<TId, TEntity, TModel>.Of(fallback);
 
         return null;
     }
 
-    internal TIdentity RequireIdentity<[TransitiveFill] TIdentity, TId, TEntity, TModel>(Template<TIdentity> template)
-        where TIdentity : IIdentifiable<TId, TEntity, TModel>
+    internal IIdentifiable<TId, TEntity, TModel> RequireIdentity<TId, TEntity, TModel>(
+        Template<IIdentifiable<TId, TEntity, TModel>> template
+    )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
         where TModel : class, IEntityModel<TId>
     {
-        if (TryGetIdentity<TId, TEntity>(out var value) && value is TIdentity identity)
+        if (TryGetIdentity<TId, TEntity>(out var value) && value is IIdentifiable<TId, TEntity, TModel> identity)
+            return identity;
+
+        throw new KeyNotFoundException($"Couldn't find an identity for '{typeof(TEntity)}'");
+    }
+
+    internal IIdentifiable<TId, TEntity, TActor, TModel> RequireIdentity<TId, TEntity, TActor, TModel>(
+        Template<IIdentifiable<TId, TEntity, TActor, TModel>> template
+    )
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>, IEntityOf<TModel>
+        where TModel : class, IEntityModel<TId>
+        where TActor : class, IActor<TId, TEntity>
+    {
+        if (TryGetIdentity<TId, TEntity>(out var value) &&
+            value is IIdentifiable<TId, TEntity, TActor, TModel> identity)
             return identity;
 
         throw new KeyNotFoundException($"Couldn't find an identity for '{typeof(TEntity)}'");
@@ -122,26 +183,27 @@ public sealed partial class CachePathable : IPathable, IReadOnlyDictionary<Type,
 
     public IEnumerator<KeyValuePair<Type, object>> GetEnumerator() => _identities.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_identities).GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) _identities).GetEnumerator();
 
     public int Count => _identities.Count;
 
     public bool ContainsKey(Type key) => _identities.ContainsKey(key);
 
-    public bool TryGetValue(Type key, [MaybeNullWhen(false)] out object value) => _identities.TryGetValue(key, out value);
+    public bool TryGetValue(Type key, [MaybeNullWhen(false)] out object value) =>
+        _identities.TryGetValue(key, out value);
 
     public object this[Type key] => _identities[key];
 
     public IEnumerable<Type> Keys => _identities.Keys;
 
-    public IEnumerable<object> Values =>  _identities.Values;
+    public IEnumerable<object> Values => _identities.Values;
 
     public void Dispose()
     {
-        if(!_pathables.IsReadOnly)
+        if (!_pathables.IsReadOnly)
             _pathables.Clear();
 
-        if(!_identities.IsReadOnly)
+        if (!_identities.IsReadOnly)
             _identities.Clear();
 
         _pathables = null!;

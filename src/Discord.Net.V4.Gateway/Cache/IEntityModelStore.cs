@@ -19,6 +19,7 @@ public interface IEntityModelStore<TId, TModel> : IEntityModelStore
         where TSubStoreModel : class, IEntityModel<TSubStoreId>;
 
     ValueTask<TModel?> GetAsync(TId id, CancellationToken token = default);
+    IAsyncEnumerable<TModel> GetManyAsync(IEnumerable<TId> ids, CancellationToken token = default);
     IAsyncEnumerable<TModel> GetAllAsync(CancellationToken token = default);
     IAsyncEnumerable<TId> GetAllIdsAsync(CancellationToken token = default);
 

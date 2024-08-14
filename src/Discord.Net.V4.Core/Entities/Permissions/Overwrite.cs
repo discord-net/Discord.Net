@@ -40,17 +40,23 @@ public readonly struct Overwrite : IEntityProperties<Models.Json.Overwrite>, ICo
 
     public Models.Json.Overwrite ToApiModel(Models.Json.Overwrite? existing = default)
     {
-        existing ??= new Models.Json.Overwrite();
+        existing ??= new Models.Json.Overwrite()
+        {
+            Allow = Allowed.ToString(),
+            Deny = Denied.ToString()
+        };
 
         existing.TargetId = TargetId;
-        existing.Type = (int)TargetType;
-        existing.Allow = Allowed;
-        existing.Deny = Denied;
+        existing.Type = (int) TargetType;
 
         return existing;
     }
 
     public static Overwrite Construct(IDiscordClient client, IOverwriteModel model)
-        => new(model.TargetId, (PermissionTarget)model.Type, model.Allow,
-            model.Deny);
+        => new(
+            model.TargetId,
+            (PermissionTarget) model.Type,
+            model.Allow,
+            model.Deny
+        );
 }
