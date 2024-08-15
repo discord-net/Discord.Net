@@ -22,7 +22,7 @@ public sealed partial class UserUpdatedEvent(
         IUserUpdatedPayloadData payload,
         CancellationToken token)
     {
-        var broker = await GatewayCurrentUserActor.GetConfiguredBrokerAsync(Client, CachePathable.Empty, token);
+        var broker = await Brokers.CurrentUser.GetConfiguredBrokerAsync(Client, token: token);
         return await broker.CreateAsync(payload, CachePathable.Empty, Client.CurrentUser, token);
     }
 

@@ -6,8 +6,7 @@ namespace Discord.Gateway.Dispatch;
 public sealed partial class GuildAvailablePackage : IDispatchPackage<IExtendedGuild>;
 
 public delegate ValueTask GuildAvailableDelegate(
-    [Supports(EventParameterDegree.All)]
-    GatewayGuild guild
+    [Supports(EventParameterDegree.All)] GatewayGuild guild
 );
 
 [Subscribable<GuildAvailableDelegate>]
@@ -19,7 +18,7 @@ public sealed partial class GuildAvailableEvent(DiscordGatewayClient client) :
         IGuildCreatePayloadData? payload,
         CancellationToken token = default)
     {
-        if(payload is not IExtendedGuild guild) return ValueTask.FromResult<GuildAvailablePackage?>(null);
+        if (payload is not IExtendedGuild guild) return ValueTask.FromResult<GuildAvailablePackage?>(null);
 
         // TODO: sync with guild create event
         return !Client.UnavailableGuilds.Remove(payload.Id)
@@ -34,7 +33,7 @@ public sealed partial class GuildAvailableEvent(DiscordGatewayClient client) :
         IExtendedGuild payload,
         CancellationToken token)
     {
-        var broker = await GatewayGuildActor.GetConfiguredBrokerAsync(Client, CachePathable.Empty, token);
+        var broker = await Brokers.Guild.GetConfiguredBrokerAsync(Client, token: token);
         return await broker.CreateAsync(payload, CachePathable.Empty, token);
     }
 }

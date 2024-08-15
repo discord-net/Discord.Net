@@ -12,7 +12,8 @@ public interface ICacheableEntity<out TSelf, out TId, TModel> :
     ICacheableEntity<TId>,
     IEntityOf<TModel>,
     IUpdatable<TModel>,
-    ICacheUpdatable<TId, TModel>
+    ICacheUpdatable<TId, TModel>,
+    IGatewayClientProvider
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
     where TSelf : class,
@@ -22,6 +23,8 @@ public interface ICacheableEntity<out TSelf, out TId, TModel> :
     ICacheableEntity<TSelf, TId, TModel>,
     IContextConstructable<TSelf, TModel, IGatewayConstructionContext, DiscordGatewayClient>
 {
+    internal CachePathable CachePath { get; }
+    
     ValueTask IUpdatable<TModel>.UpdateAsync(TModel model, CancellationToken token) => UpdateAsync(model, true, token: token);
 }
 

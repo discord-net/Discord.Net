@@ -10,21 +10,18 @@ using System.Threading.Channels;
 
 namespace Discord.Gateway.State;
 
-internal sealed partial class StateController : IDisposable
+internal sealed partial class StateController(
+    DiscordGatewayClient client,
+    ILogger<StateController> logger
+) : 
+    IDisposable
 {
     internal MutableSelfUserModel? SelfUserModel { get; set; }
 
-    private ICacheProvider CacheProvider => _client.CacheProvider;
-
     private Task? _controllerBackgroundTask;
-    private CancellationTokenSource _backgroundTokenSource;
+    private CancellationTokenSource _backgroundTokenSource = new();
 
-    private readonly DiscordGatewayClient _client;
-    private readonly ILogger<StateController> _logger;
-
-    private readonly Dictionary<Type, IStoreInfo> _rootStores = [];
-    private readonly KeyedSemaphoreSlim<Type> _rootStoreSemaphores = new(1, 1);
-
+    private readonly ILogger<StateController> _logger = logger;
 
     private readonly Dictionary<Type, IEntityBroker> _brokers = new();
     private readonly object _brokersSyncRoot = new();
@@ -32,15 +29,6 @@ internal sealed partial class StateController : IDisposable
     private readonly Channel<IStateOperation> _operationChannel = Channel.CreateUnbounded<IStateOperation>(
         new UnboundedChannelOptions {SingleReader = true, AllowSynchronousContinuations = false}
     );
-
-    public StateController(
-        DiscordGatewayClient client,
-        ILogger<StateController> logger)
-    {
-        _client = client;
-        _logger = logger;
-        _backgroundTokenSource = new();
-    }
 
     public async ValueTask StartBackgroundProcessing(CancellationToken token)
     {
@@ -66,7 +54,7 @@ internal sealed partial class StateController : IDisposable
         => CanUseStoreType(typeof(TEntity));
 
     public bool CanUseStoreType(Type type)
-        => _client.Config.CreateStoreForEveryEntity || _client.Config.ExtendedStoreTypes.Contains(type);
+        => client.Config.CreateStoreForEveryEntity || client.Config.ExtendedStoreTypes.Contains(type);
 
     private async Task RunBackgroundProcessingAsync(CancellationToken token)
     {
@@ -170,7 +158,7 @@ internal sealed partial class StateController : IDisposable
             ? new GatewayConstructionContext<TActor>(actor, path)
             : new GatewayConstructionContext(path);
 
-        var latentEntity = TEntity.Construct(_client, context, model);
+        var latentEntity = TEntity.Construct(client, context, model);
 
         _operationChannel.Writer.TryWrite(
             new AttachLatentEntityOperation<TId, TEntity, TModel>(latentEntity, model, handle, broker)
@@ -196,7 +184,7 @@ internal sealed partial class StateController : IDisposable
                 return broker;
 
             broker = new EntityBroker<TId, TEntity, TActor, TModel>(
-                _client,
+                client,
                 this
             );
             _brokers[typeof(TEntity)] = broker;
@@ -225,64 +213,6 @@ internal sealed partial class StateController : IDisposable
         }
 
         return broker is not null;
-    }
-
-    public ValueTask<IStoreInfo<TId, TModel>> GetRootStoreAsync<[TransitiveFill] TProvider, TId, TEntity, TModel>(
-        Template<TProvider> template,
-        CancellationToken token = default)
-        where TProvider :
-        IRootStoreProvider<TId, TModel>, IActor<TId, TEntity>
-        where TEntity : class, IEntityOf<TModel>, IEntity<TId>
-        where TModel : class, IEntityModel<TId>
-        where TId : IEquatable<TId>
-        => GetRootStoreAsync<TProvider, TId, TModel>(token);
-
-    public async ValueTask<IStoreInfo<TId, TModel>> GetRootStoreAsync<TProvider, TId, TModel>(
-        CancellationToken token = default
-    )
-        where TProvider : IRootStoreProvider<TId, TModel>
-        where TModel : class, IEntityModel<TId>
-        where TId : IEquatable<TId>
-    {
-        if (TryGetRootStore<TModel>(out var store))
-        {
-            if (store is IStoreInfo<TId, TModel> storeInfo)
-                return storeInfo;
-
-            _logger.LogWarning(
-                "Unexpected root store info found: Expecting {Model}, but got {Actual}",
-                typeof(TModel),
-                store.ModelType
-            );
-
-            lock (_rootStoreSemaphores)
-                _rootStores.Remove(typeof(TModel));
-        }
-
-        using var scope = _rootStoreSemaphores.Get(typeof(TModel), out var semaphoreSlim);
-
-        await semaphoreSlim.WaitAsync(token);
-
-        try
-        {
-            var info = (await TProvider.GetStoreAsync(_client, CachePathable.Empty, token))
-                .ToInfo(_client, Template.Of<TProvider>());
-
-            lock (_rootStoreSemaphores)
-                _rootStores[typeof(TModel)] = info;
-
-            return info;
-        }
-        finally
-        {
-            semaphoreSlim.Release();
-        }
-    }
-
-    private bool TryGetRootStore<TModel>([MaybeNullWhen(false)] out IStoreInfo info)
-    {
-        lock (_rootStoreSemaphores)
-            return _rootStores.TryGetValue(typeof(TModel), out info);
     }
 
     public void Dispose()

@@ -3,6 +3,26 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Gateway.State;
 
+internal static class ConfiguredBroker
+{
+    public static ConfiguredBroker<TId, TEntity, TActor, TModel> Create<TId, TEntity, TActor, TModel>(
+        IStoreInfo<TId, TModel> storeInfo,
+        IEntityBroker<TId, TEntity, TActor, TModel> broker
+        )
+        where TEntity :
+        class,
+        ICacheableEntity<TEntity, TId, TModel>,
+        IStoreProvider<TId, TModel>,
+        IBrokerProvider<TId, TEntity, TModel>,
+        IContextConstructable<TEntity, TModel, IGatewayConstructionContext, DiscordGatewayClient>
+        where TActor : class, IGatewayCachedActor<TId, TEntity, TModel>
+        where TId : IEquatable<TId>
+        where TModel : class, IEntityModel<TId>
+    {
+        return new ConfiguredBroker<TId, TEntity, TActor, TModel>(storeInfo, broker);
+    }
+}
+
 internal readonly struct ConfiguredBroker<TId, TEntity, TActor, TModel>(
     IStoreInfo<TId, TModel> storeInfo,
     IEntityBroker<TId, TEntity, TActor, TModel> broker

@@ -22,6 +22,8 @@ public abstract class GatewayCachedActor<TId, TEntity, TIdentity, TModel>(
     where TIdentity : IIdentifiable<TId>
     where TModel : class, IEntityModel<TId>
 {
+    internal virtual CachePathable CachePath => CachePathable.Empty;
+    
     protected readonly SemaphoreSlim StateSemaphore = new(1, 1);
 
     private LinkedList<Func<ValueTask>>? _disposeTasks;

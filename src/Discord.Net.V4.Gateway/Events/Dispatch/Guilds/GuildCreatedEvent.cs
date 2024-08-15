@@ -36,7 +36,7 @@ public sealed partial class GuildCreatedEvent(DiscordGatewayClient client) :
         IExtendedGuild payload,
         CancellationToken token)
     {
-        var broker = await GatewayGuildActor.GetConfiguredBrokerAsync(Client, IPathable.Empty, token);
+        var broker = await Brokers.Guild.GetConfiguredBrokerAsync(Client, token: token);
         return await broker.CreateAsync(payload, CachePathable.Empty, token);
     }
 }

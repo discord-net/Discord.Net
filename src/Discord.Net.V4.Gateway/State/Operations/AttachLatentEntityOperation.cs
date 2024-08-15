@@ -8,7 +8,7 @@ internal sealed record AttachLatentEntityOperation<TId, TEntity, TModel>(
     TModel Model,
     IDisposable Handle,
     IEntityBroker<TId, TEntity, TModel>? Broker = null
-):
+) :
     IAttachLatentEntityOperation
     where TEntity :
     class,
@@ -21,10 +21,13 @@ internal sealed record AttachLatentEntityOperation<TId, TEntity, TModel>(
 {
     public async ValueTask AttachAsync(StateController controller, CancellationToken token)
     {
-        var broker = Broker ?? Entity.GetBroker();
-
-        var store = await Entity.GetStoreInfoAsync(token);
-        await broker.AttachLatentEntityAsync(Model.Id, Entity, store, token);
+        await (Broker ?? TEntity.GetBroker(Entity.Client))
+            .AttachLatentEntityAsync(
+                Model.Id,
+                Entity,
+                await TEntity.GetStoreInfoAsync(Entity.Client, Entity.CachePath, token),
+                token
+            );
     }
 
     public void Dispose()

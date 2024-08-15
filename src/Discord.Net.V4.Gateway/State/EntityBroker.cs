@@ -154,14 +154,14 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     }
 
     public bool HasChildBrokers => _brokerHierarchy.Count > 0;
-    
+
     private readonly IReadOnlyDictionary<Type, IManageableEntityBroker<TId, TEntity, TModel>> _brokerHierarchy;
-    
+
     private readonly DiscordGatewayClient _client;
     private readonly StateController _controller;
     private readonly Dictionary<TId, EntityReference> _references;
     private readonly KeyedSemaphoreSlim<TId> _keyedSemaphore;
-    private readonly SemaphoreSlim _batchSemaphore = new(1, 1);
+    private readonly SemaphoreSlim _storeInfoSemaphore = new(1, 1);
     private readonly object _syncRoot = new();
 
     private readonly ILogger<EntityBroker<TId, TEntity, TActor, TModel>> _logger;
@@ -188,10 +188,6 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
 
         return new KeyedSemaphoreHandle(scope, semaphoreSlim);
     }
-
-    [MustDisposeResource]
-    public async ValueTask<IDisposable> GetBatchOperationLockAsync(CancellationToken token = default)
-        => await DisposableSemaphoreHandle.CreateAsync(_batchSemaphore, token);
 
     public async ValueTask UpdateInReferenceEntityAsync(TModel model, CancellationToken token)
     {
@@ -283,7 +279,8 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     public bool TryCreateLatentHandle(
         TModel model,
         [MaybeNullWhen(true)] out TEntity entity,
-        [MaybeNullWhen(false), MustDisposeResource] out IDisposable handle,
+        [MaybeNullWhen(false), MustDisposeResource]
+        out IDisposable handle,
         CancellationToken token)
     {
         var scope = _keyedSemaphore.Get(model.Id, out var semaphoreSlim);
@@ -366,7 +363,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
                 // the state controller constructed another form of the entity. We can either
                 // lock out this semaphore at construction time or we can allow multiple
                 // references.
-                
+
                 _logger.LogError(
                     "Failed to attach latent entity: The latent {Entity} entity that was constructed already has " +
                     "another entity in memory representing it with the id {Id}",
@@ -386,9 +383,9 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
             lock (_syncRoot)
                 _references[id] = new(this, id, entity);
 
-            var store = await storeInfo.GetStoreForModelTypeAsync(model.GetType(), token);
-
-            await store.AddOrUpdateAsync(model, token);
+            await storeInfo
+                .GetStoreForModelType(model.GetType())
+                .AddOrUpdateAsync(model, token);
         }
         finally
         {
@@ -400,9 +397,9 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     {
         InterceptSelfUser(ref model);
 
-        var store = await storeInfo.GetStoreForModelTypeAsync(model.GetType(), token);
-
-        await store.AddOrUpdateAsync(model, token);
+        await storeInfo
+            .GetStoreForModelType(model.GetType())
+            .AddOrUpdateAsync(model, token);
 
         if (model.GetType() == typeof(TModel))
         {
@@ -431,7 +428,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
 
         await UpdatePartialModelInternalAsync(
             partial,
-            await storeInfo.GetStoreForModelTypeAsync(partial.UnderlyingModelType, token),
+            storeInfo.GetStoreForModelType(partial.UnderlyingModelType),
             GetBrokerForModelType(partial.UnderlyingModelType),
             token
         );
@@ -444,9 +441,10 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     {
         foreach (var grouping in models.GroupBy(x => x.GetType()))
         {
-            var store = await storeInfo.GetStoreForModelTypeAsync(grouping.Key, token);
-            await store.AddOrUpdateBatchAsync(grouping, token);
-            
+            await storeInfo
+                .GetStoreForModelType(grouping.Key)
+                .AddOrUpdateBatchAsync(grouping, token);
+
             if (grouping.Key != typeof(TModel))
             {
                 await GetBrokerForModelType(grouping.Key).UpdateInReferenceEntitiesAsync(grouping, token);
@@ -464,10 +462,8 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
     {
         foreach (var grouping in models.GroupBy(x => x.UnderlyingModelType))
         {
-            var store = await storeInfo.GetStoreForModelTypeAsync(grouping.Key, token);
+            var store = storeInfo.GetStoreForModelType(grouping.Key);
             var broker = GetBrokerForModelType(grouping.Key);
-
-            using var scope = await broker.GetBatchOperationLockAsync(token);
 
             await Parallel.ForEachAsync(
                 grouping,
@@ -522,8 +518,9 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         {
             foreach (var grouping in entityModels.GroupBy(x => x.GetType()))
             {
-                var store = await storeInfo.GetStoreForModelTypeAsync(grouping.Key, token);
-                await store.AddOrUpdateBatchAsync(grouping, token);
+                await storeInfo
+                    .GetStoreForModelType(grouping.Key)
+                    .AddOrUpdateBatchAsync(grouping, token);
             }
         }
 
@@ -610,27 +607,26 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
 
             TModel? model = null;
 
-            var stores = await storeInfo.GetAllStoresAsync(token);
-
-            switch (stores.Length)
+            if (!storeInfo.HasHierarchicStores)
+                model = await storeInfo.Store.GetAsync(identity.Id, token);
+            else
             {
-                case 0:
-                    return null;
-                case 1:
-                    model = await stores[0].GetAsync(identity.Id, token);
-                    break;
-                default:
-                {
-                    using var searchTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
+                using var searchTokenSource = new CancellationTokenSource();
+                using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(searchTokenSource.Token);
 
-                    await Parallel.ForEachAsync(stores, searchTokenSource.Token, async (store, token) =>
+                try
+                {
+                    await Parallel.ForEachAsync(storeInfo.AllStores, linkedTokenSource.Token, async (store, token) =>
                     {
                         model = await store.GetAsync(identity.Id, token);
 
                         if (model is not null)
                             searchTokenSource.Cancel();
                     });
-                    break;
+                }
+                catch (OperationCanceledException ex) when (ex.CancellationToken == searchTokenSource.Token)
+                {
+                    // do nothing, search has ended
                 }
             }
 
@@ -645,44 +641,34 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         }
     }
 
-    public async IAsyncEnumerable<IEntityHandle<TId, TEntity>> GetAllAsync(
+    public IAsyncEnumerable<IEntityHandle<TId, TEntity>> GetAllAsync(
         CachePathable path,
         IStoreInfo<TId, TModel> storeInfo,
-        [EnumeratorCancellation] CancellationToken token = default)
+        CancellationToken token = default)
     {
-        var stores = await storeInfo.GetAllStoresAsync(token);
-
-        if (stores.Length == 0)
-            yield break;
-
-        await foreach
-            (var model in AsyncEnumeratorUtils.JoinAsync(
-                stores,
+        return AsyncEnumeratorUtils
+            .JoinAsync(
+                storeInfo.AllStores,
                 static (store, token) => store.GetAllAsync(token),
-                token)
+                token
             )
-        {
-            yield return await UpdateOrCreateAsync(model, path, token);
-        }
+            .SelectAwait(async model =>
+                await UpdateOrCreateAsync(model, path, token)
+            );
     }
 
-    public async IAsyncEnumerable<IEntityHandle<TId, TEntity>> QueryAsync(
+    public IAsyncEnumerable<IEntityHandle<TId, TEntity>> QueryAsync(
         CachePathable path,
         IStoreInfo<TId, TModel> storeInfo,
         TId from,
         Optional<TId> to,
         Direction direction,
         int? limit = null,
-        [EnumeratorCancellation] CancellationToken token = default)
+        CancellationToken token = default)
     {
-        var stores = await storeInfo.GetAllStoresAsync(token);
-
-        if (stores.Length == 0)
-            yield break;
-
-        await foreach
-            (var model in AsyncEnumeratorUtils.JoinAsync(
-                stores,
+        return AsyncEnumeratorUtils
+            .JoinAsync(
+                storeInfo.AllStores,
                 static (from, to, direction, limit, store, token) => store.QueryAsync(
                     from,
                     to,
@@ -694,11 +680,11 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
                 to,
                 direction,
                 limit,
-                token)
+                token
             )
-        {
-            yield return await UpdateOrCreateAsync(model, path, token);
-        }
+            .SelectAwait(async model =>
+                await UpdateOrCreateAsync(model, path, token)
+            );
     }
 
     private async ValueTask<IEntityHandle<TId, TEntity>> UpdateOrCreateAsync(
@@ -711,11 +697,11 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
             await handle.Entity.UpdateAsync(model, false, token);
             return handle;
         }
-            
+
         using var scope = _keyedSemaphore.Get(model.Id, out var semaphoreSlim);
 
         await semaphoreSlim.WaitAsync(token);
-            
+
         try
         {
             if (!TryGetHandle(model.Id, out handle))
@@ -736,25 +722,16 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         return handle;
     }
 
-    public async IAsyncEnumerable<TId> GetAllIdsAsync(
+    public IAsyncEnumerable<TId> GetAllIdsAsync(
         IStoreInfo<TId, TModel> storeInfo,
-        [EnumeratorCancellation] CancellationToken token = default)
+        CancellationToken token = default)
     {
-        // we don't have to lock since we're not accessing the reference cache
-        var stores = await storeInfo.GetAllStoresAsync(token);
-
-        if (stores.Length == 0)
-            yield break;
-
-        await foreach
-            (var id in AsyncEnumeratorUtils.JoinAsync(
-                stores,
+        return AsyncEnumeratorUtils
+            .JoinAsync(
+                storeInfo.AllStores,
                 static (store, token) => store.GetAllIdsAsync(token),
-                token)
-            )
-        {
-            yield return id;
-        }
+                token
+            );
     }
 
     private IManageableEntityBroker<TId, TEntity, TModel> GetBrokerForModelType(Type type)
@@ -764,7 +741,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
 
         if (_brokerHierarchy.TryGetValue(type, out var broker))
             return broker;
-        
+
         // TODO: should we error?
         _logger.LogWarning(
             "No broker exists for the model {Model} in the hierarchy of {Entity}",
@@ -773,7 +750,7 @@ internal sealed class EntityBroker<TId, TEntity, TActor, TModel> : IEntityBroker
         );
         return this;
     }
-    
+
     private bool RemoveReference(EntityReference reference)
     {
         lock (_syncRoot)

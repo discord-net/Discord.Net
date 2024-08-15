@@ -359,9 +359,6 @@ internal interface IManageableEntityBroker<TId, in TEntity, in TModel> : IEntity
     [MustDisposeResource]
     ValueTask<IDisposable> GetEntityLockHandleAsync(TId id, CancellationToken token = default);
 
-    [MustDisposeResource]
-    ValueTask<IDisposable> GetBatchOperationLockAsync(CancellationToken token = default);
-    
     /// <summary>
     ///     Gets the entity type that this broker represents.
     /// </summary>

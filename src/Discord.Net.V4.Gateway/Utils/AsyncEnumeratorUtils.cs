@@ -5,20 +5,22 @@ namespace Discord.Gateway;
 internal static partial class AsyncEnumeratorUtils
 {
     public static IAsyncEnumerable<T> JoinAsync<T, U>(
-        U[] sources,
+        IEnumerable<U> sources,
         [VariableFuncArgs] Func<U, CancellationToken, IAsyncEnumerable<T>> mapper,
         CancellationToken token)
     {
-        switch (sources.Length)
+        var sourcesArray = sources as U[] ?? sources.ToArray();
+        
+        switch (sourcesArray.Length)
         {
             case 0:
                 return AsyncEnumerable.Empty<T>();
             case 1:
-                return mapper(sources[0], token);
+                return mapper(sourcesArray[0], token);
             default:
-                var asyncEnumerables = new IAsyncEnumerable<T>[sources.Length];
-                for (int i = 0; i < sources.Length; i++)
-                    asyncEnumerables[i] = mapper(sources[i], token);
+                var asyncEnumerables = new IAsyncEnumerable<T>[sourcesArray.Length];
+                for (int i = 0; i < sourcesArray.Length; i++)
+                    asyncEnumerables[i] = mapper(sourcesArray[i], token);
                 return JoinInternal(token, asyncEnumerables);
         }
     }

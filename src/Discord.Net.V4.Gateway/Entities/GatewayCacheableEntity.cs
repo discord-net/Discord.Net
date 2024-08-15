@@ -19,18 +19,25 @@ public abstract class GatewayCacheableEntity<TSelf, TId, TModel>(
     where TModel : class, IEntityModel<TId>
     where TSelf :
     GatewayCacheableEntity<TSelf, TId, TModel>,
-    IStoreProvider<TId, TModel>,
     IStoreInfoProvider<TId, TModel>,
     IBrokerProvider<TId, TSelf, TModel>,
     IContextConstructable<TSelf, TModel, IGatewayConstructionContext, DiscordGatewayClient>
 {
     protected async ValueTask UpdateCacheAsync(TSelf self, TModel model, CancellationToken token)
     {
-        var store = await self.GetStoreInfoAsync(token);
-        await self.GetBroker().UpdateAsync(model, store, token);
+        await TSelf.GetBroker(Client)
+            .UpdateAsync(
+                model,
+                await TSelf.GetStoreInfoAsync(Client, CachePath, token),
+                token
+            );
     }
 
     public abstract TModel GetModel();
 
     public abstract ValueTask UpdateAsync(TModel model, bool updateCache = true, CancellationToken token = default);
+
+    internal abstract CachePathable CachePath { get; }
+
+    CachePathable ICacheableEntity<TSelf, TId, TModel>.CachePath => CachePath;
 }

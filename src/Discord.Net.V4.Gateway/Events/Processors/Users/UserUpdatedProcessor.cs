@@ -11,7 +11,7 @@ public sealed partial class UserUpdatedProcessor(DiscordGatewayClient client) :
         IUserUpdatedPayloadData payload,
         CancellationToken token = default)
     {
-        var broker = await GatewayCurrentUserActor.GetConfiguredBrokerAsync(client, CachePathable.Empty, token);
+        var broker = await Brokers.CurrentUser.GetConfiguredBrokerAsync(client, token: token);
         await broker.UpdateAsync(payload, token);
     }
 }

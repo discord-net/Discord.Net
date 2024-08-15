@@ -20,9 +20,11 @@ internal sealed record UpdateOperation<TId, TEntity, TModel>(
 {
     public async ValueTask UpdateAsync(CancellationToken token)
     {
-        var store = await Entity.GetStoreInfoAsync(token);
-
-        await Broker.UpdateAsync(Model, store, token);
+        await Broker.UpdateAsync(
+            Model,
+            await TEntity.GetStoreInfoAsync(Entity.Client, Entity.CachePath, token),
+            token
+        );
     }
 }
 
