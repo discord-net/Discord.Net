@@ -22,7 +22,7 @@ A valid AutocompleteHandlers must inherit [AutocompleteHandler] base type and im
 
 In order for Autocompletehandlers to work you must register a AutocompleteExecuted method with your DiscordSocketClient
 
-[!code-csharp[RegisterAutocompleteExecuted](docs/guides/int_framework/samples/autocompletion/exampleRegisterAutocompletion.cs)]
+[!code-csharp[RegisterAutocompleteExecuted](samples/autocompletion/exampleRegisterAutocompletion.cs)]
 
 ### GenerateSuggestionsAsync()
 
