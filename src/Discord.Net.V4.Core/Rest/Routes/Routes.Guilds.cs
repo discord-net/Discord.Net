@@ -129,6 +129,16 @@ public partial class Routes
         new ApiOutRoute<Role[]>(nameof(GetGuildRoles), RequestMethod.Get, $"guilds/{guildId}/roles",
             (ScopeType.Guild, guildId));
 
+    public static IApiOutRoute<Role> GetGuildRole(
+        [IdHeuristic<IGuild>] ulong guildId,
+        [IdHeuristic<IRole>] ulong roleId
+    ) => new ApiOutRoute<Role>(
+        nameof(GetGuildRoles),
+        RequestMethod.Get,
+        $"guilds/{guildId}/roles",
+        (ScopeType.Guild, guildId)
+    );
+
     public static IApiInOutRoute<CreateGuildRoleParams, Role>
         CreateGuildRole([IdHeuristic<IGuild>] ulong guildId, CreateGuildRoleParams body) =>
         new ApiInOutRoute<CreateGuildRoleParams, Role>(nameof(CreateGuildRole), RequestMethod.Post,
