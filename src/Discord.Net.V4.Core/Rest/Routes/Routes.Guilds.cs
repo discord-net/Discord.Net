@@ -135,7 +135,7 @@ public partial class Routes
     ) => new ApiOutRoute<Role>(
         nameof(GetGuildRoles),
         RequestMethod.Get,
-        $"guilds/{guildId}/roles",
+        $"guilds/{guildId}/roles/{roleId}",
         (ScopeType.Guild, guildId)
     );
 
