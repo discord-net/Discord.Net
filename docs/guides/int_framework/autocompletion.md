@@ -20,6 +20,10 @@ A valid AutocompleteHandlers must inherit [AutocompleteHandler] base type and im
 
 [!code-csharp[Autocomplete Command Example](samples/autocompletion/autocomplete-example.cs)]
 
+In order for Autocompletehandlers to work you must register a AutocompleteExecuted method with your DiscordSocketClient
+
+[!code-csharp[RegisterAutocompleteExecuted](docs/guides/int_framework/samples/autocompletion/exampleRegisterAutocompletion.cs)]
+
 ### GenerateSuggestionsAsync()
 
 The Interactions Service uses this method to generate a response of an Autocomplete Interaction.
