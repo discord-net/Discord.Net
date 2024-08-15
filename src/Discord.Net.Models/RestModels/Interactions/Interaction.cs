@@ -72,7 +72,7 @@ public sealed class Interaction :
     IApplicationIntegrationTypes? IInteractionModel.AuthorizingIntegrationOwners => AuthorizingIntegrationOwners;
     int IInteractionModel.Context => Context;
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (Channel.IsSpecified)
             yield return Channel.Value;

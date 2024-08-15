@@ -119,18 +119,41 @@ public sealed class GatewayPayloadConverter : JsonConverter<GatewayMessage>
 
         var payloadType = message.OpCode switch
         {
-            GatewayOpCode.Dispatch when message.EventName is not null
-                => DispatchToPayload.GetValueOrDefault(message.EventName),
+            GatewayOpCode.Dispatch when message.EventName is {IsSpecified: true, Value: not null}
+                => DispatchToPayload.GetValueOrDefault(message.EventName.Value),
             _ => OpCodeToPayload.GetValueOrDefault(message.OpCode)
         };
 
-        if(payloadType is not null)
+        if (payloadType is not null)
             message.Payload = payloadData.Deserialize(payloadType, options) as IGatewayPayloadData;
 
         return message;
     }
 
-    public override void Write(Utf8JsonWriter writer, GatewayMessage value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, GatewayMessage? value, JsonSerializerOptions options)
     {
+        if (value == null)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+
+        writer.WriteStartObject();
+
+        writer.WriteNumber("op", (byte) value.OpCode);
+        if (value.Sequence is {IsSpecified: true, Value: not null})
+            writer.WriteNumber("s", value.Sequence.Value.Value);
+
+        if (
+            value.Payload is not null &&
+            OpCodeToPayload.TryGetValue(value.OpCode, out var payloadType) &&
+            payloadType is not null)
+        {
+            writer.WritePropertyName("d");
+            var typeInfo = options.GetTypeInfo(payloadType);
+            JsonSerializer.Serialize(writer, value.Payload, typeInfo);
+        }
+
+        writer.WriteEndObject();
     }
 }

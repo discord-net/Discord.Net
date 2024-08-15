@@ -41,5 +41,5 @@ public sealed class UserConnection : IUserConnectionModel, IModelSource, IModelS
 
     IEnumerable<IIntegrationModel> IModelSourceOfMultiple<IIntegrationModel>.GetModels() => Integrations | [];
 
-    public IEnumerable<IEntityModel> GetDefinedModels() => Integrations | [];
+    public IEnumerable<IModel> GetDefinedModels() => Integrations | [];
 }

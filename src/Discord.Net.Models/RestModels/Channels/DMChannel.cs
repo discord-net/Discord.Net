@@ -19,7 +19,7 @@ public sealed class DMChannel : Channel, IDMChannelModel, IModelSource, IModelSo
     public required User[] Recipients { get; set; }
 
     ulong IDMChannelModel.RecipientId => Recipients[0].Id;
-    public IEnumerable<IEntityModel> GetDefinedModels() => Recipients;
+    public IEnumerable<IModel> GetDefinedModels() => Recipients;
 
     IUserModel IModelSourceOf<IUserModel>.Model => Recipients[0];
 }

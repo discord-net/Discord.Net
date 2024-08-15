@@ -263,7 +263,7 @@ public static class ModifyTrait
                                 ? (TypeSyntax[])
                                 [
                                     apiParamsType,
-                                    SyntaxFactory.IdentifierName("Discord.Models.IEntityModel")
+                                    SyntaxFactory.IdentifierName("Discord.Models.IModel")
                                 ]
                                 : [apiParamsType]
                         )

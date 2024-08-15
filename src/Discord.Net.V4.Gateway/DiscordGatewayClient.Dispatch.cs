@@ -24,6 +24,8 @@ public sealed partial class DiscordGatewayClient
             default:
                 if (payload is not null)
                 {
+                    _logger.LogInformation("Processing '{EventName}'...", type);
+                    
                     foreach (var processor in GetProcessors(type))
                         await processor.ProcessAsync(payload, token);
                 }

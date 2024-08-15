@@ -30,7 +30,7 @@ public sealed class ButtonComponent : MessageComponent, IModelSource, IButtonCom
     string? IButtonComponentModel.Url => ~Url;
     bool? IButtonComponentModel.IsDisabled => ~IsDisabled;
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (Emote.IsSpecified)
             yield return Emote.Value;

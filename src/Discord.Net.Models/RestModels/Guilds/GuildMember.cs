@@ -56,7 +56,7 @@ public sealed class GuildMember : IMemberModel, IModelSource, IModelSourceOf<IUs
     string? IMemberModel.Nickname => ~Nick;
     ulong IEntityModel<ulong>.Id => ~User.Map(v => v.Id);
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (User.IsSpecified)
             yield return User.Value;

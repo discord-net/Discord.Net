@@ -48,7 +48,7 @@ public sealed class Sticker :
 
     ulong? IGuildStickerModel.AuthorId => ~User.Map(v => v.Id);
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (User) yield return User.Value;
     }

@@ -26,5 +26,5 @@ public sealed class GuildWidget : IModelSource, IModelSourceOfMultiple<IChannelM
 
     IEnumerable<IMemberModel> IModelSourceOfMultiple<IMemberModel>.GetModels() => Members;
 
-    public IEnumerable<IEntityModel> GetDefinedModels() => [..Channels, ..Members];
+    public IEnumerable<IModel> GetDefinedModels() => [..Channels, ..Members];
 }

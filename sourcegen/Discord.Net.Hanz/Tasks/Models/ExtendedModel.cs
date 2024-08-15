@@ -1,7 +1,9 @@
+using System.Text;
 using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Discord.Net.Hanz.Tasks;
 
@@ -46,23 +48,28 @@ public static class ExtendedModel
             return;
         }
 
-        context.AddSource(
-            $"GeneratedConverters/Extended{symbol.Name}Converter",
+        var filename = $"GeneratedConverters/Extended{symbol.Name}Converter";
+
+        if (jsonContext.DynamicSources.ContainsKey(filename)) return;
+
+        jsonContext.DynamicSources[filename] = SourceText.From(
             $$"""
-            using Discord.Models;
-            using Discord.Models.Json;
-            using System.Text.Json;
-            using System.Text.Json.Nodes;
-            using System.Text.Json.Serialization;
-            using System.Text.Json.Serialization.Metadata;
+              using Discord.Models;
+              using Discord.Models.Json;
+              using System.Text.Json;
+              using System.Text.Json.Nodes;
+              using System.Text.Json.Serialization;
+              using System.Text.Json.Serialization.Metadata;
 
-            namespace Discord.Converters;
+              namespace Discord.Converters;
 
-            {{converter.NormalizeWhitespace()}}
-            """
+              {{converter.NormalizeWhitespace()}}
+              """,
+            Encoding.UTF8
         );
 
-        AddProxiesIfNeeded(symbol, extendedMembers, context);
+
+        AddProxiesIfNeeded(symbol, extendedMembers, jsonContext);
 
         logger.Log($"{symbol}: Generated extended converter");
     }
@@ -70,7 +77,7 @@ public static class ExtendedModel
     private static void AddProxiesIfNeeded(
         ITypeSymbol symbol,
         IPropertySymbol[] properties,
-        SourceProductionContext context)
+        JsonModels.Context context)
     {
         if (symbol.DeclaringSyntaxReferences.Length == 0)
             return;
@@ -78,8 +85,28 @@ public static class ExtendedModel
         if (symbol.DeclaringSyntaxReferences[0].GetSyntax() is not TypeDeclarationSyntax targetSyntax)
             return;
 
-        if (targetSyntax.Modifiers.All(x => x.RawKind != (ushort)SyntaxKind.PartialKeyword))
+        if (targetSyntax.Modifiers.All(x => x.RawKind != (ushort) SyntaxKind.PartialKeyword))
             return;
+
+        var syntax = SyntaxUtils.CreateSourceGenClone(targetSyntax);
+
+        foreach (var property in properties)
+        {
+            syntax = syntax
+                .WithBaseList(
+                    (syntax.BaseList ?? SyntaxFactory.BaseList())
+                    .AddTypes(
+                        SyntaxFactory.SimpleBaseType(
+                            SyntaxFactory.ParseTypeName($"IExtendedModel<{property.Type}>")
+                        )
+                    )
+                )
+                .AddMembers(
+                    SyntaxFactory.ParseMemberDeclaration(
+                        $"{property.Type} IExtendedModel<{property.Type}>.ExtendedValue => {property.Name};"
+                    )!
+                );
+        }
 
         var proxiedMembers = new Dictionary<IPropertySymbol, List<IPropertySymbol>>(SymbolEqualityComparer.Default);
 
@@ -92,9 +119,9 @@ public static class ExtendedModel
             foreach (var commonInterface in commonInterfaces)
             foreach (var member in commonInterface.GetMembers().OfType<IPropertySymbol>())
             {
-                if(!member.IsAbstract) continue;
+                if (!member.IsAbstract) continue;
 
-                if(symbol.FindImplementationForInterfaceMember(member) is not null) continue;
+                if (symbol.FindImplementationForInterfaceMember(member) is not null) continue;
 
                 if (!proxiedMembers.TryGetValue(property, out var members))
                     proxiedMembers[property] = members = new();
@@ -102,11 +129,6 @@ public static class ExtendedModel
                 members.Add(member);
             }
         }
-
-        if (proxiedMembers.Count == 0)
-            return;
-
-        var syntax = SyntaxUtils.CreateSourceGenClone(targetSyntax);
 
         foreach (var entry in proxiedMembers)
         foreach (var prop in entry.Value)
@@ -121,15 +143,20 @@ public static class ExtendedModel
             );
         }
 
-        context.AddSource(
-            $"ProxiedModels/{symbol.Name}",
+        var filename = $"ProxiedModels/{symbol.Name}";
+
+        if (context.DynamicSources.ContainsKey(filename))
+            return;
+
+        context.DynamicSources[filename] = SourceText.From(
             $$"""
-            {{targetSyntax.GetFormattedUsingDirectives()}}
+              {{targetSyntax.GetFormattedUsingDirectives()}}
 
-            namespace {{symbol.ContainingNamespace}};
+              namespace {{symbol.ContainingNamespace}};
 
-            {{syntax.NormalizeWhitespace()}}
-            """
+              {{syntax.NormalizeWhitespace()}}
+              """,
+            Encoding.UTF8
         );
     }
 
@@ -170,9 +197,9 @@ public static class ExtendedModel
                   using var jsonDocument = JsonDocument.ParseValue(ref reader);
                   var element = jsonDocument.RootElement;
                   var result = element.Deserialize(GetTypeInfoWithoutConverter(options));
-
+              
                   if(result is null) return null;
-
+              
                   {{
                       string.Join(
                           "\n",
@@ -183,7 +210,7 @@ public static class ExtendedModel
                           )
                       )
                   }}
-
+              
                   return result;
               }
               """
@@ -195,29 +222,28 @@ public static class ExtendedModel
               {
                   var node = JsonSerializer.SerializeToNode(value, GetTypeInfoWithoutConverter(options))
                       as System.Text.Json.Nodes.JsonObject;
-
+              
                   if(node is null) return;
-
+              
                   {{
                       string.Join(
                           "\n",
                           extended.Select(x =>
                               $$"""
-                              var {{x.Name}}Prop = JsonSerializer.SerializeToNode(value.{{x.Name}}, options)
-                                  as System.Text.Json.Nodes.JsonObject;
+                                var {{x.Name}}Prop = JsonSerializer.SerializeToNode(value.{{x.Name}}, options)
+                                    as System.Text.Json.Nodes.JsonObject;
 
-                              if ({{x.Name}}Prop is not null)
-                              {
-                                  foreach(var prop in {{x.Name}}Prop)
-                                      node.Add(prop);
-                              }
+                                if ({{x.Name}}Prop is not null)
+                                {
+                                    foreach(var prop in {{x.Name}}Prop)
+                                        node.Add(prop);
+                                }
 
-                              """
-
+                                """
                           )
                       )
                   }}
-
+              
                   node.WriteTo(writer, options);
               }
               """

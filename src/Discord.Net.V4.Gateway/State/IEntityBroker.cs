@@ -14,6 +14,8 @@ internal interface IEntityReference<out TId> :
     IIdentifiable<TId>
     where TId : IEquatable<TId>
 {   
+    IEntityBroker OwningBroker { get; }
+    
     [MustDisposeResource]
     ValueTask<IDisposable> GetMutationLockHandleAsync(CancellationToken token = default);
 }
@@ -326,7 +328,7 @@ internal interface IManageableEntityBroker<TId, in TEntity, in TModel> : IEntity
     ///     If the entity that the <paramref name="model"/> will represent exists already, or is being created
     ///     concurrently, the handle returned will point to that entity.
     /// </remarks>
-    ValueTask<IEntityHandle<TId>> TransferConstructionOfEntity(
+    ValueTask<IEntityHandle<TId>> TransferConstructionOfEntityAsync(
         TModel model,
         IGatewayConstructionContext context,
         CancellationToken token

@@ -37,5 +37,5 @@ public sealed class GroupDMChannel : Channel, IGroupDMChannelModel, IModelSource
 
     IEnumerable<IUserModel> IModelSourceOfMultiple<IUserModel>.GetModels() => Recipients;
 
-    public IEnumerable<IEntityModel> GetDefinedModels() => Recipients;
+    public IEnumerable<IModel> GetDefinedModels() => Recipients;
 }

@@ -62,7 +62,7 @@ public interface IModifiable<TId, in TSelf, out TParams, TApi, in TModel> :
         CancellationToken token)
         => ModifyAsync(func, options, token);
 
-    internal new static abstract IApiInOutRoute<TApi, IEntityModel> ModifyRoute(IPathable path, TId id, TApi args);
+    internal new static abstract IApiInOutRoute<TApi, IModel> ModifyRoute(IPathable path, TId id, TApi args);
 
     static IApiInRoute<TApi> IModifiable<TId, TSelf, TParams, TApi>.ModifyRoute(IPathable path, TId id, TApi args)
         => TSelf.ModifyRoute(path, id, args);
@@ -138,7 +138,7 @@ public interface IModifiable<TId, in TSelf, out TParams, TApi, TEntity, in TMode
         CancellationToken token)
         => ModifyAsync(func, options, token);
 
-    internal new static abstract IApiInOutRoute<TApi, IEntityModel> ModifyRoute(IPathable path, TId id, TApi args);
+    internal new static abstract IApiInOutRoute<TApi, IModel> ModifyRoute(IPathable path, TId id, TApi args);
 
     static IApiInRoute<TApi> IModifiable<TId, TSelf, TParams, TApi>.ModifyRoute(IPathable path, TId id, TApi args)
         => TSelf.ModifyRoute(path, id, args);

@@ -1,7 +1,7 @@
 namespace Discord.Gateway;
 
-public sealed class GatewayClosedException(GatewayCloseStatus status)
+public sealed class GatewayClosedException(GatewayReadResult result)
     : DiscordException("The gateway connection was closed")
 {
-    public GatewayCloseStatus Status { get; } = status;
+    public GatewayReadResult Result { get; } = result;
 }

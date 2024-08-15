@@ -10,12 +10,15 @@ public sealed class GatewayMessage : IGatewayMessage
     public GatewayOpCode OpCode { get; set; }
 
     [JsonPropertyName("t")]
-    public string? EventName { get; set; }
-
+    public Optional<string?> EventName { get; set; }
+    
     [JsonPropertyName("s")]
-    public int? Sequence { get; set; }
-
+    public Optional<int?> Sequence { get; set; }
+    
     // see ../Converters/GatewayPayloadConverter.cs
     [JsonIgnore]
     public IGatewayPayloadData? Payload { get; set; }
+
+    string? IGatewayMessage.EventName => ~EventName;
+    int? IGatewayMessage.Sequence => ~Sequence;
 }

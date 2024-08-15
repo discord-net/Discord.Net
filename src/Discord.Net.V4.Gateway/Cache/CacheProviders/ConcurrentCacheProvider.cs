@@ -51,7 +51,7 @@ public sealed partial class ConcurrentCacheProvider : ICacheProvider
             where TSubStoreModel : class, IEntityModel<TSubStoreId>
         {
             if (
-                _subStoreCache.GetOrAdd(id, _ => new Store<TId, TModel>())
+                _subStoreCache.GetOrAdd(id, _ => new Store<TSubStoreId, TSubStoreModel>())
                 is not IEntityModelStore<TSubStoreId, TSubStoreModel> store
             ) throw new DiscordException("Corrupted cache data");
 

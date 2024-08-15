@@ -35,12 +35,6 @@ public class OptionalConverter : JsonConverterFactory
 
 public sealed class OptionalConverter<T> : JsonConverter<Optional<T>>
 {
-    public override void WriteAsPropertyName(Utf8JsonWriter writer, Optional<T> value, JsonSerializerOptions options)
-    {
-        if(value.IsSpecified)
-            base.WriteAsPropertyName(writer, value, options);
-    }
-
     public override Optional<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return new Optional<T>(JsonSerializer.Deserialize<T>(ref reader, options)!);

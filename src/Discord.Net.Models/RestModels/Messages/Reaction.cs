@@ -35,7 +35,7 @@ public sealed class Reaction :
     bool IReactionModel.MeBurst => IsMeBurst;
     string[] IReactionModel.BurstColors => Colors;
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         yield return Emoji;
     }

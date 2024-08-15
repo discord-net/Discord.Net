@@ -91,7 +91,7 @@ public static class RestEnumerableIndexableActor
         IApiOutRoute<IEnumerable<TModel>> route,
         RequestOptions? options,
         CancellationToken token)
-        where TModel : class, IEntityModel
+        where TModel : class, IModel
     {
         return client.RestApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token);
     }

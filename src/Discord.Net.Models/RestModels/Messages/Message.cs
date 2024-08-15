@@ -145,7 +145,7 @@ public sealed class Message :
 
     int? IMessageModel.Position => ~Position;
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (Author.IsSpecified)
             yield return Author.Value;

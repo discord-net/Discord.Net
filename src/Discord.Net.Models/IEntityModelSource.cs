@@ -9,7 +9,7 @@ public interface IModelSource
     ///     Gets a collection of other models defined on this type.
     /// </summary>
     /// <returns>A collection of other entities defined on this type.</returns>
-    IEnumerable<IEntityModel> GetDefinedModels();
+    IEnumerable<IModel> GetDefinedModels();
 }
 
 public interface IModelSourceOf<out TModel>
@@ -18,9 +18,9 @@ public interface IModelSourceOf<out TModel>
 }
 
 public interface IModelSourceOfMultiple<out TModel> : IModelSource
-    where TModel : IEntityModel
+    where TModel : IModel
 {
     IEnumerable<TModel> GetModels();
 
-    IEnumerable<IEntityModel> IModelSource.GetDefinedModels() => (IEnumerable<IEntityModel>) GetModels();
+    IEnumerable<IModel> IModelSource.GetDefinedModels() => (IEnumerable<IModel>) GetModels();
 }

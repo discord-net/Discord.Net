@@ -43,6 +43,6 @@ public sealed class AuditLog :
 
     IEnumerable<IWebhookModel> IModelSourceOfMultiple<IWebhookModel>.GetModels() => Webhooks;
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
         => [..GuildScheduledEvents, ..Integrations, ..Threads, ..Users, ..Webhooks];
 }

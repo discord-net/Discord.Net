@@ -63,7 +63,7 @@ public sealed class GuildScheduledEvent :
     DateTimeOffset? IGuildScheduledEventModel.ScheduledEndTime => ScheduledEndTime;
     string? IGuildScheduledEventModel.Location => EntityMetadata?.Location.GetValueOrDefault();
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (Creator.IsSpecified)
             yield return Creator.Value;

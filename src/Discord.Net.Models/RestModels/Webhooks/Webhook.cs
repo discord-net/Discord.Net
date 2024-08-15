@@ -57,7 +57,7 @@ public sealed class Webhook : IWebhookModel, IModelSource, IModelSourceOf<IUserM
     string? IWebhookModel.Url => ~Url;
     ulong? IWebhookModel.UserId => ~Creator.Map(v => v.Id);
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (Creator) yield return Creator.Value;
     }

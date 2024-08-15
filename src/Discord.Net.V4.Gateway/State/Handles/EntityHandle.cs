@@ -56,6 +56,11 @@ internal sealed class EntityHandle<TId, TEntity>(
         _owningReference = null;
     }
 
+    public override string ToString()
+    {
+        return $"{typeof(TEntity)} '{Id}'";
+    }
+
     public bool Equals(EntityHandle<TId, TEntity>? other)
         => other is not null && other.Id.Equals(Id);
 

@@ -4,8 +4,7 @@ namespace Discord.Models.Json;
 
 public sealed partial class GuildAuditLogEntryCreated : IAuditLogEntryPayloadData
 {
-    [JsonIgnore, JsonExtend]
-    public required AuditLogEntry AuditLogEntry { get; set; }
+    [JsonIgnore, JsonExtend] public AuditLogEntry AuditLogEntry { get; set; } = null!;
 
     [JsonPropertyName("guild_id")]
     public ulong GuildId { get; set; }

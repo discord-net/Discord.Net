@@ -21,7 +21,7 @@ public sealed class IntegrationApplication : IApplicationModel, IModelSource, IM
 
     ulong? IApplicationModel.BotId => ~Bot.Map(v => v.Id);
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (Bot.IsSpecified)
             yield return Bot.Value;

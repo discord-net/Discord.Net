@@ -84,7 +84,7 @@ public sealed class Activity :
 
     DateTimeOffset? IActivityModel.TimestampEnd => ~Timestamps.Map(v => v.End);
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (Emoji is {IsSpecified: true, Value: not null})
             yield return Emoji.Value;

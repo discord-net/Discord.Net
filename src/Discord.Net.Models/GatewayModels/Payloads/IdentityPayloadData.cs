@@ -11,7 +11,7 @@ public sealed class IdentityPayloadData : IGatewayPayloadData
     public required IdentityConnectionProperties Properties { get; set; }
 
     [JsonPropertyName("intents")]
-    public ulong Intents { get; set; }
+    public int Intents { get; set; }
 
     [JsonPropertyName("compress")]
     public Optional<bool> Compress { get; set; }

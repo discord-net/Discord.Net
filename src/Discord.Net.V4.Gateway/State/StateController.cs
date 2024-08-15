@@ -10,6 +10,21 @@ using System.Threading.Channels;
 
 namespace Discord.Gateway.State;
 
+internal static class ModelMap
+{
+    private static readonly Dictionary<Type, Type> _fastLookup = new();
+    
+    public static bool TryGet(Type type, [MaybeNullWhen(false)]out Type result)
+    {
+        lock(_fastLookup) return _fastLookup.TryGetValue(type, out result);
+    }
+
+    public static void Set(Type type, Type value)
+    {
+        lock(_fastLookup) _fastLookup[type] = value;
+    }
+}
+
 internal sealed partial class StateController(
     DiscordGatewayClient client,
     ILogger<StateController> logger

@@ -10,7 +10,7 @@ public sealed class Ban : IBanModel, IModelSource, IModelSourceOf<IUserModel>
     [JsonPropertyName("user")]
     public required User User { get; set; }
 
-    public IEnumerable<IEntityModel> GetDefinedModels() => [User];
+    public IEnumerable<IModel> GetDefinedModels() => [User];
     ulong IBanModel.UserId => User.Id;
 
     IUserModel IModelSourceOf<IUserModel>.Model => User;

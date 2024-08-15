@@ -1,7 +1,9 @@
+using System.Text;
 using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Discord.Net.Hanz.Tasks;
 
@@ -148,8 +150,11 @@ public sealed class DiscriminatedUnion
             .AddMembers(read, write)
             .AddMembers(propMethods.ToArray());
 
-        context.AddSource(
-            $"GeneratedConverters/{root.Name}Union",
+        var filename = $"GeneratedConverters/{root.Name}Union";
+
+        if (jsonContext.DynamicSources.ContainsKey(filename)) return;
+
+        jsonContext.DynamicSources[filename] = SourceText.From(
             $$"""
               using Discord.Models;
               using Discord.Models.Json;
@@ -161,7 +166,8 @@ public sealed class DiscriminatedUnion
               namespace Discord.Converters;
 
               {{syntax.NormalizeWhitespace()}}
-              """
+              """,
+            Encoding.UTF8
         );
     }
 
@@ -249,7 +255,13 @@ public sealed class DiscriminatedUnion
             return;
         }
 
-        var converter = CreateRootConverter(root, propertyName, unionTypes, logger);
+        var converter = CreateRootConverter(
+            root,
+            propertyName,
+            unionTypes,
+            logger,
+            out var unionProperty
+        );
 
         if (converter is null)
         {
@@ -262,8 +274,11 @@ public sealed class DiscriminatedUnion
         if (!jsonContext.AdditionalConverters.Add($"Discord.Converters.{converter.Identifier.ValueText}"))
             return;
 
-        context.AddSource(
-            $"GeneratedConverters/{root.Name}Union",
+        var filename = $"GeneratedConverters/{root.Name}Union";
+
+        if (jsonContext.DynamicSources.ContainsKey(filename)) return;
+
+        jsonContext.DynamicSources[filename] = SourceText.From(
             $$"""
               using Discord.Models;
               using Discord.Models.Json;
@@ -275,7 +290,8 @@ public sealed class DiscriminatedUnion
               namespace Discord.Converters;
 
               {{converter.NormalizeWhitespace()}}
-              """
+              """,
+            Encoding.UTF8
         );
 
         // we want to add converters for every type within the hierarchy tree from 'symbol' to each member
@@ -298,7 +314,9 @@ public sealed class DiscriminatedUnion
                     .GetBaseTypes(x.Type)
                     .Contains(extraBase, SymbolEqualityComparer.Default)
                 ).ToList(),
-                logger
+                logger,
+                out _,
+                unionProperty
             );
 
             if (extraConverter is null)
@@ -312,8 +330,11 @@ public sealed class DiscriminatedUnion
 
             jsonContext.RequestedNoConverterTypeInfos.Add(extraBase);
 
-            context.AddSource(
-                $"GeneratedConverters/{extraBase.Name}Union",
+            filename = $"GeneratedConverters/{extraBase.Name}Union";
+
+            if (jsonContext.DynamicSources.ContainsKey(filename)) continue;
+
+            jsonContext.DynamicSources[filename] = SourceText.From(
                 $$"""
                   using Discord.Models;
                   using Discord.Models.Json;
@@ -325,7 +346,8 @@ public sealed class DiscriminatedUnion
                   namespace Discord.Converters;
 
                   {{extraConverter.NormalizeWhitespace()}}
-                  """
+                  """,
+                Encoding.UTF8
             );
         }
     }
@@ -334,21 +356,40 @@ public sealed class DiscriminatedUnion
         ITypeSymbol symbol,
         string propertyName,
         List<UnionType> unionTypes,
-        Logger logger
+        Logger logger,
+        out IPropertySymbol? unionProperty,
+        IPropertySymbol? property = null
     )
     {
-        var property = unionTypes
-            .SelectMany(x => x
-                .Type
-                .GetMembers()
-                .OfType<IPropertySymbol>()
-            )
-            .FirstOrDefault(x => x.Name == propertyName);
+        unionProperty = property;
 
         if (property is null)
         {
-            logger.Warn($"{symbol}: Failed to find a union property with the name '{propertyName}'");
-            return null;
+            var properties = symbol
+                .GetMembers()
+                .OfType<IPropertySymbol>()
+                .Concat(unionTypes
+                    .SelectMany(x => x
+                        .Type
+                        .GetMembers()
+                        .OfType<IPropertySymbol>()
+                    )
+                )
+                .ToArray();
+
+            unionProperty = property = properties.FirstOrDefault(x => x.Name == propertyName);
+
+            if (property is null)
+            {
+                logger.Warn($"{symbol}: Failed to find a union property with the name '{propertyName}'");
+                logger.Warn($"{symbol}: Candidate properties:");
+                foreach (var candidate in properties)
+                {
+                    logger.Warn($" - {candidate.ContainingType}: {candidate}");
+                }
+
+                return null;
+            }
         }
 
         var typeName = symbol.ToDisplayString();
@@ -441,7 +482,7 @@ public sealed class DiscriminatedUnion
                                           """
                                       : string.Empty
                               )}}
-                              
+
                               if (!_lookupTable.TryGetValue(delimiter, out var unionType))
                               return {{(
                                   presentNoMatchCase is not null

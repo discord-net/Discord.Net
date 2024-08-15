@@ -50,14 +50,13 @@ public static class JsonModels
         ClassDeclarationSyntax resolver,
         HashSet<string> contextAttributes,
         HashSet<ITypeSymbol> modelTypesForContext,
-        HashSet<string> additionalConverters,
         JsonModelTarget[] targets
     )
     {
         public ClassDeclarationSyntax Resolver = resolver;
         public HashSet<string> ContextAttributes { get; } = contextAttributes;
         public HashSet<ITypeSymbol> ModelTypesForContext { get; } = modelTypesForContext;
-        public HashSet<string> AdditionalConverters { get; } = additionalConverters;
+        public HashSet<string> AdditionalConverters { get; } = new();
         public JsonModelTarget[] Targets { get; } = targets;
 
         public HashSet<string> NoContextTypeInfos = new();
@@ -114,8 +113,6 @@ public static class JsonModels
             []
         );
 
-        var additionalConverters = new HashSet<string>();
-
         var targets = potentialTargets
             .Where(x => x is not null && IsSpeculativeJsonModel(x.TypeSymbol))
             .Cast<JsonModelTarget>()
@@ -125,7 +122,6 @@ public static class JsonModels
             resolverSyntax,
             contextAttributes,
             modelTypesForContext,
-            additionalConverters,
             targets
         );
 
@@ -230,11 +226,18 @@ public static class JsonModels
             logger.Warn("Failed to add user type info factory");
             return;
         }
+        
+        logger.Log("Using the following additional converters:");
+
+        foreach (var converter in jsonContext.AdditionalConverters)
+        {
+            logger.Log($" - {converter}");
+        }
 
         var options = GenerateOptions(
             modelTypesForContext,
             lowestDistanceInterfaceMap,
-            additionalConverters,
+            jsonContext.AdditionalConverters,
             out var extra
         );
 
@@ -267,7 +270,7 @@ public static class JsonModels
         foreach (var dynamicSource in jsonContext.DynamicSources)
         {
             logger.Log($"Generating dynamic source '{dynamicSource.Key}'");
-            
+
             context.AddSource(
                 dynamicSource.Key,
                 dynamicSource.Value
@@ -469,7 +472,8 @@ public static class JsonModels
         {
             "Discord.Converters.SnowflakeConverter",
             "Discord.Converters.BigIntegerConverter",
-            "Discord.Converters.UserConverter"
+            "Discord.Converters.UserConverter",
+            "Discord.Converters.GatewayPayloadConverter"
         };
 
         converters.UnionWith(additionalConverters);
@@ -508,7 +512,11 @@ public static class JsonModels
             }
         }
 
-        var options = new HashSet<string>() {"PropertyNameCaseInsensitive = false", "IgnoreReadOnlyProperties = true"};
+        var options = new HashSet<string>()
+        {
+            "PropertyNameCaseInsensitive = false",
+            "IgnoreReadOnlyProperties = true"
+        };
 
         if (converters.Count > 0)
         {
@@ -520,14 +528,15 @@ public static class JsonModels
             : null;
     }
 
-    private static IEnumerable<Hierarchy.SortedHierarchySymbol> GetModelInterfaces(ITypeSymbol symbol)
+    public static IEnumerable<Hierarchy.SortedHierarchySymbol> GetModelInterfaces(ITypeSymbol symbol)
     {
         return Hierarchy.GetHierarchy(symbol)
             .Where(x =>
+                !x.Type.ToDisplayString().StartsWith("Discord.Models.IModel") &&
                 !x.Type.ToDisplayString().StartsWith("Discord.Models.IEntityModel") &&
                 x.Type
                     .AllInterfaces
-                    .Any(x => x.ToDisplayString() == "Discord.Models.IEntityModel")
+                    .Any(x => x.ToDisplayString() == "Discord.Models.IModel")
             );
     }
 
@@ -579,11 +588,237 @@ public static class JsonModels
         {
             foreach (var source in result.GeneratedSources)
             {
-                context.AddSource("GeneratedSTJ/" + source.HintName, source.SourceText);
+                var sourceText = source.SourceText;
+
+                if (InterceptOptionals(source, jsonContext, out var tree, logger))
+                {
+                    sourceText = SourceText.From(
+                        tree.ToString(),
+                        sourceText.Encoding ?? Encoding.UTF8
+                    );
+                }
+
+                context.AddSource("GeneratedSTJ/" + source.HintName, sourceText);
             }
 
             yield return result;
         }
+    }
+
+    private static bool InterceptOptionals(
+        GeneratedSourceResult source,
+        Context jsonContext,
+        out SyntaxTree syntaxTree,
+        Logger logger)
+    {
+        syntaxTree = source.SyntaxTree;
+        SyntaxNode rootNode = syntaxTree.GetRoot();
+
+        rootNode = rootNode.ReplaceNodes(
+            rootNode
+                .DescendantNodes()
+                .OfType<MethodDeclarationSyntax>()
+                .Where(x => x.Identifier.ValueText.EndsWith("PropInit")),
+            (node, _) =>
+            {
+                if (node.Body is null) return node;
+
+                var type = jsonContext.ModelTypesForContext.FirstOrDefault(x =>
+                    x.Name == node.Identifier.ValueText.Replace("PropInit", string.Empty)
+                );
+
+                if (type is null)
+                {
+                    return node;
+                }
+
+                var optionalMembers = type.GetMembers()
+                    .OfType<IPropertySymbol>()
+                    .Where(IsNotIgnoredJsonProperty)
+                    .Where(x => x.Type.Name is "Optional")
+                    .ToArray();
+
+                if (optionalMembers.Length == 0)
+                {
+                    return node;
+                }
+
+                return node.WithBody(
+                    node.Body.ReplaceNodes(
+                        node.Body.DescendantNodes()
+                            .OfType<ObjectCreationExpressionSyntax>()
+                            .Where(x => x.Type is QualifiedNameSyntax
+                            {
+                                Right.Identifier.ValueText: "JsonPropertyInfoValues"
+                            }),
+                        (node, _) =>
+                        {
+                            if (node.Initializer is null)
+                                return node;
+
+                            var assignments = node.Initializer.Expressions
+                                .OfType<AssignmentExpressionSyntax>()
+                                .ToArray();
+
+                            if (assignments.Length == 0)
+                                return node;
+
+                            var isOptional = assignments
+                                .Any(x =>
+                                    x is
+                                    {
+                                        Left: IdentifierNameSyntax
+                                        {
+                                            Identifier.ValueText: "PropertyName"
+                                        },
+                                        Right: LiteralExpressionSyntax
+                                        {
+                                            RawKind: (int) SyntaxKind.StringLiteralExpression
+                                        } literal
+                                    }
+                                    &&
+                                    optionalMembers.Any(y => y.Name == literal.Token.Value as string)
+                                );
+
+                            if (!isOptional) return node;
+
+                            if (
+                                assignments.FirstOrDefault(x => x is
+                                {
+                                    Left: IdentifierNameSyntax
+                                    {
+                                        Identifier.ValueText: "IgnoreCondition"
+                                    }
+                                }) is { } existing
+                            )
+                            {
+                                node = node.WithInitializer(
+                                    node.Initializer.WithExpressions(
+                                        node.Initializer.Expressions.Remove(existing)
+                                    )
+                                );
+                            }
+
+                            return node.WithInitializer(
+                                node.Initializer!.AddExpressions(
+                                    SyntaxFactory.AssignmentExpression(
+                                        SyntaxKind.SimpleAssignmentExpression,
+                                        SyntaxFactory.IdentifierName("IgnoreCondition"),
+                                        SyntaxFactory.MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            SyntaxFactory.IdentifierName(
+                                                "System.Text.Json.Serialization.JsonIgnoreCondition"),
+                                            SyntaxFactory.IdentifierName("WhenWritingDefault")
+                                        )
+                                    )
+                                )
+                            );
+                        }
+                    )
+                );
+            }
+        );
+
+
+        rootNode = rootNode.ReplaceNodes(
+            rootNode
+                .DescendantNodes()
+                .OfType<MethodDeclarationSyntax>()
+                .Where(x => x.Identifier.ValueText.EndsWith("SerializeHandler")),
+            (node, _) =>
+            {
+                if (node.Body is null) return node;
+
+                var type = jsonContext.ModelTypesForContext.FirstOrDefault(x =>
+                    x.Name == node.Identifier.ValueText.Replace("SerializeHandler", string.Empty)
+                );
+
+                if (type is null)
+                {
+                    return node;
+                }
+
+                var optionalMembers = type.GetMembers()
+                    .OfType<IPropertySymbol>()
+                    .Where(IsNotIgnoredJsonProperty)
+                    .Where(x => x.Type.Name is "Optional")
+                    .ToArray();
+
+                if (optionalMembers.Length == 0)
+                {
+                    return node;
+                }
+
+                var newBody = SyntaxFactory.Block();
+
+                for (var i = 0; i < node.Body.Statements.Count; i++)
+                {
+                    var statement = node.Body.Statements[i];
+
+                    // were looking for:
+                    // global::System.Text.Json.JsonSerializer.Serialize(writer, ((global::Discord.Models.Json.SomeModel)value).SomeOptionalProp, OptionalType);
+                    if (
+                        statement is ExpressionStatementSyntax
+                        {
+                            Expression: InvocationExpressionSyntax
+                            {
+                                ArgumentList.Arguments.Count: 3,
+                                Expression: MemberAccessExpressionSyntax
+                                {
+                                    Name.Identifier.ValueText: "Serialize"
+                                }
+                            } invocationExpressionSyntax
+                        }
+                        &&
+                        invocationExpressionSyntax.ArgumentList.Arguments[1].Expression is MemberAccessExpressionSyntax
+                            access
+                        &&
+                        optionalMembers.Any(x => x.Name == access.Name.Identifier.ValueText)
+                        &&
+                        node.Body.Statements[i - 1] is ExpressionStatementSyntax
+                        {
+                            Expression: InvocationExpressionSyntax
+                            {
+                                Expression: MemberAccessExpressionSyntax
+                                {
+                                    Name.Identifier.ValueText: "WritePropertyName"
+                                }
+                            }
+                        }
+                    )
+                    {
+                        newBody = newBody
+                            .WithStatements(newBody.Statements
+                                .RemoveAt(newBody.Statements.Count - 1)
+                                .Add(
+                                    SyntaxFactory.ParseStatement(
+                                        $$"""
+                                          if ({{invocationExpressionSyntax.ArgumentList.Arguments[1].Expression}}.IsSpecified)
+                                          {
+                                             {{node.Body.Statements[i - 1]}}
+                                             {{statement}}
+                                          }
+                                          """
+                                    )
+                                )
+                            );
+                        
+                        continue;
+                    }
+
+                    newBody = newBody.AddStatements(statement);
+                }
+
+                return node.WithBody(newBody);
+            });
+
+        var isEq = rootNode.IsEquivalentTo(source.SyntaxTree.GetRoot());
+
+        if (!isEq)
+            syntaxTree = SyntaxFactory.SyntaxTree(rootNode.NormalizeWhitespace(), syntaxTree.Options,
+                encoding: syntaxTree.Encoding);
+
+        return !isEq;
     }
 
     private static bool IsSpeculativeJsonModel(ITypeSymbol type)
@@ -606,6 +841,15 @@ public static class JsonModels
                 x.AttributeClass?.ToDisplayString()
                     is "System.Text.Json.Serialization.JsonPropertyNameAttribute"
                     or ExtendedModel.ExtendedAttributeName
+            );
+    }
+
+    public static bool IsNotIgnoredJsonProperty(IPropertySymbol symbol)
+    {
+        return IsJsonProperty(symbol) && symbol
+            .GetAttributes()
+            .All(x =>
+                x.AttributeClass?.ToDisplayString() is not "System.Text.Json.Serialization.JsonIgnoreAttribute"
             );
     }
 }

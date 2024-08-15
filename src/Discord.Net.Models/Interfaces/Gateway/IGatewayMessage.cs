@@ -1,6 +1,7 @@
 namespace Discord.Models;
 
-public interface IGatewayMessage
+[ModelEquality]
+public partial interface IGatewayMessage : IModel
 {
     GatewayOpCode OpCode { get; }
     IGatewayPayloadData? Payload { get; }

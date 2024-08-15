@@ -4,6 +4,5 @@ namespace Discord.Models.Json;
 
 public sealed partial class EntitlementPayload : IEntitlementPayloadData
 {
-    [JsonIgnore, JsonExtend]
-    public required Entitlement Entitlement { get; set; }
+    [JsonIgnore, JsonExtend] public Entitlement Entitlement { get; set; } = null!;
 }

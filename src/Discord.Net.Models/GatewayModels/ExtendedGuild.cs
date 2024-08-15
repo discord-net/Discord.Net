@@ -6,7 +6,7 @@ namespace Discord.Models.Json;
 public sealed partial class ExtendedGuild : GuildCreated, IExtendedGuild
 {
     [JsonIgnore, JsonExtend]
-    public required Guild Guild { get; set; }
+    public Guild Guild { get; set; } = null!;
 
     [JsonPropertyName("joined_at")]
     public DateTimeOffset JoinedAt { get; set; }

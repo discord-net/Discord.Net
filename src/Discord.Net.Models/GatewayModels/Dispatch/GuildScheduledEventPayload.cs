@@ -4,6 +4,5 @@ namespace Discord.Models.Json;
 
 public sealed partial class GuildScheduledEventPayload : IGuildScheduledEventPayloadData
 {
-    [JsonIgnore, JsonExtend]
-    public required GuildScheduledEvent Event { get; set; }
+    [JsonIgnore, JsonExtend] public GuildScheduledEvent Event { get; set; } = null!;
 }

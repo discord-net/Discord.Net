@@ -3,17 +3,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Discord.Gateway.Events;
 
-public sealed partial class ConcurrentGatewayDispatchQueue : IGatewayDispatchQueue
+[method: TypeFactory]
+public sealed partial class ConcurrentGatewayDispatchQueue(
+    DiscordGatewayClient client
+) : IGatewayDispatchQueue
 {
-    private readonly DiscordGatewayClient _client;
-    private readonly ILogger<ConcurrentGatewayDispatchQueue> _logger;
-
-    [TypeFactory]
-    public ConcurrentGatewayDispatchQueue(DiscordGatewayClient client)
-    {
-        _client = client;
-        _logger = client.LoggerFactory.CreateLogger<ConcurrentGatewayDispatchQueue>();
-    }
+    private readonly ILogger<ConcurrentGatewayDispatchQueue> _logger =
+        client.LoggerFactory.CreateLogger<ConcurrentGatewayDispatchQueue>();
 
     public async ValueTask AcceptAsync(
         string eventName,
@@ -24,7 +20,7 @@ public sealed partial class ConcurrentGatewayDispatchQueue : IGatewayDispatchQue
         if (dispatchEvents is null)
         {
             _logger.LogWarning(
-                "Received dispatch {Event}, but no dispatch event emitters exists for that event type",
+                "Received dispatch '{Event}', but no dispatch event emitters exists for that event type",
                 eventName
             );
             return;
@@ -54,10 +50,10 @@ public sealed partial class ConcurrentGatewayDispatchQueue : IGatewayDispatchQue
             preparedHandlers.AddRange(handlers);
         }
 
-        var dispatcher = _client.GetDispatcher(eventName);
+        var dispatcher = client.GetDispatcher(eventName);
 
         _logger.LogInformation(
-            "Dispatching {Event} to {SubscriberCount} subscribers",
+            "Dispatching '{Event}' to {SubscriberCount} subscribers",
             eventName,
             preparedHandlers.Count
         );

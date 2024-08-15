@@ -10,39 +10,41 @@ internal sealed class CastUpModelStore<TId, TRootModel, TExpectedModel>(
     where TExpectedModel : class, IEntityModel<TId>
     where TId : IEquatable<TId>
 {
+    public IEntityModelStore<TId, TRootModel> Store { get; } = store;
+    
     public ValueTask<IEntityModelStore<TSubStoreId, TSubStoreModel>>
         GetSubStoreAsync<TSubStoreId, TSubStoreModel>(TId id, CancellationToken token = default)
         where TSubStoreId : IEquatable<TSubStoreId> where TSubStoreModel : class, IEntityModel<TSubStoreId>
-        => store.GetSubStoreAsync<TSubStoreId, TSubStoreModel>(id, token);
+        => Store.GetSubStoreAsync<TSubStoreId, TSubStoreModel>(id, token);
 
     public ValueTask<TExpectedModel?> GetAsync(TId id, CancellationToken token = default)
-        => store.GetAsync(id, token).CastUpAsync(Template.T<TExpectedModel>());
+        => Store.GetAsync(id, token).CastUpAsync(Template.T<TExpectedModel>());
 
     public IAsyncEnumerable<TExpectedModel> GetManyAsync(IEnumerable<TId> ids, CancellationToken token = default)
-        => store.GetManyAsync(ids, token).Cast<TExpectedModel>();
+        => Store.GetManyAsync(ids, token).Cast<TExpectedModel>();
 
     public IAsyncEnumerable<TExpectedModel> GetAllAsync(CancellationToken token = default)
-        => store.GetAllAsync(token).Cast<TExpectedModel>();
+        => Store.GetAllAsync(token).Cast<TExpectedModel>();
 
     public IAsyncEnumerable<TId> GetAllIdsAsync(CancellationToken token = default)
-        => store.GetAllIdsAsync(token);
+        => Store.GetAllIdsAsync(token);
 
     public ValueTask AddOrUpdateAsync(TExpectedModel model, CancellationToken token = default)
     {
         if (model is not TRootModel rootModel)
             throw new InvalidCastException($"Expected {typeof(TRootModel)}, got {typeof(TExpectedModel)}");
 
-        return store.AddOrUpdateAsync(rootModel, token);
+        return Store.AddOrUpdateAsync(rootModel, token);
     }
 
     public ValueTask AddOrUpdateBatchAsync(IEnumerable<TExpectedModel> models, CancellationToken token = default)
-        => store.AddOrUpdateBatchAsync(models.Cast<TRootModel>(), token);
+        => Store.AddOrUpdateBatchAsync(models.Cast<TRootModel>(), token);
 
     public ValueTask RemoveAsync(TId id, CancellationToken token = default)
-        => store.RemoveAsync(id, token);
+        => Store.RemoveAsync(id, token);
 
     public ValueTask PurgeAllAsync(CancellationToken token = default)
-        => store.PurgeAllAsync(token);
+        => Store.PurgeAllAsync(token);
 
     public IAsyncEnumerable<TExpectedModel> QueryAsync(
         TId from,
@@ -50,9 +52,9 @@ internal sealed class CastUpModelStore<TId, TRootModel, TExpectedModel>(
         Direction direction,
         int? limit = null,
         CancellationToken token = default
-    ) => store.QueryAsync(from, to, direction, limit, token).Cast<TExpectedModel>();
+    ) => Store.QueryAsync(from, to, direction, limit, token).Cast<TExpectedModel>();
 
-    Type IEntityModelStore.ModelType => store.ModelType;
+    Type IEntityModelStore.ModelType => Store.ModelType;
 }
 
 internal sealed class CastDownModelStore<TId, TRootModel, TExpectedModel>(
@@ -63,34 +65,36 @@ internal sealed class CastDownModelStore<TId, TRootModel, TExpectedModel>(
     where TExpectedModel : class, TRootModel
     where TId : IEquatable<TId>
 {
+    public IEntityModelStore<TId, TRootModel> Store { get; } = store;
+    
     public ValueTask<IEntityModelStore<TSubStoreId, TSubStoreModel>>
         GetSubStoreAsync<TSubStoreId, TSubStoreModel>(TId id, CancellationToken token = default)
         where TSubStoreId : IEquatable<TSubStoreId> where TSubStoreModel : class, IEntityModel<TSubStoreId>
-        => store.GetSubStoreAsync<TSubStoreId, TSubStoreModel>(id, token);
+        => Store.GetSubStoreAsync<TSubStoreId, TSubStoreModel>(id, token);
 
     public ValueTask<TExpectedModel?> GetAsync(TId id, CancellationToken token = default)
-        => store.GetAsync(id, token).CastDownAsync(Template.T<TExpectedModel>());
+        => Store.GetAsync(id, token).CastDownAsync(Template.T<TExpectedModel>());
 
     public IAsyncEnumerable<TExpectedModel> GetManyAsync(IEnumerable<TId> ids, CancellationToken token = default)
-        => store.GetManyAsync(ids, token).Cast<TExpectedModel>();
+        => Store.GetManyAsync(ids, token).Cast<TExpectedModel>();
 
     public IAsyncEnumerable<TExpectedModel> GetAllAsync(CancellationToken token = default)
-        => store.GetAllAsync(token).Cast<TExpectedModel>();
+        => Store.GetAllAsync(token).Cast<TExpectedModel>();
 
     public IAsyncEnumerable<TId> GetAllIdsAsync(CancellationToken token = default)
-        => store.GetAllIdsAsync(token);
+        => Store.GetAllIdsAsync(token);
 
     public ValueTask AddOrUpdateAsync(TExpectedModel model, CancellationToken token = default)
-        => store.AddOrUpdateAsync(model, token);
+        => Store.AddOrUpdateAsync(model, token);
 
     public ValueTask AddOrUpdateBatchAsync(IEnumerable<TExpectedModel> models, CancellationToken token = default)
-        => store.AddOrUpdateBatchAsync(models, token);
+        => Store.AddOrUpdateBatchAsync(models, token);
 
     public ValueTask RemoveAsync(TId id, CancellationToken token = default)
-        => store.RemoveAsync(id, token);
+        => Store.RemoveAsync(id, token);
 
     public ValueTask PurgeAllAsync(CancellationToken token = default)
-        => store.PurgeAllAsync(token);
+        => Store.PurgeAllAsync(token);
 
     public IAsyncEnumerable<TExpectedModel> QueryAsync(
         TId from,
@@ -98,7 +102,7 @@ internal sealed class CastDownModelStore<TId, TRootModel, TExpectedModel>(
         Direction direction,
         int? limit = null,
         CancellationToken token = default
-    ) => store.QueryAsync(from, to, direction, limit, token).Cast<TExpectedModel>();
+    ) => Store.QueryAsync(from, to, direction, limit, token).Cast<TExpectedModel>();
 
-    Type IEntityModelStore.ModelType => store.ModelType;
+    Type IEntityModelStore.ModelType => Store.ModelType;
 }

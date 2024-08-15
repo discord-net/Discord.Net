@@ -23,14 +23,14 @@ public enum GatewayIntents
     GuildMembers = 1 << 1,
 
     /// <summary>
-    ///     This intent includes GUILD_BAN_ADD, GUILD_BAN_REMOVE
+    ///     This intent includes GUILD_BAN_ADD, GUILD_BAN_REMOVE, and GUILD_AUDIT_LOG_ENTRY_CREATE
     /// </summary>
-    GuildBans = 1 << 2,
+    GuildModeration = 1 << 2,
 
     /// <summary>
-    ///     This intent includes GUILD_EMOJIS_UPDATE
+    ///     This intent includes GUILD_EMOJIS_UPDATE and GUILD_STICKERS_UPDATE
     /// </summary>
-    GuildEmojis = 1 << 3,
+    GuildEmojisAndStickers = 1 << 3,
 
     /// <summary>
     ///     This intent includes GUILD_INTEGRATIONS_UPDATE
@@ -43,7 +43,7 @@ public enum GatewayIntents
     GuildWebhooks = 1 << 5,
 
     /// <summary>
-    ///     This intent includes INVITE_CREATE, INVITE_DELETE
+    ///     This intent includes INVITE_CREATE and INVITE_DELETE
     /// </summary>
     GuildInvites = 1 << 6,
 
@@ -61,13 +61,13 @@ public enum GatewayIntents
     GuildPresences = 1 << 8,
 
     /// <summary>
-    ///     This intent includes MESSAGE_CREATE, MESSAGE_UPDATE, MESSAGE_DELETE, MESSAGE_DELETE_BULK
+    ///     This intent includes MESSAGE_CREATE, MESSAGE_UPDATE, MESSAGE_DELETE, and MESSAGE_DELETE_BULK
     /// </summary>
     GuildMessages = 1 << 9,
 
     /// <summary>
     ///     This intent includes MESSAGE_REACTION_ADD, MESSAGE_REACTION_REMOVE, MESSAGE_REACTION_REMOVE_ALL,
-    ///     MESSAGE_REACTION_REMOVE_EMOJI
+    ///     and MESSAGE_REACTION_REMOVE_EMOJI
     /// </summary>
     GuildMessageReactions = 1 << 10,
 
@@ -114,16 +114,20 @@ public enum GatewayIntents
     /// </summary>
     AutoModerationActionExecution = 1 << 21,
 
+    GuildMessagePolls = 1 << 24,
+
+    DirectMessagePolls = 1 << 25,
+
     /// <summary>
     ///     This intent includes all but <see cref="GuildMembers" />, <see cref="GuildPresences" /> and
     ///     <see cref="MessageContent" />
     ///     which are privileged and must be enabled in the Developer Portal.
     /// </summary>
-    AllUnprivileged = Guilds | GuildBans | GuildEmojis | GuildIntegrations | GuildWebhooks | GuildInvites |
-                      GuildVoiceStates | GuildMessages | GuildMessageReactions | GuildMessageTyping | DirectMessages |
-                      DirectMessageReactions | DirectMessageTyping | GuildScheduledEvents |
-                      AutoModerationConfiguration |
-                      AutoModerationActionExecution,
+    AllUnprivileged = Guilds | GuildModeration | GuildEmojisAndStickers | GuildIntegrations | GuildWebhooks |
+                      GuildInvites | GuildVoiceStates | GuildMessages | GuildMessageReactions | GuildMessageTyping | 
+                      DirectMessages | DirectMessageReactions | DirectMessageTyping | GuildScheduledEvents |
+                      AutoModerationConfiguration | AutoModerationActionExecution | GuildMessagePolls |
+                      DirectMessagePolls,
 
     /// <summary>
     ///     This intent includes all of them, including privileged ones.

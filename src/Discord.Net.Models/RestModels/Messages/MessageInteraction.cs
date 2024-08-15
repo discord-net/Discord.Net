@@ -39,7 +39,7 @@ public sealed class MessageInteractionMetadata :
         AuthorizingIntegrationOwners;
     ulong IMessageInteractionMetadataModel.UserId => User.Id;
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         yield return User;
     }

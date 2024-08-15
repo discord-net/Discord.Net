@@ -4,6 +4,5 @@ namespace Discord.Models.Json;
 
 public sealed partial class AutoModerationRulePayload : IAutoModerationRulePayloadData
 {
-    [JsonIgnore, JsonExtend]
-    public required AutoModerationRule AutoModerationRule { get; set; }
+    [JsonIgnore, JsonExtend] public AutoModerationRule AutoModerationRule { get; set; } = null!;
 }

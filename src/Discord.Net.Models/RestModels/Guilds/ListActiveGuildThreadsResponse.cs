@@ -14,5 +14,5 @@ public sealed class ListActiveGuildThreadsResponse : IModelSource, IModelSourceO
 
     IEnumerable<IThreadMemberModel> IModelSourceOfMultiple<IThreadMemberModel>.GetModels() => Members;
 
-    public IEnumerable<IEntityModel> GetDefinedModels() => [..Threads, ..Members];
+    public IEnumerable<IModel> GetDefinedModels() => [..Threads, ..Members];
 }

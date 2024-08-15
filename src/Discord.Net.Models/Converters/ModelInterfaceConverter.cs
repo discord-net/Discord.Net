@@ -5,12 +5,12 @@ using System.Text.Json.Serialization;
 namespace Discord.Converters;
 
 public class ModelInterfaceConverter<TInterface, TModel> : JsonConverter<TInterface>
-    where TInterface : class, IEntityModel
+    where TInterface : class, IModel
     where TModel : class, TInterface
 {
     public override TInterface? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return JsonSerializer.Deserialize(ref reader, typeof(TModel), options) as TInterface;
+        return JsonSerializer.Deserialize(ref reader, options.GetTypeInfo(typeof(TModel))) as TInterface;
     }
 
     public override void Write(Utf8JsonWriter writer, TInterface value, JsonSerializerOptions options)

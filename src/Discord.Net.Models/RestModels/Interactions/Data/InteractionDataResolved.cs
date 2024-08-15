@@ -53,7 +53,7 @@ public sealed class InteractionDataResolved :
     IEnumerable<IAttachmentModel> IModelSourceOfMultiple<IAttachmentModel>.GetModels()
         => Attachments.Map(v => (IEnumerable<IAttachmentModel>)v.Values) | [];
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (Users.IsSpecified)
             foreach (var (_, entity) in Users.Value)

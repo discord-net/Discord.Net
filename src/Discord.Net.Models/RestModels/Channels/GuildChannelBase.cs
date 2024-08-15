@@ -76,7 +76,7 @@ public abstract class GuildChannelBase : Channel, IGuildChannelModel, IModelSour
 
     int? IGuildChannelModel.Flags => Flags;
 
-    public virtual IEnumerable<IEntityModel> GetDefinedModels()
+    public virtual IEnumerable<IModel> GetDefinedModels()
     {
         if (DefaultReactionEmoji is {IsSpecified: true, Value: not null})
             yield return DefaultReactionEmoji.Value;

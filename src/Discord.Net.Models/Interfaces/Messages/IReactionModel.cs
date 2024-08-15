@@ -1,7 +1,7 @@
 namespace Discord.Models;
 
 [ModelEquality]
-public partial interface IReactionModel : IEntityModel
+public partial interface IReactionModel : IModel
 {
     int Total { get; }
     int BurstCount { get; }

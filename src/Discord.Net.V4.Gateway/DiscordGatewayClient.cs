@@ -49,7 +49,7 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
         Rest = new DiscordRestClient(config, LoggerFactory.CreateLogger<DiscordRestClient>());
         Encoding = config.Encoding.Get(this);
         CacheProvider = config.CacheProvider.Get(this);
-        GatewayCompression = config.GatewayCompression?.Get(this);
+        GatewayCompression = config.TransportCompression?.Get(this);
 
         _heartbeatSignal = Channel.CreateBounded<HeartbeatSignal>(
             new BoundedChannelOptions(2)
@@ -58,8 +58,7 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
                 SingleReader = true,
                 SingleWriter = true,
                 AllowSynchronousContinuations = false
-            },
-            HandleHeartbeatSignalDropped
+            }
         );
 
         _dispatchQueue = Config.DispatchQueue.Get(this);

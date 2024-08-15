@@ -4,8 +4,7 @@ namespace Discord.Models.Json;
 
 public sealed partial class MentionedUser : IMentionedUser
 {
-    [JsonIgnore, JsonExtend]
-    public required User User { get; set; }
+    [JsonIgnore, JsonExtend] public User User { get; set; } = null!;
 
     [JsonPropertyName("member")]
     public required PartialGuildMember Member { get; set; }

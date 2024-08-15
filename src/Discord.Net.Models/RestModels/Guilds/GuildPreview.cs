@@ -41,5 +41,5 @@ public sealed class GuildPreview : IModelSource, IModelSourceOfMultiple<IGuildEm
 
     IEnumerable<IStickerModel> IModelSourceOfMultiple<IStickerModel>.GetModels() => Stickers;
 
-    public IEnumerable<IEntityModel> GetDefinedModels() => [..Emojis, ..Stickers];
+    public IEnumerable<IModel> GetDefinedModels() => [..Emojis, ..Stickers];
 }

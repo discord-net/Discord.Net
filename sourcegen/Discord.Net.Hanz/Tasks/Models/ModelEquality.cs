@@ -64,7 +64,7 @@ public class ModelEquality : IGenerationTask<ModelEquality.GenerationTarget>
 
         if (typeSymbol is null) return null;
 
-        if (typeSymbol.AllInterfaces.All(x => x.ToDisplayString() != "Discord.Models.IEntityModel"))
+        if (typeSymbol.AllInterfaces.All(x => x.ToDisplayString() != "Discord.Models.IModel"))
             return null;
 
         if (type.Modifiers.IndexOf(SyntaxKind.PartialKeyword) == -1) return null;
@@ -200,7 +200,7 @@ public class ModelEquality : IGenerationTask<ModelEquality.GenerationTarget>
                             SyntaxFactory.Identifier("IEquatable"),
                             SyntaxFactory.TypeArgumentList(
                                 SyntaxFactory.SeparatedList(
-                                    new TypeSyntax[] {SyntaxFactory.IdentifierName("IEntityModel")}
+                                    new TypeSyntax[] {SyntaxFactory.IdentifierName("IModel")}
                                 )
                             )
                         )
@@ -213,7 +213,7 @@ public class ModelEquality : IGenerationTask<ModelEquality.GenerationTarget>
                                 SyntaxFactory.Parameter(
                                     [],
                                     [],
-                                    SyntaxFactory.NullableType(SyntaxFactory.IdentifierName("IEntityModel")),
+                                    SyntaxFactory.NullableType(SyntaxFactory.IdentifierName("IModel")),
                                     SyntaxFactory.Identifier("other"),
                                     null
                                 )

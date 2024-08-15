@@ -72,7 +72,7 @@ public sealed class Integration : IIntegrationModel, IModelSource, IModelSourceO
 
     string[]? IIntegrationModel.Scopes => ~Scopes;
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (User.IsSpecified)
             yield return User.Value;

@@ -37,7 +37,7 @@ public sealed class GuildTemplate : IModelSource, IModelSourceOf<IUserModel>
     [JsonPropertyName("is_dirty")]
     public bool? IsDirty { get; set; }
 
-    public IEnumerable<IEntityModel> GetDefinedModels() => [Creator];
+    public IEnumerable<IModel> GetDefinedModels() => [Creator];
 
     IUserModel IModelSourceOf<IUserModel>.Model => Creator;
 }

@@ -66,7 +66,7 @@ public class Invite :
 
     ulong? IInviteModel.ScheduledEventId => ~ScheduledEvent.Map(v => v.Id);
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (Channel is not null)
             yield return Channel;

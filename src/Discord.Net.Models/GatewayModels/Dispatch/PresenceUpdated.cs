@@ -4,6 +4,5 @@ namespace Discord.Models.Json;
 
 public sealed partial class PresenceUpdated : IPresenceUpdatedPayloadData
 {
-    [JsonIgnore, JsonExtend]
-    public required Presence Presence { get; set; }
+    [JsonIgnore, JsonExtend] public Presence Presence { get; set; } = null!;
 }

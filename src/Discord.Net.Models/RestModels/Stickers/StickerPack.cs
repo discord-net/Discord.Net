@@ -33,5 +33,5 @@ public sealed class StickerPack :
 
     IEnumerable<IStickerModel> IModelSourceOfMultiple<IStickerModel>.GetModels() => Stickers;
 
-    public IEnumerable<IEntityModel> GetDefinedModels() => Stickers;
+    public IEnumerable<IModel> GetDefinedModels() => Stickers;
 }

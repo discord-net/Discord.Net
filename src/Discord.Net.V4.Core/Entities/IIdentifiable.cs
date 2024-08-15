@@ -308,7 +308,7 @@ public interface IIdentifiable<TId, out TEntity, out TModel> :
     ) => left.MostSpecific(right);
 
     static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct, TClient>(
-        IEntityModel model,
+        IModel model,
         TId id,
         TClient client)
         where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
@@ -332,7 +332,7 @@ public interface IIdentifiable<TId, out TEntity, out TModel> :
         );
 
     static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct>(
-        IEntityModel model,
+        IModel model,
         TId id,
         IDiscordClient client)
         where TConstruct : class, IConstructable<TConstruct, TModel>
@@ -354,7 +354,7 @@ public interface IIdentifiable<TId, out TEntity, out TModel> :
         );
 
     static IIdentifiable<TId, TEntity, TModel> FromReferenced(
-        IEntityModel model,
+        IModel model,
         TId id,
         Func<TModel, TEntity> factory)
         => model is IModelSource source
@@ -426,7 +426,7 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
     ) => left?.MostSpecific(right) ?? Of(right);
 
     new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct, TClient>(
-        IEntityModel model,
+        IModel model,
         TId id,
         TClient client
     )
@@ -452,7 +452,7 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
         );
 
     new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct>(
-        IEntityModel model,
+        IModel model,
         TId id,
         IDiscordClient client)
         where TConstruct : class, IConstructable<TConstruct, TModel>
@@ -474,7 +474,7 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
         );
 
     new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced(
-        IEntityModel model,
+        IModel model,
         TId id,
         Func<TModel, TEntity> factory)
         => model is IModelSource source

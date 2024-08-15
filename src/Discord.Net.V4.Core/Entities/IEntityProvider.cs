@@ -5,7 +5,7 @@ namespace Discord;
 
 public interface IEntityProvider<out TEntity, in TModel> : IClientProvider
     where TEntity : IEntity
-    where TModel : IEntityModel?
+    where TModel : IModel?
 {
     internal TEntity CreateEntity(TModel model);
 
@@ -15,7 +15,7 @@ public interface IEntityProvider<out TEntity, in TModel> : IClientProvider
 
 public interface IEntityProvider<out TEntity, in TModel, in TContext> : IClientProvider
     where TEntity : IEntity
-    where TModel : IEntityModel?
+    where TModel : IModel?
 {
     internal TEntity CreateEntity(TModel model, TContext context);
 

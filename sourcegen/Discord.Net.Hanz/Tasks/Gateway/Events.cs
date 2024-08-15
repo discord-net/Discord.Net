@@ -1045,7 +1045,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
     }
 
     private static bool IsModelType(ITypeSymbol symbol)
-        => symbol.AllInterfaces.Any(x => x.ToDisplayString() == "Discord.Models.IEntityModel");
+        => symbol.AllInterfaces.Any(x => x.ToDisplayString() == "Discord.Models.IModel");
 
     private static EventParameterDegree GetSupportedDegree(IParameterSymbol parameter)
     {

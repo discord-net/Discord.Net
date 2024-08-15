@@ -61,7 +61,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             unchecked
             {
                 var hashCode = SymbolEqualityComparer.Default.GetHashCode(ClassSymbol);
-                hashCode = (hashCode * 397) ^ SymbolEqualityComparer.Default.GetHashCode(gatewayActorInterface);
+                hashCode = (hashCode * 397) ^ SymbolEqualityComparer.Default.GetHashCode(GatewayActorInterface);
                 hashCode = (hashCode * 397) ^ SymbolEqualityComparer.Default.GetHashCode(CoreActor);
                 hashCode = (hashCode * 397) ^ SymbolEqualityComparer.Default.GetHashCode(IdType);
                 hashCode = (hashCode * 397) ^ SymbolEqualityComparer.Default.GetHashCode(CoreEntity);
@@ -571,8 +571,8 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
         MemberDeclarationSyntax? fetchMethod = null;
         MemberDeclarationSyntax? fetchInternalMethod = null;
-        
-        
+
+
         if (fetchLoadableMethod is not null)
         {
             var fetchParameterMapping = MemberUtils
@@ -838,6 +838,13 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                         .GetBaseTypes(x.ClassSymbol)
                         .Contains(target.ClassSymbol, SymbolEqualityComparer.Default)
                 )
+                .OrderByDescending(x => TypeUtils
+                    .GetBaseTypes(x.ClassSymbol)
+                    .TakeWhile(x => 
+                        !x.Equals(target.ClassSymbol, SymbolEqualityComparer.Default)
+                    )
+                    .Count()
+                )
                 .ToArray();
 
             var bases = TypeUtils
@@ -958,7 +965,8 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                     x.ModelType.Name is not "ISelfUserModel" &&
                     (
                         GetStoreRoot(x, targets)?.Equals(root, SymbolEqualityComparer.Default)
-                        ?? root is not null)
+                        ?? root is not null
+                    )
                 )
                 .ToArray();
 
@@ -1199,6 +1207,13 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                     TypeUtils
                         .GetBaseTypes(x.ClassSymbol)
                         .Contains(target.ClassSymbol, SymbolEqualityComparer.Default)
+                )
+                .OrderByDescending(x => TypeUtils
+                    .GetBaseTypes(x.ClassSymbol)
+                    .TakeWhile(x => 
+                        !x.Equals(target.ClassSymbol, SymbolEqualityComparer.Default)
+                    )
+                    .Count()
                 )
                 .ToArray();
 

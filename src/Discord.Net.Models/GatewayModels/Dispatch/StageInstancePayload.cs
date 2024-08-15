@@ -4,6 +4,5 @@ namespace Discord.Models.Json;
 
 public sealed partial class StageInstancePayload : IStageInstancePayloadData
 {
-    [JsonIgnore, JsonExtend]
-    public required StageInstance StageInstance { get; set; }
+    [JsonIgnore, JsonExtend] public StageInstance StageInstance { get; set; } = null!;
 }

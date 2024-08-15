@@ -4,8 +4,7 @@ namespace Discord.Models.Json;
 
 public sealed partial class GuildMemberAdded : IGuildMemberAddedPayloadData
 {
-    [JsonIgnore, JsonExtend]
-    public required GuildMember Member { get; set; }
+    [JsonIgnore, JsonExtend] public GuildMember Member { get; set; } = null!;
 
     [JsonPropertyName("guild_id")]
     public ulong GuildId { get; set; }

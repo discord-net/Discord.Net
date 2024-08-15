@@ -109,9 +109,9 @@ public class Guild :
 
     IEnumerable<IGuildStickerModel> IModelSourceOfMultiple<IGuildStickerModel>.GetModels() => Stickers | [];
 
-    public virtual IEnumerable<IEntityModel> GetDefinedModels()
+    public virtual IEnumerable<IModel> GetDefinedModels()
     {
-        IEnumerable<IEntityModel> entities = [..Roles, ..Emojis];
+        IEnumerable<IModel> entities = [..Roles, ..Emojis];
 
         if (Stickers.IsSpecified)
             entities = entities.Concat(Stickers.Value);

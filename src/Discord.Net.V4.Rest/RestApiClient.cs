@@ -3,14 +3,20 @@ using Discord.Models.Json;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using Discord.Models;
+using Microsoft.IO;
+using StreamContent = System.Net.Http.StreamContent;
 
 namespace Discord.Rest;
 
 public sealed class RestApiClient : IRestApiClient, IDisposable
 {
+    //private static readonly RecyclableMemoryStreamManager _streamManager = new();
+
     private readonly DiscordRestClient _restClient;
     private readonly HttpClient _httpClient;
 
@@ -103,7 +109,7 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
         if (options.AuditLogReason is not null)
             request.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(options.AuditLogReason));
 
-        _restClient.Logger.LogDebug("Acquiring a bucket ratelimit contract for {}", route);
+        _restClient.Logger.LogDebug("Acquiring a bucket ratelimit contract for {Route}", route);
         var contract = await _restClient.RateLimiter.AcquireContractAsync(route, token);
         _restClient.Logger.LogDebug("Entered bucket contract");
 
@@ -120,13 +126,13 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
 
             var response = await _httpClient.SendAsync(request, requestTokenSource.Token);
 
-            _restClient.Logger.LogDebug("{} -> {}", route, response.StatusCode);
+            _restClient.Logger.LogDebug("{Route} -> {Response}", route, response.StatusCode);
 
             await ProcessRateLimitsAsync(response, contract, token);
 
             switch (response.StatusCode)
             {
-                case >= (HttpStatusCode)200 and < (HttpStatusCode)300:
+                case >= (HttpStatusCode) 200 and < (HttpStatusCode) 300:
                     return await response.Content.ReadAsStreamAsync(token);
                 case HttpStatusCode.NotFound when !options.ThrowOn404:
                     return null;
@@ -200,17 +206,25 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
     }
 
     private Task<Ratelimit?> ReadRateLimitPayloadAsync(HttpResponseMessage message, CancellationToken token)
-        => message.Content.ReadFromJsonAsync<Ratelimit?>(_restClient.Config.JsonSerializerOptions, token);
+        => message.Content.ReadFromJsonAsync(Models.ModelJsonContext.Default.Ratelimit, token);
 
     private HttpContent EncodeBodyContent<T>(T body, ContentType contentType)
     {
         switch (contentType)
         {
             case ContentType.JsonBody:
-                return JsonContent.Create(
-                    body,
-                    options: _restClient.Config.JsonSerializerOptions
-                );
+                // TODO: I don't think this works, specifically:
+                // in JsonSerializerContext:
+                // IBuiltInJsonTypeInfoResolver.IsCompatibleWithOptions(JsonSerializerOptions options) 
+                // might return false since we're using options with converters, and not the actual context. 
+                return JsonContent.Create(body, options: _restClient.Config.JsonSerializerOptions);
+
+                // the following is a hack for now.
+                // var jsonStream = _streamManager.GetStream(nameof(EncodeBodyContent));
+                // JsonSerializer.Serialize(jsonStream, body, typeof(T), ModelJsonContext.Default);
+                // var jsonContent = new StreamContent(jsonStream);
+                // jsonContent.Headers.ContentType = new("application/json");
+                // return jsonContent;
             case ContentType.MultipartForm:
                 if (body is not IDictionary<string, object?> parts)
                     throw new InvalidCastException("Cannot convert multipart data to dictionary");

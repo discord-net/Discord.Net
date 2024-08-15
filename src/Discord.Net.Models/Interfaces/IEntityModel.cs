@@ -1,11 +1,11 @@
 namespace Discord.Models;
 
-public interface IEntityModel<out T> : IEntityModel
+public interface IEntityModel<out T> : IModel
 {
     T Id { get; }
 }
 
-public interface IEntityModel : IEquatable<IEntityModel>
+public interface IModel : IEquatable<IModel>
 {
-    bool IEquatable<IEntityModel>.Equals(IEntityModel? other) => Equals(this, other);
+    bool IEquatable<IModel>.Equals(IModel? other) => Equals(this, other);
 }

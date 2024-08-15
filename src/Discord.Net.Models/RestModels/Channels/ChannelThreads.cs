@@ -17,5 +17,5 @@ public sealed class ChannelThreads : IModelSource, IModelSourceOfMultiple<IThrea
 
     IEnumerable<IThreadMemberModel> IModelSourceOfMultiple<IThreadMemberModel>.GetModels() => Members;
 
-    public IEnumerable<IEntityModel> GetDefinedModels() => [..Threads, ..Members];
+    public IEnumerable<IModel> GetDefinedModels() => [..Threads, ..Members];
 }

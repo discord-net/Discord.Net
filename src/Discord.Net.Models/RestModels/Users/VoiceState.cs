@@ -50,7 +50,7 @@ public sealed class VoiceState :
 
     ulong? IVoiceStateModel.GuildId => ~GuildId;
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (Member) yield return Member.Value;
     }

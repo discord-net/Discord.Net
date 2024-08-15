@@ -38,7 +38,7 @@ public sealed class CachePathable : IPathable, IReadOnlyDictionary<Type, object>
         // slow search
         foreach (var (type, raw) in _identities)
         {
-            if (typeof(TEntity).IsAssignableTo(type))
+            if (type.IsAssignableTo(typeof(TEntity)))
                 return (identity = raw as IIdentifiable<TId>) is not null;
         }
 

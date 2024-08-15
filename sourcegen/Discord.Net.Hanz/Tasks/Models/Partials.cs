@@ -593,7 +593,7 @@ public class Partials
                     syntax = syntax.AddMembers(
                         SyntaxFactory.ParseMemberDeclaration(
                             $$"""
-                              public IEnumerable<IEntityModel> GetDefinedModels()
+                              public IEnumerable<IModel> GetDefinedModels()
                               {
                                   {{
                                       string.Join(
@@ -922,7 +922,7 @@ public class Partials
     }
 
     private static bool IsModelInterface(INamedTypeSymbol symbol)
-        => symbol.Name is "IEntityModel" || symbol.AllInterfaces.Any(x => x.Name is "IEntityModel");
+        => symbol.Name is "IModel" || symbol.AllInterfaces.Any(x => x.Name is "IModel");
 
     private static void AddBasePartialInterfaceImplementation(
         ref ClassDeclarationSyntax syntax,

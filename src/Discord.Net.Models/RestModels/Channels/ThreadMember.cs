@@ -22,7 +22,7 @@ public sealed class ThreadMember : IThreadMemberModel, IModelSource, IModelSourc
     ulong? IThreadMemberModel.UserId => ~UserId;
     ulong? IThreadMemberModel.ThreadId => ~ThreadId;
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (GuildMember.IsSpecified)
             yield return GuildMember.Value;

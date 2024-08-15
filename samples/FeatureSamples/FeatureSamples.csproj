@@ -14,4 +14,10 @@
       <ProjectReference Include="..\..\src\Discord.Net.V4.Rest\Discord.Net.V4.Rest.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+      <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    </ItemGroup>
+
 </Project>

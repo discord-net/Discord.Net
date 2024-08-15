@@ -25,7 +25,7 @@ public sealed class SelectMenuOption : IModelSource, ISelectMenuOptionModel, IMo
 
     bool? ISelectMenuOptionModel.IsDefault => ~IsDefault;
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if (Emoji.IsSpecified)
             yield return Emoji.Value;

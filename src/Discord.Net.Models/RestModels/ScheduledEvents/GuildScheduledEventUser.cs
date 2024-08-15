@@ -17,7 +17,7 @@ public sealed class GuildScheduledEventUser :
     [JsonPropertyName("member")]
     public Optional<GuildMember> Member { get; set; }
 
-    public IEnumerable<IEntityModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         yield return User;
 

@@ -16,7 +16,7 @@ public sealed class TeamMember : IModelSource, IModelSourceOf<IUserModel>
     [JsonPropertyName("user")]
     public required User User { get; set; }
 
-    public IEnumerable<IEntityModel> GetDefinedModels() => [User];
+    public IEnumerable<IModel> GetDefinedModels() => [User];
 
     IUserModel IModelSourceOf<IUserModel>.Model => User;
 }

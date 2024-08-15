@@ -4,8 +4,7 @@ namespace Discord.Models.Json;
 
 public sealed partial class MessageCreatedUpdated : IMessageCreateUpdatePayloadData
 {
-    [JsonIgnore, JsonExtend]
-    public required Message Message { get; set; }
+    [JsonIgnore, JsonExtend] public Message Message { get; set; } = null!;
 
     [JsonPropertyName("guild_id")]
     public Optional<ulong> GuildId { get; set; }

@@ -7,6 +7,5 @@ public sealed partial class ThreadCreated : IThreadCreatedPayloadData
     [JsonPropertyName("newly_created")]
     public bool NewlyCreated { get; set; }
 
-    [JsonIgnore, JsonExtend]
-    public required ThreadChannelBase Thread { get; set; }
+    [JsonIgnore, JsonExtend] public ThreadChannelBase Thread { get; set; } = null!;
 }
