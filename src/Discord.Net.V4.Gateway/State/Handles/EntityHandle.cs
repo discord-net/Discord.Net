@@ -19,7 +19,7 @@ namespace Discord.Gateway.State;
 ///     The hashcode of this object is based on the instance and uses <see cref="RuntimeHelpers.GetHashCode(object)"/>
 ///     to generate a hashcode based off of the unique instance, rather than the value of the handles members.
 /// </remarks>
-/// <param name="id">The unique identitifer of the entity that this handle represents.</param>
+/// <param name="id">The unique identifier of the entity that this handle represents.</param>
 /// <param name="entity">The entity instance that this handle represents.</param>
 /// <param name="owningReference">The <see cref="IEntityReference{TId,TEntity}"/> that this handle is owned by.</param>
 /// <typeparam name="TId">The type of the unique identifier that this handle represents.</typeparam>
@@ -45,15 +45,15 @@ internal sealed class EntityHandle<TId, TEntity>(
     {
         if (_disposed)
             return;
-
-        _disposed = true;
-
+        
         Entity = null!;
 
         if (_owningReference is null) return;
 
         _owningReference.ReleaseHandle(this);
         _owningReference = null;
+        
+        _disposed = true;
     }
 
     public override string ToString()

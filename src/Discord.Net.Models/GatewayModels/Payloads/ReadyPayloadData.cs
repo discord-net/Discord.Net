@@ -12,7 +12,7 @@ public sealed class ReadyPayloadData : IReadyPayloadData
     [JsonPropertyName("user")]
     public required SelfUser User { get; set; }
 
-    [JsonPropertyName("guild")]
+    [JsonPropertyName("guilds")]
     public required UnavailableGuild[] Guilds { get; set; }
 
     [JsonPropertyName("session_id")]

@@ -19,7 +19,7 @@ public sealed partial class DiscordGatewayClient
         ReceivedAck
     }
 
-    private static readonly RecyclableMemoryStreamManager _streamManager = new();
+    internal static readonly RecyclableMemoryStreamManager StreamManager = new();
 
     public bool IsConnected { get; private set; }
 
@@ -30,18 +30,22 @@ public sealed partial class DiscordGatewayClient
     private Task? _eventProcessorTask;
     private CancellationTokenSource _eventProcessorCancellationTokenSource = new();
 
-    [MemberNotNullWhen(true, nameof(_sessionId), nameof(_resumeGatewayUrl))]
-    private bool CanResume => _sessionId is not null && _resumeGatewayUrl is not null;
+    [MemberNotNullWhen(true, nameof(_sessionId), nameof(_resumeGatewayUrl), nameof(_sequence))]
+    private bool CanResume
+        => _sessionId is not null && _resumeGatewayUrl is not null && _sequence.HasValue;
 
     private string? _resumeGatewayUrl;
     private string? _sessionId;
-    private int _sequence;
+    private int? _sequence;
     private int _heartbeatInterval;
+    private readonly object _sequenceSyncRoot = new();
 
+    private IGatewayCompression? _compression;
+    
     private readonly Channel<HeartbeatSignal> _heartbeatSignal;
 
     private readonly SemaphoreSlim _connectionSemaphore = new(1, 1);
-
+    
     private void StartEventProcessor()
     {
         _eventProcessorCancellationTokenSource.Cancel();
@@ -80,13 +84,14 @@ public sealed partial class DiscordGatewayClient
 
             _resumeGatewayUrl = null;
             _sessionId = null;
+            _sequence = null;
         }
 
         var uriBuilder =
             new StringBuilder($"{url}?v={Config.GatewayVersion}&encoding={Encoding.Identifier}");
 
-        if (GatewayCompression is not null)
-            uriBuilder.Append($"&encoding={GatewayCompression.Identifier}");
+        if (_compression is not null)
+            uriBuilder.Append($"&compress={_compression.Identifier}");
 
         return new Uri(uriBuilder.ToString());
     }
@@ -162,6 +167,9 @@ public sealed partial class DiscordGatewayClient
     {
         _connection ??= Config.GatewayConnection.Get(this);
 
+        _compression?.Dispose();
+        _compression = TransportCompression?.Get(this, cache: false);
+        
         var gatewayUri = await GetGatewayUriAsync(shouldResume, token);
 
         _logger.LogInformation("Connecting to {GatewayUri}...", gatewayUri);
@@ -190,7 +198,7 @@ public sealed partial class DiscordGatewayClient
                 _logger.LogInformation("Attempting to resume the session");
 
                 await SendMessageAsync(
-                    CreateResumeMessage(_sessionId),
+                    CreateResumeMessage(_sessionId, _sequence.Value),
                     _eventProcessorCancellationTokenSource.Token
                 );
 
@@ -272,7 +280,7 @@ public sealed partial class DiscordGatewayClient
 
                 _logger.LogDebug("Waiting for message...");
                 var msg = await ReceiveGatewayMessageAsync(_eventProcessorCancellationTokenSource.Token);
-                
+
                 await ProcessMessageAsync(
                     msg,
                     _eventProcessorCancellationTokenSource.Token
@@ -284,10 +292,26 @@ public sealed partial class DiscordGatewayClient
             await IndicateGatewayFailureAsync(x);
             throw;
         }
-        catch(Exception x)
+        catch (OperationCanceledException)
+        {
+            // just to ensure safety for heartbeat
+            if (!_eventProcessorCancellationTokenSource.IsCancellationRequested)
+                _eventProcessorCancellationTokenSource.Cancel();
+
+            _logger.LogDebug("Event processing is shutting down (cancelled)");
+        }
+        catch (GatewayClosedException)
+        {
+            // just to ensure safety for heartbeat
+            if (!_eventProcessorCancellationTokenSource.IsCancellationRequested)
+                _eventProcessorCancellationTokenSource.Cancel();
+
+            _logger.LogDebug("Event processing is shutting down (connection closed)");
+        }
+        catch (Exception x)
         {
             _logger.LogError(x, "Exception in event processing loop");
-            
+
             if (!_eventProcessorCancellationTokenSource.IsCancellationRequested)
                 _eventProcessorCancellationTokenSource.Cancel();
 
@@ -304,18 +328,21 @@ public sealed partial class DiscordGatewayClient
         }
         finally
         {
-            heartbeatTask?.Dispose();
+            if (heartbeatTask?.IsCompleted ?? false)
+                heartbeatTask.Dispose();
         }
     }
 
-    private IGatewayMessage CreateResumeMessage(string sessionId)
+    private IGatewayMessage CreateResumeMessage(string sessionId, int sequence)
     {
         return new GatewayMessage()
         {
             OpCode = GatewayOpCode.Resume,
             Payload = new ResumePayloadData
             {
-                SessionId = sessionId, SessionToken = Config.Token.Value, Sequence = _sequence
+                SessionId = sessionId,
+                SessionToken = Config.Token.Value,
+                Sequence = sequence
             }
         };
     }
@@ -323,7 +350,7 @@ public sealed partial class DiscordGatewayClient
     private IGatewayMessage CreateIdentityMessage()
     {
         var version = Assembly.GetExecutingAssembly().GetName().Version;
-        
+
         return new GatewayMessage
         {
             OpCode = GatewayOpCode.Identify,
@@ -350,7 +377,7 @@ public sealed partial class DiscordGatewayClient
         token.ThrowIfCancellationRequested();
 
         _logger.LogDebug("Processing OpCode '{Code}'", message.OpCode);
-        
+
         switch (message.OpCode)
         {
             case GatewayOpCode.Dispatch when message.EventName is not null:
@@ -371,7 +398,10 @@ public sealed partial class DiscordGatewayClient
                     throw new UnexpectedGatewayPayloadException(typeof(InvalidSessionPayloadData), message.Payload);
 
                 // Don't pass 'token', it will get cancelled for the reconnect.
-                await ReconnectInternalAsync(invalidSessionPayload.CanResume);
+                await ReconnectInternalAsync(
+                    shouldResume: invalidSessionPayload.CanResume,
+                    gracefulDisconnect: false
+                );
                 break;
             default:
                 _logger.LogWarning("Received unknown opcode '{OpCode}'", message.OpCode.ToString("X"));
@@ -416,13 +446,14 @@ public sealed partial class DiscordGatewayClient
                         heartbeatSignalTask
                     );
 
+                    // cancel any remaining parts
+                    heartbeatWaitCancellationToken.Cancel();
+                    token.ThrowIfCancellationRequested();
+                    
                     _logger.LogDebug(
                         "Heartbeat interrupt: {Source}",
                         triggeringTask == heartbeatTimeoutTask ? "Interval elapsed" : "Discord sent a heartbeat request"
                     );
-
-                    // cancel any remaining parts
-                    heartbeatWaitCancellationToken.Cancel();
                 }
 
                 var attempts = 0;
@@ -435,8 +466,16 @@ public sealed partial class DiscordGatewayClient
                     }
 
                     await SendMessageAsync(
-                        new GatewayMessage {OpCode = GatewayOpCode.Heartbeat, Sequence = _sequence},
-                        token);
+                        new GatewayMessage
+                        {
+                            OpCode = GatewayOpCode.Heartbeat,
+                            Payload = new HeartbeatPayloadData()
+                            {
+                                LastSequence = _sequence
+                            }
+                        },
+                        token
+                    );
 
                     using var heartbeatWaitCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(token);
                     heartbeatWaitCancellationToken.CancelAfter(3000);
@@ -459,14 +498,19 @@ public sealed partial class DiscordGatewayClient
         catch (HeartbeatUnacknowledgedException ex)
         {
             _logger.LogError(ex, "Heartbeat failed");
-            
+
             // don't pass the token, since we don't want to cancel the reconnect.
             // ReSharper disable once MethodSupportsCancellation
             await ReconnectInternalAsync(gracefulDisconnect: false);
         }
+        catch (OperationCanceledException)
+        {
+            _logger.LogDebug("Heartbeat task is shutting down (cancelled)");
+        }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            await IndicateGatewayFailureAsync(exception);
+            _logger.LogError(exception, "Exception in heartbeat loop");
+            //await IndicateGatewayFailureAsync(exception);
             throw;
         }
     }
@@ -503,8 +547,7 @@ public sealed partial class DiscordGatewayClient
             _connectionSemaphore.Release();
         }
     }
-
-
+    
     private async ValueTask StopGatewayConnectionAsync(bool graceful, CancellationToken token = default)
     {
         ShardId = null;
@@ -526,7 +569,7 @@ public sealed partial class DiscordGatewayClient
             _logger.LogDebug("Event processor has been successfully stopped.");
         }
 
-        if(_eventProcessorTask?.IsCompleted ?? false)
+        if (_eventProcessorTask?.IsCompleted ?? false)
             _eventProcessorTask?.Dispose();
 
         if (_connection is not null)
@@ -535,6 +578,9 @@ public sealed partial class DiscordGatewayClient
             await _connection.DisconnectAsync(token);
         }
 
+        UnavailableGuilds.Clear();
+        ProcessedUnavailableGuilds.Clear();
+        
         IsConnected = false;
     }
 
@@ -543,7 +589,7 @@ public sealed partial class DiscordGatewayClient
         if (_connection is null)
             throw new NullReferenceException("Connection was null");
 
-        var stream = _streamManager.GetStream(nameof(ReceiveGatewayMessageAsync));
+        var stream = StreamManager.GetStream(nameof(ReceiveGatewayMessageAsync));
 
         try
         {
@@ -551,7 +597,7 @@ public sealed partial class DiscordGatewayClient
             var result = await _connection.ReadAsync(stream, token);
 
             _logger.LogDebug("Read complete: {Result}", result);
-            
+
             if (result.CloseStatusCode.HasValue)
             {
                 await HandleGatewayClosureAsync(result);
@@ -560,12 +606,12 @@ public sealed partial class DiscordGatewayClient
 
             stream.Position = 0;
 
-            if (GatewayCompression is not null && result.Format is TransportFormat.Binary)
+            if (_compression is not null && result.Format is TransportFormat.Binary)
             {
                 _logger.LogDebug("Running decompression...");
-                
-                var secondary = _streamManager.GetStream(nameof(ReceiveGatewayMessageAsync));
-                await GatewayCompression.DecompressAsync(stream, secondary, token);
+
+                var secondary = StreamManager.GetStream(nameof(ReceiveGatewayMessageAsync));
+                await _compression.DecompressAsync(stream, secondary, token);
                 await stream.DisposeAsync();
                 stream = secondary;
 
@@ -573,21 +619,35 @@ public sealed partial class DiscordGatewayClient
             }
             else if (result.Format != Encoding.Format)
             {
-                // TODO:
-                // 'Encoding' should specify if it can support binary data
-                // if the encoding doesn't support binary or vice-versa, throw.
+                throw new InvalidOperationException(
+                    $"Unable to decode gateway message: The encoding '{Encoding.Identifier}' doesn't support the " +
+                    $"message format type '{result.Format}'"
+                );
             }
 
             _logger.LogDebug("Running decoder...");
-            
+
+            var start = DateTimeOffset.UtcNow.Ticks;
+
             var message =
                 await Encoding.DecodeAsync<IGatewayMessage>(stream, token)
                 ?? throw new NullReferenceException("Received a null gateway message");
 
-            if (message.Sequence.HasValue)
-                Interlocked.Exchange(ref _sequence, message.Sequence.Value);
+            var delta = DateTimeOffset.UtcNow.Ticks - start;
 
-            _logger.LogDebug("C<-S: {OpCode}: {EventName}", message.OpCode, message.EventName ?? "no dispatch");
+            _logger.LogDebug(
+                "Decoder took {Milliseconds} milliseconds ({Bytes} bytes per ms)",
+                TimeSpan.FromTicks(delta),
+                Math.Round(stream.Position / TimeSpan.FromTicks(delta).TotalMilliseconds, 2)
+            );
+
+            if (message.Sequence.HasValue)
+            {
+                lock (_sequenceSyncRoot) _sequence = message.Sequence.Value;
+            }
+
+            _logger.LogDebug("C<-S: {OpCode} {EventName} | Sequence: {Seq}", message.OpCode,
+                message.EventName ?? string.Empty, _sequence);
 
             return message;
         }
@@ -602,27 +662,32 @@ public sealed partial class DiscordGatewayClient
         if (_connection is null)
             throw new NullReferenceException("Connection was null");
 
-        var stream = _streamManager.GetStream(nameof(ReceiveGatewayMessageAsync));
+        _logger.LogDebug("Preparing to send an outbound message, entering ratelimit...");
+        await WaitForOutboundRateLimitsAsync(token);
+
+        var stream = StreamManager.GetStream(nameof(ReceiveGatewayMessageAsync));
 
         try
         {
+            _logger.LogDebug("Encoding outbound message...");
             await Encoding.EncodeAsync(stream, message, token);
 
             stream.Position = 0;
 
-#if DEBUG
-            var buffer = new byte[stream.Length];
-            var sz = stream.Read(buffer, 0, buffer.Length);
-            var payload = System.Text.Encoding.UTF8.GetString(buffer);
-            
-            _logger.LogDebug("Sending payload with {Size} bytes: {Payload}", sz, payload);
-
-            stream.Position = 0;
-#endif
-
+            _logger.LogDebug("Sending outbound message...");
             await _connection.SendAsync(stream, Encoding.Format, token);
 
             _logger.LogDebug("C->S: {OpCode}", message.OpCode);
+
+#if DEBUG
+            if (message.OpCode is not GatewayOpCode.Identify)
+            {
+                stream.Position = 0;
+                var utf8Buffer = new byte[stream.Length];
+                _ = stream.Read(utf8Buffer);
+                _logger.LogDebug("Payload: {Message}", System.Text.Encoding.UTF8.GetString(utf8Buffer));
+            }
+#endif
         }
         finally
         {

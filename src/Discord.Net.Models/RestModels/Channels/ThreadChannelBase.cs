@@ -49,13 +49,10 @@ public abstract class ThreadChannelBase : GuildChannelBase, IThreadChannelModel,
 
     bool IThreadChannelModel.HasJoined => Member.IsSpecified;
 
-    public override IEnumerable<IModel> GetDefinedModels()
+    public IEnumerable<IModel> GetDefinedModels()
     {
         if(Member.IsSpecified)
             yield return Member.Value;
-
-        foreach (var entity in base.GetDefinedModels())
-            yield return entity;
     }
 
     IThreadMemberModel? IModelSourceOf<IThreadMemberModel?>.Model => ~Member;

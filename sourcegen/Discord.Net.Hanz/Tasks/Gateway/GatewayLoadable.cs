@@ -106,6 +106,19 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             .FirstOrDefault() as INamedTypeSymbol;
     }
 
+    private static bool IsGatewayCachedActor(ITypeSymbol? symbol)
+    {
+        if (symbol is null)
+            return false;
+
+        return Hierarchy.GetHierarchy(symbol).Any(x => x.Type
+            .AllInterfaces
+            .Any(x => x
+                .Name is "IGatewayCachedActor"
+            )
+        );
+    }
+
     public static bool TryGetBrokerTypes(
         ITypeSymbol type,
         out ITypeSymbol idType,
@@ -172,7 +185,12 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             return null;
         }
 
-        var coreActor = classSymbol.Interfaces.FirstOrDefault(IsActor);
+        var entityType = gatewayCacheableActor.TypeArguments[1];
+        var modelType = gatewayCacheableActor.TypeArguments[3];
+
+        var coreActor = classSymbol.Interfaces
+            .Where(x => !x.Name.Contains("GatewayCachedActor"))
+            .FirstOrDefault(IsActor);
 
         if (coreActor is null)
         {
@@ -180,7 +198,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             return null;
         }
 
-        var actorType = GetActorInterface(coreActor);
+        var actorType = GetActorInterface(coreActor, modelType);
 
         if (actorType is null)
         {
@@ -190,16 +208,18 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
 
         var idType = actorType.TypeArguments[0];
         var coreEntityType = actorType.TypeArguments[1];
-        var entityType = gatewayCacheableActor.TypeArguments[1];
-        var modelType = gatewayCacheableActor.TypeArguments[3];
+
+        var restEntityName = $"Discord.Rest.Rest{coreEntityType.Name.Remove(0, 1)}";
 
         var restEntity =
             context.SemanticModel.Compilation.GetTypeByMetadataName(
-                $"Discord.Rest.Rest{coreEntityType.Name.Remove(0, 1)}");
+                restEntityName
+            );
 
         if (restEntity is null)
         {
-            logger.Warn($"Ignoring {classDeclarationSyntax.Identifier}: cannot resolve rest entity type");
+            logger.Warn(
+                $"Ignoring {classDeclarationSyntax.Identifier}: cannot resolve rest entity type '{restEntityName}' | {coreActor} | {actorType}");
             return null;
         }
 
@@ -237,8 +257,29 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
     private static bool IsActor(INamedTypeSymbol type)
         => GetActorInterface(type) is not null;
 
-    private static INamedTypeSymbol? GetActorInterface(INamedTypeSymbol type)
-        => type.Interfaces.FirstOrDefault(x => x.ToDisplayString().StartsWith("Discord.IActor"));
+    private static INamedTypeSymbol? GetActorInterface(INamedTypeSymbol type, ITypeSymbol? model = null)
+        => Hierarchy.GetHierarchy(type, false)
+            .FirstOrDefault(x =>
+                x
+                    .Type
+                    .ToDisplayString()
+                    .StartsWith("Discord.IActor")
+                &&
+                (
+                    model is null
+                    ||
+                    x.Type
+                        .TypeArguments[1]
+                        .AllInterfaces
+                        .Any(x =>
+                            x
+                                .ToDisplayString()
+                                .StartsWith("Discord.IEntityOf<")
+                            &&
+                            x.TypeArguments[0].Equals(model, SymbolEqualityComparer.Default)
+                        )
+                )
+            ).Type;
 
     public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
     {
@@ -267,6 +308,17 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             ) continue;
 
             var targetLogger = logger.WithSemanticContext(target.SemanticModel);
+
+            targetLogger.Log(
+                $"Processing {target.ClassSymbol}:\n" +
+                $"- {target.GatewayActorInterface}\n" +
+                $"- {target.CoreActor}\n" +
+                $"- {target.GatewayEntitySymbol}\n" +
+                $"- {target.RestEntitySymbol}\n" +
+                $"- {target.CoreEntity}\n" +
+                $"- {target.ModelType}\n" +
+                $"- {target.IdType}"
+            );
 
             var syntax = SyntaxUtils.CreateSourceGenClone(target.Syntax);
             entitySyntax = SyntaxUtils.CreateSourceGenClone(entitySyntax);
@@ -458,11 +510,41 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             .ToArray();
     }
 
-    private static IEnumerable<string> GetCachePathEntries(ITypeSymbol type) =>
-        type.GetMembers()
-            .OfType<IPropertySymbol>()
-            .Where(x => IsGatewayActor(x.Type))
-            .Select(x => $"{x.Name}.Identity | {x.Name}");
+    private static IEnumerable<string> GetCachePathEntries(
+        GenerationTarget target,
+        List<GenerationTarget> targets,
+        string? prefix = null)
+    {
+        var root = GetStoreRoot(target, targets);
+
+        if (root is null && IsGatewayCachedActor(target.ClassSymbol.BaseType))
+        {
+            var baseTarget = targets.FirstOrDefault(x => x
+                .ClassSymbol
+                .Equals(target.ClassSymbol.BaseType, SymbolEqualityComparer.Default)
+            );
+
+            return baseTarget is null
+                ? []
+                : GetCachePathEntries(baseTarget, targets, prefix);
+        }
+
+        if (root is null) return [];
+
+        var rootTarget = targets.FirstOrDefault(x => x
+            .ClassSymbol
+            .Equals(root.Type, SymbolEqualityComparer.Default)
+        );
+
+        if (rootTarget is null)
+            return [$"{prefix}{root.Name}.Identity | {prefix}{root.Name}"];
+
+        return
+        [
+            $"{prefix}{root.Name}.Identity | {prefix}{root.Name}",
+            ..GetCachePathEntries(rootTarget, targets, $"{prefix}{root.Name}.")
+        ];
+    }
 
     [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
     private static bool IsGatewayActor(ITypeSymbol type)
@@ -475,8 +557,12 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         List<GenerationTarget> targets,
         Logger logger)
     {
-        if (!TryCreateRestEntityConstruction(target.RestEntitySymbol, target.ModelType, logger,
-                out var restEntityConstruction))
+        if (!TryCreateRestEntityConstruction(
+                target.RestEntitySymbol,
+                target.ModelType,
+                logger,
+                out var restEntityConstruction)
+           )
         {
             logger.Warn($"{target.ClassSymbol}: failed to find a way to construct {target.RestEntitySymbol}");
             return;
@@ -492,23 +578,15 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
             out var parents
         );
 
-        var cachePathMap = TypeUtils
-            .GetBaseTypesAndThis(target.ClassSymbol)
-            .Where(x => !x.IsAbstract)
-            .ToDictionary<
-                INamedTypeSymbol,
-                INamedTypeSymbol,
-                IEnumerable<string>
-            >(
-                x => x,
-                GetCachePathEntries,
-                SymbolEqualityComparer.Default
-            );
-
-        var cachePathEntries = cachePathMap
-            .SelectMany(x => x.Value)
+        var cachePathEntries = GetCachePathEntries(target, targets)
             .Prepend("Identity | this")
             .ToArray();
+
+
+        foreach (var entry in cachePathEntries)
+        {
+            logger.Log($"{target.ClassSymbol}: Cache path entry: {entry}");
+        }
 
         var cachePathField = SyntaxFactory.ParseMemberDeclaration(
             "private CachePathable? _cachePath;"
@@ -657,10 +735,22 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
         Logger logger,
         out string entityConstruction)
     {
-        foreach (var methodSymbol in restEntity.GetMembers("Construct").OfType<IMethodSymbol>())
+        var candidates = restEntity.GetMembers("Construct").OfType<IMethodSymbol>().ToArray();
+
+        if (candidates.Length == 0)
+        {
+            logger.Warn($"{restEntity}: No construct methods found");
+            entityConstruction = null!;
+            return false;
+        }
+
+        foreach (var methodSymbol in candidates)
         {
             if (!methodSymbol.Parameters.Last().Type.Equals(model, SymbolEqualityComparer.Default))
+            {
+                logger.Log($"{restEntity}: {methodSymbol} doesn't have {model} as last parameter");
                 continue;
+            }
 
             if (methodSymbol.Parameters.Length == 2)
             {
@@ -840,7 +930,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                 )
                 .OrderByDescending(x => TypeUtils
                     .GetBaseTypes(x.ClassSymbol)
-                    .TakeWhile(x => 
+                    .TakeWhile(x =>
                         !x.Equals(target.ClassSymbol, SymbolEqualityComparer.Default)
                     )
                     .Count()
@@ -1210,7 +1300,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                 )
                 .OrderByDescending(x => TypeUtils
                     .GetBaseTypes(x.ClassSymbol)
-                    .TakeWhile(x => 
+                    .TakeWhile(x =>
                         !x.Equals(target.ClassSymbol, SymbolEqualityComparer.Default)
                     )
                     .Count()
@@ -1272,7 +1362,7 @@ public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.Gen
                                                      ",\n",
                                                      children.Select(x =>
                                                          $$"""
-                                                           { typeof({{x.ModelType}}), (IManageableEntityBroker<{{target.IdType}}, {{target.GatewayEntitySymbol}}, {{target.ModelType}}>){{GetSimpleName(x.ClassSymbol)}}.GetBroker(client) }
+                                                           { typeof({{x.ModelType}}), {{GetSimpleName(x.ClassSymbol)}}.GetBroker(client).Cast<{{target.IdType}}, {{x.GatewayEntitySymbol}}, {{x.ModelType}}, {{target.GatewayEntitySymbol}}, {{target.ModelType}}>() }
                                                            """
                                                      )
                                                  )

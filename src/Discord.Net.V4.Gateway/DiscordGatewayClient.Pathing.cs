@@ -8,7 +8,7 @@ namespace Discord.Gateway;
 public partial class DiscordGatewayClient
 {
     [SourceOfTruth]
-    public GatewayCurrentUserActor CurrentUser => throw new NotImplementedException();
+    public GatewayCurrentUserActor CurrentUser { get; }
 
     [SourceOfTruth]
     public GuildsPager Guilds { get; }
@@ -20,7 +20,7 @@ public partial class DiscordGatewayClient
     public GatewayIndexableActor<GatewayUserActor, ulong, GatewayUser> Users { get; }
 
     [SourceOfTruth]
-    public GatewayIndexableActor<GatewayWebhookActor, ulong, GatewayWebhook> Webhooks => throw new NotImplementedException();
+    public GatewayIndexableActor<GatewayWebhookActor, ulong, GatewayWebhook> Webhooks { get; }
 
     [SourceOfTruth]
     public StickerPacks StickerPacks { get; }

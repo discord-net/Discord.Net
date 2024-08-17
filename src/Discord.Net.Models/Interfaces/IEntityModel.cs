@@ -1,8 +1,9 @@
 namespace Discord.Models;
 
-public interface IEntityModel<out T> : IModel
+public interface IEntityModel<out TId> : IModel
+    where TId : IEquatable<TId>
 {
-    T Id { get; }
+    TId Id { get; }
 }
 
 public interface IModel : IEquatable<IModel>

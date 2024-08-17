@@ -8,7 +8,8 @@ public partial interface IGuildForumChannelModel : IThreadableChannelModel
     bool IsNsfw { get; }
     string? Topic { get; }
     int? RatelimitPerUser { get; }
-    IEmoteModel? DefaultReactionEmoji { get; }
+    ulong? DefaultReactionEmojiId { get; }
+    string? DefaultReactionEmojiName { get; }
     IEnumerable<ITagModel> AvailableTags { get; }
     int? DefaultSortOrder { get; }
     int DefaultForumLayout { get; }

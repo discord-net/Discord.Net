@@ -125,7 +125,7 @@ public sealed class Hanz : IIncrementalGenerator
         where T : class, IEquatable<T>
     {
         var logger = Logger.CreateForTask(task.GetType().Name);
-        var transformLogger = Logger.CreateForTask(task.GetType().Name);
+        var transformLogger = Logger.CreateForTask(task.GetType().Name, false);
 
         var provider = context.SyntaxProvider.CreateSyntaxProvider(
             predicate: task.IsValid,
@@ -133,8 +133,7 @@ public sealed class Hanz : IIncrementalGenerator
             {
                 var logger = transformLogger
                     .WithSemanticContext(syntaxContext.SemanticModel)
-                    .GetSubLogger("transform")
-                    .WithCleanLogFile();
+                    .GetSubLogger("transform");
 
                 try
                 {
@@ -148,10 +147,6 @@ public sealed class Hanz : IIncrementalGenerator
                 {
                     _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
                     throw;
-                }
-                finally
-                {
-                    logger.Flush();
                 }
             }
         ).Collect();
@@ -172,6 +167,9 @@ public sealed class Hanz : IIncrementalGenerator
             }
             finally
             {
+                transformLogger.DeleteLogFile(false);
+                transformLogger.Flush();
+                
                 var delta = DateTimeOffset.UtcNow - startTime;
                 UpdatePerfTable(task.GetType().Name, delta);
                 logger.Flush();

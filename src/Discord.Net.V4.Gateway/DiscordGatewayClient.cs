@@ -25,7 +25,7 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
 
     internal ICacheProvider CacheProvider { get; }
 
-    internal IGatewayCompression? GatewayCompression { get; }
+    internal GatewayConfiguredObject<IGatewayCompression>? TransportCompression { get; }
 
     internal StateController StateController { get; }
 
@@ -49,7 +49,7 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
         Rest = new DiscordRestClient(config, LoggerFactory.CreateLogger<DiscordRestClient>());
         Encoding = config.Encoding.Get(this);
         CacheProvider = config.CacheProvider.Get(this);
-        GatewayCompression = config.TransportCompression?.Get(this);
+        TransportCompression = config.TransportCompression;
 
         _heartbeatSignal = Channel.CreateBounded<HeartbeatSignal>(
             new BoundedChannelOptions(2)
@@ -65,6 +65,7 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
 
         StateController = new(this, LoggerFactory.CreateLogger<StateController>());
 
+        CurrentUser = new(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
         Channels = new(id => new GatewayChannelActor(this, ChannelIdentity.Of(id)));
         Guilds = GatewayActors.PageGuilds(this);
         Users = new(id => new GatewayUserActor(this, UserIdentity.Of(id)));
@@ -77,7 +78,7 @@ public sealed partial class DiscordGatewayClient : IDiscordClient
         );
         Stickers = new(id => new GatewayStickerActor(this, StickerIdentity.Of(id)));
         Invites = new(id => new(this, InviteIdentity.Of(id)));
-
+        Webhooks = new(id => new GatewayWebhookActor(this, WebhookIdentity.Of(id)));
         InitializeEvents();
     }
 

@@ -11,6 +11,7 @@ public sealed class GatewayPayloadConverter : JsonConverter<GatewayMessage>
 {
     public Dictionary<string, Type> DispatchToPayload = new()
     {
+        {"READY", typeof(ReadyPayloadData)},
         {"APPLICATION_COMMAND_PERMISSIONS_UPDATE", typeof(ApplicationCommandPermissionUpdated)},
         {"AUTO_MODERATION_RULE_CREATE", typeof(AutoModerationRulePayload)},
         {"AUTO_MODERATION_RULE_UPDATE", typeof(AutoModerationRulePayload)},

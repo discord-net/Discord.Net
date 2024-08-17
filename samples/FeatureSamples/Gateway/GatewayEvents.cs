@@ -1,4 +1,5 @@
 using Discord.Gateway;
+using Discord.Models;
 
 namespace FeatureSamples.Gateway;
 
@@ -8,18 +9,31 @@ public class GatewayEvents
     {
         await client.ConnectAsync();
         
-        client.UserUpdated += OnUserUpdateAsync;
-        client.UserUpdatedEvent.Subscribe(OnUserUpdate);
+        client.GuildAvailable += ClientOnGuildAvailable;
+        client.GuildCreated += ClientOnGuildCreated;
+        client.Ready += ClientOnReady;
         
+        // client.GatewayDisconnected += MyHandler;
+        // client.GatewayConnected += MyHandler;
+        // client.GatewayResumed += MyHandler;
+        // client.Ready += MyHandler;
     }
 
-    public static async ValueTask OnUserUpdateAsync(GatewayCurrentUser user)
+    private static ValueTask ClientOnReady(GatewayCurrentUser currentUser, IReadOnlySet<ulong> guilds)
     {
-
+        Console.WriteLine($"Ready! {currentUser.Username} | {guilds.Count} guilds");
+        return ValueTask.CompletedTask;
     }
 
-    public static void OnUserUpdate(ulong user)
+    private static ValueTask ClientOnGuildCreated(GatewayGuild guild)
     {
+        Console.WriteLine($"Guild Created! {guild.Name}");
+        return ValueTask.CompletedTask;
+    }
 
+    private static ValueTask ClientOnGuildAvailable(GatewayGuild guild)
+    {
+        Console.WriteLine($"Guild Available! {guild.Name}");
+        return ValueTask.CompletedTask;
     }
 }

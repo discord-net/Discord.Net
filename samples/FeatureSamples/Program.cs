@@ -33,8 +33,7 @@ var restClient = new DiscordRestClient(token);
 var gatewayClient = new DiscordGatewayClient(
     new DiscordGatewayConfig(token)
     {
-        TransportCompression = null,
-        Intents = GatewayIntents.Guilds
+        Intents = GatewayIntents.All
     }, 
     loggerFactory
 );

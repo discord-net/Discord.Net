@@ -32,24 +32,36 @@ public sealed partial class ConcurrentGatewayDispatchQueue(
         {
             if (dispatchEvent.RequiresPreparation)
             {
-                _logger.LogDebug("Preparing dispatch event {Event}", eventName);
+                _logger.LogDebug("Preparing dispatch event '{EventName}' for {DispatchEvent}", eventName, dispatchEvent);
                 dispatchEvent.Prepare();
             }
 
             if (!dispatchEvent.HasSubscribers)
             {
-                _logger.LogDebug("Exiting early, {Event} has no subscribers", eventName);
+                _logger.LogDebug("Exiting early, {Event} has no subscribers", dispatchEvent);
                 return;
             }
 
             var handlers = await dispatchEvent.GetHandlersAsync(payload, token);
 
             if (handlers is null)
+            {
+                _logger.LogDebug("{Event} didn't produce any prepared handlers", dispatchEvent);
                 continue;
+            }
 
+            var count = preparedHandlers.Count;
             preparedHandlers.AddRange(handlers);
+            
+            _logger.LogDebug("{Event}: {Count} handlers added", dispatchEvent, preparedHandlers.Count - count);
         }
 
+        if (preparedHandlers.Count == 0)
+        {
+            _logger.LogDebug("No prepared handlers created for '{Event}'", eventName);
+            return;
+        }
+        
         var dispatcher = client.GetDispatcher(eventName);
 
         _logger.LogInformation(

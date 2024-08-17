@@ -29,6 +29,7 @@ public interface ICacheableEntity<out TSelf, out TId, TModel> :
 }
 
 public interface ICacheUpdatable<out TId, in TModel>
+    where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
     ValueTask UpdateAsync(TModel model, bool updateCache = true, CancellationToken token = default);

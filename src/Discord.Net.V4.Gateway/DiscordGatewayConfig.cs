@@ -38,13 +38,19 @@ public struct GatewayConfiguredObject<T>
         _factory = (_, config) => factory(config);
         _value = default;
     }
+    
+    public GatewayConfiguredObject(Func<T> factory)
+    {
+        _factory = (_, _) => factory();
+        _value = default;
+    }
 
-    public T Get(DiscordGatewayClient client)
+    public T Get(DiscordGatewayClient client, bool cache = true)
     {
         if (_value is null && _factory is null)
             throw new NullReferenceException($"One of '{nameof(_factory)}' or {nameof(_value)} must be set");
 
-        return _value ??= _factory!(client, client.Config);
+        return cache ? _value ??= _factory!(client, client.Config) : _value ?? _factory!(client, client.Config);
     }
 
     public static implicit operator GatewayConfiguredObject<T>(T value) => new(value);
@@ -126,7 +132,7 @@ public sealed class DiscordGatewayConfig : DiscordConfig
     public byte MaxUnacknowledgedHeartbeats { get; set; } = 3;
 
     private Optional<int> _largeThreshold;
-    private GatewayConfiguredObject<IGatewayCompression>? _transportCompression = new(IGatewayCompression.ZLib);
+    private GatewayConfiguredObject<IGatewayCompression>? _transportCompression = new(() => new ZLibCompression());
     private Optional<bool> _usePayloadCompression;
     
     public DiscordGatewayConfig(DiscordToken token)

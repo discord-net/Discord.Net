@@ -2,6 +2,7 @@ using Discord.Models;
 using System.Collections;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Discord.Gateway.State;
 
@@ -9,10 +10,14 @@ public sealed class CachePathable : IPathable, IReadOnlyDictionary<Type, object>
 {
     public static readonly CachePathable Empty = new CachePathable().MakeReadOnly();
 
+    public bool IsReadOnly { get; private set; }
+    
     private IDictionary<Type, object> _identities = new Dictionary<Type, object>();
 
     private IList<IPathable> _pathables = new List<IPathable>();
 
+    private HashSet<IModel> _enrichedModels = new();
+    
     private CachePathable MakeReadOnly()
     {
         if (!_identities.IsReadOnly)
@@ -21,7 +26,49 @@ public sealed class CachePathable : IPathable, IReadOnlyDictionary<Type, object>
         if (!_pathables.IsReadOnly)
             _pathables = _pathables.ToImmutableList();
 
+        IsReadOnly = true;
+        
         return this;
+    }
+
+    private void EnrichFrom(IModel model)
+    {
+        _enrichedModels.Add(model);
+
+        if (model is IModelSource source)
+            _enrichedModels.UnionWith(source.GetDefinedModels());
+    }
+
+    private bool TryGetFromModels<TId, TEntity>([MaybeNullWhen(false)] out TId id)
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>
+    {
+        if (_enrichedModels.Count == 0)
+        {
+            id = default;
+            return false;
+        }
+
+        // we don't care if the entity implements multiple 'IEntityOf' interfaces since they all will use the 
+        // same underlying id.
+        var entityModel = typeof(TEntity).GetInterface("IEntityOf`1")?.GenericTypeArguments[0];
+        
+        if (entityModel is null)
+        {
+            id = default;
+            return false;
+        }
+        
+        foreach (var model in _enrichedModels)
+        {
+            if (model is ILinkingModel<TId> link && link.TryGetId(entityModel, out id))
+            {
+                return true;
+            }
+        }
+
+        id = default;
+        return false;
     }
 
     public bool Contains<TId, TEntity>(TId id)
@@ -138,6 +185,11 @@ public sealed class CachePathable : IPathable, IReadOnlyDictionary<Type, object>
     public void Add(IPathable pathable)
         => _pathables.Add(pathable);
 
+    public void Add(IModel model)
+    {
+        if (!IsReadOnly) EnrichFrom(model);
+    }
+
     public void Add<TId, TEntity, TModel>(IIdentifiable<TId, TEntity, TModel> identity)
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
@@ -154,9 +206,12 @@ public sealed class CachePathable : IPathable, IReadOnlyDictionary<Type, object>
         if (TryGetIdentity<TId, TEntity>(out var identity))
             return identity.Id;
 
+        if (TryGetFromModels<TId, TEntity>(out var id))
+            return id;
+        
         foreach (var pathable in _pathables)
         {
-            if (pathable.TryGet<TId, TEntity>(out var id))
+            if (pathable.TryGet<TId, TEntity>(out id))
                 return id;
         }
 
@@ -170,7 +225,13 @@ public sealed class CachePathable : IPathable, IReadOnlyDictionary<Type, object>
         id = default;
 
         if (TryGetIdentity<TId, TEntity>(out var identity))
+        {
             id = identity.Id;
+            return true;
+        }
+
+        if (TryGetFromModels<TId, TEntity>(out id))
+            return true;
 
         foreach (var pathable in _pathables)
         {
@@ -206,6 +267,9 @@ public sealed class CachePathable : IPathable, IReadOnlyDictionary<Type, object>
         if (!_identities.IsReadOnly)
             _identities.Clear();
 
+        _enrichedModels.Clear();
+
+        _enrichedModels = null!;
         _pathables = null!;
         _identities = null!;
     }

@@ -15,6 +15,8 @@ public interface IModelSource
 public interface IModelSourceOf<out TModel>
 {
     TModel Model { get; }
+    
+    Type ModelSourceType => typeof(TModel);
 }
 
 public interface IModelSourceOfMultiple<out TModel> : IModelSource
@@ -23,4 +25,6 @@ public interface IModelSourceOfMultiple<out TModel> : IModelSource
     IEnumerable<TModel> GetModels();
 
     IEnumerable<IModel> IModelSource.GetDefinedModels() => (IEnumerable<IModel>) GetModels();
+    
+    Type ModelSourceType => typeof(TModel);
 }

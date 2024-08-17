@@ -98,7 +98,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                     .Interfaces
                     .FirstOrDefault(x => x.Name == "IDispatchPackage")
                 is {IsGenericType: true} dispatchPackageInterface
-                ? (INamedTypeSymbol)dispatchPackageInterface.TypeArguments[0]
+                ? (INamedTypeSymbol) dispatchPackageInterface.TypeArguments[0]
                 : Payload;
         }
 
@@ -132,7 +132,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
     {
         var attribute = type.GetAttributes()
             .FirstOrDefault(x =>
-                x.AttributeClass?.ToDisplayString() == "Discord.DispatchEventAttribute"
+                x.AttributeClass?.ToDisplayString() == "Discord.Gateway.DispatchEventAttribute"
             );
 
         if (attribute is null)
@@ -180,9 +180,9 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
 
         var subscribableEvents = symbol.GetAttributes()
             .Where(x =>
-                x.AttributeClass?.ToDisplayString().StartsWith("Discord.SubscribableAttribute") ?? false
+                x.AttributeClass?.ToDisplayString().StartsWith("Discord.Gateway.SubscribableAttribute") ?? false
             )
-            .ToDictionary(x => x, x => (INamedTypeSymbol)x.AttributeClass!.TypeArguments[0]);
+            .ToDictionary(x => x, x => (INamedTypeSymbol) x.AttributeClass!.TypeArguments[0]);
 
         if (subscribableEvents.Count == 0) return null;
 
@@ -293,14 +293,14 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                               )
                           }}
                       };
-
+                  
                       foreach(var userProcessor in Config.EventProcessors)
                       {
                           var instance = userProcessor.Get(this);
-
+                  
                           if(!map.TryGetValue(instance.DispatchEventType, out var set))
                               map[instance.DispatchEventType] = set = new();
-
+                  
                           set.Add(instance);
                       }
                       
@@ -596,26 +596,91 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
             var mapping = new Dictionary<EventParameterDegree, string>();
             var requiredResolveDegree = EventParameterDegree.None;
 
+            var parameterPackagePayloadType = target.PackagePayload;
+            var payloadPath = "package.Payload";
+
+            var sourceAttribute = parameter
+                .GetAttributes()
+                .FirstOrDefault(x => x
+                    .AttributeClass?
+                    .ToDisplayString()
+                    .Equals("Discord.Gateway.PackageSourceAttribute") ?? false
+                );
+
+            logger.Log(
+                $"{parameter}: Source?: {sourceAttribute} | {sourceAttribute?.ApplicationSyntaxReference?.GetSyntax()}"
+            );
+
+            if (
+                sourceAttribute?.ApplicationSyntaxReference?.GetSyntax() is AttributeSyntax
+                {
+                    ArgumentList.Arguments.Count: 1
+                } attributeSyntax &&
+                attributeSyntax.ArgumentList.Arguments[0].Expression is InvocationExpressionSyntax
+                {
+                    Expression: IdentifierNameSyntax
+                    {
+                        Identifier.ValueText: "nameof"
+                    },
+                    ArgumentList.Arguments.Count: 1
+                } invocation &&
+                invocation.ArgumentList.Arguments[0].Expression is MemberAccessExpressionSyntax access
+            )
+            {
+                logger.Log($"{parameter}: Found source access: {access}");
+
+                var flattened = SyntaxUtils.FlattenMemberAccess(access);
+
+                if (flattened.Length > 1 && flattened[0] == parameterPackagePayloadType.Name)
+                {
+                    foreach (var element in flattened.Skip(1))
+                    {
+                        var hierarchy = parameterPackagePayloadType.TypeKind is TypeKind.Interface
+                            ? Hierarchy.GetHierarchy(parameterPackagePayloadType)
+                                .Select(x => x.Type)
+                                .Prepend(parameterPackagePayloadType)
+                            : TypeUtils.GetBaseTypesAndThis(parameterPackagePayloadType);
+
+                        var property = hierarchy
+                            .SelectMany(x => x.GetMembers().OfType<IPropertySymbol>())
+                            .FirstOrDefault(x => x.Name == element);
+
+                        if (property?.Type is INamedTypeSymbol type)
+                        {
+                            parameterPackagePayloadType = type;
+                            payloadPath += $".{property.Name}";
+                        }
+                        else
+                        {
+                            payloadPath = "package";
+                            parameterPackagePayloadType = target.PackagePayload;
+                            break;
+                        }
+                    }
+                }
+            }
+
             foreach (var implementedDegree in GetImplementedDegrees(parameter, degree))
             {
-                if (requiredResolveDegree is EventParameterDegree.Unknown)
-                    break;
+                logger.Log(
+                    $" - {parameter}: Resolved degree {implementedDegree} | {payloadPath} | {parameterPackagePayloadType}");
 
-                logger.Log($" - {parameter}: Resolved degree {implementedDegree}");
+                if (requiredResolveDegree is EventParameterDegree.Unknown)
+                    continue;
 
                 switch (implementedDegree)
                 {
                     case EventParameterDegree.None:
-                        mapping.Add(EventParameterDegree.None, $"await Get{name}Async(token)");
+                        mapping.Add(EventParameterDegree.None, $"await package.Get{name}Async(token)");
                         requiredResolveDegree = EventParameterDegree.Unknown;
                         break;
                     case EventParameterDegree.Id when
                         TryGetModelType(parameter.Type, out var modelType) &&
                         target.SemanticModel.Compilation.HasImplicitConversion(
-                            target.PackagePayload,
+                            parameterPackagePayloadType,
                             modelType
                         ):
-                        mapping.Add(EventParameterDegree.Id, "package.Payload.Id");
+                        mapping.Add(EventParameterDegree.Id, $"{payloadPath}.Id");
                         break;
                     case EventParameterDegree.Id:
                         mapping.Add(EventParameterDegree.Id, $"package.Get{name}Id()");
@@ -624,10 +689,10 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                     case EventParameterDegree.Model when
                         TryGetModelType(parameter.Type, out var modelType) &&
                         target.SemanticModel.Compilation.HasImplicitConversion(
-                            target.PackagePayload,
+                            parameterPackagePayloadType,
                             modelType
                         ):
-                        mapping.Add(EventParameterDegree.Model, "package.Payload");
+                        mapping.Add(EventParameterDegree.Model, payloadPath);
                         break;
                     case EventParameterDegree.Model:
                         mapping.Add(EventParameterDegree.Model, $"package.Get{name}Model()");
@@ -649,12 +714,32 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                 }
             }
 
+            logger.Log($" += {parameter}: {mapping.Count} variants | {requiredResolveDegree}");
+            
             parameterMapping.Add((parameter, mapping, requiredResolveDegree));
         }
 
         foreach (var mapping in parameterMapping)
         {
             if (mapping.ResolveDegree is EventParameterDegree.None) continue;
+
+            if (mapping.ResolveDegree is EventParameterDegree.Unknown)
+            {
+                logger.Log(
+                    $" - Adding get method for {mapping.Parameter.Name}: explicit type"
+                );
+                AddEventParameter(
+                    ref handlerInterface,
+                    ref packageSyntax,
+                    parsedParameters[mapping.Parameter],
+                    mapping.Parameter.Type,
+                    mapping.ResolveDegree,
+                    target.PackagePayload,
+                    logger
+                );
+
+                continue;
+            }
 
             foreach (var requiredDegree in Enum.GetValues(typeof(EventParameterDegree))
                          .Cast<EventParameterDegree>()
@@ -691,6 +776,38 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
             var mapping = parameterMapping[i];
             var parsedParameter = new Parameter(mapping.Parameter, target.SemanticModel);
 
+            if (mapping.ResolveDegree is EventParameterDegree.Unknown)
+            {
+                logger.Log($"  -> {mapping.Parameter} : {parsedParameter}");
+
+                var toUpdate = processingMapping
+                    .Where(x => x[i] is null)
+                    .ToArray();
+
+                var entry = new ParsedParameter(
+                    mapping.Parameter.Type,
+                    parsedParameter.ParameterSymbol.Name,
+                    mapping.Generated[EventParameterDegree.None]
+                );
+
+                if (toUpdate.Length == 0)
+                {
+                    var arr = new ParsedParameter?[parameterMapping.Count];
+                    arr[i] = entry;
+                    processingMapping.Add(arr);
+                    continue;
+                }
+
+                foreach (var targetToUpdate in toUpdate)
+                {
+                    var arr = new ParsedParameter?[parameterMapping.Count];
+                    targetToUpdate.CopyTo(arr, 0);
+                    arr[i] = entry;
+                    processingMapping.Add(arr);
+                }
+
+                continue;
+            }
 
             foreach (var parameter in mapping.Generated)
             {
@@ -698,7 +815,6 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
                     continue;
 
                 logger.Log($"  -> {parameter.Key} : {parsedParameter}");
-
 
                 var entry = new ParsedParameter(type, parsedParameter.ParameterSymbol.Name, parameter.Value);
 
@@ -790,7 +906,7 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
             {
                 sigs.AddRange([
                     ($"Func<{genericsParameters}, CancellationToken, ValueTask>", true, true),
-                    ($"Func<{genericsParameters}, CancellationToken, Task>",true,  true),
+                    ($"Func<{genericsParameters}, CancellationToken, Task>", true, true),
                     ($"Func<{genericsParameters}, ValueTask>", true, false),
                     ($"Func<{genericsParameters}, Task>", true, false),
                     ($"Action<{genericsParameters}>", false, false)
@@ -820,10 +936,10 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
         bool isAsync)
     {
         var shouldBeAsync = mapping.Any(x => x.Value.Contains("await"));
-        
+
         if (!isAsync && shouldBeAsync)
             return;
-        
+
         var parameters = string.Join(", ", mapping.Select(x => x.Value));
 
         if (hasCancelToken)
@@ -937,18 +1053,25 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
         EventParameterDegree? parameterDegree = null)
     {
         parameterDegree ??= GetImplicitDegree(parameter);
+
+        if (parameterDegree is EventParameterDegree.None)
+        {
+            yield return EventParameterDegree.None;
+            yield break;
+        }
+        
         var supported = GetSupportedDegree(parameter);
 
-        var rawDegree = (byte)parameterDegree.Value;
+        var rawDegree = (byte) parameterDegree.Value;
 
         while (rawDegree > 0)
         {
-            yield return (EventParameterDegree)rawDegree;
+            yield return (EventParameterDegree) rawDegree;
 
             while (rawDegree > 0)
             {
                 rawDegree >>= 1;
-                if (supported.HasFlag((EventParameterDegree)rawDegree))
+                if (supported.HasFlag((EventParameterDegree) rawDegree))
                     break;
             }
         }
@@ -1050,17 +1173,18 @@ public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
     private static EventParameterDegree GetSupportedDegree(IParameterSymbol parameter)
     {
         var attribute = parameter.GetAttributes()
-            .FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "Discord.SupportsAttribute");
+            .FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "Discord.Gateway.SupportsAttribute");
 
         if (attribute is null)
             return EventParameterDegree.All;
 
-        return (EventParameterDegree)attribute.ConstructorArguments[0].Value!;
+        return (EventParameterDegree) attribute.ConstructorArguments[0].Value!;
     }
 
     private static string ToTitle(string str)
     {
-        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str);
+        return $"{char.ToUpperInvariant(str[0])}{str.Remove(0, 1)}";
+        // return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str);
     }
 
     private static bool TryGetIdType(ITypeSymbol type, out ITypeSymbol idType)

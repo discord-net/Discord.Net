@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public abstract class GuildChannelBase : Channel, IGuildChannelModel, IModelSource, IModelSourceOf<IEmojiModel?>
+public abstract class GuildChannelBase : Channel, IGuildChannelModel
 {
     [JsonPropertyName("last_pin_timestamp")]
     public Optional<DateTimeOffset?> LastPinTimestamp { get; set; }
@@ -62,7 +62,7 @@ public abstract class GuildChannelBase : Channel, IGuildChannelModel, IModelSour
     public Optional<ForumTag[]> AvailableTags { get; set; }
 
     [JsonPropertyName("default_reaction_emoji")]
-    public Optional<Emoji> DefaultReactionEmoji { get; set; }
+    public Optional<DefaultReactionModel> DefaultReactionEmoji { get; set; }
 
     [JsonPropertyName("default_sort_order")]
     public Optional<int?> DefaultSortOrder { get; set; }
@@ -75,12 +75,4 @@ public abstract class GuildChannelBase : Channel, IGuildChannelModel, IModelSour
     IEnumerable<IOverwriteModel> IGuildChannelModel.Permissions => PermissionOverwrites.Or([]);
 
     int? IGuildChannelModel.Flags => Flags;
-
-    public virtual IEnumerable<IModel> GetDefinedModels()
-    {
-        if (DefaultReactionEmoji is {IsSpecified: true, Value: not null})
-            yield return DefaultReactionEmoji.Value;
-    }
-
-    IEmojiModel? IModelSourceOf<IEmojiModel?>.Model => ~DefaultReactionEmoji;
 }

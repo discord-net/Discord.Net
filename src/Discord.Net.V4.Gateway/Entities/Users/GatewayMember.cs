@@ -28,7 +28,7 @@ public partial class GatewayMemberActor :
         member = Identity = member | this;
 
         Guild = client.Guilds >> guild;
-        User = client.Users >> (user ?? member.Cast<GatewayUser, GatewayUserActor, IUserModel>());
+        User = client.Users >> (user | member);
         VoiceState = new(client, guild | Guild, VoiceStateIdentity.Of(member.Id), member);
     }
 

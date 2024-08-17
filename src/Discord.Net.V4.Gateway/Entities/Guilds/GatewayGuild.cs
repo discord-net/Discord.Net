@@ -64,6 +64,12 @@ public sealed partial class GatewayGuildActor :
     {
         Identity = guild | this;
 
+        CurrentMember = new GatewayCurrentMemberActor(
+            client,
+            Identity,
+            CurrentMemberIdentity.Of(Client.CurrentUser.Id)
+        );
+        
         Webhooks = new(
             client,
             client.Webhooks,
@@ -71,13 +77,7 @@ public sealed partial class GatewayGuildActor :
             CachePath,
             IWebhook.GetGuildWebhooksRoute(this)
         );
-
-        CurrentMember = new GatewayCurrentMemberActor(
-            client,
-            Identity,
-            CurrentMemberIdentity.Of(Client.CurrentUser.Id)
-        );
-
+        
         Invites = GuildInvites(client, Identity, CachePath);
 
         Channels =
@@ -181,7 +181,7 @@ public sealed partial class GatewayGuild :
 
     public MfaLevel MfaLevel => (MfaLevel)Model.MFALevel;
 
-    public GuildFeatures Features { get; private set; }
+    public GuildFeatures Features { get; private set; } = GuildFeatures.Empty;
 
     public PremiumTier PremiumTier => (PremiumTier)Model.PremiumTier;
 

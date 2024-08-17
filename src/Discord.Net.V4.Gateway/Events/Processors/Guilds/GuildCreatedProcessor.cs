@@ -21,7 +21,8 @@ public sealed partial class GuildCreatedProcessor(DiscordGatewayClient client) :
         var guildsBroker = await Brokers.Guild.GetConfiguredBrokerAsync(client, token: token);
         await guildsBroker.UpdateAsync(extendedGuild, token);
 
-        var guildCachePath = new CachePathable {GuildIdentity.Of(extendedGuild.Id)};
+        using var guildCachePath = new CachePathable();
+        guildCachePath.Add(GuildIdentity.Of(extendedGuild.Id));
 
         var voiceStateBroker = await Brokers.VoiceState.GetConfiguredBrokerAsync(client, guildCachePath, token);
         await voiceStateBroker.BatchUpdateAsync(extendedGuild.VoiceStates, token);
@@ -37,8 +38,19 @@ public sealed partial class GuildCreatedProcessor(DiscordGatewayClient client) :
 
         // TODO: presence
 
-        var stageInstancesBroker = await Brokers.StageInstance.GetConfiguredBrokerAsync(client, guildCachePath, token);
-        await stageInstancesBroker.BatchUpdateAsync(extendedGuild.StageInstances, token);
+        var stageInstancesBroker = Brokers.StageInstance.GetBroker(client);
+        // we have to iterate 'extendedGuild.StageInstances' since we need to include the channel in the path
+        // when fetching the store.
+        foreach (var stageInstance in extendedGuild.StageInstances)
+        {
+            using var path = new CachePathable();
+            
+            path.Add(GuildIdentity.Of(extendedGuild.Id));
+            path.Add(StageChannelIdentity.Of(stageInstance.ChannelId));
+            
+            var store = await Stores.StageInstance.GetStoreInfoAsync(client, path, token);
+            await stageInstancesBroker.UpdateAsync(stageInstance, store, token);
+        }
 
         var guildScheduledEventsBroker =
             await Brokers.GuildScheduledEvent.GetConfiguredBrokerAsync(client, guildCachePath, token);

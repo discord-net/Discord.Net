@@ -6,6 +6,14 @@ namespace Discord.Net.Hanz.Utils;
 
 public static class SyntaxUtils
 {
+    public static string[] FlattenMemberAccess(MemberAccessExpressionSyntax syntax)
+    {
+        if (syntax.Expression is MemberAccessExpressionSyntax left)
+            return [..FlattenMemberAccess(left), syntax.Name.Identifier.ValueText];
+        
+        return [syntax.Expression.ToString(), syntax.Name.Identifier.ValueText];
+    }
+    
     public static SyntaxNode GetMemberTargetOrSelf(SyntaxNode node)
     {
         if (node is MemberAccessExpressionSyntax memberAccess)

@@ -473,7 +473,8 @@ public static class JsonModels
             "Discord.Converters.SnowflakeConverter",
             "Discord.Converters.BigIntegerConverter",
             "Discord.Converters.UserConverter",
-            "Discord.Converters.GatewayPayloadConverter"
+            "Discord.Converters.GatewayPayloadConverter",
+            "Discord.Converters.MillisecondEpocConverter"
         };
 
         converters.UnionWith(additionalConverters);

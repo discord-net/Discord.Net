@@ -1,5 +1,6 @@
 using Discord.Gateway.State;
 using Discord.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Discord.Gateway.Dispatch;
 
@@ -13,17 +14,19 @@ public delegate ValueTask GuildAvailableDelegate(
 [DispatchEvent(DispatchEventNames.GuildCreate)]
 public sealed partial class GuildAvailableEvent(DiscordGatewayClient client) :
     DispatchEvent<GuildAvailablePackage, IGuildCreatePayloadData>(client)
-{
+{   
     public override ValueTask<GuildAvailablePackage?> PackageAsync(
         IGuildCreatePayloadData? payload,
         CancellationToken token = default)
     {
         if (payload is not IExtendedGuild guild) return ValueTask.FromResult<GuildAvailablePackage?>(null);
 
-        // TODO: sync with guild create event
-        return !Client.UnavailableGuilds.Remove(payload.Id)
-            ? ValueTask.FromResult<GuildAvailablePackage?>(null)
-            : ValueTask.FromResult<GuildAvailablePackage?>(new GuildAvailablePackage(this, guild));
+        if (
+            Client.UnavailableGuilds.Contains(payload.Id) &&
+            Client.ProcessedUnavailableGuilds.Add(payload.Id)
+        ) return ValueTask.FromResult<GuildAvailablePackage?>(new GuildAvailablePackage(this, guild));
+
+        return ValueTask.FromResult<GuildAvailablePackage?>(null);
     }
 
     public GatewayGuildActor GetGuildActor(IExtendedGuild payload)

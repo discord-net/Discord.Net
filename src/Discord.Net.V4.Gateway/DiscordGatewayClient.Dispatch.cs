@@ -11,6 +11,7 @@ namespace Discord.Gateway;
 public sealed partial class DiscordGatewayClient
 {
     internal HashSet<ulong> UnavailableGuilds { get; } = new(2500);
+    internal HashSet<ulong> ProcessedUnavailableGuilds { get; } = new(2500);
 
     private readonly IGatewayDispatchQueue _dispatchQueue;
 
@@ -47,16 +48,8 @@ public sealed partial class DiscordGatewayClient
             TotalShards = readyPayloadData.Shard[1];
         }
 
-        if (StateController.SelfUserModel is null)
-            StateController.SelfUserModel = new(readyPayloadData.User);
-        else
-        {
-            StateController.SelfUserModel.UserModelPart = readyPayloadData.User;
-            StateController.SelfUserModel.SelfUserModelPart = readyPayloadData.User;
-        }
-
         var broker = await Brokers.CurrentUser.GetConfiguredBrokerAsync(this, token: token);
-        await broker.UpdateAsync(StateController.SelfUserModel, token);
+        await broker.UpdateAsync(readyPayloadData.User, token);
 
         UnavailableGuilds.Clear();
         UnavailableGuilds.UnionWith(readyPayloadData.Guilds.Select(x => x.Id));

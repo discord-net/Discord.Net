@@ -187,64 +187,108 @@ public static class ExtendedModel
             []
         );
 
-        if (!JsonModels.AddGetTypeInfoToConverter(ref syntax, symbol))
+        var hasExtraMembers = TypeUtils.GetBaseTypesAndThis(symbol)
+            .SelectMany(x => x
+                .GetMembers()
+                .OfType<IPropertySymbol>()
+                .Where(JsonModels.IsNotIgnoredJsonProperty)
+            ).Any();
+        
+        if (hasExtraMembers && !JsonModels.AddGetTypeInfoToConverter(ref syntax, symbol))
             return null;
 
         var read = SyntaxFactory.ParseMemberDeclaration(
             $$"""
               public override {{typeName}}? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
               {
-                  using var jsonDocument = JsonDocument.ParseValue(ref reader);
-                  var element = jsonDocument.RootElement;
-                  var result = element.Deserialize(GetTypeInfoWithoutConverter(options));
+                  {{(
+                      hasExtraMembers
+                          ? $$"""
+                              using var jsonDocument = JsonDocument.ParseValue(ref reader);
+                              var element = jsonDocument.RootElement;
+                              var result = element.Deserialize(GetTypeInfoWithoutConverter(options));
+
+                              if(result is null) return null;
+
+                              {{
+                                  string.Join(
+                                      "\n",
+                                      extended.Select(x =>
+                                          $$"""
+                                            result.{{x.Name}} = element.Deserialize<{{x.Type.ToDisplayString()}}>(options)!;
+                                            """
+                                      )
+                                  )
+                              }}
+
+                              return result; 
+                              """
+                          : $$"""
+                              var result = new {{typeName}}();
+                              
+                              {{
+                                  string.Join(
+                                      "\n",
+                                      extended.Select(x =>
+                                          $$"""
+                                            result.{{x.Name}} = JsonSerializer.Deserialize<{{x.Type.ToDisplayString()}}>(ref reader, options)!;
+                                            """
+                                      )
+                                  )
+                              }}
+                              
+                              return result;
+                              """
+                  )}}
               
-                  if(result is null) return null;
-              
-                  {{
-                      string.Join(
-                          "\n",
-                          extended.Select(x =>
-                              $$"""
-                                result.{{x.Name}} = element.Deserialize<{{x.Type.ToDisplayString()}}>(options)!;
-                                """
-                          )
-                      )
-                  }}
-              
-                  return result;
+                  
               }
               """
         );
 
+        var nodeInit = hasExtraMembers
+            ? """
+              JsonSerializer.SerializeToNode(value, GetTypeInfoWithoutConverter(options))
+                  as System.Text.Json.Nodes.JsonObject;
+                  
+              if(node is null) return;
+              """
+            : "new System.Text.Json.Nodes.JsonObject();";
+        
         var write = SyntaxFactory.ParseMemberDeclaration(
             $$"""
               public override void Write(Utf8JsonWriter writer, {{typeName}} value, JsonSerializerOptions options)
               {
-                  var node = JsonSerializer.SerializeToNode(value, GetTypeInfoWithoutConverter(options))
-                      as System.Text.Json.Nodes.JsonObject;
-              
-                  if(node is null) return;
-              
-                  {{
-                      string.Join(
-                          "\n",
-                          extended.Select(x =>
-                              $$"""
-                                var {{x.Name}}Prop = JsonSerializer.SerializeToNode(value.{{x.Name}}, options)
-                                    as System.Text.Json.Nodes.JsonObject;
-
-                                if ({{x.Name}}Prop is not null)
-                                {
-                                    foreach(var prop in {{x.Name}}Prop)
-                                        node.Add(prop);
-                                }
-
-                                """
-                          )
-                      )
-                  }}
-              
-                  node.WriteTo(writer, options);
+                  {{(
+                      extended.Length > 1 || hasExtraMembers
+                      ? $$"""
+                        var node = {{nodeInit}}
+                        
+                        {{
+                            string.Join(
+                                "\n",
+                                extended.Select(x =>
+                                    $$"""
+                                      var {{x.Name}}Prop = JsonSerializer.SerializeToNode(value.{{x.Name}}, options)
+                                          as System.Text.Json.Nodes.JsonObject;
+                        
+                                      if ({{x.Name}}Prop is not null)
+                                      {
+                                          foreach(var prop in {{x.Name}}Prop)
+                                              node.Add(prop);
+                                      }
+                        
+                                      """
+                                )
+                            )
+                        }}
+                        
+                        node.WriteTo(writer, options);
+                        """
+                      : $$"""
+                        JsonSerializer.Serialize(writer, value.{{extended[0].Name}}, options);
+                        """
+                      )}}
               }
               """
         );

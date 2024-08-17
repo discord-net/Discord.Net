@@ -16,7 +16,8 @@ public sealed class GuildForumChannel : ThreadableChannelBase, IGuildForumChanne
 
     int? IGuildForumChannelModel.RatelimitPerUser => ~RatelimitPerUser;
 
-    IEmoteModel? IGuildForumChannelModel.DefaultReactionEmoji => ~DefaultReactionEmoji;
+    ulong? IGuildForumChannelModel.DefaultReactionEmojiId => ~DefaultReactionEmoji.Map(v => v.EmojiId);
+    string? IGuildForumChannelModel.DefaultReactionEmojiName => ~DefaultReactionEmoji.Map(v => v.EmojiName);
 
     IEnumerable<ITagModel> IGuildForumChannelModel.AvailableTags => AvailableTags | [];
 }

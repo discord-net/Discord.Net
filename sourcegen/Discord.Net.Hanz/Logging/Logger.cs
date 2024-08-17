@@ -17,10 +17,14 @@ public sealed class Logger : ILogger, IEquatable<Logger>
 
     private readonly object _syncRoot = new();
 
+    private readonly bool _autoFlush;
+
     public Logger(
         LogLevel logLevel,
-        string logFilePath)
+        string logFilePath,
+        bool autoFlush = true)
     {
+        _autoFlush = autoFlush;
         _logs = new();
         _logLevel = logLevel;
         _logFilePath = logFilePath;
@@ -41,25 +45,26 @@ public sealed class Logger : ILogger, IEquatable<Logger>
                         Path.GetDirectoryName(_logFilePath) ?? LogDirectory,
                         Path.GetFileNameWithoutExtension(_logFilePath),
                         $"{name}.subtask.log"
-                    )
+                    ),
+                    _autoFlush
                 );
                 logger.DeleteLogFile();
                 return logger;
             }
         );
 
-    public Logger WithCleanLogFile()
+    public Logger WithCleanLogFile(bool clearLogs = true)
     {
-        DeleteLogFile();
+        DeleteLogFile(clearLogs);
         return this;
     }
 
-    public void Clean()
+    public void Clean(bool clearLogs = true)
     {
-        DeleteLogFile();
+        DeleteLogFile(clearLogs);
         foreach (var subLogger in _subLoggers.ToArray())
         {
-            subLogger.Value.Clean();
+            subLogger.Value.Clean(clearLogs);
         }
     }
 
@@ -68,25 +73,28 @@ public sealed class Logger : ILogger, IEquatable<Logger>
         if (_logFilePath.Contains(model.Compilation.Assembly.Name))
             return this;
 
-        var name = Path.Combine(LogDirectory, model.Compilation.Assembly.Name,
-            Path.GetFileName(_logFilePath));
+        var name = Path.Combine(
+            LogDirectory,
+            model.Compilation.Assembly.Name,
+            Path.GetFileName(_logFilePath)
+        );
 
         return _subLoggers.GetOrAdd(name, name =>
         {
-            var logger = new Logger(_logLevel, name);
+            var logger = new Logger(_logLevel, name, _autoFlush);
             logger.DeleteLogFile();
             return logger;
         });
     }
 
-    public void DeleteLogFile()
+    public void DeleteLogFile(bool clearLogs = true)
     {
         if (_logFilePath.ToLowerInvariant().Contains("roslyn"))
             return;
 
         lock (_syncRoot)
         {
-            _logs.Clear();
+            if (clearLogs) _logs.Clear();
             if (File.Exists(_logFilePath))
                 File.Delete(_logFilePath);
         }
@@ -111,7 +119,7 @@ public sealed class Logger : ILogger, IEquatable<Logger>
             {
                 _logs.AddLast($"[{DateTime.Now:O} | {logLevel}] {message}");
 
-                if(_logs.Count >= MAX_UNFLUSHED_LOGS)
+                if (_autoFlush && _logs.Count >= MAX_UNFLUSHED_LOGS)
                     NoLockFlush();
             }
         }
@@ -156,16 +164,22 @@ public sealed class Logger : ILogger, IEquatable<Logger>
             Path.Combine(LogDirectory, assembly, "latest.log"));
     }
 
-    public static Logger CreateSemanticRunForTask(string assembly, string task)
+    public static Logger CreateSemanticRunForTask(string assembly, string task, bool autoFlush = true)
     {
-        return new Logger(Hanz.LoggerOptions.Level,
-            Path.Combine(LogDirectory, assembly, $"{task}.task.log"));
+        return new Logger(
+            Hanz.LoggerOptions.Level,
+            Path.Combine(LogDirectory, assembly, $"{task}.task.log"),
+            autoFlush
+        );
     }
 
-    public static Logger CreateForTask(string task)
+    public static Logger CreateForTask(string task, bool autoFlush = true)
     {
-        return new Logger(Hanz.LoggerOptions.Level,
-            Path.Combine(LogDirectory, $"{task}.task.log"));
+        return new Logger(
+            Hanz.LoggerOptions.Level,
+            Path.Combine(LogDirectory, $"{task}.task.log"),
+            autoFlush
+        );
     }
 
     public bool Equals(Logger? other)
@@ -181,7 +195,7 @@ public sealed class Logger : ILogger, IEquatable<Logger>
     {
         unchecked
         {
-            return ((int)_logLevel * 397) ^ _logFilePath.GetHashCode();
+            return ((int) _logLevel * 397) ^ _logFilePath.GetHashCode();
         }
     }
 

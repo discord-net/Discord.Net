@@ -67,6 +67,8 @@ public readonly struct GuildFeatures : IReadOnlySet<string>, IEquatable<GuildFea
 
     #endregion
 
+    public static readonly GuildFeatures Empty = new(null);
+    
     /// <inheritdoc />
     public int Count => _features.Count;
 
