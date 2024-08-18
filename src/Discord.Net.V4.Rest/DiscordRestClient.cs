@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace Discord.Rest;
 
-using GuildsPager = RestPartialPagedIndexableActor<
+using GuildsPager = RestPartialPagedIndexableLink<
     RestGuildActor,
     ulong,
     RestGuild,
@@ -16,8 +16,8 @@ using GuildsPager = RestPartialPagedIndexableActor<
     IEnumerable<IPartialGuildModel>,
     PageUserGuildsParams
 >;
-using Stickers = RestIndexableActor<RestStickerActor, ulong, RestSticker>;
-using StickerPacks = RestEnumerableIndexableActor<
+using Stickers = RestIndexableLink<RestStickerActor, ulong, RestSticker>;
+using StickerPacks = RestEnumerableIndexableLink<
     RestStickerPackActor,
     ulong,
     RestStickerPack,
@@ -34,12 +34,12 @@ public sealed partial class DiscordRestClient : IDiscordClient
 
     [SourceOfTruth] public GuildsPager Guilds { get; }
 
-    [SourceOfTruth] public RestIndexableActor<RestChannelActor, ulong, RestChannel> Channels { get; }
+    [SourceOfTruth] public RestIndexableLink<RestChannelActor, ulong, RestChannel> Channels { get; }
 
-    [SourceOfTruth] public RestIndexableActor<RestUserActor, ulong, RestUser> Users { get; }
+    [SourceOfTruth] public RestIndexableLink<RestUserActor, ulong, RestUser> Users { get; }
 
-    [SourceOfTruth] public RestIndexableActor<RestWebhookActor, ulong, RestWebhook> Webhooks { get; }
-    [SourceOfTruth] public RestIndexableActor<RestInviteActor, string, RestInvite> Invites { get; }
+    [SourceOfTruth] public RestIndexableLink<RestWebhookActor, ulong, RestWebhook> Webhooks { get; }
+    [SourceOfTruth] public RestIndexableLink<RestInviteActor, string, RestInvite> Invites { get; }
 
     [SourceOfTruth] public StickerPacks StickerPacks { get; }
 

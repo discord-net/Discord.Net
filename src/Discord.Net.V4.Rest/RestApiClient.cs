@@ -219,33 +219,47 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
                 // might return false since we're using options with converters, and not the actual context. 
                 return JsonContent.Create(body, options: _restClient.Config.JsonSerializerOptions);
 
-                // the following is a hack for now.
-                // var jsonStream = _streamManager.GetStream(nameof(EncodeBodyContent));
-                // JsonSerializer.Serialize(jsonStream, body, typeof(T), ModelJsonContext.Default);
-                // var jsonContent = new StreamContent(jsonStream);
-                // jsonContent.Headers.ContentType = new("application/json");
-                // return jsonContent;
+            // the following is a hack for now.
+            // var jsonStream = _streamManager.GetStream(nameof(EncodeBodyContent));
+            // JsonSerializer.Serialize(jsonStream, body, typeof(T), ModelJsonContext.Default);
+            // var jsonContent = new StreamContent(jsonStream);
+            // jsonContent.Headers.ContentType = new("application/json");
+            // return jsonContent;
             case ContentType.MultipartForm:
-                if (body is not IDictionary<string, object?> parts)
-                    throw new InvalidCastException("Cannot convert multipart data to dictionary");
+                if (body is not IMultipartParams multipartParams)
+                    throw new ArgumentException($"The provided body was not '{typeof(IMultipartParams)}'");
 
                 var content =
                     new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
 
-                foreach (var part in parts)
+                foreach (var (name, value) in multipartParams.GetKeys())
                 {
-                    if (part.Value is null)
+                    if (value is null)
                         continue;
 
-                    HttpContent partContent = part.Value switch
+                    HttpContent partContent = value switch
                     {
                         string str => new StringContent(str),
                         Stream stream => new StreamContent(stream),
                         _ => throw new InvalidOperationException(
-                            $"Unsupported multipart content type '{part.Value.GetType()}'")
+                            $"Unsupported multipart content type '{value.GetType()}'"
+                        )
                     };
 
-                    content.Add(partContent, part.Key);
+                    content.Add(partContent, name);
+                }
+
+                foreach (var (name, file) in multipartParams.GetFiles())
+                {
+                    if (file.Stream.CanSeek)
+                        file.Stream.Position = 0;
+
+                    var fileContent = new StreamContent(file.Stream);
+
+                    if (file.ContentType is not null)
+                        fileContent.Headers.ContentType = new(file.ContentType);
+                    
+                    content.Add(fileContent, name, file.Filename);
                 }
 
                 return content;

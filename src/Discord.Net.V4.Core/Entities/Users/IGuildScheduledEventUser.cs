@@ -3,7 +3,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-[FetchableOfMany(nameof(Routes.GetGuildScheduledEventUsers))]
+[PagedFetchableOfMany<PageGuildScheduledEventUsersParams>(nameof(Routes.GetGuildScheduledEventUsers))]
 public partial interface IGuildScheduledEventUser :
     ISnowflakeEntity<IGuildScheduledEventUserModel>,
     IGuildScheduledEventUserActor;

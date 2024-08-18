@@ -5,7 +5,7 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-using PublicThreadsPagedActor = RestPagedIndexableActor<
+using PublicThreadsPagedActor = RestPagedIndexableLink<
     RestThreadChannelActor,
     ulong,
     RestThreadChannel,
@@ -14,7 +14,7 @@ using PublicThreadsPagedActor = RestPagedIndexableActor<
     PagePublicArchivedThreadsParams
 >;
 
-using PrivateThreadsPagedActor = RestPagedIndexableActor<
+using PrivateThreadsPagedActor = RestPagedIndexableLink<
     RestThreadChannelActor,
     ulong,
     RestThreadChannel,
@@ -22,7 +22,7 @@ using PrivateThreadsPagedActor = RestPagedIndexableActor<
     ChannelThreads,
     PagePrivateArchivedThreadsParams
 >;
-using JoinedPrivateThreadsPagedActor = RestPagedIndexableActor<
+using JoinedPrivateThreadsPagedActor = RestPagedIndexableLink<
     RestThreadChannelActor,
     ulong,
     RestThreadChannel,

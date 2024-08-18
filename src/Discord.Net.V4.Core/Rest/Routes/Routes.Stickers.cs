@@ -1,5 +1,4 @@
 using Discord.Models.Json;
-using Discord.Models.Json.Stickers;
 
 namespace Discord.Rest;
 
@@ -8,7 +7,7 @@ public static partial class Routes
     public static readonly IApiOutRoute<StickerPack[]> ListStickerPacks
         = new ApiOutRoute<StickerPack[]>(nameof(ListStickerPacks), RequestMethod.Get, "sticker-packs");
 
-    public static IApiOutRoute<StickerPack> GetStickerPack([IdHeuristic<IStickerPack>]ulong packId) =>
+    public static IApiOutRoute<StickerPack> GetStickerPack([IdHeuristic<IStickerPack>] ulong packId) =>
         new ApiOutRoute<StickerPack>(nameof(GetStickerPack), RequestMethod.Get, $"sticker-packs/{packId}");
 
     public static IApiOutRoute<Sticker> GetSticker([IdHeuristic<ISticker>] ulong stickerId) =>
@@ -23,16 +22,22 @@ public static partial class Routes
         new ApiOutRoute<Sticker>(nameof(GetGuildSticker), RequestMethod.Get, $"guilds/{guildId}/stickers/{stickerId}",
             (ScopeType.Guild, guildId));
 
-    public static IApiInOutRoute<CreateStickerProperties, Sticker> CreateGuildSticker(
+    public static IApiInOutRoute<CreateGuildStickerParams, Sticker> CreateGuildSticker(
         [IdHeuristic<IGuild>] ulong guildId,
-        CreateStickerProperties body) =>
-        new ApiInOutRoute<CreateStickerProperties, Sticker>(nameof(CreateGuildSticker), RequestMethod.Post,
-            $"guilds/{guildId}/stickers", body, ContentType.MultipartForm, (ScopeType.Guild, guildId));
+        CreateGuildStickerParams body
+    ) => new ApiInOutRoute<CreateGuildStickerParams, Sticker>(
+        nameof(CreateGuildSticker),
+        RequestMethod.Post,
+        $"guilds/{guildId}/stickers",
+        body,
+        ContentType.MultipartForm,
+        (ScopeType.Guild, guildId)
+    );
 
-    public static IApiInOutRoute<ModifyGuildStickersParams, Sticker> ModifyGuildSticker(
+    public static IApiInOutRoute<ModifyGuildStickerParams, Sticker> ModifyGuildSticker(
         [IdHeuristic<IGuild>] ulong guildId, [IdHeuristic<IGuildSticker>] ulong stickerId,
-        ModifyGuildStickersParams body) =>
-        new ApiInOutRoute<ModifyGuildStickersParams, Sticker>(nameof(ModifyGuildSticker), RequestMethod.Patch,
+        ModifyGuildStickerParams body) =>
+        new ApiInOutRoute<ModifyGuildStickerParams, Sticker>(nameof(ModifyGuildSticker), RequestMethod.Patch,
             $"guilds/{guildId}/stickers/{stickerId}", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
 
     public static IApiRoute DeleteGuildSticker([IdHeuristic<IGuild>] ulong guildId,

@@ -2,7 +2,7 @@ using Discord.Models;
 
 namespace Discord.Rest;
 
-using StickersActor = RestManagedIndexableActor<RestStickerActor, ulong, RestSticker, ISticker, IStickerModel>;
+using StickersActor = RestManagedIndexableLink<RestStickerActor, ulong, RestSticker, ISticker, IStickerModel>;
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestStickerPackActor :

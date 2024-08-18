@@ -19,85 +19,85 @@ public partial interface IGuildActor :
 
     [return: TypeHeuristic(nameof(Channels))]
     IGuildChannelActor Channel(ulong id) => Channels[id];
-    IEnumerableIndexableActor<IGuildChannelActor, ulong, IGuildChannel> Channels { get; }
+    EnumerableIndexableGuildChannelLink Channels { get; }
 
     [return: TypeHeuristic(nameof(TextChannels))]
     ITextChannelActor TextChannel(ulong id) => TextChannels[id];
-    IEnumerableIndexableActor<ITextChannelActor, ulong, ITextChannel> TextChannels { get; }
+    EnumerableIndexableTextChannelLink TextChannels { get; }
 
     [return: TypeHeuristic(nameof(VoiceChannels))]
     IVoiceChannelActor VoiceChannel(ulong id) => VoiceChannels[id];
-    IEnumerableIndexableActor<IVoiceChannelActor, ulong, IVoiceChannel> VoiceChannels { get; }
+    EnumerableIndexableVoiceChannelLink VoiceChannels { get; }
 
     [return: TypeHeuristic(nameof(CategoryChannels))]
     ICategoryChannelActor CategoryChannel(ulong id) => CategoryChannels[id];
-    IEnumerableIndexableActor<ICategoryChannelActor, ulong, ICategoryChannel> CategoryChannels { get; }
+    EnumerableIndexableCategoryChannelLink CategoryChannels { get; }
 
     [return: TypeHeuristic(nameof(AnnouncementChannels))]
     INewsChannelActor AnnouncementChannel(ulong id) => AnnouncementChannels[id];
-    IEnumerableIndexableActor<INewsChannelActor, ulong, INewsChannel> AnnouncementChannels { get; }
+    EnumerableIndexableNewsChannelLink AnnouncementChannels { get; }
 
     [return: TypeHeuristic(nameof(ThreadChannels))]
     IThreadChannelActor ThreadChannel(ulong id) => ThreadChannels[id];
-    IEnumerableIndexableActor<IThreadChannelActor, ulong, IThreadChannel> ThreadChannels { get; }
+    EnumerableIndexableThreadChannelLink ThreadChannels { get; }
 
-    [return: TypeHeuristic(nameof(Invites))]
+    [return: TypeHeuristic(nameof(ActiveThreadChannels))]
     IThreadChannelActor ActiveThreadChannel(ulong id) => ActiveThreadChannels[id];
-    IEnumerableIndexableActor<IThreadChannelActor, ulong, IThreadChannel> ActiveThreadChannels { get; }
+    EnumerableIndexableThreadChannelLink ActiveThreadChannels { get; }
 
     [return: TypeHeuristic(nameof(StageChannels))]
     IStageChannelActor StageChannel(ulong id) => StageChannels[id];
-    IEnumerableIndexableActor<IStageChannelActor, ulong, IStageChannel> StageChannels { get; }
+    EnumerableIndexableStageChannelLink StageChannels { get; }
 
     [return: TypeHeuristic(nameof(ForumChannels))]
     IForumChannelActor ForumChannel(ulong id) => ForumChannels[id];
-    IEnumerableIndexableActor<IForumChannelActor, ulong, IForumChannel> ForumChannels { get; }
+    EnumerableIndexableForumChannelLink ForumChannels { get; }
 
     [return: TypeHeuristic(nameof(MediaChannels))]
     IMediaChannelActor MediaChannel(ulong id) => MediaChannels[id];
-    IEnumerableIndexableActor<IMediaChannelActor, ulong, IMediaChannel> MediaChannels { get; }
+    EnumerableIndexableMediaChannelLink MediaChannels { get; }
 
     [return: TypeHeuristic(nameof(IntegrationChannels))]
     IIntegrationChannelTrait IntegrationChannel(ulong id) => IntegrationChannels[id];
-    IEnumerableIndexableActor<IIntegrationChannelTrait, ulong, IIntegrationChannel> IntegrationChannels { get; }
+    EnumerableIndexableIntegrationChannelTraitLink IntegrationChannels { get; }
 
     #endregion
 
     [return: TypeHeuristic(nameof(Integrations))]
     IIntegrationActor Integration(ulong id) => Integrations[id];
-    IEnumerableIndexableActor<IIntegrationActor, ulong, IIntegration> Integrations { get; }
+    EnumerableIndexableIntegrationLink Integrations { get; }
 
     [return: TypeHeuristic(nameof(Bans))]
     IBanActor Ban(ulong userId) => Bans[userId];
-    IPagedIndexableActor<IBanActor, ulong, IBan, PageGuildBansParams> Bans { get; }
+    PagedIndexableBanLink Bans { get; }
 
     [return: TypeHeuristic(nameof(Members))]
     IMemberActor Member(ulong id) => Members[id];
-    IPagedIndexableActor<IMemberActor, ulong, IMember, PageGuildMembersParams> Members { get; }
+    PagedIndexableMemberLink Members { get; }
 
     [return: TypeHeuristic(nameof(Emotes))]
     IGuildEmoteActor Emote(ulong id) => Emotes[id];
-    IEnumerableIndexableActor<IGuildEmoteActor, ulong, IGuildEmote> Emotes { get; }
+    EnumerableIndexableGuildEmoteLink Emotes { get; }
 
     [return: TypeHeuristic(nameof(Roles))]
     IRoleActor Role(ulong id) => Roles[id];
-    IEnumerableIndexableActor<IRoleActor, ulong, IRole> Roles { get; }
+    EnumerableIndexableRoleLink Roles { get; }
 
     [return: TypeHeuristic(nameof(Stickers))]
     IGuildStickerActor Sticker(ulong id) => Stickers[id];
-    IEnumerableIndexableActor<IGuildStickerActor, ulong, IGuildSticker> Stickers { get; }
+    EnumerableIndexableGuildStickerLink Stickers { get; }
 
     [return: TypeHeuristic(nameof(ScheduledEvents))]
     IGuildScheduledEventActor ScheduledEvent(ulong id) => ScheduledEvents[id];
-    IEnumerableIndexableActor<IGuildScheduledEventActor, ulong, IGuildScheduledEvent> ScheduledEvents { get; }
+    EnumerableIndexableGuildScheduledEventLink ScheduledEvents { get; }
 
     [return: TypeHeuristic(nameof(Invites))]
     IGuildInviteActor Invite(string code) => Invites[code];
-    IEnumerableIndexableActor<IGuildInviteActor, string, IGuildInvite> Invites { get; }
+    EnumerableIndexableGuildInviteLink Invites { get; }
 
     [return: TypeHeuristic(nameof(Webhooks))]
     IWebhookActor Webhook(ulong id) => Webhooks[id];
-    IEnumerableIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks { get; }
+    EnumerableIndexableWebhookLink Webhooks { get; }
 
     #region Methods
 

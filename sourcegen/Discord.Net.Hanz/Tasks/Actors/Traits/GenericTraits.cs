@@ -182,15 +182,25 @@ public sealed class GenericTraits : IGenerationCombineTask<GenericTraits.Generat
 
             if (commonInterfaces.Length == 0) continue;
 
-
+            SyntaxToken[] extraModifiers = trait.Key
+                .AllInterfaces
+                .Any(x => generationTargets
+                    .Any(y => y
+                        .Traits
+                        .Contains(x, SymbolEqualityComparer.Default)
+                    )
+                )
+                ? [SyntaxFactory.Token(SyntaxKind.NewKeyword)]
+                : [];
+            
             var clone = SyntaxUtils.CreateSourceGenClone(traitSyntax)
                 .AddMembers(
                     SyntaxFactory.ParseMemberDeclaration(
                         $"internal static Type TraitRoot => typeof({commonInterfaces[0].Common.ToDisplayString()});"
-                    )!,
+                    )!.AddModifiers(extraModifiers),
                     SyntaxFactory.ParseMemberDeclaration(
                         $"internal static Type TraitRootModel => typeof({GetModel(commonInterfaces[0].Common)!.ToDisplayString()});"
-                    )!,
+                    )!.AddModifiers(extraModifiers),
                     SyntaxFactory.ParseMemberDeclaration(
                         $$"""
                           private static readonly HashSet<Type> _implementers = new()
@@ -230,13 +240,13 @@ public sealed class GenericTraits : IGenerationCombineTask<GenericTraits.Generat
                           internal static bool ImplementsTrait(Type type)
                               => _implementers.Contains(type) || _implementers.Any(x => x.IsAssignableFrom(type));
                           """
-                    )!,
+                    )!.AddModifiers(extraModifiers),
                     SyntaxFactory.ParseMemberDeclaration(
                         $$"""
                           internal static bool ImplementsTraitByModel(Type type)
                               => _implementerModels.Contains(type) || _implementerModels.Any(x => x.IsAssignableFrom(type));
                           """
-                    )!
+                    )!.AddModifiers(extraModifiers)
                 );
 
             context.AddSource(

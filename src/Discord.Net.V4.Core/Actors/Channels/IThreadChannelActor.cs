@@ -16,8 +16,8 @@ public partial interface IThreadChannelActor :
 {
     IThreadMemberActor CurrentThreadMember { get; }
 
-    // TODO: make this paged
-    IEnumerableIndexableActor<IThreadMemberActor, ulong, IThreadMember> ThreadMembers { get; }
+    // TODO: make this paged in api v11: https://discord.com/developers/docs/resources/channel#list-thread-members
+    EnumerableIndexableThreadMemberLink ThreadMembers { get; }
 
     IThreadMemberActor IThreadMemberRelationship.ThreadMember
         => CurrentThreadMember;

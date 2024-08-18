@@ -6,6 +6,7 @@ namespace Discord;
 
 [Loadable(nameof(Routes.GetGuildRole))]
 [Deletable(nameof(Routes.DeleteGuildRole))]
+[Creatable<CreateRoleProperties>(nameof(Routes.CreateGuildRole))]
 [Modifiable<ModifyRoleProperties>(nameof(Routes.ModifyGuildRole))]
 public partial interface IRoleActor :
     IGuildRelationship,

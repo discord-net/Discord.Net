@@ -8,7 +8,7 @@ namespace Discord.Rest;
 
 internal static partial class RestManagedIndexableActor
 {
-    public static RestManagedIndexableActor<TActor, TId, TEntity, TCore, TModel> Create<
+    public static RestManagedIndexableLink<TActor, TId, TEntity, TCore, TModel> Create<
         [TransitiveFill] TActor,
         TId,
         TEntity,
@@ -19,7 +19,7 @@ internal static partial class RestManagedIndexableActor
         DiscordRestClient client,
         IEnumerable<TModel> models,
         Func<DiscordRestClient, TModel, TEntity> factory,
-        RestIndexableActor<TActor, TId, TEntity> indexableActor
+        RestIndexableLink<TActor, TId, TEntity> indexableLink
     )
         where TActor : class, IRestActor<TId, TEntity>
         where TEntity : RestEntity<TId>, TCore, IProxied<TActor>, IEntityOf<TModel>
@@ -27,24 +27,24 @@ internal static partial class RestManagedIndexableActor
         where TCore : class, IEntity<TId, TModel>
         where TModel : class, IEntityModel<TId>
     {
-        return new RestManagedIndexableActor<TActor, TId, TEntity, TCore, TModel>(
+        return new RestManagedIndexableLink<TActor, TId, TEntity, TCore, TModel>(
             client,
             models,
             factory,
-            indexableActor
+            indexableLink
         );
     }
 }
 
-public sealed class RestFetchableManagedIndexableActor<TActor, TId, TEntity, TCore, TModel, TApi>(
+public sealed class RestFetchableManagedIndexableLink<TActor, TId, TEntity, TCore, TModel, TApi>(
     DiscordRestClient client,
     IEnumerable<TModel> models,
     Func<DiscordRestClient, TModel, TEntity> factory,
-    RestIndexableActor<TActor, TId, TEntity> indexableActor,
+    RestIndexableLink<TActor, TId, TEntity> indexableLink,
     IApiOutRoute<TApi> fetchRoute,
     Func<TApi, IEnumerable<TModel>> mapper
 ) :
-    RestManagedIndexableActor<TActor, TId, TEntity, TCore, TModel>(client, models, factory, indexableActor)
+    RestManagedIndexableLink<TActor, TId, TEntity, TCore, TModel>(client, models, factory, indexableLink)
     where TActor : class, IRestActor<TId, TEntity>
     where TEntity : RestEntity<TId>, TCore, IProxied<TActor>, IEntityOf<TModel>
     where TId : IEquatable<TId>
@@ -73,8 +73,8 @@ public sealed class RestFetchableManagedIndexableActor<TActor, TId, TEntity, TCo
     }
 }
 
-public class RestManagedIndexableActor<TActor, TId, TEntity, TCore, TModel> :
-    IDefinedIndexableActor<TActor, TId, TCore>,
+public class RestManagedIndexableLink<TActor, TId, TEntity, TCore, TModel> :
+    IDefinedIndexableLink<TActor, TId, TCore>,
     IReadOnlyDictionary<TId, TEntity>
     where TActor : class, IRestActor<TId, TEntity>
     where TEntity : RestEntity<TId>, TCore, IProxied<TActor>, IEntityOf<TModel>
@@ -95,17 +95,17 @@ public class RestManagedIndexableActor<TActor, TId, TEntity, TCore, TModel> :
 
     protected readonly DiscordRestClient Client;
     private readonly Func<DiscordRestClient, TModel, TEntity> _factory;
-    private readonly RestIndexableActor<TActor, TId, TEntity> _indexableActor;
+    private readonly RestIndexableLink<TActor, TId, TEntity> _indexableLink;
 
-    public RestManagedIndexableActor(
+    public RestManagedIndexableLink(
         DiscordRestClient client,
         IEnumerable<TModel> models,
         Func<DiscordRestClient, TModel, TEntity> factory,
-        RestIndexableActor<TActor, TId, TEntity> indexableActor)
+        RestIndexableLink<TActor, TId, TEntity> indexableLink)
     {
         Client = client;
         _factory = factory;
-        _indexableActor = indexableActor;
+        _indexableLink = indexableLink;
 
         All = models.ToDictionary(x => x.Id, x => factory(client, x)).AsReadOnly();
     }
@@ -124,10 +124,10 @@ public class RestManagedIndexableActor<TActor, TId, TEntity, TCore, TModel> :
         _entities = null;
     }
 
-    public TActor Specifically(TId id) => _indexableActor.Specifically(id);
+    public TActor Specifically(TId id) => _indexableLink.Specifically(id);
 
     public IEnumerable<TActor> Specifically(IEnumerable<TId> ids)
-        => ids.Select(_indexableActor.Specifically);
+        => ids.Select(_indexableLink.Specifically);
 
     public IEnumerator<KeyValuePair<TId, TEntity>> GetEnumerator() => All.GetEnumerator();
 

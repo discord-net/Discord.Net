@@ -20,7 +20,7 @@ public sealed partial class GatewayThreadChannelActor :
 {
     public IThreadMemberActor CurrentThreadMember => throw new NotImplementedException();
 
-    public IEnumerableIndexableActor<IThreadMemberActor, ulong, IThreadMember> ThreadMembers =>
+    public IEnumerableIndexableLink<IThreadMemberActor, ulong, IThreadMember> ThreadMembers =>
         throw new NotImplementedException();
 
     [SourceOfTruth] internal override ThreadChannelIdentity Identity { get; }

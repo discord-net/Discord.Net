@@ -6,7 +6,7 @@ namespace Discord.Gateway;
 
 internal static partial class GatewayActors
 {
-    public static GatewayEnumerableIndexableActor<
+    public static GatewayEnumerableIndexableLink<
         TTrait,
         TId,
         TEntity,
@@ -64,7 +64,7 @@ internal static partial class GatewayActors
         where TCoreEntity : class, IEntity<TId, TModel>, IFetchableOfMany<TId, TModel>
         where TModel : class, IEntityModel<TId>
     {
-        return new GatewayEnumerableIndexableActor<TTrait, TId, TEntity, TRestEntity, TCoreEntity, TModel>(
+        return new GatewayEnumerableIndexableLink<TTrait, TId, TEntity, TRestEntity, TCoreEntity, TModel>(
             client,
             id => TTrait.Factory(
                 client,
@@ -86,7 +86,7 @@ internal static partial class GatewayActors
         );
     }
 
-    public static GatewayEnumerableIndexableActor<
+    public static GatewayEnumerableIndexableLink<
         TActor,
         TId,
         TEntity,
@@ -128,7 +128,7 @@ internal static partial class GatewayActors
         where TCoreEntity : class, IEntity<TId, TModel>, IFetchableOfMany<TId, TModel>
         where TModel : class, IEntityModel<TId>
     {
-        return new GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel>(
+        return new GatewayEnumerableIndexableLink<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel>(
             client,
             id => TActor.Factory(client, guild, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
             model => TRestEntity.Construct(
@@ -141,7 +141,7 @@ internal static partial class GatewayActors
         );
     }
 
-    public static GatewayEnumerableIndexableActor<
+    public static GatewayEnumerableIndexableLink<
         TActor,
         TId,
         TEntity,
@@ -186,7 +186,7 @@ internal static partial class GatewayActors
         where TModel : class, TApi
         where TApi : class, IEntityModel<TId>
     {
-        return new GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel,
+        return new GatewayEnumerableIndexableLink<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel,
             IEnumerable<TApi>>(
             client,
             id => TActor.Factory(client, guild, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
@@ -201,7 +201,7 @@ internal static partial class GatewayActors
         );
     }
 
-    public static GatewayEnumerableIndexableActor<
+    public static GatewayEnumerableIndexableLink<
         TActor,
         TId,
         TEntity,
@@ -247,7 +247,7 @@ internal static partial class GatewayActors
         where TModel : class, TApi
         where TApi : class, IEntityModel<TId>
     {
-        return new GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel,
+        return new GatewayEnumerableIndexableLink<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel,
             IEnumerable<TApi>>(
             client,
             id => TActor.Factory(client, guild, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
@@ -262,7 +262,7 @@ internal static partial class GatewayActors
         );
     }
 
-    public static GatewayEnumerableIndexableActor<
+    public static GatewayEnumerableIndexableLink<
         TActor,
         TId,
         TEntity,
@@ -310,7 +310,7 @@ internal static partial class GatewayActors
         where TModel : class, IEntityModel<TId>
         where TApi : class
     {
-        return new GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel, TApi>(
+        return new GatewayEnumerableIndexableLink<TActor, TId, TEntity, TRestEntity, TCoreEntity, TModel, TApi>(
             client,
             id => TActor.Factory(client, guild, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
             model => TRestEntity.Construct(

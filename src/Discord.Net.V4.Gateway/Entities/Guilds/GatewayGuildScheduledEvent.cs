@@ -11,7 +11,7 @@ public sealed partial class GatewayGuildScheduledEventActor :
 {
     [StoreRoot, SourceOfTruth] public GatewayGuildActor Guild { get; }
 
-    public IPagedActor<ulong, IGuildScheduledEventUser, PageGuildScheduledEventUsersParams> RSVPs =>
+    public IPagedLink<ulong, IGuildScheduledEventUser, PageGuildScheduledEventUsersParams> RSVPs =>
         throw new NotImplementedException();
 
     internal override GuildScheduledEventIdentity Identity { get; }
@@ -54,7 +54,7 @@ public sealed partial class GatewayGuildScheduledEvent :
 
     public GuildScheduledEventStatus Status => (GuildScheduledEventStatus)Model.Status;
 
-    public GuildScheduledEntityType Type => (GuildScheduledEntityType)Model.EntityType;
+    public GuildScheduledEventEntityType Type => (GuildScheduledEventEntityType)Model.EntityType;
 
     public ulong? EntityId => Model.EntityId;
 

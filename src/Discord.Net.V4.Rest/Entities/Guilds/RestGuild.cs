@@ -7,35 +7,35 @@ using System.Globalization;
 namespace Discord.Rest;
 
 using BansPager =
-    RestPagedIndexableActor<RestBanActor, ulong, RestBan, IBanModel, IEnumerable<IBanModel>, PageGuildBansParams>;
+    RestPagedIndexableLink<RestBanActor, ulong, RestBan, IBanModel, IEnumerable<IBanModel>, PageGuildBansParams>;
 using MembersPager =
-    RestPagedIndexableActor<RestMemberActor, ulong, RestMember, IMemberModel, IEnumerable<IMemberModel>,
+    RestPagedIndexableLink<RestMemberActor, ulong, RestMember, IMemberModel, IEnumerable<IMemberModel>,
         PageGuildMembersParams>;
 using EnumerableGuildChannelActor =
-    RestEnumerableIndexableActor<RestGuildChannelActor, ulong, RestGuildChannel, IGuildChannel,
+    RestEnumerableIndexableLink<RestGuildChannelActor, ulong, RestGuildChannel, IGuildChannel,
         IEnumerable<IGuildChannelModel>>;
 using EnumerableIntegrationActor =
-    RestEnumerableIndexableActor<RestIntegrationActor, ulong, RestIntegration, IIntegration,
+    RestEnumerableIndexableLink<RestIntegrationActor, ulong, RestIntegration, IIntegration,
         IEnumerable<IIntegrationModel>>;
 using EnumerableStageChannelActor =
-    RestEnumerableIndexableActor<RestStageChannelActor, ulong, RestStageChannel, IStageChannel,
+    RestEnumerableIndexableLink<RestStageChannelActor, ulong, RestStageChannel, IStageChannel,
         IEnumerable<IGuildChannelModel>>;
 using EnumerableMediaChannelActor =
-    RestEnumerableIndexableActor<RestMediaChannelActor, ulong, RestMediaChannel, IMediaChannel,
+    RestEnumerableIndexableLink<RestMediaChannelActor, ulong, RestMediaChannel, IMediaChannel,
         IEnumerable<IGuildChannelModel>>;
 using EnumerableTextChannelActor =
-    RestEnumerableIndexableActor<RestTextChannelActor, ulong, RestTextChannel, ITextChannel,
+    RestEnumerableIndexableLink<RestTextChannelActor, ulong, RestTextChannel, ITextChannel,
         IEnumerable<IGuildChannelModel>>;
 using EnumerableVoiceChannelActor =
-    RestEnumerableIndexableActor<RestVoiceChannelActor, ulong, RestVoiceChannel, IVoiceChannel,
+    RestEnumerableIndexableLink<RestVoiceChannelActor, ulong, RestVoiceChannel, IVoiceChannel,
         IEnumerable<IGuildChannelModel>>;
 using EnumerableCategoryChannelActor =
-    RestEnumerableIndexableActor<RestCategoryChannelActor, ulong, RestCategoryChannel, ICategoryChannel,
+    RestEnumerableIndexableLink<RestCategoryChannelActor, ulong, RestCategoryChannel, ICategoryChannel,
         IEnumerable<IGuildChannelModel>>;
 using EnumerableAnnouncementChannelActor =
-    RestEnumerableIndexableActor<RestNewsChannelActor, ulong, RestNewsChannel, INewsChannel,
+    RestEnumerableIndexableLink<RestNewsChannelActor, ulong, RestNewsChannel, INewsChannel,
         IEnumerable<IGuildChannelModel>>;
-using EnumerableIntegrationChannelActor = RestEnumerableIndexableActor<
+using EnumerableIntegrationChannelActor = RestEnumerableIndexableLink<
     RestIntegrationChannelTrait,
     ulong,
     RestGuildChannel,
@@ -43,33 +43,33 @@ using EnumerableIntegrationChannelActor = RestEnumerableIndexableActor<
     IEnumerable<IGuildChannelModel>
 >;
 using EnumerableThreadChannelActor =
-    RestEnumerableIndexableActor<RestThreadChannelActor, ulong, RestThreadChannel, IThreadChannel,
+    RestEnumerableIndexableLink<RestThreadChannelActor, ulong, RestThreadChannel, IThreadChannel,
         IEnumerable<IGuildChannelModel>>;
 using EnumerableForumChannelActor =
-    RestEnumerableIndexableActor<RestForumChannelActor, ulong, RestForumChannel, IForumChannel,
+    RestEnumerableIndexableLink<RestForumChannelActor, ulong, RestForumChannel, IForumChannel,
         IEnumerable<IGuildChannelModel>>;
 using EnumerableGuildEmotesActor =
-    RestEnumerableIndexableActor<RestGuildEmoteActor, ulong, RestGuildEmote, IGuildEmote,
+    RestEnumerableIndexableLink<RestGuildEmoteActor, ulong, RestGuildEmote, IGuildEmote,
         IEnumerable<IGuildEmoteModel>>;
 using EnumerableRolesActor =
-    RestEnumerableIndexableActor<RestRoleActor, ulong, RestRole, IRole, IEnumerable<IRoleModel>>;
+    RestEnumerableIndexableLink<RestRoleActor, ulong, RestRole, IRole, IEnumerable<IRoleModel>>;
 using EnumerableGuildStickersActor =
-    RestEnumerableIndexableActor<RestGuildStickerActor, ulong, RestGuildSticker, IGuildSticker,
+    RestEnumerableIndexableLink<RestGuildStickerActor, ulong, RestGuildSticker, IGuildSticker,
         IEnumerable<IGuildStickerModel>>;
 using EnumerableGuildScheduledEventActor =
-    RestEnumerableIndexableActor<RestGuildScheduledEventActor, ulong, RestGuildScheduledEvent, IGuildScheduledEvent,
+    RestEnumerableIndexableLink<RestGuildScheduledEventActor, ulong, RestGuildScheduledEvent, IGuildScheduledEvent,
         IEnumerable<IGuildScheduledEventModel>>;
 using EnumerableInviteActor =
-    RestEnumerableIndexableActor<RestGuildInviteActor, string, RestGuildInvite, IGuildInvite,
+    RestEnumerableIndexableLink<RestGuildInviteActor, string, RestGuildInvite, IGuildInvite,
         IEnumerable<IInviteModel>>;
 using EnumerableWebhookActor =
-    RestEnumerableIndexableActor<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
+    RestEnumerableIndexableLink<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
 using ManagedRolesActor =
-    RestManagedEnumerableActor<RestRoleActor, ulong, RestRole, IRole, IRoleModel>;
+    RestManagedEnumerableLink<RestRoleActor, ulong, RestRole, IRole, IRoleModel>;
 using ManagedEmotesActor =
-    RestManagedEnumerableActor<RestGuildEmoteActor, ulong, RestGuildEmote, IGuildEmote, IGuildEmoteModel>;
+    RestManagedEnumerableLink<RestGuildEmoteActor, ulong, RestGuildEmote, IGuildEmote, IGuildEmoteModel>;
 using ManagedStickersActor =
-    RestManagedEnumerableActor<RestGuildStickerActor, ulong, RestGuildSticker, IGuildSticker, IGuildStickerModel>;
+    RestManagedEnumerableLink<RestGuildStickerActor, ulong, RestGuildSticker, IGuildSticker, IGuildStickerModel>;
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestGuildActor :

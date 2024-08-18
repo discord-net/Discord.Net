@@ -2,11 +2,11 @@ using Discord.Models;
 
 namespace Discord.Gateway;
 
-public sealed class GatewayDefinedIndexableActor<TActor, TId, TEntity, TCore>(
+public sealed class GatewayDefinedIndexableLink<TActor, TId, TEntity, TCore>(
     IReadOnlyCollection<TId> ids,
-    GatewayIndexableActor<TActor, TId, TEntity> indexableActor
+    GatewayIndexableLink<TActor, TId, TEntity> indexableLink
 ) :
-    IDefinedIndexableActor<TActor, TId, TCore>
+    IDefinedIndexableLink<TActor, TId, TCore>
     where TActor : class, IGatewayActor<TId, TEntity, IIdentifiable<TId>>, IActor<TId, TCore>
     where TId : IEquatable<TId>
     where TEntity : GatewayEntity<TId>, IEntityOf<IEntityModel<TId>>
@@ -14,8 +14,8 @@ public sealed class GatewayDefinedIndexableActor<TActor, TId, TEntity, TCore>(
 {
     public IReadOnlyCollection<TId> Ids { get; internal set; } = ids;
 
-    public TActor Specifically(TId id) => indexableActor.Specifically(id);
+    public TActor Specifically(TId id) => indexableLink.Specifically(id);
 
     public IEnumerable<TActor> Specifically(IEnumerable<TId> ids)
-        => ids.Select(indexableActor.Specifically);
+        => ids.Select(indexableLink.Specifically);
 }

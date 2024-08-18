@@ -8,7 +8,7 @@ using System.Collections.Immutable;
 namespace Discord.Rest;
 
 using EnumerableThreadMembers =
-    RestEnumerableIndexableActor<RestThreadMemberActor, ulong, RestThreadMember, IThreadMember,
+    RestEnumerableIndexableLink<RestThreadMemberActor, ulong, RestThreadMember, IThreadMember,
         IEnumerable<IThreadMemberModel>>;
 
 using MessageChannelTrait = RestMessageChannelTrait<RestThreadChannelActor, ThreadIdentity>;

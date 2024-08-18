@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Discord.Models.Json.Stickers;
+namespace Discord.Models.Json;
 
-public sealed class ModifyGuildStickersParams
+public sealed class ModifyGuildStickerParams
 {
     [JsonPropertyName("name")]
     public Optional<string> Name { get; set; }

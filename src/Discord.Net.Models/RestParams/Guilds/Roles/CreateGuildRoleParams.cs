@@ -5,10 +5,10 @@ namespace Discord.Models.Json;
 public sealed class CreateGuildRoleParams
 {
     [JsonPropertyName("name")]
-    public required string Name { get; set; }
+    public Optional<string> Name { get; set; }
 
     [JsonPropertyName("permissions")]
-    public Optional<ulong> Permissions { get; set; }
+    public Optional<string> Permissions { get; set; }
 
     [JsonPropertyName("color")]
     public Optional<uint> Color { get; set; }

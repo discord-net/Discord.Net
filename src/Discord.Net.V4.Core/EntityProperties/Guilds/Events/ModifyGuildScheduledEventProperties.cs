@@ -11,7 +11,7 @@ public sealed class ModifyGuildScheduledEventProperties : IEntityProperties<Modi
     public Optional<DateTimeOffset> StartTime { get; set; }
     public Optional<DateTimeOffset> EndTime { get; set; }
     public Optional<string?> Description { get; set; }
-    public Optional<GuildScheduledEntityType> EntityType { get; set; }
+    public Optional<GuildScheduledEventEntityType> EntityType { get; set; }
     public Optional<GuildScheduledEventStatus> Status { get; set; }
     public Optional<Image?> Image { get; set; }
 

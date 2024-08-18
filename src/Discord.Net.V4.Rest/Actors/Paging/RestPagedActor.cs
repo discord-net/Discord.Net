@@ -6,15 +6,15 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-public sealed class RestPartialPagedIndexableActor<TActor, TId, TEntity, TPartial, TPartialModel, TApiModel, TParams>(
+public sealed class RestPartialPagedIndexableLink<TActor, TId, TEntity, TPartial, TPartialModel, TApiModel, TParams>(
     DiscordRestClient client,
     Func<TId, TActor> actorFactory,
     IPathable path,
     Func<TApiModel, IEnumerable<TPartialModel>> modelsMapper,
     Func<TPartialModel, TApiModel, TPartial> entityFactory
 ):
-    RestPagedActor<TId, TPartial, TPartialModel, TApiModel, TParams>(client, path, modelsMapper, entityFactory),
-    IPagedIndexableActor<TActor, TId, TEntity, TPartial, TParams>
+    RestPagedLink<TId, TPartial, TPartialModel, TApiModel, TParams>(client, path, modelsMapper, entityFactory),
+    IPagedIndexableLink<TActor, TId, TEntity, TPartial, TParams>
     where TActor : class, IActor<TId, TEntity>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>, IEntity<TId, IEntityModel<TId>>
@@ -24,19 +24,19 @@ public sealed class RestPartialPagedIndexableActor<TActor, TId, TEntity, TPartia
     where TParams : class, IPagingParams<TParams, TApiModel>
 {
     public TActor this[TId id] => Specifically(id);
-    internal RestIndexableActor<TActor, TId, TEntity> IndexerActor { get; } = new(actorFactory);
-    public TActor Specifically(TId id) => IndexerActor.Specifically(id);
+    internal RestIndexableLink<TActor, TId, TEntity> IndexerLink { get; } = new(actorFactory);
+    public TActor Specifically(TId id) => IndexerLink.Specifically(id);
 }
 
-public sealed class RestPagedIndexableActor<TActor, TId, TEntity, TModel, TApiModel, TParams>(
+public sealed class RestPagedIndexableLink<TActor, TId, TEntity, TModel, TApiModel, TParams>(
     DiscordRestClient client,
     Func<TId, TActor> actorFactory,
     IPathable path,
     Func<TApiModel, IEnumerable<TModel>> modelsMapper,
     Func<TModel, TApiModel, TEntity> entityFactory
 ):
-    RestPagedActor<TId, TEntity, TModel, TApiModel, TParams>(client, path, modelsMapper, entityFactory),
-    IPagedIndexableActor<TActor, TId, TEntity, TParams>
+    RestPagedLink<TId, TEntity, TModel, TApiModel, TParams>(client, path, modelsMapper, entityFactory),
+    IPagedIndexableLink<TActor, TId, TEntity, TParams>
     where TActor : class, IActor<TId, TEntity>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>, IEntity<TId, TModel>
@@ -45,17 +45,17 @@ public sealed class RestPagedIndexableActor<TActor, TId, TEntity, TModel, TApiMo
     where TParams : class, IPagingParams<TParams, TApiModel>
 {
     public TActor this[TId id] => Specifically(id);
-    internal RestIndexableActor<TActor, TId, TEntity> IndexerActor { get; } = new(actorFactory);
-    public TActor Specifically(TId id) => IndexerActor.Specifically(id);
+    internal RestIndexableLink<TActor, TId, TEntity> IndexerLink { get; } = new(actorFactory);
+    public TActor Specifically(TId id) => IndexerLink.Specifically(id);
 }
 
-public class RestPagedActor<TId, TEntity, TModel, TApiModel, TParams>(
+public class RestPagedLink<TId, TEntity, TModel, TApiModel, TParams>(
     DiscordRestClient client,
     IPathable path,
     Func<TApiModel, IEnumerable<TModel>> modelsMapper,
     Func<TModel, TApiModel, TEntity> entityFactory
 ):
-    IPagedActor<TId, TEntity, TParams>
+    IPagedLink<TId, TEntity, TParams>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>
     where TModel : class

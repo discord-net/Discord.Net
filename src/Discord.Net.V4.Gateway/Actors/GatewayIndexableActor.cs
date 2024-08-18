@@ -3,8 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Gateway;
 
-public class GatewayIndexableActor<TActor, TId, TEntity>(Func<TId, TActor> factory) :
-    IIndexableActor<TActor, TId, TEntity>
+public class GatewayIndexableLink<TActor, TId, TEntity>(Func<TId, TActor> factory) :
+    IIndexableLink<TActor, TId, TEntity>
     where TActor : class, IGatewayActor<TId, TEntity>
     where TId : IEquatable<TId>
     where TEntity : GatewayEntity<TId>, IEntityOf<IEntityModel<TId>>
@@ -27,7 +27,7 @@ public class GatewayIndexableActor<TActor, TId, TEntity>(Func<TId, TActor> facto
         => _cache.FirstOrDefault(defaultValue);
 
     public static TActor operator >> (
-        GatewayIndexableActor<TActor, TId, TEntity> source,
+        GatewayIndexableLink<TActor, TId, TEntity> source,
         IIdentifiable<TId, TEntity, TActor, IEntityModel<TId>> identity
     ) => identity.Actor ?? source[identity.Id];
 }

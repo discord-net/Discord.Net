@@ -12,7 +12,7 @@ public enum MessageFlags
     ///     Flag given to messages that have been published to subscribed
     ///     channels (via Channel Following).
     /// </summary>
-    Crossposted = 1 << 0,
+    CrossPosted = 1 << 0,
 
     /// <summary>
     ///     Flag given to messages that originated from a message in another

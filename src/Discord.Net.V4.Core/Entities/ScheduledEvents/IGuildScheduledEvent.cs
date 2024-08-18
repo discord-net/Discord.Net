@@ -19,7 +19,7 @@ public partial interface IGuildScheduledEvent :
     DateTimeOffset? ScheduledEndTime { get; }
     GuildScheduledEventPrivacyLevel PrivacyLevel { get; }
     GuildScheduledEventStatus Status { get; }
-    GuildScheduledEntityType Type { get; }
+    GuildScheduledEventEntityType Type { get; }
     ulong? EntityId { get; }
     string? Location { get; }
     int? UserCount { get; }

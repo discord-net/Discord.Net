@@ -5,7 +5,7 @@ using Discord.Rest;
 
 namespace Discord.Gateway;
 
-public sealed class GatewayPartialPagedActor<
+public sealed class GatewayPartialPagedLink<
     TId,
     TGatewayEntity,
     TPartialRestEntity,
@@ -14,7 +14,7 @@ public sealed class GatewayPartialPagedActor<
     TApiModel,
     TParams
 >:
-    IPagedActor<TId, TGatewayEntity, TParams>
+    IPagedLink<TId, TGatewayEntity, TParams>
     where TId : IEquatable<TId>
     where TGatewayEntity :
     class,
@@ -33,7 +33,7 @@ public sealed class GatewayPartialPagedActor<
     private readonly Func<TApiModel, IEnumerable<TPartialModel>> _modelMapper;
     private readonly Func<TPartialModel, TApiModel, TPartialRestEntity> _restEntityFactory;
 
-    public GatewayPartialPagedActor(
+    public GatewayPartialPagedLink(
         DiscordGatewayClient client,
         CachePathable path,
         Func<TApiModel, IEnumerable<TPartialModel>> modelMapper,
@@ -62,14 +62,14 @@ public sealed class GatewayPartialPagedActor<
             args
         );
 
-    IAsyncPaged<TGatewayEntity> IPagedActor<TId, TGatewayEntity, TParams>.PagedAsync(TParams? args,
+    IAsyncPaged<TGatewayEntity> IPagedLink<TId, TGatewayEntity, TParams>.PagedAsync(TParams? args,
         RequestOptions? options)
         => PageCacheAsync(args);
 }
 
 
-public sealed class GatewayPagedActor<TId, TGatewayEntity, TRestEntity, TCore, TModel, TApiModel, TParams> :
-    IPagedActor<TId, TCore, TParams>
+public sealed class GatewayPagedLink<TId, TGatewayEntity, TRestEntity, TCore, TModel, TApiModel, TParams> :
+    IPagedLink<TId, TCore, TParams>
     where TId : IEquatable<TId>
     where TGatewayEntity :
     class,
@@ -95,7 +95,7 @@ public sealed class GatewayPagedActor<TId, TGatewayEntity, TRestEntity, TCore, T
     private readonly Func<TModel, TApiModel, TRestEntity> _restEntityFactory;
     private readonly Func<TApiModel, RequestOptions, CancellationToken, ValueTask>? _onRestPage;
 
-    public GatewayPagedActor(
+    public GatewayPagedLink(
         DiscordGatewayClient client,
         CachePathable path,
         Func<TApiModel, IEnumerable<TModel>> modelMapper,
@@ -146,6 +146,6 @@ public sealed class GatewayPagedActor<TId, TGatewayEntity, TRestEntity, TCore, T
         return PageRestAsync(args, options);
     }
 
-    IAsyncPaged<TCore> IPagedActor<TId, TCore, TParams>.PagedAsync(TParams? args, RequestOptions? options)
+    IAsyncPaged<TCore> IPagedLink<TId, TCore, TParams>.PagedAsync(TParams? args, RequestOptions? options)
         => PagedAsync(args, GatewayRequestOptions.FromRestOptions(options));
 }

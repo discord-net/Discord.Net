@@ -7,7 +7,7 @@ namespace Discord.Gateway;
 
 internal static partial class GatewayPagedIndexableActor
 {
-    public static GatewayPagedIndexableActor<
+    public static GatewayPagedIndexableLink<
         TActor,
         TId,
         TGatewayEntity,
@@ -51,7 +51,7 @@ internal static partial class GatewayPagedIndexableActor
         where TApiModel : class
         where TParams : class, IPagingParams<TParams, TApiModel>
     {
-        return new GatewayPagedIndexableActor<TActor, TId, TGatewayEntity, TRestEntity, TCoreEntity, TModel, TApiModel,
+        return new GatewayPagedIndexableLink<TActor, TId, TGatewayEntity, TRestEntity, TCoreEntity, TModel, TApiModel,
             TParams>(
             client,
             actorFactory,
@@ -62,7 +62,7 @@ internal static partial class GatewayPagedIndexableActor
         );
     }
 
-    public static GatewayPartialPagedIndexableActor<
+    public static GatewayPartialPagedIndexableLink<
         TActor,
         TId,
         TGatewayEntity,
@@ -105,7 +105,7 @@ internal static partial class GatewayPagedIndexableActor
         where TApiModel : class
         where TParams : class, IPagingParams<TParams, TApiModel>
     {
-        return new GatewayPartialPagedIndexableActor<
+        return new GatewayPartialPagedIndexableLink<
             TActor,
             TId,
             TGatewayEntity,
@@ -124,7 +124,7 @@ internal static partial class GatewayPagedIndexableActor
     }
 }
 
-public sealed class GatewayPartialPagedIndexableActor<
+public sealed class GatewayPartialPagedIndexableLink<
     TActor,
     TId,
     TGatewayEntity,
@@ -140,7 +140,7 @@ public sealed class GatewayPartialPagedIndexableActor<
     Func<TApiModel, IEnumerable<TPartialModel>> modelMapper,
     Func<TPartialModel, TApiModel, TPartialRestEntity> restEntityFactory
 ) :
-    IPagedIndexableActor<TActor, TId, TGatewayEntity, TPartialRestEntity, TParams>
+    IPagedIndexableLink<TActor, TId, TGatewayEntity, TPartialRestEntity, TParams>
     where TActor :
     class,
     IGatewayCachedActor<TId, TGatewayEntity, IIdentifiable<TId, TGatewayEntity, TActor, TModel>, TModel>
@@ -158,28 +158,28 @@ public sealed class GatewayPartialPagedIndexableActor<
     where TApiModel : class
     where TParams : class, IPagingParams<TParams, TApiModel>
 {
-    private readonly GatewayIndexableActor<TActor, TId, TGatewayEntity> _indexableActor = new(actorFactory);
+    private readonly GatewayIndexableLink<TActor, TId, TGatewayEntity> _indexableLink = new(actorFactory);
 
-    private readonly GatewayPartialPagedActor<TId, TGatewayEntity, TPartialRestEntity, TModel, TPartialModel, TApiModel, TParams>
-        _pagedActor = new(client, path, modelMapper, restEntityFactory);
+    private readonly GatewayPartialPagedLink<TId, TGatewayEntity, TPartialRestEntity, TModel, TPartialModel, TApiModel, TParams>
+        _pagedLink = new(client, path, modelMapper, restEntityFactory);
 
-    public TActor this[TId id] => _indexableActor[id];
-    public TActor this[IIdentifiable<TId, TGatewayEntity, TActor, TModel> identity] => _indexableActor[identity];
+    public TActor this[TId id] => _indexableLink[id];
+    public TActor this[IIdentifiable<TId, TGatewayEntity, TActor, TModel> identity] => _indexableLink[identity];
 
-    public TActor Specifically(TId id) => _indexableActor.Specifically(id);
+    public TActor Specifically(TId id) => _indexableLink.Specifically(id);
 
     public IAsyncPaged<TPartialRestEntity> PageRestAsync(TParams? args = default, GatewayRequestOptions? options = null)
-        => _pagedActor.PageRestAsync(args, options);
+        => _pagedLink.PageRestAsync(args, options);
 
     public IAsyncPaged<TGatewayEntity> PageCacheAsync(TParams? args = default)
-        => _pagedActor.PageCacheAsync(args);
+        => _pagedLink.PageCacheAsync(args);
 
-    IAsyncPaged<TPartialRestEntity> IPagedActor<TId, TPartialRestEntity, TParams>.PagedAsync(TParams? args,
+    IAsyncPaged<TPartialRestEntity> IPagedLink<TId, TPartialRestEntity, TParams>.PagedAsync(TParams? args,
         RequestOptions? options)
         => PageRestAsync(args, GatewayRequestOptions.FromRestOptions(options));
 
     public static TActor operator >>(
-        GatewayPartialPagedIndexableActor<TActor,
+        GatewayPartialPagedIndexableLink<TActor,
             TId,
             TGatewayEntity,
             TPartialRestEntity,
@@ -192,7 +192,7 @@ public sealed class GatewayPartialPagedIndexableActor<
     ) => identity.Actor ?? source[identity.Id];
 }
 
-public sealed class GatewayPagedIndexableActor<
+public sealed class GatewayPagedIndexableLink<
     TActor,
     TId,
     TGatewayEntity,
@@ -209,7 +209,7 @@ public sealed class GatewayPagedIndexableActor<
     Func<TModel, TApiModel, TRestEntity> restEntityFactory,
     Func<TApiModel, RequestOptions, CancellationToken, ValueTask>? onRestPage = null
 ) :
-    IPagedIndexableActor<TActor, TId, TCoreEntity, TParams>
+    IPagedIndexableLink<TActor, TId, TCoreEntity, TParams>
     where TActor :
     class,
     IGatewayCachedActor<TId, TGatewayEntity, IIdentifiable<TId, TGatewayEntity, TActor, TModel>, TModel>
@@ -227,32 +227,32 @@ public sealed class GatewayPagedIndexableActor<
     where TApiModel : class
     where TParams : class, IPagingParams<TParams, TApiModel>
 {
-    private readonly GatewayIndexableActor<TActor, TId, TGatewayEntity> _indexableActor = new(actorFactory);
+    private readonly GatewayIndexableLink<TActor, TId, TGatewayEntity> _indexableLink = new(actorFactory);
 
-    private readonly GatewayPagedActor<TId, TGatewayEntity, TRestEntity, TCoreEntity, TModel, TApiModel, TParams>
-        _pagedActor = new(client, path, modelMapper, restEntityFactory, onRestPage);
+    private readonly GatewayPagedLink<TId, TGatewayEntity, TRestEntity, TCoreEntity, TModel, TApiModel, TParams>
+        _pagedLink = new(client, path, modelMapper, restEntityFactory, onRestPage);
 
-    public TActor this[TId id] => _indexableActor[id];
-    public TActor this[IIdentifiable<TId, TGatewayEntity, TActor, TModel> identity] => _indexableActor[identity];
+    public TActor this[TId id] => _indexableLink[id];
+    public TActor this[IIdentifiable<TId, TGatewayEntity, TActor, TModel> identity] => _indexableLink[identity];
 
-    public TActor Specifically(TId id) => _indexableActor.Specifically(id);
+    public TActor Specifically(TId id) => _indexableLink.Specifically(id);
     public TActor Specifically(IIdentifiable<TId, TGatewayEntity, TActor, TModel> identity)
-        => _indexableActor.Specifically(identity);
+        => _indexableLink.Specifically(identity);
 
     public IAsyncPaged<TCoreEntity> PagedAsync(TParams? args = default, GatewayRequestOptions? options = null)
-        => _pagedActor.PagedAsync(args, options);
+        => _pagedLink.PagedAsync(args, options);
 
     public IAsyncPaged<TRestEntity> PageRestAsync(TParams? args = default, GatewayRequestOptions? options = null)
-        => _pagedActor.PageRestAsync(args, options);
+        => _pagedLink.PageRestAsync(args, options);
 
     public IAsyncPaged<TGatewayEntity> PageCacheAsync(TParams? args = default)
-        => _pagedActor.PageCacheAsync(args);
+        => _pagedLink.PageCacheAsync(args);
 
-    IAsyncPaged<TCoreEntity> IPagedActor<TId, TCoreEntity, TParams>.PagedAsync(TParams? args, RequestOptions? options)
-        => _pagedActor.PagedAsync(args, GatewayRequestOptions.FromRestOptions(options));
+    IAsyncPaged<TCoreEntity> IPagedLink<TId, TCoreEntity, TParams>.PagedAsync(TParams? args, RequestOptions? options)
+        => _pagedLink.PagedAsync(args, GatewayRequestOptions.FromRestOptions(options));
 
     public static TActor operator >>(
-        GatewayPagedIndexableActor<
+        GatewayPagedIndexableLink<
             TActor,
             TId,
             TGatewayEntity,

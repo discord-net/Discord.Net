@@ -12,7 +12,7 @@ using RestMemberIdentity = IIdentifiable<ulong, RestMember, RestMemberActor, IMe
 
 internal static partial class GatewayActors
 {
-    public static PublicArchivedThreadsPager PublicArchivedThreads(
+    public static GatewayPagedIndexableLink<,,,,,,,> PublicArchivedThreads(
         DiscordGatewayClient client,
         GuildIdentity guild,
         CachePathable path)
@@ -40,7 +40,7 @@ internal static partial class GatewayActors
         );
     }
 
-    public static PrivateArchivedThreadsPager PrivateArchivedThreads(
+    public static GatewayPagedIndexableLink<,,,,,,,> PrivateArchivedThreads(
         DiscordGatewayClient client,
         GuildIdentity guild,
         CachePathable path)
@@ -68,7 +68,7 @@ internal static partial class GatewayActors
         );
     }
 
-    public static JoinedPrivateArchivedThreadsPager JoinedPrivateArchivedThreads(
+    public static GatewayPagedIndexableLink<,,,,,,,> JoinedPrivateArchivedThreads(
         DiscordGatewayClient client,
         GuildIdentity guild,
         CachePathable path)

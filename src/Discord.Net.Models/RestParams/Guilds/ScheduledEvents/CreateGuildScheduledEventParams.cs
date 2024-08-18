@@ -26,7 +26,7 @@ public sealed class CreateGuildScheduledEventParams
     public Optional<string> Description { get; set; }
 
     [JsonPropertyName("entity_type")]
-    public Optional<int> EntityType { get; set; }
+    public int EntityType { get; set; }
 
     [JsonPropertyName("image")]
     public Optional<string> Image { get; set; }

@@ -7,7 +7,8 @@ namespace Discord;
 /// </summary>
 /// <typeparam name="TId">The ID type of the entity.</typeparam>
 /// <typeparam name="TEntity">The entity type represented by the ID.</typeparam>
-public readonly struct EntityOrId<TId, TEntity>
+public readonly struct EntityOrId<TId, TEntity> : 
+    IEquatable<EntityOrId<TId, TEntity>> 
     where TId : IEquatable<TId>
     where TEntity : IIdentifiable<TId>
 {
@@ -38,4 +39,29 @@ public readonly struct EntityOrId<TId, TEntity>
     public static implicit operator EntityOrId<TId, TEntity>(TEntity entity) => new(entity);
 
     public static implicit operator TId(EntityOrId<TId, TEntity> entityOrId) => entityOrId.Id;
+
+    public bool Equals(EntityOrId<TId, TEntity> other)
+    {
+        return EqualityComparer<TId>.Default.Equals(Id, other.Id);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EntityOrId<TId, TEntity> other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return EqualityComparer<TId>.Default.GetHashCode(Id);
+    }
+
+    public static bool operator ==(EntityOrId<TId, TEntity> left, EntityOrId<TId, TEntity> right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EntityOrId<TId, TEntity> left, EntityOrId<TId, TEntity> right)
+    {
+        return !left.Equals(right);
+    }
 }

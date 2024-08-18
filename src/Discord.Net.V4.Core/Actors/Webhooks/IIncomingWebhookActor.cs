@@ -7,7 +7,5 @@ namespace Discord;
 [Modifiable<ModifyWebhookProperties>(nameof(Routes.ModifyWebhook))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IIncomingWebhookActor :
-    IWebhookActor,
-    IGuildRelationship,
-    IChannelRelationship<IIntegrationChannelTrait, IIntegrationChannel>,
+    IGuildChannelWebhookActor,
     IActor<ulong, IIncomingWebhook>;

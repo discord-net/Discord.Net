@@ -23,7 +23,7 @@ public partial class GatewayMessageChannelTrait :
     IMessageChannelTrait,
     IGatewayCachedActor<ulong, GatewayChannel, MessageChannelIdentity, IChannelModel>
 {
-    public IPagedIndexableActor<IMessageActor, ulong, IMessage, PageChannelMessagesParams> Messages =>
+    public IPagedIndexableLink<IMessageActor, ulong, IMessage, PageChannelMessagesParams> Messages =>
         throw new NotImplementedException();
 
     [ProxyInterface]

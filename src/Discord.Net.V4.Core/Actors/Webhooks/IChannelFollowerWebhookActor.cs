@@ -6,9 +6,11 @@ namespace Discord;
 
 [Loadable(nameof(Routes.GetWebhook))]
 [Modifiable<ModifyWebhookProperties>(nameof(Routes.ModifyWebhook))]
+[ActorCreatableAttribute<BacklinkFollowAnnouncementChannelProperties>(
+    nameof(Routes.FollowAnnouncementChannel),
+    nameof(Models.Json.FollowedChannel.WebhookId)
+)]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IChannelFollowerWebhookActor :
-    IWebhookActor,
-    IGuildRelationship,
-    IChannelRelationship<IIntegrationChannelTrait, IIntegrationChannel>,
+    IGuildChannelWebhookActor,
     IActor<ulong, IChannelFollowerWebhook>;

@@ -4,7 +4,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-[FetchableOfMany(nameof(Routes.GetChannelMessages))]
+[PagedFetchableOfMany<PageChannelMessagesParams>(nameof(Routes.GetChannelMessages))]
 [Refreshable(nameof(Routes.GetChannelMessage))]
 public partial interface IMessage :
     ISnowflakeEntity<IMessageModel>,

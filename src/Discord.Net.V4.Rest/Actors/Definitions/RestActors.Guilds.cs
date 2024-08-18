@@ -4,7 +4,7 @@ namespace Discord.Rest;
 
 internal static partial class RestActors
 {
-    public static RestPartialPagedIndexableActor<
+    public static RestPartialPagedIndexableLink<
         RestGuildActor,
         ulong,
         RestGuild,
@@ -15,7 +15,7 @@ internal static partial class RestActors
     > PagedGuilds(
         DiscordRestClient client)
     {
-        return new RestPartialPagedIndexableActor<RestGuildActor, ulong, RestGuild, RestPartialGuild, IPartialGuildModel
+        return new RestPartialPagedIndexableLink<RestGuildActor, ulong, RestGuild, RestPartialGuild, IPartialGuildModel
             , IEnumerable<IPartialGuildModel>, PageUserGuildsParams>(
             client,
             id => new RestGuildActor(client, GuildIdentity.Of(id)),
@@ -25,7 +25,7 @@ internal static partial class RestActors
         );
     }
 
-    public static RestEnumerableIndexableActor<
+    public static RestEnumerableIndexableLink<
         TTrait,
         TId,
         TRestEntity,
@@ -105,7 +105,7 @@ internal static partial class RestActors
             );
     }
 
-    public static RestEnumerableIndexableActor<TActor, TId, TRestEntity, TCoreEntity,
+    public static RestEnumerableIndexableLink<TActor, TId, TRestEntity, TCoreEntity,
             IEnumerable<TRouteModel>>
         GuildRelatedEntityWithTransform<
             [TransitiveFill] TActor,
@@ -153,7 +153,7 @@ internal static partial class RestActors
         );
     }
 
-    public static RestEnumerableIndexableActor<TActor, TId, TRestEntity, TCoreEntity,
+    public static RestEnumerableIndexableLink<TActor, TId, TRestEntity, TCoreEntity,
             IEnumerable<TRouteModel>>
         GuildRelatedEntity<
             [TransitiveFill] TActor,
@@ -195,7 +195,7 @@ internal static partial class RestActors
     }
 
     public static
-        RestPagedIndexableActor<RestMemberActor, ulong, RestMember, IMemberModel, IEnumerable<IMemberModel>,
+        RestPagedIndexableLink<RestMemberActor, ulong, RestMember, IMemberModel, IEnumerable<IMemberModel>,
             PageGuildMembersParams> Members(DiscordRestClient client, RestGuildActor guild)
     {
         return new(
@@ -207,13 +207,13 @@ internal static partial class RestActors
         );
     }
 
-    public static RestPagedIndexableActor<RestBanActor, ulong, RestBan, IBanModel, IEnumerable<IBanModel>,
+    public static RestPagedIndexableLink<RestBanActor, ulong, RestBan, IBanModel, IEnumerable<IBanModel>,
             PageGuildBansParams>
         Bans(
             DiscordRestClient client,
             RestGuildActor guild)
     {
-        return new RestPagedIndexableActor<RestBanActor, ulong, RestBan, IBanModel, IEnumerable<IBanModel>,
+        return new RestPagedIndexableLink<RestBanActor, ulong, RestBan, IBanModel, IEnumerable<IBanModel>,
             PageGuildBansParams>(
             client,
             id => new RestBanActor(client, guild.Identity, BanIdentity.Of(id)),

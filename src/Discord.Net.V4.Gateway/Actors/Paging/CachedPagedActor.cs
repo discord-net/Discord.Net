@@ -4,11 +4,11 @@ using Discord.Paging;
 
 namespace Discord.Gateway;
 
-public class CachedPagedActor<TId, TEntity, TModel, TParams>(
+public class CachedPagedLink<TId, TEntity, TModel, TParams>(
     DiscordGatewayClient client,
     CachePathable path
 ) :
-    IPagedActor<TId, TEntity, TParams>
+    IPagedLink<TId, TEntity, TParams>
     where TId : IEquatable<TId>
     where TEntity :
     class,

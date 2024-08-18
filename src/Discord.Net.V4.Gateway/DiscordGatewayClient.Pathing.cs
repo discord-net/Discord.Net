@@ -14,20 +14,20 @@ public partial class DiscordGatewayClient
     public GuildsPager Guilds { get; }
 
     [SourceOfTruth]
-    public GatewayIndexableActor<GatewayChannelActor, ulong, GatewayChannel> Channels { get; }
+    public GatewayIndexableLink<GatewayChannelActor, ulong, GatewayChannel> Channels { get; }
 
     [SourceOfTruth]
-    public GatewayIndexableActor<GatewayUserActor, ulong, GatewayUser> Users { get; }
+    public GatewayIndexableLink<GatewayUserActor, ulong, GatewayUser> Users { get; }
 
     [SourceOfTruth]
-    public GatewayIndexableActor<GatewayWebhookActor, ulong, GatewayWebhook> Webhooks { get; }
+    public GatewayIndexableLink<GatewayWebhookActor, ulong, GatewayWebhook> Webhooks { get; }
 
     [SourceOfTruth]
     public StickerPacks StickerPacks { get; }
 
     [SourceOfTruth]
-    public GatewayIndexableActor<GatewayStickerActor, ulong, GatewaySticker> Stickers { get; }
+    public GatewayIndexableLink<GatewayStickerActor, ulong, GatewaySticker> Stickers { get; }
 
     [SourceOfTruth]
-    public GatewayIndexableActor<GatewayInviteActor, string, GatewayInvite> Invites { get; }
+    public GatewayIndexableLink<GatewayInviteActor, string, GatewayInvite> Invites { get; }
 }

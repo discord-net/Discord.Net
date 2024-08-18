@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Represents the type of guild scheduled event.
 /// </summary>
-public enum GuildScheduledEntityType
+public enum GuildScheduledEventEntityType
 {
     /// <summary>
     ///     The event doesn't have a set type.

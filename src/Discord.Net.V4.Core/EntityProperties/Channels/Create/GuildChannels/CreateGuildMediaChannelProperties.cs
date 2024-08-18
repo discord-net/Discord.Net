@@ -2,7 +2,7 @@ using Discord.Models.Json;
 
 namespace Discord;
 
-public class CreateGuildForumChannelProperties : CreateGuildChannelProperties
+public class CreateGuildMediaChannel : CreateGuildChannelBaseProperties
 {
     public Optional<string?> Topic { get; set; }
     public Optional<int?> Slowmode { get; set; }
@@ -12,8 +12,9 @@ public class CreateGuildForumChannelProperties : CreateGuildChannelProperties
     public Optional<IEmote?> DefaultReactionEmoji { get; set; }
     public Optional<ForumTag[]?> AvailableTags { get; set; }
     public Optional<SortOrder?> DefaultSortOrder { get; set; }
-    public Optional<ForumLayout?> DefaultForumLayout { get; set; }
     public Optional<int?> DefaultThreadSlowmode { get; set; }
+
+    protected override Optional<ChannelType> ChannelType => Discord.ChannelType.Media;
 
     public override CreateGuildChannelParams ToApiModel(CreateGuildChannelParams? existing = default)
     {
@@ -27,7 +28,6 @@ public class CreateGuildForumChannelProperties : CreateGuildChannelProperties
         existing.DefaultReactionEmoji = DefaultReactionEmoji.Map(v => v?.ToDefaultReactionModel());
         existing.AvailableTags = AvailableTags.Map(v => v?.Select(x => x.ToApiModel()).ToArray());
         existing.DefaultSortOrder = DefaultSortOrder.MapToInt();
-        existing.DefaultForumLayout = DefaultForumLayout.MapToInt();
         existing.DefaultThreadRatelimitPerUser = DefaultThreadSlowmode;
 
         return existing;

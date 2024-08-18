@@ -48,6 +48,6 @@ public interface ILoadable<TSelf, TId, TEntity, TModel> :
             token
         );
 
-        return entityProvider.CreateNullableEntity(model);
+        return model is null ? null : entityProvider.CreateEntity(model);
     }
 }

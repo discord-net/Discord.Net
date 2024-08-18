@@ -16,18 +16,19 @@ public interface IDiscordClient :
     /// </summary>
     ICurrentUserActor CurrentUser { get; }
 
-    IPagedIndexableActor<IGuildActor, ulong, IGuild, IPartialGuild, PageUserGuildsParams> Guilds { get; }
+    PagedIndexableGuildLink Guilds { get; }
 
-    IIndexableActor<IChannelActor, ulong, IChannel> Channels { get; }
+    IndexableChannelLink Channels { get; }
 
-    IIndexableActor<IUserActor, ulong, IUser> Users { get; }
+    IndexableUserLink Users { get; }
 
-    IIndexableActor<IWebhookActor, ulong, IWebhook> Webhooks { get; }
+    IndexableWebhookLink Webhooks { get; }
 
-    IEnumerableIndexableActor<IStickerPackActor, ulong, IStickerPack> StickerPacks { get; }
+    EnumerableIndexableStickerPackLink StickerPacks { get; }
 
-    IIndexableActor<IStickerActor, ulong, ISticker> Stickers { get; }
-    IIndexableActor<IInviteActor, string, IInvite> Invites { get; }
+    IndexableStickerLink Stickers { get; }
+    
+    IndexableInviteLink Invites { get; }
 
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }

@@ -1,3 +1,5 @@
+using Discord.Models;
+
 namespace Discord;
 
 public interface IGuildScheduledEventUserActor :
@@ -5,4 +7,5 @@ public interface IGuildScheduledEventUserActor :
     IMemberRelationship,
     IGuildScheduledEventRelationship,
     IGuildRelationship,
+    IEntityProvider<IGuildScheduledEventUser, IGuildScheduledEventUserModel>,
     IActor<ulong, IGuildScheduledEventUser>;

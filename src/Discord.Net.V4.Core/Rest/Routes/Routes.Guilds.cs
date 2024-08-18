@@ -31,10 +31,29 @@ public partial class Routes
 
     public static IApiInOutRoute<CreateGuildChannelParams, GuildChannelBase> CreateGuildChannel(
         [IdHeuristic<IGuild>] ulong guildId,
-        CreateGuildChannelParams body) =>
-        new ApiInOutRoute<CreateGuildChannelParams, GuildChannelBase>(nameof(CreateGuildChannel),
+        CreateGuildChannelParams body
+    ) => new ApiInOutRoute<CreateGuildChannelParams, GuildChannelBase>(
+        nameof(CreateGuildChannel),
+        RequestMethod.Post,
+        $"guilds/{guildId}/channels",
+        body,
+        ContentType.JsonBody,
+        (ScopeType.Guild, guildId)
+    );
+
+    public static IApiInOutRoute<CreateGuildChannelParams, TChannel> CreateGuildChannel<TChannel>(
+        [IdHeuristic<IGuild>] ulong guildId,
+        CreateGuildChannelParams body
+    )
+        where TChannel : GuildChannelBase
+        => new ApiInOutRoute<CreateGuildChannelParams, TChannel>(
+            nameof(CreateGuildChannel),
             RequestMethod.Post,
-            $"guilds/{guildId}/channels", body, ContentType.JsonBody, (ScopeType.Guild, guildId));
+            $"guilds/{guildId}/channels",
+            body,
+            ContentType.JsonBody,
+            (ScopeType.Guild, guildId)
+        );
 
     public static IApiInRoute<ModifyGuildChannelPositionsParams[]> ModifyGuildChannelPositions(
         [IdHeuristic<IGuild>] ulong guildId,

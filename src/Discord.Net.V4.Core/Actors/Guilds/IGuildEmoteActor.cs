@@ -6,6 +6,7 @@ namespace Discord;
 
 [Loadable(nameof(Routes.GetGuildEmoji))]
 [Deletable(nameof(Routes.DeleteGuildEmoji))]
+[Creatable<CreateGuildEmoteProperties>(nameof(Routes.CreateGuildEmoji))]
 [Modifiable<EmoteProperties>(nameof(Routes.ModifyGuildEmoji))]
 public partial interface IGuildEmoteActor :
     IActor<ulong, IGuildEmote>,

@@ -16,8 +16,11 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         {"RefreshableAttribute", "Discord.IRefreshable"},
         {"FetchableAttribute", "Discord.IFetchable"},
         {"FetchableOfManyAttribute", "Discord.IFetchableOfMany"},
+        {"PagedFetchableOfManyAttribute", "Discord.IPagedFetchableOfMany"},
         {"LoadableAttribute", "Discord.ILoadable"},
         {"InvitableAttribute", "Discord.IInvitable"},
+        {"CreatableAttribute", "Discord.ICreatable"},
+        {"ActorCreatableAttribute", "Discord.IActorCreatable"},
     };
 
     public class GenerationTarget(
@@ -173,8 +176,12 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                     []
                 );
 
+            targetLogger.Log($"Processing {target.InterfaceSymbol}");
+            
             foreach (var trait in target.RequestedTraits)
             {
+                targetLogger.Log($" - {trait}");
+                
                 try
                 {
                     ProcessTraitRequest(
@@ -182,6 +189,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                         trait,
                         target,
                         entitySyntax,
+                        context,
                         targetLogger
                     );
                 }
@@ -192,7 +200,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 }
             }
 
-            if (syntax!.Members.Count == 0)
+            if (syntax!.Members.Count == 0 && (syntax.BaseList is null || syntax.BaseList.Types.Count == 0))
                 continue;
 
             if (fromEntitySyntax)
@@ -268,26 +276,38 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         string trait,
         GenerationTarget target,
         Dictionary<string, InterfaceDeclarationSyntax> entitySyntax,
+        SourceProductionContext context,
         Logger logger)
     {
         if (!TraitAttributes.TryGetValue(trait, out var traitInterface))
+        {
+            logger.Warn($"{target.InterfaceSymbol}: Unknown trait '{trait}'");
             return;
+        }
 
         // if it already implements the trait interface, do nothing
         if (
             traitInterface != "Discord.IInvitable" &&
             target.InterfaceSymbol.AllInterfaces.Any(x => x.ToDisplayString().StartsWith(traitInterface))
         )
+        {
+            logger.Log($"{target.InterfaceSymbol}: Skipping {traitInterface}, implemented by base");
             return;
+        }
 
         var traitAttributes = target.InterfaceSymbol.GetAttributes()
             .Where(x => x.AttributeClass?.Name == trait)
             .ToArray();
 
         if (traitAttributes.Length == 0)
+        {
+            logger.Warn($"{target.InterfaceSymbol}: no attributes found for '{trait}'");
             return;
+        }
 
         var traitLogger = logger.GetSubLogger(traitInterface.Split('.')[1]);
+        
+        traitLogger.Log($"Processing {target.InterfaceSymbol}");
 
         switch (traitInterface)
         {
@@ -317,7 +337,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                     traitLogger
                 );
                 break;
-            case "Discord.IFetchable" or "Discord.IFetchableOfMany":
+            case "Discord.IFetchable" or "Discord.IFetchableOfMany" or "Discord.IPagedFetchableOfMany":
                 FetchableTrait.Process(
                     ref syntax,
                     target,
@@ -343,6 +363,15 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                     traitLogger
                 );
                 break;
+            case "Discord.ICreatable" or "Discord.IActorCreatable":
+                CreatableTrait.Process(
+                    ref syntax,
+                    target,
+                    traitAttributes[0],
+                    context,
+                    traitLogger
+                );
+                break;
         }
     }
 
@@ -364,15 +393,15 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
             x => x is not IMethodSymbol method || method.TypeParameters.Length == genericCount);
     }
 
-    public static ExpressionSyntax? GetNameOfArgument(AttributeData data)
+    public static ExpressionSyntax? GetNameOfArgument(AttributeData data, int index = 0)
     {
         if (data.ApplicationSyntaxReference?.GetSyntax() is not AttributeSyntax attributeSyntax)
             return null;
 
-        if (attributeSyntax.ArgumentList?.Arguments.Count == 0)
+        if (attributeSyntax.ArgumentList?.Arguments.Count < index + 1)
             return null;
 
-        var invocation = attributeSyntax.ArgumentList?.Arguments[0]
+        var invocation = attributeSyntax.ArgumentList?.Arguments[index]
             .ChildNodes()
             .OfType<InvocationExpressionSyntax>()
             .FirstOrDefault();
@@ -389,7 +418,8 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         Logger logger,
         Func<IParameterSymbol, ArgumentSyntax?>? extra = null,
         ExpressionSyntax? pathHolder = null,
-        ExpressionSyntax? idParam = null)
+        ExpressionSyntax? idParam = null,
+        Func<IParameterSymbol, ITypeSymbol, ArgumentSyntax?>? heuristic = null)
     {
         var hasReturnedId = false;
 
@@ -441,6 +471,9 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
 
                         foreach (var entityType in entityTypes)
                         {
+                            if (heuristic?.Invoke(x, entityType) is { } arg)
+                                return arg;
+                            
                             if (entityType.Equals(target.InterfaceSymbol, SymbolEqualityComparer.Default))
                                 return ReturnOwnId(ref hasReturnedId, idParam,
                                     $"{target.InterfaceSymbol}: {x} is the relation type", logger);

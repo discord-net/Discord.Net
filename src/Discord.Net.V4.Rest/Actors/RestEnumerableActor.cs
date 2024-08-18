@@ -6,7 +6,7 @@ namespace Discord.Rest;
 
 public static class RestEnumerableIndexableActor
 {
-    public static RestEnumerableIndexableActor<
+    public static RestEnumerableIndexableLink<
         TTraitActor,
         TId,
         TEntity,
@@ -33,7 +33,7 @@ public static class RestEnumerableIndexableActor
         where TCore : class, IEntity<TId, TModel>
         where TApiModel : class
     {
-        return new RestEnumerableIndexableActor<TTraitActor, TId, TEntity, TCore, TApiModel, IEnumerable<TModel>>(
+        return new RestEnumerableIndexableLink<TTraitActor, TId, TEntity, TCore, TApiModel, IEnumerable<TModel>>(
             client,
             actorFactory,
             factory,
@@ -42,7 +42,7 @@ public static class RestEnumerableIndexableActor
         );
     }
 
-    public static RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>>
+    public static RestEnumerableIndexableLink<TActor, TId, TEntity, TCore, IEnumerable<TModel>>
         Create<TActor, TId, TEntity, TCore, TApiModel, TModel>(
             DiscordRestClient client,
             Func<TId, TActor> actorFactory,
@@ -57,7 +57,7 @@ public static class RestEnumerableIndexableActor
         where TCore : class, IEntity<TId, TModel>
         where TApiModel : class
     {
-        return new RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApiModel, IEnumerable<TModel>>(
+        return new RestEnumerableIndexableLink<TActor, TId, TEntity, TCore, TApiModel, IEnumerable<TModel>>(
             client,
             actorFactory,
             factory,
@@ -66,7 +66,7 @@ public static class RestEnumerableIndexableActor
         );
     }
 
-    public static RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>>
+    public static RestEnumerableIndexableLink<TActor, TId, TEntity, TCore, IEnumerable<TModel>>
         Create<TActor, TId, TEntity, TCore, TModel>(
             DiscordRestClient client,
             Func<TId, TActor> actorFactory,
@@ -79,7 +79,7 @@ public static class RestEnumerableIndexableActor
         where TActor : class, IRestActor<TId, TEntity>, IActor<TId, TCore>
         where TCore : class, IEntity<TId, TModel>
     {
-        return new RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>>(
+        return new RestEnumerableIndexableLink<TActor, TId, TEntity, TCore, IEnumerable<TModel>>(
             actorFactory,
             factory,
             (options, token) => FetchAsync(client, route, options, token)
@@ -97,14 +97,14 @@ public static class RestEnumerableIndexableActor
     }
 }
 
-internal sealed class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApiModel, TApi>(
+internal sealed class RestEnumerableIndexableLink<TActor, TId, TEntity, TCore, TApiModel, TApi>(
     DiscordRestClient client,
     Func<TId, TActor> actorFactory,
     Func<TApi, IEnumerable<TEntity>> factory,
     IApiOutRoute<TApiModel> route,
     Func<TApiModel, TApi> transform
 ) :
-    RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApi>(
+    RestEnumerableIndexableLink<TActor, TId, TEntity, TCore, TApi>(
         actorFactory,
         factory,
         (options, token) => FetchAsync(client, route, transform, options, token)
@@ -129,12 +129,12 @@ internal sealed class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, 
     }
 }
 
-public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApi>(
+public class RestEnumerableIndexableLink<TActor, TId, TEntity, TCore, TApi>(
     Func<TId, TActor> actorFactory,
     Func<TApi, IEnumerable<TEntity>> factory,
     Func<RequestOptions?, CancellationToken, Task<TApi?>> fetch
 ) :
-    IEnumerableIndexableActor<TActor, TId, TCore>
+    IEnumerableIndexableLink<TActor, TId, TCore>
     where TEntity : RestEntity<TId>, IEntity<TId, IEntityModel<TId>>
     where TId : IEquatable<TId>
     where TApi : class
@@ -142,7 +142,7 @@ public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApi>(
     where TCore : class, IEntity<TId, IEntityModel<TId>>
 {
     public TActor this[TId id] => Specifically(id);
-    internal RestIndexableActor<TActor, TId, TEntity> IndexableActor { get; } = new(actorFactory);
+    internal RestIndexableLink<TActor, TId, TEntity> IndexableLink { get; } = new(actorFactory);
 
     public virtual async ValueTask<IReadOnlyCollection<TEntity>> AllAsync(
         RequestOptions? options = null,
@@ -156,9 +156,9 @@ public class RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, TApi>(
         return factory(model).ToImmutableArray();
     }
 
-    public virtual TActor Specifically(TId id) => IndexableActor.Specifically(id);
+    public virtual TActor Specifically(TId id) => IndexableLink.Specifically(id);
 
-    async ValueTask<IReadOnlyCollection<TCore>> IEnumerableActor<TId, TCore>.AllAsync(
+    async ValueTask<IReadOnlyCollection<TCore>> IEnumerableLink<TId, TCore>.AllAsync(
         RequestOptions? options,
         CancellationToken token)
     {

@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace Discord.Gateway;
 
-using StickersActor = GatewayDefinedIndexableActor<GatewayStickerActor, ulong, GatewaySticker, ISticker>;
+using StickersActor = GatewayDefinedIndexableLink<GatewayStickerActor, ulong, GatewaySticker, ISticker>;
 
 public sealed partial class GatewayStickerPackActor :
     GatewayCachedActor<ulong, GatewayStickerPack, StickerPackIdentity, IStickerPackModel>,

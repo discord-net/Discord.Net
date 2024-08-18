@@ -8,6 +8,7 @@ namespace Discord;
 [Loadable(nameof(Routes.GetChannel), typeof(GuildChannelBase))]
 [Modifiable<ModifyGuildChannelProperties>(nameof(Routes.ModifyChannel))]
 [Deletable(nameof(Routes.DeleteChannel))]
+[Creatable<CreateGuildChannelProperties>(nameof(Routes.CreateGuildChannel))]
 [Invitable<CreateChannelInviteProperties, IGuildChannelInvite>(nameof(Routes.CreateChannelInvite))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IGuildChannelActor :
@@ -17,5 +18,5 @@ public partial interface IGuildChannelActor :
 {
     [return: TypeHeuristic(nameof(Invites))]
     IGuildChannelInviteActor Invite(string code) => Invites[code];
-    IEnumerableIndexableActor<IGuildChannelInviteActor, string, IGuildChannelInvite> Invites { get; }
+    EnumerableIndexableGuildChannelInviteLink Invites { get; }
 }

@@ -2,7 +2,7 @@ using Discord.Models.Json;
 
 namespace Discord;
 
-public class CreateGuildVoiceChannelProperties : CreateGuildChannelProperties
+public class CreateGuildVoiceChannelProperties : CreateGuildChannelBaseProperties
 {
     public Optional<int?> Bitrate { get; set; }
     public Optional<int?> UserLimit { get; set; }
@@ -11,6 +11,8 @@ public class CreateGuildVoiceChannelProperties : CreateGuildChannelProperties
     public Optional<bool?> IsNsfw { get; set; }
     public Optional<EntityOrId<string, VoiceRegion>?> RtcRegion { get; set; }
     public Optional<VideoQualityMode?> VideoQualityMode { get; set; }
+
+    protected override Optional<ChannelType> ChannelType => Discord.ChannelType.Voice;
 
     public override CreateGuildChannelParams ToApiModel(CreateGuildChannelParams? existing = default)
     {

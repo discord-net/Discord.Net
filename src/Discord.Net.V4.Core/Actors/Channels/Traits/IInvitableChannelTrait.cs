@@ -4,7 +4,12 @@ using Discord.Rest;
 namespace Discord;
 
 [Trait]
-public interface IInvitableChannelTrait :
+public partial interface IInvitableChannelTrait :
     IChannelActor,
+    IEntityProvider<IInvitableChannel, IChannelModel>,
     IActorTrait<ulong, IInvitableChannel>,
-    IInvitable<CreateChannelInviteProperties>;
+    IInvitable<CreateChannelInviteProperties>
+{
+    [SourceOfTruth]
+    internal new IInvitableChannel CreateEntity(IChannelModel model);
+}

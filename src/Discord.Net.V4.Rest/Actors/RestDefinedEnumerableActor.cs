@@ -5,7 +5,7 @@ namespace Discord.Rest.Actors;
 
 public static partial class RestDefinedEnumerableActor
 {
-    public static RestDefinedEnumerableActor<TActor, TId, TEntity, TCoreEntity, IEnumerable<TModel>> Create<
+    public static RestDefinedEnumerableLink<TActor, TId, TEntity, TCoreEntity, IEnumerable<TModel>> Create<
         [TransitiveFill]TActor,
         TId,
         TEntity,
@@ -27,7 +27,7 @@ public static partial class RestDefinedEnumerableActor
         where TCoreEntity : class, IEntity<TId, TModel>, IFetchableOfMany<TId, TModel>
         where TModel : class, IEntityModel<TId>
     {
-        return new RestDefinedEnumerableActor<TActor, TId, TEntity, TCoreEntity, IEnumerable<TModel>>(
+        return new RestDefinedEnumerableLink<TActor, TId, TEntity, TCoreEntity, IEnumerable<TModel>>(
             ids,
             id => actorFactory(source.Client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
             models => models.Select(model => entityFactory(source.Client, model)),
@@ -40,9 +40,9 @@ public static partial class RestDefinedEnumerableActor
     }
 }
 
-public class RestDefinedEnumerableActor<TActor, TId, TEntity, TCoreEntity, TApi> :
-    RestEnumerableIndexableActor<TActor, TId, TEntity, TCoreEntity, TApi>,
-    IDefinedEnumerableActor<TActor, TId, TEntity>
+public class RestDefinedEnumerableLink<TActor, TId, TEntity, TCoreEntity, TApi> :
+    RestEnumerableIndexableLink<TActor, TId, TEntity, TCoreEntity, TApi>,
+    IDefinedEnumerableLink<TActor, TId, TEntity>
     where TActor : class, IRestActor<TId, TEntity>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>, TCoreEntity
@@ -53,7 +53,7 @@ public class RestDefinedEnumerableActor<TActor, TId, TEntity, TCoreEntity, TApi>
 
     private ImmutableArray<TId> _ids;
 
-    internal RestDefinedEnumerableActor(
+    internal RestDefinedEnumerableLink(
         IEnumerable<TId> ids,
         Func<TId, TActor> actorFactory,
         Func<TApi, IEnumerable<TEntity>> factory,

@@ -11,7 +11,7 @@ namespace Discord.Rest;
 
 internal static partial class RestManagedEnumerableActor
 {
-    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TApi> CreateWithMapper<
+    public static RestManagedEnumerableLink<TActor, TId, TEntity, TCore, TModel, TApi> CreateWithMapper<
         [TransitiveFill] TActor,
         TId,
         TEntity,
@@ -42,7 +42,7 @@ internal static partial class RestManagedEnumerableActor
         where TModel : class, IEntityModel<TId>
         where TApi : class
     {
-        return new RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TApi>(
+        return new RestManagedEnumerableLink<TActor, TId, TEntity, TCore, TModel, TApi>(
             client,
             models,
             id => actorFactory(client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
@@ -52,7 +52,7 @@ internal static partial class RestManagedEnumerableActor
         );
     }
 
-    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TApi> CreateWithMapper<
+    public static RestManagedEnumerableLink<TActor, TId, TEntity, TCore, TModel, TApi> CreateWithMapper<
         [TransitiveFill] TActor,
         TId,
         TEntity,
@@ -83,7 +83,7 @@ internal static partial class RestManagedEnumerableActor
         where TModel : class, IEntityModel<TId>
         where TApi : class
     {
-        return new RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TApi>(
+        return new RestManagedEnumerableLink<TActor, TId, TEntity, TCore, TModel, TApi>(
             client,
             ids,
             id => actorFactory(client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
@@ -93,7 +93,7 @@ internal static partial class RestManagedEnumerableActor
         );
     }
 
-    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> Create<
+    public static RestManagedEnumerableLink<TActor, TId, TEntity, TCore, TModel> Create<
         [TransitiveFill] TActor,
         TId,
         TEntity,
@@ -121,7 +121,7 @@ internal static partial class RestManagedEnumerableActor
         where TCore : class, IEntity<TId, TModel>
         where TModel : class, IEntityModel<TId>
     {
-        return new RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel>(
+        return new RestManagedEnumerableLink<TActor, TId, TEntity, TCore, TModel>(
             client,
             ids,
             id => actorFactory(client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
@@ -130,7 +130,7 @@ internal static partial class RestManagedEnumerableActor
         );
     }
 
-    public static RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> Create<
+    public static RestManagedEnumerableLink<TActor, TId, TEntity, TCore, TModel> Create<
         [TransitiveFill] TActor,
         TId,
         TEntity,
@@ -158,7 +158,7 @@ internal static partial class RestManagedEnumerableActor
         where TCore : class, IEntity<TId, TModel>
         where TModel : class, IEntityModel<TId>
     {
-        return new RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel>(
+        return new RestManagedEnumerableLink<TActor, TId, TEntity, TCore, TModel>(
             client,
             models,
             id => actorFactory(client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
@@ -168,15 +168,15 @@ internal static partial class RestManagedEnumerableActor
     }
 }
 
-public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel> :
-    RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, IEnumerable<TModel>>
+public sealed class RestManagedEnumerableLink<TActor, TId, TEntity, TCore, TModel> :
+    RestManagedEnumerableLink<TActor, TId, TEntity, TCore, TModel, IEnumerable<TModel>>
     where TActor : class, IRestActor<TId, TEntity>
     where TEntity : RestEntity<TId>, TCore, IProxied<TActor>, IEntityOf<TModel>
     where TId : IEquatable<TId>
     where TCore : class, IEntity<TId, TModel>
     where TModel : class, IEntityModel<TId>
 {
-    public RestManagedEnumerableActor(
+    public RestManagedEnumerableLink(
         DiscordRestClient client,
         IEnumerable<TModel> models,
         Func<TId, TActor> actorFactory,
@@ -193,7 +193,7 @@ public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TMod
     {
     }
 
-    public RestManagedEnumerableActor(
+    public RestManagedEnumerableLink(
         DiscordRestClient client,
         IEnumerable<TId> ids,
         Func<TId, TActor> actorFactory,
@@ -204,9 +204,9 @@ public sealed class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TMod
     }
 }
 
-public class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TApi> :
-    RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>>,
-    IDefinedEnumerableActor<TActor, TId, TCore>,
+public class RestManagedEnumerableLink<TActor, TId, TEntity, TCore, TModel, TApi> :
+    RestEnumerableIndexableLink<TActor, TId, TEntity, TCore, IEnumerable<TModel>>,
+    IDefinedEnumerableLink<TActor, TId, TCore>,
     IReadOnlyDictionary<TId, TEntity>
     where TActor : class, IRestActor<TId, TEntity>
     where TEntity : RestEntity<TId>, TCore, IProxied<TActor>, IEntityOf<TModel>
@@ -230,10 +230,10 @@ public class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TAp
     private IReadOnlyCollection<TId>? _keys;
     private IReadOnlyCollection<TEntity>? _values;
 
-    private readonly RestIndexableActor<TActor, TId, TEntity> _indexableActor;
+    private readonly RestIndexableLink<TActor, TId, TEntity> _indexableLink;
     private readonly Func<TModel, TEntity> _entityFactory;
 
-    public RestManagedEnumerableActor(
+    public RestManagedEnumerableLink(
         DiscordRestClient client,
         IEnumerable<TModel> models,
         Func<TId, TActor> actorFactory,
@@ -249,13 +249,13 @@ public class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TAp
                 : []
     )
     {
-        _indexableActor = new(actorFactory);
+        _indexableLink = new(actorFactory);
         _entityFactory = entityFactory;
 
         All = models.ToImmutableDictionary(x => x.Id, _entityFactory);
     }
 
-    public RestManagedEnumerableActor(
+    public RestManagedEnumerableLink(
         DiscordRestClient client,
         IEnumerable<TId> ids,
         Func<TId, TActor> actorFactory,
@@ -271,7 +271,7 @@ public class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TAp
                 : []
     )
     {
-        _indexableActor = new(actorFactory);
+        _indexableLink = new(actorFactory);
         _entityFactory = entityFactory;
 
         All = ImmutableDictionary<TId, TEntity>.Empty;
@@ -316,12 +316,12 @@ public class RestManagedEnumerableActor<TActor, TId, TEntity, TCore, TModel, TAp
         return entities;
     }
 
-    IEnumerable<TActor> IDefinedEnumerableActor<TActor, TId, TCore>.Specifically(IEnumerable<TId> ids)
+    IEnumerable<TActor> IDefinedEnumerableLink<TActor, TId, TCore>.Specifically(IEnumerable<TId> ids)
         => ids.Select(
-            id => All.TryGetValue(id, out var entity) ? entity.ProxiedValue : _indexableActor.Specifically(id));
+            id => All.TryGetValue(id, out var entity) ? entity.ProxiedValue : _indexableLink.Specifically(id));
 
-    TActor IIndexableActor<TActor, TId, TCore>.Specifically(TId id)
-        => All.TryGetValue(id, out var entity) ? entity.ProxiedValue : _indexableActor.Specifically(id);
+    TActor IIndexableLink<TActor, TId, TCore>.Specifically(TId id)
+        => All.TryGetValue(id, out var entity) ? entity.ProxiedValue : _indexableLink.Specifically(id);
 
     [MustDisposeResource]
     public IEnumerator<KeyValuePair<TId, TEntity>> GetEnumerator() => All.GetEnumerator();

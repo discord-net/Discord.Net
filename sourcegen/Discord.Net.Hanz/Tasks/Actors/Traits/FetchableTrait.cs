@@ -1,3 +1,4 @@
+using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,7 +19,8 @@ public static class FetchableTrait
         string fetchMethod,
         Logger logger,
         out Dictionary<IParameterSymbol, ParameterSyntax> extraParameters,
-        ITypeSymbol? targetInterface = null)
+        ITypeSymbol? targetInterface = null,
+        ITypeSymbol? pageParams = null)
     {
         targetInterface ??= target.InterfaceSymbol;
 
@@ -49,35 +51,73 @@ public static class FetchableTrait
             _ => null
         };
 
-        if (routeAccessBody is null) return false;
+        if (routeAccessBody is null)
+        {
+            logger.Warn($"{target.InterfaceSymbol}: {fetchableType}: No route access body");
+            return false;
+        }
 
         var modelTypeSyntax = ParseTypeName(modelType.ToDisplayString());
 
-        var fetchableInterface = GenericName(
-            Identifier(fetchableType),
-            TypeArgumentList(
-                SeparatedList([
-                    ParseTypeName(idType.ToDisplayString()),
-                    modelTypeSyntax
-                ])
-            )
+        var fetchableInterfaceTypeArguments = TypeArgumentList(
+            SeparatedList([
+                ParseTypeName(idType.ToDisplayString()),
+                modelTypeSyntax
+            ])
         );
 
+        if (fetchableType is "Discord.IPagedFetchableOfMany")
+        {
+            if (pageParams is null)
+            {
+                logger.Warn("pageParams was null on 'Discord.IPagedFetchableOfMany'");
+                return false;
+            }
+
+            var pagingInterface = pageParams
+                .AllInterfaces
+                .FirstOrDefault(x => x.Name == "IPagingParams" && x.IsGenericType);
+
+            if (pagingInterface is null)
+            {
+                logger.Warn($"Unable to find paging params interface on {pageParams}");
+                return false;
+            }
+
+            fetchableInterfaceTypeArguments = fetchableInterfaceTypeArguments.AddArguments(
+                ParseTypeName(pageParams.ToDisplayString()),
+                ParseTypeName(pagingInterface.TypeArguments[1].ToDisplayString())
+            );
+        }
+
+        var fetchableInterface = GenericName(
+            Identifier(fetchableType),
+            fetchableInterfaceTypeArguments
+        );
+
+        if (fetchableType is "Discord.IPagedFetchableOfMany")
+        {
+            syntax = syntax.AddBaseListTypes(SimpleBaseType(fetchableInterface));
+            return true;
+        }
+        
         var apiOutInterface = GenericName(
             Identifier("IApiOutRoute"),
             TypeArgumentList(
                 SeparatedList(new TypeSyntax[]
                 {
-                    fetchableType == "Discord.IFetchableOfMany"
-                        ? GenericName(
+                    fetchableType switch
+                    {
+                        "Discord.IFetchableOfMany" => GenericName(
                             Identifier("IEnumerable"),
                             TypeArgumentList(
                                 SeparatedList([
                                     modelTypeSyntax
                                 ])
                             )
-                        )
-                        : modelTypeSyntax
+                        ),
+                        _ => modelTypeSyntax
+                    }
                 })
             )
         );
@@ -333,30 +373,51 @@ public static class FetchableTrait
     {
         foreach (var traitAttribute in traitsAttribute)
         {
+            logger.Log($"Processing trait {traitAttribute}");
+            
             if (traitAttribute.ConstructorArguments.Length != 1)
-                return;
+            {
+                logger.Warn($"{target.InterfaceSymbol}: {traitAttribute} doesn't have 1 argument");
+                continue;
+            }
 
             // refreshable/loadable implements fetchable
             if ((IsRefreshable(target.InterfaceSymbol) || LoadableTrait.IsLoadable(target.InterfaceSymbol)) &&
                 traitAttribute.AttributeClass?.ToDisplayString() == "Discord.Fetchable")
-                return;
+            {
+                logger.Log($"{target.InterfaceSymbol}: {traitAttribute} skipped, implemented by loadable");
+                continue;
+            }
 
             var entityInterface = EntityTraits.GetEntityInterface(target.InterfaceSymbol);
 
             if (entityInterface is null)
-                return;
+            {
+                logger.Warn($"{target.InterfaceSymbol}: {traitAttribute} no 'IEntity' interface");
+                continue;
+            }
 
             var entityOfInterface = EntityTraits.GetEntityModelOfInterface(target.InterfaceSymbol);
 
             if (entityOfInterface is null)
-                return;
+            {
+                logger.Warn($"{target.InterfaceSymbol}: {traitAttribute} no 'IEntityOf' interface");
+                continue;
+            }
 
             if (EntityTraits.GetNameOfArgument(traitAttribute) is not MemberAccessExpressionSyntax routeMemberAccess)
-                return;
+            {
+                logger.Warn($"{target.InterfaceSymbol}: {traitAttribute} no route member access");
+                continue;
+            }
 
             var route = EntityTraits.GetRouteSymbol(routeMemberAccess, target.SemanticModel);
 
-            if (route is null) return;
+            if (route is null)
+            {
+                logger.Warn($"{target.InterfaceSymbol}: {traitAttribute} no route");
+                continue;
+            }
 
             var idType = entityInterface.TypeArguments[0];
 
@@ -364,6 +425,7 @@ public static class FetchableTrait
             {
                 "FetchableAttribute" => "Discord.IFetchable",
                 "FetchableOfManyAttribute" => "Discord.IFetchableOfMany",
+                "PagedFetchableOfManyAttribute" => "Discord.IPagedFetchableOfMany",
                 _ => null
             };
 
@@ -374,12 +436,17 @@ public static class FetchableTrait
                     {
                         "Discord.IFetchable" => "FetchRoute",
                         "Discord.IFetchableOfMany" => "FetchManyRoute",
+                        "Discord.IPagedFetchableOfMany" => "FetchPagedRoute",
                         _ => null
                     };
 
-            if (fetchableType is null || fetchMethod is null) return;
+            if (fetchableType is null || fetchMethod is null)
+            {
+                logger.Warn($"{target.InterfaceSymbol}: {traitAttribute} no fetchable type/method");
+                continue;
+            }
 
-            DefineFetchableRoute(
+            var result = DefineFetchableRoute(
                 ref syntax,
                 target,
                 idType,
@@ -389,8 +456,13 @@ public static class FetchableTrait
                 fetchableType,
                 fetchMethod,
                 logger,
-                out _
+                out _,
+                pageParams: fetchableType is "Discord.IPagedFetchableOfMany"
+                    ? traitAttribute.AttributeClass!.TypeArguments[0]
+                    : null
             );
+            
+            logger.Log($"{target.InterfaceSymbol}: {traitAttribute}: {result}");
         }
     }
 
@@ -431,10 +503,32 @@ public static class FetchableTrait
 
     public static bool IsFetchableOfMany(ITypeSymbol interfaceSymbol)
     {
-        if (interfaceSymbol.GetAttributes()
-            .Any(x => x.AttributeClass?.ToDisplayString() == "Discord.FetchableOfManyAttribute"))
+        if (
+            interfaceSymbol
+            .GetAttributes()
+            .Any(x =>
+                x.AttributeClass?.ToDisplayString() is "Discord.FetchableOfManyAttribute"
+                ||
+                (
+                    x.AttributeClass?.ToDisplayString().StartsWith("Discord.PagedFetchableOfManyAttribute")
+                    ?? false
+                )
+            )
+        )
             return true;
 
         return interfaceSymbol.AllInterfaces.Any(x => x.ToDisplayString().StartsWith("Discord.IFetchableOfMany"));
+    }
+
+    public static bool IsPagedFetchableOfMany(ITypeSymbol interfaceSymbol)
+    {
+        return interfaceSymbol
+            .GetAttributes()
+            .Any(x =>
+                x.AttributeClass?
+                    .ToDisplayString()
+                    .StartsWith("Discord.PagedFetchableOfManyAttribute")
+                ?? false
+            );
     }
 }

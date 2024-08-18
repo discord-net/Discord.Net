@@ -5,7 +5,7 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-using RestMessages = RestPagedIndexableActor<
+using RestMessages = RestPagedIndexableLink<
     RestMessageActor,
     ulong,
     RestMessage,

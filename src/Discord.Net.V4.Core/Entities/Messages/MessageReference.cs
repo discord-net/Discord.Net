@@ -7,7 +7,9 @@ namespace Discord;
 ///     Contains the IDs sent from a crossposted message or inline reply.
 /// </summary>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-public readonly struct MessageReference : IConstructable<MessageReference, IMessageReferenceModel>
+public readonly struct MessageReference : 
+    IEntityProperties<Discord.Models.Json.MessageReference>,
+    IConstructable<MessageReference, IMessageReferenceModel>
 {
     /// <summary>
     ///     The Message ID of the original message.
@@ -63,6 +65,17 @@ public readonly struct MessageReference : IConstructable<MessageReference, IMess
 
     public static MessageReference Construct(IDiscordClient client, IMessageReferenceModel model)
         => new(model.MessageId, model.ChannelId, model.GuildId);
+
+    public Models.Json.MessageReference ToApiModel(Models.Json.MessageReference? existing = default)
+    {
+        return new Models.Json.MessageReference()
+        {
+            ChannelId = Optional.FromNullable(ChannelId),
+            GuildId = Optional.FromNullable(GuildId),
+            MessageId = Optional.FromNullable(MessageId),
+            FailIfNotExists = FailIfNotExists
+        };
+    }
 
     /// <inheritdoc />
     public override string ToString()

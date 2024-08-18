@@ -6,6 +6,7 @@ namespace Discord;
 
 [Loadable(nameof(Routes.GetChannelMessage))]
 [Deletable(nameof(Routes.DeleteMessage))]
+[Creatable<CreateMessageProperties>(nameof(Routes.CreateMessage))]
 [Modifiable<ModifyMessageProperties>(nameof(Routes.ModifyMessage))]
 public partial interface IMessageActor :
     IChannelRelationship<IMessageChannelTrait, IMessageChannel>,

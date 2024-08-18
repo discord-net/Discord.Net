@@ -8,6 +8,9 @@ namespace Discord;
 /// <summary>
 ///     Represents a thread channel inside a guild.
 /// </summary>
+[PagedFetchableOfMany<PagePublicArchivedThreadsParams>(nameof(Routes.ListPublicArchivedThreads))]
+[PagedFetchableOfMany<PagePrivateArchivedThreadsParams>(nameof(Routes.ListPrivateArchivedThreads))]
+[PagedFetchableOfMany<PageJoinedPrivateArchivedThreadsParams>(nameof(Routes.ListJoinedPrivateArchivedThreads))]
 public partial interface IThreadChannel :
     ISnowflakeEntity<IThreadChannelModel>,
     IMessageChannel,

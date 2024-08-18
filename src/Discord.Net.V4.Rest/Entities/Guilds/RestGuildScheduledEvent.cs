@@ -5,7 +5,7 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-using RSVPType = RestPagedActor<
+using RSVPType = RestPagedLink<
     ulong,
     RestGuildScheduledEventUser,
     IGuildScheduledEventUserModel,
@@ -75,7 +75,7 @@ public sealed partial class RestGuildScheduledEvent :
 
     public GuildScheduledEventStatus Status => (GuildScheduledEventStatus)Model.Status;
 
-    public GuildScheduledEntityType Type => (GuildScheduledEntityType)Model.EntityType;
+    public GuildScheduledEventEntityType Type => (GuildScheduledEventEntityType)Model.EntityType;
 
     public ulong? EntityId => Model.EntityId;
 

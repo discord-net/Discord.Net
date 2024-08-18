@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace Discord.Rest;
 
-using EnumerableInvitesActor = RestEnumerableIndexableActor<
+using EnumerableInvitesActor = RestEnumerableIndexableLink<
     RestGuildChannelInviteActor,
     string,
     RestGuildChannelInvite,

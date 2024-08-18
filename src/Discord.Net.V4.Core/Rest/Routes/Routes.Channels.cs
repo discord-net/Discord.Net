@@ -138,10 +138,16 @@ public static partial class Routes
 
     public static IApiInOutRoute<FollowAnnouncementChannelParams, Models.Json.FollowedChannel>
         FollowAnnouncementChannel(
-            [IdHeuristic<IChannel>] ulong channelId, FollowAnnouncementChannelParams body) =>
-        new ApiInOutRoute<FollowAnnouncementChannelParams, Models.Json.FollowedChannel>(
-            nameof(FollowAnnouncementChannel), RequestMethod.Post, $"/channels/{channelId}/followers", body,
-            ContentType.JsonBody, (ScopeType.Channel, channelId));
+            [IdHeuristic<INewsChannel>] ulong channelId, FollowAnnouncementChannelParams body
+        )
+        => new ApiInOutRoute<FollowAnnouncementChannelParams, Models.Json.FollowedChannel>(
+            nameof(FollowAnnouncementChannel),
+            RequestMethod.Post,
+            $"/channels/{channelId}/followers",
+            body,
+            ContentType.JsonBody,
+            (ScopeType.Channel, channelId)
+        );
 
     public static IApiRoute TriggerTyping([IdHeuristic<IChannel>] ulong channelId) =>
         new ApiRoute(nameof(TriggerTyping), RequestMethod.Post, $"/channels/{channelId}/typing",

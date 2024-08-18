@@ -24,7 +24,7 @@ public partial interface IWebhookActor :
             token
         );
 
-        return CreateNullableEntity(model);
+        return model is null ? null : CreateEntity(model);
     }
 
     Task ModifyWithTokenAsync(

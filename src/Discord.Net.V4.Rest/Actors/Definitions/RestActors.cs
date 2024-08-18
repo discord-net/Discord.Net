@@ -4,7 +4,7 @@ namespace Discord.Rest;
 
 internal static partial class RestActors
 {
-    public static RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>> FromFetchable<
+    public static RestEnumerableIndexableLink<TActor, TId, TEntity, TCore, IEnumerable<TModel>> FromFetchable<
         [TransitiveFill] TActor,
         TId,
         TEntity,
@@ -34,7 +34,7 @@ internal static partial class RestActors
         );
     }
 
-    public static RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>> Fetchable<
+    public static RestEnumerableIndexableLink<TActor, TId, TEntity, TCore, IEnumerable<TModel>> Fetchable<
         [TransitiveFill] TActor,
         TId,
         TEntity,
@@ -54,7 +54,7 @@ internal static partial class RestActors
         where TActor : class, IRestActor<TId, TEntity>
         where TCore : class, IEntity<TId, TModel>
     {
-        return new RestEnumerableIndexableActor<TActor, TId, TEntity, TCore, IEnumerable<TModel>>(
+        return new RestEnumerableIndexableLink<TActor, TId, TEntity, TCore, IEnumerable<TModel>>(
             (id) => actorFactory(client, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id)),
             models => models.Select(x => entityFactory(client, x)),
             (options, token) => client.RestApiClient.ExecuteAsync(route, options ?? client.DefaultRequestOptions, token)

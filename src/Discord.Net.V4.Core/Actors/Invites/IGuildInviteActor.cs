@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Rest;
 
 namespace Discord;
@@ -6,4 +7,9 @@ namespace Discord;
 public partial interface IGuildInviteActor :
     IInviteActor,
     IActor<string, IGuildInvite>,
-    IGuildRelationship;
+    IEntityProvider<IGuildInvite, IInviteModel>,
+    IGuildRelationship
+{
+    [SourceOfTruth]
+    internal new IGuildInvite CreateEntity(IInviteModel model);
+}

@@ -1,5 +1,4 @@
 using Discord.Models;
-using Discord.Models.Json.Stickers;
 using Discord.Rest;
 using System.Diagnostics.CodeAnalysis;
 

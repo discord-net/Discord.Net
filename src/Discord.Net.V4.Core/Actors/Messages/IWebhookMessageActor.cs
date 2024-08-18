@@ -11,9 +11,7 @@ public partial interface IWebhookMessageActor :
 {
     [SourceOfTruth]
     internal new IWebhookMessage CreateEntity(IMessageModel model);
-    [SourceOfTruth]
-    internal new sealed IWebhookMessage? CreateNullableEntity(IMessageModel? model) => model is null ? null : CreateEntity(model);
-
+    
     Task DeleteAsync(
         string webhookToken,
         EntityOrId<ulong, IThreadChannel>? thread = null,

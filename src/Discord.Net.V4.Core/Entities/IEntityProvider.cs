@@ -8,9 +8,6 @@ public interface IEntityProvider<out TEntity, in TModel> : IClientProvider
     where TModel : IModel?
 {
     internal TEntity CreateEntity(TModel model);
-
-    [return: NotNullIfNotNull(nameof(model))]
-    internal TEntity? CreateNullableEntity(TModel? model) => model is null ? default : CreateEntity(model);
 }
 
 public interface IEntityProvider<out TEntity, in TModel, in TContext> : IClientProvider
@@ -18,10 +15,4 @@ public interface IEntityProvider<out TEntity, in TModel, in TContext> : IClientP
     where TModel : IModel?
 {
     internal TEntity CreateEntity(TModel model, TContext context);
-
-    [return: NotNullIfNotNull(nameof(model))]
-    internal TEntity? CreateNullableEntity(TModel? model, TContext context)
-        => model is null
-            ? default
-            : CreateEntity(model, context);
 }

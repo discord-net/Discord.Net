@@ -7,8 +7,8 @@ using System.Runtime.CompilerServices;
 
 namespace Discord.Gateway;
 
-public sealed class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCore, TModel> :
-    GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCore, TModel, IEnumerable<TModel>>
+public sealed class GatewayEnumerableIndexableLink<TActor, TId, TEntity, TRestEntity, TCore, TModel> :
+    GatewayEnumerableIndexableLink<TActor, TId, TEntity, TRestEntity, TCore, TModel, IEnumerable<TModel>>
     where TActor :
     class,
     IGatewayCachedActor<TId, TEntity, TModel>,
@@ -24,7 +24,7 @@ public sealed class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestE
     where TCore : class, IEntity<TId, TModel>
     where TModel : class, IEntityModel<TId>
 {
-    public GatewayEnumerableIndexableActor(
+    public GatewayEnumerableIndexableLink(
         DiscordGatewayClient client,
         Func<TId, TActor> factory,
         Func<TModel, TRestEntity> restFactory,
@@ -42,16 +42,16 @@ public sealed class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestE
     {
     }
 
-    public GatewayEnumerableIndexableActor(
+    public GatewayEnumerableIndexableLink(
         DiscordGatewayClient client,
-        GatewayIndexableActor<TActor, TId, TEntity> indexableActor,
+        GatewayIndexableLink<TActor, TId, TEntity> indexableLink,
         Func<TModel, TRestEntity> restFactory,
         CachePathable path,
         IApiOutRoute<IEnumerable<TModel>> apiRoute,
         Func<IEnumerable<TModel>, IEnumerable<TModel>>? transformer = null
     ) : base(
         client,
-        indexableActor,
+        indexableLink,
         restFactory,
         path,
         apiRoute,
@@ -61,8 +61,8 @@ public sealed class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestE
     }
 }
 
-public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, TCore, TModel, TApi> :
-    IEnumerableIndexableActor<TActor, TId, TCore>
+public class GatewayEnumerableIndexableLink<TActor, TId, TEntity, TRestEntity, TCore, TModel, TApi> :
+    IEnumerableIndexableLink<TActor, TId, TCore>
     where TActor :
     class,
     IGatewayCachedActor<TId, TEntity, TModel>,
@@ -79,9 +79,9 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
     where TModel : class, IEntityModel<TId>
     where TApi : class
 {
-    public TActor this[TId id] => _indexableActor[id];
+    public TActor this[TId id] => _indexableLink[id];
 
-    public TActor this[IIdentifiable<TId, TEntity, TActor, TModel> identity] => _indexableActor[identity];
+    public TActor this[IIdentifiable<TId, TEntity, TActor, TModel> identity] => _indexableLink[identity];
 
     private IEntityBroker<TId, TEntity, TModel>? _broker;
     private IStoreInfo<TId, TModel>? _storeInfo;
@@ -92,11 +92,11 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
     private readonly IApiOutRoute<TApi> _apiRoute;
     private readonly Func<TApi, IEnumerable<TModel>> _transformer;
 
-    private readonly GatewayIndexableActor<TActor, TId, TEntity> _indexableActor;
+    private readonly GatewayIndexableLink<TActor, TId, TEntity> _indexableLink;
 
-    internal GatewayEnumerableIndexableActor(
+    internal GatewayEnumerableIndexableLink(
         DiscordGatewayClient client,
-        GatewayIndexableActor<TActor, TId, TEntity> indexableActor,
+        GatewayIndexableLink<TActor, TId, TEntity> indexableLink,
         Func<TModel, TRestEntity> restFactory,
         CachePathable path,
         IApiOutRoute<TApi> apiRoute,
@@ -107,17 +107,17 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
         _path = path;
         _apiRoute = apiRoute;
         _transformer = transformer;
-        _indexableActor = indexableActor;
+        _indexableLink = indexableLink;
     }
 
-    internal GatewayEnumerableIndexableActor(
+    internal GatewayEnumerableIndexableLink(
         DiscordGatewayClient client,
         Func<TId, TActor> factory,
         Func<TModel, TRestEntity> restFactory,
         CachePathable path,
         IApiOutRoute<TApi> apiRoute,
         Func<TApi, IEnumerable<TModel>> transformer
-    ) : this(client, new GatewayIndexableActor<TActor, TId, TEntity>(factory), restFactory, path, apiRoute, transformer)
+    ) : this(client, new GatewayIndexableLink<TActor, TId, TEntity>(factory), restFactory, path, apiRoute, transformer)
     {
     }
 
@@ -185,9 +185,9 @@ public class GatewayEnumerableIndexableActor<TActor, TId, TEntity, TRestEntity, 
             : (await FetchAllAsync(options, token)).OfType<TCore>().ToList().AsReadOnly();
     }
 
-    ValueTask<IReadOnlyCollection<TCore>> IEnumerableActor<TId, TCore>.AllAsync(RequestOptions? options,
+    ValueTask<IReadOnlyCollection<TCore>> IEnumerableLink<TId, TCore>.AllAsync(RequestOptions? options,
         CancellationToken token)
         => AllAsync(GatewayRequestOptions.FromRestOptions(options), token);
 
-    public TActor Specifically(TId id) => _indexableActor.Specifically(id);
+    public TActor Specifically(TId id) => _indexableLink.Specifically(id);
 }

@@ -47,7 +47,7 @@ public partial interface ICurrentUserActor :
             token
         );
 
-        return CreateNullableEntity(model, guild.Id);
+        return model is null ? null : CreateEntity(model, guild);
     }
 
     Task LeaveGuildAsync(

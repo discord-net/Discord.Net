@@ -4,7 +4,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-[FetchableOfMany(nameof(Routes.ListGuildMembers))]
+[PagedFetchableOfMany<PageGuildMembersParams>(nameof(Routes.ListGuildMembers))]
 [Refreshable(nameof(Routes.GetGuildMember))]
 public partial interface IMember :
     ISnowflakeEntity<IMemberModel>,

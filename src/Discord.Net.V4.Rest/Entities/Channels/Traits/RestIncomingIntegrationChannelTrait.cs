@@ -3,7 +3,7 @@ using Discord.Models;
 namespace Discord.Rest;
 
 using EnumerableIncomingWebhookActor =
-    RestEnumerableIndexableActor<RestIncomingWebhookActor, ulong, RestIncomingWebhook, IIncomingWebhook,
+    RestEnumerableIndexableLink<RestIncomingWebhookActor, ulong, RestIncomingWebhook, IIncomingWebhook,
         IEnumerable<IWebhookModel>>;
 
 public sealed partial class RestIncomingIntegrationChannelTrait<TChannelActor, TChannel, TIdentity>(

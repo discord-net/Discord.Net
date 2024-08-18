@@ -1,11 +1,11 @@
-using Discord.Models.Json.Stickers;
+using Discord.Models.Json;
 
 namespace Discord;
 
 /// <summary>
 ///     Represents a class used to modify stickers.
 /// </summary>
-public class ModifyStickerProperties : IEntityProperties<ModifyGuildStickersParams>
+public class ModifyStickerProperties : IEntityProperties<ModifyGuildStickerParams>
 {
     /// <summary>
     ///     Gets or sets the name of the sticker.
@@ -22,9 +22,9 @@ public class ModifyStickerProperties : IEntityProperties<ModifyGuildStickersPara
     /// </summary>
     public Optional<CSVString> Tags { get; set; }
 
-    public ModifyGuildStickersParams ToApiModel(ModifyGuildStickersParams? existing = default)
+    public ModifyGuildStickerParams ToApiModel(ModifyGuildStickerParams? existing = default)
     {
-        existing ??= new ModifyGuildStickersParams();
+        existing ??= new ModifyGuildStickerParams();
 
         existing.Name = Name;
         existing.Description = Description;

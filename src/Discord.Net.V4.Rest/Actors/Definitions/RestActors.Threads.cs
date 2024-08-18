@@ -6,7 +6,7 @@ namespace Discord.Rest;
 
 internal static partial class RestActors
 {
-    public static RestPagedIndexableActor<
+    public static RestPagedIndexableLink<
         RestThreadChannelActor,
         ulong,
         RestThreadChannel,
@@ -19,7 +19,7 @@ internal static partial class RestActors
         ThreadableChannelIdentity channel
     ) => ListThreads<PagePublicArchivedThreadsParams>(client, guild, channel);
 
-    public static RestPagedIndexableActor<
+    public static RestPagedIndexableLink<
         RestThreadChannelActor,
         ulong,
         RestThreadChannel,
@@ -32,7 +32,7 @@ internal static partial class RestActors
         ThreadableChannelIdentity channel
     ) => ListThreads<PagePrivateArchivedThreadsParams>(client, guild, channel);
 
-    public static RestPagedIndexableActor<
+    public static RestPagedIndexableLink<
         RestThreadChannelActor,
         ulong,
         RestThreadChannel,
@@ -45,7 +45,7 @@ internal static partial class RestActors
         ThreadableChannelIdentity channel
     ) => ListThreads<PageJoinedPrivateArchivedThreadsParams>(client, guild, channel);
 
-    private static RestPagedIndexableActor<
+    private static RestPagedIndexableLink<
         RestThreadChannelActor,
         ulong,
         RestThreadChannel,
@@ -58,7 +58,7 @@ internal static partial class RestActors
         ThreadableChannelIdentity channel)
         where TParams : class, IPagingParams<TParams, ChannelThreads>
     {
-        return new RestPagedIndexableActor<RestThreadChannelActor, ulong, RestThreadChannel, IThreadChannelModel,
+        return new RestPagedIndexableLink<RestThreadChannelActor, ulong, RestThreadChannel, IThreadChannelModel,
             ChannelThreads, TParams>(
             client,
             id => new RestThreadChannelActor(client, guild, ThreadIdentity.Of(id)),

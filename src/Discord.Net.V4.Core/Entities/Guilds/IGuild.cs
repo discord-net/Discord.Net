@@ -6,6 +6,7 @@ using System.Globalization;
 namespace Discord;
 
 [Refreshable(nameof(Routes.GetGuild))]
+[PagedFetchableOfMany<PageUserGuildsParams, IPartialGuild>(nameof(Routes.GetCurrentUserGuilds))]
 public partial interface IGuild :
     ISnowflakeEntity<IGuildModel>,
     IPartialGuild,

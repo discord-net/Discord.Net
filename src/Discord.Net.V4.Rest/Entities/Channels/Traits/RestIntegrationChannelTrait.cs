@@ -4,7 +4,7 @@ using Discord.Rest;
 namespace Discord.Rest;
 
 using EnumerableWebhookActor =
-    RestEnumerableIndexableActor<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
+    RestEnumerableIndexableLink<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
 
 public partial class RestIntegrationChannelTrait<TChannelActor, TChannel, TIdentity> :
     RestIntegrationChannelTrait

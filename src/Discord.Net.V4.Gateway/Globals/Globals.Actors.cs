@@ -1,4 +1,4 @@
-global using Webhooks = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using Webhooks = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayWebhookActor,
     ulong,
     Discord.Gateway.GatewayWebhook,
@@ -7,7 +7,7 @@ global using Webhooks = Discord.Gateway.GatewayEnumerableIndexableActor<
     Discord.Models.IWebhookModel
 >;
 
-global using IncomingWebhooks = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using IncomingWebhooks = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayIncomingWebhookActor,
     ulong,
     Discord.Gateway.GatewayIncomingWebhook,
@@ -16,7 +16,7 @@ global using IncomingWebhooks = Discord.Gateway.GatewayEnumerableIndexableActor<
     Discord.Models.IWebhookModel
 >;
 
-global using ChannelFollowerWebhooks = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using ChannelFollowerWebhooks = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayChannelFollowerWebhookActor,
     ulong,
     Discord.Gateway.GatewayChannelFollowerWebhook,
@@ -25,7 +25,7 @@ global using ChannelFollowerWebhooks = Discord.Gateway.GatewayEnumerableIndexabl
     Discord.Models.IWebhookModel
 >;
 
-global using StickerPacks = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using StickerPacks = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayStickerPackActor,
     ulong,
     Discord.Gateway.GatewayStickerPack,
@@ -34,7 +34,7 @@ global using StickerPacks = Discord.Gateway.GatewayEnumerableIndexableActor<
     Discord.Models.IStickerPackModel
 >;
 
-global using GuildsPager = Discord.Gateway.GatewayPartialPagedIndexableActor<
+global using GuildsPager = Discord.Gateway.GatewayPartialPagedIndexableLink<
     Discord.Gateway.GatewayGuildActor,
     ulong,
     Discord.Gateway.GatewayGuild,
@@ -45,7 +45,7 @@ global using GuildsPager = Discord.Gateway.GatewayPartialPagedIndexableActor<
     Discord.PageUserGuildsParams
 >;
 
-global using MembersPager = Discord.Gateway.GatewayPagedIndexableActor<
+global using MembersPager = Discord.Gateway.GatewayPagedIndexableLink<
     Discord.Gateway.GatewayMemberActor,
     ulong,
     Discord.Gateway.GatewayMember,
@@ -56,7 +56,7 @@ global using MembersPager = Discord.Gateway.GatewayPagedIndexableActor<
     Discord.PageGuildMembersParams
 >;
 
-global using BansPager = Discord.Gateway.GatewayPagedIndexableActor<
+global using BansPager = Discord.Gateway.GatewayPagedIndexableLink<
     Discord.Gateway.GatewayBanActor,
     ulong,
     Discord.Gateway.GatewayBan,
@@ -67,7 +67,7 @@ global using BansPager = Discord.Gateway.GatewayPagedIndexableActor<
     Discord.PageGuildBansParams
 >;
 
-global using PublicArchivedThreadsPager = Discord.Gateway.GatewayPagedIndexableActor<
+global using PublicArchivedThreadsPager = Discord.Gateway.GatewayPagedIndexableLink<
     Discord.Gateway.GatewayThreadChannelActor,
     ulong,
     Discord.Gateway.GatewayThreadChannel,
@@ -78,7 +78,7 @@ global using PublicArchivedThreadsPager = Discord.Gateway.GatewayPagedIndexableA
     Discord.PagePublicArchivedThreadsParams
 >;
 
-global using PrivateArchivedThreadsPager = Discord.Gateway.GatewayPagedIndexableActor<
+global using PrivateArchivedThreadsPager = Discord.Gateway.GatewayPagedIndexableLink<
     Discord.Gateway.GatewayThreadChannelActor,
     ulong,
     Discord.Gateway.GatewayThreadChannel,
@@ -89,7 +89,7 @@ global using PrivateArchivedThreadsPager = Discord.Gateway.GatewayPagedIndexable
     Discord.PagePrivateArchivedThreadsParams
 >;
 
-global using JoinedPrivateArchivedThreadsPager = Discord.Gateway.GatewayPagedIndexableActor<
+global using JoinedPrivateArchivedThreadsPager = Discord.Gateway.GatewayPagedIndexableLink<
     Discord.Gateway.GatewayThreadChannelActor,
     ulong,
     Discord.Gateway.GatewayThreadChannel,
@@ -100,7 +100,7 @@ global using JoinedPrivateArchivedThreadsPager = Discord.Gateway.GatewayPagedInd
     Discord.PageJoinedPrivateArchivedThreadsParams
 >;
 
-global using GatewayIntegrations = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayIntegrations = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayIntegrationActor,
     ulong,
     Discord.Gateway.GatewayIntegration,
@@ -109,7 +109,7 @@ global using GatewayIntegrations = Discord.Gateway.GatewayEnumerableIndexableAct
     Discord.Models.IIntegrationModel
 >;
 
-global using GatewayRoles = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayRoles = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayRoleActor,
     ulong,
     Discord.Gateway.GatewayRole,
@@ -118,7 +118,7 @@ global using GatewayRoles = Discord.Gateway.GatewayEnumerableIndexableActor<
     Discord.Models.IRoleModel
 >;
 
-global using GatewayGuildEmotes = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayGuildEmotes = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayGuildEmoteActor,
     ulong,
     Discord.Gateway.GatewayGuildEmote,
@@ -127,7 +127,7 @@ global using GatewayGuildEmotes = Discord.Gateway.GatewayEnumerableIndexableActo
     Discord.Models.IGuildEmoteModel
 >;
 
-global using GatewayGuildStickers = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayGuildStickers = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayGuildStickerActor,
     ulong,
     Discord.Gateway.GatewayGuildSticker,
@@ -136,7 +136,7 @@ global using GatewayGuildStickers = Discord.Gateway.GatewayEnumerableIndexableAc
     Discord.Models.IGuildStickerModel
 >;
 
-global using GatewayGuildInvites = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayGuildInvites = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayGuildInviteActor,
     string,
     Discord.Gateway.GatewayGuildInvite,
@@ -145,7 +145,7 @@ global using GatewayGuildInvites = Discord.Gateway.GatewayEnumerableIndexableAct
     Discord.Models.IInviteModel
 >;
 
-global using GatewayGuildChannelInvites = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayGuildChannelInvites = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayGuildChannelInviteActor,
     string,
     Discord.Gateway.GatewayGuildChannelInvite,
@@ -154,7 +154,7 @@ global using GatewayGuildChannelInvites = Discord.Gateway.GatewayEnumerableIndex
     Discord.Models.IInviteModel
 >;
 
-global using GatewayGuildScheduledEvents = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayGuildScheduledEvents = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayGuildScheduledEventActor,
     ulong,
     Discord.Gateway.GatewayGuildScheduledEvent,
@@ -163,7 +163,7 @@ global using GatewayGuildScheduledEvents = Discord.Gateway.GatewayEnumerableInde
     Discord.Models.IGuildScheduledEventModel
 >;
 
-global using GatewayActiveThreads = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayActiveThreads = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayThreadChannelActor,
     ulong,
     Discord.Gateway.GatewayThreadChannel,
@@ -173,7 +173,7 @@ global using GatewayActiveThreads = Discord.Gateway.GatewayEnumerableIndexableAc
     Discord.Models.Json.ListActiveGuildThreadsResponse
 >;
 
-global using GatewayGuildChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayGuildChannels = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayGuildChannelActor,
     ulong,
     Discord.Gateway.GatewayGuildChannel,
@@ -181,7 +181,7 @@ global using GatewayGuildChannels = Discord.Gateway.GatewayEnumerableIndexableAc
     Discord.IGuildChannel,
     Discord.Models.IGuildChannelModel
 >;
-global using GatewayTextChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayTextChannels = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayTextChannelActor,
     ulong,
     Discord.Gateway.GatewayTextChannel,
@@ -190,7 +190,7 @@ global using GatewayTextChannels = Discord.Gateway.GatewayEnumerableIndexableAct
     Discord.Models.IGuildTextChannelModel,
     System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
 >;
-global using GatewayVoiceChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayVoiceChannels = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayVoiceChannelActor,
     ulong,
     Discord.Gateway.GatewayVoiceChannel,
@@ -199,7 +199,7 @@ global using GatewayVoiceChannels = Discord.Gateway.GatewayEnumerableIndexableAc
     Discord.Models.IGuildVoiceChannelModel,
     System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
 >;
-global using GatewayCategoryChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayCategoryChannels = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayCategoryChannelActor,
     ulong,
     Discord.Gateway.GatewayCategoryChannel,
@@ -208,7 +208,7 @@ global using GatewayCategoryChannels = Discord.Gateway.GatewayEnumerableIndexabl
     Discord.Models.IGuildCategoryChannelModel,
     System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
 >;
-global using GatewayNewsChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayNewsChannels = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayNewsChannelActor,
     ulong,
     Discord.Gateway.GatewayNewsChannel,
@@ -217,7 +217,7 @@ global using GatewayNewsChannels = Discord.Gateway.GatewayEnumerableIndexableAct
     Discord.Models.IGuildNewsChannelModel,
     System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
 >;
-global using GatewayThreadChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayThreadChannels = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayThreadChannelActor,
     ulong,
     Discord.Gateway.GatewayThreadChannel,
@@ -226,7 +226,7 @@ global using GatewayThreadChannels = Discord.Gateway.GatewayEnumerableIndexableA
     Discord.Models.IThreadChannelModel,
     System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
 >;
-global using GatewayStageChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayStageChannels = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayStageChannelActor,
     ulong,
     Discord.Gateway.GatewayStageChannel,
@@ -235,7 +235,7 @@ global using GatewayStageChannels = Discord.Gateway.GatewayEnumerableIndexableAc
     Discord.Models.IGuildStageChannelModel,
     System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
 >;
-global using GatewayForumChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayForumChannels = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayForumChannelActor,
     ulong,
     Discord.Gateway.GatewayForumChannel,
@@ -244,7 +244,7 @@ global using GatewayForumChannels = Discord.Gateway.GatewayEnumerableIndexableAc
     Discord.Models.IGuildForumChannelModel,
     System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
 >;
-global using GatewayMediaChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayMediaChannels = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayMediaChannelActor,
     ulong,
     Discord.Gateway.GatewayMediaChannel,
@@ -254,7 +254,7 @@ global using GatewayMediaChannels = Discord.Gateway.GatewayEnumerableIndexableAc
     System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
 >;
 
-global using GatewayIntegrationChannels = Discord.Gateway.GatewayEnumerableIndexableActor<
+global using GatewayIntegrationChannels = Discord.Gateway.GatewayEnumerableIndexableLink<
     Discord.Gateway.GatewayIntegrationChannelTrait,
     ulong,
     Discord.Gateway.GatewayGuildChannel,
