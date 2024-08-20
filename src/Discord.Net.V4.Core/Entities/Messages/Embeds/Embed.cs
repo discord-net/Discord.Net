@@ -8,7 +8,7 @@ namespace Discord;
 ///     Represents an embed object seen in an <see cref="IMessage" />.
 /// </summary>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-public sealed class Embed : IEntityProperties<Models.Json.Embed>, IConstructable<Embed, IEmbedModel>
+public sealed class Embed : IEntityProperties<Models.Json.Embed>, IModelConstructable<Embed, IEmbedModel>
 {
     internal Embed(EmbedType type)
     {

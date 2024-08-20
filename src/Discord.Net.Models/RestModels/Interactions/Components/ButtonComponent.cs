@@ -13,7 +13,7 @@ public sealed class ButtonComponent : MessageComponent, IModelSource, IButtonCom
     public Optional<string> Label { get; set; }
 
     [JsonPropertyName("emoji")]
-    public Optional<IEmoteModel> Emote { get; set; }
+    public Optional<DiscordEmojiId> Emote { get; set; }
 
     [JsonPropertyName("custom_id")]
     public Optional<string> CustomId { get; set; }
@@ -25,16 +25,8 @@ public sealed class ButtonComponent : MessageComponent, IModelSource, IButtonCom
     public Optional<bool> IsDisabled { get; set; }
 
     string? IButtonComponentModel.Label => ~Label;
-    IEmoteModel? IButtonComponentModel.Emote => ~Emote;
+    DiscordEmojiId? IButtonComponentModel.Emote => Emote.ToNullable();
     string? IButtonComponentModel.CustomId => ~CustomId;
     string? IButtonComponentModel.Url => ~Url;
     bool? IButtonComponentModel.IsDisabled => ~IsDisabled;
-
-    public IEnumerable<IModel> GetDefinedModels()
-    {
-        if (Emote.IsSpecified)
-            yield return Emote.Value;
-    }
-
-    IEmoteModel? IModelSourceOf<IEmoteModel?>.Model => ~Emote;
 }

@@ -5,7 +5,9 @@ namespace Discord;
 /// <summary>
 ///     Represent a permission overwrite object.
 /// </summary>
-public readonly struct Overwrite : IEntityProperties<Models.Json.Overwrite>, IConstructable<Overwrite, IOverwriteModel>
+public readonly struct Overwrite : 
+    IEntityProperties<Models.Json.Overwrite>, 
+    IModelConstructable<Overwrite, IOverwriteModel>
 {
     /// <summary>
     ///     The unique identifier for the object this overwrite is targeting.

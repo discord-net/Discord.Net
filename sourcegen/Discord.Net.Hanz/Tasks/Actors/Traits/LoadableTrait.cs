@@ -16,7 +16,7 @@ public static class LoadableTrait
         if (traitAttribute.ConstructorArguments.Length != 2)
             return;
 
-        var actorInterface = EntityTraits.GetActorInterface(target.InterfaceSymbol);
+        var actorInterface = EntityTraits.GetCoreActorInterface(target.InterfaceSymbol);
 
         if (actorInterface is null)
         {
@@ -211,7 +211,7 @@ public static class LoadableTrait
 
         foreach (var baseLoadable in target.InterfaceSymbol.AllInterfaces.Where(IsLoadable))
         {
-            var baseActorInterface = EntityTraits.GetActorInterface(baseLoadable);
+            var baseActorInterface = EntityTraits.GetCoreActorInterface(baseLoadable);
             var baseModelType = EntityTraits.GetEntityModelOfInterface(baseActorInterface?.TypeArguments[1])
                 ?.TypeArguments[0];
 

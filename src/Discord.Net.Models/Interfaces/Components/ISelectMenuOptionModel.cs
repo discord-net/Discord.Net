@@ -5,6 +5,6 @@ public interface ISelectMenuOptionModel
     string Label { get; }
     string Value { get; }
     string? Description { get; }
-    IEmoteModel? Emote { get; }
+    DiscordEmojiId? Emote { get; }
     bool? IsDefault { get; }
 }

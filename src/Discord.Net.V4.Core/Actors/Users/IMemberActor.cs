@@ -15,26 +15,57 @@ public partial interface IMemberActor :
     IActor<ulong, IMember>
 {
     IVoiceStateActor VoiceState { get; }
+    RoleLink.BackLink<IMemberActor> Roles { get; }
 
-    Task AddRoleAsync(
-        EntityOrId<ulong, IRole> role,
+    [BackLink<IGuildActor>]
+    private static async Task<IMember> AddAsync(
+        IGuildActor guild,
+        EntityOrId<ulong, IUser> user,
+        string accessToken,
+        string? nickname = null,
+        IEnumerable<EntityOrId<ulong, IRole>>? roles = null,
+        bool? mute = null,
+        bool? deaf = null,
         RequestOptions? options = null,
-        CancellationToken token = default
-    ) => Client.RestApiClient.ExecuteAsync(
-        Routes.AddGuildMemberRole(Guild.Id, Id, role.Id),
-        options ?? Client.DefaultRequestOptions,
-        token
-    );
+        CancellationToken token = default)
+    {
+        return guild.CreateEntity(
+            await guild.Client.RestApiClient.ExecuteRequiredAsync(
+                Routes.AddGuildMember(guild.Id, user.Id,
+                    new AddGuildMemberParams
+                    {
+                        AccessToken = accessToken,
+                        Nickname = Optional.FromNullable(nickname),
+                        IsDeaf = Optional.FromNullable(deaf),
+                        IsMute = Optional.FromNullable(mute),
+                        RoleIds = Optional.FromNullable(roles)
+                            .Map(v => v
+                                .Select(v => v.Id)
+                                .ToArray()
+                            )
+                    }),
+                options ?? guild.Client.DefaultRequestOptions,
+                token
+            )
+        );
+    }
 
-    Task RemoveRoleAsync(
-        EntityOrId<ulong, IRole> role,
+    [BackLink<IGuildActor>]
+    private static async Task<IReadOnlyCollection<IMember>> SearchAsync(
+        IGuildActor guild,
+        string query,
+        int limit = DiscordConfig.MaxUsersPerBatch,
         RequestOptions? options = null,
-        CancellationToken token = default
-    ) => Client.RestApiClient.ExecuteAsync(
-        Routes.RemoveGuildMemberRole(Guild.Id, Id, role.Id),
-        options ?? Client.DefaultRequestOptions,
-        token
-    );
+        CancellationToken token = default)
+    {
+        var result = await guild.Client.RestApiClient.ExecuteRequiredAsync(
+            Routes.SearchGuildMembers(guild.Id, query, limit),
+            options ?? guild.Client.DefaultRequestOptions,
+            token
+        );
+
+        return result.Select(guild.CreateEntity).ToList().AsReadOnly();
+    }
 
     Task KickAsync(
         RequestOptions? options = null,
@@ -57,7 +88,7 @@ public partial interface IMemberActor :
             {
                 DeleteMessageSeconds = Optional
                     .FromNullable(pruneDuration)
-                    .Map(v => (int)Math.Floor(v.TotalSeconds))
+                    .Map(v => (int) Math.Floor(v.TotalSeconds))
             }
         ),
         options ?? Client.DefaultRequestOptions,

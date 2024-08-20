@@ -13,7 +13,7 @@ public readonly struct ReactionMetadata(
     int burstReactionCount,
     bool isMeBurst,
     IReadOnlyCollection<string> burstColors
-) : IConstructable<ReactionMetadata, IReactionModel>, IEquatable<ReactionMetadata>
+) : IModelConstructable<ReactionMetadata, IReactionModel>, IEquatable<ReactionMetadata>
 {
     /// <summary>
     ///     The number of reactions.

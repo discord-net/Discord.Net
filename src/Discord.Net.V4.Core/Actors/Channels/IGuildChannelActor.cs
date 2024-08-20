@@ -19,4 +19,21 @@ public partial interface IGuildChannelActor :
     [return: TypeHeuristic(nameof(Invites))]
     IGuildChannelInviteActor Invite(string code) => Invites[code];
     EnumerableIndexableGuildChannelInviteLink Invites { get; }
+
+    [BackLink<IGuildActor>]
+    private static Task ModifyPositionsAsync(
+        IGuildActor guild,
+        IEnumerable<ModifyGuildChannelPositionProperties> positions,
+        RequestOptions? options = null,
+        CancellationToken token = default)
+    {
+        return guild.Client.RestApiClient.ExecuteAsync(
+            Routes.ModifyGuildChannelPositions(
+                guild.Id,
+                positions.Select(x => x.ToApiModel()).ToArray()
+            ),
+            options ?? guild.Client.DefaultRequestOptions,
+            token
+        );
+    }
 }

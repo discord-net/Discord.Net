@@ -5,6 +5,7 @@ using Discord.Rest;
 namespace Discord;
 
 [Loadable(nameof(Routes.GetUser))]
+[BackLinkable]
 public partial interface IUserActor :
     IActor<ulong, IUser>,
     IEntityProvider<IDMChannel, IDMChannelModel>
@@ -19,5 +20,39 @@ public partial interface IUserActor :
         );
 
         return CreateEntity(model);
+    }
+
+    [BackLink<IGroupChannel>]
+    private static async Task AddAsync(
+        IGroupChannel channel,
+        EntityOrId<ulong, IUserActor> user,
+        string accessToken,
+        string nickname,
+        RequestOptions? options = null,
+        CancellationToken token = default)
+    {
+        await channel.Client.RestApiClient.ExecuteAsync(
+            Routes.GroupDmAddRecipient(channel.Id, user.Id, new GroupDmAddRecipientParams()
+            {
+                Nick = nickname,
+                AccessToken = accessToken
+            }),
+            options ?? channel.Client.DefaultRequestOptions,
+            token
+        );
+    }
+
+    [BackLink<IGroupChannel>]
+    private static async Task RemoveAsync(
+        IGroupChannel channel,
+        EntityOrId<ulong, IUserActor> user,
+        RequestOptions? options = null,
+        CancellationToken token = default)
+    {
+        await channel.Client.RestApiClient.ExecuteAsync(
+            Routes.GroupDmRemoveRecipient(channel.Id, user.Id),
+            options ?? channel.Client.DefaultRequestOptions,
+            token
+        );
     }
 }

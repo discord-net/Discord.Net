@@ -2,7 +2,7 @@ using Discord.Models;
 
 namespace Discord;
 
-public readonly struct Attachment : IConstructable<Attachment, IAttachmentModel>
+public readonly struct Attachment : IModelConstructable<Attachment, IAttachmentModel>
 {
     /// <summary>
     ///     The ID of this attachment.

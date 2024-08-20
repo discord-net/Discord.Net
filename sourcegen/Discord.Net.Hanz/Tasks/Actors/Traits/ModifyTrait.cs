@@ -56,7 +56,7 @@ public static class ModifyTrait
         if (traitAttribute.ConstructorArguments.Length != 1)
             return false;
 
-        var actorInterface = EntityTraits.GetActorInterface(symbol);
+        var actorInterface = EntityTraits.GetCoreActorInterface(symbol);
 
         if (actorInterface is null)
         {

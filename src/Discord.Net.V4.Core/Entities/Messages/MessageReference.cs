@@ -9,7 +9,7 @@ namespace Discord;
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 public readonly struct MessageReference : 
     IEntityProperties<Discord.Models.Json.MessageReference>,
-    IConstructable<MessageReference, IMessageReferenceModel>
+    IModelConstructable<MessageReference, IMessageReferenceModel>
 {
     /// <summary>
     ///     The Message ID of the original message.

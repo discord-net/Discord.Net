@@ -478,7 +478,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                                 return ReturnOwnId(ref hasReturnedId, idParam,
                                     $"{target.InterfaceSymbol}: {x} is the relation type", logger);
 
-                            var actorInterface = GetActorInterface(target.InterfaceSymbol);
+                            var actorInterface = GetCoreActorInterface(target.InterfaceSymbol);
 
                             CommonConversion? conversion = actorInterface is not null
                                 ? target.SemanticModel.Compilation.ClassifyCommonConversion(
@@ -571,7 +571,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         if (model is not null)
             return model;
 
-        var actor = GetActorInterface(symbol);
+        var actor = GetCoreActorInterface(symbol);
 
         if (actor is null)
             return null;
@@ -579,7 +579,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         return GetEntityModelOfInterface(actor.TypeArguments[1] as INamedTypeSymbol)?.TypeArguments[0];
     }
 
-    public static INamedTypeSymbol? GetActorInterface(INamedTypeSymbol actor)
+    public static INamedTypeSymbol? GetCoreActorInterface(INamedTypeSymbol actor)
     {
         return Hierarchy.GetHierarchy(actor)
             .FirstOrDefault(x =>

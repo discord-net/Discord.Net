@@ -12,10 +12,13 @@ public sealed class ForumTag : ITagModel
 
     [JsonPropertyName("moderated")]
     public bool Moderated { get; set; }
-
+    
     [JsonPropertyName("emoji_id")]
     public ulong? EmojiId { get; set; }
 
     [JsonPropertyName("emoji_name")]
     public string? EmojiName { get; set; }
+
+    DiscordEmojiId? ITagModel.Emoji => EmojiName is not null || EmojiId.HasValue ? new(EmojiName, EmojiId) : null;
+
 }

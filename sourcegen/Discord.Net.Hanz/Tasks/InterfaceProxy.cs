@@ -959,7 +959,7 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
                 {
                     var propertySyntax = SyntaxFactory.PropertyDeclaration(
                         [],
-                        CreateAccessors(targetProperty.DeclaredAccessibility)
+                        MemberUtils.CreateAccessors(targetProperty.DeclaredAccessibility)
                             .AddRange(modifiers),
                         SyntaxFactory.IdentifierName(member.MemberReturnType.ToDisplayString()),
                         null,
@@ -1033,7 +1033,7 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
                 {
                     var methodSyntax = SyntaxFactory.MethodDeclaration(
                         [],
-                        CreateAccessors(targetMethod.DeclaredAccessibility)
+                        MemberUtils.CreateAccessors(targetMethod.DeclaredAccessibility)
                             .AddRange(modifiers),
                         SyntaxFactory.IdentifierName(member.MemberReturnType.ToDisplayString()),
                         null,
@@ -1225,26 +1225,5 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
 
         if (symbol.IsOverride)
             yield return SyntaxFactory.Token(SyntaxKind.OverrideKeyword);
-    }
-
-    private static SyntaxTokenList CreateAccessors(Accessibility accessibility)
-    {
-        return SyntaxFactory.TokenList(accessibility switch
-        {
-            Accessibility.Private => [SyntaxFactory.Token(SyntaxKind.PrivateKeyword)],
-            Accessibility.Protected => [SyntaxFactory.Token(SyntaxKind.ProtectedKeyword)],
-            Accessibility.ProtectedOrInternal =>
-            [
-                SyntaxFactory.Token(SyntaxKind.ProtectedKeyword),
-            ],
-            Accessibility.Internal => [SyntaxFactory.Token(SyntaxKind.InternalKeyword)],
-            Accessibility.ProtectedAndInternal =>
-            [
-                SyntaxFactory.Token(SyntaxKind.ProtectedKeyword),
-                SyntaxFactory.Token(SyntaxKind.InternalKeyword)
-            ],
-            Accessibility.Public => [SyntaxFactory.Token(SyntaxKind.PublicKeyword)],
-            _ => []
-        });
     }
 }

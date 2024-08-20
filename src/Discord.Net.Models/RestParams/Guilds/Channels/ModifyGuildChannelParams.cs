@@ -47,7 +47,7 @@ public sealed class ModifyGuildChannelParams : ModifyChannelParams
     public Optional<ForumTag[]> AvailableTags { get; set; }
 
     [JsonPropertyName("default_reaction_emoji")]
-    public Optional<DefaultReaction?> DefaultReactionEmoji { get; set; }
+    public Optional<DiscordEmojiId?> DefaultReactionEmoji { get; set; }
 
     [JsonPropertyName("default_thread_rate_limit_per_user")]
     public Optional<int?> DefaultThreadRateLimitPerUser { get; set; }

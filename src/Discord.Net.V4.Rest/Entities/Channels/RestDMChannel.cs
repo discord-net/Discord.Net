@@ -7,7 +7,7 @@ namespace Discord.Rest;
 public partial class RestDMChannelActor :
     RestChannelActor,
     IDMChannelActor,
-    IRestActor<ulong, RestDMChannel, DMChannelIdentity>
+    IRestActor<ulong, RestDMChannel, DMChannelIdentity, IDMChannelModel>
 {
     [SourceOfTruth] public RestUserActor Recipient { get; }
 
@@ -32,14 +32,13 @@ public partial class RestDMChannelActor :
     [SourceOfTruth]
     [CovariantOverride]
     internal RestDMChannel CreateEntity(IDMChannelModel model)
-        => RestDMChannel.Construct(Client, model);
+        => RestDMChannel.Construct(Client, this, model);
 }
 
 public partial class RestDMChannel :
     RestChannel,
     IDMChannel,
-    IConstructable<RestDMChannel, IDMChannelModel, DiscordRestClient>,
-    IContextConstructable<RestDMChannel, IDMChannelModel, UserIdentity, DiscordRestClient>
+    IRestConstructable<RestDMChannel, RestDMChannelActor, IDMChannelModel>
 {
     [ProxyInterface(typeof(IDMChannelActor))]
     internal override RestDMChannelActor Actor { get; }
@@ -51,20 +50,15 @@ public partial class RestDMChannel :
     internal RestDMChannel(
         DiscordRestClient client,
         IDMChannelModel model,
-        UserIdentity? recipient = null,
-        RestDMChannelActor? actor = null
+        RestDMChannelActor actor
     ) : base(client, model, actor)
     {
         _model = model;
-
-        Actor = actor ?? new(client, DMChannelIdentity.Of(this), recipient ?? UserIdentity.Of(model.RecipientId));
+        Actor = actor;
     }
 
-    public static RestDMChannel Construct(DiscordRestClient client, UserIdentity recipient, IDMChannelModel model)
-        => new(client, model, recipient);
-
-    public static RestDMChannel Construct(DiscordRestClient client, IDMChannelModel model)
-        => new(client, model);
+    public static RestDMChannel Construct(DiscordRestClient client, RestDMChannelActor actor, IDMChannelModel model)
+        => new(client, model, actor);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IDMChannelModel model, CancellationToken token = default)

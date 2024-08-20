@@ -4,12 +4,18 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
+using Discord.Net.Hanz.Tasks.Actors;
 using Exception = System.Exception;
 
 namespace Discord.Net.Hanz.Tasks;
 
 public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarget>
 {
+    public static string[] IgnoredTypes =
+    [
+        "BackLink"
+    ];
+
     public class GenerationTarget(
         SemanticModel semantic,
         TypeDeclarationSyntax typeDeclarationSyntax,
@@ -36,7 +42,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((GenerationTarget)obj);
+            return Equals((GenerationTarget) obj);
         }
 
         public override int GetHashCode()
@@ -94,12 +100,32 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
             );
     }
 
-    private class GenerationResult(string ns, string usingDirectives, TypeDeclarationSyntax syntax, ITypeSymbol typeSymbol)
+    private class GenerationResult(
+        string ns,
+        string usingDirectives,
+        TypeDeclarationSyntax syntax,
+        ITypeSymbol typeSymbol)
     {
         public ITypeSymbol TypeSymbol { get; } = typeSymbol;
         public string Namespace { get; } = ns;
         public string UsingDirectives { get; } = usingDirectives;
         public TypeDeclarationSyntax Syntax { get; set; } = syntax;
+    }
+
+    private static bool ShouldIgnoreChecks(ITypeSymbol sourceType)
+    {
+        return
+            IgnoredTypes.Contains(sourceType.Name)
+            ||
+            (
+                (
+                    Links.CoreLookupTable.Any(x => sourceType.Name.StartsWith(x.Key))
+                    ||
+                    sourceType.Name.StartsWith("Paged")
+                )
+                &&
+                sourceType.Name.EndsWith("Link")
+            );
     }
 
     public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
@@ -117,7 +143,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
             {
                 MethodDeclarationSyntax method => ModelExtensions.GetTypeInfo(target.Semantic, method.ReturnType),
                 PropertyDeclarationSyntax property => ModelExtensions.GetTypeInfo(target.Semantic, property.Type),
-                _ => (TypeInfo?)null
+                _ => (TypeInfo?) null
             })?.Type;
 
             if (sourceOfTruthType is null) continue;
@@ -156,14 +182,14 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
             foreach (var baseSymbol in TypeUtils.GetBaseTypes(typeSymbol))
                 interfaces = interfaces.Except(baseSymbol.AllInterfaces);
 
-
             foreach (var iface in interfaces)
             {
                 var targetMembers = iface.GetMembers(sourceOfTruthName);
 
                 if (targetMembers.Length > 0)
                 {
-                    targetLogger.Log($"{target.TypeSymbol}: {targetMembers.Length} candidate members for {iface} ({interfaces.Count} interfaces total)");
+                    targetLogger.Log(
+                        $"{target.TypeSymbol}: {targetMembers.Length} candidate members for {iface} ({interfaces.Count} interfaces total)");
                 }
 
                 foreach (var member in targetMembers)
@@ -174,29 +200,38 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                         continue;
                     }
 
+                    if (ShouldIgnoreChecks(sourceOfTruthType))
+                    {
+                        if (validTargets.Add(member))
+                            targetLogger.Log($"{target.TypeSymbol}: adding target {member} ({iface})");
+
+                        continue;
+                    }
+
                     switch (member)
                     {
                         case IMethodSymbol method when target.MemberDeclarationSyntax is MethodDeclarationSyntax:
-                            if (!target.Semantic.Compilation.HasImplicitConversion(sourceOfTruthType,
+                            if (!target.Semantic.Compilation.HasImplicitConversion(
+                                    sourceOfTruthType,
                                     method.ReturnType))
                             {
                                 targetLogger.Warn(
-                                    $"{target.TypeSymbol}: No conversion between {sourceOfTruthType.Name} -> {method.ReturnType.Name}");
+                                    $"{target.TypeSymbol}: No conversion between {sourceOfTruthType.ToDisplayString()} -> {method.ReturnType.ToDisplayString()}");
                                 break;
                             }
 
-                            if(validTargets.Add(member))
+                            if (validTargets.Add(member))
                                 targetLogger.Log($"{target.TypeSymbol}: adding target {member} ({iface})");
                             break;
                         case IPropertySymbol property when target.MemberDeclarationSyntax is PropertyDeclarationSyntax:
                             if (!target.Semantic.Compilation.HasImplicitConversion(sourceOfTruthType, property.Type))
                             {
                                 targetLogger.Warn(
-                                    $"{target.TypeSymbol}: No conversion between {sourceOfTruthType.Name} -> {property.Type.Name}");
+                                    $"{target.TypeSymbol}: No conversion between {sourceOfTruthType.ToDisplayString()} -> {property.Type.ToDisplayString()}");
                                 break;
                             }
 
-                            if(validTargets.Add(member))
+                            if (validTargets.Add(member))
                                 targetLogger.Log($"{target.TypeSymbol}: adding target {member} ({iface})");
                             break;
                     }

@@ -7,7 +7,7 @@ namespace Discord.Rest;
 public partial class RestMemberActor :
     RestUserActor,
     IMemberActor,
-    IRestActor<ulong, RestMember, MemberIdentity>
+    IRestActor<ulong, RestMember, MemberIdentity, IMemberModel>
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
 
@@ -38,7 +38,7 @@ public partial class RestMemberActor :
 
     [SourceOfTruth]
     internal virtual RestMember CreateEntity(IMemberModel model)
-        => RestMember.Construct(Client, Guild.Identity, model);
+        => RestMember.Construct(Client, this, model);
 
     IUserActor IUserRelationship.User => this;
 }
@@ -47,9 +47,10 @@ public partial class RestMemberActor :
 public partial class RestMember :
     RestUser,
     IMember,
-    IContextConstructable<RestMember, IMemberModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestMember, RestMemberActor, IMemberModel>
 {
-    public IDefinedLoadableEntityEnumerable<ulong, IRole> Roles => throw new NotImplementedException();
+    [SourceOfTruth]
+    public DefinedRoleLink.BackLink<RestMember> Roles => throw new NotImplementedException();
 
     public DateTimeOffset? JoinedAt => Model.JoinedAt;
 
@@ -71,26 +72,23 @@ public partial class RestMember :
 
     internal RestMember(
         DiscordRestClient client,
-        GuildIdentity guild,
         IMemberModel model,
         IUserModel userModel,
-        RestMemberActor? actor = null
-    ) : base(client, userModel)
+        RestMemberActor actor
+    ) : base(client, userModel, actor)
     {
-        Actor = actor ?? new(
-            client,
-            guild,
-            MemberIdentity.Of(this),
-            UserIdentity.FromReferenced<RestUser, DiscordRestClient>(model, model.Id, client)
-        );
+        Actor = actor;
         Model = model;
     }
 
-    public static RestMember Construct(DiscordRestClient client, GuildIdentity guild, IMemberModel model)
+    public static RestMember Construct(DiscordRestClient client, RestMemberActor actor, IMemberModel model)
     {
+        if (actor is RestCurrentMemberActor currentMemberActor)
+            return RestCurrentMember.Construct(client, currentMemberActor, model);
+        
         if(model.Id == client.CurrentUser.Id)
-            return RestCurrentMember.Construct(client, guild, model);
-
+            return RestCurrentMember.Construct(client, actor.Guild.CurrentMember, model);
+        
         if (model is not IModelSourceOf<IUserModel?> userModelSource)
             throw new ArgumentException($"Expected {model.GetType()} to be a {typeof(IModelSourceOf<IUserModel?>)}",
                 nameof(model));
@@ -98,7 +96,7 @@ public partial class RestMember :
         if (userModelSource.Model is null)
             throw new ArgumentNullException(nameof(userModelSource), "Expected 'user' to be a non-null model");
 
-        return new RestMember(client, guild, model, userModelSource.Model);
+        return new RestMember(client, model, userModelSource.Model, actor);
     }
 
     public ValueTask UpdateAsync(IMemberModel model, CancellationToken token = default)

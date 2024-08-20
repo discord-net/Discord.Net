@@ -7,7 +7,7 @@ namespace Discord;
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct EmbedImage :
     IEntityProperties<Models.Json.EmbedImage>,
-    IConstructable<EmbedImage, IEmbedImageModel>
+    IModelConstructable<EmbedImage, IEmbedImageModel>
 {
     /// <summary>
     ///     The URL of the image.

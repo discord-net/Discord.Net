@@ -8,7 +8,7 @@ namespace Discord;
 ///     Represents a select menu component defined at
 ///     <see href="https://discord.com/developers/docs/interactions/message-components#select-menu-object" />
 /// </summary>
-public class SelectMenuComponent : IMessageComponent, IConstructable<SelectMenuComponent, ISelectMenuComponentModel>
+public class SelectMenuComponent : IMessageComponent, IModelConstructable<SelectMenuComponent, ISelectMenuComponentModel>
 {
     internal SelectMenuComponent(
         string customId, IEnumerable<SelectMenuOption>? options, string? placeholder,

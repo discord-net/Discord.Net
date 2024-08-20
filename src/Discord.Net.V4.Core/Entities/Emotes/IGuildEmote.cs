@@ -34,22 +34,9 @@ public partial interface IGuildEmote :
     /// </summary>
     bool IsAvailable { get; }
 
-    IDefinedLoadableEntityEnumerable<ulong, IRole> Roles { get; }
+    RoleLink.Defined Roles { get; }
 
     IUserActor? Creator { get; }
 
-    IEmoteModel IEntityProperties<IEmoteModel>.ToApiModel(IEmoteModel? existing)
-        => ToApiModel(existing);
-
-    new IEmoteModel ToApiModel(IEmoteModel? existing = null)
-        => existing ?? new Models.Json.GuildEmote
-        {
-            Id = Id,
-            RequireColons = RequireColons,
-            Animated = IsAnimated,
-            Available = IsAvailable,
-            Managed = IsManaged,
-            Name = Name ?? string.Empty,
-            RoleIds = Roles.Ids.ToArray()
-        };
+    DiscordEmojiId IIdentifiable<DiscordEmojiId>.Id => new(Name, (this as ISnowflakeEntity<IGuildEmoteModel>).Id);
 }

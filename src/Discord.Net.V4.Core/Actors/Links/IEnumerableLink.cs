@@ -2,7 +2,8 @@ using Discord.Models;
 
 namespace Discord;
 
-public interface IEnumerableLink<out TActor, TId, TEntity, in TModel> :
+[BackLinkable]
+public partial interface IEnumerableLink<out TActor, TId, TEntity, in TModel> :
     ILink<TActor, TId, TEntity, TModel>
     where TActor : class, IActor<TId, TEntity>
     where TEntity : class, IEntity<TId, TModel>

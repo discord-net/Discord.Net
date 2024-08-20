@@ -8,7 +8,7 @@ namespace Discord;
 /// </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct EmbedAuthor : IEntityProperties<Models.Json.EmbedAuthor>,
-    IConstructable<EmbedAuthor, IEmbedAuthorModel>
+    IModelConstructable<EmbedAuthor, IEmbedAuthorModel>
 {
     /// <summary>
     ///     The name of the author field.

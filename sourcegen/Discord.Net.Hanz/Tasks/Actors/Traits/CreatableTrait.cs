@@ -12,18 +12,18 @@ public static class CreatableTrait
         INamedTypeSymbol actorInterface,
         ITypeSymbol entityType,
         ITypeSymbol modelType,
-        ITypeSymbol apiParamsType,
+        ITypeSymbol? apiParamsType,
         ITypeSymbol idType,
-        ITypeSymbol propertiesType,
+        ITypeSymbol? propertiesType,
         IMethodSymbol route,
         MemberAccessExpressionSyntax routeMemberAccess)
     {
         public INamedTypeSymbol ActorInterface { get; } = actorInterface;
         public ITypeSymbol EntityType { get; } = entityType;
         public ITypeSymbol ModelType { get; } = modelType;
-        public ITypeSymbol ApiParamsType { get; } = apiParamsType;
+        public ITypeSymbol? ApiParamsType { get; } = apiParamsType;
         public ITypeSymbol IdType { get; } = idType;
-        public ITypeSymbol PropertiesType { get; } = propertiesType;
+        public ITypeSymbol? PropertiesType { get; } = propertiesType;
         public IMethodSymbol Route { get; } = route;
         public MemberAccessExpressionSyntax RouteMemberAccess { get; } = routeMemberAccess;
     }
@@ -41,7 +41,7 @@ public static class CreatableTrait
             return;
         }
 
-        var actorInterface = EntityTraits.GetActorInterface(target.InterfaceSymbol);
+        var actorInterface = EntityTraits.GetCoreActorInterface(target.InterfaceSymbol);
 
         if (actorInterface is null)
         {
@@ -66,13 +66,20 @@ public static class CreatableTrait
         }
 
         var isActorCreatable = traitAttribute.AttributeClass?.Name is "ActorCreatableAttribute";
+        var isCanonicalCreatable = traitAttribute.AttributeClass?.TypeArguments.Length == 0;
 
-        logger.Log($"{target.InterfaceSymbol}: {traitAttribute}? {isActorCreatable}");
+        logger.Log(
+            $"{target.InterfaceSymbol}: {traitAttribute}: actor: {isActorCreatable}, canonical: {isCanonicalCreatable}");
+
+        var hasRouteGenericParameters = !isCanonicalCreatable;
+        var routeGenericParametersIndex = isActorCreatable ? 2 : 1;
 
         var route = EntityTraits.GetRouteSymbol(
             routeMemberAccess,
             target.SemanticModel,
-            traitAttribute.ConstructorArguments[isActorCreatable ? 2 : 1].Values.Length
+            hasRouteGenericParameters
+                ? traitAttribute.ConstructorArguments[routeGenericParametersIndex].Values.Length
+                : 0
         );
 
         if (route is not IMethodSymbol {ReturnType: INamedTypeSymbol returnType} routeMethod)
@@ -81,9 +88,10 @@ public static class CreatableTrait
             return;
         }
 
-        if (traitAttribute.ConstructorArguments[isActorCreatable ? 2 : 1].Values.Length > 0)
+        if (hasRouteGenericParameters &&
+            traitAttribute.ConstructorArguments[routeGenericParametersIndex].Values.Length > 0)
         {
-            var genericNames = traitAttribute.ConstructorArguments[isActorCreatable ? 2 : 1]
+            var genericNames = traitAttribute.ConstructorArguments[routeGenericParametersIndex]
                 .Values
                 .Select(x => x.Value!.ToString());
 
@@ -102,9 +110,11 @@ public static class CreatableTrait
             );
         }
 
-        var apiParams = returnType.TypeArguments[0];
+        var apiParams = isCanonicalCreatable ? null : returnType.TypeArguments[0];
         var idType = actorInterface.TypeArguments[0];
-        var properties = (INamedTypeSymbol) traitAttribute.AttributeClass!.TypeArguments[0];
+        var properties = isCanonicalCreatable
+            ? null
+            : (INamedTypeSymbol) traitAttribute.AttributeClass!.TypeArguments[0];
 
         var creatableTarget = new Target(
             actorInterface,
@@ -117,7 +127,7 @@ public static class CreatableTrait
             routeMemberAccess
         );
 
-        switch (traitAttribute.AttributeClass.Name)
+        switch (traitAttribute.AttributeClass!.Name)
         {
             case "CreatableAttribute":
                 ProcessCreatable(ref syntax, target, creatableTarget, logger);
@@ -127,6 +137,8 @@ public static class CreatableTrait
                 break;
         }
 
+        if (properties is null)
+            return;
 
         var createProperties = TypeUtils.GetBaseTypesAndThis(properties)
             .SelectMany(x => x.GetMembers().OfType<IPropertySymbol>())
@@ -388,15 +400,21 @@ public static class CreatableTrait
         Logger logger)
     {
         var interfaceName =
-            $"Discord.ICreatable<" +
-            $"{target.InterfaceSymbol}, " +
-            $"{creatableTarget.EntityType}, " +
-            $"{creatableTarget.IdType}, " +
-            $"{creatableTarget.PropertiesType}, " +
-            $"{creatableTarget.ApiParamsType}, " +
-            $"{creatableTarget.ModelType}>";
+            creatableTarget.PropertiesType is null
+                ? "Discord.ICanonicallyCreatable<" +
+                  $"{target.InterfaceSymbol}, " +
+                  $"{creatableTarget.IdType}" +
+                  ">"
+                : $"Discord.ICreatable<" +
+                  $"{target.InterfaceSymbol}, " +
+                  $"{creatableTarget.EntityType}, " +
+                  $"{creatableTarget.IdType}, " +
+                  $"{creatableTarget.PropertiesType}, " +
+                  $"{creatableTarget.ApiParamsType}, " +
+                  $"{creatableTarget.ModelType}>";
 
         var extraParameters = new Dictionary<IParameterSymbol, ParameterSyntax>(SymbolEqualityComparer.Default);
+
         var routeInvocation = SyntaxFactory.InvocationExpression(
             creatableTarget.RouteMemberAccess,
             EntityTraits.ParseRouteArguments(creatableTarget.Route, target, logger, extra =>
@@ -407,12 +425,16 @@ public static class CreatableTrait
                         SymbolEqualityComparer.Default
                     )
                     ||
-                    target.SemanticModel.Compilation
-                        .ClassifyCommonConversion(
-                            creatableTarget.ApiParamsType,
-                            extra.Type
-                        )
-                        .Exists
+                    (
+                        creatableTarget.ApiParamsType is not null
+                        &&
+                        target.SemanticModel.Compilation
+                            .ClassifyCommonConversion(
+                                creatableTarget.ApiParamsType,
+                                extra.Type
+                            )
+                            .Exists
+                    )
                 )
                 {
                     return SyntaxFactory.Argument(SyntaxFactory.IdentifierName("args"));
@@ -447,6 +469,10 @@ public static class CreatableTrait
             modifiers = modifiers.Add(SyntaxFactory.Token(SyntaxKind.NewKeyword));
         }
 
+        var secondArgName = creatableTarget.ApiParamsType is not null
+            ? "args"
+            : "id";
+        
         var parameterList = SyntaxFactory.ParameterList(
             SyntaxFactory.SeparatedList([
                 SyntaxFactory.Parameter(
@@ -459,8 +485,8 @@ public static class CreatableTrait
                 SyntaxFactory.Parameter(
                     [],
                     [],
-                    SyntaxFactory.ParseTypeName(creatableTarget.ApiParamsType.ToDisplayString()),
-                    SyntaxFactory.Identifier("args"),
+                    SyntaxFactory.ParseTypeName((creatableTarget.ApiParamsType ?? creatableTarget.IdType).ToDisplayString()),
+                    SyntaxFactory.Identifier(secondArgName),
                     null
                 ),
                 ..extraParameters.Select(x =>
@@ -475,6 +501,14 @@ public static class CreatableTrait
             ])
         );
 
+        var routeType = creatableTarget.ApiParamsType is not null
+            ? $"IApiInOutRoute<{creatableTarget.ApiParamsType}, {creatableTarget.ModelType}>"
+            : "IApiRoute";
+
+        var secondArg = creatableTarget.ApiParamsType is not null
+            ? $"{creatableTarget.ApiParamsType} args"
+            : $"{creatableTarget.IdType} id";
+        
         syntax = syntax
             .AddBaseListTypes(
                 SyntaxFactory.SimpleBaseType(
@@ -485,10 +519,10 @@ public static class CreatableTrait
             )
             .AddMembers(
                 SyntaxFactory.ParseMemberDeclaration(
-                    $"IApiInOutRoute<{creatableTarget.ApiParamsType}, {creatableTarget.ModelType}> CreateRoute{parameterList.NormalizeWhitespace()} => {routeInvocation.NormalizeWhitespace()};"
+                    $"{routeType} CreateRoute{parameterList.NormalizeWhitespace()} => {routeInvocation.NormalizeWhitespace()};"
                 )!.WithModifiers(modifiers),
                 SyntaxFactory.ParseMemberDeclaration(
-                    $"static IApiInOutRoute<{creatableTarget.ApiParamsType}, {creatableTarget.ModelType}> {interfaceName}.CreateRoute(IPathable path, {creatableTarget.ApiParamsType} args) => CreateRoute(path, args);"
+                    $"static {routeType} {interfaceName}.CreateRoute(IPathable path, {secondArg}) => CreateRoute(path, {secondArgName});"
                 )!
             );
     }

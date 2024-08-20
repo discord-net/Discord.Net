@@ -1,13 +1,10 @@
 using Discord.Models;
-using Discord.Models.Json;
-using Discord.Rest.Actors;
-using Discord.Rest;
 
 namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestUserActor :
-    RestActor<ulong, RestCurrentUser, UserIdentity>,
+    RestActor<ulong, RestUser, UserIdentity, IUserModel>,
     IUserActor
 {
     internal override UserIdentity Identity { get; }
@@ -22,8 +19,8 @@ public partial class RestUserActor :
     }
 
     [SourceOfTruth]
-    internal virtual RestUser CreateEntity(IUserModel model)
-        => RestUser.Construct(Client, model);
+    internal override RestUser CreateEntity(IUserModel model)
+        => RestUser.Construct(Client, this, model);
 
     [SourceOfTruth]
     internal RestDMChannel CreateEntity(IDMChannelModel model)
@@ -34,7 +31,7 @@ public partial class RestUserActor :
 public partial class RestUser :
     RestEntity<ulong>,
     IUser,
-    IConstructable<RestUser, IUserModel, DiscordRestClient>
+    IRestConstructable<RestUser, RestUserActor, IUserModel>
 {
     public string? AvatarId => Model.Avatar;
 
@@ -61,19 +58,20 @@ public partial class RestUser :
     internal RestUser(
         DiscordRestClient client,
         IUserModel model,
-        RestUserActor? actor = null
+        RestUserActor actor
     ) : base(client, model.Id)
     {
-        Actor = actor ?? new(client, UserIdentity.Of(this));
+        Actor = actor;
         _model = model;
     }
 
-    public static RestUser Construct(DiscordRestClient client, IUserModel model)
+    public static RestUser Construct(DiscordRestClient client, RestUserActor actor, IUserModel model)
     {
-        return model switch
+        return (model, actor) switch
         {
-            ISelfUserModel selfUserModel => RestCurrentUser.Construct(client, selfUserModel),
-            _ => new RestUser(client, model)
+            (ISelfUserModel currentUserModel, RestCurrentUserActor currentUserActor) 
+                => RestCurrentUser.Construct(client, currentUserActor, currentUserModel),
+            _ => new RestUser(client, model, actor)
         };
     }
 

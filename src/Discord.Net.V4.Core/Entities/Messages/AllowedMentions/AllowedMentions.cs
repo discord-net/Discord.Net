@@ -10,7 +10,7 @@ public readonly struct AllowedMentions(
     IEnumerable<ulong>? roleIds,
     IEnumerable<ulong>? userIds,
     bool mentionRepliedUser)
-    : IEntityProperties<Models.Json.AllowedMentions>, IConstructable<AllowedMentions, Models.Json.AllowedMentions>
+    : IEntityProperties<Models.Json.AllowedMentions>, IModelConstructable<AllowedMentions, Models.Json.AllowedMentions>
 {
     public static readonly AllowedMentions None = new();
     public static readonly AllowedMentions All = new(AllowedMentionTypes.All);

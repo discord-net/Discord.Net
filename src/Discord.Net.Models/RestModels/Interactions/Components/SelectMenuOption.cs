@@ -14,14 +14,14 @@ public sealed class SelectMenuOption : IModelSource, ISelectMenuOptionModel, IMo
     public Optional<string> Description { get; set; }
 
     [JsonPropertyName("emoji")]
-    public Optional<IEmoteModel> Emoji { get; set; }
+    public Optional<DiscordEmojiId> Emoji { get; set; }
 
     [JsonPropertyName("default")]
     public Optional<bool> IsDefault { get; set; }
 
     string? ISelectMenuOptionModel.Description => ~Description;
 
-    IEmoteModel? ISelectMenuOptionModel.Emote => ~Emoji;
+    DiscordEmojiId? ISelectMenuOptionModel.Emote => Emoji.ToNullable();
 
     bool? ISelectMenuOptionModel.IsDefault => ~IsDefault;
 

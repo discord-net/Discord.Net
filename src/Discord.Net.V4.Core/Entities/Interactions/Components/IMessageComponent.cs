@@ -7,7 +7,7 @@ namespace Discord;
 ///     Represents a message component on a message.
 /// </summary>
 public interface IMessageComponent : IEntityProperties<MessageComponent>,
-    IConstructable<IMessageComponent, IMessageComponentModel>
+    IModelConstructable<IMessageComponent, IMessageComponentModel>
 {
     /// <summary>
     ///     Gets the <see cref="ComponentType" /> of this Message Component.
@@ -19,7 +19,7 @@ public interface IMessageComponent : IEntityProperties<MessageComponent>,
     /// </summary>
     string? CustomId { get; }
 
-    static IMessageComponent IConstructable<IMessageComponent, IMessageComponentModel, IDiscordClient>.Construct(
+    static IMessageComponent IModelConstructable<IMessageComponent, IMessageComponentModel, IDiscordClient>.Construct(
         IDiscordClient client, IMessageComponentModel model)
         => Construct(client, model);
 

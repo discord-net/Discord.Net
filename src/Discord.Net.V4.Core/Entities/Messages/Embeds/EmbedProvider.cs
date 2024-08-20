@@ -6,7 +6,7 @@ namespace Discord;
 /// <summary> A provider field for an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct EmbedProvider : IEntityProperties<Models.Json.EmbedProvider>,
-    IConstructable<EmbedProvider, IEmbedProviderModel>
+    IModelConstructable<EmbedProvider, IEmbedProviderModel>
 {
     /// <summary>
     ///     The name of the provider.

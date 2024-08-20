@@ -63,41 +63,66 @@ public static partial class Routes
         new ApiOutRoute<Message>(nameof(CrosspostMessage), RequestMethod.Post,
             $"/channels/{channelId}/messages/{messageId}/crosspost", (ScopeType.Channel, channelId));
 
-    public static IApiRoute CreateReaction([IdHeuristic<IChannel>] ulong channelId,
-        [IdHeuristic<IMessage>] ulong messageId, string emoji) =>
-        new ApiRoute(nameof(CreateReaction), RequestMethod.Put,
-            $"/channels/{channelId}/messages/{messageId}/reactions/{WebUtility.UrlEncode(emoji)}/@me",
-            (ScopeType.Channel, channelId));
+    public static IApiRoute CreateReaction(
+        [IdHeuristic<IChannel>] ulong channelId,
+        [IdHeuristic<IMessage>] ulong messageId,
+        [IdHeuristic<IReaction>] DiscordEmojiId emoji
+    ) => new ApiRoute(nameof(CreateReaction), RequestMethod.Put,
+        $"/channels/{channelId}/messages/{messageId}/reactions/{emoji.ToURLEncoded()}/@me",
+        (ScopeType.Channel, channelId));
 
-    public static IApiRoute DeleteReaction([IdHeuristic<IChannel>] ulong channelId,
-        [IdHeuristic<IMessage>] ulong messageId, string emoji) =>
-        new ApiRoute(nameof(DeleteReaction), RequestMethod.Delete,
-            $"/channels/{channelId}/messages/{messageId}/reactions/{WebUtility.UrlEncode(emoji)}/@me",
-            (ScopeType.Channel, channelId));
+    public static IApiRoute DeleteOwnReaction(
+        [IdHeuristic<IChannel>] ulong channelId,
+        [IdHeuristic<IMessage>] ulong messageId,
+        [IdHeuristic<IReaction>] DiscordEmojiId emoji
+    ) => new ApiRoute(
+        nameof(DeleteOwnReaction),
+        RequestMethod.Delete,
+        $"/channels/{channelId}/messages/{messageId}/reactions/{emoji.ToURLEncoded()}/@me",
+        (ScopeType.Channel, channelId)
+    );
 
-    public static IApiRoute DeleteUserReaction([IdHeuristic<IChannel>] ulong channelId,
-        [IdHeuristic<IMessage>] ulong messageId, string emoji, [IdHeuristic<IUser>] ulong userId) =>
-        new ApiRoute(nameof(DeleteUserReaction), RequestMethod.Delete,
-            $"/channels/{channelId}/messages/{messageId}/reactions/{WebUtility.UrlEncode(emoji)}/{userId}",
-            (ScopeType.Channel, channelId));
+    public static IApiRoute DeleteUserReaction(
+        [IdHeuristic<IChannel>] ulong channelId,
+        [IdHeuristic<IMessage>] ulong messageId,
+        [IdHeuristic<IReaction>] DiscordEmojiId emoji,
+        [IdHeuristic<IUser>] ulong userId
+    ) => new ApiRoute(
+        nameof(DeleteUserReaction),
+        RequestMethod.Delete,
+        $"/channels/{channelId}/messages/{messageId}/reactions/{emoji.ToURLEncoded()}/{userId}",
+        (ScopeType.Channel, channelId)
+    );
 
-    public static IApiOutRoute<Reaction[]> GetReactions([IdHeuristic<IChannel>] ulong channelId,
-        [IdHeuristic<IMessage>] ulong messageId, string emoji,
-        ulong? afterId = default, int? limit = default, ReactionType type = ReactionType.Normal) =>
-        new ApiOutRoute<Reaction[]>(nameof(GetReactions), RequestMethod.Get,
-            $"/channels/{channelId}/messages/{messageId}/reactions/{WebUtility.UrlEncode(emoji)}{RouteUtils.GetUrlEncodedQueryParams(("after", afterId), ("limit", limit), ("type", type))}",
-            (ScopeType.Channel, channelId));
+    public static IApiOutRoute<User[]> GetReactions(
+        [IdHeuristic<IChannel>] ulong channelId,
+        [IdHeuristic<IMessage>] ulong messageId,
+        [IdHeuristic<IReaction>] DiscordEmojiId emoji,
+        ulong? afterId = default,
+        int? limit = default,
+        ReactionType? type = null
+    ) => new ApiOutRoute<User[]>(
+        nameof(GetReactions),
+        RequestMethod.Get,
+        $"/channels/{channelId}/messages/{messageId}/reactions/{emoji.ToURLEncoded()}{RouteUtils.GetUrlEncodedQueryParams(("after", afterId), ("limit", limit), ("type", type))}",
+        (ScopeType.Channel, channelId)
+    );
 
     public static IApiRoute DeleteAllReactions([IdHeuristic<IChannel>] ulong channelId,
         [IdHeuristic<IMessage>] ulong messageId) =>
         new ApiRoute(nameof(DeleteAllReactions), RequestMethod.Delete,
             $"/channels/{channelId}/messages/{messageId}/reactions", (ScopeType.Channel, channelId));
 
-    public static IApiRoute DeleteAllReactionsForEmoji([IdHeuristic<IChannel>] ulong channelId,
-        [IdHeuristic<IMessage>] ulong messageId, string emoji) =>
-        new ApiRoute(nameof(DeleteAllReactionsForEmoji), RequestMethod.Delete,
-            $"/channels/{channelId}/messages/{messageId}/reactions/{WebUtility.UrlEncode(emoji)}",
-            (ScopeType.Channel, channelId));
+    public static IApiRoute DeleteAllReactionsForEmoji(
+        [IdHeuristic<IChannel>] ulong channelId,
+        [IdHeuristic<IMessage>] ulong messageId,
+        [IdHeuristic<IReaction>] DiscordEmojiId emoji
+    ) => new ApiRoute(
+        nameof(DeleteAllReactionsForEmoji),
+        RequestMethod.Delete,
+        $"/channels/{channelId}/messages/{messageId}/reactions/{emoji.ToURLEncoded()}",
+        (ScopeType.Channel, channelId)
+    );
 
     public static IApiInOutRoute<ModifyMessageParams, Message> ModifyMessage([IdHeuristic<IChannel>] ulong channelId,
         [IdHeuristic<IMessage>] ulong messageId,
@@ -172,6 +197,16 @@ public static partial class Routes
         GroupDmAddRecipientParams body) =>
         new ApiInRoute<GroupDmAddRecipientParams>(nameof(GroupDmAddRecipient), RequestMethod.Put,
             $"/channels/{channelId}/recipients/{userId}", body, ContentType.JsonBody, (ScopeType.Channel, channelId));
+
+    public static IApiRoute GroupDmRemoveRecipient(
+        [IdHeuristic<IGroupChannel>] ulong channelId,
+        [IdHeuristic<IUser>] ulong userId
+    ) => new ApiRoute(
+        nameof(GroupDmAddRecipient),
+        RequestMethod.Get,
+        $"/channels/{channelId}/recipients/{userId}",
+        (ScopeType.Channel, channelId)
+    );
 
     public static IApiInOutRoute<StartThreadFromMessageParams, Channel> StartThreadFromMessage(
         [IdHeuristic<IThreadableChannel>] ulong channelId,

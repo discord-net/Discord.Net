@@ -8,7 +8,7 @@ namespace Discord;
 /// </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct EmbedVideo : IEntityProperties<Models.Json.EmbedVideo>,
-    IConstructable<EmbedVideo, IEmbedVideoModel>
+    IModelConstructable<EmbedVideo, IEmbedVideoModel>
 {
     /// <summary>
     ///     The URL of the video.

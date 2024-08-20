@@ -3,9 +3,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 public sealed class Reaction :
-    IReactionModel,
-    IModelSource,
-    IModelSourceOf<IEmoteModel>
+    IReactionModel
 {
     [JsonPropertyName("count")]
     public int Total { get; set; }
@@ -17,7 +15,7 @@ public sealed class Reaction :
     public bool IsMeBurst { get; set; }
 
     [JsonPropertyName("emoji")]
-    public required IEmoteModel Emoji { get; set; }
+    public required DiscordEmojiId Emoji { get; set; }
 
     [JsonPropertyName("count_details")]
     public required ReactionCountDetails CountDetails { get; set; }
@@ -25,20 +23,11 @@ public sealed class Reaction :
     [JsonPropertyName("burst_colors")]
     public required string[] Colors { get; set; }
 
-    ulong? IReactionModel.EmojiId => (Emoji as GuildEmote)?.Id;
-
-    string? IReactionModel.EmojiName => Emoji.Name;
-
     int IReactionModel.BurstCount => CountDetails.BurstCount;
 
     int IReactionModel.NormalCount => CountDetails.NormalCount;
     bool IReactionModel.MeBurst => IsMeBurst;
     string[] IReactionModel.BurstColors => Colors;
 
-    public IEnumerable<IModel> GetDefinedModels()
-    {
-        yield return Emoji;
-    }
-
-    IEmoteModel IModelSourceOf<IEmoteModel>.Model => Emoji;
+    DiscordEmojiId IEntityModel<DiscordEmojiId>.Id => Emoji;
 }

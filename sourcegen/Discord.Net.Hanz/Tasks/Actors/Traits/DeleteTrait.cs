@@ -18,7 +18,7 @@ public static class DeleteTrait
             return;
 
         // get the id type
-        var actorInterface = EntityTraits.GetActorInterface(target.InterfaceSymbol);
+        var actorInterface = EntityTraits.GetCoreActorInterface(target.InterfaceSymbol);
 
         if (actorInterface is null)
             return;

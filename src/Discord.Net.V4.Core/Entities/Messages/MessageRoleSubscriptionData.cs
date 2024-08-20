@@ -6,7 +6,7 @@ namespace Discord;
 ///     Represents a role subscription data in <see cref="IMessage" />.
 /// </summary>
 public readonly struct
-    MessageRoleSubscriptionData : IConstructable<MessageRoleSubscriptionData, IMessageRoleSubscriptionData>
+    MessageRoleSubscriptionData : IModelConstructable<MessageRoleSubscriptionData, IMessageRoleSubscriptionData>
 {
     /// <summary>
     ///     The id of the sku and listing that the user is subscribed to.

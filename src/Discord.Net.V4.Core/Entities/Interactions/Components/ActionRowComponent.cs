@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace Discord;
 
-public sealed class ActionRowComponent : IMessageComponent, IConstructable<ActionRowComponent, IActionRowModel>
+public sealed class ActionRowComponent : IMessageComponent, IModelConstructable<ActionRowComponent, IActionRowModel>
 {
     internal ActionRowComponent(IEnumerable<IMessageComponent> components)
     {

@@ -110,7 +110,7 @@ public static class Optional
         where T : struct
         => value.HasValue ? Some(value.Value) : Optional<T>.Unspecified;
     public static Optional<T> FromNullable<T>(T? value)
-        where T : class
+        where T : class?
         => value is null ? Optional<T>.Unspecified : Some<T>(value);
     public static Optional<T> Some<T>() => Optional<T>.Unspecified;
     public static Optional<T> Some<T>(T value) => new(value);

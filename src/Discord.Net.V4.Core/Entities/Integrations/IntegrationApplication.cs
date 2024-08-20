@@ -8,7 +8,7 @@ public readonly struct IntegrationApplication(
     IUserActor? bot
 ) :
     IIdentifiable<ulong>,
-    IConstructable<IntegrationApplication, Models.IApplicationModel>
+    IModelConstructable<IntegrationApplication, Models.IApplicationModel>
 {
     public readonly ulong Id = id;
     public readonly string Name = name;

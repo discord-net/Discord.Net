@@ -13,13 +13,7 @@ public partial interface IGroupChannel :
     IAudioChannel,
     IGroupChannelActor
 {
-    /// <summary>
-    ///     Gets the users that can access this channel.
-    /// </summary>
-    /// <returns>
-    ///     A <see cref="IDefinedLoadableEntityEnumerable{TId,TEntity}" /> of users that can access this channel.
-    /// </returns>
-    IDefinedLoadableEntityEnumerable<ulong, IUser> Recipients { get; }
+    UserLink.Defined.BackLink<IGroupChannel> Recipients { get; }
 
     [SourceOfTruth]
     new IGroupDMChannelModel GetModel();

@@ -6,7 +6,7 @@ namespace Discord;
 /// <summary> A footer field for an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct EmbedFooter : IEntityProperties<Models.Json.EmbedFooter>,
-    IConstructable<EmbedFooter, IEmbedFooterModel>
+    IModelConstructable<EmbedFooter, IEmbedFooterModel>
 {
     /// <summary>
     ///     The text of the footer field.

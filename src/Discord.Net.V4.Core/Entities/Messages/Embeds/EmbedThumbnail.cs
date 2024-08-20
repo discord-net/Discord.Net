@@ -6,7 +6,7 @@ namespace Discord;
 /// <summary> A thumbnail featured in an <see cref="Embed" />. </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct EmbedThumbnail : IEntityProperties<Models.Json.EmbedThumbnail>,
-    IConstructable<EmbedThumbnail, IEmbedThumbnailModel>
+    IModelConstructable<EmbedThumbnail, IEmbedThumbnailModel>
 {
     /// <summary>
     ///     The URL of the thumbnail.

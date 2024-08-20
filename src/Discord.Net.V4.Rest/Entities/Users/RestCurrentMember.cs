@@ -6,7 +6,7 @@ namespace Discord.Rest;
 public sealed partial class RestCurrentMemberActor :
     RestMemberActor,
     ICurrentMemberActor,
-    IRestActor<ulong, RestCurrentMember, CurrentMemberIdentity>
+    IRestActor<ulong, RestCurrentMember, CurrentMemberIdentity, IMemberModel>
 {
     [SourceOfTruth]
     public override RestCurrentUserVoiceStateActor VoiceState { get; }
@@ -39,30 +39,29 @@ public sealed partial class RestCurrentMemberActor :
 
     [SourceOfTruth]
     internal override RestCurrentMember CreateEntity(IMemberModel model)
-        => RestCurrentMember.Construct(Client, Guild.Identity, model);
+        => RestCurrentMember.Construct(Client, this, model);
 }
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestCurrentMember :
     RestMember,
     ICurrentMember,
-    IContextConstructable<RestCurrentMember, IMemberModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestCurrentMember, RestCurrentMemberActor, IMemberModel>
 {
     [ProxyInterface]
     internal override RestCurrentMemberActor Actor { get; }
 
     internal RestCurrentMember(
         DiscordRestClient client,
-        GuildIdentity guild,
         IMemberModel model,
         IUserModel userModel,
-        RestCurrentMemberActor? actor = null
-    ) : base(client, guild, model, userModel, actor)
+        RestCurrentMemberActor actor
+    ) : base(client, model, userModel, actor)
     {
-        Actor = actor ?? new(client, guild, CurrentMemberIdentity.Of(this));
+        Actor = actor;
     }
 
-    public new static RestCurrentMember Construct(DiscordRestClient client, GuildIdentity guild, IMemberModel model)
+    public static RestCurrentMember Construct(DiscordRestClient client, RestCurrentMemberActor actor, IMemberModel model)
     {
         if (model is not IModelSourceOf<IUserModel?> userModelSource)
             throw new ArgumentException($"Expected {model.GetType()} to be a {typeof(IModelSourceOf<IUserModel?>)}",
@@ -71,6 +70,6 @@ public sealed partial class RestCurrentMember :
         if (userModelSource.Model is null)
             throw new ArgumentNullException(nameof(userModelSource), "Expected 'user' to be a non-null model");
 
-        return new RestCurrentMember(client, guild, model, userModelSource.Model);
+        return new RestCurrentMember(client, model, userModelSource.Model, actor);
     }
 }

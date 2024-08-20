@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 namespace Discord;
 
 public readonly struct BulkBanResult(ulong[] bannedUsers, ulong[] failedUsers)
-    : IConstructable<BulkBanResult, BulkBanResponse>
+    : IModelConstructable<BulkBanResult, BulkBanResponse>
 {
     public readonly IReadOnlyCollection<ulong> BannedUsers = bannedUsers.ToImmutableArray();
     public readonly IReadOnlyCollection<ulong> FailedUsers = failedUsers.ToImmutableArray();

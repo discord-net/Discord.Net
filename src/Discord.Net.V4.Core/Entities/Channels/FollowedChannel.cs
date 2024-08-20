@@ -1,7 +1,7 @@
 namespace Discord;
 
 public readonly struct FollowedChannel(IDiscordClient client, ulong channelId, ulong webhookId) :
-    IConstructable<FollowedChannel, Models.Json.FollowedChannel>
+    IModelConstructable<FollowedChannel, Models.Json.FollowedChannel>
 {
     public readonly IChannelActor Channel = client.Channel(channelId);
     public readonly IWebhookActor Webhook = client.Webhook(webhookId);

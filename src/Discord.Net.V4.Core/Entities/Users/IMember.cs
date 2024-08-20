@@ -10,7 +10,8 @@ public partial interface IMember :
     ISnowflakeEntity<IMemberModel>,
     IMemberActor
 {
-    IDefinedLoadableEntityEnumerable<ulong, IRole> Roles { get; }
+    [SourceOfTruth]
+    new RoleLink.Defined.BackLink<IMember> Roles { get; }
 
     /// <summary>
     ///     Gets when this user joined the guild.
@@ -20,7 +21,6 @@ public partial interface IMember :
     ///     <see langword="null" /> when it cannot be obtained.
     /// </returns>
     DateTimeOffset? JoinedAt { get; }
-
 
     /// <summary>
     ///     Gets the nickname for this user.
@@ -68,6 +68,4 @@ public partial interface IMember :
     ///     Gets the public flags for this guild member.
     /// </summary>
     GuildMemberFlags Flags { get; }
-
-    ILoadableEntity<ulong, IRole> Role(ulong id) => Roles[id];
 }

@@ -10,6 +10,9 @@ public partial interface IMessage :
     ISnowflakeEntity<IMessageModel>,
     IMessageActor
 {
+    [SourceOfTruth]
+    new ReactionLink.Defined.Indexable.BackLink<IMessageActor> Reactions { get; }
+    
     /// <summary>
     ///     Gets the type of this message.
     /// </summary>
@@ -123,11 +126,11 @@ public partial interface IMessage :
     /// </returns>
     IReadOnlyCollection<Embed> Embeds { get; }
 
-    IDefinedLoadableEntityEnumerable<ulong, IChannel> MentionedChannels { get; }
+    ChannelLink.Defined MentionedChannels { get; }
 
-    IDefinedLoadableEntityEnumerable<ulong, IRole> MentionedRoles { get; }
+    RoleLink.Defined MentionedRoles { get; }
 
-    IDefinedLoadableEntityEnumerable<ulong, IUser> MentionedUsers { get; }
+    UserLink.Defined MentionedUsers { get; }
 
     /// <summary>
     ///     Gets the activity associated with a message.
@@ -163,11 +166,6 @@ public partial interface IMessage :
     ///     A message's reference, if any is associated.
     /// </returns>
     MessageReference? Reference { get; }
-
-    /// <summary>
-    ///     Gets all reactions included in this message.
-    /// </summary>
-    MessageReactions Reactions { get; }
 
     /// <summary>
     ///     The <see cref="IMessageComponent" />'s attached to this message

@@ -57,6 +57,10 @@ public class DiscordConfig
     /// </returns>
     public const int MaxMessagesPerBatch = 100;
 
+    public const int MaxBulkDeleteMessages = 100;
+
+    public const int MinBulkDeleteMessages = 2;
+    
     /// <summary>
     ///     Returns the max users allowed to be in a request.
     /// </summary>
@@ -72,6 +76,8 @@ public class DiscordConfig
     ///     The maximum number of bans that can be gotten per-batch.
     /// </returns>
     public const int MaxBansPerBatch = 1000;
+
+    public const int MaxBulkBansPerBatch = 200;
 
     /// <summary>
     ///     Returns the max users allowed to be in a request for guild event users.

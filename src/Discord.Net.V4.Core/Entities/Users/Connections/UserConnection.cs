@@ -10,7 +10,7 @@ public readonly struct UserConnection(
     bool showActivity,
     bool isTwoWayLink,
     ConnectionVisibility visibility) : IEntityProperties<Models.Json.UserConnection>,
-    IConstructable<UserConnection, Models.Json.UserConnection>
+    IModelConstructable<UserConnection, Models.Json.UserConnection>
 {
     public readonly string Id = id;
     public readonly string Name = name;

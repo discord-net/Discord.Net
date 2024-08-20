@@ -6,7 +6,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a <see cref="IMessageComponent" /> text input.
 /// </summary>
-public class TextInputComponent : IMessageComponent, IConstructable<TextInputComponent, ITextInputComponentModel>
+public class TextInputComponent : IMessageComponent, IModelConstructable<TextInputComponent, ITextInputComponentModel>
 {
     internal TextInputComponent(string customId, string label, string? placeholder, int? minLength, int? maxLength,
         TextInputStyle style, bool? required, string? value)

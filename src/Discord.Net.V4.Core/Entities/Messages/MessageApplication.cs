@@ -7,7 +7,7 @@ namespace Discord;
 ///     Represents an application found within a <see cref="IMessage" />.
 /// </summary>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-public readonly struct MessageApplication : IConstructable<MessageApplication, IMessageApplicationModel>
+public readonly struct MessageApplication : IModelConstructable<MessageApplication, IMessageApplicationModel>
 {
     /// <summary>
     ///     The snowflake ID of the application.

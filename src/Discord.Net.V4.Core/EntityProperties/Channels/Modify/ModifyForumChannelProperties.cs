@@ -10,7 +10,7 @@ public class ModifyForumChannelProperties : ModifyThreadableChannelProperties
     public Optional<EntityOrId<ulong, ICategoryChannel>?> CategoryId { get; set; }
     public Optional<ChannelFlags> Flags { get; set; }
     public Optional<IEnumerable<ForumTag>> AvailableTags { get; set; }
-    public Optional<IEmote?> DefaultReaction { get; set; }
+    public Optional<IEmote?> DefaultReactionEmoji { get; set; }
     public Optional<SortOrder?> DefaultSortOrder { get; set; }
     public Optional<ForumLayout> DefaultForumLayout { get; set; }
 
@@ -25,7 +25,7 @@ public class ModifyForumChannelProperties : ModifyThreadableChannelProperties
         existing.ParentId = CategoryId.Map(v => v?.Id);
         existing.Flags = Flags.Map(v => (int)v);
         existing.AvailableTags = AvailableTags.Map(v => v.Select(v => v.ToApiModel()).ToArray());
-        existing.DefaultReactionEmoji = DefaultReaction.Map(v => v?.ToDefaultReactionModel());
+        existing.DefaultReactionEmoji = DefaultReactionEmoji.Map(v => v?.Id);
         existing.DefaultForumSortOrder = DefaultSortOrder.Map(v => (int?)v);
         existing.DefaultForumLayout = DefaultForumLayout.Map(v => (int)v);
 

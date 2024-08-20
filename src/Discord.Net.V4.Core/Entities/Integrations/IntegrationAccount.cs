@@ -7,7 +7,7 @@ public readonly struct IntegrationAccount(
     string name
 ):
     IEntityProperties<IIntegrationAccountModel>,
-    IConstructable<IntegrationAccount, IIntegrationAccountModel>
+    IModelConstructable<IntegrationAccount, IIntegrationAccountModel>
 {
     public readonly string Id = id;
     public readonly string Name = name;

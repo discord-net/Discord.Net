@@ -8,31 +8,24 @@ public sealed class ForumTag(
     ulong id,
     string name,
     bool isModerated,
-    IGuildEmoteActor? emote,
-    string? emoji
+    DiscordEmojiId? emote
 ):
     ISnowflakeEntity<ITagModel>,
     IEntityProperties<Models.Json.ForumTag>,
-    IContextConstructable<ForumTag, ITagModel, ForumTag.Context>
+    IModelConstructable<ForumTag, ITagModel>
 {
     public string Name { get; } = name;
     public bool IsModerated { get; } = isModerated;
-    public IGuildEmoteActor? Emote { get; } = emote;
-    public string? Emoji { get; } = emoji;
+    public DiscordEmojiId? Emote { get; } = emote;
 
-    public static ForumTag Construct(IDiscordClient client, Context context, ITagModel model)
+    public static ForumTag Construct(IDiscordClient client,  ITagModel model)
     {
-        var emote = model.EmojiId.HasValue
-            ? client.Guild(context.GuildId).Emote(model.EmojiId.Value)
-            : null;
-
         return new ForumTag(
             client,
             model.Id,
             model.Name,
             model.Moderated,
-            emote,
-            model.EmojiName
+            model.Emoji
         );
     }
 
@@ -40,9 +33,9 @@ public sealed class ForumTag(
     {
         existing ??= new Models.Json.ForumTag {Name = Name};
         existing.Moderated = IsModerated;
-        existing.EmojiName = Emoji;
-        existing.Id = Id;
+        existing.EmojiName = Emote?.Name;
         existing.EmojiId = Emote?.Id;
+        existing.Id = Id;
         return existing;
     }
 

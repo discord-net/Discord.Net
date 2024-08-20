@@ -520,9 +520,9 @@ public static class FetchableTrait
         return interfaceSymbol.AllInterfaces.Any(x => x.ToDisplayString().StartsWith("Discord.IFetchableOfMany"));
     }
 
-    public static bool IsPagedFetchableOfMany(ITypeSymbol interfaceSymbol)
+    public static bool IsPagedFetchableOfMany(ITypeSymbol symbol)
     {
-        return interfaceSymbol
+        return symbol
             .GetAttributes()
             .Any(x =>
                 x.AttributeClass?

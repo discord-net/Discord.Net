@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
+using System.Text;
 
 namespace Discord.Net.Hanz.Utils;
 
@@ -9,6 +10,40 @@ public static class MemberUtils
 {
     public static readonly ConflictEqualityComparer ConflictEquality = new();
 
+    public static string ToSyntaxForm(IParameterSymbol parameter)
+    {
+        var sb = new StringBuilder()
+            .Append(parameter.Type.ToDisplayString())
+            .Append(' ')
+            .Append(parameter.Name);
+
+        if (parameter.HasExplicitDefaultValue)
+            sb.Append(" = ").Append(SyntaxUtils.CreateLiteral(parameter.Type, parameter.ExplicitDefaultValue));
+
+        return sb.ToString();
+    }
+    
+    public static SyntaxTokenList CreateAccessors(Accessibility accessibility)
+    {
+        return SyntaxFactory.TokenList(accessibility switch
+        {
+            Accessibility.Private => [SyntaxFactory.Token(SyntaxKind.PrivateKeyword)],
+            Accessibility.Protected => [SyntaxFactory.Token(SyntaxKind.ProtectedKeyword)],
+            Accessibility.ProtectedOrInternal =>
+            [
+                SyntaxFactory.Token(SyntaxKind.ProtectedKeyword),
+            ],
+            Accessibility.Internal => [SyntaxFactory.Token(SyntaxKind.InternalKeyword)],
+            Accessibility.ProtectedAndInternal =>
+            [
+                SyntaxFactory.Token(SyntaxKind.ProtectedKeyword),
+                SyntaxFactory.Token(SyntaxKind.InternalKeyword)
+            ],
+            Accessibility.Public => [SyntaxFactory.Token(SyntaxKind.PublicKeyword)],
+            _ => []
+        });
+    }
+    
     public static ParameterListSyntax CreateParameterList(
         IMethodSymbol? method, 
         bool withDefaults = true,

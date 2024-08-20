@@ -44,7 +44,7 @@ public sealed class CreateGuildChannelParams
     public Optional<int?> DefaultAutoArchiveDuration { get; set; }
 
     [JsonPropertyName("default_reaction_emoji")]
-    public Optional<DefaultReaction?> DefaultReactionEmoji { get; set; }
+    public Optional<DiscordEmojiId?> DefaultReactionEmoji { get; set; }
 
     [JsonPropertyName("available_tags")]
     public Optional<ForumTag[]?> AvailableTags { get; set; }

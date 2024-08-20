@@ -1,14 +1,12 @@
 namespace Discord.Models;
 
 [ModelEquality]
-public partial interface IReactionModel : IModel
+public partial interface IReactionModel : IEntityModel<DiscordEmojiId>
 {
     int Total { get; }
     int BurstCount { get; }
     int NormalCount { get; }
     bool Me { get; }
     bool MeBurst { get; }
-    ulong? EmojiId { get; }
-    string? EmojiName { get; }
     string[] BurstColors { get; }
 }

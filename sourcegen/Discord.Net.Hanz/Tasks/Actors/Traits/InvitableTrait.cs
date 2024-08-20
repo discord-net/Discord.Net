@@ -17,7 +17,7 @@ public static class InvitableTrait
         if (traitAttribute.AttributeClass is null || traitAttribute.ConstructorArguments.Length != 1)
             return;
 
-        var actorInterface = EntityTraits.GetActorInterface(target.InterfaceSymbol);
+        var actorInterface = EntityTraits.GetCoreActorInterface(target.InterfaceSymbol);
 
         if (actorInterface is null)
             return;

@@ -8,7 +8,7 @@ namespace Discord;
 /// </summary>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct EmbedField : IEntityProperties<Models.Json.EmbedField>,
-    IConstructable<EmbedField, IEmbedFieldModel>
+    IModelConstructable<EmbedField, IEmbedFieldModel>
 {
     /// <summary>
     ///     The name of the field.

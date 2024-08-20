@@ -7,12 +7,12 @@ namespace Discord;
 /// </summary>
 public sealed class Emoji :
     IEmote,
-    IEquatable<Emoji>,
-    IIdentifiable<string>,
-    IConstructable<Emoji, IEmojiModel>
+    IEquatable<Emoji>
 {
     /// <inheritdoc />
     public string Name { get; }
+
+    public DiscordEmojiId Id { get; }
 
     /// <summary>
     ///     Initializes a new <see cref="Emoji" /> class with the provided Unicode.
@@ -21,16 +21,16 @@ public sealed class Emoji :
     public Emoji(string unicode)
     {
         Name = unicode;
+        Id = unicode;
     }
 
-    public static Emoji Construct(IDiscordClient client, IEmojiModel model)
-        => new(model.Name!);
-
-    public IEmoteModel ToApiModel(IEmoteModel? existing = default) =>
-        existing ?? new Models.Json.Emoji {Name = Name};
-
-    string IIdentifiable<string>.Id => Name;
-    IdentityDetail IIdentifiable<string>.Detail => IdentityDetail.Entity;
+    internal Emoji(DiscordEmojiId id)
+    {
+        Name = id.Name ?? throw new ArgumentNullException(nameof(id), "'Name' must not be null!");
+        
+        // clear the id field, if its there
+        Id = new(id.Name);
+    }
 
     /// <summary>
     ///     Gets the Unicode representation of this emoji.

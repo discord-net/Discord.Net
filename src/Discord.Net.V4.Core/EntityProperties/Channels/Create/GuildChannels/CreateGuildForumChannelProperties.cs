@@ -26,7 +26,7 @@ public class CreateGuildForumChannelProperties : CreateGuildChannelBasePropertie
         existing.ParentId = Category.MapToNullableId();
         existing.IsNsfw = IsNsfw;
         existing.DefaultAutoArchiveDuration = DefaultAutoArchiveDuration.MapToInt();
-        existing.DefaultReactionEmoji = DefaultReactionEmoji.Map(v => v?.ToDefaultReactionModel());
+        existing.DefaultReactionEmoji = DefaultReactionEmoji.Map(v => v?.Id);
         existing.AvailableTags = AvailableTags.Map(v => v?.Select(x => x.ToApiModel()).ToArray());
         existing.DefaultSortOrder = DefaultSortOrder.MapToInt();
         existing.DefaultForumLayout = DefaultForumLayout.MapToInt();

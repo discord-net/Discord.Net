@@ -6,9 +6,9 @@ namespace Discord;
 /// <summary>
 ///     Represents a <see cref="IMessageComponent" /> Button.
 /// </summary>
-public sealed class ButtonComponent : IMessageComponent, IConstructable<ButtonComponent, IButtonComponentModel>
+public sealed class ButtonComponent : IMessageComponent, IModelConstructable<ButtonComponent, IButtonComponentModel>
 {
-    internal ButtonComponent(ButtonStyle style, string? label, IEmote? emote, string? customId, string? url,
+    internal ButtonComponent(ButtonStyle style, string? label, DiscordEmojiId? emote, string? customId, string? url,
         bool? isDisabled)
     {
         Style = style;
@@ -33,7 +33,7 @@ public sealed class ButtonComponent : IMessageComponent, IConstructable<ButtonCo
     /// <summary>
     ///     Gets the <see cref="IEmote" /> displayed with this button.
     /// </summary>
-    public IEmote? Emote { get; }
+    public DiscordEmojiId? Emote { get; }
 
     /// <summary>
     ///     Gets the URL for a <see cref="ButtonStyle.Link" /> button.
@@ -52,7 +52,7 @@ public sealed class ButtonComponent : IMessageComponent, IConstructable<ButtonCo
         => new(
             (ButtonStyle)model.Style,
             model.Label,
-            model.Emote is not null ? IEmote.Construct(client, model.Emote) : null,
+            model.Emote,
             model.CustomId,
             model.Url,
             model.IsDisabled
@@ -68,7 +68,7 @@ public sealed class ButtonComponent : IMessageComponent, IConstructable<ButtonCo
         existing ?? new Models.Json.ButtonComponent
         {
             Type = (uint)Type,
-            Emote = Optional.FromNullable(Emote).Map(v => (IEmoteModel)v.ToApiModel()),
+            Emote = Optional.FromNullable(Emote),
             Label = Optional.FromNullable(Label),
             Style = (int)Style,
             IsDisabled = Optional.FromNullable(IsDisabled),

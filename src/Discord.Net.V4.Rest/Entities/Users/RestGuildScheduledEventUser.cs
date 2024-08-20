@@ -5,7 +5,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestGuildScheduledEventUserActor :
-    RestActor<ulong, RestGuildScheduledEventUser, GuildScheduledEventUserIdentity>,
+    RestActor<ulong, RestGuildScheduledEventUser, GuildScheduledEventUserIdentity, IGuildScheduledEventUserModel>,
     IGuildScheduledEventUserActor
 {
     [SourceOfTruth] public RestUserActor User { get; }
@@ -32,20 +32,21 @@ public sealed partial class RestGuildScheduledEventUserActor :
         Member = member?.Actor ?? new(client, Guild.Identity, member ?? MemberIdentity.Of(eventUser.Id), user | User);
         GuildScheduledEvent = scheduledEvent.Actor ?? new(client, Guild.Identity, scheduledEvent);
     }
+
+    [SourceOfTruth]
+    internal override RestGuildScheduledEventUser CreateEntity(IGuildScheduledEventUserModel model)
+        => RestGuildScheduledEventUser.Construct(Client, this, model);
 }
 
 public sealed partial class RestGuildScheduledEventUser :
     RestEntity<ulong>,
     IGuildScheduledEventUser,
-    IContextConstructable<
-        RestGuildScheduledEventUser,
-        IGuildScheduledEventUserModel,
-        RestGuildScheduledEventUser.Context,
-        DiscordRestClient
+    IRestConstructable<
+        RestGuildScheduledEventUser, 
+        RestGuildScheduledEventUserActor, 
+        IGuildScheduledEventUserModel
     >
 {
-    public readonly record struct Context(GuildIdentity Guild, GuildScheduledEventIdentity Event);
-
     [ProxyInterface(typeof(IGuildScheduledEventUserActor))]
     internal RestGuildScheduledEventUserActor Actor { get; }
 
@@ -53,28 +54,19 @@ public sealed partial class RestGuildScheduledEventUser :
 
     internal RestGuildScheduledEventUser(
         DiscordRestClient client,
-        GuildIdentity guild,
-        GuildScheduledEventIdentity scheduledEvent,
-        IGuildScheduledEventUserModel model
+        IGuildScheduledEventUserModel model,
+        RestGuildScheduledEventUserActor actor
     ) : base(client, model.Id)
     {
-        Actor = new(
-            client,
-            guild,
-            scheduledEvent,
-            GuildScheduledEventUserIdentity.Of(this),
-            UserIdentity.FromReferenced(model, model.Id, model => RestUser.Construct(client, model)),
-            MemberIdentity.FromReferenced(model, model.Id, model => RestMember.Construct(client, guild, model))
-        );
-
+        Actor = actor;
         Model = model;
     }
 
     public static RestGuildScheduledEventUser Construct(
         DiscordRestClient client,
-        Context context,
+        RestGuildScheduledEventUserActor actor,
         IGuildScheduledEventUserModel model
-    ) => new(client, context.Guild, context.Event, model);
+    ) => new(client, model, actor);
 
     public IGuildScheduledEventUserModel GetModel() => Model;
 }

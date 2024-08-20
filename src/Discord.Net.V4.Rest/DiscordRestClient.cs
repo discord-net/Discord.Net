@@ -1,5 +1,4 @@
 using Discord.Models;
-using Discord.Rest.Actors;
 using Discord.Rest;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -7,23 +6,23 @@ using System.Text.Json;
 
 namespace Discord.Rest;
 
-using GuildsPager = RestPartialPagedIndexableLink<
-    RestGuildActor,
-    ulong,
-    RestGuild,
-    RestPartialGuild,
-    IPartialGuildModel,
-    IEnumerable<IPartialGuildModel>,
-    PageUserGuildsParams
->;
-using Stickers = RestIndexableLink<RestStickerActor, ulong, RestSticker>;
-using StickerPacks = RestEnumerableIndexableLink<
-    RestStickerPackActor,
-    ulong,
-    RestStickerPack,
-    IStickerPack,
-    IEnumerable<IStickerPackModel>
->;
+// using GuildsPager = RestPartialPagedIndexableLink<
+//     RestGuildActor,
+//     ulong,
+//     RestGuild,
+//     RestPartialGuild,
+//     IPartialGuildModel,
+//     IEnumerable<IPartialGuildModel>,
+//     PageUserGuildsParams
+// >;
+// using Stickers = RestIndexableLink<RestStickerActor, ulong, RestSticker>;
+// using StickerPacks = RestEnumerableIndexableLink<
+//     RestStickerPackActor,
+//     ulong,
+//     RestStickerPack,
+//     IStickerPack,
+//     IEnumerable<IStickerPackModel>
+// >;
 
 public sealed partial class DiscordRestClient : IDiscordClient
 {
@@ -32,18 +31,18 @@ public sealed partial class DiscordRestClient : IDiscordClient
 
     ICurrentUserActor IDiscordClient.CurrentUser => CurrentUser;
 
-    [SourceOfTruth] public GuildsPager Guilds { get; }
+    [SourceOfTruth] public PagedIndexableGuildLink Guilds { get; }
 
-    [SourceOfTruth] public RestIndexableLink<RestChannelActor, ulong, RestChannel> Channels { get; }
+    [SourceOfTruth] public IndexableChannelLink Channels { get; }
 
-    [SourceOfTruth] public RestIndexableLink<RestUserActor, ulong, RestUser> Users { get; }
+    [SourceOfTruth] public IndexableUserLink Users { get; }
 
-    [SourceOfTruth] public RestIndexableLink<RestWebhookActor, ulong, RestWebhook> Webhooks { get; }
-    [SourceOfTruth] public RestIndexableLink<RestInviteActor, string, RestInvite> Invites { get; }
+    [SourceOfTruth] public IndexableWebhookLink Webhooks { get; }
+    [SourceOfTruth] public IndexableInviteLink Invites { get; }
 
-    [SourceOfTruth] public StickerPacks StickerPacks { get; }
+    [SourceOfTruth] public EnumerableIndexableStickerPackLink StickerPacks { get; }
 
-    [SourceOfTruth] public Stickers Stickers { get; }
+    [SourceOfTruth] public IndexableStickerLink Stickers { get; }
 
     [SourceOfTruth] public RestApiClient RestApiClient { get; }
 
@@ -77,9 +76,9 @@ public sealed partial class DiscordRestClient : IDiscordClient
 
         CurrentUser =
             new RestCurrentUserActor(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
-        Channels = new(id => new RestChannelActor(this, ChannelIdentity.Of(id)));
-        Users = new(id => new RestUserActor(this, UserIdentity.Of(id)));
-        Webhooks = new(id => new RestWebhookActor(this, WebhookIdentity.Of(id)));
+        Channels = new(this, id => new RestChannelActor(this, ChannelIdentity.Of(id)));
+        Users = new(this, id => new RestUserActor(this, UserIdentity.Of(id)));
+        Webhooks = new(this, id => new RestWebhookActor(this, WebhookIdentity.Of(id)));
         CurrentUserThreadMemberIdentity = ThreadMemberIdentity.Of(CurrentUser.Id);
         Guilds = RestActors.PagedGuilds(this);
         StickerPacks = RestActors.Fetchable(
@@ -89,8 +88,8 @@ public sealed partial class DiscordRestClient : IDiscordClient
             RestStickerPack.Construct,
             IStickerPack.FetchManyRoute(IPathable.Empty)
         );
-        Stickers = new(id => new RestStickerActor(this, StickerIdentity.Of(id)));
-        Invites = new(id => new RestInviteActor(this, InviteIdentity.Of(id)));
+        Stickers = new(this, id => new RestStickerActor(this, StickerIdentity.Of(id)));
+        Invites = new(this, id => new RestInviteActor(this, InviteIdentity.Of(id)));
     }
 
     public ValueTask DisposeAsync()

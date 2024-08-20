@@ -101,162 +101,7 @@ public partial interface IGuildActor :
 
     #region Methods
 
-    [return: TypeHeuristic<IEntityProvider<IGuildChannel, IGuildChannelModel>>(nameof(CreateEntity))]
-    async Task<IGuildChannel> CreateChannelAsync(
-        CreateGuildChannelProperties args, RequestOptions? options = null, CancellationToken token = default)
-    {
-        var model = await Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.CreateGuildChannel(
-                Id,
-                args.ToApiModel()
-            ),
-            options ?? Client.DefaultRequestOptions,
-            token
-        );
-
-        return CreateEntity(model);
-    }
-
-    Task ModifyChannelPositionsAsync(
-        IEnumerable<ModifyGuildChannelPositionProperties> channels,
-        RequestOptions? options = null,
-        CancellationToken token = default
-    ) => Client.RestApiClient.ExecuteAsync(
-        Routes.ModifyGuildChannelPositions(
-            Id,
-            channels.Select(x => x.ToApiModel()).ToArray()
-        ),
-        options ?? Client.DefaultRequestOptions,
-        token
-    );
-
-    [return: TypeHeuristic<IEntityProvider<IMember, IMemberModel>>(nameof(CreateEntity))]
-    async Task<IReadOnlyCollection<IMember>> SearchGuildMembersAsync(
-        string query,
-        int limit = 1000,
-        RequestOptions? options = null,
-        CancellationToken token = default)
-    {
-        var result = await Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.SearchGuildMembers(Id, query, limit),
-            options ?? Client.DefaultRequestOptions,
-            token
-        );
-
-        return result.Select(CreateEntity).ToImmutableArray();
-    }
-
-    [return: TypeHeuristic<IEntityProvider<IMember, IMemberModel>>(nameof(CreateEntity))]
-    async Task<IMember> AddGuildMemberAsync(
-        EntityOrId<ulong, IUser> user,
-        string accessToken,
-        string? nickname = null,
-        IEnumerable<EntityOrId<ulong, IRole>>? roles = null,
-        bool? mute = null,
-        bool? deaf = null,
-        RequestOptions? options = null,
-        CancellationToken token = default)
-    {
-        var result = await Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.AddGuildMember(Id, user.Id,
-                new AddGuildMemberParams
-                {
-                    AccessToken = accessToken,
-                    Nickname = Optional.FromNullable(nickname),
-                    IsDeaf = Optional.FromNullable(deaf),
-                    IsMute = Optional.FromNullable(mute),
-                    RoleIds = Optional.FromNullable(roles).Map(v => v.Select(v => v.Id).ToArray())
-                }),
-            options ?? Client.DefaultRequestOptions,
-            token
-        );
-
-        return CreateEntity(result);
-    }
-
-    Task AddGuildMemberRoleAsync(
-        EntityOrId<ulong, IUser> user,
-        EntityOrId<ulong, IRole> role,
-        RequestOptions? options = null,
-        CancellationToken token = default
-    ) => Client.RestApiClient.ExecuteAsync(
-        Routes.AddGuildMemberRole(
-            Id,
-            user.Id,
-            role.Id
-        ),
-        options ?? Client.DefaultRequestOptions,
-        token
-    );
-
-    Task RemoveGuildMemberRole(
-        EntityOrId<ulong, IUser> user,
-        EntityOrId<ulong, IRole> role,
-        RequestOptions? options = null,
-        CancellationToken token = default
-    ) => Client.RestApiClient.ExecuteAsync(
-        Routes.RemoveGuildMemberRole(
-            Id,
-            user.Id,
-            role.Id
-        ),
-        options ?? Client.DefaultRequestOptions,
-        token
-    );
-
-    Task RemoveGuildMember(
-        EntityOrId<ulong, IUser> user,
-        RequestOptions? options = null,
-        CancellationToken token = default
-    ) => Client.RestApiClient.ExecuteAsync(
-        Routes.RemoveGuildMember(Id, user.Id),
-        options ?? Client.DefaultRequestOptions,
-        token
-    );
-
-    Task CreateGuildBanAsync(
-        EntityOrId<ulong, IUser> user,
-        int? purgeMessageSeconds = null,
-        RequestOptions? options = null,
-        CancellationToken token = default
-    ) => Client.RestApiClient.ExecuteAsync(
-        Routes.CreateGuildBan(Id, user.Id,
-            new CreateGuildBanParams {DeleteMessageSeconds = Optional.FromNullable(purgeMessageSeconds)}),
-        options ?? Client.DefaultRequestOptions,
-        token
-    );
-
-    Task RemoveGuildBanAsync(
-        EntityOrId<ulong, IUser> user,
-        RequestOptions? options = null,
-        CancellationToken token = default
-    ) => Client.RestApiClient.ExecuteAsync(
-        Routes.RemoveGuildBan(Id, user.Id),
-        options ?? Client.DefaultRequestOptions,
-        token
-    );
-
-    async Task<BulkBanResult> BulkGuildBanAsync(
-        IEnumerable<EntityOrId<ulong, IUser>> users,
-        int? purgeMessageSeconds = null,
-        RequestOptions? options = null,
-        CancellationToken token = default)
-    {
-        var result = await Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.BulkGuildBan(Id,
-                new BulkBanUsersParams
-                {
-                    UserIds = users.Select(x => x.Id).ToArray(),
-                    DeleteMessageSeconds = Optional.FromNullable(purgeMessageSeconds)
-                }),
-            options ?? Client.DefaultRequestOptions,
-            token
-        );
-
-        return BulkBanResult.Construct(Client, result);
-    }
-
-    async Task<MfaLevel> ModifyGuildMFALevelAsync(
+    async Task<MfaLevel> ModifyMFALevelAsync(
         MfaLevel level,
         RequestOptions? options = null,
         CancellationToken token = default)
@@ -270,7 +115,7 @@ public partial interface IGuildActor :
         return (MfaLevel)result.Level;
     }
 
-    async Task<int> GetGuildPruneCountAsync(
+    async Task<int> GetPruneCountAsync(
         int? days = null,
         Optional<IEnumerable<EntityOrId<ulong, IRole>>> includeRoles = default,
         RequestOptions? options = null,
@@ -289,7 +134,7 @@ public partial interface IGuildActor :
         return result.Pruned;
     }
 
-    async Task<int?> BeginGuildPruneAsync(
+    async Task<int?> BeginPruneAsync(
         int? days = null,
         bool? computePruneCount = null,
         Optional<IEnumerable<EntityOrId<ulong, IRole>>> includeRoles = default,
@@ -325,16 +170,6 @@ public partial interface IGuildActor :
 
         return result.Select(v => VoiceRegion.Construct(Client, v)).ToImmutableArray();
     }
-
-    Task DeleteGuildIntegration(
-        EntityOrId<ulong, IIntegration> integration,
-        RequestOptions? options = null,
-        CancellationToken token = default
-    ) => Client.RestApiClient.ExecuteAsync(
-        Routes.DeleteGuildIntegration(Id, integration.Id),
-        options ?? Client.DefaultRequestOptions,
-        token
-    );
 
     #endregion
 }

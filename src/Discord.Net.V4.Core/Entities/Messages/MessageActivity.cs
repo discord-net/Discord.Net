@@ -14,7 +14,7 @@ namespace Discord;
 ///     <para>For example, a Spotify party invitation counts as a message activity.</para>
 /// </remarks>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-public readonly struct MessageActivity : IConstructable<MessageActivity, IMessageActivityModel>
+public readonly struct MessageActivity : IModelConstructable<MessageActivity, IMessageActivityModel>
 {
     /// <summary>
     ///     The type of activity of this message.

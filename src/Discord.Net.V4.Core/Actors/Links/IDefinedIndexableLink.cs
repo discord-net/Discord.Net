@@ -2,7 +2,8 @@ using Discord.Models;
 
 namespace Discord;
 
-public interface IDefinedIndexableLink<out TActor, TId, out TEntity, in TModel> :
+[BackLinkable]
+public partial interface IDefinedIndexableLink<out TActor, TId, out TEntity, in TModel> :
     IIndexableLink<TActor, TId, TEntity, TModel>
     where TActor : class, IActor<TId, TEntity>, IEntityProvider<TEntity, TModel>
     where TEntity : class, IEntity<TId, TModel>

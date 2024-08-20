@@ -9,7 +9,7 @@ public partial interface IButtonComponentModel : IMessageComponentModel
 
     string? Label { get; }
 
-    IEmoteModel? Emote { get; }
+    DiscordEmojiId? Emote { get; }
 
     string? CustomId { get; }
 

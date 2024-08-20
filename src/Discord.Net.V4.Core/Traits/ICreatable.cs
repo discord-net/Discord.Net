@@ -5,6 +5,9 @@ namespace Discord;
 #pragma warning disable CS9113 // Parameter is unread.
 
 [AttributeUsage(AttributeTargets.Interface)]
+internal sealed class CreatableAttribute(string route) : Attribute;
+
+[AttributeUsage(AttributeTargets.Interface)]
 internal sealed class CreatableAttribute<TParams>(string route, params Type[] generics) : Attribute;
 
 [AttributeUsage(AttributeTargets.Interface)]
@@ -34,4 +37,23 @@ public interface IActorCreatable<TActor, out TId, in TParams, out TApiParams, ou
     where TApi : class
 {
     static abstract IApiInOutRoute<TApiParams, TApi> CreateRoute(IPathable path, TParams args);
+}
+
+public interface ICanonicallyCreatable<TActor, TId> :
+    IClientProvider,
+    IIdentifiable<TId>,
+    IPathable
+    where TActor : ICanonicallyCreatable<TActor, TId>
+    where TId : IEquatable<TId>
+{
+    static abstract IApiRoute CreateRoute(IPathable path, TId id);
+
+    Task CreateAsync(RequestOptions? options = null, CancellationToken token = default)
+    {
+        return Client.RestApiClient.ExecuteAsync(
+            TActor.CreateRoute(this, Id),
+            options ?? Client.DefaultRequestOptions,
+            token
+        );
+    }
 }

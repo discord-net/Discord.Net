@@ -7,9 +7,9 @@ namespace Discord;
 /// </summary>
 public readonly struct SelectMenuOption :
     IEntityProperties<Models.Json.SelectMenuOption>,
-    IConstructable<SelectMenuOption, ISelectMenuOptionModel>
+    IModelConstructable<SelectMenuOption, ISelectMenuOptionModel>
 {
-    internal SelectMenuOption(string label, string value, string? description, IEmote? emote, bool? defaultValue)
+    internal SelectMenuOption(string label, string value, string? description, DiscordEmojiId? emote, bool? defaultValue)
     {
         Label = label;
         Value = value;
@@ -36,7 +36,7 @@ public readonly struct SelectMenuOption :
     /// <summary>
     ///     Gets the <see cref="IEmote" /> displayed with this menu option.
     /// </summary>
-    public IEmote? Emote { get; }
+    public DiscordEmojiId? Emote { get; }
 
     /// <summary>
     ///     Gets whether this option will render as selected by default.
@@ -50,7 +50,7 @@ public readonly struct SelectMenuOption :
             Value = Value,
             Description = Optional.FromNullable(Description),
             IsDefault = Optional.FromNullable(IsDefault),
-            Emoji = Optional.FromNullable(Emote).Map(v => v.ToApiModel())
+            Emoji = Optional.FromNullable(Emote)
         };
 
     public static SelectMenuOption Construct(IDiscordClient client, ISelectMenuOptionModel model) =>
@@ -58,7 +58,7 @@ public readonly struct SelectMenuOption :
             model.Label,
             model.Value,
             model.Description,
-            model.Emote is not null ? IEmote.Construct(client, model.Emote) : null,
+            model.Emote,
             model.IsDefault
         );
 }

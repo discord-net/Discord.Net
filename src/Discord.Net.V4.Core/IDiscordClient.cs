@@ -1,4 +1,5 @@
 using Discord.Models;
+using Discord.Models.Json;
 using Discord.Rest;
 
 namespace Discord;
@@ -18,17 +19,17 @@ public interface IDiscordClient :
 
     PagedIndexableGuildLink Guilds { get; }
 
-    IndexableChannelLink Channels { get; }
+    ChannelLink.Indexable Channels { get; }
 
-    IndexableUserLink Users { get; }
+    UserLink.Indexable Users { get; }
 
-    IndexableWebhookLink Webhooks { get; }
+    WebhookLink.Indexable Webhooks { get; }
 
-    EnumerableIndexableStickerPackLink StickerPacks { get; }
+    StickerPackLink.Enumerable.Indexable StickerPacks { get; }
 
-    IndexableStickerLink Stickers { get; }
+    StickerLink.Indexable Stickers { get; }
     
-    IndexableInviteLink Invites { get; }
+    InviteLink.Indexable Invites { get; }
 
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }

@@ -6,7 +6,7 @@ namespace Discord;
 ///     Provides tags related to a discord role.
 /// </summary>
 public readonly struct RoleTags :
-    IConstructable<RoleTags, IRoleTagsModel>,
+    IModelConstructable<RoleTags, IRoleTagsModel>,
     IEquatable<RoleTags>
 {
     /// <summary>

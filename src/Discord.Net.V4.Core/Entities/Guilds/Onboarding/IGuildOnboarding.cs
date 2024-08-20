@@ -3,18 +3,8 @@ namespace Discord;
 /// <summary>
 ///     Represents the guild onboarding flow.
 /// </summary>
-public interface IGuildOnboarding
+public interface IGuildOnboarding : ISnowflakeEntity
 {
-    /// <summary>
-    ///     Gets the ID of the guild this onboarding is part of.
-    /// </summary>
-    ulong GuildId { get; }
-
-    /// <summary>
-    ///     Gets the guild this onboarding is part of.
-    /// </summary>
-    ILoadableEntity<ulong, IGuild> Guild { get; }
-
     /// <summary>
     ///     Gets prompts shown during onboarding and in customize community.
     /// </summary>

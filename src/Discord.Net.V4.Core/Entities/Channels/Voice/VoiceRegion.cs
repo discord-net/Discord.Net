@@ -2,7 +2,7 @@ namespace Discord;
 
 public readonly struct VoiceRegion(string id, string name, bool isOptimal, bool isDeprecated, bool isCustom) :
     IEntityProperties<Models.Json.VoiceRegion>,
-    IConstructable<VoiceRegion, Models.Json.VoiceRegion>,
+    IModelConstructable<VoiceRegion, Models.Json.VoiceRegion>,
     IIdentifiable<string>
 {
     public readonly string Id = id;

@@ -1,7 +1,7 @@
 using System.Runtime;
 using System.Runtime.CompilerServices;
 
-namespace Discord.Gateway;
+namespace Discord;
 
 internal static class DependantHandleUtils
 {

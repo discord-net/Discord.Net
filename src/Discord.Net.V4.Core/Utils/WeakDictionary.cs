@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime;
 using System.Runtime.CompilerServices;
 
-namespace Discord.Gateway;
+namespace Discord;
 
 internal sealed class WeakDictionary<TKey, TValue>
     where TKey : notnull

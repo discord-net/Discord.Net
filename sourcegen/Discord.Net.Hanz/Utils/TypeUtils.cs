@@ -10,7 +10,21 @@ public static class TypeUtils
     }
 
     public static string ToFullMetadataName(this ISymbol symbol)
-        => $"{symbol.ContainingNamespace}.{symbol.MetadataName}";
+    {
+        var parts = new List<string>() {symbol.MetadataName};
+
+        var container = symbol.ContainingType;
+
+        while (container is not null)
+        {
+            parts.Add(symbol.ContainingType.MetadataName);
+            container = container.ContainingType;
+        }
+
+        parts.Reverse();
+        
+        return $"{symbol.ContainingNamespace}.{string.Join(".", parts)}";
+    }
 
     public static bool TypeLooselyEquals(ITypeSymbol first, ITypeSymbol second)
     {

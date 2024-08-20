@@ -307,71 +307,71 @@ public interface IIdentifiable<TId, out TEntity, out TModel> :
         TEntity right
     ) => left.MostSpecific(right);
 
-    static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct, TClient>(
-        IModel model,
-        TId id,
-        TClient client)
-        where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
-        where TClient : IDiscordClient
-        => model is IModelSource source
-            ? FromReferenced<TConstruct, TClient>(source, id, client)
-            : Of(id);
-
-    static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct, TClient>(
-        IModelSource model,
-        TId id,
-        TClient client)
-        where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
-        where TClient : IDiscordClient
-        => FromReferenced(
-            model,
-            id,
-            model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
-                $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
-            )
-        );
-
-    static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct>(
-        IModel model,
-        TId id,
-        IDiscordClient client)
-        where TConstruct : class, IConstructable<TConstruct, TModel>
-        => model is IModelSource source
-            ? FromReferenced<TConstruct>(source, id, client)
-            : Of(id);
-
-    static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct>(
-        IModelSource model,
-        TId id,
-        IDiscordClient client)
-        where TConstruct : class, IConstructable<TConstruct, TModel>
-        => FromReferenced(
-            model,
-            id,
-            model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
-                $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
-            )
-        );
-
-    static IIdentifiable<TId, TEntity, TModel> FromReferenced(
-        IModel model,
-        TId id,
-        Func<TModel, TEntity> factory)
-        => model is IModelSource source
-            ? FromReferenced(source, id, factory)
-            : Of(id);
-
-    static IIdentifiable<TId, TEntity, TModel> FromReferenced(
-        IModelSource model,
-        TId id,
-        Func<TModel, TEntity> factory)
-    {
-        var referenced = model.GetReferencedEntityModel<TId, TModel>(id);
-
-        return referenced is null
-            ? Of(id)
-            : Of(referenced, factory);
-    }
+    // static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct, TClient>(
+    //     IModel model,
+    //     TId id,
+    //     TClient client)
+    //     where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
+    //     where TClient : IDiscordClient
+    //     => model is IModelSource source
+    //         ? FromReferenced<TConstruct, TClient>(source, id, client)
+    //         : Of(id);
+    //
+    // static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct, TClient>(
+    //     IModelSource model,
+    //     TId id,
+    //     TClient client)
+    //     where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
+    //     where TClient : IDiscordClient
+    //     => FromReferenced(
+    //         model,
+    //         id,
+    //         model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
+    //             $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
+    //         )
+    //     );
+    //
+    // static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct>(
+    //     IModel model,
+    //     TId id,
+    //     IDiscordClient client)
+    //     where TConstruct : class, IConstructable<TConstruct, TModel>
+    //     => model is IModelSource source
+    //         ? FromReferenced<TConstruct>(source, id, client)
+    //         : Of(id);
+    //
+    // static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct>(
+    //     IModelSource model,
+    //     TId id,
+    //     IDiscordClient client)
+    //     where TConstruct : class, IConstructable<TConstruct, TModel>
+    //     => FromReferenced(
+    //         model,
+    //         id,
+    //         model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
+    //             $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
+    //         )
+    //     );
+    //
+    // static IIdentifiable<TId, TEntity, TModel> FromReferenced(
+    //     IModel model,
+    //     TId id,
+    //     Func<TModel, TEntity> factory)
+    //     => model is IModelSource source
+    //         ? FromReferenced(source, id, factory)
+    //         : Of(id);
+    //
+    // static IIdentifiable<TId, TEntity, TModel> FromReferenced(
+    //     IModelSource model,
+    //     TId id,
+    //     Func<TModel, TEntity> factory)
+    // {
+    //     var referenced = model.GetReferencedEntityModel<TId, TModel>(id);
+    //
+    //     return referenced is null
+    //         ? Of(id)
+    //         : Of(referenced, factory);
+    // }
 
     static IIdentifiable<TId, TEntity, TModel> Of(TId id)
         => new Identifiable<TId, TEntity, TModel>(id);
@@ -425,73 +425,73 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
         TActor right
     ) => left?.MostSpecific(right) ?? Of(right);
 
-    new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct, TClient>(
-        IModel model,
-        TId id,
-        TClient client
-    )
-        where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
-        where TClient : IDiscordClient
-        => model is IModelSource source
-            ? FromReferenced<TConstruct, TClient>(source, id, client)
-            : Of(id);
-
-    new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct, TClient>(
-        IModelSource model,
-        TId id,
-        TClient client
-    )
-        where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
-        where TClient : IDiscordClient
-        => FromReferenced(
-            model,
-            id,
-            model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
-                $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
-            )
-        );
-
-    new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct>(
-        IModel model,
-        TId id,
-        IDiscordClient client)
-        where TConstruct : class, IConstructable<TConstruct, TModel>
-        => model is IModelSource source
-            ? FromReferenced<TConstruct>(source, id, client)
-            : Of(id);
-
-    new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct>(
-        IModelSource model,
-        TId id,
-        IDiscordClient client)
-        where TConstruct : class, IConstructable<TConstruct, TModel>
-        => FromReferenced(
-            model,
-            id,
-            model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
-                $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
-            )
-        );
-
-    new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced(
-        IModel model,
-        TId id,
-        Func<TModel, TEntity> factory)
-        => model is IModelSource source
-            ? FromReferenced(source, id, factory)
-            : Of(id);
-
-    new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced(
-        IModelSource model,
-        TId id,
-        Func<TModel, TEntity> factory)
-    {
-        var referenced = model.GetReferencedEntityModel<TId, TModel>(id);
-
-        return referenced is null
-            ? Of(id)
-            : Of(referenced, factory);
-    }
+    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct, TClient>(
+    //     IModel model,
+    //     TId id,
+    //     TClient client
+    // )
+    //     where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
+    //     where TClient : IDiscordClient
+    //     => model is IModelSource source
+    //         ? FromReferenced<TConstruct, TClient>(source, id, client)
+    //         : Of(id);
+    //
+    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct, TClient>(
+    //     IModelSource model,
+    //     TId id,
+    //     TClient client
+    // )
+    //     where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
+    //     where TClient : IDiscordClient
+    //     => FromReferenced(
+    //         model,
+    //         id,
+    //         model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
+    //             $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
+    //         )
+    //     );
+    //
+    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct>(
+    //     IModel model,
+    //     TId id,
+    //     IDiscordClient client)
+    //     where TConstruct : class, IConstructable<TConstruct, TModel>
+    //     => model is IModelSource source
+    //         ? FromReferenced<TConstruct>(source, id, client)
+    //         : Of(id);
+    //
+    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct>(
+    //     IModelSource model,
+    //     TId id,
+    //     IDiscordClient client)
+    //     where TConstruct : class, IConstructable<TConstruct, TModel>
+    //     => FromReferenced(
+    //         model,
+    //         id,
+    //         model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
+    //             $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
+    //         )
+    //     );
+    //
+    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced(
+    //     IModel model,
+    //     TId id,
+    //     Func<TModel, TEntity> factory)
+    //     => model is IModelSource source
+    //         ? FromReferenced(source, id, factory)
+    //         : Of(id);
+    //
+    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced(
+    //     IModelSource model,
+    //     TId id,
+    //     Func<TModel, TEntity> factory)
+    // {
+    //     var referenced = model.GetReferencedEntityModel<TId, TModel>(id);
+    //
+    //     return referenced is null
+    //         ? Of(id)
+    //         : Of(referenced, factory);
+    // }
 
     new static IIdentifiable<TId, TEntity, TActor, TModel> Of(TId id)
         => new Identifiable<TId, TEntity, TActor, TModel>(id);

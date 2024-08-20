@@ -474,7 +474,8 @@ public static class JsonModels
             "Discord.Converters.BigIntegerConverter",
             "Discord.Converters.UserConverter",
             "Discord.Converters.GatewayPayloadConverter",
-            "Discord.Converters.MillisecondEpocConverter"
+            "Discord.Converters.MillisecondEpocConverter",
+            "Discord.Converters.ReactionIdConverter"
         };
 
         converters.UnionWith(additionalConverters);
