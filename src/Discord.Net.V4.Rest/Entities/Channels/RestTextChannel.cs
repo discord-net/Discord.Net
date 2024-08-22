@@ -51,7 +51,7 @@ public partial class RestTextChannelActor :
 public partial class RestTextChannel :
     RestThreadableChannel,
     ITextChannel,
-    IContextConstructable<RestTextChannel, IGuildTextChannelModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestTextChannel, RestTextChannelActor, IGuildTextChannelModel>
 {
     public bool IsNsfw => Model.IsNsfw;
 

@@ -34,7 +34,7 @@ public sealed partial class RestCurrentUserVoiceStateActor :
 public sealed partial class RestCurrentUserVoiceState :
     RestVoiceState,
     ICurrentUserVoiceState,
-    IContextConstructable<RestCurrentUserVoiceState, IVoiceStateModel, RestVoiceState.Context, DiscordRestClient>
+    IRestConstructable<RestCurrentUserVoiceState, RestCurrentUserVoiceStateActor, IVoiceStateModel>
 {
     [ProxyInterface]
     internal override RestCurrentUserVoiceStateActor Actor { get; }

@@ -33,7 +33,7 @@ public partial class RestRoleActor :
 public sealed partial class RestRole :
     RestEntity<ulong>,
     IRole,
-    IContextConstructable<RestRole, IRoleModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestRole, RestRoleActor, IRoleModel>
 {
     public Color Color => Model.Color;
 

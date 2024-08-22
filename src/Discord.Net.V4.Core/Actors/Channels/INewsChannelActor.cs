@@ -1,11 +1,19 @@
 using Discord.Models.Json;
 using Discord.Rest;
 using System.Diagnostics.CodeAnalysis;
+using Discord.Models;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetChannel), typeof(GuildAnnouncementChannel))]
-[SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
+[
+    Loadable(nameof(Routes.GetChannel), typeof(GuildAnnouncementChannel)),
+    Creatable<CreateGuildAnnouncementChannelProperties>(
+        nameof(Routes.CreateGuildChannel),
+        typeof(IGuildActor),
+        RouteGenerics = [typeof(IGuildNewsChannelModel)]
+    ),
+    SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
+]
 public partial interface INewsChannelActor :
     ITextChannelActor,
     IActor<ulong, INewsChannel>

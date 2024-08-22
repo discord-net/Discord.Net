@@ -37,7 +37,7 @@ public sealed partial class RestStageInstanceActor :
 public sealed partial class RestStageInstance :
     RestEntity<ulong>,
     IStageInstance,
-    IContextConstructable<RestStageInstance, IStageInstanceModel, RestStageInstance.Context, DiscordRestClient>
+    IRestConstructable<RestStageInstance, RestStageInstanceActor, IStageInstanceModel>
 {
     public readonly record struct Context(GuildIdentity Guild, StageChannelIdentity Channel);
 

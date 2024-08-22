@@ -6,5 +6,5 @@ public interface IIncomingIntegrationChannelTrait :
 {
     [return: TypeHeuristic(nameof(IncomingWebhooks))]
     IIncomingWebhookActor IncomingWebhook(ulong id) => IncomingWebhooks[id];
-    EnumerableIndexableIncomingWebhookLink IncomingWebhooks { get; }
+    IncomingWebhookLink.Enumerable.Indexable IncomingWebhooks { get; }
 }

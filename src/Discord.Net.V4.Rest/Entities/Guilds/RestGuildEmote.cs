@@ -32,7 +32,7 @@ public partial class RestGuildEmoteActor :
 public sealed partial class RestGuildEmote :
     RestEntity<ulong>,
     IGuildEmote,
-    IContextConstructable<RestGuildEmote, IGuildEmoteModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestGuildEmote, RestGuildEmoteActor, IGuildEmoteModel>
 {
     public IDefinedLoadableEntityEnumerable<ulong, IRole> Roles => throw new NotImplementedException();
 

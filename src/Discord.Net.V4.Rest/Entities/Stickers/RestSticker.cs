@@ -29,7 +29,7 @@ public partial class RestSticker :
     RestEntity<ulong>,
     ISticker,
     IConstructable<RestSticker, IStickerModel, DiscordRestClient>,
-    IContextConstructable<RestSticker, IStickerModel, StickerPackIdentity?, DiscordRestClient>
+    IRestConstructable<RestSticker, RestStickerActor, IStickerModel>
 {
     public string Name => Model.Name;
 

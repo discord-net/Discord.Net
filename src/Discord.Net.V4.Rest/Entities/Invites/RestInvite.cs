@@ -29,7 +29,7 @@ public partial class RestInvite :
     RestEntity<string>,
     IInvite,
     IConstructable<RestInvite, IInviteModel, DiscordRestClient>,
-    IContextConstructable<RestInvite, IInviteModel, RestInvite.Context, DiscordRestClient>
+    IRestConstructable<RestInvite, RestInviteActor, IInviteModel>
 {
     public readonly record struct Context(
         GuildIdentity? Guild = null,

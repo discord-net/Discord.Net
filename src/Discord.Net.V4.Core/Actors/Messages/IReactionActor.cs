@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Rest;
 
 namespace Discord;
@@ -6,7 +7,8 @@ namespace Discord;
 public partial interface IReactionActor :
     IActor<DiscordEmojiId, IReaction>,
     IChannelRelationship<IMessageChannelTrait, IMessageChannel>,
-    IMessageRelationship
+    IMessageRelationship,
+    IEntityProvider<IReaction, IReactionModel>
 {
     ICurrentUserActor.BackLink<IReactionActor> CurrentUser { get; }
     
@@ -15,7 +17,7 @@ public partial interface IReactionActor :
     IUserActor.BackLink<IReactionActor>.Paged<PageUserSuperReactionsParams>.Indexable SuperReactionUsers { get; }
     
     [OnVertex]
-    private static Task CreateAsync(
+    private static Task AddAsync(
         ICurrentUserActor.BackLink<IReactionActor> target,
         RequestOptions? options = null,
         CancellationToken token = default)
@@ -32,7 +34,7 @@ public partial interface IReactionActor :
     }
     
     [BackLink<IMessageActor>]
-    private static Task DeleteAllAsync(
+    private static Task RemoveAllAsync(
         IMessageActor message,
         RequestOptions? options = null,
         CancellationToken token = default)
@@ -45,7 +47,7 @@ public partial interface IReactionActor :
     }
     
     [OnVertex]
-    private static Task DeleteAsync(
+    private static Task RemoveAsync(
         IUserActor.BackLink<IReactionActor> target,
         RequestOptions? options = null,
         CancellationToken token = default)

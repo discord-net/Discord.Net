@@ -1,5 +1,6 @@
 using Discord.Paging;
 using System.Collections.Immutable;
+using Discord.Models;
 
 namespace Discord.Rest;
 
@@ -15,8 +16,8 @@ internal sealed class RestPager<TId, TEntity, TModel, TPagingModel, TParams>(
 ):
     IAsyncPaged<TEntity>
     where TId : IEquatable<TId>
-    where TEntity : RestEntity<TId>
-    where TModel : class
+    where TEntity : class, IEntity<TId, TModel>
+    where TModel : IEntityModel<TId>
     where TParams : class, IPagingParams<TParams, TPagingModel>
     where TPagingModel : class
 {

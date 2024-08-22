@@ -32,7 +32,7 @@ public sealed partial class RestGuildChannelInviteActor :
 public sealed partial class RestGuildChannelInvite :
     RestGuildInvite,
     IGuildChannelInvite,
-    IContextConstructable<RestGuildChannelInvite, IInviteModel, RestGuildChannelInvite.Context, DiscordRestClient>
+    IRestConstructable<RestGuildChannelInvite, RestGuildChannelInviteActor, IInviteModel>
 {
     public new readonly record struct Context(
         GuildIdentity Guild,

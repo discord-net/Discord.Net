@@ -6,5 +6,5 @@ public interface IChannelFollowerIntegrationChannelTrait :
 {
     [return: TypeHeuristic(nameof(ChannelFollowerWebhooks))]
     IChannelFollowerWebhookActor FollowerWebhook(ulong id) => ChannelFollowerWebhooks[id];
-    EnumerableIndexableChannelFollowerWebhookLink ChannelFollowerWebhooks { get; }
+    ChannelFollowerWebhookLink.Enumerable.Indexable ChannelFollowerWebhooks { get; }
 }

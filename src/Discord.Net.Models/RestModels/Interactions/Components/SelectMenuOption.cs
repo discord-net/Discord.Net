@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class SelectMenuOption : IModelSource, ISelectMenuOptionModel, IModelSourceOf<IEmoteModel?>
+public sealed class SelectMenuOption : ISelectMenuOptionModel
 {
     [JsonPropertyName("label")]
     public required string Label { get; set; }
@@ -24,12 +24,4 @@ public sealed class SelectMenuOption : IModelSource, ISelectMenuOptionModel, IMo
     DiscordEmojiId? ISelectMenuOptionModel.Emote => Emoji.ToNullable();
 
     bool? ISelectMenuOptionModel.IsDefault => ~IsDefault;
-
-    public IEnumerable<IModel> GetDefinedModels()
-    {
-        if (Emoji.IsSpecified)
-            yield return Emoji.Value;
-    }
-
-    IEmoteModel? IModelSourceOf<IEmoteModel?>.Model => ~Emoji;
 }

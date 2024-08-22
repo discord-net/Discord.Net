@@ -12,5 +12,7 @@ public class Guilds
         await client.Guilds[915079505557721090].Invites["abc"].DeleteAsync();
 
         var result = await client.Guilds[123].Members[123].FetchAsync();
+
+        IGuildActor guild = null!;
     }
 }

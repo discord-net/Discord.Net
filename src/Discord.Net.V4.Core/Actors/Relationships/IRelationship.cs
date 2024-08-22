@@ -14,5 +14,5 @@ public interface IRelationship<out TActor, out TId, out TEntity> :
 public interface IRelation<out TId, out TEntity>
     where TId : IEquatable<TId>
 {
-    TId RelationshipId { get; }
+    internal TId RelationshipId { get; }
 }

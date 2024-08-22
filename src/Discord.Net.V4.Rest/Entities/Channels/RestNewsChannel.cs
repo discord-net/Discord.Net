@@ -32,7 +32,7 @@ public partial class RestNewsChannelActor :
 public partial class RestNewsChannel :
     RestTextChannel,
     INewsChannel,
-    IContextConstructable<RestNewsChannel, IGuildNewsChannelModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestNewsChannel, RestNewsChannelActor, IGuildNewsChannelModel>
 {
     internal override IGuildNewsChannelModel Model => _model;
 

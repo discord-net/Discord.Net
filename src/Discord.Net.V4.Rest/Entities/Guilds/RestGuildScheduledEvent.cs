@@ -53,7 +53,7 @@ public partial class RestGuildScheduledEventActor :
 public sealed partial class RestGuildScheduledEvent :
     RestEntity<ulong>,
     IGuildScheduledEvent,
-    IContextConstructable<RestGuildScheduledEvent, IGuildScheduledEventModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestGuildScheduledEvent, RestGuildScheduledEventActor, IGuildScheduledEventModel>
 {
     [SourceOfTruth]
     public RestGuildChannelActor? Channel { get; private set; }

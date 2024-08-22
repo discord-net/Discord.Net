@@ -37,7 +37,7 @@ public partial class RestGuildStickerActor :
 public sealed partial class RestGuildSticker :
     RestSticker,
     IGuildSticker,
-    IContextConstructable<RestGuildSticker, IGuildStickerModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestGuildSticker, RestGuildStickerActor, IGuildStickerModel>
 {
     [SourceOfTruth] public RestMemberActor? Author { get; private set; }
 

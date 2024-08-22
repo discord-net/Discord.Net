@@ -26,23 +26,25 @@ namespace Discord.Rest;
 
 public sealed partial class DiscordRestClient : IDiscordClient
 {
-    //[SourceOfTruth]
+    [SourceOfTruth]
     public RestCurrentUserActor CurrentUser { get; }
+    
+    [SourceOfTruth]
+    public GuildLink
+        .Paged<RestPartialGuild, IPartialGuildModel, PageUserGuildsParams, IEnumerable<IPartialGuildModel>>
+        .Indexable Guilds { get; }
 
-    ICurrentUserActor IDiscordClient.CurrentUser => CurrentUser;
+    [SourceOfTruth] 
+    public ChannelLink.Indexable Channels { get; }
 
-    [SourceOfTruth] public PagedIndexableGuildLink Guilds { get; }
+    [SourceOfTruth] public UserLink.Indexable Users { get; }
 
-    [SourceOfTruth] public IndexableChannelLink Channels { get; }
+    [SourceOfTruth] public WebhookLink.Indexable Webhooks { get; }
+    [SourceOfTruth] public InviteLink.Indexable Invites { get; }
 
-    [SourceOfTruth] public IndexableUserLink Users { get; }
+    [SourceOfTruth] public StickerPackLink.Enumerable.Indexable StickerPacks { get; }
 
-    [SourceOfTruth] public IndexableWebhookLink Webhooks { get; }
-    [SourceOfTruth] public IndexableInviteLink Invites { get; }
-
-    [SourceOfTruth] public EnumerableIndexableStickerPackLink StickerPacks { get; }
-
-    [SourceOfTruth] public IndexableStickerLink Stickers { get; }
+    [SourceOfTruth] public StickerLink.Indexable Stickers { get; }
 
     [SourceOfTruth] public RestApiClient RestApiClient { get; }
 

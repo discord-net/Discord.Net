@@ -17,7 +17,7 @@ public interface IDiscordClient :
     /// </summary>
     ICurrentUserActor CurrentUser { get; }
 
-    PagedIndexableGuildLink Guilds { get; }
+    GuildLink.Paged<IPartialGuild, PageUserGuildsParams>.Indexable Guilds { get; }
 
     ChannelLink.Indexable Channels { get; }
 

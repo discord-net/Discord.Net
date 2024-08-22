@@ -39,7 +39,7 @@ public sealed partial class RestMediaChannelActor :
 public partial class RestMediaChannel :
     RestThreadableChannel,
     IMediaChannel,
-    IContextConstructable<RestMediaChannel, IGuildMediaChannelModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestMediaChannel, RestMediaChannelActor, IGuildMediaChannelModel>
 {
     public bool IsNsfw => Model.IsNsfw;
 

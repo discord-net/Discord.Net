@@ -18,7 +18,7 @@ public sealed class ForumTag(
     public bool IsModerated { get; } = isModerated;
     public DiscordEmojiId? Emote { get; } = emote;
 
-    public static ForumTag Construct(IDiscordClient client,  ITagModel model)
+    public static ForumTag Construct(IDiscordClient client, ITagModel model)
     {
         return new ForumTag(
             client,
@@ -42,8 +42,6 @@ public sealed class ForumTag(
     public ulong Id { get; } = id;
 
     IDiscordClient IClientProvider.Client => client;
-
-    public readonly record struct Context(ulong GuildId);
 
     public ITagModel GetModel() => ToApiModel();
 }

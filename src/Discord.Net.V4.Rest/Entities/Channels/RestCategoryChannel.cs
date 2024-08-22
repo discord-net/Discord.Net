@@ -6,7 +6,7 @@ namespace Discord.Rest;
 public sealed partial class RestCategoryChannelActor :
     RestGuildChannelActor,
     ICategoryChannelActor,
-    IRestActor<ulong, RestCategoryChannel, CategoryChannelIdentity>
+    IRestActor<ulong, RestCategoryChannel, CategoryChannelIdentity, IGuildCategoryChannelModel>
 {
     [SourceOfTruth] internal override CategoryChannelIdentity Identity { get; }
 
@@ -23,13 +23,13 @@ public sealed partial class RestCategoryChannelActor :
     [SourceOfTruth]
     [CovariantOverride]
     internal RestCategoryChannel CreateEntity(IGuildCategoryChannelModel model)
-        => RestCategoryChannel.Construct(Client, Guild.Identity, model);
+        => RestCategoryChannel.Construct(Client, this, model);
 }
 
 public sealed partial class RestCategoryChannel :
     RestGuildChannel,
     ICategoryChannel,
-    IContextConstructable<RestCategoryChannel, IGuildCategoryChannelModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestCategoryChannel, RestCategoryChannelActor, IGuildCategoryChannelModel>
 {
     internal override RestCategoryChannelActor Actor { get; }
 
@@ -39,18 +39,19 @@ public sealed partial class RestCategoryChannel :
 
     internal RestCategoryChannel(
         DiscordRestClient client,
-        GuildIdentity guild,
         IGuildCategoryChannelModel model,
-        RestCategoryChannelActor? actor = null
-    ) : base(client, guild, model)
+        RestCategoryChannelActor actor
+    ) : base(client, model, actor)
     {
         _model = model;
-        Actor = actor ?? new RestCategoryChannelActor(client, guild, CategoryChannelIdentity.Of(this));
+        Actor = actor;
     }
 
-    public static RestCategoryChannel Construct(DiscordRestClient client,
-        GuildIdentity guild,
-        IGuildCategoryChannelModel model) => new(client, guild, model);
+    public static RestCategoryChannel Construct(
+        DiscordRestClient client,
+        RestCategoryChannelActor actor,
+        IGuildCategoryChannelModel model
+    ) => new(client, model, actor);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IGuildCategoryChannelModel model, CancellationToken token = default)

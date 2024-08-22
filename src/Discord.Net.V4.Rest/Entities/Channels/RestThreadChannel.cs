@@ -73,7 +73,7 @@ public partial class RestThreadChannelActor :
 public partial class RestThreadChannel :
     RestGuildChannel,
     IThreadChannel,
-    IContextConstructable<RestThreadChannel, IThreadChannelModel, RestThreadChannel.Context, DiscordRestClient>
+    IRestConstructable<RestThreadChannel, RestThreadChannelActor, IThreadChannelModel>
 {
     public readonly record struct Context(
         GuildIdentity? Guild = null,

@@ -44,7 +44,7 @@ public partial class RestVoiceChannelActor :
 public partial class RestVoiceChannel :
     RestGuildChannel,
     IVoiceChannel,
-    IContextConstructable<RestVoiceChannel, IGuildVoiceChannelModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestVoiceChannel, RestVoiceChannelActor, IGuildVoiceChannelModel>
 {
     [SourceOfTruth] public RestCategoryChannelActor? Category { get; private set; }
 

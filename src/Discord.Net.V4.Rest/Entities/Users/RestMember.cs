@@ -1,5 +1,4 @@
 using Discord.Models;
-using Discord.Models.Json;
 
 namespace Discord.Rest;
 
@@ -10,6 +9,9 @@ public partial class RestMemberActor :
     IRestActor<ulong, RestMember, MemberIdentity, IMemberModel>
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
+    
+    [SourceOfTruth]
+    public RoleLink.BackLink<RestMemberActor> Roles { get; }
 
     [SourceOfTruth] public virtual RestVoiceStateActor VoiceState { get; }
 
@@ -34,6 +36,8 @@ public partial class RestMemberActor :
             voiceState ?? VoiceStateIdentity.Of(member.Id),
             member
         );
+
+        Roles = new(this, client, Guild.Roles);
     }
 
     [SourceOfTruth]
@@ -50,7 +54,7 @@ public partial class RestMember :
     IRestConstructable<RestMember, RestMemberActor, IMemberModel>
 {
     [SourceOfTruth]
-    public DefinedRoleLink.BackLink<RestMember> Roles => throw new NotImplementedException();
+    public RoleLink.Defined.Indexable.BackLink<RestMember> Roles => throw new NotImplementedException();
 
     public DateTimeOffset? JoinedAt => Model.JoinedAt;
 

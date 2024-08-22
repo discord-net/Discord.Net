@@ -33,7 +33,7 @@ public partial class RestGuildInviteActor :
 public partial class RestGuildInvite :
     RestInvite,
     IGuildInvite,
-    IContextConstructable<RestGuildInvite, IInviteModel, RestGuildInvite.Context, DiscordRestClient>
+    IRestConstructable<RestGuildInvite, RestGuildInviteActor, IInviteModel>
 {
     public new readonly record struct Context(
         GuildIdentity Guild,

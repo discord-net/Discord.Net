@@ -117,15 +117,9 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
         return
             IgnoredTypes.Contains(sourceType.Name)
             ||
-            (
-                (
-                    Links.CoreLookupTable.Any(x => sourceType.Name.StartsWith(x.Key))
-                    ||
-                    sourceType.Name.StartsWith("Paged")
-                )
-                &&
-                sourceType.Name.EndsWith("Link")
-            );
+            sourceType.Name.EndsWith("Link")
+            ||
+            sourceType.Name is "Indexable" or "Enumerable" or "Defined" or "Paged";
     }
 
     public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
@@ -260,9 +254,9 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
                             target.TypeDeclarationSyntax.TypeParameterList,
                             null,
                             target.TypeDeclarationSyntax.ConstraintClauses,
-                            target.TypeDeclarationSyntax.OpenBraceToken,
+                            SyntaxFactory.Token(SyntaxKind.OpenBraceToken),
                             [],
-                            target.TypeDeclarationSyntax.CloseBraceToken,
+                            SyntaxFactory.Token(SyntaxKind.CloseBraceToken),
                             target.TypeDeclarationSyntax.SemicolonToken
                         ),
                         target.TypeSymbol

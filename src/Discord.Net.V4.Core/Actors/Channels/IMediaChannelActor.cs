@@ -5,9 +5,16 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetChannel), typeof(GuildMediaChannel))]
-[Modifiable<ModifyMediaChannelProperties>(nameof(Routes.ModifyChannel))]
-[SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
+[
+    Loadable(nameof(Routes.GetChannel), typeof(GuildMediaChannel)),
+    Modifiable<ModifyMediaChannelProperties>(nameof(Routes.ModifyChannel)),
+    Creatable<CreateGuildMediaChannelProperties>(
+        nameof(Routes.CreateGuildChannel),
+        typeof(IGuildActor),
+        RouteGenerics = [typeof(IGuildMediaChannelModel)]
+    ),
+    SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
+]
 public partial interface IMediaChannelActor :
     IThreadableChannelActor,
     IIncomingIntegrationChannelTrait,

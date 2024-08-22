@@ -38,7 +38,7 @@ public sealed partial class RestWebhookMessage :
     RestMessage,
     IWebhookMessage,
     IConstructable<RestWebhookMessage, IMessageModel, DiscordRestClient>,
-    IContextConstructable<RestWebhookMessage, IMessageModel, RestWebhookMessage.Context, DiscordRestClient>
+    IRestConstructable<RestWebhookMessage, RestWebhookMessageActor, IMessageModel>
 {
     public new readonly record struct Context(
         GuildIdentity? Guild = null,

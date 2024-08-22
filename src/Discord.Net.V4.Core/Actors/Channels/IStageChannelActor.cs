@@ -5,8 +5,15 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetChannel), typeof(GuildStageChannel))]
-[SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
+[
+    Loadable(nameof(Routes.GetChannel), typeof(GuildStageChannel)),
+    Creatable<CreateGuildVoiceChannelProperties>(
+        nameof(Routes.CreateGuildChannel),
+        typeof(IGuildActor),
+        RouteGenerics = [typeof(IGuildVoiceChannelModel)]
+    ),
+    SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
+]
 public partial interface IStageChannelActor :
     IVoiceChannelActor,
     IChannelFollowerIntegrationChannelTrait,
@@ -27,7 +34,7 @@ public partial interface IStageChannelActor :
             {
                 Topic = topic,
                 ChannelId = Id,
-                PrivacyLevel = Optional.FromNullable(privacyLevel).Map(v => (int)v),
+                PrivacyLevel = Optional.FromNullable(privacyLevel).Map(v => (int) v),
                 SendStartNotification = Optional.FromNullable(sendStartNotification),
                 GuildScheduledEventId = Optional.FromNullable(scheduledEvent).Map(v => v.Id)
             }),

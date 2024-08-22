@@ -34,7 +34,7 @@ public partial class RestVoiceStateActor :
 public partial class RestVoiceState :
     RestEntity<ulong>,
     IVoiceState,
-    IContextConstructable<RestVoiceState, IVoiceStateModel, RestVoiceState.Context, DiscordRestClient>
+    IRestConstructable<RestVoiceState, RestVoiceStateActor, IVoiceStateModel>
 {
     public readonly record struct Context(GuildIdentity Guild, MemberIdentity? Member = null);
 

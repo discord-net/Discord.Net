@@ -129,27 +129,6 @@ public static class ModifyTrait
                 out var entityType)
            ) return;
 
-        foreach (var baseInterface in target.InterfaceSymbol.AllInterfaces)
-        {
-            if (!ResolveModifiableTypes(
-                    baseInterface,
-                    target.SemanticModel,
-                    null,
-                    logger,
-                    out var baseIdType,
-                    out var baseUserPropertiesType,
-                    out var baseApiParamsType,
-                    out var baseEntityTypeSyntax,
-                    out var baseModelType,
-                    out var baseRouteMethod,
-                    out var baseRouteMemberAccess,
-                    out var baseEntityPropertiesInterface,
-                    out var baseEntityType)
-               ) continue;
-
-            // base is modifiable, we should override its method if its parameters are assignable from ours
-        }
-
         var hasModelResult = routeMethod.ReturnType.Name.Contains("Out");
 
         var modifiableGenerics = SyntaxFactory.SeparatedList([
@@ -219,6 +198,12 @@ public static class ModifyTrait
                            .WithCloseBraceToken(SyntaxFactory.Token(SyntaxKind.CloseBraceToken))
                            ?? throw new KeyNotFoundException($"Couldn't find entity syntax for {entityType}");
 
+        if (entitySyntax.BaseList?.Types.Any(x => x.Type.IsEquivalentTo(entityModifiableInterface)) ?? false)
+        {
+            logger.Log($"{target.InterfaceSymbol}: Returning early, {entityType} already is modifiable");
+            return;
+        }
+        
         entitySyntax = entitySyntax.AddBaseListTypes(SyntaxFactory.SimpleBaseType(entityModifiableInterface));
 
         GenerateModifyOverload(

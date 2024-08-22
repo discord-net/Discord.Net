@@ -7,23 +7,15 @@ using System.ComponentModel;
 
 namespace Discord.Rest;
 
-using EnumerableInvitesActor = RestEnumerableIndexableLink<
-    RestGuildChannelInviteActor,
-    string,
-    RestGuildChannelInvite,
-    IGuildChannelInvite,
-    IEnumerable<IInviteModel>
->;
-
 [ExtendInterfaceDefaults]
 public partial class RestGuildChannelActor :
     RestChannelActor,
     IGuildChannelActor,
-    IRestActor<ulong, RestGuildChannel, GuildChannelIdentity>
+    IRestActor<ulong, RestGuildChannel, GuildChannelIdentity, IGuildChannelModel>
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
 
-    [SourceOfTruth] public EnumerableInvitesActor Invites { get; }
+    [SourceOfTruth] public GuildChannelInviteLink.Enumerable.Indexable Invites { get; }
 
     [SourceOfTruth]
     internal override GuildChannelIdentity Identity { get; }
@@ -64,7 +56,7 @@ public partial class RestGuildChannelActor :
 public partial class RestGuildChannel :
     RestChannel,
     IGuildChannel,
-    IContextConstructable<RestGuildChannel, IGuildChannelModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestGuildChannel, RestGuildChannelActor, IGuildChannelModel>
 {
     public string Name => Model.Name;
 
@@ -85,19 +77,13 @@ public partial class RestGuildChannel :
 
     internal RestGuildChannel(
         DiscordRestClient client,
-        GuildIdentity guild,
         IGuildChannelModel model,
-        RestGuildChannelActor? actor = null
-    ) : base(client, model)
+        RestGuildChannelActor actor
+    ) : base(client, model, actor)
     {
         _model = model;
-
-        Actor = actor ?? new RestGuildChannelActor(
-            client,
-            guild,
-            GuildChannelIdentity.Of(this)
-        );
-
+        Actor = actor;
+        
         PermissionOverwrites = model.Permissions.Select(x => Overwrite.Construct(client, x)).ToImmutableArray();
     }
 

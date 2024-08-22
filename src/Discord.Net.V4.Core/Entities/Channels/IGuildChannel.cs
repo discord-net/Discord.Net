@@ -7,7 +7,7 @@ namespace Discord;
 [FetchableOfMany(nameof(Routes.GetGuildChannels))]
 public partial interface IGuildChannel :
     ISnowflakeEntity<IGuildChannelModel>,
-    IInvitableChannel,
+    IChannel,
     IGuildChannelActor
 {
     string Name { get; }

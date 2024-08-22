@@ -3,7 +3,8 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
-using IncomingIntegrationChannelTrait = RestIncomingIntegrationChannelTrait<RestForumChannelActor, RestForumChannel, ForumChannelIdentity>;
+using IncomingIntegrationChannelTrait =
+    RestIncomingIntegrationChannelTrait<RestForumChannelActor, RestForumChannel, ForumChannelIdentity>;
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestForumChannelActor :
@@ -11,8 +12,7 @@ public sealed partial class RestForumChannelActor :
     IForumChannelActor,
     IRestActor<ulong, RestForumChannel, ForumChannelIdentity>
 {
-    [SourceOfTruth]
-    internal override ForumChannelIdentity Identity { get; }
+    [SourceOfTruth] internal override ForumChannelIdentity Identity { get; }
 
     [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
     internal IncomingIntegrationChannelTrait IncomingIntegrationChannelTrait { get; }
@@ -38,13 +38,13 @@ public sealed partial class RestForumChannelActor :
 public partial class RestForumChannel :
     RestThreadableChannel,
     IForumChannel,
-    IContextConstructable<RestForumChannel, IGuildForumChannelModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestForumChannel, RestForumChannelActor, IGuildForumChannelModel>
 {
     public bool IsNsfw => Model.IsNsfw;
 
     public string? Topic => Model.Topic;
 
-    public ThreadArchiveDuration DefaultAutoArchiveDuration => (ThreadArchiveDuration)Model.DefaultAutoArchiveDuration;
+    public ThreadArchiveDuration DefaultAutoArchiveDuration => (ThreadArchiveDuration) Model.DefaultAutoArchiveDuration;
 
     public IReadOnlyCollection<ForumTag> AvailableTags { get; private set; }
 
@@ -52,9 +52,9 @@ public partial class RestForumChannel :
 
     public ILoadableEntity<IEmote> DefaultReactionEmoji => throw new NotImplementedException();
 
-    public SortOrder? DefaultSortOrder => (SortOrder?)Model.DefaultSortOrder;
+    public SortOrder? DefaultSortOrder => (SortOrder?) Model.DefaultSortOrder;
 
-    public ForumLayout DefaultLayout => (ForumLayout)Model.DefaultForumLayout;
+    public ForumLayout DefaultLayout => (ForumLayout) Model.DefaultForumLayout;
 
     [ProxyInterface(
         typeof(IForumChannelActor),
@@ -68,22 +68,24 @@ public partial class RestForumChannel :
 
     internal RestForumChannel(
         DiscordRestClient client,
-        GuildIdentity guild,
         IGuildForumChannelModel model,
-        RestForumChannelActor? actor = null
-    ) : base(client, guild, model, actor)
+        RestForumChannelActor actor
+    ) : base(client, model, actor)
     {
         _model = model;
-        Actor = actor ?? new(client, guild, ForumChannelIdentity.Of(this));
+        Actor = actor;
 
         AvailableTags = model.AvailableTags
-            .Select(x => ForumTag.Construct(client, new ForumTag.Context(guild.Id), x))
-            .ToImmutableArray();
+            .Select(x => ForumTag.Construct(client, x))
+            .ToList()
+            .AsReadOnly();
     }
 
-    public static RestForumChannel Construct(DiscordRestClient client,
-        GuildIdentity guild,
-        IGuildForumChannelModel model) => new(client, guild, model);
+    public static RestForumChannel Construct(
+        DiscordRestClient client,
+        RestForumChannelActor actor,
+        IGuildForumChannelModel model
+    ) => new(client, model, actor);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IGuildForumChannelModel model, CancellationToken token = default)
@@ -91,8 +93,9 @@ public partial class RestForumChannel :
         if (!_model.AvailableTags.SequenceEqual(model.AvailableTags))
         {
             AvailableTags = Model.AvailableTags
-                .Select(x => ForumTag.Construct(Client, new ForumTag.Context(Actor.Guild.Id), x))
-                .ToImmutableArray();
+                .Select(x => ForumTag.Construct(Client, x))
+                .ToList()
+                .AsReadOnly();
         }
 
         _model = model;

@@ -27,7 +27,7 @@ public sealed partial class RestIntegrationActor :
 public sealed partial class RestIntegration :
     RestEntity<ulong>,
     IIntegration,
-    IContextConstructable<RestIntegration, IIntegrationModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestIntegration, RestIntegrationActor, IIntegrationModel>
 {
     [SourceOfTruth] public RestRoleActor? Role { get; }
 

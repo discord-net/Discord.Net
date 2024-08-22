@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Discord.Net.Hanz.Tasks.Actors;
 using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -14,18 +15,20 @@ public static class CreatableTrait
         ITypeSymbol modelType,
         ITypeSymbol? apiParamsType,
         ITypeSymbol idType,
-        ITypeSymbol? propertiesType,
+        INamedTypeSymbol? propertiesType,
         IMethodSymbol route,
-        MemberAccessExpressionSyntax routeMemberAccess)
+        MemberAccessExpressionSyntax routeMemberAccess,
+        bool isActorCreatable)
     {
         public INamedTypeSymbol ActorInterface { get; } = actorInterface;
         public ITypeSymbol EntityType { get; } = entityType;
         public ITypeSymbol ModelType { get; } = modelType;
         public ITypeSymbol? ApiParamsType { get; } = apiParamsType;
         public ITypeSymbol IdType { get; } = idType;
-        public ITypeSymbol? PropertiesType { get; } = propertiesType;
+        public INamedTypeSymbol? PropertiesType { get; } = propertiesType;
         public IMethodSymbol Route { get; } = route;
         public MemberAccessExpressionSyntax RouteMemberAccess { get; } = routeMemberAccess;
+        public bool IsActorCreatable { get; } = isActorCreatable;
     }
 
     public static void Process(
@@ -35,7 +38,7 @@ public static class CreatableTrait
         SourceProductionContext context,
         Logger logger)
     {
-        if (traitAttribute.ConstructorArguments.Length is < 1 or > 3)
+        if (traitAttribute.ConstructorArguments.Length is < 2 or > 3)
         {
             logger.Warn($"{traitAttribute.ConstructorArguments.Length} attribute arguments specified");
             return;
@@ -72,14 +75,17 @@ public static class CreatableTrait
             $"{target.InterfaceSymbol}: {traitAttribute}: actor: {isActorCreatable}, canonical: {isCanonicalCreatable}");
 
         var hasRouteGenericParameters = !isCanonicalCreatable;
-        var routeGenericParametersIndex = isActorCreatable ? 2 : 1;
+
+        var routeGenerics = traitAttribute.NamedArguments
+            .FirstOrDefault(x => x.Key == "RouteGenerics")
+            .Value is {Kind: TypedConstantKind.Array} specified
+            ? specified.Values
+            : ImmutableArray<TypedConstant>.Empty;
 
         var route = EntityTraits.GetRouteSymbol(
             routeMemberAccess,
             target.SemanticModel,
-            hasRouteGenericParameters
-                ? traitAttribute.ConstructorArguments[routeGenericParametersIndex].Values.Length
-                : 0
+            routeGenerics.Length
         );
 
         if (route is not IMethodSymbol {ReturnType: INamedTypeSymbol returnType} routeMethod)
@@ -88,11 +94,9 @@ public static class CreatableTrait
             return;
         }
 
-        if (hasRouteGenericParameters &&
-            traitAttribute.ConstructorArguments[routeGenericParametersIndex].Values.Length > 0)
+        if (hasRouteGenericParameters && routeGenerics.Length > 0)
         {
-            var genericNames = traitAttribute.ConstructorArguments[routeGenericParametersIndex]
-                .Values
+            var genericNames = routeGenerics
                 .Select(x => x.Value!.ToString());
 
             routeMemberAccess = SyntaxFactory.MemberAccessExpression(
@@ -124,7 +128,8 @@ public static class CreatableTrait
             idType,
             properties,
             routeMethod,
-            routeMemberAccess
+            routeMemberAccess,
+            isActorCreatable
         );
 
         switch (traitAttribute.AttributeClass!.Name)
@@ -137,12 +142,77 @@ public static class CreatableTrait
                 break;
         }
 
-        if (properties is null)
+        var linkTargets = traitAttribute.ConstructorArguments.Last().Values;
+
+        var methods = new List<MemberDeclarationSyntax>();
+
+        if (linkTargets.Length == 0)
+        {
+            if (CreateLinkExtensionMethod(target, creatableTarget, null, traitAttribute, logger) is not { } method)
+            {
+                logger.Warn($"Failed to create link extension method for {target.InterfaceSymbol}");
+                return;
+            }
+
+            methods.Add(method);
+        }
+        else
+        {
+            foreach (var linkTarget in linkTargets)
+            {
+                if (linkTarget.Value is not INamedTypeSymbol linkTargetType)
+                {
+                    logger.Warn($"Expected a type for link target entry, got '{linkTarget.Value}'");
+                    continue;
+                }
+
+                if (CreateLinkExtensionMethod(target, creatableTarget, linkTargetType, traitAttribute, logger) is not
+                    { } method)
+                {
+                    logger.Warn($"Failed to create link extension method for {target.InterfaceSymbol}");
+                    continue;
+                }
+
+                methods.Add(method);
+            }
+        }
+
+        if (methods.Count == 0)
             return;
 
-        var createProperties = TypeUtils.GetBaseTypesAndThis(properties)
-            .SelectMany(x => x.GetMembers().OfType<IPropertySymbol>())
-            .ToArray();
+        context.AddSource(
+            $"Traits/Creatable{target.InterfaceSymbol.ToFullMetadataName()}",
+            $$"""
+              {{target.InterfaceDeclarationSyntax.GetFormattedUsingDirectives()}}
+
+              namespace {{target.InterfaceSymbol.ContainingNamespace}};
+
+              public static class Creatable{{target.InterfaceSymbol.Name}}Extensions
+              {
+                  {{
+                      string.Join(
+                          "\n        ",
+                          methods.Select(x => x.NormalizeWhitespace().ToString())
+                      )
+                  }}
+              }
+              """
+        );
+    }
+
+    private static MemberDeclarationSyntax? CreateLinkExtensionMethod(
+        EntityTraits.GenerationTarget target,
+        Target creatableTarget,
+        INamedTypeSymbol? backlinkTarget,
+        AttributeData traitAttribute,
+        Logger logger)
+    {
+        var createProperties =
+            creatableTarget.PropertiesType is null
+                ? []
+                : TypeUtils.GetBaseTypesAndThis(creatableTarget.PropertiesType)
+                    .SelectMany(x => x.GetMembers().OfType<IPropertySymbol>())
+                    .ToArray();
 
         var requiredProps = createProperties
             .Where(x => x.IsRequired)
@@ -152,13 +222,37 @@ public static class CreatableTrait
             .Where(x => !x.IsRequired)
             .ToArray();
 
-        var linkType = isActorCreatable
-            ? "IIndexableLink"
-            : "ILink";
+        var linkType =
+            $"ILink<{target.InterfaceSymbol}, {creatableTarget.IdType}, {creatableTarget.EntityType}, {creatableTarget.ModelType}>";
+
+        if (backlinkTarget is not null)
+        {
+            var friendlyName = Links.GetFriendlyName(target.InterfaceSymbol);
+            var backlinkProperty = Hierarchy.GetHierarchy(backlinkTarget)
+                .Select(x => x.Type)
+                .Prepend(backlinkTarget)
+                .SelectMany(x => x.GetMembers())
+                .OfType<IPropertySymbol>()
+                .FirstOrDefault(x =>
+                    x.Type.ToString().StartsWith($"{friendlyName}Link")
+                );
+
+            if (backlinkProperty is null)
+            {
+                logger.Warn($"No backlink found from {backlinkTarget} -> {target.InterfaceSymbol}");
+
+                return null;
+            }
+
+            linkType = $"{backlinkProperty.Type}";
+
+            if (!linkType.EndsWith($".BackLink<{backlinkTarget.ToDisplayString()}>"))
+                linkType = $"{linkType}.BackLink<{backlinkTarget.ToDisplayString()}>";
+        }
 
         var parameters = new List<string>()
         {
-            $"this {linkType}<{target.InterfaceSymbol}, {idType}, {entityType}, {modelType}> link"
+            $"this {linkType} link"
         };
 
         if (requiredProps.Length > 0)
@@ -170,9 +264,9 @@ public static class CreatableTrait
             );
         }
 
-        if (notRequiredProps.Length > 0)
+        if (creatableTarget.PropertiesType is not null && notRequiredProps.Length > 0)
         {
-            parameters.Add($"Action<{properties}>? func = null");
+            parameters.Add($"Action<{creatableTarget.PropertiesType}>? func = null");
         }
 
         parameters.AddRange([
@@ -180,63 +274,67 @@ public static class CreatableTrait
             "CancellationToken token = default"
         ]);
 
-        var ctor = properties.Constructors
+        var ctor = creatableTarget.PropertiesType?.Constructors
             .FirstOrDefault(x => x.Parameters.Length == 1 && x.Parameters[0].Type.Name == "IPathable");
 
-        var extensionReturnType = isActorCreatable
+        var extensionReturnType = creatableTarget.IsActorCreatable
             ? target.InterfaceSymbol
-            : entityType;
+            : creatableTarget.EntityType;
 
         List<string> flattened;
 
-        context.AddSource(
-            $"TraitExtensions/{target.InterfaceSymbol.ToFullMetadataName()}",
+        return SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              using Discord.Models;
-
-              namespace Discord;
-
-              public static partial class CreatableTraitExtensions
+              public static async Task<{{extensionReturnType}}> CreateAsync(
+                  {{string.Join(",\n".PadRight(10), parameters)}}      
+              )
               {
-                  public static async Task<{{extensionReturnType}}> CreateAsync(
-                      {{string.Join(",\n".PadRight(10), parameters)}}      
-                  )
-                  {
-                      var args = new {{properties}}({{(ctor is not null ? "link" : string.Empty)}}){{(
-                          requiredProps.Length > 0
-                              ? $" {{ {string.Join(", ", requiredProps.Select(x => $"{x.Name} = {char.ToLowerInvariant(x.Name[0])}{x.Name.Remove(0, 1)}"))} }}"
-                              : string.Empty
-                      )}};
-                      {{(notRequiredProps.Length > 0 ? "func?.Invoke(args);" : string.Empty)}}
-                      var model = await link.Client.RestApiClient.ExecuteRequiredAsync(
-                          {{target.InterfaceSymbol}}.CreateRoute(link, args{{(!isActorCreatable ? ".ToApiModel()" : string.Empty)}}),
-                          options ?? link.Client.DefaultRequestOptions,
-                          token
-                      );
-                      
-                      {{(
-                          isActorCreatable
-                              ? $"return link.Specifically(model.{
-                                  string.Join(
-                                      ".",
-                                      (
-                                          flattened = SyntaxUtils
-                                              .FlattenMemberAccess(
-                                                  (MemberAccessExpressionSyntax) EntityTraits.GetNameOfArgument(
-                                                      traitAttribute,
-                                                      1
-                                                  )!
-                                              )
-                                              .ToList()
-                                      )
-                                      .Skip(
-                                          flattened.IndexOf(returnType.TypeArguments[1].Name) + 1
-                                      )
+                  {{(
+                      creatableTarget.PropertiesType is not null
+                          ? $$"""
+                              var args = new {{creatableTarget.PropertiesType}}({{(ctor is not null ? "link" : string.Empty)}}){{(
+                                  requiredProps.Length > 0
+                                      ? $" {{ {string.Join(", ", requiredProps.Select(x => $"{x.Name} = {char.ToLowerInvariant(x.Name[0])}{x.Name.Remove(0, 1)}"))} }}"
+                                      : string.Empty
+                              )}};
+                              {{(notRequiredProps.Length > 0 ? "func?.Invoke(args);" : string.Empty)}}
+                              """
+                          : string.Empty
+                  )}}
+              
+                  var model = await link.Client.RestApiClient.ExecuteRequiredAsync(
+                      {{target.InterfaceSymbol}}.CreateRoute(link{{(
+                          creatableTarget.PropertiesType is not null
+                              ? $$"""
+                                  , args{{(!creatableTarget.IsActorCreatable ? ".ToApiModel()" : string.Empty)}}
+                                  """
+                              : string.Empty)}}),
+                      options ?? link.Client.DefaultRequestOptions,
+                      token
+                  );
+                  
+                  {{(
+                      creatableTarget.IsActorCreatable
+                          ? $"return link.Specifically(model.{
+                              string.Join(
+                                  ".",
+                                  (
+                                      flattened = SyntaxUtils
+                                          .FlattenMemberAccess(
+                                              (MemberAccessExpressionSyntax) EntityTraits.GetNameOfArgument(
+                                                  traitAttribute,
+                                                  1
+                                              )!
+                                          )
+                                          .ToList()
                                   )
-                              });"
-                              : "return link.CreateEntity(model);"
-                      )}}
-                  }
+                                  .Skip(
+                                      flattened.IndexOf(((INamedTypeSymbol) creatableTarget.Route.ReturnType).TypeArguments[1].Name) + 1
+                                  )
+                              )
+                          });"
+                          : "return link.CreateEntity(model);"
+                  )}}
               }
               """
         );
@@ -472,7 +570,7 @@ public static class CreatableTrait
         var secondArgName = creatableTarget.ApiParamsType is not null
             ? "args"
             : "id";
-        
+
         var parameterList = SyntaxFactory.ParameterList(
             SyntaxFactory.SeparatedList([
                 SyntaxFactory.Parameter(
@@ -485,7 +583,8 @@ public static class CreatableTrait
                 SyntaxFactory.Parameter(
                     [],
                     [],
-                    SyntaxFactory.ParseTypeName((creatableTarget.ApiParamsType ?? creatableTarget.IdType).ToDisplayString()),
+                    SyntaxFactory.ParseTypeName((creatableTarget.ApiParamsType ?? creatableTarget.IdType)
+                        .ToDisplayString()),
                     SyntaxFactory.Identifier(secondArgName),
                     null
                 ),
@@ -508,7 +607,7 @@ public static class CreatableTrait
         var secondArg = creatableTarget.ApiParamsType is not null
             ? $"{creatableTarget.ApiParamsType} args"
             : $"{creatableTarget.IdType} id";
-        
+
         syntax = syntax
             .AddBaseListTypes(
                 SyntaxFactory.SimpleBaseType(

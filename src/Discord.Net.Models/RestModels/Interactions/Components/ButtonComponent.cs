@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Discord.Models.Json;
 
 [ComponentType(ComponentTypes.Button)]
-public sealed class ButtonComponent : MessageComponent, IModelSource, IButtonComponentModel, IModelSourceOf<IEmoteModel?>
+public sealed class ButtonComponent : MessageComponent, IButtonComponentModel
 {
     [JsonPropertyName("style")]
     public int Style { get; set; }

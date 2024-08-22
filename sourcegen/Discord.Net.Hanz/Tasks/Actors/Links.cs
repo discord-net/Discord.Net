@@ -67,6 +67,16 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
         }
     }
 
+    public sealed class BackLinkPropertiesToTypeGenerationTarget(
+        SemanticModel semantic,
+        INamedTypeSymbol symbol,
+        TypeDeclarationSyntax syntax,
+        HashSet<IPropertySymbol> properties
+    ) : GenerationTarget(semantic, symbol, syntax)
+    {
+        public HashSet<IPropertySymbol> Properties { get; } = properties;
+    }
+
     public sealed class VertexAppliedMethodGenerationTarget(
         SemanticModel semantic,
         INamedTypeSymbol symbol,
@@ -217,6 +227,9 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
                 if (GetActorGenerationTarget(context, typeSyntax, symbol) is { } actor)
                     set.Add(actor);
 
+                if (GetBackLinkPropertyToTypeGenerationTarget(context, typeSyntax, symbol) is { } backlinkProperties)
+                    set.Add(backlinkProperties);
+
                 return set.Count > 0
                     ? new(set)
                     : null;
@@ -246,6 +259,54 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
             default:
                 return null;
         }
+    }
+
+    private static AttributeData[] GetBackLinkAttributes(ITypeSymbol symbol)
+        => symbol
+            .GetAttributes()
+            .Where(x =>
+                x.AttributeClass?
+                    .ToDisplayString() == "Discord.BackLinkAttribute" &&
+                !x.AttributeClass.IsGenericType
+            )
+            .ToArray();
+
+    private static BackLinkPropertiesToTypeGenerationTarget? GetBackLinkPropertyToTypeGenerationTarget(
+        GeneratorSyntaxContext context,
+        TypeDeclarationSyntax typeSyntax,
+        INamedTypeSymbol symbol)
+    {
+        var attributes = GetBackLinkAttributes(symbol);
+
+        if (attributes.Length == 0) return null;
+
+        var properties = new HashSet<IPropertySymbol>(SymbolEqualityComparer.Default);
+
+        var typeProperties = Hierarchy.GetHierarchy(symbol)
+            .SelectMany(x => x.Type.GetMembers())
+            .OfType<IPropertySymbol>()
+            .Distinct<IPropertySymbol>(SymbolEqualityComparer.Default)
+            .ToArray();
+
+        foreach (var attribute in attributes)
+        {
+            if (attribute.ConstructorArguments.FirstOrDefault().Value is not string name)
+                continue;
+
+            var property = typeProperties.FirstOrDefault(x => x.Name == name);
+
+            if (property is not null)
+                properties.Add(property);
+        }
+
+        if (properties.Count == 0) return null;
+
+        return new BackLinkPropertiesToTypeGenerationTarget(
+            context.SemanticModel,
+            symbol,
+            typeSyntax,
+            properties
+        );
     }
 
     private static VertexAppliedMethodGenerationTarget? GetVertexMethodGenerationTarget(
@@ -416,6 +477,7 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
         var backlinkTypes = flattened.OfType<BackLinkableTypeGenerationTarget>().ToList();
         var backlinkMethods = flattened.OfType<BackLinkMethodGenerationTarget>().ToList();
         var vertexMethods = flattened.OfType<VertexAppliedMethodGenerationTarget>().ToList();
+        var backlinkProperties = flattened.OfType<BackLinkPropertiesToTypeGenerationTarget>().ToList();
 
         try
         {
@@ -430,11 +492,96 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
 
             if (vertexMethods.Count > 0)
                 ExecuteVertexMethods(context, vertexMethods, logger);
+
+            if (backlinkProperties.Count > 0)
+                ExecuteBackLinkToProperties(context, backlinkProperties, logger);
         }
         catch (Exception x)
         {
             logger.Log(LogLevel.Error, x.ToString());
             throw;
+        }
+    }
+
+    private static void ExecuteBackLinkToProperties(
+        SourceProductionContext context,
+        List<BackLinkPropertiesToTypeGenerationTarget> targets,
+        Logger logger)
+    {
+        foreach (var group in targets
+                     .GroupBy(
+                         x => x.Symbol,
+                         (IEqualityComparer<INamedTypeSymbol>) SymbolEqualityComparer.Default)
+                )
+        {
+            TypeDeclarationSyntax? syntax = null;
+
+            foreach (var target in group)
+            {
+                syntax ??= SyntaxUtils.CreateSourceGenClone(target.Syntax);
+
+                var targetLogger = logger.WithSemanticContext(target.Semantic).GetSubLogger("BackLinkProperties");
+
+                targetLogger.Log($"Processing {target.Symbol}");
+
+                foreach (var property in target.Properties)
+                {
+                    targetLogger.Log($" - {property.Type} {property.Name} ({property.ContainingType})");
+                    
+                    if (property.ContainingType.Equals(target.Symbol, SymbolEqualityComparer.Default))
+                        continue;
+
+                    if (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not
+                        PropertyDeclarationSyntax propertySyntax)
+                        continue;
+
+                    if (propertySyntax.Modifiers.IndexOf(SyntaxKind.NewKeyword) != -1)
+                    {
+                        propertySyntax = propertySyntax.WithModifiers(
+                            propertySyntax.Modifiers.RemoveAt(propertySyntax.Modifiers.IndexOf(SyntaxKind.NewKeyword))
+                        );
+                    }
+
+                    syntax = syntax
+                        .AddMembers(
+                            propertySyntax
+                                .WithType(
+                                    SyntaxFactory.ParseTypeName($"{property.Type}.BackLink<{target.Symbol}>")
+                                )
+                                .AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword)),
+                            propertySyntax
+                                .WithType(
+                                    SyntaxFactory.ParseTypeName($"{property.Type}")
+                                )
+                                .WithExplicitInterfaceSpecifier(
+                                    SyntaxFactory.ExplicitInterfaceSpecifier(
+                                        SyntaxFactory.IdentifierName(property.ContainingType.ToDisplayString())
+                                    )
+                                )
+                                .WithAccessorList(null)
+                                .WithInitializer(null)
+                                .WithExpressionBody(
+                                    SyntaxFactory.ArrowExpressionClause(
+                                        SyntaxFactory.IdentifierName(property.Name)
+                                    )
+                                )
+                                .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
+                        );
+                }
+            }
+
+            if (syntax is null) continue;
+
+            context.AddSource(
+                $"BackLinkProperties/{group.Key.ToFullMetadataName()}",
+                $$"""
+                  {{group.First().Syntax.GetFormattedUsingDirectives()}}
+
+                  namespace {{group.Key.ContainingNamespace}};
+
+                  {{syntax.NormalizeWhitespace()}}
+                  """
+            );
         }
     }
 
@@ -464,7 +611,7 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
 
             foreach (var target in group)
             {
-                var targetLogger = logger.WithSemanticContext(target.Semantic);
+                var targetLogger = logger.WithSemanticContext(target.Semantic).GetSubLogger("VertexMethods");
 
                 targetLogger.Log($"Processing {target.MethodSymbol}");
 
@@ -563,7 +710,7 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
 
             foreach (var target in group)
             {
-                var targetLogger = logger.WithSemanticContext(target.Semantic);
+                var targetLogger = logger.WithSemanticContext(target.Semantic).GetSubLogger("BackLinkMethods");
 
                 targetLogger.Log($"Processing {target.MethodSymbol}");
 
@@ -653,7 +800,7 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
 
         foreach (var target in targets)
         {
-            var targetLogger = logger.WithSemanticContext(target.Semantic);
+            var targetLogger = logger.WithSemanticContext(target.Semantic).GetSubLogger("BackLinkTypes");
 
             targetLogger.Log($"Processing {target.Symbol}");
 
@@ -700,7 +847,8 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
                     var hierarchy = Hierarchy.GetHierarchy(target.Symbol)
                         .Select(x => x.Type)
                         .Where(HasBackLinkableAttribute)
-                        .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+                        .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default)
+                        .ToArray();
 
                     var parentBackLinks = target.ActorType is not null
                         ? hierarchy
@@ -727,6 +875,7 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
                             )
                         : [];
 
+
                     if (parentBackLinks.Count > 0)
                     {
                         members.AddRange([
@@ -738,6 +887,13 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
                     if (target.LinkType is not null && target.Symbol.Name is not "ILinkType")
                     {
                         bases.Add($"ILinkType<{formattedTypeArguments}>.BackLink<TSource>");
+
+                        foreach (var extra in hierarchy
+                                     .Where(x => x.Name is not "ILinkType" and not "ISpecifiedLinkType"))
+                        {
+                            targetLogger.Log($"{target.Symbol}: extra backlink {extra}");
+                            bases.Add($"{extra}.BackLink<TSource>");
+                        }
                     }
 
                     foreach (var parentBackLinkable in parentBackLinks)
@@ -763,15 +919,35 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
                     if (backlinkSyntax is null)
                         break;
 
-                    // if (target.ActorType is null)
-                    //     backlinkSyntax = backlinkSyntax.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
+                    if (hierarchy.Length > 0)
+                        backlinkSyntax = backlinkSyntax.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
 
                     break;
                 case TypeKind.Class:
-                    var backLinkInterfaces = target.Symbol
-                        .AllInterfaces
+                    List<string> backlinkInterfaces =
+                    [
+                        $"ILinkType<{formattedTypeArguments}>.BackLink<TSource>"
+                    ];
+
+                    var baseInterfaceSymbols = TypeUtils.GetBaseTypesAndThis(target.Symbol)
+                        .SelectMany(x => x.AllInterfaces)
+                        .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default)
                         .Where(HasBackLinkableAttribute)
-                        .ToList();
+                        .Where(x =>
+                            x.Name is not "ISpecifiedLinkType" &&
+                            x.AllInterfaces.Any(x => x.Name is "ILink")
+                        )
+                        .ToArray();
+
+                    targetLogger.Log($" - {baseInterfaceSymbols.Length} base backlinks");
+
+                    foreach (
+                        var baseInterface
+                        in baseInterfaceSymbols)
+                    {
+                        backlinkInterfaces.Add($"{baseInterface}.BackLink<TSource>");
+                        targetLogger.Log($" += {baseInterface}.BackLink<TSource>");
+                    }
 
                     var constructors = new List<string>();
 
@@ -779,7 +955,6 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
                     {
                         var ctorParams = (string[])
                             ["TSource source", ..constructor.Parameters.Select(MemberUtils.ToSyntaxForm)];
-
 
                         constructors.Add(
                             $$"""
@@ -795,14 +970,13 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
 
                     backlinkSyntax = SyntaxFactory.ParseMemberDeclaration(
                         $$"""
-                            public sealed class BackLink<TSource> : {{target.Symbol.ToDisplayString()}}
+                            public sealed class BackLink<TSource> : 
+                                {{target.Symbol.ToDisplayString()}}
                                 {{(
-                                    backLinkInterfaces.Count > 0
+                                    backlinkInterfaces.Count > 0
                                         ? $", {string.Join(
                                             ", ",
-                                            backLinkInterfaces.Select(x =>
-                                                $"{x.ToDisplayString()}.BackLink<TSource>"
-                                            ).Distinct()
+                                            backlinkInterfaces
                                         )}"
                                         : string.Empty
                                 )}}
@@ -820,17 +994,19 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
                                 {{
                                     string.Join(
                                         "\n",
-                                        backLinkInterfaces.Select(x =>
-                                            $"TSource IBackLink<TSource, {
-                                                string.Join(
-                                                    ", ",
-                                                    x.AllInterfaces
-                                                        .First(x => x.Name == "ILink")
-                                                        .TypeArguments
-                                                        .Select(x => x.Name)
-                                                )
-                                            }>.Source => Source;"
-                                        )
+                                        baseInterfaceSymbols
+                                            .Select(x => string.Join(
+                                                ", ",
+                                                x.AllInterfaces
+                                                    .First(x => x.Name == "ILink")
+                                                    .TypeArguments
+                                                    .Select(x => x.Name)
+                                            ))
+                                            .Prepend(formattedTypeArguments)
+                                            .Select(x =>
+                                                $"TSource IBackLink<TSource, {x}>.Source => Source;"
+                                            )
+                                            .Distinct()
                                     )
                                 }}
                             }
@@ -884,22 +1060,22 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
         }
     }
 
-    public static readonly Dictionary<string, string> CoreLookupTable = new()
-    {
-        {"DefinedEnumerableIndexable", "Discord.IDefinedEnumerableIndexableLink"},
-        {"DefinedIndexable", "Discord.IDefinedIndexableLink"},
-        {"EnumerableIndexable", "Discord.IEnumerableIndexableLink"},
-    };
+    // public static readonly Dictionary<string, string> CoreLookupTable = new()
+    // {
+    //     {"DefinedEnumerableIndexable", "Discord.IDefinedEnumerableIndexableLink"},
+    //     {"DefinedIndexable", "Discord.IDefinedIndexableLink"},
+    //     {"EnumerableIndexable", "Discord.IEnumerableIndexableLink"},
+    // };
 
-    public static readonly Dictionary<string, string> RestLookupTable = new()
-    {
-        {"DefinedEnumerableIndexable", "Discord.Rest.RestDefinedEnumerableIndexableLink"},
-        {"DefinedIndexable", "Discord.Rest.RestDefinedIndexableLink"},
-        {"Defined", "Discord.Rest.RestDefinedLink"},
-        {"EnumerableIndexable", "Discord.Rest.RestEnumerableIndexableLink"},
-        {"Enumerable", "Discord.Rest.RestEnumerableLink"},
-        {"Indexable", "Discord.Rest.RestIndexableLink"},
-    };
+    // public static readonly Dictionary<string, string> RestLookupTable = new()
+    // {
+    //     {"DefinedEnumerableIndexable", "Discord.Rest.RestDefinedEnumerableIndexableLink"},
+    //     {"DefinedIndexable", "Discord.Rest.RestDefinedIndexableLink"},
+    //     {"Defined", "Discord.Rest.RestDefinedLink"},
+    //     {"EnumerableIndexable", "Discord.Rest.RestEnumerableIndexableLink"},
+    //     {"Enumerable", "Discord.Rest.RestEnumerableLink"},
+    //     {"Indexable", "Discord.Rest.RestIndexableLink"},
+    // };
 
     private static void ExecuteActors(
         SourceProductionContext context,
@@ -922,111 +1098,19 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
 
             var impl = target.Semantic.Compilation.Assembly.Name.Split('.').Last();
 
-            var table = impl switch
-            {
-                "Core" => CoreLookupTable,
-                "Rest" => RestLookupTable,
-                _ => []
-            };
-
             var name = GetFriendlyName(target.Symbol);
 
-            if (impl is "Core")
+            var linkType = impl switch
             {
-                aliases[$"{name}Link"] =
-                    $"Discord.ILinkType<{target.Symbol}, {target.Id}, {target.Entity}, {target.Model}>";
-            }
+                "Core" => "Discord.ILinkType",
+                "Rest" => "Discord.Rest.RestLinkType",
+                _ => null
+            };
 
-            targetLogger.Log($"{impl} implementation for {name}:");
+            if (linkType is null)
+                continue;
 
-            foreach (var entry in table)
-            {
-                var key = $"{entry.Key}{name}Link";
-
-                if (!aliases.ContainsKey(key))
-                {
-                    var formatted = Format(entry.Value, target);
-
-                    if (formatted is null)
-                    {
-                        targetLogger.Warn($"Failed to format {entry.Key} with {target.Symbol}");
-                        continue;
-                    }
-
-                    aliases[key] = formatted;
-                    targetLogger.Log($" += {key}");
-                }
-            }
-
-            var pagedAttributes = Hierarchy.GetHierarchy(target.Entity)
-                .Select(x => x.Type)
-                .Prepend(target.Entity)
-                .SelectMany(x => x
-                    .GetAttributes()
-                    .Where(x =>
-                        x.AttributeClass?
-                            .ToDisplayString()
-                            .StartsWith("Discord.PagedFetchableOfManyAttribute")
-                        ?? false
-                    )
-                )
-                .ToArray();
-
-            targetLogger.Log($" - {target.Entity} is paged?: {pagedAttributes.Length > 0}");
-
-            if (pagedAttributes.Length > 0)
-            {
-                foreach (var pagedAttribute in pagedAttributes)
-                {
-                    var pagingParams = pagedAttribute.AttributeClass!.TypeArguments[0];
-                    var pagedEntity = pagedAttribute.AttributeClass.TypeArguments.Length == 2
-                        ? pagedAttribute.AttributeClass.TypeArguments[1]
-                        : null;
-
-                    var pagedName = name;
-                    if (pagedAttributes.Length > 1)
-                    {
-                        pagedName = pagedAttribute.AttributeClass.TypeArguments[0]
-                            .Name
-                            .Replace("Page", string.Empty)
-                            .Replace("Params", string.Empty);
-                    }
-
-                    var paged = $"Paged{pagedName}Link";
-                    var pagedIndexableFull = $"PagedIndexable{pagedName}Link";
-                    var pagedIndexablePartial = $"PartialPagedIndexable{pagedName}Link";
-
-                    switch (impl)
-                    {
-                        case "Core":
-                            if (!aliases.ContainsKey(paged))
-                                aliases[paged] =
-                                    $"Discord.ILinkType<{target.Symbol}, {target.Id}, {target.Entity}, {target.Model}>.Paged<{pagingParams}>";
-
-                            if (!aliases.ContainsKey(pagedIndexableFull))
-                                aliases[pagedIndexableFull] = FormatPaged("Discord.IPagedIndexableLink", pagingParams,
-                                    null, target);
-
-                            if (pagedEntity is not null && !aliases.ContainsKey(pagedIndexablePartial))
-                                aliases[pagedIndexablePartial] = FormatPaged("Discord.IPagedIndexableLink",
-                                    pagingParams, pagedEntity, target);
-                            break;
-                        case "Rest":
-                            if (!aliases.ContainsKey(paged))
-                                aliases[paged] = FormatPaged("Discord.Rest.RestPagedLink", pagingParams, pagedEntity,
-                                    target);
-
-                            if (!aliases.ContainsKey(pagedIndexableFull))
-                                aliases[pagedIndexableFull] = FormatPaged("Discord.Rest.RestPagedIndexableLink",
-                                    pagingParams, null, target);
-
-                            if (pagedEntity is not null && !aliases.ContainsKey(pagedIndexablePartial))
-                                aliases[pagedIndexablePartial] = FormatPaged("Discord.Rest.RestPagedIndexableLink",
-                                    pagingParams, pagedEntity, target);
-                            break;
-                    }
-                }
-            }
+            aliases[$"{name}Link"] = $"{linkType}<{target.Symbol}, {target.Id}, {target.Entity}, {target.Model}>";
         }
 
         if (aliases.Count == 0) return;
@@ -1121,7 +1205,7 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
         }
     }
 
-    private static string GetFriendlyName(ITypeSymbol symbol)
+    public static string GetFriendlyName(ITypeSymbol symbol)
     {
         if (symbol.TypeKind is TypeKind.Interface)
             return symbol.Name.Remove(0, 1).Replace("Actor", string.Empty);

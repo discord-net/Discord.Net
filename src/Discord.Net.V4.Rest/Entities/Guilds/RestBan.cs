@@ -35,7 +35,7 @@ public sealed partial class RestBanActor :
 public sealed partial class RestBan :
     RestEntity<ulong>,
     IBan,
-    IContextConstructable<RestBan, IBanModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestBan, RestBanActor, IBanModel>
 {
     public string? Reason => Model.Reason;
 

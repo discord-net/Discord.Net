@@ -8,7 +8,7 @@ internal sealed class WeakDictionary<TKey, TValue>
     where TKey : notnull
     where TValue : class
 {
-    private sealed class ValueHolder
+    private sealed class ValueHolder : IDisposable
     {
         private readonly WeakDictionary<TKey, TValue> _dictionary;
         private readonly TKey _key;
@@ -34,22 +34,34 @@ internal sealed class WeakDictionary<TKey, TValue>
         ~ValueHolder()
         {
             _dictionary.Remove(_key);
+            _handle.Dispose();
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            
+            _handle.Dispose();
+            _dictionary.UnsafeRemove(_key);
+            _handle = default;
         }
     }
 
     // ReSharper disable once InconsistentlySynchronizedField
     public int Count => _dictionary.Count;
-
-
+    
     private readonly Dictionary<TKey, WeakReference<ValueHolder>> _dictionary = new();
     private readonly object _syncRoot = new();
 
     ~WeakDictionary()
     {
-        lock (_syncRoot)
-        {
+        Clear();
+    }
+
+    public void Clear()
+    {
+        lock(_syncRoot)
             _dictionary.Clear();
-        }
     }
 
     public TValue GetOrAdd(TKey key, Func<TKey, TValue> factory)

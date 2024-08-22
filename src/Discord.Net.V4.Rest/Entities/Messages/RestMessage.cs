@@ -47,7 +47,7 @@ public partial class RestMessage :
     RestEntity<ulong>,
     IMessage,
     IConstructable<RestMessage, IMessageModel, DiscordRestClient>,
-    IContextConstructable<RestMessage, IMessageModel, RestMessage.Context, DiscordRestClient>
+    IRestConstructable<RestMessage, RestMessageActor, IMessageModel>
 {
     public readonly record struct Context(
         GuildIdentity? Guild = null,

@@ -70,7 +70,7 @@ public partial class RestThreadableChannelActor :
 public partial class RestThreadableChannel :
     RestGuildChannel,
     IThreadableChannel,
-    IContextConstructable<RestThreadableChannel, IThreadableChannelModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestThreadableChannel, RestThreadableChannelActor, IThreadableChannelModel>
 {
     [SourceOfTruth]
     public RestCategoryChannelActor? Category { get; private set; }

@@ -16,7 +16,7 @@ public partial interface IStickerPack :
     /// <summary>
     ///     Gets a collection of the stickers in the pack.
     /// </summary>
-    DefinedIndexableStickerLink Stickers { get; }
+    StickerLink.Defined.Indexable Stickers { get; }
 
     /// <summary>
     ///     Gets the id of the pack's SKU.

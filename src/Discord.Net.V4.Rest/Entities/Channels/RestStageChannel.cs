@@ -44,7 +44,7 @@ public sealed partial class RestStageChannelActor :
 public partial class RestStageChannel :
     RestVoiceChannel,
     IStageChannel,
-    IContextConstructable<RestStageChannel, IGuildStageChannelModel, GuildIdentity, DiscordRestClient>
+    IRestConstructable<RestStageChannel, RestStageChannelActor, IGuildStageChannelModel>
 {
     [ProxyInterface(
         typeof(IStageChannelActor),

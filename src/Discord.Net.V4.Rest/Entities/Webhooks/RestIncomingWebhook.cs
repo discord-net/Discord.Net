@@ -36,7 +36,7 @@ public sealed partial class RestIncomingWebhookActor :
 public sealed partial class RestIncomingWebhook :
     RestWebhook,
     IIncomingWebhook,
-    IContextConstructable<RestIncomingWebhook, IWebhookModel, RestIncomingWebhook.Context, DiscordRestClient>
+    IRestConstructable<RestIncomingWebhook, RestIncomingWebhookActor, IWebhookModel>
 {
     public readonly record struct Context(GuildIdentity Guild, IncomingIntegrationChannelIdentity Channel);
 

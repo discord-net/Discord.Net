@@ -95,6 +95,13 @@ public static class FetchableTrait
             fetchableInterfaceTypeArguments
         );
 
+        if (syntax.BaseList?.Types.Any(x => x.Type.IsEquivalentTo(fetchableInterface)) ?? false)
+        {
+            logger.Log($"{target.InterfaceSymbol}: exiting early, already fetchable");
+            return true;
+        }
+        
+
         if (fetchableType is "Discord.IPagedFetchableOfMany")
         {
             syntax = syntax.AddBaseListTypes(SimpleBaseType(fetchableInterface));
