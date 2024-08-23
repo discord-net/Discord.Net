@@ -11,7 +11,7 @@ public sealed class StartThreadParams
     public Optional<int> AutoArchiveDuration { get; set; }
 
     [JsonPropertyName("type")]
-    public required int Type { get; set; }
+    public Optional<int> Type { get; set; }
 
     [JsonPropertyName("invitable")]
     public Optional<bool> IsInvitable { get; set; }

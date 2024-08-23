@@ -367,7 +367,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 CreatableTrait.Process(
                     ref syntax,
                     target,
-                    traitAttributes[0],
+                    traitAttributes,
                     context,
                     traitLogger
                 );

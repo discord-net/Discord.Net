@@ -4,9 +4,6 @@ using MorseCode.ITask;
 
 namespace Discord;
 
-// To prevent confusion with this api, theres 2 types here, one contains nested types, while the other doesnt.
-// ALL NESTED TYPES MUST INHERIT THE 'ISpecifiedLinkType' INTERFACE
-
 public interface ISpecifiedLinkType<out TActor, TId, out TEntity, in TModel> :
     ILink<TActor, TId, TEntity, TModel>
     where TActor : class, IActor<TId, TEntity>

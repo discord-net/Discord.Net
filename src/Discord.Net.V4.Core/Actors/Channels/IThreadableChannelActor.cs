@@ -19,8 +19,8 @@ public partial interface IThreadableChannelActor :
     [SourceOfTruth]
     new ThreadsLink Threads { get; }
     
-    public interface ThreadsLink :
-        GuildThreadChannelLink.Indexable
+    [BackLinkable]
+    public partial interface ThreadsLink : GuildThreadChannelLink.Indexable
     {
         ThreadChannelLink.Paged<PagePublicArchivedThreadsParams> PublicArchivedThreads { get; }
         ThreadChannelLink.Paged<PagePrivateArchivedThreadsParams> PrivateArchivedThreads { get; }

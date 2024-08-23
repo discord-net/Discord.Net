@@ -10,9 +10,10 @@ namespace Discord;
     Modifiable<ModifyForumChannelProperties>(nameof(Routes.ModifyChannel)),
     Creatable<CreateGuildForumChannelProperties>(
         nameof(Routes.CreateGuildChannel),
-        typeof(IGuildActor),
+        nameof(IGuildActor.ForumChannels),
         RouteGenerics = [typeof(GuildForumChannel)]
     ), 
+    BackLink(nameof(Threads)),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IForumChannelActor :

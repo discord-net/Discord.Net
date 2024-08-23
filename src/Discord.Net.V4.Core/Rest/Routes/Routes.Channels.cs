@@ -208,25 +208,25 @@ public static partial class Routes
         (ScopeType.Channel, channelId)
     );
 
-    public static IApiInOutRoute<StartThreadFromMessageParams, Channel> StartThreadFromMessage(
+    public static IApiInOutRoute<StartThreadFromMessageParams, ThreadChannelBase> StartThreadFromMessage(
         [IdHeuristic<IThreadableChannel>] ulong channelId,
         [IdHeuristic<IMessage>] ulong messageId, StartThreadFromMessageParams body) =>
-        new ApiInOutRoute<StartThreadFromMessageParams, Channel>(nameof(StartThreadFromMessage),
+        new ApiInOutRoute<StartThreadFromMessageParams, ThreadChannelBase>(nameof(StartThreadFromMessage),
             RequestMethod.Post,
             $"/channels/{channelId}/messages/{messageId}/threads", body, ContentType.JsonBody,
             (ScopeType.Channel, channelId));
 
-    public static IApiInOutRoute<StartThreadParams, Channel> StartThreadWithoutMessage(
+    public static IApiInOutRoute<StartThreadParams, ThreadChannelBase> StartThreadWithoutMessage(
         [IdHeuristic<IThreadableChannel>] ulong channelId,
         StartThreadParams body) =>
-        new ApiInOutRoute<StartThreadParams, Channel>(nameof(StartThreadWithoutMessage), RequestMethod.Post,
+        new ApiInOutRoute<StartThreadParams, ThreadChannelBase>(nameof(StartThreadWithoutMessage), RequestMethod.Post,
             $"/channels/{channelId}/threads", body, ContentType.JsonBody, (ScopeType.Channel, channelId));
 
     //TODO: add support for files
-    public static IApiInOutRoute<StartThreadInForumParams, Channel> StartThreadInForum(
+    public static IApiInOutRoute<StartThreadInForumOrMediaParams, ThreadChannelBase> StartThreadInForum(
         [IdHeuristic<IForumChannel>] ulong channelId,
-        StartThreadInForumParams body) =>
-        new ApiInOutRoute<StartThreadInForumParams, Channel>(nameof(StartThreadInForum), RequestMethod.Post,
+        StartThreadInForumOrMediaParams body) =>
+        new ApiInOutRoute<StartThreadInForumOrMediaParams, ThreadChannelBase>(nameof(StartThreadInForum), RequestMethod.Post,
             $"/channels/{channelId}/threads", body, ContentType.JsonBody, (ScopeType.Channel, channelId));
 
     public static IApiRoute JoinThread([IdHeuristic<IThreadChannel>] ulong channelId) =>

@@ -4,7 +4,7 @@ namespace Discord.Models;
 
 public class AttachmentUploadParams
 {
-    public Optional<AttachmentParam[]> Attachments { get; set; }
+    public virtual Optional<AttachmentParam[]> Attachments { get; set; }
 }
 
 public sealed class AttachmentParam

@@ -7,9 +7,12 @@ namespace Discord;
 
 [
     Loadable(nameof(Routes.GetChannel), typeof(GuildChannelBase)),
-    Modifiable<ModifyGuildChannelProperties>(nameof(Routes.ModifyChannel)), 
+    Modifiable<ModifyGuildChannelProperties>(nameof(Routes.ModifyChannel)),
     Deletable(nameof(Routes.DeleteChannel)),
-    Creatable<CreateGuildChannelProperties>(nameof(Routes.CreateGuildChannel), typeof(IGuildActor)),
+    Creatable<CreateGuildChannelProperties>(
+        nameof(Routes.CreateGuildChannel),
+        nameof(IGuildActor.Channels)
+    ),
     BackLink(nameof(Invites)),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]

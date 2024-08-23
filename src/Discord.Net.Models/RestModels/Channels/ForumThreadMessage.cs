@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class ForumThreadMessage
+public sealed class ForumOrMediaThreadMessage : AttachmentUploadParams
 {
     [JsonPropertyName("content")]
     public Optional<string> Content { get; set; }
@@ -14,10 +14,10 @@ public sealed class ForumThreadMessage
     public Optional<AllowedMentions> AllowedMentions { get; set; }
 
     [JsonPropertyName("components")]
-    public Optional<ActionRow[]> Components { get; set; }
+    public Optional<MessageComponent[]> Components { get; set; }
 
     [JsonPropertyName("sticker_ids")]
-    public Optional<ulong[]> Stickers { get; set; }
+    public Optional<ulong[]> StickerIds { get; set; }
 
     [JsonPropertyName("flags")]
     public Optional<int> Flags { get; set; }

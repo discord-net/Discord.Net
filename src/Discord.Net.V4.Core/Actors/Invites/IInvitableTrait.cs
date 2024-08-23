@@ -2,7 +2,6 @@ using Discord.Models;
 
 namespace Discord;
 
-[Trait]
 public partial interface IInvitableTrait<out TInviteActor, out TInvite> : IInvitableTrait
     where TInvite : class, IInvite
     where TInviteActor : class, IInviteActor, IActor<string, TInvite>
@@ -15,7 +14,6 @@ public partial interface IInvitableTrait<out TInviteActor, out TInvite> : IInvit
     new ILinkType<TInviteActor, string, TInvite, IInviteModel>.Enumerable.Indexable Invites { get; }
 }
 
-[Trait]
 public interface IInvitableTrait
 {
     [return: TypeHeuristic(nameof(Invites))]

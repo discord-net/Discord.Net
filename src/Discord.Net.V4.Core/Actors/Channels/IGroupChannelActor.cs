@@ -8,7 +8,6 @@ namespace Discord;
 [
     Loadable(nameof(Routes.GetChannel), typeof(GroupDMChannel)),
     Modifiable<ModifyGroupDMProperties>(nameof(Routes.ModifyChannel)),
-    Creatable<CreateGuildChannelProperties>(nameof(Routes.CreateGuildChannel), typeof(IGuildActor)),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IGroupChannelActor :

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Linq.Expressions;
 using Discord.Net.Hanz.Tasks.Actors;
 using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
@@ -34,15 +35,15 @@ public static class CreatableTrait
     public static void Process(
         ref InterfaceDeclarationSyntax syntax,
         EntityTraits.GenerationTarget target,
-        AttributeData traitAttribute,
+        AttributeData[] traitAttributes,
         SourceProductionContext context,
         Logger logger)
     {
-        if (traitAttribute.ConstructorArguments.Length is < 2 or > 3)
-        {
-            logger.Warn($"{traitAttribute.ConstructorArguments.Length} attribute arguments specified");
-            return;
-        }
+        // if (traitAttribute.ConstructorArguments.Length is < 2 or > 3)
+        // {
+        //     logger.Warn($"{traitAttribute.ConstructorArguments.Length} attribute arguments specified");
+        //     return;
+        // }
 
         var actorInterface = EntityTraits.GetCoreActorInterface(target.InterfaceSymbol);
 
@@ -62,118 +63,128 @@ public static class CreatableTrait
             return;
         }
 
-        if (EntityTraits.GetNameOfArgument(traitAttribute) is not MemberAccessExpressionSyntax routeMemberAccess)
-        {
-            logger.Warn($"Cannot find route nameof for creatable {target.InterfaceSymbol}");
-            return;
-        }
-
-        var isActorCreatable = traitAttribute.AttributeClass?.Name is "ActorCreatableAttribute";
-        var isCanonicalCreatable = traitAttribute.AttributeClass?.TypeArguments.Length == 0;
-
-        logger.Log(
-            $"{target.InterfaceSymbol}: {traitAttribute}: actor: {isActorCreatable}, canonical: {isCanonicalCreatable}");
-
-        var hasRouteGenericParameters = !isCanonicalCreatable;
-
-        var routeGenerics = traitAttribute.NamedArguments
-            .FirstOrDefault(x => x.Key == "RouteGenerics")
-            .Value is {Kind: TypedConstantKind.Array} specified
-            ? specified.Values
-            : ImmutableArray<TypedConstant>.Empty;
-
-        var route = EntityTraits.GetRouteSymbol(
-            routeMemberAccess,
-            target.SemanticModel,
-            routeGenerics.Length
-        );
-
-        if (route is not IMethodSymbol {ReturnType: INamedTypeSymbol returnType} routeMethod)
-        {
-            logger.Warn($"Cannot find route for creatable {target.InterfaceSymbol}");
-            return;
-        }
-
-        if (hasRouteGenericParameters && routeGenerics.Length > 0)
-        {
-            var genericNames = routeGenerics
-                .Select(x => x.Value!.ToString());
-
-            routeMemberAccess = SyntaxFactory.MemberAccessExpression(
-                SyntaxKind.SimpleMemberAccessExpression,
-                routeMemberAccess.Expression,
-                SyntaxFactory.GenericName(
-                    routeMemberAccess.Name.Identifier,
-                    SyntaxFactory.TypeArgumentList(
-                        SyntaxFactory.SeparatedList(
-                            genericNames
-                                .Select(x => SyntaxFactory.ParseTypeName(x))
-                        )
-                    )
-                )
-            );
-        }
-
-        var apiParams = isCanonicalCreatable ? null : returnType.TypeArguments[0];
-        var idType = actorInterface.TypeArguments[0];
-        var properties = isCanonicalCreatable
-            ? null
-            : (INamedTypeSymbol) traitAttribute.AttributeClass!.TypeArguments[0];
-
-        var creatableTarget = new Target(
-            actorInterface,
-            entityType,
-            modelType,
-            apiParams,
-            idType,
-            properties,
-            routeMethod,
-            routeMemberAccess,
-            isActorCreatable
-        );
-
-        switch (traitAttribute.AttributeClass!.Name)
-        {
-            case "CreatableAttribute":
-                ProcessCreatable(ref syntax, target, creatableTarget, logger);
-                break;
-            case "ActorCreatableAttribute":
-                ProcessCreatableActor(ref syntax, target, creatableTarget, logger);
-                break;
-        }
-
-        var linkTargets = traitAttribute.ConstructorArguments.Last().Values;
+        var generatedRoutes = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
 
         var methods = new List<MemberDeclarationSyntax>();
 
-        if (linkTargets.Length == 0)
+        foreach (var traitAttribute in traitAttributes)
         {
-            if (CreateLinkExtensionMethod(target, creatableTarget, null, traitAttribute, logger) is not { } method)
+            if (EntityTraits.GetNameOfArgument(traitAttribute) is not MemberAccessExpressionSyntax routeMemberAccess)
             {
-                logger.Warn($"Failed to create link extension method for {target.InterfaceSymbol}");
+                logger.Warn($"Cannot find route nameof for creatable {target.InterfaceSymbol}");
                 return;
             }
 
-            methods.Add(method);
-        }
-        else
-        {
-            foreach (var linkTarget in linkTargets)
-            {
-                if (linkTarget.Value is not INamedTypeSymbol linkTargetType)
-                {
-                    logger.Warn($"Expected a type for link target entry, got '{linkTarget.Value}'");
-                    continue;
-                }
+            var isActorCreatable = traitAttribute.AttributeClass?.Name is "ActorCreatableAttribute";
+            var isCanonicalCreatable = traitAttribute.AttributeClass?.TypeArguments.Length == 0;
 
-                if (CreateLinkExtensionMethod(target, creatableTarget, linkTargetType, traitAttribute, logger) is not
-                    { } method)
+            logger.Log(
+                $"{target.InterfaceSymbol}: {traitAttribute}: actor: {isActorCreatable}, canonical: {isCanonicalCreatable}");
+
+            var hasRouteGenericParameters = !isCanonicalCreatable;
+
+            var routeGenerics = traitAttribute.NamedArguments
+                .FirstOrDefault(x => x.Key == "RouteGenerics")
+                .Value is {Kind: TypedConstantKind.Array} specified
+                ? specified.Values
+                : ImmutableArray<TypedConstant>.Empty;
+
+            var route = EntityTraits.GetRouteSymbol(
+                routeMemberAccess,
+                target.SemanticModel,
+                routeGenerics.Length
+            );
+
+            if (route is not IMethodSymbol {ReturnType: INamedTypeSymbol returnType} routeMethod)
+            {
+                logger.Warn($"Cannot find route for creatable {target.InterfaceSymbol}");
+                return;
+            }
+
+            if (hasRouteGenericParameters && routeGenerics.Length > 0)
+            {
+                var genericNames = routeGenerics
+                    .Select(x => x.Value!.ToString());
+
+                routeMemberAccess = SyntaxFactory.MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    routeMemberAccess.Expression,
+                    SyntaxFactory.GenericName(
+                        routeMemberAccess.Name.Identifier,
+                        SyntaxFactory.TypeArgumentList(
+                            SyntaxFactory.SeparatedList(
+                                genericNames
+                                    .Select(x => SyntaxFactory.ParseTypeName(x))
+                            )
+                        )
+                    )
+                );
+            }
+
+            var apiParams = isCanonicalCreatable ? null : returnType.TypeArguments[0];
+            var idType = actorInterface.TypeArguments[0];
+            var properties = isCanonicalCreatable
+                ? null
+                : (INamedTypeSymbol) traitAttribute.AttributeClass!.TypeArguments[0];
+
+            var creatableTarget = new Target(
+                actorInterface,
+                entityType,
+                modelType,
+                apiParams,
+                idType,
+                properties,
+                routeMethod,
+                routeMemberAccess,
+                isActorCreatable
+            );
+
+            if (generatedRoutes.Add(routeMethod))
+            {
+                switch (traitAttribute.AttributeClass!.Name)
+                {
+                    case "CreatableAttribute":
+                        ProcessCreatable(ref syntax, target, creatableTarget, logger);
+                        break;
+                    case "ActorCreatableAttribute":
+                        ProcessCreatableActor(ref syntax, target, creatableTarget, logger);
+                        break;
+                }
+            }
+
+            var linkTargets = traitAttribute.ConstructorArguments.Last().Values;
+
+            if (linkTargets.Length == 0)
+            {
+                if (CreateLinkExtensionMethod(target, creatableTarget, null, traitAttribute, logger) is not { } method)
                 {
                     logger.Warn($"Failed to create link extension method for {target.InterfaceSymbol}");
-                    continue;
+                    return;
                 }
 
                 methods.Add(method);
+            }
+            else
+            {
+                var backlinkTargets = GetBackLinkTargets(traitAttribute, target.SemanticModel.Compilation);
+
+                if (backlinkTargets is null)
+                {
+                    logger.Warn($"Unable to resolve backlink targets for {target.InterfaceSymbol}");
+                    return;
+                }
+
+                foreach (var linkTarget in backlinkTargets)
+                {
+                    if (CreateLinkExtensionMethod(target, creatableTarget, linkTarget, traitAttribute, logger)
+                        is not { } method)
+                    {
+                        logger.Warn($"Failed to create link extension method for {target.InterfaceSymbol}");
+                        continue;
+                    }
+
+                    methods.Add(method);
+                }
             }
         }
 
@@ -200,10 +211,105 @@ public static class CreatableTrait
         );
     }
 
+    private static List<BackLinkTarget>? GetBackLinkTargets(
+        AttributeData traitAttribute,
+        Compilation compilation)
+    {
+        var argIndex = traitAttribute.ConstructorArguments.Length - 1;
+
+        if (traitAttribute.ApplicationSyntaxReference?.GetSyntax() is not AttributeSyntax attributeSyntax)
+        {
+            return null;
+        }
+
+        if (attributeSyntax.ArgumentList is null)
+            return null;
+
+        if (attributeSyntax.ArgumentList.Arguments.Count <= argIndex)
+            return [];
+
+        var targets = attributeSyntax.ArgumentList.Arguments[argIndex].Expression switch
+        {
+            CollectionExpressionSyntax collection => collection.Elements
+                .OfType<ExpressionElementSyntax>()
+                .Select(x => x.Expression),
+            ArrayCreationExpressionSyntax array => array.Initializer?.Expressions,
+            _ => attributeSyntax.ArgumentList.Arguments.Skip(argIndex)
+                .TakeWhile(x => x is {NameEquals: null, NameColon: null})
+                .Select(x => x.Expression)
+        };
+
+        if (targets is null) return null;
+
+        var results = new List<BackLinkTarget>();
+
+        foreach (var target in targets)
+        {
+            if (target is not InvocationExpressionSyntax invocation)
+                return null;
+
+            var property = ResolveNameOfExpression(invocation, compilation);
+
+            if (property is null)
+                return null;
+
+            results.Add(property);
+        }
+
+        return results;
+    }
+
+    private static BackLinkTarget? ResolveNameOfExpression(
+        InvocationExpressionSyntax invocation,
+        Compilation compilation)
+    {
+        if (invocation is not
+            {
+                Expression: IdentifierNameSyntax
+                {
+                    Identifier.ValueText: "nameof"
+                },
+                ArgumentList.Arguments.Count: 1
+            })
+            return null;
+
+        if (invocation.ArgumentList.Arguments.Count != 1)
+            return null;
+
+        if (invocation.ArgumentList.Arguments[0].Expression is not MemberAccessExpressionSyntax access)
+            return null;
+
+        var candidates = compilation
+            .GetSymbolsWithName(x => x.EndsWith(access.Expression.ToString()))
+            .OfType<INamedTypeSymbol>()
+            .ToArray();
+
+        if (candidates.Length != 1)
+            return null;
+
+        var candidate = candidates[0];
+
+        var prop = Hierarchy.GetHierarchy(candidate)
+            .Select(x => x.Type)
+            .Prepend(candidate)
+            .SelectMany(x => x.GetMembers().OfType<IPropertySymbol>())
+            .FirstOrDefault(x => x.Name == access.Name.Identifier.ValueText);
+
+        if (prop is null) return null;
+
+        return new BackLinkTarget(prop.Type, candidate);
+    }
+
+    private sealed class BackLinkTarget(ITypeSymbol linkType, ITypeSymbol backlinkTargetType)
+    {
+        public ITypeSymbol LinkType { get; } = linkType;
+        public ITypeSymbol BacklinkTargetType { get; } = backlinkTargetType;
+    }
+
     private static MemberDeclarationSyntax? CreateLinkExtensionMethod(
         EntityTraits.GenerationTarget target,
         Target creatableTarget,
-        INamedTypeSymbol? backlinkTarget,
+        BackLinkTarget? backlinkTarget,
         AttributeData traitAttribute,
         Logger logger)
     {
@@ -227,27 +333,26 @@ public static class CreatableTrait
 
         if (backlinkTarget is not null)
         {
-            var friendlyName = Links.GetFriendlyName(target.InterfaceSymbol);
-            var backlinkProperty = Hierarchy.GetHierarchy(backlinkTarget)
-                .Select(x => x.Type)
-                .Prepend(backlinkTarget)
-                .SelectMany(x => x.GetMembers())
-                .OfType<IPropertySymbol>()
-                .FirstOrDefault(x =>
-                    x.Type.ToString().StartsWith($"{friendlyName}Link")
-                );
+            linkType = $"{backlinkTarget.LinkType}";
 
-            if (backlinkProperty is null)
+            if (
+                (
+                    (
+                        !backlinkTarget.LinkType.ContainingType?.Equals(
+                            backlinkTarget.BacklinkTargetType,
+                            SymbolEqualityComparer.Default
+                        )
+                        ?? true
+                    )
+                    || 
+                    Links.HasBackLinkableAttribute(backlinkTarget.LinkType)
+                )
+                &&
+                !linkType.EndsWith($".BackLink<{backlinkTarget.BacklinkTargetType.ToDisplayString()}>")
+            )
             {
-                logger.Warn($"No backlink found from {backlinkTarget} -> {target.InterfaceSymbol}");
-
-                return null;
+                linkType = $"{linkType}.BackLink<{backlinkTarget.BacklinkTargetType.ToDisplayString()}>";
             }
-
-            linkType = $"{backlinkProperty.Type}";
-
-            if (!linkType.EndsWith($".BackLink<{backlinkTarget.ToDisplayString()}>"))
-                linkType = $"{linkType}.BackLink<{backlinkTarget.ToDisplayString()}>";
         }
 
         var parameters = new List<string>()
@@ -283,9 +388,17 @@ public static class CreatableTrait
 
         List<string> flattened;
 
+        var methodName = "CreateAsync";
+
+        if (
+            traitAttribute.NamedArguments
+                .FirstOrDefault(x => x.Key == "MethodName")
+                .Value.Value is string name
+        ) methodName = name;
+
         return SyntaxFactory.ParseMemberDeclaration(
             $$"""
-              public static async Task<{{extensionReturnType}}> CreateAsync(
+              public static async Task<{{extensionReturnType}}> {{methodName}}(
                   {{string.Join(",\n".PadRight(10), parameters)}}      
               )
               {

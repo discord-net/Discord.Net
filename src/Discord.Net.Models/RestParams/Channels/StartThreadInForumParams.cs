@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class StartThreadInForumParams
+public sealed class StartThreadInForumOrMediaParams : AttachmentUploadParams
 {
     [JsonPropertyName("name")]
     public required string Name { get; set; }
@@ -14,7 +14,7 @@ public sealed class StartThreadInForumParams
     public Optional<int?> RateLimitPerUser { get; set; }
 
     [JsonPropertyName("message")]
-    public required ForumThreadMessage Message { get; set; }
+    public required ForumOrMediaThreadMessage Message { get; set; }
 
     [JsonPropertyName("applied_tags")]
     public Optional<ulong[]> AppliedTags { get; set; }

@@ -161,7 +161,7 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
     ) : GenerationTarget(semantic, symbol, syntax)
     {
         public INamedTypeSymbol? LinkType { get; } = linkType;
-        public INamedTypeSymbol? ActorType { get; } = actorType;
+        public INamedTypeSymbol? ActorType { get; set; } = actorType;
 
         public override bool Equals(GenerationTarget? other)
             => base.Equals(other) &&
@@ -393,7 +393,7 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
         );
     }
 
-    private static bool HasBackLinkableAttribute(ITypeSymbol symbol)
+    public static bool HasBackLinkableAttribute(ITypeSymbol symbol)
         => symbol
             .GetAttributes()
             .Any(x => x
@@ -422,7 +422,16 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
 
         if (typeSyntax.Modifiers.IndexOf(SyntaxKind.PartialKeyword) == -1) return null;
 
-        var linkType = symbol.AllInterfaces.FirstOrDefault(x => x.Name == "ILink");
+        var linkType =
+            symbol
+                .AllInterfaces
+                .FirstOrDefault(x => x.Name is "ILink")
+            ??
+            symbol
+                .AllInterfaces
+                .FirstOrDefault(x =>
+                    x.Name is "Indexable" or "Enumerable" or "Defined" or "Paged"
+                );
 
         if (linkType is not null)
             return new(context.SemanticModel, symbol, typeSyntax, linkType);
@@ -527,7 +536,7 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
                 foreach (var property in target.Properties)
                 {
                     targetLogger.Log($" - {property.Type} {property.Name} ({property.ContainingType})");
-                    
+
                     if (property.ContainingType.Equals(target.Symbol, SymbolEqualityComparer.Default))
                         continue;
 
@@ -819,6 +828,34 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
                 _ => []
             };
 
+            var isInheritingFriendlyLink = false;
+
+            if (typeArguments.Count == 0 && target.LinkType is not null)
+            {
+                var linkTypeName = target.LinkType.ToString();
+
+                if (linkTypeName.Contains("Link"))
+                    linkTypeName = linkTypeName
+                        .Split(['.'], StringSplitOptions.RemoveEmptyEntries)
+                        .First(x => x.Contains("Link"));
+
+                if (
+                    GetActorFromFriendlyName(linkTypeName, target.Semantic.Compilation) is { } actor &&
+                    GetActorType(actor) is { } actorInterface)
+                {
+                    typeArguments =
+                    [
+                        actor.Name,
+                        actorInterface.TypeArguments[0].Name,
+                        actorInterface.TypeArguments[1].Name,
+                        EntityTraits.GetEntityModelOfInterface(actorInterface.TypeArguments[1])!.TypeArguments[0].Name
+                    ];
+
+                    targetLogger.Log($"Resolved {actor} : {actorInterface}");
+                    isInheritingFriendlyLink = true;
+                }
+            }
+
             if (typeArguments.Count == 0)
             {
                 targetLogger.Warn($"Unable to determine type arguments for backlink to {target.Symbol}");
@@ -841,8 +878,6 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
 
                     List<string> members = [];
                     List<string> bases = [target.Symbol.ToDisplayString(), backlinkBaseType];
-
-                    var shouldBeNew = false;
 
                     var hierarchy = Hierarchy.GetHierarchy(target.Symbol)
                         .Select(x => x.Type)
@@ -919,8 +954,11 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
                     if (backlinkSyntax is null)
                         break;
 
-                    if (hierarchy.Length > 0)
-                        backlinkSyntax = backlinkSyntax.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
+                    if (
+                        isInheritingFriendlyLink ||
+                        hierarchy.Length > 0 ||
+                        target.Symbol.AllInterfaces.Any(x => x.Name is "ISpecifiedLinkType")
+                    ) backlinkSyntax = backlinkSyntax.AddModifiers(SyntaxFactory.Token(SyntaxKind.NewKeyword));
 
                     break;
                 case TypeKind.Class:
@@ -1060,23 +1098,6 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
         }
     }
 
-    // public static readonly Dictionary<string, string> CoreLookupTable = new()
-    // {
-    //     {"DefinedEnumerableIndexable", "Discord.IDefinedEnumerableIndexableLink"},
-    //     {"DefinedIndexable", "Discord.IDefinedIndexableLink"},
-    //     {"EnumerableIndexable", "Discord.IEnumerableIndexableLink"},
-    // };
-
-    // public static readonly Dictionary<string, string> RestLookupTable = new()
-    // {
-    //     {"DefinedEnumerableIndexable", "Discord.Rest.RestDefinedEnumerableIndexableLink"},
-    //     {"DefinedIndexable", "Discord.Rest.RestDefinedIndexableLink"},
-    //     {"Defined", "Discord.Rest.RestDefinedLink"},
-    //     {"EnumerableIndexable", "Discord.Rest.RestEnumerableIndexableLink"},
-    //     {"Enumerable", "Discord.Rest.RestEnumerableLink"},
-    //     {"Indexable", "Discord.Rest.RestIndexableLink"},
-    // };
-
     private static void ExecuteActors(
         SourceProductionContext context,
         List<ActorGenerationTarget> targets,
@@ -1212,5 +1233,15 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
 
         return symbol.Name.Replace("Actor", string.Empty).Replace("Gateway", string.Empty)
             .Replace("Rest", string.Empty);
+    }
+
+    public static INamedTypeSymbol? GetActorFromFriendlyName(string name, Compilation compilation)
+    {
+        return
+            compilation.GetTypeByMetadataName($"Discord.Gateway.Gateway{name.Replace("Link", string.Empty)}Actor")
+            ??
+            compilation.GetTypeByMetadataName($"Discord.Rest.Rest{name.Replace("Link", string.Empty)}Actor")
+            ??
+            compilation.GetTypeByMetadataName($"Discord.I{name.Replace("Link", string.Empty)}Actor");
     }
 }

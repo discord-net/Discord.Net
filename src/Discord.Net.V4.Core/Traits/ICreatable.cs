@@ -4,12 +4,17 @@ namespace Discord;
 
 #pragma warning disable CS9113 // Parameter is unread.
 
-[AttributeUsage(AttributeTargets.Interface)]
-internal sealed class CreatableAttribute(string route, params Type[] fromBackLinks) : Attribute;
-
-[AttributeUsage(AttributeTargets.Interface)]
-internal sealed class CreatableAttribute<TParams>(string route, params Type[] fromBackLinks) : Attribute
+[AttributeUsage(AttributeTargets.Interface, AllowMultiple = true)]
+internal sealed class CreatableAttribute(string route, params string[] fromBackLinks) : Attribute
 {
+    public string? MethodName { get; set; }
+    public Type[]? RouteGenerics { get; set; }
+}
+
+[AttributeUsage(AttributeTargets.Interface, AllowMultiple = true)]
+internal sealed class CreatableAttribute<TParams>(string route, params string[] fromBackLinks) : Attribute
+{
+    public string? MethodName { get; set; }
     public Type[]? RouteGenerics { get; set; }
 }
 
