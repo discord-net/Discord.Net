@@ -16,7 +16,7 @@ public partial interface IIntegrationModel : IEntityModel<ulong>
     DateTimeOffset? SyncedAt { get; }
     int? SubscriberCount { get; }
     bool? IsRevoked { get; }
-    IApplicationModel? Application { get; }
+    IPartialApplicationModel? Application { get; }
     string[]? Scopes { get; }
 }
 

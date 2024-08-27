@@ -33,7 +33,7 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
         };
     }
 
-    public Task ExecuteAsync(IApiRoute route, RequestOptions options, CancellationToken token)
+    public Task ExecuteAsync(IApiRoute route, RequestOptions? options, CancellationToken token)
         => SendAsync(
             route,
             new HttpRequestMessage(
@@ -44,7 +44,7 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
             token
         );
 
-    public async Task<T?> ExecuteAsync<T>(IApiOutRoute<T> outRoute, RequestOptions options, CancellationToken token)
+    public async Task<T?> ExecuteAsync<T>(IApiOutRoute<T> outRoute, RequestOptions? options, CancellationToken token)
         where T : class
     {
         var result = await SendAsync(
@@ -67,7 +67,7 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
         );
     }
 
-    public Task ExecuteAsync<T>(IApiInRoute<T> route, RequestOptions options, CancellationToken token)
+    public Task ExecuteAsync<T>(IApiInRoute<T> route, RequestOptions? options, CancellationToken token)
         where T : class
     {
         var request = new HttpRequestMessage(
@@ -78,7 +78,7 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
         return SendAsync(route, request, options, token);
     }
 
-    public async Task<U?> ExecuteAsync<T, U>(IApiInOutRoute<T, U> route, RequestOptions options,
+    public async Task<U?> ExecuteAsync<T, U>(IApiInOutRoute<T, U> route, RequestOptions? options,
         CancellationToken token)
         where T : class
         where U : class
@@ -103,9 +103,11 @@ public sealed class RestApiClient : IRestApiClient, IDisposable
     private async Task<Stream?> SendAsync(
         IApiRoute route,
         HttpRequestMessage request,
-        RequestOptions options,
+        RequestOptions? options,
         CancellationToken token = default)
     {
+        options ??= _restClient.DefaultRequestOptions;
+        
         if (options.AuditLogReason is not null)
             request.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(options.AuditLogReason));
 

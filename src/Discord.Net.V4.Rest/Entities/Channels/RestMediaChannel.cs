@@ -11,7 +11,7 @@ using IncomingIntegrationChannelTrait = RestIncomingIntegrationChannelTrait<Rest
 public sealed partial class RestMediaChannelActor :
     RestThreadableChannelActor,
     IMediaChannelActor,
-    IRestActor<ulong, RestMediaChannel, MediaChannelIdentity>
+    IRestActor<ulong, RestMediaChannel, MediaChannelIdentity, IGuildMediaChannelModel>
 {
     [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
     internal IncomingIntegrationChannelTrait IntegrationChannelActor { get; }

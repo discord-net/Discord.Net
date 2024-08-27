@@ -16,23 +16,28 @@ public partial class Routes
         body
     );
 
-    public static IApiOutRoute<ApplicationRoleConnectionMetadata> GetApplicationRoleConnectionMetadata(
-        ulong applicationId,
-        [IdHeuristic<IRole>] ulong roleId
-    ) => new ApiOutRoute<ApplicationRoleConnectionMetadata>(nameof(GetApplicationRoleConnectionMetadata),
+    public static IApiOutRoute<IEnumerable<ApplicationRoleConnectionMetadata>> GetApplicationRoleConnectionMetadata(
+        [IdHeuristic<IApplication>] ulong applicationId
+    ) => new ApiOutRoute<IEnumerable<ApplicationRoleConnectionMetadata>>(nameof(GetApplicationRoleConnectionMetadata),
         RequestMethod.Get,
-        $"applications/{applicationId}/role-connections/{roleId}/metadata"
+        $"applications/{applicationId}/role-connections/metadata"
     );
 
-    public static IApiInOutRoute<ApplicationRoleConnectionMetadata, ApplicationRoleConnectionMetadata>
-        ModifyApplicationRoleConnectionMetadata(
-            ulong applicationId,
-            [IdHeuristic<IRole>] ulong roleId,
-            ApplicationRoleConnectionMetadata body
-        ) => new ApiInOutRoute<ApplicationRoleConnectionMetadata, ApplicationRoleConnectionMetadata>(
-        nameof(GetApplicationRoleConnectionMetadata),
-        RequestMethod.Get,
-        $"applications/{applicationId}/role-connections/{roleId}/metadata",
+    public static IApiInOutRoute<
+        IEnumerable<ApplicationRoleConnectionMetadata>,
+        IEnumerable<ApplicationRoleConnectionMetadata>
+    > ModifyApplicationRoleConnectionMetadata(
+        [IdHeuristic<IApplication>] ulong applicationId,
+        IEnumerable<ApplicationRoleConnectionMetadata> body
+    ) => new ApiInOutRoute<
+        IEnumerable<ApplicationRoleConnectionMetadata>,
+        IEnumerable<ApplicationRoleConnectionMetadata>
+    >(
+        nameof(ModifyApplicationRoleConnectionMetadata),
+        RequestMethod.Put,
+        $"applications/{applicationId}/role-connections/metadata",
         body
     );
+    
+    
 }

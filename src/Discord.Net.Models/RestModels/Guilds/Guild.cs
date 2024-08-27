@@ -7,7 +7,7 @@ public class Guild :
     PartialGuild,
     IGuildModel,
     IModelSourceOfMultiple<IRoleModel>,
-    IModelSourceOfMultiple<IGuildEmoteModel>,
+    IModelSourceOfMultiple<ICustomEmoteModel>,
     IModelSourceOfMultiple<IGuildStickerModel>
 {
     [JsonPropertyName("icon_hash")]
@@ -44,7 +44,7 @@ public class Guild :
     public required Role[] Roles { get; set; }
 
     [JsonPropertyName("emojis")]
-    public required GuildEmote[] Emojis { get; set; }
+    public required CustomEmote[] Emojis { get; set; }
 
     [JsonPropertyName("mfa_level")]
     public int MFALevel { get; set; }
@@ -105,7 +105,7 @@ public class Guild :
 
     IEnumerable<IRoleModel> IModelSourceOfMultiple<IRoleModel>.GetModels() => Roles;
 
-    IEnumerable<IGuildEmoteModel> IModelSourceOfMultiple<IGuildEmoteModel>.GetModels() => Emojis;
+    IEnumerable<ICustomEmoteModel> IModelSourceOfMultiple<ICustomEmoteModel>.GetModels() => Emojis;
 
     IEnumerable<IGuildStickerModel> IModelSourceOfMultiple<IGuildStickerModel>.GetModels() => Stickers | [];
 

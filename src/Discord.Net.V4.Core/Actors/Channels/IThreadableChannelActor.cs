@@ -13,6 +13,7 @@ namespace Discord;
 ]
 public partial interface IThreadableChannelActor :
     IGuildChannelActor,
+    IInvitableTrait<IGuildChannelInviteActor, IGuildChannelInvite>,
     IContainsThreadsTrait<IGuildThreadChannelActor>,
     IActor<ulong, IThreadableChannel>
 {

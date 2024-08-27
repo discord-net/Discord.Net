@@ -13,7 +13,8 @@ public partial interface IGroupChannel :
     IAudioChannel,
     IGroupChannelActor
 {
-    UserLink.Defined.BackLink<IGroupChannel> Recipients { get; }
+    [SourceOfTruth]
+    new UserLink.Defined.Indexable.BackLink<IGroupChannelActor> Recipients { get; }
 
     [SourceOfTruth]
     new IGroupDMChannelModel GetModel();

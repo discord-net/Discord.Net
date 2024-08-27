@@ -2,11 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class Team
+public sealed class Team : ITeamModel
 {
     [JsonPropertyName("icon")]
     public string? Icon { get; set; }
-
+    
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
 
@@ -18,4 +18,7 @@ public sealed class Team
 
     [JsonPropertyName("owner_user_id")]
     public ulong OwnerUserId { get; set; }
+
+    IEnumerable<ITeamMember> ITeamModel.Members => TeamMembers;
+    ulong ITeamModel.OwnerId => OwnerUserId;
 }

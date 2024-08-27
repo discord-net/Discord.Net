@@ -4,11 +4,14 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestGuildChannelInviteActor :
-    RestGuildInviteActor,
+    RestInviteActor,
     IGuildChannelInviteActor,
-    IRestActor<string, RestGuildChannelInvite, GuildChannelInviteIdentity>
+    IRestActor<string, RestGuildChannelInvite, GuildChannelInviteIdentity, IInviteModel>
 {
     [SourceOfTruth] public RestGuildChannelActor Channel { get; }
+    
+    [SourceOfTruth]
+    public RestGuildActor Guild { get; }
 
     [SourceOfTruth] internal override GuildChannelInviteIdentity Identity { get; }
 
@@ -18,48 +21,50 @@ public sealed partial class RestGuildChannelInviteActor :
         GuildIdentity guild,
         GuildChannelIdentity channel,
         GuildChannelInviteIdentity invite
-    ) : base(client, guild, invite)
+    ) : base(client, invite)
     {
         Identity = invite | this;
-        Channel = channel.Actor ?? new(client, guild, channel);
+        
+        Guild = guild.Actor ?? client.Guilds[guild.Id];
+        Channel = channel.Actor ?? Guild.Channels[channel.Id];
     }
 
-    internal override RestInvite CreateEntity(IInviteModel model)
-        => RestInvite.Construct(Client, new(Guild.Identity, Channel.Identity), model);
+    [SourceOfTruth]
+    internal override RestGuildChannelInvite CreateEntity(IInviteModel model)
+        => RestGuildChannelInvite.Construct(Client, this, model);
 }
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestGuildChannelInvite :
-    RestGuildInvite,
+    RestInvite,
     IGuildChannelInvite,
     IRestConstructable<RestGuildChannelInvite, RestGuildChannelInviteActor, IInviteModel>
 {
-    public new readonly record struct Context(
-        GuildIdentity Guild,
-        GuildChannelIdentity Channel,
-        GuildScheduledEventIdentity? ScheduledEvent = null
-    );
-
+    [SourceOfTruth]
+    public RestGuildScheduledEventActor? GuildScheduledEvent { get; }
+    
     [ProxyInterface] internal override RestGuildChannelInviteActor Actor { get; }
 
     public RestGuildChannelInvite(
         DiscordRestClient client,
-        GuildIdentity guild,
-        GuildChannelIdentity channel,
         IInviteModel model,
-        RestGuildChannelInviteActor? actor = null,
-        GuildScheduledEventIdentity? scheduledEvent = null
-    ) : base(client, guild, model, actor, scheduledEvent)
+        RestGuildChannelInviteActor actor
+    ) : base(client, model, actor)
     {
-        Actor = actor ?? new(client, guild, channel, GuildChannelInviteIdentity.Of(this));
+        Actor = actor;
+
+        GuildScheduledEvent = model.ScheduledEventId.HasValue
+            ? actor.Guild.ScheduledEvents[model.ScheduledEventId.Value]
+            : null;
     }
 
-    public static RestGuildChannelInvite Construct(DiscordRestClient client, Context context, IInviteModel model)
-        => new(
+    public static RestGuildChannelInvite Construct(
+        DiscordRestClient client, 
+        RestGuildChannelInviteActor actor, 
+        IInviteModel model
+        ) => new(
             client,
-            context.Guild,
-            context.Channel,
             model,
-            scheduledEvent: context.ScheduledEvent
+            actor
         );
 }

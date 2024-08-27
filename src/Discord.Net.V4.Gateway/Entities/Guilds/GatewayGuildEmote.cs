@@ -5,7 +5,7 @@ using static Discord.Template;
 namespace Discord.Gateway;
 
 public sealed partial class GatewayGuildEmoteActor :
-    GatewayCachedActor<ulong, GatewayGuildEmote, GuildEmoteIdentity, IGuildEmoteModel>,
+    GatewayCachedActor<ulong, GatewayGuildEmote, GuildEmoteIdentity, ICustomEmoteModel>,
     IGuildEmoteActor
 {
     [SourceOfTruth, StoreRoot] public GatewayGuildActor Guild { get; }
@@ -24,12 +24,12 @@ public sealed partial class GatewayGuildEmoteActor :
     }
 
     [SourceOfTruth]
-    internal GatewayGuildEmote CreateEntity(IGuildEmoteModel model)
+    internal GatewayGuildEmote CreateEntity(ICustomEmoteModel model)
         => Client.StateController.CreateLatent(this, model, CachePath);
 }
 
 public sealed partial class GatewayGuildEmote :
-    GatewayCacheableEntity<GatewayGuildEmote, ulong, IGuildEmoteModel>,
+    GatewayCacheableEntity<GatewayGuildEmote, ulong, ICustomEmoteModel>,
     IGuildEmote
 {
     public string Name => Model.Name;
@@ -48,12 +48,12 @@ public sealed partial class GatewayGuildEmote :
 
     [ProxyInterface] internal GatewayGuildEmoteActor Actor { get; }
 
-    internal IGuildEmoteModel Model { get; private set; }
+    internal ICustomEmoteModel Model { get; private set; }
 
     public GatewayGuildEmote(
         DiscordGatewayClient client,
         GuildIdentity guild,
-        IGuildEmoteModel model,
+        ICustomEmoteModel model,
         GatewayGuildEmoteActor? actor = null
     ) : base(client, model.Id)
     {
@@ -69,7 +69,7 @@ public sealed partial class GatewayGuildEmote :
     public static GatewayGuildEmote Construct(
         DiscordGatewayClient client,
         IGatewayConstructionContext context,
-        IGuildEmoteModel model
+        ICustomEmoteModel model
     ) => new(
         client,
         context.Path.RequireIdentity(T<GuildIdentity>()),
@@ -78,7 +78,7 @@ public sealed partial class GatewayGuildEmote :
     );
 
     public override ValueTask UpdateAsync(
-        IGuildEmoteModel model,
+        ICustomEmoteModel model,
         bool updateCache = true,
         CancellationToken token = default)
     {
@@ -95,5 +95,5 @@ public sealed partial class GatewayGuildEmote :
         return ValueTask.CompletedTask;
     }
 
-    public override IGuildEmoteModel GetModel() => Model;
+    public override ICustomEmoteModel GetModel() => Model;
 }

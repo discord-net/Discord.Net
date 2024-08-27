@@ -134,7 +134,7 @@ global using RoleIdentity =
         Discord.Models.IRoleModel>;
 global using GuildEmoteIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayGuildEmote, Discord.Gateway.GatewayGuildEmoteActor,
-        Discord.Models.IGuildEmoteModel>;
+        Discord.Models.ICustomEmoteModel>;
 global using GuildStickerIdentity =
     Discord.IIdentifiable<ulong, Discord.Gateway.GatewayGuildSticker,
         Discord.Gateway.GatewayGuildStickerActor, Discord.Models.IGuildStickerModel>;

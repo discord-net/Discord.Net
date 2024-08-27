@@ -35,10 +35,10 @@ internal static partial class RestActorExtensions
         [VariableFuncArgs] Func<IIdentifiable<TId, TEntity, TActor, TModel>, TActor> factory,
         Func<TId, IIdentifiable<TId, TEntity, TActor, TModel>?>? identityFactory = null
     )
-        where TEntity : class, IEntity<TId>, IEntityOf<TModel>
+        where TEntity : class, IEntity<TId, TModel>
         where TId : struct, IEquatable<TId>
         where TModel : class, IEntityModel<TId>
-        where TActor : class, IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>>
+        where TActor : class, IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
     {
         if (id is null && actor is null)
             return null;

@@ -14,7 +14,7 @@ public sealed class EmoteConverter : JsonConverter<IEmoteModel>
         var doc = JsonDocument.ParseValue(ref reader).RootElement;
 
         if (doc.TryGetProperty("id", out var snowflake) && snowflake.ValueKind is not JsonValueKind.Null)
-            return doc.Deserialize<GuildEmote>(options);
+            return doc.Deserialize<CustomEmote>(options);
 
         if (doc.TryGetProperty("name", out var name) && name.ValueKind is not JsonValueKind.Null)
             return doc.Deserialize<Emoji>();

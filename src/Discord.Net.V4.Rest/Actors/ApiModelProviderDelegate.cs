@@ -1,6 +1,8 @@
+using MorseCode.ITask;
+
 namespace Discord.Rest;
 
-public delegate Task<TModel> ApiModelProviderDelegate<TModel>(
+public delegate ITask<TModel> ApiModelProviderDelegate<out TModel>(
     DiscordRestClient client,
     RequestOptions? options,
     CancellationToken token

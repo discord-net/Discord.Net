@@ -4,8 +4,11 @@ namespace Discord.Models.Json;
 
 [HasPartialVariant]
 [DiscriminatedUnionType(nameof(Id), WhenSpecified = true)]
-public sealed class GuildEmote : Emote, IGuildEmoteModel, IModelSource, IModelSourceOf<IUserModel?>
+public sealed class CustomEmote : Emote, ICustomEmoteModel, IModelSource, IModelSourceOf<IUserModel?>
 {
+    [JsonIgnore]
+    protected override DiscordEmojiId DiscordEmojiId => new(Name, Id, ~Animated);
+
     [JsonPropertyName("id"), PartialIgnore]
     public required ulong Id { get; set; }
 
@@ -27,14 +30,14 @@ public sealed class GuildEmote : Emote, IGuildEmoteModel, IModelSource, IModelSo
     [JsonPropertyName("available")]
     public Optional<bool> Available { get; set; }
 
-    ulong[] IGuildEmoteModel.Roles => RoleIds | [];
+    ulong[] ICustomEmoteModel.Roles => RoleIds | [];
 
-    bool IGuildEmoteModel.RequireColons => ~RequireColons;
-    bool IGuildEmoteModel.IsManaged => ~Managed;
-    bool IGuildEmoteModel.IsAnimated => ~Animated;
-    bool IGuildEmoteModel.IsAvailable => ~Available;
+    bool ICustomEmoteModel.RequireColons => ~RequireColons;
+    bool ICustomEmoteModel.IsManaged => ~Managed;
+    bool ICustomEmoteModel.IsAnimated => ~Animated;
+    bool ICustomEmoteModel.IsAvailable => ~Available;
 
-    ulong? IGuildEmoteModel.UserId => ~User.Map(v => v.Id);
+    ulong? ICustomEmoteModel.UserId => ~User.Map(v => v.Id);
 
     public IEnumerable<IModel> GetDefinedModels()
     {

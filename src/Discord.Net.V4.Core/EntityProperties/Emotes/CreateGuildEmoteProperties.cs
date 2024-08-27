@@ -2,14 +2,14 @@ using Discord.Models.Json;
 
 namespace Discord;
 
-public sealed class CreateGuildEmoteProperties : IEntityProperties<CreateEmojiParams>
+public sealed class CreateGuildEmoteProperties : IEntityProperties<CreateGuildEmojiParams>
 {
     public required string Name { get; set; }
     public required Image Image { get; set; }
     public Optional<IEnumerable<EntityOrId<ulong, IRole>>> Roles { get; set; }
-    public CreateEmojiParams ToApiModel(CreateEmojiParams? existing = default)
+    public CreateGuildEmojiParams ToApiModel(CreateGuildEmojiParams? existing = default)
     {
-        return new CreateEmojiParams()
+        return new CreateGuildEmojiParams()
         {
             Name = Name,
             Image = Image.ToImageData(),

@@ -3,6 +3,7 @@ using Discord.Models;
 namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
+[BackLinkable]
 public sealed partial class RestCurrentMemberActor :
     RestMemberActor,
     ICurrentMemberActor,

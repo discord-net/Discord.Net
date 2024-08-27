@@ -12,19 +12,13 @@ namespace Discord;
 ]
 public partial interface IThreadChannelActor :
     IMessageChannelTrait,
-    IThreadMemberRelationship,
     IActor<ulong, IThreadChannel>
 {
-    IThreadMemberActor CurrentThreadMember { get; }
-
-    // TODO: make this paged in api v11: https://discord.com/developers/docs/resources/channel#list-thread-members
-    ThreadMemberLink.Enumerable.Indexable.BackLink<IThreadChannelActor> ThreadMembers { get; }
+    IThreadMembersLink Members { get; }
 
     Task JoinAsync(RequestOptions? options = null, CancellationToken token = default)
         => Client.RestApiClient.ExecuteAsync(Routes.JoinThread(Id), options ?? Client.DefaultRequestOptions, token);
 
     Task LeaveAsync(RequestOptions? options = null, CancellationToken token = default)
         => Client.RestApiClient.ExecuteAsync(Routes.LeaveThread(Id), options ?? Client.DefaultRequestOptions, token);
-
-    IThreadMemberActor IThreadMemberRelationship.ThreadMember => CurrentThreadMember;
 }

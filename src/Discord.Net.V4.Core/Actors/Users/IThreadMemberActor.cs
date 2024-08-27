@@ -7,7 +7,6 @@ namespace Discord;
 public partial interface IThreadMemberActor :
     IActor<ulong, IThreadMember>,
     IThreadRelationship,
-    IMemberRelationship,
     IUserRelationship
 {
     [BackLink<IThreadChannelActor>]

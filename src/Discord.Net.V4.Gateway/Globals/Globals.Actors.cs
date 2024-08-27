@@ -124,7 +124,7 @@ global using GatewayGuildEmotes = Discord.Gateway.GatewayEnumerableIndexableLink
     Discord.Gateway.GatewayGuildEmote,
     Discord.Rest.RestGuildEmote,
     Discord.IGuildEmote,
-    Discord.Models.IGuildEmoteModel
+    Discord.Models.ICustomEmoteModel
 >;
 
 global using GatewayGuildStickers = Discord.Gateway.GatewayEnumerableIndexableLink<

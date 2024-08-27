@@ -41,11 +41,11 @@ public sealed partial class DiscordGatewayClient
     private readonly object _sequenceSyncRoot = new();
 
     private IGatewayCompression? _compression;
-    
+
     private readonly Channel<HeartbeatSignal> _heartbeatSignal;
 
     private readonly SemaphoreSlim _connectionSemaphore = new(1, 1);
-    
+
     private void StartEventProcessor()
     {
         _eventProcessorCancellationTokenSource.Cancel();
@@ -169,7 +169,7 @@ public sealed partial class DiscordGatewayClient
 
         _compression?.Dispose();
         _compression = TransportCompression?.Get(this, cache: false);
-        
+
         var gatewayUri = await GetGatewayUriAsync(shouldResume, token);
 
         _logger.LogInformation("Connecting to {GatewayUri}...", gatewayUri);
@@ -235,10 +235,13 @@ public sealed partial class DiscordGatewayClient
 
                 _logger.LogInformation("Resume successful, dispatching {Count} missed events", dispatchQueue.Count);
 
-                heartbeatTask = Task.Run(() => HeartbeatLoopAsync(
-                    _heartbeatInterval,
+                heartbeatTask = Task.Run(
+                    () => HeartbeatLoopAsync(
+                        _heartbeatInterval,
+                        _eventProcessorCancellationTokenSource.Token
+                    ),
                     _eventProcessorCancellationTokenSource.Token
-                ), _eventProcessorCancellationTokenSource.Token);
+                );
 
                 while (dispatchQueue.TryDequeue(out var dispatch))
                     await HandleDispatchAsync(
@@ -261,10 +264,13 @@ public sealed partial class DiscordGatewayClient
                     _heartbeatInterval
                 );
 
-                heartbeatTask = Task.Run(() => HeartbeatLoopAsync(
-                    _heartbeatInterval,
+                heartbeatTask = Task.Run(
+                    () => HeartbeatLoopAsync(
+                        _heartbeatInterval,
+                        _eventProcessorCancellationTokenSource.Token
+                    ),
                     _eventProcessorCancellationTokenSource.Token
-                ), _eventProcessorCancellationTokenSource.Token);
+                );
 
                 await SendMessageAsync(
                     CreateIdentityMessage(),
@@ -449,7 +455,7 @@ public sealed partial class DiscordGatewayClient
                     // cancel any remaining parts
                     heartbeatWaitCancellationToken.Cancel();
                     token.ThrowIfCancellationRequested();
-                    
+
                     _logger.LogDebug(
                         "Heartbeat interrupt: {Source}",
                         triggeringTask == heartbeatTimeoutTask ? "Interval elapsed" : "Discord sent a heartbeat request"
@@ -547,7 +553,7 @@ public sealed partial class DiscordGatewayClient
             _connectionSemaphore.Release();
         }
     }
-    
+
     private async ValueTask StopGatewayConnectionAsync(bool graceful, CancellationToken token = default)
     {
         ShardId = null;
@@ -580,7 +586,7 @@ public sealed partial class DiscordGatewayClient
 
         UnavailableGuilds.Clear();
         ProcessedUnavailableGuilds.Clear();
-        
+
         IsConnected = false;
     }
 

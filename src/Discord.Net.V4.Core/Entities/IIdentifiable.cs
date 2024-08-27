@@ -272,8 +272,8 @@ file sealed class Identifiable<TId, TEntity, TModel> :
 public enum IdentityDetail
 {
     Id,
-    EntityFactory,
     Actor,
+    EntityFactory,
     Entity,
 }
 

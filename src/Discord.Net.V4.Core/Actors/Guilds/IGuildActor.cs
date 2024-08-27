@@ -11,60 +11,14 @@ namespace Discord;
 public partial interface IGuildActor :
     IActor<ulong, IGuild>,
     IContainsThreadsTrait<IGuildThreadChannelActor>,
-    IInvitableTrait<IGuildInviteActor, IGuildInvite>,
-    IEntityProvider<IGuildChannel, IGuildChannelModel>,
-    IEntityProvider<IMember, IMemberModel>
+    IInvitableTrait<IGuildInviteActor, IGuildInvite>
 {
-    ICurrentMemberActor CurrentMember { get; }
-
-    #region Channels
-
     [return: TypeHeuristic(nameof(Channels))]
     IGuildChannelActor Channel(ulong id) => Channels[id];
-    GuildChannelLink.Enumerable.Indexable.BackLink<IGuildActor> Channels { get; }
-
-    [return: TypeHeuristic(nameof(TextChannels))]
-    ITextChannelActor TextChannel(ulong id) => TextChannels[id];
-    TextChannelLink.Enumerable.Indexable.BackLink<IGuildActor> TextChannels { get; }
-
-    [return: TypeHeuristic(nameof(VoiceChannels))]
-    IVoiceChannelActor VoiceChannel(ulong id) => VoiceChannels[id];
-    VoiceChannelLink.Enumerable.Indexable.BackLink<IGuildActor> VoiceChannels { get; }
-
-    [return: TypeHeuristic(nameof(CategoryChannels))]
-    ICategoryChannelActor CategoryChannel(ulong id) => CategoryChannels[id];
-    CategoryChannelLink.Enumerable.Indexable.BackLink<IGuildActor> CategoryChannels { get; }
-
-    [return: TypeHeuristic(nameof(AnnouncementChannels))]
-    INewsChannelActor AnnouncementChannel(ulong id) => AnnouncementChannels[id];
-    NewsChannelLink.Enumerable.Indexable.BackLink<IGuildActor> AnnouncementChannels { get; }
+    IGuildChannelsLink Channels { get; }
     
-    [return: TypeHeuristic(nameof(StageChannels))]
-    IStageChannelActor StageChannel(ulong id) => StageChannels[id];
-    StageChannelLink.Enumerable.Indexable.BackLink<IGuildActor> StageChannels { get; }
-
-    [return: TypeHeuristic(nameof(ForumChannels))]
-    IForumChannelActor ForumChannel(ulong id) => ForumChannels[id];
-    ForumChannelLink.Enumerable.Indexable.BackLink<IGuildActor> ForumChannels { get; }
-
-    [return: TypeHeuristic(nameof(MediaChannels))]
-    IMediaChannelActor MediaChannel(ulong id) => MediaChannels[id];
-    MediaChannelLink.Enumerable.Indexable.BackLink<IGuildActor> MediaChannels { get; }
-
-    [return: TypeHeuristic(nameof(IntegrationChannels))]
-    IIntegrationChannelTrait IntegrationChannel(ulong id) => IntegrationChannels[id];
-    IntegrationChannelTraitLink.Enumerable.Indexable.BackLink<IGuildActor> IntegrationChannels { get; }
-
     [SourceOfTruth]
-    new ThreadsLink Threads { get; }
-    
-    public interface ThreadsLink :
-        GuildThreadChannelLink.Indexable
-    {
-        GuildThreadChannelLink.Enumerable Active { get; }
-    }
-    
-    #endregion
+    new IGuildThreadsLink Threads { get; }
 
     [return: TypeHeuristic(nameof(Integrations))]
     IIntegrationActor Integration(ulong id) => Integrations[id];
@@ -76,7 +30,7 @@ public partial interface IGuildActor :
 
     [return: TypeHeuristic(nameof(Members))]
     IMemberActor Member(ulong id) => Members[id];
-    MemberLink.Paged<PageGuildMembersParams>.Indexable.BackLink<IGuildActor> Members { get; }
+    IMembersLink Members { get; }
 
     [return: TypeHeuristic(nameof(Emotes))]
     IGuildEmoteActor Emote(ulong id) => Emotes[id];

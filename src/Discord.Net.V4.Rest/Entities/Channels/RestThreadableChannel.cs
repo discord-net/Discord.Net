@@ -35,7 +35,7 @@ using JoinedPrivateThreadsPagedActor = RestPagedIndexableLink<
 public partial class RestThreadableChannelActor :
     RestGuildChannelActor,
     IThreadableChannelActor,
-    IRestActor<ulong, RestThreadableChannel, ThreadableChannelIdentity>
+    IRestActor<ulong, RestThreadableChannel, ThreadableChannelIdentity, IThreadableChannelModel>
 {
     [SourceOfTruth]
     public PublicThreadsPagedActor PublicArchivedThreads { get; }

@@ -10,7 +10,7 @@ namespace Discord;
     Modifiable<ModifyVoiceChannelProperties>(nameof(Routes.ModifyChannel)),
     Creatable<CreateGuildVoiceChannelProperties>(
         nameof(Routes.CreateGuildChannel),
-        nameof(IGuildActor.VoiceChannels),
+        nameof(IGuildChannelsLink.Voice),
         RouteGenerics = [typeof(GuildVoiceChannel)]
     ),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity"), 
@@ -18,5 +18,6 @@ namespace Discord;
 ]
 public partial interface IVoiceChannelActor :
     IMessageChannelTrait,
+    IInvitableTrait<IGuildChannelInviteActor, IGuildChannelInvite>,
     IIncomingIntegrationChannelTrait,
     IActor<ulong, IVoiceChannel>;

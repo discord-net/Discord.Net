@@ -12,7 +12,7 @@ using IncomingIntegrationChannelTrait = RestIncomingIntegrationChannelTrait<Rest
 public partial class RestVoiceChannelActor :
     RestGuildChannelActor,
     IVoiceChannelActor,
-    IRestActor<ulong, RestVoiceChannel, VoiceChannelIdentity>
+    IRestActor<ulong, RestVoiceChannel, VoiceChannelIdentity, IGuildVoiceChannelModel>
 {
     [ProxyInterface(typeof(IMessageChannelTrait))]
     internal MessageChannelTrait MessageChannelTrait { get; }

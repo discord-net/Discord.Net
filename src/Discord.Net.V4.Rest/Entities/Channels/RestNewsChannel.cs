@@ -8,7 +8,7 @@ namespace Discord.Rest;
 public partial class RestNewsChannelActor :
     RestTextChannelActor,
     INewsChannelActor,
-    IRestActor<ulong, RestNewsChannel, NewsChannelIdentity>
+    IRestActor<ulong, RestNewsChannel, NewsChannelIdentity, IGuildNewsChannelModel>
 {
     [SourceOfTruth]
     internal override NewsChannelIdentity Identity { get; }

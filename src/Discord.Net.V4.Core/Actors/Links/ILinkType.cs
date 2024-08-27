@@ -22,7 +22,7 @@ public partial interface ILinkType<out TActor, TId, out TEntity, in TModel> :
     where TActor : class, IActor<TId, TEntity>
     where TEntity : class, IEntity<TId, TModel>
     where TId : IEquatable<TId>
-    where TModel : IEntityModel<TId>
+    where TModel : class, IEntityModel<TId>
 {
     public interface BackLink<out TSource> : 
         ILink<TActor, TId, TEntity, TModel>,

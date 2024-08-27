@@ -9,5 +9,5 @@ public interface IBackLinkedActor<out TSource, out TBackLink, out TActor, TId, o
     where TActor : class, IActor<TId, TEntity>
     where TEntity : class, IEntity<TId, TModel>
     where TId : IEquatable<TId>
-    where TModel : IEntityModel<TId>
+    where TModel : class, IEntityModel<TId>
     where TSource : class, IPathable;

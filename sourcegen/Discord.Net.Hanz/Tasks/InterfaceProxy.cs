@@ -525,6 +525,10 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
         {
             logger.Log($"Generating {item.Key}");
 
+            TypeDeclarationSyntax syntax = item.Value.Syntax;
+            
+            SyntaxUtils.ApplyNesting(item.Value.Target.Symbol, ref syntax);
+            
             context.AddSource(
                 $"InterfaceProxy/{item.Key}",
                 $$"""
@@ -532,7 +536,7 @@ public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTa
 
                   namespace {{ModelExtensions.GetDeclaredSymbol(item.Value.Target.SemanticModel, item.Value.Target.ClassDeclarationSyntax)!.ContainingNamespace}};
 
-                  {{item.Value.Syntax.NormalizeWhitespace()}}
+                  {{syntax.NormalizeWhitespace()}}
                   """
             );
         }

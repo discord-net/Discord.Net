@@ -6,6 +6,8 @@ namespace Discord;
 [Flags]
 public enum ApplicationFlags
 {
+    None = 0,
+    
     /// <summary>
     ///     Indicates if an app uses the Auto Moderation API.
     /// </summary>

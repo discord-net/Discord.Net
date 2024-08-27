@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class GuildPreview : IModelSource, IModelSourceOfMultiple<IGuildEmoteModel>, IModelSourceOfMultiple<IStickerModel>
+public sealed class GuildPreview : IModelSource, IModelSourceOfMultiple<ICustomEmoteModel>, IModelSourceOfMultiple<IStickerModel>
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -20,7 +20,7 @@ public sealed class GuildPreview : IModelSource, IModelSourceOfMultiple<IGuildEm
     public string? DiscoverySplash { get; set; }
 
     [JsonPropertyName("emojis")]
-    public required GuildEmote[] Emojis { get; set; }
+    public required CustomEmote[] Emojis { get; set; }
 
     [JsonPropertyName("features")]
     public required string[] Features { get; set; }
@@ -37,7 +37,7 @@ public sealed class GuildPreview : IModelSource, IModelSourceOfMultiple<IGuildEm
     [JsonPropertyName("stickers")]
     public required Sticker[] Stickers { get; set; }
 
-    IEnumerable<IGuildEmoteModel> IModelSourceOfMultiple<IGuildEmoteModel>.GetModels() => Emojis;
+    IEnumerable<ICustomEmoteModel> IModelSourceOfMultiple<ICustomEmoteModel>.GetModels() => Emojis;
 
     IEnumerable<IStickerModel> IModelSourceOfMultiple<IStickerModel>.GetModels() => Stickers;
 

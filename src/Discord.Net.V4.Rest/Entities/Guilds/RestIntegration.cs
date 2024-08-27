@@ -5,7 +5,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestIntegrationActor :
-    RestActor<ulong, RestIntegration, IntegrationIdentity>,
+    RestActor<ulong, RestIntegration, IntegrationIdentity, IIntegrationModel>,
     IIntegrationActor
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }

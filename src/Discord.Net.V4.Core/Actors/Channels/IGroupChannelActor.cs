@@ -13,4 +13,7 @@ namespace Discord;
 public partial interface IGroupChannelActor :
     IMessageChannelTrait,
     IInvitableTrait<IChannelInviteActor, IChannelInvite>,
-    IActor<ulong, IGroupChannel>;
+    IActor<ulong, IGroupChannel>
+{
+    UserLink.Indexable.BackLink<IGroupChannelActor> Recipients { get; }
+}

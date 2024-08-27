@@ -4,13 +4,11 @@ using Discord.Rest;
 namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
-public sealed partial class RestThreadMemberActor :
+public partial class RestThreadMemberActor :
     RestActor<ulong, RestThreadMember, ThreadMemberIdentity, IThreadMemberModel>,
     IThreadMemberActor
 {
-    [SourceOfTruth] public RestThreadChannelActor Thread { get; }
-
-    [SourceOfTruth] public RestMemberActor Member { get; }
+    [SourceOfTruth] public virtual RestThreadChannelActor Thread { get; }
 
     [SourceOfTruth] public RestUserActor User { get; }
 
@@ -19,18 +17,15 @@ public sealed partial class RestThreadMemberActor :
     [TypeFactory(LastParameter = nameof(threadMember))]
     public RestThreadMemberActor(
         DiscordRestClient client,
-        GuildIdentity guild,
         ThreadIdentity thread,
         ThreadMemberIdentity threadMember,
-        MemberIdentity? member = null,
         UserIdentity? user = null
     ) : base(client, threadMember)
     {
         Identity = threadMember | this;
 
-        Thread = thread.Actor ?? new(client, guild, thread, threadMember);
-        User = user?.Actor ?? new(client, user ?? UserIdentity.Of(threadMember.Id));
-        Member = member?.Actor ?? new(client, guild, member ?? MemberIdentity.Of(threadMember.Id), user | User);
+        Thread = thread.Actor ?? client.Threads[thread.Id];
+        User = user?.Actor ?? client.Users[threadMember.Id];
     }
 
     [SourceOfTruth]
@@ -40,6 +35,45 @@ public sealed partial class RestThreadMemberActor :
             this,
             model
         );
+}
+
+public sealed partial class RestGuildThreadMemberActor :
+    RestThreadMemberActor,
+    IGuildThreadMemberActor,
+    IRestActor<ulong, RestThreadMember, GuildThreadMemberIdentity, IThreadMemberModel>
+{
+    [SourceOfTruth]
+    public RestGuildActor Guild { get; }
+    
+    [SourceOfTruth] public RestMemberActor Member { get; }
+
+    [SourceOfTruth] public override RestGuildThreadChannelActor Thread { get; }
+
+    [SourceOfTruth] internal override GuildThreadMemberIdentity Identity => _identity;
+
+    private GuildThreadMemberIdentity _identity;
+    
+    public RestGuildThreadMemberActor(
+        DiscordRestClient client,
+        GuildIdentity guild,
+        GuildThreadIdentity thread,
+        GuildThreadMemberIdentity threadMember,
+        UserIdentity? user = null,
+        MemberIdentity? member = null
+    ) : base(client, thread, threadMember, user)
+    {
+        _identity = threadMember | this;
+        
+        Guild = guild.Actor ?? client.Guilds[guild.Id];
+        Thread = thread.Actor ?? Guild.Threads[thread.Id];
+        Member = member?.Actor ?? Guild.Members[threadMember.Id];
+    }
+
+    internal void UpdateIdentity(IThreadMemberModel model)
+    {
+        if(_identity.Detail < IdentityDetail.EntityFactory)
+            _identity = GuildThreadMemberIdentity.Of(model, CreateEntity);
+    }
 }
 
 public sealed partial class RestThreadMember :

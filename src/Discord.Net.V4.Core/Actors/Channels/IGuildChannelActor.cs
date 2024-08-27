@@ -13,12 +13,10 @@ namespace Discord;
         nameof(Routes.CreateGuildChannel),
         nameof(IGuildActor.Channels)
     ),
-    BackLink(nameof(Invites)),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IGuildChannelActor :
     IGuildRelationship,
-    IInvitableTrait<IGuildChannelInviteActor, IGuildChannelInvite>,
     IActor<ulong, IGuildChannel>
 {
     [OnVertex]

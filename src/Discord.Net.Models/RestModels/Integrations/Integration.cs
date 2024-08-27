@@ -47,7 +47,7 @@ public sealed class Integration : IIntegrationModel, IModelSource, IModelSourceO
     public Optional<bool> Revoked { get; set; }
 
     [JsonPropertyName("application")]
-    public Optional<IntegrationApplication> Application { get; set; }
+    public Optional<PartialApplication> Application { get; set; }
 
     [JsonPropertyName("scopes")]
     public Optional<string[]> Scopes { get; set; }
@@ -68,7 +68,7 @@ public sealed class Integration : IIntegrationModel, IModelSource, IModelSourceO
 
     bool? IIntegrationModel.IsRevoked => ~Revoked;
 
-    IApplicationModel? IIntegrationModel.Application => ~Application;
+    IPartialApplicationModel? IIntegrationModel.Application => ~Application;
 
     string[]? IIntegrationModel.Scopes => ~Scopes;
 

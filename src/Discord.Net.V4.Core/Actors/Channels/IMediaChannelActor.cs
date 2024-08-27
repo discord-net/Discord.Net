@@ -10,9 +10,10 @@ namespace Discord;
     Modifiable<ModifyMediaChannelProperties>(nameof(Routes.ModifyChannel)),
     Creatable<CreateGuildMediaChannelProperties>(
         nameof(Routes.CreateGuildChannel),
-        nameof(IGuildActor.MediaChannels),
+        nameof(IGuildChannelsLink.Media),
         RouteGenerics = [typeof(GuildMediaChannel)]
     ),
+    BackLink(nameof(Threads)),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IMediaChannelActor :

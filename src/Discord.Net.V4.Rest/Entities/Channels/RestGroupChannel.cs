@@ -9,8 +9,12 @@ using MessageChannelTrait = RestMessageChannelTrait<RestGroupChannelActor, Group
 public partial class RestGroupChannelActor :
     RestChannelActor,
     IGroupChannelActor,
-    IRestActor<ulong, RestGroupChannel, GroupChannelIdentity>
+    IRestActor<ulong, RestGroupChannel, GroupChannelIdentity, IGroupDMChannelModel>
 {
+    [SourceOfTruth] public ChannelInviteLink.Enumerable.Indexable Invites { get; }
+
+    [SourceOfTruth] public UserLink.Indexable.BackLink<RestGroupChannelActor> Recipients { get; }
+
     [ProxyInterface(typeof(IMessageChannelTrait))]
     internal MessageChannelTrait MessageChannelTrait { get; }
 
@@ -23,25 +27,38 @@ public partial class RestGroupChannelActor :
     ) : base(client, channel)
     {
         Identity = channel | this;
+
         MessageChannelTrait = new(client, this, channel);
+
+        Recipients =
+            (UserLink.Indexable.BackLink<RestGroupChannelActor>?) channel.Entity?.Recipients
+            ?? new RestUserLink.Indexable.BackLink<RestGroupChannelActor>(
+                this,
+                client,
+                client.Users
+            );
+
+        Invites = new RestChannelInviteLink.Enumerable.Indexable(
+            client,
+            new RestActorProvider<string, RestChannelInviteActor>(
+                (client, id) => new RestChannelInviteActor(client, Identity, ChannelInviteIdentity.Of(id))
+            ),
+            Routes.GetChannelInvites(Id).AsRequiredProvider()
+        );
     }
 
     [SourceOfTruth]
+    [CovariantOverride]
     internal RestGroupChannel CreateEntity(IGroupDMChannelModel model)
-        => RestGroupChannel.Construct(Client, model);
-
-    [SourceOfTruth]
-    internal virtual RestInvite CreateEntity(IInviteModel model)
-        => RestInvite.Construct(Client, model);
+        => RestGroupChannel.Construct(Client, this, model);
 }
 
 public partial class RestGroupChannel :
     RestChannel,
     IGroupChannel,
-    IConstructable<RestGroupChannel, IGroupDMChannelModel, DiscordRestClient>
+    IRestConstructable<RestGroupChannel, RestGroupChannelActor, IGroupDMChannelModel>
 {
-    [SourceOfTruth]
-    public IDefinedLoadableEntityEnumerable<ulong, IUser> Recipients => throw new NotImplementedException();
+    [SourceOfTruth] public UserLink.Defined.Indexable.BackLink<RestGroupChannelActor> Recipients { get; }
 
     [ProxyInterface(
         typeof(IGroupChannelActor),
@@ -57,15 +74,25 @@ public partial class RestGroupChannel :
     internal RestGroupChannel(
         DiscordRestClient client,
         IGroupDMChannelModel model,
-        RestGroupChannelActor? actor = null
-    ) : base(client, model)
+        RestGroupChannelActor actor
+    ) : base(client, model, actor)
     {
         _model = model;
-        Actor = actor ?? new(client, GroupChannelIdentity.Of(this));
+        Actor = actor;
+
+        Recipients = new RestUserLink.Defined.Indexable.BackLink<RestGroupChannelActor>(
+            actor,
+            Client,
+            Client.Users,
+            model.Recipients.ToList().AsReadOnly()
+        );
     }
 
-    public static RestGroupChannel Construct(DiscordRestClient client, IGroupDMChannelModel model)
-        => new(client, model);
+    public static RestGroupChannel Construct(
+        DiscordRestClient client,
+        RestGroupChannelActor actor,
+        IGroupDMChannelModel model)
+        => new(client, model, actor);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IGroupDMChannelModel model, CancellationToken token = default)

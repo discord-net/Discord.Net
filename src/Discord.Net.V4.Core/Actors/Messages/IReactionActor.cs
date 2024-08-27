@@ -10,11 +10,7 @@ public partial interface IReactionActor :
     IMessageRelationship,
     IEntityProvider<IReaction, IReactionModel>
 {
-    ICurrentUserActor.BackLink<IReactionActor> CurrentUser { get; }
-    
-    IUserActor.BackLink<IReactionActor>.Paged<PageUserBasicReactionsParams>.Indexable Users { get; }
-    
-    IUserActor.BackLink<IReactionActor>.Paged<PageUserSuperReactionsParams>.Indexable SuperReactionUsers { get; }
+    UsersLink Users { get; }
     
     [OnVertex]
     private static Task AddAsync(
@@ -59,5 +55,13 @@ public partial interface IReactionActor :
             options ?? target.Client.DefaultRequestOptions,
             token
         );
+    }
+
+    public interface UsersLink : 
+        IUserActor.BackLink<IReactionActor>.Paged<PageUserBasicReactionsParams>.Indexable
+    {
+        ICurrentUserActor.BackLink<IReactionActor> Current { get; }
+        
+        IUserActor.BackLink<IReactionActor>.Paged<PageUserSuperReactionsParams>.Indexable SuperReactors { get; }
     }
 }

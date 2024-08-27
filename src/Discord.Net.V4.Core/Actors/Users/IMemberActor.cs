@@ -17,9 +17,9 @@ public partial interface IMemberActor :
     IVoiceStateActor VoiceState { get; }
     RoleLink.BackLink<IMemberActor> Roles { get; }
 
-    [BackLink<IGuildActor>]
+    [OnVertex<IMembersLink>]
     private static async Task<IMember> AddAsync(
-        IGuildActor guild,
+        IMembersLink link,
         EntityOrId<ulong, IUser> user,
         string accessToken,
         string? nickname = null,
@@ -29,9 +29,11 @@ public partial interface IMemberActor :
         RequestOptions? options = null,
         CancellationToken token = default)
     {
-        return guild.CreateEntity(
-            await guild.Client.RestApiClient.ExecuteRequiredAsync(
-                Routes.AddGuildMember(guild.Id, user.Id,
+        return link.CreateEntity(
+            await link.Client.RestApiClient.ExecuteRequiredAsync(
+                Routes.AddGuildMember(
+                    link.Source.Id,
+                    user.Id,
                     new AddGuildMemberParams
                     {
                         AccessToken = accessToken,
@@ -43,28 +45,33 @@ public partial interface IMemberActor :
                                 .Select(v => v.Id)
                                 .ToArray()
                             )
-                    }),
-                options ?? guild.Client.DefaultRequestOptions,
+                    }
+                ),
+                options,
                 token
             )
         );
     }
 
-    [BackLink<IGuildActor>]
+    [OnVertex<IMembersLink>]
     private static async Task<IReadOnlyCollection<IMember>> SearchAsync(
-        IGuildActor guild,
+        IMembersLink link,
         string query,
         int limit = DiscordConfig.MaxUsersPerBatch,
         RequestOptions? options = null,
         CancellationToken token = default)
     {
-        var result = await guild.Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.SearchGuildMembers(guild.Id, query, limit),
-            options ?? guild.Client.DefaultRequestOptions,
+        var result = await link.Client.RestApiClient.ExecuteRequiredAsync(
+            Routes.SearchGuildMembers(
+                link.Source.Id,
+                query,
+                limit
+            ),
+            options,
             token
         );
 
-        return result.Select(guild.CreateEntity).ToList().AsReadOnly();
+        return result.Select(link.CreateEntity).ToList().AsReadOnly();
     }
 
     Task KickAsync(

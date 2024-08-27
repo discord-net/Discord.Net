@@ -6,6 +6,23 @@ namespace Discord.Net.Hanz.Utils;
 
 public static class SyntaxUtils
 {
+    public static void ApplyNesting(ITypeSymbol type, ref TypeDeclarationSyntax syntax)
+    {
+        var container = type.ContainingType;
+
+        while (container is not null)
+        {
+            if (
+                container.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax()
+                is not TypeDeclarationSyntax containerSyntax
+            ) break;
+
+            syntax = CreateSourceGenClone(containerSyntax).AddMembers(syntax);
+
+            container = container.ContainingType;
+        }
+    }
+    
     public static string[] FlattenMemberAccess(MemberAccessExpressionSyntax syntax)
     {
         if (syntax.Expression is MemberAccessExpressionSyntax left)

@@ -17,6 +17,7 @@ public sealed class ReactionIdConverter : JsonConverter<DiscordEmojiId>
             case JsonTokenType.StartObject when JsonNode.Parse(ref reader) is JsonObject obj:
                 ulong? id = null;
                 string? name = null;
+                bool isAnimated = false;
 
                 if (obj.TryGetPropertyValue("id", out var idNode) && idNode is not null)
                 {
@@ -33,10 +34,15 @@ public sealed class ReactionIdConverter : JsonConverter<DiscordEmojiId>
                     name = nameNode.Deserialize<string?>();
                 }
 
+                if (obj.TryGetPropertyValue("animated", out var isAnimatedNode) && isAnimatedNode is not null)
+                {
+                    isAnimated = isAnimatedNode.Deserialize<bool>();
+                }
+
                 if (!id.HasValue && name is null)
                     throw new JsonException("Invalid emoji identifier");
 
-                return new DiscordEmojiId(name, id);
+                return new DiscordEmojiId(name, id, isAnimated);
 
             default:
                 throw new JsonException("Invalid emoji identifier");

@@ -10,7 +10,7 @@ using ChannelFollowerIntegrationChannelTrait =
 public sealed partial class RestStageChannelActor :
     RestVoiceChannelActor,
     IStageChannelActor,
-    IRestActor<ulong, RestStageChannel, StageChannelIdentity>
+    IRestActor<ulong, RestStageChannel, StageChannelIdentity, IGuildStageChannelModel>
 {
     [SourceOfTruth] public RestStageInstanceActor StageInstance { get; }
 

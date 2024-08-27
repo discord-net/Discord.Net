@@ -31,7 +31,7 @@ public partial class RestIntegrationChannelTrait<TChannelActor, TChannel, TIdent
 }
 
 public partial class RestIntegrationChannelTrait :
-    RestTrait<ulong, RestGuildChannel, IntegrationChannelIdentity>,
+    RestTrait<ulong, RestGuildChannel, IntegrationChannelIdentity, IGuildChannelModel>,
     IIntegrationChannelTrait
 {
     [SourceOfTruth] public EnumerableWebhookActor Webhooks { get; }

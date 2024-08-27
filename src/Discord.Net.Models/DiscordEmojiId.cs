@@ -10,6 +10,7 @@ public readonly struct DiscordEmojiId :
 {
     public string? Name { get; }
     public ulong? Id { get; }
+    public bool IsAnimated { get; }
 
     public DiscordEmojiId(string emoji)
     {
@@ -17,49 +18,51 @@ public readonly struct DiscordEmojiId :
         Id = null;
     }
 
-    public DiscordEmojiId(string name, ulong snowflake)
+    public DiscordEmojiId(ulong snowflake, string name, bool isAnimated = false)
+    {
+        Id = snowflake;
+        Name = name;
+        IsAnimated = isAnimated;
+    }
+
+    internal DiscordEmojiId(string? name, ulong? snowflake, bool? isAnimated)
     {
         Name = name;
         Id = snowflake;
-    }
-
-    public DiscordEmojiId(ulong snowflake)
-    {
-        Id = snowflake;
-        Name = null;
-    }
-
-    internal DiscordEmojiId(string? name, ulong? snowflake)
-    {
-        Name = name;
-        Id = snowflake;
+        IsAnimated = isAnimated ?? false;
     }
 
     public static bool TryParse(string value, out DiscordEmojiId result)
     {
         if (ulong.TryParse(value, out var id))
         {
-            result = new(id);
+            result = new(null, id, false);
             return true;
         }
 
         if (value.Contains(':'))
         {
-            var split = value.Split(':');
+            var split = value.Split(":", StringSplitOptions.RemoveEmptyEntries);
 
-            if (split.Length != 2)
+            if (split.Length is < 2 or > 3)
             {
                 result = default;
                 return false;
             }
 
-            if (!ulong.TryParse(split[1], out id))
+            var idStr = split[^1];
+            var name = split[^2];
+            
+            var isAnimated = split is ["a", _, _];
+
+            if (!ulong.TryParse(idStr, out id))
             {
                 result = default;
                 return false;
             }
-
-            result = new DiscordEmojiId(split[0], id);
+            
+            result = new DiscordEmojiId(name, id, isAnimated);
+            return true;
         }
 
         bool hasEmpty = false;
@@ -83,7 +86,7 @@ public readonly struct DiscordEmojiId :
     {
         return (Name, Id) switch
         {
-            (not null, not null) => $"{Name}:{Id.Value}",
+            (not null, not null) => IsAnimated ? $"a:{Name}:{Id.Value}" :  $":{Name}:{Id.Value}",
             (not null, null) => Name,
             (null, not null) => Id.Value.ToString(),
             _ => throw new ArgumentException("Neither 'name' or 'snowflake' was specified.")
@@ -96,10 +99,11 @@ public readonly struct DiscordEmojiId :
     public IModel ToModel()
     {
         if (Id.HasValue)
-            return new PartialGuildEmote()
+            return new PartialCustomEmote()
             {
                 Name = Optional.FromNullable<string?>(Name),
-                Id = Id.Value
+                Id = Id.Value,
+                Animated = IsAnimated
             };
 
         if (Name is null)
@@ -147,10 +151,10 @@ public readonly struct DiscordEmojiId :
             : throw new ArgumentException($"The provided string '{str}' is not a valid emoji identifier");
 
     public static implicit operator DiscordEmojiId(ulong snowflake)
-        => new(snowflake);
+        => new(null, snowflake, false);
     
     public static implicit operator DiscordEmojiId((string Name, ulong Id) identifier)
-        => new(identifier.Name, identifier.Id);
+        => new(identifier.Id, identifier.Name);
     
     // https://www.unicode.org/reports/tr51/#EBNF_and_Regex
     private static readonly Regex EmojiRegex = new(

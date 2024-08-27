@@ -13,6 +13,12 @@ public sealed class ModifyCurrentApplicationParams
     [JsonPropertyName("role_connections_verification_url")]
     public Optional<string> RoleConnectionsVerificationUrl { get; set; }
 
+    [JsonPropertyName("install_params")]
+    public Optional<InstallParams> InstallParams { get; set; }
+    
+    [JsonPropertyName("integration_types_config")]
+    public Optional<ApplicationIntegrationTypesConfig> IntegrationTypesConfig { get; set; }
+    
     [JsonPropertyName("flags")]
     public Optional<int> Flags { get; set; }
 

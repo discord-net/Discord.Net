@@ -19,6 +19,7 @@ public sealed class ForumTag : ITagModel
     [JsonPropertyName("emoji_name")]
     public string? EmojiName { get; set; }
 
-    DiscordEmojiId? ITagModel.Emoji => EmojiName is not null || EmojiId.HasValue ? new(EmojiName, EmojiId) : null;
+    DiscordEmojiId? ITagModel.Emoji 
+        => EmojiName is not null || EmojiId.HasValue ? new(EmojiName, EmojiId, false) : null;
 
 }

@@ -10,7 +10,7 @@ using IncomingIntegrationChannelTrait =
 public sealed partial class RestForumChannelActor :
     RestThreadableChannelActor,
     IForumChannelActor,
-    IRestActor<ulong, RestForumChannel, ForumChannelIdentity>
+    IRestActor<ulong, RestForumChannel, ForumChannelIdentity, IGuildForumChannelModel>
 {
     [SourceOfTruth] internal override ForumChannelIdentity Identity { get; }
 

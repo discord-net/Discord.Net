@@ -25,6 +25,10 @@ namespace Discord;
     ),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
-public partial interface IGuildThreadChannelActor : 
+public partial interface IGuildThreadChannelActor :
     IThreadChannelActor,
-    IGuildChannelActor;
+    IGuildRelationship
+{
+    [SourceOfTruth]
+    new IGuildThreadMembersLink Members { get; }
+}

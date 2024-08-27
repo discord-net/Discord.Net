@@ -279,8 +279,10 @@ public static class CreatableTrait
         if (invocation.ArgumentList.Arguments[0].Expression is not MemberAccessExpressionSyntax access)
             return null;
 
+        var typeName = access.Expression.ToString().Split(['.'], StringSplitOptions.RemoveEmptyEntries).Last();
+
         var candidates = compilation
-            .GetSymbolsWithName(x => x.EndsWith(access.Expression.ToString()))
+            .GetSymbolsWithName(x => x.EndsWith(typeName))
             .OfType<INamedTypeSymbol>()
             .ToArray();
 
@@ -336,19 +338,20 @@ public static class CreatableTrait
             linkType = $"{backlinkTarget.LinkType}";
 
             if (
-                (
-                    (
-                        !backlinkTarget.LinkType.ContainingType?.Equals(
-                            backlinkTarget.BacklinkTargetType,
-                            SymbolEqualityComparer.Default
-                        )
-                        ?? true
-                    )
-                    || 
-                    Links.HasBackLinkableAttribute(backlinkTarget.LinkType)
-                )
-                &&
-                !linkType.EndsWith($".BackLink<{backlinkTarget.BacklinkTargetType.ToDisplayString()}>")
+                !linkType.Contains("BackLink")
+                // (
+                //     (
+                //         !backlinkTarget.LinkType.ContainingType?.Equals(
+                //             backlinkTarget.BacklinkTargetType,
+                //             SymbolEqualityComparer.Default
+                //         )
+                //         ?? true
+                //     )
+                //     || 
+                //     Links.HasBackLinkableAttribute(backlinkTarget.LinkType)
+                // )
+                // &&
+                // !linkType.EndsWith($".BackLink<{backlinkTarget.BacklinkTargetType.ToDisplayString()}>")
             )
             {
                 linkType = $"{linkType}.BackLink<{backlinkTarget.BacklinkTargetType.ToDisplayString()}>";

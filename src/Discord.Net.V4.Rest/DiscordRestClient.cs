@@ -26,16 +26,14 @@ namespace Discord.Rest;
 
 public sealed partial class DiscordRestClient : IDiscordClient
 {
-    [SourceOfTruth]
-    public RestCurrentUserActor CurrentUser { get; }
-    
+    [SourceOfTruth] public RestCurrentUserActor CurrentUser { get; }
+
     [SourceOfTruth]
     public GuildLink
         .Paged<RestPartialGuild, IPartialGuildModel, PageUserGuildsParams, IEnumerable<IPartialGuildModel>>
         .Indexable Guilds { get; }
 
-    [SourceOfTruth] 
-    public ChannelLink.Indexable Channels { get; }
+    [SourceOfTruth] public ChannelLink.Indexable Channels { get; }
 
     [SourceOfTruth] public UserLink.Indexable Users { get; }
 
@@ -45,6 +43,8 @@ public sealed partial class DiscordRestClient : IDiscordClient
     [SourceOfTruth] public StickerPackLink.Enumerable.Indexable StickerPacks { get; }
 
     [SourceOfTruth] public StickerLink.Indexable Stickers { get; }
+
+    [SourceOfTruth] public ThreadChannelLink.Indexable Threads { get; }
 
     [SourceOfTruth] public RestApiClient RestApiClient { get; }
 
@@ -76,6 +76,12 @@ public sealed partial class DiscordRestClient : IDiscordClient
         RateLimiter = new();
         Logger = logger;
 
+        Threads = new RestThreadChannelLink.Indexable(
+            this,
+            new RestActorProvider<ulong, RestThreadChannelActor>(
+                (client, id) => new RestThreadChannelActor(client, ThreadIdentity.Of(id))
+            )
+        );
         CurrentUser =
             new RestCurrentUserActor(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
         Channels = new(this, id => new RestChannelActor(this, ChannelIdentity.Of(id)));
@@ -92,6 +98,13 @@ public sealed partial class DiscordRestClient : IDiscordClient
         );
         Stickers = new(this, id => new RestStickerActor(this, StickerIdentity.Of(id)));
         Invites = new(this, id => new RestInviteActor(this, InviteIdentity.Of(id)));
+    }
+
+    internal ApiModelProviderDelegate<TModel> GetApiProvider<TModel>(
+        IApiOutRoute<TModel> route)
+        where TModel : class
+    {
+        return async (client, options, token) => await client.RestApiClient.ExecuteAsync(route, options, token);
     }
 
     public ValueTask DisposeAsync()

@@ -2,6 +2,8 @@ using Discord.Models;
 using Discord.Paging;
 using MorseCode.ITask;
 
+// ReSharper disable MemberHidesStaticFromOuterClass
+
 namespace Discord.Rest;
 
 [BackLinkable]
@@ -19,7 +21,7 @@ public partial class RestLinkType<TActor, TId, TEntity, TModel>(
     [BackLinkable]
     public partial class Indexable(
         DiscordRestClient client,
-        RestActorProvider<TId, TActor> actorFactory
+        IActorProvider<DiscordRestClient, TActor, TId> actorFactory
     ) :
         RestLink<TActor, TId, TEntity, TModel>(client, actorFactory),
         ILinkType<TActor, TId, TEntity, TModel>.Indexable
@@ -31,35 +33,70 @@ public partial class RestLinkType<TActor, TId, TEntity, TModel>(
     }
 
     [BackLinkable]
-    public partial class Enumerable(
-        DiscordRestClient client,
-        RestActorProvider<TId, TActor> actorFactory,
-        ApiModelProviderDelegate<IEnumerable<TModel>> apiProvider
-    ) :
-        RestLink<TActor, TId, TEntity, TModel>(client, actorFactory),
+    public partial class Enumerable :
+        RestLink<TActor, TId, TEntity, TModel>,
         ILinkType<TActor, TId, TEntity, TModel>.Enumerable
     {
-        public async ITask<IReadOnlyCollection<TEntity>> AllAsync(
+        public delegate ITask<IReadOnlyCollection<TEntity>> EnumerableProviderDelegate(
+            DiscordRestClient client,
             RequestOptions? options = null,
-            CancellationToken token = default)
-        {
-            var models = await apiProvider(Client, options, token);
+            CancellationToken token = default
+        );
 
-            return models
-                .Select(CreateEntity)
-                .ToList()
-                .AsReadOnly();
+        internal EnumerableProviderDelegate EnumerableProvider { get; }
+
+        internal Enumerable(
+            DiscordRestClient client,
+            IActorProvider<DiscordRestClient, TActor, TId> actorFactory,
+            ApiModelProviderDelegate<IEnumerable<TModel>> modelProvider
+        ) : base(client, actorFactory)
+        {
+            EnumerableProvider = async (client, options, token) =>
+            {
+                var models = await modelProvider(client, options, token);
+
+                return models
+                    .Select(CreateEntity)
+                    .ToList()
+                    .AsReadOnly();
+            };
         }
 
-        [BackLinkable]
-        public partial class Indexable(
+        public Enumerable(
             DiscordRestClient client,
-            RestActorProvider<TId, TActor> actorFactory,
-            ApiModelProviderDelegate<IEnumerable<TModel>> apiProvider
-        ) :
-            Enumerable(client, actorFactory, apiProvider),
-            ILinkType<TActor, TId, TEntity, TModel>.Indexable
+            IActorProvider<DiscordRestClient, TActor, TId> actorFactory,
+            EnumerableProviderDelegate provider
+        ) : base(client, actorFactory)
         {
+            EnumerableProvider = provider;
+        }
+
+        public ITask<IReadOnlyCollection<TEntity>> AllAsync(
+            RequestOptions? options = null,
+            CancellationToken token = default)
+            => EnumerableProvider(Client, options, token);
+
+        [BackLinkable]
+        public partial class Indexable :
+            Enumerable,
+            ILinkType<TActor, TId, TEntity, TModel>.Enumerable.Indexable
+        {
+            public Indexable(
+                DiscordRestClient client,
+                IActorProvider<DiscordRestClient, TActor, TId> actorFactory,
+                ApiModelProviderDelegate<IEnumerable<TModel>> apiProvider
+            ) : base(client, actorFactory, apiProvider)
+            {
+            }
+
+            public Indexable(
+                DiscordRestClient client,
+                IActorProvider<DiscordRestClient, TActor, TId> actorFactory,
+                EnumerableProviderDelegate provider
+            ) : base(client, actorFactory, provider)
+            {
+            }
+
             public TActor this[TId id] => Specifically(id);
 
             public TActor Specifically(TId id)
@@ -70,7 +107,7 @@ public partial class RestLinkType<TActor, TId, TEntity, TModel>(
     [BackLinkable]
     public partial class Paged<TParams, TPageModel>(
         DiscordRestClient client,
-        RestActorProvider<TId, TActor> actorFactory,
+        IActorProvider<DiscordRestClient, TActor, TId> actorFactory,
         IPathable path,
         Func<TPageModel, IEnumerable<TModel>> mapper
     ) :
@@ -91,14 +128,15 @@ public partial class RestLinkType<TActor, TId, TEntity, TModel>(
             );
         }
 
+        [BackLinkable]
         public partial class Indexable(
             DiscordRestClient client,
-            RestActorProvider<TId, TActor> actorFactory,
+            IActorProvider<DiscordRestClient, TActor, TId> actorFactory,
             IPathable path,
             Func<TPageModel, IEnumerable<TModel>> mapper
         ) :
             Paged<TParams, TPageModel>(client, actorFactory, path, mapper),
-            ILinkType<TActor, TId, TEntity, TModel>.Indexable
+            ILinkType<TActor, TId, TEntity, TModel>.Paged<TParams>.Indexable
         {
             public TActor this[TId id] => Specifically(id);
 
@@ -110,7 +148,7 @@ public partial class RestLinkType<TActor, TId, TEntity, TModel>(
     [BackLinkable]
     public partial class Paged<TPaged, TPagedModel, TParams, TApiModel>(
         DiscordRestClient client,
-        RestActorProvider<TId, TActor> actorFactory,
+        IActorProvider<DiscordRestClient, TActor, TId> actorFactory,
         IPathable path,
         Func<TApiModel, IEnumerable<TPagedModel>> mapper
     ) :
@@ -136,7 +174,7 @@ public partial class RestLinkType<TActor, TId, TEntity, TModel>(
         [BackLinkable]
         public partial class Indexable(
             DiscordRestClient client,
-            RestActorProvider<TId, TActor> actorFactory,
+            IActorProvider<DiscordRestClient, TActor, TId> actorFactory,
             IPathable path,
             Func<TApiModel, IEnumerable<TPagedModel>> mapper
         ) :
@@ -153,7 +191,7 @@ public partial class RestLinkType<TActor, TId, TEntity, TModel>(
     [BackLinkable]
     public partial class Defined(
         DiscordRestClient client,
-        RestActorProvider<TId, TActor> actorFactory,
+        IActorProvider<DiscordRestClient, TActor, TId> actorFactory,
         IReadOnlyCollection<TId> ids
     ) :
         RestLink<TActor, TId, TEntity, TModel>(client, actorFactory),
@@ -164,11 +202,11 @@ public partial class RestLinkType<TActor, TId, TEntity, TModel>(
         [BackLinkable]
         public partial class Indexable(
             DiscordRestClient client,
-            RestActorProvider<TId, TActor> actorFactory,
+            IActorProvider<DiscordRestClient, TActor, TId> actorFactory,
             IReadOnlyCollection<TId> ids
         ) :
             Defined(client, actorFactory, ids),
-            ILinkType<TActor, TId, TEntity, TModel>.Indexable
+            ILinkType<TActor, TId, TEntity, TModel>.Defined.Indexable
         {
             public TActor this[TId id] => Specifically(id);
 

@@ -22,9 +22,9 @@ public partial interface IUserActor :
         return CreateEntity(model);
     }
 
-    [BackLink<IGroupChannel>]
+    [BackLink<IGroupChannelActor>]
     private static async Task AddAsync(
-        IGroupChannel channel,
+        IGroupChannelActor channel,
         EntityOrId<ulong, IUserActor> user,
         string accessToken,
         string nickname,
@@ -42,9 +42,9 @@ public partial interface IUserActor :
         );
     }
 
-    [BackLink<IGroupChannel>]
+    [BackLink<IGroupChannelActor>]
     private static async Task RemoveAsync(
-        IGroupChannel channel,
+        IGroupChannelActor channel,
         EntityOrId<ulong, IUserActor> user,
         RequestOptions? options = null,
         CancellationToken token = default)

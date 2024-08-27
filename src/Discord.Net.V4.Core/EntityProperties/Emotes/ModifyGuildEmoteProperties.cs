@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     Provides properties that are used to modify an <see cref="IGuildEmote" /> with the specified changes.
 /// </summary>
-public class EmoteProperties : IEntityProperties<ModifyEmojiParams>
+public class ModifyGuildEmoteProperties : IEntityProperties<ModifyEmojiParams>
 {
     /// <summary>
     ///     Gets or sets the name of the <see cref="IGuildEmote" />.

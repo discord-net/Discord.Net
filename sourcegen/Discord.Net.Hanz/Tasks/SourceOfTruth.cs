@@ -367,6 +367,10 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
 
         foreach (var target in toGenerate)
         {
+            var syntax = target.Value.Syntax;
+            
+            SyntaxUtils.ApplyNesting(target.Value.TypeSymbol, ref syntax);
+            
             context.AddSource(
                 $"SourceOfTruths/{target.Key}",
                 $$"""
@@ -374,7 +378,7 @@ public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarg
 
                   namespace {{target.Value.Namespace}};
 
-                  {{target.Value.Syntax.NormalizeWhitespace()}}
+                  {{syntax.NormalizeWhitespace()}}
                   """
             );
         }

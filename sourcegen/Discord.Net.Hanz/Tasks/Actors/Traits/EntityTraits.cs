@@ -48,7 +48,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((GenerationTarget)obj);
+            return Equals((GenerationTarget) obj);
         }
 
         public override int GetHashCode()
@@ -177,11 +177,11 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 );
 
             targetLogger.Log($"Processing {target.InterfaceSymbol}");
-            
+
             foreach (var trait in target.RequestedTraits)
             {
                 targetLogger.Log($" - {trait}");
-                
+
                 try
                 {
                     ProcessTraitRequest(
@@ -306,7 +306,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
         }
 
         var traitLogger = logger.GetSubLogger(traitInterface.Split('.')[1]);
-        
+
         traitLogger.Log($"Processing {target.InterfaceSymbol}");
 
         switch (traitInterface)
@@ -429,8 +429,12 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                 switch (x.Name)
                 {
                     case "id":
-                        return ReturnOwnId(ref hasReturnedId, idParam,
-                            $"{target.InterfaceSymbol}: {x} -> direct 'id' reference", logger);
+                        return ReturnOwnId(
+                            ref hasReturnedId,
+                            idParam,
+                            $"{target.InterfaceSymbol}: {x} -> direct 'id' reference",
+                            logger
+                        );
                     default:
                         if (x.Type is INamedTypeSymbol paramType &&
                             x.Type.ToDisplayString().StartsWith("Discord.EntityOrId"))
@@ -473,7 +477,7 @@ public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.Generatio
                         {
                             if (heuristic?.Invoke(x, entityType) is { } arg)
                                 return arg;
-                            
+
                             if (entityType.Equals(target.InterfaceSymbol, SymbolEqualityComparer.Default))
                                 return ReturnOwnId(ref hasReturnedId, idParam,
                                     $"{target.InterfaceSymbol}: {x} is the relation type", logger);

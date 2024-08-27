@@ -3,7 +3,7 @@
 
 global using GuildIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuild, Discord.Rest.RestGuildActor, Discord.Models.IGuildModel>;
 global using RoleIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestRole, Discord.Rest.RestRoleActor, Discord.Models.IRoleModel>;
-global using GuildEmoteIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildEmote, Discord.Rest.RestGuildEmoteActor, Discord.Models.IGuildEmoteModel>;
+global using GuildEmoteIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildEmote, Discord.Rest.RestGuildEmoteActor, Discord.Models.ICustomEmoteModel>;
 global using BanIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestBan, Discord.Rest.RestBanActor, Discord.Models.IBanModel>;
 global using IntegrationIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestIntegration, Discord.Rest.RestIntegrationActor, Discord.Models.IIntegrationModel>;
 
@@ -24,6 +24,7 @@ global using CurrentMemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.R
 global using UserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestUser, Discord.Rest.RestUserActor, Discord.Models.IUserModel>;
 global using SelfUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestCurrentUser, Discord.Rest.RestCurrentUserActor, Discord.Models.ISelfUserModel>;
 global using ThreadMemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadMember, Discord.Rest.RestThreadMemberActor, Discord.Models.IThreadMemberModel>;
+global using GuildThreadMemberIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadMember, Discord.Rest.RestGuildThreadMemberActor, Discord.Models.IThreadMemberModel>;
 global using GuildScheduledEventUserIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildScheduledEventUser, Discord.Rest.RestGuildScheduledEventUserActor, Discord.Models.IGuildScheduledEventUserModel>;
 global using VoiceStateIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestVoiceState, Discord.Rest.RestVoiceStateActor, Discord.Models.IVoiceStateModel>;
 global using CurrentUserVoiceStateIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestCurrentUserVoiceState, Discord.Rest.RestCurrentUserVoiceStateActor, Discord.Models.IVoiceStateModel>;
@@ -35,6 +36,7 @@ global using CurrentUserVoiceStateIdentity = Discord.IIdentifiable<ulong, Discor
 global using DMChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestDMChannel, Discord.Rest.RestDMChannelActor, Discord.Models.IDMChannelModel>;
 global using GroupChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGroupChannel, Discord.Rest.RestGroupChannelActor, Discord.Models.IGroupDMChannelModel>;
 global using ThreadIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadChannel, Discord.Rest.RestThreadChannelActor, Discord.Models.IThreadChannelModel>;
+global using GuildThreadIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadChannel, Discord.Rest.RestGuildThreadChannelActor, Discord.Models.IThreadChannelModel>;
 global using ChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestChannel, Discord.Rest.RestChannelActor, Discord.Models.IChannelModel>;
 global using MessageChannelIdentity = Discord.IIdentifiable<ulong, Discord.IMessageChannel, Discord.IMessageChannelTrait, Discord.Models.IChannelModel>;
 global using GuildChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildChannel, Discord.Rest.RestGuildChannelActor, Discord.Models.IGuildChannelModel>;
@@ -64,6 +66,7 @@ global using MessageIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestMes
 global using InviteIdentity = Discord.IIdentifiable<string, Discord.Rest.RestInvite, Discord.Rest.RestInviteActor, Discord.Models.IInviteModel>;
 global using GuildInviteIdentity = Discord.IIdentifiable<string, Discord.Rest.RestGuildInvite, Discord.Rest.RestGuildInviteActor, Discord.Models.IInviteModel>;
 global using GuildChannelInviteIdentity = Discord.IIdentifiable<string, Discord.Rest.RestGuildChannelInvite, Discord.Rest.RestGuildChannelInviteActor, Discord.Models.IInviteModel>;
+global using ChannelInviteIdentity = Discord.IIdentifiable<string, Discord.Rest.RestChannelInvite, Discord.Rest.RestChannelInviteActor, Discord.Models.IInviteModel>;
 
 #endregion
 

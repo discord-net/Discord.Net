@@ -14,7 +14,7 @@ using ChannelFollowerIntegrationChannelTrait = RestChannelFollowerIntegrationCha
 public partial class RestTextChannelActor :
     RestThreadableChannelActor,
     ITextChannelActor,
-    IRestActor<ulong, RestTextChannel, TextChannelIdentity>
+    IRestActor<ulong, RestTextChannel, TextChannelIdentity, IGuildTextChannelModel>
 {
     [ProxyInterface(typeof(IMessageChannelTrait))]
     internal MessageChannelTrait MessageChannelTrait { get; }

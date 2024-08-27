@@ -1008,7 +1008,7 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
 
                     backlinkSyntax = SyntaxFactory.ParseMemberDeclaration(
                         $$"""
-                            public sealed class BackLink<TSource> : 
+                            public class BackLink<TSource> : 
                                 {{target.Symbol.ToDisplayString()}}
                                 {{(
                                     backlinkInterfaces.Count > 0
@@ -1065,19 +1065,7 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
                 backlinkSyntax
             );
 
-            var container = target.Symbol.ContainingType;
-
-            while (container is not null)
-            {
-                if (
-                    container.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax()
-                    is not TypeDeclarationSyntax containerSyntax
-                ) break;
-
-                syntax = SyntaxUtils.CreateSourceGenClone(containerSyntax).AddMembers(syntax);
-
-                container = container.ContainingType;
-            }
+            SyntaxUtils.ApplyNesting(target.Symbol, ref syntax);
 
             if (!generated.Add(target.Symbol.ToFullMetadataName()))
             {
@@ -1120,18 +1108,19 @@ public class Links : IGenerationCombineTask<Links.TargetCollection>
             var impl = target.Semantic.Compilation.Assembly.Name.Split('.').Last();
 
             var name = GetFriendlyName(target.Symbol);
-
+            
             var linkType = impl switch
             {
-                "Core" => "Discord.ILinkType",
                 "Rest" => "Discord.Rest.RestLinkType",
                 _ => null
             };
 
+            aliases[$"{name}Link"] = $"Discord.ILinkType<{target.Symbol}, {target.Id}, {target.Entity}, {target.Model}>";
+            
             if (linkType is null)
                 continue;
-
-            aliases[$"{name}Link"] = $"{linkType}<{target.Symbol}, {target.Id}, {target.Entity}, {target.Model}>";
+            
+            aliases[$"{impl}{name}Link"] = $"{linkType}<{target.Symbol}, {target.Id}, {target.Entity}, {target.Model}>";
         }
 
         if (aliases.Count == 0) return;

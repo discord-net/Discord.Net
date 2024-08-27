@@ -25,14 +25,14 @@ public partial class RestGuildEmoteActor :
     }
 
     [SourceOfTruth]
-    internal RestGuildEmote CreateEntity(IGuildEmoteModel model)
+    internal RestGuildEmote CreateEntity(ICustomEmoteModel model)
         => RestGuildEmote.Construct(Client, Guild.Identity, model);
 }
 
 public sealed partial class RestGuildEmote :
     RestEntity<ulong>,
     IGuildEmote,
-    IRestConstructable<RestGuildEmote, RestGuildEmoteActor, IGuildEmoteModel>
+    IRestConstructable<RestGuildEmote, RestGuildEmoteActor, ICustomEmoteModel>
 {
     public IDefinedLoadableEntityEnumerable<ulong, IRole> Roles => throw new NotImplementedException();
 
@@ -51,16 +51,16 @@ public sealed partial class RestGuildEmote :
     [ProxyInterface(
         typeof(IGuildEmoteActor),
         typeof(IGuildRelationship),
-        typeof(IEntityProvider<IGuildEmote, IGuildEmoteModel>)
+        typeof(IEntityProvider<IGuildEmote, ICustomEmoteModel>)
     )]
     internal RestGuildEmoteActor Actor { get; }
 
-    internal IGuildEmoteModel Model { get; private set; }
+    internal ICustomEmoteModel Model { get; private set; }
 
     internal RestGuildEmote(
         DiscordRestClient client,
         GuildIdentity guild,
-        IGuildEmoteModel model,
+        ICustomEmoteModel model,
         RestGuildEmoteActor? actor = null
     ) : base(client, model.Id)
     {
@@ -68,10 +68,10 @@ public sealed partial class RestGuildEmote :
         Model = model;
     }
 
-    public static RestGuildEmote Construct(DiscordRestClient client, GuildIdentity guild, IGuildEmoteModel model)
+    public static RestGuildEmote Construct(DiscordRestClient client, GuildIdentity guild, ICustomEmoteModel model)
         => new(client, guild, model);
 
-    public ValueTask UpdateAsync(IGuildEmoteModel model, CancellationToken token = default)
+    public ValueTask UpdateAsync(ICustomEmoteModel model, CancellationToken token = default)
     {
         Creator = Creator.UpdateFrom(
             model.UserId,
@@ -84,5 +84,5 @@ public sealed partial class RestGuildEmote :
         return ValueTask.CompletedTask;
     }
 
-    public IGuildEmoteModel GetModel() => Model;
+    public ICustomEmoteModel GetModel() => Model;
 }

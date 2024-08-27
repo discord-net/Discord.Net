@@ -9,7 +9,7 @@ namespace Discord;
     Loadable(nameof(Routes.GetChannel), typeof(GuildStageChannel)),
     Creatable<CreateGuildStageChannelProperties>(
         nameof(Routes.CreateGuildChannel),
-        nameof(IGuildActor.StageChannels),
+        nameof(IGuildChannelsLink.Stage),
         RouteGenerics = [typeof(GuildStageChannel)]
     ),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")

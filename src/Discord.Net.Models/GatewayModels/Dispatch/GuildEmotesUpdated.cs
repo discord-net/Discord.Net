@@ -8,7 +8,7 @@ public sealed class GuildEmotesUpdated : IGuildEmotesUpdatedPayloadData
     public ulong GuildId { get; set; }
 
     [JsonPropertyName("emojis")]
-    public required GuildEmote[] Emotes { get; set; }
+    public required CustomEmote[] Emotes { get; set; }
 
-    IEnumerable<IGuildEmoteModel> IGuildEmotesUpdatedPayloadData.Emotes => Emotes;
+    IEnumerable<ICustomEmoteModel> IGuildEmotesUpdatedPayloadData.Emotes => Emotes;
 }

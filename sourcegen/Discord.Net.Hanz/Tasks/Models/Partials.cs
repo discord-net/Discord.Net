@@ -194,6 +194,7 @@ public class Partials
         SyntaxNode node,
         SemanticModel semanticModel
     ) => node.DescendantNodes()
+        .Prepend(node)
         .OfType<IdentifierNameSyntax>()
         .Select(x => semanticModel.GetOperation(x))
         .OfType<IPropertyReferenceOperation>();
@@ -269,7 +270,10 @@ public class Partials
             var type = typeInfo.ConvertedType ?? typeInfo.Type;
 
             if (type is null)
+            {
+                logger.Warn($"{symbol}: Failed to find property type for {implementation}");
                 goto failed_condition;
+            }
 
             var propertyReferences = GetPropertyReferences(
                     explicitPropertySyntax.ExpressionBody.Expression,
@@ -277,7 +281,11 @@ public class Partials
                 )
                 .ToArray();
 
-            if (propertyReferences.Length == 0) goto failed_condition;
+            if (propertyReferences.Length == 0)
+            {
+                logger.Warn($"{symbol}: No property references found for {implementation}");
+                goto failed_condition;
+            }
 
             var dependants = propertyReferences
                 .Where(x =>
@@ -383,12 +391,111 @@ public class Partials
                     return true;
                 }
 
+                var expression = expressionSyntax
+                    .ReplaceNodes(
+                        expressionSyntax.Expression.DescendantNodes()
+                            .Where(x =>
+                                dependants.Keys.Any(y => y.IsEquivalentTo(x))
+                            )
+                            .OfType<IdentifierNameSyntax>()
+                            .Select(x => x.Parent)
+                            .OfType<ExpressionSyntax>(),
+                        (_, node) =>
+                        {
+                            var access = node switch
+                            {
+                                ConditionalAccessExpressionSyntax conditional => conditional.Expression,
+                                MemberAccessExpressionSyntax member => member.Expression,
+                                _ => null
+                            };
+
+                            if (access is null)
+                                return node;
+
+                            var entry = dependants.First(x => x.Key.IsEquivalentTo(access));
+
+                            logger.Log($" - {entry.Key} : {entry.Value.Property.Type} {entry.Value.Property}");
+
+                            ExpressionSyntax mapExpression;
+
+                            switch (node)
+                            {
+                                case ConditionalAccessExpressionSyntax memberAccess:
+                                    logger.Log(" - Conditional access, returning map");
+                                    mapExpression = SyntaxFactory.InvocationExpression(
+                                        SyntaxFactory.MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            memberAccess.Expression,
+                                            SyntaxFactory.IdentifierName("Map")
+                                        ),
+                                        SyntaxFactory.ArgumentList(
+                                            SyntaxFactory.SeparatedList([
+                                                SyntaxFactory.Argument(
+                                                    SyntaxFactory.SimpleLambdaExpression(
+                                                        SyntaxFactory.Parameter(SyntaxFactory.Identifier("x")),
+                                                        null,
+                                                        SyntaxFactory.ConditionalAccessExpression(
+                                                            SyntaxFactory.IdentifierName("x"),
+                                                            memberAccess.WhenNotNull
+                                                        )
+                                                    )
+                                                )
+                                            ])
+                                        )
+                                    );
+                                    break;
+                                case MemberAccessExpressionSyntax
+                                {
+                                    Name.Identifier.ValueText: not "Map",
+                                    Parent: not InvocationExpressionSyntax
+                                } memberAccess:
+                                    logger.Log(" - Member access, returning map");
+                                    mapExpression = SyntaxFactory.InvocationExpression(
+                                        SyntaxFactory.MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            memberAccess.Expression,
+                                            SyntaxFactory.IdentifierName("Map")
+                                        ),
+                                        SyntaxFactory.ArgumentList(
+                                            SyntaxFactory.SeparatedList([
+                                                SyntaxFactory.Argument(
+                                                    SyntaxFactory.SimpleLambdaExpression(
+                                                        SyntaxFactory.Parameter(SyntaxFactory.Identifier("x")),
+                                                        null,
+                                                        SyntaxFactory.MemberAccessExpression(
+                                                            SyntaxKind.SimpleMemberAccessExpression,
+                                                            SyntaxFactory.IdentifierName("x"),
+                                                            memberAccess.Name
+                                                        )
+                                                    )
+                                                )
+                                            ])
+                                        )
+                                    );
+                                    break;
+                                default:
+                                    logger.Log(" - default condition returned");
+                                    return node;
+                            }
+
+                            if (property.Type is {IsValueType: true, Name: "Nullable"})
+                            {
+                                mapExpression = SyntaxFactory.PrefixUnaryExpression(
+                                    SyntaxKind.BitwiseNotExpression,
+                                    mapExpression
+                                );
+                            }
+
+                            return mapExpression;
+                        }
+                    );
+
                 logger.Log(
                     $"{symbol}: {property} conversion {type} -> {interfacePropertyType} with {dependants.Count} dependants");
 
                 addedMembers.Add(
                     SyntaxFactory.ParseMemberDeclaration(
-                        $"{interfacePropertyType} {interfaceName}.{property.Name} => {expressionSyntax.Expression};"
+                        $"{interfacePropertyType} {interfaceName}.{property.Name} => {expression.Expression};"
                     )!
                 );
 
@@ -439,6 +546,8 @@ public class Partials
                 return true;
             }
         }
+
+        logger.Warn($"{symbol}: No resolution strategy found for {property}");
 
         failed_condition:
         logger.Warn(
@@ -493,13 +602,15 @@ public class Partials
         );
 
         var optionalProperties = new HashSet<IPropertySymbol>(SymbolEqualityComparer.Default);
+        var propertiesWithBodies =
+            new Dictionary<IPropertySymbol, PropertyDeclarationSyntax>(SymbolEqualityComparer.Default);
 
         foreach
         (
             var property in symbol
                 .GetMembers()
                 .OfType<IPropertySymbol>()
-                .Where(JsonModels.IsJsonProperty)
+                .Where(x => JsonModels.IsJsonProperty(x) || x.IsOverride || x.IsAbstract)
         )
         {
             if (!TryGetSyntax<PropertyDeclarationSyntax>(property, out var propertySyntax))
@@ -510,7 +621,10 @@ public class Partials
             if (ShouldBeNullableInPartialForm(property))
                 propertyType = GetNullableType(propertyType, semanticModel);
 
-            if (!IsRequired(property) && propertyType.Name is not "Optional")
+            if (
+                !IsRequired(property) &&
+                propertyType.Name is not "Optional" &&
+                !(property.IsOverride || property.IsAbstract))
             {
                 propertyType = optionalType.Construct(propertyType);
             }
@@ -533,12 +647,74 @@ public class Partials
                 propSyntax = propSyntax.WithModifiers(propSyntax.Modifiers.Remove(requiredToken));
             }
 
+            logger.Log($" += {property.Name}: {propertyType}");
+
+            if (propertySyntax.ExpressionBody is not null)
+            {
+                propertiesWithBodies.Add(property, propertySyntax);
+                continue;
+            }
+
             syntax = syntax.AddMembers(
                 propSyntax
             );
         }
 
         if (syntax.Members.Count == 0) return;
+
+        foreach (var entry in propertiesWithBodies)
+        {
+            // replace all optional references with their nullable form
+            var propSyntax = entry.Value
+                .ReplaceNodes(
+                    GetPropertyReferences(entry.Value.ExpressionBody!.Expression, semanticModel)
+                        .Select(x => x.Syntax),
+                    (node, _) =>
+                    {
+                        if (node is not IdentifierNameSyntax identifier)
+                            return node;
+
+                        var property =
+                            optionalProperties.FirstOrDefault(x => x.Name == identifier.Identifier.ValueText)
+                            ??
+                            TypeUtils.GetBaseTypes(symbol)
+                                .Where(HasPartialAttribute)
+                                .SelectMany(x => x.GetMembers().OfType<IPropertySymbol>())
+                                .Where(x =>
+                                    !IsRequired(x) &&
+                                    x.Name is not "Optional"
+                                )
+                                .FirstOrDefault(x => x.Name == identifier.Identifier.ValueText);
+
+                        if (property is null)
+                            return node;
+
+                        var propType = property.Type;
+
+                        if (propType is INamedTypeSymbol {Name: "Optional"} opt)
+                            return node;
+
+                        if (propType.IsReferenceType)
+                        {
+                            return SyntaxFactory.PrefixUnaryExpression(
+                                SyntaxKind.BitwiseNotExpression,
+                                identifier
+                            );
+                        }
+
+                        return SyntaxFactory.InvocationExpression(
+                            SyntaxFactory.MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                identifier,
+                                SyntaxFactory.IdentifierName("ToNullable")
+                            )
+                        );
+                    }
+                );
+
+            syntax = syntax
+                .AddMembers(propSyntax);
+        }
 
         AddApplyToMethod(ref syntax, symbol, optionalProperties, jsonContext);
         AddBasePartialInterfaceImplementation(ref syntax, symbol, optionalProperties, jsonContext);
@@ -601,9 +777,24 @@ public class Partials
                                           links
                                               .Select(x =>
                                                   {
-                                                      var access = x.Type.Name is "Optional" or "Nullable"
-                                                          ? $"{x.Name}.Value"
-                                                          : x.Name;
+                                                      var conditions = new List<string>();
+                                                      var accessors = new List<string>();
+
+                                                      var type = x.Type;
+
+                                                      if(optionalProperties.Contains(x))
+                                                          accessors.Add("Value");
+                                                      
+                                                      while (type is INamedTypeSymbol {Name: "Nullable", IsValueType: true} opt)
+                                                      {
+                                                          accessors.Add("Value");
+                                                          type = opt.TypeArguments[0];
+                                                      }
+
+                                                      var access = $"{x.Name}";
+
+                                                      if (accessors.Count > 0)
+                                                          access = $"{access}.{string.Join(".", accessors)}";
 
                                                       var yieldValue = IsIterable(x.Type)
                                                           ? $"foreach (var item in {access}) yield return item;"
@@ -611,21 +802,38 @@ public class Partials
 
 
                                                       if (optionalProperties.Contains(x))
-                                                          return $"if ({x.Name}.IsSpecified) {yieldValue}";
+                                                          conditions.Add($"{x.Name}.IsSpecified");
 
-                                                      if (
-                                                          x.Type
-                                                          is
+                                                      type = x.Type;
+                                                      var conditionalStepAccess = x.Name;
+
+                                                      while (
+                                                          type is INamedTypeSymbol
                                                           {
                                                               IsValueType: true,
-                                                              Name: "Nullable"}
-                                                          or
+                                                              Name: "Nullable"
+                                                          }
+                                                          or INamedTypeSymbol
                                                           {
                                                               IsReferenceType: true,
                                                               NullableAnnotation: NullableAnnotation.Annotated
                                                           }
-                                                      ) return $"if ({x.Name} is not null) {yieldValue}";
+                                                      )
+                                                      {
+                                                          var isValueNullableType = type.Name is "Nullable";
+                                                          conditionalStepAccess = $"{conditionalStepAccess}.Value";
+                                                          conditions.Add(
+                                                              $"{conditionalStepAccess} is not null"
+                                                          );
+                                                          
+                                                          type = isValueNullableType ? ((INamedTypeSymbol)type).TypeArguments[0] : null;
+                                                      }
 
+                                                      if (conditions.Count > 0)
+                                                      {
+                                                          return  $"if ({string.Join(" && ", conditions)}) {yieldValue}";
+                                                      }
+                                                      
                                                       return yieldValue;
                                                   }
                                               )
@@ -799,9 +1007,9 @@ public class Partials
                 syntax = syntax.AddMembers(
                     SyntaxFactory.ParseMemberDeclaration(
                         $$"""
-                           bool Discord.Models.IPartial<{{modelInterface}}>.ApplyTo({{modelInterface}} model)
-                               => model is {{symbol}} ourModel && ApplyTo(ourModel);
-                           """
+                          bool Discord.Models.IPartial<{{modelInterface}}>.ApplyTo({{modelInterface}} model)
+                              => model is {{symbol}} ourModel && ApplyTo(ourModel);
+                          """
                     )!
                 );
 
@@ -976,7 +1184,7 @@ public class Partials
                         "{{x.Name}}" when {{x.Name}} is T val => (result = val) is T,
                         """
             );
-        
+
         var tryGetMethod = SyntaxFactory.ParseMemberDeclaration(
             $$"""
               public bool TryGet<T>(string property, out T result)
@@ -995,7 +1203,7 @@ public class Partials
               }
               """
         )!;
-        
+
         var underlyingModelTypeProp = SyntaxFactory.ParseMemberDeclaration(
             $"public Type UnderlyingModelType => typeof({model.ToDisplayString()});"
         )!;
@@ -1003,13 +1211,12 @@ public class Partials
         ApplyPolymorphicModifiers(ref hasMethod, hasPartialParent, hasPartialChildren);
         ApplyPolymorphicModifiers(ref tryGetMethod, hasPartialParent, hasPartialChildren);
         ApplyPolymorphicModifiers(ref underlyingModelTypeProp, hasPartialParent, hasPartialChildren);
-        
+
         syntax = syntax.AddMembers(
             underlyingModelTypeProp,
             hasMethod,
             tryGetMethod
         );
-        
     }
 
     private static void AddApplyToMethod(
@@ -1061,20 +1268,21 @@ public class Partials
         )!;
 
         //ApplyPolymorphicModifiers(ref method, hasPartialParent, hasPartialChildren);
-        
+
         syntax = syntax.AddMembers(
             method
         );
     }
 
-    private static void ApplyPolymorphicModifiers(ref MemberDeclarationSyntax syntax, bool hasPartialParent, bool hasPartialChildren)
+    private static void ApplyPolymorphicModifiers(ref MemberDeclarationSyntax syntax, bool hasPartialParent,
+        bool hasPartialChildren)
     {
         if (hasPartialParent)
             syntax = syntax.AddModifiers(SyntaxFactory.Token(SyntaxKind.OverrideKeyword));
         else if (hasPartialChildren)
             syntax = syntax.AddModifiers(SyntaxFactory.Token(SyntaxKind.VirtualKeyword));
     }
-    
+
     private static bool IsIterable(ITypeSymbol symbol)
     {
         return symbol switch

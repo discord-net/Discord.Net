@@ -16,10 +16,14 @@ public interface IDiscordClient :
     ///     Gets the currently logged-in user.
     /// </summary>
     ICurrentUserActor CurrentUser { get; }
+    
+    IApplicationsLink Applications { get; }
 
     GuildLink.Paged<IPartialGuild, PageUserGuildsParams>.Indexable Guilds { get; }
 
     ChannelLink.Indexable Channels { get; }
+    
+    ThreadChannelLink.Indexable Threads { get; }
 
     UserLink.Indexable Users { get; }
 

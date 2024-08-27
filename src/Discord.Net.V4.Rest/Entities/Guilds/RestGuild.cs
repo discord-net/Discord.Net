@@ -3,120 +3,30 @@ using Discord.Models.Json;
 using Discord.Rest;
 using Discord.Rest.Extensions;
 using System.Globalization;
+using MorseCode.ITask;
 
 namespace Discord.Rest;
 
-using BansPager =
-    RestPagedIndexableLink<RestBanActor, ulong, RestBan, IBanModel, IEnumerable<IBanModel>, PageGuildBansParams>;
-using MembersPager =
-    RestPagedIndexableLink<RestMemberActor, ulong, RestMember, IMemberModel, IEnumerable<IMemberModel>,
-        PageGuildMembersParams>;
-using EnumerableGuildChannelActor =
-    RestEnumerableIndexableLink<RestGuildChannelActor, ulong, RestGuildChannel, IGuildChannel,
-        IEnumerable<IGuildChannelModel>>;
-using EnumerableIntegrationActor =
-    RestEnumerableIndexableLink<RestIntegrationActor, ulong, RestIntegration, IIntegration,
-        IEnumerable<IIntegrationModel>>;
-using EnumerableStageChannelActor =
-    RestEnumerableIndexableLink<RestStageChannelActor, ulong, RestStageChannel, IStageChannel,
-        IEnumerable<IGuildChannelModel>>;
-using EnumerableMediaChannelActor =
-    RestEnumerableIndexableLink<RestMediaChannelActor, ulong, RestMediaChannel, IMediaChannel,
-        IEnumerable<IGuildChannelModel>>;
-using EnumerableTextChannelActor =
-    RestEnumerableIndexableLink<RestTextChannelActor, ulong, RestTextChannel, ITextChannel,
-        IEnumerable<IGuildChannelModel>>;
-using EnumerableVoiceChannelActor =
-    RestEnumerableIndexableLink<RestVoiceChannelActor, ulong, RestVoiceChannel, IVoiceChannel,
-        IEnumerable<IGuildChannelModel>>;
-using EnumerableCategoryChannelActor =
-    RestEnumerableIndexableLink<RestCategoryChannelActor, ulong, RestCategoryChannel, ICategoryChannel,
-        IEnumerable<IGuildChannelModel>>;
-using EnumerableAnnouncementChannelActor =
-    RestEnumerableIndexableLink<RestNewsChannelActor, ulong, RestNewsChannel, INewsChannel,
-        IEnumerable<IGuildChannelModel>>;
-using EnumerableIntegrationChannelActor = RestEnumerableIndexableLink<
-    RestIntegrationChannelTrait,
-    ulong,
-    RestGuildChannel,
-    IIntegrationChannel,
-    IEnumerable<IGuildChannelModel>
->;
-using EnumerableThreadChannelActor =
-    RestEnumerableIndexableLink<RestThreadChannelActor, ulong, RestThreadChannel, IThreadChannel,
-        IEnumerable<IGuildChannelModel>>;
-using EnumerableForumChannelActor =
-    RestEnumerableIndexableLink<RestForumChannelActor, ulong, RestForumChannel, IForumChannel,
-        IEnumerable<IGuildChannelModel>>;
-using EnumerableGuildEmotesActor =
-    RestEnumerableIndexableLink<RestGuildEmoteActor, ulong, RestGuildEmote, IGuildEmote,
-        IEnumerable<IGuildEmoteModel>>;
-using EnumerableRolesActor =
-    RestEnumerableIndexableLink<RestRoleActor, ulong, RestRole, IRole, IEnumerable<IRoleModel>>;
-using EnumerableGuildStickersActor =
-    RestEnumerableIndexableLink<RestGuildStickerActor, ulong, RestGuildSticker, IGuildSticker,
-        IEnumerable<IGuildStickerModel>>;
-using EnumerableGuildScheduledEventActor =
-    RestEnumerableIndexableLink<RestGuildScheduledEventActor, ulong, RestGuildScheduledEvent, IGuildScheduledEvent,
-        IEnumerable<IGuildScheduledEventModel>>;
-using EnumerableInviteActor =
-    RestEnumerableIndexableLink<RestGuildInviteActor, string, RestGuildInvite, IGuildInvite,
-        IEnumerable<IInviteModel>>;
-using EnumerableWebhookActor =
-    RestEnumerableIndexableLink<RestWebhookActor, ulong, RestWebhook, IWebhook, IEnumerable<IWebhookModel>>;
-using ManagedRolesActor =
-    RestManagedEnumerableLink<RestRoleActor, ulong, RestRole, IRole, IRoleModel>;
-using ManagedEmotesActor =
-    RestManagedEnumerableLink<RestGuildEmoteActor, ulong, RestGuildEmote, IGuildEmote, IGuildEmoteModel>;
-using ManagedStickersActor =
-    RestManagedEnumerableLink<RestGuildStickerActor, ulong, RestGuildSticker, IGuildSticker, IGuildStickerModel>;
-
 [ExtendInterfaceDefaults]
 public sealed partial class RestGuildActor :
-    RestActor<ulong, RestGuild, GuildIdentity>,
+    RestActor<ulong, RestGuild, GuildIdentity, IGuildModel>,
     IGuildActor
 {
-    [SourceOfTruth] public EnumerableGuildChannelActor Channels { get; }
+    [SourceOfTruth] public ChannelsLink Channels { get; }
+    [SourceOfTruth] public ThreadsLink Threads { get; }
+    [SourceOfTruth] public IntegrationLink.Enumerable.Indexable.BackLink<RestGuildActor> Integrations { get; }
+    [SourceOfTruth] public BanLink.Paged<PageGuildBansParams>.Indexable.BackLink<RestGuildActor> Bans { get; }
+    [SourceOfTruth] public MemberLink.Paged<PageGuildMembersParams>.Indexable.BackLink<RestGuildActor> Members { get; }
+    [SourceOfTruth] public GuildEmoteLink.Enumerable.Indexable.BackLink<RestGuildActor> Emotes { get; }
+    [SourceOfTruth] public RoleLink.Enumerable.Indexable.BackLink<RestGuildActor> Roles { get; }
+    [SourceOfTruth] public GuildStickerLink.Enumerable.Indexable.BackLink<RestGuildActor> Stickers { get; }
 
-    [SourceOfTruth] public EnumerableTextChannelActor TextChannels { get; }
+    [SourceOfTruth]
+    public GuildScheduledEventLink.Enumerable.Indexable.BackLink<RestGuildActor> ScheduledEvents { get; }
 
-    [SourceOfTruth] public EnumerableVoiceChannelActor VoiceChannels { get; }
-
-    [SourceOfTruth] public EnumerableCategoryChannelActor CategoryChannels { get; }
-
-    [SourceOfTruth] public EnumerableAnnouncementChannelActor AnnouncementChannels { get; }
-
-    [SourceOfTruth] public EnumerableThreadChannelActor ThreadChannels { get; }
-
-    [SourceOfTruth] public EnumerableStageChannelActor StageChannels { get; }
-
-    [SourceOfTruth] public EnumerableThreadChannelActor ActiveThreadChannels { get; }
-
-    [SourceOfTruth] public EnumerableForumChannelActor ForumChannels { get; }
-
-    [SourceOfTruth] public EnumerableMediaChannelActor MediaChannels { get; }
-
-    [SourceOfTruth] public EnumerableIntegrationChannelActor IntegrationChannels { get; }
-
-    [SourceOfTruth] public EnumerableIntegrationActor Integrations { get; }
-
-    [SourceOfTruth] public BansPager Bans { get; }
-
-    [SourceOfTruth] public MembersPager Members { get; }
-
-    [SourceOfTruth] public EnumerableGuildEmotesActor Emotes { get; }
-
-    [SourceOfTruth] public EnumerableRolesActor Roles { get; }
-
-    [SourceOfTruth] public EnumerableGuildStickersActor Stickers { get; }
-
-    [SourceOfTruth] public EnumerableGuildScheduledEventActor ScheduledEvents { get; }
-
-    [SourceOfTruth] public EnumerableInviteActor Invites { get; }
-
-    [SourceOfTruth] public EnumerableWebhookActor Webhooks { get; }
-
-    [SourceOfTruth] public RestCurrentMemberActor CurrentMember { get; }
+    [SourceOfTruth] public GuildInviteLink.Enumerable.Indexable.BackLink<RestGuildActor> Invites { get; }
+    [SourceOfTruth] public WebhookLink.Enumerable.Indexable.BackLink<RestGuildActor> Webhooks { get; }
+    [SourceOfTruth] public RestCurrentMemberActor.BackLink<RestGuildActor> CurrentMember { get; }
 
     internal override GuildIdentity Identity { get; }
 
@@ -129,41 +39,29 @@ public sealed partial class RestGuildActor :
     {
         Identity = guild | this;
 
-        CurrentMember = currentMember?.Actor ?? new(
+        CurrentMember = new RestCurrentMemberActor.BackLink<RestGuildActor>(
+            this,
             client,
-            Identity,
+            guild,
             currentMember ?? CurrentMemberIdentity.Of(client.CurrentUser.Id)
         );
 
-        MediaChannels = RestActors.GuildRelatedEntity(Template.T<RestMediaChannelActor>(), client, this);
-        Channels = RestActors.GuildRelatedEntity(Template.T<RestGuildChannelActor>(), client, this);
-        TextChannels = RestActors.GuildRelatedEntity(Template.T<RestTextChannelActor>(), client, this);
-        VoiceChannels = RestActors.GuildRelatedEntity(Template.T<RestVoiceChannelActor>(), client, this);
-        CategoryChannels = RestActors.GuildRelatedEntity(Template.T<RestCategoryChannelActor>(), client, this);
-        AnnouncementChannels = RestActors.GuildRelatedEntity(Template.T<RestNewsChannelActor>(), client, this);
-        ThreadChannels = RestActors.GuildRelatedEntity(Template.T<RestThreadChannelActor>(), client, this);
-        StageChannels = RestActors.GuildRelatedEntity(Template.T<RestStageChannelActor>(), client, this);
-        ForumChannels = RestActors.GuildRelatedEntity(Template.T<RestForumChannelActor>(), client, this);
-        ActiveThreadChannels =
-            RestActors.GuildRelatedEntityWithTransform(
-                Template.T<RestThreadChannelActor>(),
-                client,
-                this,
-                Routes.ListActiveGuildThreads(Identity.Id),
-                api => api.Threads
-            );
-        IntegrationChannels =
-            RestActors.GuildRelatedTrait(
-                Template.T<RestIntegrationChannelTrait>(),
-                Template.T<RestGuildChannelActor>(),
-                client,
-                this,
-                IGuildChannel.FetchManyRoute(this),
-                model => IIntegrationChannelTrait.ImplementsTraitByModel(model.GetType())
-            );
+        Channels = new(this);
+        Threads = new(this);
 
-        Integrations = RestActors.GuildRelatedEntity(Template.T<RestIntegrationActor>(), client, this);
-        Bans = RestActors.Bans(client, this);
+        Integrations = RestActors.GuildRelatedLink(
+            Template.Of<RestIntegrationActor>(),
+            this
+        );
+        Bans = new RestBanLink.Paged<PageGuildBansParams, IEnumerable<IBanModel>>.Indexable.BackLink<RestGuildActor>(
+            this,
+            client,
+            new RestActorProvider<ulong, RestBanActor>(
+                (client, id) => new RestBanActor(client, Identity, BanIdentity.Of(id))
+            ),
+            this,
+            a => a
+        );
         Members = RestActors.Members(client, this);
 
         if (Identity.Detail is IdentityDetail.Entity && Identity.Entity is not null)
@@ -201,16 +99,175 @@ public sealed partial class RestGuildActor :
     }
 
     [SourceOfTruth]
-    internal RestGuild CreateEntity(IGuildModel model)
+    internal override RestGuild CreateEntity(IGuildModel model)
         => RestGuild.Construct(Client, model);
 
-    [SourceOfTruth]
-    internal RestGuildChannel CreateEntity(IGuildChannelModel model)
-        => RestGuildChannel.Construct(Client, Identity, model);
+    #region Link Types
 
-    [SourceOfTruth]
-    internal RestMember CreateEntity(IMemberModel model)
-        => RestMember.Construct(Client, Identity, model);
+    public sealed partial class ThreadsLink :
+        RestGuildThreadChannelLink.Indexable.BackLink<RestGuildActor>,
+        IGuildActor.ThreadsLink
+    {
+        [SourceOfTruth] public GuildThreadChannelLink.Enumerable.BackLink<RestGuildActor> Active { get; }
+
+        public ThreadsLink(
+            RestGuildActor guild
+        ) : base(
+            guild,
+            guild.Client,
+            new RestActorProvider<ulong, RestGuildThreadChannelActor>(
+                (client, id) => new RestGuildThreadChannelActor(client, guild.Identity, GuildThreadIdentity.Of(id))
+            )
+        )
+        {
+            Active = new RestGuildThreadChannelLink.Enumerable.BackLink<RestGuildActor>(
+                guild,
+                guild.Client,
+                Provider,
+                (RestGuildThreadChannelLink.Enumerable.EnumerableProviderDelegate) (
+                    async (client, options, token) =>
+                    {
+                        var model = await Routes
+                            .ListActiveGuildThreads(guild.Id)
+                            .AsRequiredProvider()
+                            (client, options, token);
+
+                        return model
+                            .Threads
+                            .Select(thread =>
+                            {
+                                var actor = Provider.GetActor(client, thread.Id);
+
+                                var currentThreadMemberModel = model.Members.FirstOrDefault(x =>
+                                    x.ThreadId.IsSpecified && x.ThreadId.Value == actor.Id
+                                );
+
+                                if (currentThreadMemberModel is not null)
+                                    actor.CurrentThreadMember.UpdateIdentity(currentThreadMemberModel);
+
+                                return RestThreadChannel.Construct(client, actor, thread);
+                            })
+                            .ToList()
+                            .AsReadOnly();
+                    }
+                )
+            );
+        }
+
+        IThreadChannel IEntityProvider<IThreadChannel, IThreadChannelModel>.CreateEntity(IThreadChannelModel model)
+            => CreateEntity(model);
+
+        IGuildThreadChannelActor IActorProvider<IDiscordClient, IGuildThreadChannelActor, ulong>.GetActor(
+            IDiscordClient client, ulong id
+        ) => GetActor(id);
+
+        IGuildThreadChannelActor ILinkType<
+            IGuildThreadChannelActor,
+            ulong,
+            IThreadChannel,
+            IThreadChannelModel
+        >.Indexable.Specifically(
+            ulong id
+        ) => Specifically(id);
+
+        IGuildActor IBackLink<
+            IGuildActor,
+            IGuildThreadChannelActor,
+            ulong,
+            IThreadChannel,
+            IThreadChannelModel
+        >.Source => Source;
+    }
+
+    public sealed partial class MembersLink : 
+        RestMemberLink.Paged<PageGuildMembersParams, IEnumerable<IMemberModel>>.Indexable.BackLink<RestGuildActor>,
+        IGuildActor.MemebrsLink
+    {
+        public MembersLink(
+            RestGuildActor guild 
+            ) : base(guild, guild.Client, )
+        {
+        }
+
+        public IGuildActor Source => throw new NotImplementedException();
+
+        public ICurrentMemberActor Current => throw new NotImplementedException();
+    }
+    
+    public sealed partial class ChannelsLink :
+        RestGuildChannelLink.Enumerable.Indexable.BackLink<RestGuildActor>,
+        IGuildActor.IGuildChannelsLink
+    {
+        [SourceOfTruth] public TextChannelLink.Enumerable.Indexable.BackLink<RestGuildActor> Text { get; }
+
+        [SourceOfTruth] public VoiceChannelLink.Enumerable.Indexable.BackLink<RestGuildActor> Voice { get; }
+
+        [SourceOfTruth] public CategoryChannelLink.Enumerable.Indexable.BackLink<RestGuildActor> Category { get; }
+
+        [SourceOfTruth] public NewsChannelLink.Enumerable.Indexable.BackLink<RestGuildActor> News { get; }
+
+        [SourceOfTruth] public StageChannelLink.Enumerable.Indexable.BackLink<RestGuildActor> Stage { get; }
+
+        [SourceOfTruth] public ForumChannelLink.Enumerable.Indexable.BackLink<RestGuildActor> Forum { get; }
+
+        [SourceOfTruth] public MediaChannelLink.Enumerable.Indexable.BackLink<RestGuildActor> Media { get; }
+
+        [SourceOfTruth]
+        public IntegrationChannelTraitLink.Enumerable.Indexable.BackLink<RestGuildActor> Integration { get; }
+
+        [SourceOfTruth] public ThreadableChannelLink.Enumerable.Indexable.BackLink<RestGuildActor> Threadable { get; }
+
+        public ChannelsLink(RestGuildActor guild) : base(
+            guild,
+            guild.Client,
+            new RestActorProvider<ulong, RestGuildChannelActor>(
+                (client, id) => new RestGuildChannelActor(client, guild.Identity, GuildChannelIdentity.Of(id))
+            ),
+            Routes.GetGuildChannels(guild.Id).AsRequiredProvider()
+        )
+        {
+            Text = RestActors.GuildChannel(Template.Of<RestTextChannelActor>(), guild, ApiProvider);
+            Voice = RestActors.GuildChannel(Template.Of<RestVoiceChannelActor>(), guild, ApiProvider);
+            Category = RestActors.GuildChannel(Template.Of<RestCategoryChannelActor>(), guild, ApiProvider);
+            News = RestActors.GuildChannel(Template.Of<RestNewsChannelActor>(), guild, ApiProvider);
+            Stage = RestActors.GuildChannel(Template.Of<RestStageChannelActor>(), guild, ApiProvider);
+            Forum = RestActors.GuildChannel(Template.Of<RestForumChannelActor>(), guild, ApiProvider);
+            Media = RestActors.GuildChannel(Template.Of<RestMediaChannelActor>(), guild, ApiProvider);
+            Threadable = RestActors.GuildChannel(Template.Of<RestThreadableChannelActor>(), guild, ApiProvider);
+            Integration = RestActors.GuildChannel(Template.Of<RestIntegrationChannelTrait>(), guild, ApiProvider);
+        }
+
+        IGuildChannel IEntityProvider<IGuildChannel, IGuildChannelModel>.CreateEntity(IGuildChannelModel model)
+            => CreateEntity(model);
+
+        IGuildChannelActor IActorProvider<IDiscordClient, IGuildChannelActor, ulong>.GetActor(
+            IDiscordClient client,
+            ulong id
+        ) => GetActor(id);
+
+        ITask<IReadOnlyCollection<IGuildChannel>> ILinkType<
+            IGuildChannelActor,
+            ulong,
+            IGuildChannel,
+            IGuildChannelModel
+        >.Enumerable.AllAsync(
+            RequestOptions? options,
+            CancellationToken token
+        ) => AllAsync(options, token);
+
+        IGuildChannelActor ILinkType<
+            IGuildChannelActor,
+            ulong,
+            IGuildChannel,
+            IGuildChannelModel
+        >.Indexable.Specifically(ulong id)
+            => Specifically(id);
+
+        IGuildActor IBackLink<IGuildActor, IGuildChannelActor, ulong, IGuildChannel, IGuildChannelModel>.Source
+            => Source;
+    }
+
+    #endregion
 }
 
 [ExtendInterfaceDefaults]
@@ -242,15 +299,15 @@ public sealed partial class RestGuild :
     public bool IsWidgetEnabled => Model.WidgetEnabled;
 
     public DefaultMessageNotifications DefaultMessageNotifications =>
-        (DefaultMessageNotifications)Model.DefaultMessageNotifications;
+        (DefaultMessageNotifications) Model.DefaultMessageNotifications;
 
-    public MfaLevel MfaLevel => (MfaLevel)Model.MFALevel;
+    public MfaLevel MfaLevel => (MfaLevel) Model.MFALevel;
 
     public new GuildFeatures Features => base.Features ?? default;
 
-    public PremiumTier PremiumTier => (PremiumTier)Model.PremiumTier;
+    public PremiumTier PremiumTier => (PremiumTier) Model.PremiumTier;
 
-    public SystemChannelFlags SystemChannelFlags => (SystemChannelFlags)Model.SystemChannelFlags;
+    public SystemChannelFlags SystemChannelFlags => (SystemChannelFlags) Model.SystemChannelFlags;
 
     public new NsfwLevel NsfwLevel => base.NsfwLevel ?? NsfwLevel.Default;
 
@@ -274,7 +331,7 @@ public sealed partial class RestGuild :
 
     public new VerificationLevel VerificationLevel => base.VerificationLevel ?? VerificationLevel.None;
 
-    public ExplicitContentFilterLevel ExplicitContentFilter => (ExplicitContentFilterLevel)Model.ExplicitContentFilter;
+    public ExplicitContentFilterLevel ExplicitContentFilter => (ExplicitContentFilterLevel) Model.ExplicitContentFilter;
 
     public string? DiscoverySplashId => Model.DiscoverySplashId;
 
@@ -298,7 +355,7 @@ public sealed partial class RestGuild :
             model is not (
             IModelSourceOfMultiple<IRoleModel> roles and
             IModelSourceOfMultiple<IGuildStickerModel> stickers and
-            IModelSourceOfMultiple<IGuildEmoteModel> emotes
+            IModelSourceOfMultiple<ICustomEmoteModel> emotes
             )
         ) throw new ArgumentException($"{nameof(model)} must provide a collection of roles, stickers, and emotes.");
 
