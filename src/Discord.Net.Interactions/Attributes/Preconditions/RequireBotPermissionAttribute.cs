@@ -7,7 +7,6 @@ namespace Discord.Interactions
     ///     Requires the bot to have a specific permission in the channel a command is invoked in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-    [Obsolete("This attribute does not support user app interactions. Consider switching to 'RequireAppPermissionAttribute'", false)]
     public class RequireBotPermissionAttribute : PreconditionAttribute
     {
         /// <summary>
