@@ -73,6 +73,10 @@ namespace Discord.WebSocket
             => GuildUser.GuildAvatarId;
 
         /// <inheritdoc/>
+        public string GuildBannerHash
+            => GuildUser.GuildBannerHash;
+
+        /// <inheritdoc/>
         public override ushort DiscriminatorValue
         {
             get => GuildUser.DiscriminatorValue;
@@ -239,6 +243,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => GuildUser.GetGuildAvatarUrl(format, size);
+
+        /// <inheritdoc />
+        string IGuildUser.GetGuildBannerUrl(ImageFormat format, ushort size) => GuildUser.GetGuildBannerUrl(format, size);
 
         /// <inheritdoc />
         public override string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)

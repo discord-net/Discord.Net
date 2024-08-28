@@ -29,6 +29,10 @@ namespace Discord.Rest
         public string DisplayAvatarId => GuildAvatarId ?? AvatarId;
         /// <inheritdoc/>
         public string GuildAvatarId { get; private set; }
+
+        /// <inheritdoc/>
+        public string GuildBannerHash { get; private set; }
+
         internal IGuild Guild { get; private set; }
         /// <inheritdoc />
         public bool IsDeafened { get; private set; }
@@ -122,6 +126,8 @@ namespace Discord.Rest
                 _timedOutTicks = model.TimedOutUntil.Value?.UtcTicks;
             if (model.Pending.IsSpecified)
                 IsPending = model.Pending.Value;
+            if (model.Banner.IsSpecified)
+                GuildBannerHash = model.Banner.Value;
             Flags = model.Flags;
         }
         private void UpdateRoles(ulong[] roleIds)
@@ -199,6 +205,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, GuildId, GuildAvatarId, size, format);
+
+        /// <inheritdoc />
+        public string GetGuildBannerUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildUserBannerUrl(Id, GuildId, GuildBannerHash, size, format);
 
         /// <inheritdoc />
         public override string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)

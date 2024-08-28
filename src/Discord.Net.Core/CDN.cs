@@ -55,6 +55,14 @@ namespace Discord
             return $"{DiscordConfig.CDNUrl}guilds/{guildId}/users/{userId}/avatars/{avatarId}.{extension}?size={size}";
         }
 
+        public static string GetGuildUserBannerUrl(ulong userId, ulong guildId, string bannerId, ushort size, ImageFormat format)
+        {
+            if (bannerId == null)
+                return null;
+            var extension = FormatToExtension(format, bannerId);
+            return $"{DiscordConfig.CDNUrl}guilds/{guildId}/users/{userId}/banners/{bannerId}.{extension}?size={size}";
+        }
+
         /// <summary>
         ///     Returns a user banner URL.
         /// </summary>
