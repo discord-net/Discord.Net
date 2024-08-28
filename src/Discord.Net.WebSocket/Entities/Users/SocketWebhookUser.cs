@@ -75,7 +75,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         string IGuildUser.GuildAvatarId => null;
         /// <inheritdoc />
+        string IGuildUser.GuildBannerHash => null;
+        /// <inheritdoc />
         string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => null;
+        /// <inheritdoc />
+        string IGuildUser.GetGuildBannerUrl(ImageFormat format, ushort size) => null;
         /// <inheritdoc />
         DateTimeOffset? IGuildUser.PremiumSince => null;
         /// <inheritdoc />
