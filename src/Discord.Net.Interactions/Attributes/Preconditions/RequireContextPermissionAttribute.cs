@@ -4,10 +4,10 @@ using System;
 namespace Discord.Interactions;
 
 /// <summary>
-///     Requires the bot to have a specific permission in the channel a command is invoked in.
+///     Requires the bot to have a specific permission in the context a command is invoked in.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-public class RequireAppPermissionAttribute : PreconditionAttribute
+public class RequireContextPermissionAttribute : PreconditionAttribute
 {
     /// <summary>
     ///     Gets the specified <see cref="Discord.GuildPermission" /> of the precondition.
@@ -35,7 +35,7 @@ public class RequireAppPermissionAttribute : PreconditionAttribute
     ///     The <see cref="Discord.GuildPermission"/> that the bot must have. Multiple permissions can be specified
     ///     by ORing the permissions together.
     /// </param>
-    public RequireAppPermissionAttribute(GuildPermission permission)
+    public RequireContextPermissionAttribute(GuildPermission permission)
     {
         GuildPermission = permission;
         ChannelPermission = null;
@@ -47,7 +47,7 @@ public class RequireAppPermissionAttribute : PreconditionAttribute
     ///     The <see cref="Discord.ChannelPermission"/> that the bot must have. Multiple permissions can be
     ///     specified by ORing the permissions together.
     /// </param>
-    public RequireAppPermissionAttribute(ChannelPermission permission)
+    public RequireContextPermissionAttribute(ChannelPermission permission)
     {
         ChannelPermission = permission;
         GuildPermission = null;
