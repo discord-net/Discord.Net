@@ -2200,6 +2200,15 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IRole IGuild.GetRole(ulong id)
             => GetRole(id);
+
+        /// <inheritdoc cref="IGuild.GetRole" />
+        public Task<RestRole> GetRoleAsync(ulong id, RequestOptions options = null)
+            => GuildHelper.GetRoleAsync(this, Discord, id, options);
+
+        /// <inheritdoc />
+        async Task<IRole> IGuild.GetRoleAsync(ulong id, RequestOptions options)
+            => await GetRoleAsync(id);
+
         /// <inheritdoc />
         async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
             => await CreateRoleAsync(name, permissions, color, isHoisted, false, options).ConfigureAwait(false);
