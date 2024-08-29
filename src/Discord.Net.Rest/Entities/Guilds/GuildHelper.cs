@@ -644,6 +644,13 @@ namespace Discord.Rest
 
             return RestRole.Create(client, guild, model);
         }
+
+        public static async Task<RestRole> GetRoleAsync(IGuild guild, BaseDiscordClient client, ulong roleId, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetRoleAsync(guild.Id, roleId, options).ConfigureAwait(false);
+            return model is null ? null : RestRole.Create(client, guild, model);
+        }
+
         #endregion
 
         #region Users
