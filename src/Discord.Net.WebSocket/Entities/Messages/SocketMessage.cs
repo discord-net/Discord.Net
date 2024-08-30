@@ -204,7 +204,8 @@ namespace Discord.WebSocket
 
             if (model.Components.IsSpecified)
             {
-                Components = model.Components.Value.Select(x => new ActionRowComponent(x.Components.Select<IMessageComponent, IMessageComponent>(y =>
+                Components = model.Components.Value.Where(x => x.Type is ComponentType.ActionRow)
+                    .Select(x => new ActionRowComponent(((API.ActionRowComponent)x).Components.Select<IMessageComponent, IMessageComponent>(y =>
                 {
                     switch (y.Type)
                     {

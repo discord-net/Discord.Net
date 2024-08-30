@@ -198,7 +198,7 @@ namespace Discord.Rest
                     Content = (data.Content.IsSpecified && data.Content.Value == null) ? Optional<string>.Unspecified : data.Content,
                     Embeds = data.Embeds,
                     AllowedMentions = data.AllowedMentions,
-                    Components = data.Components,
+                    Components = data.Components.GetValueOrDefault(Array.Empty<API.ActionRowComponent>()),
                     Flags = data.Flags,
                 };
 

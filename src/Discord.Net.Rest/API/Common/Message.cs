@@ -82,7 +82,7 @@ internal class Message
     public Optional<Message> ReferencedMessage { get; set; }
 
     [JsonProperty("components")]
-    public Optional<ActionRowComponent[]> Components { get; set; }
+    public Optional<IMessageComponent[]> Components { get; set; }
 
     [JsonProperty("interaction")]
     public Optional<MessageInteraction> Interaction { get; set; }
