@@ -198,7 +198,8 @@ namespace Discord.WebSocket
                     GuildId = model.Reference.Value.GuildId,
                     InternalChannelId = model.Reference.Value.ChannelId,
                     MessageId = model.Reference.Value.MessageId,
-                    FailIfNotExists = model.Reference.Value.FailIfNotExists
+                    FailIfNotExists = model.Reference.Value.FailIfNotExists,
+                    ReferenceType = model.Reference.Value.Type
                 };
             }
 

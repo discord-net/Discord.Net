@@ -284,7 +284,7 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
 
-            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers, poll: poll);
+            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers, poll: poll, messageReference: messageReference);
             Preconditions.ValidatePoll(poll);
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
@@ -400,7 +400,7 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
 
-            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers, attachments, poll);
+            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers, attachments, poll, messageReference);
             Preconditions.ValidatePoll(poll);
 
             foreach (var attachment in attachments)
