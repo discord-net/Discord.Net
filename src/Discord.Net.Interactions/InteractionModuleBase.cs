@@ -112,7 +112,7 @@ namespace Discord.Interactions
         protected virtual async Task DeleteOriginalResponseAsync()
         {
             var response = await Context.Interaction.GetOriginalResponseAsync().ConfigureAwait(false);
-            await response.DeleteAsync().ConfigureAwait(false);
+            await Context.Interaction.DeleteOriginalResponseAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc cref="IDiscordInteraction.RespondWithModalAsync(Modal, RequestOptions)"/>
