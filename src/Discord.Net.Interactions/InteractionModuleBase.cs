@@ -110,7 +110,7 @@ namespace Discord.Interactions
 
         /// <inheritdoc cref="IDeletable.DeleteAsync(RequestOptions)"/>
         protected virtual Task DeleteOriginalResponseAsync()
-            => Context.Interaction.DeleteOriginalResponseAsync().ConfigureAwait(false);
+            => Context.Interaction.DeleteOriginalResponseAsync();
 
         /// <inheritdoc cref="IDiscordInteraction.RespondWithModalAsync(Modal, RequestOptions)"/>
         protected virtual Task RespondWithModalAsync(Modal modal, RequestOptions options = null) 
