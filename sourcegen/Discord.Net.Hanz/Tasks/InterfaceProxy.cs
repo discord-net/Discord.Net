@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public class InterfaceProxy : IGenerationCombineTask<InterfaceProxy.GenerationTarget>
+public class InterfaceProxy : ISyntaxGenerationCombineTask<InterfaceProxy.GenerationTarget>
 {
     public sealed class GenerationTarget(
         SemanticModel semanticModel,

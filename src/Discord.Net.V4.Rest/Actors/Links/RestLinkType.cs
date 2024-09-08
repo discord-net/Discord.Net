@@ -1,5 +1,5 @@
 using Discord.Models;
-using Discord.Paging;
+using Discord;
 using MorseCode.ITask;
 
 // ReSharper disable MemberHidesStaticFromOuterClass
@@ -109,7 +109,8 @@ public partial class RestLinkType<TActor, TId, TEntity, TModel>(
         DiscordRestClient client,
         IActorProvider<DiscordRestClient, TActor, TId> actorFactory,
         IPathable path,
-        Func<TPageModel, IEnumerable<TModel>> mapper
+        Func<TPageModel, IEnumerable<TModel>> mapper,
+        Func<TModel, TPageModel, TEntity>? entityFactory = null
     ) :
         RestLink<TActor, TId, TEntity, TModel>(client, actorFactory),
         ILinkType<TActor, TId, TEntity, TModel>.Paged<TParams>
@@ -123,10 +124,13 @@ public partial class RestLinkType<TActor, TId, TEntity, TModel>(
                 path,
                 options ?? Client.DefaultRequestOptions,
                 mapper,
-                (model, _) => CreateEntity(model),
+                entityFactory ?? Factory,
                 args
             );
         }
+
+        private TEntity Factory(TModel model, TPageModel pageModel)
+            => CreateEntity(model);
 
         [BackLinkable]
         public partial class Indexable(

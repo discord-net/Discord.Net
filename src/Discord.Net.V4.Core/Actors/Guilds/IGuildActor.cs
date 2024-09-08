@@ -75,7 +75,7 @@ public partial interface IGuildActor :
             options ?? Client.DefaultRequestOptions,
             token
         );
-
+        
         return (MfaLevel)result.Level;
     }
 

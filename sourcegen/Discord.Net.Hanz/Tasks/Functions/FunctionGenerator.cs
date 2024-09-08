@@ -8,7 +8,7 @@ using CSharpExtensions = Microsoft.CodeAnalysis.CSharp.CSharpExtensions;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public sealed class FunctionGenerator : IGenerationCombineTask<FunctionGenerator.GenerationTarget>
+public sealed class FunctionGenerator : ISyntaxGenerationCombineTask<FunctionGenerator.GenerationTarget>
 {
     public class MethodTarget(
         MethodDeclarationSyntax methodSyntax,

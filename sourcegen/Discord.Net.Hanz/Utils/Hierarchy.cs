@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace Discord.Net.Hanz.Utils;
+namespace Discord.Net.Hanz;
 
 public static class Hierarchy
 {

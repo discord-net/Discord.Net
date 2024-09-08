@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public class ModelEquality : IGenerationTask<ModelEquality.GenerationTarget>
+public class ModelEquality : ISyntaxGenerationTask<ModelEquality.GenerationTarget>
 {
     public class GenerationTarget(
         SemanticModel semanticModel,

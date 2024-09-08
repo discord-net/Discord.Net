@@ -1,7 +1,5 @@
 using Discord.Models;
 
-// ReSharper disable IdentifierTypo
-
 namespace Discord;
 
 public interface ILink<out TActor, in TId, out TEntity, in TModel> :

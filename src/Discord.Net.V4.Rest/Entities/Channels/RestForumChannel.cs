@@ -32,7 +32,7 @@ public sealed partial class RestForumChannelActor :
     [CovariantOverride]
     [SourceOfTruth]
     internal RestForumChannel CreateEntity(IGuildForumChannelModel model)
-        => RestForumChannel.Construct(Client, Guild.Identity, model);
+        => RestForumChannel.Construct(Client, this, model);
 }
 
 public partial class RestForumChannel :
@@ -50,7 +50,7 @@ public partial class RestForumChannel :
 
     public int? ThreadCreationSlowmode => Model.DefaultThreadRateLimitPerUser;
 
-    public ILoadableEntity<IEmote> DefaultReactionEmoji => throw new NotImplementedException();
+    public DiscordEmojiId? DefaultReactionEmoji => Model.DefaultReactionEmoji;
 
     public SortOrder? DefaultSortOrder => (SortOrder?) Model.DefaultSortOrder;
 

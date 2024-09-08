@@ -7,7 +7,7 @@ using System.Collections.Immutable;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public class RestLoadable : IGenerationCombineTask<RestLoadable.GenerationContext>
+public class RestLoadable : ISyntaxGenerationCombineTask<RestLoadable.GenerationContext>
 {
     public sealed class GenerationContext(
         SemanticModel semanticModel,

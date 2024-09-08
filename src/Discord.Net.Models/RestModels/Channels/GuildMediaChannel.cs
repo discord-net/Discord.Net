@@ -12,8 +12,9 @@ public sealed class GuildMediaChannel : ThreadableChannelBase, IGuildMediaChanne
 
     int? IGuildMediaChannelModel.RatelimitPerUser => ~RatelimitPerUser;
 
-    ulong? IGuildMediaChannelModel.DefaultReactionEmojiId => ~DefaultReactionEmoji.Map(v => v.EmojiId);
-    string? IGuildMediaChannelModel.DefaultReactionEmojiName => ~DefaultReactionEmoji.Map(v => v.EmojiName);
+    DiscordEmojiId? IGuildMediaChannelModel.DefaultReactionEmoji
+        => ~DefaultReactionEmoji
+            .Map(v => new DiscordEmojiId(v.EmojiName, v.EmojiId, null));
 
     IEnumerable<ITagModel> IGuildMediaChannelModel.AvailableTags => AvailableTags | [];
 

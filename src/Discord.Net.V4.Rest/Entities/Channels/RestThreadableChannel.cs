@@ -5,47 +5,12 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-using PublicThreadsPagedActor = RestPagedIndexableLink<
-    RestThreadChannelActor,
-    ulong,
-    RestThreadChannel,
-    IThreadChannelModel,
-    ChannelThreads,
-    PagePublicArchivedThreadsParams
->;
-
-using PrivateThreadsPagedActor = RestPagedIndexableLink<
-    RestThreadChannelActor,
-    ulong,
-    RestThreadChannel,
-    IThreadChannelModel,
-    ChannelThreads,
-    PagePrivateArchivedThreadsParams
->;
-using JoinedPrivateThreadsPagedActor = RestPagedIndexableLink<
-    RestThreadChannelActor,
-    ulong,
-    RestThreadChannel,
-    IThreadChannelModel,
-    ChannelThreads,
-    PageJoinedPrivateArchivedThreadsParams
->;
-
 [ExtendInterfaceDefaults]
 public partial class RestThreadableChannelActor :
     RestGuildChannelActor,
     IThreadableChannelActor,
     IRestActor<ulong, RestThreadableChannel, ThreadableChannelIdentity, IThreadableChannelModel>
 {
-    [SourceOfTruth]
-    public PublicThreadsPagedActor PublicArchivedThreads { get; }
-
-    [SourceOfTruth]
-    public PrivateThreadsPagedActor PrivateArchivedThreads { get; }
-
-    [SourceOfTruth]
-    public JoinedPrivateThreadsPagedActor JoinedPrivateArchivedThreads { get; }
-
     [SourceOfTruth]
     internal override ThreadableChannelIdentity Identity { get; }
 

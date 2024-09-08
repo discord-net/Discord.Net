@@ -13,7 +13,7 @@ public partial interface IMessageChannelTrait :
 {
     [return: TypeHeuristic(nameof(Messages))]
     IMessageActor Message(ulong id) => Messages[id];
-    MessageLink.Paged<PageChannelMessagesParams>.Indexable Messages { get; }
+    IMessageActor.Paged.Indexable Messages { get; }
 
     IChannel IEntityProvider<IChannel, IChannelModel>.CreateEntity(IChannelModel model)
         => (this as IEntityProvider<IMessageChannel, IChannelModel>).CreateEntity(model);

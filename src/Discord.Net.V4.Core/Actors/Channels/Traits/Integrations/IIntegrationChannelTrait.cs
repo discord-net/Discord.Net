@@ -10,7 +10,7 @@ public partial interface IIntegrationChannelTrait :
 {
     [return: TypeHeuristic(nameof(Webhooks))]
     IGuildChannelWebhookActor Webhook(ulong id) => Webhooks[id];
-    GuildChannelWebhookLink.Enumerable.Indexable Webhooks { get; }
+    IGuildChannelWebhookActor.Enumerable.Indexable Webhooks { get; }
 
     [SourceOfTruth]
     internal new IIntegrationChannel CreateEntity(IGuildChannelModel model);

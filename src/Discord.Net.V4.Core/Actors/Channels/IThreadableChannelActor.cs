@@ -2,7 +2,7 @@ using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 using System.Diagnostics.CodeAnalysis;
-using Discord.Paging;
+using Discord;
 
 namespace Discord;
 
@@ -18,13 +18,5 @@ public partial interface IThreadableChannelActor :
     IActor<ulong, IThreadableChannel>
 {
     [SourceOfTruth]
-    new ThreadsLink Threads { get; }
-    
-    [BackLinkable]
-    public partial interface ThreadsLink : GuildThreadChannelLink.Indexable
-    {
-        ThreadChannelLink.Paged<PagePublicArchivedThreadsParams> PublicArchivedThreads { get; }
-        ThreadChannelLink.Paged<PagePrivateArchivedThreadsParams> PrivateArchivedThreads { get; }
-        ThreadChannelLink.Paged<PageJoinedPrivateArchivedThreadsParams> JoinedPrivateArchivedThreads { get; }
-    }
+    new INestedThreadsLink Threads { get; }
 }

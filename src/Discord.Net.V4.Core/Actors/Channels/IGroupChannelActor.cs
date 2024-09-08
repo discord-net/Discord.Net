@@ -15,5 +15,5 @@ public partial interface IGroupChannelActor :
     IInvitableTrait<IChannelInviteActor, IChannelInvite>,
     IActor<ulong, IGroupChannel>
 {
-    UserLink.Indexable.BackLink<IGroupChannelActor> Recipients { get; }
+    IUserActor.Indexable.BackLink<IGroupChannelActor> Recipients { get; }
 }

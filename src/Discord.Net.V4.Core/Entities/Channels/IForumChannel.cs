@@ -54,7 +54,7 @@ public partial interface IForumChannel :
     /// <summary>
     ///     Gets the emoji to show in the add reaction button on a thread in a forum channel
     /// </summary>
-    DiscordEmojiId DefaultReactionEmoji { get; }
+    DiscordEmojiId? DefaultReactionEmoji { get; }
 
     /// <summary>
     ///     Gets the rule used to order posts in forum channels.

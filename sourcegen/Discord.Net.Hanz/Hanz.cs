@@ -59,7 +59,7 @@ public sealed class Hanz : IIncrementalGenerator
         }
     }
 
-    public static void RegisterTask<T>(IncrementalGeneratorInitializationContext context, IGenerationTask<T> task)
+    public static void RegisterTask<T>(IncrementalGeneratorInitializationContext context, ISyntaxGenerationTask<T> task)
         where T : class, IEquatable<T>
     {
         var assemblyLoggers = new ConcurrentDictionary<string, Logger>();
@@ -121,7 +121,7 @@ public sealed class Hanz : IIncrementalGenerator
     }
 
     public static void RegisterCombineTask<T>(IncrementalGeneratorInitializationContext context,
-        IGenerationCombineTask<T> task)
+        ISyntaxGenerationCombineTask<T> task)
         where T : class, IEquatable<T>
     {
         var logger = Logger.CreateForTask(task.GetType().Name);
@@ -182,8 +182,8 @@ public sealed class Hanz : IIncrementalGenerator
     private static bool IsGenerationTask(Type type)
     {
         return type.IsGenericType && (
-            type.GetGenericTypeDefinition() == typeof(IGenerationTask<>) ||
-            type.GetGenericTypeDefinition() == typeof(IGenerationCombineTask<>)
+            type.GetGenericTypeDefinition() == typeof(ISyntaxGenerationTask<>) ||
+            type.GetGenericTypeDefinition() == typeof(ISyntaxGenerationCombineTask<>)
         );
     }
 
@@ -209,16 +209,16 @@ public sealed class Hanz : IIncrementalGenerator
 
                 if (generationInterface is null) continue;
 
-                if (generationInterface.GetGenericTypeDefinition() == typeof(IGenerationTask<>))
+                if (generationInterface.GetGenericTypeDefinition() == typeof(ISyntaxGenerationTask<>))
                     _registerTaskMethod.MakeGenericMethod(generationInterface.GenericTypeArguments[0])
                         .Invoke(null, [context, Activator.CreateInstance(task)]);
-                else if (generationInterface.GetGenericTypeDefinition() == typeof(IGenerationCombineTask<>))
+                else if (generationInterface.GetGenericTypeDefinition() == typeof(ISyntaxGenerationCombineTask<>))
                     _registerCombineTaskMethod.MakeGenericMethod(generationInterface.GenericTypeArguments[0])
                         .Invoke(null, [context, Activator.CreateInstance(task)]);
             }
 
             var jsonTaskLogger = Logger.CreateForTask("JsonModels");
-
+            
             context.RegisterSourceOutput(
                 context.SyntaxProvider
                     .CreateSyntaxProvider(

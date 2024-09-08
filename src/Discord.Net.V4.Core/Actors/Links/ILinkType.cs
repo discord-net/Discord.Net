@@ -1,5 +1,5 @@
 using Discord.Models;
-using Discord.Paging;
+using Discord;
 using MorseCode.ITask;
 
 namespace Discord;
@@ -24,9 +24,7 @@ public partial interface ILinkType<out TActor, TId, out TEntity, in TModel> :
     where TId : IEquatable<TId>
     where TModel : class, IEntityModel<TId>
 {
-    public interface BackLink<out TSource> : 
-        ILink<TActor, TId, TEntity, TModel>,
-        IBackLink<TSource, TActor, TId, TEntity, TModel> 
+    public interface BackLink<out TSource> : IBackLink<TSource, TActor, TId, TEntity, TModel> 
         where TSource : class, IPathable;
     
     [BackLinkable]

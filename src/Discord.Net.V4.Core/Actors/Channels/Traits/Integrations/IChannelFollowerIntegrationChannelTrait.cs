@@ -1,10 +1,10 @@
 namespace Discord;
 
 [Trait]
-public interface IChannelFollowerIntegrationChannelTrait :
+public partial interface IChannelFollowerIntegrationChannelTrait :
     IIntegrationChannelTrait
 {
     [return: TypeHeuristic(nameof(ChannelFollowerWebhooks))]
-    IChannelFollowerWebhookActor FollowerWebhook(ulong id) => ChannelFollowerWebhooks[id];
-    ChannelFollowerWebhookLink.Enumerable.Indexable ChannelFollowerWebhooks { get; }
+    IChannelFollowerWebhookActor ChannelFollowerWebhook(ulong id) => ChannelFollowerWebhooks[id];
+    IChannelFollowerWebhookActor.Enumerable.Indexable ChannelFollowerWebhooks { get; }
 }

@@ -8,7 +8,7 @@ using CSharpExtensions = Microsoft.CodeAnalysis.CSharp.CSharpExtensions;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public class TypeFactories : IGenerationCombineTask<TypeFactories.GenerationTarget>
+public class TypeFactories : ISyntaxGenerationCombineTask<TypeFactories.GenerationTarget>
 {
     public class ConstructorArgs(ParameterListSyntax parameters, string? shouldBeLastParameter)
         : IEquatable<ConstructorArgs>

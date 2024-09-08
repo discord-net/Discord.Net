@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public class ModelLinking : IGenerationCombineTask<ModelLinking.GenerationTarget>
+public class ModelLinking : ISyntaxGenerationCombineTask<ModelLinking.GenerationTarget>
 {
     public const string LinkAttribute = "Discord.LinkAttribute";
 

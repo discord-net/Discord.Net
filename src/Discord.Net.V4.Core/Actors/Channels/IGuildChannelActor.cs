@@ -19,26 +19,6 @@ public partial interface IGuildChannelActor :
     IGuildRelationship,
     IActor<ulong, IGuildChannel>
 {
-    [OnVertex]
-    private static async Task<IGuildChannelInvite> CreateAsync(
-        GuildChannelInviteLink.Enumerable.Indexable.BackLink<IGuildChannelActor> invites,
-        Action<CreateChannelInviteProperties>? func = null,
-        RequestOptions? options = null,
-        CancellationToken token = default)
-    {
-        var args = new CreateChannelInviteProperties();
-
-        func?.Invoke(args);
-
-        var model = await invites.Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.CreateChannelInvite(invites.Source.Id, args.ToApiModel()),
-            options ?? invites.Client.DefaultRequestOptions,
-            token
-        );
-
-        return invites.CreateEntity(model);
-    }
-
     [BackLink<IGuildActor>]
     private static Task ModifyPositionsAsync(
         IGuildActor guild,

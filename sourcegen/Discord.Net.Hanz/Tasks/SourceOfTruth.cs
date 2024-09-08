@@ -9,7 +9,7 @@ using Exception = System.Exception;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public class SourceOfTruth : IGenerationCombineTask<SourceOfTruth.GenerationTarget>
+public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.GenerationTarget>
 {
     public static string[] IgnoredTypes =
     [

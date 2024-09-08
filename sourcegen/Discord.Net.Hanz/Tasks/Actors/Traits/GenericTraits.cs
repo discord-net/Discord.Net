@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 
 namespace Discord.Net.Hanz.Tasks.Traits;
 
-public sealed class GenericTraits : IGenerationCombineTask<GenericTraits.GenerationTarget>
+public sealed class GenericTraits : ISyntaxGenerationCombineTask<GenericTraits.GenerationTarget>
 {
     public sealed class GenerationTarget(
         SemanticModel model,

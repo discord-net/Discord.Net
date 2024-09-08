@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Discord.Net.Hanz.Tasks.Gateway;
 
-public sealed class GatewayLoadable : IGenerationCombineTask<GatewayLoadable.GenerationTarget>
+public sealed class GatewayLoadable : ISyntaxGenerationCombineTask<GatewayLoadable.GenerationTarget>
 {
     public sealed class GenerationTarget(
         SemanticModel semanticModel,

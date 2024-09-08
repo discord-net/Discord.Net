@@ -1,10 +1,10 @@
 namespace Discord;
 
 [Trait]
-public interface IIncomingIntegrationChannelTrait :
+public partial interface IIncomingIntegrationChannelTrait :
     IIntegrationChannelTrait
 {
     [return: TypeHeuristic(nameof(IncomingWebhooks))]
     IIncomingWebhookActor IncomingWebhook(ulong id) => IncomingWebhooks[id];
-    IncomingWebhookLink.Enumerable.Indexable IncomingWebhooks { get; }
+    IIncomingWebhookActor.Enumerable.Indexable IncomingWebhooks { get; }
 }

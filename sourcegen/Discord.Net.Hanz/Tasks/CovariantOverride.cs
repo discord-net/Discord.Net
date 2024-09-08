@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public class CovariantOverride : IGenerationCombineTask<CovariantOverride.GenerationTarget>
+public class CovariantOverride : ISyntaxGenerationCombineTask<CovariantOverride.GenerationTarget>
 {
     public class GenerationTarget(
         SemanticModel semanticModel,

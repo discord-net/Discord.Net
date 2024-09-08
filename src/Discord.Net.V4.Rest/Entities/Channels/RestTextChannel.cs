@@ -1,6 +1,5 @@
 using Discord.Models;
 using Discord.Models.Json;
-using Discord.Rest.Actors;
 using Discord.Rest;
 
 namespace Discord.Rest;

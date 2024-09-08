@@ -23,7 +23,7 @@ public enum EventParameterDegree : byte
     Unknown = byte.MaxValue
 }
 
-public sealed class Events : IGenerationCombineTask<Events.GenerationTarget>
+public sealed class Events : ISyntaxGenerationCombineTask<Events.GenerationTarget>
 {
     public abstract class GenerationTarget : IEquatable<GenerationTarget>
     {

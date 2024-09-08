@@ -7,6 +7,7 @@ namespace Discord;
 /// </summary>
 public partial interface ICategoryChannel :
     ISnowflakeEntity<IGuildCategoryChannelModel>,
+    ICategoryChannelActor,
     IGuildChannel,
     IUpdatable<IGuildCategoryChannelModel>
 {

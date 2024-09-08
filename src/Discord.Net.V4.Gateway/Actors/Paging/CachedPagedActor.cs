@@ -1,6 +1,6 @@
 using Discord.Gateway.State;
 using Discord.Models;
-using Discord.Paging;
+using Discord;
 
 namespace Discord.Gateway;
 

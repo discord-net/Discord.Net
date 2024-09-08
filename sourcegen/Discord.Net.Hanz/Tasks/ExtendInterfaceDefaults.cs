@@ -8,7 +8,7 @@ using CSharpExtensions = Microsoft.CodeAnalysis.CSharp.CSharpExtensions;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public class ExtendInterfaceDefaults : IGenerationCombineTask<ExtendInterfaceDefaults.GenerationTarget>
+public class ExtendInterfaceDefaults : ISyntaxGenerationCombineTask<ExtendInterfaceDefaults.GenerationTarget>
 {
     public sealed class GenerationTarget(
         SemanticModel semanticModel,

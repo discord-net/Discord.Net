@@ -226,7 +226,8 @@ public static partial class Routes
     public static IApiInOutRoute<StartThreadInForumOrMediaParams, ThreadChannelBase> StartThreadInForum(
         [IdHeuristic<IForumChannel>] ulong channelId,
         StartThreadInForumOrMediaParams body) =>
-        new ApiInOutRoute<StartThreadInForumOrMediaParams, ThreadChannelBase>(nameof(StartThreadInForum), RequestMethod.Post,
+        new ApiInOutRoute<StartThreadInForumOrMediaParams, ThreadChannelBase>(nameof(StartThreadInForum),
+            RequestMethod.Post,
             $"/channels/{channelId}/threads", body, ContentType.JsonBody, (ScopeType.Channel, channelId));
 
     public static IApiRoute JoinThread([IdHeuristic<IThreadChannel>] ulong channelId) =>
@@ -252,12 +253,25 @@ public static partial class Routes
             $"/channels/{channelId}/thread-members/{userId}{RouteUtils.GetUrlEncodedQueryParams(("with_member", withMember))}",
             (ScopeType.Channel, channelId));
 
-    public static IApiOutRoute<ThreadMember[]> ListThreadMembers([IdHeuristic<IThreadChannel>] ulong channelId,
-        bool? withMember = default,
-        ulong? afterId = default, int? limit = default) =>
-        new ApiOutRoute<ThreadMember[]>(nameof(ListThreadMembers), RequestMethod.Get,
-            $"/channels/{channelId}/thread-members{RouteUtils.GetUrlEncodedQueryParams(("with_member", withMember), ("after", afterId), ("limit", limit))}",
-            (ScopeType.Channel, channelId));
+    public static IApiOutRoute<ThreadMember[]> ListThreadMembers(
+        [IdHeuristic<IThreadChannel>] ulong channelId
+    ) => new ApiOutRoute<ThreadMember[]>(
+        nameof(ListThreadMembers),
+        RequestMethod.Get,
+        $"/channels/{channelId}/thread-members",
+        (ScopeType.Channel, channelId)
+    );
+    
+    public static IApiOutRoute<ThreadMember[]> ListThreadMembersPaged(
+        [IdHeuristic<IThreadChannel>] ulong channelId,
+        ulong? afterId = default,
+        int? limit = default
+    ) => new ApiOutRoute<ThreadMember[]>(
+        nameof(ListThreadMembers),
+        RequestMethod.Get,
+        $"/channels/{channelId}/thread-members{RouteUtils.GetUrlEncodedQueryParams(("with_member", true), ("after", afterId), ("limit", limit))}",
+        (ScopeType.Channel, channelId)
+    );
 
     public static IApiOutRoute<ChannelThreads> ListPublicArchivedThreads(
         [IdHeuristic<IThreadableChannel>] ulong channelId,

@@ -1,4 +1,4 @@
-namespace Discord.Paging;
+namespace Discord;
 
 public interface IAsyncPaged<out T> : IAsyncEnumerable<T>
 {

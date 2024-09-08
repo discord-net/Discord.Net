@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace Discord.Net.Hanz.Tasks;
 
-public interface IGenerationTask<T>
+public interface ISyntaxGenerationTask<T>
     where T : class, IEquatable<T>
 {
     bool IsValid(SyntaxNode node, CancellationToken token = default);
@@ -13,7 +13,7 @@ public interface IGenerationTask<T>
     void Execute(SourceProductionContext context, T? target, Logger logger);
 }
 
-public interface IGenerationCombineTask<T> where T : class, IEquatable<T>
+public interface ISyntaxGenerationCombineTask<T> where T : class, IEquatable<T>
 {
     bool IsValid(SyntaxNode node, CancellationToken token = default);
 

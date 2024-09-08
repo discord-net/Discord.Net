@@ -7,7 +7,7 @@ using System.Collections.Immutable;
 
 namespace Discord.Net.Hanz.Tasks.Traits;
 
-public sealed class EntityTraits : IGenerationCombineTask<EntityTraits.GenerationTarget>
+public sealed class EntityTraits : ISyntaxGenerationCombineTask<EntityTraits.GenerationTarget>
 {
     public static readonly Dictionary<string, string> TraitAttributes = new()
     {
