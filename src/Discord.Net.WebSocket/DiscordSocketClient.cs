@@ -3342,6 +3342,13 @@ namespace Discord.WebSocket
             }
             catch (Exception ex)
             {
+                if (BaseConfig.IncludeRawPayloadOnGatewayErrors)
+                {
+                    ex.Data["opcode"] = opCode;
+                    ex.Data["type"] = type;
+                    ex.Data["payload_data"] = (payload as JToken).ToString();
+                }
+
                 await _gatewayLogger.ErrorAsync($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
             }
         }

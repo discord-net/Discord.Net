@@ -176,6 +176,11 @@ namespace Discord.WebSocket
             }
         }
 
+        /// <summary>
+        ///     Gets or sets whether or not to include the raw payload on gateway errors.
+        /// </summary>
+        public bool IncludeRawPayloadOnGatewayErrors { get; set; } = false;
+
         private int maxWaitForGuildAvailable = 10000;
 
         /// <summary>
