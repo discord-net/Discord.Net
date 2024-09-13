@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.16.0] - 2024-09-14
+
+### Added
+- #2918 Message Forwards (c4d90cd)
+- #2976 New interactions precondition attribute that supports app commands (1f252a3)
+- #2978 Add Application Approximate User Install Count (47f98bc)
+- #2987 Add guild profile banners (57eb906)
+- #3002 Add subscriptions support (88ea2ed)
+- #2994 Add more member flags (9b8c7b1)
+- #2989 Add GetRoleAsync (466b491)
+- #2986 Add StickFormat gif and animated guild icon (2aaa0fd)
+
+### Fixed
+- #3001 StackOverflow in sharded clients (c53aac3)
+  
+### Misc
+- #2979 Create a (Discord)Color using a string (bc84b94)
+- #2991 Minor optimization + make sure top level components are action rows (623a457)
+- #2995 Use interaction method in `InteractionModuleBase.DeleteOriginalResponse` (f65d3ad)
+- #2999 Option to dump gw payloads on errors (b87ec6e)
+  
+
 ## [3.15.3] - 2024-07-21
 
 ### Added
