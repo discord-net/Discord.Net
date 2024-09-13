@@ -10,54 +10,53 @@ namespace Discord;
 [Deletable(nameof(Routes.DeleteGuild))]
 public partial interface IGuildActor :
     IActor<ulong, IGuild>,
-    IContainsThreadsTrait<IGuildThreadChannelActor>,
+    IHasThreadsTrait<
+        IGuildThreadChannelActor, 
+        IGuildThreadChannelActor.Indexable.WithActive.BackLink<IGuildActor>>,
     IInvitableTrait<IGuildInviteActor, IGuildInvite>
 {
     [return: TypeHeuristic(nameof(Channels))]
     IGuildChannelActor Channel(ulong id) => Channels[id];
-    IGuildChannelsLink Channels { get; }
-    
-    [SourceOfTruth]
-    new IGuildThreadsLink Threads { get; }
+    IGuildChannelActor.Enumerable.Indexable.Hierarchy.BackLink<IGuildActor> Channels { get; }
 
     [return: TypeHeuristic(nameof(Integrations))]
     IIntegrationActor Integration(ulong id) => Integrations[id];
-    IntegrationLink.Enumerable.Indexable Integrations { get; }
+    IIntegrationActor.Enumerable.Indexable Integrations { get; }
 
     [return: TypeHeuristic(nameof(Bans))]
     IBanActor Ban(ulong userId) => Bans[userId];
-    BanLink.Paged<PageGuildBansParams>.Indexable.BackLink<IGuildActor> Bans { get; }
+    IBanActor.PagedGuildBans.Indexable.BackLink<IGuildActor> Bans { get; }
 
     [return: TypeHeuristic(nameof(Members))]
     IMemberActor Member(ulong id) => Members[id];
-    IMembersLink Members { get; }
+    IMemberActor.PagedGuildMembers.Indexable.Hierarchy Members { get; }
 
     [return: TypeHeuristic(nameof(Emotes))]
     IGuildEmoteActor Emote(ulong id) => Emotes[id];
-    GuildEmoteLink.Enumerable.Indexable.BackLink<IGuildActor> Emotes { get; }
+    IGuildEmoteActor.Enumerable.Indexable.BackLink<IGuildActor> Emotes { get; }
 
     [return: TypeHeuristic(nameof(Roles))]
     IRoleActor Role(ulong id) => Roles[id];
-    RoleLink.Enumerable.Indexable.BackLink<IGuildActor> Roles { get; }
+    IRoleActor.Enumerable.Indexable.BackLink<IGuildActor> Roles { get; }
 
     [return: TypeHeuristic(nameof(Stickers))]
     IGuildStickerActor Sticker(ulong id) => Stickers[id];
-    GuildStickerLink.Enumerable.Indexable.BackLink<IGuildActor> Stickers { get; }
+    IGuildStickerActor.Enumerable.Indexable.BackLink<IGuildActor> Stickers { get; }
 
     [return: TypeHeuristic(nameof(ScheduledEvents))]
     IGuildScheduledEventActor ScheduledEvent(ulong id) => ScheduledEvents[id];
-    GuildScheduledEventLink.Enumerable.Indexable.BackLink<IGuildActor> ScheduledEvents { get; }
+    IGuildScheduledEventActor.Enumerable.Indexable.BackLink<IGuildActor> ScheduledEvents { get; }
 
     [return: TypeHeuristic(nameof(Webhooks))]
     IWebhookActor Webhook(ulong id) => Webhooks[id];
-    WebhookLink.Enumerable.Indexable Webhooks { get; }
+    IWebhookActor.Enumerable.Indexable Webhooks { get; }
 
     #region Methods
 
     Task LeaveAsync(
         RequestOptions? options = null,
         CancellationToken token = default)
-    {
+    {   
         return Client.RestApiClient.ExecuteAsync(
             Routes.LeaveGuild(Id),
             options ?? Client.DefaultRequestOptions,

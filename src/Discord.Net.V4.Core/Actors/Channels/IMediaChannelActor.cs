@@ -10,7 +10,7 @@ namespace Discord;
     Modifiable<ModifyMediaChannelProperties>(nameof(Routes.ModifyChannel)),
     Creatable<CreateGuildMediaChannelProperties>(
         nameof(Routes.CreateGuildChannel),
-        nameof(IGuildChannelsLink.Media),
+        nameof(IGuildActor),
         RouteGenerics = [typeof(GuildMediaChannel)]
     ),
     BackLink(nameof(Threads)),

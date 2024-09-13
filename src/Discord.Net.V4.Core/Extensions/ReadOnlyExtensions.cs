@@ -11,8 +11,8 @@ public static class ReadOnlyExtensions
         where TKey : notnull
         => new(dictionary);
 
-    public static ReadOnlyCollection<T> AsReadOnly<T>(this IList<T> list)
-        => new(list);
+    public static IReadOnlyCollection<T> AsReadOnly<T>(this IList<T> list)
+        => new ReadOnlyCollection<T>(list);
 
     public static IReadOnlySet<T> AsReadOnly<T>(this ISet<T> set)
         => set.ToFrozenSet();

@@ -20,7 +20,7 @@ public sealed class Interaction :
         JsonIgnore,
         JsonPropertyName("data"),
         DiscriminatedUnion(nameof(Type)),
-        DiscriminatedUnionEntry<ApplicationCommandData>(
+        DiscriminatedUnionEntry<ApplicationCommandInteractionData>(
             InteractionDataTypes.ApplicationCommand,
             InteractionDataTypes.ApplicationCommandAutocomplete
         ),

@@ -70,7 +70,7 @@ public partial interface ILinkType<out TActor, TId, out TEntity, in TModel> :
 
         [BackLinkable]
         public partial interface Indexable :
-            Paged<TParams>,
+            Paged<TPaged, TParams>,
             ILinkType<TActor, TId, TEntity, TModel>.Indexable;
     }
 

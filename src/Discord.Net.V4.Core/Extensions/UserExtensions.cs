@@ -1,6 +1,6 @@
 namespace Discord;
 
-public static class UserExtensions
+public static partial class UserExtensions
 {
     public static string? GetAvatarUrl(this IUser user, ImageFormat format = ImageFormat.Auto, ushort size = 128)
         => CDN.GetUserAvatarUrl(user.Client.Config, user.Id, user.AvatarId, size, format);

@@ -18,5 +18,5 @@ public partial interface IGuildEmote :
     /// </summary>
     bool IsAvailable { get; }
 
-    RoleLink.Defined Roles { get; }
+    IRoleActor.Defined Roles { get; }
 }

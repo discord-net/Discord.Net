@@ -14,7 +14,7 @@ public partial interface IThreadChannelActor :
     IMessageChannelTrait,
     IActor<ulong, IThreadChannel>
 {
-    IThreadMembersLink Members { get; }
+    IThreadMemberActor.Enumerable.Indexable.WithCurrentMember.BackLink<IThreadChannelActor> Members { get; }
 
     Task JoinAsync(RequestOptions? options = null, CancellationToken token = default)
         => Client.RestApiClient.ExecuteAsync(Routes.JoinThread(Id), options ?? Client.DefaultRequestOptions, token);

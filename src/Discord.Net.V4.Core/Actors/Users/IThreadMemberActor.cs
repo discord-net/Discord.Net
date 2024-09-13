@@ -9,6 +9,12 @@ public partial interface IThreadMemberActor :
     IThreadRelationship,
     IUserRelationship
 {
+    [LinkExtension]
+    protected interface WithCurrentMemberExtension
+    {
+        IThreadMemberActor Current { get; }
+    }
+    
     [BackLink<IThreadChannelActor>]
     private static Task AddAsync(
         IThreadChannelActor thread,

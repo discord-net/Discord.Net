@@ -11,8 +11,9 @@ namespace Discord;
     Deletable(nameof(Routes.DeleteChannel)),
     Creatable<CreateGuildChannelProperties>(
         nameof(Routes.CreateGuildChannel),
-        nameof(IGuildActor.Channels)
+        nameof(IGuildActor)
     ),
+    LinkHierarchicalRoot,
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IGuildChannelActor :

@@ -10,7 +10,7 @@ namespace Discord;
     Modifiable<ModifyVoiceChannelProperties>(nameof(Routes.ModifyChannel)),
     Creatable<CreateGuildVoiceChannelProperties>(
         nameof(Routes.CreateGuildChannel),
-        nameof(IGuildChannelsLink.Voice),
+        nameof(IGuildActor),
         RouteGenerics = [typeof(GuildVoiceChannel)]
     ),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity"), 

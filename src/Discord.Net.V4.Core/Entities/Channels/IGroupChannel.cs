@@ -14,7 +14,7 @@ public partial interface IGroupChannel :
     IGroupChannelActor
 {
     [SourceOfTruth]
-    new UserLink.Defined.Indexable.BackLink<IGroupChannelActor> Recipients { get; }
+    new IUserActor.Defined.Indexable.BackLink<IGroupChannelActor> Recipients { get; }
 
     [SourceOfTruth]
     new IGroupDMChannelModel GetModel();

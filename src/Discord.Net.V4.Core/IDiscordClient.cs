@@ -17,23 +17,23 @@ public interface IDiscordClient :
     /// </summary>
     ICurrentUserActor CurrentUser { get; }
     
-    IApplicationsLink Applications { get; }
+    IApplicationActor.Indexable Applications { get; }
 
-    GuildLink.Paged<IPartialGuild, PageUserGuildsParams>.Indexable Guilds { get; }
+    IGuildActor.PagedUserGuildsAsPartialGuild.Indexable Guilds { get; }
 
-    ChannelLink.Indexable Channels { get; }
+    IChannelActor.Indexable Channels { get; }
     
-    ThreadChannelLink.Indexable Threads { get; }
+    IThreadChannelActor.Indexable Threads { get; }
 
-    UserLink.Indexable Users { get; }
+    IUserActor.Indexable Users { get; }
 
-    WebhookLink.Indexable Webhooks { get; }
+    IWebhookActor.Indexable Webhooks { get; }
 
-    StickerPackLink.Enumerable.Indexable StickerPacks { get; }
+    IStickerPackActor.Enumerable.Indexable StickerPacks { get; }
 
-    StickerLink.Indexable Stickers { get; }
+    IStickerActor.Indexable Stickers { get; }
     
-    InviteLink.Indexable Invites { get; }
+    IInviteActor.Indexable Invites { get; }
 
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }

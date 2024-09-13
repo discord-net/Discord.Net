@@ -11,7 +11,7 @@ public partial interface IMember :
     IMemberActor
 {
     [SourceOfTruth]
-    new RoleLink.Defined.BackLink<IMember> Roles { get; }
+    new IRoleActor.Defined.Indexable.BackLink<IMemberActor> Roles { get; }
 
     /// <summary>
     ///     Gets when this user joined the guild.

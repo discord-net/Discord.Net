@@ -14,9 +14,8 @@ namespace Discord;
 public partial interface IThreadableChannelActor :
     IGuildChannelActor,
     IInvitableTrait<IGuildChannelInviteActor, IGuildChannelInvite>,
-    IContainsThreadsTrait<IGuildThreadChannelActor>,
-    IActor<ulong, IThreadableChannel>
-{
-    [SourceOfTruth]
-    new INestedThreadsLink Threads { get; }
-}
+    IHasThreadsTrait<
+        IGuildThreadChannelActor, 
+        IGuildThreadChannelActor.Indexable.WithNestedThreads.BackLink<IThreadableChannelActor>
+    >,
+    IActor<ulong, IThreadableChannel>;

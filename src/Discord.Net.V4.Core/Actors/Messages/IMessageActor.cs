@@ -12,7 +12,7 @@ public partial interface IMessageActor :
     IChannelRelationship<IMessageChannelTrait, IMessageChannel>,
     IActor<ulong, IMessage>
 {
-    ReactionLink.Indexable.BackLink<IMessageActor> Reactions { get; }
+    IReactionActor.Indexable.BackLink<IMessageActor> Reactions { get; }
 
     [BackLink<IGuildChannelActor>]
     private static Task BulkDeleteAsync(

@@ -11,7 +11,7 @@ public partial interface IMessage :
     IMessageActor
 {
     [SourceOfTruth]
-    new ReactionLink.Defined.Indexable.BackLink<IMessageActor> Reactions { get; }
+    new IReactionActor.Defined.Indexable.BackLink<IMessageActor> Reactions { get; }
     
     /// <summary>
     ///     Gets the type of this message.
@@ -126,11 +126,11 @@ public partial interface IMessage :
     /// </returns>
     IReadOnlyCollection<Embed> Embeds { get; }
 
-    ChannelLink.Defined MentionedChannels { get; }
+    IChannelActor.Defined MentionedChannels { get; }
 
-    RoleLink.Defined MentionedRoles { get; }
+    IRoleActor.Defined MentionedRoles { get; }
 
-    UserLink.Defined MentionedUsers { get; }
+    IUserActor.Defined MentionedUsers { get; }
 
     /// <summary>
     ///     Gets the activity associated with a message.

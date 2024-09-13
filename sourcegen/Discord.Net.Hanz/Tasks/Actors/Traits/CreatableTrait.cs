@@ -39,12 +39,6 @@ public static class CreatableTrait
         SourceProductionContext context,
         Logger logger)
     {
-        // if (traitAttribute.ConstructorArguments.Length is < 2 or > 3)
-        // {
-        //     logger.Warn($"{traitAttribute.ConstructorArguments.Length} attribute arguments specified");
-        //     return;
-        // }
-
         var actorInterface = EntityTraits.GetCoreActorInterface(target.InterfaceSymbol);
 
         if (actorInterface is null)
@@ -166,7 +160,11 @@ public static class CreatableTrait
             }
             else
             {
-                var backlinkTargets = GetBackLinkTargets(traitAttribute, target.SemanticModel.Compilation);
+                var backlinkTargets = GetBackLinkTargets(
+                    traitAttribute, 
+                    target.SemanticModel.Compilation, 
+                    logger
+                );
 
                 if (backlinkTargets is null)
                 {
@@ -176,6 +174,9 @@ public static class CreatableTrait
 
                 foreach (var linkTarget in backlinkTargets)
                 {
+                    linkTarget.Formatted =
+                        $"Discord.IBackLink<{linkTarget.LinkType}, {target.InterfaceSymbol}, {idType}, {entityType}, {modelType}>";
+
                     if (CreateLinkExtensionMethod(target, creatableTarget, linkTarget, traitAttribute, logger)
                         is not { } method)
                     {
@@ -213,12 +214,14 @@ public static class CreatableTrait
 
     private static List<BackLinkTarget>? GetBackLinkTargets(
         AttributeData traitAttribute,
-        Compilation compilation)
+        Compilation compilation,
+        Logger logger)
     {
         var argIndex = traitAttribute.ConstructorArguments.Length - 1;
 
         if (traitAttribute.ApplicationSyntaxReference?.GetSyntax() is not AttributeSyntax attributeSyntax)
         {
+            logger.Warn("Cannot resolve attribute syntax for backlink targets");
             return null;
         }
 
@@ -248,12 +251,15 @@ public static class CreatableTrait
             if (target is not InvocationExpressionSyntax invocation)
                 return null;
 
-            var property = ResolveNameOfExpression(invocation, compilation);
+            var backlinkTarget = ResolveNameOfExpression(invocation, compilation, logger);
 
-            if (property is null)
+            if (backlinkTarget is null)
+            {
+                logger.Warn("No target info found for backlink target");
                 return null;
+            }
 
-            results.Add(property);
+            results.Add(backlinkTarget);
         }
 
         return results;
@@ -261,7 +267,8 @@ public static class CreatableTrait
 
     private static BackLinkTarget? ResolveNameOfExpression(
         InvocationExpressionSyntax invocation,
-        Compilation compilation)
+        Compilation compilation,
+        Logger logger)
     {
         if (invocation is not
             {
@@ -276,36 +283,28 @@ public static class CreatableTrait
         if (invocation.ArgumentList.Arguments.Count != 1)
             return null;
 
-        if (invocation.ArgumentList.Arguments[0].Expression is not MemberAccessExpressionSyntax access)
-            return null;
-
-        var typeName = access.Expression.ToString().Split(['.'], StringSplitOptions.RemoveEmptyEntries).Last();
+        var typeName = invocation.ArgumentList.Arguments[0].Expression.ToString().Split(['.'], StringSplitOptions.RemoveEmptyEntries).Last();
 
         var candidates = compilation
             .GetSymbolsWithName(x => x.EndsWith(typeName))
             .OfType<INamedTypeSymbol>()
             .ToArray();
 
-        if (candidates.Length != 1)
+        if (candidates.Length == 0)
+        {
+            logger.Warn("No candidates found for backlink target");
             return null;
+        }
 
         var candidate = candidates[0];
 
-        var prop = Hierarchy.GetHierarchy(candidate)
-            .Select(x => x.Type)
-            .Prepend(candidate)
-            .SelectMany(x => x.GetMembers().OfType<IPropertySymbol>())
-            .FirstOrDefault(x => x.Name == access.Name.Identifier.ValueText);
-
-        if (prop is null) return null;
-
-        return new BackLinkTarget(prop.Type, candidate);
+        return new BackLinkTarget(candidate);
     }
 
-    private sealed class BackLinkTarget(ITypeSymbol linkType, ITypeSymbol backlinkTargetType)
+    private sealed class BackLinkTarget(ITypeSymbol linkType)
     {
         public ITypeSymbol LinkType { get; } = linkType;
-        public ITypeSymbol BacklinkTargetType { get; } = backlinkTargetType;
+        public string? Formatted { get; set; }
     }
 
     private static MemberDeclarationSyntax? CreateLinkExtensionMethod(
@@ -333,29 +332,9 @@ public static class CreatableTrait
         var linkType =
             $"ILink<{target.InterfaceSymbol}, {creatableTarget.IdType}, {creatableTarget.EntityType}, {creatableTarget.ModelType}>";
 
-        if (backlinkTarget is not null)
+        if (backlinkTarget?.Formatted is not null)
         {
-            linkType = $"{backlinkTarget.LinkType}";
-
-            if (
-                !linkType.Contains("BackLink")
-                // (
-                //     (
-                //         !backlinkTarget.LinkType.ContainingType?.Equals(
-                //             backlinkTarget.BacklinkTargetType,
-                //             SymbolEqualityComparer.Default
-                //         )
-                //         ?? true
-                //     )
-                //     || 
-                //     Links.HasBackLinkableAttribute(backlinkTarget.LinkType)
-                // )
-                // &&
-                // !linkType.EndsWith($".BackLink<{backlinkTarget.BacklinkTargetType.ToDisplayString()}>")
-            )
-            {
-                linkType = $"{linkType}.BackLink<{backlinkTarget.BacklinkTargetType.ToDisplayString()}>";
-            }
+            linkType = $"{backlinkTarget.Formatted}";
         }
 
         var parameters = new List<string>()

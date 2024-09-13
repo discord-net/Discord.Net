@@ -2,7 +2,7 @@ using Discord.Models;
 
 namespace Discord;
 
-public interface IGuildScheduledEventUserActor :
+public partial interface IGuildScheduledEventUserActor :
     IUserRelationship,
     IMemberRelationship,
     IGuildScheduledEventRelationship,

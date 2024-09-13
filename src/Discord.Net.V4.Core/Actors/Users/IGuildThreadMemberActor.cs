@@ -7,4 +7,11 @@ public partial interface IGuildThreadMemberActor :
 {
     [SourceOfTruth]
     new IGuildThreadChannelActor Thread { get; }
+
+    [LinkExtension]
+    private interface WithCurrentMemberExtension : IThreadMemberActor.WithCurrentMemberExtension
+    {
+        new IGuildThreadMemberActor Current { get; }
+        IThreadMemberActor IThreadMemberActor.WithCurrentMemberExtension.Current => Current;
+    }
 }

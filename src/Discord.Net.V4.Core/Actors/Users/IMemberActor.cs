@@ -5,9 +5,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetGuildMember))]
-[Modifiable<ModifyGuildUserProperties>(nameof(Routes.ModifyGuildMember))]
-[SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
+[
+    Loadable(nameof(Routes.GetGuildMember)),
+    Modifiable<ModifyGuildUserProperties>(nameof(Routes.ModifyGuildMember)),
+    LinkHierarchicalRoot,
+    SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
+]
 public partial interface IMemberActor :
     IUserActor,
     IGuildRelationship,
@@ -15,11 +18,12 @@ public partial interface IMemberActor :
     IActor<ulong, IMember>
 {
     IVoiceStateActor VoiceState { get; }
-    RoleLink.BackLink<IMemberActor> Roles { get; }
+    RoleLinkType.BackLink<IMemberActor> Roles { get; }
 
-    [OnVertex<IMembersLink>]
+    [BackLink<IGuildActor>]
     private static async Task<IMember> AddAsync(
-        IMembersLink link,
+        IGuildActor guild,
+        MemberLink link,
         EntityOrId<ulong, IUser> user,
         string accessToken,
         string? nickname = null,
@@ -32,7 +36,7 @@ public partial interface IMemberActor :
         return link.CreateEntity(
             await link.Client.RestApiClient.ExecuteRequiredAsync(
                 Routes.AddGuildMember(
-                    link.Source.Id,
+                    guild.Id,
                     user.Id,
                     new AddGuildMemberParams
                     {
@@ -53,9 +57,10 @@ public partial interface IMemberActor :
         );
     }
 
-    [OnVertex<IMembersLink>]
+    [BackLink<IGuildActor>]
     private static async Task<IReadOnlyCollection<IMember>> SearchAsync(
-        IMembersLink link,
+        IGuildActor guild,
+        MemberLink link,
         string query,
         int limit = DiscordConfig.MaxUsersPerBatch,
         RequestOptions? options = null,
@@ -63,7 +68,7 @@ public partial interface IMemberActor :
     {
         var result = await link.Client.RestApiClient.ExecuteRequiredAsync(
             Routes.SearchGuildMembers(
-                link.Source.Id,
+                guild.Id,
                 query,
                 limit
             ),

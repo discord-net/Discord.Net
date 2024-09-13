@@ -110,22 +110,56 @@ public sealed class GenericTraits : ISyntaxGenerationCombineTask<GenericTraits.G
             .OfType<GenerationTarget>()
             .ToArray();
 
+        var grouping = targets
+            .OfType<GenerationTarget>()
+            .SelectMany(x => x.Traits.Select(y => (Trait: y, Target: x)))
+            .GroupBy(
+                x => x.Trait,
+                x => x.Target,
+                (IEqualityComparer<INamedTypeSymbol>) SymbolEqualityComparer.Default
+            )
+            .Select(grouping =>
+                (
+                    grouping.Key,
+                    Implementers: grouping.ToArray(),
+                    CommonInterfaces: grouping
+                        .Select(x => Hierarchy.GetHierarchy(x.Symbol, false).Select(x => x.Type))
+                        .Aggregate((a, b) =>
+                            a.Intersect<INamedTypeSymbol>(b, SymbolEqualityComparer.Default)
+                        )
+                        .Where(x =>
+                            !IsTrait(x) &&
+                            x.AllInterfaces.Any(IsActor) &&
+                            x.Name is not "IActorTrait"
+                        )
+                        .Select(x =>
+                            (
+                                Common: x,
+                                Distance: grouping
+                                    .Select(y => Hierarchy
+                                        .GetHierarchy(y.Symbol, false)
+                                        .Where(z => z
+                                            .Type
+                                            .Equals(x, SymbolEqualityComparer.Default)
+                                        )
+                                        .Average(x => x.Distance)
+                                    )
+                                    .Average()
+                            )
+                        )
+                        .OrderBy(x => x.Distance)
+                        .ToArray()
+                )
+            )
+            .Where(x => x.Implementers.Length > 0 && x.CommonInterfaces.Length > 0)
+            .ToArray();
+
         foreach
         (
-            var trait in targets
-                .OfType<GenerationTarget>()
-                .SelectMany(x => x.Traits.Select(y => (Trait: y, Target: x)))
-                .GroupBy(
-                    x => x.Trait,
-                    x => x.Target,
-                    (IEqualityComparer<INamedTypeSymbol>)SymbolEqualityComparer.Default
-                )
+            var trait in grouping
         )
         {
-            var implementers = trait.ToArray();
-            if (implementers.Length == 0) continue;
-
-            var targetLogger = logger.WithSemanticContext(implementers[0].Model);
+            var targetLogger = logger.WithSemanticContext(trait.Implementers[0].Model);
 
             if (
                 trait.Key.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax()
@@ -138,68 +172,37 @@ public sealed class GenericTraits : ISyntaxGenerationCombineTask<GenericTraits.G
                 continue;
             }
 
-            var commonInterfaces = implementers
-                .Select(x => Hierarchy.GetHierarchy(x.Symbol, false).Select(x => x.Type))
-                .Aggregate((a, b) =>
-                    a.Intersect<INamedTypeSymbol>(b, SymbolEqualityComparer.Default)
-                )
-                .Where(x =>
-                    !IsTrait(x) &&
-                    x.AllInterfaces.Any(IsActor) &&
-                    x.Name is not "IActorTrait"
-                )
-                .Select(x =>
-                    (
-                        Common: x,
-                        Distance: implementers
-                            .Select(y => Hierarchy
-                                .GetHierarchy(y.Symbol, false)
-                                .Where(z => z
-                                    .Type
-                                    .Equals(x, SymbolEqualityComparer.Default)
-                                )
-                                .Average(x => x.Distance)
-                            )
-                            .Average()
-                    )
-                )
-                .OrderBy(x => x.Distance)
-                .ToArray();
+            targetLogger.Log($"{trait.Key} has {trait.Implementers.Length} implementers:");
 
-            targetLogger.Log($"{trait.Key} has {implementers.Length} implementers:");
-
-            foreach (var implementer in implementers)
+            foreach (var implementer in trait.Implementers)
             {
                 targetLogger.Log($" - implementer {implementer.Symbol}");
             }
 
-            targetLogger.Log($"{trait.Key} has {commonInterfaces.Length} common interfaces:");
+            targetLogger.Log($"{trait.Key} has {trait.CommonInterfaces.Length} common interfaces:");
 
-            foreach (var commonInterface in commonInterfaces)
+            foreach (var commonInterface in trait.CommonInterfaces)
             {
                 targetLogger.Log($" - common {commonInterface.Common}: {Math.Round(commonInterface.Distance, 2)}");
             }
 
-            if (commonInterfaces.Length == 0) continue;
-
             SyntaxToken[] extraModifiers = trait.Key
                 .AllInterfaces
-                .Any(x => generationTargets
-                    .Any(y => y
-                        .Traits
-                        .Contains(x, SymbolEqualityComparer.Default)
+                .Any(x => grouping
+                    .Any(y =>
+                        y.Key.Equals(x, SymbolEqualityComparer.Default)
                     )
                 )
                 ? [SyntaxFactory.Token(SyntaxKind.NewKeyword)]
                 : [];
-            
+
             var clone = SyntaxUtils.CreateSourceGenClone(traitSyntax)
                 .AddMembers(
                     SyntaxFactory.ParseMemberDeclaration(
-                        $"internal static Type TraitRoot => typeof({commonInterfaces[0].Common.ToDisplayString()});"
+                        $"internal static Type TraitRoot => typeof({trait.CommonInterfaces[0].Common.ToDisplayString()});"
                     )!.AddModifiers(extraModifiers),
                     SyntaxFactory.ParseMemberDeclaration(
-                        $"internal static Type TraitRootModel => typeof({GetModel(commonInterfaces[0].Common)!.ToDisplayString()});"
+                        $"internal static Type TraitRootModel => typeof({GetModel(trait.CommonInterfaces[0].Common)!.ToDisplayString()});"
                     )!.AddModifiers(extraModifiers),
                     SyntaxFactory.ParseMemberDeclaration(
                         $$"""
@@ -208,7 +211,7 @@ public sealed class GenericTraits : ISyntaxGenerationCombineTask<GenericTraits.G
                               {{
                                   string.Join(
                                       ", ",
-                                      implementers.Select(x =>
+                                      trait.Implementers.Select(x =>
                                           $"typeof({x.Symbol.ToDisplayString()})"
                                       )
                                   )
@@ -223,7 +226,7 @@ public sealed class GenericTraits : ISyntaxGenerationCombineTask<GenericTraits.G
                             {{
                                 string.Join(
                                     ", ",
-                                    implementers
+                                    trait.Implementers
                                         .Select(x => GetModel(x.Symbol))
                                         .Where(x => x is not null)
                                         .Distinct(SymbolEqualityComparer.Default)
