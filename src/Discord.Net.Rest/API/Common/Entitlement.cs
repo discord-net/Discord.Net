@@ -30,5 +30,5 @@ internal class Entitlement
     public Optional<DateTimeOffset> StartsAt { get; set; }
 
     [JsonProperty("ends_at")]
-    public Optional<DateTimeOffset> EndsAt { get; set; }
+    public Optional<DateTimeOffset?> EndsAt { get; set; }
 }

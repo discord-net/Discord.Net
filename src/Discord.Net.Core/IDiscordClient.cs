@@ -341,7 +341,7 @@ namespace Discord
         /// <summary>
         ///     Returns all entitlements for a given app, active and expired.
         /// </summary>
-        IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> GetEntitlementsAsync(int? limit = 100,
+        IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> GetEntitlementsAsync(int limit = 100,
             ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
             ulong[] skuIds = null, RequestOptions options = null);
 
@@ -356,6 +356,17 @@ namespace Discord
         /// <param name="entitlementId">The id of the entitlement.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null);
+
+        /// <summary>
+        ///     Returns all subscriptions for a given SKU. 
+        /// </summary>
+        IAsyncEnumerable<IReadOnlyCollection<ISubscription>> GetSKUSubscriptionsAsync(ulong skuId, int limit = 100, ulong? afterId = null,
+            ulong? beforeId = null, ulong? userId = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a subscription by its id.
+        /// </summary>
+        Task<ISubscription> GetSKUSubscriptionAsync(ulong skuId, ulong subscriptionId, RequestOptions options = null);
 
         /// <summary>
         ///     Gets an emote for the current application.

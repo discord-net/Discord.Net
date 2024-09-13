@@ -30,12 +30,18 @@ public struct SKU : ISnowflakeEntity
     /// </summary>
     public string Slug { get; }
 
-    internal SKU(ulong id, SKUType type, ulong applicationId, string name, string slug)
+    /// <summary>
+    ///     Gets the flags for this SKU.
+    /// </summary>
+    public SKUFlags Flags { get; }
+
+    internal SKU(ulong id, SKUType type, ulong applicationId, string name, string slug, SKUFlags flags)
     {
         Id = id;
         Type = type;
         ApplicationId = applicationId;
         Name = name;
         Slug = slug;
+        Flags = flags;
     }
 }

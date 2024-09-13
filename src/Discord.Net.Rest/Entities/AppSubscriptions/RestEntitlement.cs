@@ -6,8 +6,8 @@ namespace Discord.Rest;
 
 public class RestEntitlement : RestEntity<ulong>, IEntitlement
 {
-    /// <inheritdoc/>
-    public DateTimeOffset CreatedAt { get; private set; }
+    /// <inheritdoc />
+    public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
     /// <inheritdoc/>
     public ulong SkuId { get; private set; }
