@@ -2852,6 +2852,24 @@ namespace Discord.API
         public Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null)
             => SendAsync("POST", () => $"applications/{CurrentApplicationId}/entitlements/{entitlementId}/consume", new BucketIds(), options: options);
 
+        public Task<Subscription> GetSKUSubscriptionAsync(ulong skuId, ulong subscriptionId, RequestOptions options = null)
+            => SendAsync<Subscription>("GET", () => $"skus/{skuId}/subscriptions/{subscriptionId}", new BucketIds(), options: options);
+
+        public Task<Subscription[]> ListSKUSubscriptionsAsync(ulong skuId, ulong? before = null, ulong? after = null, int limit = 100, ulong? userId = null, RequestOptions options = null)
+        {
+            Preconditions.AtMost(100, limit, "Limit must be less or equal to 100.");
+            Preconditions.AtLeast(1, limit, "Limit must be greater or equal to 1.");
+
+            var args = $"?limit={limit}";
+            if (before is not null)
+                args += $"&before={before}";
+            if (after is not null)
+                args += $"&after={after}";
+            if (userId is not null)
+                args += $"&user_id={userId}";
+
+            return SendAsync<Subscription[]>("GET", () => $"skus/{skuId}/subscriptions{args}", new BucketIds(), options: options);
+        }
         #endregion
 
         #region Polls

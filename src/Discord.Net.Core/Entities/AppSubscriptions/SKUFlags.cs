@@ -9,6 +9,11 @@ namespace Discord;
 public enum SKUFlags
 {
     /// <summary>
+    ///      The SKU is available for purchase.
+    /// </summary>
+    IsAvailable = 1 << 2,
+
+    /// <summary>
     ///     The SKU is a guild subscription.
     /// </summary>
     GuildSubscription = 1 << 7,

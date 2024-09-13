@@ -266,6 +266,11 @@ namespace Discord
         public const int MaxEntitlementsPerBatch = 100;
 
         /// <summary>
+        ///     Returns the maximum number of subscriptions that can be gotten per-batch.
+        /// </summary>
+        public const int MaxSubscriptionsPerBatch = 100;
+
+        /// <summary>
         ///     Returns the maximum number of poll answer voters that can be gotten per-batch.
         /// </summary>
         public const int MaxPollVotersPerBatch = 100;
