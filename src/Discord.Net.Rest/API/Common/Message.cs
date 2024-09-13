@@ -82,7 +82,7 @@ internal class Message
     public Optional<Message> ReferencedMessage { get; set; }
 
     [JsonProperty("components")]
-    public Optional<ActionRowComponent[]> Components { get; set; }
+    public Optional<IMessageComponent[]> Components { get; set; }
 
     [JsonProperty("interaction")]
     public Optional<MessageInteraction> Interaction { get; set; }
@@ -102,6 +102,9 @@ internal class Message
     [JsonProperty("interaction_metadata")]
     public Optional<MessageInteractionMetadata> InteractionMetadata { get; set; }
 
+    [JsonProperty("message_snapshots")]
+    public Optional<MessageSnapshot[]> MessageSnapshots { get; set; }
+  
     [JsonProperty("poll")]
     public Optional<Poll> Poll { get; set; }
 

@@ -165,13 +165,15 @@ namespace Discord.Rest
                     GuildId = model.Reference.Value.GuildId,
                     InternalChannelId = model.Reference.Value.ChannelId,
                     MessageId = model.Reference.Value.MessageId,
-                    FailIfNotExists = model.Reference.Value.FailIfNotExists
+                    FailIfNotExists = model.Reference.Value.FailIfNotExists,
+                    ReferenceType = model.Reference.Value.Type
                 };
             }
 
             if (model.Components.IsSpecified)
             {
-                Components = model.Components.Value.Select(x => new ActionRowComponent(x.Components.Select<IMessageComponent, IMessageComponent>(y =>
+                Components = model.Components.Value.Where(x => x.Type is ComponentType.ActionRow)
+                    .Select(x => new ActionRowComponent(((API.ActionRowComponent)x).Components.Select<IMessageComponent, IMessageComponent>(y =>
                 {
                     switch (y.Type)
                     {

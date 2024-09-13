@@ -4,6 +4,9 @@ namespace Discord.API
 {
     internal class MessageReference
     {
+        [JsonProperty("type")]
+        public Optional<MessageReferenceType> Type { get; set; }
+
         [JsonProperty("message_id")]
         public Optional<ulong> MessageId { get; set; }
 

@@ -176,6 +176,15 @@ namespace Discord.WebSocket
             }
         }
 
+        /// <summary>
+        ///     Gets or sets whether or not to include the raw payload on gateway errors.
+        /// </summary>
+        /// <remarks>
+        ///     Note that this may expose sensitive information to logs. It is recommended to only enable this in
+        ///     cases where you are actively debugging an issue.
+        /// </remarks>
+        public bool IncludeRawPayloadOnGatewayErrors { get; set; } = false;
+
         private int maxWaitForGuildAvailable = 10000;
 
         /// <summary>

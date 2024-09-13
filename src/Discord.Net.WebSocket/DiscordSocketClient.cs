@@ -83,6 +83,7 @@ namespace Discord.WebSocket
         internal bool AlwaysResolveStickers { get; private set; }
         internal bool LogGatewayIntentWarnings { get; private set; }
         internal bool SuppressUnknownDispatchWarnings { get; private set; }
+        internal bool IncludeRawPayloadOnGatewayErrors { get; private set; }
         internal int AuditLogCacheSize { get; private set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
@@ -158,6 +159,7 @@ namespace Discord.WebSocket
             AlwaysResolveStickers = config.AlwaysResolveStickers;
             LogGatewayIntentWarnings = config.LogGatewayIntentWarnings;
             SuppressUnknownDispatchWarnings = config.SuppressUnknownDispatchWarnings;
+            IncludeRawPayloadOnGatewayErrors = config.IncludeRawPayloadOnGatewayErrors;
             HandlerTimeout = config.HandlerTimeout;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
@@ -3416,6 +3418,13 @@ namespace Discord.WebSocket
             }
             catch (Exception ex)
             {
+                if (IncludeRawPayloadOnGatewayErrors)
+                {
+                    ex.Data["opcode"] = opCode;
+                    ex.Data["type"] = type;
+                    ex.Data["payload_data"] = (payload as JToken).ToString();
+                }
+
                 await _gatewayLogger.ErrorAsync($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
             }
         }

@@ -790,6 +790,17 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options);
         }
+
+        public Task<API.Role> GetRoleAsync(ulong guildId, ulong roleId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(roleId, 0, nameof(roleId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(guildId: guildId);
+            return SendAsync<API.Role>("GET", () => $"guilds/{guildId}/roles/{roleId}", ids, options: options);
+        }
+
         #endregion
 
         #region Channel Messages

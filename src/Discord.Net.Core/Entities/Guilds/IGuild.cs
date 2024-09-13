@@ -953,6 +953,17 @@ namespace Discord
         ///     A role that is associated with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
         IRole GetRole(ulong id);
+
+        /// <summary>
+        ///     Gets a role in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the role.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the role
+        ///     that is associated with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<IRole> GetRoleAsync(ulong id, RequestOptions options = null);
+
         /// <summary>
         ///     Creates a new role with the provided name.
         /// </summary>
