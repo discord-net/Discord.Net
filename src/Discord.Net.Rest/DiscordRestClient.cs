@@ -300,6 +300,15 @@ namespace Discord.Rest
         public Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null)
             => ClientHelper.ConsumeEntitlementAsync(this, entitlementId, options);
 
+        /// <inheritdoc cref="IDiscordClient.GetSKUSubscriptionAsync" />
+        public Task<RestSubscription> GetSKUSubscriptionAsync(ulong skuId, ulong subscriptionId, RequestOptions options = null)
+            => ClientHelper.GetSKUSubscriptionAsync(this, skuId, subscriptionId, options);
+
+        /// <inheritdoc cref="IDiscordClient.GetSKUSubscriptionsAsync" />
+        public IAsyncEnumerable<IReadOnlyCollection<RestSubscription>> GetSKUSubscriptionsAsync(ulong skuId, int limit = 100, ulong? afterId = null,
+            ulong? beforeId = null, ulong? userId = null, RequestOptions options = null)
+            => ClientHelper.ListSubscriptionsAsync(this, skuId, limit, afterId, beforeId, userId, options);
+
         /// <inheritdoc />
         public Task<Emote> GetApplicationEmoteAsync(ulong emoteId, RequestOptions options = null)
             => ClientHelper.GetApplicationEmojiAsync(this, emoteId, options);
@@ -329,6 +338,14 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync(options).ConfigureAwait(false);
+
+        /// <inheritdoc />
+        async Task<ISubscription> IDiscordClient.GetSKUSubscriptionAsync(ulong skuId, ulong subscriptionId, RequestOptions options)
+            => await GetSKUSubscriptionAsync(skuId, subscriptionId, options);
+
+        /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<ISubscription>> IDiscordClient.GetSKUSubscriptionsAsync(ulong skuId, int limit, ulong? afterId,
+            ulong? beforeId, ulong? userId, RequestOptions options) => GetSKUSubscriptionsAsync(skuId, limit, afterId, beforeId, userId, options);
 
         /// <inheritdoc />
         async Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)

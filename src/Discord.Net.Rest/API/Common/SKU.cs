@@ -18,4 +18,7 @@ internal class SKU
 
     [JsonProperty("slug")]
     public string Slug { get; set; }
+
+    [JsonProperty("flags")]
+    public SKUFlags Flags { get; set; }
 }

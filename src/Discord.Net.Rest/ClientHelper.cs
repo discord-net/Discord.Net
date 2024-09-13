@@ -443,11 +443,45 @@ namespace Discord.Rest
         {
             var models = await client.ApiClient.ListSKUsAsync(options).ConfigureAwait(false);
 
-            return models.Select(x => new SKU(x.Id, x.Type, x.ApplicationId, x.Name, x.Slug)).ToImmutableArray();
+            return models.Select(x => new SKU(x.Id, x.Type, x.ApplicationId, x.Name, x.Slug, x.Flags)).ToImmutableArray();
         }
 
         public static Task ConsumeEntitlementAsync(BaseDiscordClient client, ulong entitlementId, RequestOptions options = null)
             => client.ApiClient.ConsumeEntitlementAsync(entitlementId, options);
+
+        public static async Task<RestSubscription> GetSKUSubscriptionAsync(BaseDiscordClient client, ulong skuId, ulong subscriptionId, RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetSKUSubscriptionAsync(skuId, subscriptionId, options);
+
+            return RestSubscription.Create(client, model);
+        }
+
+        public static IAsyncEnumerable<IReadOnlyCollection<RestSubscription>> ListSubscriptionsAsync(BaseDiscordClient client, ulong skuId, int limit = 100,
+            ulong? afterId = null, ulong? beforeId = null, ulong? userId = null, RequestOptions options = null)
+        {
+            return new PagedAsyncEnumerable<RestSubscription>(
+                DiscordConfig.MaxSubscriptionsPerBatch,
+                async (info, ct) =>
+                {
+                    var _afterId = afterId;
+                    if (info.Position != null)
+                        _afterId = info.Position.Value;
+                    var models = await client.ApiClient.ListSKUSubscriptionsAsync(skuId, beforeId, _afterId, limit, userId, options).ConfigureAwait(false);
+                    return models
+                        .Select(x => RestSubscription.Create(client, x))
+                        .ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxSubscriptionsPerBatch)
+                        return false;
+                    info.Position = lastPage.Max(x => x.Id);
+                    return true;
+                },
+                start: afterId,
+                count: limit
+            );
+        }
 
         #endregion
 

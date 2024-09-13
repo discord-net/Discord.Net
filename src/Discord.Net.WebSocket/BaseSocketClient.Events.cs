@@ -1032,6 +1032,42 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<Cacheable<SocketEntitlement, ulong>, Task>> _entitlementDeleted = new();
 
 
+
+        /// <summary>
+        ///     Fired when a user subscribes to a SKU.
+        /// </summary>
+        public event Func<SocketSubscription, Task> SubscriptionCreated
+        {
+            add { _subscriptionCreated.Add(value); }
+            remove { _subscriptionCreated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<SocketSubscription, Task>> _subscriptionCreated = new();
+
+
+        /// <summary>
+        ///     Fired when a subscription to a SKU is updated.
+        /// </summary>
+        public event Func<Cacheable<SocketSubscription, ulong>, SocketSubscription, Task> SubscriptionUpdated
+        {
+            add { _subscriptionUpdated.Add(value); }
+            remove { _subscriptionUpdated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<SocketSubscription, ulong>, SocketSubscription, Task>> _subscriptionUpdated = new();
+
+
+        /// <summary>
+        ///     Fired when a user's subscription is deleted.
+        /// </summary>
+        public event Func<Cacheable<SocketSubscription, ulong>, Task> SubscriptionDeleted
+        {
+            add { _subscriptionDeleted.Add(value); }
+            remove { _subscriptionDeleted.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<SocketSubscription, ulong>, Task>> _subscriptionDeleted = new();
+
         #endregion
     }
 }
