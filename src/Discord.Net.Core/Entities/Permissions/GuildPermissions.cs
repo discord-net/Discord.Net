@@ -236,6 +236,7 @@ namespace Discord
             Permissions.SetValue(ref value, sendPolls, GuildPermission.SendPolls);
             Permissions.SetValue(ref value, useExternalApps, GuildPermission.UseExternalApps);
             Permissions.SetValue(ref value, useExternalSounds, GuildPermission.UseExternalSounds);
+            Permissions.SetValue(ref value, createEvents, GuildPermission.CreateEvents);
 
             RawValue = value;
         }

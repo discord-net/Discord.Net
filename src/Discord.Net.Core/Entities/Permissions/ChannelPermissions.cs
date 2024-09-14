@@ -157,7 +157,7 @@ namespace Discord
         /// <summary> If <see langword="true"/>, a user-installed application can send public responses.</summary>
         public bool UserExternalApps => Permissions.GetValue(RawValue, ChannelPermission.UseExternalApps);
         /// <summary> If <see langword="true"/>, a user-installed application can send public responses.</summary>
-        public bool UseExternalSounds => Permissions.GetValue(RawValue, ChannelPermission.UseExternalApps);
+        public bool UseExternalSounds => Permissions.GetValue(RawValue, ChannelPermission.UseExternalSounds);
 
         /// <summary> Creates a new <see cref="ChannelPermissions"/> with the provided packed value.</summary>
         public ChannelPermissions(ulong rawValue) { RawValue = rawValue; }
