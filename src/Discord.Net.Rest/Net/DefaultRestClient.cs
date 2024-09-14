@@ -24,7 +24,7 @@ namespace Discord.Net.Rest
         private CancellationToken _cancelToken;
         private bool _isDisposed;
 
-        public DefaultRestClient(string baseUrl, bool useProxy = false)
+        public DefaultRestClient(string baseUrl, bool useProxy = false, IWebProxy webProxy = null)
         {
             _baseUrl = baseUrl;
 
@@ -34,6 +34,7 @@ namespace Discord.Net.Rest
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                 UseCookies = false,
                 UseProxy = useProxy,
+                Proxy = webProxy
             });
 #pragma warning restore IDISP014
             SetHeader("accept-encoding", "gzip, deflate");
