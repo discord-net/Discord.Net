@@ -97,6 +97,7 @@ namespace Discord
             AssertFlag(() => new ChannelPermissions(setVoiceChannelStatus: true), ChannelPermission.SetVoiceChannelStatus);
             AssertFlag(() => new ChannelPermissions(sendPolls: true), ChannelPermission.SendPolls);
             AssertFlag(() => new ChannelPermissions(useExternalApps: true), ChannelPermission.UseExternalApps);
+            AssertFlag(() => new ChannelPermissions(useExternalSounds: true), ChannelPermission.UseExternalSounds);
         }
 
         /// <summary>
@@ -166,6 +167,7 @@ namespace Discord
             AssertUtil(ChannelPermission.SetVoiceChannelStatus, x => x.SetVoiceChannelStatus, (p, enable) => p.Modify(setVoiceChannelStatus: enable));
             AssertUtil(ChannelPermission.SendPolls, x => x.SendPolls, (p, enable) => p.Modify(sendPolls: enable));
             AssertUtil(ChannelPermission.UseExternalApps, x => x.UserExternalApps, (p, enable) => p.Modify(useExternalApps: enable));
+            AssertUtil(ChannelPermission.UseExternalSounds, x => x.UseExternalSounds, (p, enable) => p.Modify(useExternalSounds: enable));
         }
 
         /// <summary>

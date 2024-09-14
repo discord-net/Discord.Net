@@ -179,6 +179,11 @@ namespace Discord
         CreateEvents = 1L << 44,
 
         /// <summary>
+        ///     Allows the usage of custom soundboard sounds from other servers.
+        /// </summary>
+        UseExternalSounds = 1L << 45,
+
+        /// <summary>
         ///     Allows sending voice messages.
         /// </summary>
         SendVoiceMessages = 1L << 46,
