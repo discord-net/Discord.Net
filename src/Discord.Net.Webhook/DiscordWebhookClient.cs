@@ -70,6 +70,7 @@ public class DiscordWebhookClient : IDisposable
     {
         Webhook = webhook;
         _webhookId = Webhook.Id;
+        ApiClient.LoginAsync(TokenType.Webhook, webhook.Token).GetAwaiter().GetResult();
     }
 
     /// <summary>
