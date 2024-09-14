@@ -9,8 +9,9 @@ namespace Discord.Rest;
 /// </summary>
 public class StickerUpdatedAuditLogData : IAuditLogData
 {
-    internal StickerUpdatedAuditLogData(StickerInfo before, StickerInfo after)
+    internal StickerUpdatedAuditLogData(ulong id, StickerInfo before, StickerInfo after)
     {
+        StickerId = id;
         Before = before;
         After = after;
     }
@@ -20,8 +21,16 @@ public class StickerUpdatedAuditLogData : IAuditLogData
         var changes = entry.Changes;
         var (before, after) = AuditLogHelper.CreateAuditLogEntityInfo<StickerInfoAuditLogModel>(changes, discord);
 
-        return new StickerUpdatedAuditLogData(new(before), new (after));
+        return new StickerUpdatedAuditLogData(entry.TargetId.Value, new(before), new (after));
     }
+
+    /// <summary>
+    ///     Gets the snowflake ID of the updated sticker.
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="ulong"/> representing the snowflake identifier of the updated sticker.
+    /// </returns>
+    public ulong StickerId { get; }
 
     /// <summary>
     ///     Gets the sticker information before the changes.
