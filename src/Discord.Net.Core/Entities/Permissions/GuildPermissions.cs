@@ -120,7 +120,10 @@ namespace Discord
         public bool SendPolls => Permissions.GetValue(RawValue, GuildPermission.SendPolls);
         /// <summary> If <see langword="true"/>, a user-installed application can send public responses.</summary>
         public bool UserExternalApps => Permissions.GetValue(RawValue, GuildPermission.UseExternalApps);
-
+        /// <summary> If <see langword="true"/>, a user can send soundboard sounds from other servers.</summary>
+        public bool UserExternalSounds => Permissions.GetValue(RawValue, GuildPermission.UseExternalSounds);
+        /// <summary> If <see langword="true"/>, a user can create events.</summary>
+        public bool CreateEvents => Permissions.GetValue(RawValue, GuildPermission.CreateEvents);
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value. </summary>
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
@@ -177,7 +180,9 @@ namespace Discord
             bool? createGuildExpressions = null,
             bool? setVoiceChannelStatus = null,
             bool? sendPolls = null,
-            bool? useExternalApps = null)
+            bool? useExternalApps = null,
+            bool? useExternalSounds = null,
+            bool? createEvents = null)
         {
             ulong value = initialValue;
 
@@ -230,6 +235,8 @@ namespace Discord
             Permissions.SetValue(ref value, setVoiceChannelStatus, GuildPermission.SetVoiceChannelStatus);
             Permissions.SetValue(ref value, sendPolls, GuildPermission.SendPolls);
             Permissions.SetValue(ref value, useExternalApps, GuildPermission.UseExternalApps);
+            Permissions.SetValue(ref value, useExternalSounds, GuildPermission.UseExternalSounds);
+            Permissions.SetValue(ref value, createEvents, GuildPermission.CreateEvents);
 
             RawValue = value;
         }
@@ -284,7 +291,9 @@ namespace Discord
             bool createGuildExpressions = false,
             bool setVoiceChannelStatus = false,
             bool sendPolls = false,
-            bool useExternalApps = false)
+            bool useExternalApps = false,
+            bool useExternalSounds = false,
+            bool createEvents = false)
             : this(0,
                 createInstantInvite: createInstantInvite,
                 manageRoles: manageRoles,
@@ -334,7 +343,9 @@ namespace Discord
                 createGuildExpressions: createGuildExpressions,
                 setVoiceChannelStatus: setVoiceChannelStatus,
                 sendPolls: sendPolls,
-                useExternalApps: useExternalApps)
+                useExternalApps: useExternalApps,
+                useExternalSounds: useExternalSounds,
+                createEvents: createEvents)
         { }
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> from this one, changing the provided non-null permissions. </summary>
@@ -387,14 +398,16 @@ namespace Discord
             bool? createGuildExpressions = null,
             bool? setVoiceChannelStatus = null,
             bool? sendPolls = null,
-            bool? useExternalApps = null)
+            bool? useExternalApps = null,
+            bool? useExternalSounds = null,
+            bool? createEvents = null)
             => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
                 viewAuditLog, viewGuildInsights, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojisAndStickers,
                 useApplicationCommands, requestToSpeak, manageEvents, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
                 startEmbeddedActivities, moderateMembers, useSoundboard, viewMonetizationAnalytics, sendVoiceMessages, useClydeAI, createGuildExpressions, setVoiceChannelStatus,
-                sendPolls, useExternalApps);
+                sendPolls, useExternalApps, useExternalSounds, createEvents);
 
         /// <summary>
         ///     Returns a value that indicates if a specific <see cref="GuildPermission"/> is enabled
