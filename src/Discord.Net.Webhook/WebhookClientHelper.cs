@@ -56,8 +56,8 @@ namespace Discord.Webhook
             if (poll != null)
                 args.Poll = poll.ToModel();
 
-            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds)
-                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
+            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
+                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds, SuppressNotification and none.", nameof(flags));
 
             var model = await client.ApiClient.CreateWebhookMessageAsync(client.Webhook.Id, args, options: options, threadId: threadId).ConfigureAwait(false);
             return model.Id;
