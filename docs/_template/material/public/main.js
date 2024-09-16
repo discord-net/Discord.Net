@@ -22,28 +22,17 @@
     {
         // Ugly hack to improve toc filter.
         let target = document.getElementById("toc");
-        
-        if(!target) return;
-        
+
+        if (!target) return;
+
         let config = { attributes: false, childList: true, subtree: true };
         let observer = new MutationObserver((list) =>
         {
-            for(const mutation of list)
+            for (const mutation of list)
             {
-                if(mutation.type === "childList" && mutation.target == target)
+                if (mutation.type === "childList" && mutation.target == target)
                 {
-                    let filter = target.getElementsByClassName("form-control")[0];
-
-                    let filterValue = localStorage.getItem("tocFilter");
                     let scrollValue = localStorage.getItem("tocScroll");
-
-                    if(filterValue && filterValue !== "")
-                    {
-                        filter.value = filterValue;
-
-                        let inputEvent = new Event("input");
-                        filter.dispatchEvent(inputEvent);
-                    }
 
                     // Add event to store scroll pos.
                     let tocDiv = target.getElementsByClassName("flex-fill")[0];
@@ -56,7 +45,7 @@
                         }
                     });
 
-                    if(scrollValue && scrollValue >= 0)
+                    if (scrollValue && scrollValue >= 0)
                     {
                         tocDiv.scroll(0, scrollValue);
                     }
