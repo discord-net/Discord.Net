@@ -14,7 +14,7 @@ public interface IDiscordClient :
     
     IApplicationActor.Indexable.WithCurrent Applications { get; }
 
-    IGuildActor.PagedUserGuildsAsPartialGuild.Indexable Guilds { get; }
+    IGuildActor.PagedUserGuildsAsPartialGuild.Indexable.WithTemplates Guilds { get; }
 
     IChannelActor.Indexable Channels { get; }
     

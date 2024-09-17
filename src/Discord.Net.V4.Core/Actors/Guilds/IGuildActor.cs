@@ -15,6 +15,10 @@ public partial interface IGuildActor :
         IGuildThreadChannelActor.Indexable.WithActive.BackLink<IGuildActor>>,
     IInvitableTrait<IGuildInviteActor, IGuildInvite>
 {
+    [return: TypeHeuristic(nameof(Templates))]
+    IGuildTemplateFromGuildActor Template(string code) => Templates[code];
+    IGuildTemplateFromGuildActor.Enumerable.Indexable.BackLink<IGuildActor> Templates { get; }
+    
     [return: TypeHeuristic(nameof(Channels))]
     IGuildChannelActor Channel(ulong id) => Channels[id];
     IGuildChannelActor.Enumerable.Indexable.Hierarchy.BackLink<IGuildActor> Channels { get; }
@@ -135,4 +139,10 @@ public partial interface IGuildActor :
     }
 
     #endregion
+
+    [LinkExtension]
+    private interface WithTemplatesExtension
+    {
+        IGuildTemplateActor.Indexable Templates { get; }
+    }
 }
