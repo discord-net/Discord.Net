@@ -20,13 +20,16 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
         SemanticModel semantic,
         TypeDeclarationSyntax typeDeclarationSyntax,
         MemberDeclarationSyntax memberDeclarationSyntax,
-        ITypeSymbol typeSymbol
+        ITypeSymbol typeSymbol,
+        bool force
     ) : IEquatable<GenerationTarget>
     {
         public SemanticModel Semantic { get; } = semantic;
         public TypeDeclarationSyntax TypeDeclarationSyntax { get; } = typeDeclarationSyntax;
         public MemberDeclarationSyntax MemberDeclarationSyntax { get; } = memberDeclarationSyntax;
         public ITypeSymbol TypeSymbol { get; } = typeSymbol;
+
+        public bool Force { get; } = force;
 
         public bool Equals(GenerationTarget? other)
         {
@@ -78,15 +81,29 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
         var symbol = context.SemanticModel.GetDeclaredSymbol(member, token);
         var typeSymbol = context.SemanticModel.GetDeclaredSymbol(type, token);
 
-        if (symbol is null || !IsTarget(symbol) || typeSymbol is null)
+        if (symbol is null || !IsTarget(symbol, out var attribute) || typeSymbol is null)
             return null;
 
-        return new GenerationTarget(context.SemanticModel, type, member, typeSymbol);
+        return new GenerationTarget(
+            context.SemanticModel,
+            type,
+            member,
+            typeSymbol,
+            (attribute.NamedArguments.FirstOrDefault(x => x.Key is "Force").Value.Value as bool?)
+            is true
+        );
     }
 
-    public static bool IsTarget(ISymbol symbol)
+    public static bool IsTarget(ISymbol symbol, out AttributeData attribute)
     {
-        return symbol.GetAttributes().Any(x => x.AttributeClass?.ToDisplayString() == "Discord.SourceOfTruthAttribute");
+        return
+        (
+            attribute = symbol
+                .GetAttributes()
+                .FirstOrDefault(x =>
+                    x.AttributeClass?.ToDisplayString() == "Discord.SourceOfTruthAttribute"
+                )!
+        ) is not null;
     }
 
     public static ISymbol? GetSourceOfTruthMember(ITypeSymbol type, ISymbol member)
@@ -94,7 +111,7 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
         return type
             .GetMembers()
             .FirstOrDefault(x =>
-                IsTarget(x) &&
+                IsTarget(x, out _) &&
                 MemberUtils.GetMemberName(x) == MemberUtils.GetMemberName(member) &&
                 x.Kind == member.Kind
             );
@@ -114,12 +131,16 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
 
     private static bool ShouldIgnoreChecks(ITypeSymbol sourceType)
     {
+        var parts = sourceType.ToDisplayString().Split(["."], StringSplitOptions.RemoveEmptyEntries);
+
         return
             IgnoredTypes.Contains(sourceType.Name)
             ||
             sourceType.Name.EndsWith("Link")
             ||
-            sourceType.Name is "Indexable" or "Enumerable" or "Defined" or "Paged";
+            sourceType.Name is "Indexable" or "Enumerable" or "Defined" or "Paged"
+            ||
+            parts.Any(x => x is "Indexable" or "Enumerable" or "Defined" or "Paged");
     }
 
     public void Execute(SourceProductionContext context, ImmutableArray<GenerationTarget?> targets, Logger logger)
@@ -194,7 +215,7 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
                         continue;
                     }
 
-                    if (ShouldIgnoreChecks(sourceOfTruthType))
+                    if (target.Force || ShouldIgnoreChecks(sourceOfTruthType))
                     {
                         if (validTargets.Add(member))
                             targetLogger.Log($"{target.TypeSymbol}: adding target {member} ({iface})");
@@ -368,9 +389,9 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
         foreach (var target in toGenerate)
         {
             var syntax = target.Value.Syntax;
-            
+
             SyntaxUtils.ApplyNesting(target.Value.TypeSymbol, ref syntax);
-            
+
             context.AddSource(
                 $"SourceOfTruths/{target.Key}",
                 $$"""

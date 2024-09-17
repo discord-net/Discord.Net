@@ -358,7 +358,7 @@ public class ExtendInterfaceDefaults : ISyntaxGenerationCombineTask<ExtendInterf
                 foreach (var searchMember in searchMembers)
                 {
                     if (searchMember is null || heuristicMember.Kind != searchMember.Kind ||
-                        !SourceOfTruth.IsTarget(searchMember))
+                        !SourceOfTruth.IsTarget(searchMember, out _))
                         continue;
 
                     var searchMemberType = MemberUtils.GetMemberType(searchMember);

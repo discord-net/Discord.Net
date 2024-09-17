@@ -144,7 +144,7 @@ public partial class Routes
         $"applications/{applicationId}/guilds/{guildId}/commands/permissions",
         (ScopeType.Guild, guildId)
     );
-    
+
     public static IApiOutRoute<ApplicationCommandPermissions> GetApplicationCommandPermissions(
         [IdHeuristic<IApplication>] ulong applicationId,
         [IdHeuristic<IGuild>] ulong guildId,
@@ -156,13 +156,18 @@ public partial class Routes
         (ScopeType.Guild, guildId)
     );
 
-    public static IApiInOutRoute<ModifyApplicationCommandPermissionsParams, ApplicationCommandPermissions>
-        ModifyApplicationCommandPermissions(
-            [IdHeuristic<IApplication>] ulong applicationId,
-            [IdHeuristic<IGuild>] ulong guildId,
-            [IdHeuristic<IApplicationCommand>] ulong commandId,
-            ModifyApplicationCommandPermissionsParams body
-        ) => new ApiInOutRoute<ModifyApplicationCommandPermissionsParams, ApplicationCommandPermissions>(
+    public static IApiInOutRoute<
+        ModifyApplicationCommandPermissionsParams,
+        Discord.Models.Json.ApplicationCommandPermissions
+    > ModifyApplicationCommandPermissions(
+        [IdHeuristic<IApplication>] ulong applicationId,
+        [IdHeuristic<IGuild>] ulong guildId,
+        [IdHeuristic<IApplicationCommand>] ulong commandId,
+        ModifyApplicationCommandPermissionsParams body
+    ) => new ApiInOutRoute<
+        ModifyApplicationCommandPermissionsParams,
+        Discord.Models.Json.ApplicationCommandPermissions
+    >(
         nameof(ModifyApplicationCommandPermissions),
         RequestMethod.Put,
         $"applications/{applicationId}/guilds/{guildId}/commands/{commandId}/permissions",

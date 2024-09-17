@@ -12,6 +12,18 @@ public interface IPathable
 {
     static IPathable Empty => EmptyPath.Instance;
 
+    internal U Variable<T, U>()
+        where T : IPathIdProvider<U>
+        where U : IEquatable<U>
+    {
+        if (this is not T provider)
+            throw new InvalidOperationException(
+                $"Expected {GetType()} to implement {typeof(T)}"
+            );
+
+        return provider.Id;
+    }
+
     internal IIdentifiable<TId, TEntity, TActor, TModel> RequireIdentity<TActor, TId, TEntity, TModel>(
         Template<IIdentifiable<TId, TEntity, TActor, TModel>> template
     )

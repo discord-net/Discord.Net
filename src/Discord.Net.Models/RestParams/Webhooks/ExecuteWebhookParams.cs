@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class ExecuteWebhookParams
+public sealed class ExecuteWebhookParams : AttachmentUploadParams
 {
     [JsonPropertyName("content")]
     public Optional<string> Content { get; set; }

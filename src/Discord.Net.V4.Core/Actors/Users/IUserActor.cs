@@ -55,4 +55,10 @@ public partial interface IUserActor :
             token
         );
     }
+
+    [LinkExtension]
+    private interface WithCurrentExtension
+    {
+        ICurrentUserActor Current { get; }
+    }
 }

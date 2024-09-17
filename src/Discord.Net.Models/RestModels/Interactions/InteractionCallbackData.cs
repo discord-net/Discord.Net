@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class InteractionCallbackData
+public sealed class InteractionCallbackData : AttachmentUploadParams
 {
     [JsonPropertyName("tts")]
     public Optional<bool> TTS { get; set; }
@@ -23,7 +23,7 @@ public sealed class InteractionCallbackData
     public Optional<MessageComponent[]> Components { get; set; }
 
     [JsonPropertyName("choices")]
-    public Optional<ApplicationCommandOptionChoice[]> Choices { get; set; }
+    public Optional<IApplicationCommandOptionChoiceModel[]> Choices { get; set; }
 
     [JsonPropertyName("title")]
     public Optional<string> Title { get; set; }

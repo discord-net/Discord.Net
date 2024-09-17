@@ -29,7 +29,7 @@ public sealed class ApiInOutRoute<TRequestBody, TResponseBody>(
     ApiInRoute<TRequestBody>(name, method, endpoint, body, contentType, bucket),
     IApiInOutRoute<TRequestBody, TResponseBody>
     where TRequestBody : class
-    where TResponseBody : class;
+    where TResponseBody : class?;
 
 public sealed class ApiOutRoute<TResponse>(
     string name,

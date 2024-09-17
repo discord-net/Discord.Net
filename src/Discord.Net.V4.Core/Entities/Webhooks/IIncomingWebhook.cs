@@ -5,8 +5,7 @@ namespace Discord;
 [FetchableOfMany(nameof(Routes.GetGuildWebhooks))]
 public partial interface IIncomingWebhook :
     IWebhook,
-    IIncomingWebhookActor
+    IIncomingWebhookWithTokenActor
 {
-    string? Token { get; }
     string? Url { get; }
 }

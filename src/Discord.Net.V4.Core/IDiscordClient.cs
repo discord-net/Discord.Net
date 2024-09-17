@@ -11,13 +11,8 @@ public interface IDiscordClient :
     IAsyncDisposable
 {
     IRestApiClient RestApiClient { get; }
-
-    /// <summary>
-    ///     Gets the currently logged-in user.
-    /// </summary>
-    ICurrentUserActor CurrentUser { get; }
     
-    IApplicationActor.Indexable Applications { get; }
+    IApplicationActor.Indexable.WithCurrent Applications { get; }
 
     IGuildActor.PagedUserGuildsAsPartialGuild.Indexable Guilds { get; }
 
@@ -25,7 +20,7 @@ public interface IDiscordClient :
     
     IThreadChannelActor.Indexable Threads { get; }
 
-    IUserActor.Indexable Users { get; }
+    IUserActor.Indexable.WithCurrent Users { get; }
 
     IWebhookActor.Indexable Webhooks { get; }
 
@@ -34,6 +29,8 @@ public interface IDiscordClient :
     IStickerActor.Indexable Stickers { get; }
     
     IInviteActor.Indexable Invites { get; }
+    
+    IInteractionActor.ClientLink Interactions { get; }
 
     internal DiscordConfig Config { get; }
     internal RequestOptions DefaultRequestOptions { get; }

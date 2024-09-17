@@ -97,6 +97,8 @@ public sealed class LinksV2 :
 
             var targetLogger = logger.WithSemanticContext(target.SemanticModel);
 
+            targetLogger.Log($"Processing {target.Actor}");
+            
             LinkMethods.Apply(context, target, logger);
 
             // add the default link types
@@ -423,20 +425,27 @@ public sealed class LinksV2 :
                 ApplyNewWhereNeeded(ref syntax, ancestor.Value, targetLogger);
             }
 
-            context.AddSource(
-                $"Links/{target.Actor.ToFullMetadataName()}",
-                $$"""
-                  {{target.Syntax.GetFormattedUsingDirectives("MorseCode.ITask")}}
+            try
+            {
+                context.AddSource(
+                    $"Links/{target.Actor.ToFullMetadataName()}",
+                    $$"""
+                      {{target.Syntax.GetFormattedUsingDirectives("MorseCode.ITask")}}
 
-                  namespace {{target.Actor.ContainingNamespace}};
+                      namespace {{target.Actor.ContainingNamespace}};
 
-                  #pragma warning disable CS0108
-                  #pragma warning disable CS0109
-                  {{syntax.NormalizeWhitespace()}}
-                  #pragma warning restore CS0108
-                  #pragma warning restore CS0109
-                  """
-            );
+                      #pragma warning disable CS0108
+                      #pragma warning disable CS0109
+                      {{syntax.NormalizeWhitespace()}}
+                      #pragma warning restore CS0108
+                      #pragma warning restore CS0109
+                      """
+                );
+            }
+            catch (Exception x)
+            {
+                targetLogger.Warn($"{target.Actor}: {x}");
+            }
         }
 
         var aliases = targets
