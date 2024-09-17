@@ -38,6 +38,6 @@ public partial class Routes
         $"applications/{applicationId}/role-connections/metadata",
         body
     );
-    
+
     
 }

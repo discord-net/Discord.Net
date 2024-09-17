@@ -8,6 +8,8 @@ public partial interface IApplicationActor :
     IApplicationRoleConnectionMetadataActor.Enumerable.BackLink<IApplicationActor> RoleConnectionMetadata { get; }
     
     IApplicationEmoteActor.Enumerable.Indexable.BackLink<IApplicationActor> Emotes { get; }
+    
+    ISkuActor.Enumerable Skus { get; }
 
     [LinkExtension]
     private interface WithCurrentExtension

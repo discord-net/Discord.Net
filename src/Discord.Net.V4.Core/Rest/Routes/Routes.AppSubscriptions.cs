@@ -21,8 +21,11 @@ public partial class Routes
             RequestMethod.Delete,
             $"applications/{applicationId}/entitlements/{entitlementId}");
 
-    public static IApiOutRoute<SKU[]> ListSKUs(ulong applicationId)
-        => new ApiOutRoute<SKU[]>(nameof(ListSKUs),
-            RequestMethod.Get,
-            $"applications/{applicationId}/skus");
+    public static IApiOutRoute<IEnumerable<Sku>> ListSKUs(
+        [IdHeuristic<IApplication>] ulong applicationId
+    ) => new ApiOutRoute<IEnumerable<Sku>>(
+        nameof(ListSKUs),
+        RequestMethod.Get,
+        $"applications/{applicationId}/skus"
+    );
 }
