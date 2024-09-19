@@ -4,7 +4,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestUserActor :
-    RestActor<ulong, RestUser, UserIdentity, IUserModel>,
+    RestActor<RestUserActor, ulong, RestUser, IUserModel>,
     IUserActor
 {
     internal override UserIdentity Identity { get; }
@@ -21,10 +21,6 @@ public partial class RestUserActor :
     [SourceOfTruth]
     internal override RestUser CreateEntity(IUserModel model)
         => RestUser.Construct(Client, this, model);
-
-    [SourceOfTruth]
-    internal RestDMChannel CreateEntity(IDMChannelModel model)
-        => RestDMChannel.Construct(Client, Identity | this, model);
 }
 
 [ExtendInterfaceDefaults]
@@ -46,8 +42,7 @@ public partial class RestUser :
     public UserFlags PublicFlags => (UserFlags?)Model.PublicFlags ?? UserFlags.None;
 
     [ProxyInterface(
-        typeof(IUserActor),
-        typeof(IEntityProvider<IUser, IUserModel>)
+        typeof(IUserActor)
     )]
     internal virtual RestUserActor Actor { get; }
 

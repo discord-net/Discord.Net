@@ -9,8 +9,6 @@ public partial class RestDMChannelActor :
     IDMChannelActor,
     IRestActor<ulong, RestDMChannel, DMChannelIdentity, IDMChannelModel>
 {
-    [SourceOfTruth] public RestUserActor Recipient { get; }
-
     [ProxyInterface(typeof(IMessageChannelTrait))]
     internal RestMessageChannelTrait<RestDMChannelActor, DMChannelIdentity> MessageChannelTrait { get; }
 
@@ -19,13 +17,11 @@ public partial class RestDMChannelActor :
     [method: TypeFactory]
     public RestDMChannelActor(
         DiscordRestClient client,
-        DMChannelIdentity channel,
-        UserIdentity recipient
+        DMChannelIdentity channel
     ) : base(client, channel)
     {
         Identity = channel | this;
 
-        Recipient = recipient.Actor ?? new(client, recipient);
         MessageChannelTrait = new(client, this, channel);
     }
 
@@ -40,6 +36,9 @@ public partial class RestDMChannel :
     IDMChannel,
     IRestConstructable<RestDMChannel, RestDMChannelActor, IDMChannelModel>
 {
+    [SourceOfTruth]
+    public RestUserActor Recipient { get; }
+    
     [ProxyInterface(typeof(IDMChannelActor))]
     internal override RestDMChannelActor Actor { get; }
 
@@ -55,6 +54,11 @@ public partial class RestDMChannel :
     {
         _model = model;
         Actor = actor;
+
+        Recipient = client.Users[model.RecipientId];
+
+        if (model is IModelSourceOf<IUserModel> userModelSource)
+            Recipient.AddModelSource(userModelSource.Model);
     }
 
     public static RestDMChannel Construct(DiscordRestClient client, RestDMChannelActor actor, IDMChannelModel model)

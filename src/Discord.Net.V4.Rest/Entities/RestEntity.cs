@@ -1,6 +1,7 @@
 namespace Discord.Rest;
 
-public abstract class RestEntity<TId>(DiscordRestClient client, TId id) : IEntity<TId>
+public abstract class RestEntity<TId>(DiscordRestClient client, TId id) : 
+    IEntity<TId>
     where TId : IEquatable<TId>
 {
     protected DiscordRestClient Client { get; } = client;

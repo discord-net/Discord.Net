@@ -7,8 +7,7 @@ namespace Discord;
 [Loadable(nameof(Routes.GetUser))]
 [BackLinkable]
 public partial interface IUserActor :
-    IActor<ulong, IUser>,
-    IEntityProvider<IDMChannel, IDMChannelModel>
+    IActor<ulong, IUser>
 {
     [return: TypeHeuristic(nameof(CreateEntity))]
     async Task<IDMChannel> CreateDMAsync(RequestOptions? options = null, CancellationToken token = default)
@@ -19,7 +18,7 @@ public partial interface IUserActor :
             token
         );
 
-        return CreateEntity(model);
+        return (IDMChannel)Client.Channels.CreateEntity(model);
     }
 
     [BackLink<IGroupChannelActor>]

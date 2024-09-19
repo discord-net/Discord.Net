@@ -15,8 +15,6 @@ public partial class RestGuildChannelActor :
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
 
-    [SourceOfTruth] public GuildChannelInviteLink.Enumerable.Indexable.BackLink<RestGuildChannelActor> Invites { get; }
-
     [SourceOfTruth] internal override GuildChannelIdentity Identity { get; }
 
     [TypeFactory]
@@ -30,19 +28,31 @@ public partial class RestGuildChannelActor :
 
         Guild = guild.Actor ?? client.Guilds[guild.Id];
 
-        Invites = new RestGuildChannelInviteLink.Enumerable.Indexable.BackLink<RestGuildChannelActor>(
+        Invites = new(
             this,
             client,
-            new RestActorProvider<string, RestGuildChannelInviteActor>(
-                (client, id) => new RestGuildChannelInviteActor(
-                    client,
-                    guild,
-                    Identity,
-                    GuildChannelInviteIdentity.Of(id)
-                )
+            RestActorProvider.GetOrCreate(
+                client,
+                Template.Of<GuildChannelInviteIdentity>(),
+                guild,
+                channel
             ),
             Routes.GetChannelInvites(Id).AsRequiredProvider()
         );
+
+        // Invites = new RestGuildChannelInviteLink.Enumerable.Indexable.BackLink<RestGuildChannelActor>(
+        //     this,
+        //     client,
+        //     new RestActorProvider<string, RestGuildChannelInviteActor>(
+        //         (client, id) => new RestGuildChannelInviteActor(
+        //             client,
+        //             guild,
+        //             Identity,
+        //             GuildChannelInviteIdentity.Of(id)
+        //         )
+        //     ),
+        //     Routes.GetChannelInvites(Id).AsRequiredProvider()
+        // );
     }
 
     [SourceOfTruth]
@@ -95,43 +105,43 @@ public partial class RestGuildChannel :
             case IGuildCategoryChannelModel guildCategoryChannelModel:
                 return RestCategoryChannel.Construct(
                     client,
-                    actor as RestCategoryChannelActor ?? actor.Guild.CategoryChannels[model.Id],
+                    actor as RestCategoryChannelActor ?? actor.Guild.Channels.Category[model.Id],
                     guildCategoryChannelModel
                 );
             case IGuildForumChannelModel guildForumChannelModel:
                 return RestForumChannel.Construct(
                     client,
-                    actor as RestForumChannelActor ?? actor.Guild.ForumChannels[model.Id],
+                    actor as RestForumChannelActor ?? actor.Guild.Channels.Forum[model.Id],
                     guildForumChannelModel
                 );
             case IGuildMediaChannelModel guildMediaChannelModel:
                 return RestMediaChannel.Construct(
                     client,
-                    actor as RestMediaChannelActor ?? actor.Guild.MediaChannels[model.Id],
+                    actor as RestMediaChannelActor ?? actor.Guild.Channels.Media[model.Id],
                     guildMediaChannelModel
                 );
             case IGuildNewsChannelModel guildNewsChannelModel:
                 return RestNewsChannel.Construct(
                     client,
-                    actor as RestNewsChannelActor ?? actor.Guild.AnnouncementChannels[model.Id],
+                    actor as RestNewsChannelActor ?? actor.Guild.Channels.News[model.Id],
                     guildNewsChannelModel
                 );
             case IGuildStageChannelModel guildStageChannelModel:
                 return RestStageChannel.Construct(
                     client,
-                    actor as RestStageChannelActor ?? actor.Guild.StageChannels[model.Id],
+                    actor as RestStageChannelActor ?? actor.Guild.Channels.Stage[model.Id],
                     guildStageChannelModel
                 );
             case IGuildTextChannelModel guildTextChannelModel:
                 return RestTextChannel.Construct(
                     client,
-                    actor as RestTextChannelActor ?? actor.Guild.TextChannels[model.Id],
+                    actor as RestTextChannelActor ?? actor.Guild.Channels.Text[model.Id],
                     guildTextChannelModel
                 );
             case IGuildVoiceChannelModel guildVoiceChannelModel:
                 return RestVoiceChannel.Construct(
                     client,
-                    actor as RestVoiceChannelActor ?? actor.Guild.VoiceChannels[model.Id],
+                    actor as RestVoiceChannelActor ?? actor.Guild.Channels.Voice[model.Id],
                     guildVoiceChannelModel
                 );
             case IThreadableChannelModel threadableChannelModel:

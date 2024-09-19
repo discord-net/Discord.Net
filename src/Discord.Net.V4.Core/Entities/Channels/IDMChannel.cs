@@ -11,6 +11,8 @@ public partial interface IDMChannel :
     IUpdatable<IDMChannelModel>,
     IDMChannelActor
 {
+    IUserActor Recipient { get; }
+    
     [SourceOfTruth]
     new IDMChannelModel GetModel();
 }

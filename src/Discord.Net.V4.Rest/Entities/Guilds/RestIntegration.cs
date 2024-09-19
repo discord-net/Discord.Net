@@ -5,7 +5,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestIntegrationActor :
-    RestActor<ulong, RestIntegration, IntegrationIdentity, IIntegrationModel>,
+    RestActor<RestIntegrationActor, ulong, RestIntegration, IIntegrationModel>,
     IIntegrationActor
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
@@ -22,6 +22,10 @@ public sealed partial class RestIntegrationActor :
         Identity = integration | this;
         Guild = guild.Actor ?? new(client, guild);
     }
+
+    [SourceOfTruth]
+    internal override RestIntegration CreateEntity(IIntegrationModel model)
+        => RestIntegration.Construct(Client, this, model);
 }
 
 public sealed partial class RestIntegration :
@@ -66,12 +70,11 @@ public sealed partial class RestIntegration :
 
     internal RestIntegration(
         DiscordRestClient client,
-        GuildIdentity guild,
         IIntegrationModel model,
-        RestIntegrationActor? actor = null
+        RestIntegrationActor actor
     ) : base(client, model.Id)
     {
-        Actor = actor ?? new(client, guild, IntegrationIdentity.Of(this));
+        Actor = actor;
         Model = model;
 
         Role = model.RoleId.Map(
@@ -109,8 +112,8 @@ public sealed partial class RestIntegration :
             : null;
     }
 
-    public static RestIntegration Construct(DiscordRestClient client, GuildIdentity guild, IIntegrationModel model)
-        => new(client, guild, model);
+    public static RestIntegration Construct(DiscordRestClient client, RestIntegrationActor actor, IIntegrationModel model)
+        => new(client, model, actor);
 
     public IIntegrationModel GetModel() => Model;
 }

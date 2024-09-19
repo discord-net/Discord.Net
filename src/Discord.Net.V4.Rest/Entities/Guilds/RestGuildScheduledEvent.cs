@@ -5,24 +5,16 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-using RSVPType = RestPagedLink<
-    ulong,
-    RestGuildScheduledEventUser,
-    IGuildScheduledEventUserModel,
-    IEnumerable<IGuildScheduledEventUserModel>,
-    PageGuildScheduledEventUsersParams
->;
-
 [ExtendInterfaceDefaults]
 public partial class RestGuildScheduledEventActor :
-    RestActor<ulong, RestGuildScheduledEvent, GuildScheduledEventIdentity>,
+    RestActor<RestGuildScheduledEventActor, ulong, RestGuildScheduledEvent, IGuildScheduledEventModel>,
     IGuildScheduledEventActor
 {
     [SourceOfTruth]
     public RestGuildActor Guild { get; }
 
     [SourceOfTruth]
-    public RSVPType RSVPs { get; }
+    public RestGuildScheduledEventUserActor.Paged<PageGuildScheduledEventUsersParams> RSVPs { get; }
 
     internal override GuildScheduledEventIdentity Identity { get; }
 
@@ -45,7 +37,7 @@ public partial class RestGuildScheduledEventActor :
     }
 
     [SourceOfTruth]
-    internal RestGuildScheduledEvent CreateEntity(
+    internal override RestGuildScheduledEvent CreateEntity(
         IGuildScheduledEventModel model
     ) => RestGuildScheduledEvent.Construct(Client, Guild.Identity, model);
 }
@@ -94,12 +86,11 @@ public sealed partial class RestGuildScheduledEvent :
 
     internal RestGuildScheduledEvent(
         DiscordRestClient client,
-        GuildIdentity guild,
         IGuildScheduledEventModel model,
-        RestGuildScheduledEventActor? actor = null
+        RestGuildScheduledEventActor actor
     ) : base(client, model.Id)
     {
-        Actor = actor ?? new(client, guild, GuildScheduledEventIdentity.Of(this));
+        Actor = actor;
         Model = model;
 
         Creator = new RestUserActor(
@@ -115,9 +106,11 @@ public sealed partial class RestGuildScheduledEvent :
         );
     }
 
-    public static RestGuildScheduledEvent Construct(DiscordRestClient client,
-        GuildIdentity guild, IGuildScheduledEventModel model) =>
-        new(client, guild, model);
+    public static RestGuildScheduledEvent Construct(
+        DiscordRestClient client,
+        RestGuildScheduledEventActor actor,
+        IGuildScheduledEventModel model
+    ) => new(client, model, actor);
 
     public ValueTask UpdateAsync(IGuildScheduledEventModel model, CancellationToken token = default)
     {

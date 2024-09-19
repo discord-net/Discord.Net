@@ -4,8 +4,8 @@ using Discord.Rest;
 namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
-public sealed partial class RestGuildScheduledEventUserActor :
-    RestActor<ulong, RestGuildScheduledEventUser, GuildScheduledEventUserIdentity, IGuildScheduledEventUserModel>,
+public partial class RestGuildScheduledEventUserActor :
+    RestActor<RestGuildScheduledEventUserActor, ulong, RestGuildScheduledEventUser, IGuildScheduledEventUserModel>,
     IGuildScheduledEventUserActor
 {
     [SourceOfTruth] public RestUserActor User { get; }
@@ -18,12 +18,14 @@ public sealed partial class RestGuildScheduledEventUserActor :
 
     internal override GuildScheduledEventUserIdentity Identity { get; }
 
-    public RestGuildScheduledEventUserActor(DiscordRestClient client,
+    public RestGuildScheduledEventUserActor(
+        DiscordRestClient client,
         GuildIdentity guild,
         GuildScheduledEventIdentity scheduledEvent,
         GuildScheduledEventUserIdentity eventUser,
         UserIdentity? user = null,
-        MemberIdentity? member = null) : base(client, eventUser)
+        MemberIdentity? member = null
+    ) : base(client, eventUser)
     {
         Identity = eventUser | this;
 
@@ -42,8 +44,8 @@ public sealed partial class RestGuildScheduledEventUser :
     RestEntity<ulong>,
     IGuildScheduledEventUser,
     IRestConstructable<
-        RestGuildScheduledEventUser, 
-        RestGuildScheduledEventUserActor, 
+        RestGuildScheduledEventUser,
+        RestGuildScheduledEventUserActor,
         IGuildScheduledEventUserModel
     >
 {

@@ -63,4 +63,6 @@ public class RequestOptions
     public bool? UseSystemClock { get; set; }
 
     public bool AllowCached { get; set; }
+    
+    public bool UpdateCached { get; set; }
 }

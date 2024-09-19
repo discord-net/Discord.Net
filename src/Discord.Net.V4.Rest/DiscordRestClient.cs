@@ -29,22 +29,22 @@ public sealed partial class DiscordRestClient : IDiscordClient
     [SourceOfTruth] public RestCurrentUserActor CurrentUser { get; }
 
     [SourceOfTruth]
-    public GuildLink
+    public RestGuildActor
         .Paged<RestPartialGuild, IPartialGuildModel, PageUserGuildsParams, IEnumerable<IPartialGuildModel>>
         .Indexable Guilds { get; }
 
-    [SourceOfTruth] public ChannelLink.Indexable Channels { get; }
+    [SourceOfTruth] public RestChannelActor.Indexable.Hierarchy Channels { get; }
 
-    [SourceOfTruth] public UserLink.Indexable Users { get; }
+    [SourceOfTruth] public RestUserActor.Indexable Users { get; }
 
-    [SourceOfTruth] public WebhookLink.Indexable Webhooks { get; }
-    [SourceOfTruth] public InviteLink.Indexable Invites { get; }
+    [SourceOfTruth] public RestWebhookActor.Indexable Webhooks { get; }
+    [SourceOfTruth] public RestInviteActor.Indexable Invites { get; }
 
-    [SourceOfTruth] public StickerPackLink.Enumerable.Indexable StickerPacks { get; }
+    [SourceOfTruth] public RestStickerPackActor.Enumerable.Indexable StickerPacks { get; }
 
-    [SourceOfTruth] public StickerLink.Indexable Stickers { get; }
+    [SourceOfTruth] public RestStickerActor.Indexable Stickers { get; }
 
-    [SourceOfTruth] public ThreadChannelLink.Indexable Threads { get; }
+    [SourceOfTruth] public RestThreadChannelActor.Indexable Threads { get; }
 
     [SourceOfTruth] public RestApiClient RestApiClient { get; }
 

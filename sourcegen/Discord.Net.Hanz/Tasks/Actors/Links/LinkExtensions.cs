@@ -38,11 +38,13 @@ public sealed class LinkExtensions
             .ToArray();
     }
 
-    public static void Process(
-        ref InterfaceDeclarationSyntax syntax,
+    public static void Process<T>(
+        ref T syntax,
         LinksV2.GenerationTarget target,
         ImmutableArray<LinksV2.GenerationTarget?> targets,
-        Logger logger)
+        Logger logger
+    )
+        where T : TypeDeclarationSyntax
     {
         if (syntax.Identifier.ValueText is "BackLink")
         {
@@ -50,8 +52,9 @@ public sealed class LinkExtensions
             return;
         }
 
-        var extensions = target
-            .Actor.GetTypeMembers()
+        var extensions = 
+            (target.Assembly is LinksV2.AssemblyTarget.Core ? target.Actor : target.GetCoreActor())
+            .GetTypeMembers()
             .Where(x => x
                 .GetAttributes()
                 .Any(x => x.AttributeClass?.Name == "LinkExtensionAttribute")
@@ -71,9 +74,9 @@ public sealed class LinkExtensions
                 continue;
             }
 
-            var extensionSyntax = (InterfaceDeclarationSyntax) SyntaxFactory.ParseMemberDeclaration(
+            var extensionSyntax = (T) SyntaxFactory.ParseMemberDeclaration(
                 $$"""
-                    public interface {{name}}
+                    public {{(syntax is ClassDeclarationSyntax ? "class" : "interface")}} {{name}}
                     {
                         {{
                             string.Join(
@@ -109,7 +112,8 @@ public sealed class LinkExtensions
                   """
             )!;
 
-            var baseExtensions = extension.Interfaces
+            var baseExtensions = extension
+                .Interfaces
                 .Where(x => x
                     .GetAttributes()
                     .Any(x => x.AttributeClass?.Name == "LinkExtensionAttribute")
@@ -118,7 +122,7 @@ public sealed class LinkExtensions
 
             if (baseExtensions.Length > 0)
             {
-                extensionSyntax = extensionSyntax
+                extensionSyntax = (T) extensionSyntax
                     .AddBaseListTypes(
                         baseExtensions
                             .Select(x =>
@@ -132,7 +136,7 @@ public sealed class LinkExtensions
                     );
             }
 
-            syntax = syntax
+            syntax = (T) syntax
                 .AddMembers(
                     extensionSyntax
                 );
@@ -140,7 +144,7 @@ public sealed class LinkExtensions
             syntax = syntax.ReplaceNodes(
                 syntax
                     .DescendantNodes()
-                    .OfType<InterfaceDeclarationSyntax>(),
+                    .OfType<T>(),
                 (old, node) =>
                 {
                     if (old.Identifier.ValueText == name) return node;
@@ -148,7 +152,7 @@ public sealed class LinkExtensions
                     if (node.Identifier.ValueText is "BackLink") return node;
 
                     var anscestors = old.AncestorsAndSelf()
-                        .OfType<InterfaceDeclarationSyntax>()
+                        .OfType<T>()
                         .ToList();
 
                     var path = string.Join(
@@ -172,25 +176,27 @@ public sealed class LinkExtensions
                             .Reverse()
                     );
 
-                    var extensionInterface = (InterfaceDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(
+                    var extensionSyntax = (T) SyntaxFactory.ParseMemberDeclaration(
                         $$"""
-                          public interface {{name}} : {{target.Actor}}.{{name}}, {{path}}
+                          public {{(old is ClassDeclarationSyntax ? "class" : "interface")}} {{name}} : {{path}}, {{target.Actor}}.{{name}} 
                           {
                               {{
                                   string.Join(
                                       Environment.NewLine,
                                       members.Select(x =>
                                       {
-                                          var shouldBeNew =
-                                              members.Count(y => y.Property.Name == x.Property.Name) > 1
-                                              && x.Property.ExplicitInterfaceImplementations.Length == 0;
-
                                           if (x.Property.ExplicitInterfaceImplementations.Length == 0)
-                                              return
-                                                  $$"""
-                                                  new {{x.Property.Type}} {{x.Property.Name}} { get; }
-                                                  {{x.Type}} {{target.Actor}}.{{name}}.{{x.Property.Name}} => {{x.Property.Name}};
-                                                  """;
+                                          {
+                                              return target.Assembly is LinksV2.AssemblyTarget.Core
+                                                  ? $$"""
+                                                      new {{x.Property.Type}} {{x.Property.Name}} { get; }
+                                                      {{x.Type}} {{target.Actor}}.{{name}}.{{x.Property.Name}} => {{x.Property.Name}};
+                                                      """
+                                                  : $$"""
+                                                      public {{x.Property.Type}} {{x.Property.Name}} { get; }
+                                                      {{x.Type}} {{target.Actor}}.{{name}}.{{x.Property.Name}} => {{x.Property.Name}};
+                                                      """;
+                                          }
 
                                           var baseProp = x.Property.ExplicitInterfaceImplementations.First();
 
@@ -198,18 +204,6 @@ public sealed class LinkExtensions
                                               $$"""
                                                 {{x.Property.Type}} {{baseProp.ContainingType.ContainingType}}.{{path}}.{{baseProp.ContainingType.Name.Replace("Extension", string.Empty)}}.{{MemberUtils.GetMemberName(baseProp)}} => {{MemberUtils.GetMemberName(x.Property)}};
                                                 """;
-
-
-//                                           x.Property.ExplicitInterfaceImplementations.Length == 0 ?
-//                                               $$"""
-//                                                 new {{(
-//                                                     x.Target is not null
-//                                                         ? $"{x.Target!.Actor}.{path}"
-//                                                         : x.Type
-//                                                 )}} {{x.Property.Name}} { get; }
-//                                                 {{x.Type}} {{target.Actor}}.{{name}}.{{x.Property.Name}} => {{x.Property.Name}};
-//                                                 """
-//                                               : x.Property.DeclaringSyntaxReferences.First().GetSyntax().ToString()
                                       })
                                   )
                               }}
@@ -219,7 +213,7 @@ public sealed class LinkExtensions
 
                     if (baseExtensions.Length > 0)
                     {
-                        extensionInterface = extensionInterface
+                        extensionSyntax = (T)extensionSyntax
                             .AddBaseListTypes(
                                 baseExtensions
                                     .Select(x =>
@@ -233,14 +227,14 @@ public sealed class LinkExtensions
                             );
                     }
 
-                    LinksV2.AddBackLink(ref extensionInterface!, target, logger, false, false);
+                    LinksV2.AddBackLink(ref extensionSyntax!, target, logger, false, false);
 
                     return node
                         .WithOpenBraceToken(SyntaxFactory.Token(SyntaxKind.OpenBraceToken))
                         .WithCloseBraceToken(SyntaxFactory.Token(SyntaxKind.CloseBraceToken))
                         .WithSemicolonToken(default)
                         .AddMembers(
-                            extensionInterface
+                            extensionSyntax
                         );
                 }
             );

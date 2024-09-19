@@ -42,6 +42,9 @@ file sealed class CastedIdentifiable<
 
     public IdentityDetail Detail => source.Detail;
 
+    public override int GetHashCode()
+        => EqualityComparer<TId>.Default.GetHashCode(Id);
+    
     Type IIdentifiable<TId, TDestinationEntity, TDestinationModel>.EntityType => typeof(TSourceEntity);
 
     Type IIdentifiable<TId, TDestinationEntity, TDestinationModel>.ModelType => typeof(TSourceModel);
@@ -103,8 +106,12 @@ file sealed class CastedIdentifiable<
             return destinationEntity;
         }
     }
+    
 
     public IdentityDetail Detail => source.Detail;
+    
+    public override int GetHashCode()
+        => EqualityComparer<TId>.Default.GetHashCode(Id);
 
     Type IIdentifiable<TId, TDestinationEntity, TDestinationModel>.EntityType => typeof(TSourceEntity);
 
@@ -191,6 +198,9 @@ file sealed class Identifiable<TId, TEntity, TActor, TModel> :
         _actor = actor;
     }
 
+    public override int GetHashCode()
+        => EqualityComparer<TId>.Default.GetHashCode(Id);
+    
     public static implicit operator Identifiable<TId, TEntity, TActor, TModel>(TId id) => new(id);
     public static implicit operator Identifiable<TId, TEntity, TActor, TModel>(TEntity entity) => new(entity);
 
@@ -257,6 +267,9 @@ file sealed class Identifiable<TId, TEntity, TModel> :
         _entity = entity;
     }
 
+    public override int GetHashCode()
+        => EqualityComparer<TId>.Default.GetHashCode(Id);
+
     public static implicit operator Identifiable<TId, TEntity, TModel>(TId id) => new(id);
     public static implicit operator Identifiable<TId, TEntity, TModel>(TEntity entity) => new(entity);
 
@@ -279,11 +292,19 @@ public enum IdentityDetail
 
 public interface ISnowflakeIdentifiable : IIdentifiable<ulong>;
 
-public interface IIdentifiable<out TId> where TId : IEquatable<TId>
+public interface IIdentityDetail
+{
+    internal IdentityDetail Detail { get; }
+}
+
+public interface IIdentifiable<out TId> : IIdentityDetail
+    where TId : IEquatable<TId>
 {
     TId Id { get; }
 
-    internal IdentityDetail Detail => IdentityDetail.Id;
+    internal new IdentityDetail Detail => IdentityDetail.Id;
+
+    IdentityDetail IIdentityDetail.Detail => Detail;
 }
 
 public interface IIdentifiable<TId, out TEntity, out TModel> :

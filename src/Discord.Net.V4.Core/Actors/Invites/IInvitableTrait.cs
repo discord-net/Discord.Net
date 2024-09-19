@@ -18,5 +18,5 @@ public interface IInvitableTrait
 {
     [return: TypeHeuristic(nameof(Invites))]
     IInviteActor Invite(string code) => Invites[code];
-    IInviteActor.Enumerable.Indexable Invites { get; }
+    InviteLinkType.Enumerable.Indexable Invites { get; }
 }

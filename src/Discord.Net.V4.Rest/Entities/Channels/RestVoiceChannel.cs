@@ -6,7 +6,8 @@ using Discord.Rest.Extensions;
 namespace Discord.Rest;
 
 using MessageChannelTrait = RestMessageChannelTrait<RestVoiceChannelActor, VoiceChannelIdentity>;
-using IncomingIntegrationChannelTrait = RestIncomingIntegrationChannelTrait<RestVoiceChannelActor, RestVoiceChannel, VoiceChannelIdentity>;
+using IncomingIntegrationChannelTrait =
+    RestIncomingIntegrationChannelTrait<RestVoiceChannelActor, RestVoiceChannel, VoiceChannelIdentity>;
 
 [ExtendInterfaceDefaults]
 public partial class RestVoiceChannelActor :
@@ -14,11 +15,16 @@ public partial class RestVoiceChannelActor :
     IVoiceChannelActor,
     IRestActor<ulong, RestVoiceChannel, VoiceChannelIdentity, IGuildVoiceChannelModel>
 {
+    [SourceOfTruth]
+    public RestGuildChannelInviteActor.Enumerable.Indexable.BackLink<RestGuildChannelActor> Invites { get; }
+    
     [ProxyInterface(typeof(IMessageChannelTrait))]
     internal MessageChannelTrait MessageChannelTrait { get; }
 
     [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
     internal IncomingIntegrationChannelTrait IncomingIntegrationChannelTrait { get; }
+    
+    internal RestInvitableTrait<RestGuildChannelInviteActor, RestGuildChannelInvite> InvitableTrait { get; }
 
     [SourceOfTruth] internal override VoiceChannelIdentity Identity { get; }
 
@@ -38,7 +44,7 @@ public partial class RestVoiceChannelActor :
     [SourceOfTruth]
     [CovariantOverride]
     internal virtual RestVoiceChannel CreateEntity(IGuildVoiceChannelModel model)
-        => RestVoiceChannel.Construct(Client, Guild.Identity, model);
+        => RestVoiceChannel.Construct(Client, this, model);
 }
 
 public partial class RestVoiceChannel :
@@ -54,7 +60,7 @@ public partial class RestVoiceChannel :
 
     public int? UserLimit => Model.UserLimit;
 
-    public VideoQualityMode VideoQualityMode => (VideoQualityMode?)Model.VideoQualityMode ?? VideoQualityMode.Auto;
+    public VideoQualityMode VideoQualityMode => (VideoQualityMode?) Model.VideoQualityMode ?? VideoQualityMode.Auto;
 
     internal override IGuildVoiceChannelModel Model => _model;
 
@@ -67,37 +73,35 @@ public partial class RestVoiceChannel :
 
     private IGuildVoiceChannelModel _model;
 
-    internal RestVoiceChannel(DiscordRestClient client,
-        GuildIdentity guild,
+    internal RestVoiceChannel(
+        DiscordRestClient client,
         IGuildVoiceChannelModel model,
-        RestVoiceChannelActor? actor = null
-    ) : base(client, guild, model)
+        RestVoiceChannelActor actor
+    ) : base(client, model, actor)
     {
         _model = model;
+        Actor = actor;
 
-        Category = model.ParentId.Map(
-            static (id, client, guild) => new RestCategoryChannelActor(client, guild, CategoryChannelIdentity.Of(id)),
-            client,
-            guild
-        );
-
-        Actor = actor ?? new(
-            client,
-            guild,
-            VoiceChannelIdentity.Of(this)
-        );
+        Category = model.ParentId.HasValue
+            ? actor.Guild.Channels.Category[model.ParentId.Value]
+            : null;
     }
 
-    public static RestVoiceChannel Construct(DiscordRestClient client,
-        GuildIdentity guild,
+    public static RestVoiceChannel Construct(
+        DiscordRestClient client,
+        RestVoiceChannelActor actor,
         IGuildVoiceChannelModel model)
     {
         switch (model)
         {
             case IGuildStageChannelModel stage:
-                return RestStageChannel.Construct(client, guild, stage);
+                return RestStageChannel.Construct(
+                    client,
+                    actor as RestStageChannelActor ?? actor.Guild.Channels.Stage[actor.Id],
+                    stage
+                );
             default:
-                return new(client, guild, model);
+                return new(client, model, actor);
         }
     }
 

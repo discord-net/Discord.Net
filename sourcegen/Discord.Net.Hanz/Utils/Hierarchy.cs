@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Discord.Net.Hanz.Utils;
 
 namespace Discord.Net.Hanz;
 
@@ -9,6 +10,21 @@ public static class Hierarchy
     private static readonly Dictionary<ITypeSymbol, List<SortedHierarchySymbol>> _cache =
         new(SymbolEqualityComparer.Default);
 
+    public static bool Implements(INamedTypeSymbol source, INamedTypeSymbol toCheck)
+    {
+        if (source.TypeKind is TypeKind.Interface && toCheck.TypeKind is TypeKind.Class)
+            return false;
+
+        switch (source.TypeKind, toCheck.TypeKind)
+        {
+            case (_, TypeKind.Interface):
+                return source.AllInterfaces.Contains(toCheck);
+            case (TypeKind.Class, TypeKind.Class):
+                return TypeUtils.GetBaseTypes(source).Contains(toCheck, SymbolEqualityComparer.Default);
+            default: return false;
+        }
+    }
+    
     public static HashSet<INamedTypeSymbol> AllInterfacesWrtVariance(
         this ITypeSymbol seed,
         SemanticModel model,

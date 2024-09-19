@@ -3,7 +3,7 @@ using Discord.Models;
 namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
-public sealed partial class RestCategoryChannelActor :
+public partial class RestCategoryChannelActor :
     RestGuildChannelActor,
     ICategoryChannelActor,
     IRestActor<ulong, RestCategoryChannel, CategoryChannelIdentity, IGuildCategoryChannelModel>
@@ -31,6 +31,7 @@ public sealed partial class RestCategoryChannel :
     ICategoryChannel,
     IRestConstructable<RestCategoryChannel, RestCategoryChannelActor, IGuildCategoryChannelModel>
 {
+    [ProxyInterface]
     internal override RestCategoryChannelActor Actor { get; }
 
     internal override IGuildCategoryChannelModel Model => _model;

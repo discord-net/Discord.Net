@@ -6,7 +6,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestWebhookActor :
-    RestActor<ulong, RestWebhook, WebhookIdentity>,
+    RestActor<RestWebhookActor, ulong, RestWebhook, IWebhookModel>,
     IWebhookActor
 {
     internal override WebhookIdentity Identity { get; }
@@ -32,7 +32,7 @@ public partial class RestWebhookActor :
 public partial class RestWebhook :
     RestEntity<ulong>,
     IWebhook,
-    IConstructable<RestWebhook, IWebhookModel, DiscordRestClient>
+    IRestConstructable<RestWebhook, RestWebhookActor, IWebhookModel>
 {
     public WebhookType Type => (WebhookType)Model.Type;
 

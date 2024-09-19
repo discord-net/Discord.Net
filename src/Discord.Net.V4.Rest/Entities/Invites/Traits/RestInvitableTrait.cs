@@ -2,58 +2,66 @@ using Discord.Models;
 
 namespace Discord.Rest;
 
-public sealed class RestInvitableTrait<TBackLink, TInviteActor, TInvite> :
-    RestInvitableTrait
-    where TBackLink : class, IPathable
+public sealed partial class RestInvitableTrait<TInviteActor, TInvite> :
+    RestInvitableTrait,
+    IInvitableTrait<TInviteActor, TInvite>
     where TInvite : RestInvite, IRestConstructable<TInvite, TInviteActor, IInviteModel>
     where TInviteActor : RestInviteActor, IRestActor<string, TInvite, IInviteModel>
 {
-    public override ILinkType<TInviteActor, string, TInvite, IInviteModel>.Enumerable.Indexable.BackLink<TBackLink>
-        Invites { get; }
+    [SourceOfTruth]
+    public override ILinkType<TInviteActor, string, TInvite, IInviteModel>.Enumerable.Indexable Invites { get; }
 
     public RestInvitableTrait(
-        TBackLink backLink,
         DiscordRestClient client,
-        IApiOutRoute<IEnumerable<IInviteModel>> route,
-        IActorProvider<DiscordRestClient, TInviteActor, string> provider)
-        : base(client, route)
+        IActorProvider<TInviteActor, string> provider,
+        IApiOutRoute<IEnumerable<IInviteModel>> route
+    ) : base(client, provider, route)
     {
-        Invites =
-            new RestLinkType<TInviteActor, string, TInvite, IInviteModel>.Enumerable.Indexable.BackLink<TBackLink>(
-                backLink,
+        Invites = new RestLinkTypeV2<TInviteActor, string, TInvite, IInviteModel>
+            .Enumerable
+            .Indexable(
                 client,
                 provider,
-                FetchAsync
+                route.AsRequiredProvider()
             );
     }
+
+    // public override ILinkType<TInviteActor, string, TInvite, IInviteModel>.Enumerable.Indexable.BackLink<TBackLink>
+    //     Invites { get; }
+    //
+    // public RestInvitableTrait(
+    //     TBackLink backLink,
+    //     DiscordRestClient client,
+    //     IApiOutRoute<IEnumerable<IInviteModel>> route,
+    //     IActorProvider<DiscordRestClient, TInviteActor, string> provider)
+    //     : base(client, route)
+    // {
+    //     Invites =
+    //         new RestLinkType<TInviteActor, string, TInvite, IInviteModel>.Enumerable.Indexable.BackLink<TBackLink>(
+    //             backLink,
+    //             client,
+    //             provider,
+    //             FetchAsync
+    //         );
+    // }
 }
 
 public partial class RestInvitableTrait : IInvitableTrait
 {
-    [SourceOfTruth] public virtual InviteLink.Enumerable.Indexable Invites { get; }
-
-    private readonly IApiOutRoute<IEnumerable<IInviteModel>> _route;
+    [SourceOfTruth] public virtual InviteLinkType.Enumerable.Indexable Invites { get; }
 
     public RestInvitableTrait(
         DiscordRestClient client,
-        IApiOutRoute<IEnumerable<IInviteModel>> route)
+        IActorProvider<RestInviteActor, string> provider,
+        IApiOutRoute<IEnumerable<IInviteModel>> route
+    )
     {
-        _route = route;
-
-        Invites = new RestInviteLink.Enumerable.Indexable(
-            client,
-            client.Invites,
-            FetchAsync
-        );
-    }
-
-    protected async Task<IEnumerable<IInviteModel>> FetchAsync(
-        DiscordRestClient client,
-        RequestOptions? options,
-        CancellationToken token)
-    {
-        var result = await client.RestApiClient.ExecuteAsync(_route, options, token);
-
-        return result ?? [];
+        Invites = new RestLinkTypeV2<RestInviteActor, string, RestInvite, IInviteModel>
+            .Enumerable
+            .Indexable(
+                client,
+                provider,
+                route.AsRequiredProvider()
+            );
     }
 }

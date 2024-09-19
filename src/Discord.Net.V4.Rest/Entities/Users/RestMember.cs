@@ -11,7 +11,7 @@ public partial class RestMemberActor :
     [SourceOfTruth] public RestGuildActor Guild { get; }
     
     [SourceOfTruth]
-    public RoleLink.BackLink<RestMemberActor> Roles { get; }
+    public RestRoleActor.Indexable.BackLink<RestMemberActor> Roles { get; }
 
     [SourceOfTruth] public virtual RestVoiceStateActor VoiceState { get; }
 
@@ -54,7 +54,7 @@ public partial class RestMember :
     IRestConstructable<RestMember, RestMemberActor, IMemberModel>
 {
     [SourceOfTruth]
-    public RoleLink.Defined.Indexable.BackLink<RestMember> Roles => throw new NotImplementedException();
+    public RestRoleActor.Defined.Indexable.BackLink<RestMember> Roles { get; }
 
     public DateTimeOffset? JoinedAt => Model.JoinedAt;
 
@@ -83,6 +83,12 @@ public partial class RestMember :
     {
         Actor = actor;
         Model = model;
+
+        Roles = new(
+            this,
+            actor.Roles,
+            new(client, actor.Roles, model.RoleIds)
+        );
     }
 
     public static RestMember Construct(DiscordRestClient client, RestMemberActor actor, IMemberModel model)

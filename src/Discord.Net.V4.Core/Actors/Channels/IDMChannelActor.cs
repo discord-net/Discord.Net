@@ -13,10 +13,4 @@ namespace Discord;
 ]
 public partial interface IDMChannelActor :
     IMessageChannelTrait,
-    IUserRelationship,
-    IActor<ulong, IDMChannel>
-{
-    IUserActor Recipient { get; }
-
-    IUserActor IUserRelationship.User => Recipient;
-}
+    IActor<ulong, IDMChannel>;

@@ -6,7 +6,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestInviteActor :
-    RestActor<string, RestInvite, InviteIdentity, IInviteModel>,
+    RestActor<RestInviteActor, string, RestInvite, IInviteModel>,
     IInviteActor
 {
     internal override InviteIdentity Identity { get; }

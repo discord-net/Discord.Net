@@ -5,7 +5,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestThreadMemberActor :
-    RestActor<ulong, RestThreadMember, ThreadMemberIdentity, IThreadMemberModel>,
+    RestActor<RestThreadMemberActor, ulong, RestThreadMember, IThreadMemberModel>,
     IThreadMemberActor
 {
     [SourceOfTruth] public virtual RestThreadChannelActor Thread { get; }

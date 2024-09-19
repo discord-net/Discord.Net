@@ -313,7 +313,8 @@ public class RestLoadable : ISyntaxGenerationCombineTask<RestLoadable.Generation
                 !semanticModel.Compilation.HasImplicitConversion(restEntity, valueTask.TypeArguments[0])
             )
             {
-                logger.Warn($"{restEntity}: no implicit conversion exists for {restEntity} -> {valueTask.TypeArguments[0]}");
+                logger.Warn(
+                    $"{restEntity}: no implicit conversion exists for {restEntity} -> {valueTask.TypeArguments[0]}");
                 continue;
             }
 
@@ -372,16 +373,42 @@ public class RestLoadable : ISyntaxGenerationCombineTask<RestLoadable.Generation
               // {{bestMatch?.ToDisplayString() ?? "Default Implementation"}}
               public{{modifier}} async ValueTask<{{restEntityType}}?> FetchAsync{{parameters.NormalizeWhitespace()}}
               {
-                  if ((options?.AllowCached ?? true) && CachedValue is not null)
-                      return CachedValue;
+                  var cached = await GetTestAsync(token);
 
-                  return _cachedValue = await {{coreActor}}.FetchInternalAsync(
-                      Client,
-                      this,
-                      {{coreActor}}.FetchRoute(this, Id{{extraArgs}}),
-                      options,
-                      token
-                  ) as {{restEntityType}};
+                  options ??= Client.DefaultRequestOptions;
+    
+                  if (cached is not null && options is {AllowCached: true, UpdateCached: false})
+                      return cached;
+    
+                  var model = await Client.RestApiClient
+                      .ExecuteAsync(
+                          {{coreActor}}.FetchRoute(this, Id{{extraArgs}}),
+                          options,
+                          token
+                      );
+    
+                  if (model is null && options.UpdateCached)
+                  {
+                      Unbind();
+                      return null;
+                  }
+    
+                  if (model is not null && options.UpdateCached)
+                  {
+                      if (cached is null)
+                      {
+                          cached = CreateEntity(model);
+                          Bind(cached);
+                      }
+                      else
+                      {
+                          await cached.UpdateAsync(model, token);
+                      }
+                  
+                      return cached;
+                  }
+    
+                  return model is null ? null : CreateEntity(model);
               }
               """
         );
@@ -394,11 +421,13 @@ public class RestLoadable : ISyntaxGenerationCombineTask<RestLoadable.Generation
 
         var getMethod = SyntaxFactory.ParseMemberDeclaration(
             $$"""
-            public{{modifier}} ValueTask<{{restEntityType}}?> GetAsync(CancellationToken token = default)
-            {
-                return ValueTask.FromResult(CachedValue);
-            }
-            """
+              public{{modifier}} ValueTask<{{restEntityType}}?> GetAsync(CancellationToken token = default)
+                  => ValueTask.FromResult<RestChannel?>(
+                      TryGetBoundEntity(out var entity)
+                          ? entity
+                          : null
+                  );
+              """
         );
 
         if (getMethod is null)

@@ -18,7 +18,7 @@ public partial interface IMemberActor :
     IActor<ulong, IMember>
 {
     IVoiceStateActor VoiceState { get; }
-    RoleLinkType.BackLink<IMemberActor> Roles { get; }
+    RoleLinkType.Indexable.BackLink<IMemberActor> Roles { get; }
 
     [BackLink<IGuildActor>]
     private static async Task<IMember> AddAsync(

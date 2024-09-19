@@ -4,10 +4,15 @@ using Discord.Rest;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetChannelMessage))]
-[Deletable(nameof(Routes.DeleteMessage))]
-[Creatable<CreateMessageProperties>(nameof(Routes.CreateMessage))]
-[Modifiable<ModifyMessageProperties>(nameof(Routes.ModifyMessage))]
+[
+    Loadable(nameof(Routes.GetChannelMessage)),
+    Deletable(nameof(Routes.DeleteMessage)),
+    Creatable<CreateMessageProperties>(
+        nameof(Routes.CreateMessage),
+        nameof(IMessageChannelTrait)
+    ),
+    Modifiable<ModifyMessageProperties>(nameof(Routes.ModifyMessage))
+]
 public partial interface IMessageActor :
     IChannelRelationship<IMessageChannelTrait, IMessageChannel>,
     IActor<ulong, IMessage>

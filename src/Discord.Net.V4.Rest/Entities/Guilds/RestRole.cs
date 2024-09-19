@@ -5,7 +5,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestRoleActor :
-    RestActor<ulong, RestRole, RoleIdentity>,
+    RestActor<RestRoleActor, ulong, RestRole, IRoleModel>,
     IRoleActor
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
@@ -25,8 +25,8 @@ public partial class RestRoleActor :
     }
 
     [SourceOfTruth]
-    internal RestRole CreateEntity(IRoleModel model)
-        => RestRole.Construct(Client, Guild.Identity, model);
+    internal override RestRole CreateEntity(IRoleModel model)
+        => RestRole.Construct(Client, this, model);
 }
 
 [ExtendInterfaceDefaults]
@@ -68,24 +68,24 @@ public sealed partial class RestRole :
 
     internal RestRole(
         DiscordRestClient client,
-        GuildIdentity guild,
         IRoleModel model,
-        RestRoleActor? actor = null
+        RestRoleActor actor
     ) : base(client, model.Id)
     {
-        Actor = actor ?? new(client, guild, RoleIdentity.Of(this));
+        Actor = actor;
         Model = model;
 
         Emoji = model.UnicodeEmoji is not null
             ? new(model.UnicodeEmoji)
             : null;
+        
         Tags = model.Tags is not null
             ? RoleTags.Construct(Client, model.Tags)
             : null;
     }
 
-    public static RestRole Construct(DiscordRestClient client, GuildIdentity context, IRoleModel model)
-        => new(client, context, model);
+    public static RestRole Construct(DiscordRestClient client, RestRoleActor actor, IRoleModel model)
+        => new(client, model, actor);
 
     public ValueTask UpdateAsync(IRoleModel model, CancellationToken token = default)
     {

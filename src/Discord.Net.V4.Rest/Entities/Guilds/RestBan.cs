@@ -5,7 +5,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestBanActor :
-    RestActor<ulong, RestBan, BanIdentity>,
+    RestActor<RestBanActor, ulong, RestBan, IBanModel>,
     IBanActor
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
@@ -28,8 +28,8 @@ public sealed partial class RestBanActor :
     }
 
     [SourceOfTruth]
-    internal RestBan CreateEntity(IBanModel model)
-        => RestBan.Construct(Client, Guild.Identity, model);
+    internal override RestBan CreateEntity(IBanModel model)
+        => RestBan.Construct(Client, this, model);
 }
 
 public sealed partial class RestBan :
@@ -49,22 +49,18 @@ public sealed partial class RestBan :
 
     internal IBanModel Model { get; private set; }
 
-    public RestBan(DiscordRestClient client,
-        GuildIdentity guild,
+    internal RestBan(
+        DiscordRestClient client,
         IBanModel model,
-        RestBanActor? actor = null) : base(client, model.UserId)
+        RestBanActor actor
+    ) : base(client, model.UserId)
     {
-        Actor = actor ?? new(
-            client,
-            guild,
-            BanIdentity.Of(this),
-            UserIdentity.FromReferenced<RestUser, DiscordRestClient>(model, model.UserId, client)
-        );
+        Actor = actor;
         Model = model;
     }
 
-    public static RestBan Construct(DiscordRestClient client, GuildIdentity guild, IBanModel model)
-        => new(client, guild, model);
+    public static RestBan Construct(DiscordRestClient client, RestBanActor actor, IBanModel model)
+        => new(client, model, actor);
 
     public ValueTask UpdateAsync(IBanModel model, CancellationToken token = default)
     {

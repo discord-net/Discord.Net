@@ -6,7 +6,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestGuildEmoteActor :
-    RestActor<ulong, RestGuildEmote, GuildEmoteIdentity>,
+    RestActor<RestGuildEmoteActor, ulong, RestGuildEmote, ICustomEmoteModel>,
     IGuildEmoteActor
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
@@ -21,12 +21,12 @@ public partial class RestGuildEmoteActor :
     ) : base(client, emote)
     {
         Identity = emote | this;
-        Guild = guild.Actor ?? new(client, guild);
+        Guild = client.Guilds[guild];
     }
 
     [SourceOfTruth]
-    internal RestGuildEmote CreateEntity(ICustomEmoteModel model)
-        => RestGuildEmote.Construct(Client, Guild.Identity, model);
+    internal override RestGuildEmote CreateEntity(ICustomEmoteModel model)
+        => RestGuildEmote.Construct(Client, this, model);
 }
 
 public sealed partial class RestGuildEmote :
@@ -34,7 +34,8 @@ public sealed partial class RestGuildEmote :
     IGuildEmote,
     IRestConstructable<RestGuildEmote, RestGuildEmoteActor, ICustomEmoteModel>
 {
-    public IDefinedLoadableEntityEnumerable<ulong, IRole> Roles => throw new NotImplementedException();
+    [SourceOfTruth]
+    public RestRoleActor.Defined Roles { get; }
 
     [SourceOfTruth] public RestUserActor? Creator { get; private set; }
 
@@ -59,17 +60,18 @@ public sealed partial class RestGuildEmote :
 
     internal RestGuildEmote(
         DiscordRestClient client,
-        GuildIdentity guild,
         ICustomEmoteModel model,
-        RestGuildEmoteActor? actor = null
+        RestGuildEmoteActor actor
     ) : base(client, model.Id)
     {
-        Actor = actor ?? new(client, guild, GuildEmoteIdentity.Of(this));
+        Actor = actor;
         Model = model;
+        
+        Roles = new(client, actor.Guild.Roles, model.Roles);
     }
 
-    public static RestGuildEmote Construct(DiscordRestClient client, GuildIdentity guild, ICustomEmoteModel model)
-        => new(client, guild, model);
+    public static RestGuildEmote Construct(DiscordRestClient client, RestGuildEmoteActor actor, ICustomEmoteModel model)
+        => new(client, model, actor);
 
     public ValueTask UpdateAsync(ICustomEmoteModel model, CancellationToken token = default)
     {

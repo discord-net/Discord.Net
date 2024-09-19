@@ -11,6 +11,7 @@ public partial class RestChannelInviteActor :
 
     [SourceOfTruth] internal override ChannelInviteIdentity Identity { get; }
 
+    [TypeFactory]
     public RestChannelInviteActor(
         DiscordRestClient client,
         ChannelIdentity channel,

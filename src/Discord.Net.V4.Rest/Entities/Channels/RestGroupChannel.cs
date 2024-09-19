@@ -11,9 +11,9 @@ public partial class RestGroupChannelActor :
     IGroupChannelActor,
     IRestActor<ulong, RestGroupChannel, GroupChannelIdentity, IGroupDMChannelModel>
 {
-    [SourceOfTruth] public ChannelInviteLink.Enumerable.Indexable Invites { get; }
+    [SourceOfTruth] public ChannelInviteLinkType.Enumerable.Indexable Invites { get; }
 
-    [SourceOfTruth] public UserLink.Indexable.BackLink<RestGroupChannelActor> Recipients { get; }
+    [SourceOfTruth] public RestUserActor.Indexable.BackLink<RestGroupChannelActor> Recipients { get; }
 
     [ProxyInterface(typeof(IMessageChannelTrait))]
     internal MessageChannelTrait MessageChannelTrait { get; }
@@ -30,18 +30,14 @@ public partial class RestGroupChannelActor :
 
         MessageChannelTrait = new(client, this, channel);
 
-        Recipients =
-            (UserLink.Indexable.BackLink<RestGroupChannelActor>?) channel.Entity?.Recipients
-            ?? new RestUserLink.Indexable.BackLink<RestGroupChannelActor>(
-                this,
-                client,
-                client.Users
-            );
+        Recipients = new(this, client, client.Users);
 
-        Invites = new RestChannelInviteLink.Enumerable.Indexable(
+        Invites = new RestChannelInviteActor.Enumerable.Indexable(
             client,
-            new RestActorProvider<string, RestChannelInviteActor>(
-                (client, id) => new RestChannelInviteActor(client, Identity, ChannelInviteIdentity.Of(id))
+            RestActorProvider.GetOrCreate(
+                client,
+                Template.Of<ChannelInviteIdentity>(),
+                (ChannelIdentity)Identity
             ),
             Routes.GetChannelInvites(Id).AsRequiredProvider()
         );
@@ -58,7 +54,7 @@ public partial class RestGroupChannel :
     IGroupChannel,
     IRestConstructable<RestGroupChannel, RestGroupChannelActor, IGroupDMChannelModel>
 {
-    [SourceOfTruth] public UserLink.Defined.Indexable.BackLink<RestGroupChannelActor> Recipients { get; }
+    [SourceOfTruth] public RestUserActor.Defined.Indexable.BackLink<RestGroupChannelActor> Recipients { get; }
 
     [ProxyInterface(
         typeof(IGroupChannelActor),
@@ -80,12 +76,17 @@ public partial class RestGroupChannel :
         _model = model;
         Actor = actor;
 
-        Recipients = new RestUserLink.Defined.Indexable.BackLink<RestGroupChannelActor>(
+        Recipients = new(
             actor,
-            Client,
-            Client.Users,
-            model.Recipients.ToList().AsReadOnly()
+            actor.Recipients,
+            new(client, client.Users, model.Recipients.ToList().AsReadOnly())
         );
+
+        if (model is IModelSourceOfMultiple<IUserModel> users)
+        {
+            foreach (var user in users.GetModels())
+                client.Users[user.Id].AddModelSource(user);
+        }
     }
 
     public static RestGroupChannel Construct(

@@ -6,7 +6,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestChannelActor :
-    RestActor<ulong, RestChannel, ChannelIdentity, IChannelModel>,
+    RestActor<RestChannelActor, ulong, RestChannel, IChannelModel>,
     IChannelActor
 {
     internal override ChannelIdentity Identity { get; }
@@ -56,7 +56,11 @@ public partial class RestChannel :
     {
         return model switch
         {
-            IDMChannelModel dmChannelModel => RestDMChannel.Construct(client, dmChannelModel),
+            IDMChannelModel dmChannelModel => RestDMChannel.Construct(
+                client,
+                actor as RestDMChannelActor ?? client.Channels
+                dmChannelModel
+            ),
             IGroupDMChannelModel groupDMChannel => RestGroupChannel.Construct(client, groupDMChannel),
             IGuildChannelModel guildChannelBase => RestGuildChannel.Construct(
                 client,
