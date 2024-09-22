@@ -9,40 +9,118 @@ namespace Discord.Rest;
 public partial class RestThreadableChannelActor :
     RestGuildChannelActor,
     IThreadableChannelActor,
-    IRestActor<ulong, RestThreadableChannel, ThreadableChannelIdentity, IThreadableChannelModel>
+    IRestActor<RestThreadableChannelActor, ulong, RestThreadableChannel, IThreadableChannelModel>,
+    IRestGuildChannelInvitableTrait
 {
     [SourceOfTruth]
-    internal override ThreadableChannelIdentity Identity { get; }
+    public RestGuildThreadChannelActor.Indexable.WithNestedThreads.BackLink<RestThreadableChannelActor> Threads { get; }
+
+    [SourceOfTruth] internal override ThreadableChannelIdentity Identity { get; }
 
     [TypeFactory]
-    public RestThreadableChannelActor(DiscordRestClient client,
+    public RestThreadableChannelActor(
+        DiscordRestClient client,
         GuildIdentity guild,
-        ThreadableChannelIdentity channel) : base(client, guild, channel)
+        ThreadableChannelIdentity channel
+    ) : base(client, guild, channel)
     {
-        channel = Identity = channel | this;
+        Identity = channel | this;
 
-        PublicArchivedThreads = RestActors.PublicArchivedThreads(client, guild, channel);
-        PrivateArchivedThreads = RestActors.PrivateArchivedThreads(client, guild, channel);
-        JoinedPrivateArchivedThreads = RestActors.JoinedPrivateArchivedThreads(client, guild, channel);
+        Threads = new(
+            this,
+            client,
+            RestActorProvider.GetOrCreate(
+                client,
+                Template.Of<GuildThreadIdentity>(),
+                guild
+            ),
+            new(
+                client,
+                RestActorProvider.GetOrCreate(
+                    client,
+                    Template.Of<GuildThreadIdentity>(),
+                    guild
+                ),
+                new RestPagingProvider<
+                    IThreadChannelModel,
+                    ChannelThreads, 
+                    PagePublicArchivedThreadsParams,
+                    RestThreadChannel
+                >(
+                    client,
+                    m => m.Threads,
+                    CreateThreadFromPaged,
+                    this
+                )
+            ),
+            new(
+                client,
+                RestActorProvider.GetOrCreate(
+                    client,
+                    Template.Of<GuildThreadIdentity>(),
+                    guild
+                ),
+                new RestPagingProvider<
+                    IThreadChannelModel,
+                    ChannelThreads, 
+                    PagePrivateArchivedThreadsParams,
+                    RestThreadChannel
+                >(
+                    client,
+                    m => m.Threads,
+                    CreateThreadFromPaged,
+                    this
+                )
+            ),
+            new(
+                client,
+                RestActorProvider.GetOrCreate(
+                    client,
+                    Template.Of<GuildThreadIdentity>(),
+                    guild
+                ),
+                new RestPagingProvider<
+                    IThreadChannelModel,
+                    ChannelThreads, 
+                    PageJoinedPrivateArchivedThreadsParams,
+                    RestThreadChannel
+                >(
+                    client,
+                    m => m.Threads,
+                    CreateThreadFromPaged,
+                    this
+                )
+            )
+        );
+    }
+
+    private RestThreadChannel CreateThreadFromPaged(IThreadChannelModel model, ChannelThreads api)
+    {
+        var actor = Threads[model.Id];
+        
+        var memberModel = api.Members.FirstOrDefault(x => x.ThreadId == actor.Id);
+        
+        if(memberModel is not null)
+            actor.Members.Current.AddModelSource(memberModel);
+
+        return actor.CreateEntity(model);
     }
 
     [SourceOfTruth]
     [CovariantOverride]
     internal virtual RestThreadableChannel CreateEntity(IThreadableChannelModel model)
-        => RestThreadableChannel.Construct(Client, Guild.Identity, model);
+        => RestThreadableChannel.Construct(Client, this, model);
 }
 
 public partial class RestThreadableChannel :
     RestGuildChannel,
     IThreadableChannel,
+    IRestNestedChannelTrait,
     IRestConstructable<RestThreadableChannel, RestThreadableChannelActor, IThreadableChannelModel>
 {
-    [SourceOfTruth]
-    public RestCategoryChannelActor? Category { get; private set; }
-
     public int? DefaultThreadSlowmode => Model.DefaultThreadRateLimitPerUser;
 
-    public ThreadArchiveDuration DefaultArchiveDuration => (ThreadArchiveDuration)Model.DefaultAutoArchiveDuration;
+    public ThreadArchiveDuration DefaultArchiveDuration => (ThreadArchiveDuration) Model.DefaultAutoArchiveDuration;
 
     internal override IThreadableChannelModel Model => _model;
 
@@ -56,54 +134,53 @@ public partial class RestThreadableChannel :
 
     internal RestThreadableChannel(
         DiscordRestClient client,
-        GuildIdentity guild,
         IThreadableChannelModel model,
-        RestThreadableChannelActor? actor = null
-    ) : base(client, guild, model)
+        RestThreadableChannelActor actor
+    ) : base(client, model, actor)
     {
         _model = model;
-
-        Actor = actor ?? new(
-            client,
-            guild,
-            ThreadableChannelIdentity.Of(this)
-        );
-
-        Category = model.ParentId.Map(
-            static (id, client, guild) => new RestCategoryChannelActor(client, guild, CategoryChannelIdentity.Of(id)),
-            client,
-            guild
-        );
+        Actor = actor;
     }
 
-    public static RestThreadableChannel Construct(DiscordRestClient client,
-        GuildIdentity guild,
+    public static RestThreadableChannel Construct(
+        DiscordRestClient client,
+        RestThreadableChannelActor actor,
         IThreadableChannelModel model)
     {
-        return model switch
+        switch (model)
         {
-            IGuildForumChannelModel guildForumChannelModel
-                => RestForumChannel.Construct(client, guild, guildForumChannelModel),
-            IGuildMediaChannelModel guildMediaChannelModel
-                => RestMediaChannel.Construct(client, guild, guildMediaChannelModel),
-            IGuildNewsChannelModel guildNewsChannelModel
-                => RestNewsChannel.Construct(client, guild, guildNewsChannelModel),
-            IGuildTextChannelModel guildTextChannelModel
-                => RestTextChannel.Construct(client, guild, guildTextChannelModel),
-            _ => new RestThreadableChannel(client, guild, model)
-        };
+            case IGuildForumChannelModel forumModel:
+                return RestForumChannel.Construct(
+                    client,
+                    actor as RestForumChannelActor ?? actor.Guild.Channels.Forum[model.Id],
+                    forumModel
+                );
+            case IGuildMediaChannelModel mediaModel:
+                return RestMediaChannel.Construct(
+                    client,
+                    actor as RestMediaChannelActor ?? actor.Guild.Channels.Media[model.Id],
+                    mediaModel
+                );
+            case IGuildNewsChannelModel newsModel:
+                return RestNewsChannel.Construct(
+                    client,
+                    actor as RestNewsChannelActor ?? actor.Guild.Channels.News[model.Id],
+                    newsModel
+                );
+            case IGuildTextChannelModel textModel:
+                return RestTextChannel.Construct(
+                    client,
+                    actor as RestTextChannelActor ?? actor.Guild.Channels.Text[model.Id],
+                    textModel
+                );
+            default:
+                return new(client, model, actor);
+        }
     }
 
     [CovariantOverride]
     public virtual ValueTask UpdateAsync(IThreadableChannelModel model, CancellationToken token = default)
     {
-        Category = Category.UpdateFrom(
-            model.Id,
-            RestCategoryChannelActor.Factory,
-            Client,
-            Actor.Guild.Identity
-        );
-
         _model = model;
 
         return base.UpdateAsync(model, token);

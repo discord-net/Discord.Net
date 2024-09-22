@@ -1,31 +1,19 @@
 using Discord.Models;
-using Discord.Models.Json;
-using Discord.Rest.Actors;
 using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-using MessageChannelTrait = RestMessageChannelTrait<RestVoiceChannelActor, VoiceChannelIdentity>;
-using IncomingIntegrationChannelTrait =
-    RestIncomingIntegrationChannelTrait<RestVoiceChannelActor, RestVoiceChannel, VoiceChannelIdentity>;
+//using MessageChannelTrait = RestMessageChannelTrait<RestVoiceChannelActor, VoiceChannelIdentity>;
 
 [ExtendInterfaceDefaults]
 public partial class RestVoiceChannelActor :
     RestGuildChannelActor,
+    IRestActor<RestVoiceChannelActor, ulong, RestVoiceChannel, IGuildVoiceChannelModel>,
     IVoiceChannelActor,
-    IRestActor<ulong, RestVoiceChannel, VoiceChannelIdentity, IGuildVoiceChannelModel>
+    IRestMessageChannelTrait,
+    IRestIntegrationChannelTrait.WithIncoming,
+    IRestGuildChannelInvitableTrait
 {
-    [SourceOfTruth]
-    public RestGuildChannelInviteActor.Enumerable.Indexable.BackLink<RestGuildChannelActor> Invites { get; }
-    
-    [ProxyInterface(typeof(IMessageChannelTrait))]
-    internal MessageChannelTrait MessageChannelTrait { get; }
-
-    [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
-    internal IncomingIntegrationChannelTrait IncomingIntegrationChannelTrait { get; }
-    
-    internal RestInvitableTrait<RestGuildChannelInviteActor, RestGuildChannelInvite> InvitableTrait { get; }
-
     [SourceOfTruth] internal override VoiceChannelIdentity Identity { get; }
 
     [method: TypeFactory]
@@ -35,10 +23,8 @@ public partial class RestVoiceChannelActor :
         VoiceChannelIdentity channel
     ) : base(client, guild, channel)
     {
-        channel = Identity = channel | this;
-
-        MessageChannelTrait = new(client, this, channel);
-        IncomingIntegrationChannelTrait = new(client, this, channel);
+        Identity = channel | this;
+        
     }
 
     [SourceOfTruth]
@@ -47,13 +33,13 @@ public partial class RestVoiceChannelActor :
         => RestVoiceChannel.Construct(Client, this, model);
 }
 
+[ExtendInterfaceDefaults]
 public partial class RestVoiceChannel :
     RestGuildChannel,
     IVoiceChannel,
-    IRestConstructable<RestVoiceChannel, RestVoiceChannelActor, IGuildVoiceChannelModel>
+    IRestConstructable<RestVoiceChannel, RestVoiceChannelActor, IGuildVoiceChannelModel>,
+    IRestNestedChannelTrait
 {
-    [SourceOfTruth] public RestCategoryChannelActor? Category { get; private set; }
-
     public string? RTCRegion => Model.RTCRegion;
 
     public int Bitrate => Model.Bitrate;
@@ -81,10 +67,6 @@ public partial class RestVoiceChannel :
     {
         _model = model;
         Actor = actor;
-
-        Category = model.ParentId.HasValue
-            ? actor.Guild.Channels.Category[model.ParentId.Value]
-            : null;
     }
 
     public static RestVoiceChannel Construct(
@@ -108,13 +90,6 @@ public partial class RestVoiceChannel :
     [CovariantOverride]
     public virtual ValueTask UpdateAsync(IGuildVoiceChannelModel model, CancellationToken token = default)
     {
-        Category = Category.UpdateFrom(
-            model.ParentId,
-            RestCategoryChannelActor.Factory,
-            Client,
-            Actor.Guild.Identity
-        );
-
         _model = model;
 
         return base.UpdateAsync(model, token);

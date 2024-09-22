@@ -6,11 +6,15 @@ namespace Discord;
 [FetchableOfMany(nameof(Routes.GetGuildWebhooks))]
 public partial interface IChannelFollowerWebhook :
     IWebhook,
-    IChannelFollowerWebhookActor
+    IChannelFollowerWebhookActor,
+    ISnowflakeEntity<IChannelFollowerWebhookModel>
 {
-    IGuildActor? SourceGuild { get; }
+    IGuildActor SourceGuild { get; }
+    string SourceGuildName { get; }
     string? SourceGuildIcon { get; }
-    string? SourceGuildName { get; }
-    INewsChannelActor? SourceChannel { get; }
-    string? SourceChannelName { get; }
+    INewsChannelActor SourceChannel { get; }
+    string SourceChannelName { get; }
+
+    [SourceOfTruth]
+    new IChannelFollowerWebhookModel GetModel();
 }

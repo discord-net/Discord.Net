@@ -8,7 +8,6 @@ namespace Discord;
 [
     Loadable(nameof(Routes.GetGuildMember)),
     Modifiable<ModifyGuildUserProperties>(nameof(Routes.ModifyGuildMember)),
-    LinkHierarchicalRoot,
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IMemberActor :
@@ -115,4 +114,10 @@ public partial interface IMemberActor :
         options ?? Client.DefaultRequestOptions,
         token
     );
+
+    [LinkExtension]
+    private interface WithCurrentExtension
+    {
+        ICurrentMemberActor Current { get; }
+    }
 }

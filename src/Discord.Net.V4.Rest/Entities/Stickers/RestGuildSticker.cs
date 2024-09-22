@@ -1,9 +1,5 @@
 using Discord.Models;
-using Discord.Models.Json;
-using Discord.Models.Json.Stickers;
 using Discord.Rest.Extensions;
-using Discord.Rest;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Discord.Rest;
 
@@ -11,7 +7,7 @@ namespace Discord.Rest;
 public partial class RestGuildStickerActor :
     RestStickerActor,
     IGuildStickerActor,
-    IRestActor<ulong, RestGuildSticker, GuildStickerIdentity>
+    IRestActor<RestGuildStickerActor, ulong, RestGuildSticker, IGuildStickerModel>
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
 
@@ -31,7 +27,7 @@ public partial class RestGuildStickerActor :
 
     [SourceOfTruth]
     internal RestGuildSticker CreateEntity(IGuildStickerModel model)
-        => RestGuildSticker.Construct(Client, Guild.Identity, model);
+        => RestGuildSticker.Construct(Client, this, model);
 }
 
 public sealed partial class RestGuildSticker :
@@ -56,46 +52,30 @@ public sealed partial class RestGuildSticker :
 
     internal RestGuildSticker(
         DiscordRestClient client,
-        GuildIdentity guild,
         IGuildStickerModel model,
-        RestGuildStickerActor? actor = null
-    ) : base(client, model)
+        RestGuildStickerActor actor
+    ) : base(client, model, actor)
     {
         _model = model;
+        Actor = actor;
 
-        Actor = actor ?? new(client, guild, GuildStickerIdentity.Of(this));
-
-        Author = model.AuthorId.Map(
-            static (id, client, guild, model)
-                => new RestMemberActor(
-                    client,
-                    guild,
-                    MemberIdentity.Of(id),
-                    UserIdentity.FromReferenced<RestUser, DiscordRestClient>(model, id, client)
-                ),
-            client,
-            guild,
-            model
-        );
+        Author = model.AuthorId.HasValue
+            ? actor.Guild.Members[model.AuthorId.Value]
+            : null;
     }
 
-    public static RestGuildSticker Construct(DiscordRestClient client, GuildIdentity guild, IGuildStickerModel model)
-        => new(client, guild, model);
+    public static RestGuildSticker Construct(
+        DiscordRestClient client, 
+        RestGuildStickerActor actor, 
+        IGuildStickerModel model
+        ) => new(client, model, actor);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IGuildStickerModel model, CancellationToken token = default)
     {
         Author = Author.UpdateFrom(
             model.AuthorId,
-            RestMemberActor.Factory,
-            Client,
-            Actor.Guild.Identity,
-            model.AuthorId.Map(
-                static (id, model, client)
-                    => UserIdentity.FromReferenced<RestUser, DiscordRestClient>(model, id, client),
-                model,
-                Client
-            )
+            Actor.Guild.Members.Specifically
         );
 
         _model = model;

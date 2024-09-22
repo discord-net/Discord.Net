@@ -158,14 +158,14 @@ public static class MemberUtils
         {
             IPropertySymbol propA when baseSymbol is IPropertySymbol propB =>
                 CanOverrideProperty(
-                    propA.Type, propA.Name,
-                    propB.Type, propB.Name,
+                    propA.Type, GetMemberName(propA),
+                    propB.Type, GetMemberName(propB),
                     compilation
                 ),
             IMethodSymbol methodA when baseSymbol is IMethodSymbol methodB =>
                 CanOverrideMethod(
-                    methodA.ReturnType, methodA.Name, methodA.Parameters,
-                    methodB.ReturnType, methodB.Name, methodB.Parameters,
+                    methodA.ReturnType, GetMemberName(methodA), methodA.Parameters,
+                    methodB.ReturnType, GetMemberName(methodB), methodB.Parameters,
                     compilation
                 ),
             _ => false

@@ -6,6 +6,7 @@ global using RoleIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestRole, 
 global using GuildEmoteIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildEmote, Discord.Rest.RestGuildEmoteActor, Discord.Models.ICustomEmoteModel>;
 global using BanIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestBan, Discord.Rest.RestBanActor, Discord.Models.IBanModel>;
 global using IntegrationIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestIntegration, Discord.Rest.RestIntegrationActor, Discord.Models.IIntegrationModel>;
+global using GuildTemplateIdentity = Discord.IIdentifiable<string, Discord.Rest.RestGuildTemplate, Discord.Rest.RestGuildTemplateActor, Discord.Models.IGuildTemplateModel>;
 
 #endregion
 
@@ -38,7 +39,7 @@ global using GroupChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Re
 global using ThreadIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadChannel, Discord.Rest.RestThreadChannelActor, Discord.Models.IThreadChannelModel>;
 global using GuildThreadIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadChannel, Discord.Rest.RestGuildThreadChannelActor, Discord.Models.IThreadChannelModel>;
 global using ChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestChannel, Discord.Rest.RestChannelActor, Discord.Models.IChannelModel>;
-global using MessageChannelIdentity = Discord.IIdentifiable<ulong, Discord.IMessageChannel, Discord.IMessageChannelTrait, Discord.Models.IChannelModel>;
+global using MessageChannelIdentity = Discord.IIdentifiable<ulong, Discord.IMessageChannel, Discord.Rest.IRestMessageChannelTrait, Discord.Models.IChannelModel>;
 global using GuildChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildChannel, Discord.Rest.RestGuildChannelActor, Discord.Models.IGuildChannelModel>;
 global using ThreadableChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestThreadableChannel, Discord.Rest.RestThreadableChannelActor, Discord.Models.IThreadableChannelModel>;
 global using VoiceChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestVoiceChannel, Discord.Rest.RestVoiceChannelActor, Discord.Models.IGuildVoiceChannelModel>;
@@ -49,9 +50,9 @@ global using TextChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Res
 global using StageChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestStageChannel, Discord.Rest.RestStageChannelActor, Discord.Models.IGuildStageChannelModel>;
 global using CategoryChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestCategoryChannel, Discord.Rest.RestCategoryChannelActor, Discord.Models.IGuildCategoryChannelModel>;
 
-global using IntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
-global using IncomingIntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IIncomingIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
-global using ChannelFollowerIntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.IChannelFollowerIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
+global using IntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.Rest.IRestIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
+global using IncomingIntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.Rest.IRestIncomingIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
+global using ChannelFollowerIntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.Rest.IRestChannelFollowerIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
 
 #endregion
 
@@ -85,5 +86,8 @@ global using GuildScheduledEventIdentity = Discord.IIdentifiable<ulong, Discord.
 #region Webhooks
 
 global using WebhookIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestWebhook, Discord.Rest.RestWebhookActor, Discord.Models.IWebhookModel>;
+global using GuildChannelWebhookIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestWebhook, Discord.Rest.RestGuildChannelWebhookActor, Discord.Models.IWebhookModel>;
+global using IncomingWebhookIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestIncomingWebhook, Discord.Rest.RestIncomingWebhookActor, Discord.Models.IIncomingWebhookModel>;
+global using ChannelFollowerWebhookIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestChannelFollowerWebhook, Discord.Rest.RestChannelFollowerWebhookActor, Discord.Models.IChannelFollowerWebhookModel>;
 
 #endregion

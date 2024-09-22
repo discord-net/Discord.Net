@@ -1,12 +1,11 @@
 using Discord.Models;
+using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-using StickersActor = RestManagedIndexableLink<RestStickerActor, ulong, RestSticker, ISticker, IStickerModel>;
-
 [ExtendInterfaceDefaults]
 public sealed partial class RestStickerPackActor :
-    RestActor<ulong, RestStickerPack, StickerPackIdentity>,
+    RestActor<RestStickerPackActor, ulong, RestStickerPack, IStickerPackModel>,
     IStickerPackActor
 {
     internal override StickerPackIdentity Identity { get; }
@@ -21,24 +20,24 @@ public sealed partial class RestStickerPackActor :
     }
 
     [SourceOfTruth]
-    internal RestStickerPack CreateEntity(IStickerPackModel model)
-        => RestStickerPack.Construct(Client, model);
+    internal override RestStickerPack CreateEntity(IStickerPackModel model)
+        => RestStickerPack.Construct(Client, this, model);
 }
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestStickerPack :
     RestEntity<ulong>,
     IStickerPack,
-    IConstructable<RestStickerPack, IStickerPackModel, DiscordRestClient>
+    IRestConstructable<RestStickerPack, RestStickerPackActor, IStickerPackModel>
 {
     public string Name => Model.Name;
 
     [SourceOfTruth]
-    public StickersActor Stickers { get; }
+    public RestStickerActor.Defined.Indexable Stickers { get; }
 
     public ulong SkuId => Model.SkuId;
 
-    [SourceOfTruth] public RestStickerActor? CoverSticker { get; }
+    [SourceOfTruth] public RestStickerActor? CoverSticker { get; private set; }
 
     public string Description => Model.Description;
 
@@ -46,34 +45,54 @@ public sealed partial class RestStickerPack :
 
     [ProxyInterface] internal RestStickerPackActor Actor { get; }
 
-    internal IStickerPackModel Model { get; }
+    internal IStickerPackModel Model { get; private set; }
 
     public RestStickerPack(
         DiscordRestClient client,
         IStickerPackModel model,
-        RestStickerPackActor? actor = null
+        RestStickerPackActor actor
     ) : base(client, model.Id)
     {
         Model = model;
-        Actor = actor ?? new(client, StickerPackIdentity.Of(this));
+        Actor = actor;
 
-        if (model is not IModelSourceOfMultiple<IStickerModel> stickersSource)
-            throw new ArgumentException($"Expected {model.GetType()} to provide sticker models");
-
-        Stickers = RestManagedIndexableActor.Create(
-            Template.Of<RestStickerActor>(),
+        Stickers = new(
             client,
-            stickersSource.GetModels(),
-            RestSticker.Construct,
-            Client.Stickers
+            RestActorProvider.GetOrCreate(
+                client,
+                Template.Of<StickerIdentity>()
+            ),
+            model.StickerIds.ToList().AsReadOnly()
         );
+
+        if (model is IModelSourceOfMultiple<IStickerModel> stickers)
+            Stickers.AddModelSources(Template.Of<StickerIdentity>(), stickers);
 
         if(model.CoverStickerId.HasValue)
             CoverSticker = client.Stickers[model.CoverStickerId.Value];
     }
 
-    public IStickerPackModel GetModel() => Model;
+    public static RestStickerPack Construct(
+        DiscordRestClient client, 
+        RestStickerPackActor actor,
+        IStickerPackModel model)
+        => new(client, model, actor);
 
-    public static RestStickerPack Construct(DiscordRestClient client, IStickerPackModel model)
-        => new(client, model);
+    public ValueTask UpdateAsync(IStickerPackModel model, CancellationToken token = default)
+    {
+        Model = model;
+        
+        if (model is IModelSourceOfMultiple<IStickerModel> stickers)
+            Stickers.AddModelSources(Template.Of<StickerIdentity>(), stickers);
+
+        CoverSticker = CoverSticker.UpdateFrom(
+            model.CoverStickerId,
+            RestStickerActor.Factory,
+            Client
+        );
+        
+        return ValueTask.CompletedTask;
+    }
+    
+    public IStickerPackModel GetModel() => Model;
 }

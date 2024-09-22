@@ -3,19 +3,14 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
-using IncomingIntegrationChannelTrait =
-    RestIncomingIntegrationChannelTrait<RestForumChannelActor, RestForumChannel, ForumChannelIdentity>;
-
 [ExtendInterfaceDefaults]
 public sealed partial class RestForumChannelActor :
     RestThreadableChannelActor,
     IForumChannelActor,
-    IRestActor<ulong, RestForumChannel, ForumChannelIdentity, IGuildForumChannelModel>
+    IRestActor<RestForumChannelActor, ulong, RestForumChannel, IGuildForumChannelModel>,
+    IRestIncomingIntegrationChannelTrait
 {
     [SourceOfTruth] internal override ForumChannelIdentity Identity { get; }
-
-    [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
-    internal IncomingIntegrationChannelTrait IncomingIntegrationChannelTrait { get; }
 
     [method: TypeFactory]
     public RestForumChannelActor(
@@ -25,8 +20,6 @@ public sealed partial class RestForumChannelActor :
     ) : base(client, guild, channel)
     {
         Identity = channel | this;
-
-        IncomingIntegrationChannelTrait = new(client, this, channel);
     }
 
     [CovariantOverride]

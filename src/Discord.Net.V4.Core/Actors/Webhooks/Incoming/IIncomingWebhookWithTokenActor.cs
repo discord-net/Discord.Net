@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 
@@ -35,6 +36,6 @@ public partial interface IIncomingWebhookWithTokenActor :
 
         return model is null
             ? null
-            : Messages.CreateEntity(model);
+            : (Messages as IEntityProvider<IWebhookMessage, IMessageModel>).CreateEntity(model);
     }
 }

@@ -4,7 +4,7 @@ using Discord.Models;
 
 namespace Discord.Rest;
 
-internal sealed class RestPager<TId, TEntity, TModel, TPagingModel, TParams>(
+internal sealed class RestPager<TEntity, TModel, TPagingModel, TParams>(
     DiscordRestClient client,
     IPathable path,
     RequestOptions options,
@@ -15,9 +15,8 @@ internal sealed class RestPager<TId, TEntity, TModel, TPagingModel, TParams>(
     Func<TPagingModel, RequestOptions, CancellationToken, ValueTask>? onPage = null
 ):
     IAsyncPaged<TEntity>
-    where TId : IEquatable<TId>
-    where TEntity : class, IEntity<TId, TModel>
-    where TModel : IEntityModel<TId>
+    where TEntity : class, IEntityOf<TModel>
+    where TModel : IModel
     where TParams : class, IPagingParams<TParams, TPagingModel>
     where TPagingModel : class
 {

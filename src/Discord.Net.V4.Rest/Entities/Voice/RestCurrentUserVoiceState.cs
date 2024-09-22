@@ -6,28 +6,24 @@ namespace Discord.Rest;
 public sealed partial class RestCurrentUserVoiceStateActor :
     RestVoiceStateActor,
     ICurrentUserVoiceStateActor,
-    IRestActor<ulong, RestCurrentUserVoiceState, CurrentUserVoiceStateIdentity>
+    IRestActor<RestCurrentUserVoiceStateActor, ulong, RestCurrentUserVoiceState, IVoiceStateModel>
 {
-    [SourceOfTruth]
-    public override RestCurrentMemberActor Member { get; }
+    [SourceOfTruth] public override RestCurrentMemberActor Member => Guild.Members.Current;
 
-    [SourceOfTruth]
-    internal override CurrentUserVoiceStateIdentity Identity { get; }
+    [SourceOfTruth] internal override CurrentUserVoiceStateIdentity Identity { get; }
 
     public RestCurrentUserVoiceStateActor(
         DiscordRestClient client,
         GuildIdentity guild,
-        CurrentUserVoiceStateIdentity voiceState,
-        CurrentMemberIdentity? currentMember = null
-    ) : base(client, guild, voiceState, currentMember ?? CurrentMemberIdentity.Of(client.CurrentUser.Id))
+        CurrentUserVoiceStateIdentity voiceState
+    ) : base(client, guild, voiceState, client.Guilds[guild].Members.Current.Identity)
     {
         Identity = voiceState | this;
-        Member = currentMember?.Actor ?? Guild.CurrentMember;
     }
 
     [SourceOfTruth]
     internal override RestCurrentUserVoiceState CreateEntity(IVoiceStateModel model)
-        => RestCurrentUserVoiceState.Construct(Client, new(Guild.Identity, Member.Identity), model);
+        => RestCurrentUserVoiceState.Construct(Client, this, model);
 }
 
 [ExtendInterfaceDefaults]
@@ -36,21 +32,20 @@ public sealed partial class RestCurrentUserVoiceState :
     ICurrentUserVoiceState,
     IRestConstructable<RestCurrentUserVoiceState, RestCurrentUserVoiceStateActor, IVoiceStateModel>
 {
-    [ProxyInterface]
-    internal override RestCurrentUserVoiceStateActor Actor { get; }
+    [ProxyInterface] internal override RestCurrentUserVoiceStateActor Actor { get; }
 
-    public RestCurrentUserVoiceState(
+    internal RestCurrentUserVoiceState(
         DiscordRestClient client,
-        GuildIdentity guild,
         IVoiceStateModel model,
-        RestCurrentUserVoiceStateActor? actor = null,
-        CurrentMemberIdentity? member = null
-    ) : base(client, guild, model, actor, member)
+        RestCurrentUserVoiceStateActor actor
+    ) : base(client, model, actor)
     {
-        Actor = actor ?? new(client, guild, CurrentUserVoiceStateIdentity.Of(this), member);
+        Actor = actor;
     }
 
-    public new static RestCurrentUserVoiceState Construct(DiscordRestClient client, Context context,
-        IVoiceStateModel model)
-        => new(client, context.Guild, model, member: context.Member as CurrentMemberIdentity);
+    public static RestCurrentUserVoiceState Construct(
+        DiscordRestClient client,
+        RestCurrentUserVoiceStateActor actor,
+        IVoiceStateModel model
+    ) => new(client, model, actor);
 }

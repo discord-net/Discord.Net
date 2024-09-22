@@ -26,8 +26,6 @@ namespace Discord.Rest;
 
 public sealed partial class DiscordRestClient : IDiscordClient
 {
-    [SourceOfTruth] public RestCurrentUserActor CurrentUser { get; }
-
     [SourceOfTruth]
     public RestGuildActor
         .Paged<RestPartialGuild, IPartialGuildModel, PageUserGuildsParams, IEnumerable<IPartialGuildModel>>
@@ -35,7 +33,7 @@ public sealed partial class DiscordRestClient : IDiscordClient
 
     [SourceOfTruth] public RestChannelActor.Indexable.Hierarchy Channels { get; }
 
-    [SourceOfTruth] public RestUserActor.Indexable Users { get; }
+    [SourceOfTruth] public RestUserActor.Indexable.WithCurrent Users { get; }
 
     [SourceOfTruth] public RestWebhookActor.Indexable Webhooks { get; }
     [SourceOfTruth] public RestInviteActor.Indexable Invites { get; }

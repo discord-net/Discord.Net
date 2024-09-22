@@ -85,7 +85,7 @@ public partial class RestLinkTypeV2<TActor, TId, TEntity, TModel>(
 
             internal TActor this[IIdentifiable<TId, TEntity, TActor, TModel> identity]
                 => identity.Actor ?? this[identity.Id];
-            
+
             public ITask<IReadOnlyCollection<TEntity>> AllAsync(
                 RequestOptions? options = null,
                 CancellationToken token = default
@@ -98,7 +98,7 @@ public partial class RestLinkTypeV2<TActor, TId, TEntity, TModel>(
             ) : this(new(client, provider), new(client, provider, enumerableProviderDelegate))
             {
             }
-            
+
             public Indexable(
                 DiscordRestClient client,
                 IActorProvider<TActor, TId> provider,
@@ -124,14 +124,25 @@ public partial class RestLinkTypeV2<TActor, TId, TEntity, TModel>(
             protected override RestLinkV2<TActor, TId, TEntity, TModel>[] Components
                 => [IndexableLink, PagedLink];
 
+            public Indexable(
+                DiscordRestClient client,
+                IActorProvider<TActor, TId> actorProvider,
+                IPagingProvider<TParams, TEntity, TModel> pagingProvider
+            ) : this(new(client, actorProvider), new(client, actorProvider, pagingProvider))
+            {
+            }
+
             public TActor this[TId id] => Specifically(id);
 
             public TActor Specifically(TId id)
                 => GetActor(id);
-            
-            internal TActor this[IIdentifiable<TId, TEntity, TActor, TModel> identity]
-                => identity.Actor ?? this[identity.Id];
 
+            internal TActor this[IIdentifiable<TId, TEntity, TActor, TModel> identity]
+                => Specifically(identity);
+
+            internal TActor Specifically(IIdentifiable<TId, TEntity, TActor, TModel> identity)
+                =>  identity.Actor ?? this[identity.Id];
+            
             public IAsyncPaged<TEntity> PagedAsync(TParams? args = default, RequestOptions? options = null)
                 => PagedLink.PagedAsync(args, options);
         }
@@ -156,7 +167,7 @@ public partial class RestLinkTypeV2<TActor, TId, TEntity, TModel>(
 
             public TActor Specifically(TId id)
                 => GetActor(id);
-            
+
             internal TActor this[IIdentifiable<TId, TEntity, TActor, TModel> identity]
                 => identity.Actor ?? this[identity.Id];
 
@@ -174,8 +185,18 @@ public partial class RestLinkTypeV2<TActor, TId, TEntity, TModel>(
             RestLinkV2<TActor, TId, TEntity, TModel>(indexable.Client, indexable),
             ILinkType<TActor, TId, TEntity, TModel>.Defined.Indexable
         {
+            public IReadOnlyCollection<TId> Ids => DefinedLink.Ids;
+
             internal RestLinkTypeV2<TActor, TId, TEntity, TModel>.Indexable IndexableLink { get; } = indexable;
             internal Defined DefinedLink { get; } = defined;
+
+            public Indexable(
+                DiscordRestClient client,
+                IActorProvider<TActor, TId> provider,
+                IReadOnlyCollection<TId> ids
+            ) : this(new(client, provider), new(client, provider, ids))
+            {
+            }
 
             protected override RestLinkV2<TActor, TId, TEntity, TModel>[] Components
                 => [IndexableLink, DefinedLink];
@@ -184,11 +205,9 @@ public partial class RestLinkTypeV2<TActor, TId, TEntity, TModel>(
 
             public TActor Specifically(TId id)
                 => GetActor(id);
-            
+
             internal TActor this[IIdentifiable<TId, TEntity, TActor, TModel> identity]
                 => identity.Actor ?? this[identity.Id];
-
-            public IReadOnlyCollection<TId> Ids => DefinedLink.Ids;
         }
     }
 }

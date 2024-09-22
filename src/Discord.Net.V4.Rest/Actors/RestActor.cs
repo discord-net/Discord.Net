@@ -4,8 +4,8 @@ using Discord.Models;
 
 namespace Discord.Rest;
 
-public abstract class RestActor<TSelf, TId, TEntity, TModel> :
-    IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TSelf, TModel>, TModel>
+public abstract partial class RestActor<TSelf, TId, TEntity, TModel> :
+    IRestActor<TSelf, TId, TEntity, TModel>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>, IEntity<TId, TModel>, IRestConstructable<TEntity, TSelf, TModel>
     where TSelf : RestActor<TSelf, TId, TEntity, TModel>
@@ -97,24 +97,24 @@ public abstract class RestActor<TSelf, TId, TEntity, TModel> :
         
         lock(Identity) _modelQueue.Enqueue(model);
     }
-    
+
     internal virtual TEntity CreateEntity(TModel model)
         => TEntity.Construct(Client, (TSelf)this, model);
 
-    IIdentifiable<TId, TEntity, TSelf, TModel>
-        IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TSelf, TModel>, TModel>
-        .Identity => Identity;
+    IIdentifiable<TId, TEntity, TSelf, TModel> IRestActor<TSelf, TId, TEntity, TModel>.Identity => Identity;
 
     TEntity IEntityProvider<TEntity, TModel>.CreateEntity(TModel model) => CreateEntity(model);
 }
 
-public interface IRestActor<out TId, out TEntity, out TIdentity, in TModel> :
-    IRestActor<TId, TEntity, TModel>
+public interface IRestActor<out TSelf, TId, out TEntity, TModel> :
+    IRestActor<TId, TEntity, TModel>,
+    IRestTraitProvider<TSelf>
     where TId : IEquatable<TId>
-    where TEntity : IEntity<TId, TModel>
-    where TModel : IEntityModel<TId>
+    where TEntity : class, IEntity<TId, TModel>
+    where TModel : class, IEntityModel<TId>
+    where TSelf : class, IRestActor<TSelf, TId, TEntity, TModel>
 {
-    internal TIdentity Identity { get; }
+    internal IIdentifiable<TId, TEntity, TSelf, TModel> Identity { get; }
 }
 
 public interface IRestActor<out TId, out TEntity, in TModel> :
@@ -126,6 +126,7 @@ public interface IRestActor<out TId, out TEntity, in TModel> :
 
 public interface IRestActor<out TId, out TEntity> :
     IActor<TId, TEntity>,
-    IRestClientProvider
+    IRestClientProvider,
+    IRestTraitProvider
     where TId : IEquatable<TId>
     where TEntity : IEntity<TId>;

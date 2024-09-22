@@ -14,6 +14,12 @@ public partial interface IThreadMemberActor :
     {
         IThreadMemberActor Current { get; }
     }
+
+    [LinkExtension]
+    protected interface WithPagedVariantExtension
+    {
+        IThreadMemberActor.Paged<PageThreadMembersParams>.Indexable AsPaged { get; }
+    }
     
     [BackLink<IThreadChannelActor>]
     private static Task AddAsync(

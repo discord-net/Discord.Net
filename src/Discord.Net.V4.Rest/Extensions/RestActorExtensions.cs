@@ -38,7 +38,7 @@ internal static partial class RestActorExtensions
         where TEntity : class, IEntity<TId, TModel>
         where TId : struct, IEquatable<TId>
         where TModel : class, IEntityModel<TId>
-        where TActor : class, IRestActor<TId, TEntity, IIdentifiable<TId, TEntity, TActor, TModel>, TModel>
+        where TActor : class, IRestActor<TActor, TId, TEntity, TModel>
     {
         if (id is null && actor is null)
             return null;

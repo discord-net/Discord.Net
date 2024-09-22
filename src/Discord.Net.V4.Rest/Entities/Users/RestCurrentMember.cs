@@ -7,16 +7,13 @@ namespace Discord.Rest;
 public sealed partial class RestCurrentMemberActor :
     RestMemberActor,
     ICurrentMemberActor,
-    IRestActor<ulong, RestCurrentMember, CurrentMemberIdentity, IMemberModel>
+    IRestActor<RestCurrentMemberActor, ulong, RestCurrentMember, IMemberModel>
 {
-    [SourceOfTruth]
-    public override RestCurrentUserVoiceStateActor VoiceState { get; }
+    [SourceOfTruth] public override RestCurrentUserVoiceStateActor VoiceState { get; }
 
-    [ProxyInterface, SourceOfTruth]
-    private RestCurrentUserActor User { get; }
+    [ProxyInterface, SourceOfTruth] private RestCurrentUserActor User { get; }
 
-    [SourceOfTruth]
-    internal override CurrentMemberIdentity Identity { get; }
+    [SourceOfTruth] internal override CurrentMemberIdentity Identity { get; }
 
     [TypeFactory(LastParameter = nameof(member))]
     public RestCurrentMemberActor(
@@ -24,11 +21,11 @@ public sealed partial class RestCurrentMemberActor :
         GuildIdentity guild,
         CurrentMemberIdentity member,
         CurrentUserVoiceStateIdentity? voiceState = null
-    ) : base(client, guild, member, client.CurrentUser.Identity, voiceState)
+    ) : base(client, guild, member, client.Users.Current.Identity, voiceState)
     {
         Identity = member | this;
 
-        User = client.CurrentUser;
+        User = client.Users.Current;
 
         VoiceState = voiceState?.Actor ?? new(
             client,
@@ -49,8 +46,7 @@ public sealed partial class RestCurrentMember :
     ICurrentMember,
     IRestConstructable<RestCurrentMember, RestCurrentMemberActor, IMemberModel>
 {
-    [ProxyInterface]
-    internal override RestCurrentMemberActor Actor { get; }
+    [ProxyInterface] internal override RestCurrentMemberActor Actor { get; }
 
     internal RestCurrentMember(
         DiscordRestClient client,
@@ -62,7 +58,10 @@ public sealed partial class RestCurrentMember :
         Actor = actor;
     }
 
-    public static RestCurrentMember Construct(DiscordRestClient client, RestCurrentMemberActor actor, IMemberModel model)
+    public static RestCurrentMember Construct(
+        DiscordRestClient client,
+        RestCurrentMemberActor actor,
+        IMemberModel model)
     {
         if (model is not IModelSourceOf<IUserModel?> userModelSource)
             throw new ArgumentException($"Expected {model.GetType()} to be a {typeof(IModelSourceOf<IUserModel?>)}",

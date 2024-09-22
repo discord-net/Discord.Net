@@ -19,10 +19,13 @@ public interface ILoadable<TSelf, TId, TEntity, TModel> :
 {
     async ValueTask<TEntity?> GetOrFetchAsync(RequestOptions? options = null, CancellationToken token = default)
     {
-        var result = await GetAsync(token);
+        if ((options ?? Client.DefaultRequestOptions).AllowCached)
+        {
+            var result = await GetAsync(token);
 
-        if (result is not null)
-            return result;
+            if (result is not null)
+                return result;
+        }
 
         return await FetchAsync(options, token);
     }

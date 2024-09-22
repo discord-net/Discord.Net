@@ -6,7 +6,7 @@ namespace Discord.Rest;
 public partial class RestMemberActor :
     RestUserActor,
     IMemberActor,
-    IRestActor<ulong, RestMember, MemberIdentity, IMemberModel>
+    IRestActor<RestMemberActor, ulong, RestMember, IMemberModel>
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
     
@@ -96,8 +96,8 @@ public partial class RestMember :
         if (actor is RestCurrentMemberActor currentMemberActor)
             return RestCurrentMember.Construct(client, currentMemberActor, model);
         
-        if(model.Id == client.CurrentUser.Id)
-            return RestCurrentMember.Construct(client, actor.Guild.CurrentMember, model);
+        if(model.Id == client.Users.Current.Id)
+            return RestCurrentMember.Construct(client, actor.Guild.Members.Current, model);
         
         if (model is not IModelSourceOf<IUserModel?> userModelSource)
             throw new ArgumentException($"Expected {model.GetType()} to be a {typeof(IModelSourceOf<IUserModel?>)}",

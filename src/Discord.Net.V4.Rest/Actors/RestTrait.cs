@@ -2,29 +2,27 @@ using Discord.Models;
 
 namespace Discord.Rest;
 
-public abstract class RestTrait<TId, TEntity, TIdentity, TModel>(
+public abstract class RestTrait<TId, TEntity, TModel>(
     DiscordRestClient client,
-    TIdentity identity
+    TId id
 ) :
-    RestActor<TId, TEntity, TIdentity, TModel>(client, identity),
-    IRestTrait<TId, TEntity, TIdentity, TModel>
+    IRestTrait<TId, TEntity, TModel>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>, IEntity<TId, TModel>
-    where TIdentity : IIdentifiable<TId>
     where TModel : IEntityModel<TId>
 {
-    internal abstract TEntity CreateEntity(TIdentity model);
+    public IDiscordClient Client { get; } = client;
+
+    public TId Id { get; } = id;
 }
 
-public interface IRestTrait<out TId, out TEntity, out TIdentity, in TModel> :
-    IRestTrait<TId, TEntity>,
-    IRestActor<TId, TEntity, TIdentity, TModel>
+public interface IRestTrait<out TId, out TEntity, in TModel> :
+    IRestTrait<TId, TEntity>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>, IEntity<TId, TModel>
-    where TIdentity : IIdentifiable<TId>
     where TModel : IEntityModel<TId>;
 
 public interface IRestTrait<out TId, out TEntity> :
-    IRestActor<TId, TEntity>
+    IActorTrait<TId, TEntity>
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>;

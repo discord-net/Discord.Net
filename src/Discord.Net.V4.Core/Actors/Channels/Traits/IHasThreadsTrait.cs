@@ -23,5 +23,5 @@ public partial interface IHasThreadsTrait
 {
     [return: TypeHeuristic(nameof(Threads))]
     IThreadChannelActor Thread(ulong id) => Threads[id];
-    ILinkType<IThreadChannelActor, ulong, IThreadChannel, IThreadChannelModel>.Indexable Threads { get; }
+    ThreadChannelLinkType.Indexable Threads { get; }
 }

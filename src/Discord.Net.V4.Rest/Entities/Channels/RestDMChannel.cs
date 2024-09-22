@@ -6,12 +6,10 @@ namespace Discord.Rest;
 [ExtendInterfaceDefaults]
 public partial class RestDMChannelActor :
     RestChannelActor,
+    IRestActor<RestDMChannelActor, ulong, RestDMChannel, IDMChannelModel>,
     IDMChannelActor,
-    IRestActor<ulong, RestDMChannel, DMChannelIdentity, IDMChannelModel>
+    IRestMessageChannelTrait
 {
-    [ProxyInterface(typeof(IMessageChannelTrait))]
-    internal RestMessageChannelTrait<RestDMChannelActor, DMChannelIdentity> MessageChannelTrait { get; }
-
     [SourceOfTruth] internal sealed override DMChannelIdentity Identity { get; }
 
     [method: TypeFactory]
@@ -21,8 +19,6 @@ public partial class RestDMChannelActor :
     ) : base(client, channel)
     {
         Identity = channel | this;
-
-        MessageChannelTrait = new(client, this, channel);
     }
 
     [SourceOfTruth]

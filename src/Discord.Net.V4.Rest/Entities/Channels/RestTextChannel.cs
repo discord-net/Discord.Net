@@ -4,26 +4,15 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-using MessageChannelTrait = RestMessageChannelTrait<RestTextChannelActor, TextChannelIdentity>;
-using IncomingIntegrationChannelTrait = RestIncomingIntegrationChannelTrait<RestTextChannelActor, RestTextChannel, TextChannelIdentity>;
-using ChannelFollowerIntegrationChannelTrait = RestChannelFollowerIntegrationChannelTrait<RestTextChannelActor, RestTextChannel, TextChannelIdentity>;
-
-
 [ExtendInterfaceDefaults]
 public partial class RestTextChannelActor :
     RestThreadableChannelActor,
     ITextChannelActor,
-    IRestActor<ulong, RestTextChannel, TextChannelIdentity, IGuildTextChannelModel>
+    IRestActor<RestTextChannelActor, ulong, RestTextChannel, IGuildTextChannelModel>,
+    IRestMessageChannelTrait,
+    IRestIncomingIntegrationChannelTrait,
+    IRestChannelFollowerIntegrationChannelTrait
 {
-    [ProxyInterface(typeof(IMessageChannelTrait))]
-    internal MessageChannelTrait MessageChannelTrait { get; }
-
-    [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
-    internal IncomingIntegrationChannelTrait IncomingIntegrationChannelTrait { get; }
-
-    [ProxyInterface(typeof(IChannelFollowerIntegrationChannelTrait))]
-    internal ChannelFollowerIntegrationChannelTrait ChannelFollowerIntegrationChannelTrait { get; }
-
     [SourceOfTruth] internal override TextChannelIdentity Identity { get; }
 
     [method: TypeFactory]
@@ -33,18 +22,13 @@ public partial class RestTextChannelActor :
         TextChannelIdentity channel
     ) : base(client, guild, channel)
     {
-        channel = Identity = channel | this;
-
-        MessageChannelTrait = new MessageChannelTrait(client, this, channel);
-
-        IncomingIntegrationChannelTrait = new(client, this, channel);
-        ChannelFollowerIntegrationChannelTrait = new(client, this, channel);
+        Identity = channel | this;
     }
 
     [SourceOfTruth]
     [CovariantOverride]
     internal virtual RestTextChannel CreateEntity(IGuildTextChannelModel model)
-        => RestTextChannel.Construct(Client, Guild.Identity, model);
+        => RestTextChannel.Construct(Client, this, model);
 }
 
 public partial class RestTextChannel :
@@ -71,17 +55,32 @@ public partial class RestTextChannel :
 
     internal RestTextChannel(
         DiscordRestClient client,
-        GuildIdentity guild,
         IGuildTextChannelModel model,
-        RestTextChannelActor? actor = null
-    ) : base(client, guild, model, actor)
+        RestTextChannelActor actor
+    ) : base(client, model, actor)
     {
         _model = model;
-        Actor = actor ?? new(client, guild, TextChannelIdentity.Of(this));
+        Actor = actor;
     }
 
-    public static RestTextChannel Construct(DiscordRestClient client, GuildIdentity guild, IGuildTextChannelModel model)
-        => new(client, guild, model);
+    public static RestTextChannel Construct(
+        DiscordRestClient client,
+        RestTextChannelActor actor,
+        IGuildTextChannelModel model
+    )
+    {
+        switch (model)
+        {
+            case IGuildNewsChannelModel newsModel:
+                return RestNewsChannel.Construct(
+                    client,
+                    actor as RestNewsChannelActor ?? actor.Guild.Channels.News[model.Id],
+                    newsModel
+                );
+            default:
+                return new(client, model, actor);
+        }
+    }
 
     [CovariantOverride]
     public virtual ValueTask UpdateAsync(IGuildTextChannelModel model, CancellationToken token = default)

@@ -5,17 +5,13 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
-using IncomingIntegrationChannelTrait = RestIncomingIntegrationChannelTrait<RestMediaChannelActor, RestMediaChannel, MediaChannelIdentity>;
-
 [ExtendInterfaceDefaults]
 public sealed partial class RestMediaChannelActor :
     RestThreadableChannelActor,
     IMediaChannelActor,
-    IRestActor<ulong, RestMediaChannel, MediaChannelIdentity, IGuildMediaChannelModel>
+    IRestActor<RestMediaChannelActor, ulong, RestMediaChannel, IGuildMediaChannelModel>,
+    IRestIncomingIntegrationChannelTrait
 {
-    [ProxyInterface(typeof(IIncomingIntegrationChannelTrait))]
-    internal IncomingIntegrationChannelTrait IntegrationChannelActor { get; }
-
     [SourceOfTruth] internal override MediaChannelIdentity Identity { get; }
 
     [TypeFactory]
@@ -26,14 +22,12 @@ public sealed partial class RestMediaChannelActor :
     ) : base(client, guild, channel)
     {
         Identity = channel | this;
-
-        IntegrationChannelActor = new(client, this, channel);
     }
 
     [CovariantOverride]
     [SourceOfTruth]
     internal RestMediaChannel CreateEntity(IGuildMediaChannelModel model)
-        => RestMediaChannel.Construct(Client, Guild.Identity, model);
+        => RestMediaChannel.Construct(Client, this, model);
 }
 
 public partial class RestMediaChannel :
@@ -45,15 +39,15 @@ public partial class RestMediaChannel :
 
     public string? Topic => Model.Topic;
 
-    public ThreadArchiveDuration DefaultAutoArchiveDuration => (ThreadArchiveDuration)Model.DefaultAutoArchiveDuration;
+    public ThreadArchiveDuration DefaultAutoArchiveDuration => (ThreadArchiveDuration) Model.DefaultAutoArchiveDuration;
 
     public IReadOnlyCollection<ForumTag> AvailableTags { get; private set; }
 
     public int? ThreadCreationSlowmode => Model.DefaultThreadRateLimitPerUser;
 
-    public ILoadableEntity<IEmote> DefaultReactionEmoji => throw new NotImplementedException();
+    public DiscordEmojiId? DefaultReactionEmoji => Model.DefaultReactionEmoji;
 
-    public SortOrder? DefaultSortOrder => (SortOrder?)Model.DefaultSortOrder;
+    public SortOrder? DefaultSortOrder => (SortOrder?) Model.DefaultSortOrder;
 
     [ProxyInterface(typeof(IMediaChannelActor))]
     internal override RestMediaChannelActor Actor { get; }
@@ -64,23 +58,24 @@ public partial class RestMediaChannel :
 
     internal RestMediaChannel(
         DiscordRestClient client,
-        GuildIdentity guild,
         IGuildMediaChannelModel model,
-        RestMediaChannelActor? actor = null
-    ) : base(client, guild, model)
+        RestMediaChannelActor actor
+    ) : base(client, model, actor)
     {
         _model = model;
 
-        Actor = actor ?? new(client, guild, MediaChannelIdentity.Of(this));
+        Actor = actor;
 
         AvailableTags = model.AvailableTags
-            .Select(x => ForumTag.Construct(client, new ForumTag.Context(guild.Id), x))
+            .Select(x => ForumTag.Construct(client, x))
             .ToImmutableArray();
     }
 
-    public static RestMediaChannel Construct(DiscordRestClient client,
-        GuildIdentity guild, IGuildMediaChannelModel model)
-        => new(client, guild, model);
+    public static RestMediaChannel Construct(
+        DiscordRestClient client,
+        RestMediaChannelActor actor,
+        IGuildMediaChannelModel model
+    ) => new(client, model, actor);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IGuildMediaChannelModel model, CancellationToken token = default)
@@ -88,7 +83,7 @@ public partial class RestMediaChannel :
         if (!_model.AvailableTags.SequenceEqual(model.AvailableTags))
         {
             AvailableTags = model.AvailableTags
-                .Select(x => ForumTag.Construct(Client, new ForumTag.Context(Actor.Guild.Id), x))
+                .Select(x => ForumTag.Construct(Client, x))
                 .ToImmutableArray();
         }
 

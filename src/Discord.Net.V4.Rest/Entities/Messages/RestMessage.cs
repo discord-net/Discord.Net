@@ -10,10 +10,10 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestMessageActor :
-    RestActor<ulong, RestMessage, MessageIdentity>,
+    RestActor<RestMessageActor, ulong, RestMessage, IMessageModel>,
     IMessageActor
 {
-    [SourceOfTruth] public RestMessageChannelTrait Channel { get; }
+    [SourceOfTruth] public IRestMessageChannelTrait Channel { get; }
 
     internal override MessageIdentity Identity { get; }
 
@@ -31,7 +31,7 @@ public partial class RestMessageActor :
 
         GuildIdentity = guild;
 
-        Channel = new RestMessageChannelTrait(
+        Channel = channel.Actor ?? new RestMessageChannelTrait(
             client,
             channel.Actor as RestChannelActor ?? client.Channels[channel.Id],
             channel

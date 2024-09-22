@@ -16,7 +16,7 @@ namespace Discord;
 ]
 public partial interface IStageChannelActor :
     IVoiceChannelActor,
-    IChannelFollowerIntegrationChannelTrait,
+    IIntegrationChannelTrait.WithChannelFollower,
     IStageInstanceRelationship,
     IActor<ulong, IStageChannel>,
     IEntityProvider<IStageInstance, IStageInstanceModel>

@@ -5,7 +5,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestVoiceStateActor :
-    RestActor<ulong, RestVoiceState, VoiceStateIdentity>,
+    RestActor<RestVoiceStateActor, ulong, RestVoiceState, IVoiceStateModel>,
     IVoiceStateActor
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
@@ -14,20 +14,22 @@ public partial class RestVoiceStateActor :
 
     internal override VoiceStateIdentity Identity { get; }
 
-    public RestVoiceStateActor(DiscordRestClient client,
+    public RestVoiceStateActor(
+        DiscordRestClient client,
         GuildIdentity guild,
         VoiceStateIdentity voiceState,
-        MemberIdentity? member = null) : base(client, voiceState)
+        MemberIdentity? member = null
+    ) : base(client, voiceState)
     {
         Identity = voiceState | this;
 
-        Guild = guild.Actor ?? new(client, guild);
-        Member = member?.Actor ?? new(client, guild, MemberIdentity.Of(voiceState.Id));
+        Guild = client.Guilds[guild];
+        Member = Guild.Members[member | voiceState];
     }
 
     [SourceOfTruth]
-    internal virtual RestVoiceState CreateEntity(IVoiceStateModel model)
-        => RestVoiceState.Construct(Client, new(Guild.Identity, Member.Identity), model);
+    internal override RestVoiceState CreateEntity(IVoiceStateModel model)
+        => RestVoiceState.Construct(Client, this, model);
 }
 
 [ExtendInterfaceDefaults]
@@ -62,29 +64,34 @@ public partial class RestVoiceState :
 
     internal IVoiceStateModel Model { get; }
 
-    public RestVoiceState(
+    internal RestVoiceState(
         DiscordRestClient client,
-        GuildIdentity guild,
         IVoiceStateModel model,
-        RestVoiceStateActor? actor = null,
-        MemberIdentity? member = null
+        RestVoiceStateActor actor
     ) : base(client, model.Id)
     {
         Model = model;
-        Actor = actor ?? new(client, guild, VoiceStateIdentity.Of(this), member);
+        Actor = actor;
 
         Channel = model.ChannelId.Map(
-            static (id, client, guild) => new RestVoiceChannelActor(client, guild, VoiceChannelIdentity.Of(id)),
-            client,
-            guild
+            static (id, actor) => actor.Guild.Channels.Voice[id],
+            actor
         );
     }
 
-    public static RestVoiceState Construct(DiscordRestClient client, Context context, IVoiceStateModel model)
+    public static RestVoiceState Construct(
+        DiscordRestClient client,
+        RestVoiceStateActor actor,
+        IVoiceStateModel model)
     {
-        return model.UserId == client.CurrentUser.Id
-            ? RestCurrentUserVoiceState.Construct(client, context, model)
-            : new RestVoiceState(client, context.Guild, model, member: context.Member);
+        return model.UserId == client.Users.Current.Id
+            ? RestCurrentUserVoiceState
+                .Construct(
+                    client,
+                    actor as RestCurrentUserVoiceStateActor ?? actor.Guild.Members.Current.VoiceState,
+                    model
+                )
+            : new RestVoiceState(client, model, actor);
     }
 
     public ValueTask UpdateAsync(IVoiceStateModel model, CancellationToken token = default)

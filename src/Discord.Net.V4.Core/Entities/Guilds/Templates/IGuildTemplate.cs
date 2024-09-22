@@ -9,9 +9,8 @@ namespace Discord;
 ]
 public partial interface IGuildTemplate :
     IEntity<string, IGuildTemplateModel>,
-    IGuildTemplateActor
+    IGuildTemplateFromGuildActor
 {
-    IGuildActor SourceGuild { get; }
     IUserActor Creator { get; }
     
     string Name { get; }

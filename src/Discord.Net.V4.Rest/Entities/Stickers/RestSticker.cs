@@ -6,7 +6,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestStickerActor :
-    RestActor<ulong, RestSticker, StickerIdentity>,
+    RestActor<RestStickerActor, ulong, RestSticker, IStickerModel>,
     IStickerActor
 {
     internal override StickerIdentity Identity { get; }
@@ -21,19 +21,18 @@ public partial class RestStickerActor :
     }
 
     [SourceOfTruth]
-    internal RestSticker CreateEntity(IStickerModel model)
-        => RestSticker.Construct(Client, model);
+    internal override RestSticker CreateEntity(IStickerModel model)
+        => RestSticker.Construct(Client, this, model);
 }
 
 public partial class RestSticker :
     RestEntity<ulong>,
     ISticker,
-    IConstructable<RestSticker, IStickerModel, DiscordRestClient>,
     IRestConstructable<RestSticker, RestStickerActor, IStickerModel>
 {
     public string Name => Model.Name;
 
-    public StickerFormatType Format => (StickerFormatType)Model.FormatType;
+    public StickerFormatType Format => (StickerFormatType) Model.FormatType;
 
     [SourceOfTruth] public RestStickerPackActor? Pack { get; }
 
@@ -41,7 +40,7 @@ public partial class RestSticker :
 
     public IReadOnlyCollection<string> Tags { get; private set; }
 
-    public StickerType Type => (StickerType)Model.Type;
+    public StickerType Type => (StickerType) Model.Type;
 
     public int? SortOrder => Model.SortValue;
 
@@ -54,33 +53,29 @@ public partial class RestSticker :
     internal RestSticker(
         DiscordRestClient client,
         IStickerModel model,
-        RestStickerActor? actor = null,
-        StickerPackIdentity? pack = null
+        RestStickerActor actor
     ) : base(client, model.Id)
     {
         _model = model;
         Tags = model.Tags.Split(',').ToImmutableArray();
 
-        Actor = actor ?? new(client, StickerIdentity.Of(this));
+        Actor = actor;
 
-        Pack = pack?.Actor ?? (pack is not null
-            ? new RestStickerPackActor(client, pack)
-            : model.PackId.Map(
-                (id, client) => new RestStickerPackActor(client, StickerPackIdentity.Of(id)),
-                client
-            ));
+        Pack = model.PackId.HasValue
+            ? client.StickerPacks[model.PackId.Value]
+            : null;
     }
 
-    public static RestSticker Construct(DiscordRestClient client, IStickerModel model)
-        => Construct(client, null, model);
-
-    public static RestSticker Construct(DiscordRestClient client, StickerPackIdentity? pack, IStickerModel model)
+    public static RestSticker Construct(DiscordRestClient client, RestStickerActor actor, IStickerModel model)
     {
         return model switch
         {
-            IGuildStickerModel guildSticker
-                => RestGuildSticker.Construct(client, GuildIdentity.Of(guildSticker.GuildId), guildSticker),
-            _ => new RestSticker(client, model, pack: pack)
+            IGuildStickerModel guildSticker => RestGuildSticker.Construct(
+                client,
+                actor as RestGuildStickerActor ?? client.Guilds[guildSticker.GuildId].Stickers[model.Id],
+                guildSticker
+            ),
+            _ => new RestSticker(client, model, actor)
         };
     }
 

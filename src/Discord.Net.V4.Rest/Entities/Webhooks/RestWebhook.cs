@@ -21,12 +21,8 @@ public partial class RestWebhookActor :
     }
 
     [SourceOfTruth]
-    internal virtual RestWebhook CreateEntity(IWebhookModel model)
-        => RestWebhook.Construct(Client, model);
-
-    [SourceOfTruth]
-    internal RestWebhookMessage CreateEntity(IMessageModel model)
-        => RestWebhookMessage.Construct(Client, new(Webhook: Identity.MostSpecific(this)), model);
+    internal override RestWebhook CreateEntity(IWebhookModel model)
+        => RestWebhook.Construct(Client, this, model);
 }
 
 public partial class RestWebhook :
@@ -47,41 +43,59 @@ public partial class RestWebhook :
     [ProxyInterface(typeof(IWebhookActor))]
     internal virtual RestWebhookActor Actor { get; }
 
-    internal IWebhookModel Model { get; private set; }
+    internal virtual IWebhookModel Model => _model;
 
+    private IWebhookModel _model;
+    
     internal RestWebhook(
         DiscordRestClient client,
         IWebhookModel model,
-        RestWebhookActor? actor = null
+        RestWebhookActor actor
     ) : base(client, model.Id)
     {
-        Actor = actor ?? new(client, WebhookIdentity.Of(this));
-        Model = model;
+        Actor = actor;
+        _model = model;
     }
 
-    public static RestWebhook Construct(DiscordRestClient client, IWebhookModel model)
+    public static RestWebhook Construct(DiscordRestClient client, RestWebhookActor actor, IWebhookModel model)
     {
-        return (WebhookType)model.Type switch
+        switch (model)
         {
-            WebhookType.Incoming when model is {GuildId: not null, ChannelId: not null} =>
-                RestIncomingWebhook.Construct(
+            case IIncomingWebhookModel incomingModel:
+                return RestIncomingWebhook.Construct(
                     client,
-                    new(
-                        GuildIdentity.Of(model.GuildId.Value),
-                        TextChannelIdentity.Of(model.ChannelId.Value)
-                    ), model
-                ),
-            WebhookType.ChannelFollower when model is {GuildId: not null, ChannelId: not null} =>
-                RestChannelFollowerWebhook.Construct(
-                    client,
-                    new(
-                        GuildIdentity.Of(model.GuildId.Value),
-                        TextChannelIdentity.Of(model.ChannelId.Value)
-                    ),
+                    actor as RestIncomingWebhookActor,
                     model
-                ),
-            _ => new RestWebhook(client, model)
-        };
+                );
+            case IChannelFollowerWebhookModel followerModel:
+                return RestChannelFollowerWebhook.Construct(
+                    client,
+                    actor as RestChannelFollowerWebhookActor,
+                    followerModel
+                );
+            default: return new(client, model, actor);
+        }
+        // return (WebhookType)model.Type switch
+        // {
+        //     WebhookType.Incoming when model is {GuildId: not null, ChannelId: not null} =>
+        //         RestIncomingWebhook.Construct(
+        //             client,
+        //             new(
+        //                 GuildIdentity.Of(model.GuildId.Value),
+        //                 TextChannelIdentity.Of(model.ChannelId.Value)
+        //             ), model
+        //         ),
+        //     WebhookType.ChannelFollower when model is {GuildId: not null, ChannelId: not null} =>
+        //         RestChannelFollowerWebhook.Construct(
+        //             client,
+        //             new(
+        //                 GuildIdentity.Of(model.GuildId.Value),
+        //                 TextChannelIdentity.Of(model.ChannelId.Value)
+        //             ),
+        //             model
+        //         ),
+        //     _ => new RestWebhook(client, model)
+        // };
     }
 
     public virtual ValueTask UpdateAsync(IWebhookModel model, CancellationToken token = default)
@@ -92,10 +106,10 @@ public partial class RestWebhook :
             Client
         );
 
-        Model = model;
+        _model = model;
 
         return ValueTask.CompletedTask;
     }
 
-    public IWebhookModel GetModel() => Model;
+    public virtual IWebhookModel GetModel() => Model;
 }

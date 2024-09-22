@@ -6,7 +6,7 @@ namespace Discord.Rest;
 public partial class RestCategoryChannelActor :
     RestGuildChannelActor,
     ICategoryChannelActor,
-    IRestActor<ulong, RestCategoryChannel, CategoryChannelIdentity, IGuildCategoryChannelModel>
+    IRestActor<RestCategoryChannelActor, ulong, RestCategoryChannel, IGuildCategoryChannelModel>
 {
     [SourceOfTruth] internal override CategoryChannelIdentity Identity { get; }
 

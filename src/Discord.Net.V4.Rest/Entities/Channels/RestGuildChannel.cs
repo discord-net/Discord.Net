@@ -11,7 +11,7 @@ namespace Discord.Rest;
 public partial class RestGuildChannelActor :
     RestChannelActor,
     IGuildChannelActor,
-    IRestActor<ulong, RestGuildChannel, GuildChannelIdentity, IGuildChannelModel>
+    IRestActor<RestGuildChannelActor, ulong, RestGuildChannel, IGuildChannelModel>
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
 
@@ -27,32 +27,6 @@ public partial class RestGuildChannelActor :
         Identity = channel | this;
 
         Guild = guild.Actor ?? client.Guilds[guild.Id];
-
-        Invites = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(
-                client,
-                Template.Of<GuildChannelInviteIdentity>(),
-                guild,
-                channel
-            ),
-            Routes.GetChannelInvites(Id).AsRequiredProvider()
-        );
-
-        // Invites = new RestGuildChannelInviteLink.Enumerable.Indexable.BackLink<RestGuildChannelActor>(
-        //     this,
-        //     client,
-        //     new RestActorProvider<string, RestGuildChannelInviteActor>(
-        //         (client, id) => new RestGuildChannelInviteActor(
-        //             client,
-        //             guild,
-        //             Identity,
-        //             GuildChannelInviteIdentity.Of(id)
-        //         )
-        //     ),
-        //     Routes.GetChannelInvites(Id).AsRequiredProvider()
-        // );
     }
 
     [SourceOfTruth]
@@ -162,7 +136,7 @@ public partial class RestGuildChannel :
                         actor.Guild.Identity,
                         ThreadableChannelIdentity.Of(model.Id)
                     ),
-                    threadableChannelModel
+                    threadChannelModel
                 );
             default:
                 return new(client, model, actor);

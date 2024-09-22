@@ -7,20 +7,21 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest;
 
-using MessageChannelTrait = RestMessageChannelTrait<RestThreadChannelActor, ThreadIdentity>;
-
 [ExtendInterfaceDefaults]
 public partial class RestThreadChannelActor :
     RestChannelActor,
     IThreadChannelActor,
-    IRestActor<ulong, RestThreadChannel, ThreadIdentity, IThreadChannelModel>
+    IRestActor<RestThreadChannelActor, ulong, RestThreadChannel, IThreadChannelModel>,
+    IRestMessageChannelTrait
 {
-    [ProxyInterface(typeof(IMessageChannelTrait))]
-    internal MessageChannelTrait MessageChannelTrait { get; }
-
-    [SourceOfTruth] public virtual RestThreadMemberActor CurrentThreadMember { get; }
-
-    [SourceOfTruth] public virtual ThreadMemberLink.Enumerable.Indexable ThreadMembers { get; }
+    [SourceOfTruth]
+    public RestThreadMemberActor
+        .Enumerable
+        .Indexable
+        .WithCurrentMember
+        .WithPagedVariant
+        .BackLink<RestThreadChannelActor>
+        Members { get; }
 
     [SourceOfTruth] internal override ThreadIdentity Identity { get; }
 
@@ -28,88 +29,131 @@ public partial class RestThreadChannelActor :
     public RestThreadChannelActor(
         DiscordRestClient client,
         ThreadIdentity thread,
-        ThreadMemberIdentity? currentThreadMember = null
+        ThreadMemberIdentity? currentThreadMember = null,
+        IActorProvider<RestThreadMemberActor, ulong>? memberProvider = null
     ) : base(client, thread)
     {
         thread = Identity = thread | this;
 
-        MessageChannelTrait = new(client, this, thread);
+        memberProvider ??= RestActorProvider.GetOrCreate(
+            client,
+            Template.Of<ThreadMemberIdentity>(),
+            thread
+        );
 
-        CurrentThreadMember =
-            currentThreadMember?.Actor
-            ??
-            new RestThreadMemberActor(
+        Members = new(
+            this,
+            client,
+            memberProvider,
+            Routes
+                .ListThreadMembers(thread.Id)
+                .AsRequiredProvider(),
+            currentThreadMember?.Actor ?? new(
                 client,
                 thread,
-                currentThreadMember ?? ThreadMemberIdentity.Of(client.CurrentUser.Id),
-                client.CurrentUser.Identity
-            );
-
-        ThreadMembers = RestActors.Fetchable(
-            Template.T<RestThreadMemberActor>(),
-            client,
-            RestThreadMemberActor.Factory,
-            Guild.Identity,
-            thread,
-            entityFactory: RestThreadMember.Construct,
-            new RestThreadMember.Context(Guild.Identity, thread),
-            IThreadMember.FetchManyRoute(this)
+                currentThreadMember ?? ThreadMemberIdentity.Of(client.Users.Current.Id)
+            ),
+            new(
+                client,
+                memberProvider,
+                new RestPagingProvider<
+                    IThreadMemberModel,
+                    PageThreadMembersParams,
+                    RestThreadMember
+                >(
+                    client,
+                    (model, _) => Members![model.Id].CreateEntity(model),
+                    this
+                )
+            )
         );
     }
 
     [SourceOfTruth]
     [CovariantOverride]
     internal virtual RestThreadChannel CreateEntity(IThreadChannelModel model)
-        => RestThreadChannel.Construct(Client, new RestThreadChannel.Context(
-            Guild.Identity,
-            CurrentThreadMember.Identity
-        ), model);
+        => RestThreadChannel.Construct(Client, this, model);
 }
 
 public sealed partial class RestGuildThreadChannelActor :
-    RestThreadChannelActor,
+    RestGuildChannelActor,
     IGuildThreadChannelActor,
-    IRestActor<ulong, RestThreadChannel, GuildThreadIdentity, IThreadChannelModel>
+    IRestActor<RestGuildThreadChannelActor, ulong, RestThreadChannel, IThreadChannelModel>,
+    IRestMessageChannelTrait
 {
     [SourceOfTruth]
-    public override RestGuildThreadMemberActor CurrentThreadMember { get; }
+    public RestGuildThreadMemberActor
+        .Enumerable
+        .Indexable
+        .WithCurrentMember
+        .WithPagedVariant
+        .BackLink<RestGuildThreadChannelActor>
+        Members { get; }
     
-    [SourceOfTruth]
-    public override GuildThreadMemberLink.Enumerable.Indexable.BackLink<RestGuildThreadChannelActor> ThreadMembers { get; }
-    
-    [SourceOfTruth] public RestGuildActor Guild { get; }
-
     [SourceOfTruth] internal override GuildThreadIdentity Identity { get; }
 
+    [TypeFactory(LastParameter = nameof(thread))]
     public RestGuildThreadChannelActor(
         DiscordRestClient client,
         GuildIdentity guild,
         GuildThreadIdentity thread,
-        ThreadMemberIdentity? currentThreadMember = null
-    ) : base(client, thread)
+        GuildThreadMemberIdentity? currentThreadMember = null
+    ) : base(client, guild, thread)
     {
         Identity = thread;
-        Guild = guild.Actor ?? client.Guilds[guild.Id];
-    }
 
-    internal void UpdateCurrentMember(IThreadMemberModel model)
-    {
-        CurrentThreadMember.Identity
+        Members = new(
+            this,
+            client,
+            RestActorProvider.GetOrCreate(
+                client,
+                Template.Of<GuildThreadMemberIdentity>(),
+                guild,
+                thread
+            ),
+            Routes
+                .ListThreadMembers(thread.Id)
+                .AsRequiredProvider(),
+            currentThreadMember?.Actor ?? new(
+                client,
+                guild,
+                thread,
+                currentThreadMember ?? GuildThreadMemberIdentity.Of(client.Users.Current.Id)
+            ),
+            new(
+                client,
+                RestActorProvider.GetOrCreate(
+                    client,
+                    Template.Of<GuildThreadMemberIdentity>(),
+                    guild,
+                    thread
+                ),
+                new RestPagingProvider<
+                    IThreadMemberModel,
+                    PageThreadMembersParams,
+                    RestThreadMember
+                >(
+                    client,
+                    (model, _) => Members![model.Id].CreateEntity(model),
+                    this
+                )
+            )
+        );
     }
 
     [SourceOfTruth]
-    internal override RestThreadChannel CreateEntity(IThreadChannelModel model)
+    [CovariantOverride]
+    internal RestThreadChannel CreateEntity(IThreadChannelModel model)
         => RestThreadChannel.Construct(Client, this, model);
 }
 
 public partial class RestThreadChannel :
-    RestChannel,
+    RestGuildChannel,
     IThreadChannel,
+    IRestConstructable<RestThreadChannel, RestGuildThreadChannelActor, IThreadChannelModel>,
     IRestConstructable<RestThreadChannel, RestThreadChannelActor, IThreadChannelModel>
 {
     [SourceOfTruth] public RestThreadableChannelActor Parent { get; }
-
-    [SourceOfTruth] public RestGuildActor Guild { get; }
 
     [SourceOfTruth] public RestUserActor Creator { get; }
 
@@ -135,8 +179,8 @@ public partial class RestThreadChannel :
 
     public DateTimeOffset CreatedAt => Model.CreatedAt ?? SnowflakeUtils.FromSnowflake(Id);
 
-    [ProxyInterface(typeof(IThreadChannelActor))]
-    internal override RestThreadChannelActor Actor { get; }
+    [ProxyInterface(typeof(IGuildThreadChannelActor))]
+    internal override RestGuildThreadChannelActor Actor { get; }
 
     internal override IThreadChannelModel Model => _model;
 
@@ -144,17 +188,15 @@ public partial class RestThreadChannel :
 
     internal RestThreadChannel(
         DiscordRestClient client,
-        RestGuildActor guild,
-        RestThreadableChannelActor parent,
         IThreadChannelModel model,
-        RestThreadChannelActor actor
+        RestGuildThreadChannelActor actor
     ) : base(client, model, actor)
     {
         _model = model;
 
         Actor = actor;
-        Guild = guild;
-        Parent = parent;
+        Parent = Guild.Channels.Threadable[model.ParentId];
+        Creator = client.Users[model.OwnerId];
 
         AppliedTags = model.AppliedTags.ToImmutableArray();
     }
@@ -163,16 +205,18 @@ public partial class RestThreadChannel :
     public static RestThreadChannel Construct(
         DiscordRestClient client,
         RestThreadChannelActor actor,
-        IThreadChannelModel model)
-    {
-        var guild = actor is RestGuildThreadChannelActor guildThreadActor
-            ? guildThreadActor.Guild
-            : client.Guilds[model.GuildId];
-
-        var parent = guild.Channels.Threadable[model.ParentId];
-
-        return new RestThreadChannel(client, guild, parent, model, actor);
-    }
+        IThreadChannelModel model
+    ) => new(
+        client,
+        model,
+        client.Guilds[model.GuildId].Threads[model.Id]
+    );
+    
+    public static RestThreadChannel Construct(
+        DiscordRestClient client,
+        RestGuildThreadChannelActor actor,
+        IThreadChannelModel model
+    ) => new(client, model, actor);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IThreadChannelModel model, CancellationToken token = default)
@@ -186,19 +230,4 @@ public partial class RestThreadChannel :
     }
 
     public override IThreadChannelModel GetModel() => Model;
-
-    internal static ThreadMemberIdentity GetCurrentThreadMemberIdentity(
-        DiscordRestClient client,
-        GuildIdentity guild,
-        ThreadIdentity thread,
-        IThreadChannelModel? model)
-    {
-        return ThreadMemberIdentity.OfNullable(
-            model?.GetReferencedEntityModel<ulong, IThreadMemberModel>(client.CurrentUser.Id),
-            model => RestThreadMember.Construct(client, new RestThreadMember.Context(
-                guild,
-                thread
-            ), model)
-        ) ?? ThreadMemberIdentity.Of(client.CurrentUser.Id);
-    }
 }

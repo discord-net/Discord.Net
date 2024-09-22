@@ -3,20 +3,15 @@ using Discord.Models.Json;
 
 namespace Discord.Rest;
 
-using MessageChannelTrait = RestMessageChannelTrait<RestGroupChannelActor, GroupChannelIdentity>;
-
 [ExtendInterfaceDefaults]
 public partial class RestGroupChannelActor :
     RestChannelActor,
     IGroupChannelActor,
-    IRestActor<ulong, RestGroupChannel, GroupChannelIdentity, IGroupDMChannelModel>
+    IRestActor<RestGroupChannelActor, ulong, RestGroupChannel, IGroupDMChannelModel>,
+    IRestMessageChannelTrait,
+    IRestChannelInvitableTrait
 {
-    [SourceOfTruth] public ChannelInviteLinkType.Enumerable.Indexable Invites { get; }
-
     [SourceOfTruth] public RestUserActor.Indexable.BackLink<RestGroupChannelActor> Recipients { get; }
-
-    [ProxyInterface(typeof(IMessageChannelTrait))]
-    internal MessageChannelTrait MessageChannelTrait { get; }
 
     [SourceOfTruth] internal sealed override GroupChannelIdentity Identity { get; }
 
@@ -28,19 +23,7 @@ public partial class RestGroupChannelActor :
     {
         Identity = channel | this;
 
-        MessageChannelTrait = new(client, this, channel);
-
         Recipients = new(this, client, client.Users);
-
-        Invites = new RestChannelInviteActor.Enumerable.Indexable(
-            client,
-            RestActorProvider.GetOrCreate(
-                client,
-                Template.Of<ChannelInviteIdentity>(),
-                (ChannelIdentity)Identity
-            ),
-            Routes.GetChannelInvites(Id).AsRequiredProvider()
-        );
     }
 
     [SourceOfTruth]

@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Rest;
 
 namespace Discord;
@@ -5,7 +6,11 @@ namespace Discord;
 [FetchableOfMany(nameof(Routes.GetGuildWebhooks))]
 public partial interface IIncomingWebhook :
     IWebhook,
-    IIncomingWebhookWithTokenActor
+    IIncomingWebhookWithTokenActor,
+    ISnowflakeEntity<IIncomingWebhookModel>
 {
     string? Url { get; }
+
+    [SourceOfTruth]
+    new IIncomingWebhookModel GetModel();
 }

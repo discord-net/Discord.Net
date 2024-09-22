@@ -13,6 +13,9 @@ public sealed partial class RestGuildActor :
     IGuildActor
 {
     [SourceOfTruth]
+    public RestGuildTemplateFromGuildActor.Enumerable.Indexable.BackLink<RestGuildActor> Templates { get; }
+    
+    [SourceOfTruth]
     public RestGuildChannelActor.Enumerable.Indexable.Hierarchy.BackLink<RestGuildActor> Channels { get; }
 
     [SourceOfTruth] public RestGuildThreadChannelActor.Indexable.WithActive.BackLink<RestGuildActor> Threads { get; }
@@ -20,7 +23,7 @@ public sealed partial class RestGuildActor :
     [SourceOfTruth] public RestBanActor.Paged<PageGuildBansParams>.Indexable.BackLink<RestGuildActor> Bans { get; }
 
     [SourceOfTruth]
-    public RestMemberActor.Paged<PageGuildMembersParams>.Indexable.BackLink<RestGuildActor> Members { get; }
+    public RestMemberActor.Paged<PageGuildMembersParams>.Indexable.WithCurrent.BackLink<RestGuildActor> Members { get; }
 
     [SourceOfTruth] public RestGuildEmoteActor.Enumerable.Indexable.BackLink<RestGuildActor> Emotes { get; }
     [SourceOfTruth] public RestRoleActor.Enumerable.Indexable.BackLink<RestGuildActor> Roles { get; }
@@ -31,7 +34,6 @@ public sealed partial class RestGuildActor :
 
     [SourceOfTruth] public RestGuildInviteActor.Enumerable.Indexable.BackLink<RestGuildActor> Invites { get; }
     [SourceOfTruth] public RestWebhookActor.Enumerable.Indexable.BackLink<RestGuildActor> Webhooks { get; }
-    [SourceOfTruth] public RestCurrentMemberActor.BackLink<RestGuildActor> CurrentMember { get; }
 
     internal override GuildIdentity Identity { get; }
 
@@ -69,10 +71,6 @@ public sealed partial class RestGuild :
     [SourceOfTruth] public RestTextChannelActor? PublicUpdatesChannel { get; private set; }
 
     [SourceOfTruth] public RestMemberActor Owner { get; private set; }
-
-    [SourceOfTruth] public ManagedRolesActor Roles { get; }
-    [SourceOfTruth] public ManagedEmotesActor Emotes { get; }
-    [SourceOfTruth] public ManagedStickersActor Stickers { get; }
 
     public int AFKTimeout => Model.AFKTimeout;
 
@@ -131,49 +129,18 @@ public sealed partial class RestGuild :
     {
         _model = model;
         Actor = actor;
-
-        if (
-            model is not (
-            IModelSourceOfMultiple<IRoleModel> roles and
-            IModelSourceOfMultiple<IGuildStickerModel> stickers and
-            IModelSourceOfMultiple<ICustomEmoteModel> emotes
-            )
-        ) throw new ArgumentException($"{nameof(model)} must provide a collection of roles, stickers, and emotes.");
-
+        
         var identity = GuildIdentity.Of(this);
 
-        Emotes = RestManagedEnumerableActor.Create(
-            Template.T<RestGuildEmoteActor>(),
-            client,
-            emotes.GetModels(),
-            RestGuildEmoteActor.Factory,
-            identity,
-            entityFactory: RestGuildEmote.Construct,
-            identity,
-            IGuildEmote.FetchManyRoute(this)
-        );
+        if (model is IModelSourceOfMultiple<IRoleModel> roles)
+            actor.Roles.AddModelSources(Discord.Template.Of<RoleIdentity>(), roles);
 
-        Stickers = RestManagedEnumerableActor.Create(
-            Template.T<RestGuildStickerActor>(),
-            client,
-            stickers.GetModels(),
-            RestGuildStickerActor.Factory,
-            identity,
-            entityFactory: RestGuildSticker.Construct,
-            identity,
-            IGuildSticker.FetchManyRoute(this)
-        );
+        if (model is IModelSourceOfMultiple<ICustomEmoteModel> emotes)
+            actor.Emotes.AddModelSources(Discord.Template.Of<GuildEmoteIdentity>(), emotes);
 
-        Roles = RestManagedEnumerableActor.Create(
-            Template.T<RestRoleActor>(),
-            client,
-            roles.GetModels(),
-            RestRoleActor.Factory,
-            identity,
-            entityFactory: RestRole.Construct,
-            identity,
-            IRole.FetchManyRoute(this)
-        );
+        if (model is IModelSourceOfMultiple<IGuildStickerModel> stickers)
+            actor.Stickers.AddModelSources(Discord.Template.Of<GuildStickerIdentity>(), stickers);
+       
 
         AFKChannel = model.AFKChannelId
             .Map(

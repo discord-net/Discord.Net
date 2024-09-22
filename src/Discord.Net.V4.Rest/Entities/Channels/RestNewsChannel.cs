@@ -8,10 +8,9 @@ namespace Discord.Rest;
 public partial class RestNewsChannelActor :
     RestTextChannelActor,
     INewsChannelActor,
-    IRestActor<ulong, RestNewsChannel, NewsChannelIdentity, IGuildNewsChannelModel>
+    IRestActor<RestNewsChannelActor, ulong, RestNewsChannel, IGuildNewsChannelModel>
 {
-    [SourceOfTruth]
-    internal override NewsChannelIdentity Identity { get; }
+    [SourceOfTruth] internal override NewsChannelIdentity Identity { get; }
 
     [TypeFactory]
     public RestNewsChannelActor(
@@ -26,7 +25,7 @@ public partial class RestNewsChannelActor :
     [SourceOfTruth]
     [CovariantOverride]
     internal RestNewsChannel CreateEntity(IGuildNewsChannelModel model)
-        => RestNewsChannel.Construct(Client, Guild.Identity, model);
+        => RestNewsChannel.Construct(Client, this, model);
 }
 
 public partial class RestNewsChannel :
@@ -46,18 +45,19 @@ public partial class RestNewsChannel :
 
     internal RestNewsChannel(
         DiscordRestClient client,
-        GuildIdentity guild,
         IGuildNewsChannelModel model,
-        RestNewsChannelActor? actor = null
-    ) : base(client, guild, model)
+        RestNewsChannelActor actor
+    ) : base(client, model, actor)
     {
         _model = model;
-
-        Actor = actor ?? new(client, guild, NewsChannelIdentity.Of(this));
+        Actor = actor;
     }
 
-    public static RestNewsChannel Construct(DiscordRestClient client, GuildIdentity guild, IGuildNewsChannelModel model)
-        => new(client, guild, model);
+    public static RestNewsChannel Construct(
+        DiscordRestClient client,
+        RestNewsChannelActor actor,
+        IGuildNewsChannelModel model
+    ) => new(client, model, actor);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IGuildNewsChannelModel model, CancellationToken token = default)

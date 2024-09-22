@@ -6,7 +6,7 @@ namespace Discord.Rest;
 public sealed partial class RestGuildChannelInviteActor :
     RestInviteActor,
     IGuildChannelInviteActor,
-    IRestActor<string, RestGuildChannelInvite, GuildChannelInviteIdentity, IInviteModel>
+    IRestActor<RestGuildChannelInviteActor, string, RestGuildChannelInvite, IInviteModel>
 {
     [SourceOfTruth] public RestGuildChannelActor Channel { get; }
     

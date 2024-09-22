@@ -14,8 +14,8 @@ namespace Discord;
 public partial interface IThreadChannel :
     ISnowflakeEntity<IThreadChannelModel>,
     IMessageChannel,
-    IGuildRelationship,
-    IThreadChannelActor
+    IGuildChannel,
+    IGuildThreadChannelActor
 {
     [SourceOfTruth]
     new IThreadChannelModel GetModel();

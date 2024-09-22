@@ -5,7 +5,7 @@ namespace Discord.Rest;
 public partial class RestChannelInviteActor :
     RestInviteActor,
     IChannelInviteActor,
-    IRestActor<string, RestChannelInvite, ChannelInviteIdentity, IInviteModel>
+    IRestActor<RestChannelInviteActor, string, RestChannelInvite, IInviteModel>
 {
     [SourceOfTruth] public RestChannelActor Channel { get; }
 

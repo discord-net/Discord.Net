@@ -18,6 +18,5 @@ namespace Discord;
 public partial interface ITextChannelActor :
     IMessageChannelTrait,
     IThreadableChannelActor,
-    IChannelFollowerIntegrationChannelTrait,
-    IIncomingIntegrationChannelTrait,
+    IIntegrationChannelTrait.WithIncoming.WithChannelFollower,
     IActor<ulong, ITextChannel>;

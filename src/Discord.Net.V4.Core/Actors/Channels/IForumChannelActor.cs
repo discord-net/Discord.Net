@@ -18,5 +18,5 @@ namespace Discord;
 ]
 public partial interface IForumChannelActor :
     IThreadableChannelActor,
-    IIncomingIntegrationChannelTrait,
+    IIntegrationChannelTrait.WithIncoming,
     IActor<ulong, IForumChannel>;

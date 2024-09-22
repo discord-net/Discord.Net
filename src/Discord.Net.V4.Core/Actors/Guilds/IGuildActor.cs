@@ -33,7 +33,7 @@ public partial interface IGuildActor :
 
     [return: TypeHeuristic(nameof(Members))]
     IMemberActor Member(ulong id) => Members[id];
-    IMemberActor.PagedGuildMembers.Indexable.Hierarchy Members { get; }
+    IMemberActor.PagedGuildMembers.Indexable.WithCurrent Members { get; }
 
     [return: TypeHeuristic(nameof(Emotes))]
     IGuildEmoteActor Emote(ulong id) => Emotes[id];
@@ -61,6 +61,8 @@ public partial interface IGuildActor :
         RequestOptions? options = null,
         CancellationToken token = default)
     {   
+        Channels[123]
+        
         return Client.RestApiClient.ExecuteAsync(
             Routes.LeaveGuild(Id),
             options ?? Client.DefaultRequestOptions,

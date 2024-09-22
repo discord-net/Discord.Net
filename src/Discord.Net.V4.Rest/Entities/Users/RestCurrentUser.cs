@@ -8,7 +8,7 @@ namespace Discord.Rest;
 public partial class RestCurrentUserActor :
     RestUserActor,
     ICurrentUserActor,
-    IRestActor<ulong, RestCurrentUser, SelfUserIdentity, ISelfUserModel>
+    IRestActor<RestCurrentUserActor, ulong, RestCurrentUser, ISelfUserModel>
 {
     [SourceOfTruth] internal override SelfUserIdentity Identity { get; }
 

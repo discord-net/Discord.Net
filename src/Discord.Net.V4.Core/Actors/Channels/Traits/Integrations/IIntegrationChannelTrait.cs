@@ -14,4 +14,16 @@ public partial interface IIntegrationChannelTrait :
 
     [SourceOfTruth]
     internal new IIntegrationChannel CreateEntity(IGuildChannelModel model);
+
+    
+    
+    
+    [TraitComponent, TraitLinkExtends(nameof(Webhooks), typeof(IGuildChannelWebhookActor.WithIncoming))]
+    private interface WithIncomingComponent : IIntegrationChannelTrait;
+
+    [
+        TraitComponent(Parent = typeof(WithIncomingComponent)), 
+        TraitLinkExtends(nameof(Webhooks), typeof(IGuildChannelWebhookActor.WithChannelFollower))
+    ]
+    private interface WithChannelFollowerComponent : IIntegrationChannelTrait;
 }

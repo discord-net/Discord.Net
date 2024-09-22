@@ -58,13 +58,18 @@ public partial class RestChannel :
         {
             IDMChannelModel dmChannelModel => RestDMChannel.Construct(
                 client,
-                actor as RestDMChannelActor ?? client.Channels
+                actor as RestDMChannelActor ?? client.Channels.DM[model.Id],
                 dmChannelModel
             ),
-            IGroupDMChannelModel groupDMChannel => RestGroupChannel.Construct(client, groupDMChannel),
-            IGuildChannelModel guildChannelBase => RestGuildChannel.Construct(
+            IGroupDMChannelModel groupChannelModel => RestGroupChannel.Construct(
                 client,
-                GuildIdentity.Of(guildChannelBase.GuildId),
+                actor as RestGroupChannelActor ?? client.Channels.Group[model.Id],
+                groupChannelModel
+            ),
+            IGuildChannelModel guildChannelModel => RestGuildChannel.Construct(
+                client,
+                // TODO: client.Guilds[guildChannelBase.GuildId].Channels[model.Id] leads to bad cast later on
+                actor as RestGuildChannelActor ?? client.Guilds[guildChannelModel.GuildId].Channels[model.Id], 
                 model
             ),
             _ => new RestChannel(client, model, actor)

@@ -8,100 +8,79 @@ namespace Discord.Rest;
 public sealed partial class RestChannelFollowerWebhookActor :
     RestWebhookActor,
     IChannelFollowerWebhookActor,
-    IRestActor<ulong, RestChannelFollowerWebhook, WebhookIdentity>
+    IRestActor<RestChannelFollowerWebhookActor, ulong, RestChannelFollowerWebhook, IChannelFollowerWebhookModel>
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
 
-    [SourceOfTruth] public RestChannelFollowerIntegrationChannelTrait Channel { get; }
+    [SourceOfTruth] public IRestChannelFollowerIntegrationChannelTrait Channel { get; }
 
     [SourceOfTruth]
-    internal override WebhookIdentity Identity { get; }
+    internal override ChannelFollowerWebhookIdentity Identity { get; }
 
     [TypeFactory]
     public RestChannelFollowerWebhookActor(
         DiscordRestClient client,
         GuildIdentity guild,
         ChannelFollowerIntegrationChannelIdentity channel,
-        WebhookIdentity webhook
+        ChannelFollowerWebhookIdentity webhook
     ) : base(client, webhook)
     {
         Identity = webhook | this;
 
         Guild = new RestGuildActor(client, guild);
-        Channel = new(client, Guild.Channels[channel.Id], channel);
+        Channel = 
+            channel.Actor 
+            ??
+            IRestChannelFollowerIntegrationChannelTrait.GetContainerized(Guild.Channels[channel.Id]);
     }
 
     [SourceOfTruth]
-    internal override RestChannelFollowerWebhook CreateEntity(IWebhookModel model)
-        => RestChannelFollowerWebhook.Construct(Client, new(Guild.Identity, Channel.Identity), model);
+    internal override RestChannelFollowerWebhook CreateEntity(IChannelFollowerWebhookModel model)
+        => RestChannelFollowerWebhook.Construct(Client, this, model);
 }
 
 public sealed partial class RestChannelFollowerWebhook :
     RestWebhook,
     IChannelFollowerWebhook,
-    IContextConstructable<RestChannelFollowerWebhook, IWebhookModel, RestChannelFollowerWebhook.Context,
-        DiscordRestClient>
+    IRestConstructable<RestChannelFollowerWebhook, RestChannelFollowerWebhookActor, IChannelFollowerWebhookModel>
 {
-    public readonly record struct Context(GuildIdentity Guild, ChannelFollowerIntegrationChannelIdentity Channel);
-
-    [SourceOfTruth] public RestGuildActor? SourceGuild { get; private set; }
+    [SourceOfTruth] public RestGuildActor SourceGuild => Client.Guilds[Model.SourceGuildId];
 
     public string? SourceGuildIcon => Model.SourceGuildIcon;
 
-    public string? SourceGuildName => Model.SourceGuildName;
+    public string SourceGuildName => Model.SourceGuildName;
 
-    [SourceOfTruth] public RestNewsChannelActor? SourceChannel { get; private set; }
+    [SourceOfTruth] public RestNewsChannelActor SourceChannel => SourceGuild.Channels.News[Model.SourceChannelId];
 
-    public string? SourceChannelName => Model.SourceChannelName;
+    public string SourceChannelName => Model.SourceChannelName;
 
     [ProxyInterface(typeof(IChannelFollowerWebhookActor))]
     internal override RestChannelFollowerWebhookActor Actor { get; }
 
+    internal override IChannelFollowerWebhookModel Model => _model;
+
+    private IChannelFollowerWebhookModel _model;
+
     internal RestChannelFollowerWebhook(
         DiscordRestClient client,
-        GuildIdentity guild,
-        ChannelFollowerIntegrationChannelIdentity channel,
-        IWebhookModel model,
-        RestChannelFollowerWebhookActor? actor = null
+        IChannelFollowerWebhookModel model,
+        RestChannelFollowerWebhookActor actor
     ) : base(client, model, actor)
     {
-        Actor = actor ?? new(client, guild, channel, WebhookIdentity.Of(this));
-
-        SourceGuild = model.SourceGuildId.Map(
-            static (id, client) => new RestGuildActor(client, GuildIdentity.Of(id)),
-            client
-        );
-
-        SourceChannel = model.SourceChannelId.Map(
-            static (id, client, guild) =>
-                guild is null
-                    ? null
-                    : new RestNewsChannelActor(client, guild, NewsChannelIdentity.Of(id)),
-            client,
-            SourceGuild?.Identity
-        );
+        _model = model;
+        Actor = actor;
     }
 
-    public static RestChannelFollowerWebhook Construct(DiscordRestClient client, Context context, IWebhookModel model)
-        => new(client, context.Guild, context.Channel, model);
+    public static RestChannelFollowerWebhook Construct(
+        DiscordRestClient client, 
+        RestChannelFollowerWebhookActor actor, 
+        IChannelFollowerWebhookModel model)
+        => new(client, model, actor);
 
-    public override ValueTask UpdateAsync(IWebhookModel model, CancellationToken token = default)
+    [CovariantOverride]
+    public ValueTask UpdateAsync(IChannelFollowerWebhookModel model, CancellationToken token = default)
     {
-        SourceGuild = SourceGuild.UpdateFrom(
-            model.SourceGuildId,
-            RestGuildActor.Factory,
-            Client
-        );
-
-        SourceChannel = SourceChannel.UpdateFrom(
-            model.SourceChannelId,
-            static (client, guild, channel) => guild is null
-                ? null!
-                : RestNewsChannelActor.Factory(client, guild, channel),
-            Client,
-            SourceGuild?.Identity
-        );
-
+        _model = model;
         return base.UpdateAsync(model, token);
     }
 }

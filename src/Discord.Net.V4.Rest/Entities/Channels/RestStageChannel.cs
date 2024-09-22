@@ -3,19 +3,14 @@ using Discord.Rest;
 
 namespace Discord.Rest;
 
-using ChannelFollowerIntegrationChannelTrait =
-    RestChannelFollowerIntegrationChannelTrait<RestStageChannelActor, RestStageChannel, StageChannelIdentity>;
-
 [ExtendInterfaceDefaults]
 public sealed partial class RestStageChannelActor :
     RestVoiceChannelActor,
     IStageChannelActor,
-    IRestActor<ulong, RestStageChannel, StageChannelIdentity, IGuildStageChannelModel>
+    IRestActor<RestStageChannelActor, ulong, RestStageChannel, IGuildStageChannelModel>,
+    IRestChannelFollowerIntegrationChannelTrait
 {
     [SourceOfTruth] public RestStageInstanceActor StageInstance { get; }
-
-    [ProxyInterface(typeof(IChannelFollowerIntegrationChannelTrait))]
-    internal ChannelFollowerIntegrationChannelTrait ChannelFollowerIntegrationChannelTrait {  get; }
 
     [SourceOfTruth] internal override StageChannelIdentity Identity { get; }
 
@@ -27,20 +22,20 @@ public sealed partial class RestStageChannelActor :
     ) : base(client, guild, channel)
     {
         Identity = channel | this;
-        StageInstance = new RestStageInstanceActor(client, Guild.Identity, Identity, StageInstanceIdentity.Of(channel.Id));
-
-        ChannelFollowerIntegrationChannelTrait = new(client, this, channel);
+        StageInstance =
+            new RestStageInstanceActor(client, Guild.Identity, Identity, StageInstanceIdentity.Of(channel.Id));
     }
 
     [SourceOfTruth]
     public RestStageChannel CreateEntity(IGuildStageChannelModel model)
-        => RestStageChannel.Construct(Client, Guild.Identity, model);
+        => RestStageChannel.Construct(Client, this, model);
 
     [SourceOfTruth]
     internal RestStageInstance CreateEntity(IStageInstanceModel model)
         => RestStageInstance.Construct(Client, new(Guild.Identity, Identity), model);
 }
 
+[ExtendInterfaceDefaults]
 public partial class RestStageChannel :
     RestVoiceChannel,
     IStageChannel,
@@ -59,19 +54,19 @@ public partial class RestStageChannel :
 
     internal RestStageChannel(
         DiscordRestClient client,
-        GuildIdentity guild,
         IGuildStageChannelModel model,
-        RestStageChannelActor? actor = null
-    ) : base(client, guild, model)
+        RestStageChannelActor actor
+    ) : base(client, model, actor)
     {
         _model = model;
-
-        Actor = actor ?? new(client, guild, StageChannelIdentity.Of(this));
+        Actor = actor;
     }
 
-    public static RestStageChannel Construct(DiscordRestClient client, GuildIdentity guild,
-        IGuildStageChannelModel model)
-        => new(client, guild, model);
+    public static RestStageChannel Construct(
+        DiscordRestClient client,
+        RestStageChannelActor actor,
+        IGuildStageChannelModel model
+    ) => new(client, model, actor);
 
     [CovariantOverride]
     public ValueTask UpdateAsync(IGuildStageChannelModel model, CancellationToken token = default)

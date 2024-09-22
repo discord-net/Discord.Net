@@ -4,6 +4,19 @@ namespace Discord.Net.Hanz.Utils;
 
 public static class TypeUtils
 {
+    public static IEnumerable<ITypeSymbol> SelfAndContaingTypes(ITypeSymbol symbol)
+    {
+        yield return symbol;
+
+        var current = symbol.ContainingType;
+
+        while (current is not null)
+        {
+            yield return current;
+            current = current.ContainingType;
+        }
+    }
+    
     public static IEnumerable<INamedTypeSymbol> AllDirectInterfaces(ITypeSymbol symbol)
     {
         return symbol.Interfaces.SelectMany(x => (INamedTypeSymbol[])[x, ..x.AllInterfaces]);
