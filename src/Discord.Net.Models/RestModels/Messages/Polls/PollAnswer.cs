@@ -2,11 +2,13 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public class PollAnswer
+public sealed class PollAnswer : IPollAnswerModel
 {
     [JsonPropertyName("answer_id")]
-    public uint AnswerId { get; set; }
+    public int Id { get; set; }
 
     [JsonPropertyName("poll_media")]
     public required PollMedia PollMedia { get; set; }
+
+    IPollMediaModel IPollAnswerModel.Media => PollMedia;
 }

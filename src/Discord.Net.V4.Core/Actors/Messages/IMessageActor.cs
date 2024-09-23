@@ -17,6 +17,7 @@ public partial interface IMessageActor :
     IChannelRelationship<IMessageChannelTrait, IMessageChannel>,
     IActor<ulong, IMessage>
 {
+    IPollActor Poll { get; }
     IReactionActor.Indexable.BackLink<IMessageActor> Reactions { get; }
 
     [BackLink<IGuildChannelActor>]

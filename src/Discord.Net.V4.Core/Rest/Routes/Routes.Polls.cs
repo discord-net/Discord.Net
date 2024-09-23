@@ -5,10 +5,10 @@ namespace Discord.Rest;
 
 public partial class Routes
 {
-    public static IApiOutRoute<PollAnswerVoters[]> GetPollAnswerVoters([IdHeuristic<IChannel>] ulong channelId,
-        [IdHeuristic<IMessage>] ulong messageId, ulong answerId,
+    public static IApiOutRoute<PollVoters> GetPollAnswerVoters([IdHeuristic<IChannel>] ulong channelId,
+        [IdHeuristic<IMessage>] ulong messageId, int answerId,
         ulong? afterId, int? limit) =>
-        new ApiOutRoute<PollAnswerVoters[]>(nameof(GetPollAnswerVoters), RequestMethod.Get,
+        new ApiOutRoute<PollVoters>(nameof(GetPollAnswerVoters), RequestMethod.Get,
             $"channels/{channelId}/polls/{messageId}/answers/{answerId}{RouteUtils.GetUrlEncodedQueryParams(("after", afterId), ("limit", limit))}",
             (ScopeType.Channel, channelId));
 

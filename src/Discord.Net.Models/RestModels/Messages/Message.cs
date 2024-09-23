@@ -4,14 +4,13 @@ namespace Discord.Models.Json;
 
 public sealed class Message :
     IMessageModel,
-    IModelSource,
     IModelSourceOfMultiple<IUserModel>,
     IModelSourceOfMultiple<IReactionModel>,
     IModelSourceOfMultiple<IAttachmentModel>,
     IModelSourceOf<IMessageModel?>,
     IModelSourceOf<IThreadChannelModel?>,
+    IModelSourceOf<IPollModel?>,
     IModelSourceOfMultiple<IStickerItemModel>
-
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -161,6 +160,9 @@ public sealed class Message :
 
         if(StickerItems.IsSpecified) foreach (var item in StickerItems.Value)
             yield return item;
+
+        if (Poll.IsSpecified)
+            yield return Poll.Value;
     }
 
     IEnumerable<IUserModel> IModelSourceOfMultiple<IUserModel>.GetModels()
@@ -184,4 +186,6 @@ public sealed class Message :
     IMessageModel? IModelSourceOf<IMessageModel?>.Model => ~ReferencedMessage;
 
     IThreadChannelModel? IModelSourceOf<IThreadChannelModel?>.Model => ~Thread;
+    
+    IPollModel? IModelSourceOf<IPollModel?>.Model => ~Poll;
 }

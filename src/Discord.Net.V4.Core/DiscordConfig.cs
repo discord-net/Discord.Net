@@ -39,6 +39,8 @@ public class DiscordConfig
     /// </returns>
     public const int DefaultRequestTimeout = 15000;
 
+    public const int MaxPollVotersPerBatch = 100;
+    
     public const int MaxThreadsPerBatch = 100;
 
     /// <summary>

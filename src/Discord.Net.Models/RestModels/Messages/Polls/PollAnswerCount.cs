@@ -2,15 +2,14 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-
-public class PollAnswerCount
+public sealed class PollAnswerCount : IPollAnswerCountModel
 {
     [JsonPropertyName("id")]
-    public ulong Id { get; set; }
-
+    public int Id { get; set; }
+    
     [JsonPropertyName("count")]
-    public uint Count { get; set; }
-
+    public int Count { get; set; }
+    
     [JsonPropertyName("me_voted")]
     public bool MeVoted { get; set; }
 }
